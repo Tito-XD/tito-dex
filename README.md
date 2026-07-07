@@ -75,3 +75,32 @@ Start here:
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
 - [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
+
+## Development
+
+Stack: **Capacitor + React + TypeScript + Vite** (Phase 2 mock app).
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- Android Studio (for building/running the Android shell)
+
+### Setup
+
+```bash
+npm install
+npm run dev
+```
+
+Open the local dev server URL (default `http://localhost:5173`) to preview the responsive mock UI in a browser.
+
+### Build & Android
+
+```bash
+npm run build          # typecheck + web production build
+npm run cap:sync       # build and sync web assets into android/
+npm run cap:android    # open Android Studio (after sync)
+```
+
+Mock data is hard-coded for SoulSilver / Goldenrod City (3 badges) per Phase 2 scope.
