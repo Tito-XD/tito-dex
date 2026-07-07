@@ -103,4 +103,21 @@ npm run cap:sync       # build and sync web assets into android/
 npm run cap:android    # open Android Studio (after sync)
 ```
 
+In Android Studio:
+
+1. Open the `android/` folder.
+2. Create/start an AVD (Pixel 5 or similar; API 34+ recommended).
+3. Run the `app` configuration on the emulator or a connected device.
+
+Command-line debug build (requires Android SDK + `android/local.properties`):
+
+```bash
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+cd android && ./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb shell am start -n com.tito.titodex/.MainActivity
+```
+
+Fonts are bundled locally (`@fontsource/nunito`) so the WebView does not depend on Google Fonts at runtime.
+
 Mock data is hard-coded for SoulSilver / Goldenrod City (3 badges) per Phase 2 scope.
