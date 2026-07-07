@@ -20,7 +20,7 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-body);
   color: var(--color-ink);
-  background: linear-gradient(165deg, var(--color-sky-blue) 0%, var(--color-slate-blue) 45%, var(--color-deep-blue) 100%);
+  background: var(--color-deep-blue);
   -webkit-font-smoothing: antialiased;
 }
 

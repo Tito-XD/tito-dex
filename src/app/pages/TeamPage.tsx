@@ -1,22 +1,20 @@
-import { AppHeader } from '../../components/AppHeader';
+import { ScreenLayout } from '../../components/layout/ScreenLayout';
 import { PartySummary } from '../../components/PartySummary';
 import { StickerCard } from '../../components/StickerCard';
-import { getCurrentJourney } from '../../features/journey/journeyStore';
+import { useJourney } from '../../features/journey/JourneyProvider';
 
 export function TeamPage() {
-  const journey = getCurrentJourney();
+  const journey = useJourney();
 
   return (
-    <div className="screen-page">
-      <AppHeader />
-      <h2 className="screen-page__title">Team — {journey.game}</h2>
+    <ScreenLayout title={`Team — ${journey.game}`}>
       <PartySummary party={journey.party} />
       <StickerCard>
-        <p style={{ margin: 0 }}>
+        <p className="screen-note">
           Party management will become editable in Phase 3. For now, this screen mirrors your SoulSilver
           mock party.
         </p>
       </StickerCard>
-    </div>
+    </ScreenLayout>
   );
 }

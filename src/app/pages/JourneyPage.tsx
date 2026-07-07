@@ -1,32 +1,30 @@
-import { AppHeader } from '../../components/AppHeader';
+import { ScreenLayout } from '../../components/layout/ScreenLayout';
 import { JourneyTimeline } from '../../components/JourneyTimeline';
 import { StickerCard } from '../../components/StickerCard';
-import { getCurrentJourney } from '../../features/journey/journeyStore';
+import { useJourney } from '../../features/journey/JourneyProvider';
 
 export function JourneyPage() {
-  const journey = getCurrentJourney();
+  const journey = useJourney();
 
   return (
-    <div className="screen-page">
-      <AppHeader />
-      <h2 className="screen-page__title">Journey — {journey.location}</h2>
+    <ScreenLayout title={`Journey — ${journey.location}`}>
       <JourneyTimeline entries={journey.timeline} nextReminder={journey.nextReminder} />
       <StickerCard>
         <div className="timeline-page__entry">
           <strong>Current location</strong>
-          <p style={{ margin: '4px 0 0' }}>{journey.location}</p>
+          <p className="screen-note screen-note--tight">{journey.location}</p>
         </div>
         <div className="timeline-page__entry">
           <strong>Play time</strong>
-          <p style={{ margin: '4px 0 0' }}>{journey.playTime}</p>
+          <p className="screen-note screen-note--tight">{journey.playTime}</p>
         </div>
         <div className="timeline-page__entry">
           <strong>Badges</strong>
-          <p style={{ margin: '4px 0 0' }}>
+          <p className="screen-note screen-note--tight">
             {journey.badges} / {journey.maxBadges}
           </p>
         </div>
       </StickerCard>
-    </div>
+    </ScreenLayout>
   );
 }

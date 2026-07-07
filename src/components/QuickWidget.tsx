@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 type QuickWidgetProps = {
   to: string;
   label: string;
-  icon: string;
+  icon: ReactNode;
 };
 
 export function QuickWidget({ to, label, icon }: QuickWidgetProps) {

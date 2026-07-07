@@ -3,6 +3,7 @@ import { DexPage } from './pages/DexPage';
 import { HomePage } from './pages/HomePage';
 import { JourneyPage } from './pages/JourneyPage';
 import { SearchPage } from './pages/SearchPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { TeamPage } from './pages/TeamPage';
 
 export function AppRoutes() {
@@ -13,6 +14,7 @@ export function AppRoutes() {
       <Route path="/journey" element={<JourneyPage />} />
       <Route path="/dex" element={<DexPage />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
     </Routes>
   );
 }
