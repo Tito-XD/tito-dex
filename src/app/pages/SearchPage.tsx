@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
-import { AppHeader } from '../../components/AppHeader';
+import { ScreenLayout } from '../../components/layout/ScreenLayout';
 import { StickerCard } from '../../components/StickerCard';
 import { dexMockData } from '../../features/dex/dexMockData';
-import { getCurrentJourney } from '../../features/journey/journeyStore';
+import { useJourney } from '../../features/journey/JourneyProvider';
 
 export function SearchPage() {
-  const journey = getCurrentJourney();
+  const journey = useJourney();
   const [query, setQuery] = useState('');
 
   const results = useMemo(() => {
@@ -20,9 +20,7 @@ export function SearchPage() {
   }, [query]);
 
   return (
-    <div className="screen-page">
-      <AppHeader />
-      <h2 className="screen-page__title">Search — {journey.game} context</h2>
+    <ScreenLayout title={`Search — ${journey.game}`}>
       <input
         className="search-input"
         type="search"
@@ -31,9 +29,14 @@ export function SearchPage() {
         onChange={(e) => setQuery(e.target.value)}
         aria-label="Search Pokémon"
       />
+      {!query && (
+        <StickerCard>
+          <p className="screen-note">Search mock Dex entries from your current journey context.</p>
+        </StickerCard>
+      )}
       {query && results.length === 0 && (
         <StickerCard>
-          <p style={{ margin: 0 }}>No matches in the current mock Dex data.</p>
+          <p className="screen-note">No matches in the current mock Dex data.</p>
         </StickerCard>
       )}
       {results.length > 0 && (
@@ -47,6 +50,6 @@ export function SearchPage() {
           ))}
         </div>
       )}
-    </div>
+    </ScreenLayout>
   );
 }

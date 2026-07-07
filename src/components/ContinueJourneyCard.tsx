@@ -16,6 +16,8 @@ export function ContinueJourneyCard({ journey }: ContinueJourneyCardProps) {
         <div className="continue-card__city">
           <span className="continue-card__tower" />
           <span className="continue-card__buildings" />
+          <span className="continue-card__star continue-card__star--1">★</span>
+          <span className="continue-card__star continue-card__star--2">★</span>
         </div>
       </div>
       <div className="continue-card__meta">
@@ -34,6 +36,15 @@ export function ContinueJourneyCard({ journey }: ContinueJourneyCardProps) {
           </strong>
         </div>
       </div>
+      {journey.party.length > 0 && (
+        <div className="continue-card__party" aria-label="Party preview">
+          {journey.party.map((member) => (
+            <span key={member.species} className="continue-card__party-chip">
+              {member.nickname ?? member.species}
+            </span>
+          ))}
+        </div>
+      )}
       <button type="button" className="continue-card__cta">
         Continue
       </button>

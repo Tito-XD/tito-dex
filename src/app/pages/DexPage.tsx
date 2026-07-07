@@ -1,18 +1,17 @@
-import { AppHeader } from '../../components/AppHeader';
+import { ScreenLayout } from '../../components/layout/ScreenLayout';
 import { StickerCard } from '../../components/StickerCard';
 import { dexMockData } from '../../features/dex/dexMockData';
-import { getCurrentJourney } from '../../features/journey/journeyStore';
+import { useJourney } from '../../features/journey/JourneyProvider';
 
 export function DexPage() {
-  const journey = getCurrentJourney();
+  const journey = useJourney();
   const caughtCount = dexMockData.filter((e) => e.caught).length;
 
   return (
-    <div className="screen-page">
-      <AppHeader />
-      <h2 className="screen-page__title">
-        Dex — {journey.game} ({caughtCount}/{dexMockData.length} caught)
-      </h2>
+    <ScreenLayout title={`Dex — ${journey.game} (${caughtCount}/${dexMockData.length})`}>
+      <p className="screen-note screen-note--muted">
+        Mock Dex scoped to your current SoulSilver journey — not a full encyclopedia.
+      </p>
       <div className="dex-grid">
         {dexMockData.map((entry) => (
           <StickerCard
@@ -28,6 +27,6 @@ export function DexPage() {
           </StickerCard>
         ))}
       </div>
-    </div>
+    </ScreenLayout>
   );
 }
