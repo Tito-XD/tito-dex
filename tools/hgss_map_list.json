@@ -1,0 +1,2002 @@
+[
+{
+"name": "Mystery Zone",
+"code": "EVERYWHERE"
+},
+{
+"name": "Mystery Zone",
+"code": "NOTHING"
+},
+{
+"name": "Mystery Zone",
+"code": "UNION"
+},
+{
+"name": "Mystery Zone",
+"code": "UG"
+},
+{
+"name": "Mystery Zone",
+"code": "DIRECT2"
+},
+{
+"name": "Mystery Zone",
+"code": "DIRECT4"
+},
+{
+"name": "Bellchime Trail",
+"code": "D 17: R 11-01"
+},
+{
+"name": "Burned Tower",
+"code": "D 18: R 01-01"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: None None-None"
+},
+{
+"name": "Route 1",
+"code": "R 01: None None-None"
+},
+{
+"name": "Route 2",
+"code": "R 02: None None-None"
+},
+{
+"name": "Route 3",
+"code": "R 03: None None-None"
+},
+{
+"name": "Route 4",
+"code": "R 04: None None-None"
+},
+{
+"name": "Route 5",
+"code": "R 05: None None-None"
+},
+{
+"name": "Route 6",
+"code": "R 06: None None-None"
+},
+{
+"name": "Route 7",
+"code": "R 07: None None-None"
+},
+{
+"name": "Route 8",
+"code": "R 08: None None-None"
+},
+{
+"name": "Route 9",
+"code": "R 09: None None-None"
+},
+{
+"name": "Route 10",
+"code": "R 10: None None-None"
+},
+{
+"name": "Route 11",
+"code": "R 11: None None-None"
+},
+{
+"name": "Route 12",
+"code": "R 12: None None-None"
+},
+{
+"name": "Route 13",
+"code": "R 13: None None-None"
+},
+{
+"name": "Route 14",
+"code": "R 14: None None-None"
+},
+{
+"name": "Route 15",
+"code": "R 15: None None-None"
+},
+{
+"name": "Route 16",
+"code": "R 16: None None-None"
+},
+{
+"name": "Route 17",
+"code": "R 17: None None-None"
+},
+{
+"name": "Route 18",
+"code": "R 18: None None-None"
+},
+{
+"name": "Route 22",
+"code": "R 22: None None-None"
+},
+{
+"name": "Route 24",
+"code": "R 24: None None-None"
+},
+{
+"name": "Route 25",
+"code": "R 25: None None-None"
+},
+{
+"name": "Route 26",
+"code": "R 26: None None-None"
+},
+{
+"name": "Route 27",
+"code": "R 27: None None-None"
+},
+{
+"name": "Route 28",
+"code": "R 28: None None-None"
+},
+{
+"name": "Route 29",
+"code": "R 29: None None-None"
+},
+{
+"name": "Route 30",
+"code": "R 30: None None-None"
+},
+{
+"name": "Route 31",
+"code": "R 31: None None-None"
+},
+{
+"name": "Route 32",
+"code": "R 32: None None-None"
+},
+{
+"name": "Route 33",
+"code": "R 33: None None-None"
+},
+{
+"name": "Route 34",
+"code": "R 34: None None-None"
+},
+{
+"name": "Route 35",
+"code": "R 35: None None-None"
+},
+{
+"name": "Route 36",
+"code": "R 36: None None-None"
+},
+{
+"name": "Route 37",
+"code": "R 37: None None-None"
+},
+{
+"name": "Route 38",
+"code": "R 38: None None-None"
+},
+{
+"name": "Route 39",
+"code": "R 39: None None-None"
+},
+{
+"name": "Route 42",
+"code": "R 42: None None-None"
+},
+{
+"name": "Route 43",
+"code": "R 43: None None-None"
+},
+{
+"name": "Route 44",
+"code": "R 44: None None-None"
+},
+{
+"name": "Route 45",
+"code": "R 45: None None-None"
+},
+{
+"name": "Route 46",
+"code": "R 46: None None-None"
+},
+{
+"name": "Pallet Town",
+"code": "T 01: None None-None"
+},
+{
+"name": "Viridian City",
+"code": "T 02: None None-None"
+},
+{
+"name": "Pewter City",
+"code": "T 03: None None-None"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: None None-None"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: None None-None"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: None None-None"
+},
+{
+"name": "Celadon City",
+"code": "T 07: None None-None"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: None None-None"
+},
+{
+"name": "Cinnabar Island",
+"code": "T 09: None None-None"
+},
+{
+"name": "Indigo Plateau",
+"code": "T 10: None None-None"
+},
+{
+"name": "Saffron City",
+"code": "T 11: None None-None"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: None None-None"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 01-01"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 01-02"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 02-01"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 02-02"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 03-01"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 04-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: None None-None"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: FS 01-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: PC 01-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: R 03-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: R 04-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: R 05-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: None None-None"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: None None-None"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: None None-None"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: None None-None"
+},
+{
+"name": "Olivine City",
+"code": "T 26: None None-None"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: None None-None"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: FS 01-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: GYM 01-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: PC 01-01"
+},
+{
+"name": "Jubilife City",
+"code": "T 27: R 01-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: R 02-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: R 08-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: R 04-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: R 05-01"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: None None-None"
+},
+{
+"name": "Lake of Rage",
+"code": "T 29: None None-None"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: None None-None"
+},
+{
+"name": "Mt. Silver",
+"code": "T 31: None None-None"
+},
+{
+"name": "Route 19",
+"code": "W 19: None None-None"
+},
+{
+"name": "Route 20",
+"code": "W 20: None None-None"
+},
+{
+"name": "Route 21",
+"code": "W 21: None None-None"
+},
+{
+"name": "Route 40",
+"code": "W 40: None None-None"
+},
+{
+"name": "Route 41",
+"code": "W 41: None None-None"
+},
+{
+"name": "National Park",
+"code": "D 22: R 01-01"
+},
+{
+"name": "Route 31",
+"code": "R 31: R 01-01"
+},
+{
+"name": "Route 32",
+"code": "R 32: R 01-01"
+},
+{
+"name": "Union Cave",
+"code": "D 25: R 01-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: R 01-01"
+},
+{
+"name": "Route 35",
+"code": "R 35: R 01-01"
+},
+{
+"name": "Route 35",
+"code": "R 35: R 02-01"
+},
+{
+"name": "Route 36",
+"code": "R 36: R 01-01"
+},
+{
+"name": "Route 36",
+"code": "R 36: R 02-01"
+},
+{
+"name": "Jubilife City",
+"code": "T 27: R 06-01"
+},
+{
+"name": "DIGLETT's Cave",
+"code": "D 01: R 01-01"
+},
+{
+"name": "Mt. Moon",
+"code": "D 02: R 01-01"
+},
+{
+"name": "Rock Tunnel",
+"code": "D 05: R 01-01"
+},
+{
+"name": "Pal Park",
+"code": "D 10: R 01-01"
+},
+{
+"name": "Sprout Tower",
+"code": "D 15: R 01-01"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-01"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-01"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 01-01"
+},
+{
+"name": "SLOWPOKE Well",
+"code": "D 26: R 01-01"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-01"
+},
+{
+"name": "Mahogany Town",
+"code": "D 35: R 01-01"
+},
+{
+"name": "Ilex Forest",
+"code": "D 36: R 01-01"
+},
+{
+"name": "Goldenrod Tunnel",
+"code": "D 37: R 01-01"
+},
+{
+"name": "Mt. Mortar",
+"code": "D 38: R 01-01"
+},
+{
+"name": "Ice Path",
+"code": "D 39: R 01-01"
+},
+{
+"name": "Whirl Islands",
+"code": "D 40: R 01-01"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-01"
+},
+{
+"name": "Dark Cave",
+"code": "D 42: R 01-01"
+},
+{
+"name": "Victory Road",
+"code": "D 43: R 01-01"
+},
+{
+"name": "Dragon's Den",
+"code": "D 44: R 01-01"
+},
+{
+"name": "Tohjo Falls",
+"code": "D 45: R 01-01"
+},
+{
+"name": "Route 30",
+"code": "R 30: R 01-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: PC 01-02"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: PC 01-03"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: PC 01-04"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: PC 01-05"
+},
+{
+"name": "Route 42",
+"code": "R 42: R 01-01"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: R 02-01"
+},
+{
+"name": "Route 29",
+"code": "R 29: R 01-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: GYM 01-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: GYM 01-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: GYM 01-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: GYM 01-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: GYM 01-01"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: GYM 01-01"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: GYM 01-01"
+},
+{
+"name": "Route 43",
+"code": "R 43: R 01-01"
+},
+{
+"name": "Route 30",
+"code": "R 30: R 02-01"
+},
+{
+"name": "Cherrygrove City",
+"code": "T 21: PC 01-02"
+},
+{
+"name": "Cerulean Cave",
+"code": "D 03: R 01-01"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-01"
+},
+{
+"name": "Viridian Forest",
+"code": "D 46: R 01-01"
+},
+{
+"name": "Power Plant",
+"code": "R 09: R 01-01"
+},
+{
+"name": "Route 36",
+"code": "T 22: R 07-01"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 22: R 02-01"
+},
+{
+"name": "Route 47",
+"code": "R 47: None None-None"
+},
+{
+"name": "Route 48",
+"code": "R 48: None None-None"
+},
+{
+"name": "Union Cave",
+"code": "D 25: R 01-02"
+},
+{
+"name": "Union Cave",
+"code": "D 25: R 01-03"
+},
+{
+"name": "Sprout Tower",
+"code": "D 15: R 01-02"
+},
+{
+"name": "Sprout Tower",
+"code": "D 15: R 01-03"
+},
+{
+"name": "Violet City",
+"code": "T 22: FS 01-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: PC 01-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: R 03-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: R 04-01"
+},
+{
+"name": "Jubilife City",
+"code": "T 22: R 05-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: R 06-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: R 02-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: R 05-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: FS 01-01"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: PC 01-01"
+},
+{
+"name": "Violet City",
+"code": "T 22: PC 01-02"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: PC 01-02"
+},
+{
+"name": "Route 32",
+"code": "R 32: PC 01-01"
+},
+{
+"name": "Route 32",
+"code": "R 32: PC 01-02"
+},
+{
+"name": "Route 34",
+"code": "R 34: R 02-01"
+},
+{
+"name": "Route 38",
+"code": "R 38: R 01-01"
+},
+{
+"name": "Safari Zone Gate",
+"code": "D 47: R 01-01"
+},
+{
+"name": "Safari Zone Gate",
+"code": "D 47: None None-None"
+},
+{
+"name": "Jubilife City",
+"code": "T 27: R 03-01"
+},
+{
+"name": "Dark Cave",
+"code": "D 42: R 01-02"
+},
+{
+"name": "SLOWPOKE Well",
+"code": "D 26: R 01-02"
+},
+{
+"name": "Victory Road",
+"code": "D 43: R 01-02"
+},
+{
+"name": "Victory Road",
+"code": "D 43: R 01-03"
+},
+{
+"name": "Azalea Town",
+"code": "T 23: GYM 01-02"
+},
+{
+"name": "SLOWPOKE Well",
+"code": "D 26: R 01-03"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 02-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 11-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 06-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: PC 01-01"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-02"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-03"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-04"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-05"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-06"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-02"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-03"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-04"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-05"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-06"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 05-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 05-02"
+},
+{
+"name": "Goldenrod Tunnel",
+"code": "D 37: R 01-02"
+},
+{
+"name": "Goldenrod City",
+"code": "D 37: R 01-03"
+},
+{
+"name": "Goldenrod City",
+"code": "D 37: R 01-04"
+},
+{
+"name": "Goldenrod City",
+"code": "D 37: R 01-05"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 04-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 03-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 08-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 09-01"
+},
+{
+"name": "Global Terminal",
+"code": "T 25: R 12-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-02"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-03"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-04"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-05"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 13-06"
+},
+{
+"name": "Route 39",
+"code": "R 39: R 01-01"
+},
+{
+"name": "Route 39",
+"code": "R 39: R 02-01"
+},
+{
+"name": "Ecruteak City",
+"code": "T 27: R 02-02"
+},
+{
+"name": "Burned Tower",
+"code": "D 18: R 01-02"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: PC 01-02"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-02"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-03"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-04"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-05"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-06"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-07"
+},
+{
+"name": "Olivine City",
+"code": "T 26: PC 01-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: FS 01-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: R 03-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: R 05-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: R 06-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: R 07-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: R 02-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: R 05-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: R 06-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: R 07-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: PC 01-01"
+},
+{
+"name": "Ice Path",
+"code": "D 39: R 01-02"
+},
+{
+"name": "Ice Path",
+"code": "D 39: R 01-03"
+},
+{
+"name": "Ice Path",
+"code": "D 39: R 01-04"
+},
+{
+"name": "Olivine City",
+"code": "P 01: R 01-01"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: PC 01-02"
+},
+{
+"name": "Whirl Islands",
+"code": "D 40: R 01-02"
+},
+{
+"name": "Whirl Islands",
+"code": "D 40: R 01-04"
+},
+{
+"name": "Whirl Islands",
+"code": "D 40: R 01-07"
+},
+{
+"name": "Route 43",
+"code": "R 43: R 02-01"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: PC 01-01"
+},
+{
+"name": "Team Rocket HQ",
+"code": "D 35: R 01-02"
+},
+{
+"name": "Team Rocket HQ",
+"code": "D 35: R 01-03"
+},
+{
+"name": "Team Rocket HQ",
+"code": "D 35: R 01-04"
+},
+{
+"name": "Mt. Mortar",
+"code": "D 38: R 01-02"
+},
+{
+"name": "Mt. Mortar",
+"code": "D 38: R 01-03"
+},
+{
+"name": "Mt. Mortar",
+"code": "D 38: R 01-04"
+},
+{
+"name": "Dragon's Den",
+"code": "D 44: R 01-02"
+},
+{
+"name": "Fight Area",
+"code": "C 11: None None-None"
+},
+{
+"name": "Fight Area",
+"code": "C 11: PC 01-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: PC 01-02"
+},
+{
+"name": "Fight Area",
+"code": "C 11: FS 01-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: R 01-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: R 02-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: R 03-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: R 04-01"
+},
+{
+"name": "Fight Area",
+"code": "C 11: PC 01-03"
+},
+{
+"name": "Battle Park",
+"code": "D 31: None None-None"
+},
+{
+"name": "Battle Park",
+"code": "D 31: R 01-01"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-01"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-02"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-03"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-04"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-05"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-06"
+},
+{
+"name": "Battle Tower",
+"code": "D 31: R 02-07"
+},
+{
+"name": "Battle Frontier",
+"code": "D 32: None None-None"
+},
+{
+"name": "Battle Frontier",
+"code": "D 32: R 01-01"
+},
+{
+"name": "Battle Tower",
+"code": "D 32: R 02-01"
+},
+{
+"name": "Battle Factory",
+"code": "D 32: R 03-01"
+},
+{
+"name": "Battle Hall",
+"code": "D 32: R 04-01"
+},
+{
+"name": "Battle Castle",
+"code": "D 32: R 05-01"
+},
+{
+"name": "Battle Arcade",
+"code": "D 32: R 06-01"
+},
+{
+"name": "Cliff Edge Gate",
+"code": "D 48: R 01-01"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: None None-None"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-01"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-02"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-03"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-04"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-05"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-06"
+},
+{
+"name": "Pok\\xe9athlon Dome",
+"code": "D 49: R 01-07"
+},
+{
+"name": "Dragon's Den",
+"code": "D 44: R 01-03"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: R 02-01"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: R 03-01"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: R 06-01"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: FS 01-01"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: PC 01-01"
+},
+{
+"name": "Lake of Rage",
+"code": "T 29: R 01-01"
+},
+{
+"name": "Lake of Rage",
+"code": "T 29: R 02-01"
+},
+{
+"name": "Route 26",
+"code": "R 26: R 01-01"
+},
+{
+"name": "Route 26",
+"code": "R 26: R 02-01"
+},
+{
+"name": "Tohjo Falls",
+"code": "D 45: R 01-02"
+},
+{
+"name": "Route 26",
+"code": "R 22: R 01-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 01-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 02-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 03-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 04-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 05-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 06-01"
+},
+{
+"name": "Pok\\xe9mon League",
+"code": "T 10: R 07-01"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-01"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-02"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-03"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-04"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-05"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-02"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-03"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-04"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-05"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-06"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-07"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-08"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-09"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-10"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 01-02"
+},
+{
+"name": "Route 27",
+"code": "R 27: R 01-01"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-11"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-12"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-13"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-14"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-15"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-06"
+},
+{
+"name": "S.S. Aqua",
+"code": "P 01: R 03-07"
+},
+{
+"name": "Olivine City",
+"code": "P 01: R 01-02"
+},
+{
+"name": "Route 34",
+"code": "R 34: R 01-01"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-02"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-03"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-04"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-05"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-06"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-07"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-08"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-09"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-10"
+},
+{
+"name": "Bell Tower",
+"code": "D 17: R 01-12"
+},
+{
+"name": "Cliff Cave",
+"code": "D 50: R 01-01"
+},
+{
+"name": "Safari Zone",
+"code": "SAF01"
+},
+{
+"name": "Safari Zone",
+"code": "SAF02"
+},
+{
+"name": "Safari Zone",
+"code": "SAF03"
+},
+{
+"name": "Safari Zone",
+"code": "SAF04"
+},
+{
+"name": "Safari Zone",
+"code": "SAF05"
+},
+{
+"name": "Safari Zone",
+"code": "SAF06"
+},
+{
+"name": "Safari Zone",
+"code": "SAF07"
+},
+{
+"name": "Safari Zone",
+"code": "SAF08"
+},
+{
+"name": "Safari Zone",
+"code": "SAF09"
+},
+{
+"name": "Safari Zone",
+"code": "SAF10"
+},
+{
+"name": "Safari Zone",
+"code": "SAF11"
+},
+{
+"name": "Safari Zone",
+"code": "SAF12"
+},
+{
+"name": "Safari Zone",
+"code": "SAF13"
+},
+{
+"name": "Safari Zone",
+"code": "SAF14"
+},
+{
+"name": "Safari Zone",
+"code": "D 47: R 01-02"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: PC 01-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: PC 01-02"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: FS 01-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: R 01-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: R 03-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: R 04-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: R 06-01"
+},
+{
+"name": "Vermilion City",
+"code": "T 06: GYM 01-01"
+},
+{
+"name": "Route 40",
+"code": "W 40: R 01-01"
+},
+{
+"name": "Olivine City",
+"code": "T 26: PC 01-02"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: PC 01-02"
+},
+{
+"name": "Blackthorn City",
+"code": "T 30: PC 01-02"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-02"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-03"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-04"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-05"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-06"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-02"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-03"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-04"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-05"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 04-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 05-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 07-01"
+},
+{
+"name": "New Bark Town",
+"code": "T 20: R 04-02"
+},
+{
+"name": "Cianwood City",
+"code": "T 24: R 08-01"
+},
+{
+"name": "Vermilion City",
+"code": "P 01: R 01-03"
+},
+{
+"name": "Vermilion City",
+"code": "P 01: R 01-04"
+},
+{
+"name": "Route 10",
+"code": "R 10: R 01-01"
+},
+{
+"name": "Route 6",
+"code": "R 06: R 02-01"
+},
+{
+"name": "Route 8",
+"code": "R 08: R 02-01"
+},
+{
+"name": "Route 5",
+"code": "R 05: R 03-01"
+},
+{
+"name": "Route 15",
+"code": "R 15: R 01-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: PC 01-01"
+},
+{
+"name": "Celadon City",
+"code": "T 07: PC 01-02"
+},
+{
+"name": "Celadon City",
+"code": "T 07: GYM 01-01"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: GYM 01-02"
+},
+{
+"name": "Mahogany Town",
+"code": "T 28: GYM 01-03"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 01-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 05-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 06-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 06-02"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 07-01"
+},
+{
+"name": "ROTOM's Room",
+"code": "T 11: R 07-02"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 08-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 08-02"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 09-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: PC 01-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: PC 01-02"
+},
+{
+"name": "Saffron City",
+"code": "T 11: FS 01-01"
+},
+{
+"name": "Saffron City",
+"code": "T 11: GYM 01-01"
+},
+{
+"name": "Frontier Access",
+"code": "D 32: R 01-02"
+},
+{
+"name": "Global Terminal",
+"code": "T 25: R 12-02"
+},
+{
+"name": "Global Terminal",
+"code": "T 25: R 12-03"
+},
+{
+"name": "Route 2",
+"code": "R 02: R 01-01"
+},
+{
+"name": "Route 16",
+"code": "R 16: R 01-01"
+},
+{
+"name": "Route 20",
+"code": "W 20: R 01-01"
+},
+{
+"name": "Route 2",
+"code": "R 02: R 02-01"
+},
+{
+"name": "Route 2",
+"code": "R 02: R 03-01"
+},
+{
+"name": "Route 2",
+"code": "R 02: R 04-01"
+},
+{
+"name": "Route 2",
+"code": "R 02: R 05-01"
+},
+{
+"name": "Route 16",
+"code": "R 16: R 02-01"
+},
+{
+"name": "Route 16",
+"code": "R 16: R 03-01"
+},
+{
+"name": "Route 18",
+"code": "R 18: R 01-01"
+},
+{
+"name": "Route 19",
+"code": "W 19: R 01-01"
+},
+{
+"name": "Route 11",
+"code": "R 11: R 01-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: FS 01-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: GYM 01-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: PC 01-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: R 01-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: R 02-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: R 03-01"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: R 04-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: FS 01-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: PC 01-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: R 02-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: R 03-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: R 04-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: R 06-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: R 07-01"
+},
+{
+"name": "Route 25",
+"code": "R 25: R 01-01"
+},
+{
+"name": "Goldenrod City",
+"code": "T 25: R 10-07"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 01-07"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-06"
+},
+{
+"name": "Celadon City",
+"code": "T 07: R 02-07"
+},
+{
+"name": "Saffron City",
+"code": "T 11: R 07-03"
+},
+{
+"name": "Lighthouse",
+"code": "D 27: R 01-08"
+},
+{
+"name": "Radio Tower",
+"code": "D 23: R 01-07"
+},
+{
+"name": "Mt. Moon",
+"code": "D 02: R 01-02"
+},
+{
+"name": "Mt. Moon",
+"code": "D 02: R 01-03"
+},
+{
+"name": "Cerulean Cave",
+"code": "D 03: R 01-02"
+},
+{
+"name": "Cerulean Cave",
+"code": "D 03: R 01-03"
+},
+{
+"name": "Rock Tunnel",
+"code": "D 05: R 01-02"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-02"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-03"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-04"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-05"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-06"
+},
+{
+"name": "Seafoam Islands",
+"code": "D 11: R 01-07"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-02"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-03"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-04"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-05"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-06"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-07"
+},
+{
+"name": "Mt. Silver Cave",
+"code": "D 41: R 01-08"
+},
+{
+"name": "Route 10",
+"code": "R 10: PC 01-01"
+},
+{
+"name": "Power Plant",
+"code": "R 10: R 02-01"
+},
+{
+"name": "Route 5",
+"code": "R 05: R 01-01"
+},
+{
+"name": "Route 5",
+"code": "R 05: R 02-01"
+},
+{
+"name": "Route 6",
+"code": "R 06: R 01-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: R 01-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: R 02-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: GYM 01-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: FS 01-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: PC 01-01"
+},
+{
+"name": "Pewter City",
+"code": "T 03: PC 01-02"
+},
+{
+"name": "Pewter City",
+"code": "T 03: R 06-01"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: FS 01-01"
+},
+{
+"name": "Pal Park",
+"code": "T 08: R 02-01"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: GYM 01-01"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: R 04-01"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: PC 01-01"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: R 06-01"
+},
+{
+"name": "Route 10",
+"code": "R 10: PC 01-02"
+},
+{
+"name": "Fuchsia City",
+"code": "T 08: PC 01-02"
+},
+{
+"name": "Whirl Islands",
+"code": "D 40: R 01-06"
+},
+{
+"name": "National Park",
+"code": "D 22: R 01-02"
+},
+{
+"name": "National Park",
+"code": "D 22: R 01-03"
+},
+{
+"name": "Power Plant",
+"code": "R 10: R 02-02"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-16"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-17"
+},
+{
+"name": "Ruins of Alph",
+"code": "D 24: R 02-18"
+},
+{
+"name": "Route 7",
+"code": "R 07: R 01-01"
+},
+{
+"name": "Lavender Town",
+"code": "T 05: PC 01-02"
+},
+{
+"name": "Cerulean City",
+"code": "T 04: PC 01-02"
+},
+{
+"name": "Viridian City",
+"code": "T 02: GYM 01-01"
+},
+{
+"name": "Viridian City",
+"code": "T 02: R 02-01"
+},
+{
+"name": "Viridian City",
+"code": "T 02: R 03-01"
+},
+{
+"name": "Viridian City",
+"code": "T 02: R 03-02"
+}
+]
