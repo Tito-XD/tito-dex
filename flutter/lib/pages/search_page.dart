@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-import '../features/dex/dex_mock_data.dart';
+import '../features/dex/dex_models.dart';
+import '../features/dex/dex_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
+import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
 
 class SearchPage extends StatefulWidget {
@@ -19,32 +23,79 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _controller = TextEditingController();
+  Timer? _debounce;
+  bool _searching = false;
+  String? _error;
+  List<PokemonSummary> _results = const [];
+  Set<int> _caughtIds = const {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCaughtIds();
+  }
+
+  Future<void> _loadCaughtIds() async {
+    final caught = await dexRepository.journeyCaughtIds(widget.journey);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _caughtIds = caught);
+  }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  List<DexEntry> get _results {
-    final query = _controller.text.trim().toLowerCase();
-    if (query.isEmpty) {
-      return const [];
+  void _onQueryChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      _runSearch(value);
+    });
+  }
+
+  Future<void> _runSearch(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      setState(() {
+        _results = const [];
+        _searching = false;
+        _error = null;
+      });
+      return;
     }
-    return dexMockData
-        .where(
-          (entry) =>
-              entry.name.toLowerCase().contains(query) ||
-              entry.type.toLowerCase().contains(query) ||
-              entry.id.toString().contains(query) ||
-              localizeSpecies(entry.name).toLowerCase().contains(query),
-        )
-        .toList();
+
+    setState(() {
+      _searching = true;
+      _error = null;
+    });
+
+    try {
+      final results = await dexRepository.search(trimmed);
+      if (!mounted || _controller.text.trim() != trimmed) {
+        return;
+      }
+      setState(() {
+        _results = results;
+        _searching = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = error.toString();
+        _searching = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final results = _results;
+    final query = _controller.text.trim();
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -60,7 +111,7 @@ class _SearchPageState extends State<SearchPage> {
         const SizedBox(height: 12),
         TextField(
           controller: _controller,
-          onChanged: (_) => setState(() {}),
+          onChanged: _onQueryChanged,
           decoration: InputDecoration(
             hintText: AppZh.searchPlaceholder,
             filled: true,
@@ -75,19 +126,29 @@ class _SearchPageState extends State<SearchPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              borderSide: const BorderSide(color: TitoColors.softYellow, width: 3),
+              borderSide:
+                  const BorderSide(color: TitoColors.softYellow, width: 3),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        if (_controller.text.isEmpty)
+        if (query.isEmpty)
           StickerCard(
             child: Text(
               AppZh.searchEmptyHint,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           )
-        else if (results.isEmpty)
+        else if (_searching)
+          const Center(child: CircularProgressIndicator())
+        else if (_error != null)
+          StickerCard(
+            child: Text(
+              _error!,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          )
+        else if (_results.isEmpty)
           StickerCard(
             child: Text(
               AppZh.searchNoResults,
@@ -102,41 +163,15 @@ class _SearchPageState extends State<SearchPage> {
               maxCrossAxisExtent: 160,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 0.9,
+              childAspectRatio: 0.78,
             ),
-            itemCount: results.length,
+            itemCount: _results.length,
             itemBuilder: (context, index) {
-              final entry = results[index];
-              return StickerCard(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '#${entry.id.toString().padLeft(3, '0')}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: TitoColors.mutedInk,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      localizeSpecies(entry.name),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    Text(
-                      entry.type,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: TitoColors.mutedInk,
-                      ),
-                    ),
-                  ],
-                ),
+              final entry = _results[index];
+              final status = dexRepository.statusFor(entry.id, _caughtIds);
+              return PokemonMiniCard(
+                summary: entry,
+                status: status,
               );
             },
           ),

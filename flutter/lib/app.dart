@@ -13,6 +13,7 @@ import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'pages/dex_page.dart';
+import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
 import 'pages/search_page.dart';
@@ -51,6 +52,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
           builder: (context, state, child) {
             final onHome = state.uri.path == '/';
             final onSettings = state.uri.path == '/settings';
+            final onDexDetail = RegExp(r'^/dex/\d+$').hasMatch(state.uri.path);
             return PopScope(
               canPop: onHome,
               onPopInvokedWithResult: (didPop, result) {
@@ -59,6 +61,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 }
                 if (onSettings) {
                   context.go('/');
+                } else if (onDexDetail) {
+                  context.go('/dex');
                 } else if (!onHome) {
                   context.go('/');
                 }
@@ -92,6 +96,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
             GoRoute(
               path: '/dex',
               builder: (context, state) => DexPage(journey: _journey),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  builder: (context, state) => PokemonDetailPage(
+                    pokemonId: int.parse(state.pathParameters['id']!),
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '/search',
