@@ -101,6 +101,77 @@ DefensiveProfile computeDefensiveProfile(
   );
 }
 
+/// Per attack-type multiplier when hitting [defenderTypes] (0, 0.25, 0.5, 1, 2, 4).
+Map<String, double> computeDefensiveMultipliers(
+  List<String> defenderTypes,
+  Map<String, TypeDamageRelations> relationsByType,
+) {
+  final multipliers = <String, double>{};
+
+  for (final attackType in typeNamesZh.keys) {
+    var multiplier = 1.0;
+    for (final defenderType in defenderTypes) {
+      final relations = relationsByType[attackType];
+      if (relations == null) {
+        continue;
+      }
+      if (relations.noDamageTo.contains(defenderType)) {
+        multiplier = 0;
+        break;
+      }
+      if (relations.doubleDamageTo.contains(defenderType)) {
+        multiplier *= 2;
+      } else if (relations.halfDamageTo.contains(defenderType)) {
+        multiplier *= 0.5;
+      }
+    }
+    multipliers[attackType] = multiplier;
+  }
+
+  return multipliers;
+}
+
+String formatTypeMultiplier(double multiplier) {
+  if (multiplier == 0) {
+    return '0';
+  }
+  if (multiplier <= 0.25) {
+    return '1/4';
+  }
+  if (multiplier <= 0.5) {
+    return '1/2';
+  }
+  if (multiplier >= 4) {
+    return '4';
+  }
+  if (multiplier >= 2) {
+    return '2';
+  }
+  return '1';
+}
+
+/// Stable display order for the 18-type effectiveness grid.
+const typeGridOrder = <String>[
+  'normal',
+  'fire',
+  'water',
+  'electric',
+  'grass',
+  'ice',
+  'fighting',
+  'poison',
+  'ground',
+  'flying',
+  'psychic',
+  'bug',
+  'rock',
+  'ghost',
+  'dragon',
+  'dark',
+  'steel',
+  'fairy',
+];
+
 /// Offensive profile: types that [attackerTypes] hit for super-effective damage.
 List<String> computeStabSuperEffective(
   List<String> attackerTypes,

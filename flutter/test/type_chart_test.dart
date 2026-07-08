@@ -69,6 +69,14 @@ void main() {
   });
 
   test('dual-type combines multipliers', () {
+    final multipliers = computeDefensiveMultipliers(
+      ['grass', 'poison'],
+      relations,
+    );
+    expect(formatTypeMultiplier(multipliers['fire'] ?? 1), '2');
+  });
+
+  test('dual-type weaknesses list', () {
     final profile = computeDefensiveProfile(['grass', 'poison'], relations);
     expect(profile.weaknesses, contains('火'));
     expect(profile.weaknesses, contains('飞行'));

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
-import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
+import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
 
 class PokemonDetailPage extends StatefulWidget {
@@ -19,13 +19,22 @@ class PokemonDetailPage extends StatefulWidget {
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
 }
 
-class _PokemonDetailPageState extends State<PokemonDetailPage> {
+class _PokemonDetailPageState extends State<PokemonDetailPage>
+    with SingleTickerProviderStateMixin {
   late Future<PokemonDetail> _detailFuture;
+  late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
     _detailFuture = dexRepository.getDetail(widget.pokemonId);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -84,203 +93,42 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         }
 
         final detail = snapshot.data!;
-        final summary = detail.summary;
-        final heightM = detail.heightDm / 10;
-        final weightKg = detail.weightHg / 10;
 
-        return ListView(
-          padding: const EdgeInsets.all(16),
+        return Column(
           children: [
-            const AppHeader(showSettings: true),
-            StickerCard(
-              variant: StickerVariant.deep,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '#${summary.id.toString().padLeft(3, '0')}',
-                          style: const TextStyle(
-                            color: TitoColors.skyBlue,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          summary.nameZh,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                color: TitoColors.card,
-                                fontWeight: FontWeight.w900,
-                              ),
-                        ),
-                        if (detail.genusZh.isNotEmpty)
-                          Text(
-                            detail.genusZh,
-                            style: const TextStyle(
-                              color: TitoColors.skyBlue,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        const SizedBox(height: 8),
-                        TypeChipRow(
-                          types: summary.types.map(typeNameZh).toList(),
-                          typeKeys: summary.types,
-                        ),
-                      ],
-                    ),
-                  ),
-                  DexSpriteImage(
-                    source: summary.displaySpritePath,
-                    width: 120,
-                    height: 120,
+                  const AppHeader(showSettings: true),
+                  PokemonDetailHeader(detail: detail),
+                  const SizedBox(height: 8),
+                  TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    labelColor: TitoColors.coral,
+                    unselectedLabelColor: TitoColors.card,
+                    indicatorColor: TitoColors.coral,
+                    dividerColor: Colors.transparent,
+                    tabs: const [
+                      Tab(text: AppZh.dexTabIntro),
+                      Tab(text: AppZh.dexTabBasic),
+                      Tab(text: AppZh.dexTabObtain),
+                      Tab(text: AppZh.dexTabMoves),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            StickerCard(
-              child: Row(
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
                 children: [
-                  Expanded(
-                    child: _StatTile(
-                      label: AppZh.dexHeight,
-                      value: '${heightM.toStringAsFixed(1)} m',
-                    ),
-                  ),
-                  Expanded(
-                    child: _StatTile(
-                      label: AppZh.dexWeight,
-                      value: '${weightKg.toStringAsFixed(1)} kg',
-                    ),
-                  ),
+                  _IntroTab(detail: detail),
+                  _BasicTab(detail: detail),
+                  _ObtainTab(detail: detail),
+                  _MovesTab(detail: detail),
                 ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            _SectionCard(
-              title: AppZh.dexWeaknesses,
-              types: detail.weaknesses,
-              tone: TypeChipTone.weak,
-            ),
-            const SizedBox(height: 12),
-            _SectionCard(
-              title: AppZh.dexResistances,
-              types: detail.resistances,
-              tone: TypeChipTone.resist,
-            ),
-            const SizedBox(height: 12),
-            _SectionCard(
-              title: AppZh.dexImmunities,
-              types: detail.immunities,
-              tone: TypeChipTone.immune,
-            ),
-            const SizedBox(height: 12),
-            _SectionCard(
-              title: AppZh.dexStabEffective,
-              types: detail.stabSuperEffective,
-              tone: TypeChipTone.neutral,
-            ),
-            if (detail.moves.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppZh.dexMoves,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ...detail.moves.take(12).map(
-                          (entry) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Row(
-                              children: [
-                                if (entry.level != null)
-                                  SizedBox(
-                                    width: 42,
-                                    child: Text(
-                                      'Lv.${entry.level}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        color: TitoColors.mutedInk,
-                                      ),
-                                    ),
-                                  ),
-                                Expanded(
-                                  child: Text(
-                                    entry.move.nameZh,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  typeNameZh(entry.move.type),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: TitoColors.mutedInk,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    if (detail.moves.length > 12)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          AppZh.dexMovesMore(detail.moves.length - 12),
-                          style: const TextStyle(
-                            color: TitoColors.mutedInk,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-            if (detail.evolutionChain != null) ...[
-              const SizedBox(height: 12),
-              StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppZh.dexEvolution,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    EvolutionChainView(
-                      root: detail.evolutionChain!,
-                      highlightId: summary.id,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 12),
-            StickerCard(
-              child: Text(
-                AppZh.dexApiNote,
-                style: const TextStyle(
-                  color: TitoColors.mutedInk,
-                  fontWeight: FontWeight.w600,
-                  height: 1.4,
-                ),
               ),
             ),
           ],
@@ -290,59 +138,152 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 }
 
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.types,
-    required this.tone,
-  });
+class _IntroTab extends StatelessWidget {
+  const _IntroTab({required this.detail});
 
-  final String title;
-  final List<String> types;
-  final TypeChipTone tone;
+  final PokemonDetail detail;
 
   @override
   Widget build(BuildContext context) {
-    return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        FlavorTextCarousel(entries: detail.flavorEntries),
+        const SizedBox(height: 12),
+        IntroMetaCard(detail: detail),
+        const SizedBox(height: 12),
+        StickerCard(
+          child: Text(
+            AppZh.dexApiNote,
+            style: const TextStyle(
+              color: TitoColors.mutedInk,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
           ),
-          const SizedBox(height: 8),
-          TypeChipRow(types: types, tone: tone),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value});
+class _BasicTab extends StatelessWidget {
+  const _BasicTab({required this.detail});
 
-  final String label;
-  final String value;
+  final PokemonDetail detail;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        if (detail.baseStats != null) ...[
+          BaseStatsCard(stats: detail.baseStats!),
+          const SizedBox(height: 12),
+        ],
+        if (detail.typeMultipliers.isNotEmpty)
+          TypeEffectivenessGrid(multipliers: detail.typeMultipliers),
+        const SizedBox(height: 12),
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexStabEffective,
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              TypeChipRow(
+                types: detail.stabSuperEffective,
+                tone: TypeChipTone.neutral,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ObtainTab extends StatelessWidget {
+  const _ObtainTab({required this.detail});
+
+  final PokemonDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    if (detail.evolutionChain == null) {
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          StickerCard(
+            child: Text(
+              AppZh.dexNoEvolution,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexEvolution,
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              EvolutionChainView(
+                root: detail.evolutionChain!,
+                highlightId: detail.summary.id,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MovesTab extends StatelessWidget {
+  const _MovesTab({required this.detail});
+
+  final PokemonDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final moveSet = detail.moveSet;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
       children: [
         Text(
-          label,
+          AppZh.dexMovesHgssScope,
           style: const TextStyle(
-            color: TitoColors.mutedInk,
+            color: TitoColors.card,
             fontWeight: FontWeight.w700,
           ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-          ),
+        const SizedBox(height: 12),
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('level-up'),
+          moves: moveSet.levelUp,
+          showLevel: true,
+        ),
+        const SizedBox(height: 12),
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('machine'),
+          moves: moveSet.machine,
+        ),
+        const SizedBox(height: 12),
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('egg'),
+          moves: moveSet.egg,
         ),
       ],
     );
