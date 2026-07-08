@@ -59,6 +59,8 @@ class CurrentJourney {
     required this.timeline,
     required this.companion,
     this.nextReminder,
+    this.saveTrainerName,
+    this.trainerNameCustomized = false,
   });
 
   final String game;
@@ -71,6 +73,8 @@ class CurrentJourney {
   final List<JourneyTimelineEntry> timeline;
   final String companion;
   final String? nextReminder;
+  final String? saveTrainerName;
+  final bool trainerNameCustomized;
 
   CurrentJourney copyWith({
     String? game,
@@ -83,6 +87,8 @@ class CurrentJourney {
     List<JourneyTimelineEntry>? timeline,
     String? companion,
     String? nextReminder,
+    String? saveTrainerName,
+    bool? trainerNameCustomized,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -95,6 +101,9 @@ class CurrentJourney {
       timeline: timeline ?? this.timeline,
       companion: companion ?? this.companion,
       nextReminder: nextReminder ?? this.nextReminder,
+      saveTrainerName: saveTrainerName ?? this.saveTrainerName,
+      trainerNameCustomized:
+          trainerNameCustomized ?? this.trainerNameCustomized,
     );
   }
 
@@ -109,6 +118,8 @@ class CurrentJourney {
         'timeline': timeline.map((entry) => entry.toJson()).toList(),
         'companion': companion,
         if (nextReminder != null) 'nextReminder': nextReminder,
+        if (saveTrainerName != null) 'saveTrainerName': saveTrainerName,
+        if (trainerNameCustomized) 'trainerNameCustomized': true,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -129,6 +140,8 @@ class CurrentJourney {
             .toList(),
         companion: json['companion'] as String,
         nextReminder: json['nextReminder'] as String?,
+        saveTrainerName: json['saveTrainerName'] as String?,
+        trainerNameCustomized: json['trainerNameCustomized'] as bool? ?? false,
       );
 
   static CurrentJourney mock() => const CurrentJourney(

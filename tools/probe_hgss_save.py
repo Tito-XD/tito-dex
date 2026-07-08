@@ -3,9 +3,13 @@
 
 from __future__ import annotations
 
+import json
 import struct
 import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+MAP_LIST = ROOT / "tools" / "hgss_map_list.json"
 
 PARTITION_SIZE = 0x40000
 SAVE_COUNT_OFFSET = 0xF618
@@ -105,6 +109,15 @@ def active_partition(data: bytes) -> int:
     return 1 if counts[1] >= counts[0] else 0
 
 
+def map_label(map_id: int) -> str:
+    if not MAP_LIST.exists():
+        return f"Map #{map_id}"
+    entries = json.loads(MAP_LIST.read_text())
+    if map_id < 0 or map_id >= len(entries):
+        return f"Map #{map_id}"
+    return entries[map_id]["name"]
+
+
 def probe(path: Path) -> None:
     data = path.read_bytes()
     if len(data) != 524288:
@@ -130,7 +143,7 @@ def probe(path: Path) -> None:
     print(f"TID: {tid}")
     print(f"Johto badges ({len(badges)}/8): {', '.join(badges) or '(none)'}")
     print(f"Play time: {hours}:{minutes:02d}:{seconds:02d}")
-    print(f"Map header id: {map_id}")
+    print(f"Map id: {map_id} → {map_label(map_id)}")
     print(f"Party ({party_count}):")
     for index in range(party_count):
         slot = data[base + 0x98 + index * 236 : base + 0x98 + (index + 1) * 236]

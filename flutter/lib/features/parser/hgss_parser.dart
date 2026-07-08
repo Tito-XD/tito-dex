@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
 import 'hgss_format.dart';
+import 'hgss_map_lookup.dart';
 
 const _partitionSize = 0x40000;
 const _retailSaveSize = 524288;
@@ -33,7 +34,7 @@ class HgssParser {
     final minutes = bytes[base + 0x88];
     final seconds = bytes[base + 0x89];
     final partyCount = bytes[base + 0x94];
-    final mapHeaderId = readUint16(bytes, base + 0x1234);
+    final mapId = readUint16(bytes, base + 0x1234);
 
     if (trainerName.trim().isEmpty) {
       warnings.add('Trainer name could not be decoded cleanly.');
@@ -59,12 +60,6 @@ class HgssParser {
       );
     }
 
-    if (mapHeaderId == 76) {
-      warnings.add(
-        'Map header id 76 is an internal matrix index; city name lookup is not wired yet.',
-      );
-    }
-
     return ParsedSaveSummary(
       game: 'SoulSilver',
       trainerName: trainerName.isEmpty ? 'Trainer' : trainerName,
@@ -72,20 +67,28 @@ class HgssParser {
           '${hours.toString()}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
       badges: badgeCount,
       maxBadges: 8,
-      locationLabel: locationLabelForMapHeader(mapHeaderId),
+      locationLabel: locationLabelForMapId(mapId),
       party: party,
       saveHash: sha256.convert(bytes).toString(),
       parsedAt: DateTime.now().toUtc(),
       warnings: warnings,
       tid: tid,
-      mapHeaderId: mapHeaderId,
+      mapHeaderId: mapId,
     );
   }
 
-  CurrentJourney toJourney(ParsedSaveSummary summary) {
+  CurrentJourney toJourney(
+    ParsedSaveSummary summary, {
+    CurrentJourney? existing,
+  }) {
+    final preserveTrainerName = existing?.trainerNameCustomized ?? false;
+
     return CurrentJourney(
       game: summary.game,
-      trainerName: summary.trainerName,
+      trainerName:
+          preserveTrainerName ? existing!.trainerName : summary.trainerName,
+      saveTrainerName: summary.trainerName,
+      trainerNameCustomized: preserveTrainerName,
       location: summary.locationLabel,
       badges: summary.badges,
       maxBadges: summary.maxBadges,

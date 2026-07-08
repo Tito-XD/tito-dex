@@ -114,11 +114,3 @@ int readUint32(List<int> data, int offset) =>
 
 int readUint16(List<int> data, int offset) =>
     data[offset] | (data[offset + 1] << 8);
-
-String locationLabelForMapHeader(int mapHeaderId) {
-  // TODO: full HGSS map table — header id is matrix index, not met-location id.
-  if (mapHeaderId == 0) {
-    return 'Mystery Zone';
-  }
-  return 'Map #$mapHeaderId';
-}

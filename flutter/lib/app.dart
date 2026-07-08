@@ -65,6 +65,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 journey: _journey,
                 onImportFixture: _importBundledSave,
                 onResetMock: _resetMock,
+                onSaveJourney: _persist,
               ),
             ),
           ],
@@ -93,7 +94,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   Future<void> _importBundledSave() async {
     final bytes = await rootBundle.load('assets/fixtures/PKMSS.sav');
     final summary = _parser.parseSummary(bytes.buffer.asUint8List());
-    await _persist(_parser.toJourney(summary));
+    await _persist(_parser.toJourney(summary, existing: _journey));
     if (!mounted) {
       return;
     }
