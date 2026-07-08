@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
 class TitoBottomNav extends StatelessWidget {
@@ -26,10 +27,16 @@ class TitoBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = DeviceLayout.isCompact(context);
+    final hPad = compact ? 6.0 : 12.0;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, compact ? 4 : 8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 4 : 6,
+          vertical: compact ? 4 : 8,
+        ),
         decoration: BoxDecoration(
           color: TitoColors.deepBlue,
           borderRadius: BorderRadius.circular(TitoRadii.lg),
@@ -49,11 +56,13 @@ class TitoBottomNav extends StatelessWidget {
                     ? _CenterNavItem(
                         spec: spec,
                         selected: _isActive(spec.path),
+                        compact: compact,
                         onTap: () => context.go(spec.path),
                       )
                     : _NavItem(
                         spec: spec,
                         selected: _isActive(spec.path),
+                        compact: compact,
                         onTap: () => context.go(spec.path),
                       ),
               ),
@@ -78,17 +87,21 @@ class _NavItem extends StatelessWidget {
   const _NavItem({
     required this.spec,
     required this.selected,
+    required this.compact,
     required this.onTap,
   });
 
   final _NavSpec spec;
   final bool selected;
+  final bool compact;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final fg = selected ? TitoColors.deepBlue : TitoColors.skyBlue;
     final bg = selected ? TitoColors.cream : Colors.transparent;
+    final iconSize = compact ? 18.0 : 22.0;
+    final fontSize = compact ? 9.0 : 10.0;
 
     return Material(
       color: bg,
@@ -98,17 +111,22 @@ class _NavItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(TitoRadii.sm),
         splashColor: TitoColors.skyBlue.withValues(alpha: 0.2),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+          padding: EdgeInsets.symmetric(
+            vertical: compact ? 4 : 8,
+            horizontal: 2,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(spec.icon, color: fg, size: 22),
-              const SizedBox(height: 2),
+              Icon(spec.icon, color: fg, size: iconSize),
+              SizedBox(height: compact ? 1 : 2),
               Text(
                 spec.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: fg,
-                  fontSize: 10,
+                  fontSize: fontSize,
                   fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
                 ),
               ),
@@ -124,17 +142,23 @@ class _CenterNavItem extends StatelessWidget {
   const _CenterNavItem({
     required this.spec,
     required this.selected,
+    required this.compact,
     required this.onTap,
   });
 
   final _NavSpec spec;
   final bool selected;
+  final bool compact;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final size = compact ? 46.0 : 56.0;
+    final lift = compact ? -8.0 : -14.0;
+    final iconSize = compact ? 22.0 : 26.0;
+
     return Transform.translate(
-      offset: const Offset(0, -14),
+      offset: Offset(0, lift),
       child: Material(
         color: selected ? TitoColors.softYellow : TitoColors.cream,
         shape: const CircleBorder(
@@ -145,24 +169,25 @@ class _CenterNavItem extends StatelessWidget {
           onTap: onTap,
           customBorder: const CircleBorder(),
           child: SizedBox(
-            width: 56,
-            height: 56,
+            width: size,
+            height: size,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   spec.icon,
                   color: TitoColors.deepBlue,
-                  size: 26,
+                  size: iconSize,
                 ),
-                Text(
-                  spec.label,
-                  style: const TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.deepBlue,
+                if (!compact)
+                  Text(
+                    spec.label,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      color: TitoColors.deepBlue,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

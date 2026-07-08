@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../theme/device_layout.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
@@ -97,19 +98,25 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              padding: DeviceLayout.pagePadding(context).copyWith(bottom: 0),
               child: Column(
                 children: [
-                  const AppHeader(showSettings: true),
+                  if (!DeviceLayout.isCompact(context))
+                    const AppHeader(showSettings: true),
                   PokemonDetailHeader(detail: detail),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   TabBar(
                     controller: _tabController,
                     isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                     labelColor: TitoColors.coral,
                     unselectedLabelColor: TitoColors.card,
                     indicatorColor: TitoColors.coral,
                     dividerColor: Colors.transparent,
+                    labelStyle: TextStyle(
+                      fontSize: DeviceLayout.isCompact(context) ? 13 : 14,
+                      fontWeight: FontWeight.w800,
+                    ),
                     tabs: const [
                       Tab(text: AppZh.dexTabIntro),
                       Tab(text: AppZh.dexTabBasic),
@@ -146,7 +153,7 @@ class _IntroTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         FlavorTextCarousel(entries: detail.flavorEntries),
         const SizedBox(height: 12),
@@ -175,7 +182,7 @@ class _BasicTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         if (detail.baseStats != null) ...[
           BaseStatsCard(stats: detail.baseStats!),
@@ -227,7 +234,7 @@ class _ObtainTab extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         StickerCard(
           child: Column(
@@ -260,7 +267,7 @@ class _MovesTab extends StatelessWidget {
     final moveSet = detail.moveSet;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         Text(
           AppZh.dexMovesHgssScope,

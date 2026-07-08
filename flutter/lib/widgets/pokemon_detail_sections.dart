@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_card.dart';
@@ -18,6 +20,7 @@ class PokemonDetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final summary = detail.summary;
+    final compact = DeviceLayout.isCompact(context);
     return StickerCard(
       variant: StickerVariant.deep,
       child: Row(
@@ -32,9 +35,10 @@ class PokemonDetailHeader extends StatelessWidget {
                     if (detail.johtoDexLabel != null) detail.johtoDexLabel,
                     detail.nationalDexLabel,
                   ].join(' · '),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: TitoColors.skyBlue,
                     fontWeight: FontWeight.w700,
+                    fontSize: compact ? 12 : 14,
                   ),
                 ),
                 Text(
@@ -42,17 +46,19 @@ class PokemonDetailHeader extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         color: TitoColors.card,
                         fontWeight: FontWeight.w900,
+                        fontSize: compact ? 20 : null,
                       ),
                 ),
                 if (detail.genusZh.isNotEmpty)
                   Text(
                     detail.genusZh,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: TitoColors.skyBlue,
                       fontWeight: FontWeight.w600,
+                      fontSize: compact ? 12 : 14,
                     ),
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 TypeChipRow(
                   types: summary.types.map(typeNameZh).toList(),
                   typeKeys: summary.types,
@@ -60,10 +66,20 @@ class PokemonDetailHeader extends StatelessWidget {
               ],
             ),
           ),
-          DexSpriteImage(
-            source: summary.displaySpritePath,
-            width: 108,
-            height: 108,
+          Column(
+            children: [
+              if (compact)
+                IconButton(
+                  onPressed: () => context.push('/settings'),
+                  icon: const Icon(Icons.settings_rounded, color: TitoColors.card),
+                  tooltip: AppZh.navSettings,
+                ),
+              DexSpriteImage(
+                source: summary.displaySpritePath,
+                width: compact ? 84 : 108,
+                height: compact ? 84 : 108,
+              ),
+            ],
           ),
         ],
       ),
