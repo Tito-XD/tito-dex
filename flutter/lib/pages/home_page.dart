@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_buttons.dart';
+import '../theme/device_layout.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_sticker.dart';
 import '../widgets/continue_journey_card.dart';
@@ -26,10 +27,12 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 520;
+        final wide = constraints.maxWidth >= 520 &&
+            constraints.maxHeight >= 500 &&
+            !DeviceLayout.isCompact(context);
 
         return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          padding: DeviceLayout.pagePadding(context),
           children: [
             const AppHeader(),
             if (wide)

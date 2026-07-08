@@ -7,6 +7,7 @@ import '../features/dex/dex_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
@@ -98,7 +99,7 @@ class _SearchPageState extends State<SearchPage> {
     final query = _controller.text.trim();
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         const AppHeader(showSettings: true),
         Text(
@@ -159,11 +160,11 @@ class _SearchPageState extends State<SearchPage> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 160,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: DeviceLayout.gridMaxExtent(context),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 0.78,
+              childAspectRatio: DeviceLayout.isCompact(context) ? 0.72 : 0.78,
             ),
             itemCount: _results.length,
             itemBuilder: (context, index) {

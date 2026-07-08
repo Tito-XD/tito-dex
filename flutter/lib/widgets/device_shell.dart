@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
 class DeviceShell extends StatelessWidget {
@@ -17,50 +18,99 @@ class DeviceShell extends StatelessWidget {
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: TitoColors.deepBlue,
+        systemNavigationBarIconBrightness: Brightness.light,
       ),
-      child: ColoredBox(
-        color: TitoColors.deepBlue,
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: TitoColors.slateBlue,
-                    borderRadius: BorderRadius.circular(TitoRadii.xl),
-                    border: Border.all(color: TitoColors.ink, width: 3),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x4D18283B),
-                        blurRadius: 24,
-                        offset: Offset(0, 12),
+      child: DeviceLayout.isNativeTarget
+          ? _NativeShell(child: child)
+          : _PreviewShell(child: child),
+    );
+  }
+}
+
+/// Full-screen layout for RG / Android — no decorative phone bezel.
+class _NativeShell extends StatelessWidget {
+  const _NativeShell({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: TitoColors.deepBlue,
+      child: SafeArea(
+        bottom: false,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                TitoColors.skyBlue,
+                TitoColors.slateBlue,
+              ],
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Mock phone frame for web / desktop preview.
+class _PreviewShell extends StatelessWidget {
+  const _PreviewShell({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: TitoColors.deepBlue,
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: TitoColors.slateBlue,
+                  borderRadius: BorderRadius.circular(TitoRadii.xl),
+                  border: Border.all(color: TitoColors.ink, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x4D18283B),
+                      blurRadius: 24,
+                      offset: Offset(0, 12),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(TitoRadii.xl - 3),
+                  child: Column(
+                    children: [
+                      const _StatusStrip(),
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                TitoColors.skyBlue,
+                                TitoColors.slateBlue,
+                              ],
+                            ),
+                          ),
+                          child: child,
+                        ),
                       ),
                     ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(TitoRadii.xl - 3),
-                    child: Column(
-                      children: [
-                        const _StatusStrip(),
-                        Expanded(
-                          child: DecoratedBox(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  TitoColors.skyBlue,
-                                  TitoColors.slateBlue,
-                                ],
-                              ),
-                            ),
-                            child: child,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),

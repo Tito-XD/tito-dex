@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 
@@ -17,14 +18,15 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = DeviceLayout.isCompact(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: compact ? 8 : 16),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.pets_rounded,
             color: TitoColors.softYellow,
-            size: 32,
+            size: compact ? 26 : 32,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -33,6 +35,7 @@ class AppHeader extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: TitoColors.card,
+                    fontSize: compact ? 22 : null,
                     letterSpacing: -0.5,
                     shadows: const [
                       Shadow(
@@ -50,6 +53,7 @@ class AppHeader extends StatelessWidget {
               icon: Icons.settings_rounded,
               onTap: () => context.push('/settings'),
               label: AppZh.navSettings,
+              compact: compact,
             ),
           ],
         ],
@@ -63,11 +67,13 @@ class _HeaderIconButton extends StatelessWidget {
     required this.icon,
     required this.onTap,
     required this.label,
+    this.compact = false,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final String label;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +90,13 @@ class _HeaderIconButton extends StatelessWidget {
           onTap: onTap,
           customBorder: const CircleBorder(),
           child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Icon(icon, color: TitoColors.deepBlue, size: 22),
+            width: compact ? 34 : 40,
+            height: compact ? 34 : 40,
+            child: Icon(
+              icon,
+              color: TitoColors.deepBlue,
+              size: compact ? 18 : 22,
+            ),
           ),
         ),
       ),
