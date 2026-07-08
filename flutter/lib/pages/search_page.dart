@@ -9,6 +9,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
@@ -104,10 +105,7 @@ class _SearchPageState extends State<SearchPage> {
         const AppHeader(showSettings: true),
         Text(
           '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: TitoColors.card,
-              ),
+          style: context.tito.pageTitleOnGradient,
         ),
         const SizedBox(height: 12),
         TextField(
@@ -137,7 +135,7 @@ class _SearchPageState extends State<SearchPage> {
           StickerCard(
             child: Text(
               AppZh.searchEmptyHint,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: context.tito.cardBodyStrong,
             ),
           )
         else if (_searching)
@@ -146,14 +144,14 @@ class _SearchPageState extends State<SearchPage> {
           StickerCard(
             child: Text(
               _error!,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: context.tito.cardBodyStrong,
             ),
           )
         else if (_results.isEmpty)
           StickerCard(
             child: Text(
               AppZh.searchNoResults,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: context.tito.cardBodyStrong,
             ),
           )
         else

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/game_zh.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 
 class CompanionSticker extends StatelessWidget {
   const CompanionSticker({
@@ -38,10 +39,7 @@ class CompanionSticker extends StatelessWidget {
             ),
             child: Text(
               text,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
+              style: context.tito.companionBubble,
             ),
           ),
           const SizedBox(height: 8),
@@ -59,11 +57,7 @@ class CompanionSticker extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             localizeCompanion(name),
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 12,
-              color: TitoColors.card,
-            ),
+            style: context.tito.companionName,
           ),
         ],
       ),

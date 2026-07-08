@@ -13,6 +13,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/sticker_card.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -249,10 +250,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(width: 12),
             Text(
               AppZh.navSettings,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.card,
-                  ),
+              style: context.tito.settingsTitle,
             ),
           ],
         ),
@@ -263,9 +261,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsTrainerProfile,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -305,9 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsEditJourney,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 12),
               TextField(
@@ -366,14 +360,12 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsDexOffline,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsDexOfflineHint,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: context.tito.cardMuted,
               ),
               const SizedBox(height: 12),
               Text(
@@ -385,7 +377,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         dexManifest.downloadedAt?.split('T').first ?? '',
                       )
                     : AppZh.settingsDexOfflineUnset,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: context.tito.cardBodyEmphasis,
               ),
               if (_dexDownloading && dexProgress != null) ...[
                 const SizedBox(height: 12),
@@ -401,7 +393,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     dexProgress.current,
                     dexProgress.total,
                   ),
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.tito.cardMuted,
                 ),
               ],
               const SizedBox(height: 12),
@@ -437,21 +429,19 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsEmulator,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsEmulatorHint,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: context.tito.cardMuted,
               ),
               const SizedBox(height: 12),
               Text(
                 emulator != null
                     ? AppZh.settingsEmulatorSelected(emulator.appName)
                     : AppZh.settingsEmulatorUnset,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: context.tito.cardBodyEmphasis,
               ),
               const SizedBox(height: 12),
               FilledButton(
@@ -480,22 +470,19 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsSaveDirectory,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsSaveDirectoryHint,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: context.tito.cardMuted,
               ),
               const SizedBox(height: 12),
               Text(
                 directoryPath ?? AppZh.settingsSaveDirectoryUnset,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
+                style: context.tito.cardBodyEmphasis.copyWith(
                   color: directoryPath == null
-                      ? Theme.of(context).colorScheme.outline
+                      ? TitoColors.mutedInk
                       : TitoColors.ink,
                 ),
               ),
@@ -526,7 +513,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 lastSynced != null
                     ? AppZh.settingsLastSynced(lastSynced)
                     : AppZh.settingsLastSyncedNone,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: context.tito.cardMuted,
               ),
               const SizedBox(height: 8),
               OutlinedButton(
@@ -569,9 +556,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 AppZh.settingsJourneyData,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 12),
               FilledButton(
@@ -618,12 +603,12 @@ class _Row extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: context.tito.cardLabel),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontWeight: FontWeight.w800),
+              style: context.tito.cardValue,
             ),
           ),
         ],

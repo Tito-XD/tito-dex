@@ -4,6 +4,7 @@ import '../features/launcher/emulator_launcher.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
   BuildContext context,
@@ -15,7 +16,10 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
       showDragHandle: true,
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
-        child: Text(AppZh.continueSheetDesktopHint),
+        child: Text(
+          AppZh.continueSheetDesktopHint,
+          style: context.tito.cardBody,
+        ),
       ),
     );
     return null;
@@ -32,7 +36,10 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
       showDragHandle: true,
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
-        child: Text(AppZh.continueSheetNoEmulators),
+        child: Text(
+          AppZh.continueSheetNoEmulators,
+          style: context.tito.cardBody,
+        ),
       ),
     );
     return null;
@@ -52,9 +59,7 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
             children: [
               Text(
                 AppZh.continueSheetPickEmulator,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardTitle,
               ),
               const SizedBox(height: 12),
               Flexible(
@@ -77,17 +82,12 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
                               Expanded(
                                 child: Text(
                                   app.appName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: context.tito.cardBodyEmphasis,
                                 ),
                               ),
                               Text(
                                 app.packageName,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(color: TitoColors.mutedInk),
+                                style: context.tito.caption,
                               ),
                             ],
                           ),

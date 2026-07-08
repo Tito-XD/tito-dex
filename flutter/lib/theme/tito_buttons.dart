@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'device_layout.dart';
 import 'tito_colors.dart';
+import 'tito_typography.dart';
 
 /// Sticker-style primary action — deep blue pill per design reference.
 class TitoPrimaryButton extends StatelessWidget {
@@ -114,10 +115,10 @@ class TitoCoralButton extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: TitoColors.ink,
-              fontWeight: FontWeight.w800,
+            style: TitoTypography.style(
               fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: TitoColors.ink,
             ),
           ),
         ),

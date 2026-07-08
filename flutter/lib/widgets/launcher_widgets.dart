@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class LauncherWidgets extends StatelessWidget {
@@ -60,31 +60,19 @@ class _WidgetTile extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: TitoColors.mutedInk,
-              letterSpacing: 0.6,
-            ),
+            style: context.tito.overline,
           ),
           const SizedBox(height: 4),
           Text(
             value,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-            ),
+            style: context.tito.cardBodyEmphasis,
           ),
           if (meta != null) ...[
             const SizedBox(height: 2),
             Text(
               meta!,
-              style: const TextStyle(
-                fontSize: 11,
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w600,
-              ),
+              style: context.tito.caption,
             ),
           ],
         ],

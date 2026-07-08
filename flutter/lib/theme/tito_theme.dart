@@ -1,9 +1,50 @@
 import 'package:flutter/material.dart';
 
 import 'tito_colors.dart';
+import 'tito_typography.dart';
 
 ThemeData buildTitoTheme() {
-  const fontFamily = 'Nunito';
+  const fontFamily = TitoTypography.fontFamily;
+
+  TextStyle baseStyle({
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w600,
+    Color color = TitoColors.ink,
+    double? height,
+  }) {
+    return TextStyle(
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      height: height,
+    );
+  }
+
+  final textTheme = TextTheme(
+    displayLarge: baseStyle(fontSize: 32, fontWeight: FontWeight.w800),
+    displayMedium: baseStyle(fontSize: 28, fontWeight: FontWeight.w800),
+    displaySmall: baseStyle(fontSize: 24, fontWeight: FontWeight.w800),
+    headlineLarge: baseStyle(fontSize: 24, fontWeight: FontWeight.w800),
+    headlineMedium: baseStyle(fontSize: 22, fontWeight: FontWeight.w800),
+    headlineSmall: baseStyle(fontSize: 20, fontWeight: FontWeight.w800),
+    titleLarge: baseStyle(fontSize: 20, fontWeight: FontWeight.w800),
+    titleMedium: baseStyle(fontSize: 18, fontWeight: FontWeight.w800),
+    titleSmall: baseStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    bodyLarge: baseStyle(fontSize: 16),
+    bodyMedium: baseStyle(fontSize: 14),
+    bodySmall: baseStyle(
+      fontSize: 12,
+      color: TitoColors.mutedInk,
+    ),
+    labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w800),
+    labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    labelSmall: baseStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      color: TitoColors.mutedInk,
+    ),
+  );
 
   final base = ThemeData(
     useMaterial3: true,
@@ -12,6 +53,7 @@ ThemeData buildTitoTheme() {
     scaffoldBackgroundColor: Colors.transparent,
     splashFactory: InkRipple.splashFactory,
     highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
+    textTheme: textTheme,
   );
 
   return base.copyWith(
@@ -21,44 +63,81 @@ ThemeData buildTitoTheme() {
       secondary: TitoColors.coral,
       surface: TitoColors.card,
     ),
-    textTheme: base.textTheme.apply(
-      fontFamily: fontFamily,
-      bodyColor: TitoColors.ink,
-      displayColor: TitoColors.ink,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: TitoColors.card,
+      titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
+    ),
+    listTileTheme: ListTileThemeData(
+      titleTextStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+      subtitleTextStyle: textTheme.bodySmall,
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          textTheme.labelLarge?.copyWith(fontSize: 13),
+        ),
+      ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      contentTextStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.card),
+      backgroundColor: TitoColors.deepBlue,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        side: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: TitoColors.deepBlue,
         foregroundColor: TitoColors.card,
+        textStyle: textTheme.labelLarge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
           side: const BorderSide(color: TitoColors.ink, width: 3),
-        ),
-        textStyle: const TextStyle(
-          fontFamily: fontFamily,
-          fontWeight: FontWeight.w800,
         ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         side: const BorderSide(color: TitoColors.ink, width: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
         ),
-        textStyle: const TextStyle(
-          fontFamily: fontFamily,
-          fontWeight: FontWeight.w700,
-        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: TitoColors.card,
+      labelStyle: textTheme.bodySmall?.copyWith(
+        color: TitoColors.mutedInk,
+        fontWeight: FontWeight.w700,
+      ),
+      hintStyle: textTheme.bodyMedium?.copyWith(
+        color: TitoColors.mutedInk,
+        fontWeight: FontWeight.w600,
+      ),
+      helperStyle: textTheme.bodySmall,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
         borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.coral, width: 2),
       ),
     ),
   );

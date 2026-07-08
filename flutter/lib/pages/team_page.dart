@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/party_summary.dart';
 import '../widgets/sticker_card.dart';
@@ -26,18 +26,12 @@ class TeamPage extends StatelessWidget {
             children: [
               Text(
                 '${AppZh.navTeam} · ${localizeGame(journey.game)}',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: TitoColors.card,
-                    ),
+                style: context.tito.onDeepTitle,
               ),
               const SizedBox(height: 4),
               Text(
                 AppZh.teamSubtitle(journey.party.length),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: TitoColors.skyBlue,
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: context.tito.onDeepSubtitle,
               ),
             ],
           ),
@@ -49,9 +43,7 @@ class TeamPage extends StatelessWidget {
           variant: StickerVariant.cream,
           child: Text(
             AppZh.teamNote,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: context.tito.cardBodyStrong,
           ),
         ),
       ],

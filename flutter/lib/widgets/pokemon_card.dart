@@ -6,6 +6,7 @@ import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 
@@ -43,11 +44,7 @@ class PokemonMiniCard extends StatelessWidget {
             ),
             Text(
               '#${summary.id.toString().padLeft(3, '0')}',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: TitoColors.mutedInk,
-              ),
+              style: context.tito.dexNumber,
             ),
             const SizedBox(height: 2),
             Text(
@@ -55,10 +52,7 @@ class PokemonMiniCard extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
+              style: context.tito.chip,
             ),
             _PokemonTypeRow(types: summary.types),
             const Spacer(),
@@ -68,10 +62,7 @@ class PokemonMiniCard extends StatelessWidget {
                 DexEncounterStatus.seen => AppZh.dexSeen,
                 DexEncounterStatus.unknown => AppZh.dexUnknown,
               },
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
+              style: context.tito.statusBadge,
             ),
           ],
         ),
@@ -135,10 +126,7 @@ class TypeChipRow extends StatelessWidget {
     if (types.isEmpty) {
       return Text(
         AppZh.dexNone,
-        style: const TextStyle(
-          color: TitoColors.mutedInk,
-          fontWeight: FontWeight.w600,
-        ),
+        style: context.tito.cardMuted,
       );
     }
 
@@ -179,10 +167,7 @@ class TypeChipRow extends StatelessWidget {
                   ],
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                    ),
+                    style: context.tito.chip,
                   ),
                 ],
               ),
@@ -277,18 +262,14 @@ class _EvolutionCard extends StatelessWidget {
               Text(
                 node.nameZh,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: context.tito.cardBodyEmphasis,
               ),
               if (node.triggerZh != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   node.triggerZh!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.tito.caption,
                 ),
               ],
             ],
