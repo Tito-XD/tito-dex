@@ -21,7 +21,9 @@ void main() {
     expect(summary.playTime, '7:03:41');
     expect(summary.party, isNotEmpty);
     expect(summary.party.first.speciesName, 'Quilava');
-    expect(summary.party.first.level, 58);
+    expect(summary.party.first.level, 27);
+    expect(summary.party[1].speciesName, 'Togepi');
+    expect(summary.party[1].level, 6);
     expect(summary.saveHash, isNotEmpty);
   });
 }

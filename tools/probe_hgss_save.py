@@ -85,13 +85,15 @@ def shuffle_blocks(data: bytes, sv: int) -> bytes:
 
 
 def decrypt_party_slot(raw: bytes) -> tuple[int, int]:
-    personality = struct.unpack_from("<I", raw, 0)[0]
-    checksum = struct.unpack_from("<H", raw, 6)[0]
+    slot = bytearray(raw)
+    personality = struct.unpack_from("<I", slot, 0)[0]
+    checksum = struct.unpack_from("<H", slot, 6)[0]
     sv = (personality >> 13) & 31
-    encrypted = crypt_array(raw[8:136], checksum)
+    encrypted = crypt_array(slot[8:136], checksum)
     decrypted = shuffle_blocks(encrypted, sv)
     species = struct.unpack_from("<H", decrypted, 0)[0]
-    level = raw[0x84]
+    slot[136:236] = crypt_array(slot[136:236], personality)
+    level = slot[0x8C]
     return species, level
 
 

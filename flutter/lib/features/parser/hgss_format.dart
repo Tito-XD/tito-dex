@@ -81,13 +81,19 @@ List<int> _shuffleBlocks(List<int> data, int sv) {
 }
 
 (int speciesId, int level) decryptPartySlot(List<int> raw) {
-  final personality = raw[0] | (raw[1] << 8) | (raw[2] << 16) | (raw[3] << 24);
-  final checksum = raw[6] | (raw[7] << 8);
+  final slot = List<int>.from(raw);
+  final personality =
+      slot[0] | (slot[1] << 8) | (slot[2] << 16) | (slot[3] << 24);
+  final checksum = slot[6] | (slot[7] << 8);
   final sv = (personality >> 13) & 31;
-  final encrypted = _cryptArray(raw.sublist(8, 136), checksum);
+  final encrypted = _cryptArray(slot.sublist(8, 136), checksum);
   final decrypted = _shuffleBlocks(encrypted, sv);
   final speciesId = decrypted[0] | (decrypted[1] << 8);
-  final level = raw[0x84];
+
+  // Party stats (bytes 136–235) are encrypted with the personality value.
+  // Current level lives at 0x8C (Stat_Level), not 0x84 (MetLevel).
+  final stats = _cryptArray(slot.sublist(136, 236), personality);
+  final level = stats[0x8C - 136];
   return (speciesId, level);
 }
 
