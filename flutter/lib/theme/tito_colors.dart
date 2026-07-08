@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+
+abstract final class TitoColors {
+  static const deepBlue = Color(0xFF2F4361);
+  static const slateBlue = Color(0xFF7B91A6);
+  static const skyBlue = Color(0xFFAFC7DA);
+  static const cream = Color(0xFFF3E4B3);
+  static const coral = Color(0xFFFF8F6A);
+  static const ink = Color(0xFF221F26);
+  static const softYellow = Color(0xFFF7D977);
+  static const card = Color(0xFFFFF7E6);
+  static const mutedInk = Color(0xFF536273);
+  static const mint = Color(0xFF7EC8A8);
+}
+
+abstract final class TitoRadii {
+  static const sm = 10.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+}
