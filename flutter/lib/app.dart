@@ -3,15 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
+import 'features/launcher/emulator_launcher.dart';
+import 'features/launcher/emulator_launcher_repository.dart';
 import 'features/parser/hgss_parser.dart';
 import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'pages/home_page.dart';
+import 'pages/journey_page.dart';
 import 'pages/settings_page.dart';
+import 'pages/team_page.dart';
 import 'theme/tito_theme.dart';
+import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/tito_bottom_nav.dart';
 
@@ -26,9 +32,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
   final _repository = JourneyRepository();
   final _parser = const HgssParser();
   final _saveSync = SaveSyncService();
+  final _emulatorLauncher = EmulatorLauncher();
+  final _journeyIo = const JourneyIo();
   late final GoRouter _router;
   CurrentJourney _journey = CurrentJourney.mock();
   SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
+  EmulatorAppChoice? _emulatorChoice;
   bool _ready = false;
 
   @override
@@ -38,12 +47,21 @@ class _TitoDexAppState extends State<TitoDexApp> {
       routes: [
         ShellRoute(
           builder: (context, state, child) {
-            return DeviceShell(
-              child: Column(
-                children: [
-                  Expanded(child: child),
-                  TitoBottomNav(location: state.uri.path),
-                ],
+            final onHome = state.uri.path == '/';
+            return PopScope(
+              canPop: onHome,
+              onPopInvokedWithResult: (didPop, result) {
+                if (!didPop && !onHome) {
+                  context.go('/');
+                }
+              },
+              child: DeviceShell(
+                child: Column(
+                  children: [
+                    Expanded(child: child),
+                    TitoBottomNav(location: state.uri.path),
+                  ],
+                ),
               ),
             );
           },
@@ -52,24 +70,23 @@ class _TitoDexAppState extends State<TitoDexApp> {
               path: '/',
               builder: (context, state) => HomePage(
                 journey: _journey,
-                onContinue: _showContinueSheet,
+                onContinue: _onContinue,
               ),
             ),
             GoRoute(
               path: '/team',
-              builder: (context, state) =>
-                  PlaceholderPage(title: AppZh.navTeam),
+              builder: (context, state) => TeamPage(journey: _journey),
             ),
             GoRoute(
               path: '/journey',
-              builder: (context, state) =>
-                  PlaceholderPage(title: AppZh.navJourney),
+              builder: (context, state) => JourneyPage(journey: _journey),
             ),
             GoRoute(
               path: '/settings',
               builder: (context, state) => SettingsPage(
                 journey: _journey,
                 saveConfig: _saveConfig,
+                emulatorChoice: _emulatorChoice,
                 onImportFixture: _importBundledSave,
                 onResetMock: _resetMock,
                 onSaveJourney: _persist,
@@ -77,6 +94,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 onClearSaveDirectory: _clearSaveDirectory,
                 onToggleAutoLoad: _setAutoLoadOnStartup,
                 onSyncNow: () => _syncSaveDirectory(force: true),
+                onExportJourney: _exportJourney,
+                onImportJourney: _importJourneyJson,
+                onPickEmulator: _pickEmulatorFromSettings,
+                onClearEmulator: _clearEmulator,
               ),
             ),
           ],
@@ -94,12 +115,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
       await _repository.save(journey);
     }
     final saveConfig = await _saveSync.loadConfig();
+    final emulatorChoice = await _emulatorLauncher.loadChoice();
     if (!mounted) {
       return;
     }
     setState(() {
       _journey = journey;
       _saveConfig = saveConfig;
+      _emulatorChoice = emulatorChoice;
       _ready = true;
     });
   }
@@ -215,35 +238,101 @@ class _TitoDexAppState extends State<TitoDexApp> {
     );
   }
 
-  Future<void> _showContinueSheet() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.continueSheetTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              const Text(AppZh.continueSheetBody),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(AppZh.continueSheetOk),
-              ),
-            ],
-          ),
-        );
-      },
+  Future<void> _exportJourney() async {
+    await _journeyIo.copyExportToClipboard(_journey);
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackJourneyExported)),
     );
+  }
+
+  Future<void> _importJourneyJson() async {
+    final journey = await _journeyIo.pickAndImport();
+    if (journey == null || !mounted) {
+      return;
+    }
+    await _persist(journey);
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackJourneyImported)),
+    );
+  }
+
+  Future<void> _rememberEmulator(EmulatorAppChoice choice) async {
+    await _emulatorLauncher.saveChoice(choice);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _emulatorChoice = choice);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackEmulatorSaved)),
+    );
+  }
+
+  Future<void> _clearEmulator() async {
+    await _emulatorLauncher.clearChoice();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _emulatorChoice = null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackEmulatorCleared)),
+    );
+  }
+
+  Future<void> _pickEmulatorFromSettings() async {
+    final choice = await showEmulatorPickerSheet(context, _emulatorLauncher);
+    if (choice != null) {
+      await _rememberEmulator(choice);
+    }
+  }
+
+  Future<void> _onContinue() async {
+    final saved = _emulatorChoice;
+    if (saved != null && _emulatorLauncher.isLaunchSupported) {
+      try {
+        await _emulatorLauncher.launch(saved);
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.continueSheetLaunching(saved.appName))),
+        );
+        return;
+      } catch (_) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
+        );
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+    final choice = await showEmulatorPickerSheet(context, _emulatorLauncher);
+    if (choice == null || !mounted) {
+      return;
+    }
+
+    await _rememberEmulator(choice);
+    if (_emulatorLauncher.isLaunchSupported) {
+      try {
+        await _emulatorLauncher.launch(choice);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -252,7 +341,22 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return MaterialApp(
         theme: buildTitoTheme(),
         home: const DeviceShell(
-          child: Center(child: CircularProgressIndicator()),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppZh.appTitle,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 16),
+                CircularProgressIndicator(),
+              ],
+            ),
+          ),
         ),
       );
     }

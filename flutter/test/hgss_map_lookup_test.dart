@@ -45,4 +45,29 @@ void main() {
     expect(journey.saveTrainerName, 'ETeZ');
     expect(journey.location, '满金市');
   });
+
+  test('toJourney merges timeline instead of wiping manual entries', () {
+    const parser = HgssParser();
+    final summary = ParsedSaveSummary(
+      game: 'SoulSilver',
+      trainerName: 'ETeZ',
+      playTime: '7:03:41',
+      badges: 3,
+      maxBadges: 8,
+      locationLabel: '满金市',
+      party: [],
+      saveHash: 'deadbeef',
+      parsedAt: DateTime.utc(2026, 1, 1),
+    );
+
+    final existing = CurrentJourney.mock();
+    final journey = parser.toJourney(summary, existing: existing);
+
+    expect(journey.timeline.first.text, '已从本地魂银存档同步');
+    expect(
+      journey.timeline.any((entry) => entry.text == '抵达满金市'),
+      isTrue,
+    );
+    expect(journey.nextReminder, existing.nextReminder);
+  });
 }
