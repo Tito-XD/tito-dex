@@ -19,7 +19,9 @@ import 'pages/journey_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
+import 'theme/tito_colors.dart';
 import 'theme/tito_theme.dart';
+import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/tito_bottom_nav.dart';
@@ -368,20 +370,21 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!_ready) {
       return MaterialApp(
         theme: buildTitoTheme(),
-        home: const DeviceShell(
+        home: DeviceShell(
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   AppZh.appTitle,
-                  style: TextStyle(
+                  style: TitoTypography.style(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
+                    color: TitoColors.card,
                   ),
                 ),
-                SizedBox(height: 16),
-                CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                const CircularProgressIndicator(),
               ],
             ),
           ),

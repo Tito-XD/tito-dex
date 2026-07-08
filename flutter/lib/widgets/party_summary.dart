@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class PartySummary extends StatelessWidget {
@@ -25,9 +26,7 @@ class PartySummary extends StatelessWidget {
         children: [
           Text(
             AppZh.party,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: context.tito.cardTitle,
           ),
           const SizedBox(height: 8),
           for (var i = 0; i < party.length; i++)
@@ -43,7 +42,7 @@ class PartySummary extends StatelessWidget {
                           : party[i].nickname != null
                               ? party[i].nickname!
                               : localizeSpecies(party[i].species),
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: context.tito.cardBodyStrong,
                     ),
                   ),
                   if (party[i].level != null)
@@ -59,11 +58,7 @@ class PartySummary extends StatelessWidget {
                       ),
                       child: Text(
                         '${AppZh.level}${party[i].level}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                          color: TitoColors.mutedInk,
-                        ),
+                        style: context.tito.captionStrong,
                       ),
                     ),
                 ],

@@ -6,7 +6,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
@@ -108,18 +108,12 @@ class _DexPageState extends State<DexPage> {
           const AppHeader(showSettings: true),
           Text(
             '${AppZh.navDex} · ${localizeGame(widget.journey.game)} ($caughtCount/$hgssMaxNationalDexId)',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: TitoColors.card,
-                ),
+            style: context.tito.pageTitleOnGradient,
           ),
           const SizedBox(height: 8),
           Text(
             AppZh.dexScopeNote,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: TitoColors.card,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: context.tito.pageSubtitleOnGradient,
           ),
           const SizedBox(height: 12),
           SegmentedButton<bool>(
@@ -137,7 +131,7 @@ class _DexPageState extends State<DexPage> {
             StickerCard(
               child: Text(
                 _error!,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: context.tito.cardBodyStrong,
               ),
             )
           else if (visible.isEmpty && _loadingChunk)
@@ -146,7 +140,7 @@ class _DexPageState extends State<DexPage> {
             StickerCard(
               child: Text(
                 AppZh.dexJourneyEmpty,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: context.tito.cardBodyStrong,
               ),
             )
           else
@@ -179,10 +173,7 @@ class _DexPageState extends State<DexPage> {
               child: Text(
                 AppZh.dexLoadingProgress(_loadedThrough, hgssMaxNationalDexId),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: TitoColors.card,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.tito.pageSubtitleOnGradient,
               ),
             ),
         ],

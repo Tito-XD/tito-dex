@@ -5,6 +5,7 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'handheld_status_icons.dart';
 
 class AppHeader extends StatelessWidget {
@@ -21,7 +22,6 @@ class AppHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final compact = DeviceLayout.isCompact(context);
     final square = DeviceLayout.useSquareDashboard(context);
-    final titleSize = DeviceLayout.appTitleSize(context);
     final iconSize = DeviceLayout.appTitleIconSize(context);
 
     return Padding(
@@ -37,18 +37,15 @@ class AppHeader extends StatelessWidget {
           Expanded(
             child: Text(
               AppZh.appTitle,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.card,
-                    fontSize: titleSize,
-                    letterSpacing: -0.5,
-                    shadows: const [
-                      Shadow(
-                        color: Color(0x4018283B),
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+              style: context.tito.pageTitleOnGradient.copyWith(
+                letterSpacing: -0.5,
+                shadows: const [
+                  Shadow(
+                    color: Color(0x4018283B),
+                    offset: Offset(0, 2),
                   ),
+                ],
+              ),
             ),
           ),
           if (!square)

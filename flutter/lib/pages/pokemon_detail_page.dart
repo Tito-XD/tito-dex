@@ -6,6 +6,7 @@ import '../features/dex/dex_repository.dart';
 import '../theme/device_layout.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
@@ -46,15 +47,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         if (snapshot.connectionState != ConnectionState.done) {
           return ListView(
             padding: const EdgeInsets.all(16),
-            children: const [
-              AppHeader(showSettings: true),
-              SizedBox(height: 24),
-              Center(child: CircularProgressIndicator()),
-              SizedBox(height: 12),
+            children: [
+              const AppHeader(showSettings: true),
+              const SizedBox(height: 24),
+              const Center(child: CircularProgressIndicator()),
+              const SizedBox(height: 12),
               Center(
                 child: Text(
                   AppZh.dexLoadingDetail,
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: context.tito.cardBodyStrong,
                 ),
               ),
             ],
@@ -72,7 +73,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   children: [
                     Text(
                       AppZh.dexLoadFailed,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
+                      style: context.tito.cardBodyEmphasis,
                     ),
                     const SizedBox(height: 8),
                     Text(snapshot.error.toString()),
@@ -114,6 +115,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                     indicatorColor: TitoColors.coral,
                     dividerColor: Colors.transparent,
                     labelStyle: TextStyle(
+                      fontFamily: TitoTypography.fontFamily,
                       fontSize: DeviceLayout.useSquareDashboard(context)
                           ? 11
                           : (DeviceLayout.isCompact(context) ? 12 : 14),
@@ -164,11 +166,7 @@ class _IntroTab extends StatelessWidget {
         StickerCard(
           child: Text(
             AppZh.dexApiNote,
-            style: const TextStyle(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w600,
-              height: 1.4,
-            ),
+            style: context.tito.cardMuted.copyWith(height: 1.4),
           ),
         ),
       ],
@@ -199,7 +197,7 @@ class _BasicTab extends StatelessWidget {
             children: [
               Text(
                 AppZh.dexStabEffective,
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                style: context.tito.cardSectionTitle,
               ),
               const SizedBox(height: 8),
               TypeChipRow(
@@ -228,7 +226,7 @@ class _ObtainTab extends StatelessWidget {
           StickerCard(
             child: Text(
               AppZh.dexNoEvolution,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: context.tito.cardBodyStrong,
             ),
           ),
         ],
@@ -244,7 +242,7 @@ class _ObtainTab extends StatelessWidget {
             children: [
               Text(
                 AppZh.dexEvolution,
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                style: context.tito.cardSectionTitle,
               ),
               const SizedBox(height: 12),
               EvolutionChainView(
@@ -273,10 +271,7 @@ class _MovesTab extends StatelessWidget {
       children: [
         Text(
           AppZh.dexMovesHgssScope,
-          style: const TextStyle(
-            color: TitoColors.card,
-            fontWeight: FontWeight.w700,
-          ),
+          style: context.tito.pageNoteOnGradient,
         ),
         const SizedBox(height: 12),
         MoveCategoryPanel(

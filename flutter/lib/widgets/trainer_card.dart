@@ -5,6 +5,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class TrainerCard extends StatelessWidget {
@@ -48,50 +49,29 @@ class TrainerCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.trainerCard.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: compact ? 10 : 11,
-                    fontWeight: FontWeight.w700,
-                    color: TitoColors.mutedInk,
-                    letterSpacing: 0.8,
-                  ),
+                  style: context.tito.overline,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   journey.trainerName,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                        fontSize: compact
-                            ? DeviceLayout.cardHeadingSize(context)
-                            : null,
-                      ),
+                  style: context.tito.cardValueLarge.copyWith(height: 1.1),
                 ),
                 if (!compact) ...[
+                  const SizedBox(height: 4),
                   Text(
                     AppZh.journeySince2026,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: TitoColors.mutedInk,
-                    ),
+                    style: context.tito.caption,
                   ),
-                  const SizedBox(height: 4),
                 ],
+                const SizedBox(height: 2),
                 Text(
                   localizeGame(journey.game),
-                  style: TextStyle(
-                    fontSize: compact ? 12 : 13,
-                    fontWeight: FontWeight.w700,
-                    color: TitoColors.mutedInk,
-                  ),
+                  style: context.tito.captionStrong,
                 ),
                 if (!compact)
                   Text(
                     '${AppZh.companion} · ${localizeCompanion(journey.companion)}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: TitoColors.mutedInk,
-                    ),
+                    style: context.tito.caption,
                   ),
                 SizedBox(height: compact ? 6 : 10),
                 Row(

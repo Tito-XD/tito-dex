@@ -6,6 +6,7 @@ import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'city_illustration.dart';
 import 'sticker_card.dart';
 
@@ -33,24 +34,12 @@ class ContinueJourneyCard extends StatelessWidget {
         children: [
           Text(
             AppZh.continueJourney.toUpperCase(),
-            style: TextStyle(
-              fontSize: compact ? 11 : 12,
-              color: TitoColors.skyBlue,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
-            ),
+            style: context.tito.onDeepOverline,
           ),
           SizedBox(height: compact ? 2 : 4),
           Text(
             localizeLocation(journey.location),
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: TitoColors.card,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.3,
-                  fontSize: compact
-                      ? DeviceLayout.cardHeadingSize(context)
-                      : null,
-                ),
+            style: context.tito.onDeepHeading,
           ),
           SizedBox(height: compact ? 8 : 12),
           CityIllustration(compact: compact),
@@ -95,10 +84,9 @@ class ContinueJourneyCard extends StatelessWidget {
                       member.nickname != null
                           ? member.nickname!
                           : localizeSpecies(member.species),
-                      style: const TextStyle(
+                      style: context.tito.onDeepMetaValue.copyWith(
                         color: TitoColors.card,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                        fontSize: DeviceLayout.bodyTextSize(context),
                       ),
                     ),
                   ),
@@ -137,19 +125,11 @@ class _Meta extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: TitoColors.skyBlue,
-              fontSize: compact ? 10 : 12,
-              fontWeight: FontWeight.w700,
-            ),
+            style: context.tito.onDeepMetaLabel,
           ),
           Text(
             value,
-            style: TextStyle(
-              color: TitoColors.card,
-              fontWeight: FontWeight.w800,
-              fontSize: compact ? 12 : 14,
-            ),
+            style: context.tito.onDeepMetaValue,
           ),
         ],
       ),

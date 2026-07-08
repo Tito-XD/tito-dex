@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 
 class TitoBottomNav extends StatelessWidget {
   const TitoBottomNav({super.key, required this.location});
@@ -109,7 +110,6 @@ class _NavItem extends StatelessWidget {
     final fg = selected ? TitoColors.deepBlue : TitoColors.skyBlue;
     final bg = selected ? TitoColors.cream : Colors.transparent;
     final iconSize = compact ? 18.0 : 22.0;
-    final fontSize = compact ? 9.0 : 10.0;
 
     return Material(
       color: bg,
@@ -132,11 +132,7 @@ class _NavItem extends StatelessWidget {
                 spec.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: fg,
-                  fontSize: fontSize,
-                  fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
-                ),
+                style: TitoTypography.navLabel(context, selected: selected),
               ),
             ],
           ),
@@ -192,7 +188,7 @@ class _CenterNavItem extends StatelessWidget {
                 if (!compact)
                   Text(
                     spec.label,
-                    style: const TextStyle(
+                    style: TitoTypography.style(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
                       color: TitoColors.deepBlue,

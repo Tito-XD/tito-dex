@@ -5,6 +5,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class PartyStrip extends StatelessWidget {
@@ -26,10 +27,7 @@ class PartyStrip extends StatelessWidget {
         padding: DeviceLayout.cardPadding(context),
         child: Text(
           AppZh.currentParty,
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: compact ? 14 : 16,
-          ),
+          style: context.tito.cardTitle,
         ),
       );
     }
@@ -43,10 +41,7 @@ class PartyStrip extends StatelessWidget {
         children: [
           Text(
             AppZh.currentParty,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: compact ? 14 : null,
-                ),
+            style: context.tito.cardTitle,
           ),
           SizedBox(height: compact ? 8 : 10),
           if (vertical)
@@ -129,20 +124,13 @@ class _PartyOrb extends StatelessWidget {
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        fontSize: compact ? 10 : 11,
-        fontWeight: FontWeight.w700,
-      ),
+      style: context.tito.captionStrong,
     );
 
     final level = member.level != null
         ? Text(
             '${AppZh.level}${member.level}',
-            style: TextStyle(
-              fontSize: compact ? 9 : 10,
-              fontWeight: FontWeight.w800,
-              color: TitoColors.mutedInk,
-            ),
+            style: context.tito.caption,
           )
         : null;
 

@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class JourneyTimeline extends StatelessWidget {
@@ -24,17 +25,13 @@ class JourneyTimeline extends StatelessWidget {
         children: [
           Text(
             AppZh.recentTimeline,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: context.tito.cardTitle,
           ),
           const SizedBox(height: 8),
           if (entries.isEmpty)
             Text(
               AppZh.journeyTimelineEmpty,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
+              style: context.tito.cardMuted,
             )
           else
             for (final entry in entries)
@@ -60,16 +57,12 @@ class JourneyTimeline extends StatelessWidget {
                         children: [
                           Text(
                             localizeTimelineEntry(entry.text),
-                            style: const TextStyle(fontWeight: FontWeight.w700),
+                            style: context.tito.cardBodyStrong,
                           ),
                           if (entry.at != null)
                             Text(
                               entry.at!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: TitoColors.mutedInk,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: context.tito.caption,
                             ),
                         ],
                       ),
@@ -89,10 +82,7 @@ class JourneyTimeline extends StatelessWidget {
               ),
               child: Text(
                 '${AppZh.nextPrefix}${localizeReminder(nextReminder)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                ),
+                style: context.tito.cardBodyStrong,
               ),
             ),
           ],

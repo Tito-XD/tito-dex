@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/sticker_card.dart';
@@ -26,18 +26,12 @@ class JourneyPage extends StatelessWidget {
             children: [
               Text(
                 AppZh.navJourney,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: TitoColors.card,
-                    ),
+                style: context.tito.onDeepTitle,
               ),
               const SizedBox(height: 4),
               Text(
                 localizeLocation(journey.location),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: TitoColors.cream,
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.onDeepHeading,
               ),
             ],
           ),
@@ -88,12 +82,12 @@ class _StatRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: context.tito.cardLabel),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontWeight: FontWeight.w800),
+              style: context.tito.cardValue,
             ),
           ),
         ],
