@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'dex_cache_store.dart';
 import 'dex_models.dart';
 import 'dex_sprite_codec.dart';
+import 'poke_api_throttle.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
@@ -14,6 +16,8 @@ class DexOfflineService {
     PokeApiClient? client,
     DexCacheStore? store,
     DexSpriteCodec? codec,
+    this.pokemonRetryAttempts = 5,
+    this.checkpointEvery = 5,
   })  : _client = client ?? PokeApiClient(),
         _store = store ?? DexCacheStore(),
         _codec = codec ?? const DexSpriteCodec();
@@ -22,6 +26,8 @@ class DexOfflineService {
   final DexCacheStore _store;
   final DexSpriteCodec _codec;
   final http.Client _http = http.Client();
+  final int pokemonRetryAttempts;
+  final int checkpointEvery;
 
   bool _downloading = false;
   DexCacheProgress? _progress;
@@ -62,7 +68,10 @@ class DexOfflineService {
 
   Future<bool> shouldPreferOffline() async {
     final manifest = await _store.readManifest();
-    return manifest.complete && manifest.preferOffline;
+    if (!manifest.preferOffline) {
+      return false;
+    }
+    return manifest.complete || manifest.pokemonCount > 0;
   }
 
   Future<List<PokemonSummary>> readAllSummaries() => _store.readSummaries();
@@ -74,7 +83,8 @@ class DexOfflineService {
         return _attachAbsoluteSprite(entry);
       }
     }
-    return null;
+    final detail = await readDetail(id);
+    return detail?.summary;
   }
 
   Future<PokemonDetail?> readDetail(int id) async {
@@ -122,77 +132,168 @@ class DexOfflineService {
         );
       }
 
-      final summaries = <PokemonSummary>[];
-      final moves = <int, CachedMove>{};
+      final summaries = await _store.readSummaries();
+      final moves = await _store.readMoves();
+      _client.primeMoveCache(moves);
 
-      for (var start = 1; start <= hgssMaxNationalDexId; start += 10) {
-        final end = (start + 9).clamp(1, hgssMaxNationalDexId);
-        for (var id = start; id <= end; id++) {
-          yield _setProgress(
-            phase: 'pokemon',
-            current: id,
-            total: hgssMaxNationalDexId,
-            label: '#$id',
-          );
+      final completedIds = summaries.map((entry) => entry.id).toSet();
+      final failedIds = <int>[];
 
-          final detail = await _client.fetchDetailWithMoves(id);
-          mergeMoves(moves, detail.moveSet.allMoves);
-
-          final spritePath = await _cachePokemonSprite(id, detail.summary.spriteUrl);
-          final summary = detail.summary.copyWith(localSpritePath: spritePath);
-          final localizedEvolution = await _localizeEvolutionSprites(
-            detail.evolutionChain,
-          );
-          final localizedDetail = PokemonDetail(
-            summary: summary,
-            genusZh: detail.genusZh,
-            heightDm: detail.heightDm,
-            weightHg: detail.weightHg,
-            weaknesses: detail.weaknesses,
-            resistances: detail.resistances,
-            immunities: detail.immunities,
-            stabSuperEffective: detail.stabSuperEffective,
-            evolutionChain: localizedEvolution,
-            johtoDexNumber: detail.johtoDexNumber,
-            baseStats: detail.baseStats,
-            typeMultipliers: detail.typeMultipliers,
-            flavorEntries: detail.flavorEntries,
-            moveSet: detail.moveSet,
-            genderFemalePercent: detail.genderFemalePercent,
-            eggGroups: detail.eggGroups,
-            hatchCounter: detail.hatchCounter,
-          );
-
-          await _store.writeDetail(id, localizedDetail);
-          summaries.add(summary);
+      for (var id = 1; id <= hgssMaxNationalDexId; id++) {
+        if (completedIds.contains(id)) {
+          continue;
         }
 
-        await _store.writeMoves(moves);
-        await _store.writeSummaries(summaries);
+        yield _setProgress(
+          phase: 'pokemon',
+          current: id,
+          total: hgssMaxNationalDexId,
+          label: '宝可梦 #$id',
+        );
+
+        final detail = await _fetchPokemonDetailWithRetry(id);
+        if (detail == null) {
+          failedIds.add(id);
+          continue;
+        }
+
+        mergeMoves(moves, detail.moveSet.allMoves);
+
+        final spritePath =
+            await _cachePokemonSprite(id, detail.summary.spriteUrl);
+        final summary = detail.summary.copyWith(localSpritePath: spritePath);
+        final localizedEvolution = await _localizeEvolutionSprites(
+          detail.evolutionChain,
+        );
+        final localizedDetail = PokemonDetail(
+          summary: summary,
+          genusZh: detail.genusZh,
+          heightDm: detail.heightDm,
+          weightHg: detail.weightHg,
+          weaknesses: detail.weaknesses,
+          resistances: detail.resistances,
+          immunities: detail.immunities,
+          stabSuperEffective: detail.stabSuperEffective,
+          evolutionChain: localizedEvolution,
+          johtoDexNumber: detail.johtoDexNumber,
+          baseStats: detail.baseStats,
+          typeMultipliers: detail.typeMultipliers,
+          flavorEntries: detail.flavorEntries,
+          moveSet: detail.moveSet,
+          genderFemalePercent: detail.genderFemalePercent,
+          eggGroups: detail.eggGroups,
+          hatchCounter: detail.hatchCounter,
+        );
+
+        await _store.writeDetail(id, localizedDetail);
+        summaries.add(summary);
+        completedIds.add(id);
+
+        if (id % checkpointEvery == 0 || id == hgssMaxNationalDexId) {
+          await _store.writeMoves(moves);
+          await _store.writeSummaries(summaries);
+          await _writeCheckpoint(
+            pokemonCount: summaries.length,
+            moveCount: moves.length,
+            complete: false,
+          );
+        }
       }
 
-      final sizeBytes = await _store.directorySizeBytes();
-      final manifest = DexCacheManifest(
-        version: DexCacheManifest.currentVersion,
-        complete: true,
-        preferOffline: true,
-        downloadedAt: DateTime.now().toIso8601String(),
+      await _store.writeMoves(moves);
+      await _store.writeSummaries(summaries);
+
+      if (failedIds.isEmpty && summaries.length == hgssMaxNationalDexId) {
+        final sizeBytes = await _store.directorySizeBytes();
+        await _store.writeManifest(
+          DexCacheManifest(
+            version: DexCacheManifest.currentVersion,
+            complete: true,
+            preferOffline: true,
+            downloadedAt: DateTime.now().toIso8601String(),
+            pokemonCount: summaries.length,
+            moveCount: moves.length,
+            sizeBytes: sizeBytes,
+          ),
+        );
+
+        yield _setProgress(
+          phase: 'done',
+          current: hgssMaxNationalDexId,
+          total: hgssMaxNationalDexId,
+          label: null,
+        );
+        return;
+      }
+
+      await _writeCheckpoint(
         pokemonCount: summaries.length,
         moveCount: moves.length,
-        sizeBytes: sizeBytes,
+        complete: false,
       );
-      await _store.writeManifest(manifest);
+
+      debugPrint(
+        'DexOfflineService: partial download '
+        '${summaries.length}/$hgssMaxNationalDexId, failed=$failedIds',
+      );
 
       yield _setProgress(
-        phase: 'done',
-        current: hgssMaxNationalDexId,
+        phase: 'partial',
+        current: summaries.length,
         total: hgssMaxNationalDexId,
-        label: null,
+        label: failedIds.isEmpty ? null : '${failedIds.length} 只失败',
       );
     } finally {
       _downloading = false;
       _progress = null;
     }
+  }
+
+  Future<PokemonDetail?> _fetchPokemonDetailWithRetry(int id) async {
+    for (var attempt = 0; attempt < pokemonRetryAttempts; attempt++) {
+      try {
+        return await _client.fetchDetailWithMoves(id);
+      } on PokeApiException catch (error, stackTrace) {
+        debugPrint(
+          'DexOfflineService: #$id attempt ${attempt + 1} failed: $error',
+        );
+        debugPrint('$stackTrace');
+        if (attempt == pokemonRetryAttempts - 1) {
+          return null;
+        }
+        await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      } catch (error, stackTrace) {
+        debugPrint(
+          'DexOfflineService: #$id unexpected error on attempt ${attempt + 1}: $error',
+        );
+        debugPrint('$stackTrace');
+        if (attempt == pokemonRetryAttempts - 1) {
+          return null;
+        }
+        await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      }
+    }
+    return null;
+  }
+
+  Future<void> _writeCheckpoint({
+    required int pokemonCount,
+    required int moveCount,
+    required bool complete,
+  }) async {
+    final manifest = await _store.readManifest();
+    final sizeBytes = await _store.directorySizeBytes();
+    await _store.writeManifest(
+      DexCacheManifest(
+        version: DexCacheManifest.currentVersion,
+        complete: complete,
+        preferOffline: true,
+        downloadedAt: manifest.downloadedAt ?? DateTime.now().toIso8601String(),
+        pokemonCount: pokemonCount,
+        moveCount: moveCount,
+        sizeBytes: sizeBytes,
+      ),
+    );
   }
 
   Future<void> clearAll() async {
@@ -239,7 +340,7 @@ class DexOfflineService {
       return null;
     }
     await _store.writeSpriteBytes(id, compressed);
-    return await _store.spriteRelativePath(id);
+    return _store.spriteRelativePath(id);
   }
 
   Uint8List? _compressForPokemon(Uint8List bytes) {

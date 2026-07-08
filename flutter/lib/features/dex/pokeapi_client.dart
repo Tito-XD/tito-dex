@@ -318,6 +318,10 @@ class PokeApiClient {
 
   final Map<int, CachedMove> _moveCache = {};
 
+  void primeMoveCache(Map<int, CachedMove> moves) {
+    _moveCache.addAll(moves);
+  }
+
   Future<CachedMove> _fetchMove(int id) async {
     if (_moveCache.containsKey(id)) {
       return _moveCache[id]!;

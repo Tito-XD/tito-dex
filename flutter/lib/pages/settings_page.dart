@@ -94,7 +94,9 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _dexDownloading = true);
 
     try {
+      DexCacheProgress? lastProgress;
       await for (final progress in dexOfflineService.downloadAll()) {
+        lastProgress = progress;
         if (!mounted) {
           return;
         }
@@ -107,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   preferOffline: true,
                 ),
             sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
-            isDownloading: progress.phase != 'done',
+            isDownloading: progress.phase != 'done' && progress.phase != 'partial',
             progress: progress,
           );
         });
@@ -117,9 +119,20 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
-      );
+      final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
+      if (lastProgress?.phase == 'done') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
+        );
+      } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+        );
+      }
     } catch (_) {
       if (!mounted) {
         return;
@@ -377,7 +390,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         formatCacheSize(dexCache?.sizeBytes ?? 0),
                         dexManifest.downloadedAt?.split('T').first ?? '',
                       )
-                    : AppZh.settingsDexOfflineUnset,
+                    : dexManifest != null && dexManifest.pokemonCount > 0
+                        ? AppZh.settingsDexOfflinePartial(
+                            dexManifest.pokemonCount,
+                          )
+                        : AppZh.settingsDexOfflineUnset,
                 style: context.tito.cardBodyEmphasis,
               ),
               if (_dexDownloading && dexProgress != null) ...[
@@ -390,12 +407,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 6),
                 Text(
                   AppZh.settingsDexOfflineProgress(
-                    dexProgress.label ?? dexProgress.phase,
+                    dexProgress.phase,
                     dexProgress.current,
                     dexProgress.total,
                   ),
                   style: context.tito.cardMuted,
                 ),
+                if (dexProgress.label != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    dexProgress.label!,
+                    style: context.tito.caption,
+                  ),
+                ],
               ],
               const SizedBox(height: 12),
               FilledButton(
@@ -404,9 +428,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   backgroundColor: TitoColors.deepBlue,
                   foregroundColor: TitoColors.card,
                 ),
-                child: const Text(AppZh.settingsDexOfflineDownload),
+                child: Text(
+                  dexManifest != null &&
+                          dexManifest.pokemonCount > 0 &&
+                          !dexManifest.complete
+                      ? AppZh.settingsDexOfflineResume
+                      : AppZh.settingsDexOfflineDownload,
+                ),
               ),
-              if (dexManifest != null && dexManifest.complete) ...[
+              if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
                 const SizedBox(height: 8),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
