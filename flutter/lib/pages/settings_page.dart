@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -10,15 +11,25 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({
     super.key,
     required this.journey,
+    required this.saveConfig,
     required this.onImportFixture,
     required this.onResetMock,
     required this.onSaveJourney,
+    required this.onPickSaveDirectory,
+    required this.onClearSaveDirectory,
+    required this.onToggleAutoLoad,
+    required this.onSyncNow,
   });
 
   final CurrentJourney journey;
+  final SaveDirectoryConfig saveConfig;
   final VoidCallback onImportFixture;
   final VoidCallback onResetMock;
   final ValueChanged<CurrentJourney> onSaveJourney;
+  final VoidCallback onPickSaveDirectory;
+  final VoidCallback onClearSaveDirectory;
+  final ValueChanged<bool> onToggleAutoLoad;
+  final VoidCallback onSyncNow;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -71,6 +82,9 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final saveName = widget.journey.saveTrainerName;
+    final config = widget.saveConfig;
+    final directoryPath = config.directoryPath;
+    final lastSynced = config.lastLoadedFileName;
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -107,6 +121,71 @@ class _SettingsPageState extends State<SettingsPage> {
                   foregroundColor: TitoColors.ink,
                 ),
                 child: const Text(AppZh.settingsSaveTrainerName),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        StickerCard(
+          variant: StickerVariant.cream,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.settingsSaveDirectory,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppZh.settingsSaveDirectoryHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                directoryPath ?? AppZh.settingsSaveDirectoryUnset,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: directoryPath == null
+                      ? Theme.of(context).colorScheme.outline
+                      : TitoColors.ink,
+                ),
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: widget.onPickSaveDirectory,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.deepBlue,
+                  foregroundColor: TitoColors.card,
+                ),
+                child: const Text(AppZh.settingsPickSaveDirectory),
+              ),
+              if (directoryPath != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: widget.onClearSaveDirectory,
+                  child: const Text(AppZh.settingsClearSaveDirectory),
+                ),
+              ],
+              const SizedBox(height: 12),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text(AppZh.settingsAutoLoadOnStartup),
+                value: config.autoLoadOnStartup,
+                onChanged: widget.onToggleAutoLoad,
+              ),
+              Text(
+                lastSynced != null
+                    ? AppZh.settingsLastSynced(lastSynced)
+                    : AppZh.settingsLastSyncedNone,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed:
+                    directoryPath != null ? widget.onSyncNow : null,
+                child: const Text(AppZh.settingsSyncNow),
               ),
             ],
           ),

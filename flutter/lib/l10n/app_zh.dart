@@ -42,6 +42,25 @@ abstract final class AppZh {
   static const settingsImportSave = '导入内置 PKMSS.sav';
   static const settingsResetMock = '恢复演示数据';
 
+  static const settingsSaveDirectory = '存档目录';
+  static const settingsSaveDirectoryHint =
+      '选择 melonDS / Delta 等模拟器的存档文件夹，启动时自动读取最新的 .sav。';
+  static const settingsSaveDirectoryUnset = '未设置';
+  static const settingsPickSaveDirectory = '选择存档文件夹';
+  static const settingsClearSaveDirectory = '清除目录';
+  static const settingsAutoLoadOnStartup = '启动时自动加载最新存档';
+  static const settingsSyncNow = '立即同步';
+  static String settingsLastSynced(String fileName) => '上次同步：$fileName';
+  static const settingsLastSyncedNone = '尚未从目录同步过存档';
+
+  static const snackSaveDirectorySet = '存档目录已设置';
+  static const snackSaveDirectoryCleared = '已清除存档目录';
+  static const snackSaveSyncUnchanged = '存档未变化，无需更新';
+  static const snackSaveSyncNoDirectory = '请先在设置中选择存档目录';
+  static const snackSaveSyncNoSave = '目录中未找到 512 KB 的 .sav 文件';
+  static const snackSaveSyncUnsupported = '找到的存档格式不受支持';
+  static String snackSaveSyncLoaded(String fileName) => '已从 $fileName 同步存档';
+
   static const snackTrainerSaved = '训练家名称已保存';
   static String snackSaveLoaded(String name, int partyCount) =>
       '已加载 $name 的存档 · 队伍 $partyCount 只';
