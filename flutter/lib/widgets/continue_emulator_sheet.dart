@@ -9,9 +9,9 @@ import '../theme/tito_typography.dart';
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
   BuildContext context,
   EmulatorLauncher launcher,
-) async {
+) {
   if (!launcher.isLaunchSupported) {
-    await showModalBottomSheet<void>(
+    return showModalBottomSheet<EmulatorAppChoice>(
       context: context,
       showDragHandle: true,
       builder: (context) => Padding(
@@ -22,51 +22,122 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
         ),
       ),
     );
-    return null;
   }
-
-  final appsFuture = launcher.listCandidateApps();
 
   return showModalBottomSheet<EmulatorAppChoice>(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
-    builder: (context) {
-      return SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: FutureBuilder<List<EmulatorAppChoice>>(
-            future: appsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return SizedBox(
-                  height: MediaQuery.sizeOf(context).height * 0.25,
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              if (snapshot.hasError) {
-                return Text(
-                  AppZh.continueSheetEmulatorLoadFailed,
-                  style: context.tito.cardBody,
-                );
-              }
-
-              final apps = snapshot.data ?? const [];
-              if (apps.isEmpty) {
-                return Text(
-                  AppZh.continueSheetNoEmulators,
-                  style: context.tito.cardBody,
-                );
-              }
-
-              return _EmulatorPickerList(apps: apps);
-            },
-          ),
-        ),
-      );
-    },
+    builder: (context) => _EmulatorPickerSheet(launcher: launcher),
   );
+}
+
+class _EmulatorPickerSheet extends StatefulWidget {
+  const _EmulatorPickerSheet({required this.launcher});
+
+  final EmulatorLauncher launcher;
+
+  @override
+  State<_EmulatorPickerSheet> createState() => _EmulatorPickerSheetState();
+}
+
+class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
+    with WidgetsBindingObserver {
+  late Future<List<EmulatorAppChoice>> _appsFuture;
+  Object? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _reload();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _reload();
+    }
+  }
+
+  void _reload() {
+    setState(() {
+      _error = null;
+      _appsFuture = widget.launcher.listCandidateApps().catchError((error) {
+        _error = error;
+        return <EmulatorAppChoice>[];
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: FutureBuilder<List<EmulatorAppChoice>>(
+          future: _appsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return SizedBox(
+                height: MediaQuery.sizeOf(context).height * 0.25,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (_error != null) {
+              return _EmulatorPickerMessage(
+                message: AppZh.continueSheetEmulatorLoadFailed,
+                onRetry: _reload,
+              );
+            }
+
+            final apps = snapshot.data ?? const [];
+            if (apps.isEmpty) {
+              return _EmulatorPickerMessage(
+                message: AppZh.continueSheetNoEmulators,
+                onRetry: _reload,
+              );
+            }
+
+            return _EmulatorPickerList(apps: apps);
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _EmulatorPickerMessage extends StatelessWidget {
+  const _EmulatorPickerMessage({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(message, style: context.tito.cardBody),
+        const SizedBox(height: 12),
+        FilledButton(
+          onPressed: onRetry,
+          child: const Text(AppZh.dexRetry),
+        ),
+      ],
+    );
+  }
 }
 
 class _EmulatorPickerList extends StatelessWidget {

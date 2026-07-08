@@ -114,11 +114,12 @@ class _NavItem extends StatelessWidget {
     return Material(
       color: bg,
       borderRadius: BorderRadius.circular(TitoRadii.sm),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        splashColor: TitoColors.skyBlue.withValues(alpha: 0.2),
-        child: Padding(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(TitoRadii.sm),
+          splashColor: TitoColors.skyBlue.withValues(alpha: 0.28),
+          highlightColor: TitoColors.skyBlue.withValues(alpha: 0.14),
+          child: Padding(
           padding: EdgeInsets.symmetric(
             vertical: compact ? 3 : 8,
             horizontal: 2,
@@ -174,6 +175,8 @@ class _CenterNavItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           customBorder: const CircleBorder(),
+          splashColor: TitoColors.deepBlue.withValues(alpha: 0.12),
+          highlightColor: TitoColors.deepBlue.withValues(alpha: 0.08),
           child: SizedBox(
             width: size,
             height: size,

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:installed_apps/installed_apps.dart';
 
@@ -15,11 +14,15 @@ const knownEmulatorPackages = <String, String>{
   'com.explusalpha.MdEmu': 'MD.emu',
   'com.explusalpha.Snes9xPlus': 'Snes9x EX+',
   'com.retroarch': 'RetroArch',
+  'com.retroarch.aarch64': 'RetroArch',
   'org.dolphinemu.dolphinemu': 'Dolphin',
   'com.citra.citra_emu': 'Citra',
+  'com.citra.citra_emu.canary': 'Citra Canary',
   'com.ndsemulator': 'NDS Emulator',
   'com.fastemulator.gbafree': 'My Boy!',
   'com.fastemulator.gba': 'My Boy! GBA',
+  'com.duckstation.psx': 'DuckStation',
+  'org.easyrpg.player': 'EasyRPG',
 };
 
 const _emulatorKeywords = [
@@ -34,6 +37,7 @@ const _emulatorKeywords = [
   'citra',
   'dolphin',
   'retroarch',
+  'duckstation',
 ];
 
 class EmulatorLauncher {
@@ -66,11 +70,8 @@ class EmulatorLauncher {
 
     final results = <String, EmulatorAppChoice>{};
 
-    // Probe each known package directly — works even when the full installed-app
-    // list is empty due to Android 11+ package visibility limits.
     for (final entry in knownEmulatorPackages.entries) {
-      final installed = await InstalledApps.isAppInstalled(entry.key);
-      if (installed != true) {
+      if (!await _canLaunch(entry.key)) {
         continue;
       }
       final app = await InstalledApps.getAppInfo(entry.key, null);
@@ -81,15 +82,19 @@ class EmulatorLauncher {
     }
 
     try {
-      final installed = await InstalledApps.getInstalledApps(true, false);
+      final installed = await InstalledApps.getInstalledApps(false, false);
       for (final app in installed) {
         final haystack = '${app.name} ${app.packageName}'.toLowerCase();
-        if (_emulatorKeywords.any(haystack.contains)) {
-          results[app.packageName] = EmulatorAppChoice(
-            packageName: app.packageName,
-            appName: app.name,
-          );
+        if (!_emulatorKeywords.any(haystack.contains)) {
+          continue;
         }
+        if (!await _canLaunch(app.packageName)) {
+          continue;
+        }
+        results[app.packageName] = EmulatorAppChoice(
+          packageName: app.packageName,
+          appName: app.name,
+        );
       }
     } catch (error, stackTrace) {
       debugPrint('EmulatorLauncher: installed app scan failed: $error');
@@ -106,14 +111,12 @@ class EmulatorLauncher {
       return false;
     }
 
-    final intent = AndroidIntent(
-      action: 'android.intent.action.MAIN',
-      package: choice.packageName,
-      flags: <int>[
-        0x10000000, // FLAG_ACTIVITY_NEW_TASK
-      ],
-    );
-    await intent.launch();
-    return true;
+    final started = await InstalledApps.startApp(choice.packageName);
+    return started == true;
+  }
+
+  Future<bool> _canLaunch(String packageName) async {
+    final installed = await InstalledApps.isAppInstalled(packageName);
+    return installed == true;
   }
 }

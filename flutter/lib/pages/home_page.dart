@@ -25,6 +25,19 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        _buildBody(context),
+        FloatingCompanion(
+          name: journey.companion,
+          message: AppZh.companionMessage(journey.location),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     if (DeviceLayout.useSquareDashboard(context)) {
       return Padding(
         padding: DeviceLayout.pagePadding(context),
@@ -151,11 +164,6 @@ class _NarrowHomeLayout extends StatelessWidget {
             nextReminder: journey.nextReminder,
           ),
           SizedBox(height: gap),
-          CompanionSticker(
-            name: journey.companion,
-            message: AppZh.companionMessage(journey.location),
-          ),
-          SizedBox(height: gap),
           LauncherWidgets(journey: journey),
         ] else ...[
           SizedBox(height: gap),
@@ -205,11 +213,6 @@ class _WideHomeLayout extends StatelessWidget {
                   JourneyTimeline(
                     entries: journey.timeline,
                     nextReminder: journey.nextReminder,
-                  ),
-                  SizedBox(height: gap),
-                  CompanionSticker(
-                    name: journey.companion,
-                    message: AppZh.companionMessage(journey.location),
                   ),
                 ],
               ),

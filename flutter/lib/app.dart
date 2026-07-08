@@ -82,34 +82,50 @@ class _TitoDexAppState extends State<TitoDexApp> {
           routes: [
             GoRoute(
               path: '/',
-              builder: (context, state) => HomePage(
-                journey: _journey,
-                onContinue: _onContinue,
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: HomePage(
+                  journey: _journey,
+                  onContinue: _onContinue,
+                ),
               ),
             ),
             GoRoute(
               path: '/team',
-              builder: (context, state) => TeamPage(journey: _journey),
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: TeamPage(journey: _journey),
+              ),
             ),
             GoRoute(
               path: '/journey',
-              builder: (context, state) => JourneyPage(journey: _journey),
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: JourneyPage(journey: _journey),
+              ),
             ),
             GoRoute(
               path: '/dex',
-              builder: (context, state) => DexPage(journey: _journey),
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: DexPage(journey: _journey),
+              ),
               routes: [
                 GoRoute(
                   path: ':id',
                   builder: (context, state) => PokemonDetailPage(
-                    pokemonId: int.parse(state.pathParameters['id']!),
+                    pokemonId:
+                        int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
                   ),
                 ),
               ],
             ),
             GoRoute(
               path: '/search',
-              builder: (context, state) => SearchPage(journey: _journey),
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: SearchPage(journey: _journey),
+              ),
             ),
             GoRoute(
               path: '/settings',
@@ -139,6 +155,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   Future<void> _bootstrap() async {
     var journey = await _repository.load();
+    if (journey.game == 'SoulSilver' && journey.companion == 'Riolu') {
+      journey = journey.copyWith(companion: 'Cyndaquil');
+      await _repository.save(journey);
+    }
     final syncResult = await _saveSync.syncOnStartup(existing: journey);
     if (syncResult.updated) {
       journey = syncResult.journey;

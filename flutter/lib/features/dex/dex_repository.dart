@@ -54,11 +54,15 @@ class DexRepository {
     }
 
     if (await _offline.shouldPreferOffline()) {
-      final cached = await _offline.readDetail(id);
-      if (cached != null) {
-        _detailCache[id] = cached;
-        _summaryCache[id] = cached.summary;
-        return cached;
+      try {
+        final cached = await _offline.readDetail(id);
+        if (cached != null) {
+          _detailCache[id] = cached;
+          _summaryCache[id] = cached.summary;
+          return cached;
+        }
+      } catch (_) {
+        // Corrupt partial offline cache — fall through to live API.
       }
     }
 
