@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
-import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 
 import 'emulator_launcher_repository.dart';
@@ -65,32 +64,36 @@ class EmulatorLauncher {
           .toList();
     }
 
-    final installed = await InstalledApps.getInstalledApps(true, false);
-
-    final byPackage = <String, AppInfo>{
-      for (final app in installed) app.packageName: app,
-    };
-
     final results = <String, EmulatorAppChoice>{};
 
+    // Probe each known package directly — works even when the full installed-app
+    // list is empty due to Android 11+ package visibility limits.
     for (final entry in knownEmulatorPackages.entries) {
-      final app = byPackage[entry.key];
-      if (app != null) {
-        results[entry.key] = EmulatorAppChoice(
-          packageName: app.packageName,
-          appName: app.name,
-        );
+      final installed = await InstalledApps.isAppInstalled(entry.key);
+      if (installed != true) {
+        continue;
       }
+      final app = await InstalledApps.getAppInfo(entry.key, null);
+      results[entry.key] = EmulatorAppChoice(
+        packageName: entry.key,
+        appName: app?.name ?? entry.value,
+      );
     }
 
-    for (final app in installed) {
-      final haystack = '${app.name} ${app.packageName}'.toLowerCase();
-      if (_emulatorKeywords.any(haystack.contains)) {
-        results[app.packageName] = EmulatorAppChoice(
-          packageName: app.packageName,
-          appName: app.name,
-        );
+    try {
+      final installed = await InstalledApps.getInstalledApps(true, false);
+      for (final app in installed) {
+        final haystack = '${app.name} ${app.packageName}'.toLowerCase();
+        if (_emulatorKeywords.any(haystack.contains)) {
+          results[app.packageName] = EmulatorAppChoice(
+            packageName: app.packageName,
+            appName: app.name,
+          );
+        }
       }
+    } catch (error, stackTrace) {
+      debugPrint('EmulatorLauncher: installed app scan failed: $error');
+      debugPrint('$stackTrace');
     }
 
     final list = results.values.toList()

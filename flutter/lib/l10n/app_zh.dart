@@ -41,6 +41,8 @@ abstract final class AppZh {
       '正在加载图鉴 $loaded / $total…';
   static const dexLoadingDetail = '正在从 PokeAPI 拉取详情…';
   static const dexLoadFailed = '图鉴数据加载失败';
+  static String dexLoadFailedDetail(int statusCode) =>
+      'PokeAPI 请求失败（HTTP $statusCode）。请检查网络，或在设置中下载离线图鉴后重试。';
   static const dexRetry = '重试';
   static const dexHeight = '身高';
   static const dexWeight = '体重';
@@ -166,6 +168,7 @@ abstract final class AppZh {
   static const continueSheetLaunch = '启动';
   static const continueSheetChange = '换一个';
   static const continueSheetNoEmulators = '未找到已安装的模拟器应用';
+  static const continueSheetEmulatorLoadFailed = '读取已安装应用失败，请稍后重试';
   static const continueSheetDesktopHint = '模拟器启动目前仅支持 Android';
   static String continueSheetLaunching(String name) => '正在打开 $name…';
   static const snackEmulatorSaved = '已记住模拟器选择';

@@ -4,22 +4,41 @@ import 'package:http/http.dart' as http;
 
 import 'dex_game_scope.dart';
 import 'dex_models.dart';
+import 'poke_api_throttle.dart';
 import 'type_chart.dart';
 
 class PokeApiClient {
-  PokeApiClient({http.Client? client}) : _client = client ?? http.Client();
+  PokeApiClient({
+    http.Client? client,
+    PokeApiThrottle? throttle,
+    this.maxRetries = 4,
+  })  : _client = client ?? http.Client(),
+        _throttle = throttle ?? PokeApiThrottle();
 
   final http.Client _client;
+  final PokeApiThrottle _throttle;
+  final int maxRetries;
   static const baseUrl = 'https://pokeapi.co/api/v2';
 
   final Map<String, TypeDamageRelations> _typeRelationsCache = {};
 
-  Future<Map<String, dynamic>> _getJson(String path) async {
+  Future<Map<String, dynamic>> _getJson(String path) {
+    return _throttle.run(() => _getJsonWithRetry(path));
+  }
+
+  Future<Map<String, dynamic>> _getJsonWithRetry(
+    String path, {
+    int attempt = 0,
+  }) async {
     final response = await _client.get(Uri.parse('$baseUrl$path'));
-    if (response.statusCode != 200) {
-      throw PokeApiException(path, response.statusCode);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
     }
-    return jsonDecode(response.body) as Map<String, dynamic>;
+    if (attempt < maxRetries && pokeApiStatusShouldRetry(response.statusCode)) {
+      await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      return _getJsonWithRetry(path, attempt: attempt + 1);
+    }
+    throw PokeApiException(path, response.statusCode);
   }
 
   Future<Map<String, TypeDamageRelations>> loadAllTypeRelations() async {
@@ -332,12 +351,23 @@ class PokeApiClient {
   }
 
   Future<EvolutionNode> _fetchEvolutionChain(String url) async {
+    return _throttle.run(() => _fetchEvolutionChainWithRetry(url));
+  }
+
+  Future<EvolutionNode> _fetchEvolutionChainWithRetry(
+    String url, {
+    int attempt = 0,
+  }) async {
     final response = await _client.get(Uri.parse(url));
-    if (response.statusCode != 200) {
-      throw PokeApiException(url, response.statusCode);
+    if (response.statusCode == 200) {
+      final chain = jsonDecode(response.body) as Map<String, dynamic>;
+      return _parseEvolutionNode(chain['chain'] as Map<String, dynamic>);
     }
-    final chain = jsonDecode(response.body) as Map<String, dynamic>;
-    return _parseEvolutionNode(chain['chain'] as Map<String, dynamic>);
+    if (attempt < maxRetries && pokeApiStatusShouldRetry(response.statusCode)) {
+      await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      return _fetchEvolutionChainWithRetry(url, attempt: attempt + 1);
+    }
+    throw PokeApiException(url, response.statusCode);
   }
 
   Future<EvolutionNode> _parseEvolutionNode(Map<String, dynamic> node) async {

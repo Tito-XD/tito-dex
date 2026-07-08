@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/pokeapi_client.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -21,7 +22,7 @@ class DexPage extends StatefulWidget {
 }
 
 class _DexPageState extends State<DexPage> {
-  static const _chunkSize = 40;
+  static const _chunkSize = 12;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
@@ -48,8 +49,15 @@ class _DexPageState extends State<DexPage> {
       if (!mounted) {
         return;
       }
-      setState(() => _error = error.toString());
+      setState(() => _error = _formatDexError(error));
     }
+  }
+
+  String _formatDexError(Object error) {
+    if (error is PokeApiException) {
+      return '${AppZh.dexLoadFailed}\n${AppZh.dexLoadFailedDetail(error.statusCode)}';
+    }
+    return '${AppZh.dexLoadFailed}\n$error';
   }
 
   Future<void> _loadMore() async {
@@ -75,7 +83,7 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() {
-        _error = error.toString();
+        _error = _formatDexError(error);
         _loadingChunk = false;
       });
     }
@@ -141,9 +149,22 @@ class _DexPageState extends State<DexPage> {
           const SizedBox(height: 16),
           if (_error != null)
             StickerCard(
-              child: Text(
-                _error!,
-                style: context.tito.cardBodyStrong,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    _error!,
+                    style: context.tito.cardBodyStrong,
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: () {
+                      setState(() => _error = null);
+                      _loadMore();
+                    },
+                    child: const Text(AppZh.dexRetry),
+                  ),
+                ],
               ),
             )
           else if (visible.isEmpty && _loadingChunk)
