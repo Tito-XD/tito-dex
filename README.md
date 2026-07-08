@@ -29,16 +29,17 @@ TitoDex should feel less like a wiki and more like a small trainer device that s
 5. **Iterative** — begin with HGSS, then adapt for Pt, BW, B2W2, XY, ORAS, USUM as Tito reaches them.
 6. **Do not over-engineer** — first make a delightful companion, not a universal platform.
 
-## Suggested Stack
+## Stack
 
-The recommended initial stack is:
+**Active:** Flutter + Dart (Android-first; Linux handheld and web later).
 
-- **Capacitor** for Android-first native packaging and future local file access.
-- **React + TypeScript** for a fast, component-driven UI.
-- **Vite** for simple frontend tooling.
-- **Local-first storage** before cloud sync.
+**Reference:** Capacitor + React + TypeScript + Vite (Phase 2 mock app under `src/`).
 
-Future native needs include local save-file access, save parsing, optional cloud backup, and Android device adaptation across phones, tablets, foldables, and square handheld screens such as RG Rotate.
+TitoDex migrated to Flutter after real-device testing showed WebView limitations and to support future Linux handheld targets. See [Stack Decision](./docs/STACK_DECISION.md) for the full rationale and migration notes.
+
+- **Flutter** for native rendering, cross-platform UI, and platform plugins (file picker, app launcher).
+- **Local-first storage** (`shared_preferences` / `drift`) before cloud sync.
+- **Dart HGSS parser** with fixture tests against `src/PKMSS.sav`.
 
 ## Phase 1 Scope
 
@@ -73,51 +74,39 @@ Start here:
 - [Design system](./docs/DESIGN_SYSTEM.md)
 - [UI reference notes](./docs/UI_REFERENCE.md)
 - [Architecture](./docs/ARCHITECTURE.md)
+- [Stack decision (Flutter migration)](./docs/STACK_DECISION.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
 - [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
 
 ## Development
 
-Stack: **Capacitor + React + TypeScript + Vite** (Phase 2 mock app).
+### Flutter (active)
 
-### Prerequisites
+Prerequisites: Flutter stable, Android SDK, Android Studio or CLI device.
 
-- Node.js 20+
-- npm
-- Android Studio (for building/running the Android shell)
+```bash
+flutter pub get
+flutter run          # connected device or emulator
+flutter test         # parser and unit tests
+```
 
-### Setup
+The Flutter app will live under `lib/` once Phase 0 scaffolding lands. Until then, use the Phase 2 reference below for UI and product shape.
+
+### Phase 2 reference (Capacitor + React)
+
+Frozen mock app for design reference — not the shipping target.
+
+Prerequisites: Node.js 20+, npm, Android SDK.
 
 ```bash
 npm install
-npm run dev
+npm run dev          # browser preview at http://localhost:5173
+npm run build
+npm run cap:sync     # sync into android/ Capacitor shell
 ```
 
-Open the local dev server URL (default `http://localhost:5173`) to preview the responsive mock UI in a browser.
+Fonts are bundled locally (`@fontsource/nunito`). Journey data is still mock-only in this tree (`journeyStore.ts`).
 
-### Build & Android
+### HGSS save fixture
 
-```bash
-npm run build          # typecheck + web production build
-npm run cap:sync       # build and sync web assets into android/
-npm run cap:android    # open Android Studio (after sync)
-```
-
-In Android Studio:
-
-1. Open the `android/` folder.
-2. Create/start an AVD (Pixel 5 or similar; API 34+ recommended).
-3. Run the `app` configuration on the emulator or a connected device.
-
-Command-line debug build (requires Android SDK + `android/local.properties`):
-
-```bash
-echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-cd android && ./gradlew assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.tito.titodex/.MainActivity
-```
-
-Fonts are bundled locally (`@fontsource/nunito`) so the WebView does not depend on Google Fonts at runtime.
-
-Mock data is hard-coded for SoulSilver / Goldenrod City (3 badges) per Phase 2 scope.
+`src/PKMSS.sav` — 524 288-byte SoulSilver save for parser development. See `docs/PARSER_PROPOSAL.md`.
