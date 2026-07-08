@@ -1,207 +1,222 @@
 # TitoDex Architecture
 
-## Recommended Initial Stack
+> **Active stack:** Flutter + Dart in `flutter/`. Capacitor + React under `src/` is a frozen design reference. See [Stack Decision](./STACK_DECISION.md) for migration rationale and current feature status.
 
-Use **Capacitor + React + TypeScript** for an Android-first application with a web-based UI layer.
+## Recommended Stack
 
-Why:
+**Flutter + Dart** (`flutter/` subdirectory)
 
-- Android packaging is first-class through Capacitor.
-- React is productive for componentized dashboard UI.
-- TypeScript keeps local data and parser boundaries explicit.
-- Capacitor can later support local file access and platform plugins.
-- The app can still be tested as a responsive web UI during early iteration.
+| Concern | Choice |
+| --- | --- |
+| UI | Custom widgets — `DeviceShell`, sticker cards, Nunito via `google_fonts` |
+| Routing | `go_router` — shell route + bottom nav |
+| Persistence | `shared_preferences` — journey JSON + save-directory config |
+| Save parsing | `HgssParser` — retail 512 KB NDS `.sav` |
+| Save sync | `SaveSyncService` + `SaveScanner` — directory watch, newest file by mtime |
+| File picking | `file_picker` — directory path (not single-file yet) |
+| Hashing | `package:crypto` SHA-256 |
+| Localization | Static Chinese maps in `lib/l10n/` |
 
+### Legacy reference (Phase 2)
 
-## Stack Decision for RG Rotate
+Capacitor + React + TypeScript + Vite — mock UI and tokens in `src/styles/tokens.css`. Not the shipping target.
 
-The default Phase 2 stack is **Capacitor + React + TypeScript + Vite**. This remains the recommended path for TitoDex because the product is primarily a local-first companion dashboard rather than a performance-heavy native application.
+## Target Devices
 
-The first target handheld is **Anbernic RG Rotate**, with a Unisoc chipset and Android 12 ceiling. That target reinforces a few constraints:
+| Device | Status |
+| --- | --- |
+| Android phone / RG Rotate | Primary — `flutter/android/` |
+| Linux handheld (future) | `flutter/linux/` scaffold present |
+| Web preview | `flutter/web/` — save sync disabled (`dart:io`) |
 
-- keep the UI lightweight and dashboard-oriented;
-- avoid heavy blur, excessive animation, and large unoptimized art assets;
-- test square and landscape-like layouts early instead of assuming phone portrait;
-- use Capacitor for the Android shell and bridge only where needed;
-- isolate native file access behind platform adapters;
-- prefer Android Storage Access Framework style file picking for `.sav` files instead of assuming unrestricted filesystem paths;
-- keep React/CSS components custom rather than adopting a default Material or Ionic UI look.
+Constraints:
 
-Fallback options are intentionally secondary:
-
-- **React Native** if WebView performance or input handling becomes a real RG Rotate problem.
-- **Flutter** if a future rewrite needs stronger custom-rendered cross-platform UI.
-- **Kotlin + Jetpack Compose** if TitoDex becomes Android-only and needs deep native integration.
-
-Do not switch stacks preemptively. Validate the Capacitor build on the target device first.
+- lightweight dashboard UI for Unisoc-class hardware
+- custom visual language — not Material-default chrome
+- **DeviceShell retained** on all form factors
+- save access via user-selected directory (SAF-style folder pick), not hard-coded paths
 
 ## Architecture Goals
 
 - local first
-- Android first
-- responsive UI
+- Android first (Linux + web follow)
+- responsive phone + square layouts
 - simple data model
-- no premature all-generation abstraction
-- parser modules are optional and game-scoped
-- cloud sync is a later adapter, not a core dependency
+- game-scoped parser (HGSS only for now)
+- cloud sync as optional later adapter
 
-## Proposed Project Shape
+## Project Shape
 
-When implementation begins:
+### Flutter (active) — `flutter/`
 
 ```txt
-src/
-  app/
-    App.tsx
-    routes.tsx
-  components/
-    TrainerCard.tsx
-    ContinueJourneyCard.tsx
-    QuickWidget.tsx
-    PartySummary.tsx
-    JourneyTimeline.tsx
-  data/
-    mockJourney.ts
-  features/
-    journey/
-      journeyTypes.ts
-      journeyStore.ts
-    dex/
-      dexMockData.ts
-    parser/
-      hgssParser.ts
-      parserTypes.ts
-    sync/
-      syncTypes.ts
-  styles/
-    tokens.css
-    global.css
-    layouts.css
-  platform/
-    fileAccess.ts
-    capacitor.ts
+flutter/
+  lib/
+    app.dart                      # Bootstrap, GoRouter, save sync hooks
+    main.dart
+    features/
+      journey/journey_repository.dart
+      parser/
+        hgss_parser.dart          # Parse + toJourney
+        hgss_format.dart          # Gen IV text, party decrypt
+        hgss_map_lookup.dart
+        hgss_map_list.dart        # Generated map table
+      save/
+        save_sync_service.dart
+        save_scanner.dart
+        save_directory_repository.dart
+        save_types.dart
+    l10n/
+      app_zh.dart                 # UI strings
+      game_zh.dart                # Location/species zh maps
+    models/
+      journey.dart
+      parsed_save.dart
+    pages/
+      home_page.dart
+      settings_page.dart
+    theme/
+      tito_colors.dart
+      tito_theme.dart
+    widgets/
+      device_shell.dart
+      tito_bottom_nav.dart
+      trainer_card.dart
+      continue_journey_card.dart
+      party_summary.dart
+      sticker_card.dart
+  test/
+    hgss_parser_test.dart
+    hgss_map_lookup_test.dart
+    save_scanner_test.dart
+    widget_test.dart
+  assets/fixtures/PKMSS.sav
+  android/ linux/ web/
 ```
 
-Keep early modules small. Do not create a large plugin framework before the HGSS flow is validated.
+Repo-level tooling:
+
+```txt
+fixtures/PKMSS.sav
+tools/
+  probe_hgss_save.py
+  generate_hgss_map_list.py
+  hgss_map_list.json
+```
+
+### React (frozen reference) — `src/`
+
+```txt
+src/                    # Phase 2 mock — design reference only
+android/                # Capacitor shell (legacy)
+package.json
+```
+
+## Data Flow
+
+### App bootstrap (`lib/app.dart`)
+
+1. `JourneyRepository.load()` — prefs or `CurrentJourney.mock()`.
+2. `SaveSyncService.syncOnStartup()` — if auto-load enabled and directory set, parse newest `.sav`.
+3. If sync updated journey → persist.
+4. Render `HomePage` with current journey.
+
+### Save directory sync
+
+```txt
+User picks directory (Settings)
+  → SaveDirectoryRepository persists path + auto-load flag
+  → SaveScanner.findNewestSave() — recursive, 524288-byte .sav only
+  → skip if same path+mtime (unless force)
+  → HgssParser.parseSummary() → toJourney(existing: …)
+  → JourneyRepository.save()
+```
+
+### Journey model highlights
+
+- `trainerName` — display name (may be customized)
+- `saveTrainerName` — raw decoded OT from last parse
+- `trainerNameCustomized` — when true, re-import preserves display name
+- `timeline`, `party`, `location`, `badges`, `playTime` — from mock or parser
 
 ## Data Layers
 
-### 1. Mock Data Layer
+### 1. Mock seed
 
-Phase 1 / Phase 2 can use hard-coded data:
+`CurrentJourney.mock()` — Chinese SoulSilver template on first launch.
 
-- SoulSilver
-- Goldenrod City
-- 3 badges
-- play time
-- party
-- journey timeline
-- Dex search mock
+### 2. Local journey store
 
-### 2. Local Journey Store
+`JourneyRepository` — JSON in `shared_preferences`.
 
-The first real persistence layer should store user-editable journey state locally.
+Helpers on `HgssParser`: `encodeJourneyJson` / `decodeJourneyJson` (export/import UI not wired yet).
 
-Possible storage choices:
+### 3. Save parser adapter
 
-- simple local storage for early mock app
-- IndexedDB for richer local data
-- Capacitor Preferences for small settings
-- file-backed export/import later
+`ParsedSaveSummary` → `toJourney()` merges into `CurrentJourney`.
 
-### 3. Save Parser Adapter
+**Limitations today:**
 
-A parser should read save files and produce journey metadata. It should not own the whole app state.
+- SoulSilver only; game string hardcoded
+- Johto badges only (Kanto `0x83` not read)
+- Timeline replaced on import (merge TODO)
+- Partial Gen IV charset; ASCII trainer names only decode cleanly
+- Retail 524 288 bytes only
 
-Suggested output:
+See `PARSER_PROPOSAL.md` for full boundary.
 
-```ts
-export type ParsedSaveSummary = {
-  game: 'SoulSilver' | 'HeartGold';
-  trainerName?: string;
-  playTime?: string;
-  badges?: number;
-  location?: string;
-  party?: Array<{
-    species: string;
-    level?: number;
-  }>;
-  saveHash: string;
-  parsedAt: string;
-};
-```
+### 4. Cloud sync adapter
 
-### 4. Cloud Sync Adapter
-
-Cloud sync should be optional. The local app should remain useful without it.
-
-Cloud sync can later send:
-
-- current game
-- play time
-- badges
-- location
-- party
-- save hash
-- updated time
-- optional `.sav` backup to R2
+Not implemented. See `CLOUD_SYNC_PROPOSAL.md`.
 
 ## UI Routing
 
-Initial screens:
+| Route | Screen | Status |
+| --- | --- | --- |
+| `/` | Home — trainer, continue, party, timeline | ✅ |
+| `/team` | Team | Placeholder |
+| `/journey` | Journey | Placeholder |
+| `/settings` | Trainer, save folder, journey snapshot | ✅ |
 
-- Home / Continue
-- Team
-- Journey
-- Dex
-- Search
-- Settings later
+React mock also had `/dex` and `/search` — not ported yet.
 
-The home route is the most important route.
+**Continue button:** opens bottom sheet stub; emulator launch is Phase B.
 
 ## Responsive Strategy
 
-Use CSS rather than device-specific assumptions:
-
-- mobile-first stacking
-- grid dashboard at wider or square-ish viewports
-- `repeat(auto-fit, minmax(...))`
-- `clamp()` for spacing and type
-- `dvh` / `dvw`
-- safe-area insets
-
-Avoid:
-
-- fixed `720×720`
-- phone-only assumptions
-- Material Design default-heavy layout
+- `DeviceShell` wraps all routes
+- `ListView` / `Column` home layout; grid dashboard on wider viewports
+- `SafeArea` for notches and system bars
+- Test at 360×780 phone and 720×720 square (RG Rotate)
 
 ## Native Boundaries
 
-Capacitor-related code should be isolated under `platform/` or specific adapters.
+| Adapter | Location | Notes |
+| --- | --- | --- |
+| Journey prefs | `journey_repository.dart` | |
+| Save directory prefs | `save_directory_repository.dart` | |
+| Directory pick | `file_picker` in `app.dart` | |
+| Save file read | `save_sync_service.dart` | `dart:io` — not on web |
+| Parser | `hgss_parser.dart` | pure Dart |
 
-Examples:
+## Testing
 
-- file picking
-- local file permission handling
-- save backup export
-- Android storage APIs
+```bash
+cd flutter && flutter test
+```
 
-The React UI should consume typed services, not direct native calls everywhere.
+| Test | Covers |
+| --- | --- |
+| `hgss_parser_test.dart` | Full PKMSS fixture |
+| `hgss_map_lookup_test.dart` | Map ID 76 → 满金市, trainer name preservation |
+| `save_scanner_test.dart` | Newest-by-mtime, size filter |
+| `widget_test.dart` | App boot loading shell |
 
-## Testing Direction
+Manual: Settings import, directory sync on Android device with emulator save folder.
 
-Early checks:
+## Related Documents
 
-- TypeScript type check
-- unit tests for data transforms
-- responsive visual checks at several viewport sizes
-- parser fixture tests only after save parser work begins
-
-Target viewport checks:
-
-- 360 × 780 phone portrait
-- 720 × 720 square
-- 800 × 1280 tablet portrait
-- 1280 × 800 tablet landscape
-- foldable-like wide layout
+- [Stack Decision](./STACK_DECISION.md) — status table, gaps, decision log
+- [Flutter README](../flutter/README.md) — dev quick start
+- [Parser Proposal](./PARSER_PROPOSAL.md) — HGSS offsets and limits
+- [Design System](./DESIGN_SYSTEM.md) — tokens ported to `tito_colors.dart`

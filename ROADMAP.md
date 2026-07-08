@@ -1,118 +1,88 @@
 # TitoDex Roadmap
 
-## Phase 1 — Foundation and Direction
+> **Active implementation:** `flutter/`. See [Stack Decision](./docs/STACK_DECISION.md) for phase status and gaps.
 
-Goal: define TitoDex clearly before building complex features.
+## Phase 1 — Foundation and Direction ✅
 
-Deliverables:
+Documentation, vision, product shape, architecture proposals.
 
-- README
-- vision document
-- product document
-- roadmap
-- AI read-first instructions
-- design system direction
-- architecture proposal
-- save parser proposal
-- cloud sync proposal
+## Phase 2 — Android-first Mock App ✅ (reference)
 
-Recommended next implementation step after this phase:
+Capacitor + React mock under `src/` — validated layout and DeviceShell design. Frozen; not the shipping target.
 
-- scaffold Capacitor + React + TypeScript + Vite app
-- create responsive mock home dashboard
-- use hard-coded SoulSilver data
-- validate layout on RG Rotate-style square screens, phone, tablet, and foldable-like viewport sizes
-- keep the UI lightweight for Android 12 / Unisoc-class handheld hardware
-- only consider React Native, Flutter, or Kotlin Compose if target-device testing exposes concrete Capacitor/WebView limitations
+## Phase 0 — Flutter Scaffold ✅
 
-## Phase 2 — Android-first Mock App
+| Deliverable | Status |
+| --- | --- |
+| `flutter/` project with `lib/`, `test/`, platforms | ✅ |
+| Theme tokens → `tito_colors.dart` / `tito_theme.dart` | ✅ |
+| DeviceShell + home dashboard widgets | ✅ |
+| `go_router` + bottom navigation | ✅ |
+| Nunito via `google_fonts` | ✅ |
 
-Goal: make TitoDex feel like a real companion device with mock data.
+## Phase A — Native Feel + Local Persistence ⚠️
 
-Scope:
+| Deliverable | Status |
+| --- | --- |
+| `JourneyRepository` — mock on first launch, then prefs | ✅ |
+| Persist across restarts | ✅ |
+| Custom splash + launcher icon | ❌ |
+| `SystemChrome` status bar styling | ❌ |
+| Android back — `PopScope` route stack | ❌ |
+| DeviceShell safe-area tuning per form factor | ⚠️ basic |
 
-- Capacitor Android project
-- React component shell
-- design tokens
-- responsive dashboard layout
-- Continue Journey card
-- Trainer Card
-- Quick widgets
-- mock Team / Journey / Dex / Search screens
-- local mock data module
+## Phase B — Useful Companion ⚠️
 
-Out of scope:
+| Deliverable | Status |
+| --- | --- |
+| Continue → pick emulator app, remember, launch | ❌ stub sheet only |
+| Settings — edit trainer display name | ✅ |
+| Settings — edit game / location / badges / time | ❌ read-only snapshot |
+| Journey timeline user editing | ❌ |
+| Journey JSON export / import UI | ❌ helpers exist |
 
-- real save parsing
-- cloud sync
-- complete Pokédex
+## Phase C — HGSS Save Parser ✅ (core) + extras
 
-## Phase 3 — Local Data and HGSS Context
+| Deliverable | Status |
+| --- | --- |
+| `HgssParser` — retail 512 KB `.sav` | ✅ |
+| Trainer, badges, time, party, map location | ✅ |
+| Party level decrypt (stats `0x8C`) | ✅ |
+| Map ID → Chinese location (`hgss_map_list`) | ✅ |
+| Fixture tests (`PKMSS.sav`) | ✅ 8 tests pass |
+| Bundled fixture import (Settings) | ✅ |
+| **Save directory auto-sync** (newest `.sav`) | ✅ extra |
+| Startup auto-load toggle | ✅ |
+| Preserve customized trainer name on re-import | ✅ |
+| Merge parser into timeline without wiping notes | ❌ |
+| Single-file `.sav` picker | ❌ directory only |
+| HeartGold detection | ❌ |
 
-Goal: make TitoDex useful for HGSS play without depending on network access.
+## Next Up (recommended order)
 
-Scope:
+1. **Continue → emulator launcher** — `device_apps` or intent + remembered package
+2. **Team / Journey pages** — replace placeholders
+3. **Native polish** — splash, icon, status bar, back button
+4. **Timeline merge** — parser updates structured fields, keeps manual entries
+5. **Dex / Search** — scoped to current game (lower priority than journey loop)
+6. **Journey JSON export/import** in Settings
 
-- local storage model
-- editable current journey state
-- HGSS-specific context notes
-- party management as user-entered data
-- journey timeline persistence
-- local data export/import
+## Phase 3 — HGSS Context Content
 
-## Phase 4 — Save Parser Prototype
+HGSS-specific notes, checklists, richer Dex search scoped to current game.
 
-Goal: parse enough HGSS save metadata to power Continue Journey.
+## Phase 4 — Optional Cloud Sync
 
-Scope:
-
-- read selected `.sav` file locally
-- compute save hash
-- extract safe metadata only
-- current game
-- trainer name if practical
-- play time if practical
-- badges if practical
-- location if practical
-- party summary if practical
-
-Non-goal:
-
-- perfect full save editor
-- multi-generation parser framework
-
-## Phase 5 — Optional Cloud Sync Prototype
-
-Goal: back up journey metadata and save files safely.
-
-Suggested platform:
-
-- Cloudflare Worker API
-- D1 for metadata
-- R2 for `.sav` backup blobs
-
-Scope:
-
-- manual backup
-- save hash tracking
-- updated time
-- simple conflict display
-
-Non-goal:
-
-- complex account system
-- social features
-- automatic cross-device merge magic
+Cloudflare Worker + D1 + R2 per `docs/CLOUD_SYNC_PROPOSAL.md`. Non-goal for now.
 
 ## Later Generation Packs
 
-Add generations when Tito actually reaches them:
+Platinum → BW → B2W2 → XY → ORAS → USUM when the journey reaches each.
 
-- Platinum
-- Black / White
-- Black 2 / White 2
-- X / Y
-- ORAS
-- USUM
+## Platform Roadmap
 
-Each pack should be small, contextual, and journey-driven.
+| Platform | When |
+| --- | --- |
+| Android (phone + RG Rotate) | Now |
+| Linux handheld | After Android journey loop is solid |
+| Web companion | After save sync strategy works without `dart:io` |
