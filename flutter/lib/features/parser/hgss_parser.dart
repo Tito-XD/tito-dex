@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 
 import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
+import '../../l10n/game_zh.dart';
 import 'hgss_format.dart';
 import 'hgss_map_lookup.dart';
 
@@ -97,7 +98,7 @@ class HgssParser {
       party: summary.party
           .map(
             (member) => PartyMember(
-              species: member.speciesName,
+              species: localizeSpecies(member.speciesName),
               level: member.level,
             ),
           )
@@ -105,12 +106,10 @@ class HgssParser {
       timeline: const [
         JourneyTimelineEntry(
           id: 'parsed',
-          text: 'Loaded from local SoulSilver save',
+          text: '已从本地魂银存档同步',
         ),
       ],
-      nextReminder: summary.warnings.isEmpty
-          ? 'Continue your Johto journey'
-          : summary.warnings.first,
+      nextReminder: '继续城都地区的旅程',
     );
   }
 

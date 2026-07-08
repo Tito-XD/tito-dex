@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
@@ -17,7 +19,7 @@ class PartySummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Party',
+            AppZh.party,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -30,7 +32,9 @@ class PartySummary extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    member.nickname ?? member.species,
+                    member.nickname != null
+                        ? member.nickname!
+                        : localizeSpecies(member.species),
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   if (member.level != null)
@@ -45,7 +49,7 @@ class PartySummary extends StatelessWidget {
                         border: Border.all(color: TitoColors.ink, width: 1.5),
                       ),
                       child: Text(
-                        'Lv ${member.level}',
+                        '${AppZh.level}${member.level}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 12,

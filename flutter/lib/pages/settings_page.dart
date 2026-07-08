@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/sticker_card.dart';
@@ -62,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     setState(() => _dirty = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Trainer name saved')),
+      const SnackBar(content: Text(AppZh.snackTrainerSaved)),
     );
   }
 
@@ -78,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Trainer profile',
+                AppZh.settingsTrainerProfile,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -87,11 +89,12 @@ class _SettingsPageState extends State<SettingsPage> {
               TextField(
                 controller: _trainerController,
                 decoration: InputDecoration(
-                  labelText: 'Display name',
-                  hintText: 'Tito',
-                  helperText: saveName != null && saveName != _trainerController.text
-                      ? 'From save (standard decode): $saveName — fan translations may differ'
-                      : 'Fan translations may show a different name than the save bytes.',
+                  labelText: AppZh.settingsDisplayName,
+                  hintText: AppZh.settingsDisplayNameHint,
+                  helperText: saveName != null &&
+                          saveName != _trainerController.text
+                      ? AppZh.settingsSaveDecodeHint(saveName)
+                      : AppZh.settingsSaveTrainerHint,
                   border: const OutlineInputBorder(),
                 ),
                 onChanged: (_) => setState(() => _dirty = true),
@@ -103,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   backgroundColor: TitoColors.coral,
                   foregroundColor: TitoColors.ink,
                 ),
-                child: const Text('Save trainer name'),
+                child: const Text(AppZh.settingsSaveTrainerName),
               ),
             ],
           ),
@@ -112,11 +115,20 @@ class _SettingsPageState extends State<SettingsPage> {
         StickerCard(
           child: Column(
             children: [
-              _Row(label: 'Current game', value: widget.journey.game),
-              _Row(label: 'Location', value: widget.journey.location),
-              _Row(label: 'Play time', value: widget.journey.playTime),
               _Row(
-                label: 'Badges',
+                label: AppZh.settingsCurrentGame,
+                value: localizeGame(widget.journey.game),
+              ),
+              _Row(
+                label: AppZh.settingsLocation,
+                value: localizeLocation(widget.journey.location),
+              ),
+              _Row(
+                label: AppZh.settingsPlayTime,
+                value: widget.journey.playTime,
+              ),
+              _Row(
+                label: AppZh.settingsBadges,
                 value: '${widget.journey.badges}/${widget.journey.maxBadges}',
               ),
             ],
@@ -129,7 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Journey data',
+                AppZh.settingsJourneyData,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -141,12 +153,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   backgroundColor: TitoColors.deepBlue,
                   foregroundColor: TitoColors.card,
                 ),
-                child: const Text('Import bundled PKMSS.sav'),
+                child: const Text(AppZh.settingsImportSave),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: widget.onResetMock,
-                child: const Text('Reset to mock journey'),
+                child: const Text(AppZh.settingsResetMock),
               ),
             ],
           ),
@@ -193,7 +205,7 @@ class PlaceholderPage extends StatelessWidget {
     return Center(
       child: StickerCard(
         child: Text(
-          '$title screen coming soon',
+          AppZh.placeholderScreen(title),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
               ),

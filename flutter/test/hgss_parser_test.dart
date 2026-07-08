@@ -24,7 +24,7 @@ void main() {
     expect(summary.party.first.level, 27);
     expect(summary.party[1].speciesName, 'Togepi');
     expect(summary.party[1].level, 6);
-    expect(summary.locationLabel, 'Goldenrod City');
+    expect(summary.locationLabel, '满金市');
     expect(summary.mapHeaderId, 76);
     expect(summary.saveHash, isNotEmpty);
   });

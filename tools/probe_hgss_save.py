@@ -10,18 +10,36 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_LIST = ROOT / "tools" / "hgss_map_list.json"
+LOCATION_ZH = {
+    "Goldenrod City": "满金市",
+    "New Bark Town": "若叶镇",
+    "Violet City": "桔梗市",
+    "Azalea Town": "桧皮镇",
+    "Ecruteak City": "圆朱市",
+    "Olivine City": "浅葱市",
+    "Cherrygrove City": "吉花市",
+    "Cianwood City": "湛蓝市",
+    "Mahogany Town": "卡吉镇",
+    "Blackthorn City": "烟墨市",
+}
+SPECIES_ZH = {
+    156: "火岩鼠",
+    175: "波克比",
+    96: "催眠貘",
+    63: "凯西",
+}
 
 PARTITION_SIZE = 0x40000
 SAVE_COUNT_OFFSET = 0xF618
 JOHTO_BADGE_NAMES = [
-    "Zephyr",
-    "Hive",
-    "Plain",
-    "Fog",
-    "Storm",
-    "Mineral",
-    "Glacier",
-    "Rising",
+    "飞翼",
+    "蜂巢",
+    "平原",
+    "浓雾",
+    "雷鸣",
+    "矿产",
+    "冰河",
+    "升龙",
 ]
 
 BLOCK_POSITION = [
@@ -111,11 +129,12 @@ def active_partition(data: bytes) -> int:
 
 def map_label(map_id: int) -> str:
     if not MAP_LIST.exists():
-        return f"Map #{map_id}"
+        return f"地图 #{map_id}"
     entries = json.loads(MAP_LIST.read_text())
     if map_id < 0 or map_id >= len(entries):
-        return f"Map #{map_id}"
-    return entries[map_id]["name"]
+        return f"地图 #{map_id}"
+    english = entries[map_id]["name"]
+    return LOCATION_ZH.get(english, english)
 
 
 def probe(path: Path) -> None:
@@ -148,8 +167,8 @@ def probe(path: Path) -> None:
     for index in range(party_count):
         slot = data[base + 0x98 + index * 236 : base + 0x98 + (index + 1) * 236]
         species, level = decrypt_party_slot(slot)
-        label = SPECIES.get(species, f"Species #{species}")
-        warn = " (suspicious level)" if level > 100 else ""
+        label = SPECIES_ZH.get(species, SPECIES.get(species, f"#{species}"))
+        warn = "（等级异常）" if level > 100 else ""
         print(f"  {index + 1}. {label} Lv{level}{warn}")
 
 

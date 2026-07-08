@@ -147,12 +147,12 @@ class CurrentJourney {
   static CurrentJourney mock() => const CurrentJourney(
         game: 'SoulSilver',
         trainerName: 'Tito',
-        location: 'Goldenrod City',
+        location: '满金市',
         badges: 3,
         maxBadges: 8,
         playTime: '18:42',
         companion: 'Riolu',
-        nextReminder: 'Visit the Radio Tower when ready',
+        nextReminder: '准备好就去广播塔看看',
         party: [
           PartyMember(species: 'Quilava', level: 24, nickname: 'Quilava'),
           PartyMember(species: 'Riolu', level: 18, nickname: 'Riolu'),
@@ -162,14 +162,14 @@ class CurrentJourney {
         timeline: [
           JourneyTimelineEntry(
             id: 't1',
-            text: 'Reached Goldenrod City',
-            at: 'Day 4',
+            text: '抵达满金市',
+            at: '第 4 天',
           ),
-          JourneyTimelineEntry(id: 't2', text: 'Won Hive Badge', at: 'Day 3'),
+          JourneyTimelineEntry(id: 't2', text: '获得蜂巢徽章', at: '第 3 天'),
           JourneyTimelineEntry(
             id: 't3',
-            text: 'Added Riolu as companion',
-            at: 'Day 2',
+            text: '利欧路加入同行',
+            at: '第 2 天',
           ),
         ],
       );

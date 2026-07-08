@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'features/journey/journey_repository.dart';
 import 'features/parser/hgss_parser.dart';
+import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'pages/home_page.dart';
 import 'pages/settings_page.dart';
@@ -52,12 +53,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
             GoRoute(
               path: '/team',
               builder: (context, state) =>
-                  const PlaceholderPage(title: 'Team'),
+                  PlaceholderPage(title: AppZh.navTeam),
             ),
             GoRoute(
               path: '/journey',
               builder: (context, state) =>
-                  const PlaceholderPage(title: 'Journey'),
+                  PlaceholderPage(title: AppZh.navJourney),
             ),
             GoRoute(
               path: '/settings',
@@ -103,8 +104,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
       SnackBar(
         content: Text(
           warnings.isEmpty
-              ? 'Loaded ${summary.trainerName} — ${summary.party.length} party members'
-              : 'Loaded save with ${warnings.length} parser warning(s)',
+              ? AppZh.snackSaveLoaded(
+                  summary.trainerName,
+                  summary.party.length,
+                )
+              : AppZh.snackSaveLoadedWarnings(warnings.length),
         ),
       ),
     );
@@ -116,7 +120,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Restored mock journey')),
+      const SnackBar(content: Text(AppZh.snackMockRestored)),
     );
   }
 
@@ -132,19 +136,17 @@ class _TitoDexAppState extends State<TitoDexApp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Continue Journey',
+                AppZh.continueSheetTitle,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Emulator app picker arrives in Phase B. For now, Continue confirms your current journey context.',
-              ),
+              const Text(AppZh.continueSheetBody),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Got it'),
+                child: const Text(AppZh.continueSheetOk),
               ),
             ],
           ),
@@ -165,7 +167,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
 
     return MaterialApp.router(
-      title: 'TitoDex',
+      title: AppZh.appTitle,
       theme: buildTitoTheme(),
       routerConfig: _router,
     );

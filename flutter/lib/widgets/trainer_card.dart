@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
@@ -31,7 +33,7 @@ class TrainerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Trainer Card',
+                  AppZh.trainerCard,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: TitoColors.mutedInk,
                         fontWeight: FontWeight.w700,
@@ -44,12 +46,14 @@ class TrainerCard extends StatelessWidget {
                       ),
                 ),
                 Text(
-                  journey.game,
+                  localizeGame(journey.game),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                 ),
-                Text('Companion: ${journey.companion}'),
+                Text(
+                  '${AppZh.companion}：${localizeCompanion(journey.companion)}',
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
