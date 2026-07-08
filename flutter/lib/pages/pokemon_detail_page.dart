@@ -6,6 +6,7 @@ import '../features/dex/dex_repository.dart';
 import '../theme/device_layout.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import '../theme/error_text.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
@@ -63,6 +64,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
         }
 
         if (snapshot.hasError || !snapshot.hasData) {
+          final errorCopy = snapshot.hasError
+              ? splitUserFacingError(snapshot.error!)
+              : (AppZh.dexLoadFailed, AppZh.errorGeneric);
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -72,11 +76,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppZh.dexLoadFailed,
+                      errorCopy.$1,
                       style: context.tito.cardBodyEmphasis,
                     ),
                     const SizedBox(height: 8),
-                    Text(snapshot.error.toString()),
+                    Text(
+                      errorCopy.$2,
+                      style: context.tito.errorDetail,
+                    ),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () {

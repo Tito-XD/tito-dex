@@ -43,6 +43,8 @@ abstract final class AppZh {
   static const dexLoadFailed = '图鉴数据加载失败';
   static String dexLoadFailedDetail(int statusCode) =>
       'PokeAPI 请求失败（HTTP $statusCode）。请检查网络，或在设置中下载离线图鉴后重试。';
+  static const errorGeneric = '加载失败，请稍后重试。';
+  static const errorFormatDetail = '数据格式异常，请检查网络后重试，或下载离线图鉴。';
   static const dexRetry = '重试';
   static const dexHeight = '身高';
   static const dexWeight = '体重';

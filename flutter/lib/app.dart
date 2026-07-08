@@ -415,6 +415,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
     return MaterialApp.router(
       title: AppZh.appTitle,
       theme: buildTitoTheme(),
+      builder: (context, child) {
+        return DefaultTextStyle(
+          style: TitoTypography.style().copyWith(
+            decoration: TextDecoration.none,
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: _router,
     );
   }

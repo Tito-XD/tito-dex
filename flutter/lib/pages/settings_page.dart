@@ -283,6 +283,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: _trainerController,
+                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
                 decoration: InputDecoration(
                   labelText: AppZh.settingsDisplayName,
                   hintText: AppZh.settingsDisplayNameHint,
@@ -323,6 +324,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: _locationController,
+                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsLocation,
                   border: OutlineInputBorder(),
@@ -332,6 +334,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _playTimeController,
+                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsPlayTime,
                   border: OutlineInputBorder(),
@@ -342,6 +345,7 @@ class _SettingsPageState extends State<SettingsPage> {
               TextField(
                 controller: _badgesController,
                 keyboardType: TextInputType.number,
+                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsBadges,
                   border: OutlineInputBorder(),
@@ -351,6 +355,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _reminderController,
+                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsNextReminder,
                   border: OutlineInputBorder(),
