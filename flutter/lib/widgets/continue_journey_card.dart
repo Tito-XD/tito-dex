@@ -16,15 +16,19 @@ class ContinueJourneyCard extends StatelessWidget {
     required this.journey,
     this.onContinue,
     this.compact = false,
+    this.dense = false,
   });
 
   final CurrentJourney journey;
   final VoidCallback? onContinue;
   final bool compact;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
-    final padding = compact ? DeviceLayout.cardPadding(context) : null;
+    final padding = (compact || dense)
+        ? DeviceLayout.cardPadding(context)
+        : null;
 
     return StickerCard(
       variant: StickerVariant.deep,
@@ -32,38 +36,53 @@ class ContinueJourneyCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.continueJourney.toUpperCase(),
-            style: context.tito.onDeepOverline,
-          ),
-          SizedBox(height: compact ? 2 : 4),
+          if (dense)
+            Text(
+              '${journey.trainerName} · ${localizeGame(journey.game)}',
+              style: context.tito.onDeepOverline,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )
+          else
+            Text(
+              AppZh.continueJourney.toUpperCase(),
+              style: context.tito.onDeepOverline,
+            ),
+          SizedBox(height: dense ? 1 : (compact ? 2 : 4)),
           Text(
             localizeLocation(journey.location),
             style: context.tito.onDeepHeading,
+            maxLines: dense ? 2 : null,
+            overflow: dense ? TextOverflow.ellipsis : null,
           ),
-          SizedBox(height: compact ? 8 : 12),
-          CityIllustration(compact: compact),
-          SizedBox(height: compact ? 8 : 12),
+          if (!dense) ...[
+            SizedBox(height: compact ? 8 : 12),
+            CityIllustration(compact: compact),
+          ],
+          SizedBox(height: dense ? 4 : (compact ? 8 : 12)),
           Row(
             children: [
               _Meta(
                 label: AppZh.labelGame,
                 value: localizeGame(journey.game),
-                compact: compact,
+                compact: compact || dense,
+                dense: dense,
               ),
               _Meta(
                 label: AppZh.labelPlayTime,
                 value: journey.playTime,
-                compact: compact,
+                compact: compact || dense,
+                dense: dense,
               ),
               _Meta(
                 label: AppZh.labelBadges,
                 value: '${journey.badges}/${journey.maxBadges}',
-                compact: compact,
+                compact: compact || dense,
+                dense: dense,
               ),
             ],
           ),
-          if (!compact && journey.party.isNotEmpty) ...[
+          if (!compact && !dense && journey.party.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -93,12 +112,14 @@ class ContinueJourneyCard extends StatelessWidget {
               ],
             ),
           ],
-          SizedBox(height: compact ? 10 : 16),
+          const Spacer(),
+          SizedBox(height: dense ? 4 : (compact ? 10 : 16)),
           TitoPrimaryButton(
             label: AppZh.continueButton,
             onPressed: onContinue,
             expanded: true,
-            compact: compact,
+            compact: compact || dense,
+            dense: dense,
           ),
         ],
       ),
@@ -111,11 +132,13 @@ class _Meta extends StatelessWidget {
     required this.label,
     required this.value,
     this.compact = false,
+    this.dense = false,
   });
 
   final String label;
   final String value;
   final bool compact;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -125,11 +148,19 @@ class _Meta extends StatelessWidget {
         children: [
           Text(
             label,
-            style: context.tito.onDeepMetaLabel,
+            style: dense
+                ? context.tito.onDeepMetaLabel.copyWith(fontSize: 9)
+                : context.tito.onDeepMetaLabel,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             value,
-            style: context.tito.onDeepMetaValue,
+            style: dense
+                ? context.tito.onDeepMetaValue.copyWith(fontSize: 10)
+                : context.tito.onDeepMetaValue,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

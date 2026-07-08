@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/journey_timeline.dart';
@@ -16,7 +17,7 @@ class JourneyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         const AppHeader(showSettings: true),
         StickerCard(

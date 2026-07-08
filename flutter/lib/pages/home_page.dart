@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// RG Rotate square dashboard: journey + party side-by-side, quick tiles below.
+/// RG Rotate square dashboard — fits one screen, no scroll.
 class _SquareDashboardLayout extends StatelessWidget {
   const _SquareDashboardLayout({
     required this.journey,
@@ -85,34 +85,33 @@ class _SquareDashboardLayout extends StatelessWidget {
 
     return Column(
       children: [
-        TrainerCard(journey: journey, compact: true),
-        SizedBox(height: gap),
         Expanded(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 11,
+                flex: 13,
                 child: ContinueJourneyCard(
                   journey: journey,
                   onContinue: onContinue,
                   compact: true,
+                  dense: true,
                 ),
               ),
               SizedBox(width: gap),
               Expanded(
-                flex: 9,
+                flex: 10,
                 child: PartyStrip(
                   party: journey.party,
                   compact: true,
-                  vertical: true,
+                  square: true,
                 ),
               ),
             ],
           ),
         ),
         SizedBox(height: gap),
-        const _QuickActionsRow(),
+        const _QuickActionsRow(dense: true),
       ],
     );
   }
@@ -246,15 +245,17 @@ class _QuickActions extends StatelessWidget {
 }
 
 class _QuickActionsRow extends StatelessWidget {
-  const _QuickActionsRow();
+  const _QuickActionsRow({this.dense = false});
+
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
-    final tiles = _quickTiles(context, compact: true);
+    final tiles = _quickTiles(context, compact: true, dense: dense);
     return Row(
       children: [
         for (var i = 0; i < tiles.length; i++) ...[
-          if (i > 0) const SizedBox(width: 8),
+          if (i > 0) SizedBox(width: dense ? 6 : 8),
           Expanded(child: tiles[i]),
         ],
       ],
@@ -262,31 +263,39 @@ class _QuickActionsRow extends StatelessWidget {
   }
 }
 
-List<Widget> _quickTiles(BuildContext context, {bool compact = false}) {
+List<Widget> _quickTiles(
+  BuildContext context, {
+  bool compact = false,
+  bool dense = false,
+}) {
   return [
     TitoQuickTile(
       label: AppZh.navTeam,
       icon: Icons.groups_rounded,
       onTap: () => context.go('/team'),
       compact: compact,
+      dense: dense,
     ),
     TitoQuickTile(
       label: AppZh.navJourney,
       icon: Icons.map_rounded,
       onTap: () => context.go('/journey'),
       compact: compact,
+      dense: dense,
     ),
     TitoQuickTile(
       label: AppZh.navDex,
       icon: Icons.grid_view_rounded,
       onTap: () => context.go('/dex'),
       compact: compact,
+      dense: dense,
     ),
     TitoQuickTile(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       onTap: () => context.go('/search'),
       compact: compact,
+      dense: dense,
     ),
   ];
 }

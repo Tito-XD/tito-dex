@@ -46,7 +46,7 @@ abstract final class TitoTypography {
 
   /// Large titles on the blue gradient shell (Dex, Search, etc.).
   static TextStyle pageTitleOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 22, 18),
+        fontSize: _sz(context, 22, 14),
         fontWeight: FontWeight.w800,
         color: TitoColors.card,
         letterSpacing: -0.3,
@@ -67,17 +67,17 @@ abstract final class TitoTypography {
 
   /// Cream / sky / mint sticker card content.
   static TextStyle cardTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 18, 15),
+        fontSize: _sz(context, 18, 13),
         fontWeight: FontWeight.w800,
       );
 
   static TextStyle cardSectionTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 16, 14),
+        fontSize: _sz(context, 16, 12),
         fontWeight: FontWeight.w900,
       );
 
   static TextStyle cardBody(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
+        fontSize: _sz(context, 14, 11),
         fontWeight: FontWeight.w600,
         height: 1.4,
       );
@@ -108,7 +108,7 @@ abstract final class TitoTypography {
       );
 
   static TextStyle cardValueLarge(BuildContext context) => _base(
-        fontSize: _sz(context, 18, 15),
+        fontSize: _sz(context, 18, 13),
         fontWeight: FontWeight.w900,
       );
 
@@ -146,7 +146,7 @@ abstract final class TitoTypography {
       );
 
   static TextStyle onDeepHeading(BuildContext context) => _base(
-        fontSize: _sz(context, 20, 16),
+        fontSize: _sz(context, 20, 13),
         fontWeight: FontWeight.w800,
         color: TitoColors.card,
         letterSpacing: -0.3,
@@ -211,9 +211,15 @@ abstract final class TitoTypography {
 
   static TextStyle navLabel(BuildContext context, {required bool selected}) =>
       _base(
-        fontSize: _sz(context, 10, 9),
+        fontSize: _sz(context, 10, 8),
         fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
         color: selected ? TitoColors.deepBlue : TitoColors.skyBlue,
+      );
+
+  static TextStyle quickTileLabel(BuildContext context) => _base(
+        fontSize: _sz(context, 13, 9),
+        fontWeight: FontWeight.w800,
+        color: TitoColors.deepBlue,
       );
 }
 
@@ -257,4 +263,5 @@ final class TitoTextStyles {
   TextStyle get accentCoral => TitoTypography.accentCoral(context);
   TextStyle get companionBubble => TitoTypography.companionBubble(context);
   TextStyle get companionName => TitoTypography.companionName(context);
+  TextStyle get quickTileLabel => TitoTypography.quickTileLabel(context);
 }

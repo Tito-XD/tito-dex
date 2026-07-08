@@ -15,11 +15,8 @@ abstract final class DeviceLayout {
     return size.width > size.height;
   }
 
-  /// RG Rotate and similar ~square handheld screens (e.g. 720×720).
-  static bool isSquareHandheld(BuildContext context) {
-    if (!isNativeTarget) {
-      return false;
-    }
+  /// ~Square screen by aspect ratio (layout), including web preview at 720×720.
+  static bool isSquareScreen(BuildContext context) {
     final size = sizeOf(context);
     if (size.shortestSide < 520) {
       return false;
@@ -28,27 +25,32 @@ abstract final class DeviceLayout {
     return ratio > 0.82 && ratio < 1.22;
   }
 
+  /// RG Rotate native square handheld.
+  static bool isSquareHandheld(BuildContext context) {
+    return isNativeTarget && isSquareScreen(context);
+  }
+
   /// Short landscape screens (e.g. RG35XX 640×480).
   static bool isShortScreen(BuildContext context) {
     return sizeOf(context).height < 560;
   }
 
-  /// True on RG-like screens: square handheld, short height, or narrow width.
+  /// True on RG-like screens: square, short height, or narrow width.
   static bool isCompact(BuildContext context) {
     final size = sizeOf(context);
-    return isSquareHandheld(context) ||
+    return isSquareScreen(context) ||
         isShortScreen(context) ||
         size.shortestSide < 520;
   }
 
-  /// Dashboard home for square RG screens — not a scaled phone column.
+  /// Dashboard home for square screens — single-screen, no scroll.
   static bool useSquareDashboard(BuildContext context) {
-    return isSquareHandheld(context);
+    return isSquareScreen(context);
   }
 
   static EdgeInsets pagePadding(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return const EdgeInsets.fromLTRB(10, 4, 10, 2);
+      return const EdgeInsets.fromLTRB(8, 2, 8, 0);
     }
     if (isCompact(context)) {
       return const EdgeInsets.fromLTRB(10, 6, 10, 4);
@@ -68,7 +70,7 @@ abstract final class DeviceLayout {
 
   static EdgeInsets cardPadding(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return const EdgeInsets.all(10);
+      return const EdgeInsets.all(8);
     }
     if (isCompact(context)) {
       return const EdgeInsets.all(12);
@@ -89,7 +91,7 @@ abstract final class DeviceLayout {
   /// App bar title on the home header.
   static double? appTitleSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 16;
+      return 14;
     }
     if (isCompact(context)) {
       return 20;
@@ -110,7 +112,7 @@ abstract final class DeviceLayout {
   /// Prominent card headings (location, species name, etc.).
   static double cardHeadingSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 15;
+      return 13;
     }
     if (isCompact(context)) {
       return 18;
@@ -120,7 +122,7 @@ abstract final class DeviceLayout {
 
   static double bodyTextSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 12;
+      return 11;
     }
     if (isCompact(context)) {
       return 13;
@@ -138,7 +140,9 @@ abstract final class DeviceLayout {
     return 12;
   }
 
-  /// Clamp Android system font scaling so dense handheld layouts do not overflow.
+  static double squareQuickTileHeight(BuildContext context) {
+    return useSquareDashboard(context) ? 42 : 56;
+  }
   static TextScaler clampedTextScaler(BuildContext context) {
     final maxScale = useSquareDashboard(context) ? 1.0 : 1.12;
     return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: maxScale);
