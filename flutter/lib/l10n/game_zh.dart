@@ -82,6 +82,10 @@ const speciesNamesZh = <String, String>{
   'Drowzee': '催眠貘',
   'Riolu': '利欧路',
   'Lucario': '路卡利欧',
+  'Hoothoot': '咕咕',
+  'Jigglypuff': '胖丁',
+  'Eevee': '伊布',
+  'Pikachu': '皮卡丘',
 };
 
 const companionNamesZh = <String, String>{

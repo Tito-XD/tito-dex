@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import 'city_illustration.dart';
 import 'sticker_card.dart';
 
 class ContinueJourneyCard extends StatelessWidget {
@@ -24,38 +26,25 @@ class ContinueJourneyCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppZh.continueJourney,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: TitoColors.skyBlue,
-                  fontWeight: FontWeight.w800,
-                ),
+            AppZh.continueJourney.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 12,
+              color: TitoColors.skyBlue,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.8,
+            ),
           ),
+          const SizedBox(height: 4),
           Text(
             localizeLocation(journey.location),
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
                 ),
           ),
           const SizedBox(height: 12),
-          Container(
-            height: 96,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF243A57),
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.card, width: 2),
-            ),
-            child: const Center(
-              child: Text(
-                AppZh.cityView,
-                style: TextStyle(
-                  color: TitoColors.softYellow,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ),
+          const CityIllustration(),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -80,7 +69,7 @@ class ContinueJourneyCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: TitoColors.card.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: TitoColors.card, width: 1.5),
+                      border: Border.all(color: TitoColors.skyBlue, width: 2),
                     ),
                     child: Text(
                       member.nickname != null
@@ -89,6 +78,7 @@ class ContinueJourneyCard extends StatelessWidget {
                       style: const TextStyle(
                         color: TitoColors.card,
                         fontWeight: FontWeight.w700,
+                        fontSize: 12,
                       ),
                     ),
                   ),
@@ -96,24 +86,10 @@ class ContinueJourneyCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: onContinue,
-              style: FilledButton.styleFrom(
-                backgroundColor: TitoColors.coral,
-                foregroundColor: TitoColors.ink,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  side: const BorderSide(color: TitoColors.ink, width: 2),
-                ),
-              ),
-              child: const Text(
-                AppZh.continueButton,
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
-              ),
-            ),
+          TitoPrimaryButton(
+            label: AppZh.continueButton,
+            onPressed: onContinue,
+            expanded: true,
           ),
         ],
       ),

@@ -53,15 +53,16 @@ class PartySummary extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: TitoColors.card,
+                        color: TitoColors.cream,
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: TitoColors.ink, width: 1.5),
+                        border: Border.all(color: TitoColors.ink, width: 2),
                       ),
                       child: Text(
                         '${AppZh.level}${party[i].level}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 12,
+                          color: TitoColors.mutedInk,
                         ),
                       ),
                     ),
