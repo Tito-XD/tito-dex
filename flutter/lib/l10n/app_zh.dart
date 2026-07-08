@@ -77,6 +77,8 @@ abstract final class AppZh {
   static const settingsDexOfflineHint =
       '一次性下载全国图鉴 1–493：中文名、属性图标、克制关系、进化链、升级招式与压缩立绘。招式按 ID 去重复用，属性图标全局共用。';
   static const settingsDexOfflineUnset = '尚未下载离线图鉴';
+  static String settingsDexOfflinePartial(int pokemonCount) =>
+      '部分缓存 $pokemonCount / 493，可点「继续下载」补全';
   static String settingsDexOfflineReady(
     int pokemonCount,
     int moveCount,
@@ -85,11 +87,22 @@ abstract final class AppZh {
   ) =>
       '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
   static const settingsDexOfflineDownload = '下载离线图鉴';
+  static const settingsDexOfflineResume = '继续下载离线图鉴';
   static const settingsDexOfflineClear = '清除离线缓存';
   static const settingsDexOfflinePrefer = '优先使用离线缓存';
-  static String settingsDexOfflineProgress(String phase, int current, int total) =>
-      '正在缓存$phase $current / $total';
+  static String settingsDexOfflineProgress(String phase, int current, int total) {
+    final phaseLabel = switch (phase) {
+      'types' => '属性',
+      'pokemon' => '宝可梦',
+      'done' => '完成',
+      'partial' => '部分完成',
+      _ => phase,
+    };
+    return '正在缓存$phaseLabel $current / $total';
+  }
   static const snackDexOfflineDone = '离线图鉴已下载完成';
+  static String snackDexOfflinePartial(int count) =>
+      '已缓存 $count / 493 只宝可梦，可再次点击继续下载补全';
   static const snackDexOfflineCleared = '已清除离线图鉴缓存';
   static const snackDexOfflineFailed = '离线图鉴下载失败';
 
