@@ -52,6 +52,28 @@ abstract final class AppZh {
   static const dexNone = '无';
   static const dexApiNote =
       '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
+  static const dexMoves = '升级招式';
+  static String dexMovesMore(int count) => '另有 $count 个招式已缓存';
+
+  static const settingsDexOffline = '离线图鉴缓存';
+  static const settingsDexOfflineHint =
+      '一次性下载全国图鉴 1–493：中文名、属性图标、克制关系、进化链、升级招式与压缩立绘。招式按 ID 去重复用，属性图标全局共用。';
+  static const settingsDexOfflineUnset = '尚未下载离线图鉴';
+  static String settingsDexOfflineReady(
+    int pokemonCount,
+    int moveCount,
+    String size,
+    String downloadedAt,
+  ) =>
+      '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
+  static const settingsDexOfflineDownload = '下载离线图鉴';
+  static const settingsDexOfflineClear = '清除离线缓存';
+  static const settingsDexOfflinePrefer = '优先使用离线缓存';
+  static String settingsDexOfflineProgress(String phase, int current, int total) =>
+      '正在缓存$phase $current / $total';
+  static const snackDexOfflineDone = '离线图鉴已下载完成';
+  static const snackDexOfflineCleared = '已清除离线图鉴缓存';
+  static const snackDexOfflineFailed = '离线图鉴下载失败';
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
   static const searchEmptyHint = '可搜索 1–493 号宝可梦的中文名、英文名、编号或属性。';

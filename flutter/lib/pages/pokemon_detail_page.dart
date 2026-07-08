@@ -6,6 +6,7 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
+import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
 
@@ -128,17 +129,16 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                         const SizedBox(height: 8),
                         TypeChipRow(
                           types: summary.types.map(typeNameZh).toList(),
+                          typeKeys: summary.types,
                         ),
                       ],
                     ),
                   ),
-                  if (summary.spriteUrl != null)
-                    Image.network(
-                      summary.spriteUrl!,
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.contain,
-                    ),
+                  DexSpriteImage(
+                    source: summary.displaySpritePath,
+                    width: 120,
+                    height: 120,
+                  ),
                 ],
               ),
             ),
@@ -185,6 +185,71 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               types: detail.stabSuperEffective,
               tone: TypeChipTone.neutral,
             ),
+            if (detail.moves.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              StickerCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppZh.dexMoves,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...detail.moves.take(12).map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                if (entry.level != null)
+                                  SizedBox(
+                                    width: 42,
+                                    child: Text(
+                                      'Lv.${entry.level}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        color: TitoColors.mutedInk,
+                                      ),
+                                    ),
+                                  ),
+                                Expanded(
+                                  child: Text(
+                                    entry.move.nameZh,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  typeNameZh(entry.move.type),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: TitoColors.mutedInk,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    if (detail.moves.length > 12)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          AppZh.dexMovesMore(detail.moves.length - 12),
+                          style: const TextStyle(
+                            color: TitoColors.mutedInk,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
             if (detail.evolutionChain != null) ...[
               const SizedBox(height: 12),
               StickerCard(

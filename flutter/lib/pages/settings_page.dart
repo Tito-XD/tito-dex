@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/launcher/emulator_launcher_repository.dart';
+import '../features/dex/dex_models.dart';
+import '../features/dex/dex_offline_service.dart';
+import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -55,6 +61,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late final TextEditingController _reminderController;
   bool _trainerDirty = false;
   bool _journeyDirty = false;
+  DexCacheStatus? _dexCacheStatus;
+  bool _dexDownloading = false;
 
   @override
   void initState() {
@@ -66,6 +74,79 @@ class _SettingsPageState extends State<SettingsPage> {
         TextEditingController(text: widget.journey.badges.toString());
     _reminderController =
         TextEditingController(text: widget.journey.nextReminder ?? '');
+    _refreshDexCacheStatus();
+  }
+
+  Future<void> _refreshDexCacheStatus() async {
+    final status = await dexOfflineService.getStatus();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _dexCacheStatus = status);
+  }
+
+  Future<void> _downloadDexOffline() async {
+    if (_dexDownloading) {
+      return;
+    }
+    setState(() => _dexDownloading = true);
+
+    try {
+      await for (final progress in dexOfflineService.downloadAll()) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _dexCacheStatus = DexCacheStatus(
+            manifest: _dexCacheStatus?.manifest ??
+                const DexCacheManifest(
+                  version: DexCacheManifest.currentVersion,
+                  complete: false,
+                  preferOffline: true,
+                ),
+            sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
+            isDownloading: progress.phase != 'done',
+            progress: progress,
+          );
+        });
+      }
+      dexRepository.clearMemoryCache();
+      await _refreshDexCacheStatus();
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dexDownloading = false);
+      }
+    }
+  }
+
+  Future<void> _clearDexOffline() async {
+    await dexOfflineService.clearAll();
+    dexRepository.clearMemoryCache();
+    await _refreshDexCacheStatus();
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackDexOfflineCleared)),
+    );
+  }
+
+  Future<void> _setDexPreferOffline(bool enabled) async {
+    await dexOfflineService.setPreferOffline(enabled);
+    await _refreshDexCacheStatus();
   }
 
   @override
@@ -141,6 +222,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final directoryPath = config.directoryPath;
     final lastSynced = config.lastLoadedFileName;
     final emulator = widget.emulatorChoice;
+    final dexCache = _dexCacheStatus;
+    final dexManifest = dexCache?.manifest;
+    final dexProgress = dexCache?.progress;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -271,6 +355,77 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 child: const Text(AppZh.settingsSaveJourneyEdits),
               ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        StickerCard(
+          variant: StickerVariant.mint,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.settingsDexOffline,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppZh.settingsDexOfflineHint,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                dexManifest != null && dexManifest.complete
+                    ? AppZh.settingsDexOfflineReady(
+                        dexManifest.pokemonCount,
+                        dexManifest.moveCount,
+                        formatCacheSize(dexCache?.sizeBytes ?? 0),
+                        dexManifest.downloadedAt?.split('T').first ?? '',
+                      )
+                    : AppZh.settingsDexOfflineUnset,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              if (_dexDownloading && dexProgress != null) ...[
+                const SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: dexProgress.fraction,
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  AppZh.settingsDexOfflineProgress(
+                    dexProgress.label ?? dexProgress.phase,
+                    dexProgress.current,
+                    dexProgress.total,
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: _dexDownloading ? null : _downloadDexOffline,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.deepBlue,
+                  foregroundColor: TitoColors.card,
+                ),
+                child: const Text(AppZh.settingsDexOfflineDownload),
+              ),
+              if (dexManifest != null && dexManifest.complete) ...[
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(AppZh.settingsDexOfflinePrefer),
+                  value: dexManifest.preferOffline,
+                  onChanged: _dexDownloading ? null : _setDexPreferOffline,
+                ),
+                OutlinedButton(
+                  onPressed: _dexDownloading ? null : _clearDexOffline,
+                  child: const Text(AppZh.settingsDexOfflineClear),
+                ),
+              ],
             ],
           ),
         ),

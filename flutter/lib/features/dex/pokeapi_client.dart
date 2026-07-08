@@ -58,7 +58,9 @@ class PokeApiClient {
     );
   }
 
-  Future<PokemonDetail> fetchDetail(int id) async {
+  Future<PokemonDetail> fetchDetail(int id) => fetchDetailWithMoves(id);
+
+  Future<PokemonDetail> fetchDetailWithMoves(int id) async {
     final pokemon = await _getJson('/pokemon/$id');
     final species = await _getJson('/pokemon-species/$id');
     final relations = await loadAllTypeRelations();
@@ -83,6 +85,11 @@ class PokeApiClient {
       evolution = await _fetchEvolutionChain(evolutionUrl);
     }
 
+    final moves = await _fetchLevelUpMoves(
+      pokemon['moves'] as List<dynamic>,
+      maxGeneration: 4,
+    );
+
     return PokemonDetail(
       summary: summary,
       genusZh: _genusZh(species['genera'] as List<dynamic>),
@@ -93,7 +100,102 @@ class PokeApiClient {
       immunities: profile.immunities,
       stabSuperEffective: stab,
       evolutionChain: evolution,
+      moves: moves,
     );
+  }
+
+  Future<List<PokemonMove>> _fetchLevelUpMoves(
+    List<dynamic> moveEntries, {
+    required int maxGeneration,
+  }) async {
+    final byMoveId = <int, PokemonMove>{};
+
+    for (final entry in moveEntries) {
+      final map = entry as Map<String, dynamic>;
+      final move = map['move'] as Map<String, dynamic>;
+      final moveId = _idFromUrl(move['url'] as String);
+      final details = map['version_group_details'] as List<dynamic>;
+
+      for (final detail in details) {
+        final detailMap = detail as Map<String, dynamic>;
+        final method =
+            (detailMap['move_learn_method'] as Map<String, dynamic>)['name']
+                as String;
+        if (method != 'level-up') {
+          continue;
+        }
+        final versionGroup =
+            (detailMap['version_group'] as Map<String, dynamic>)['name']
+                as String;
+        final generation = _generationForVersionGroup(versionGroup);
+        if (generation == null || generation > maxGeneration) {
+          continue;
+        }
+        final level = detailMap['level_learned_at'] as int? ?? 0;
+        final existing = byMoveId[moveId];
+        if (existing != null && (existing.level ?? 0) <= level) {
+          continue;
+        }
+        final cachedMove = await _fetchMove(moveId);
+        byMoveId[moveId] = PokemonMove(
+          move: cachedMove,
+          method: method,
+          level: level == 0 ? null : level,
+        );
+      }
+    }
+
+    final moves = byMoveId.values.toList()
+      ..sort((a, b) => (a.level ?? 0).compareTo(b.level ?? 0));
+    return moves;
+  }
+
+  final Map<int, CachedMove> _moveCache = {};
+
+  Future<CachedMove> _fetchMove(int id) async {
+    if (_moveCache.containsKey(id)) {
+      return _moveCache[id]!;
+    }
+    final move = await _getJson('/move/$id');
+    final cached = CachedMove(
+      id: id,
+      nameEn: _capitalize(move['name'] as String),
+      nameZh: _localizedName(
+        move['names'] as List<dynamic>,
+        fallback: move['name'] as String,
+      ),
+      type: (move['type'] as Map<String, dynamic>)['name'] as String,
+      category:
+          (move['damage_class'] as Map<String, dynamic>)['name'] as String,
+      power: move['power'] as int?,
+      accuracy: move['accuracy'] as int?,
+      pp: move['pp'] as int?,
+    );
+    _moveCache[id] = cached;
+    return cached;
+  }
+
+  int? _generationForVersionGroup(String versionGroup) {
+    const genIvGroups = {
+      'gold-silver',
+      'crystal',
+      'ruby-sapphire',
+      'emerald',
+      'firered-leafgreen',
+      'diamond-pearl',
+      'platinum',
+      'heartgold-soulsilver',
+    };
+    if (genIvGroups.contains(versionGroup)) {
+      return 4;
+    }
+    if (versionGroup.startsWith('red') || versionGroup == 'yellow') {
+      return 1;
+    }
+    if (versionGroup.contains('gold') || versionGroup.contains('crystal')) {
+      return 2;
+    }
+    return null;
   }
 
   Future<int?> resolveSpeciesId(String speciesName) async {
