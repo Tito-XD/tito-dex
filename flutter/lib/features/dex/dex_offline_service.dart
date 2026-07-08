@@ -136,7 +136,7 @@ class DexOfflineService {
           );
 
           final detail = await _client.fetchDetailWithMoves(id);
-          mergeMoves(moves, detail.moves.map((entry) => entry.move));
+          mergeMoves(moves, detail.moveSet.allMoves);
 
           final spritePath = await _cachePokemonSprite(id, detail.summary.spriteUrl);
           final summary = detail.summary.copyWith(localSpritePath: spritePath);
@@ -153,7 +153,14 @@ class DexOfflineService {
             immunities: detail.immunities,
             stabSuperEffective: detail.stabSuperEffective,
             evolutionChain: localizedEvolution,
-            moves: detail.moves,
+            johtoDexNumber: detail.johtoDexNumber,
+            baseStats: detail.baseStats,
+            typeMultipliers: detail.typeMultipliers,
+            flavorEntries: detail.flavorEntries,
+            moveSet: detail.moveSet,
+            genderFemalePercent: detail.genderFemalePercent,
+            eggGroups: detail.eggGroups,
+            hatchCounter: detail.hatchCounter,
           );
 
           await _store.writeDetail(id, localizedDetail);
@@ -297,7 +304,14 @@ class DexOfflineService {
       immunities: detail.immunities,
       stabSuperEffective: detail.stabSuperEffective,
       evolutionChain: evolution,
-      moves: detail.moves,
+      johtoDexNumber: detail.johtoDexNumber,
+      baseStats: detail.baseStats,
+      typeMultipliers: detail.typeMultipliers,
+      flavorEntries: detail.flavorEntries,
+      moveSet: detail.moveSet,
+      genderFemalePercent: detail.genderFemalePercent,
+      eggGroups: detail.eggGroups,
+      hatchCounter: detail.hatchCounter,
     );
   }
 

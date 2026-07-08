@@ -20,26 +20,27 @@ Capacitor + React mock under `src/` — validated layout and DeviceShell design.
 | `go_router` + bottom navigation | ✅ |
 | Nunito via `google_fonts` | ✅ |
 
-## Phase A — Native Feel + Local Persistence ⚠️
+## Phase A — Native Feel + Local Persistence ✅
 
 | Deliverable | Status |
 | --- | --- |
 | `JourneyRepository` — mock on first launch, then prefs | ✅ |
 | Persist across restarts | ✅ |
 | Custom splash + launcher icon | ❌ |
-| `SystemChrome` status bar styling | ❌ |
-| Android back — `PopScope` route stack | ❌ |
+| `SystemChrome` status bar styling | ✅ |
+| Android back — `PopScope` route stack | ✅ |
 | DeviceShell safe-area tuning per form factor | ⚠️ basic |
 
-## Phase B — Useful Companion ⚠️
+## Phase B — Useful Companion ✅
 
 | Deliverable | Status |
 | --- | --- |
-| Continue → pick emulator app, remember, launch | ❌ stub sheet only |
+| Continue → pick emulator app, remember, launch | ✅ |
 | Settings — edit trainer display name | ✅ |
-| Settings — edit game / location / badges / time | ❌ read-only snapshot |
-| Journey timeline user editing | ❌ |
-| Journey JSON export / import UI | ❌ helpers exist |
+| Settings — edit game / location / badges / time | ✅ |
+| Journey timeline user editing | ⚠️ via JSON import/export |
+| Journey JSON export / import UI | ✅ |
+| Team + Journey pages | ✅ |
 
 ## Phase C — HGSS Save Parser ✅ (core) + extras
 
@@ -49,27 +50,77 @@ Capacitor + React mock under `src/` — validated layout and DeviceShell design.
 | Trainer, badges, time, party, map location | ✅ |
 | Party level decrypt (stats `0x8C`) | ✅ |
 | Map ID → Chinese location (`hgss_map_list`) | ✅ |
-| Fixture tests (`PKMSS.sav`) | ✅ 8 tests pass |
+| Fixture tests (`PKMSS.sav`) | ✅ |
 | Bundled fixture import (Settings) | ✅ |
-| **Save directory auto-sync** (newest `.sav`) | ✅ extra |
+| **Save directory auto-sync** (newest `.sav`) | ✅ |
 | Startup auto-load toggle | ✅ |
 | Preserve customized trainer name on re-import | ✅ |
-| Merge parser into timeline without wiping notes | ❌ |
+| Merge parser into timeline without wiping notes | ✅ |
 | Single-file `.sav` picker | ❌ directory only |
 | HeartGold detection | ❌ |
+| Save dex seen/caught flags from `.sav` | ❌ |
 
-## Next Up (recommended order)
+## Phase D — HGSS Dex (PokeAPI) ⚠️ in progress
 
-1. **Continue → emulator launcher** — `device_apps` or intent + remembered package
-2. **Team / Journey pages** — replace placeholders
-3. **Native polish** — splash, icon, status bar, back button
-4. **Timeline merge** — parser updates structured fields, keeps manual entries
-5. **Dex / Search** — scoped to current game (lower priority than journey loop)
-6. **Journey JSON export/import** in Settings
+Reference: [破壳萌图鉴 / Pocket Gallery](https://eurekaffeine.github.io/pocket-gallery/zh-hans/) detail layout (简介 / 基本信息 / 获取 / 招式).
+
+| Deliverable | Status |
+| --- | --- |
+| National dex 1–493 browse + search (PokeAPI, zh-Hans) | ✅ |
+| Detail: types, height/weight, genus, evolution chain | ✅ |
+| Type effectiveness (weak / resist / immune) | ✅ |
+| **Detail 4-tab layout** (简介 / 基本信息 / 获取 / 招式) | ✅ |
+| **Johto + National dual numbering** | ✅ |
+| **Base stats bars + BST total** | ✅ |
+| **18-type defensive multiplier grid** (cached type icons) | ✅ |
+| **Flavor text carousel** (金/银/水晶/心金/魂银; EN fallback) | ✅ |
+| **HGSS move sets** — level-up / TM / egg | ✅ |
+| Gender ratio, egg groups, hatch steps (intro tab) | ✅ |
+| Offline cache — batch download, move dedup, JPEG sprites | ✅ |
+| Journey party → caught marker on dex cards | ✅ |
+| Re-download offline cache after schema v2 upgrade | ⚠️ manual (Settings) |
+| Radar chart for base stats | ❌ (bars only for now) |
+| Capture locations / encounter tables | ❌ |
+| Abilities on detail page | ❌ |
+| Save-linked seen/caught on dex grid | ❌ |
+
+## Phase E — Regional & Version Scopes
+
+Cross-filter dex like Pocket Gallery’s **地区图鉴** + per-game move/flavor differences.
+
+| Deliverable | Status |
+| --- | --- |
+| `DexScope` model (`region`, `versionGroup`, dex id range) | ❌ |
+| Johto 251 list view (regional dex browse) | ❌ |
+| Version switcher on detail (HGSS default; future SV, Z-A…) | ❌ |
+| Scoped offline packs (HGSS / SV / …) | ❌ |
+| Settings: default game version for dex | ❌ |
+
+## Phase F — Reference Data (“常用资料”)
+
+Standalone lists — lower priority than journey loop; can live under Search or Settings.
+
+| Deliverable | Status |
+| --- | --- |
+| Move encyclopedia | ❌ |
+| Ability list | ❌ |
+| Natures / items / weather / terrain / status | ❌ |
+| Interactive maps | ❌ |
+
+## Phase G — Battle Tools (“计算器 / 对战资料”)
+
+Optional; Pocket Gallery strength but out of TitoDex “journey companion” core.
+
+| Deliverable | Status |
+| --- | --- |
+| Damage calculator | ❌ |
+| IV / EV / stat calculators | ❌ |
+| Team editor + coverage / blind-spot analysis | ❌ |
+| Usage rankings | ❌ |
 
 ## Phase 3 — HGSS Context Content
 
-HGSS-specific notes, checklists, richer Dex search scoped to current game.
+HGSS-specific notes, checklists, richer reminders scoped to current game.
 
 ## Phase 4 — Optional Cloud Sync
 
@@ -77,7 +128,17 @@ Cloudflare Worker + D1 + R2 per `docs/CLOUD_SYNC_PROPOSAL.md`. Non-goal for now.
 
 ## Later Generation Packs
 
-Platinum → BW → B2W2 → XY → ORAS → USUM when the journey reaches each.
+When the journey reaches each era, extend Phase E scopes:
+
+| Pack | Focus |
+| --- | --- |
+| HeartGold | Shared HGSS data; separate title if needed |
+| D/P/Pt | Sinnoh 210, Plat forms |
+| B/W/B2W2 | Unova dex, seasons |
+| XY / ORAS | Mega, Hoenn 211 |
+| SM / USUM | Alola dex, Z-Moves |
+| Sw/Sh / SV | Dynamax/Tera, DLC dex splits |
+| Legends / Z-A | Spin-off mechanics, separate move tables |
 
 ## Platform Roadmap
 
@@ -86,3 +147,12 @@ Platinum → BW → B2W2 → XY → ORAS → USUM when the journey reaches each.
 | Android (phone + RG Rotate) | Now |
 | Linux handheld | After Android journey loop is solid |
 | Web companion | After save sync strategy works without `dart:io` |
+
+## Recommended Next Steps
+
+1. **Save dex flags** — read caught/seen from `.sav` when parser supports it
+2. **Johto 251 regional browse** — filter grid by `original-johto` entries
+3. **Abilities** on detail intro/basic tabs
+4. **Capture locations** for HGSS (PokeAPI encounter data or curated subset)
+5. **Custom launcher icon** + splash polish
+6. **Re-download prompt** when offline cache schema version bumps

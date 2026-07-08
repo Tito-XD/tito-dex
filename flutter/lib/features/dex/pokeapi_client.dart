@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'dex_game_scope.dart';
 import 'dex_models.dart';
 import 'type_chart.dart';
 
@@ -78,17 +79,27 @@ class PokeApiClient {
 
     final profile = computeDefensiveProfile(summary.types, relations);
     final stab = computeStabSuperEffective(summary.types, relations);
+    final multipliers =
+        computeDefensiveMultipliers(summary.types, relations);
+    final baseStats = _parseBaseStats(pokemon['stats'] as List<dynamic>);
+    final johtoDex = _johtoDexNumber(
+      species['pokedex_numbers'] as List<dynamic>,
+    );
+    final flavorEntries = _parseFlavorEntries(
+      species['flavor_text_entries'] as List<dynamic>,
+    );
+    final moveSet = await _fetchHgssMoveSet(pokemon['moves'] as List<dynamic>);
+    final genderFemalePercent = _genderFemalePercent(
+      species['gender_rate'] as int?,
+    );
+    final eggGroups = _eggGroupsZh(species['egg_groups'] as List<dynamic>);
+    final hatchCounter = species['hatch_counter'] as int?;
 
     final evolutionUrl = species['evolution_chain']?['url'] as String?;
     EvolutionNode? evolution;
     if (evolutionUrl != null) {
       evolution = await _fetchEvolutionChain(evolutionUrl);
     }
-
-    final moves = await _fetchLevelUpMoves(
-      pokemon['moves'] as List<dynamic>,
-      maxGeneration: 4,
-    );
 
     return PokemonDetail(
       summary: summary,
@@ -100,15 +111,96 @@ class PokeApiClient {
       immunities: profile.immunities,
       stabSuperEffective: stab,
       evolutionChain: evolution,
-      moves: moves,
+      johtoDexNumber: johtoDex,
+      baseStats: baseStats,
+      typeMultipliers: multipliers,
+      flavorEntries: flavorEntries,
+      moveSet: moveSet,
+      genderFemalePercent: genderFemalePercent,
+      eggGroups: eggGroups,
+      hatchCounter: hatchCounter,
     );
   }
 
-  Future<List<PokemonMove>> _fetchLevelUpMoves(
-    List<dynamic> moveEntries, {
-    required int maxGeneration,
-  }) async {
-    final byMoveId = <int, PokemonMove>{};
+  PokemonBaseStats _parseBaseStats(List<dynamic> stats) {
+    final values = <String, int>{};
+    for (final entry in stats) {
+      final map = entry as Map<String, dynamic>;
+      final stat = map['stat'] as Map<String, dynamic>;
+      values[stat['name'] as String] = map['base_stat'] as int? ?? 0;
+    }
+    return PokemonBaseStats(
+      hp: values['hp'] ?? 0,
+      attack: values['attack'] ?? 0,
+      defense: values['defense'] ?? 0,
+      specialAttack: values['special-attack'] ?? 0,
+      specialDefense: values['special-defense'] ?? 0,
+      speed: values['speed'] ?? 0,
+    );
+  }
+
+  int? _johtoDexNumber(List<dynamic> entries) {
+    for (final entry in entries) {
+      final map = entry as Map<String, dynamic>;
+      final pokedex = map['pokedex'] as Map<String, dynamic>;
+      final name = pokedex['name'] as String;
+      if (johtoPokedexNames.contains(name)) {
+        return map['entry_number'] as int;
+      }
+    }
+    return null;
+  }
+
+  List<FlavorTextEntry> _parseFlavorEntries(List<dynamic> entries) {
+    final byVersion = <String, String>{};
+
+    for (final version in hgssFlavorVersions) {
+      String? zhHans;
+      String? zhHant;
+      String? english;
+
+      for (final entry in entries) {
+        final map = entry as Map<String, dynamic>;
+        if ((map['version'] as Map<String, dynamic>)['name'] != version) {
+          continue;
+        }
+        final language =
+            (map['language'] as Map<String, dynamic>)['name'] as String;
+        final text = (map['flavor_text'] as String)
+            .replaceAll('\n', ' ')
+            .replaceAll('\f', ' ')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
+        if (text.isEmpty) {
+          continue;
+        }
+        switch (language) {
+          case 'zh-Hans':
+          case 'zh-hans':
+            zhHans = text;
+          case 'zh-Hant':
+            zhHant = text;
+          case 'en':
+            english = text;
+        }
+      }
+
+      final chosen = zhHans ?? zhHant ?? english;
+      if (chosen != null) {
+        byVersion[version] = chosen;
+      }
+    }
+
+    return hgssFlavorVersions
+        .where(byVersion.containsKey)
+        .map((version) => FlavorTextEntry(version: version, text: byVersion[version]!))
+        .toList();
+  }
+
+  Future<PokemonMoveSet> _fetchHgssMoveSet(List<dynamic> moveEntries) async {
+    final levelUp = <int, PokemonMove>{};
+    final machine = <int, PokemonMove>{};
+    final egg = <int, PokemonMove>{};
 
     for (final entry in moveEntries) {
       final map = entry as Map<String, dynamic>;
@@ -118,36 +210,91 @@ class PokeApiClient {
 
       for (final detail in details) {
         final detailMap = detail as Map<String, dynamic>;
-        final method =
-            (detailMap['move_learn_method'] as Map<String, dynamic>)['name']
-                as String;
-        if (method != 'level-up') {
-          continue;
-        }
         final versionGroup =
             (detailMap['version_group'] as Map<String, dynamic>)['name']
                 as String;
-        final generation = _generationForVersionGroup(versionGroup);
-        if (generation == null || generation > maxGeneration) {
+        if (versionGroup != hgssVersionGroup) {
           continue;
         }
+        final method =
+            (detailMap['move_learn_method'] as Map<String, dynamic>)['name']
+                as String;
+        if (method != 'level-up' &&
+            method != 'machine' &&
+            method != 'egg') {
+          continue;
+        }
+
         final level = detailMap['level_learned_at'] as int? ?? 0;
-        final existing = byMoveId[moveId];
-        if (existing != null && (existing.level ?? 0) <= level) {
+        final target = switch (method) {
+          'level-up' => levelUp,
+          'machine' => machine,
+          _ => egg,
+        };
+        final existing = target[moveId];
+        if (method == 'level-up' &&
+            existing != null &&
+            (existing.level ?? 0) <= level) {
           continue;
         }
+        if (method != 'level-up' && existing != null) {
+          continue;
+        }
+
         final cachedMove = await _fetchMove(moveId);
-        byMoveId[moveId] = PokemonMove(
+        target[moveId] = PokemonMove(
           move: cachedMove,
           method: method,
-          level: level == 0 ? null : level,
+          level: method == 'level-up' && level > 0 ? level : null,
         );
       }
     }
 
-    final moves = byMoveId.values.toList()
+    final sortedLevelUp = levelUp.values.toList()
       ..sort((a, b) => (a.level ?? 0).compareTo(b.level ?? 0));
-    return moves;
+    final sortedMachine = machine.values.toList()
+      ..sort((a, b) => a.move.nameZh.compareTo(b.move.nameZh));
+    final sortedEgg = egg.values.toList()
+      ..sort((a, b) => a.move.nameZh.compareTo(b.move.nameZh));
+
+    return PokemonMoveSet(
+      levelUp: sortedLevelUp,
+      machine: sortedMachine,
+      egg: sortedEgg,
+    );
+  }
+
+  double? _genderFemalePercent(int? genderRate) {
+    if (genderRate == null || genderRate < 0) {
+      return null;
+    }
+    return genderRate / 8 * 100;
+  }
+
+  List<String> _eggGroupsZh(List<dynamic> groups) {
+    const labels = <String, String>{
+      'monster': '怪兽',
+      'water1': '水中1',
+      'bug': '虫',
+      'flying': '飞行',
+      'ground': '陆上',
+      'fairy': '妖精',
+      'plant': '植物',
+      'humanshape': '人形',
+      'water3': '水中3',
+      'mineral': '矿物',
+      'indeterminate': '不定形',
+      'water2': '水中2',
+      'ditto': '百变怪',
+      'dragon': '龙',
+      'no-eggs': '未发现',
+    };
+    return groups
+        .map((entry) {
+          final name = (entry as Map<String, dynamic>)['name'] as String;
+          return labels[name] ?? name;
+        })
+        .toList();
   }
 
   final Map<int, CachedMove> _moveCache = {};
@@ -173,29 +320,6 @@ class PokeApiClient {
     );
     _moveCache[id] = cached;
     return cached;
-  }
-
-  int? _generationForVersionGroup(String versionGroup) {
-    const genIvGroups = {
-      'gold-silver',
-      'crystal',
-      'ruby-sapphire',
-      'emerald',
-      'firered-leafgreen',
-      'diamond-pearl',
-      'platinum',
-      'heartgold-soulsilver',
-    };
-    if (genIvGroups.contains(versionGroup)) {
-      return 4;
-    }
-    if (versionGroup.startsWith('red') || versionGroup == 'yellow') {
-      return 1;
-    }
-    if (versionGroup.contains('gold') || versionGroup.contains('crystal')) {
-      return 2;
-    }
-    return null;
   }
 
   Future<int?> resolveSpeciesId(String speciesName) async {

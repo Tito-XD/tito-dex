@@ -54,6 +54,22 @@ abstract final class AppZh {
       '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
   static const dexMoves = '升级招式';
   static String dexMovesMore(int count) => '另有 $count 个招式已缓存';
+  static const dexTabIntro = '简介';
+  static const dexTabBasic = '基本信息';
+  static const dexTabObtain = '获取';
+  static const dexTabMoves = '招式';
+  static const dexFlavorTitle = '图鉴描述';
+  static const dexFlavorEmpty = '暂无可用图鉴描述（PokeAPI 未提供该版本中文文案时会显示英文）。';
+  static const dexBaseStats = '种族值';
+  static const dexBaseStatTotal = '种族值合计';
+  static const dexTypeGridTitle = '当受到以下属性攻击时';
+  static const dexGenderRatio = '性别比例';
+  static String dexGenderFemale(double percent) =>
+      '雌性 ${percent.toStringAsFixed(1)}%';
+  static const dexEggGroups = '生蛋分组';
+  static const dexHatchSteps = '孵化步数';
+  static const dexNoEvolution = '没有进化链记录。';
+  static const dexMovesHgssScope = '以下招式范围：心金 / 魂银';
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
