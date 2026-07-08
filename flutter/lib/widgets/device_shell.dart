@@ -14,6 +14,9 @@ class DeviceShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final handheld = DeviceLayout.isNativeTarget;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
@@ -21,9 +24,10 @@ class DeviceShell extends StatelessWidget {
         systemNavigationBarColor: TitoColors.deepBlue,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
-      child: DeviceLayout.isNativeTarget
-          ? _NativeShell(child: child)
-          : _PreviewShell(child: child),
+      child: MediaQuery(
+        data: mq.copyWith(textScaler: DeviceLayout.clampedTextScaler(context)),
+        child: handheld ? _NativeShell(child: child) : _PreviewShell(child: child),
+      ),
     );
   }
 }
@@ -36,25 +40,28 @@ class _NativeShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.paddingOf(context);
+
     return ColoredBox(
       color: TitoColors.deepBlue,
-      child: SafeArea(
-        bottom: false,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                TitoColors.skyBlue,
-                TitoColors.slateBlue,
-              ],
-            ),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              TitoColors.skyBlue,
+              TitoColors.slateBlue,
+            ],
           ),
-          child: SafeArea(
-            top: false,
-            child: child,
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: padding.top,
+            left: padding.left,
+            right: padding.right,
           ),
+          child: child,
         ),
       ),
     );

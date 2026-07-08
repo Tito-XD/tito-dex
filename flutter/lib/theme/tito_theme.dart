@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'tito_colors.dart';
 
 ThemeData buildTitoTheme() {
+  const fontFamily = 'Nunito';
+
   final base = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
+    fontFamily: fontFamily,
     scaffoldBackgroundColor: Colors.transparent,
     splashFactory: InkRipple.splashFactory,
     highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
@@ -19,7 +21,8 @@ ThemeData buildTitoTheme() {
       secondary: TitoColors.coral,
       surface: TitoColors.card,
     ),
-    textTheme: GoogleFonts.nunitoTextTheme(base.textTheme).apply(
+    textTheme: base.textTheme.apply(
+      fontFamily: fontFamily,
       bodyColor: TitoColors.ink,
       displayColor: TitoColors.ink,
     ),
@@ -31,7 +34,10 @@ ThemeData buildTitoTheme() {
           borderRadius: BorderRadius.circular(TitoRadii.md),
           side: const BorderSide(color: TitoColors.ink, width: 3),
         ),
-        textStyle: const TextStyle(fontWeight: FontWeight.w800),
+        textStyle: const TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -41,7 +47,10 @@ ThemeData buildTitoTheme() {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
         ),
-        textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        textStyle: const TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

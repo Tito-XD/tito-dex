@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'app.dart';
+import 'theme/device_layout.dart';
 import 'theme/tito_colors.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  GoogleFonts.config.allowRuntimeFetching = false;
+
+  if (DeviceLayout.isNativeTarget) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  } else {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  }
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: TitoColors.card,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: TitoColors.deepBlue,
+      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
   runApp(const TitoDexApp());

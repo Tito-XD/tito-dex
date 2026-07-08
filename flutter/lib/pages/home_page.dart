@@ -6,11 +6,11 @@ import '../models/journey.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/device_layout.dart';
 import '../widgets/app_header.dart';
-import '../widgets/companion_sticker.dart';
 import '../widgets/continue_journey_card.dart';
+import '../widgets/party_strip.dart';
+import '../widgets/companion_sticker.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/launcher_widgets.dart';
-import '../widgets/party_strip.dart';
 import '../widgets/trainer_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -25,6 +25,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (DeviceLayout.useSquareDashboard(context)) {
+      return Padding(
+        padding: DeviceLayout.pagePadding(context),
+        child: Column(
+          children: [
+            const AppHeader(),
+            Expanded(
+              child: _SquareDashboardLayout(
+                journey: journey,
+                onContinue: onContinue,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final wide = constraints.maxWidth >= 520 &&
@@ -52,6 +69,55 @@ class HomePage extends StatelessWidget {
   }
 }
 
+/// RG Rotate square dashboard: journey + party side-by-side, quick tiles below.
+class _SquareDashboardLayout extends StatelessWidget {
+  const _SquareDashboardLayout({
+    required this.journey,
+    required this.onContinue,
+  });
+
+  final CurrentJourney journey;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = DeviceLayout.sectionSpacing(context);
+
+    return Column(
+      children: [
+        TrainerCard(journey: journey, compact: true),
+        SizedBox(height: gap),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 11,
+                child: ContinueJourneyCard(
+                  journey: journey,
+                  onContinue: onContinue,
+                  compact: true,
+                ),
+              ),
+              SizedBox(width: gap),
+              Expanded(
+                flex: 9,
+                child: PartyStrip(
+                  party: journey.party,
+                  compact: true,
+                  vertical: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: gap),
+        const _QuickActionsRow(),
+      ],
+    );
+  }
+}
+
 class _NarrowHomeLayout extends StatelessWidget {
   const _NarrowHomeLayout({
     required this.journey,
@@ -63,27 +129,39 @@ class _NarrowHomeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gap = DeviceLayout.sectionSpacing(context);
+    final compact = DeviceLayout.isCompact(context);
+
     return Column(
       children: [
-        TrainerCard(journey: journey),
-        const SizedBox(height: 14),
-        ContinueJourneyCard(journey: journey, onContinue: onContinue),
-        const SizedBox(height: 14),
-        PartyStrip(party: journey.party),
-        const SizedBox(height: 14),
-        _QuickActions(),
-        const SizedBox(height: 14),
-        JourneyTimeline(
-          entries: journey.timeline,
-          nextReminder: journey.nextReminder,
+        TrainerCard(journey: journey, compact: compact),
+        SizedBox(height: gap),
+        ContinueJourneyCard(
+          journey: journey,
+          onContinue: onContinue,
+          compact: compact,
         ),
-        const SizedBox(height: 14),
-        CompanionSticker(
-          name: journey.companion,
-          message: AppZh.companionMessage(journey.location),
-        ),
-        const SizedBox(height: 14),
-        LauncherWidgets(journey: journey),
+        SizedBox(height: gap),
+        PartyStrip(party: journey.party, compact: compact),
+        if (!DeviceLayout.isShortScreen(context)) ...[
+          SizedBox(height: gap),
+          _QuickActions(compact: compact),
+          SizedBox(height: gap),
+          JourneyTimeline(
+            entries: journey.timeline,
+            nextReminder: journey.nextReminder,
+          ),
+          SizedBox(height: gap),
+          CompanionSticker(
+            name: journey.companion,
+            message: AppZh.companionMessage(journey.location),
+          ),
+          SizedBox(height: gap),
+          LauncherWidgets(journey: journey),
+        ] else ...[
+          SizedBox(height: gap),
+          const _QuickActionsRow(),
+        ],
       ],
     );
   }
@@ -100,6 +178,8 @@ class _WideHomeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final gap = DeviceLayout.sectionSpacing(context);
+
     return Column(
       children: [
         Row(
@@ -109,7 +189,7 @@ class _WideHomeLayout extends StatelessWidget {
               child: Column(
                 children: [
                   TrainerCard(journey: journey),
-                  const SizedBox(height: 14),
+                  SizedBox(height: gap),
                   ContinueJourneyCard(
                     journey: journey,
                     onContinue: onContinue,
@@ -117,17 +197,17 @@ class _WideHomeLayout extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: gap),
             Expanded(
               child: Column(
                 children: [
                   PartyStrip(party: journey.party),
-                  const SizedBox(height: 14),
+                  SizedBox(height: gap),
                   JourneyTimeline(
                     entries: journey.timeline,
                     nextReminder: journey.nextReminder,
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: gap),
                   CompanionSticker(
                     name: journey.companion,
                     message: AppZh.companionMessage(journey.location),
@@ -137,9 +217,9 @@ class _WideHomeLayout extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        _QuickActions(),
-        const SizedBox(height: 14),
+        SizedBox(height: gap),
+        _QuickActions(compact: false),
+        SizedBox(height: gap),
         LauncherWidgets(journey: journey),
       ],
     );
@@ -147,37 +227,66 @@ class _WideHomeLayout extends StatelessWidget {
 }
 
 class _QuickActions extends StatelessWidget {
+  const _QuickActions({required this.compact});
+
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1.35,
+      mainAxisSpacing: compact ? 8 : 10,
+      crossAxisSpacing: compact ? 8 : 10,
+      childAspectRatio: compact ? 1.5 : 1.35,
+      children: _quickTiles(context, compact: compact),
+    );
+  }
+}
+
+class _QuickActionsRow extends StatelessWidget {
+  const _QuickActionsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = _quickTiles(context, compact: true);
+    return Row(
       children: [
-        TitoQuickTile(
-          label: AppZh.navTeam,
-          icon: Icons.groups_rounded,
-          onTap: () => context.go('/team'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navJourney,
-          icon: Icons.map_rounded,
-          onTap: () => context.go('/journey'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navDex,
-          icon: Icons.grid_view_rounded,
-          onTap: () => context.go('/dex'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navSearch,
-          icon: Icons.search_rounded,
-          onTap: () => context.go('/search'),
-        ),
+        for (var i = 0; i < tiles.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          Expanded(child: tiles[i]),
+        ],
       ],
     );
   }
+}
+
+List<Widget> _quickTiles(BuildContext context, {bool compact = false}) {
+  return [
+    TitoQuickTile(
+      label: AppZh.navTeam,
+      icon: Icons.groups_rounded,
+      onTap: () => context.go('/team'),
+      compact: compact,
+    ),
+    TitoQuickTile(
+      label: AppZh.navJourney,
+      icon: Icons.map_rounded,
+      onTap: () => context.go('/journey'),
+      compact: compact,
+    ),
+    TitoQuickTile(
+      label: AppZh.navDex,
+      icon: Icons.grid_view_rounded,
+      onTap: () => context.go('/dex'),
+      compact: compact,
+    ),
+    TitoQuickTile(
+      label: AppZh.navSearch,
+      icon: Icons.search_rounded,
+      onTap: () => context.go('/search'),
+      compact: compact,
+    ),
+  ];
 }
