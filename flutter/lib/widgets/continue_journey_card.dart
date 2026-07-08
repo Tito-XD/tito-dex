@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
@@ -22,14 +24,14 @@ class ContinueJourneyCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Continue Journey',
+            AppZh.continueJourney,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: TitoColors.skyBlue,
                   fontWeight: FontWeight.w800,
                 ),
           ),
           Text(
-            journey.location,
+            localizeLocation(journey.location),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
@@ -46,7 +48,7 @@ class ContinueJourneyCard extends StatelessWidget {
             ),
             child: const Center(
               child: Text(
-                '★  City view  ★',
+                AppZh.cityView,
                 style: TextStyle(
                   color: TitoColors.softYellow,
                   fontWeight: FontWeight.w800,
@@ -57,10 +59,10 @@ class ContinueJourneyCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _Meta(label: 'Game', value: journey.game),
-              _Meta(label: 'Play Time', value: journey.playTime),
+              _Meta(label: AppZh.labelGame, value: localizeGame(journey.game)),
+              _Meta(label: AppZh.labelPlayTime, value: journey.playTime),
               _Meta(
-                label: 'Badges',
+                label: AppZh.labelBadges,
                 value: '${journey.badges}/${journey.maxBadges}',
               ),
             ],
@@ -81,7 +83,9 @@ class ContinueJourneyCard extends StatelessWidget {
                       border: Border.all(color: TitoColors.card, width: 1.5),
                     ),
                     child: Text(
-                      member.nickname ?? member.species,
+                      member.nickname != null
+                          ? member.nickname!
+                          : localizeSpecies(member.species),
                       style: const TextStyle(
                         color: TitoColors.card,
                         fontWeight: FontWeight.w700,
@@ -106,7 +110,7 @@ class ContinueJourneyCard extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                'Continue',
+                AppZh.continueButton,
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
               ),
             ),

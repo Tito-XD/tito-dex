@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 
 class TitoBottomNav extends StatelessWidget {
@@ -23,25 +24,25 @@ class TitoBottomNav extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _NavItem(
-                label: 'Home',
+                label: AppZh.navHome,
                 icon: Icons.home_rounded,
                 selected: location == '/',
                 onTap: () => context.go('/'),
               ),
               _NavItem(
-                label: 'Team',
+                label: AppZh.navTeam,
                 icon: Icons.groups_rounded,
                 selected: location.startsWith('/team'),
                 onTap: () => context.go('/team'),
               ),
               _NavItem(
-                label: 'Journey',
+                label: AppZh.navJourney,
                 icon: Icons.map_rounded,
                 selected: location.startsWith('/journey'),
                 onTap: () => context.go('/journey'),
               ),
               _NavItem(
-                label: 'Settings',
+                label: AppZh.navSettings,
                 icon: Icons.settings_rounded,
                 selected: location.startsWith('/settings'),
                 onTap: () => context.go('/settings'),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_zh.dart';
+import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../widgets/continue_journey_card.dart';
 import '../widgets/party_summary.dart';
@@ -32,7 +34,7 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Recent timeline',
+                AppZh.recentTimeline,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -45,7 +47,7 @@ class HomePage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          entry.text,
+                          localizeTimelineEntry(entry.text),
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -60,7 +62,7 @@ class HomePage extends StatelessWidget {
               if (journey.nextReminder != null) ...[
                 const SizedBox(height: 8),
                 Text(
-                  'Next: ${journey.nextReminder}',
+                  '${AppZh.nextPrefix}${localizeReminder(journey.nextReminder)}',
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ],

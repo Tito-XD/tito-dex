@@ -1,9 +1,10 @@
+import '../../l10n/game_zh.dart';
 import 'hgss_map_list.dart';
 
 /// Save offset 0x1234 stores an index into the HGSS map list (Project Pokémon).
 String locationLabelForMapId(int mapId) {
   if (mapId < 0 || mapId >= hgssMapEntries.length) {
-    return 'Map #$mapId';
+    return localizeLocation('Map #$mapId');
   }
 
   final entry = hgssMapEntries[mapId];
@@ -11,14 +12,14 @@ String locationLabelForMapId(int mapId) {
   final code = entry['code'] ?? '';
 
   if (code.contains('None None-None')) {
-    return name;
+    return localizeLocation(name);
   }
 
   final hint = _interiorHint(code);
   if (hint == null) {
-    return name;
+    return localizeLocation(name);
   }
-  return '$name · $hint';
+  return localizeLocation('$name · $hint');
 }
 
 String? _interiorHint(String code) {
