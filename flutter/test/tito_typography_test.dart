@@ -12,5 +12,6 @@ void main() {
 
     expect(style.fontFamily, TitoTypography.fontFamily);
     expect(style.fontFamily, 'Nunito');
+    expect(style.decoration, TextDecoration.none);
   });
 }

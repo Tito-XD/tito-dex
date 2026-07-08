@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/pokeapi_client.dart';
+import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -53,12 +53,7 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
-  String _formatDexError(Object error) {
-    if (error is PokeApiException) {
-      return '${AppZh.dexLoadFailed}\n${AppZh.dexLoadFailedDetail(error.statusCode)}';
-    }
-    return '${AppZh.dexLoadFailed}\n$error';
-  }
+  String _formatDexError(Object error) => formatUserFacingError(error);
 
   Future<void> _loadMore() async {
     if (_loadingChunk || _loadedThrough >= hgssMaxNationalDexId) {
@@ -153,8 +148,13 @@ class _DexPageState extends State<DexPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
+                    AppZh.dexLoadFailed,
+                    style: context.tito.cardBodyEmphasis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
                     _error!,
-                    style: context.tito.cardBodyStrong,
+                    style: context.tito.errorDetail,
                   ),
                   const SizedBox(height: 12),
                   FilledButton(

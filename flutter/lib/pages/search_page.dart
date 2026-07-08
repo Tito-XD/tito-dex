@@ -9,6 +9,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/error_text.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/app_header.dart';
 import '../widgets/pokemon_card.dart';
@@ -89,7 +90,7 @@ class _SearchPageState extends State<SearchPage> {
         return;
       }
       setState(() {
-        _error = error.toString();
+        _error = formatUserFacingError(error);
         _searching = false;
       });
     }
@@ -111,6 +112,7 @@ class _SearchPageState extends State<SearchPage> {
         TextField(
           controller: _controller,
           onChanged: _onQueryChanged,
+          spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
           decoration: InputDecoration(
             hintText: AppZh.searchPlaceholder,
             filled: true,
@@ -142,9 +144,19 @@ class _SearchPageState extends State<SearchPage> {
           const Center(child: CircularProgressIndicator())
         else if (_error != null)
           StickerCard(
-            child: Text(
-              _error!,
-              style: context.tito.cardBodyStrong,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppZh.dexLoadFailed,
+                  style: context.tito.cardBodyEmphasis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _error!,
+                  style: context.tito.errorDetail,
+                ),
+              ],
             ),
           )
         else if (_results.isEmpty)

@@ -127,6 +127,10 @@ ThemeData buildTitoTheme() {
         fontWeight: FontWeight.w600,
       ),
       helperStyle: textTheme.bodySmall,
+      errorStyle: textTheme.bodySmall?.copyWith(
+        color: TitoColors.coral,
+        fontWeight: FontWeight.w700,
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
         borderSide: const BorderSide(color: TitoColors.ink, width: 2),

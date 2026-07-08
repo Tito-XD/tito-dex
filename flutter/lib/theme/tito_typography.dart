@@ -32,11 +32,18 @@ abstract final class TitoTypography {
   }) {
     return TextStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: const [
+        'Noto Sans CJK SC',
+        'Noto Sans SC',
+        'sans-serif',
+      ],
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       height: height,
       letterSpacing: letterSpacing,
+      decoration: TextDecoration.none,
+      decorationThickness: 0,
     );
   }
 
@@ -221,6 +228,14 @@ abstract final class TitoTypography {
         fontWeight: FontWeight.w800,
         color: TitoColors.deepBlue,
       );
+
+  /// Secondary error detail inside cream cards (not raw exception dumps).
+  static TextStyle errorDetail(BuildContext context) => _base(
+        fontSize: _sz(context, 13, 11),
+        fontWeight: FontWeight.w600,
+        color: TitoColors.mutedInk,
+        height: 1.45,
+      );
 }
 
 /// Shorthand: `context.tito.cardTitle`
@@ -264,4 +279,5 @@ final class TitoTextStyles {
   TextStyle get companionBubble => TitoTypography.companionBubble(context);
   TextStyle get companionName => TitoTypography.companionName(context);
   TextStyle get quickTileLabel => TitoTypography.quickTileLabel(context);
+  TextStyle get errorDetail => TitoTypography.errorDetail(context);
 }
