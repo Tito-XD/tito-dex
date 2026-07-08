@@ -1,87 +1,120 @@
 # TitoDex Roadmap
 
-## Phase 1 — Foundation and Direction
+> **Stack update (July 2026):** Implementation moves to **Flutter**. Phase 2 (Capacitor + React mock) is complete as a reference. See [Stack Decision](./docs/STACK_DECISION.md).
+
+## Phase 1 — Foundation and Direction ✅
 
 Goal: define TitoDex clearly before building complex features.
 
 Deliverables:
 
-- README
-- vision document
-- product document
-- roadmap
+- README, vision, product, roadmap
 - AI read-first instructions
 - design system direction
 - architecture proposal
 - save parser proposal
 - cloud sync proposal
 
-Recommended next implementation step after this phase:
-
-- scaffold Capacitor + React + TypeScript + Vite app
-- create responsive mock home dashboard
-- use hard-coded SoulSilver data
-- validate layout on RG Rotate-style square screens, phone, tablet, and foldable-like viewport sizes
-- keep the UI lightweight for Android 12 / Unisoc-class handheld hardware
-- only consider React Native, Flutter, or Kotlin Compose if target-device testing exposes concrete Capacitor/WebView limitations
-
-## Phase 2 — Android-first Mock App
+## Phase 2 — Android-first Mock App ✅
 
 Goal: make TitoDex feel like a real companion device with mock data.
 
+Delivered (Capacitor + React — **reference only**):
+
+- responsive dashboard layout
+- DeviceShell, Continue Journey card, Trainer Card
+- Quick widgets, Team / Journey / Dex / Search / Settings skeletons
+- design tokens, local mock data module
+- HGSS save fixture: `src/PKMSS.sav`
+
+Known gaps that motivated the Flutter migration:
+
+- WebView tap highlight and “webpage” feel on real Android devices
+- `journeyStore` always returns mock data (no persistence)
+- Continue button is decorative (no emulator launch)
+- Settings shows Phase 2 placeholder copy
+- `hgssParser.ts` is a stub
+
+## Phase 0 — Flutter Migration (current)
+
+Goal: establish the Flutter codebase and reach visual parity on the home screen.
+
 Scope:
 
-- Capacitor Android project
-- React component shell
-- design tokens
-- responsive dashboard layout
-- Continue Journey card
-- Trainer Card
-- Quick widgets
-- mock Team / Journey / Dex / Search screens
-- local mock data module
+- Flutter project scaffold (`lib/`, `pubspec.yaml`, `test/`)
+- port design tokens from `tokens.css`
+- rebuild DeviceShell + home dashboard widgets
+- routing + bottom navigation
+- Nunito font bundled locally
 
 Out of scope:
 
-- real save parsing
+- save parser
 - cloud sync
-- complete Pokédex
+- full Settings editing
 
-## Phase 3 — Local Data and HGSS Context
+## Phase A — Native Feel + Local Persistence
 
-Goal: make TitoDex useful for HGSS play without depending on network access.
+Goal: app feels native on Android and remembers journey state.
 
 Scope:
 
-- local storage model
-- editable current journey state
-- HGSS-specific context notes
-- party management as user-entered data
+- local journey store (mock template on first launch only)
+- editable fields persisted across restarts
+- custom splash screen and launcher icon (TitoDex branding)
+- system status bar styling (`SystemChrome`)
+- Android back: pop routes first, exit on home
+- keep DeviceShell; adjust safe areas for phone vs square
+
+## Phase B — Useful Companion
+
+Goal: core interactions are real, not decorative.
+
+Scope:
+
+- **Continue:** first tap → pick installed emulator/game app; remember; launch on later taps
+- **Settings:** edit trainer name, game, location, badges, play time; remove dev placeholder text
 - journey timeline persistence
-- local data export/import
+- local JSON export / import
 
-## Phase 4 — Save Parser Prototype
+## Phase C — HGSS Save Parser
 
-Goal: parse enough HGSS save metadata to power Continue Journey.
+Goal: parse enough SoulSilver / HeartGold save metadata to power Continue Journey.
 
 Scope:
 
-- read selected `.sav` file locally
-- compute save hash
-- extract safe metadata only
+- SAF `.sav` file picker on Android
+- HGSS parser in Dart (see `docs/PARSER_PROPOSAL.md`)
+- validate against fixture `src/PKMSS.sav`
+- compute save hash; detect save changes
+- merge parser output into journey state without wiping manual timeline notes
+
+Extract (partial OK):
+
 - current game
-- trainer name if practical
-- play time if practical
-- badges if practical
-- location if practical
-- party summary if practical
+- trainer name
+- play time
+- badges (Johto + Kanto bitmasks)
+- party summary
+- location (when offset/mapping is reliable)
 
-Non-goal:
+Non-goals:
 
-- perfect full save editor
+- full save editor
 - multi-generation parser framework
+- PC box management
 
-## Phase 5 — Optional Cloud Sync Prototype
+## Phase 3 — HGSS Context (content)
+
+Goal: make TitoDex useful for HGSS play without network.
+
+Scope:
+
+- HGSS-specific context notes and checklists
+- party management (user-entered + parser-fed)
+- Dex search scoped to current game context
+
+## Phase 4 — Optional Cloud Sync Prototype
 
 Goal: back up journey metadata and save files safely.
 
@@ -116,3 +149,11 @@ Add generations when Tito actually reaches them:
 - USUM
 
 Each pack should be small, contextual, and journey-driven.
+
+## Platform Roadmap
+
+| Platform | Phase |
+| --- | --- |
+| Android phone + RG Rotate | Phase 0–C |
+| Linux handheld | After Android home is stable |
+| Web companion | After core journey loop works |

@@ -1,207 +1,206 @@
 # TitoDex Architecture
 
-## Recommended Initial Stack
+> **Stack update (July 2026):** TitoDex is migrating from Capacitor + React to **Flutter + Dart**. See [Stack Decision](./STACK_DECISION.md) for rationale, migration phases, and contributor notes. The React tree under `src/` remains a design reference until Flutter reaches home-screen parity.
 
-Use **Capacitor + React + TypeScript** for an Android-first application with a web-based UI layer.
+## Recommended Stack
+
+Use **Flutter + Dart** for TitoDex going forward.
 
 Why:
 
-- Android packaging is first-class through Capacitor.
-- React is productive for componentized dashboard UI.
-- TypeScript keeps local data and parser boundaries explicit.
-- Capacitor can later support local file access and platform plugins.
-- The app can still be tested as a responsive web UI during early iteration.
+- Skia/Impeller rendering avoids WebView “webpage” feel on Android.
+- One codebase targets Android, Linux (future handhelds), and web.
+- Custom sticker/device UI maps cleanly to Flutter Widgets.
+- Native needs (SAF file pick, app launcher, preferences, splash/icon) have mature plugins.
+- Dart parser and fixture tests fit the local-first journey model.
 
+### Previous stack (Phase 2 — reference only)
 
-## Stack Decision for RG Rotate
+**Capacitor + React + TypeScript + Vite** delivered the Phase 2 mock app. It validated product shape and RG Rotate layouts but is no longer the implementation target.
 
-The default Phase 2 stack is **Capacitor + React + TypeScript + Vite**. This remains the recommended path for TitoDex because the product is primarily a local-first companion dashboard rather than a performance-heavy native application.
+## Target Devices
 
-The first target handheld is **Anbernic RG Rotate**, with a Unisoc chipset and Android 12 ceiling. That target reinforces a few constraints:
+| Device | Notes |
+| --- | --- |
+| Android phones | Primary daily driver; system status bar + gesture nav |
+| Anbernic RG Rotate | Unisoc, Android 12; 720×720 square dashboard |
+| Linux handhelds (future) | e.g. RG DS–class; Flutter Linux desktop |
+| Web (later) | Companion dashboard; not Phase 0 priority |
+
+Constraints for all targets:
 
 - keep the UI lightweight and dashboard-oriented;
 - avoid heavy blur, excessive animation, and large unoptimized art assets;
-- test square and landscape-like layouts early instead of assuming phone portrait;
-- use Capacitor for the Android shell and bridge only where needed;
-- isolate native file access behind platform adapters;
-- prefer Android Storage Access Framework style file picking for `.sav` files instead of assuming unrestricted filesystem paths;
-- keep React/CSS components custom rather than adopting a default Material or Ionic UI look.
+- test square and phone layouts early;
+- keep custom UI — no default Material look as the product identity;
+- use Android Storage Access Framework for `.sav` files;
+- **retain DeviceShell** as the signature device frame (tune margins per form factor).
 
-Fallback options are intentionally secondary:
+### Alternatives considered
 
-- **React Native** if WebView performance or input handling becomes a real RG Rotate problem.
-- **Flutter** if a future rewrite needs stronger custom-rendered cross-platform UI.
-- **Kotlin + Jetpack Compose** if TitoDex becomes Android-only and needs deep native integration.
-
-Do not switch stacks preemptively. Validate the Capacitor build on the target device first.
+| Option | Verdict |
+| --- | --- |
+| Stay on Capacitor | Rejected — WebView ceiling + no Linux path |
+| Jetpack Compose | Rejected for now — Android-only; Linux/web weaker than Flutter |
+| React Native | Not chosen — UI is custom-drawn; Flutter better for Linux/web |
 
 ## Architecture Goals
 
 - local first
-- Android first
-- responsive UI
+- Android first (Linux + web follow)
+- responsive UI across phone and square screens
 - simple data model
 - no premature all-generation abstraction
 - parser modules are optional and game-scoped
 - cloud sync is a later adapter, not a core dependency
 
-## Proposed Project Shape
+## Project Shape
 
-When implementation begins:
+### Flutter (active target)
+
+```txt
+lib/
+  app/
+    app.dart
+    router.dart
+  theme/
+    tokens.dart
+    app_theme.dart
+  widgets/
+    device_shell.dart
+    trainer_card.dart
+    continue_journey_card.dart
+    ...
+  features/
+    journey/
+      journey_model.dart
+      journey_repository.dart
+    parser/
+      hgss_parser.dart
+      parser_types.dart
+    launcher/
+      emulator_launcher.dart
+    settings/
+      settings_page.dart
+  platform/
+    file_access.dart
+test/
+  parser/
+    hgss_parser_test.dart
+fixtures/
+  saves/
+    PKMSS.sav          # planned move from src/
+pubspec.yaml
+```
+
+### React (Phase 2 reference — frozen)
 
 ```txt
 src/
-  app/
-    App.tsx
-    routes.tsx
-  components/
-    TrainerCard.tsx
-    ContinueJourneyCard.tsx
-    QuickWidget.tsx
-    PartySummary.tsx
-    JourneyTimeline.tsx
-  data/
-    mockJourney.ts
-  features/
-    journey/
-      journeyTypes.ts
-      journeyStore.ts
-    dex/
-      dexMockData.ts
-    parser/
-      hgssParser.ts
-      parserTypes.ts
-    sync/
-      syncTypes.ts
-  styles/
-    tokens.css
-    global.css
-    layouts.css
-  platform/
-    fileAccess.ts
-    capacitor.ts
+  app/          # routes, pages
+  components/   # DeviceShell, cards, widgets
+  features/     # journey, parser stubs, sync types
+  styles/       # tokens.css — port values to Dart
+  data/         # mockJourney.ts
+android/        # Capacitor shell — legacy builds only
 ```
 
-Keep early modules small. Do not create a large plugin framework before the HGSS flow is validated.
+Keep Flutter modules small. Do not create a large plugin framework before the HGSS flow is validated.
 
 ## Data Layers
 
 ### 1. Mock Data Layer
 
-Phase 1 / Phase 2 can use hard-coded data:
-
-- SoulSilver
-- Goldenrod City
-- 3 badges
-- play time
-- party
-- journey timeline
-- Dex search mock
+First launch seeds from mock journey data (SoulSilver / Goldenrod City template). After that, read local store.
 
 ### 2. Local Journey Store
 
-The first real persistence layer should store user-editable journey state locally.
+Persist user-editable journey state locally.
 
-Possible storage choices:
+Flutter options:
 
-- simple local storage for early mock app
-- IndexedDB for richer local data
-- Capacitor Preferences for small settings
-- file-backed export/import later
+- `shared_preferences` for small settings (e.g. chosen emulator package name)
+- `drift` or `isar` for structured journey + timeline
+- JSON file export/import for backup
+
+The journey repository must not always return mock data — that was the Phase 2 `journeyStore.ts` limitation.
 
 ### 3. Save Parser Adapter
 
-A parser should read save files and produce journey metadata. It should not own the whole app state.
+A parser reads save files and produces journey metadata. It does not own the whole app state.
 
-Suggested output:
-
-```ts
-export type ParsedSaveSummary = {
-  game: 'SoulSilver' | 'HeartGold';
-  trainerName?: string;
-  playTime?: string;
-  badges?: number;
-  location?: string;
-  party?: Array<{
-    species: string;
-    level?: number;
-  }>;
-  saveHash: string;
-  parsedAt: string;
-};
+```dart
+class ParsedSaveSummary {
+  final String game;
+  final String? trainerName;
+  final String? playTime;
+  final int? badges;
+  final String? location;
+  final List<ParsedPartyMember>? party;
+  final String saveHash;
+  final DateTime parsedAt;
+  final List<String> warnings;
+}
 ```
+
+Fixture: `src/PKMSS.sav` (524 288-byte SoulSilver save). See `PARSER_PROPOSAL.md`.
 
 ### 4. Cloud Sync Adapter
 
-Cloud sync should be optional. The local app should remain useful without it.
-
-Cloud sync can later send:
-
-- current game
-- play time
-- badges
-- location
-- party
-- save hash
-- updated time
-- optional `.sav` backup to R2
+Cloud sync remains optional. The local app must stay useful without it. See `CLOUD_SYNC_PROPOSAL.md`.
 
 ## UI Routing
 
-Initial screens:
+Initial screens (unchanged):
 
 - Home / Continue
 - Team
 - Journey
 - Dex
 - Search
-- Settings later
+- Settings
 
 The home route is the most important route.
 
+**Continue button behavior:** first tap opens emulator app picker; choice is saved; subsequent taps launch the selected app.
+
 ## Responsive Strategy
 
-Use CSS rather than device-specific assumptions:
+Flutter layout guidelines (same intent as CSS Phase 2):
 
-- mobile-first stacking
-- grid dashboard at wider or square-ish viewports
-- `repeat(auto-fit, minmax(...))`
-- `clamp()` for spacing and type
-- `dvh` / `dvw`
-- safe-area insets
+- mobile-first stacking on narrow portrait
+- grid dashboard at wider or square viewports
+- `LayoutBuilder` / `MediaQuery` instead of fixed 720×720
+- `SafeArea` and display cutout insets
+- `DeviceShell` on all form factors unless a future “kiosk” mode says otherwise
 
 Avoid:
 
-- fixed `720×720`
 - phone-only assumptions
-- Material Design default-heavy layout
+- Material Design as the default visual language
 
 ## Native Boundaries
 
-Capacitor-related code should be isolated under `platform/` or specific adapters.
+Platform code lives behind adapters in `lib/platform/`:
 
-Examples:
-
-- file picking
-- local file permission handling
+- file picking (SAF)
+- emulator / app launch by package name
 - save backup export
-- Android storage APIs
+- status bar and system UI mode
 
-The React UI should consume typed services, not direct native calls everywhere.
+UI layers consume typed services, not raw platform channels.
 
 ## Testing Direction
 
-Early checks:
+- `flutter test` for parser fixtures and journey repository
+- widget tests for home dashboard key widgets
+- golden tests optional for DeviceShell
+- manual checks: 360×780 phone, 720×720 square, tablet landscape
 
-- TypeScript type check
-- unit tests for data transforms
-- responsive visual checks at several viewport sizes
-- parser fixture tests only after save parser work begins
+Parser tests must run against `PKMSS.sav` before HGSS support is claimed.
 
-Target viewport checks:
+## Related Documents
 
-- 360 × 780 phone portrait
-- 720 × 720 square
-- 800 × 1280 tablet portrait
-- 1280 × 800 tablet landscape
-- foldable-like wide layout
+- [Stack Decision](./STACK_DECISION.md) — why Flutter, migration phases, pitfalls
+- [Parser Proposal](./PARSER_PROPOSAL.md) — HGSS scope and fixture
+- [Design System](./DESIGN_SYSTEM.md) — visual tokens to port

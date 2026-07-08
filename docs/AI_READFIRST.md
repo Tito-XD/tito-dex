@@ -2,6 +2,20 @@
 
 Future AI contributors must read this document before working on TitoDex.
 
+## Stack and Migration (July 2026)
+
+TitoDex is migrating from **Capacitor + React** to **Flutter + Dart**.
+
+Read [Stack Decision](./STACK_DECISION.md) before starting implementation work.
+
+Key points:
+
+- The React app under `src/` is a **design reference** — do not add major features there.
+- New UI, persistence, parser, and platform code go in **Flutter** (`lib/`, `test/`).
+- **DeviceShell stays** — rebuild in Flutter; it is intentional product identity.
+- Real Android testing showed WebView limitations; native rendering is the fix.
+- Future targets include Linux handhelds and web; Flutter covers all three.
+
 ## Communication Defaults
 
 - Default communication with Tito should be in **Chinese**.
@@ -85,27 +99,38 @@ Design language:
 ## Responsive Requirements
 
 - mobile first
-- CSS Grid / Flex
-- `clamp()` for type and spacing
-- `dvh` / `dvw` for viewport-aware sizing
-- safe-area inset support
+- grid dashboard for square / wide viewports
+- `clamp()`-style scaling in Flutter (`MediaQuery`, responsive padding)
+- safe-area / `SafeArea` inset support
 - no fixed `720×720` layout
-- Dex grid should use `auto-fit` / `minmax`
-- square screens can use a dashboard layout and should fill space well
+- Dex grid should use flexible columns (`GridView`, `SliverGrid`)
+- square screens (RG Rotate) use dashboard layout and should fill space well
+- **DeviceShell** retained on all form factors unless explicitly changed
+
+## Implementation Stack
+
+- **Flutter + Dart** for app UI, routing, persistence, parser, and platform adapters
+- **Phase 2 React tree** — reference only for tokens, layout, and component naming
+- Parser tests against `src/PKMSS.sav` before claiming HGSS support
 
 ## Phase 1 Guardrails
 
 Allowed:
 
 - documentation
-- initial architecture direction
-- mock data for SoulSilver, Goldenrod City, 3 badges, party, journey timeline, Dex search
+- Flutter scaffolding and widget port from Phase 2 reference
+- mock data for SoulSilver, Goldenrod City, party, journey timeline, Dex search
+- HGSS parser prototype against `src/PKMSS.sav`
 
 Do not build yet:
 
 - all-generation parser
 - cloud sync implementation
 - complete encyclopedia
-- emulator automation
 - OCR
 - complex account system
+
+Do not:
+
+- add major features to the Capacitor/React tree
+- switch to another framework (Compose-only, React Native) without explicit approval
