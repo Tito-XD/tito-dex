@@ -29,13 +29,33 @@ abstract final class AppZh {
   static const widgetContinue = '继续';
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
-  static const dexScopeNote = '仅显示当前魂银旅程相关的图鉴记录，不是完整百科。';
+  static const dexScopeNote =
+      '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
-  static const dexUnknown = '未知';
-  static const searchPlaceholder = '搜索当前旅程中的宝可梦…';
-  static const searchEmptyHint = '在当前旅程图鉴范围内搜索宝可梦、属性或编号。';
-  static const searchNoResults = '当前 mock 图鉴里没有匹配结果。';
+  static const dexUnknown = '未捕获';
+  static const dexTabNational = '全国图鉴';
+  static const dexTabJourney = '旅程同行';
+  static const dexJourneyEmpty = '当前旅程同行里还没有载入图鉴条目，试试全国图鉴。';
+  static String dexLoadingProgress(int loaded, int total) =>
+      '正在加载图鉴 $loaded / $total…';
+  static const dexLoadingDetail = '正在从 PokeAPI 拉取详情…';
+  static const dexLoadFailed = '图鉴数据加载失败';
+  static const dexRetry = '重试';
+  static const dexHeight = '身高';
+  static const dexWeight = '体重';
+  static const dexWeaknesses = '弱点（受到 ×2）';
+  static const dexResistances = '抗性（受到 ×0.5）';
+  static const dexImmunities = '免疫（受到 ×0）';
+  static const dexStabEffective = '本系克制（打出 ×2）';
+  static const dexEvolution = '进化链';
+  static const dexNone = '无';
+  static const dexApiNote =
+      '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
+
+  static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
+  static const searchEmptyHint = '可搜索 1–493 号宝可梦的中文名、英文名、编号或属性。';
+  static const searchNoResults = '没有找到匹配的宝可梦。';
 
   static const recentTimeline = '最近动态';
   static const nextPrefix = '下一步：';
