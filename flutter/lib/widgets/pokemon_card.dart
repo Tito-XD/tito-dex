@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 
 class PokemonMiniCard extends StatelessWidget {
@@ -35,15 +37,10 @@ class PokemonMiniCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (summary.spriteUrl != null)
-              Image.network(
-                summary.spriteUrl!,
-                height: 56,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const SizedBox(height: 56),
-              )
-            else
-              const SizedBox(height: 56),
+            DexSpriteImage(
+              source: summary.displaySpritePath,
+              height: 56,
+            ),
             Text(
               '#${summary.id.toString().padLeft(3, '0')}',
               style: const TextStyle(
@@ -63,13 +60,7 @@ class PokemonMiniCard extends StatelessWidget {
                 fontSize: 13,
               ),
             ),
-            Text(
-              summary.types.map(typeNameZh).join('/'),
-              style: const TextStyle(
-                fontSize: 10,
-                color: TitoColors.mutedInk,
-              ),
-            ),
+            _PokemonTypeRow(types: summary.types),
             const Spacer(),
             Text(
               switch (status) {
@@ -89,14 +80,54 @@ class PokemonMiniCard extends StatelessWidget {
   }
 }
 
+class _PokemonTypeRow extends StatelessWidget {
+  const _PokemonTypeRow({required this.types});
+
+  final List<String> types;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, String?>>(
+      future: _iconPaths(),
+      builder: (context, snapshot) {
+        final icons = snapshot.data ?? const {};
+        return Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 4,
+          children: types
+              .map(
+                (type) => DexTypeIcon(
+                  typeEn: type,
+                  labelZh: typeNameZh(type),
+                  iconPath: icons[type],
+                  compact: true,
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+
+  Future<Map<String, String?>> _iconPaths() async {
+    final paths = <String, String?>{};
+    for (final type in types) {
+      paths[type] = await dexOfflineService.typeIconPath(type);
+    }
+    return paths;
+  }
+}
+
 class TypeChipRow extends StatelessWidget {
   const TypeChipRow({
     super.key,
     required this.types,
+    this.typeKeys,
     this.tone = TypeChipTone.neutral,
   });
 
   final List<String> types;
+  final List<String>? typeKeys;
   final TypeChipTone tone;
 
   @override
@@ -111,12 +142,19 @@ class TypeChipRow extends StatelessWidget {
       );
     }
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: types
-          .map(
-            (type) => Container(
+    return FutureBuilder<Map<String, String?>>(
+      future: _iconPaths(),
+      builder: (context, snapshot) {
+        final icons = snapshot.data ?? const {};
+        return Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: List.generate(types.length, (index) {
+            final label = types[index];
+            final key = typeKeys != null && index < typeKeys!.length
+                ? typeKeys![index]
+                : null;
+            return Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: switch (tone) {
@@ -128,17 +166,42 @@ class TypeChipRow extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: TitoColors.ink, width: 2),
               ),
-              child: Text(
-                type,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (key != null && icons[key] != null) ...[
+                    DexSpriteImage(
+                      source: icons[key],
+                      height: 14,
+                      width: 14,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          )
-          .toList(),
+            );
+          }),
+        );
+      },
     );
+  }
+
+  Future<Map<String, String?>> _iconPaths() async {
+    if (typeKeys == null) {
+      return const {};
+    }
+    final paths = <String, String?>{};
+    for (final type in typeKeys!) {
+      paths[type] = await dexOfflineService.typeIconPath(type);
+    }
+    return paths;
   }
 }
 
@@ -207,10 +270,10 @@ class _EvolutionCard extends StatelessWidget {
           width: 96,
           child: Column(
             children: [
-              if (node.spriteUrl != null)
-                Image.network(node.spriteUrl!, height: 64, fit: BoxFit.contain)
-              else
-                const SizedBox(height: 64),
+              DexSpriteImage(
+                source: node.displaySpritePath,
+                height: 64,
+              ),
               Text(
                 node.nameZh,
                 textAlign: TextAlign.center,

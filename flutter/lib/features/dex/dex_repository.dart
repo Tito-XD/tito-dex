@@ -1,15 +1,18 @@
 import '../../models/journey.dart';
 import 'dex_models.dart';
+import 'dex_offline_service.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
-/// HGSS national dex scope (Gen IV).
-const hgssMaxNationalDexId = 493;
-
 class DexRepository {
-  DexRepository({PokeApiClient? client}) : _client = client ?? PokeApiClient();
+  DexRepository({
+    PokeApiClient? client,
+    DexOfflineService? offline,
+  })  : _client = client ?? PokeApiClient(),
+        _offline = offline ?? dexOfflineService;
 
   final PokeApiClient _client;
+  final DexOfflineService _offline;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
   final Map<String, int> _nameToIdCache = {};
@@ -20,10 +23,17 @@ class DexRepository {
     if (_summaryCache.containsKey(id)) {
       return _summaryCache[id]!;
     }
+
+    if (await _offline.shouldPreferOffline()) {
+      final cached = await _offline.readSummary(id);
+      if (cached != null) {
+        _rememberSummary(cached);
+        return cached;
+      }
+    }
+
     final summary = await _client.fetchSummary(id);
-    _summaryCache[id] = summary;
-    _nameToIdCache[summary.nameEn.toLowerCase()] = id;
-    _nameToIdCache[summary.nameZh] = id;
+    _rememberSummary(summary);
     return summary;
   }
 
@@ -31,13 +41,34 @@ class DexRepository {
     if (_detailCache.containsKey(id)) {
       return _detailCache[id]!;
     }
-    final detail = await _client.fetchDetail(id);
+
+    if (await _offline.shouldPreferOffline()) {
+      final cached = await _offline.readDetail(id);
+      if (cached != null) {
+        _detailCache[id] = cached;
+        _summaryCache[id] = cached.summary;
+        return cached;
+      }
+    }
+
+    final detail = await _client.fetchDetailWithMoves(id);
     _detailCache[id] = detail;
-    _summaryCache[id] = detail.summary;
+    _rememberSummary(detail.summary);
     return detail;
   }
 
-  Future<List<PokemonSummary>> getAllSummaries() {
+  Future<List<PokemonSummary>> getAllSummaries() async {
+    if (await _offline.shouldPreferOffline()) {
+      final cached = await _offline.readAllSummaries();
+      if (cached.isNotEmpty) {
+        _allSummaries = cached;
+        for (final summary in cached) {
+          _rememberSummary(summary);
+        }
+        return cached;
+      }
+    }
+
     _allSummariesFuture ??= _loadAllSummaries();
     return _allSummariesFuture!;
   }
@@ -133,12 +164,18 @@ class DexRepository {
     return DexEncounterStatus.unknown;
   }
 
-  void clearCache() {
+  void clearMemoryCache() {
     _summaryCache.clear();
     _detailCache.clear();
     _nameToIdCache.clear();
     _allSummaries = null;
     _allSummariesFuture = null;
+  }
+
+  void _rememberSummary(PokemonSummary summary) {
+    _summaryCache[summary.id] = summary;
+    _nameToIdCache[summary.nameEn.toLowerCase()] = summary.id;
+    _nameToIdCache[summary.nameZh] = summary.id;
   }
 }
 
