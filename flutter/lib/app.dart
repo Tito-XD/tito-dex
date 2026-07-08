@@ -1,9 +1,12 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/journey/journey_repository.dart';
 import 'features/parser/hgss_parser.dart';
+import 'features/save/save_sync_service.dart';
+import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'pages/home_page.dart';
@@ -22,8 +25,10 @@ class TitoDexApp extends StatefulWidget {
 class _TitoDexAppState extends State<TitoDexApp> {
   final _repository = JourneyRepository();
   final _parser = const HgssParser();
+  final _saveSync = SaveSyncService();
   late final GoRouter _router;
   CurrentJourney _journey = CurrentJourney.mock();
+  SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
   bool _ready = false;
 
   @override
@@ -64,9 +69,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
               path: '/settings',
               builder: (context, state) => SettingsPage(
                 journey: _journey,
+                saveConfig: _saveConfig,
                 onImportFixture: _importBundledSave,
                 onResetMock: _resetMock,
                 onSaveJourney: _persist,
+                onPickSaveDirectory: _pickSaveDirectory,
+                onClearSaveDirectory: _clearSaveDirectory,
+                onToggleAutoLoad: _setAutoLoadOnStartup,
+                onSyncNow: () => _syncSaveDirectory(force: true),
               ),
             ),
           ],
@@ -77,12 +87,19 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 
   Future<void> _bootstrap() async {
-    final journey = await _repository.load();
+    var journey = await _repository.load();
+    final syncResult = await _saveSync.syncOnStartup(existing: journey);
+    if (syncResult.updated) {
+      journey = syncResult.journey;
+      await _repository.save(journey);
+    }
+    final saveConfig = await _saveSync.loadConfig();
     if (!mounted) {
       return;
     }
     setState(() {
       _journey = journey;
+      _saveConfig = saveConfig;
       _ready = true;
     });
   }
@@ -90,6 +107,80 @@ class _TitoDexAppState extends State<TitoDexApp> {
   Future<void> _persist(CurrentJourney journey) async {
     setState(() => _journey = journey);
     await _repository.save(journey);
+  }
+
+  Future<void> _pickSaveDirectory() async {
+    final path = await FilePicker.platform.getDirectoryPath();
+    if (path == null) {
+      return;
+    }
+
+    final config = await _saveSync.updateDirectory(path);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _saveConfig = config);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackSaveDirectorySet)),
+    );
+    await _syncSaveDirectory(force: true);
+  }
+
+  Future<void> _clearSaveDirectory() async {
+    final config = await _saveSync.updateDirectory(null);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _saveConfig = config);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackSaveDirectoryCleared)),
+    );
+  }
+
+  Future<void> _setAutoLoadOnStartup(bool enabled) async {
+    final config = await _saveSync.setAutoLoadOnStartup(enabled);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _saveConfig = config);
+  }
+
+  Future<void> _syncSaveDirectory({bool force = false}) async {
+    final result = await _saveSync.syncLatest(existing: _journey, force: force);
+    final config = await _saveSync.loadConfig();
+    if (!mounted) {
+      return;
+    }
+
+    if (result.updated) {
+      await _persist(result.journey);
+    } else {
+      setState(() => _saveConfig = config);
+    }
+
+    final message = _syncMessage(result);
+    if (message != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  String? _syncMessage(SaveSyncResult result) {
+    switch (result.message) {
+      case 'loaded':
+        return AppZh.snackSaveSyncLoaded(result.fileName ?? '');
+      case 'unchanged':
+        return AppZh.snackSaveSyncUnchanged;
+      case 'no_directory':
+        return AppZh.snackSaveSyncNoDirectory;
+      case 'no_save_found':
+        return AppZh.snackSaveSyncNoSave;
+      case 'unsupported_save':
+        return AppZh.snackSaveSyncUnsupported;
+      default:
+        return null;
+    }
   }
 
   Future<void> _importBundledSave() async {
