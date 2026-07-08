@@ -78,29 +78,42 @@ Start here:
 
 ## Development
 
-Stack: **Capacitor + React + TypeScript + Vite** (Phase 2 mock app).
+TitoDex is migrating from **Capacitor + React** (Phase 2 mock) to **Flutter** for Android, Linux handheld, and web.
 
-### Prerequisites
+### React mock (legacy Phase 2)
 
-- Node.js 20+
-- npm
-- Android Studio (for building/running the Android shell)
-
-### Setup
+Stack: **Capacitor + React + TypeScript + Vite**.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the local dev server URL (default `http://localhost:5173`) to preview the responsive mock UI in a browser.
-
-### Build & Android
+### Flutter app (Phase 0 — in progress)
 
 ```bash
-npm run build          # typecheck + web production build
-npm run cap:sync       # build and sync web assets into android/
-npm run cap:android    # open Android Studio (after sync)
+cd flutter
+flutter pub get
+flutter run -d chrome    # web preview
+flutter test             # parser + widget smoke tests
+```
+
+Bundled fixture save: `fixtures/PKMSS.sav` (also at `src/PKMSS.sav` from git upload).
+
+Probe a save file locally:
+
+```bash
+python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
+```
+
+Settings → **Import bundled PKMSS.sav** loads parsed trainer/party data into the Flutter home screen.
+
+### Android (Capacitor legacy)
+
+```bash
+npm run build
+npm run cap:sync
+npm run cap:android
 ```
 
 In Android Studio:
