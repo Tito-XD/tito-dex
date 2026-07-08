@@ -241,9 +241,12 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
 
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
+    return SingleChildScrollView(
+      padding: DeviceLayout.pagePadding(context).copyWith(bottom: 96),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
         Row(
           children: [
             Material(
@@ -370,6 +373,7 @@ class _SettingsPageState extends State<SettingsPage> {
         StickerCard(
           variant: StickerVariant.mint,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
@@ -438,11 +442,20 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
                 const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(AppZh.settingsDexOfflinePrefer),
-                  value: dexManifest.preferOffline,
-                  onChanged: _dexDownloading ? null : _setDexPreferOffline,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppZh.settingsDexOfflinePrefer,
+                        style: context.tito.cardBody,
+                      ),
+                    ),
+                    Switch(
+                      value: dexManifest.preferOffline,
+                      onChanged:
+                          _dexDownloading ? null : _setDexPreferOffline,
+                    ),
+                  ],
                 ),
                 OutlinedButton(
                   onPressed: _dexDownloading ? null : _clearDexOffline,
@@ -497,6 +510,7 @@ class _SettingsPageState extends State<SettingsPage> {
         StickerCard(
           variant: StickerVariant.cream,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
@@ -534,11 +548,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ],
               const SizedBox(height: 12),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text(AppZh.settingsAutoLoadOnStartup),
-                value: config.autoLoadOnStartup,
-                onChanged: widget.onToggleAutoLoad,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.settingsAutoLoadOnStartup,
+                      style: context.tito.cardBody,
+                    ),
+                  ),
+                  Switch(
+                    value: config.autoLoadOnStartup,
+                    onChanged: widget.onToggleAutoLoad,
+                  ),
+                ],
               ),
               Text(
                 lastSynced != null
@@ -616,7 +638,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }

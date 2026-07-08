@@ -151,7 +151,7 @@ class CurrentJourney {
         badges: 3,
         maxBadges: 8,
         playTime: '18:42',
-        companion: 'Riolu',
+        companion: 'Cyndaquil',
         nextReminder: '准备好就去广播塔看看',
         party: [
           PartyMember(species: 'Quilava', level: 24, nickname: 'Quilava'),
@@ -168,7 +168,7 @@ class CurrentJourney {
           JourneyTimelineEntry(id: 't2', text: '获得蜂巢徽章', at: '第 3 天'),
           JourneyTimelineEntry(
             id: 't3',
-            text: '利欧路加入同行',
+            text: '火球鼠一直跟在身旁',
             at: '第 2 天',
           ),
         ],

@@ -224,7 +224,6 @@ class PokeApiClient {
     for (final entry in moveEntries) {
       final map = entry as Map<String, dynamic>;
       final move = map['move'] as Map<String, dynamic>;
-      final moveId = _idFromUrl(move['url'] as String);
       final details = map['version_group_details'] as List<dynamic>;
 
       for (final detail in details) {
@@ -241,6 +240,11 @@ class PokeApiClient {
         if (method != 'level-up' &&
             method != 'machine' &&
             method != 'egg') {
+          continue;
+        }
+
+        final moveId = _tryIdFromUrl(move['url'] as String);
+        if (moveId == null) {
           continue;
         }
 
@@ -488,9 +492,23 @@ class PokeApiClient {
     };
   }
 
-  int _idFromUrl(String url) {
+  int? _tryIdFromUrl(String url) {
     final segments = Uri.parse(url).pathSegments;
-    return int.parse(segments.last);
+    for (var i = segments.length - 1; i >= 0; i--) {
+      final id = int.tryParse(segments[i]);
+      if (id != null) {
+        return id;
+      }
+    }
+    return null;
+  }
+
+  int _idFromUrl(String url) {
+    final id = _tryIdFromUrl(url);
+    if (id == null) {
+      throw FormatException('No numeric id in PokeAPI url: $url');
+    }
+    return id;
   }
 
   String _capitalize(String value) {

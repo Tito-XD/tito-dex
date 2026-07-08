@@ -50,7 +50,7 @@ ThemeData buildTitoTheme() {
     useMaterial3: true,
     brightness: Brightness.light,
     fontFamily: fontFamily,
-    scaffoldBackgroundColor: Colors.transparent,
+    scaffoldBackgroundColor: TitoColors.slateBlue,
     splashFactory: InkRipple.splashFactory,
     highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
     textTheme: textTheme,

@@ -101,7 +101,7 @@ class HgssParser {
       badges: summary.badges,
       maxBadges: summary.maxBadges,
       playTime: summary.playTime,
-      companion: existing?.companion ?? 'Riolu',
+      companion: existing?.companion ?? 'Cyndaquil',
       party: summary.party
           .map(
             (member) => PartyMember(

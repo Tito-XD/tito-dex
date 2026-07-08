@@ -89,6 +89,11 @@ const speciesNamesZh = <String, String>{
 };
 
 const companionNamesZh = <String, String>{
+  'Cyndaquil': '火球鼠',
+  'Quilava': '火岩鼠',
+  'Typhlosion': '火暴兽',
+  'Chikorita': '菊草叶',
+  'Totodile': '小锯鳄',
   'Riolu': '利欧路',
 };
 

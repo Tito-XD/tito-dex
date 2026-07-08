@@ -55,5 +55,9 @@
         <package android:name="com.ndsemulator" />
         <package android:name="com.fastemulator.gbafree" />
         <package android:name="com.fastemulator.gba" />
+        <package android:name="com.retroarch.aarch64" />
+        <package android:name="com.citra.citra_emu.canary" />
+        <package android:name="com.duckstation.psx" />
+        <package android:name="org.easyrpg.player" />
     </queries>
 </manifest>
