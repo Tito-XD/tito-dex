@@ -1,0 +1,33 @@
+:root {
+  --color-deep-blue: #2f4361;
+  --color-slate-blue: #7b91a6;
+  --color-sky-blue: #afc7da;
+  --color-cream: #f3e4b3;
+  --color-coral: #ff8f6a;
+  --color-ink: #221f26;
+  --color-soft-yellow: #f7d977;
+  --color-card: #fff7e6;
+  --color-muted-ink: #536273;
+  --color-mint: #7ec8a8;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --outline-thick: 3px;
+  --outline-thin: 2px;
+  --shadow-sticker: 0 5px 0 rgba(24, 40, 59, 0.22);
+  --shadow-soft: 0 12px 32px rgba(24, 40, 59, 0.14);
+
+  --font-sans: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --space-xs: clamp(6px, 1.2dvw, 10px);
+  --space-sm: clamp(10px, 2dvw, 16px);
+  --space-md: clamp(14px, 2.5dvw, 22px);
+  --space-lg: clamp(20px, 3.5dvw, 32px);
+  --space-xl: clamp(28px, 5dvw, 48px);
+
+  --text-title: clamp(1.6rem, 5dvw, 3rem);
+  --text-card-title: clamp(1rem, 2.8dvw, 1.4rem);
+  --text-body: clamp(0.9rem, 2.2dvw, 1.05rem);
+  --text-small: clamp(0.78rem, 1.8dvw, 0.9rem);
+}

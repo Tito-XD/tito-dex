@@ -75,3 +75,49 @@ Start here:
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
 - [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
+
+## Development
+
+Stack: **Capacitor + React + TypeScript + Vite** (Phase 2 mock app).
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- Android Studio (for building/running the Android shell)
+
+### Setup
+
+```bash
+npm install
+npm run dev
+```
+
+Open the local dev server URL (default `http://localhost:5173`) to preview the responsive mock UI in a browser.
+
+### Build & Android
+
+```bash
+npm run build          # typecheck + web production build
+npm run cap:sync       # build and sync web assets into android/
+npm run cap:android    # open Android Studio (after sync)
+```
+
+In Android Studio:
+
+1. Open the `android/` folder.
+2. Create/start an AVD (Pixel 5 or similar; API 34+ recommended).
+3. Run the `app` configuration on the emulator or a connected device.
+
+Command-line debug build (requires Android SDK + `android/local.properties`):
+
+```bash
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+cd android && ./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb shell am start -n com.tito.titodex/.MainActivity
+```
+
+Fonts are bundled locally (`@fontsource/nunito`) so the WebView does not depend on Google Fonts at runtime.
+
+Mock data is hard-coded for SoulSilver / Goldenrod City (3 badges) per Phase 2 scope.
