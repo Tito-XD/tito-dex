@@ -11,7 +11,10 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   if (DeviceLayout.isNativeTarget) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [],
+    );
   } else {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }

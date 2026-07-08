@@ -61,7 +61,9 @@ class TrainerCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         height: 1.1,
-                        fontSize: compact ? 18 : null,
+                        fontSize: compact
+                            ? DeviceLayout.cardHeadingSize(context)
+                            : null,
                       ),
                 ),
                 if (!compact) ...[

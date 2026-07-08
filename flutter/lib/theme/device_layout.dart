@@ -48,7 +48,7 @@ abstract final class DeviceLayout {
 
   static EdgeInsets pagePadding(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return const EdgeInsets.fromLTRB(12, 8, 12, 4);
+      return const EdgeInsets.fromLTRB(10, 4, 10, 2);
     }
     if (isCompact(context)) {
       return const EdgeInsets.fromLTRB(10, 6, 10, 4);
@@ -58,7 +58,7 @@ abstract final class DeviceLayout {
 
   static double sectionSpacing(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 8;
+      return 6;
     }
     if (isCompact(context)) {
       return 10;
@@ -67,6 +67,9 @@ abstract final class DeviceLayout {
   }
 
   static EdgeInsets cardPadding(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return const EdgeInsets.all(10);
+    }
     if (isCompact(context)) {
       return const EdgeInsets.all(12);
     }
@@ -75,7 +78,7 @@ abstract final class DeviceLayout {
 
   static double gridMaxExtent(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 132;
+      return 120;
     }
     if (isCompact(context)) {
       return isLandscape(context) ? 112 : 128;
@@ -83,8 +86,61 @@ abstract final class DeviceLayout {
     return 160;
   }
 
+  /// App bar title on the home header.
+  static double? appTitleSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 16;
+    }
+    if (isCompact(context)) {
+      return 20;
+    }
+    return null;
+  }
+
+  static double appTitleIconSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 20;
+    }
+    if (isCompact(context)) {
+      return 24;
+    }
+    return 32;
+  }
+
+  /// Prominent card headings (location, species name, etc.).
+  static double cardHeadingSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 15;
+    }
+    if (isCompact(context)) {
+      return 18;
+    }
+    return 22;
+  }
+
+  static double bodyTextSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 12;
+    }
+    if (isCompact(context)) {
+      return 13;
+    }
+    return 14;
+  }
+
+  static double captionTextSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 10;
+    }
+    if (isCompact(context)) {
+      return 11;
+    }
+    return 12;
+  }
+
   /// Clamp Android system font scaling so dense handheld layouts do not overflow.
   static TextScaler clampedTextScaler(BuildContext context) {
-    return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.12);
+    final maxScale = useSquareDashboard(context) ? 1.0 : 1.12;
+    return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: maxScale);
   }
 }

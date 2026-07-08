@@ -57,7 +57,6 @@ class _NativeShell extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.only(
-            top: padding.top,
             left: padding.left,
             right: padding.right,
           ),
