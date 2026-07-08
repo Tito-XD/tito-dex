@@ -117,9 +117,21 @@ class _DexPageState extends State<DexPage> {
           ),
           const SizedBox(height: 12),
           SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(value: false, label: Text(AppZh.dexTabNational)),
-              ButtonSegment(value: true, label: Text(AppZh.dexTabJourney)),
+            segments: [
+              ButtonSegment(
+                value: false,
+                label: Text(
+                  AppZh.dexTabNational,
+                  style: context.tito.chip,
+                ),
+              ),
+              ButtonSegment(
+                value: true,
+                label: Text(
+                  AppZh.dexTabJourney,
+                  style: context.tito.chip,
+                ),
+              ),
             ],
             selected: {_showJourneyOnly},
             onSelectionChanged: (selection) {

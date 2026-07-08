@@ -13,6 +13,7 @@ class TitoPrimaryButton extends StatelessWidget {
     this.showArrow = true,
     this.expanded = false,
     this.compact = false,
+    this.dense = false,
   });
 
   final String label;
@@ -20,6 +21,7 @@ class TitoPrimaryButton extends StatelessWidget {
   final bool showArrow;
   final bool expanded;
   final bool compact;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +35,8 @@ class TitoPrimaryButton extends StatelessWidget {
         highlightColor: TitoColors.skyBlue.withValues(alpha: 0.15),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: compact ? 16 : 24,
-            vertical: compact ? 10 : 14,
+            horizontal: dense ? 12 : (compact ? 16 : 24),
+            vertical: dense ? 8 : (compact ? 10 : 14),
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -52,18 +54,18 @@ class TitoPrimaryButton extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: TitoTypography.style(
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
-                  fontSize: compact ? 14 : 16,
+                  fontSize: dense ? 12 : (compact ? 14 : 16),
                 ),
               ),
               if (showArrow) ...[
-                SizedBox(width: compact ? 6 : 8),
+                SizedBox(width: dense ? 4 : (compact ? 6 : 8)),
                 Icon(
                   Icons.play_arrow_rounded,
                   color: TitoColors.card,
-                  size: compact ? 18 : 22,
+                  size: dense ? 16 : (compact ? 18 : 22),
                 ),
               ],
             ],
@@ -140,16 +142,22 @@ class TitoQuickTile extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.compact = false,
+    this.dense = false,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final bool compact;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
-    final square = DeviceLayout.useSquareDashboard(context);
+    final height = dense
+        ? DeviceLayout.squareQuickTileHeight(context)
+        : (compact ? 56.0 : 88.0);
+    final iconSize = dense ? 18.0 : (compact ? 22.0 : 28.0);
+
     return Material(
       color: TitoColors.card,
       borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -169,25 +177,21 @@ class TitoQuickTile extends StatelessWidget {
             ],
           ),
           child: SizedBox(
-            height: compact ? 56 : (square ? 64 : 88),
+            height: height,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   icon,
                   color: TitoColors.deepBlue,
-                  size: compact ? 22 : 28,
+                  size: iconSize,
                 ),
-                SizedBox(height: compact ? 4 : 8),
+                SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: TitoColors.deepBlue,
-                    fontWeight: FontWeight.w800,
-                    fontSize: compact ? 11 : 13,
-                  ),
+                  style: context.tito.quickTileLabel,
                 ),
               ],
             ),
@@ -230,7 +234,7 @@ class TitoBadgePill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: TitoTypography.style(
           color: fg,
           fontWeight: FontWeight.w800,
           fontSize: compact ? 10 : 12,

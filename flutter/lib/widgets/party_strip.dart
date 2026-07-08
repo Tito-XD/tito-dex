@@ -14,25 +14,34 @@ class PartyStrip extends StatelessWidget {
     required this.party,
     this.compact = false,
     this.vertical = false,
+    this.square = false,
   });
 
   final List<PartyMember> party;
   final bool compact;
   final bool vertical;
+  final bool square;
 
   @override
   Widget build(BuildContext context) {
+    final useHorizontal = square || !vertical;
+    final titleStyle = square
+        ? context.tito.cardSectionTitle
+        : context.tito.cardTitle;
+
     if (party.isEmpty) {
       return StickerCard(
         padding: DeviceLayout.cardPadding(context),
         child: Text(
           AppZh.currentParty,
-          style: context.tito.cardTitle,
+          style: titleStyle,
         ),
       );
     }
 
-    final padding = compact ? DeviceLayout.cardPadding(context) : null;
+    final padding = (compact || square)
+        ? DeviceLayout.cardPadding(context)
+        : null;
 
     return StickerCard(
       padding: padding ?? const EdgeInsets.all(16),
@@ -41,34 +50,37 @@ class PartyStrip extends StatelessWidget {
         children: [
           Text(
             AppZh.currentParty,
-            style: context.tito.cardTitle,
+            style: titleStyle,
           ),
-          SizedBox(height: compact ? 8 : 10),
-          if (vertical)
-            Expanded(
+          SizedBox(height: square ? 4 : (compact ? 8 : 10)),
+          if (useHorizontal)
+            SizedBox(
+              height: square ? 48 : (compact ? 60 : 72),
               child: ListView.separated(
+                scrollDirection: Axis.horizontal,
                 itemCount: party.length,
-                separatorBuilder: (_, __) => SizedBox(height: compact ? 6 : 8),
+                separatorBuilder: (_, __) =>
+                    SizedBox(width: square ? 6 : (compact ? 8 : 10)),
                 itemBuilder: (context, index) {
                   return _PartyOrb(
                     member: party[index],
-                    compact: compact,
-                    horizontal: true,
+                    compact: compact || square,
+                    mini: square,
                   );
                 },
               ),
             )
           else
-            SizedBox(
-              height: compact ? 60 : 72,
+            Expanded(
               child: ListView.separated(
-                scrollDirection: Axis.horizontal,
                 itemCount: party.length,
-                separatorBuilder: (_, __) => SizedBox(width: compact ? 8 : 10),
+                separatorBuilder: (_, __) =>
+                    SizedBox(height: compact ? 6 : 8),
                 itemBuilder: (context, index) {
                   return _PartyOrb(
                     member: party[index],
                     compact: compact,
+                    horizontal: true,
                   );
                 },
               ),
@@ -84,16 +96,18 @@ class _PartyOrb extends StatelessWidget {
     required this.member,
     this.compact = false,
     this.horizontal = false,
+    this.mini = false,
   });
 
   final PartyMember member;
   final bool compact;
   final bool horizontal;
+  final bool mini;
 
   @override
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
-    final orbSize = compact ? 40.0 : 48.0;
+    final orbSize = mini ? 30.0 : (compact ? 40.0 : 48.0);
 
     final avatar = Container(
       width: orbSize,
@@ -112,9 +126,9 @@ class _PartyOrb extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         label.isNotEmpty ? label[0].toUpperCase() : '?',
-        style: TextStyle(
+        style: TitoTypography.style(
+          fontSize: mini ? 12 : (compact ? 16 : 18),
           fontWeight: FontWeight.w800,
-          fontSize: compact ? 16 : 18,
           color: TitoColors.deepBlue,
         ),
       ),
@@ -124,13 +138,17 @@ class _PartyOrb extends StatelessWidget {
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: context.tito.captionStrong,
+      style: mini
+          ? context.tito.captionStrong.copyWith(fontSize: 8)
+          : context.tito.captionStrong,
     );
 
     final level = member.level != null
         ? Text(
             '${AppZh.level}${member.level}',
-            style: context.tito.caption,
+            style: mini
+                ? context.tito.caption.copyWith(fontSize: 8)
+                : context.tito.caption,
           )
         : null;
 
@@ -153,11 +171,11 @@ class _PartyOrb extends StatelessWidget {
     }
 
     return SizedBox(
-      width: compact ? 56 : 64,
+      width: mini ? 44 : (compact ? 56 : 64),
       child: Column(
         children: [
           avatar,
-          const SizedBox(height: 4),
+          SizedBox(height: mini ? 2 : 4),
           name,
           if (level != null) level,
         ],

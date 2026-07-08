@@ -25,9 +25,9 @@ void main() {
       ),
     );
 
-    expect(titleSize, 16);
-    expect(headingSize, 15);
-    expect(bodySize, 12);
+    expect(titleSize, 14);
+    expect(headingSize, 13);
+    expect(bodySize, 11);
   });
 
   testWidgets('detects RG Rotate square handheld', (tester) async {

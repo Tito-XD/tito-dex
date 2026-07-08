@@ -12,6 +12,7 @@ import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/sticker_card.dart';
@@ -228,7 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexProgress = dexCache?.progress;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: DeviceLayout.pagePadding(context),
       children: [
         Row(
           children: [
