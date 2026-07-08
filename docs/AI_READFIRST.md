@@ -2,6 +2,21 @@
 
 Future AI contributors must read this document before working on TitoDex.
 
+## Stack and Migration (July 2026)
+
+TitoDex runs on **Flutter + Dart** in the `flutter/` directory.
+
+Read [Stack Decision](./STACK_DECISION.md) before starting implementation work.
+
+Key points:
+
+- The React app under `src/` is a **frozen design reference** — do not add features there.
+- All new work goes in **`flutter/lib/`** and **`flutter/test/`**.
+- **DeviceShell stays** — it is intentional product identity.
+- **Chinese UI** is the default (`lib/l10n/app_zh.dart`, `game_zh.dart`).
+- HGSS parser and save-directory sync are **implemented** — check status table in Stack Decision before assuming gaps.
+- Flutter nav: Home, Team, Journey, Settings — Dex/Search not ported yet.
+
 ## Communication Defaults
 
 - Default communication with Tito should be in **Chinese**.
@@ -85,27 +100,46 @@ Design language:
 ## Responsive Requirements
 
 - mobile first
-- CSS Grid / Flex
-- `clamp()` for type and spacing
-- `dvh` / `dvw` for viewport-aware sizing
-- safe-area inset support
+- grid dashboard for square / wide viewports
+- `clamp()`-style scaling in Flutter (`MediaQuery`, responsive padding)
+- safe-area / `SafeArea` inset support
 - no fixed `720×720` layout
-- Dex grid should use `auto-fit` / `minmax`
-- square screens can use a dashboard layout and should fill space well
+- Dex grid should use flexible columns (`GridView`, `SliverGrid`)
+- square screens (RG Rotate) use dashboard layout and should fill space well
+- **DeviceShell** retained on all form factors unless explicitly changed
+
+## Implementation Stack
+
+- **Flutter + Dart** — `flutter/lib/`, active development
+- **Phase 2 React** — `src/`, frozen reference for tokens and layout
+- **Parser tests** — `cd flutter && flutter test` with `assets/fixtures/PKMSS.sav`
+- **Save sync** — directory-based on Android; do not assume web support without replacing `dart:io`
+
+## Localization
+
+- Default UI language: **Simplified Chinese** (`app_zh.dart`)
+- Game strings (locations, species): `game_zh.dart`
+- No `intl` ARB / locale switching yet — do not introduce English-only UI strings on primary surfaces without Tito's OK
 
 ## Phase 1 Guardrails
 
 Allowed:
 
 - documentation
-- initial architecture direction
-- mock data for SoulSilver, Goldenrod City, 3 badges, party, journey timeline, Dex search
+- Flutter features in `flutter/`
+- HGSS parser improvements and fixture tests
+- Chinese copy updates in `lib/l10n/`
 
 Do not build yet:
 
 - all-generation parser
 - cloud sync implementation
 - complete encyclopedia
-- emulator automation
 - OCR
 - complex account system
+
+Do not:
+
+- add features to `src/` (Capacitor/React)
+- switch frameworks without explicit approval
+- overwrite manual journey timeline on save import without implementing merge rules in `PARSER_PROPOSAL.md`

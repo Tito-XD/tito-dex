@@ -29,38 +29,22 @@ TitoDex should feel less like a wiki and more like a small trainer device that s
 5. **Iterative** — begin with HGSS, then adapt for Pt, BW, B2W2, XY, ORAS, USUM as Tito reaches them.
 6. **Do not over-engineer** — first make a delightful companion, not a universal platform.
 
-## Suggested Stack
+## Stack
 
-The recommended initial stack is:
+**Active:** Flutter + Dart (`flutter/`)
 
-- **Capacitor** for Android-first native packaging and future local file access.
-- **React + TypeScript** for a fast, component-driven UI.
-- **Vite** for simple frontend tooling.
-- **Local-first storage** before cloud sync.
+**Reference:** Capacitor + React + TypeScript + Vite (`src/`, root `android/`)
 
-Future native needs include local save-file access, save parsing, optional cloud backup, and Android device adaptation across phones, tablets, foldables, and square handheld screens such as RG Rotate.
+See [Stack Decision](./docs/STACK_DECISION.md) for why we migrated and what is implemented today.
 
-## Phase 1 Scope
-
-Phase 1 creates the project documentation and initial architecture direction. It intentionally avoids complex functionality.
-
-Allowed mock data:
-
-- current game: SoulSilver
-- current location: Goldenrod City
-- badge count: 3
-- party summary
-- journey timeline entries
-- Pokédex search mock entries
-
-Not in Phase 1:
-
-- all-generation save parsers
-- cloud sync implementation
-- complete encyclopedia data
-- emulator automation
-- OCR
-- complex account systems
+| Layer | Technology |
+| --- | --- |
+| UI | Flutter widgets, `DeviceShell`, sticker cards, Nunito via `google_fonts` |
+| Routing | `go_router` — Home, Team, Journey, Settings |
+| Persistence | `shared_preferences` — journey JSON + save-directory config |
+| Save parsing | Dart `HgssParser` — retail 512 KB `.sav` |
+| Save sync | Directory watch — newest `.sav` by mtime, startup auto-load |
+| Localization | Simplified Chinese UI (`lib/l10n/`) — static maps, no ARB yet |
 
 ## Documentation
 
@@ -73,64 +57,52 @@ Start here:
 - [Design system](./docs/DESIGN_SYSTEM.md)
 - [UI reference notes](./docs/UI_REFERENCE.md)
 - [Architecture](./docs/ARCHITECTURE.md)
+- [Stack decision](./docs/STACK_DECISION.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
 - [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
 
 ## Development
 
-TitoDex is migrating from **Capacitor + React** (Phase 2 mock) to **Flutter** for Android, Linux handheld, and web.
-
-### React mock (legacy Phase 2)
-
-Stack: **Capacitor + React + TypeScript + Vite**.
-
-```bash
-npm install
-npm run dev
-```
-
-### Flutter app (Phase 0 — in progress)
+### Flutter app (active)
 
 ```bash
 cd flutter
 flutter pub get
-flutter run -d chrome    # web preview
-flutter test             # parser + widget smoke tests
+flutter run -d chrome      # web preview
+flutter run                # connected Android device / emulator
+flutter test               # parser, map lookup, save scanner, widget smoke
 ```
 
-Bundled fixture save: `fixtures/PKMSS.sav` (also at `src/PKMSS.sav` from git upload).
+**First launch:** loads mock journey from `CurrentJourney.mock()` unless a saved journey exists in preferences.
 
-Probe a save file locally:
+**Import test save:** Settings → 旅程数据 → 导入内置 PKMSS.sav
+
+**Auto-sync from emulator folder:** Settings → 存档目录 → pick a folder containing `.sav` files → enable 启动时自动加载. On startup, TitoDex picks the newest 524 288-byte `.sav` and refreshes the home screen.
+
+Probe a save file from the command line:
 
 ```bash
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
 ```
 
-Settings → **Import bundled PKMSS.sav** loads parsed trainer/party data into the Flutter home screen.
+### HGSS save fixtures
 
-### Android (Capacitor legacy)
+| Path | Purpose |
+| --- | --- |
+| `fixtures/PKMSS.sav` | Repo-root copy for scripts |
+| `flutter/assets/fixtures/PKMSS.sav` | Bundled asset for tests + Settings import |
+| `src/PKMSS.sav` | Original upload (legacy path) |
 
-```bash
-npm run build
-npm run cap:sync
-npm run cap:android
-```
+Fixture expectations (active save block): trainer `ETeZ`, TID `22813`, 3 Johto badges, play time `7:03:41`, location 满金市 (map ID 76), party includes Quilava Lv27 and Togepi Lv6.
 
-In Android Studio:
+### React mock (legacy Phase 2 — frozen)
 
-1. Open the `android/` folder.
-2. Create/start an AVD (Pixel 5 or similar; API 34+ recommended).
-3. Run the `app` configuration on the emulator or a connected device.
-
-Command-line debug build (requires Android SDK + `android/local.properties`):
+Design reference only. Do not add features here.
 
 ```bash
-echo "sdk.dir=$ANDROID_HOME" > android/local.properties
-cd android && ./gradlew assembleDebug
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n com.tito.titodex/.MainActivity
+npm install
+npm run dev                # http://localhost:5173
+npm run cap:sync           # sync into root android/ Capacitor shell
 ```
 
-Fonts are bundled locally (`@fontsource/nunito`) so the WebView does not depend on Google Fonts at runtime.
-
-Mock data is hard-coded for SoulSilver / Goldenrod City (3 badges) per Phase 2 scope.
+Journey data in React is still mock-only (`journeyStore.ts` always returns `mockJourney`).

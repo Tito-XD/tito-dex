@@ -2,6 +2,8 @@
 
 TitoDex should feel like a warm Pokémon companion device, not a generic Android application. The current UI north star is captured in [UI Reference Notes](./UI_REFERENCE.md).
 
+**Implementation:** Design tokens live in `src/styles/tokens.css` (React reference) and `flutter/lib/theme/tito_colors.dart` (active). Keep both in sync when changing colors or radii. See [Stack Decision](./STACK_DECISION.md).
+
 ## Design Personality
 
 Keywords:
