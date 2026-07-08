@@ -114,7 +114,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                     indicatorColor: TitoColors.coral,
                     dividerColor: Colors.transparent,
                     labelStyle: TextStyle(
-                      fontSize: DeviceLayout.isCompact(context) ? 13 : 14,
+                      fontSize: DeviceLayout.useSquareDashboard(context)
+                          ? 11
+                          : (DeviceLayout.isCompact(context) ? 12 : 14),
                       fontWeight: FontWeight.w800,
                     ),
                     tabs: const [

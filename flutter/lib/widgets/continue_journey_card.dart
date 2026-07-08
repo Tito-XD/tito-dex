@@ -47,7 +47,9 @@ class ContinueJourneyCard extends StatelessWidget {
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
-                  fontSize: compact ? 20 : null,
+                  fontSize: compact
+                      ? DeviceLayout.cardHeadingSize(context)
+                      : null,
                 ),
           ),
           SizedBox(height: compact ? 8 : 12),

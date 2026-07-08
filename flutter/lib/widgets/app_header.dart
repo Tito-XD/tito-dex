@@ -5,6 +5,7 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import 'handheld_status_icons.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
@@ -19,23 +20,27 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = DeviceLayout.isCompact(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final titleSize = DeviceLayout.appTitleSize(context);
+    final iconSize = DeviceLayout.appTitleIconSize(context);
+
     return Padding(
-      padding: EdgeInsets.only(bottom: compact ? 8 : 16),
+      padding: EdgeInsets.only(bottom: square ? 4 : (compact ? 8 : 16)),
       child: Row(
         children: [
           Icon(
             Icons.pets_rounded,
             color: TitoColors.softYellow,
-            size: compact ? 26 : 32,
+            size: iconSize,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: square ? 6 : 8),
           Expanded(
             child: Text(
               AppZh.appTitle,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     color: TitoColors.card,
-                    fontSize: compact ? 22 : null,
+                    fontSize: titleSize,
                     letterSpacing: -0.5,
                     shadows: const [
                       Shadow(
@@ -46,9 +51,18 @@ class AppHeader extends StatelessWidget {
                   ),
             ),
           ),
-          TitoBadgePill(label: gameBadge, tone: TitoBadgeTone.yellow),
+          if (!square)
+            TitoBadgePill(
+              label: gameBadge,
+              tone: TitoBadgeTone.yellow,
+              compact: compact,
+            ),
+          if (DeviceLayout.isNativeTarget) ...[
+            SizedBox(width: square ? 4 : 8),
+            HandheldStatusIcons(compact: compact),
+          ],
           if (showSettings) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: square ? 4 : 8),
             _HeaderIconButton(
               icon: Icons.settings_rounded,
               onTap: () => context.push('/settings'),
@@ -77,6 +91,10 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
+    final size = square ? 28.0 : (compact ? 34.0 : 40.0);
+    final iconSize = square ? 16.0 : (compact ? 18.0 : 22.0);
+
     return Semantics(
       button: true,
       label: label,
@@ -90,12 +108,12 @@ class _HeaderIconButton extends StatelessWidget {
           onTap: onTap,
           customBorder: const CircleBorder(),
           child: SizedBox(
-            width: compact ? 34 : 40,
-            height: compact ? 34 : 40,
+            width: size,
+            height: size,
             child: Icon(
               icon,
               color: TitoColors.deepBlue,
-              size: compact ? 18 : 22,
+              size: iconSize,
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'device_layout.dart';
 import 'tito_colors.dart';
 
 /// Sticker-style primary action — deep blue pill per design reference.
@@ -147,6 +148,7 @@ class TitoQuickTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
     return Material(
       color: TitoColors.card,
       borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -166,7 +168,7 @@ class TitoQuickTile extends StatelessWidget {
             ],
           ),
           child: SizedBox(
-            height: compact ? 64 : 88,
+            height: compact ? 56 : (square ? 64 : 88),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -200,10 +202,12 @@ class TitoBadgePill extends StatelessWidget {
     super.key,
     required this.label,
     this.tone = TitoBadgeTone.yellow,
+    this.compact = false,
   });
 
   final String label;
   final TitoBadgeTone tone;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +218,10 @@ class TitoBadgePill extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),
@@ -225,7 +232,7 @@ class TitoBadgePill extends StatelessWidget {
         style: TextStyle(
           color: fg,
           fontWeight: FontWeight.w800,
-          fontSize: 12,
+          fontSize: compact ? 10 : 12,
         ),
       ),
     );

@@ -21,6 +21,7 @@ class PokemonDetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = detail.summary;
     final compact = DeviceLayout.isCompact(context);
+    final square = DeviceLayout.useSquareDashboard(context);
     return StickerCard(
       variant: StickerVariant.deep,
       child: Row(
@@ -38,7 +39,7 @@ class PokemonDetailHeader extends StatelessWidget {
                   style: TextStyle(
                     color: TitoColors.skyBlue,
                     fontWeight: FontWeight.w700,
-                    fontSize: compact ? 12 : 14,
+                    fontSize: DeviceLayout.captionTextSize(context),
                   ),
                 ),
                 Text(
@@ -46,7 +47,7 @@ class PokemonDetailHeader extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         color: TitoColors.card,
                         fontWeight: FontWeight.w900,
-                        fontSize: compact ? 20 : null,
+                        fontSize: DeviceLayout.cardHeadingSize(context),
                       ),
                 ),
                 if (detail.genusZh.isNotEmpty)
@@ -55,7 +56,7 @@ class PokemonDetailHeader extends StatelessWidget {
                     style: TextStyle(
                       color: TitoColors.skyBlue,
                       fontWeight: FontWeight.w600,
-                      fontSize: compact ? 12 : 14,
+                      fontSize: DeviceLayout.bodyTextSize(context),
                     ),
                   ),
                 const SizedBox(height: 6),
@@ -76,8 +77,8 @@ class PokemonDetailHeader extends StatelessWidget {
                 ),
               DexSpriteImage(
                 source: summary.displaySpritePath,
-                width: compact ? 84 : 108,
-                height: compact ? 84 : 108,
+                width: square ? 72 : (compact ? 84 : 108),
+                height: square ? 72 : (compact ? 84 : 108),
               ),
             ],
           ),

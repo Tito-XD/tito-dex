@@ -4,6 +4,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/theme/device_layout.dart';
 
 void main() {
+  testWidgets('square handheld uses smaller typography scale', (tester) async {
+    late double? titleSize;
+    late double headingSize;
+    late double bodySize;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(size: Size(720, 720)),
+          child: Builder(
+            builder: (context) {
+              titleSize = DeviceLayout.appTitleSize(context);
+              headingSize = DeviceLayout.cardHeadingSize(context);
+              bodySize = DeviceLayout.bodyTextSize(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(titleSize, 16);
+    expect(headingSize, 15);
+    expect(bodySize, 12);
+  });
+
   testWidgets('detects RG Rotate square handheld', (tester) async {
     late bool square;
     late bool compact;
