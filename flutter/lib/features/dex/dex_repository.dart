@@ -8,11 +8,13 @@ class DexRepository {
   DexRepository({
     PokeApiClient? client,
     DexOfflineService? offline,
+    this.summaryBatchSize = 4,
   })  : _client = client ?? PokeApiClient(),
         _offline = offline ?? dexOfflineService;
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
+  final int summaryBatchSize;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
   final Map<String, int> _nameToIdCache = {};
@@ -32,9 +34,18 @@ class DexRepository {
       }
     }
 
-    final summary = await _client.fetchSummary(id);
-    _rememberSummary(summary);
-    return summary;
+    try {
+      final summary = await _client.fetchSummary(id);
+      _rememberSummary(summary);
+      return summary;
+    } on PokeApiException {
+      final cached = await _offline.readSummary(id);
+      if (cached != null) {
+        _rememberSummary(cached);
+        return cached;
+      }
+      rethrow;
+    }
   }
 
   Future<PokemonDetail> getDetail(int id) async {
@@ -51,10 +62,20 @@ class DexRepository {
       }
     }
 
-    final detail = await _client.fetchDetailWithMoves(id);
-    _detailCache[id] = detail;
-    _rememberSummary(detail.summary);
-    return detail;
+    try {
+      final detail = await _client.fetchDetailWithMoves(id);
+      _detailCache[id] = detail;
+      _rememberSummary(detail.summary);
+      return detail;
+    } on PokeApiException {
+      final cached = await _offline.readDetail(id);
+      if (cached != null) {
+        _detailCache[id] = cached;
+        _summaryCache[id] = cached.summary;
+        return cached;
+      }
+      rethrow;
+    }
   }
 
   Future<List<PokemonSummary>> getAllSummaries() async {
@@ -78,17 +99,11 @@ class DexRepository {
       return _allSummaries!;
     }
 
-    const batchSize = 25;
     final summaries = <PokemonSummary>[];
 
-    for (var start = 1; start <= hgssMaxNationalDexId; start += batchSize) {
-      final end = (start + batchSize - 1).clamp(1, hgssMaxNationalDexId);
-      final batch = await Future.wait(
-        [
-          for (var id = start; id <= end; id++) getSummary(id),
-        ],
-      );
-      summaries.addAll(batch);
+    for (var start = 1; start <= hgssMaxNationalDexId; start += summaryBatchSize) {
+      final end = (start + summaryBatchSize - 1).clamp(1, hgssMaxNationalDexId);
+      summaries.addAll(await getSummaryRange(start, end));
     }
 
     _allSummaries = summaries;
@@ -98,11 +113,20 @@ class DexRepository {
   Future<List<PokemonSummary>> getSummaryRange(int start, int end) async {
     final safeStart = start.clamp(1, hgssMaxNationalDexId);
     final safeEnd = end.clamp(safeStart, hgssMaxNationalDexId);
-    return Future.wait(
-      [
-        for (var id = safeStart; id <= safeEnd; id++) getSummary(id),
-      ],
-    );
+    final summaries = <PokemonSummary>[];
+
+    for (var id = safeStart; id <= safeEnd; id += summaryBatchSize) {
+      final batchEnd = (id + summaryBatchSize - 1).clamp(safeStart, safeEnd);
+      final batch = await Future.wait(
+        [
+          for (var batchId = id; batchId <= batchEnd; batchId++)
+            getSummary(batchId),
+        ],
+      );
+      summaries.addAll(batch);
+    }
+
+    return summaries;
   }
 
   Future<List<PokemonSummary>> search(String query) async {

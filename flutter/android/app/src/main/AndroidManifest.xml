@@ -45,8 +45,15 @@
         </intent>
         <package android:name="com.dsemu.drastic" />
         <package android:name="me.magnum.melonds" />
+        <package android:name="com.explusalpha.NeoEmu" />
+        <package android:name="com.explusalpha.GbaEmu" />
+        <package android:name="com.explusalpha.MdEmu" />
+        <package android:name="com.explusalpha.Snes9xPlus" />
         <package android:name="com.retroarch" />
         <package android:name="org.dolphinemu.dolphinemu" />
         <package android:name="com.citra.citra_emu" />
+        <package android:name="com.ndsemulator" />
+        <package android:name="com.fastemulator.gbafree" />
+        <package android:name="com.fastemulator.gba" />
     </queries>
 </manifest>
