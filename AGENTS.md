@@ -2,43 +2,40 @@
 
 ## Cursor Cloud specific instructions
 
-### Repository state (read this first)
+### Repository state
 
-This repository is currently **documentation-only (Phase 1)**. There is intentionally
-**no application code, no `package.json`, no build system, and no test/lint tooling**.
-The deliverables are the Markdown files at the repo root (`README.md`, `VISION.md`,
-`PRODUCT.md`, `ROADMAP.md`) and under `docs/`. Building the app is explicitly deferred —
-see the Phase 1 guardrails in `docs/AI_READFIRST.md` and `README.md`.
+TitoDex is now a **Phase 2 app**: a **Capacitor + React + TypeScript + Vite** web UI
+(Android shell under `android/`). It is a local-first Pokémon journey companion using
+hard-coded mock data (`src/data/mockJourney.ts`) — no backend, no database, no auth.
+See `README.md` and `docs/ARCHITECTURE.md` for product/architecture direction and
+`docs/AI_READFIRST.md` for guardrails (still mock-data only; no real save parsing or
+cloud sync yet).
 
-Because there is nothing to install, the startup update script is a no-op guard that will
-only run a package manager once a `package.json` actually exists (see below). Do **not**
-scaffold the app or add dependencies just to make setup "look" complete.
+### Communication
 
-### Planned stack (for when implementation begins)
+Per `docs/AI_READFIRST.md`: default chat replies to Tito in **Chinese**; keep GitHub
+artifacts (PR/issue/commit messages) in **English**.
 
-Per `docs/ARCHITECTURE.md` / `ROADMAP.md`, Phase 2 will scaffold **Capacitor + React +
-TypeScript + Vite**. When that happens:
+### Commands (scripts live in `package.json`)
 
-- A `package.json` will appear; the startup update script (`pnpm install` when a lockfile/
-  manifest exists) will begin installing dependencies automatically.
-- The dev server will be `vite` (typically `npm run dev` / `pnpm dev`, default port `5173`).
-- Update this file with the real lint/test/build/run commands once they exist.
+- `npm run dev` — Vite dev server on port **5173** (main development workflow).
+- `npm run lint` — `oxlint` (fast; used instead of ESLint).
+- `npm run build` — `tsc -b` typecheck + `vite build` to `dist/`.
+- `npm run preview` — serve the production build.
+- `npm run cap:sync` / `npm run cap:android` — build + sync/open the Android project.
 
-### Previewing the docs (current "dev" workflow)
+Package manager is **npm** (`package-lock.json` is committed). The startup update script
+runs `npm ci` automatically when the lockfile is present.
 
-The only meaningful thing to run today is a Markdown preview of the docs. There is no
-committed tooling for this. A lightweight, non-committed way to preview locally:
+### Non-obvious notes
 
-```bash
-mkdir -p /tmp/titodex-preview && cd /tmp/titodex-preview
-npm install markdown-it@14
-# then serve the /workspace *.md and docs/*.md files, rendered to HTML, on a local port
-```
-
-Keep any such preview tooling **out of the repo** — committing a preview server or its
-dependencies would violate the Phase 1 "documentation only" guardrail.
+- **Web-first dev**: Do all UI iteration in the browser via `npm run dev`. The `android/`
+  Capacitor project requires the Android SDK / Android Studio, which is **not** installed
+  on the cloud VM — do not expect `cap:android` to work here; use it only as reference.
+- Lint is `oxlint`, not ESLint — there is no `.eslintrc`.
+- Fonts are bundled locally via `@fontsource/nunito` (no network font fetch at runtime).
+- All journey/party/Dex/search data is mock data; there is no persistence yet (Phase 3).
 
 ### Toolchain available on the VM
 
-Node 22, npm 10, pnpm 10, yarn 1.22, Python 3.12, and git are preinstalled. No language
-runtime installation is needed for the current repo state.
+Node 22, npm 10, pnpm 10, Python 3.12, git preinstalled. No Android SDK.
