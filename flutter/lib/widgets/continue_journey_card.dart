@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import 'city_illustration.dart';
@@ -13,50 +14,65 @@ class ContinueJourneyCard extends StatelessWidget {
     super.key,
     required this.journey,
     this.onContinue,
+    this.compact = false,
   });
 
   final CurrentJourney journey;
   final VoidCallback? onContinue;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final padding = compact ? DeviceLayout.cardPadding(context) : null;
+
     return StickerCard(
       variant: StickerVariant.deep,
+      padding: padding ?? const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             AppZh.continueJourney.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 12,
+            style: TextStyle(
+              fontSize: compact ? 11 : 12,
               color: TitoColors.skyBlue,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: compact ? 2 : 4),
           Text(
             localizeLocation(journey.location),
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
+                  fontSize: compact ? 20 : null,
                 ),
           ),
-          const SizedBox(height: 12),
-          const CityIllustration(),
-          const SizedBox(height: 12),
+          SizedBox(height: compact ? 8 : 12),
+          CityIllustration(compact: compact),
+          SizedBox(height: compact ? 8 : 12),
           Row(
             children: [
-              _Meta(label: AppZh.labelGame, value: localizeGame(journey.game)),
-              _Meta(label: AppZh.labelPlayTime, value: journey.playTime),
+              _Meta(
+                label: AppZh.labelGame,
+                value: localizeGame(journey.game),
+                compact: compact,
+              ),
+              _Meta(
+                label: AppZh.labelPlayTime,
+                value: journey.playTime,
+                compact: compact,
+              ),
               _Meta(
                 label: AppZh.labelBadges,
                 value: '${journey.badges}/${journey.maxBadges}',
+                compact: compact,
               ),
             ],
           ),
-          if (journey.party.isNotEmpty) ...[
+          if (!compact && journey.party.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -64,8 +80,10 @@ class ContinueJourneyCard extends StatelessWidget {
               children: [
                 for (final member in journey.party)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: TitoColors.card.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
@@ -85,11 +103,12 @@ class ContinueJourneyCard extends StatelessWidget {
               ],
             ),
           ],
-          const SizedBox(height: 16),
+          SizedBox(height: compact ? 10 : 16),
           TitoPrimaryButton(
             label: AppZh.continueButton,
             onPressed: onContinue,
             expanded: true,
+            compact: compact,
           ),
         ],
       ),
@@ -98,10 +117,15 @@ class ContinueJourneyCard extends StatelessWidget {
 }
 
 class _Meta extends StatelessWidget {
-  const _Meta({required this.label, required this.value});
+  const _Meta({
+    required this.label,
+    required this.value,
+    this.compact = false,
+  });
 
   final String label;
   final String value;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -111,17 +135,18 @@ class _Meta extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: TitoColors.skyBlue,
-              fontSize: 12,
+              fontSize: compact ? 10 : 12,
               fontWeight: FontWeight.w700,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: TitoColors.card,
               fontWeight: FontWeight.w800,
+              fontSize: compact ? 12 : 14,
             ),
           ),
         ],

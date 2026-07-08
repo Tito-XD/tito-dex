@@ -10,12 +10,14 @@ class TitoPrimaryButton extends StatelessWidget {
     this.onPressed,
     this.showArrow = true,
     this.expanded = false,
+    this.compact = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool showArrow;
   final bool expanded;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,10 @@ class TitoPrimaryButton extends StatelessWidget {
         splashColor: TitoColors.skyBlue.withValues(alpha: 0.3),
         highlightColor: TitoColors.skyBlue.withValues(alpha: 0.15),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 16 : 24,
+            vertical: compact ? 10 : 14,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
             border: Border.all(color: TitoColors.ink, width: 3),
@@ -45,18 +50,18 @@ class TitoPrimaryButton extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   color: TitoColors.card,
                   fontWeight: FontWeight.w800,
-                  fontSize: 16,
+                  fontSize: compact ? 14 : 16,
                 ),
               ),
               if (showArrow) ...[
-                const SizedBox(width: 8),
-                const Icon(
+                SizedBox(width: compact ? 6 : 8),
+                Icon(
                   Icons.play_arrow_rounded,
                   color: TitoColors.card,
-                  size: 22,
+                  size: compact ? 18 : 22,
                 ),
               ],
             ],
@@ -132,11 +137,13 @@ class TitoQuickTile extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onTap,
+    this.compact = false,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -159,18 +166,24 @@ class TitoQuickTile extends StatelessWidget {
             ],
           ),
           child: SizedBox(
-            height: 88,
+            height: compact ? 64 : 88,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: TitoColors.deepBlue, size: 28),
-                const SizedBox(height: 8),
+                Icon(
+                  icon,
+                  color: TitoColors.deepBlue,
+                  size: compact ? 22 : 28,
+                ),
+                SizedBox(height: compact ? 4 : 8),
                 Text(
                   label,
-                  style: const TextStyle(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
                     color: TitoColors.deepBlue,
                     fontWeight: FontWeight.w800,
-                    fontSize: 13,
+                    fontSize: compact ? 11 : 13,
                   ),
                 ),
               ],

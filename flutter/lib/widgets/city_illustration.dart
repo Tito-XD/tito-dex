@@ -4,12 +4,16 @@ import '../theme/tito_colors.dart';
 
 /// Pixel-style Goldenrod / city scene for Continue Journey card.
 class CityIllustration extends StatelessWidget {
-  const CityIllustration({super.key});
+  const CityIllustration({super.key, this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final height = compact ? 72.0 : 120.0;
+
     return Container(
-      height: 120,
+      height: height,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -28,51 +32,63 @@ class CityIllustration extends StatelessWidget {
       child: Stack(
         children: [
           Positioned(
-            left: 24,
-            bottom: 22,
+            left: compact ? 16 : 24,
+            bottom: compact ? 14 : 22,
             child: _Block(
-              width: 36,
-              height: 56,
+              width: compact ? 28 : 36,
+              height: compact ? 40 : 56,
               color: TitoColors.cream,
             ),
           ),
           Positioned(
-            right: 20,
-            bottom: 18,
+            right: compact ? 14 : 20,
+            bottom: compact ? 12 : 18,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _Block(width: 28, height: 32, color: TitoColors.deepBlue),
-                const SizedBox(width: 8),
-                _Block(width: 36, height: 40, color: TitoColors.slateBlue),
-                const SizedBox(width: 8),
-                _Block(width: 24, height: 28, color: TitoColors.skyBlue),
+                _Block(
+                  width: compact ? 22 : 28,
+                  height: compact ? 24 : 32,
+                  color: TitoColors.deepBlue,
+                ),
+                SizedBox(width: compact ? 6 : 8),
+                _Block(
+                  width: compact ? 28 : 36,
+                  height: compact ? 30 : 40,
+                  color: TitoColors.slateBlue,
+                ),
+                SizedBox(width: compact ? 6 : 8),
+                _Block(
+                  width: compact ? 18 : 24,
+                  height: compact ? 20 : 28,
+                  color: TitoColors.skyBlue,
+                ),
               ],
             ),
           ),
-          const Positioned(
-            top: 14,
-            right: 28,
+          Positioned(
+            top: compact ? 10 : 14,
+            right: compact ? 18 : 28,
             child: Text(
               '★',
               style: TextStyle(
                 color: TitoColors.softYellow,
-                fontSize: 14,
-                shadows: [
+                fontSize: compact ? 12 : 14,
+                shadows: const [
                   Shadow(color: TitoColors.ink, offset: Offset(0, 1)),
                 ],
               ),
             ),
           ),
-          const Positioned(
-            bottom: 32,
-            left: 18,
+          Positioned(
+            bottom: compact ? 22 : 32,
+            left: compact ? 12 : 18,
             child: Text(
               '★',
               style: TextStyle(
                 color: TitoColors.softYellow,
-                fontSize: 12,
-                shadows: [
+                fontSize: compact ? 10 : 12,
+                shadows: const [
                   Shadow(color: TitoColors.ink, offset: Offset(0, 1)),
                 ],
               ),
