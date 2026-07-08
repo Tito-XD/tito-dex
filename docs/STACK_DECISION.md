@@ -18,8 +18,8 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 | --- | --- | --- |
 | **0 — Scaffold** | Flutter project, theme, DeviceShell, home, routing | ✅ Done |
 | **A — Persistence + native feel** | Local journey store, splash/icon/back | ⚠️ Partial — persistence done; splash/icon/`PopScope` not yet |
-| **B — Useful companion** | Emulator launcher, full Settings editing, JSON I/O | ⚠️ Partial — trainer name editable; Continue is stub |
-| **C — HGSS parser** | Parse `.sav`, drive home | ✅ Mostly done — plus **save-directory auto-sync** (beyond original spec) |
+| **B — Useful companion** | Emulator launcher, full Settings editing, JSON I/O | ⚠️ Mostly done — launcher + journey edits + JSON clipboard import; Dex/Search deferred |
+| **C — HGSS parser** | Parse `.sav`, drive home | ✅ Parser + directory sync; timeline merge on re-import |
 
 ### Shipped in `flutter/`
 
@@ -29,18 +29,15 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 - **HGSS parser** — retail 524 288-byte `.sav`; active partition via save counter at `0xF618` (`HgssParser`)
 - **Map → location** — ~500 map IDs → English label → Chinese via `game_zh.dart`
 - **Save directory sync** — pick folder, scan newest `.sav` by mtime, auto-load on startup (`SaveSyncService`)
-- **Settings** — trainer display name (preserved across re-import), save folder, fixture import, reset mock
-- **Chinese UI** — `app_zh.dart` / `game_zh.dart` (static maps, no `intl` ARB yet)
-- **Tests** — `flutter test` (8 tests): parser fixture, map lookup, save scanner, widget smoke
+- **Settings** — trainer name, journey edits, emulator picker, save folder, fixture import, JSON export/import
+- **Continue** — first tap picks Android emulator; later taps launch remembered app
+- **Team / Journey pages** — party slots, timeline, journey stats
+- **Tests** — `flutter test` (9 tests)
 
 ### Not yet shipped
 
-- Continue → pick and launch emulator app (`_showContinueSheet` is a placeholder)
-- Team / Journey page content (placeholders)
-- Dex / Search routes (React mock had these; Flutter nav uses Settings instead)
-- Custom splash, launcher icon, status bar polish, Android back handling
-- Journey JSON export/import UI (encode/decode helpers exist on `HgssParser`)
-- Manual edit of game / location / badges / play time in Settings (read-only snapshot rows)
+- Dex / Search routes (React mock had these; Flutter nav uses Settings)
+- Custom launcher icon (splash uses deep-blue background; default Flutter icon remains)
 - HeartGold detection, Kanto badge count, single-file `.sav` picker
 - Cloud sync
 
@@ -54,7 +51,7 @@ Dex and Search are deferred; Settings holds save sync and journey controls.
 
 ### Known parser behavior gaps
 
-- `toJourney()` **replaces** `timeline` with a single “已从本地魂银存档同步” entry — manual timeline merge is still TODO (see `PARSER_PROPOSAL.md`).
+- `toJourney()` prepends a sync entry and **keeps** manual timeline rows (`id` not starting with `parsed`).
 - Customized trainer display name **is** preserved when `trainerNameCustomized` is true (tested).
 - Game is hardcoded to `SoulSilver`; Gen IV trainer names outside ASCII decode as `[code]` fragments.
 - Save sync uses `dart:io` — directory auto-load is **Android/desktop only**, not web.

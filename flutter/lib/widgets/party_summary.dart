@@ -7,9 +7,14 @@ import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
 
 class PartySummary extends StatelessWidget {
-  const PartySummary({super.key, required this.party});
+  const PartySummary({
+    super.key,
+    required this.party,
+    this.showSlots = false,
+  });
 
   final List<PartyMember> party;
+  final bool showSlots;
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +30,23 @@ class PartySummary extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 8),
-          for (final member in party)
+          for (var i = 0; i < party.length; i++)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    member.nickname != null
-                        ? member.nickname!
-                        : localizeSpecies(member.species),
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  Expanded(
+                    child: Text(
+                      showSlots
+                          ? '${AppZh.partySlot(i + 1)} · ${party[i].nickname ?? localizeSpecies(party[i].species)}'
+                          : party[i].nickname != null
+                              ? party[i].nickname!
+                              : localizeSpecies(party[i].species),
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
-                  if (member.level != null)
+                  if (party[i].level != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -49,7 +58,7 @@ class PartySummary extends StatelessWidget {
                         border: Border.all(color: TitoColors.ink, width: 1.5),
                       ),
                       child: Text(
-                        '${AppZh.level}${member.level}',
+                        '${AppZh.level}${party[i].level}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 12,

@@ -83,6 +83,13 @@ class HgssParser {
     CurrentJourney? existing,
   }) {
     final preserveTrainerName = existing?.trainerNameCustomized ?? false;
+    final syncId = summary.saveHash.length >= 8
+        ? summary.saveHash.substring(0, 8)
+        : summary.saveHash;
+    final syncEntry = JourneyTimelineEntry(
+      id: 'parsed-$syncId',
+      text: '已从本地魂银存档同步',
+    );
 
     return CurrentJourney(
       game: summary.game,
@@ -94,7 +101,7 @@ class HgssParser {
       badges: summary.badges,
       maxBadges: summary.maxBadges,
       playTime: summary.playTime,
-      companion: 'Riolu',
+      companion: existing?.companion ?? 'Riolu',
       party: summary.party
           .map(
             (member) => PartyMember(
@@ -103,14 +110,18 @@ class HgssParser {
             ),
           )
           .toList(),
-      timeline: const [
-        JourneyTimelineEntry(
-          id: 'parsed',
-          text: '已从本地魂银存档同步',
-        ),
-      ],
-      nextReminder: '继续城都地区的旅程',
+      timeline: _mergeTimeline(existing?.timeline ?? const [], syncEntry),
+      nextReminder: existing?.nextReminder ?? '继续城都地区的旅程',
     );
+  }
+
+  List<JourneyTimelineEntry> _mergeTimeline(
+    List<JourneyTimelineEntry> existing,
+    JourneyTimelineEntry syncEntry,
+  ) {
+    final manual =
+        existing.where((entry) => !entry.id.startsWith('parsed')).toList();
+    return [syncEntry, ...manual];
   }
 
   int _activePartition(Uint8List bytes) {
