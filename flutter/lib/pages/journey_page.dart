@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../widgets/app_header.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/sticker_card.dart';
 
@@ -15,8 +16,9 @@ class JourneyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       children: [
+        const AppHeader(showSettings: true),
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -40,12 +42,12 @@ class JourneyPage extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         JourneyTimeline(
           entries: journey.timeline,
           nextReminder: journey.nextReminder,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         StickerCard(
           child: Column(
             children: [

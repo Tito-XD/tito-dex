@@ -12,8 +12,10 @@ import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
+import 'pages/dex_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
 import 'theme/tito_theme.dart';
@@ -48,10 +50,16 @@ class _TitoDexAppState extends State<TitoDexApp> {
         ShellRoute(
           builder: (context, state, child) {
             final onHome = state.uri.path == '/';
+            final onSettings = state.uri.path == '/settings';
             return PopScope(
               canPop: onHome,
               onPopInvokedWithResult: (didPop, result) {
-                if (!didPop && !onHome) {
+                if (didPop) {
+                  return;
+                }
+                if (onSettings) {
+                  context.go('/');
+                } else if (!onHome) {
                   context.go('/');
                 }
               },
@@ -80,6 +88,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
             GoRoute(
               path: '/journey',
               builder: (context, state) => JourneyPage(journey: _journey),
+            ),
+            GoRoute(
+              path: '/dex',
+              builder: (context, state) => DexPage(journey: _journey),
+            ),
+            GoRoute(
+              path: '/search',
+              builder: (context, state) => SearchPage(journey: _journey),
             ),
             GoRoute(
               path: '/settings',

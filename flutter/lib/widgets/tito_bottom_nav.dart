@@ -9,43 +9,108 @@ class TitoBottomNav extends StatelessWidget {
 
   final String location;
 
+  static const _routes = [
+    _NavSpec('/team', AppZh.navTeam, Icons.groups_rounded),
+    _NavSpec('/journey', AppZh.navJourney, Icons.map_rounded),
+    _NavSpec('/', AppZh.navHome, Icons.pets_rounded, center: true),
+    _NavSpec('/dex', AppZh.navDex, Icons.grid_view_rounded),
+    _NavSpec('/search', AppZh.navSearch, Icons.search_rounded),
+  ];
+
+  bool _isActive(String path) {
+    if (path == '/') {
+      return location == '/';
+    }
+    return location.startsWith(path);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: TitoColors.card,
-        border: Border(top: BorderSide(color: TitoColors.ink, width: 2)),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        decoration: BoxDecoration(
+          color: TitoColors.deepBlue,
+          borderRadius: BorderRadius.circular(TitoRadii.lg),
+          border: Border.all(color: TitoColors.ink, width: 3),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x3818283B),
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            for (final spec in _routes) ...[
+              Expanded(
+                child: spec.center
+                    ? _CenterNavItem(
+                        spec: spec,
+                        selected: _isActive(spec.path),
+                        onTap: () => context.go(spec.path),
+                      )
+                    : _NavItem(
+                        spec: spec,
+                        selected: _isActive(spec.path),
+                        onTap: () => context.go(spec.path),
+                      ),
+              ),
+            ],
+          ],
+        ),
       ),
-      child: SafeArea(
-        top: false,
+    );
+  }
+}
+
+class _NavSpec {
+  const _NavSpec(this.path, this.label, this.icon, {this.center = false});
+
+  final String path;
+  final String label;
+  final IconData icon;
+  final bool center;
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.spec,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _NavSpec spec;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = selected ? TitoColors.deepBlue : TitoColors.skyBlue;
+    final bg = selected ? TitoColors.cream : Colors.transparent;
+
+    return Material(
+      color: bg,
+      borderRadius: BorderRadius.circular(TitoRadii.sm),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        splashColor: TitoColors.skyBlue.withValues(alpha: 0.2),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _NavItem(
-                label: AppZh.navHome,
-                icon: Icons.home_rounded,
-                selected: location == '/',
-                onTap: () => context.go('/'),
-              ),
-              _NavItem(
-                label: AppZh.navTeam,
-                icon: Icons.groups_rounded,
-                selected: location.startsWith('/team'),
-                onTap: () => context.go('/team'),
-              ),
-              _NavItem(
-                label: AppZh.navJourney,
-                icon: Icons.map_rounded,
-                selected: location.startsWith('/journey'),
-                onTap: () => context.go('/journey'),
-              ),
-              _NavItem(
-                label: AppZh.navSettings,
-                icon: Icons.settings_rounded,
-                selected: location.startsWith('/settings'),
-                onTap: () => context.go('/settings'),
+              Icon(spec.icon, color: fg, size: 22),
+              const SizedBox(height: 2),
+              Text(
+                spec.label,
+                style: TextStyle(
+                  color: fg,
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -55,41 +120,52 @@ class TitoBottomNav extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.label,
-    required this.icon,
+class _CenterNavItem extends StatelessWidget {
+  const _CenterNavItem({
+    required this.spec,
     required this.selected,
     required this.onTap,
   });
 
-  final String label;
-  final IconData icon;
+  final _NavSpec spec;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? TitoColors.deepBlue : TitoColors.mutedInk;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(TitoRadii.sm),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 11,
-                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              ),
+    return Transform.translate(
+      offset: const Offset(0, -14),
+      child: Material(
+        color: selected ? TitoColors.softYellow : TitoColors.cream,
+        shape: const CircleBorder(
+          side: BorderSide(color: TitoColors.ink, width: 3),
+        ),
+        elevation: 0,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: 56,
+            height: 56,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  spec.icon,
+                  color: TitoColors.deepBlue,
+                  size: 26,
+                ),
+                Text(
+                  spec.label,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: TitoColors.deepBlue,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

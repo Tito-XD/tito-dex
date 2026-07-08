@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/save/save_types.dart';
@@ -142,8 +143,36 @@ class _SettingsPageState extends State<SettingsPage> {
     final emulator = widget.emulatorChoice;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       children: [
+        Row(
+          children: [
+            Material(
+              color: TitoColors.card,
+              shape: const CircleBorder(
+                side: BorderSide(color: TitoColors.ink, width: 2),
+              ),
+              child: InkWell(
+                onTap: () => context.pop(),
+                customBorder: const CircleBorder(),
+                child: const SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Icon(Icons.arrow_back_rounded, color: TitoColors.deepBlue),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              AppZh.navSettings,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: TitoColors.card,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
         StickerCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -174,6 +203,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: FilledButton.styleFrom(
                   backgroundColor: TitoColors.coral,
                   foregroundColor: TitoColors.ink,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(TitoRadii.md),
+                    side: const BorderSide(color: TitoColors.ink, width: 3),
+                  ),
                 ),
                 child: const Text(AppZh.settingsSaveTrainerName),
               ),

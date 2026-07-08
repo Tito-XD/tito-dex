@@ -15,59 +15,79 @@ class TrainerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return StickerCard(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 72,
             height: 72,
             decoration: BoxDecoration(
               color: TitoColors.softYellow,
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink, width: 2),
+              shape: BoxShape.circle,
+              border: Border.all(color: TitoColors.ink, width: 3),
             ),
             alignment: Alignment.center,
             child: const Text('🐾', style: TextStyle(fontSize: 32)),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppZh.trainerCard,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: TitoColors.mutedInk,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  AppZh.trainerCard.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: TitoColors.mutedInk,
+                    letterSpacing: 0.8,
+                  ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   journey.trainerName,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w800,
+                        height: 1.1,
                       ),
                 ),
+                Text(
+                  AppZh.journeySince2026,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   localizeGame(journey.game),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
                 Text(
-                  '${AppZh.companion}：${localizeCompanion(journey.companion)}',
+                  '${AppZh.companion} · ${localizeCompanion(journey.companion)}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     for (var index = 0; index < journey.maxBadges; index++)
                       Container(
-                        width: 12,
-                        height: 12,
+                        width: 14,
+                        height: 14,
                         margin: const EdgeInsets.only(right: 6),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: index < journey.badges
-                              ? TitoColors.coral
+                              ? TitoColors.softYellow
                               : TitoColors.skyBlue,
-                          border: Border.all(color: TitoColors.ink, width: 1.5),
+                          border: Border.all(color: TitoColors.ink, width: 2),
                         ),
                       ),
                   ],

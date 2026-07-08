@@ -25,12 +25,12 @@ class DeviceShell extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1B2940),
+                    color: TitoColors.slateBlue,
                     borderRadius: BorderRadius.circular(TitoRadii.xl),
-                    border: Border.all(color: TitoColors.ink, width: 4),
+                    border: Border.all(color: TitoColors.ink, width: 3),
                     boxShadow: const [
                       BoxShadow(
                         color: Color(0x4D18283B),
@@ -40,11 +40,25 @@ class DeviceShell extends StatelessWidget {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(TitoRadii.xl - 4),
+                    borderRadius: BorderRadius.circular(TitoRadii.xl - 3),
                     child: Column(
                       children: [
-                        _StatusStrip(),
-                        Expanded(child: child),
+                        const _StatusStrip(),
+                        Expanded(
+                          child: DecoratedBox(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  TitoColors.skyBlue,
+                                  TitoColors.slateBlue,
+                                ],
+                              ),
+                            ),
+                            child: child,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -59,31 +73,75 @@ class DeviceShell extends StatelessWidget {
 }
 
 class _StatusStrip extends StatelessWidget {
+  const _StatusStrip();
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: const Color(0xFF152033),
+      color: TitoColors.deepBlue,
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'TitoDex',
             style: TextStyle(
-              color: TitoColors.card,
+              color: TitoColors.skyBlue,
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),
           ),
           Row(
             children: [
-              Icon(Icons.wifi, size: 14, color: TitoColors.skyBlue),
+              _StatusDot(),
               SizedBox(width: 6),
-              Icon(Icons.battery_full, size: 14, color: TitoColors.mint),
+              _BatteryIcon(),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StatusDot extends StatelessWidget {
+  const _StatusDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 6,
+      height: 6,
+      decoration: BoxDecoration(
+        color: TitoColors.softYellow,
+        shape: BoxShape.circle,
+        border: Border.all(color: TitoColors.skyBlue, width: 1),
+      ),
+    );
+  }
+}
+
+class _BatteryIcon extends StatelessWidget {
+  const _BatteryIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 18,
+      height: 10,
+      decoration: BoxDecoration(
+        border: Border.all(color: TitoColors.skyBlue, width: 2),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.all(1),
+      child: Container(
+        width: 11,
+        decoration: BoxDecoration(
+          color: TitoColors.mint,
+          borderRadius: BorderRadius.circular(1),
+        ),
       ),
     );
   }
