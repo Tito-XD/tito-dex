@@ -167,8 +167,8 @@ abstract final class DeviceLayout {
     return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.12);
   }
 
-  /// Unified handheld UI scale for typography and chrome (v0.2.18 used 2.0).
-  static const double handheldUiScale = 1.0;
+  /// Unified handheld UI scale relative to original 1× baseline (v0.2.18 used 2.0).
+  static const double handheldUiScale = 1.5;
 
   static double uiScale(BuildContext context) {
     final scope = TitoFontScale.maybeOf(context);
