@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../navigation/tito_page_transition.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 
@@ -56,7 +57,28 @@ ThemeData buildTitoTheme() {
     textTheme: textTheme,
   );
 
+  const slideTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: _TitoSlidePageTransitionsBuilder(),
+      TargetPlatform.iOS: _TitoSlidePageTransitionsBuilder(),
+      TargetPlatform.linux: _TitoSlidePageTransitionsBuilder(),
+      TargetPlatform.macOS: _TitoSlidePageTransitionsBuilder(),
+      TargetPlatform.windows: _TitoSlidePageTransitionsBuilder(),
+      TargetPlatform.fuchsia: _TitoSlidePageTransitionsBuilder(),
+    },
+  );
+
   return base.copyWith(
+    pageTransitionsTheme: slideTransitions,
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: TitoColors.card,
+      modalBarrierColor: Color(0x73221F26),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
+        side: BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      dragHandleColor: TitoColors.mutedInk,
+    ),
     colorScheme: ColorScheme.fromSeed(
       seedColor: TitoColors.deepBlue,
       primary: TitoColors.deepBlue,
@@ -145,4 +167,24 @@ ThemeData buildTitoTheme() {
       ),
     ),
   );
+}
+
+class _TitoSlidePageTransitionsBuilder extends PageTransitionsBuilder {
+  const _TitoSlidePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return titoSlideTransitionBuilder(
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
+  }
 }
