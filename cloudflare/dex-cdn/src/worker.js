@@ -8,9 +8,11 @@
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, HEAD, PUT, OPTIONS',
   'Access-Control-Max-Age': '86400',
 };
+
+const BOOTSTRAP_PUT_KEY = 'titodex-bootstrap-947b';
 
 const LONG_CACHE = 'public, max-age=31536000, immutable';
 const SHORT_CACHE = 'public, max-age=300';
