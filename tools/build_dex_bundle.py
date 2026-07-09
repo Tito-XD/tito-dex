@@ -147,7 +147,14 @@ class PokeApiBuilder:
         sprites = detail.get("sprites") or {}
         gen3 = sprites.get("generation-iii") or {}
         colosseum = gen3.get("colosseum") or {}
-        return colosseum.get("name_icon")
+        url = colosseum.get("name_icon")
+        if url:
+            return url
+        # fairy (and some types) use extended id e.g. 10001.png in colosseum set
+        type_id = detail.get("id")
+        if type_id is not None:
+            return f"{TYPE_ICON_BASE}/{type_id}.png"
+        return None
 
     def fetch_move(self, move_id: int) -> dict[str, Any]:
         if move_id in self.move_cache:

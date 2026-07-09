@@ -8,9 +8,12 @@
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, HEAD, PUT, OPTIONS',
   'Access-Control-Max-Age': '86400',
 };
+
+/** One-time bootstrap key — remove _put route after R2 is populated. */
+const BOOTSTRAP_PUT_KEY = 'titodex-bootstrap-947b';
 
 const LONG_CACHE = 'public, max-age=31536000, immutable';
 const SHORT_CACHE = 'public, max-age=300';
@@ -60,11 +63,27 @@ export default {
       return new Response(null, { status: 204, headers: CORS_HEADERS });
     }
 
+    const url = new URL(request.url);
+
+    if (request.method === 'PUT' && url.pathname.startsWith('/_put/')) {
+      if (request.headers.get('x-bootstrap-key') !== BOOTSTRAP_PUT_KEY) {
+        return new Response('Unauthorized', { status: 401, headers: CORS_HEADERS });
+      }
+      const key = decodeURIComponent(url.pathname.slice('/_put/'.length));
+      const contentType = request.headers.get('content-type') || contentTypeForKey(key);
+      await env.DEX_BUCKET.put(key, request.body, {
+        httpMetadata: { contentType },
+      });
+      return new Response(JSON.stringify({ ok: true, key }), {
+        status: 200,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405, headers: CORS_HEADERS });
     }
 
-    const url = new URL(request.url);
 
     if (url.pathname === '/bundle/latest') {
       const manifestObj = await env.DEX_BUCKET.get('bundle-manifest.json');
