@@ -12,6 +12,7 @@ import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
+import 'navigation/back_navigation.dart';
 import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
@@ -52,22 +53,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
       routes: [
         ShellRoute(
           builder: (context, state, child) {
-            final onHome = state.uri.path == '/';
-            final onSettings = state.uri.path == '/settings';
-            final onDexDetail = RegExp(r'^/dex/\d+$').hasMatch(state.uri.path);
             return PopScope(
-              canPop: onHome,
+              canPop: TitoBackNavigation.canPopRoute(context, state.uri.path),
               onPopInvokedWithResult: (didPop, result) {
                 if (didPop) {
                   return;
                 }
-                if (onSettings) {
-                  context.go('/');
-                } else if (onDexDetail) {
-                  context.go('/dex');
-                } else if (!onHome) {
-                  context.go('/');
-                }
+                TitoBackNavigation.navigateBack(context, state.uri.path);
               },
               child: HandheldInputShell(
                 location: state.uri.path,
