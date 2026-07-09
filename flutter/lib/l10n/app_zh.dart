@@ -29,18 +29,26 @@ abstract final class AppZh {
   static const widgetContinue = '继续';
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
-  static const dexScopeNote =
-      '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
+  static const dexScopeNote = '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
   static const dexUnknown = '未捕获';
   static const dexTabNational = '全国图鉴';
   static const dexTabJourney = '旅程同行';
+  static const dexRegionNational = '全国';
+  static const dexRegionJohto = '城都';
+  static const dexRegionKanto = '关东';
   static const dexJourneyEmpty = '当前旅程同行里还没有载入图鉴条目，试试全国图鉴。';
+  static const dexCaughtEmpty = '还没有已捕获的图鉴条目，同行宝可梦会自动标记为已捕获。';
+  static const dexSeenEmpty = '还没有已见过的图鉴条目。';
   static String dexLoadingProgress(int loaded, int total) =>
       '正在加载图鉴 $loaded / $total…';
   static const dexLoadingDetail = '正在从 PokeAPI 拉取详情…';
   static const dexLoadFailed = '图鉴数据加载失败';
+  static String dexLoadFailedDetail(int statusCode) =>
+      'PokeAPI 请求失败（HTTP $statusCode）。请检查网络，或在设置中下载离线图鉴后重试。';
+  static const errorGeneric = '加载失败，请稍后重试。';
+  static const errorFormatDetail = '数据格式异常，请检查网络后重试，或下载离线图鉴。';
   static const dexRetry = '重试';
   static const dexHeight = '身高';
   static const dexWeight = '体重';
@@ -49,6 +57,12 @@ abstract final class AppZh {
   static const dexImmunities = '免疫（受到 ×0）';
   static const dexStabEffective = '本系克制（打出 ×2）';
   static const dexEvolution = '进化链';
+  static const dexObtainHgss = '心金·魂银 出现地点';
+  static const dexObtainEmpty =
+      'PokeAPI 未收录该宝可梦在心金/魂银的野外遭遇数据（可能为进化、赠送或不可野生捕获）。';
+  static const dexFlavorEnglishNote = '该世代暂无官方中文描述，以下为英文原文。';
+  static const dexFlavorZhFallbackNote =
+      '心金/魂银世代无中文图鉴文案，以下为近世代中文译名供参考。';
   static const dexNone = '无';
   static const dexApiNote =
       '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
@@ -75,24 +89,56 @@ abstract final class AppZh {
   static const settingsDexOfflineHint =
       '一次性下载全国图鉴 1–493：中文名、属性图标、克制关系、进化链、升级招式与压缩立绘。招式按 ID 去重复用，属性图标全局共用。';
   static const settingsDexOfflineUnset = '尚未下载离线图鉴';
+  static String settingsDexOfflinePartial(int pokemonCount) =>
+      '部分缓存 $pokemonCount / 493，可点「继续下载」补全';
   static String settingsDexOfflineReady(
     int pokemonCount,
     int moveCount,
     String size,
     String downloadedAt,
-  ) =>
-      '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
+  ) => '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
   static const settingsDexOfflineDownload = '下载离线图鉴';
+  static const settingsDexOfflineResume = '继续下载离线图鉴';
   static const settingsDexOfflineClear = '清除离线缓存';
   static const settingsDexOfflinePrefer = '优先使用离线缓存';
-  static String settingsDexOfflineProgress(String phase, int current, int total) =>
-      '正在缓存$phase $current / $total';
+  static String settingsDexOfflineProgress(
+    String phase,
+    int current,
+    int total,
+  ) {
+    final phaseLabel = switch (phase) {
+      'types' => '属性',
+      'pokemon' => '宝可梦',
+      'cdn_manifest' => 'CDN 清单',
+      'cdn_download' => 'CDN 下载',
+      'cdn_verify' => '校验',
+      'cdn_decompress' => '解压',
+      'cdn_extract' => '写入',
+      'done' => '完成',
+      'partial' => '部分完成',
+      _ => phase,
+    };
+    return '正在缓存$phaseLabel $current / $total';
+  }
+
+  static const settingsDexCdnDownload = '从 CDN 下载图鉴包';
+  static const settingsDexCdnDownloadHint =
+      '从 dex.tito.cafe 下载预打包图鉴（更快，含全部 493 只立绘与数据）';
+  static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
+  static const snackDexCdnDone = 'CDN 图鉴包已安装完成';
+  static const snackDexCdnFailed = 'CDN 图鉴包下载失败';
+
   static const snackDexOfflineDone = '离线图鉴已下载完成';
+  static String snackDexOfflinePartial(int count) =>
+      '已缓存 $count / 493 只宝可梦，可再次点击继续下载补全';
   static const snackDexOfflineCleared = '已清除离线图鉴缓存';
   static const snackDexOfflineFailed = '离线图鉴下载失败';
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
+  static const searchPrompt = '搜索宝可梦';
   static const searchEmptyHint = '可搜索 1–493 号宝可梦的中文名、英文名、编号或属性。';
+  static const searchRecent = '最近搜索';
+  static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
 
   static const recentTimeline = '最近动态';
@@ -100,14 +146,17 @@ abstract final class AppZh {
   static const journeyTimelineEmpty = '还没有旅程记录';
 
   static const teamNote = '队伍数据来自当前存档或演示旅程。后续可在这里编辑同行宝可梦。';
+  static const teamEmptySlot = '空位';
   static String teamSubtitle(int count) => '同行 $count 只';
 
   static const settingsTrainerProfile = '训练家资料';
+  static const settingsGroupTrainer = 'Trainer';
+  static const settingsGroupSaveSync = 'Save sync';
+  static const settingsGroupAdvanced = 'Advanced';
   static const settingsDisplayName = '显示名称';
   static const settingsDisplayNameHint = 'Tito';
   static const settingsSaveTrainerName = '保存名称';
-  static const settingsSaveTrainerHint =
-      '民间汉化版的显示名可能与存档字节解码不同。';
+  static const settingsSaveTrainerHint = '民间汉化版的显示名可能与存档字节解码不同。';
   static String settingsSaveDecodeHint(String saveName) =>
       '存档标准解码：$saveName（汉化版可能显示不同）';
 
@@ -157,8 +206,7 @@ abstract final class AppZh {
   static const snackJourneyImported = '已从 JSON 导入旅程';
   static String snackSaveLoaded(String name, int partyCount) =>
       '已加载 $name 的存档 · 队伍 $partyCount 只';
-  static String snackSaveLoadedWarnings(int count) =>
-      '已加载存档（$count 条解析提示）';
+  static String snackSaveLoadedWarnings(int count) => '已加载存档（$count 条解析提示）';
   static const snackMockRestored = '已恢复演示旅程';
 
   static const continueSheetTitle = '继续旅程';
@@ -166,11 +214,17 @@ abstract final class AppZh {
   static const continueSheetLaunch = '启动';
   static const continueSheetChange = '换一个';
   static const continueSheetNoEmulators = '未找到已安装的模拟器应用';
+  static const continueSheetEmulatorLoadFailed = '读取已安装应用失败，请稍后重试';
   static const continueSheetDesktopHint = '模拟器启动目前仅支持 Android';
   static String continueSheetLaunching(String name) => '正在打开 $name…';
   static const snackEmulatorSaved = '已记住模拟器选择';
   static const snackEmulatorCleared = '已清除模拟器选择';
   static const snackEmulatorLaunchFailed = '无法启动该应用';
+
+  static const snackAvatarConfirmAgain = '再次点击修改头像';
+  static const snackAvatarUpdated = '头像已更新';
+  static const avatarPickGallery = '从相册选择';
+  static String snackGameSwitched(String gameTitle) => '已切换至 $gameTitle';
 
   static String placeholderScreen(String title) => '$title 页面开发中';
 }

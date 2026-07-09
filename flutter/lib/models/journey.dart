@@ -1,24 +1,40 @@
 class PartyMember {
   const PartyMember({
     required this.species,
+    this.speciesId,
     this.level,
     this.nickname,
+    this.currentHp,
+    this.maxHp,
+    this.experience,
   });
 
   final String species;
+  final int? speciesId;
   final int? level;
   final String? nickname;
+  final int? currentHp;
+  final int? maxHp;
+  final int? experience;
 
   Map<String, dynamic> toJson() => {
         'species': species,
+        if (speciesId != null) 'speciesId': speciesId,
         if (level != null) 'level': level,
         if (nickname != null) 'nickname': nickname,
+        if (currentHp != null) 'currentHp': currentHp,
+        if (maxHp != null) 'maxHp': maxHp,
+        if (experience != null) 'experience': experience,
       };
 
   factory PartyMember.fromJson(Map<String, dynamic> json) => PartyMember(
         species: json['species'] as String,
+        speciesId: json['speciesId'] as int?,
         level: json['level'] as int?,
         nickname: json['nickname'] as String?,
+        currentHp: json['currentHp'] as int?,
+        maxHp: json['maxHp'] as int?,
+        experience: json['experience'] as int?,
       );
 }
 
@@ -61,6 +77,8 @@ class CurrentJourney {
     this.nextReminder,
     this.saveTrainerName,
     this.trainerNameCustomized = false,
+    this.trainerAvatarPath,
+    this.trainerAvatarCustomized = false,
   });
 
   final String game;
@@ -75,6 +93,8 @@ class CurrentJourney {
   final String? nextReminder;
   final String? saveTrainerName;
   final bool trainerNameCustomized;
+  final String? trainerAvatarPath;
+  final bool trainerAvatarCustomized;
 
   CurrentJourney copyWith({
     String? game,
@@ -89,6 +109,8 @@ class CurrentJourney {
     String? nextReminder,
     String? saveTrainerName,
     bool? trainerNameCustomized,
+    String? trainerAvatarPath,
+    bool? trainerAvatarCustomized,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -104,6 +126,9 @@ class CurrentJourney {
       saveTrainerName: saveTrainerName ?? this.saveTrainerName,
       trainerNameCustomized:
           trainerNameCustomized ?? this.trainerNameCustomized,
+      trainerAvatarPath: trainerAvatarPath ?? this.trainerAvatarPath,
+      trainerAvatarCustomized:
+          trainerAvatarCustomized ?? this.trainerAvatarCustomized,
     );
   }
 
@@ -120,6 +145,8 @@ class CurrentJourney {
         if (nextReminder != null) 'nextReminder': nextReminder,
         if (saveTrainerName != null) 'saveTrainerName': saveTrainerName,
         if (trainerNameCustomized) 'trainerNameCustomized': true,
+        if (trainerAvatarPath != null) 'trainerAvatarPath': trainerAvatarPath,
+        if (trainerAvatarCustomized) 'trainerAvatarCustomized': true,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -142,6 +169,9 @@ class CurrentJourney {
         nextReminder: json['nextReminder'] as String?,
         saveTrainerName: json['saveTrainerName'] as String?,
         trainerNameCustomized: json['trainerNameCustomized'] as bool? ?? false,
+        trainerAvatarPath: json['trainerAvatarPath'] as String?,
+        trainerAvatarCustomized:
+            json['trainerAvatarCustomized'] as bool? ?? false,
       );
 
   static CurrentJourney mock() => const CurrentJourney(
@@ -151,25 +181,59 @@ class CurrentJourney {
         badges: 3,
         maxBadges: 8,
         playTime: '18:42',
-        companion: 'Riolu',
+        companion: 'Cyndaquil',
         nextReminder: '准备好就去广播塔看看',
         party: [
-          PartyMember(species: 'Quilava', level: 24, nickname: 'Quilava'),
-          PartyMember(species: 'Riolu', level: 18, nickname: 'Riolu'),
-          PartyMember(species: 'Flaaffy', level: 21),
-          PartyMember(species: 'Togepi', level: 15),
+          PartyMember(
+            species: 'Quilava',
+            speciesId: 156,
+            level: 24,
+            nickname: 'Quilava',
+            currentHp: 68,
+            maxHp: 72,
+            experience: 13824,
+          ),
+          PartyMember(
+            species: 'Riolu',
+            speciesId: 447,
+            level: 18,
+            nickname: 'Riolu',
+            currentHp: 42,
+            maxHp: 48,
+            experience: 5832,
+          ),
+          PartyMember(
+            species: 'Flaaffy',
+            speciesId: 180,
+            level: 21,
+            currentHp: 55,
+            maxHp: 60,
+            experience: 9261,
+          ),
+          PartyMember(
+            species: 'Togepi',
+            speciesId: 175,
+            level: 15,
+            currentHp: 38,
+            maxHp: 42,
+            experience: 3375,
+          ),
         ],
         timeline: [
           JourneyTimelineEntry(
             id: 't1',
             text: '抵达满金市',
-            at: '第 4 天',
+            at: '2026-04-15 14:22',
           ),
-          JourneyTimelineEntry(id: 't2', text: '获得蜂巢徽章', at: '第 3 天'),
+          JourneyTimelineEntry(
+            id: 't2',
+            text: '获得蜂巢徽章',
+            at: '2026-04-14 09:05',
+          ),
           JourneyTimelineEntry(
             id: 't3',
-            text: '利欧路加入同行',
-            at: '第 2 天',
+            text: '火球鼠一直跟在身旁',
+            at: '2026-04-13 18:40',
           ),
         ],
       );

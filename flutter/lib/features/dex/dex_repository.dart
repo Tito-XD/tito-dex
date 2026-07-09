@@ -1,3 +1,5 @@
+import '../companion/companion_art.dart';
+import '../parser/hgss_format.dart';
 import '../../models/journey.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
@@ -8,11 +10,13 @@ class DexRepository {
   DexRepository({
     PokeApiClient? client,
     DexOfflineService? offline,
+    this.summaryBatchSize = 4,
   })  : _client = client ?? PokeApiClient(),
         _offline = offline ?? dexOfflineService;
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
+  final int summaryBatchSize;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
   final Map<String, int> _nameToIdCache = {};
@@ -32,9 +36,18 @@ class DexRepository {
       }
     }
 
-    final summary = await _client.fetchSummary(id);
-    _rememberSummary(summary);
-    return summary;
+    try {
+      final summary = await _client.fetchSummary(id);
+      _rememberSummary(summary);
+      return summary;
+    } on PokeApiException {
+      final cached = await _offline.readSummary(id);
+      if (cached != null) {
+        _rememberSummary(cached);
+        return cached;
+      }
+      rethrow;
+    }
   }
 
   Future<PokemonDetail> getDetail(int id) async {
@@ -43,18 +56,32 @@ class DexRepository {
     }
 
     if (await _offline.shouldPreferOffline()) {
+      try {
+        final cached = await _offline.readDetail(id);
+        if (cached != null) {
+          _detailCache[id] = cached;
+          _summaryCache[id] = cached.summary;
+          return cached;
+        }
+      } catch (_) {
+        // Corrupt partial offline cache — fall through to live API.
+      }
+    }
+
+    try {
+      final detail = await _client.fetchDetailWithMoves(id);
+      _detailCache[id] = detail;
+      _rememberSummary(detail.summary);
+      return detail;
+    } on PokeApiException {
       final cached = await _offline.readDetail(id);
       if (cached != null) {
         _detailCache[id] = cached;
         _summaryCache[id] = cached.summary;
         return cached;
       }
+      rethrow;
     }
-
-    final detail = await _client.fetchDetailWithMoves(id);
-    _detailCache[id] = detail;
-    _rememberSummary(detail.summary);
-    return detail;
   }
 
   Future<List<PokemonSummary>> getAllSummaries() async {
@@ -78,17 +105,11 @@ class DexRepository {
       return _allSummaries!;
     }
 
-    const batchSize = 25;
     final summaries = <PokemonSummary>[];
 
-    for (var start = 1; start <= hgssMaxNationalDexId; start += batchSize) {
-      final end = (start + batchSize - 1).clamp(1, hgssMaxNationalDexId);
-      final batch = await Future.wait(
-        [
-          for (var id = start; id <= end; id++) getSummary(id),
-        ],
-      );
-      summaries.addAll(batch);
+    for (var start = 1; start <= hgssMaxNationalDexId; start += summaryBatchSize) {
+      final end = (start + summaryBatchSize - 1).clamp(1, hgssMaxNationalDexId);
+      summaries.addAll(await getSummaryRange(start, end));
     }
 
     _allSummaries = summaries;
@@ -98,11 +119,20 @@ class DexRepository {
   Future<List<PokemonSummary>> getSummaryRange(int start, int end) async {
     final safeStart = start.clamp(1, hgssMaxNationalDexId);
     final safeEnd = end.clamp(safeStart, hgssMaxNationalDexId);
-    return Future.wait(
-      [
-        for (var id = safeStart; id <= safeEnd; id++) getSummary(id),
-      ],
-    );
+    final summaries = <PokemonSummary>[];
+
+    for (var id = safeStart; id <= safeEnd; id += summaryBatchSize) {
+      final batchEnd = (id + summaryBatchSize - 1).clamp(safeStart, safeEnd);
+      final batch = await Future.wait(
+        [
+          for (var batchId = id; batchId <= batchEnd; batchId++)
+            getSummary(batchId),
+        ],
+      );
+      summaries.addAll(batch);
+    }
+
+    return summaries;
   }
 
   Future<List<PokemonSummary>> search(String query) async {
@@ -137,12 +167,32 @@ class DexRepository {
 
   Future<Set<int>> journeyCaughtIds(CurrentJourney journey) async {
     final ids = <int>{};
+
+    for (final member in journey.party) {
+      final id = member.speciesId ??
+          speciesIdForName(member.species) ??
+          knownSpeciesIdForLabel(member.species);
+      if (id != null) {
+        ids.add(id);
+      }
+    }
+
+    final companionId = speciesIdForName(journey.companion) ??
+        knownSpeciesIdForLabel(journey.companion);
+    if (companionId != null) {
+      ids.add(companionId);
+    }
+
     final names = <String>{
       ...journey.party.map((member) => member.species),
       journey.companion,
     };
 
     for (final name in names) {
+      if (speciesIdForName(name) != null ||
+          knownSpeciesIdForLabel(name) != null) {
+        continue;
+      }
       final cached = _nameToIdCache[name.toLowerCase()];
       if (cached != null) {
         ids.add(cached);
@@ -155,6 +205,14 @@ class DexRepository {
       }
     }
     return ids;
+  }
+
+  Future<List<PokemonSummary>> getSummariesForIds(Iterable<int> ids) async {
+    final unique = ids.toSet().toList()..sort();
+    if (unique.isEmpty) {
+      return const [];
+    }
+    return Future.wait(unique.map(getSummary));
   }
 
   DexEncounterStatus statusFor(int id, Set<int> caughtIds) {

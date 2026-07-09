@@ -146,12 +146,15 @@ class DexCacheStore {
       return {};
     }
     final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-    return json.map(
-      (key, value) => MapEntry(
-        int.parse(key),
-        CachedMove.fromJson(value as Map<String, dynamic>),
-      ),
-    );
+    final moves = <int, CachedMove>{};
+    for (final entry in json.entries) {
+      final id = int.tryParse(entry.key);
+      if (id == null) {
+        continue;
+      }
+      moves[id] = CachedMove.fromJson(entry.value as Map<String, dynamic>);
+    }
+    return moves;
   }
 
   Future<void> writeDetail(int id, PokemonDetail detail) async {

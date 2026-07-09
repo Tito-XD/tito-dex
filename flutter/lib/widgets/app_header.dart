@@ -5,37 +5,41 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
+import 'handheld_input.dart';
+import 'handheld_status_icons.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
     super.key,
     this.gameBadge = 'HGSS',
     this.showSettings = true,
+    this.onGameBadgeTap,
   });
 
   final String gameBadge;
   final bool showSettings;
+  final VoidCallback? onGameBadgeTap;
 
   @override
   Widget build(BuildContext context) {
     final compact = DeviceLayout.isCompact(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final barHeight = DeviceLayout.headerBarHeight(context);
+
     return Padding(
-      padding: EdgeInsets.only(bottom: compact ? 8 : 16),
-      child: Row(
-        children: [
-          Icon(
-            Icons.pets_rounded,
-            color: TitoColors.softYellow,
-            size: compact ? 26 : 32,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              AppZh.appTitle,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.card,
-                    fontSize: compact ? 22 : null,
+      padding: EdgeInsets.only(bottom: square ? 4 : (compact ? 8 : 16)),
+      child: SizedBox(
+        height: barHeight,
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  AppZh.appTitle,
+                  style: context.tito.pageTitleOnGradient.copyWith(
+                    fontSize: DeviceLayout.headerTitleSize(context),
                     letterSpacing: -0.5,
                     shadows: const [
                       Shadow(
@@ -44,19 +48,30 @@ class AppHeader extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
             ),
-          ),
-          TitoBadgePill(label: gameBadge, tone: TitoBadgeTone.yellow),
-          if (showSettings) ...[
-            const SizedBox(width: 8),
-            _HeaderIconButton(
-              icon: Icons.settings_rounded,
-              onTap: () => context.push('/settings'),
-              label: AppZh.navSettings,
+            TitoBadgePill(
+              label: gameBadge,
+              tone: TitoBadgeTone.yellow,
               compact: compact,
+              onTap: onGameBadgeTap,
             ),
+            if (DeviceLayout.isNativeTarget) ...[
+              SizedBox(width: square ? 8 : 10),
+              HandheldStatusIcons(compact: square || compact),
+            ],
+            if (showSettings) ...[
+              SizedBox(width: square ? 6 : 8),
+              _HeaderIconButton(
+                icon: Icons.settings_rounded,
+                onTap: () => context.push('/settings'),
+                label: AppZh.navSettings,
+                compact: compact,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -77,25 +92,32 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: Material(
-        color: TitoColors.card,
-        shape: const CircleBorder(
-          side: BorderSide(color: TitoColors.ink, width: 2),
-        ),
-        elevation: 0,
-        child: InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: SizedBox(
-            width: compact ? 34 : 40,
-            height: compact ? 34 : 40,
-            child: Icon(
-              icon,
-              color: TitoColors.deepBlue,
-              size: compact ? 18 : 22,
+    final size = DeviceLayout.headerIconSize(context);
+    final iconSize = size * 0.55;
+
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(size / 2),
+      child: Semantics(
+        button: true,
+        label: label,
+        child: Material(
+          color: TitoColors.card,
+          shape: const CircleBorder(
+            side: BorderSide(color: TitoColors.ink, width: 2),
+          ),
+          elevation: 0,
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const CircleBorder(),
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Icon(
+                icon,
+                color: TitoColors.deepBlue,
+                size: iconSize,
+              ),
             ),
           ),
         ),

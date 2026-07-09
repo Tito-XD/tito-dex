@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <application
         android:label="TitoDex"
         android:name="${applicationName}"
@@ -26,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -43,8 +53,19 @@
         </intent>
         <package android:name="com.dsemu.drastic" />
         <package android:name="me.magnum.melonds" />
+        <package android:name="com.explusalpha.NeoEmu" />
+        <package android:name="com.explusalpha.GbaEmu" />
+        <package android:name="com.explusalpha.MdEmu" />
+        <package android:name="com.explusalpha.Snes9xPlus" />
         <package android:name="com.retroarch" />
         <package android:name="org.dolphinemu.dolphinemu" />
         <package android:name="com.citra.citra_emu" />
+        <package android:name="com.ndsemulator" />
+        <package android:name="com.fastemulator.gbafree" />
+        <package android:name="com.fastemulator.gba" />
+        <package android:name="com.retroarch.aarch64" />
+        <package android:name="com.citra.citra_emu.canary" />
+        <package android:name="com.duckstation.psx" />
+        <package android:name="org.easyrpg.player" />
     </queries>
 </manifest>

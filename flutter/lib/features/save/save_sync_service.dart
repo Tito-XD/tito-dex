@@ -27,6 +27,8 @@ class SaveSyncService {
     final current = await _directoryRepository.load();
     final next = current.copyWith(
       directoryPath: directoryPath,
+      autoLoadOnStartup:
+          directoryPath != null ? true : current.autoLoadOnStartup,
       clearLastLoaded: directoryPath != current.directoryPath,
     );
     await _directoryRepository.save(next);
@@ -112,7 +114,8 @@ class SaveSyncService {
 
   Future<SaveSyncResult> syncOnStartup({required CurrentJourney existing}) async {
     final config = await _directoryRepository.load();
-    if (!config.autoLoadOnStartup || config.directoryPath == null) {
+    final directoryPath = config.directoryPath;
+    if (directoryPath == null || directoryPath.isEmpty) {
       return SaveSyncResult(journey: existing, updated: false);
     }
     return syncLatest(existing: existing);

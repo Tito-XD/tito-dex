@@ -5,9 +5,13 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
+import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
+import 'tito_sprite_sticker.dart';
 
 class PokemonMiniCard extends StatelessWidget {
   const PokemonMiniCard({
@@ -15,11 +19,13 @@ class PokemonMiniCard extends StatelessWidget {
     required this.summary,
     required this.status,
     this.onTap,
+    this.compact = false,
   });
 
   final PokemonSummary summary;
   final DexEncounterStatus status;
   final VoidCallback? onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -28,53 +34,59 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
+    final spriteSize = compact ? DeviceLayout.dim(context, 44.0) : 64.0;
+    final padding = compact ? DeviceLayout.dim(context, 4.0) : 10.0;
+
+    final checkSize = compact ? DeviceLayout.dim(context, 14.0) : 18.0;
 
     return GestureDetector(
       onTap: onTap ?? () => context.push('/dex/${summary.id}'),
-      child: StickerCard(
-        variant: variant,
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DexSpriteImage(
-              source: summary.displaySpritePath,
-              height: 56,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          StickerCard(
+            variant: variant,
+            padding: EdgeInsets.all(padding),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TitoSpriteSticker(
+                  source: summary.displaySpritePath,
+                  size: spriteSize,
+                  padding: 2,
+                ),
+                SizedBox(height: compact ? 2 : 4),
+                Text(
+                  '#${summary.id.toString().padLeft(3, '0')}',
+                  style: context.secondary.body14(
+                    color: TitoColors.mutedInk,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  summary.nameZh,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.secondary.body14(fontWeight: FontWeight.w800),
+                ),
+                _PokemonTypeRow(types: summary.types),
+              ],
             ),
-            Text(
-              '#${summary.id.toString().padLeft(3, '0')}',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: TitoColors.mutedInk,
+          ),
+          if (status == DexEncounterStatus.caught)
+            Positioned(
+              top: 2,
+              right: 2,
+              child: Icon(
+                Icons.check_circle_rounded,
+                color: TitoColors.mint,
+                size: checkSize,
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              summary.nameZh,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-            _PokemonTypeRow(types: summary.types),
-            const Spacer(),
-            Text(
-              switch (status) {
-                DexEncounterStatus.caught => AppZh.dexCaught,
-                DexEncounterStatus.seen => AppZh.dexSeen,
-                DexEncounterStatus.unknown => AppZh.dexUnknown,
-              },
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -135,10 +147,7 @@ class TypeChipRow extends StatelessWidget {
     if (types.isEmpty) {
       return Text(
         AppZh.dexNone,
-        style: const TextStyle(
-          color: TitoColors.mutedInk,
-          fontWeight: FontWeight.w600,
-        ),
+        style: context.tito.cardMuted,
       );
     }
 
@@ -179,10 +188,7 @@ class TypeChipRow extends StatelessWidget {
                   ],
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                    ),
+                    style: context.tito.chip,
                   ),
                 ],
               ),
@@ -219,12 +225,20 @@ class EvolutionChainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: _buildNodes(context, root),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildNodes(context, root),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -277,24 +291,81 @@ class _EvolutionCard extends StatelessWidget {
               Text(
                 node.nameZh,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: context.tito.cardBodyEmphasis,
               ),
               if (node.triggerZh != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   node.triggerZh!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.tito.caption,
                 ),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Vertical evolution tree — linear chains stack down, branches split sideways.
+class EvolutionChainVerticalView extends StatelessWidget {
+  const EvolutionChainVerticalView({
+    super.key,
+    required this.root,
+    required this.highlightId,
+  });
+
+  final EvolutionNode root;
+  final int highlightId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: _buildNode(context, root),
+    );
+  }
+
+  Widget _buildNode(BuildContext context, EvolutionNode node) {
+    if (node.children.isEmpty) {
+      return _EvolutionCard(node: node, highlighted: node.id == highlightId);
+    }
+
+    if (node.children.length == 1) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _EvolutionCard(node: node, highlighted: node.id == highlightId),
+          const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+          _buildNode(context, node.children.first),
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _EvolutionCard(node: node, highlighted: node.id == highlightId),
+        const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < node.children.length; i++) ...[
+              if (i > 0) ...[
+                const Padding(
+                  padding: EdgeInsets.only(top: 40),
+                  child: Icon(Icons.arrow_forward_rounded, color: TitoColors.ink),
+                ),
+                const SizedBox(width: 6),
+              ],
+              Flexible(child: _buildNode(context, node.children[i])),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }
