@@ -12,6 +12,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../theme/tito_typography.dart';
@@ -87,8 +88,6 @@ class _DexPageState extends State<DexPage> {
     }
     return ids;
   }
-
-  Set<int> get _seenIds => {..._caughtIds, ..._journeyIds};
 
   Future<void> _loadMore() async {
     if (_loadingChunk || _loadedThrough >= hgssMaxNationalDexId) {
@@ -191,8 +190,6 @@ class _DexPageState extends State<DexPage> {
 
   @override
   Widget build(BuildContext context) {
-    final caughtCount = _caughtIds.length;
-    final seenCount = _seenIds.length;
     final visible = _visibleEntries;
     final columns = DeviceLayout.dexGridColumns(context);
     final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
@@ -224,7 +221,7 @@ class _DexPageState extends State<DexPage> {
                   SizedBox(height: squareGap(context)),
                   Text(
                     AppZh.dexScopeNote,
-                    style: context.tito.pageSubtitleOnGradient,
+                    style: SecondaryTypography.onGradient.body14,
                     maxLines: DeviceLayout.useSquareDashboard(context) ? 2 : 3,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -234,8 +231,6 @@ class _DexPageState extends State<DexPage> {
                     region: _region,
                     nationalTotal: _nationalScopeTotal,
                     journeyCount: _journeyIds.length,
-                    seenCount: seenCount,
-                    caughtCount: caughtCount,
                     onModeSelected: _setMode,
                     onRegionSelected: _setRegion,
                   ),
@@ -387,7 +382,7 @@ class _DexTopBar extends StatelessWidget {
                 '${AppZh.navDex} · $gameTitle',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.tito.pageTitleOnGradient.copyWith(
+                style: SecondaryTypography.onGradient.title.copyWith(
                   letterSpacing: -0.5,
                   shadows: const [
                     Shadow(
@@ -425,7 +420,10 @@ class _DexTopBar extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       AppZh.navSearch,
-                      style: context.tito.chip.copyWith(color: TitoColors.card),
+                      style: SecondaryTypography.onGradient.small12.copyWith(
+                        color: TitoColors.card,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ],
                 ),
@@ -444,8 +442,6 @@ class _DexScopeBar extends StatelessWidget {
     required this.region,
     required this.nationalTotal,
     required this.journeyCount,
-    required this.seenCount,
-    required this.caughtCount,
     required this.onModeSelected,
     required this.onRegionSelected,
   });
@@ -454,46 +450,34 @@ class _DexScopeBar extends StatelessWidget {
   final DexRegionalScope region;
   final int nationalTotal;
   final int journeyCount;
-  final int seenCount;
-  final int caughtCount;
   final ValueChanged<_DexMode> onModeSelected;
   final ValueChanged<DexRegionalScope> onRegionSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _DexModeTab(
-                selected: mode == _DexMode.national,
-                title: AppZh.dexTabNational,
-                subtitle: regionalScopeLabelZh(region),
-                count: nationalTotal,
-                showRegionMenu: true,
-                region: region,
-                onTap: () => onModeSelected(_DexMode.national),
-                onRegionSelected: onRegionSelected,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: _DexModeTab(
-                selected: mode == _DexMode.journey,
-                title: AppZh.dexTabJourney,
-                subtitle: '${AppZh.dexCaught} $caughtCount',
-                count: journeyCount,
-                onTap: () => onModeSelected(_DexMode.journey),
-              ),
-            ),
-          ],
+        Expanded(
+          child: _DexModeTab(
+            selected: mode == _DexMode.national,
+            title: AppZh.dexTabNational,
+            subtitle: regionalScopeLabelZh(region),
+            count: nationalTotal,
+            showRegionMenu: true,
+            region: region,
+            onTap: () => onModeSelected(_DexMode.national),
+            onRegionSelected: onRegionSelected,
+          ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          '${AppZh.dexSeen} $seenCount · ${AppZh.dexCaught} $caughtCount',
-          style: context.tito.caption,
+        const SizedBox(width: 6),
+        Expanded(
+          child: _DexModeTab(
+            selected: mode == _DexMode.journey,
+            title: AppZh.dexTabJourney,
+            subtitle: AppZh.teamSubtitle(journeyCount),
+            count: journeyCount,
+            onTap: () => onModeSelected(_DexMode.journey),
+          ),
         ),
       ],
     );
@@ -547,7 +531,9 @@ class _DexModeTab extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.tito.chip,
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   Text(
@@ -566,7 +552,10 @@ class _DexModeTab extends StatelessWidget {
                       subtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.tito.caption,
+                      style: SecondaryTypography.onCard.meta14.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: TitoColors.mutedInk,
+                      ),
                     ),
                   ),
                   if (showRegionMenu && selected)

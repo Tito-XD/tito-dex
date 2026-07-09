@@ -220,7 +220,7 @@ class _QuickActionsBar extends StatelessWidget {
     final gap = DeviceLayout.sectionSpacing(context);
 
     return TitoFontScale(
-      multiplier: DeviceLayout.homeDetailMultiplier(context),
+      multiplier: 2.0,
       child: Row(
         children: [
           for (var index = 0; index < actions.length; index++) ...[

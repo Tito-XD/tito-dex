@@ -6,6 +6,7 @@ import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
@@ -36,45 +37,56 @@ class PokemonMiniCard extends StatelessWidget {
     final spriteSize = compact ? DeviceLayout.dim(context, 44.0) : 64.0;
     final padding = compact ? DeviceLayout.dim(context, 4.0) : 10.0;
 
+    final checkSize = compact ? DeviceLayout.dim(context, 14.0) : 18.0;
+
     return GestureDetector(
       onTap: onTap ?? () => context.push('/dex/${summary.id}'),
-      child: StickerCard(
-        variant: variant,
-        padding: EdgeInsets.all(padding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TitoSpriteSticker(
-              source: summary.displaySpritePath,
-              size: spriteSize,
-              padding: 2,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          StickerCard(
+            variant: variant,
+            padding: EdgeInsets.all(padding),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TitoSpriteSticker(
+                  source: summary.displaySpritePath,
+                  size: spriteSize,
+                  padding: 2,
+                ),
+                SizedBox(height: compact ? 2 : 4),
+                Text(
+                  '#${summary.id.toString().padLeft(3, '0')}',
+                  style: context.secondary.body14(
+                    color: TitoColors.mutedInk,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  summary.nameZh,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.secondary.body14(fontWeight: FontWeight.w800),
+                ),
+                _PokemonTypeRow(types: summary.types),
+              ],
             ),
-            SizedBox(height: compact ? 2 : 4),
-            Text(
-              '#${summary.id.toString().padLeft(3, '0')}',
-              style: context.tito.dexNumber,
+          ),
+          if (status == DexEncounterStatus.caught)
+            Positioned(
+              top: 2,
+              right: 2,
+              child: Icon(
+                Icons.check_circle_rounded,
+                color: TitoColors.mint,
+                size: checkSize,
+              ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              summary.nameZh,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: context.tito.chip,
-            ),
-            _PokemonTypeRow(types: summary.types),
-            SizedBox(height: compact ? 2 : 4),
-            Text(
-              switch (status) {
-                DexEncounterStatus.caught => AppZh.dexCaught,
-                DexEncounterStatus.seen => AppZh.dexSeen,
-                DexEncounterStatus.unknown => AppZh.dexUnknown,
-              },
-              style: context.tito.statusBadge,
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

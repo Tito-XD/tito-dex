@@ -11,6 +11,7 @@ import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_font_scale.dart';
@@ -32,7 +33,6 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   static const _recentQueriesKey = 'search_page_recent_queries_v1';
   static const _maxRecentQueries = 5;
-  static const _trendingQueries = ['皮卡丘', '伊布', '火', '水', '龙'];
 
   final _controller = TextEditingController();
   Timer? _debounce;
@@ -158,16 +158,24 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppZh.searchPrompt, style: context.tito.onDeepTitle),
+              Text(
+                AppZh.searchPrompt,
+                style: SecondaryTypography.onGradient.h15,
+              ),
               const SizedBox(height: 10),
               TextField(
                 controller: _controller,
                 onChanged: _onQueryChanged,
                 spellCheckConfiguration:
                     const SpellCheckConfiguration.disabled(),
-                style: context.tito.cardBodyStrong,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
                 decoration: InputDecoration(
                   hintText: AppZh.searchPlaceholder,
+                  hintStyle: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
                   prefixIcon: const Icon(
                     Icons.search_rounded,
                     color: TitoColors.deepBlue,
@@ -230,10 +238,7 @@ class _SearchPageState extends State<SearchPage> {
         ],
         const SizedBox(height: 16),
         if (query.isEmpty)
-          _SearchIdlePlaceholder(
-            trendingQueries: _trendingQueries,
-            onTapQuery: _applyQuery,
-          )
+          const _SearchIdlePlaceholder()
         else if (_searching)
           const Center(child: CircularProgressIndicator())
         else if (_error != null)
@@ -277,38 +282,17 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class _SearchIdlePlaceholder extends StatelessWidget {
-  const _SearchIdlePlaceholder({
-    required this.trendingQueries,
-    required this.onTapQuery,
-  });
-
-  final List<String> trendingQueries;
-  final ValueChanged<String> onTapQuery;
+  const _SearchIdlePlaceholder();
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
       variant: StickerVariant.sky,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppZh.searchEmptyHint, style: context.tito.cardBodyStrong),
-          const SizedBox(height: 10),
-          Text(AppZh.searchTrending, style: context.tito.cardSectionTitle),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: trendingQueries
-                .map(
-                  (query) => _SearchQueryChip(
-                    label: query,
-                    onTap: () => onTapQuery(query),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
+      child: Text(
+        AppZh.searchEmptyHint,
+        style: SecondaryTypography.onCard.small12.copyWith(
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
@@ -327,7 +311,12 @@ class _SearchQueryChip extends StatelessWidget {
       backgroundColor: TitoColors.card,
       side: const BorderSide(color: TitoColors.ink, width: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-      label: Text(label, style: context.tito.chip),
+      label: Text(
+        label,
+        style: SecondaryTypography.onCard.small12.copyWith(
+          fontWeight: FontWeight.w800,
+        ),
+      ),
     );
   }
 }
@@ -351,45 +340,54 @@ class _SearchResultRow extends StatelessWidget {
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
 
-    final statusLabel = switch (status) {
-      DexEncounterStatus.caught => AppZh.dexCaught,
-      DexEncounterStatus.seen => AppZh.dexSeen,
-      DexEncounterStatus.unknown => AppZh.dexUnknown,
-    };
-
     return GestureDetector(
       onTap: onTap,
-      child: StickerCard(
-        variant: variant,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            DexSpriteImage(
-              source: entry.displaySpritePath,
-              height: 48,
-              width: 48,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          StickerCard(
+            variant: variant,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                DexSpriteImage(
+                  source: entry.displaySpritePath,
+                  height: 48,
+                  width: 48,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TypeChipRow(
+                        types: entry.types.map(typeNameZh).toList(),
+                        typeKeys: entry.types,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
-                    style: context.tito.cardBodyEmphasis,
-                  ),
-                  const SizedBox(height: 6),
-                  TypeChipRow(
-                    types: entry.types.map(typeNameZh).toList(),
-                    typeKeys: entry.types,
-                  ),
-                ],
+          ),
+          if (status == DexEncounterStatus.caught)
+            const Positioned(
+              top: 6,
+              right: 6,
+              child: Icon(
+                Icons.check_circle_rounded,
+                color: TitoColors.mint,
+                size: 18,
               ),
             ),
-            const SizedBox(width: 10),
-            Text(statusLabel, style: context.tito.captionStrong),
-          ],
-        ),
+        ],
       ),
     );
   }
