@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_font_scale.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -16,10 +17,12 @@ class JourneyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SecondaryPageScaffold(
-      title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
-      subtitle: AppZh.journeySince2026,
-      children: [
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: SecondaryPageScaffold(
+        title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
+        subtitle: AppZh.journeySince2026,
+        children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -81,6 +84,7 @@ class JourneyPage extends StatelessWidget {
           ),
         ),
       ],
+      ),
     );
   }
 }

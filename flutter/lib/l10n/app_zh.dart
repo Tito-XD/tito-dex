@@ -35,6 +35,9 @@ abstract final class AppZh {
   static const dexUnknown = '未捕获';
   static const dexTabNational = '全国图鉴';
   static const dexTabJourney = '旅程同行';
+  static const dexRegionNational = '全国';
+  static const dexRegionJohto = '城都';
+  static const dexRegionKanto = '关东';
   static const dexJourneyEmpty = '当前旅程同行里还没有载入图鉴条目，试试全国图鉴。';
   static const dexCaughtEmpty = '还没有已捕获的图鉴条目，同行宝可梦会自动标记为已捕获。';
   static const dexSeenEmpty = '还没有已见过的图鉴条目。';

@@ -1,6 +1,8 @@
 /// HGSS / Johto dex scope constants for PokeAPI version groups.
 library;
 
+import 'dex_models.dart';
+
 const hgssVersionGroup = 'heartgold-soulsilver';
 
 const johtoPokedexNames = <String>{
@@ -44,3 +46,21 @@ String flavorVersionLabelZh(String version) =>
 
 String moveMethodLabelZh(String method) =>
     moveMethodLabelsZh[method] ?? method;
+
+enum DexRegionalScope { national, johto, kanto }
+
+(int, int) regionalDexIdRange(DexRegionalScope scope) {
+  return switch (scope) {
+    DexRegionalScope.national => (1, hgssMaxNationalDexId),
+    DexRegionalScope.johto => (152, 251),
+    DexRegionalScope.kanto => (1, 151),
+  };
+}
+
+String regionalScopeLabelZh(DexRegionalScope scope) {
+  return switch (scope) {
+    DexRegionalScope.national => '全国',
+    DexRegionalScope.johto => '城都',
+    DexRegionalScope.kanto => '关东',
+  };
+}

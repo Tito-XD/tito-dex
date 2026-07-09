@@ -5,6 +5,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
+import '../theme/tito_font_scale.dart';
 import '../widgets/party_team_list.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -16,10 +17,12 @@ class TeamPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SecondaryPageScaffold(
-      title: AppZh.navTeam,
-      padding: DeviceLayout.pagePadding(context),
-      children: [
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: SecondaryPageScaffold(
+        title: AppZh.navTeam,
+        padding: DeviceLayout.pagePadding(context),
+        children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -45,6 +48,7 @@ class TeamPage extends StatelessWidget {
           child: Text(AppZh.teamNote, style: context.tito.cardBodyStrong),
         ),
       ],
+      ),
     );
   }
 }

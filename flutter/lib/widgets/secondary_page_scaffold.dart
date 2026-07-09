@@ -59,8 +59,7 @@ class SecondaryPageAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final path = GoRouterState.of(context).uri.path;
     final canOpenSettings = showSettings && path != '/settings';
-    final backIconSize = DeviceLayout.dexBackIconSize(context);
-    final backFontSize = DeviceLayout.dexBackControlSize(context);
+    final backIconSize = DeviceLayout.backIconSize(context);
 
     return Row(
       children: [
@@ -69,7 +68,6 @@ class SecondaryPageAppBar extends StatelessWidget {
             title: title,
             onTap: () => _handleBack(context, path),
             iconSize: backIconSize,
-            fontSize: backFontSize,
           ),
         ),
         if (canOpenSettings) ...[
@@ -99,13 +97,11 @@ class _BackTitleButton extends StatelessWidget {
     required this.title,
     required this.onTap,
     required this.iconSize,
-    required this.fontSize,
   });
 
   final String title;
   final VoidCallback onTap;
   final double iconSize;
-  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +133,6 @@ class _BackTitleButton extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: context.tito.pageTitleOnGradient.copyWith(
-                        fontSize: fontSize,
                         letterSpacing: -0.5,
                         shadows: const [
                           Shadow(

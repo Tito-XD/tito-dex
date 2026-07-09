@@ -5,6 +5,7 @@ import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
+import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
 import '../widgets/trainer_card.dart';
 import '../widgets/continue_journey_card.dart';
@@ -218,22 +219,25 @@ class _QuickActionsBar extends StatelessWidget {
     final actions = _quickActions();
     final gap = DeviceLayout.sectionSpacing(context);
 
-    return Row(
-      children: [
-        for (var index = 0; index < actions.length; index++) ...[
-          if (index > 0) SizedBox(width: gap),
-          Expanded(
-            child: TitoQuickTile(
-              label: actions[index].label,
-              icon: actions[index].icon,
-              onTap: () => _openRoute(context, actions[index].route),
-              compact: true,
-              dense: true,
-              square: true,
+    return TitoFontScale(
+      multiplier: DeviceLayout.homeDetailMultiplier(context),
+      child: Row(
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) SizedBox(width: gap),
+            Expanded(
+              child: TitoQuickTile(
+                label: actions[index].label,
+                icon: actions[index].icon,
+                onTap: () => _openRoute(context, actions[index].route),
+                compact: true,
+                dense: true,
+                square: true,
+              ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

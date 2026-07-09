@@ -7,6 +7,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_font_scale.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
@@ -52,7 +53,7 @@ class TrainerCard extends StatelessWidget {
                 size: avatarSize,
                 onTap: onAvatarTap,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,16 +65,20 @@ class TrainerCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: context.tito.cardValueLarge.copyWith(height: 1.0),
                     ),
-                    Text(
-                      localizeGame(journey.game),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: context.tito.captionStrong,
+                    TitoFontScale(
+                      multiplier: DeviceLayout.homeDetailMultiplier(context),
+                      child: Text(
+                        localizeGame(journey.game),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.tito.captionStrong,
+                      ),
                     ),
+                    const SizedBox(height: 4),
+                    _BadgeGrid(journey: journey, micro: true),
                   ],
                 ),
               ),
-              _BadgeRow(journey: journey, dense: true, micro: true),
             ],
           ),
         ),
@@ -121,7 +126,7 @@ class TrainerCard extends StatelessWidget {
                     style: context.tito.caption,
                   ),
                 SizedBox(height: dense ? 4 : (compact ? 6 : 10)),
-                _BadgeRow(journey: journey, dense: dense, compact: compact),
+                _BadgeGrid(journey: journey, dense: dense, compact: compact),
               ],
             ),
           ),
@@ -201,8 +206,8 @@ class _TrainerAvatar extends StatelessWidget {
   }
 }
 
-class _BadgeRow extends StatelessWidget {
-  const _BadgeRow({
+class _BadgeGrid extends StatelessWidget {
+  const _BadgeGrid({
     required this.journey,
     this.dense = false,
     this.compact = false,
@@ -217,29 +222,66 @@ class _BadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dot = micro
-        ? DeviceLayout.dim(context, 10.0)
+        ? DeviceLayout.dim(context, 9.0)
         : (dense
             ? DeviceLayout.dim(context, 10.0)
             : (compact ? DeviceLayout.dim(context, 12.0) : 14.0));
-    return Row(
-      mainAxisSize: micro ? MainAxisSize.min : MainAxisSize.max,
+    final gap = micro ? 3.0 : (dense ? 3.0 : 4.0);
+    final rowGap = micro ? 2.0 : 3.0;
+    const perRow = 4;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var index = 0; index < journey.maxBadges; index++)
-          Container(
-            width: dot,
-            height: dot,
-            margin: EdgeInsets.only(
-              right: micro ? 3 : (dense ? 3 : (compact ? 4 : 6)),
-            ),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: index < journey.badges
-                  ? TitoColors.softYellow
-                  : TitoColors.skyBlue,
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
+        for (var row = 0; row < (journey.maxBadges / perRow).ceil(); row++) ...[
+          if (row > 0) SizedBox(height: rowGap),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var col = 0; col < perRow; col++) ...[
+                if (col > 0) SizedBox(width: gap),
+                _BadgeDot(
+                  index: row * perRow + col,
+                  journey: journey,
+                  size: dot,
+                ),
+              ],
+            ],
           ),
+        ],
       ],
+    );
+  }
+}
+
+class _BadgeDot extends StatelessWidget {
+  const _BadgeDot({
+    required this.index,
+    required this.journey,
+    required this.size,
+  });
+
+  final int index;
+  final CurrentJourney journey;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (index >= journey.maxBadges) {
+      return SizedBox(width: size, height: size);
+    }
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: index < journey.badges
+            ? TitoColors.softYellow
+            : TitoColors.skyBlue,
+        border: Border.all(color: TitoColors.ink, width: 2),
+      ),
     );
   }
 }
