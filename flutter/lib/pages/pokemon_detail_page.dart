@@ -5,6 +5,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
+import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
@@ -13,6 +14,7 @@ import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_skeleton.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemonId});
@@ -23,35 +25,14 @@ class PokemonDetailPage extends StatefulWidget {
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
 }
 
-class _PokemonDetailPageState extends State<PokemonDetailPage>
-    with SingleTickerProviderStateMixin {
+class _PokemonDetailPageState extends State<PokemonDetailPage> {
   late Future<PokemonDetail> _detailFuture;
-  late final TabController _tabController;
   int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    _tabController.addListener(_syncCurrentTab);
     _detailFuture = dexRepository.getDetail(widget.pokemonId);
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_syncCurrentTab);
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _syncCurrentTab() {
-    if (!mounted) {
-      return;
-    }
-    final next = _tabController.index;
-    if (_currentTabIndex != next) {
-      setState(() => _currentTabIndex = next);
-    }
   }
 
   @override
@@ -59,59 +40,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     return FutureBuilder<PokemonDetail>(
       future: _detailFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return ListView(
-            padding: DeviceLayout.pagePadding(context),
-            children: [
-              _DexBackBar(path: '/dex/${widget.pokemonId}'),
-              const SizedBox(height: 12),
-              const Center(child: CircularProgressIndicator()),
-              const SizedBox(height: 12),
-              Center(
-                child: Text(
-                  AppZh.dexLoadingDetail,
-                  style: context.tito.cardBodyStrong,
-                ),
-              ),
-            ],
-          );
-        }
-
-        if (snapshot.hasError || !snapshot.hasData) {
-          final errorCopy = snapshot.hasError
-              ? splitUserFacingError(snapshot.error!)
-              : (AppZh.dexLoadFailed, AppZh.errorGeneric);
-          return ListView(
-            padding: DeviceLayout.pagePadding(context),
-            children: [
-              _DexBackBar(path: '/dex/${widget.pokemonId}'),
-              const SizedBox(height: 12),
-              StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(errorCopy.$1, style: context.tito.cardBodyEmphasis),
-                    const SizedBox(height: 8),
-                    Text(errorCopy.$2, style: context.tito.errorDetail),
-                    const SizedBox(height: 12),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _detailFuture = dexRepository.getDetail(
-                            widget.pokemonId,
-                          );
-                        });
-                      },
-                      child: const Text(AppZh.dexRetry),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-
-        final detail = snapshot.data!;
+        final loading = snapshot.connectionState != ConnectionState.done;
+        final detail = snapshot.data;
+        final errorCopy = snapshot.hasError
+            ? splitUserFacingError(snapshot.error!)
+            : null;
 
         return Column(
           children: [
@@ -121,29 +54,130 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                 children: [
                   _DexBackBar(path: '/dex/${widget.pokemonId}'),
                   const SizedBox(height: 8),
-                  _CompactPokemonHeader(detail: detail),
+                  if (loading)
+                    const TitoDetailHeaderSkeleton()
+                  else if (detail != null)
+                    _CompactPokemonHeader(detail: detail)
+                  else
+                    const TitoDetailHeaderSkeleton(),
                 ],
               ),
             ),
             Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _IntroTab(detail: detail),
-                  _BasicTab(detail: detail),
-                  _ObtainTab(detail: detail),
-                  _MovesTab(detail: detail),
-                ],
+              child: AnimatedSwitcher(
+                duration: TitoMotion.tabFadeDuration,
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                layoutBuilder: (currentChild, previousChildren) {
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    children: [
+                      ...previousChildren,
+                      if (currentChild != null) currentChild,
+                    ],
+                  );
+                },
+                child: _buildBody(
+                  key: ValueKey(
+                    loading
+                        ? 'loading'
+                        : errorCopy != null
+                            ? 'error'
+                            : 'tab-$_currentTabIndex-${detail!.summary.id}',
+                  ),
+                  loading: loading,
+                  detail: detail,
+                  errorCopy: errorCopy,
+                  tabIndex: _currentTabIndex,
+                ),
               ),
             ),
             _DetailBottomTabs(
               currentIndex: _currentTabIndex,
-              onSelected: (index) => _tabController.animateTo(index),
+              onSelected: (index) {
+                if (_currentTabIndex != index) {
+                  setState(() => _currentTabIndex = index);
+                }
+              },
             ),
           ],
         );
       },
     );
+  }
+
+  Widget _buildBody({
+    required Key key,
+    required bool loading,
+    required PokemonDetail? detail,
+    required (String, String)? errorCopy,
+    required int tabIndex,
+  }) {
+    if (loading) {
+      return ListView(
+        key: key,
+        padding: DeviceLayout.pagePadding(context),
+        children: const [
+          TitoCardSkeleton(height: 140),
+          SizedBox(height: 12),
+          TitoCardSkeleton(height: 88),
+        ],
+      );
+    }
+
+    if (errorCopy != null || detail == null) {
+      final copy = errorCopy ?? (AppZh.dexLoadFailed, AppZh.errorGeneric);
+      return ListView(
+        key: key,
+        padding: DeviceLayout.pagePadding(context),
+        children: [
+          StickerCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(copy.$1, style: context.tito.cardBodyEmphasis),
+                const SizedBox(height: 8),
+                Text(copy.$2, style: context.tito.errorDetail),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _detailFuture = dexRepository.getDetail(widget.pokemonId);
+                    });
+                  },
+                  child: const Text(AppZh.dexRetry),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return KeyedSubtree(
+      key: key,
+      child: _DetailTabBody(detail: detail, tabIndex: tabIndex),
+    );
+  }
+}
+
+class _DetailTabBody extends StatelessWidget {
+  const _DetailTabBody({
+    required this.detail,
+    required this.tabIndex,
+  });
+
+  final PokemonDetail detail;
+  final int tabIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (tabIndex) {
+      0 => _IntroTab(detail: detail),
+      1 => _BasicTab(detail: detail),
+      2 => _ObtainTab(detail: detail),
+      _ => _MovesTab(detail: detail),
+    };
   }
 }
 
@@ -352,7 +386,7 @@ class _ObtainTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (detail.evolutionChain == null) {
       return ListView(
-        padding: const EdgeInsets.all(16),
+        padding: DeviceLayout.pagePadding(context),
         children: [
           StickerCard(
             child: Text(

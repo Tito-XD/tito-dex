@@ -3,17 +3,18 @@ import 'package:flutter/material.dart';
 import '../features/launcher/emulator_launcher.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../l10n/app_zh.dart';
+import '../navigation/tito_page_transition.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import 'tito_skeleton.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
   BuildContext context,
   EmulatorLauncher launcher,
 ) {
   if (!launcher.isLaunchSupported) {
-    return showModalBottomSheet<EmulatorAppChoice>(
+    return showTitoModalBottomSheet<EmulatorAppChoice>(
       context: context,
-      showDragHandle: true,
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24),
         child: Text(
@@ -24,9 +25,8 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
     );
   }
 
-  return showModalBottomSheet<EmulatorAppChoice>(
+  return showTitoModalBottomSheet<EmulatorAppChoice>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
     builder: (context) => _EmulatorPickerSheet(launcher: launcher),
   );
@@ -87,7 +87,9 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
             if (snapshot.connectionState != ConnectionState.done) {
               return SizedBox(
                 height: MediaQuery.sizeOf(context).height * 0.25,
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(
+                  child: TitoSkeletonBox(height: 14, width: 160),
+                ),
               );
             }
 

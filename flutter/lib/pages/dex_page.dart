@@ -13,6 +13,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_skeleton.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({super.key, required this.journey});
@@ -154,7 +155,12 @@ class _DexPageState extends State<DexPage> {
                     ),
                   )
                 else if (visible.isEmpty && _loadingChunk)
-                  const Center(child: CircularProgressIndicator())
+                  TitoDexGridSkeleton(
+                    crossAxisCount: wideGrid ? 3 : 2,
+                    childAspectRatio: DeviceLayout.isCompact(context)
+                        ? 0.72
+                        : 0.78,
+                  )
                 else if (visible.isEmpty)
                   StickerCard(
                     child: Text(
@@ -186,7 +192,13 @@ class _DexPageState extends State<DexPage> {
                   ),
                 if (_loadingChunk && visible.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  const Center(child: CircularProgressIndicator()),
+                  TitoDexGridSkeleton(
+                    crossAxisCount: wideGrid ? 3 : 2,
+                    itemCount: wideGrid ? 3 : 2,
+                    childAspectRatio: DeviceLayout.isCompact(context)
+                        ? 0.72
+                        : 0.78,
+                  ),
                 ],
                 if (!_showJourneyOnly && _loadedThrough < hgssMaxNationalDexId)
                   Padding(

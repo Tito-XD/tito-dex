@@ -13,6 +13,7 @@ import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
+import 'navigation/tito_page_transition.dart';
 import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
@@ -26,6 +27,7 @@ import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
+import 'widgets/tito_page_container.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -70,69 +72,90 @@ class _TitoDexAppState extends State<TitoDexApp> {
           routes: [
             GoRoute(
               path: '/',
-              pageBuilder: (context, state) => NoTransitionPage(
+              pageBuilder: (context, state) => titoHomePage(
                 key: state.pageKey,
-                child: HomePage(
-                  journey: _journey,
-                  onContinue: _onContinue,
-                  onCompanionChanged: _onCompanionChanged,
+                child: TitoPageContainer(
+                  child: HomePage(
+                    journey: _journey,
+                    onContinue: _onContinue,
+                    onCompanionChanged: _onCompanionChanged,
+                  ),
                 ),
               ),
             ),
             GoRoute(
               path: '/team',
-              pageBuilder: (context, state) => NoTransitionPage(
+              pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
-                child: TeamPage(journey: _journey),
+                child: TitoPageContainer(
+                  child: TeamPage(journey: _journey),
+                ),
               ),
             ),
             GoRoute(
               path: '/journey',
-              pageBuilder: (context, state) => NoTransitionPage(
+              pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
-                child: JourneyPage(journey: _journey),
+                child: TitoPageContainer(
+                  child: JourneyPage(journey: _journey),
+                ),
               ),
             ),
             GoRoute(
               path: '/dex',
-              pageBuilder: (context, state) => NoTransitionPage(
+              pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
-                child: DexPage(journey: _journey),
+                child: TitoPageContainer(
+                  child: DexPage(journey: _journey),
+                ),
               ),
               routes: [
                 GoRoute(
                   path: ':id',
-                  builder: (context, state) => PokemonDetailPage(
-                    pokemonId:
-                        int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: PokemonDetailPage(
+                        pokemonId:
+                            int.tryParse(state.pathParameters['id'] ?? '') ??
+                                1,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
             GoRoute(
               path: '/search',
-              pageBuilder: (context, state) => NoTransitionPage(
+              pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
-                child: SearchPage(journey: _journey),
+                child: TitoPageContainer(
+                  child: SearchPage(journey: _journey),
+                ),
               ),
             ),
             GoRoute(
               path: '/settings',
-              builder: (context, state) => SettingsPage(
-                journey: _journey,
-                saveConfig: _saveConfig,
-                emulatorChoice: _emulatorChoice,
-                onImportFixture: _importBundledSave,
-                onResetMock: _resetMock,
-                onSaveJourney: _persist,
-                onPickSaveDirectory: _pickSaveDirectory,
-                onClearSaveDirectory: _clearSaveDirectory,
-                onToggleAutoLoad: _setAutoLoadOnStartup,
-                onSyncNow: () => _syncSaveDirectory(force: true),
-                onExportJourney: _exportJourney,
-                onImportJourney: _importJourneyJson,
-                onPickEmulator: _pickEmulatorFromSettings,
-                onClearEmulator: _clearEmulator,
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: SettingsPage(
+                    journey: _journey,
+                    saveConfig: _saveConfig,
+                    emulatorChoice: _emulatorChoice,
+                    onImportFixture: _importBundledSave,
+                    onResetMock: _resetMock,
+                    onSaveJourney: _persist,
+                    onPickSaveDirectory: _pickSaveDirectory,
+                    onClearSaveDirectory: _clearSaveDirectory,
+                    onToggleAutoLoad: _setAutoLoadOnStartup,
+                    onSyncNow: () => _syncSaveDirectory(force: true),
+                    onExportJourney: _exportJourney,
+                    onImportJourney: _importJourneyJson,
+                    onPickEmulator: _pickEmulatorFromSettings,
+                    onClearEmulator: _clearEmulator,
+                  ),
+                ),
               ),
             ),
           ],
@@ -383,22 +406,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!_ready) {
       return MaterialApp(
         theme: buildTitoTheme(),
-        home: DeviceShell(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  AppZh.appTitle,
-                  style: TitoTypography.style(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.card,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const CircularProgressIndicator(),
-              ],
+        home: const TitoPageContainer(
+          child: DeviceShell(
+            child: Center(
+              child: _BootstrapLoading(),
             ),
           ),
         ),
@@ -417,6 +428,29 @@ class _TitoDexAppState extends State<TitoDexApp> {
         );
       },
       routerConfig: _router,
+    );
+  }
+}
+
+class _BootstrapLoading extends StatelessWidget {
+  const _BootstrapLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          AppZh.appTitle,
+          style: TitoTypography.style(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: TitoColors.card,
+          ),
+        ),
+        const SizedBox(height: 16),
+        const CircularProgressIndicator(color: TitoColors.card),
+      ],
     );
   }
 }
