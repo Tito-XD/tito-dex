@@ -1,0 +1,69 @@
+name: Upload Dex Bundle to R2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - deploy/dex-cdn
+    paths:
+      - dist/dex-v2/upload/**
+      - tools/build_dex_bundle.py
+      - tools/upload_dex_bundle.sh
+      - .github/workflows/upload-dex-bundle.yml
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install -r tools/dex_bundle_requirements.txt
+
+      - name: Build dex bundle v2
+        run: |
+          python3 tools/build_dex_bundle.py \
+            --cdn-base https://dex.tito.cafe \
+            --output dist/dex-v2 \
+            --delay 0.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Upload to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd cloudflare/dex-cdn
+          npm ci
+          npx wrangler r2 object put titodex-dex/bundle-manifest.json \
+            --file=../../dist/dex-v2/upload/bundle-manifest.json \
+            --content-type=application/json
+          V2=../../dist/dex-v2/upload/v2
+          for f in manifest.json summaries.json types.json moves.json bundle.tar.zst; do
+            npx wrangler r2 object put "titodex-dex/v2/$f" --file="$V2/$f"
+          done
+          find "$V2/details" -type f | while read -r file; do
+            rel="${file#"$V2/"}"
+            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=application/json
+          done
+          find "$V2/sprites" -type f | while read -r file; do
+            rel="${file#"$V2/"}"
+            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/jpeg
+          done
+          find "$V2/type_icons" -type f | while read -r file; do
+            rel="${file#"$V2/"}"
+            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/jpeg
+          done
+
+      - name: Verify CDN
+        run: |
+          curl -sf https://dex.tito.cafe/cdn-health
+          curl -sfI https://dex.tito.cafe/bundle-manifest.json | head -5
