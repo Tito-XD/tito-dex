@@ -32,7 +32,12 @@ def upload_with_wrangler(upload_dir: Path, bucket: str) -> None:
         ct = "application/json" if name.endswith(".json") else "application/octet-stream"
         put(f"v2/{name}", v2 / name, ct)
 
-    for folder, default_ct in (("details", "application/json"), ("sprites", "image/png"), ("type_icons", "image/png")):
+    for folder, default_ct in (
+        ("details", "application/json"),
+        ("sprites", "image/png"),
+        ("artwork", "image/png"),
+        ("type_icons", "image/png"),
+    ):
         for file in sorted((v2 / folder).rglob("*")):
             if file.is_file():
                 rel = file.relative_to(v2).as_posix()

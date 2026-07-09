@@ -19,7 +19,7 @@ App 侧将来读取三个环境变量（由你交付给 App 开发者）：
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=2
+TITODEX_DEX_BUNDLE_VERSION=4
 ```
 
 自定义域名配置详解：[`cloudflare/dex-cdn/DOMAIN.md`](../cloudflare/dex-cdn/DOMAIN.md)
@@ -68,9 +68,14 @@ titodex-dex/
     ├── details/
     │   └── 1.json … 493.json
     ├── sprites/
-    │   └── 1.png … 493.png       # PNG，保留透明通道，宽 ≤220px
+    │   └── 1.png … 493.png       # PNG 缩略图，宽 ≤220px
     └── type_icons/
         └── fire.png …            # 18 种属性
+
+CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
+
+    upload/v2/artwork/
+        └── 1.png … 493.png       # PNG 原尺寸 official-artwork
 ```
 
 ### `bundle-manifest.json`（CDN 根目录 / R2 根）
@@ -109,6 +114,7 @@ titodex-dex/
   "nameZh": "火球鼠",
   "types": ["fire"],
   "spriteUrl": "https://dex.<域名>/v2/sprites/155.png",
+  "artworkUrl": "https://dex.<域名>/v2/artwork/155.png",
   "localSpritePath": "sprites/155.png"
 }
 ```
@@ -124,8 +130,8 @@ dex_offline/
 ├── types.json
 ├── moves.json
 ├── details/{id}.json
-├── sprites/{id}.jpg
-└── type_icons/{type}.jpg
+├── sprites/{id}.png
+└── type_icons/{type}.png
 ```
 
 > 仓库内 `tools/build_dex_bundle.py` 生成的 tar 根目录即为上述结构（无 `v2/` 前缀）。
@@ -142,8 +148,8 @@ dex_offline/
 
 | URL | 内容 |
 | --- | --- |
-| `https://dex.<域名>/v2/sprites/{id}.jpg` | 精灵图 |
-| `https://dex.<域名>/v2/type_icons/{type}.jpg` | 属性图标 |
+| `https://dex.<域名>/v2/sprites/{id}.png` | 精灵图 |
+| `https://dex.<域名>/v2/type_icons/{type}.png` | 属性图标 |
 | `https://dex.<域名>/v2/details/{id}.json` | 详情 JSON |
 | `https://dex.<域名>/v2/summaries.json` | 摘要列表 |
 | `https://dex.<域名>/v2/bundle.tar.zst` | 完整离线包 |
@@ -266,7 +272,7 @@ wrangler deploy
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.<你的域名>
 TITODEX_DEX_BUNDLE_URL=https://dex.<你的域名>/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=2
+TITODEX_DEX_BUNDLE_VERSION=4
 ```
 
 ---
