@@ -15,7 +15,8 @@ Key points:
 - **DeviceShell stays** — it is intentional product identity.
 - **Chinese UI** is the default (`lib/l10n/app_zh.dart`, `game_zh.dart`).
 - HGSS parser and save-directory sync are **implemented** — check status table in Stack Decision before assuming gaps.
-- Flutter nav: Home, Team, Journey, Settings — Dex/Search not ported yet.
+- Flutter nav: **Home, Team, Journey, Dex, Search, Settings** — Dex + Search shipped in v0.2.x.
+- **Dex CDN** is live at `https://dex.tito.cafe` (bundle v4, PNG). App downloads via Settings.
 
 ## Communication Defaults
 
@@ -133,7 +134,7 @@ Allowed:
 Do not build yet:
 
 - all-generation parser
-- cloud sync implementation
+- journey cloud sync implementation (dex CDN is done; see `CLOUDFLARE_DEX_CDN.md`)
 - complete encyclopedia
 - OCR
 - complex account system

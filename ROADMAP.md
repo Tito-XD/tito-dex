@@ -7,7 +7,8 @@
 | Tag | Meaning |
 | --- | --- |
 | `v0.1.x` | Phase 2 debug / early APK |
-| `v0.2.x` | **Current pre-release** — RG handheld builds (UI, emulator, offline dex in progress) |
+| `v0.2.x` | **Current pre-release** — RG handheld builds (UI polish, offline dex, CDN v4) |
+| `v0.2.25` | **Latest** — UI overhaul + PNG CDN bundle + artwork viewer ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25)) |
 | `v1.0.0` | Reserved for **feature-complete** public release (stable offline dex, emulator launch, save workflow, polish) |
 
 Early builds were briefly tagged `v1.0.x` by mistake; they map 1:1 to `v0.2.x` on the same commits.
@@ -70,7 +71,7 @@ Capacitor + React mock under `src/` — validated layout and DeviceShell design.
 | HeartGold detection | ❌ |
 | Save dex seen/caught flags from `.sav` | ❌ |
 
-## Phase D — HGSS Dex (PokeAPI) ⚠️ in progress
+## Phase D — HGSS Dex (PokeAPI) ✅ core + CDN
 
 Reference: [破壳萌图鉴 / Pocket Gallery](https://eurekaffeine.github.io/pocket-gallery/zh-hans/) detail layout (简介 / 基本信息 / 获取 / 招式).
 
@@ -86,9 +87,11 @@ Reference: [破壳萌图鉴 / Pocket Gallery](https://eurekaffeine.github.io/poc
 | **Flavor text carousel** (金/银/水晶/心金/魂银; EN fallback) | ✅ |
 | **HGSS move sets** — level-up / TM / egg | ✅ |
 | Gender ratio, egg groups, hatch steps (intro tab) | ✅ |
-| Offline cache — batch download, move dedup, JPEG sprites | ✅ |
+| Offline cache — PokeAPI batch **or CDN bundle v4** | ✅ |
+| **PNG sprites** (transparent; legacy JPEG removed from CDN) | ✅ |
+| **Tap header sprite → fullscreen artwork** (lazy CDN / PokeAPI) | ✅ |
 | Journey party → caught marker on dex cards | ✅ |
-| Re-download offline cache after schema v2 upgrade | ⚠️ manual (Settings) |
+| **Cloudflare CDN** `dex.tito.cafe` — Worker + R2 + bundle upload | ✅ |
 | Radar chart for base stats | ❌ (bars only for now) |
 | Capture locations / encounter tables | ❌ |
 | Abilities on detail page | ❌ |
@@ -134,7 +137,7 @@ HGSS-specific notes, checklists, richer reminders scoped to current game.
 
 ## Phase 4 — Optional Cloud Sync
 
-Cloudflare Worker + D1 + R2 per `docs/CLOUD_SYNC_PROPOSAL.md`. Non-goal for now.
+Cloudflare Worker + D1 + R2 per `docs/CLOUD_SYNC_PROPOSAL.md`. **Dex CDN (R2 only) is live**; journey cloud sync remains non-goal for now.
 
 ## Later Generation Packs
 
@@ -165,4 +168,4 @@ When the journey reaches each era, extend Phase E scopes:
 3. **Abilities** on detail intro/basic tabs
 4. **Capture locations** for HGSS (PokeAPI encounter data or curated subset)
 5. **Custom launcher icon** + splash polish
-6. **Re-download prompt** when offline cache schema version bumps
+6. **`tito.cafe/pokedex` web** — reuse `dex.tito.cafe` CDN URLs + JSON

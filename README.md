@@ -4,6 +4,8 @@ TitoDex is a personal Pokémon journey companion app: **Tito + Pokédex**, but n
 
 It is designed as a warm companion device for Tito's own Pokémon playthroughs, starting with **Pokémon SoulSilver / HeartGold-SoulSilver context** and expanding only when the journey reaches later games.
 
+**Current release:** [v0.2.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25) · App `0.2.25+27` · Dex CDN bundle **v4**
+
 ## Product North Star
 
 **Continue First.**
@@ -35,16 +37,55 @@ TitoDex should feel less like a wiki and more like a small trainer device that s
 
 **Reference:** Capacitor + React + TypeScript + Vite (`src/`, root `android/`)
 
-See [Stack Decision](./docs/STACK_DECISION.md) for why we migrated and what is implemented today.
+See [Stack Decision](./docs/STACK_DECISION.md) for migration history and current feature status.
 
 | Layer | Technology |
 | --- | --- |
-| UI | Flutter widgets, `DeviceShell`, sticker cards, Nunito via `google_fonts` |
-| Routing | `go_router` — Home, Team, Journey, Settings |
+| UI | Flutter widgets, `DeviceShell`, sticker cards, bundled **Nunito** |
+| Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
 | Persistence | `shared_preferences` — journey JSON + save-directory config |
 | Save parsing | Dart `HgssParser` — retail 512 KB `.sav` |
 | Save sync | Directory watch — newest `.sav` by mtime, startup auto-load |
-| Localization | Simplified Chinese UI (`lib/l10n/`) — static maps, no ARB yet |
+| Dex data | PokeAPI + **Cloudflare CDN** offline bundle (`dex.tito.cafe`) |
+| Dex sprites | **PNG** thumbnails + lazy-loaded full **artwork** |
+| Localization | Simplified Chinese UI (`lib/l10n/`) |
+
+## Releases (RG handheld APK)
+
+Pre-built Android APKs live under [`releases/`](releases/) and on [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases).
+
+| File | Use |
+| --- | --- |
+| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate / most devices** (64-bit) |
+| `TitoDex-0.2.25-rg-armv7.apk` | 32-bit ARM handhelds |
+
+Build locally:
+
+```bash
+cd flutter
+flutter pub get
+flutter build apk --release --split-per-abi
+# → build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+## Dex CDN (production)
+
+| Item | Value |
+| --- | --- |
+| Base URL | `https://dex.tito.cafe` |
+| Offline bundle | `https://dex.tito.cafe/v2/bundle.tar.zst` |
+| Bundle version | **4** (PNG sprites, no legacy JPEG) |
+| Worker branch | `deploy/dex-cdn` |
+
+App compile-time defaults (`flutter/lib/features/dex/dex_cdn_config.dart`):
+
+```bash
+TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=4
+```
+
+Setup & upload: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md)
 
 ## Documentation
 
@@ -59,8 +100,9 @@ Start here:
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Stack decision](./docs/STACK_DECISION.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
-- [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
+- [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md) *(not implemented)*
 - [Cloudflare dex CDN setup](./docs/CLOUDFLARE_DEX_CDN.md)
+- [RG polish plan](./docs/RG_POLISH_PLAN.md)
 
 ## Development
 
@@ -69,14 +111,16 @@ Start here:
 ```bash
 cd flutter
 flutter pub get
+flutter test
 flutter run -d chrome      # web preview
 flutter run                # connected Android device / emulator
-flutter test               # parser, map lookup, save scanner, widget smoke
 ```
 
 **First launch:** loads mock journey from `CurrentJourney.mock()` unless a saved journey exists in preferences.
 
 **Import test save:** Settings → 旅程数据 → 导入内置 PKMSS.sav
+
+**Dex offline pack:** Settings → 图鉴离线包 → 从 CDN 下载（`dex.tito.cafe` bundle v4）
 
 **Auto-sync from emulator folder:** Settings → 存档目录 → pick a folder containing `.sav` files → enable 启动时自动加载. On startup, TitoDex picks the newest 524 288-byte `.sav` and refreshes the home screen.
 
@@ -84,6 +128,13 @@ Probe a save file from the command line:
 
 ```bash
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
+```
+
+Build dex CDN bundle (493 Pokémon):
+
+```bash
+pip install -r tools/dex_bundle_requirements.txt
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4
 ```
 
 ### HGSS save fixtures

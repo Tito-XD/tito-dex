@@ -1,6 +1,8 @@
 # TitoDex Dex CDN — Cloudflare Worker
 
-Proxy R2 bucket `titodex-dex` with CORS + cache headers.
+Proxy R2 bucket `titodex-dex` at **`https://dex.tito.cafe`** with CORS + cache headers.
+
+**Worker name:** `tito-dex` · **Bundle version:** 4 (PNG) · **Health:** `/cdn-health`
 
 ## Auto-deploy (recommended)
 

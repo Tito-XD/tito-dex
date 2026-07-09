@@ -72,10 +72,24 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 在域名 zone 下添加 Cache Rules（见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)）：
 
-- `/v2/sprites/*`、`/v2/type_icons/*`、`/v2/details/*` → 1 年 immutable
+- `/v2/sprites/*`、`/v2/artwork/*`、`/v2/type_icons/*`、`/v2/details/*` → 1 年 immutable
 - `/bundle-manifest.json` → 5 分钟
 
 Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
+
+---
+
+## 图鉴包构建与上传
+
+与 Worker 部署 **分开**进行：
+
+```bash
+pip install -r tools/dex_bundle_requirements.txt
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4
+python3 tools/upload_dex_via_worker.py dist/dex-v4/upload   # 需临时 bootstrap 路由，或 wrangler / CI
+```
+
+详见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
 ---
 
@@ -102,8 +116,10 @@ Worker + R2 资源就绪后：
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=2
+TITODEX_DEX_BUNDLE_VERSION=4
 ```
+
+当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
 
 ---
 
