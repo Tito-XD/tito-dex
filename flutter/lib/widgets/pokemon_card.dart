@@ -17,11 +17,13 @@ class PokemonMiniCard extends StatelessWidget {
     required this.summary,
     required this.status,
     this.onTap,
+    this.compact = false,
   });
 
   final PokemonSummary summary;
   final DexEncounterStatus status;
   final VoidCallback? onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +32,24 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
+    final spriteSize = compact ? 52.0 : 64.0;
+    final padding = compact ? 6.0 : 10.0;
 
     return GestureDetector(
       onTap: onTap ?? () => context.push('/dex/${summary.id}'),
       child: StickerCard(
         variant: variant,
-        padding: const EdgeInsets.all(10),
+        padding: EdgeInsets.all(padding),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             TitoSpriteSticker(
               source: summary.displaySpritePath,
-              size: 64,
+              size: spriteSize,
               padding: 2,
             ),
+            SizedBox(height: compact ? 2 : 4),
             Text(
               '#${summary.id.toString().padLeft(3, '0')}',
               style: context.tito.dexNumber,
@@ -57,7 +63,7 @@ class PokemonMiniCard extends StatelessWidget {
               style: context.tito.chip,
             ),
             _PokemonTypeRow(types: summary.types),
-            const Spacer(),
+            SizedBox(height: compact ? 2 : 4),
             Text(
               switch (status) {
                 DexEncounterStatus.caught => AppZh.dexCaught,

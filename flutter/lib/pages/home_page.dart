@@ -76,37 +76,38 @@ class _PortraitHomeLayout extends StatelessWidget {
     final compact = DeviceLayout.isCompact(context);
     final continueHeight = compact ? 228.0 : 292.0;
     final partyHeight = compact ? 126.0 : 154.0;
+    final companionPad = compact ? 72.0 : 84.0;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: compact ? 84 : 96),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TrainerCard(journey: journey, compact: true, dense: true),
-                SizedBox(height: gap),
-                SizedBox(
-                  height: continueHeight,
-                  child: ContinueJourneyCard(
-                    journey: journey,
-                    onContinue: onContinue,
-                    compact: compact,
-                    mergeContinue: true,
-                  ),
-                ),
-                SizedBox(height: gap),
-                SizedBox(
-                  height: partyHeight,
-                  child: PartyStrip(party: journey.party, compact: compact),
-                ),
-                SizedBox(height: gap),
-                _QuickActionsGrid(dense: compact, polaroid: false),
-              ],
+        final column = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TrainerCard(journey: journey, compact: true, dense: true),
+            SizedBox(height: gap),
+            SizedBox(
+              height: continueHeight,
+              child: ContinueJourneyCard(
+                journey: journey,
+                onContinue: onContinue,
+                compact: compact,
+                mergeContinue: true,
+              ),
             ),
-          ),
+            SizedBox(height: gap),
+            SizedBox(
+              height: partyHeight,
+              child: PartyStrip(party: journey.party, compact: compact),
+            ),
+            SizedBox(height: gap),
+            _QuickActionsGrid(dense: compact, polaroid: false),
+            SizedBox(height: companionPad),
+          ],
+        );
+
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: column,
         );
       },
     );
@@ -124,12 +125,10 @@ class _SquareHomeLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
-    final landscape = DeviceLayout.isLandscape(context);
 
     return Column(
       children: [
         Expanded(
-          flex: landscape ? 16 : 15,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -166,65 +165,39 @@ class _SquareHomeLayout extends StatelessWidget {
           ),
         ),
         SizedBox(height: gap),
-        Expanded(
-          flex: landscape ? 6 : 8,
-          child: _QuickActionsBar(landscape: landscape),
+        SizedBox(
+          height: DeviceLayout.squareQuickTileHeight(context),
+          child: const _QuickActionsBar(),
         ),
       ],
     );
   }
 }
 
-/// Bottom quick bar — one row on 4:3 landscape, 2×2 on 1:1 / 3:4.
+/// Bottom quick bar — always one row on handheld dashboard.
 class _QuickActionsBar extends StatelessWidget {
-  const _QuickActionsBar({required this.landscape});
-
-  final bool landscape;
+  const _QuickActionsBar();
 
   @override
   Widget build(BuildContext context) {
     final actions = _quickActions();
     final gap = DeviceLayout.sectionSpacing(context);
 
-    if (landscape) {
-      return Row(
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) SizedBox(width: gap),
-            Expanded(
-              child: TitoQuickTile(
-                label: actions[index].label,
-                icon: actions[index].icon,
-                onTap: () => _openRoute(context, actions[index].route),
-                compact: true,
-                dense: true,
-              ),
+    return Row(
+      children: [
+        for (var index = 0; index < actions.length; index++) ...[
+          if (index > 0) SizedBox(width: gap),
+          Expanded(
+            child: TitoQuickTile(
+              label: actions[index].label,
+              icon: actions[index].icon,
+              onTap: () => _openRoute(context, actions[index].route),
+              compact: true,
+              dense: true,
             ),
-          ],
+          ),
         ],
-      );
-    }
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: gap,
-        mainAxisSpacing: gap,
-        childAspectRatio: 1.25,
-      ),
-      itemCount: actions.length,
-      itemBuilder: (context, index) {
-        final action = actions[index];
-        return TitoPolaroidQuickTile(
-          label: action.label,
-          icon: action.icon,
-          onTap: () => _openRoute(context, action.route),
-          tone: action.tone,
-          compact: true,
-          tiltDegrees: const [-2.5, 2.0, 1.5, -1.75][index],
-        );
-      },
+      ],
     );
   }
 }

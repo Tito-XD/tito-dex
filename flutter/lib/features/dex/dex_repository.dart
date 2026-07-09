@@ -1,3 +1,5 @@
+import '../companion/companion_art.dart';
+import '../parser/hgss_format.dart';
 import '../../models/journey.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
@@ -165,12 +167,32 @@ class DexRepository {
 
   Future<Set<int>> journeyCaughtIds(CurrentJourney journey) async {
     final ids = <int>{};
+
+    for (final member in journey.party) {
+      final id = member.speciesId ??
+          speciesIdForName(member.species) ??
+          knownSpeciesIdForLabel(member.species);
+      if (id != null) {
+        ids.add(id);
+      }
+    }
+
+    final companionId = speciesIdForName(journey.companion) ??
+        knownSpeciesIdForLabel(journey.companion);
+    if (companionId != null) {
+      ids.add(companionId);
+    }
+
     final names = <String>{
       ...journey.party.map((member) => member.species),
       journey.companion,
     };
 
     for (final name in names) {
+      if (speciesIdForName(name) != null ||
+          knownSpeciesIdForLabel(name) != null) {
+        continue;
+      }
       final cached = _nameToIdCache[name.toLowerCase()];
       if (cached != null) {
         ids.add(cached);
@@ -183,6 +205,14 @@ class DexRepository {
       }
     }
     return ids;
+  }
+
+  Future<List<PokemonSummary>> getSummariesForIds(Iterable<int> ids) async {
+    final unique = ids.toSet().toList()..sort();
+    if (unique.isEmpty) {
+      return const [];
+    }
+    return Future.wait(unique.map(getSummary));
   }
 
   DexEncounterStatus statusFor(int id, Set<int> caughtIds) {

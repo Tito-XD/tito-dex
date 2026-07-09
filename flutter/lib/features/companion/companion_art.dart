@@ -1,3 +1,6 @@
+import '../../l10n/game_zh.dart';
+import '../parser/hgss_format.dart';
+
 /// HGSS journey companion artwork — bundled front sprites + tap cycle.
 const hgssDefaultCompanion = 'Cyndaquil';
 
@@ -39,3 +42,30 @@ String companionSpriteUrl(String species) {
 /// Prefer bundled asset, then remote URL.
 String companionSpriteSource(String species) =>
     companionAssetPath(species) ?? companionSpriteUrl(species);
+
+/// Resolve a party / companion label (EN or ZH) to a national dex id.
+int? speciesIdForName(String name) {
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) {
+    return null;
+  }
+
+  for (final entry in companionSpeciesIds.entries) {
+    if (entry.key.toLowerCase() == trimmed.toLowerCase()) {
+      return entry.value;
+    }
+    if (localizeSpecies(entry.key) == trimmed) {
+      return entry.value;
+    }
+  }
+
+  for (final entry in speciesNamesZh.entries) {
+    if (entry.value == trimmed ||
+        entry.key.toLowerCase() == trimmed.toLowerCase()) {
+      return companionSpeciesIds[entry.key] ??
+          knownSpeciesIdForLabel(entry.key);
+    }
+  }
+
+  return knownSpeciesIdForLabel(trimmed);
+}
