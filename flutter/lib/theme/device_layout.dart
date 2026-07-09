@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'tito_colors.dart';
+import 'tito_font_scale.dart';
+
 /// Layout helpers for real Android/Linux handhelds vs web preview frame.
 abstract final class DeviceLayout {
   static bool get isNativeTarget =>
@@ -164,34 +167,76 @@ abstract final class DeviceLayout {
     return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.12);
   }
 
+  static double fontMultiplier(BuildContext context) {
+    final scope = TitoFontScale.maybeOf(context);
+    if (scope != null) {
+      return scope.multiplier;
+    }
+    if (isNativeTarget || useSquareDashboard(context)) {
+      return 2.0;
+    }
+    return 1.0;
+  }
+
+  static double radius(BuildContext context, double base) {
+    if (isNativeTarget || useSquareDashboard(context)) {
+      return base * 0.5;
+    }
+    return base;
+  }
+
+  static double rSm(BuildContext context) => radius(context, TitoRadii.sm);
+  static double rMd(BuildContext context) => radius(context, TitoRadii.md);
+  static double rLg(BuildContext context) => radius(context, TitoRadii.lg);
+
   static double headerIconSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 36;
+      return 72;
     }
     if (isCompact(context)) {
-      return 34;
+      return 68;
     }
-    return 40;
+    return 80;
   }
 
   static double headerTitleSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 22;
+      return 44;
     }
     if (isCompact(context)) {
-      return 20;
+      return 40;
     }
-    return 26;
+    return 52;
+  }
+
+  static double headerBarHeight(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 80;
+    }
+    if (isCompact(context)) {
+      return 72;
+    }
+    return 80;
   }
 
   static double dexBackControlSize(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return 16;
+      return 56;
     }
     if (isCompact(context)) {
-      return 15;
+      return 48;
     }
-    return 16;
+    return 40;
+  }
+
+  static double dexBackIconSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 56;
+    }
+    if (isCompact(context)) {
+      return 48;
+    }
+    return 44;
   }
 
   static int dexGridColumns(BuildContext context) {

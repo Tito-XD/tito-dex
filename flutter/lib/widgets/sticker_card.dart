@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/tito_colors.dart';
+import '../theme/device_layout.dart';
+import '../theme/tito_colors.dart';
 
 enum StickerVariant { cream, deep, sky, mint, softYellow }
 
@@ -18,6 +19,7 @@ class StickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = DeviceLayout.rLg(context);
     final colors = switch (variant) {
       StickerVariant.cream => (TitoColors.card, TitoColors.ink),
       StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
@@ -29,7 +31,7 @@ class StickerCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.$1,
-        borderRadius: BorderRadius.circular(TitoRadii.lg),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: TitoColors.ink, width: 3),
         boxShadow: const [
           BoxShadow(

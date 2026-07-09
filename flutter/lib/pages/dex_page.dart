@@ -351,8 +351,8 @@ class _DexTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final square = DeviceLayout.useSquareDashboard(context);
     final controlSize = DeviceLayout.dexBackControlSize(context);
-    final iconSize = square ? 22.0 : 20.0;
-    final barHeight = square ? 40.0 : 36.0;
+    final iconSize = DeviceLayout.dexBackIconSize(context);
+    final barHeight = DeviceLayout.headerBarHeight(context);
 
     return SizedBox(
       height: barHeight,
@@ -360,16 +360,24 @@ class _DexTopBar extends StatelessWidget {
         children: [
           HandheldFocusDecorator(
             onActivate: () => TitoBackNavigation.navigateBack(context, '/dex'),
-            child: TextButton(
+            child: TextButton.icon(
               onPressed: () => TitoBackNavigation.navigateBack(context, '/dex'),
               style: TextButton.styleFrom(
                 foregroundColor: TitoColors.card,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: square ? 10 : 8,
+                  vertical: square ? 8 : 6,
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: Text(
-                '← 图鉴',
+              icon: Icon(
+                Icons.arrow_back_rounded,
+                size: iconSize,
+                color: TitoColors.card,
+              ),
+              label: Text(
+                AppZh.navDex,
                 style: context.tito.cardBodyStrong.copyWith(
                   color: TitoColors.card,
                   fontSize: controlSize,

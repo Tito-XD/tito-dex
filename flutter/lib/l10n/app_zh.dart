@@ -200,5 +200,10 @@ abstract final class AppZh {
   static const snackEmulatorCleared = '已清除模拟器选择';
   static const snackEmulatorLaunchFailed = '无法启动该应用';
 
+  static const snackAvatarConfirmAgain = '再次点击修改头像';
+  static const snackAvatarUpdated = '头像已更新';
+  static const avatarPickGallery = '从相册选择';
+  static String snackGameSwitched(String gameTitle) => '已切换至 $gameTitle';
+
   static String placeholderScreen(String title) => '$title 页面开发中';
 }

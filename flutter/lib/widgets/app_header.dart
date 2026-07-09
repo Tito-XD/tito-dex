@@ -14,56 +14,62 @@ class AppHeader extends StatelessWidget {
     super.key,
     this.gameBadge = 'HGSS',
     this.showSettings = true,
+    this.onGameBadgeTap,
   });
 
   final String gameBadge;
   final bool showSettings;
+  final VoidCallback? onGameBadgeTap;
 
   @override
   Widget build(BuildContext context) {
     final compact = DeviceLayout.isCompact(context);
     final square = DeviceLayout.useSquareDashboard(context);
+    final barHeight = DeviceLayout.headerBarHeight(context);
 
     return Padding(
       padding: EdgeInsets.only(bottom: square ? 4 : (compact ? 8 : 16)),
       child: SizedBox(
-        height: square ? 40 : null,
+        height: barHeight,
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                AppZh.appTitle,
-                style: context.tito.pageTitleOnGradient.copyWith(
-                  fontSize: DeviceLayout.headerTitleSize(context),
-                  letterSpacing: -0.5,
-                  shadows: const [
-                    Shadow(
-                      color: Color(0x4018283B),
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  AppZh.appTitle,
+                  style: context.tito.pageTitleOnGradient.copyWith(
+                    fontSize: DeviceLayout.headerTitleSize(context),
+                    letterSpacing: -0.5,
+                    shadows: const [
+                      Shadow(
+                        color: Color(0x4018283B),
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          if (!square)
             TitoBadgePill(
               label: gameBadge,
               tone: TitoBadgeTone.yellow,
               compact: compact,
+              onTap: onGameBadgeTap,
             ),
-          if (DeviceLayout.isNativeTarget) ...[
-            SizedBox(width: square ? 6 : 8),
-            HandheldStatusIcons(compact: square || compact),
-          ],
-          if (showSettings) ...[
-            SizedBox(width: square ? 4 : 8),
-            _HeaderIconButton(
-              icon: Icons.settings_rounded,
-              onTap: () => context.push('/settings'),
-              label: AppZh.navSettings,
-              compact: compact,
-            ),
-          ],
+            if (DeviceLayout.isNativeTarget) ...[
+              SizedBox(width: square ? 8 : 10),
+              HandheldStatusIcons(compact: square || compact),
+            ],
+            if (showSettings) ...[
+              SizedBox(width: square ? 6 : 8),
+              _HeaderIconButton(
+                icon: Icons.settings_rounded,
+                onTap: () => context.push('/settings'),
+                label: AppZh.navSettings,
+                compact: compact,
+              ),
+            ],
           ],
         ),
       ),
@@ -86,9 +92,8 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final square = DeviceLayout.useSquareDashboard(context);
     final size = DeviceLayout.headerIconSize(context);
-    final iconSize = square ? 22.0 : (compact ? 18.0 : 22.0);
+    final iconSize = size * 0.55;
 
     return HandheldFocusDecorator(
       onActivate: onTap,

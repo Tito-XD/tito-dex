@@ -383,24 +383,30 @@ class TitoBadgePill extends StatelessWidget {
     required this.label,
     this.tone = TitoBadgeTone.yellow,
     this.compact = false,
+    this.onTap,
   });
 
   final String label;
   final TitoBadgeTone tone;
   final bool compact;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
     final (bg, fg) = switch (tone) {
       TitoBadgeTone.yellow => (TitoColors.softYellow, TitoColors.ink),
       TitoBadgeTone.sky => (TitoColors.skyBlue, TitoColors.ink),
       TitoBadgeTone.coral => (TitoColors.coral, TitoColors.ink),
     };
 
-    return Container(
+    final fontSize = (square ? 20.0 : (compact ? 16.0 : 18.0)) *
+        DeviceLayout.fontMultiplier(context);
+
+    final pill = Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 14,
-        vertical: compact ? 4 : 6,
+        horizontal: square ? 14 : (compact ? 10 : 14),
+        vertical: square ? 8 : (compact ? 6 : 8),
       ),
       decoration: BoxDecoration(
         color: bg,
@@ -415,7 +421,24 @@ class TitoBadgePill extends StatelessWidget {
         style: TitoTypography.style(
           color: fg,
           fontWeight: FontWeight.w800,
-          fontSize: compact ? 10 : 12,
+          fontSize: fontSize,
+        ),
+      ),
+    );
+
+    if (onTap == null) {
+      return pill;
+    }
+
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: pill,
         ),
       ),
     );

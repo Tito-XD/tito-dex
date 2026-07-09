@@ -48,10 +48,11 @@ abstract final class TitoTypography {
   }
 
   static double _sz(BuildContext context, double phone, double handheld) {
-    if (DeviceLayout.isNativeTarget || DeviceLayout.useSquareDashboard(context)) {
-      return handheld;
-    }
-    return phone;
+    final base = DeviceLayout.isNativeTarget ||
+            DeviceLayout.useSquareDashboard(context)
+        ? handheld
+        : phone;
+    return base * DeviceLayout.fontMultiplier(context);
   }
 
   /// Large titles on the blue gradient shell (Dex, Search, etc.).

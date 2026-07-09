@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/companion/companion_art.dart';
+import 'features/game/game_catalog.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -11,7 +12,9 @@ import 'features/launcher/emulator_launcher_repository.dart';
 import 'features/parser/hgss_parser.dart';
 import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
+import 'features/trainer/trainer_avatar_service.dart';
 import 'l10n/app_zh.dart';
+import 'l10n/game_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
@@ -49,6 +52,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
   EmulatorAppChoice? _emulatorChoice;
   bool _ready = false;
+  bool _avatarChangeArmed = false;
 
   @override
   void initState() {
@@ -94,6 +98,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: HomePage(
                     journey: _journey,
                     onContinue: _onContinue,
+                    gameBadge: badgeForGame(_journey.game),
+                    onGameBadgeTap: _onGameBadgeTap,
+                    onAvatarTap: _onTrainerAvatarTap,
                   ),
                 ),
               ),
@@ -370,6 +377,78 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   Future<void> _onCompanionChanged(String companion) async {
     await _persist(_journey.copyWith(companion: companion));
+  }
+
+  Future<void> _onGameBadgeTap() async {
+    final nextGame = cycleGameKey(_journey.game);
+    await _persist(_journey.copyWith(game: nextGame));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppZh.snackGameSwitched(localizeGame(nextGame)))),
+    );
+  }
+
+  Future<void> _onTrainerAvatarTap() async {
+    if (_journey.trainerAvatarCustomized) {
+      if (!_avatarChangeArmed) {
+        setState(() => _avatarChangeArmed = true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackAvatarConfirmAgain)),
+        );
+        return;
+      }
+      setState(() => _avatarChangeArmed = false);
+      await _pickAndSaveAvatar();
+      return;
+    }
+
+    await _showAvatarPickerMenu();
+  }
+
+  Future<void> _showAvatarPickerMenu() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded),
+                title: const Text(AppZh.avatarPickGallery),
+                onTap: () => Navigator.pop(context, 'gallery'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice == 'gallery' && mounted) {
+      await _pickAndSaveAvatar();
+    }
+  }
+
+  Future<void> _pickAndSaveAvatar() async {
+    final path = await TrainerAvatarService.pickAndCropSquare();
+    if (path == null || !mounted) {
+      return;
+    }
+    await _persist(
+      _journey.copyWith(
+        trainerAvatarPath: path,
+        trainerAvatarCustomized: true,
+      ),
+    );
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackAvatarUpdated)),
+    );
   }
 
   Future<void> _onContinue() async {

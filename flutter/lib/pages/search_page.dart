@@ -13,6 +13,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
+import '../theme/tito_font_scale.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
@@ -147,9 +148,11 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final query = _controller.text.trim();
 
-    return SecondaryPageScaffold(
-      title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
-      children: [
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: SecondaryPageScaffold(
+        title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
+        children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -268,6 +271,7 @@ class _SearchPageState extends State<SearchPage> {
             },
           ),
       ],
+      ),
     );
   }
 }
