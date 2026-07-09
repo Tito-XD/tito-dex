@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../widgets/app_header.dart';
+import '../theme/tito_font_scale.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/journey_timeline.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 
 class JourneyPage extends StatelessWidget {
@@ -15,29 +18,46 @@ class JourneyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      children: [
-        const AppHeader(showSettings: true),
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: SecondaryPageScaffold(
+        title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
+        children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppZh.navJourney,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: TitoColors.card,
-                    ),
+                AppZh.settingsLocation,
+                style: SecondaryTypography.onGradient.small12.copyWith(
+                  color: TitoColors.skyBlue,
+                  letterSpacing: 0.8,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 localizeLocation(journey.location),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: TitoColors.cream,
-                      fontWeight: FontWeight.w800,
+                style: SecondaryTypography.onGradient.h15,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _SummaryMeta(
+                      label: AppZh.settingsCurrentGame,
+                      value: localizeGame(journey.game),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _SummaryMeta(
+                      label: AppZh.settingsBadges,
+                      value: '${journey.badges}/${journey.maxBadges}',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -50,15 +70,15 @@ class JourneyPage extends StatelessWidget {
         const SizedBox(height: 14),
         StickerCard(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(AppZh.trainerCard, style: SecondaryTypography.onCard.h15),
+              const SizedBox(height: 10),
               _StatRow(
-                label: AppZh.settingsLocation,
-                value: localizeLocation(journey.location),
+                label: AppZh.settingsDisplayName,
+                value: journey.trainerName,
               ),
-              _StatRow(
-                label: AppZh.settingsPlayTime,
-                value: journey.playTime,
-              ),
+              _StatRow(label: AppZh.settingsPlayTime, value: journey.playTime),
               _StatRow(
                 label: AppZh.settingsBadges,
                 value: '${journey.badges}/${journey.maxBadges}',
@@ -71,6 +91,7 @@ class JourneyPage extends StatelessWidget {
           ),
         ),
       ],
+      ),
     );
   }
 }
@@ -88,15 +109,55 @@ class _StatRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: context.tito.cardLabel),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontWeight: FontWeight.w800),
+              style: context.tito.cardValue,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SummaryMeta extends StatelessWidget {
+  const _SummaryMeta({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: TitoColors.deepBlue.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        border: Border.all(color: TitoColors.skyBlue, width: 1.2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: SecondaryTypography.onGradient.small12.copyWith(
+                color: TitoColors.skyBlue,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: SecondaryTypography.onGradient.meta14,
+            ),
+          ],
+        ),
       ),
     );
   }

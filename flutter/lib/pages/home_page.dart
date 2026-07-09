@@ -3,181 +3,334 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
-import '../theme/tito_buttons.dart';
 import '../theme/device_layout.dart';
+import '../theme/tito_buttons.dart';
+import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
-import '../widgets/companion_sticker.dart';
-import '../widgets/continue_journey_card.dart';
-import '../widgets/journey_timeline.dart';
-import '../widgets/launcher_widgets.dart';
-import '../widgets/party_strip.dart';
 import '../widgets/trainer_card.dart';
+import '../widgets/continue_journey_card.dart';
+import '../widgets/party_strip.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
     required this.journey,
     required this.onContinue,
+    this.gameBadge = 'HGSS',
+    this.onGameBadgeTap,
+    this.onAvatarTap,
   });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
+  final String gameBadge;
+  final VoidCallback? onGameBadgeTap;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
+    return _buildBody(context);
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final padding = DeviceLayout.pagePadding(context);
+    final header = AppHeader(
+      gameBadge: gameBadge,
+      onGameBadgeTap: onGameBadgeTap,
+    );
+
+    if (DeviceLayout.useSquareDashboard(context)) {
+      return Padding(
+        padding: padding,
+        child: Column(
+          children: [
+            header,
+            Expanded(
+              child: _SquareHomeLayout(
+                journey: journey,
+                onContinue: onContinue,
+                onAvatarTap: onAvatarTap,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: padding,
+      child: Column(
+        children: [
+          header,
+          Expanded(
+            child: _PortraitHomeLayout(
+              journey: journey,
+              onContinue: onContinue,
+              onAvatarTap: onAvatarTap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Portrait H4 layout:
+/// trainer card -> continue card -> horizontal party strip -> 2x2 quick grid.
+class _PortraitHomeLayout extends StatelessWidget {
+  const _PortraitHomeLayout({
+    required this.journey,
+    required this.onContinue,
+    this.onAvatarTap,
+  });
+
+  final CurrentJourney journey;
+  final VoidCallback onContinue;
+  final VoidCallback? onAvatarTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = DeviceLayout.sectionSpacing(context);
+    final compact = DeviceLayout.isCompact(context);
+    final continueHeight = compact ? 228.0 : 292.0;
+    final partyHeight = compact ? 126.0 : 154.0;
+    final companionPad = compact ? 72.0 : 84.0;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 520 &&
-            constraints.maxHeight >= 500 &&
-            !DeviceLayout.isCompact(context);
-
-        return ListView(
-          padding: DeviceLayout.pagePadding(context),
+        final column = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const AppHeader(),
-            if (wide)
-              _WideHomeLayout(
+            TrainerCard(
+              journey: journey,
+              compact: true,
+              dense: true,
+              onAvatarTap: onAvatarTap,
+            ),
+            SizedBox(height: gap),
+            SizedBox(
+              height: continueHeight,
+              child: ContinueJourneyCard(
                 journey: journey,
                 onContinue: onContinue,
-              )
-            else
-              _NarrowHomeLayout(
-                journey: journey,
-                onContinue: onContinue,
+                compact: compact,
+                mergeContinue: true,
               ),
+            ),
+            SizedBox(height: gap),
+            SizedBox(
+              height: partyHeight,
+              child: PartyStrip(party: journey.party, compact: compact),
+            ),
+            SizedBox(height: gap),
+            _QuickActionsGrid(dense: compact, polaroid: false),
+            SizedBox(height: companionPad),
           ],
+        );
+
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: column,
         );
       },
     );
   }
 }
 
-class _NarrowHomeLayout extends StatelessWidget {
-  const _NarrowHomeLayout({
+/// Square / 4:3 / 3:4 handheld layout (H5):
+/// [ Trainer + Continue | Party ] + square quick actions.
+class _SquareHomeLayout extends StatelessWidget {
+  const _SquareHomeLayout({
     required this.journey,
     required this.onContinue,
+    this.onAvatarTap,
   });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
+    final gap = DeviceLayout.sectionSpacing(context);
+    final quickSize = DeviceLayout.squareQuickTileHeight(context);
+
     return Column(
       children: [
-        TrainerCard(journey: journey),
-        const SizedBox(height: 14),
-        ContinueJourneyCard(journey: journey, onContinue: onContinue),
-        const SizedBox(height: 14),
-        PartyStrip(party: journey.party),
-        const SizedBox(height: 14),
-        _QuickActions(),
-        const SizedBox(height: 14),
-        JourneyTimeline(
-          entries: journey.timeline,
-          nextReminder: journey.nextReminder,
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TrainerCard(
+                      journey: journey,
+                      compact: true,
+                      dense: true,
+                      micro: true,
+                      onAvatarTap: onAvatarTap,
+                    ),
+                    SizedBox(height: gap),
+                    Expanded(
+                      child: ContinueJourneyCard(
+                        journey: journey,
+                        onContinue: onContinue,
+                        compact: true,
+                        dense: true,
+                        mergeContinue: true,
+                        showIllustration: false,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: gap),
+              Expanded(
+                flex: 1,
+                child: PartyStrip(
+                  party: journey.party,
+                  compact: true,
+                  square: true,
+                  listMode: true,
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 14),
-        CompanionSticker(
-          name: journey.companion,
-          message: AppZh.companionMessage(journey.location),
+        SizedBox(height: gap),
+        SizedBox(
+          height: quickSize,
+          child: const _QuickActionsBar(),
         ),
-        const SizedBox(height: 14),
-        LauncherWidgets(journey: journey),
       ],
     );
   }
 }
 
-class _WideHomeLayout extends StatelessWidget {
-  const _WideHomeLayout({
-    required this.journey,
-    required this.onContinue,
-  });
-
-  final CurrentJourney journey;
-  final VoidCallback onContinue;
+/// Bottom quick bar — square tiles in one row on handheld dashboard.
+class _QuickActionsBar extends StatelessWidget {
+  const _QuickActionsBar();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    final actions = _quickActions();
+    final gap = DeviceLayout.sectionSpacing(context);
+
+    return TitoFontScale(
+      multiplier: 2.0,
+      child: Row(
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) SizedBox(width: gap),
             Expanded(
-              child: Column(
-                children: [
-                  TrainerCard(journey: journey),
-                  const SizedBox(height: 14),
-                  ContinueJourneyCard(
-                    journey: journey,
-                    onContinue: onContinue,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                children: [
-                  PartyStrip(party: journey.party),
-                  const SizedBox(height: 14),
-                  JourneyTimeline(
-                    entries: journey.timeline,
-                    nextReminder: journey.nextReminder,
-                  ),
-                  const SizedBox(height: 14),
-                  CompanionSticker(
-                    name: journey.companion,
-                    message: AppZh.companionMessage(journey.location),
-                  ),
-                ],
+              child: TitoQuickTile(
+                label: actions[index].label,
+                icon: actions[index].icon,
+                onTap: () => _openRoute(context, actions[index].route),
+                compact: true,
+                dense: true,
+                square: true,
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 14),
-        _QuickActions(),
-        const SizedBox(height: 14),
-        LauncherWidgets(journey: journey),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _QuickActions extends StatelessWidget {
+void _openRoute(BuildContext context, String route) {
+  context.push(route);
+}
+
+class _QuickActionsGrid extends StatelessWidget {
+  const _QuickActionsGrid({required this.dense, required this.polaroid});
+
+  final bool dense;
+  final bool polaroid;
+
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
+    final actions = _quickActions();
+    final rotations = const [-2.5, 2.0, 1.5, -1.75];
+
+    return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1.35,
-      children: [
-        TitoQuickTile(
-          label: AppZh.navTeam,
-          icon: Icons.groups_rounded,
-          onTap: () => context.go('/team'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navJourney,
-          icon: Icons.map_rounded,
-          onTap: () => context.go('/journey'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navDex,
-          icon: Icons.grid_view_rounded,
-          onTap: () => context.go('/dex'),
-        ),
-        TitoQuickTile(
-          label: AppZh.navSearch,
-          icon: Icons.search_rounded,
-          onTap: () => context.go('/search'),
-        ),
-      ],
+      shrinkWrap: true,
+      itemCount: actions.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: dense ? 6 : 10,
+        mainAxisSpacing: dense ? 6 : 10,
+        childAspectRatio: polaroid ? 1.2 : 1.85,
+      ),
+      itemBuilder: (context, index) {
+        final action = actions[index];
+        if (polaroid) {
+          return TitoPolaroidQuickTile(
+            label: action.label,
+            icon: action.icon,
+            onTap: () => _openRoute(context, action.route),
+            tone: action.tone,
+            compact: dense,
+            tiltDegrees: rotations[index],
+          );
+        }
+
+        return TitoQuickTile(
+          label: action.label,
+          icon: action.icon,
+          onTap: () => _openRoute(context, action.route),
+          compact: true,
+          dense: dense,
+        );
+      },
     );
   }
+}
+
+List<_QuickAction> _quickActions() {
+  return [
+    _QuickAction(
+      label: AppZh.navTeam,
+      icon: Icons.groups_rounded,
+      route: '/team',
+      tone: TitoPolaroidTone.blue,
+    ),
+    _QuickAction(
+      label: AppZh.navJourney,
+      icon: Icons.map_rounded,
+      route: '/journey',
+      tone: TitoPolaroidTone.yellow,
+    ),
+    _QuickAction(
+      label: AppZh.navDex,
+      icon: Icons.grid_view_rounded,
+      route: '/dex',
+      tone: TitoPolaroidTone.coral,
+    ),
+    _QuickAction(
+      label: AppZh.navSearch,
+      icon: Icons.search_rounded,
+      route: '/search',
+      tone: TitoPolaroidTone.mint,
+    ),
+  ];
+}
+
+class _QuickAction {
+  const _QuickAction({
+    required this.label,
+    required this.icon,
+    required this.route,
+    required this.tone,
+  });
+
+  final String label;
+  final IconData icon;
+  final String route;
+  final TitoPolaroidTone tone;
 }

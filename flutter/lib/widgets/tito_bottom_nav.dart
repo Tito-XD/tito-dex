@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 
 class TitoBottomNav extends StatelessWidget {
   const TitoBottomNav({super.key, required this.location});
@@ -28,14 +29,21 @@ class TitoBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = DeviceLayout.isCompact(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
     final hPad = compact ? 6.0 : 12.0;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, compact ? 4 : 8),
+      padding: EdgeInsets.fromLTRB(
+        hPad,
+        compact ? 2 : 0,
+        hPad,
+        (compact ? 4 : 8) + bottomInset,
+      ),
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: compact ? 4 : 6,
-          vertical: compact ? 4 : 8,
+          vertical: compact ? 3 : 8,
         ),
         decoration: BoxDecoration(
           color: TitoColors.deepBlue,
@@ -57,6 +65,7 @@ class TitoBottomNav extends StatelessWidget {
                         spec: spec,
                         selected: _isActive(spec.path),
                         compact: compact,
+                        square: square,
                         onTap: () => context.go(spec.path),
                       )
                     : _NavItem(
@@ -101,18 +110,18 @@ class _NavItem extends StatelessWidget {
     final fg = selected ? TitoColors.deepBlue : TitoColors.skyBlue;
     final bg = selected ? TitoColors.cream : Colors.transparent;
     final iconSize = compact ? 18.0 : 22.0;
-    final fontSize = compact ? 9.0 : 10.0;
 
     return Material(
       color: bg,
       borderRadius: BorderRadius.circular(TitoRadii.sm),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        splashColor: TitoColors.skyBlue.withValues(alpha: 0.2),
-        child: Padding(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(TitoRadii.sm),
+          splashColor: TitoColors.skyBlue.withValues(alpha: 0.28),
+          highlightColor: TitoColors.skyBlue.withValues(alpha: 0.14),
+          child: Padding(
           padding: EdgeInsets.symmetric(
-            vertical: compact ? 4 : 8,
+            vertical: compact ? 3 : 8,
             horizontal: 2,
           ),
           child: Column(
@@ -124,11 +133,7 @@ class _NavItem extends StatelessWidget {
                 spec.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: fg,
-                  fontSize: fontSize,
-                  fontWeight: selected ? FontWeight.w800 : FontWeight.w700,
-                ),
+                style: TitoTypography.navLabel(context, selected: selected),
               ),
             ],
           ),
@@ -143,19 +148,21 @@ class _CenterNavItem extends StatelessWidget {
     required this.spec,
     required this.selected,
     required this.compact,
+    required this.square,
     required this.onTap,
   });
 
   final _NavSpec spec;
   final bool selected;
   final bool compact;
+  final bool square;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final size = compact ? 46.0 : 56.0;
-    final lift = compact ? -8.0 : -14.0;
-    final iconSize = compact ? 22.0 : 26.0;
+    final size = compact ? (square ? 40.0 : 44.0) : 56.0;
+    final lift = compact ? (square ? -4.0 : -6.0) : -14.0;
+    final iconSize = compact ? 20.0 : 26.0;
 
     return Transform.translate(
       offset: Offset(0, lift),
@@ -168,6 +175,8 @@ class _CenterNavItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           customBorder: const CircleBorder(),
+          splashColor: TitoColors.deepBlue.withValues(alpha: 0.12),
+          highlightColor: TitoColors.deepBlue.withValues(alpha: 0.08),
           child: SizedBox(
             width: size,
             height: size,
@@ -182,7 +191,7 @@ class _CenterNavItem extends StatelessWidget {
                 if (!compact)
                   Text(
                     spec.label,
-                    style: const TextStyle(
+                    style: TitoTypography.style(
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
                       color: TitoColors.deepBlue,

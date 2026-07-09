@@ -22,6 +22,9 @@ void main() {
     expect(summary.party, isNotEmpty);
     expect(summary.party.first.speciesName, 'Quilava');
     expect(summary.party.first.level, 27);
+    expect(summary.party.first.currentHp, isNotNull);
+    expect(summary.party.first.maxHp, isNotNull);
+    expect(summary.party.first.maxHp!, greaterThan(0));
     expect(summary.party[1].speciesName, 'Togepi');
     expect(summary.party[1].level, 6);
     expect(summary.locationLabel, '满金市');

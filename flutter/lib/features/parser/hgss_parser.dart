@@ -45,7 +45,8 @@ class HgssParser {
     for (var index = 0; index < partyCount; index++) {
       final start = base + 0x98 + index * 236;
       final slot = bytes.sublist(start, start + 236);
-      final (speciesId, level) = decryptPartySlot(slot);
+      final slotStats = decryptPartySlotStats(slot);
+      final level = slotStats.level ?? 0;
       String? slotWarning;
       if (level > 100) {
         slotWarning = 'Level $level looks invalid — slot may be empty or corrupted.';
@@ -53,9 +54,12 @@ class HgssParser {
       }
       party.add(
         ParsedPartyMember(
-          speciesId: speciesId,
-          speciesName: speciesNameFor(speciesId),
+          speciesId: slotStats.speciesId,
+          speciesName: speciesNameFor(slotStats.speciesId),
           level: level <= 100 ? level : null,
+          currentHp: slotStats.currentHp,
+          maxHp: slotStats.maxHp,
+          experience: slotStats.experience,
           warning: slotWarning,
         ),
       );
@@ -89,6 +93,7 @@ class HgssParser {
     final syncEntry = JourneyTimelineEntry(
       id: 'parsed-$syncId',
       text: '已从本地魂银存档同步',
+      at: _formatParsedAtLocal(summary.parsedAt),
     );
 
     return CurrentJourney(
@@ -101,12 +106,16 @@ class HgssParser {
       badges: summary.badges,
       maxBadges: summary.maxBadges,
       playTime: summary.playTime,
-      companion: existing?.companion ?? 'Riolu',
+      companion: existing?.companion ?? 'Cyndaquil',
       party: summary.party
           .map(
             (member) => PartyMember(
               species: localizeSpecies(member.speciesName),
+              speciesId: member.speciesId,
               level: member.level,
+              currentHp: member.currentHp,
+              maxHp: member.maxHp,
+              experience: member.experience,
             ),
           )
           .toList(),
@@ -122,6 +131,13 @@ class HgssParser {
     final manual =
         existing.where((entry) => !entry.id.startsWith('parsed')).toList();
     return [syncEntry, ...manual];
+  }
+
+  String _formatParsedAtLocal(DateTime parsedAt) {
+    final local = parsedAt.toLocal();
+    return '${local.year}/${local.month}/${local.day} '
+        '${local.hour.toString().padLeft(2, '0')}:'
+        '${local.minute.toString().padLeft(2, '0')}';
   }
 
   int _activePartition(Uint8List bytes) {

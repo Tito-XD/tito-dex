@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
@@ -13,7 +10,10 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_progress_bar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -67,13 +67,17 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _trainerController = TextEditingController(text: widget.journey.trainerName);
+    _trainerController = TextEditingController(
+      text: widget.journey.trainerName,
+    );
     _locationController = TextEditingController(text: widget.journey.location);
     _playTimeController = TextEditingController(text: widget.journey.playTime);
-    _badgesController =
-        TextEditingController(text: widget.journey.badges.toString());
-    _reminderController =
-        TextEditingController(text: widget.journey.nextReminder ?? '');
+    _badgesController = TextEditingController(
+      text: widget.journey.badges.toString(),
+    );
+    _reminderController = TextEditingController(
+      text: widget.journey.nextReminder ?? '',
+    );
     _refreshDexCacheStatus();
   }
 
@@ -85,20 +89,23 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _dexCacheStatus = status);
   }
 
-  Future<void> _downloadDexOffline() async {
+  Future<void> _downloadDexCdnBundle() async {
     if (_dexDownloading) {
       return;
     }
     setState(() => _dexDownloading = true);
 
     try {
-      await for (final progress in dexOfflineService.downloadAll()) {
+      DexCacheProgress? lastProgress;
+      await for (final progress in dexOfflineService.downloadFromCdnBundle()) {
+        lastProgress = progress;
         if (!mounted) {
           return;
         }
         setState(() {
           _dexCacheStatus = DexCacheStatus(
-            manifest: _dexCacheStatus?.manifest ??
+            manifest:
+                _dexCacheStatus?.manifest ??
                 const DexCacheManifest(
                   version: DexCacheManifest.currentVersion,
                   complete: false,
@@ -115,9 +122,77 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) {
         return;
       }
+      if (lastProgress?.phase == 'done') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexCdnDone)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
+        );
+      }
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
+        const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
       );
+    } finally {
+      if (mounted) {
+        setState(() => _dexDownloading = false);
+      }
+    }
+  }
+
+  Future<void> _downloadDexOffline() async {
+    if (_dexDownloading) {
+      return;
+    }
+    setState(() => _dexDownloading = true);
+
+    try {
+      DexCacheProgress? lastProgress;
+      await for (final progress in dexOfflineService.downloadAll()) {
+        lastProgress = progress;
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _dexCacheStatus = DexCacheStatus(
+            manifest:
+                _dexCacheStatus?.manifest ??
+                const DexCacheManifest(
+                  version: DexCacheManifest.currentVersion,
+                  complete: false,
+                  preferOffline: true,
+                ),
+            sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
+            isDownloading:
+                progress.phase != 'done' && progress.phase != 'partial',
+            progress: progress,
+          );
+        });
+      }
+      dexRepository.clearMemoryCache();
+      await _refreshDexCacheStatus();
+      if (!mounted) {
+        return;
+      }
+      final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
+      if (lastProgress?.phase == 'done') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
+        );
+      } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+        );
+      }
     } catch (_) {
       if (!mounted) {
         return;
@@ -139,9 +214,9 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackDexOfflineCleared)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -188,9 +263,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     setState(() => _trainerDirty = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackTrainerSaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackTrainerSaved)));
   }
 
   void _saveJourneyEdits() {
@@ -210,9 +285,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     setState(() => _journeyDirty = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackJourneySaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneySaved)));
   }
 
   @override
@@ -226,55 +301,25 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+    return SecondaryPageScaffold(
+      title: AppZh.navSettings,
+      subtitle: localizeGame(widget.journey.game),
       children: [
-        Row(
-          children: [
-            Material(
-              color: TitoColors.card,
-              shape: const CircleBorder(
-                side: BorderSide(color: TitoColors.ink, width: 2),
-              ),
-              child: InkWell(
-                onTap: () => context.pop(),
-                customBorder: const CircleBorder(),
-                child: const SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Icon(Icons.arrow_back_rounded, color: TitoColors.deepBlue),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              AppZh.navSettings,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.card,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
         StickerCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsTrainerProfile,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+              Text(AppZh.settingsGroupTrainer, style: context.tito.cardTitle),
               const SizedBox(height: 12),
               TextField(
                 controller: _trainerController,
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: InputDecoration(
                   labelText: AppZh.settingsDisplayName,
                   hintText: AppZh.settingsDisplayNameHint,
-                  helperText: saveName != null &&
-                          saveName != _trainerController.text
+                  helperText:
+                      saveName != null && saveName != _trainerController.text
                       ? AppZh.settingsSaveDecodeHint(saveName)
                       : AppZh.settingsSaveTrainerHint,
                   border: const OutlineInputBorder(),
@@ -294,24 +339,16 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 child: const Text(AppZh.settingsSaveTrainerName),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+              const SizedBox(height: 16),
               Text(
                 AppZh.settingsEditJourney,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: context.tito.cardSectionTitle,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: _locationController,
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsLocation,
                   border: OutlineInputBorder(),
@@ -321,6 +358,8 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _playTimeController,
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsPlayTime,
                   border: OutlineInputBorder(),
@@ -331,6 +370,8 @@ class _SettingsPageState extends State<SettingsPage> {
               TextField(
                 controller: _badgesController,
                 keyboardType: TextInputType.number,
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsBadges,
                   border: OutlineInputBorder(),
@@ -340,6 +381,8 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _reminderController,
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsNextReminder,
                   border: OutlineInputBorder(),
@@ -360,21 +403,80 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 16),
         StickerCard(
-          variant: StickerVariant.mint,
+          variant: StickerVariant.cream,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsDexOffline,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+              Text(AppZh.settingsGroupSaveSync, style: context.tito.cardTitle),
               const SizedBox(height: 8),
               Text(
-                AppZh.settingsDexOfflineHint,
-                style: Theme.of(context).textTheme.bodySmall,
+                AppZh.settingsSaveDirectoryHint,
+                style: context.tito.cardMuted,
               ),
+              const SizedBox(height: 12),
+              Text(
+                directoryPath ?? AppZh.settingsSaveDirectoryUnset,
+                style: context.tito.cardBodyEmphasis.copyWith(
+                  color: directoryPath == null
+                      ? TitoColors.mutedInk
+                      : TitoColors.ink,
+                ),
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: widget.onPickSaveDirectory,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.deepBlue,
+                  foregroundColor: TitoColors.card,
+                ),
+                child: const Text(AppZh.settingsPickSaveDirectory),
+              ),
+              if (directoryPath != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: widget.onClearSaveDirectory,
+                  child: const Text(AppZh.settingsClearSaveDirectory),
+                ),
+              ],
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.settingsAutoLoadOnStartup,
+                      style: context.tito.cardBody,
+                    ),
+                  ),
+                  Switch(
+                    value: config.autoLoadOnStartup,
+                    onChanged: widget.onToggleAutoLoad,
+                  ),
+                ],
+              ),
+              Text(
+                lastSynced != null
+                    ? AppZh.settingsLastSynced(lastSynced)
+                    : AppZh.settingsLastSyncedNone,
+                style: context.tito.cardMuted,
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: directoryPath != null ? widget.onSyncNow : null,
+                child: const Text(AppZh.settingsSyncNow),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        StickerCard(
+          variant: StickerVariant.mint,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(AppZh.settingsDexOffline, style: context.tito.cardTitle),
+              const SizedBox(height: 8),
+              Text(AppZh.settingsDexOfflineHint, style: context.tito.cardMuted),
               const SizedBox(height: 12),
               Text(
                 dexManifest != null && dexManifest.complete
@@ -384,42 +486,68 @@ class _SettingsPageState extends State<SettingsPage> {
                         formatCacheSize(dexCache?.sizeBytes ?? 0),
                         dexManifest.downloadedAt?.split('T').first ?? '',
                       )
+                    : dexManifest != null && dexManifest.pokemonCount > 0
+                    ? AppZh.settingsDexOfflinePartial(dexManifest.pokemonCount)
                     : AppZh.settingsDexOfflineUnset,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: context.tito.cardBodyEmphasis,
               ),
               if (_dexDownloading && dexProgress != null) ...[
                 const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: dexProgress.fraction,
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(999),
-                ),
+                TitoProgressBar(value: dexProgress.fraction, height: 10),
                 const SizedBox(height: 6),
                 Text(
                   AppZh.settingsDexOfflineProgress(
-                    dexProgress.label ?? dexProgress.phase,
+                    dexProgress.phase,
                     dexProgress.current,
                     dexProgress.total,
                   ),
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: context.tito.cardMuted,
                 ),
+                if (dexProgress.label != null) ...[
+                  const SizedBox(height: 4),
+                  Text(dexProgress.label!, style: context.tito.caption),
+                ],
               ],
               const SizedBox(height: 12),
-              FilledButton(
-                onPressed: _dexDownloading ? null : _downloadDexOffline,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.deepBlue,
-                  foregroundColor: TitoColors.card,
-                ),
-                child: const Text(AppZh.settingsDexOfflineDownload),
+              Text(
+                AppZh.settingsDexCdnDownloadHint,
+                style: context.tito.cardMuted,
               ),
-              if (dexManifest != null && dexManifest.complete) ...[
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: _dexDownloading ? null : _downloadDexCdnBundle,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.coral,
+                  foregroundColor: TitoColors.ink,
+                ),
+                child: const Text(AppZh.settingsDexCdnDownload),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: _dexDownloading ? null : _downloadDexOffline,
+                child: Text(
+                  dexManifest != null &&
+                          dexManifest.pokemonCount > 0 &&
+                          !dexManifest.complete
+                      ? AppZh.settingsDexOfflineResume
+                      : AppZh.settingsDexOfflineDownloadPokeApi,
+                ),
+              ),
+              if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
                 const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(AppZh.settingsDexOfflinePrefer),
-                  value: dexManifest.preferOffline,
-                  onChanged: _dexDownloading ? null : _setDexPreferOffline,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppZh.settingsDexOfflinePrefer,
+                        style: context.tito.cardBody,
+                      ),
+                    ),
+                    Switch(
+                      value: dexManifest.preferOffline,
+                      onChanged: _dexDownloading ? null : _setDexPreferOffline,
+                    ),
+                  ],
                 ),
                 OutlinedButton(
                   onPressed: _dexDownloading ? null : _clearDexOffline,
@@ -435,23 +563,15 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsEmulator,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+              Text(AppZh.settingsEmulator, style: context.tito.cardTitle),
               const SizedBox(height: 8),
-              Text(
-                AppZh.settingsEmulatorHint,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(AppZh.settingsEmulatorHint, style: context.tito.cardMuted),
               const SizedBox(height: 12),
               Text(
                 emulator != null
                     ? AppZh.settingsEmulatorSelected(emulator.appName)
                     : AppZh.settingsEmulatorUnset,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: context.tito.cardBodyEmphasis,
               ),
               const SizedBox(height: 12),
               FilledButton(
@@ -474,73 +594,11 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 16),
         StickerCard(
-          variant: StickerVariant.cream,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsSaveDirectory,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+              Text(AppZh.settingsGroupAdvanced, style: context.tito.cardTitle),
               const SizedBox(height: 8),
-              Text(
-                AppZh.settingsSaveDirectoryHint,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                directoryPath ?? AppZh.settingsSaveDirectoryUnset,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: directoryPath == null
-                      ? Theme.of(context).colorScheme.outline
-                      : TitoColors.ink,
-                ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: widget.onPickSaveDirectory,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.deepBlue,
-                  foregroundColor: TitoColors.card,
-                ),
-                child: const Text(AppZh.settingsPickSaveDirectory),
-              ),
-              if (directoryPath != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: widget.onClearSaveDirectory,
-                  child: const Text(AppZh.settingsClearSaveDirectory),
-                ),
-              ],
-              const SizedBox(height: 12),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text(AppZh.settingsAutoLoadOnStartup),
-                value: config.autoLoadOnStartup,
-                onChanged: widget.onToggleAutoLoad,
-              ),
-              Text(
-                lastSynced != null
-                    ? AppZh.settingsLastSynced(lastSynced)
-                    : AppZh.settingsLastSyncedNone,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed:
-                    directoryPath != null ? widget.onSyncNow : null,
-                child: const Text(AppZh.settingsSyncNow),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          child: Column(
-            children: [
               _Row(
                 label: AppZh.settingsCurrentGame,
                 value: localizeGame(widget.journey.game),
@@ -555,25 +613,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               _Row(
                 label: AppZh.settingsBadges,
-                value:
-                    '${widget.journey.badges}/${widget.journey.maxBadges}',
+                value: '${widget.journey.badges}/${widget.journey.maxBadges}',
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.sky,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsJourneyData,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 6),
               FilledButton(
                 onPressed: widget.onImportFixture,
                 style: FilledButton.styleFrom(
@@ -618,12 +660,12 @@ class _Row extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(label, style: context.tito.cardLabel),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontWeight: FontWeight.w800),
+              style: context.tito.cardValue,
             ),
           ),
         ],

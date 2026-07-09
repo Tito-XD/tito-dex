@@ -5,22 +5,60 @@ import 'package:http/http.dart' as http;
 import 'dex_game_scope.dart';
 import 'dex_models.dart';
 import 'dex_sprite_codec.dart';
+import 'poke_api_throttle.dart';
 import 'type_chart.dart';
 
 class PokeApiClient {
-  PokeApiClient({http.Client? client}) : _client = client ?? http.Client();
+  PokeApiClient({
+    http.Client? client,
+    PokeApiThrottle? throttle,
+    this.maxRetries = 4,
+  })  : _client = client ?? http.Client(),
+        _throttle = throttle ?? PokeApiThrottle();
 
   final http.Client _client;
+  final PokeApiThrottle _throttle;
+  final int maxRetries;
   static const baseUrl = 'https://pokeapi.co/api/v2';
 
   final Map<String, TypeDamageRelations> _typeRelationsCache = {};
 
-  Future<Map<String, dynamic>> _getJson(String path) async {
+  Future<Map<String, dynamic>> _getJson(String path) {
+    return _throttle.run(() => _getJsonWithRetry(path));
+  }
+
+  Future<List<dynamic>> _getJsonList(String path) {
+    return _throttle.run(() => _getJsonListWithRetry(path));
+  }
+
+  Future<List<dynamic>> _getJsonListWithRetry(
+    String path, {
+    int attempt = 0,
+  }) async {
     final response = await _client.get(Uri.parse('$baseUrl$path'));
-    if (response.statusCode != 200) {
-      throw PokeApiException(path, response.statusCode);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as List<dynamic>;
     }
-    return jsonDecode(response.body) as Map<String, dynamic>;
+    if (attempt < maxRetries && pokeApiStatusShouldRetry(response.statusCode)) {
+      await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      return _getJsonListWithRetry(path, attempt: attempt + 1);
+    }
+    throw PokeApiException(path, response.statusCode);
+  }
+
+  Future<Map<String, dynamic>> _getJsonWithRetry(
+    String path, {
+    int attempt = 0,
+  }) async {
+    final response = await _client.get(Uri.parse('$baseUrl$path'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+    if (attempt < maxRetries && pokeApiStatusShouldRetry(response.statusCode)) {
+      await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      return _getJsonWithRetry(path, attempt: attempt + 1);
+    }
+    throw PokeApiException(path, response.statusCode);
   }
 
   Future<Map<String, TypeDamageRelations>> loadAllTypeRelations() async {
@@ -93,6 +131,7 @@ class PokeApiClient {
     final flavorEntries = _parseFlavorEntries(
       species['flavor_text_entries'] as List<dynamic>,
     );
+    final obtainLocations = await _fetchHgssObtainLocations(id);
     final moveSet = await _fetchHgssMoveSet(pokemon['moves'] as List<dynamic>);
     final genderFemalePercent = _genderFemalePercent(
       species['gender_rate'] as int?,
@@ -120,6 +159,7 @@ class PokeApiClient {
       baseStats: baseStats,
       typeMultipliers: multipliers,
       flavorEntries: flavorEntries,
+      obtainLocations: obtainLocations,
       moveSet: moveSet,
       genderFemalePercent: genderFemalePercent,
       eggGroups: eggGroups,
@@ -157,49 +197,133 @@ class PokeApiClient {
   }
 
   List<FlavorTextEntry> _parseFlavorEntries(List<dynamic> entries) {
-    final byVersion = <String, String>{};
+    final byVersion = <String, _FlavorBundle>{};
+    String? referenceZhHans;
+    String? referenceZhHant;
 
     for (final version in hgssFlavorVersions) {
-      String? zhHans;
-      String? zhHant;
-      String? english;
+      byVersion[version] = _FlavorBundle();
+    }
 
-      for (final entry in entries) {
-        final map = entry as Map<String, dynamic>;
-        if ((map['version'] as Map<String, dynamic>)['name'] != version) {
-          continue;
-        }
-        final language =
-            (map['language'] as Map<String, dynamic>)['name'] as String;
-        final text = (map['flavor_text'] as String)
-            .replaceAll('\n', ' ')
-            .replaceAll('\f', ' ')
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim();
-        if (text.isEmpty) {
-          continue;
-        }
-        switch (language) {
-          case 'zh-Hans':
-          case 'zh-hans':
-            zhHans = text;
-          case 'zh-Hant':
-            zhHant = text;
-          case 'en':
-            english = text;
-        }
+    for (final entry in entries) {
+      final map = entry as Map<String, dynamic>;
+      final version =
+          (map['version'] as Map<String, dynamic>)['name'] as String;
+      final language =
+          (map['language'] as Map<String, dynamic>)['name'] as String;
+      final text = (map['flavor_text'] as String)
+          .replaceAll('\n', ' ')
+          .replaceAll('\f', ' ')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trim();
+      if (text.isEmpty) {
+        continue;
       }
 
-      final chosen = zhHans ?? zhHant ?? english;
-      if (chosen != null) {
-        byVersion[version] = chosen;
+      switch (language) {
+        case 'zh-Hans':
+        case 'zh-hans':
+          referenceZhHans ??= text;
+          if (byVersion.containsKey(version)) {
+            byVersion[version]!.zhHans ??= text;
+          }
+        case 'zh-Hant':
+        case 'zh-hant':
+          referenceZhHant ??= text;
+          if (byVersion.containsKey(version)) {
+            byVersion[version]!.zhHant ??= text;
+          }
+        case 'en':
+          if (byVersion.containsKey(version)) {
+            byVersion[version]!.english ??= text;
+          }
       }
     }
 
-    return hgssFlavorVersions
-        .where(byVersion.containsKey)
-        .map((version) => FlavorTextEntry(version: version, text: byVersion[version]!))
-        .toList();
+    final results = <FlavorTextEntry>[];
+    for (final version in hgssFlavorVersions) {
+      final bundle = byVersion[version]!;
+      final chosen = bundle.zhHans ?? bundle.zhHant ?? bundle.english;
+      if (chosen != null) {
+        results.add(FlavorTextEntry(version: version, text: chosen));
+      }
+    }
+
+    final referenceChinese = referenceZhHans ?? referenceZhHant;
+    final hgssHasChinese = results.any(
+      (entry) => entry.version != 'zh-reference' && _looksChinese(entry.text),
+    );
+    if (referenceChinese != null && !hgssHasChinese) {
+      results.insert(
+        0,
+        FlavorTextEntry(version: 'zh-reference', text: referenceChinese),
+      );
+    }
+
+    return results;
+  }
+
+  bool _looksChinese(String text) {
+    return RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
+  }
+
+  Future<List<ObtainLocationEntry>> _fetchHgssObtainLocations(int id) async {
+    try {
+      final list = await _getJsonList('/pokemon/$id/encounters');
+      final merged = <String, ObtainLocationEntry>{};
+
+      for (final encounter in list) {
+        final map = encounter as Map<String, dynamic>;
+        final areaUrl = map['location_area']?['url'] as String?;
+        if (areaUrl == null) {
+          continue;
+        }
+        final slug = areaUrl.split('/').where((part) => part.isNotEmpty).last;
+        var minLevel = 100;
+        var maxChance = 0;
+        var inHgss = false;
+
+        for (final detail in map['version_details'] as List<dynamic>) {
+          final detailMap = detail as Map<String, dynamic>;
+          final version =
+              (detailMap['version'] as Map<String, dynamic>)['name'] as String;
+          if (version != 'heartgold' && version != 'soulsilver') {
+            continue;
+          }
+          inHgss = true;
+          final chance = detailMap['max_chance'] as int? ?? 0;
+          if (chance > maxChance) {
+            maxChance = chance;
+          }
+          for (final encounterDetail
+              in detailMap['encounter_details'] as List<dynamic>? ?? const []) {
+            final level = (encounterDetail
+                    as Map<String, dynamic>)['min_level'] as int? ??
+                100;
+            if (level < minLevel) {
+              minLevel = level;
+            }
+          }
+        }
+
+        if (!inHgss) {
+          continue;
+        }
+
+        merged[slug] = ObtainLocationEntry(
+          areaSlug: slug,
+          areaLabelZh: encounterAreaLabelZh(slug),
+          minLevel: minLevel == 100 ? null : minLevel,
+          maxChance: maxChance,
+        );
+      }
+
+      final results = merged.values.toList()
+        ..sort((a, b) => a.areaLabelZh.compareTo(b.areaLabelZh));
+      return results;
+    } catch (_) {
+      return const [];
+    }
   }
 
   Future<PokemonMoveSet> _fetchHgssMoveSet(List<dynamic> moveEntries) async {
@@ -210,7 +334,6 @@ class PokeApiClient {
     for (final entry in moveEntries) {
       final map = entry as Map<String, dynamic>;
       final move = map['move'] as Map<String, dynamic>;
-      final moveId = _idFromUrl(move['url'] as String);
       final details = map['version_group_details'] as List<dynamic>;
 
       for (final detail in details) {
@@ -227,6 +350,11 @@ class PokeApiClient {
         if (method != 'level-up' &&
             method != 'machine' &&
             method != 'egg') {
+          continue;
+        }
+
+        final moveId = _tryIdFromUrl(move['url'] as String);
+        if (moveId == null) {
           continue;
         }
 
@@ -304,6 +432,10 @@ class PokeApiClient {
 
   final Map<int, CachedMove> _moveCache = {};
 
+  void primeMoveCache(Map<int, CachedMove> moves) {
+    _moveCache.addAll(moves);
+  }
+
   Future<CachedMove> _fetchMove(int id) async {
     if (_moveCache.containsKey(id)) {
       return _moveCache[id]!;
@@ -337,12 +469,23 @@ class PokeApiClient {
   }
 
   Future<EvolutionNode> _fetchEvolutionChain(String url) async {
+    return _throttle.run(() => _fetchEvolutionChainWithRetry(url));
+  }
+
+  Future<EvolutionNode> _fetchEvolutionChainWithRetry(
+    String url, {
+    int attempt = 0,
+  }) async {
     final response = await _client.get(Uri.parse(url));
-    if (response.statusCode != 200) {
-      throw PokeApiException(url, response.statusCode);
+    if (response.statusCode == 200) {
+      final chain = jsonDecode(response.body) as Map<String, dynamic>;
+      return _parseEvolutionNode(chain['chain'] as Map<String, dynamic>);
     }
-    final chain = jsonDecode(response.body) as Map<String, dynamic>;
-    return _parseEvolutionNode(chain['chain'] as Map<String, dynamic>);
+    if (attempt < maxRetries && pokeApiStatusShouldRetry(response.statusCode)) {
+      await Future<void>.delayed(pokeApiRetryDelay(attempt));
+      return _fetchEvolutionChainWithRetry(url, attempt: attempt + 1);
+    }
+    throw PokeApiException(url, response.statusCode);
   }
 
   Future<EvolutionNode> _parseEvolutionNode(Map<String, dynamic> node) async {
@@ -464,9 +607,23 @@ class PokeApiClient {
     };
   }
 
-  int _idFromUrl(String url) {
+  int? _tryIdFromUrl(String url) {
     final segments = Uri.parse(url).pathSegments;
-    return int.parse(segments.last);
+    for (var i = segments.length - 1; i >= 0; i--) {
+      final id = int.tryParse(segments[i]);
+      if (id != null) {
+        return id;
+      }
+    }
+    return null;
+  }
+
+  int _idFromUrl(String url) {
+    final id = _tryIdFromUrl(url);
+    if (id == null) {
+      throw FormatException('No numeric id in PokeAPI url: $url');
+    }
+    return id;
   }
 
   String _capitalize(String value) {
@@ -475,6 +632,12 @@ class PokeApiClient {
     }
     return value[0].toUpperCase() + value.substring(1);
   }
+}
+
+class _FlavorBundle {
+  String? zhHans;
+  String? zhHant;
+  String? english;
 }
 
 class PokeApiException implements Exception {

@@ -1,3 +1,5 @@
+import '../../l10n/game_zh.dart';
+
 const _blockPosition = <int>[
   0, 1, 2, 3, 0, 1, 3, 2, 0, 2, 1, 3, 0, 3, 1, 2, 0, 2, 3, 1, 0, 3, 2, 1, 1, 0, 2, 3, 1, 0, 3, 2,
   2, 0, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 3, 0, 2, 1, 1, 2, 0, 3, 1, 3, 0, 2, 2, 1, 0, 3, 3, 1, 0, 2,
@@ -22,6 +24,24 @@ const _speciesNames = <int, String>{
 
 String speciesNameFor(int speciesId) =>
     _speciesNames[speciesId] ?? 'Species #$speciesId';
+
+int? knownSpeciesIdForLabel(String label) {
+  final trimmed = label.trim();
+  if (trimmed.isEmpty) {
+    return null;
+  }
+
+  for (final entry in _speciesNames.entries) {
+    if (entry.value.toLowerCase() == trimmed.toLowerCase()) {
+      return entry.key;
+    }
+    if (localizeSpecies(entry.value) == trimmed) {
+      return entry.key;
+    }
+  }
+
+  return null;
+}
 
 String decodeGen4Text(List<int> buffer) {
   final chars = <String>[];
@@ -80,7 +100,28 @@ List<int> _shuffleBlocks(List<int> data, int sv) {
   return blocks.expand((block) => block).toList();
 }
 
+class PartySlotStats {
+  const PartySlotStats({
+    required this.speciesId,
+    this.level,
+    this.currentHp,
+    this.maxHp,
+    this.experience,
+  });
+
+  final int speciesId;
+  final int? level;
+  final int? currentHp;
+  final int? maxHp;
+  final int? experience;
+}
+
 (int speciesId, int level) decryptPartySlot(List<int> raw) {
+  final stats = decryptPartySlotStats(raw);
+  return (stats.speciesId, stats.level ?? 0);
+}
+
+PartySlotStats decryptPartySlotStats(List<int> raw) {
   final slot = List<int>.from(raw);
   final personality =
       slot[0] | (slot[1] << 8) | (slot[2] << 16) | (slot[3] << 24);
@@ -89,12 +130,34 @@ List<int> _shuffleBlocks(List<int> data, int sv) {
   final encrypted = _cryptArray(slot.sublist(8, 136), checksum);
   final decrypted = _shuffleBlocks(encrypted, sv);
   final speciesId = decrypted[0] | (decrypted[1] << 8);
+  final experience = readUint32(decrypted, 4);
 
-  // Party stats (bytes 136–235) are encrypted with the personality value.
-  // Current level lives at 0x8C (Stat_Level), not 0x84 (MetLevel).
   final stats = _cryptArray(slot.sublist(136, 236), personality);
-  final level = stats[0x8C - 136];
-  return (speciesId, level);
+  // HGSS party stats: level @ +4, max HP @ +6, current HP @ +8.
+  final level = stats[4];
+  final maxHp = readUint16(stats, 6);
+  final currentHp = readUint16(stats, 8);
+
+  final validLevel = level > 0 && level <= 100 ? level : null;
+  final validHp = maxHp > 0 && currentHp >= 0 && currentHp <= maxHp + 999
+      ? (currentHp: currentHp, maxHp: maxHp)
+      : null;
+
+  return PartySlotStats(
+    speciesId: speciesId,
+    level: validLevel,
+    currentHp: validHp?.currentHp,
+    maxHp: validHp?.maxHp,
+    experience: experience > 0 && experience < 2000000 ? experience : null,
+  );
+}
+
+/// Exposed for fixture/debug tooling.
+List<int> decryptPartyStatsBlock(List<int> raw) {
+  final slot = List<int>.from(raw);
+  final personality =
+      slot[0] | (slot[1] << 8) | (slot[2] << 16) | (slot[3] << 24);
+  return _cryptArray(slot.sublist(136, 236), personality);
 }
 
 int popcount(int value) {

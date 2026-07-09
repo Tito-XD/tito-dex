@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="tito_deep_blue">#FF2F4361</color>
+    <color name="tito_slate_blue">#FF7B91A6</color>
 </resources>

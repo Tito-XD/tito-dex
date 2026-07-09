@@ -1,71 +1,95 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/game_zh.dart';
+import '../features/companion/companion_art.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import 'dex_sprite_image.dart';
 
 class CompanionSticker extends StatelessWidget {
   const CompanionSticker({
     super.key,
     required this.name,
-    this.message,
+    this.compact = false,
+    this.onTap,
   });
 
   final String name;
-  final String? message;
+  final bool compact;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final text = message ?? '欢迎回来，训练家！';
+    final square = DeviceLayout.useSquareDashboard(context);
+    final spriteSize = square
+        ? DeviceLayout.dim(context, 52.0)
+        : (compact ? DeviceLayout.dim(context, 52.0) : 72.0);
 
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 180),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    return Semantics(
+      button: onTap != null,
+      label: '切换同行宝可梦',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: spriteSize,
+            height: spriteSize,
             decoration: BoxDecoration(
               color: TitoColors.card,
-              borderRadius: BorderRadius.circular(TitoRadii.md),
+              shape: BoxShape.circle,
               border: Border.all(color: TitoColors.ink, width: 3),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x3818283B),
-                  offset: Offset(0, 5),
+                  color: Color(0x2818283B),
+                  offset: Offset(0, 4),
                 ),
               ],
             ),
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
+            clipBehavior: Clip.antiAlias,
+            child: DexSpriteImage(
+              source: companionSpriteSource(name),
+              height: spriteSize,
+              width: spriteSize,
+              fit: BoxFit.contain,
             ),
           ),
-          const SizedBox(height: 8),
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: TitoColors.skyBlue,
-              shape: BoxShape.circle,
-              border: Border.all(color: TitoColors.ink, width: 3),
-            ),
-            alignment: Alignment.center,
-            child: const Text('🐾', style: TextStyle(fontSize: 32)),
+        ),
+      ),
+    );
+  }
+}
+
+class FloatingCompanion extends StatelessWidget {
+  const FloatingCompanion({
+    super.key,
+    required this.name,
+    this.onTap,
+  });
+
+  final String name;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
+    final compact = !square && MediaQuery.sizeOf(context).shortestSide < 520;
+
+    return SafeArea(
+      top: false,
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: EdgeInsets.only(
+            right: square ? 8 : (compact ? 6 : 10),
+            bottom: DeviceLayout.companionOverlayBottom(context),
           ),
-          const SizedBox(height: 6),
-          Text(
-            localizeCompanion(name),
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 12,
-              color: TitoColors.card,
-            ),
+          child: CompanionSticker(
+            name: name,
+            compact: compact,
+            onTap: onTap,
           ),
-        ],
+        ),
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/companion/companion_art.dart';
+import 'features/game/game_catalog.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -10,8 +12,12 @@ import 'features/launcher/emulator_launcher_repository.dart';
 import 'features/parser/hgss_parser.dart';
 import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
+import 'features/trainer/trainer_avatar_service.dart';
 import 'l10n/app_zh.dart';
+import 'l10n/game_zh.dart';
 import 'models/journey.dart';
+import 'navigation/back_navigation.dart';
+import 'navigation/tito_page_transition.dart';
 import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
@@ -19,10 +25,14 @@ import 'pages/journey_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
+import 'theme/tito_colors.dart';
 import 'theme/tito_theme.dart';
+import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
-import 'widgets/tito_bottom_nav.dart';
+import 'widgets/handheld_input.dart';
+import 'widgets/shell_companion_overlay.dart';
+import 'widgets/tito_page_container.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -42,6 +52,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
   EmulatorAppChoice? _emulatorChoice;
   bool _ready = false;
+  bool _avatarChangeArmed = false;
 
   @override
   void initState() {
@@ -50,82 +61,123 @@ class _TitoDexAppState extends State<TitoDexApp> {
       routes: [
         ShellRoute(
           builder: (context, state, child) {
-            final onHome = state.uri.path == '/';
-            final onSettings = state.uri.path == '/settings';
-            final onDexDetail = RegExp(r'^/dex/\d+$').hasMatch(state.uri.path);
             return PopScope(
-              canPop: onHome,
+              canPop: TitoBackNavigation.canPopRoute(context, state.uri.path),
               onPopInvokedWithResult: (didPop, result) {
                 if (didPop) {
                   return;
                 }
-                if (onSettings) {
-                  context.go('/');
-                } else if (onDexDetail) {
-                  context.go('/dex');
-                } else if (!onHome) {
-                  context.go('/');
-                }
+                TitoBackNavigation.navigateBack(context, state.uri.path);
               },
-              child: DeviceShell(
-                child: Column(
-                  children: [
-                    Expanded(child: child),
-                    TitoBottomNav(location: state.uri.path),
-                  ],
-                ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  HandheldInputShell(
+                    location: state.uri.path,
+                    child: DeviceShell(child: child),
+                  ),
+                  Positioned.fill(
+                    child: ShellCompanionOverlay(
+                      onHome: TitoBackNavigation.isHome(state.uri.path),
+                      companionName: _journey.companion,
+                      onTap: () => _onCompanionChanged(
+                        cycleCompanion(_journey.companion),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },
           routes: [
             GoRoute(
               path: '/',
-              builder: (context, state) => HomePage(
-                journey: _journey,
-                onContinue: _onContinue,
+              pageBuilder: (context, state) => titoHomePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: HomePage(
+                    journey: _journey,
+                    onContinue: _onContinue,
+                    gameBadge: badgeForGame(_journey.game),
+                    onGameBadgeTap: _onGameBadgeTap,
+                    onAvatarTap: _onTrainerAvatarTap,
+                  ),
+                ),
               ),
             ),
             GoRoute(
               path: '/team',
-              builder: (context, state) => TeamPage(journey: _journey),
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: TeamPage(journey: _journey),
+                ),
+              ),
             ),
             GoRoute(
               path: '/journey',
-              builder: (context, state) => JourneyPage(journey: _journey),
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: JourneyPage(journey: _journey),
+                ),
+              ),
             ),
             GoRoute(
               path: '/dex',
-              builder: (context, state) => DexPage(journey: _journey),
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: DexPage(journey: _journey),
+                ),
+              ),
               routes: [
                 GoRoute(
                   path: ':id',
-                  builder: (context, state) => PokemonDetailPage(
-                    pokemonId: int.parse(state.pathParameters['id']!),
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: PokemonDetailPage(
+                        pokemonId:
+                            int.tryParse(state.pathParameters['id'] ?? '') ??
+                                1,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
             GoRoute(
               path: '/search',
-              builder: (context, state) => SearchPage(journey: _journey),
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: SearchPage(journey: _journey),
+                ),
+              ),
             ),
             GoRoute(
               path: '/settings',
-              builder: (context, state) => SettingsPage(
-                journey: _journey,
-                saveConfig: _saveConfig,
-                emulatorChoice: _emulatorChoice,
-                onImportFixture: _importBundledSave,
-                onResetMock: _resetMock,
-                onSaveJourney: _persist,
-                onPickSaveDirectory: _pickSaveDirectory,
-                onClearSaveDirectory: _clearSaveDirectory,
-                onToggleAutoLoad: _setAutoLoadOnStartup,
-                onSyncNow: () => _syncSaveDirectory(force: true),
-                onExportJourney: _exportJourney,
-                onImportJourney: _importJourneyJson,
-                onPickEmulator: _pickEmulatorFromSettings,
-                onClearEmulator: _clearEmulator,
+              pageBuilder: (context, state) => titoSlidePage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: SettingsPage(
+                    journey: _journey,
+                    saveConfig: _saveConfig,
+                    emulatorChoice: _emulatorChoice,
+                    onImportFixture: _importBundledSave,
+                    onResetMock: _resetMock,
+                    onSaveJourney: _persist,
+                    onPickSaveDirectory: _pickSaveDirectory,
+                    onClearSaveDirectory: _clearSaveDirectory,
+                    onToggleAutoLoad: _setAutoLoadOnStartup,
+                    onSyncNow: () => _syncSaveDirectory(force: true),
+                    onExportJourney: _exportJourney,
+                    onImportJourney: _importJourneyJson,
+                    onPickEmulator: _pickEmulatorFromSettings,
+                    onClearEmulator: _clearEmulator,
+                  ),
+                ),
               ),
             ),
           ],
@@ -137,6 +189,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   Future<void> _bootstrap() async {
     var journey = await _repository.load();
+    if (journey.game == 'SoulSilver' && journey.companion == 'Riolu') {
+      journey = journey.copyWith(companion: 'Cyndaquil');
+      await _repository.save(journey);
+    }
     final syncResult = await _saveSync.syncOnStartup(existing: journey);
     if (syncResult.updated) {
       journey = syncResult.journey;
@@ -319,6 +375,82 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
   }
 
+  Future<void> _onCompanionChanged(String companion) async {
+    await _persist(_journey.copyWith(companion: companion));
+  }
+
+  Future<void> _onGameBadgeTap() async {
+    final nextGame = cycleGameKey(_journey.game);
+    await _persist(_journey.copyWith(game: nextGame));
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppZh.snackGameSwitched(localizeGame(nextGame)))),
+    );
+  }
+
+  Future<void> _onTrainerAvatarTap() async {
+    if (_journey.trainerAvatarCustomized) {
+      if (!_avatarChangeArmed) {
+        setState(() => _avatarChangeArmed = true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackAvatarConfirmAgain)),
+        );
+        return;
+      }
+      setState(() => _avatarChangeArmed = false);
+      await _pickAndSaveAvatar();
+      return;
+    }
+
+    await _showAvatarPickerMenu();
+  }
+
+  Future<void> _showAvatarPickerMenu() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded),
+                title: const Text(AppZh.avatarPickGallery),
+                onTap: () => Navigator.pop(context, 'gallery'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice == 'gallery' && mounted) {
+      await _pickAndSaveAvatar();
+    }
+  }
+
+  Future<void> _pickAndSaveAvatar() async {
+    final path = await TrainerAvatarService.pickAndCropSquare();
+    if (path == null || !mounted) {
+      return;
+    }
+    await _persist(
+      _journey.copyWith(
+        trainerAvatarPath: path,
+        trainerAvatarCustomized: true,
+      ),
+    );
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppZh.snackAvatarUpdated)),
+    );
+  }
+
   Future<void> _onContinue() async {
     final saved = _emulatorChoice;
     if (saved != null && _emulatorLauncher.isLaunchSupported) {
@@ -368,21 +500,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!_ready) {
       return MaterialApp(
         theme: buildTitoTheme(),
-        home: const DeviceShell(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  AppZh.appTitle,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 16),
-                CircularProgressIndicator(),
-              ],
+        home: const TitoPageContainer(
+          child: DeviceShell(
+            child: Center(
+              child: _BootstrapLoading(),
             ),
           ),
         ),
@@ -392,7 +513,38 @@ class _TitoDexAppState extends State<TitoDexApp> {
     return MaterialApp.router(
       title: AppZh.appTitle,
       theme: buildTitoTheme(),
+      builder: (context, child) {
+        return DefaultTextStyle(
+          style: TitoTypography.style().copyWith(
+            decoration: TextDecoration.none,
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: _router,
+    );
+  }
+}
+
+class _BootstrapLoading extends StatelessWidget {
+  const _BootstrapLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          AppZh.appTitle,
+          style: TitoTypography.style(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: TitoColors.card,
+          ),
+        ),
+        const SizedBox(height: 16),
+        const CircularProgressIndicator(color: TitoColors.card),
+      ],
     );
   }
 }

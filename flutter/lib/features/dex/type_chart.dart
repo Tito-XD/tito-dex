@@ -1,6 +1,8 @@
 /// Type effectiveness helpers with Chinese labels.
 library;
 
+import 'package:flutter/material.dart';
+
 const typeNamesZh = <String, String>{
   'normal': '一般',
   'fire': '火',
@@ -23,6 +25,37 @@ const typeNamesZh = <String, String>{
 };
 
 String typeNameZh(String type) => typeNamesZh[type] ?? type;
+
+String? typeEnForZh(String labelZh) {
+  for (final entry in typeNamesZh.entries) {
+    if (entry.value == labelZh) {
+      return entry.key;
+    }
+  }
+  return null;
+}
+
+Color typeTileColor(String type) => switch (type) {
+      'normal' => const Color(0xFFD8D3C3),
+      'fire' => const Color(0xFFF5A26F),
+      'water' => const Color(0xFF7CB7FF),
+      'electric' => const Color(0xFFF7D977),
+      'grass' => const Color(0xFF8ED081),
+      'ice' => const Color(0xFF9BE7E6),
+      'fighting' => const Color(0xFFE07B62),
+      'poison' => const Color(0xFFC68FD9),
+      'ground' => const Color(0xFFE6C07A),
+      'flying' => const Color(0xFFB8C8F0),
+      'psychic' => const Color(0xFFFF8CB3),
+      'bug' => const Color(0xFFB5D06A),
+      'rock' => const Color(0xFFC9B48A),
+      'ghost' => const Color(0xFF9F8AC8),
+      'dragon' => const Color(0xFF7B8CFF),
+      'dark' => const Color(0xFF9B8B7D),
+      'steel' => const Color(0xFFB0C0CF),
+      'fairy' => const Color(0xFFFFA9D6),
+      _ => const Color(0xFFB8D8F0),
+    };
 
 /// Defensive profile: how incoming attack types interact with [defenderTypes].
 class DefensiveProfile {
