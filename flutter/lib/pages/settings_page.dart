@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
@@ -12,10 +9,11 @@ import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
-import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_progress_bar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -69,13 +67,17 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _trainerController = TextEditingController(text: widget.journey.trainerName);
+    _trainerController = TextEditingController(
+      text: widget.journey.trainerName,
+    );
     _locationController = TextEditingController(text: widget.journey.location);
     _playTimeController = TextEditingController(text: widget.journey.playTime);
-    _badgesController =
-        TextEditingController(text: widget.journey.badges.toString());
-    _reminderController =
-        TextEditingController(text: widget.journey.nextReminder ?? '');
+    _badgesController = TextEditingController(
+      text: widget.journey.badges.toString(),
+    );
+    _reminderController = TextEditingController(
+      text: widget.journey.nextReminder ?? '',
+    );
     _refreshDexCacheStatus();
   }
 
@@ -102,14 +104,16 @@ class _SettingsPageState extends State<SettingsPage> {
         }
         setState(() {
           _dexCacheStatus = DexCacheStatus(
-            manifest: _dexCacheStatus?.manifest ??
+            manifest:
+                _dexCacheStatus?.manifest ??
                 const DexCacheManifest(
                   version: DexCacheManifest.currentVersion,
                   complete: false,
                   preferOffline: true,
                 ),
             sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
-            isDownloading: progress.phase != 'done' && progress.phase != 'partial',
+            isDownloading:
+                progress.phase != 'done' && progress.phase != 'partial',
             progress: progress,
           );
         });
@@ -154,9 +158,9 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackDexOfflineCleared)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -203,9 +207,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     setState(() => _trainerDirty = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackTrainerSaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackTrainerSaved)));
   }
 
   void _saveJourneyEdits() {
@@ -225,9 +229,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     setState(() => _journeyDirty = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackJourneySaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneySaved)));
   }
 
   @override
@@ -241,54 +245,25 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
 
-    return SingleChildScrollView(
-      padding: DeviceLayout.pagePadding(context).copyWith(bottom: 96),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-        Row(
-          children: [
-            Material(
-              color: TitoColors.card,
-              shape: const CircleBorder(
-                side: BorderSide(color: TitoColors.ink, width: 2),
-              ),
-              child: InkWell(
-                onTap: () => context.pop(),
-                customBorder: const CircleBorder(),
-                child: const SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Icon(Icons.arrow_back_rounded, color: TitoColors.deepBlue),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              AppZh.navSettings,
-              style: context.tito.settingsTitle,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
+    return SecondaryPageScaffold(
+      title: AppZh.navSettings,
+      subtitle: localizeGame(widget.journey.game),
+      children: [
         StickerCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsTrainerProfile,
-                style: context.tito.cardTitle,
-              ),
+              Text(AppZh.settingsGroupTrainer, style: context.tito.cardTitle),
               const SizedBox(height: 12),
               TextField(
                 controller: _trainerController,
-                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: InputDecoration(
                   labelText: AppZh.settingsDisplayName,
                   hintText: AppZh.settingsDisplayNameHint,
-                  helperText: saveName != null &&
-                          saveName != _trainerController.text
+                  helperText:
+                      saveName != null && saveName != _trainerController.text
                       ? AppZh.settingsSaveDecodeHint(saveName)
                       : AppZh.settingsSaveTrainerHint,
                   border: const OutlineInputBorder(),
@@ -308,23 +283,16 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 child: const Text(AppZh.settingsSaveTrainerName),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+              const SizedBox(height: 16),
               Text(
                 AppZh.settingsEditJourney,
-                style: context.tito.cardTitle,
+                style: context.tito.cardSectionTitle,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: _locationController,
-                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsLocation,
                   border: OutlineInputBorder(),
@@ -334,7 +302,8 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _playTimeController,
-                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsPlayTime,
                   border: OutlineInputBorder(),
@@ -345,7 +314,8 @@ class _SettingsPageState extends State<SettingsPage> {
               TextField(
                 controller: _badgesController,
                 keyboardType: TextInputType.number,
-                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsBadges,
                   border: OutlineInputBorder(),
@@ -355,7 +325,8 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 8),
               TextField(
                 controller: _reminderController,
-                spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                spellCheckConfiguration:
+                    const SpellCheckConfiguration.disabled(),
                 decoration: const InputDecoration(
                   labelText: AppZh.settingsNextReminder,
                   border: OutlineInputBorder(),
@@ -376,152 +347,11 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 16),
         StickerCard(
-          variant: StickerVariant.mint,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsDexOffline,
-                style: context.tito.cardTitle,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppZh.settingsDexOfflineHint,
-                style: context.tito.cardMuted,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                dexManifest != null && dexManifest.complete
-                    ? AppZh.settingsDexOfflineReady(
-                        dexManifest.pokemonCount,
-                        dexManifest.moveCount,
-                        formatCacheSize(dexCache?.sizeBytes ?? 0),
-                        dexManifest.downloadedAt?.split('T').first ?? '',
-                      )
-                    : dexManifest != null && dexManifest.pokemonCount > 0
-                        ? AppZh.settingsDexOfflinePartial(
-                            dexManifest.pokemonCount,
-                          )
-                        : AppZh.settingsDexOfflineUnset,
-                style: context.tito.cardBodyEmphasis,
-              ),
-              if (_dexDownloading && dexProgress != null) ...[
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: dexProgress.fraction,
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  AppZh.settingsDexOfflineProgress(
-                    dexProgress.phase,
-                    dexProgress.current,
-                    dexProgress.total,
-                  ),
-                  style: context.tito.cardMuted,
-                ),
-                if (dexProgress.label != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    dexProgress.label!,
-                    style: context.tito.caption,
-                  ),
-                ],
-              ],
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: _dexDownloading ? null : _downloadDexOffline,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.deepBlue,
-                  foregroundColor: TitoColors.card,
-                ),
-                child: Text(
-                  dexManifest != null &&
-                          dexManifest.pokemonCount > 0 &&
-                          !dexManifest.complete
-                      ? AppZh.settingsDexOfflineResume
-                      : AppZh.settingsDexOfflineDownload,
-                ),
-              ),
-              if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppZh.settingsDexOfflinePrefer,
-                        style: context.tito.cardBody,
-                      ),
-                    ),
-                    Switch(
-                      value: dexManifest.preferOffline,
-                      onChanged:
-                          _dexDownloading ? null : _setDexPreferOffline,
-                    ),
-                  ],
-                ),
-                OutlinedButton(
-                  onPressed: _dexDownloading ? null : _clearDexOffline,
-                  child: const Text(AppZh.settingsDexOfflineClear),
-                ),
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.sky,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsEmulator,
-                style: context.tito.cardTitle,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppZh.settingsEmulatorHint,
-                style: context.tito.cardMuted,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                emulator != null
-                    ? AppZh.settingsEmulatorSelected(emulator.appName)
-                    : AppZh.settingsEmulatorUnset,
-                style: context.tito.cardBodyEmphasis,
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: widget.onPickEmulator,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.coral,
-                  foregroundColor: TitoColors.ink,
-                ),
-                child: const Text(AppZh.settingsPickEmulator),
-              ),
-              if (emulator != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: widget.onClearEmulator,
-                  child: const Text(AppZh.settingsClearEmulator),
-                ),
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
           variant: StickerVariant.cream,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                AppZh.settingsSaveDirectory,
-                style: context.tito.cardTitle,
-              ),
+              Text(AppZh.settingsGroupSaveSync, style: context.tito.cardTitle),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsSaveDirectoryHint,
@@ -552,7 +382,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Text(AppZh.settingsClearSaveDirectory),
                 ),
               ],
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -575,8 +405,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const SizedBox(height: 8),
               OutlinedButton(
-                onPressed:
-                    directoryPath != null ? widget.onSyncNow : null,
+                onPressed: directoryPath != null ? widget.onSyncNow : null,
                 child: const Text(AppZh.settingsSyncNow),
               ),
             ],
@@ -584,8 +413,126 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 16),
         StickerCard(
+          variant: StickerVariant.mint,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(AppZh.settingsDexOffline, style: context.tito.cardTitle),
+              const SizedBox(height: 8),
+              Text(AppZh.settingsDexOfflineHint, style: context.tito.cardMuted),
+              const SizedBox(height: 12),
+              Text(
+                dexManifest != null && dexManifest.complete
+                    ? AppZh.settingsDexOfflineReady(
+                        dexManifest.pokemonCount,
+                        dexManifest.moveCount,
+                        formatCacheSize(dexCache?.sizeBytes ?? 0),
+                        dexManifest.downloadedAt?.split('T').first ?? '',
+                      )
+                    : dexManifest != null && dexManifest.pokemonCount > 0
+                    ? AppZh.settingsDexOfflinePartial(dexManifest.pokemonCount)
+                    : AppZh.settingsDexOfflineUnset,
+                style: context.tito.cardBodyEmphasis,
+              ),
+              if (_dexDownloading && dexProgress != null) ...[
+                const SizedBox(height: 12),
+                TitoProgressBar(value: dexProgress.fraction, height: 10),
+                const SizedBox(height: 6),
+                Text(
+                  AppZh.settingsDexOfflineProgress(
+                    dexProgress.phase,
+                    dexProgress.current,
+                    dexProgress.total,
+                  ),
+                  style: context.tito.cardMuted,
+                ),
+                if (dexProgress.label != null) ...[
+                  const SizedBox(height: 4),
+                  Text(dexProgress.label!, style: context.tito.caption),
+                ],
+              ],
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: _dexDownloading ? null : _downloadDexOffline,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.deepBlue,
+                  foregroundColor: TitoColors.card,
+                ),
+                child: Text(
+                  dexManifest != null &&
+                          dexManifest.pokemonCount > 0 &&
+                          !dexManifest.complete
+                      ? AppZh.settingsDexOfflineResume
+                      : AppZh.settingsDexOfflineDownload,
+                ),
+              ),
+              if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppZh.settingsDexOfflinePrefer,
+                        style: context.tito.cardBody,
+                      ),
+                    ),
+                    Switch(
+                      value: dexManifest.preferOffline,
+                      onChanged: _dexDownloading ? null : _setDexPreferOffline,
+                    ),
+                  ],
+                ),
+                OutlinedButton(
+                  onPressed: _dexDownloading ? null : _clearDexOffline,
+                  child: const Text(AppZh.settingsDexOfflineClear),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        StickerCard(
+          variant: StickerVariant.sky,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(AppZh.settingsEmulator, style: context.tito.cardTitle),
+              const SizedBox(height: 8),
+              Text(AppZh.settingsEmulatorHint, style: context.tito.cardMuted),
+              const SizedBox(height: 12),
+              Text(
+                emulator != null
+                    ? AppZh.settingsEmulatorSelected(emulator.appName)
+                    : AppZh.settingsEmulatorUnset,
+                style: context.tito.cardBodyEmphasis,
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: widget.onPickEmulator,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.coral,
+                  foregroundColor: TitoColors.ink,
+                ),
+                child: const Text(AppZh.settingsPickEmulator),
+              ),
+              if (emulator != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: widget.onClearEmulator,
+                  child: const Text(AppZh.settingsClearEmulator),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(AppZh.settingsGroupAdvanced, style: context.tito.cardTitle),
+              const SizedBox(height: 8),
               _Row(
                 label: AppZh.settingsCurrentGame,
                 value: localizeGame(widget.journey.game),
@@ -600,23 +547,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               _Row(
                 label: AppZh.settingsBadges,
-                value:
-                    '${widget.journey.badges}/${widget.journey.maxBadges}',
+                value: '${widget.journey.badges}/${widget.journey.maxBadges}',
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.sky,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsJourneyData,
-                style: context.tito.cardTitle,
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 6),
               FilledButton(
                 onPressed: widget.onImportFixture,
                 style: FilledButton.styleFrom(
@@ -643,8 +576,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ),
-        ],
-      ),
+      ],
     );
   }
 }
