@@ -24,7 +24,21 @@ TITODEX_DEX_BUNDLE_VERSION=2
 
 ---
 
-## 资源范围
+## Worker 自动部署（Workers Builds）
+
+**不用本地 wrangler deploy。** 在 Cloudflare Dashboard 连接 GitHub，推送 **`deploy/dex-cdn`** 分支即自动部署。
+
+| 设置 | 值 |
+| --- | --- |
+| 仓库 | `Tito-XD/tito-dex` |
+| 生产分支 | **`deploy/dex-cdn`** |
+| Root directory | `cloudflare/dex-cdn` |
+| Build command | *(留空)* |
+| Deploy command | `npx wrangler deploy` |
+
+详细步骤：[`cloudflare/dex-cdn/DEPLOY.md`](../cloudflare/dex-cdn/DEPLOY.md)
+
+---
 
 | 项目 | 说明 |
 | --- | --- |
