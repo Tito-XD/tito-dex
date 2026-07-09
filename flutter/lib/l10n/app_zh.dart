@@ -29,8 +29,7 @@ abstract final class AppZh {
   static const widgetContinue = '继续';
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
-  static const dexScopeNote =
-      '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
+  static const dexScopeNote = '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
   static const dexUnknown = '未捕获';
@@ -86,13 +85,16 @@ abstract final class AppZh {
     int moveCount,
     String size,
     String downloadedAt,
-  ) =>
-      '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
+  ) => '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
   static const settingsDexOfflineDownload = '下载离线图鉴';
   static const settingsDexOfflineResume = '继续下载离线图鉴';
   static const settingsDexOfflineClear = '清除离线缓存';
   static const settingsDexOfflinePrefer = '优先使用离线缓存';
-  static String settingsDexOfflineProgress(String phase, int current, int total) {
+  static String settingsDexOfflineProgress(
+    String phase,
+    int current,
+    int total,
+  ) {
     final phaseLabel = switch (phase) {
       'types' => '属性',
       'pokemon' => '宝可梦',
@@ -102,6 +104,7 @@ abstract final class AppZh {
     };
     return '正在缓存$phaseLabel $current / $total';
   }
+
   static const snackDexOfflineDone = '离线图鉴已下载完成';
   static String snackDexOfflinePartial(int count) =>
       '已缓存 $count / 493 只宝可梦，可再次点击继续下载补全';
@@ -109,7 +112,10 @@ abstract final class AppZh {
   static const snackDexOfflineFailed = '离线图鉴下载失败';
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
+  static const searchPrompt = '搜索宝可梦';
   static const searchEmptyHint = '可搜索 1–493 号宝可梦的中文名、英文名、编号或属性。';
+  static const searchRecent = '最近搜索';
+  static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
 
   static const recentTimeline = '最近动态';
@@ -120,11 +126,13 @@ abstract final class AppZh {
   static String teamSubtitle(int count) => '同行 $count 只';
 
   static const settingsTrainerProfile = '训练家资料';
+  static const settingsGroupTrainer = 'Trainer';
+  static const settingsGroupSaveSync = 'Save sync';
+  static const settingsGroupAdvanced = 'Advanced';
   static const settingsDisplayName = '显示名称';
   static const settingsDisplayNameHint = 'Tito';
   static const settingsSaveTrainerName = '保存名称';
-  static const settingsSaveTrainerHint =
-      '民间汉化版的显示名可能与存档字节解码不同。';
+  static const settingsSaveTrainerHint = '民间汉化版的显示名可能与存档字节解码不同。';
   static String settingsSaveDecodeHint(String saveName) =>
       '存档标准解码：$saveName（汉化版可能显示不同）';
 
@@ -174,8 +182,7 @@ abstract final class AppZh {
   static const snackJourneyImported = '已从 JSON 导入旅程';
   static String snackSaveLoaded(String name, int partyCount) =>
       '已加载 $name 的存档 · 队伍 $partyCount 只';
-  static String snackSaveLoadedWarnings(int count) =>
-      '已加载存档（$count 条解析提示）';
+  static String snackSaveLoadedWarnings(int count) => '已加载存档（$count 条解析提示）';
   static const snackMockRestored = '已恢复演示旅程';
 
   static const continueSheetTitle = '继续旅程';
