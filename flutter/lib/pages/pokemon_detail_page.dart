@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../theme/device_layout.dart';
 import '../l10n/app_zh.dart';
+import '../navigation/back_navigation.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_typography.dart';
-import '../widgets/app_header.dart';
+import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
@@ -26,18 +27,31 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
     with SingleTickerProviderStateMixin {
   late Future<PokemonDetail> _detailFuture;
   late final TabController _tabController;
+  int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_syncCurrentTab);
     _detailFuture = dexRepository.getDetail(widget.pokemonId);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_syncCurrentTab);
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _syncCurrentTab() {
+    if (!mounted) {
+      return;
+    }
+    final next = _tabController.index;
+    if (_currentTabIndex != next) {
+      setState(() => _currentTabIndex = next);
+    }
   }
 
   @override
@@ -47,10 +61,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: DeviceLayout.pagePadding(context),
             children: [
-              const AppHeader(showSettings: true),
-              const SizedBox(height: 24),
+              _DexBackBar(path: '/dex/${widget.pokemonId}'),
+              const SizedBox(height: 12),
               const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 12),
               Center(
@@ -68,28 +82,24 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               ? splitUserFacingError(snapshot.error!)
               : (AppZh.dexLoadFailed, AppZh.errorGeneric);
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: DeviceLayout.pagePadding(context),
             children: [
-              const AppHeader(showSettings: true),
+              _DexBackBar(path: '/dex/${widget.pokemonId}'),
+              const SizedBox(height: 12),
               StickerCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      errorCopy.$1,
-                      style: context.tito.cardBodyEmphasis,
-                    ),
+                    Text(errorCopy.$1, style: context.tito.cardBodyEmphasis),
                     const SizedBox(height: 8),
-                    Text(
-                      errorCopy.$2,
-                      style: context.tito.errorDetail,
-                    ),
+                    Text(errorCopy.$2, style: context.tito.errorDetail),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          _detailFuture =
-                              dexRepository.getDetail(widget.pokemonId);
+                          _detailFuture = dexRepository.getDetail(
+                            widget.pokemonId,
+                          );
                         });
                       },
                       child: const Text(AppZh.dexRetry),
@@ -109,32 +119,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
               padding: DeviceLayout.pagePadding(context).copyWith(bottom: 0),
               child: Column(
                 children: [
-                  if (!DeviceLayout.isCompact(context))
-                    const AppHeader(showSettings: true),
-                  PokemonDetailHeader(detail: detail),
-                  const SizedBox(height: 4),
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    labelColor: TitoColors.coral,
-                    unselectedLabelColor: TitoColors.card,
-                    indicatorColor: TitoColors.coral,
-                    dividerColor: Colors.transparent,
-                    labelStyle: TextStyle(
-                      fontFamily: TitoTypography.fontFamily,
-                      fontSize: DeviceLayout.useSquareDashboard(context)
-                          ? 11
-                          : (DeviceLayout.isCompact(context) ? 12 : 14),
-                      fontWeight: FontWeight.w800,
-                    ),
-                    tabs: const [
-                      Tab(text: AppZh.dexTabIntro),
-                      Tab(text: AppZh.dexTabBasic),
-                      Tab(text: AppZh.dexTabObtain),
-                      Tab(text: AppZh.dexTabMoves),
-                    ],
-                  ),
+                  _DexBackBar(path: '/dex/${widget.pokemonId}'),
+                  const SizedBox(height: 8),
+                  _CompactPokemonHeader(detail: detail),
                 ],
               ),
             ),
@@ -149,9 +136,149 @@ class _PokemonDetailPageState extends State<PokemonDetailPage>
                 ],
               ),
             ),
+            _DetailBottomTabs(
+              currentIndex: _currentTabIndex,
+              onSelected: (index) => _tabController.animateTo(index),
+            ),
           ],
         );
       },
+    );
+  }
+}
+
+class _DexBackBar extends StatelessWidget {
+  const _DexBackBar({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton(
+        onPressed: () => TitoBackNavigation.navigateBack(context, path),
+        style: TextButton.styleFrom(
+          foregroundColor: TitoColors.card,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          visualDensity: VisualDensity.compact,
+        ),
+        child: Text(
+          '← 图鉴',
+          style: context.tito.cardBodyStrong.copyWith(color: TitoColors.card),
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactPokemonHeader extends StatelessWidget {
+  const _CompactPokemonHeader({required this.detail});
+
+  final PokemonDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = detail.summary;
+    final square = DeviceLayout.useSquareDashboard(context);
+    final dexLabel = [
+      if (detail.johtoDexLabel != null) detail.johtoDexLabel,
+      detail.nationalDexLabel,
+    ].join(' · ');
+
+    return StickerCard(
+      variant: StickerVariant.deep,
+      padding: EdgeInsets.symmetric(
+        horizontal: square ? 10 : 12,
+        vertical: square ? 8 : 10,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '$dexLabel · ${summary.nameZh}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.tito.onDeepHeading.copyWith(
+                fontSize: square ? 13 : 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          DexSpriteImage(
+            source: summary.displaySpritePath,
+            width: square ? 50 : 58,
+            height: square ? 50 : 58,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailBottomTabs extends StatelessWidget {
+  const _DetailBottomTabs({
+    required this.currentIndex,
+    required this.onSelected,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onSelected;
+
+  static const _tabs = [
+    AppZh.dexTabIntro,
+    '基本',
+    AppZh.dexTabObtain,
+    AppZh.dexTabMoves,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: TitoColors.deepBlue,
+            borderRadius: BorderRadius.circular(TitoRadii.md),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          child: Row(
+            children: List.generate(_tabs.length, (index) {
+              final selected = index == currentIndex;
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Material(
+                    color: selected
+                        ? TitoColors.softYellow
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    child: InkWell(
+                      onTap: () => onSelected(index),
+                      borderRadius: BorderRadius.circular(TitoRadii.sm),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          _tabs[index],
+                          textAlign: TextAlign.center,
+                          style: context.tito.chip.copyWith(
+                            color: selected
+                                ? TitoColors.deepBlue
+                                : TitoColors.card,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -247,10 +374,7 @@ class _ObtainTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppZh.dexEvolution,
-                style: context.tito.cardSectionTitle,
-              ),
+              Text(AppZh.dexEvolution, style: context.tito.cardSectionTitle),
               const SizedBox(height: 12),
               EvolutionChainView(
                 root: detail.evolutionChain!,
@@ -276,10 +400,7 @@ class _MovesTab extends StatelessWidget {
     return ListView(
       padding: DeviceLayout.pagePadding(context),
       children: [
-        Text(
-          AppZh.dexMovesHgssScope,
-          style: context.tito.pageNoteOnGradient,
-        ),
+        Text(AppZh.dexMovesHgssScope, style: context.tito.pageNoteOnGradient),
         const SizedBox(height: 12),
         MoveCategoryPanel(
           title: moveMethodLabelZh('level-up'),
@@ -292,10 +413,7 @@ class _MovesTab extends StatelessWidget {
           moves: moveSet.machine,
         ),
         const SizedBox(height: 12),
-        MoveCategoryPanel(
-          title: moveMethodLabelZh('egg'),
-          moves: moveSet.egg,
-        ),
+        MoveCategoryPanel(title: moveMethodLabelZh('egg'), moves: moveSet.egg),
       ],
     );
   }

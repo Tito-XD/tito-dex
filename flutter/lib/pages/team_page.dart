@@ -5,7 +5,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
-import '../widgets/app_header.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/party_summary.dart';
 import '../widgets/sticker_card.dart';
 
@@ -16,10 +16,10 @@ class TeamPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return SecondaryPageScaffold(
+      title: AppZh.navTeam,
       padding: DeviceLayout.pagePadding(context),
       children: [
-        const AppHeader(showSettings: true),
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -42,10 +42,7 @@ class TeamPage extends StatelessWidget {
         const SizedBox(height: 14),
         StickerCard(
           variant: StickerVariant.cream,
-          child: Text(
-            AppZh.teamNote,
-            style: context.tito.cardBodyStrong,
-          ),
+          child: Text(AppZh.teamNote, style: context.tito.cardBodyStrong),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'device_layout.dart';
@@ -43,10 +44,7 @@ class TitoPrimaryButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(TitoRadii.md),
             border: Border.all(color: TitoColors.ink, width: 3),
             boxShadow: const [
-              BoxShadow(
-                color: Color(0x3818283B),
-                offset: Offset(0, 5),
-              ),
+              BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
             ],
           ),
           child: Row(
@@ -64,12 +62,69 @@ class TitoPrimaryButton extends StatelessWidget {
               if (showArrow) ...[
                 SizedBox(width: dense ? 4 : (compact ? 6 : 8)),
                 Icon(
-                  Icons.play_arrow_rounded,
+                  Icons.arrow_forward_rounded,
                   color: TitoColors.card,
                   size: dense ? 16 : (compact ? 18 : 22),
                 ),
               ],
             ],
+          ),
+        ),
+      ),
+    );
+
+    if (expanded) {
+      return SizedBox(width: double.infinity, child: button);
+    }
+    return button;
+  }
+}
+
+/// Sky-blue secondary action with dark text and sticker shadow.
+class TitoSecondaryButton extends StatelessWidget {
+  const TitoSecondaryButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.expanded = false,
+    this.compact = false,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final bool expanded;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final button = Material(
+      color: TitoColors.skyBlue,
+      borderRadius: BorderRadius.circular(TitoRadii.md),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        splashColor: TitoColors.deepBlue.withValues(alpha: 0.22),
+        highlightColor: TitoColors.deepBlue.withValues(alpha: 0.12),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: compact ? 16 : 24,
+            vertical: compact ? 10 : 14,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(TitoRadii.md),
+            border: Border.all(color: TitoColors.ink, width: 3),
+            boxShadow: const [
+              BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
+            ],
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TitoTypography.style(
+              color: TitoColors.ink,
+              fontWeight: FontWeight.w800,
+              fontSize: compact ? 14 : 16,
+            ),
           ),
         ),
       ),
@@ -109,10 +164,7 @@ class TitoCoralButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(TitoRadii.md),
             border: Border.all(color: TitoColors.ink, width: 3),
             boxShadow: const [
-              BoxShadow(
-                color: Color(0x3818283B),
-                offset: Offset(0, 5),
-              ),
+              BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
             ],
           ),
           child: Text(
@@ -173,10 +225,7 @@ class TitoQuickTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(TitoRadii.md),
               border: Border.all(color: TitoColors.ink, width: 3),
               boxShadow: const [
-                BoxShadow(
-                  color: Color(0x3818283B),
-                  offset: Offset(0, 5),
-                ),
+                BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
               ],
             ),
             child: SizedBox(
@@ -184,11 +233,7 @@ class TitoQuickTile extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    icon,
-                    color: TitoColors.deepBlue,
-                    size: iconSize,
-                  ),
+                  Icon(icon, color: TitoColors.deepBlue, size: iconSize),
                   SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
                   Text(
                     label,
@@ -206,6 +251,101 @@ class TitoQuickTile extends StatelessWidget {
   }
 }
 
+/// Colorful quick-action tile with slight tilt for square dashboard mode.
+class TitoPolaroidQuickTile extends StatelessWidget {
+  const TitoPolaroidQuickTile({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.tone = TitoPolaroidTone.blue,
+    this.compact = false,
+    this.tiltDegrees = 0,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final TitoPolaroidTone tone;
+  final bool compact;
+  final double tiltDegrees;
+
+  @override
+  Widget build(BuildContext context) {
+    final (frameColor, iconColor) = switch (tone) {
+      TitoPolaroidTone.blue => (TitoColors.skyBlue, TitoColors.deepBlue),
+      TitoPolaroidTone.yellow => (TitoColors.softYellow, TitoColors.ink),
+      TitoPolaroidTone.coral => (TitoColors.coral, TitoColors.ink),
+      TitoPolaroidTone.mint => (TitoColors.mint, TitoColors.ink),
+    };
+    final iconSize = compact ? 22.0 : 30.0;
+    final radius = BorderRadius.circular(TitoRadii.md);
+
+    final tile = HandheldFocusDecorator(
+      onActivate: onTap,
+      child: Material(
+        color: TitoColors.card,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: TitoColors.ink, width: 3),
+              boxShadow: const [
+                BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
+              ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                compact ? 8 : 10,
+                compact ? 8 : 10,
+                compact ? 8 : 10,
+                compact ? 6 : 8,
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: frameColor,
+                        borderRadius: BorderRadius.circular(TitoRadii.sm),
+                        border: Border.all(color: TitoColors.ink, width: 2),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(icon, color: iconColor, size: iconSize),
+                    ),
+                  ),
+                  SizedBox(height: compact ? 4 : 6),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.tito.quickTileLabel.copyWith(
+                      color: TitoColors.ink,
+                      fontSize: compact ? 10 : 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (tiltDegrees.abs() < 0.01) {
+      return tile;
+    }
+    return Transform.rotate(angle: tiltDegrees * math.pi / 180, child: tile);
+  }
+}
+
+enum TitoPolaroidTone { blue, yellow, coral, mint }
+
 class TitoBadgePill extends StatelessWidget {
   const TitoBadgePill({
     super.key,
@@ -221,20 +361,23 @@ class TitoBadgePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (tone) {
-      TitoBadgeTone.yellow => (TitoColors.softYellow, TitoColors.deepBlue),
+      TitoBadgeTone.yellow => (TitoColors.softYellow, TitoColors.ink),
       TitoBadgeTone.sky => (TitoColors.skyBlue, TitoColors.ink),
       TitoBadgeTone.coral => (TitoColors.coral, TitoColors.ink),
     };
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 12,
+        horizontal: compact ? 8 : 14,
         vertical: compact ? 4 : 6,
       ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        border: Border.all(color: TitoColors.ink, width: 3),
+        boxShadow: const [
+          BoxShadow(color: Color(0x3818283B), offset: Offset(0, 3)),
+        ],
       ),
       child: Text(
         label,

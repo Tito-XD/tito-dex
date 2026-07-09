@@ -12,17 +12,61 @@ import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
+import 'tito_progress_bar.dart';
 
 class PokemonDetailHeader extends StatelessWidget {
-  const PokemonDetailHeader({super.key, required this.detail});
+  const PokemonDetailHeader({
+    super.key,
+    required this.detail,
+    this.compact = false,
+    this.showSettingsAction = true,
+  });
 
   final PokemonDetail detail;
+  final bool compact;
+  final bool showSettingsAction;
 
   @override
   Widget build(BuildContext context) {
     final summary = detail.summary;
-    final compact = DeviceLayout.isCompact(context);
+    final compactLayout = compact || DeviceLayout.isCompact(context);
     final square = DeviceLayout.useSquareDashboard(context);
+    final dexLabel = [
+      if (detail.johtoDexLabel != null) detail.johtoDexLabel,
+      detail.nationalDexLabel,
+    ].join(' · ');
+
+    if (compact) {
+      return StickerCard(
+        variant: StickerVariant.deep,
+        padding: EdgeInsets.symmetric(
+          horizontal: square ? 10 : 12,
+          vertical: square ? 8 : 10,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                '$dexLabel · ${summary.nameZh}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.tito.onDeepHeading.copyWith(
+                  fontSize: square ? 13 : 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            DexSpriteImage(
+              source: summary.displaySpritePath,
+              width: square ? 50 : 58,
+              height: square ? 50 : 58,
+            ),
+          ],
+        ),
+      );
+    }
+
     return StickerCard(
       variant: StickerVariant.deep,
       child: Row(
@@ -32,13 +76,7 @@ class PokemonDetailHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  [
-                    if (detail.johtoDexLabel != null) detail.johtoDexLabel,
-                    detail.nationalDexLabel,
-                  ].join(' · '),
-                  style: context.tito.onDeepSubtitle,
-                ),
+                Text(dexLabel, style: context.tito.onDeepSubtitle),
                 Text(
                   summary.nameZh,
                   style: context.tito.onDeepHeading.copyWith(
@@ -46,10 +84,7 @@ class PokemonDetailHeader extends StatelessWidget {
                   ),
                 ),
                 if (detail.genusZh.isNotEmpty)
-                  Text(
-                    detail.genusZh,
-                    style: context.tito.onDeepSubtitle,
-                  ),
+                  Text(detail.genusZh, style: context.tito.onDeepSubtitle),
                 const SizedBox(height: 6),
                 TypeChipRow(
                   types: summary.types.map(typeNameZh).toList(),
@@ -60,16 +95,19 @@ class PokemonDetailHeader extends StatelessWidget {
           ),
           Column(
             children: [
-              if (compact)
+              if (compactLayout && showSettingsAction)
                 IconButton(
                   onPressed: () => context.push('/settings'),
-                  icon: const Icon(Icons.settings_rounded, color: TitoColors.card),
+                  icon: const Icon(
+                    Icons.settings_rounded,
+                    color: TitoColors.card,
+                  ),
                   tooltip: AppZh.navSettings,
                 ),
               DexSpriteImage(
                 source: summary.displaySpritePath,
-                width: square ? 72 : (compact ? 84 : 108),
-                height: square ? 72 : (compact ? 84 : 108),
+                width: square ? 72 : (compactLayout ? 84 : 108),
+                height: square ? 72 : (compactLayout ? 84 : 108),
               ),
             ],
           ),
@@ -108,10 +146,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   Widget build(BuildContext context) {
     if (widget.entries.isEmpty) {
       return StickerCard(
-        child: Text(
-          AppZh.dexFlavorEmpty,
-          style: context.tito.cardBodyStrong,
-        ),
+        child: Text(AppZh.dexFlavorEmpty, style: context.tito.cardBodyStrong),
       );
     }
 
@@ -119,10 +154,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexFlavorTitle,
-            style: context.tito.cardSectionTitle,
-          ),
+          Text(AppZh.dexFlavorTitle, style: context.tito.cardSectionTitle),
           const SizedBox(height: 8),
           SizedBox(
             height: 120,
@@ -141,10 +173,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                     ),
                     const SizedBox(height: 6),
                     Expanded(
-                      child: Text(
-                        entry.text,
-                        style: context.tito.cardBody,
-                      ),
+                      child: Text(entry.text, style: context.tito.cardBody),
                     ),
                   ],
                 );
@@ -190,10 +219,7 @@ class BaseStatsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexBaseStats,
-            style: context.tito.cardSectionTitle,
-          ),
+          Text(AppZh.dexBaseStats, style: context.tito.cardSectionTitle),
           const SizedBox(height: 12),
           ...stats.entries.map((entry) {
             final label = statLabelsZh[entry.key] ?? entry.key;
@@ -211,14 +237,9 @@ class BaseStatsCard extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: entry.value / maxStat,
-                        minHeight: 10,
-                        backgroundColor: TitoColors.skyBlue,
-                        color: TitoColors.coral,
-                      ),
+                    child: TitoProgressBar(
+                      value: entry.value / maxStat,
+                      height: 10,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -242,12 +263,11 @@ class BaseStatsCard extends StatelessWidget {
             children: [
               Text(
                 AppZh.dexBaseStatTotal,
-                style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w800),
+                style: context.tito.cardLabel.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-              Text(
-                '${stats.total}',
-                style: context.tito.cardValueLarge,
-              ),
+              Text('${stats.total}', style: context.tito.cardValueLarge),
             ],
           ),
         ],
@@ -257,10 +277,7 @@ class BaseStatsCard extends StatelessWidget {
 }
 
 class TypeEffectivenessGrid extends StatelessWidget {
-  const TypeEffectivenessGrid({
-    super.key,
-    required this.multipliers,
-  });
+  const TypeEffectivenessGrid({super.key, required this.multipliers});
 
   final Map<String, double> multipliers;
 
@@ -270,10 +287,7 @@ class TypeEffectivenessGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexTypeGridTitle,
-            style: context.tito.cardSectionTitle,
-          ),
+          Text(AppZh.dexTypeGridTitle, style: context.tito.cardSectionTitle),
           const SizedBox(height: 12),
           FutureBuilder<Map<String, String?>>(
             future: _iconPaths(),
@@ -335,26 +349,26 @@ class TypeEffectivenessGrid extends StatelessWidget {
   }
 
   Color _typeColor(String type) => switch (type) {
-        'normal' => const Color(0xFFD8D3C3),
-        'fire' => const Color(0xFFF5A26F),
-        'water' => const Color(0xFF7CB7FF),
-        'electric' => const Color(0xFFF7D977),
-        'grass' => const Color(0xFF8ED081),
-        'ice' => const Color(0xFF9BE7E6),
-        'fighting' => const Color(0xFFE07B62),
-        'poison' => const Color(0xFFC68FD9),
-        'ground' => const Color(0xFFE6C07A),
-        'flying' => const Color(0xFFB8C8F0),
-        'psychic' => const Color(0xFFFF8CB3),
-        'bug' => const Color(0xFFB5D06A),
-        'rock' => const Color(0xFFC9B48A),
-        'ghost' => const Color(0xFF9F8AC8),
-        'dragon' => const Color(0xFF7B8CFF),
-        'dark' => const Color(0xFF9B8B7D),
-        'steel' => const Color(0xFFB0C0CF),
-        'fairy' => const Color(0xFFFFA9D6),
-        _ => TitoColors.skyBlue,
-      };
+    'normal' => const Color(0xFFD8D3C3),
+    'fire' => const Color(0xFFF5A26F),
+    'water' => const Color(0xFF7CB7FF),
+    'electric' => const Color(0xFFF7D977),
+    'grass' => const Color(0xFF8ED081),
+    'ice' => const Color(0xFF9BE7E6),
+    'fighting' => const Color(0xFFE07B62),
+    'poison' => const Color(0xFFC68FD9),
+    'ground' => const Color(0xFFE6C07A),
+    'flying' => const Color(0xFFB8C8F0),
+    'psychic' => const Color(0xFFFF8CB3),
+    'bug' => const Color(0xFFB5D06A),
+    'rock' => const Color(0xFFC9B48A),
+    'ghost' => const Color(0xFF9F8AC8),
+    'dragon' => const Color(0xFF7B8CFF),
+    'dark' => const Color(0xFF9B8B7D),
+    'steel' => const Color(0xFFB0C0CF),
+    'fairy' => const Color(0xFFFFA9D6),
+    _ => TitoColors.skyBlue,
+  };
 
   Color _multiplierColor(double multiplier) {
     if (multiplier >= 2) {
@@ -391,24 +405,15 @@ class MoveCategoryPanel extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  title,
-                  style: context.tito.cardSectionTitle,
-                ),
+                child: Text(title, style: context.tito.cardSectionTitle),
               ),
-              Text(
-                '${moves.length}',
-                style: context.tito.accentCoral,
-              ),
+              Text('${moves.length}', style: context.tito.accentCoral),
             ],
           ),
           if (moves.isEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                AppZh.dexNone,
-                style: context.tito.cardMuted,
-              ),
+              child: Text(AppZh.dexNone, style: context.tito.cardMuted),
             )
           else
             ...moves.map(
@@ -480,7 +485,9 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexGenderRatio,
-                  style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w800),
+                  style: context.tito.cardLabel.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const Spacer(),
                 Text(
@@ -496,7 +503,9 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexEggGroups,
-                  style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w800),
+                  style: context.tito.cardLabel.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const Spacer(),
                 Text(
@@ -512,7 +521,9 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexHatchSteps,
-                  style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w800),
+                  style: context.tito.cardLabel.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const Spacer(),
                 Text(
@@ -543,10 +554,7 @@ class _MetaTile extends StatelessWidget {
           label,
           style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w700),
         ),
-        Text(
-          value,
-          style: context.tito.cardValueLarge,
-        ),
+        Text(value, style: context.tito.cardValueLarge),
       ],
     );
   }
