@@ -56,11 +56,17 @@ jobs:
           done
           find "$V2/sprites" -type f | while read -r file; do
             rel="${file#"$V2/"}"
-            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/jpeg
+            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
           done
+          if [ -d "$V2/artwork" ]; then
+            find "$V2/artwork" -type f | while read -r file; do
+              rel="${file#"$V2/"}"
+              npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
+            done
+          fi
           find "$V2/type_icons" -type f | while read -r file; do
             rel="${file#"$V2/"}"
-            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/jpeg
+            npx wrangler r2 object put "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
           done
 
       - name: Verify CDN
