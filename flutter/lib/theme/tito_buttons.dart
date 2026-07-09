@@ -213,7 +213,9 @@ class TitoQuickTile extends StatelessWidget {
         : (dense
             ? DeviceLayout.squareQuickTileHeight(context)
             : (compact ? 56.0 : 88.0));
-    final iconSize = square ? 20.0 : (dense ? 18.0 : (compact ? 22.0 : 28.0));
+    final iconSize = square
+        ? DeviceLayout.quickTileIconSize(context, square: true)
+        : (dense ? 18.0 : (compact ? 22.0 : 28.0));
 
     final tile = HandheldFocusDecorator(
       onActivate: onTap,
@@ -400,13 +402,15 @@ class TitoBadgePill extends StatelessWidget {
       TitoBadgeTone.coral => (TitoColors.coral, TitoColors.ink),
     };
 
-    final fontSize = (square ? 20.0 : (compact ? 16.0 : 18.0)) *
-        DeviceLayout.fontMultiplier(context);
+    final fontSize = DeviceLayout.dim(
+      context,
+      square ? 20.0 : (compact ? 16.0 : 18.0),
+    );
 
     final pill = Container(
       padding: EdgeInsets.symmetric(
-        horizontal: square ? 14 : (compact ? 10 : 14),
-        vertical: square ? 8 : (compact ? 6 : 8),
+        horizontal: DeviceLayout.dim(context, square ? 14.0 : (compact ? 10.0 : 14.0)),
+        vertical: DeviceLayout.dim(context, square ? 8.0 : (compact ? 6.0 : 8.0)),
       ),
       decoration: BoxDecoration(
         color: bg,

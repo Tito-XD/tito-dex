@@ -220,8 +220,12 @@ class _PartyOrb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
-    final orbSize = mini ? 28.0 : (compact ? 40.0 : 48.0);
-    final slotWidth = mini ? 52.0 : (compact ? 58.0 : 64.0);
+    final orbSize = mini
+        ? DeviceLayout.dim(context, 28.0)
+        : (compact ? DeviceLayout.dim(context, 40.0) : 48.0);
+    final slotWidth = mini
+        ? DeviceLayout.dim(context, 52.0)
+        : (compact ? DeviceLayout.dim(context, 58.0) : 64.0);
 
     final avatar = _PartyMemberAvatar(
       member: member,

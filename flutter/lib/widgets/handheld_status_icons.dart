@@ -48,7 +48,7 @@ class _WifiIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Icon(
       onWifi ? Icons.wifi_rounded : Icons.wifi_off_rounded,
-      size: compact ? 18 : 16,
+      size: DeviceLayout.statusIconSize(context, compact: compact),
       color: onWifi ? TitoColors.deepBlue : TitoColors.deepBlue.withValues(alpha: 0.45),
     );
   }
@@ -75,8 +75,8 @@ class _BatteryIndicator extends StatelessWidget {
     };
     const borderColor = TitoColors.deepBlue;
 
-    final bodyWidth = compact ? 24.0 : 20.0;
-    final bodyHeight = compact ? 14.0 : 11.0;
+    final bodyWidth = DeviceLayout.dim(context, compact ? 24.0 : 20.0);
+    final bodyHeight = DeviceLayout.dim(context, compact ? 14.0 : 11.0);
     final fillWidth = bodyWidth * (value / 100);
 
     return Row(
