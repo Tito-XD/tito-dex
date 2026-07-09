@@ -24,7 +24,6 @@ import 'theme/tito_theme.dart';
 import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
-import 'widgets/tito_bottom_nav.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -69,14 +68,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   context.go('/');
                 }
               },
-              child: DeviceShell(
-                child: Column(
-                  children: [
-                    Expanded(child: child),
-                    TitoBottomNav(location: state.uri.path),
-                  ],
-                ),
-              ),
+              child: DeviceShell(child: child),
             );
           },
           routes: [
