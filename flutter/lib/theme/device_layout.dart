@@ -167,15 +167,28 @@ abstract final class DeviceLayout {
     return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.12);
   }
 
-  static double fontMultiplier(BuildContext context) {
+  /// Unified handheld UI scale for typography and chrome (v0.2.18 used 2.0).
+  static const double handheldUiScale = 1.0;
+
+  static double uiScale(BuildContext context) {
     final scope = TitoFontScale.maybeOf(context);
     if (scope != null) {
       return scope.multiplier;
     }
     if (isNativeTarget || useSquareDashboard(context)) {
-      return 2.0;
+      return handheldUiScale;
     }
     return 1.0;
+  }
+
+  static double fontMultiplier(BuildContext context) => uiScale(context);
+
+  /// Scale layout values that were sized for v0.2.18's 2× handheld chrome.
+  static double dim(BuildContext context, double at2xHandheld) {
+    if (isNativeTarget || useSquareDashboard(context) || isCompact(context)) {
+      return at2xHandheld * (uiScale(context) / 2.0);
+    }
+    return at2xHandheld;
   }
 
   static double radius(BuildContext context, double base) {
@@ -190,54 +203,56 @@ abstract final class DeviceLayout {
   static double rLg(BuildContext context) => radius(context, TitoRadii.lg);
 
   static double headerIconSize(BuildContext context) {
-    if (useSquareDashboard(context)) {
-      return 72;
-    }
-    if (isCompact(context)) {
-      return 68;
-    }
-    return 80;
+    final raw = useSquareDashboard(context)
+        ? 72.0
+        : (isCompact(context) ? 68.0 : 80.0);
+    return dim(context, raw);
   }
 
   static double headerTitleSize(BuildContext context) {
-    if (useSquareDashboard(context)) {
-      return 44;
-    }
-    if (isCompact(context)) {
-      return 40;
-    }
-    return 52;
+    final raw = useSquareDashboard(context)
+        ? 44.0
+        : (isCompact(context) ? 40.0 : 52.0);
+    return dim(context, raw);
   }
 
   static double headerBarHeight(BuildContext context) {
-    if (useSquareDashboard(context)) {
-      return 80;
-    }
-    if (isCompact(context)) {
-      return 72;
-    }
-    return 80;
+    final raw = useSquareDashboard(context)
+        ? 80.0
+        : (isCompact(context) ? 72.0 : 80.0);
+    return dim(context, raw);
   }
 
   static double dexBackControlSize(BuildContext context) {
-    if (useSquareDashboard(context)) {
-      return 56;
-    }
-    if (isCompact(context)) {
-      return 48;
-    }
-    return 40;
+    final raw = useSquareDashboard(context)
+        ? 56.0
+        : (isCompact(context) ? 48.0 : 40.0);
+    return dim(context, raw);
   }
 
   static double dexBackIconSize(BuildContext context) {
-    if (useSquareDashboard(context)) {
-      return 56;
-    }
-    if (isCompact(context)) {
-      return 48;
-    }
-    return 44;
+    final raw = useSquareDashboard(context)
+        ? 56.0
+        : (isCompact(context) ? 48.0 : 44.0);
+    return dim(context, raw);
   }
+
+  static double trainerMicroCardHeight(BuildContext context) =>
+      dim(context, 104.0);
+
+  static double trainerMicroAvatarSize(BuildContext context) =>
+      dim(context, 56.0);
+
+  static double trainerDenseAvatarSize(BuildContext context) =>
+      dim(context, 44.0);
+
+  static double quickTileIconSize(BuildContext context, {bool square = false}) {
+    final raw = square ? 20.0 : 18.0;
+    return dim(context, raw);
+  }
+
+  static double statusIconSize(BuildContext context, {bool compact = false}) =>
+      dim(context, compact ? 18.0 : 16.0);
 
   static int dexGridColumns(BuildContext context) {
     final size = sizeOf(context);

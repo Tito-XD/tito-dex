@@ -396,8 +396,8 @@ class _DexTopBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(TitoRadii.md),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: square ? 12 : 10,
-                    vertical: square ? 8 : 6,
+                    horizontal: DeviceLayout.dim(context, square ? 12.0 : 10.0),
+                    vertical: DeviceLayout.dim(context, square ? 8.0 : 6.0),
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(TitoRadii.md),

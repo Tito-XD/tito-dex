@@ -5,6 +5,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
@@ -32,8 +33,8 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
-    final spriteSize = compact ? 44.0 : 64.0;
-    final padding = compact ? 4.0 : 10.0;
+    final spriteSize = compact ? DeviceLayout.dim(context, 44.0) : 64.0;
+    final padding = compact ? DeviceLayout.dim(context, 4.0) : 10.0;
 
     return GestureDetector(
       onTap: onTap ?? () => context.push('/dex/${summary.id}'),

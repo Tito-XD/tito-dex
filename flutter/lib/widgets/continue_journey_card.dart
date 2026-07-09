@@ -165,7 +165,7 @@ class _ContinueButton extends StatelessWidget {
                 Icon(
                   Icons.play_arrow_rounded,
                   color: TitoColors.card,
-                  size: dense ? 28 : 24,
+                  size: dense ? DeviceLayout.dim(context, 28.0) : 24,
                 ),
               ],
             ),

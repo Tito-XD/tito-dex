@@ -30,7 +30,11 @@ class TrainerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compactMode = compact || dense;
-    final avatarSize = micro ? 56.0 : (dense ? 44.0 : (compact ? 52.0 : 72.0));
+    final avatarSize = micro
+        ? DeviceLayout.trainerMicroAvatarSize(context)
+        : (dense
+            ? DeviceLayout.trainerDenseAvatarSize(context)
+            : (compact ? 52.0 : 72.0));
     final padding = (compactMode || micro)
         ? DeviceLayout.cardPadding(context)
         : null;
@@ -39,7 +43,7 @@ class TrainerCard extends StatelessWidget {
       return StickerCard(
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: SizedBox(
-          height: 104,
+          height: DeviceLayout.trainerMicroCardHeight(context),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -212,7 +216,11 @@ class _BadgeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dot = micro ? 10.0 : (dense ? 10.0 : (compact ? 12.0 : 14.0));
+    final dot = micro
+        ? DeviceLayout.dim(context, 10.0)
+        : (dense
+            ? DeviceLayout.dim(context, 10.0)
+            : (compact ? DeviceLayout.dim(context, 12.0) : 14.0));
     return Row(
       mainAxisSize: micro ? MainAxisSize.min : MainAxisSize.max,
       children: [

@@ -20,7 +20,9 @@ class CompanionSticker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final square = DeviceLayout.useSquareDashboard(context);
-    final spriteSize = square ? 52.0 : (compact ? 52.0 : 72.0);
+    final spriteSize = square
+        ? DeviceLayout.dim(context, 52.0)
+        : (compact ? DeviceLayout.dim(context, 52.0) : 72.0);
 
     return Semantics(
       button: onTap != null,
