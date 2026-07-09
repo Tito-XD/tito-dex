@@ -8,7 +8,7 @@
 | --- | --- |
 | **生产部署分支** | `deploy/dex-cdn` |
 | **Worker 根目录** | `cloudflare/dex-cdn` |
-| **Worker 名称** | `titodex-dex-cdn` |
+| **Worker 名称** | `tito-dex`（与 Dashboard 项目名一致） |
 
 只把 **Worker / CDN 相关改动** 合进 `deploy/dex-cdn`，避免 Flutter App 每次 push 都触发 Worker 重部署。
 
@@ -39,7 +39,7 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 | 设置项 | 填写 |
 | --- | --- |
-| **Project name** | `titodex-dex-cdn` |
+| **Project name** | `tito-dex` |
 | **Production branch** | `deploy/dex-cdn` |
 | **Root directory** | `cloudflare/dex-cdn` |
 | **Build command** | *(留空，或 `npm ci`)* |

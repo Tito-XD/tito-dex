@@ -78,6 +78,21 @@ export default {
       return Response.redirect(manifest.archiveUrl, 302);
     }
 
+    if (url.pathname === '/cdn-health') {
+      const headers = new Headers(CORS_HEADERS);
+      headers.set('Content-Type', 'application/json; charset=utf-8');
+      headers.set('Cache-Control', 'no-store');
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          service: 'tito-dex-cdn',
+          rev: '2026-07-09a',
+          bucket: 'titodex-dex',
+        }),
+        { status: 200, headers },
+      );
+    }
+
     const key = objectKeyFromPath(url.pathname);
     const object = await env.DEX_BUCKET.get(key);
     if (!object) {
