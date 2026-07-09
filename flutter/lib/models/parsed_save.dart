@@ -3,12 +3,18 @@ class ParsedPartyMember {
     required this.speciesId,
     required this.speciesName,
     this.level,
+    this.currentHp,
+    this.maxHp,
+    this.experience,
     this.warning,
   });
 
   final int speciesId;
   final String speciesName;
   final int? level;
+  final int? currentHp;
+  final int? maxHp;
+  final int? experience;
   final String? warning;
 }
 

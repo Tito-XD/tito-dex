@@ -123,6 +123,7 @@ abstract final class AppZh {
   static const journeyTimelineEmpty = '还没有旅程记录';
 
   static const teamNote = '队伍数据来自当前存档或演示旅程。后续可在这里编辑同行宝可梦。';
+  static const teamEmptySlot = '空位';
   static String teamSubtitle(int count) => '同行 $count 只';
 
   static const settingsTrainerProfile = '训练家资料';

@@ -10,11 +10,15 @@ class TitoProgressBar extends StatelessWidget {
     required this.value,
     this.label,
     this.height = 8,
+    this.fillColor,
+    this.trackColor,
   });
 
   final double value;
   final String? label;
   final double height;
+  final Color? fillColor;
+  final Color? trackColor;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +41,12 @@ class TitoProgressBar extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                const ColoredBox(color: TitoColors.slateBlue),
+                ColoredBox(color: trackColor ?? TitoColors.slateBlue),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: FractionallySizedBox(
                     widthFactor: clamped,
-                    child: const ColoredBox(color: TitoColors.deepBlue),
+                    child: ColoredBox(color: fillColor ?? TitoColors.deepBlue),
                   ),
                 ),
               ],

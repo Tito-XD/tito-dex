@@ -9,6 +9,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
+import 'tito_sprite_sticker.dart';
 
 class PokemonMiniCard extends StatelessWidget {
   const PokemonMiniCard({
@@ -38,9 +39,10 @@ class PokemonMiniCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DexSpriteImage(
+            TitoSpriteSticker(
               source: summary.displaySpritePath,
-              height: 56,
+              size: 64,
+              padding: 2,
             ),
             Text(
               '#${summary.id.toString().padLeft(3, '0')}',
