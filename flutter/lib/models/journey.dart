@@ -1,22 +1,26 @@
 class PartyMember {
   const PartyMember({
     required this.species,
+    this.speciesId,
     this.level,
     this.nickname,
   });
 
   final String species;
+  final int? speciesId;
   final int? level;
   final String? nickname;
 
   Map<String, dynamic> toJson() => {
         'species': species,
+        if (speciesId != null) 'speciesId': speciesId,
         if (level != null) 'level': level,
         if (nickname != null) 'nickname': nickname,
       };
 
   factory PartyMember.fromJson(Map<String, dynamic> json) => PartyMember(
         species: json['species'] as String,
+        speciesId: json['speciesId'] as int?,
         level: json['level'] as int?,
         nickname: json['nickname'] as String?,
       );
@@ -154,10 +158,20 @@ class CurrentJourney {
         companion: 'Cyndaquil',
         nextReminder: '准备好就去广播塔看看',
         party: [
-          PartyMember(species: 'Quilava', level: 24, nickname: 'Quilava'),
-          PartyMember(species: 'Riolu', level: 18, nickname: 'Riolu'),
-          PartyMember(species: 'Flaaffy', level: 21),
-          PartyMember(species: 'Togepi', level: 15),
+          PartyMember(
+            species: 'Quilava',
+            speciesId: 156,
+            level: 24,
+            nickname: 'Quilava',
+          ),
+          PartyMember(
+            species: 'Riolu',
+            speciesId: 447,
+            level: 18,
+            nickname: 'Riolu',
+          ),
+          PartyMember(species: 'Flaaffy', speciesId: 180, level: 21),
+          PartyMember(species: 'Togepi', speciesId: 175, level: 15),
         ],
         timeline: [
           JourneyTimelineEntry(

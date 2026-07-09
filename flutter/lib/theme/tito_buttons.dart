@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'device_layout.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
+import '../widgets/handheld_input.dart';
 
 /// Sticker-style primary action — deep blue pill per design reference.
 class TitoPrimaryButton extends StatelessWidget {
@@ -158,42 +159,45 @@ class TitoQuickTile extends StatelessWidget {
         : (compact ? 56.0 : 88.0);
     final iconSize = dense ? 18.0 : (compact ? 22.0 : 28.0);
 
-    return Material(
-      color: TitoColors.card,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
-      child: InkWell(
-        onTap: onTap,
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      child: Material(
+        color: TitoColors.card,
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
-        child: Ink(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 3),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x3818283B),
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: SizedBox(
-            height: height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  color: TitoColors.deepBlue,
-                  size: iconSize,
-                ),
-                SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.tito.quickTileLabel,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              border: Border.all(color: TitoColors.ink, width: 3),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x3818283B),
+                  offset: Offset(0, 5),
                 ),
               ],
+            ),
+            child: SizedBox(
+              height: height,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    color: TitoColors.deepBlue,
+                    size: iconSize,
+                  ),
+                  SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.tito.quickTileLabel,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../features/companion/companion_art.dart';
+import '../features/dex/dex_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 
 class PartyStrip extends StatelessWidget {
@@ -54,13 +57,12 @@ class PartyStrip extends StatelessWidget {
           ),
           SizedBox(height: square ? 4 : (compact ? 8 : 10)),
           if (useHorizontal)
-            SizedBox(
-              height: square ? 48 : (compact ? 60 : 72),
+            Expanded(
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: party.length,
                 separatorBuilder: (_, __) =>
-                    SizedBox(width: square ? 6 : (compact ? 8 : 10)),
+                    SizedBox(width: square ? 4 : (compact ? 8 : 10)),
                 itemBuilder: (context, index) {
                   return _PartyOrb(
                     member: party[index],
@@ -108,30 +110,12 @@ class _PartyOrb extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
     final orbSize = mini ? 30.0 : (compact ? 40.0 : 48.0);
+    final slotWidth = mini ? 52.0 : (compact ? 58.0 : 64.0);
 
-    final avatar = Container(
-      width: orbSize,
-      height: orbSize,
-      decoration: BoxDecoration(
-        color: TitoColors.cream,
-        shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 2),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3818283B),
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        label.isNotEmpty ? label[0].toUpperCase() : '?',
-        style: TitoTypography.style(
-          fontSize: mini ? 12 : (compact ? 16 : 18),
-          fontWeight: FontWeight.w800,
-          color: TitoColors.deepBlue,
-        ),
-      ),
+    final avatar = _PartyMemberAvatar(
+      member: member,
+      size: orbSize,
+      label: label,
     );
 
     final name = Text(
@@ -171,7 +155,7 @@ class _PartyOrb extends StatelessWidget {
     }
 
     return SizedBox(
-      width: mini ? 44 : (compact ? 56 : 64),
+      width: slotWidth,
       child: Column(
         children: [
           avatar,
@@ -181,5 +165,80 @@ class _PartyOrb extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _PartyMemberAvatar extends StatelessWidget {
+  const _PartyMemberAvatar({
+    required this.member,
+    required this.size,
+    required this.label,
+  });
+
+  final PartyMember member;
+  final double size;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final speciesId = member.speciesId ?? _guessSpeciesId(member.species);
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: TitoColors.cream,
+        shape: BoxShape.circle,
+        border: Border.all(color: TitoColors.ink, width: 2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x3818283B),
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      alignment: Alignment.center,
+      child: speciesId != null
+          ? FutureBuilder(
+              future: dexRepository.getSummary(speciesId),
+              builder: (context, snapshot) {
+                final sprite = snapshot.data?.displaySpritePath;
+                if (sprite != null && sprite.isNotEmpty) {
+                  return DexSpriteImage(
+                    source: sprite,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.contain,
+                  );
+                }
+                return _letterFallback(label, size);
+              },
+            )
+          : _letterFallback(label, size),
+    );
+  }
+
+  Widget _letterFallback(String label, double size) {
+    return Text(
+      label.isNotEmpty ? label[0].toUpperCase() : '?',
+      style: TitoTypography.style(
+        fontSize: size * 0.42,
+        fontWeight: FontWeight.w800,
+        color: TitoColors.deepBlue,
+      ),
+    );
+  }
+
+  int? _guessSpeciesId(String species) {
+    for (final entry in companionSpeciesIds.entries) {
+      if (entry.key.toLowerCase() == species.toLowerCase()) {
+        return entry.value;
+      }
+      if (localizeSpecies(entry.key) == species) {
+        return entry.value;
+      }
+    }
+    return null;
   }
 }

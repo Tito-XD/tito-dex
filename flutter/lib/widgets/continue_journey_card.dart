@@ -4,10 +4,10 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'city_illustration.dart';
+import 'handheld_input.dart';
 import 'sticker_card.dart';
 
 class ContinueJourneyCard extends StatelessWidget {
@@ -17,12 +17,15 @@ class ContinueJourneyCard extends StatelessWidget {
     this.onContinue,
     this.compact = false,
     this.dense = false,
+    this.mergeContinue = false,
   });
 
   final CurrentJourney journey;
   final VoidCallback? onContinue;
   final bool compact;
   final bool dense;
+  /// Map thumbnail acts as the continue button (no separate CTA).
+  final bool mergeContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class ContinueJourneyCard extends StatelessWidget {
         ? DeviceLayout.cardPadding(context)
         : null;
 
-    return StickerCard(
+    final card = StickerCard(
       variant: StickerVariant.deep,
       padding: padding ?? const EdgeInsets.all(16),
       child: Column(
@@ -48,23 +51,39 @@ class ContinueJourneyCard extends StatelessWidget {
               AppZh.continueJourney.toUpperCase(),
               style: context.tito.onDeepOverline,
             ),
-          SizedBox(height: dense ? 1 : (compact ? 2 : 4)),
+          SizedBox(height: dense ? 2 : (compact ? 4 : 6)),
           Text(
             localizeLocation(journey.location),
             style: context.tito.onDeepHeading,
-            maxLines: dense ? 2 : null,
-            overflow: dense ? TextOverflow.ellipsis : null,
+            maxLines: dense ? 2 : 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          if (!dense) ...[
-            SizedBox(height: compact ? 8 : 12),
-            CityIllustration(compact: compact),
-          ],
-          SizedBox(height: dense ? 4 : (compact ? 8 : 12)),
+          SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
+          Expanded(
+            child: mergeContinue
+                ? HandheldFocusDecorator(
+                    onActivate: onContinue,
+                    borderRadius: BorderRadius.circular(TitoRadii.md),
+                    child: CityIllustration(
+                      location: journey.location,
+                      compact: compact,
+                      dense: dense,
+                      onTap: onContinue,
+                      showContinueHint: onContinue != null,
+                    ),
+                  )
+                : CityIllustration(
+                    location: journey.location,
+                    compact: compact,
+                    dense: dense,
+                  ),
+          ),
+          SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
           Row(
             children: [
               _Meta(
-                label: AppZh.labelGame,
-                value: localizeGame(journey.game),
+                label: AppZh.labelBadges,
+                value: '${journey.badges}/${journey.maxBadges}',
                 compact: compact || dense,
                 dense: dense,
               ),
@@ -74,54 +93,83 @@ class ContinueJourneyCard extends StatelessWidget {
                 compact: compact || dense,
                 dense: dense,
               ),
-              _Meta(
-                label: AppZh.labelBadges,
-                value: '${journey.badges}/${journey.maxBadges}',
-                compact: compact || dense,
-                dense: dense,
-              ),
+              if (!dense)
+                _Meta(
+                  label: AppZh.labelGame,
+                  value: localizeGame(journey.game),
+                  compact: compact || dense,
+                  dense: dense,
+                ),
             ],
           ),
-          if (!compact && !dense && journey.party.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final member in journey.party)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: TitoColors.card.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: TitoColors.skyBlue, width: 2),
-                    ),
-                    child: Text(
-                      member.nickname != null
-                          ? member.nickname!
-                          : localizeSpecies(member.species),
-                      style: context.tito.onDeepMetaValue.copyWith(
-                        color: TitoColors.card,
-                        fontSize: DeviceLayout.bodyTextSize(context),
-                      ),
-                    ),
-                  ),
-              ],
+          if (!mergeContinue && !compact && !dense) ...[
+            const Spacer(),
+            SizedBox(height: compact ? 10 : 16),
+            _ContinueButton(
+              onContinue: onContinue,
+              compact: compact,
+              dense: dense,
             ),
           ],
-          const Spacer(),
-          SizedBox(height: dense ? 4 : (compact ? 10 : 16)),
-          TitoPrimaryButton(
-            label: AppZh.continueButton,
-            onPressed: onContinue,
-            expanded: true,
-            compact: compact || dense,
-            dense: dense,
-          ),
         ],
+      ),
+    );
+
+    return card;
+  }
+}
+
+class _ContinueButton extends StatelessWidget {
+  const _ContinueButton({
+    required this.onContinue,
+    required this.compact,
+    required this.dense,
+  });
+
+  final VoidCallback? onContinue;
+  final bool compact;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    return HandheldFocusDecorator(
+      onActivate: onContinue,
+      child: Material(
+        color: TitoColors.deepBlue,
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        child: InkWell(
+          onTap: onContinue,
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              vertical: dense ? 8 : (compact ? 10 : 14),
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              border: Border.all(color: TitoColors.ink, width: 3),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppZh.continueButton,
+                  style: TitoTypography.style(
+                    color: TitoColors.card,
+                    fontWeight: FontWeight.w800,
+                    fontSize: dense ? 12 : (compact ? 14 : 16),
+                  ),
+                ),
+                SizedBox(width: dense ? 4 : 6),
+                Icon(
+                  Icons.play_arrow_rounded,
+                  color: TitoColors.card,
+                  size: dense ? 16 : (compact ? 18 : 22),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

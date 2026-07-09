@@ -24,6 +24,7 @@ import 'theme/tito_theme.dart';
 import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
+import 'widgets/handheld_input.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -68,7 +69,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   context.go('/');
                 }
               },
-              child: DeviceShell(child: child),
+              child: HandheldInputShell(
+                location: state.uri.path,
+                child: DeviceShell(child: child),
+              ),
             );
           },
           routes: [
@@ -79,6 +83,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 child: HomePage(
                   journey: _journey,
                   onContinue: _onContinue,
+                  onCompanionChanged: _onCompanionChanged,
                 ),
               ),
             ),
@@ -331,6 +336,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (choice != null) {
       await _rememberEmulator(choice);
     }
+  }
+
+  Future<void> _onCompanionChanged(String companion) async {
+    await _persist(_journey.copyWith(companion: companion));
   }
 
   Future<void> _onContinue() async {
