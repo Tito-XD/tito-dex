@@ -312,7 +312,7 @@ class _DexStatsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _DexStatCard(
-            label: AppZh.dexTabNational,
+            label: '全国',
             value: '$hgssMaxNationalDexId',
             variant: StickerVariant.cream,
           ),
