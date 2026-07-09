@@ -113,10 +113,10 @@ class DexOfflineService {
 
   Future<String?> typeIconPath(String type) async {
     final relative = await _store.typeIconRelativePath(type);
-    if (relative == null) {
-      return null;
+    if (relative != null) {
+      return _store.absolutePathForRelative(relative);
     }
-    return _store.absolutePathForRelative(relative);
+    return _cdnConfig.typeIconUrl(type);
   }
 
   Stream<DexCacheProgress> downloadFromCdnBundle() async* {
@@ -216,6 +216,7 @@ class DexOfflineService {
           baseStats: detail.baseStats,
           typeMultipliers: detail.typeMultipliers,
           flavorEntries: detail.flavorEntries,
+          obtainLocations: detail.obtainLocations,
           moveSet: detail.moveSet,
           genderFemalePercent: detail.genderFemalePercent,
           eggGroups: detail.eggGroups,
@@ -447,6 +448,7 @@ class DexOfflineService {
       baseStats: detail.baseStats,
       typeMultipliers: detail.typeMultipliers,
       flavorEntries: detail.flavorEntries,
+      obtainLocations: detail.obtainLocations,
       moveSet: detail.moveSet,
       genderFemalePercent: detail.genderFemalePercent,
       eggGroups: detail.eggGroups,

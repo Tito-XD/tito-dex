@@ -287,12 +287,12 @@ abstract final class DeviceLayout {
   static double dexCardAspectRatio(BuildContext context) {
     final columns = dexGridColumns(context);
     if (columns >= 4) {
-      return 0.88;
+      return 0.82;
     }
     if (columns == 3) {
-      return 0.92;
+      return 0.86;
     }
-    return 1.0;
+    return 0.78;
   }
 
   static double companionOverlayBottom(BuildContext context) {

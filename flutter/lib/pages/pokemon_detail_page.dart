@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
-import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_typography.dart';
-import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
@@ -67,32 +67,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   Widget build(BuildContext context) {
     final detail = _detail;
     final errorCopy = _errorCopy;
-    final contentReady = !_loading && detail != null && errorCopy == null;
+    final padding = DeviceLayout.pagePadding(context);
 
     return Column(
       children: [
-        Padding(
-          padding: DeviceLayout.pagePadding(context).copyWith(bottom: 0),
-          child: Column(
-            children: [
-              _DexBackBar(path: '/dex/${widget.pokemonId}'),
-              const SizedBox(height: 8),
-              TitoSkeletonGate(
-                loading: _loading,
-                skeleton: const TitoDetailHeaderSkeleton(),
-                child: detail != null
-                    ? _CompactPokemonHeader(detail: detail)
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ),
         Expanded(
           child: TitoSkeletonGate(
             loading: _loading,
             skeleton: ListView(
-              padding: DeviceLayout.pagePadding(context),
+              padding: padding,
               children: const [
+                TitoDetailHeaderSkeleton(),
+                SizedBox(height: 12),
                 TitoCardSkeleton(height: 140),
                 SizedBox(height: 12),
                 TitoCardSkeleton(height: 88),
@@ -103,31 +89,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     copy: errorCopy,
                     onRetry: _loadDetail,
                   )
-                : contentReady
-                    ? AnimatedSwitcher(
-                        duration: TitoMotion.tabFadeDuration,
-                        switchInCurve: TitoMotion.standardCurve,
-                        switchOutCurve: TitoMotion.standardCurve,
-                        layoutBuilder: (currentChild, previousChildren) {
-                          return Stack(
-                            alignment: Alignment.topCenter,
-                            children: [
-                              ...previousChildren,
-                              if (currentChild != null) currentChild,
-                            ],
-                          );
-                        },
-                        child: KeyedSubtree(
-                          key: ValueKey(
-                            'tab-$_currentTabIndex-${detail!.summary.id}',
-                          ),
-                          child: _DetailTabBody(
+                : detail == null
+                    ? const SizedBox.shrink()
+                    : ListView(
+                        padding: padding.copyWith(bottom: 12),
+                        children: [
+                          _DexBackBar(path: '/dex/${widget.pokemonId}'),
+                          const SizedBox(height: 8),
+                          PokemonDetailHeader(
                             detail: detail,
-                            tabIndex: _currentTabIndex,
+                            compact: true,
+                            showSettingsAction: false,
                           ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                          const SizedBox(height: 12),
+                          ..._tabSections(detail, _currentTabIndex),
+                          const SizedBox(height: 72),
+                        ],
+                      ),
           ),
         ),
         _DetailBottomTabs(
@@ -140,6 +118,127 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
       ],
     );
+  }
+
+  List<Widget> _tabSections(PokemonDetail detail, int tabIndex) {
+    return switch (tabIndex) {
+      0 => _introSections(detail),
+      1 => _basicSections(detail),
+      2 => _obtainSections(detail),
+      _ => _movesSections(detail),
+    };
+  }
+
+  List<Widget> _introSections(PokemonDetail detail) => [
+        FlavorTextCarousel(entries: detail.flavorEntries),
+        const SizedBox(height: 12),
+        IntroMetaCard(detail: detail),
+        const SizedBox(height: 12),
+        StickerCard(
+          child: Text(
+            AppZh.dexApiNote,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ];
+
+  List<Widget> _basicSections(PokemonDetail detail) {
+    return [
+      if (detail.baseStats != null) ...[
+        BaseStatsCard(stats: detail.baseStats!),
+        const SizedBox(height: 12),
+      ],
+      if (detail.typeMultipliers.isNotEmpty) ...[
+        TypeEffectivenessGrid(multipliers: detail.typeMultipliers),
+        const SizedBox(height: 12),
+      ],
+      StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppZh.dexStabEffective,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            TypeChipRow(
+              types: detail.stabSuperEffective,
+              typeKeys: detail.stabSuperEffective
+                  .map(typeEnForZh)
+                  .whereType<String>()
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _obtainSections(PokemonDetail detail) {
+    final sections = <Widget>[
+      if (detail.obtainLocations.isNotEmpty)
+        ObtainLocationsCard(locations: detail.obtainLocations)
+      else
+        StickerCard(
+          child: Text(
+            AppZh.dexObtainEmpty,
+            style: SecondaryTypography.onCard.body14,
+          ),
+        ),
+    ];
+
+    if (detail.evolutionChain != null) {
+      sections.addAll([
+        const SizedBox(height: 12),
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexEvolution,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 12),
+              EvolutionChainVerticalView(
+                root: detail.evolutionChain!,
+                highlightId: detail.summary.id,
+              ),
+            ],
+          ),
+        ),
+      ]);
+    }
+
+    return sections;
+  }
+
+  List<Widget> _movesSections(PokemonDetail detail) {
+    final moveSet = detail.moveSet;
+    return [
+      Text(
+        AppZh.dexMovesHgssScope,
+        style: SecondaryTypography.onGradient.body14,
+      ),
+      const SizedBox(height: 12),
+      MoveCategoryPanel(
+        title: moveMethodLabelZh('level-up'),
+        moves: moveSet.levelUp,
+        showLevel: true,
+      ),
+      const SizedBox(height: 12),
+      MoveCategoryPanel(
+        title: moveMethodLabelZh('machine'),
+        moves: moveSet.machine,
+      ),
+      const SizedBox(height: 12),
+      MoveCategoryPanel(
+        title: moveMethodLabelZh('egg'),
+        moves: moveSet.egg,
+      ),
+    ];
   }
 }
 
@@ -174,26 +273,6 @@ class _ErrorBody extends StatelessWidget {
   }
 }
 
-class _DetailTabBody extends StatelessWidget {
-  const _DetailTabBody({
-    required this.detail,
-    required this.tabIndex,
-  });
-
-  final PokemonDetail detail;
-  final int tabIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    return switch (tabIndex) {
-      0 => _IntroTab(detail: detail),
-      1 => _BasicTab(detail: detail),
-      2 => _ObtainTab(detail: detail),
-      _ => _MovesTab(detail: detail),
-    };
-  }
-}
-
 class _DexBackBar extends StatelessWidget {
   const _DexBackBar({required this.path});
 
@@ -212,50 +291,10 @@ class _DexBackBar extends StatelessWidget {
         ),
         child: Text(
           '← 图鉴',
-          style: context.tito.cardBodyStrong.copyWith(color: TitoColors.card),
+          style: SecondaryTypography.onGradient.body14.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _CompactPokemonHeader extends StatelessWidget {
-  const _CompactPokemonHeader({required this.detail});
-
-  final PokemonDetail detail;
-
-  @override
-  Widget build(BuildContext context) {
-    final summary = detail.summary;
-    final square = DeviceLayout.useSquareDashboard(context);
-    final compactTitle = '${summary.nameZh} · ${detail.nationalDexLabel}';
-
-    return StickerCard(
-      variant: StickerVariant.deep,
-      padding: EdgeInsets.symmetric(
-        horizontal: square ? 10 : 12,
-        vertical: square ? 8 : 10,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              compactTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.tito.onDeepHeading.copyWith(
-                fontSize: square ? 13 : 16,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          DexSpriteImage(
-            source: summary.displaySpritePath,
-            width: square ? 50 : 58,
-            height: square ? 50 : 58,
-          ),
-        ],
       ),
     );
   }
@@ -308,7 +347,8 @@ class _DetailBottomTabs extends StatelessWidget {
                         child: Text(
                           _tabs[index],
                           textAlign: TextAlign.center,
-                          style: context.tito.chip.copyWith(
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            fontWeight: FontWeight.w800,
                             color: selected
                                 ? TitoColors.deepBlue
                                 : TitoColors.card,
@@ -323,142 +363,6 @@ class _DetailBottomTabs extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _IntroTab extends StatelessWidget {
-  const _IntroTab({required this.detail});
-
-  final PokemonDetail detail;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
-        FlavorTextCarousel(entries: detail.flavorEntries),
-        const SizedBox(height: 12),
-        IntroMetaCard(detail: detail),
-        const SizedBox(height: 12),
-        StickerCard(
-          child: Text(
-            AppZh.dexApiNote,
-            style: context.tito.cardMuted.copyWith(height: 1.4),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _BasicTab extends StatelessWidget {
-  const _BasicTab({required this.detail});
-
-  final PokemonDetail detail;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
-        if (detail.baseStats != null) ...[
-          BaseStatsCard(stats: detail.baseStats!),
-          const SizedBox(height: 12),
-        ],
-        if (detail.typeMultipliers.isNotEmpty)
-          TypeEffectivenessGrid(multipliers: detail.typeMultipliers),
-        const SizedBox(height: 12),
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.dexStabEffective,
-                style: context.tito.cardSectionTitle,
-              ),
-              const SizedBox(height: 8),
-              TypeChipRow(
-                types: detail.stabSuperEffective,
-                tone: TypeChipTone.neutral,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ObtainTab extends StatelessWidget {
-  const _ObtainTab({required this.detail});
-
-  final PokemonDetail detail;
-
-  @override
-  Widget build(BuildContext context) {
-    if (detail.evolutionChain == null) {
-      return ListView(
-        padding: DeviceLayout.pagePadding(context),
-        children: [
-          StickerCard(
-            child: Text(
-              AppZh.dexNoEvolution,
-              style: context.tito.cardBodyStrong,
-            ),
-          ),
-        ],
-      );
-    }
-
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(AppZh.dexEvolution, style: context.tito.cardSectionTitle),
-              const SizedBox(height: 12),
-              EvolutionChainView(
-                root: detail.evolutionChain!,
-                highlightId: detail.summary.id,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MovesTab extends StatelessWidget {
-  const _MovesTab({required this.detail});
-
-  final PokemonDetail detail;
-
-  @override
-  Widget build(BuildContext context) {
-    final moveSet = detail.moveSet;
-
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
-        Text(AppZh.dexMovesHgssScope, style: context.tito.pageNoteOnGradient),
-        const SizedBox(height: 12),
-        MoveCategoryPanel(
-          title: moveMethodLabelZh('level-up'),
-          moves: moveSet.levelUp,
-          showLevel: true,
-        ),
-        const SizedBox(height: 12),
-        MoveCategoryPanel(
-          title: moveMethodLabelZh('machine'),
-          moves: moveSet.machine,
-        ),
-        const SizedBox(height: 12),
-        MoveCategoryPanel(title: moveMethodLabelZh('egg'), moves: moveSet.egg),
-      ],
     );
   }
 }

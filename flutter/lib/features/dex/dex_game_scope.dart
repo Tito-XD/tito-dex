@@ -10,13 +10,16 @@ const johtoPokedexNames = <String>{
   'updated-johto',
 };
 
+/// HeartGold / SoulSilver first — primary game scope for TitoDex.
 const hgssFlavorVersions = <String>[
-  'gold',
-  'silver',
-  'crystal',
   'heartgold',
   'soulsilver',
+  'crystal',
+  'gold',
+  'silver',
 ];
+
+const maxBaseStatValue = 255;
 
 const flavorVersionLabelsZh = <String, String>{
   'gold': '金版',
@@ -24,7 +27,44 @@ const flavorVersionLabelsZh = <String, String>{
   'crystal': '水晶版',
   'heartgold': '心金',
   'soulsilver': '魂银',
+  'zh-reference': '心金·魂银（中文参考）',
 };
+
+/// Common PokeAPI `location-area` slugs → Chinese labels for HGSS encounters.
+const encounterAreaLabelsZh = <String, String>{
+  'pallet-town-area': '真新镇',
+  'viridian-city-area': '常磐市',
+  'viridian-forest-area': '常磐森林',
+  'pewter-city-area': '尼比市',
+  'route-1-area': '1号道路',
+  'route-2-area': '2号道路',
+  'route-24-area': '24号道路',
+  'route-25-area': '25号道路',
+  'safari-zone-area': '狩猎地带',
+  'mt-silver-area': '白银山',
+  'national-park-area': '自然公园',
+  'bell-tower-1f': '铃铛塔',
+  'burned-tower-1f': '烧焦塔',
+  'ice-path-1f': '冰雪小径',
+  'mt-mortar-1f': '擂钵山',
+  'dark-cave-area': '黑暗洞窟',
+  'union-cave-1f': '连接洞窟',
+  'slowpoke-well-1f': '呆呆兽之井',
+};
+
+String encounterAreaLabelZh(String slug) {
+  if (encounterAreaLabelsZh.containsKey(slug)) {
+    return encounterAreaLabelsZh[slug]!;
+  }
+  final route = RegExp(r'^route-(\d+)-').firstMatch(slug);
+  if (route != null) {
+    return '${route.group(1)}号道路';
+  }
+  final cleaned = slug
+      .replaceAll(RegExp(r'-area$'), '')
+      .replaceAll('-', ' ');
+  return cleaned;
+}
 
 const statLabelsZh = <String, String>{
   'hp': 'HP',
