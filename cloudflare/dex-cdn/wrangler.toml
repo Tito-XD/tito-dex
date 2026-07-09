@@ -13,10 +13,11 @@ compatibility_date = "2024-09-23"
 binding = "DEX_BUCKET"
 bucket_name = "titodex-dex"
 
-# Custom domain — set zone_name to your domain, then uncomment:
-# [[routes]]
-# pattern = "dex.example.com/*"
-# zone_name = "example.com"
+# Custom domain — zone tito.cafe must be on this Cloudflare account.
+[[routes]]
+pattern = "dex.tito.cafe/*"
+zone_name = "tito.cafe"
 
 [vars]
 CDN_VERSION = "2"
+CDN_BASE_URL = "https://dex.tito.cafe"

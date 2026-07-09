@@ -17,10 +17,12 @@
 App 侧将来读取三个环境变量（由你交付给 App 开发者）：
 
 ```bash
-TITODEX_DEX_CDN_BASE=https://dex.<你的域名>
-TITODEX_DEX_BUNDLE_URL=https://dex.<你的域名>/v2/bundle.tar.zst
+TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=2
 ```
+
+自定义域名配置详解：[`cloudflare/dex-cdn/DOMAIN.md`](../cloudflare/dex-cdn/DOMAIN.md)
 
 ---
 
