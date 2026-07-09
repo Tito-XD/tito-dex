@@ -223,13 +223,17 @@ class CurrentJourney {
           JourneyTimelineEntry(
             id: 't1',
             text: '抵达满金市',
-            at: '第 4 天',
+            at: '2026-04-15 14:22',
           ),
-          JourneyTimelineEntry(id: 't2', text: '获得蜂巢徽章', at: '第 3 天'),
+          JourneyTimelineEntry(
+            id: 't2',
+            text: '获得蜂巢徽章',
+            at: '2026-04-14 09:05',
+          ),
           JourneyTimelineEntry(
             id: 't3',
             text: '火球鼠一直跟在身旁',
-            at: '第 2 天',
+            at: '2026-04-13 18:40',
           ),
         ],
       );

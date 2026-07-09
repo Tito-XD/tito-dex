@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../theme/tito_typography.dart';
@@ -21,18 +22,24 @@ class JourneyPage extends StatelessWidget {
       multiplier: 1.0,
       child: SecondaryPageScaffold(
         title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
-        subtitle: AppZh.journeySince2026,
         children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppZh.settingsLocation, style: context.tito.onDeepOverline),
+              Text(
+                AppZh.settingsLocation,
+                style: SecondaryTypography.onGradient.small12.copyWith(
+                  color: TitoColors.skyBlue,
+                  letterSpacing: 0.8,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 4),
               Text(
                 localizeLocation(journey.location),
-                style: context.tito.onDeepHeading,
+                style: SecondaryTypography.onGradient.h15,
               ),
               const SizedBox(height: 10),
               Row(
@@ -65,7 +72,7 @@ class JourneyPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppZh.trainerCard, style: context.tito.cardTitle),
+              Text(AppZh.trainerCard, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 10),
               _StatRow(
                 label: AppZh.settingsDisplayName,
@@ -135,13 +142,19 @@ class _SummaryMeta extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: context.tito.onDeepMetaLabel),
+            Text(
+              label,
+              style: SecondaryTypography.onGradient.small12.copyWith(
+                color: TitoColors.skyBlue,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 2),
             Text(
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.tito.onDeepMetaValue,
+              style: SecondaryTypography.onGradient.meta14,
             ),
           ],
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
@@ -19,7 +20,7 @@ class JourneyTimeline extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppZh.recentTimeline, style: context.tito.cardTitle),
+          Text(AppZh.recentTimeline, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
           if (entries.isEmpty)
             Text(AppZh.journeyTimelineEmpty, style: context.tito.cardMuted)
@@ -93,11 +94,19 @@ class _TimelineEntryTile extends StatelessWidget {
                   if (entry.at != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
-                      child: Text(entry.at!, style: context.tito.captionStrong),
+                      child: Text(
+                        entry.at!,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: TitoColors.mutedInk,
+                        ),
+                      ),
                     ),
                   Text(
                     localizeTimelineEntry(entry.text),
-                    style: context.tito.cardBodyStrong,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

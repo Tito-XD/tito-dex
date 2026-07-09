@@ -4,6 +4,7 @@ import '../features/parser/gen4_exp.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import '../features/dex/dex_repository.dart';
@@ -49,6 +50,7 @@ class _PartyTeamRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
     final speciesId = member.speciesId;
+    final team12 = SecondaryTypography.onCard.team12;
 
     return StickerCard(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -77,9 +79,7 @@ class _PartyTeamRow extends StatelessWidget {
                   children: [
                     Text(
                       AppZh.partySlot(slot),
-                      style: context.tito.caption.copyWith(
-                        color: TitoColors.mutedInk,
-                      ),
+                      style: team12.copyWith(color: TitoColors.mutedInk),
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -87,14 +87,11 @@ class _PartyTeamRow extends StatelessWidget {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: context.tito.cardBodyEmphasis,
+                        style: team12,
                       ),
                     ),
                     if (member.level != null)
-                      Text(
-                        '${AppZh.level}${member.level}',
-                        style: context.tito.captionStrong,
-                      ),
+                      Text('${AppZh.level}${member.level}', style: team12),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -141,14 +138,13 @@ class _StatBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final team12 = SecondaryTypography.onCard.team12;
+
     return Row(
       children: [
         SizedBox(
           width: 28,
-          child: Text(
-            label,
-            style: context.tito.captionStrong.copyWith(fontSize: 10),
-          ),
+          child: Text(label, style: team12),
         ),
         Expanded(
           child: TitoProgressBar(
@@ -160,7 +156,7 @@ class _StatBar extends StatelessWidget {
         ),
         if (detail != null) ...[
           const SizedBox(width: 6),
-          Text(detail!, style: context.tito.caption.copyWith(fontSize: 10)),
+          Text(detail!, style: team12),
         ],
       ],
     );

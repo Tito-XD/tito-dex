@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
@@ -132,7 +133,7 @@ class _BackTitleButton extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.tito.pageTitleOnGradient.copyWith(
+                      style: SecondaryTypography.onGradient.title.copyWith(
                         letterSpacing: -0.5,
                         shadows: const [
                           Shadow(

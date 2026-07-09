@@ -111,10 +111,6 @@ class TrainerCard extends StatelessWidget {
                   journey.trainerName,
                   style: context.tito.cardValueLarge.copyWith(height: 1.1),
                 ),
-                if (!compactMode) ...[
-                  const SizedBox(height: 4),
-                  Text(AppZh.journeySince2026, style: context.tito.caption),
-                ],
                 SizedBox(height: dense ? 0 : 2),
                 Text(
                   localizeGame(journey.game),

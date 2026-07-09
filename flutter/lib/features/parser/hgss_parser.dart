@@ -93,6 +93,7 @@ class HgssParser {
     final syncEntry = JourneyTimelineEntry(
       id: 'parsed-$syncId',
       text: '已从本地魂银存档同步',
+      at: _formatParsedAtLocal(summary.parsedAt),
     );
 
     return CurrentJourney(
@@ -130,6 +131,13 @@ class HgssParser {
     final manual =
         existing.where((entry) => !entry.id.startsWith('parsed')).toList();
     return [syncEntry, ...manual];
+  }
+
+  String _formatParsedAtLocal(DateTime parsedAt) {
+    final local = parsedAt.toLocal();
+    return '${local.year}/${local.month}/${local.day} '
+        '${local.hour.toString().padLeft(2, '0')}:'
+        '${local.minute.toString().padLeft(2, '0')}';
   }
 
   int _activePartition(Uint8List bytes) {
