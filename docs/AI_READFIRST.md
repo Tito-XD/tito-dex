@@ -18,6 +18,21 @@ Key points:
 - Flutter nav: **Home, Team, Journey, Dex, Search, Settings** — Dex + Search shipped in v0.2.x.
 - **Dex CDN** is live at `https://dex.tito.cafe` (bundle v4, PNG). App downloads via Settings.
 
+## RG APK Release (agents)
+
+When building or publishing RG handheld APKs:
+
+| Rule | Detail |
+| --- | --- |
+| **ABI** | **arm64-v8a only** (same as 0.2.1–0.2.11) |
+| **Filename** | `releases/TitoDex-<ver>-rg-arm64.apk` — do not rename to split-per-abi output names |
+| **Build** | `flutter build apk --release --target-platform android-arm64` |
+| **Do not** | `--split-per-abi` — compresses native `.so` → RG sideload shows「安装包无效」 |
+| **Gradle** | `android/app/build.gradle.kts`: `minSdk = maxOf(24, …)`, `useLegacyPackaging = false` (`.so` must be **Stored**, not Defl:N) |
+| **GitHub Release** | One asset: `TitoDex-<ver>-rg-arm64.apk` (~20–22 MB). No armv7 for 0.2.x track. |
+
+Full build notes: [flutter/README.md](../flutter/README.md).
+
 ## Communication Defaults
 
 - Default communication with Tito should be in **Chinese**.

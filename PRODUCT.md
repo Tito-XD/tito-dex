@@ -114,3 +114,4 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - Save parser integration (HGSS retail `.sav`)
 - Emulator launcher (Continue → pick / remember app)
 - Mock Dex → **real offline dex** with PNG sprites + artwork viewer
+- RG release APK: `TitoDex-0.2.25-rg-arm64.apk` (arm64-v8a; see `flutter/README.md` for build guardrails)
