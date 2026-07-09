@@ -13,6 +13,7 @@ import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
@@ -29,7 +30,7 @@ class DexPage extends StatefulWidget {
 enum _DexListFilter { all, seen, journey, caught }
 
 class _DexPageState extends State<DexPage> {
-  static const _chunkSize = 12;
+  static const _chunkSize = 18;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
@@ -184,9 +185,11 @@ class _DexPageState extends State<DexPage> {
     final caughtCount = _caughtIds.length;
     final seenCount = _seenIds.length;
     final visible = _visibleEntries;
-    final wideGrid = _useWideGrid(context);
-    final aspectRatio = _dexCardAspectRatio(context);
-    final loading = _filter == _DexListFilter.all ? _loadingChunk : _loadingFilter;
+    final columns = DeviceLayout.dexGridColumns(context);
+    final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
+    final loading =
+        _filter == _DexListFilter.all ? _loadingChunk : _loadingFilter;
+    final padding = DeviceLayout.pagePadding(context);
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
@@ -197,36 +200,38 @@ class _DexPageState extends State<DexPage> {
         }
         return false;
       },
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: DeviceLayout.pagePadding(context).copyWith(bottom: 8),
-              children: [
-                const _DexBackBar(),
-                const SizedBox(height: 8),
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: padding.copyWith(bottom: 8),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate.fixed([
+                _DexTopBar(onSearch: () => context.push('/search')),
+                SizedBox(height: squareGap(context)),
                 Text(
                   '${AppZh.navDex} · ${localizeGame(widget.journey.game)}',
                   style: context.tito.pageTitleOnGradient,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: squareGap(context)),
                 Text(
                   AppZh.dexScopeNote,
                   style: context.tito.pageSubtitleOnGradient,
+                  maxLines: DeviceLayout.useSquareDashboard(context) ? 2 : 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: squareGap(context) + 2),
                 _DexStatsRow(
                   seenCount: seenCount,
                   caughtCount: caughtCount,
                   selected: _filter,
                   onSelected: _setFilter,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: squareGap(context)),
                 _DexFilterBar(
                   current: _filter,
                   onSelected: _setFilter,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: squareGap(context)),
                 if (_error != null)
                   StickerCard(
                     child: Column(
@@ -255,7 +260,7 @@ class _DexPageState extends State<DexPage> {
                   )
                 else if (visible.isEmpty && loading)
                   TitoDexGridSkeleton(
-                    crossAxisCount: wideGrid ? 3 : 2,
+                    crossAxisCount: columns,
                     childAspectRatio: aspectRatio,
                   )
                 else if (visible.isEmpty)
@@ -264,82 +269,150 @@ class _DexPageState extends State<DexPage> {
                       _emptyMessageForFilter(),
                       style: context.tito.cardBodyStrong,
                     ),
-                  )
-                else
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: wideGrid ? 3 : 2,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      childAspectRatio: aspectRatio,
-                    ),
-                    itemCount: visible.length,
-                    itemBuilder: (context, index) {
-                      final entry = visible[index];
-                      final status = dexRepository.statusFor(
-                        entry.id,
-                        _caughtIds,
-                      );
-                      return PokemonMiniCard(
-                        summary: entry,
-                        status: status,
-                        compact: DeviceLayout.isCompact(context),
-                      );
-                    },
                   ),
-                if (_filter == _DexListFilter.all &&
-                    _loadingChunk &&
-                    visible.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  TitoDexGridSkeleton(
-                    crossAxisCount: wideGrid ? 3 : 2,
-                    itemCount: wideGrid ? 3 : 2,
-                    childAspectRatio: aspectRatio,
-                  ),
-                ],
-                if (_filter == _DexListFilter.all &&
-                    _loadedThrough < hgssMaxNationalDexId)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Text(
-                      AppZh.dexLoadingProgress(
-                        _loadedThrough,
-                        hgssMaxNationalDexId,
-                      ),
-                      textAlign: TextAlign.center,
-                      style: context.tito.pageSubtitleOnGradient,
-                    ),
-                  ),
-              ],
+              ]),
             ),
           ),
-          SafeArea(
-            top: false,
-            child: Padding(
-              padding: DeviceLayout.pagePadding(
-                context,
-              ).copyWith(top: 8, bottom: 8),
-              child: StickerCard(
-                variant: StickerVariant.deep,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
+          if (visible.isNotEmpty && _error == null)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                padding.left,
+                0,
+                padding.right,
+                0,
+              ),
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6,
+                  childAspectRatio: aspectRatio,
                 ),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    ActionChip(
-                      onPressed: () => context.push('/search'),
-                      avatar: const Icon(Icons.search_rounded, size: 18),
-                      label: Text(AppZh.navSearch, style: context.tito.chip),
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(color: TitoColors.ink, width: 2),
-                    ),
-                  ],
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final entry = visible[index];
+                    final status = dexRepository.statusFor(
+                      entry.id,
+                      _caughtIds,
+                    );
+                    return PokemonMiniCard(
+                      summary: entry,
+                      status: status,
+                      compact: DeviceLayout.isCompact(context),
+                    );
+                  },
+                  childCount: visible.length,
+                ),
+              ),
+            ),
+          if (_filter == _DexListFilter.all &&
+              _loadingChunk &&
+              visible.isNotEmpty)
+            SliverPadding(
+              padding: padding.copyWith(top: 8),
+              sliver: SliverToBoxAdapter(
+                child: TitoDexGridSkeleton(
+                  crossAxisCount: columns,
+                  itemCount: columns,
+                  childAspectRatio: aspectRatio,
+                ),
+              ),
+            ),
+          if (_filter == _DexListFilter.all &&
+              _loadedThrough < hgssMaxNationalDexId)
+            SliverPadding(
+              padding: padding.copyWith(top: 8, bottom: 4),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  AppZh.dexLoadingProgress(
+                    _loadedThrough,
+                    hgssMaxNationalDexId,
+                  ),
+                  textAlign: TextAlign.center,
+                  style: context.tito.pageSubtitleOnGradient,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  double squareGap(BuildContext context) =>
+      DeviceLayout.useSquareDashboard(context) ? 6 : 8;
+}
+
+class _DexTopBar extends StatelessWidget {
+  const _DexTopBar({required this.onSearch});
+
+  final VoidCallback onSearch;
+
+  @override
+  Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
+    final controlSize = DeviceLayout.dexBackControlSize(context);
+    final iconSize = square ? 22.0 : 20.0;
+    final barHeight = square ? 40.0 : 36.0;
+
+    return SizedBox(
+      height: barHeight,
+      child: Row(
+        children: [
+          HandheldFocusDecorator(
+            onActivate: () => TitoBackNavigation.navigateBack(context, '/dex'),
+            child: TextButton(
+              onPressed: () => TitoBackNavigation.navigateBack(context, '/dex'),
+              style: TextButton.styleFrom(
+                foregroundColor: TitoColors.card,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                '← 图鉴',
+                style: context.tito.cardBodyStrong.copyWith(
+                  color: TitoColors.card,
+                  fontSize: controlSize,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          HandheldFocusDecorator(
+            onActivate: onSearch,
+            borderRadius: BorderRadius.circular(TitoRadii.md),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onSearch,
+                borderRadius: BorderRadius.circular(TitoRadii.md),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: square ? 12 : 10,
+                    vertical: square ? 8 : 6,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(TitoRadii.md),
+                    border: Border.all(color: TitoColors.card, width: 2),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.search_rounded,
+                        color: TitoColors.card,
+                        size: iconSize,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        AppZh.navSearch,
+                        style: context.tito.cardBodyStrong.copyWith(
+                          color: TitoColors.card,
+                          fontSize: controlSize,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -347,21 +420,6 @@ class _DexPageState extends State<DexPage> {
         ],
       ),
     );
-  }
-
-  bool _useWideGrid(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    return size.width >= 680 || (size.width > size.height && size.width >= 520);
-  }
-
-  double _dexCardAspectRatio(BuildContext context) {
-    if (DeviceLayout.useSquareDashboard(context)) {
-      return 1.18;
-    }
-    if (DeviceLayout.isCompact(context)) {
-      return 1.02;
-    }
-    return 1.08;
   }
 }
 
@@ -382,61 +440,74 @@ class _DexFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final (filter, label, icon) in _options) ...[
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: FilterChip(
-                avatar: Icon(
-                  icon,
-                  size: 16,
-                  color: current == filter
-                      ? TitoColors.deepBlue
-                      : TitoColors.ink,
-                ),
-                label: Text(
-                  label,
-                  style: context.tito.chip.copyWith(
-                    color: current == filter
-                        ? TitoColors.deepBlue
-                        : TitoColors.ink,
-                  ),
-                ),
+    return Row(
+      children: [
+        for (final (filter, label, icon) in _options) ...[
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: filter == _DexListFilter.caught ? 0 : 6,
+              ),
+              child: _DexFilterChip(
+                label: label,
+                icon: icon,
                 selected: current == filter,
-                onSelected: (_) => onSelected(filter),
-                selectedColor: TitoColors.softYellow,
-                backgroundColor: TitoColors.card,
-                side: const BorderSide(color: TitoColors.ink, width: 2),
-                showCheckmark: false,
+                onTap: () => onSelected(filter),
               ),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 }
 
-class _DexBackBar extends StatelessWidget {
-  const _DexBackBar();
+class _DexFilterChip extends StatelessWidget {
+  const _DexFilterChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TextButton(
-        onPressed: () => TitoBackNavigation.navigateBack(context, '/dex'),
-        style: TextButton.styleFrom(
-          foregroundColor: TitoColors.card,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          visualDensity: VisualDensity.compact,
-        ),
-        child: Text(
-          '← 图鉴',
-          style: context.tito.cardBodyStrong.copyWith(color: TitoColors.card),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: selected ? TitoColors.softYellow : TitoColors.card,
+            borderRadius: BorderRadius.circular(TitoRadii.md),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color: TitoColors.ink,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.tito.chip,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -469,7 +540,7 @@ class _DexStatsRow extends StatelessWidget {
             onTap: () => onSelected(_DexListFilter.seen),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Expanded(
           child: _DexStatCard(
             label: AppZh.dexCaught,
@@ -479,7 +550,7 @@ class _DexStatsRow extends StatelessWidget {
             onTap: () => onSelected(_DexListFilter.caught),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Expanded(
           child: _DexStatCard(
             label: '全国',
@@ -517,33 +588,25 @@ class _DexStatCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: StickerCard(
-          variant: variant,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: selected
-                  ? Border.all(color: TitoColors.deepBlue, width: 3)
-                  : null,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: context.tito.captionStrong,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          variant: selected ? StickerVariant.softYellow : variant,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          child: Column(
+            children: [
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: context.tito.captionStrong,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: context.tito.cardValueLarge.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: context.tito.cardValueLarge.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

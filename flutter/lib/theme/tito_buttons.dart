@@ -196,6 +196,7 @@ class TitoQuickTile extends StatelessWidget {
     required this.onTap,
     this.compact = false,
     this.dense = false,
+    this.square = false,
   });
 
   final String label;
@@ -203,15 +204,18 @@ class TitoQuickTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool compact;
   final bool dense;
+  final bool square;
 
   @override
   Widget build(BuildContext context) {
-    final height = dense
-        ? DeviceLayout.squareQuickTileHeight(context)
-        : (compact ? 56.0 : 88.0);
-    final iconSize = dense ? 18.0 : (compact ? 22.0 : 28.0);
+    final height = square
+        ? null
+        : (dense
+            ? DeviceLayout.squareQuickTileHeight(context)
+            : (compact ? 56.0 : 88.0));
+    final iconSize = square ? 20.0 : (dense ? 18.0 : (compact ? 22.0 : 28.0));
 
-    return HandheldFocusDecorator(
+    final tile = HandheldFocusDecorator(
       onActivate: onTap,
       child: Material(
         color: TitoColors.card,
@@ -228,26 +232,53 @@ class TitoQuickTile extends StatelessWidget {
                 BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
               ],
             ),
-            child: SizedBox(
-              height: height,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-                  SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.tito.quickTileLabel,
+            child: square
+                ? LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            icon,
+                            color: TitoColors.deepBlue,
+                            size: iconSize,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.tito.quickTileLabel,
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                : SizedBox(
+                    height: height,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, color: TitoColors.deepBlue, size: iconSize),
+                        SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
+                        Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.tito.quickTileLabel,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
           ),
         ),
       ),
     );
+
+    if (square) {
+      return AspectRatio(aspectRatio: 1, child: tile);
+    }
+    return tile;
   }
 }
 

@@ -115,7 +115,7 @@ class _PortraitHomeLayout extends StatelessWidget {
 }
 
 /// Square / 4:3 / 3:4 handheld layout (H5):
-/// [ Trainer + Continue | Party ] + quick actions.
+/// [ Trainer + Continue | Party ] + square quick actions.
 class _SquareHomeLayout extends StatelessWidget {
   const _SquareHomeLayout({required this.journey, required this.onContinue});
 
@@ -125,6 +125,7 @@ class _SquareHomeLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
+    final quickSize = DeviceLayout.squareQuickTileHeight(context);
 
     return Column(
       children: [
@@ -137,7 +138,12 @@ class _SquareHomeLayout extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TrainerCard(journey: journey, compact: true, dense: true),
+                    TrainerCard(
+                      journey: journey,
+                      compact: true,
+                      dense: true,
+                      micro: true,
+                    ),
                     SizedBox(height: gap),
                     Expanded(
                       child: ContinueJourneyCard(
@@ -146,6 +152,7 @@ class _SquareHomeLayout extends StatelessWidget {
                         compact: true,
                         dense: true,
                         mergeContinue: true,
+                        showIllustration: false,
                       ),
                     ),
                   ],
@@ -158,7 +165,7 @@ class _SquareHomeLayout extends StatelessWidget {
                   party: journey.party,
                   compact: true,
                   square: true,
-                  gridMode: true,
+                  listMode: true,
                 ),
               ),
             ],
@@ -166,7 +173,7 @@ class _SquareHomeLayout extends StatelessWidget {
         ),
         SizedBox(height: gap),
         SizedBox(
-          height: DeviceLayout.squareQuickTileHeight(context),
+          height: quickSize,
           child: const _QuickActionsBar(),
         ),
       ],
@@ -174,7 +181,7 @@ class _SquareHomeLayout extends StatelessWidget {
   }
 }
 
-/// Bottom quick bar — always one row on handheld dashboard.
+/// Bottom quick bar — square tiles in one row on handheld dashboard.
 class _QuickActionsBar extends StatelessWidget {
   const _QuickActionsBar();
 
@@ -194,6 +201,7 @@ class _QuickActionsBar extends StatelessWidget {
               onTap: () => _openRoute(context, actions[index].route),
               compact: true,
               dense: true,
+              square: true,
             ),
           ),
         ],

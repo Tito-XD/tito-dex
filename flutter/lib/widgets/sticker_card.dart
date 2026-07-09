@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tito_colors.dart';
 
-enum StickerVariant { cream, deep, sky, mint }
+enum StickerVariant { cream, deep, sky, mint, softYellow }
 
 class StickerCard extends StatelessWidget {
   const StickerCard({
@@ -23,6 +23,7 @@ class StickerCard extends StatelessWidget {
       StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
       StickerVariant.sky => (TitoColors.skyBlue, TitoColors.ink),
       StickerVariant.mint => (TitoColors.mint, TitoColors.ink),
+      StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
     };
 
     return DecoratedBox(
