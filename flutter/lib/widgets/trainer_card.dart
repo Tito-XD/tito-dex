@@ -35,14 +35,24 @@ class TrainerCard extends StatelessWidget {
             width: avatarSize,
             height: avatarSize,
             decoration: BoxDecoration(
-              color: TitoColors.softYellow,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [TitoColors.softYellow, TitoColors.coral],
+              ),
               shape: BoxShape.circle,
               border: Border.all(color: TitoColors.ink, width: 3),
             ),
             alignment: Alignment.center,
             child: Text(
-              '🐾',
-              style: TextStyle(fontSize: dense ? 22 : (compact ? 24 : 32)),
+              journey.trainerName.isNotEmpty
+                  ? journey.trainerName[0].toUpperCase()
+                  : 'T',
+              style: TitoTypography.style(
+                fontSize: dense ? 18 : (compact ? 22 : 28),
+                fontWeight: FontWeight.w900,
+                color: TitoColors.deepBlue,
+              ),
             ),
           ),
           SizedBox(width: dense ? 8 : (compact ? 10 : 14)),

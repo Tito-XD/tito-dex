@@ -45,7 +45,8 @@ class HgssParser {
     for (var index = 0; index < partyCount; index++) {
       final start = base + 0x98 + index * 236;
       final slot = bytes.sublist(start, start + 236);
-      final (speciesId, level) = decryptPartySlot(slot);
+      final slotStats = decryptPartySlotStats(slot);
+      final level = slotStats.level ?? 0;
       String? slotWarning;
       if (level > 100) {
         slotWarning = 'Level $level looks invalid — slot may be empty or corrupted.';
@@ -53,9 +54,12 @@ class HgssParser {
       }
       party.add(
         ParsedPartyMember(
-          speciesId: speciesId,
-          speciesName: speciesNameFor(speciesId),
+          speciesId: slotStats.speciesId,
+          speciesName: speciesNameFor(slotStats.speciesId),
           level: level <= 100 ? level : null,
+          currentHp: slotStats.currentHp,
+          maxHp: slotStats.maxHp,
+          experience: slotStats.experience,
           warning: slotWarning,
         ),
       );
@@ -108,6 +112,9 @@ class HgssParser {
               species: localizeSpecies(member.speciesName),
               speciesId: member.speciesId,
               level: member.level,
+              currentHp: member.currentHp,
+              maxHp: member.maxHp,
+              experience: member.experience,
             ),
           )
           .toList(),

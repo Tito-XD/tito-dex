@@ -24,12 +24,14 @@ class DexPage extends StatefulWidget {
   State<DexPage> createState() => _DexPageState();
 }
 
+enum _DexListFilter { all, journey, caught }
+
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 12;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
-  bool _showJourneyOnly = false;
+  _DexListFilter _filter = _DexListFilter.all;
   List<PokemonSummary> _summaries = const [];
   Set<int> _caughtIds = const {};
   String? _error;
@@ -88,11 +90,20 @@ class _DexPageState extends State<DexPage> {
   }
 
   List<PokemonSummary> get _visibleEntries {
-    if (!_showJourneyOnly) {
-      return _summaries;
-    }
-    return _summaries.where((entry) => _caughtIds.contains(entry.id)).toList();
+    return switch (_filter) {
+      _DexListFilter.all => _summaries,
+      _DexListFilter.journey => _summaries
+          .where((entry) => _journeyPartyIds.contains(entry.id))
+          .toList(),
+      _DexListFilter.caught =>
+        _summaries.where((entry) => _caughtIds.contains(entry.id)).toList(),
+    };
   }
+
+  Set<int> get _journeyPartyIds => widget.journey.party
+      .map((member) => member.speciesId)
+      .whereType<int>()
+      .toSet();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +118,7 @@ class _DexPageState extends State<DexPage> {
       onNotification: (notification) {
         if (notification.metrics.pixels >=
                 notification.metrics.maxScrollExtent - 240 &&
-            !_showJourneyOnly) {
+            _filter == _DexListFilter.all) {
           _loadMore();
         }
         return false;
@@ -131,6 +142,11 @@ class _DexPageState extends State<DexPage> {
                 ),
                 const SizedBox(height: 12),
                 _DexStatsRow(seenCount: seenCount, caughtCount: caughtCount),
+                const SizedBox(height: 12),
+                _DexFilterBar(
+                  current: _filter,
+                  onSelected: (filter) => setState(() => _filter = filter),
+                ),
                 const SizedBox(height: 12),
                 if (_error != null)
                   StickerCard(
@@ -200,7 +216,8 @@ class _DexPageState extends State<DexPage> {
                         : 0.78,
                   ),
                 ],
-                if (!_showJourneyOnly && _loadedThrough < hgssMaxNationalDexId)
+                if (_filter == _DexListFilter.all &&
+                    _loadedThrough < hgssMaxNationalDexId)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
@@ -232,24 +249,6 @@ class _DexPageState extends State<DexPage> {
                   runSpacing: 8,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    FilterChip(
-                      label: Text(
-                        AppZh.dexTabJourney,
-                        style: context.tito.chip.copyWith(
-                          color: _showJourneyOnly
-                              ? TitoColors.deepBlue
-                              : TitoColors.ink,
-                        ),
-                      ),
-                      selected: _showJourneyOnly,
-                      onSelected: (value) {
-                        setState(() => _showJourneyOnly = value);
-                      },
-                      selectedColor: TitoColors.softYellow,
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(color: TitoColors.ink, width: 2),
-                      checkmarkColor: TitoColors.deepBlue,
-                    ),
                     ActionChip(
                       onPressed: () => context.push('/search'),
                       avatar: const Icon(Icons.search_rounded, size: 18),
@@ -270,6 +269,61 @@ class _DexPageState extends State<DexPage> {
   bool _useWideGrid(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     return size.width >= 680 || (size.width > size.height && size.width >= 520);
+  }
+}
+
+class _DexFilterBar extends StatelessWidget {
+  const _DexFilterBar({
+    required this.current,
+    required this.onSelected,
+  });
+
+  final _DexListFilter current;
+  final ValueChanged<_DexListFilter> onSelected;
+
+  static const _options = [
+    ( _DexListFilter.all, AppZh.dexTabNational, Icons.grid_view_rounded),
+    (_DexListFilter.journey, AppZh.dexTabJourney, Icons.groups_rounded),
+    (_DexListFilter.caught, AppZh.dexCaught, Icons.catching_pokemon_rounded),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final (filter, label, icon) in _options) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: FilterChip(
+                avatar: Icon(
+                  icon,
+                  size: 16,
+                  color: current == filter
+                      ? TitoColors.deepBlue
+                      : TitoColors.ink,
+                ),
+                label: Text(
+                  label,
+                  style: context.tito.chip.copyWith(
+                    color: current == filter
+                        ? TitoColors.deepBlue
+                        : TitoColors.ink,
+                  ),
+                ),
+                selected: current == filter,
+                onSelected: (_) => onSelected(filter),
+                selectedColor: TitoColors.softYellow,
+                backgroundColor: TitoColors.card,
+                side: const BorderSide(color: TitoColors.ink, width: 2),
+                showCheckmark: false,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }
 

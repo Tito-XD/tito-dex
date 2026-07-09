@@ -9,8 +9,11 @@ abstract final class TitoColors {
   static const ink = Color(0xFF221F26);
   static const softYellow = Color(0xFFF7D977);
   static const card = Color(0xFFFFF7E6);
+  static const cardWarm = Color(0xFFFDF5E6);
   static const mutedInk = Color(0xFF536273);
   static const mint = Color(0xFF7EC8A8);
+  static const hpGreen = Color(0xFF6BC4A6);
+  static const expGold = Color(0xFFF7D977);
 }
 
 abstract final class TitoRadii {

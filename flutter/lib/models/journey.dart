@@ -4,18 +4,27 @@ class PartyMember {
     this.speciesId,
     this.level,
     this.nickname,
+    this.currentHp,
+    this.maxHp,
+    this.experience,
   });
 
   final String species;
   final int? speciesId;
   final int? level;
   final String? nickname;
+  final int? currentHp;
+  final int? maxHp;
+  final int? experience;
 
   Map<String, dynamic> toJson() => {
         'species': species,
         if (speciesId != null) 'speciesId': speciesId,
         if (level != null) 'level': level,
         if (nickname != null) 'nickname': nickname,
+        if (currentHp != null) 'currentHp': currentHp,
+        if (maxHp != null) 'maxHp': maxHp,
+        if (experience != null) 'experience': experience,
       };
 
   factory PartyMember.fromJson(Map<String, dynamic> json) => PartyMember(
@@ -23,6 +32,9 @@ class PartyMember {
         speciesId: json['speciesId'] as int?,
         level: json['level'] as int?,
         nickname: json['nickname'] as String?,
+        currentHp: json['currentHp'] as int?,
+        maxHp: json['maxHp'] as int?,
+        experience: json['experience'] as int?,
       );
 }
 
@@ -163,15 +175,35 @@ class CurrentJourney {
             speciesId: 156,
             level: 24,
             nickname: 'Quilava',
+            currentHp: 68,
+            maxHp: 72,
+            experience: 13824,
           ),
           PartyMember(
             species: 'Riolu',
             speciesId: 447,
             level: 18,
             nickname: 'Riolu',
+            currentHp: 42,
+            maxHp: 48,
+            experience: 5832,
           ),
-          PartyMember(species: 'Flaaffy', speciesId: 180, level: 21),
-          PartyMember(species: 'Togepi', speciesId: 175, level: 15),
+          PartyMember(
+            species: 'Flaaffy',
+            speciesId: 180,
+            level: 21,
+            currentHp: 55,
+            maxHp: 60,
+            experience: 9261,
+          ),
+          PartyMember(
+            species: 'Togepi',
+            speciesId: 175,
+            level: 15,
+            currentHp: 38,
+            maxHp: 42,
+            experience: 3375,
+          ),
         ],
         timeline: [
           JourneyTimelineEntry(

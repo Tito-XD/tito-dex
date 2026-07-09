@@ -5,8 +5,8 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/party_team_list.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/party_summary.dart';
 import '../widgets/sticker_card.dart';
 
 class TeamPage extends StatelessWidget {
@@ -38,7 +38,7 @@ class TeamPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        PartySummary(party: journey.party, showSlots: true),
+        PartyTeamList(party: journey.party, showEmptySlots: true),
         const SizedBox(height: 14),
         StickerCard(
           variant: StickerVariant.cream,
