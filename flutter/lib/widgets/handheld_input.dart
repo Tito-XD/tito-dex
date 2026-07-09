@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
+import '../navigation/back_navigation.dart';
 import '../theme/tito_colors.dart';
 
 /// D-pad / gamepad focus traversal and A·B actions for RG handhelds.
@@ -69,22 +69,7 @@ class HandheldInputShell extends StatelessWidget {
   }
 
   void _handleBack(BuildContext context) {
-    final onHome = location == '/';
-    final onSettings = location == '/settings';
-    final onDexDetail = RegExp(r'^/dex/\d+$').hasMatch(location);
-
-    if (onHome) {
-      return;
-    }
-    if (onSettings) {
-      context.go('/');
-      return;
-    }
-    if (onDexDetail) {
-      context.go('/dex');
-      return;
-    }
-    context.go('/');
+    TitoBackNavigation.navigateBack(context, location);
   }
 }
 
