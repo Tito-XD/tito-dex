@@ -170,6 +170,16 @@ abstract final class DeviceLayout {
   /// Unified handheld UI scale relative to original 1× baseline (v0.2.18 used 2.0).
   static const double handheldUiScale = 1.5;
 
+  /// Extra boost for home subtitles / quick-action labels (on top of [handheldUiScale]).
+  static const double homeDetailBoost = 1.5;
+
+  static double homeDetailMultiplier(BuildContext context) {
+    if (isNativeTarget || useSquareDashboard(context)) {
+      return handheldUiScale * homeDetailBoost;
+    }
+    return 1.0;
+  }
+
   static double uiScale(BuildContext context) {
     final scope = TitoFontScale.maybeOf(context);
     if (scope != null) {
@@ -232,13 +242,16 @@ abstract final class DeviceLayout {
 
   static double dexBackIconSize(BuildContext context) {
     final raw = useSquareDashboard(context)
-        ? 56.0
-        : (isCompact(context) ? 48.0 : 44.0);
+        ? 72.0
+        : (isCompact(context) ? 64.0 : 56.0);
     return dim(context, raw);
   }
 
+  /// Back arrow — larger touch target, independent of title font size.
+  static double backIconSize(BuildContext context) => dexBackIconSize(context);
+
   static double trainerMicroCardHeight(BuildContext context) =>
-      dim(context, 104.0);
+      dim(context, 116.0);
 
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);
@@ -247,8 +260,11 @@ abstract final class DeviceLayout {
       dim(context, 44.0);
 
   static double quickTileIconSize(BuildContext context, {bool square = false}) {
-    final raw = square ? 20.0 : 18.0;
-    return dim(context, raw);
+    final raw = square ? 30.0 : 18.0;
+    return dim(context, raw) *
+        (square && (isNativeTarget || useSquareDashboard(context))
+            ? homeDetailBoost
+            : 1.0);
   }
 
   static double statusIconSize(BuildContext context, {bool compact = false}) =>
