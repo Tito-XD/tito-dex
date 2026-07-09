@@ -42,7 +42,7 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 | **Project name** | `tito-dex` |
 | **Production branch** | `deploy/dex-cdn` |
 | **Root directory** | `cloudflare/dex-cdn` |
-| **Build command** | *(留空，或 `npm ci`)* |
+| **Build command** | *(留空)* 或 `npm run build`（package.json 已含 no-op build） |
 | **Deploy command** | `npx wrangler deploy` |
 
 4. **Save and Deploy**

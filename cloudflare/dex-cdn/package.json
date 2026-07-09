@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "TitoDex offline dex CDN — R2 proxy Worker",
   "scripts": {
+    "build": "echo \"titodex-dex-cdn: no static build\"",
     "deploy": "wrangler deploy",
     "dry-run": "wrangler deploy --dry-run"
   },
@@ -11,6 +12,6 @@
     "wrangler": "^4.24.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
