@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../features/dex/type_chart.dart';
 import '../theme/tito_colors.dart';
 
 class DexSpriteImage extends StatelessWidget {
@@ -72,33 +73,35 @@ class DexTypeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = compact ? 16.0 : 18.0;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 10,
+        horizontal: compact ? 6 : 8,
         vertical: compact ? 3 : 4,
       ),
       decoration: BoxDecoration(
-        color: TitoColors.skyBlue,
-        borderRadius: BorderRadius.circular(999),
+        color: typeTileColor(typeEn),
+        borderRadius: BorderRadius.circular(compact ? 8 : 10),
         border: Border.all(color: TitoColors.ink, width: 2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (iconPath != null)
-            DexSpriteImage(
-              source: iconPath,
-              height: compact ? 14 : 16,
-              width: compact ? 14 : 16,
-            ),
-          if (iconPath != null) const SizedBox(width: 4),
-          Text(
-            labelZh,
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: compact ? 11 : 12,
-            ),
+          DexSpriteImage(
+            source: iconPath,
+            height: iconSize,
+            width: iconSize,
           ),
+          if (!compact || iconPath == null) ...[
+            const SizedBox(width: 4),
+            Text(
+              labelZh,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: compact ? 10 : 11,
+              ),
+            ),
+          ],
         ],
       ),
     );

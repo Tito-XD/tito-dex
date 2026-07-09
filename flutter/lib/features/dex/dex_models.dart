@@ -1,3 +1,4 @@
+import 'dex_game_scope.dart';
 import 'type_chart.dart';
 
 // HGSS national dex scope (Gen IV).
@@ -214,6 +215,36 @@ class FlavorTextEntry {
       );
 }
 
+class ObtainLocationEntry {
+  const ObtainLocationEntry({
+    required this.areaSlug,
+    required this.areaLabelZh,
+    this.minLevel,
+    this.maxChance = 0,
+  });
+
+  final String areaSlug;
+  final String areaLabelZh;
+  final int? minLevel;
+  final int maxChance;
+
+  Map<String, dynamic> toJson() => {
+        'areaSlug': areaSlug,
+        'areaLabelZh': areaLabelZh,
+        if (minLevel != null) 'minLevel': minLevel,
+        'maxChance': maxChance,
+      };
+
+  factory ObtainLocationEntry.fromJson(Map<String, dynamic> json) =>
+      ObtainLocationEntry(
+        areaSlug: json['areaSlug'] as String,
+        areaLabelZh: json['areaLabelZh'] as String? ??
+            encounterAreaLabelZh(json['areaSlug'] as String),
+        minLevel: json['minLevel'] as int?,
+        maxChance: json['maxChance'] as int? ?? 0,
+      );
+}
+
 class PokemonMoveSet {
   const PokemonMoveSet({
     this.levelUp = const [],
@@ -300,6 +331,7 @@ class PokemonDetail {
     this.baseStats,
     this.typeMultipliers = const {},
     this.flavorEntries = const [],
+    this.obtainLocations = const [],
     this.moveSet = const PokemonMoveSet(),
     this.genderFemalePercent,
     this.eggGroups = const [],
@@ -319,6 +351,7 @@ class PokemonDetail {
   final PokemonBaseStats? baseStats;
   final Map<String, double> typeMultipliers;
   final List<FlavorTextEntry> flavorEntries;
+  final List<ObtainLocationEntry> obtainLocations;
   final PokemonMoveSet moveSet;
   final double? genderFemalePercent;
   final List<String> eggGroups;
@@ -349,6 +382,8 @@ class PokemonDetail {
         ),
         'flavorEntries':
             flavorEntries.map((entry) => entry.toJson()).toList(),
+        'obtainLocations':
+            obtainLocations.map((entry) => entry.toJson()).toList(),
         'moveSet': moveSet.toJson(),
         if (genderFemalePercent != null)
           'genderFemalePercent': genderFemalePercent,
@@ -423,6 +458,11 @@ class PokemonDetail {
       typeMultipliers: typeMultipliers,
       flavorEntries: (json['flavorEntries'] as List<dynamic>? ?? const [])
           .map((item) => FlavorTextEntry.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      obtainLocations: (json['obtainLocations'] as List<dynamic>? ?? const [])
+          .map(
+            (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
       moveSet: resolvedMoveSet,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),

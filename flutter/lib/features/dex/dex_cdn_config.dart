@@ -28,6 +28,8 @@ class DexCdnConfig {
 
   String spriteUrl(int id) => '$cdnBase/v2/sprites/$id.jpg';
 
+  String typeIconUrl(String type) => '$cdnBase/v2/type_icons/$type.jpg';
+
   DexBundleManifest fallbackManifest() => DexBundleManifest(
         bundleVersion: bundleVersion,
         archiveUrl: bundleUrl,

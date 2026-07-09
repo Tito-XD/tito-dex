@@ -57,6 +57,12 @@ abstract final class AppZh {
   static const dexImmunities = '免疫（受到 ×0）';
   static const dexStabEffective = '本系克制（打出 ×2）';
   static const dexEvolution = '进化链';
+  static const dexObtainHgss = '心金·魂银 出现地点';
+  static const dexObtainEmpty =
+      'PokeAPI 未收录该宝可梦在心金/魂银的野外遭遇数据（可能为进化、赠送或不可野生捕获）。';
+  static const dexFlavorEnglishNote = '该世代暂无官方中文描述，以下为英文原文。';
+  static const dexFlavorZhFallbackNote =
+      '心金/魂银世代无中文图鉴文案，以下为近世代中文译名供参考。';
   static const dexNone = '无';
   static const dexApiNote =
       '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
