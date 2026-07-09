@@ -56,17 +56,16 @@ Pre-built Android APKs live under [`releases/`](releases/) and on [GitHub Releas
 
 | File | Use |
 | --- | --- |
-| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate / most devices** (64-bit) |
-| `TitoDex-0.2.25-rg-armv7.apk` | 32-bit ARM handhelds |
+| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate** — arm64-v8a (same naming as 0.2.1–0.2.11) |
 
 Build locally:
 
 ```bash
 cd flutter
 flutter pub get
+# arm64-v8a only — copy output to releases/TitoDex-<ver>-rg-arm64.apk
 flutter build apk --release --target-platform android-arm64
-# → build/app/outputs/flutter-apk/app-release.apk (~22 MB)
-# Copy to releases/TitoDex-<ver>-rg-arm64.apk
+cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
 
 Do not use `--split-per-abi`; see [flutter/README.md](flutter/README.md) for RG packaging notes.

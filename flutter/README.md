@@ -17,14 +17,11 @@ flutter run              # Android device / emulator
 
 ## Build release APK (RG handheld)
 
+Same convention as 0.2.1–0.2.11: **arm64-v8a only**, filename `TitoDex-<ver>-rg-arm64.apk`.
+
 ```bash
-# RG Rotate / 64-bit handhelds (~22 MB)
 flutter build apk --release --target-platform android-arm64
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
-
-# 32-bit ARM handhelds (~20 MB)
-flutter build apk --release --target-platform android-arm
-cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-armv7.apk
 ```
 
 Do **not** use `--split-per-abi` for RG releases. With default `minSdk 21`, native `.so` files get zip-compressed and sideload fails with「安装包无效」. `android/app/build.gradle.kts` sets `minSdk = 24` and `useLegacyPackaging = false` so `.so` stay **Stored** (uncompressed), matching v0.2.11 builds.
