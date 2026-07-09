@@ -64,9 +64,12 @@ Build locally:
 ```bash
 cd flutter
 flutter pub get
-flutter build apk --release --split-per-abi
-# → build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+flutter build apk --release --target-platform android-arm64
+# → build/app/outputs/flutter-apk/app-release.apk (~22 MB)
+# Copy to releases/TitoDex-<ver>-rg-arm64.apk
 ```
+
+Do not use `--split-per-abi`; see [flutter/README.md](flutter/README.md) for RG packaging notes.
 
 ## Dex CDN (production)
 
