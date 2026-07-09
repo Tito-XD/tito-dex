@@ -15,6 +15,7 @@ import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
+import '../widgets/tito_skeleton_gate.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemonId});
@@ -26,137 +27,149 @@ class PokemonDetailPage extends StatefulWidget {
 }
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> {
-  late Future<PokemonDetail> _detailFuture;
+  PokemonDetail? _detail;
+  (String, String)? _errorCopy;
+  bool _loading = true;
   int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _detailFuture = dexRepository.getDetail(widget.pokemonId);
+    _loadDetail();
+  }
+
+  Future<void> _loadDetail() async {
+    setState(() {
+      _loading = true;
+      _errorCopy = null;
+    });
+    try {
+      final detail = await dexRepository.getDetail(widget.pokemonId);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _detail = detail;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _errorCopy = splitUserFacingError(error);
+        _loading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<PokemonDetail>(
-      future: _detailFuture,
-      builder: (context, snapshot) {
-        final loading = snapshot.connectionState != ConnectionState.done;
-        final detail = snapshot.data;
-        final errorCopy = snapshot.hasError
-            ? splitUserFacingError(snapshot.error!)
-            : null;
+    final detail = _detail;
+    final errorCopy = _errorCopy;
+    final contentReady = !_loading && detail != null && errorCopy == null;
 
-        return Column(
-          children: [
-            Padding(
-              padding: DeviceLayout.pagePadding(context).copyWith(bottom: 0),
-              child: Column(
-                children: [
-                  _DexBackBar(path: '/dex/${widget.pokemonId}'),
-                  const SizedBox(height: 8),
-                  if (loading)
-                    const TitoDetailHeaderSkeleton()
-                  else if (detail != null)
-                    _CompactPokemonHeader(detail: detail)
-                  else
-                    const TitoDetailHeaderSkeleton(),
-                ],
+    return Column(
+      children: [
+        Padding(
+          padding: DeviceLayout.pagePadding(context).copyWith(bottom: 0),
+          child: Column(
+            children: [
+              _DexBackBar(path: '/dex/${widget.pokemonId}'),
+              const SizedBox(height: 8),
+              TitoSkeletonGate(
+                loading: _loading,
+                skeleton: const TitoDetailHeaderSkeleton(),
+                child: detail != null
+                    ? _CompactPokemonHeader(detail: detail)
+                    : const SizedBox.shrink(),
               ),
-            ),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: TitoMotion.tabFadeDuration,
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                layoutBuilder: (currentChild, previousChildren) {
-                  return Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      ...previousChildren,
-                      if (currentChild != null) currentChild,
-                    ],
-                  );
-                },
-                child: _buildBody(
-                  key: ValueKey(
-                    loading
-                        ? 'loading'
-                        : errorCopy != null
-                            ? 'error'
-                            : 'tab-$_currentTabIndex-${detail!.summary.id}',
-                  ),
-                  loading: loading,
-                  detail: detail,
-                  errorCopy: errorCopy,
-                  tabIndex: _currentTabIndex,
-                ),
-              ),
-            ),
-            _DetailBottomTabs(
-              currentIndex: _currentTabIndex,
-              onSelected: (index) {
-                if (_currentTabIndex != index) {
-                  setState(() => _currentTabIndex = index);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildBody({
-    required Key key,
-    required bool loading,
-    required PokemonDetail? detail,
-    required (String, String)? errorCopy,
-    required int tabIndex,
-  }) {
-    if (loading) {
-      return ListView(
-        key: key,
-        padding: DeviceLayout.pagePadding(context),
-        children: const [
-          TitoCardSkeleton(height: 140),
-          SizedBox(height: 12),
-          TitoCardSkeleton(height: 88),
-        ],
-      );
-    }
-
-    if (errorCopy != null || detail == null) {
-      final copy = errorCopy ?? (AppZh.dexLoadFailed, AppZh.errorGeneric);
-      return ListView(
-        key: key,
-        padding: DeviceLayout.pagePadding(context),
-        children: [
-          StickerCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(copy.$1, style: context.tito.cardBodyEmphasis),
-                const SizedBox(height: 8),
-                Text(copy.$2, style: context.tito.errorDetail),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _detailFuture = dexRepository.getDetail(widget.pokemonId);
-                    });
-                  },
-                  child: const Text(AppZh.dexRetry),
-                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TitoSkeletonGate(
+            loading: _loading,
+            skeleton: ListView(
+              padding: DeviceLayout.pagePadding(context),
+              children: const [
+                TitoCardSkeleton(height: 140),
+                SizedBox(height: 12),
+                TitoCardSkeleton(height: 88),
               ],
             ),
+            child: errorCopy != null
+                ? _ErrorBody(
+                    copy: errorCopy,
+                    onRetry: _loadDetail,
+                  )
+                : contentReady
+                    ? AnimatedSwitcher(
+                        duration: TitoMotion.tabFadeDuration,
+                        switchInCurve: TitoMotion.standardCurve,
+                        switchOutCurve: TitoMotion.standardCurve,
+                        layoutBuilder: (currentChild, previousChildren) {
+                          return Stack(
+                            alignment: Alignment.topCenter,
+                            children: [
+                              ...previousChildren,
+                              if (currentChild != null) currentChild,
+                            ],
+                          );
+                        },
+                        child: KeyedSubtree(
+                          key: ValueKey(
+                            'tab-$_currentTabIndex-${detail!.summary.id}',
+                          ),
+                          child: _DetailTabBody(
+                            detail: detail,
+                            tabIndex: _currentTabIndex,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
           ),
-        ],
-      );
-    }
+        ),
+        _DetailBottomTabs(
+          currentIndex: _currentTabIndex,
+          onSelected: (index) {
+            if (_currentTabIndex != index) {
+              setState(() => _currentTabIndex = index);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
 
-    return KeyedSubtree(
-      key: key,
-      child: _DetailTabBody(detail: detail, tabIndex: tabIndex),
+class _ErrorBody extends StatelessWidget {
+  const _ErrorBody({required this.copy, required this.onRetry});
+
+  final (String, String) copy;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: DeviceLayout.pagePadding(context),
+      children: [
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(copy.$1, style: context.tito.cardBodyEmphasis),
+              const SizedBox(height: 8),
+              Text(copy.$2, style: context.tito.errorDetail),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: onRetry,
+                child: const Text(AppZh.dexRetry),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

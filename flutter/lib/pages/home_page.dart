@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/companion/companion_art.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
@@ -10,37 +9,20 @@ import '../widgets/app_header.dart';
 import '../widgets/trainer_card.dart';
 import '../widgets/continue_journey_card.dart';
 import '../widgets/party_strip.dart';
-import '../widgets/companion_sticker.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
     required this.journey,
     required this.onContinue,
-    this.onCompanionChanged,
   });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
-  final ValueChanged<String>? onCompanionChanged;
-
-  void _cycleCompanion() {
-    final next = cycleCompanion(journey.companion);
-    onCompanionChanged?.call(next);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        _buildBody(context),
-        FloatingCompanion(
-          name: journey.companion,
-          onTap: onCompanionChanged != null ? _cycleCompanion : null,
-        ),
-      ],
-    );
+    return _buildBody(context);
   }
 
   Widget _buildBody(BuildContext context) {
