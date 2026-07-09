@@ -153,7 +153,9 @@ class PokeApiBuilder:
         # fairy (and some types) use extended id e.g. 10001.png in colosseum set
         type_id = detail.get("id")
         if type_id is not None:
-            return f"{TYPE_ICON_BASE}/{type_id}.png"
+            # fairy uses extended colosseum id 10001
+            lookup_id = 10001 if type_name == "fairy" else type_id
+            return f"{TYPE_ICON_BASE}/{lookup_id}.png"
         return None
 
     def fetch_move(self, move_id: int) -> dict[str, Any]:
