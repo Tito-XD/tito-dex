@@ -89,6 +89,62 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _dexCacheStatus = status);
   }
 
+  Future<void> _downloadDexCdnBundle() async {
+    if (_dexDownloading) {
+      return;
+    }
+    setState(() => _dexDownloading = true);
+
+    try {
+      DexCacheProgress? lastProgress;
+      await for (final progress in dexOfflineService.downloadFromCdnBundle()) {
+        lastProgress = progress;
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _dexCacheStatus = DexCacheStatus(
+            manifest:
+                _dexCacheStatus?.manifest ??
+                const DexCacheManifest(
+                  version: DexCacheManifest.currentVersion,
+                  complete: false,
+                  preferOffline: true,
+                ),
+            sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
+            isDownloading: progress.phase != 'done',
+            progress: progress,
+          );
+        });
+      }
+      dexRepository.clearMemoryCache();
+      await _refreshDexCacheStatus();
+      if (!mounted) {
+        return;
+      }
+      if (lastProgress?.phase == 'done') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexCdnDone)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
+        );
+      }
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dexDownloading = false);
+      }
+    }
+  }
+
   Future<void> _downloadDexOffline() async {
     if (_dexDownloading) {
       return;
@@ -453,18 +509,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ],
               const SizedBox(height: 12),
+              Text(
+                AppZh.settingsDexCdnDownloadHint,
+                style: context.tito.cardMuted,
+              ),
+              const SizedBox(height: 12),
               FilledButton(
-                onPressed: _dexDownloading ? null : _downloadDexOffline,
+                onPressed: _dexDownloading ? null : _downloadDexCdnBundle,
                 style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.deepBlue,
-                  foregroundColor: TitoColors.card,
+                  backgroundColor: TitoColors.coral,
+                  foregroundColor: TitoColors.ink,
                 ),
+                child: const Text(AppZh.settingsDexCdnDownload),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: _dexDownloading ? null : _downloadDexOffline,
                 child: Text(
                   dexManifest != null &&
                           dexManifest.pokemonCount > 0 &&
                           !dexManifest.complete
                       ? AppZh.settingsDexOfflineResume
-                      : AppZh.settingsDexOfflineDownload,
+                      : AppZh.settingsDexOfflineDownloadPokeApi,
                 ),
               ),
               if (dexManifest != null && dexManifest.pokemonCount > 0) ...[

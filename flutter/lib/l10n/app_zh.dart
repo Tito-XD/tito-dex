@@ -103,12 +103,24 @@ abstract final class AppZh {
     final phaseLabel = switch (phase) {
       'types' => '属性',
       'pokemon' => '宝可梦',
+      'cdn_manifest' => 'CDN 清单',
+      'cdn_download' => 'CDN 下载',
+      'cdn_verify' => '校验',
+      'cdn_decompress' => '解压',
+      'cdn_extract' => '写入',
       'done' => '完成',
       'partial' => '部分完成',
       _ => phase,
     };
     return '正在缓存$phaseLabel $current / $total';
   }
+
+  static const settingsDexCdnDownload = '从 CDN 下载图鉴包';
+  static const settingsDexCdnDownloadHint =
+      '从 dex.tito.cafe 下载预打包图鉴（更快，含全部 493 只立绘与数据）';
+  static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
+  static const snackDexCdnDone = 'CDN 图鉴包已安装完成';
+  static const snackDexCdnFailed = 'CDN 图鉴包下载失败';
 
   static const snackDexOfflineDone = '离线图鉴已下载完成';
   static String snackDexOfflinePartial(int count) =>
