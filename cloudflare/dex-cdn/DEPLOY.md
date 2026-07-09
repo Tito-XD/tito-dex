@@ -54,13 +54,19 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 - 确认已有 R2 binding：`DEX_BUCKET` → `titodex-dex`
 - 若缺失，添加 R2 bucket binding，名称必须为 **`DEX_BUCKET`**（与 `wrangler.toml` 一致）
 
-### 4. 自定义域名（可选）
+### 4. 自定义域名 `dex.tito.cafe`
 
-Worker → **Settings** → **Domains & Routes** → Add：
+专用图鉴 CDN 子域名。**推荐**，App 与离线包 URL 均使用该域名。
 
-- `dex.<你的域名>/*`
+详细步骤：**[DOMAIN.md](./DOMAIN.md)**
 
-或在 `wrangler.toml` 取消注释 `[[routes]]` 后 push 到 `deploy/dex-cdn`。
+简要：
+
+1. Worker → **Settings** → **Domains & Routes** → Add custom domain → `dex.tito.cafe`
+2. 确认 `tito.cafe` zone 在本 CF 账号（DNS 通常自动创建）
+3. 在 **tito.cafe** zone 配置 Cache Rules（见 DOMAIN.md）
+
+`wrangler.toml` 已含 `dex.tito.cafe/*` 路由；push `deploy/dex-cdn` 后会同步。
 
 ### 5. Cache Rules（Dashboard）
 
@@ -94,8 +100,8 @@ npx wrangler deploy --dry-run
 Worker + R2 资源就绪后：
 
 ```bash
-TITODEX_DEX_CDN_BASE=https://dex.<你的域名>
-TITODEX_DEX_BUNDLE_URL=https://dex.<你的域名>/v2/bundle.tar.zst
+TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=2
 ```
 
