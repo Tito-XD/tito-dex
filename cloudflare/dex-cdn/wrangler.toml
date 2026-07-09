@@ -1,0 +1,19 @@
+name = "titodex-dex-cdn"
+main = "src/worker.js"
+compatibility_date = "2024-09-23"
+
+# Replace with your Cloudflare account ID.
+# account_id = "YOUR_ACCOUNT_ID"
+
+[[r2_buckets]]
+binding = "DEX_BUCKET"
+bucket_name = "titodex-dex"
+
+# Attach to custom domain, e.g. dex.example.com
+# [[routes]]
+# pattern = "dex.example.com/*"
+# zone_name = "example.com"
+
+[vars]
+# Informational — App reads CDN base from build-time env, not Worker vars.
+CDN_VERSION = "2"
