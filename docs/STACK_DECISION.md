@@ -17,37 +17,40 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 | Phase | Goal | Status |
 | --- | --- | --- |
 | **0 — Scaffold** | Flutter project, theme, DeviceShell, home, routing | ✅ Done |
-| **A — Persistence + native feel** | Local journey store, splash/icon/back | ⚠️ Partial — persistence done; splash/icon/`PopScope` not yet |
-| **B — Useful companion** | Emulator launcher, full Settings editing, JSON I/O | ⚠️ Mostly done — launcher + journey edits + JSON clipboard import; Dex/Search deferred |
-| **C — HGSS parser** | Parse `.sav`, drive home | ✅ Parser + directory sync; timeline merge on re-import |
+| **A — Persistence + native feel** | Local journey store, splash/icon/back | ⚠️ Partial — persistence + back; custom icon/splash pending |
+| **B — Useful companion** | Emulator launcher, Settings, JSON I/O | ✅ Done |
+| **C — HGSS parser** | Parse `.sav`, drive home | ✅ Parser + directory sync + timeline merge |
+| **D — Dex + CDN** | Offline dex, Cloudflare bundle, PNG artwork | ✅ v0.2.25 |
 
 ### Shipped in `flutter/`
 
-- **Home dashboard** — trainer card, continue card, party, timeline (`lib/pages/home_page.dart`)
-- **DeviceShell + bottom nav** — `/`, `/team`, `/journey`, `/settings` (`lib/widgets/`)
+- **Home dashboard** — trainer card, continue + map, party, quick actions, companion sticker
+- **DeviceShell + bottom nav** — `/`, `/team`, `/journey`, `/dex`, `/search`, `/settings`
+- **Handheld polish** — RG square layout, D-pad focus, Nunito typography, status icons
 - **Journey persistence** — JSON in `shared_preferences` (`JourneyRepository`)
-- **HGSS parser** — retail 524 288-byte `.sav`; active partition via save counter at `0xF618` (`HgssParser`)
+- **HGSS parser** — retail 524 288-byte `.sav`; active partition via save counter at `0xF618`
 - **Map → location** — ~500 map IDs → English label → Chinese via `game_zh.dart`
-- **Save directory sync** — pick folder, scan newest `.sav` by mtime, auto-load on startup (`SaveSyncService`)
+- **Save directory sync** — pick folder, scan newest `.sav` by mtime, auto-load on startup
 - **Settings** — trainer name, journey edits, emulator picker, save folder, fixture import, JSON export/import
 - **Continue** — first tap picks Android emulator; later taps launch remembered app
 - **Team / Journey pages** — party slots, timeline, journey stats
-- **Tests** — `flutter test` (9 tests)
+- **Dex 1–493** — grid, search, 4-tab detail, type chart, HGSS moves, evolution chain
+- **Offline dex** — PokeAPI batch download **or** one-tap CDN bundle from `dex.tito.cafe`
+- **PNG sprites + artwork viewer** — transparent thumbnails; tap header for lazy full-size PNG
+- **Tests** — `flutter test` (40+ tests)
 
 ### Not yet shipped
 
-- Dex / Search routes (React mock had these; Flutter nav uses Settings)
-- Custom launcher icon (splash uses deep-blue background; default Flutter icon remains)
+- Custom launcher icon (default Flutter icon remains)
 - HeartGold detection, Kanto badge count, single-file `.sav` picker
-- Cloud sync
+- Save dex seen/caught flags from `.sav`
+- Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`)
 
-### Navigation difference from React mock
+### Navigation (current)
 
-| React Phase 2 | Flutter (current) |
+| Route | Screen |
 | --- | --- |
-| Home, Team, Journey, Dex, Search | Home, Team, Journey, **Settings** |
-
-Dex and Search are deferred; Settings holds save sync and journey controls.
+| Home, Team, Journey, Dex, Search, Settings | All shipped in Flutter |
 
 ### Known parser behavior gaps
 
@@ -138,10 +141,11 @@ The root `android/` Capacitor project and `npm` scripts remain as legacy referen
 
 ```
 Phase 0 — Flutter scaffold                    ✅
-Phase A — Native feel + persistence           ⚠️ persistence done
-Phase B — Useful companion                    ⚠️ trainer name + save sync
-Phase C — HGSS parser + save directory sync   ✅ parser; ⚠️ timeline merge
-Next    — Emulator launcher, Team/Journey UI, Dex/Search, native polish
+Phase A — Native feel + persistence           ⚠️ icon/splash pending
+Phase B — Useful companion                    ✅
+Phase C — HGSS parser + save directory sync   ✅
+Phase D — Dex + Cloudflare CDN v4             ✅
+Next    — Save dex flags, Johto 251 browse, web pokedex
 ```
 
 Original phase definitions (for planning):
@@ -259,6 +263,9 @@ References: [Project Pokémon HGSS save structure](https://projectpokemon.org/ho
 | Jul 2026 | DeviceShell retained; native shell + persistence + launcher prioritized |
 | Jul 2026 | Flutter app in `flutter/` — parser, persistence, save sync, zh UI shipped |
 | Jul 2026 | Save-directory auto-load on startup added (newest `.sav` by mtime) |
+| Jul 2026 | Dex UI + offline cache + RG handheld polish (v0.2.20–0.2.23) |
+| Jul 2026 | **Cloudflare dex CDN** live — `dex.tito.cafe`, bundle v4 PNG, Worker `tito-dex` |
+| Jul 2026 | **v0.2.25** — UI merge + artwork viewer + RG APK release |
 
 ## Related Documents
 

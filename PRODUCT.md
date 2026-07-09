@@ -88,23 +88,29 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - Trainer Card feeling.
 - Riolu companion presence.
 - Compact widget dashboard.
-- Mock Dex search that is clearly scoped to current game context.
+- **HGSS national dex 1–493** with offline CDN bundle (`dex.tito.cafe` v4).
 - Journey timeline.
 
 ### Could Have Later
 
-- Save parser integration.
+- Save dex seen/caught flags from `.sav`.
 - Local backup browsing.
-- Cloud sync.
+- Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`).
 - Route notes.
 - Game-specific checklists.
 - Generation-specific data packs.
+- Web companion at `tito.cafe/pokedex` (reuse CDN assets).
 
 ### Should Not Have in Phase 1
 
-- full Pokédex encyclopedia
+- full Pokédex encyclopedia (beyond HGSS 493 scope)
 - all-game parser abstraction
 - account system
-- emulator launcher
 - OCR
 - large public content ingestion
+
+### Shipped (v0.2.25)
+
+- Save parser integration (HGSS retail `.sav`)
+- Emulator launcher (Continue → pick / remember app)
+- Mock Dex → **real offline dex** with PNG sprites + artwork viewer

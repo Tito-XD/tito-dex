@@ -2,19 +2,25 @@
 
 > **Active stack:** Flutter + Dart in `flutter/`. Capacitor + React under `src/` is a frozen design reference. See [Stack Decision](./STACK_DECISION.md) for migration rationale and current feature status.
 
+**Release:** v0.2.25 · Dex CDN bundle v4 at `https://dex.tito.cafe`
+
 ## Recommended Stack
 
 **Flutter + Dart** (`flutter/` subdirectory)
 
 | Concern | Choice |
 | --- | --- |
-| UI | Custom widgets — `DeviceShell`, sticker cards, Nunito via `google_fonts` |
-| Routing | `go_router` — shell route + bottom nav |
+| UI | Custom widgets — `DeviceShell`, sticker cards, bundled Nunito |
+| Routing | `go_router` — shell route + bottom nav + dex detail |
 | Persistence | `shared_preferences` — journey JSON + save-directory config |
 | Save parsing | `HgssParser` — retail 512 KB NDS `.sav` |
 | Save sync | `SaveSyncService` + `SaveScanner` — directory watch, newest file by mtime |
-| File picking | `file_picker` — directory path (not single-file yet) |
-| Hashing | `package:crypto` SHA-256 |
+| Dex online | `PokeApiClient` + throttle/retry |
+| Dex offline | `DexOfflineService` — PokeAPI batch **or** `DexBundleInstaller` (CDN tar.zst) |
+| Dex CDN | `DexCdnConfig` — compile-time URLs; defaults to `dex.tito.cafe` v4 |
+| Artwork | `DexArtworkService` — lazy PNG full-size; local `artwork/` cache on tap |
+| File picking | `file_picker` — directory path |
+| Hashing | `package:crypto` SHA-256 (saves + bundle integrity) |
 | Localization | Static Chinese maps in `lib/l10n/` |
 
 ### Legacy reference (Phase 2)
@@ -43,7 +49,7 @@ Constraints:
 - responsive phone + square layouts
 - simple data model
 - game-scoped parser (HGSS only for now)
-- cloud sync as optional later adapter
+- dex CDN as shared asset layer (App + future `tito.cafe/pokedex` web)
 
 ## Project Shape
 
@@ -53,55 +59,38 @@ Constraints:
 flutter/
   lib/
     app.dart                      # Bootstrap, GoRouter, save sync hooks
-    main.dart
     features/
+      dex/                        # PokeAPI, offline cache, CDN installer, artwork
       journey/journey_repository.dart
-      parser/
-        hgss_parser.dart          # Parse + toJourney
-        hgss_format.dart          # Gen IV text, party decrypt
-        hgss_map_lookup.dart
-        hgss_map_list.dart        # Generated map table
-      save/
-        save_sync_service.dart
-        save_scanner.dart
-        save_directory_repository.dart
-        save_types.dart
-    l10n/
-      app_zh.dart                 # UI strings
-      game_zh.dart                # Location/species zh maps
-    models/
-      journey.dart
-      parsed_save.dart
-    pages/
-      home_page.dart
-      settings_page.dart
-    theme/
-      tito_colors.dart
-      tito_theme.dart
-    widgets/
-      device_shell.dart
-      tito_bottom_nav.dart
-      trainer_card.dart
-      continue_journey_card.dart
-      party_summary.dart
-      sticker_card.dart
-  test/
-    hgss_parser_test.dart
-    hgss_map_lookup_test.dart
-    save_scanner_test.dart
-    widget_test.dart
-  assets/fixtures/PKMSS.sav
+      parser/                     # HgssParser, map list, Gen IV text/crypto
+      save/                       # SaveSyncService, SaveScanner
+      trainer/                    # Avatar service
+    l10n/                         # app_zh.dart, game_zh.dart
+    models/                       # journey.dart, parsed_save.dart
+    navigation/                   # back_navigation, page transitions
+    pages/                        # home, dex, detail, search, settings, …
+    theme/                        # colors, typography, device_layout
+    widgets/                      # DeviceShell, cards, artwork viewer, …
+  test/                           # parser, dex CDN, layout, widget smoke
+  assets/
+    fixtures/PKMSS.sav
+    fonts/Nunito-*.ttf
+    companion/*.png
   android/ linux/ web/
 ```
 
-Repo-level tooling:
+Repo-level tooling & CDN:
 
 ```txt
 fixtures/PKMSS.sav
+releases/TitoDex-*-rg-*.apk
 tools/
+  build_dex_bundle.py             # CDN bundle v4 builder
+  upload_dex_via_worker.py
+  cleanup_r2_jpg.py
   probe_hgss_save.py
-  generate_hgss_map_list.py
-  hgss_map_list.json
+cloudflare/dex-cdn/               # Worker tito-dex → R2 titodex-dex
+docs/CLOUDFLARE_DEX_CDN.md
 ```
 
 ### React (frozen reference) — `src/`
@@ -132,6 +121,18 @@ User picks directory (Settings)
   → JourneyRepository.save()
 ```
 
+### Dex offline (CDN path)
+
+```txt
+Settings → download CDN bundle
+  → GET bundle-manifest.json (short TTL)
+  → GET bundle.tar.zst + SHA256 verify
+  → zstd decompress → dex_offline/ layout
+  → manifest.complete=true, preferOffline=true
+```
+
+Sprites are **PNG** thumbnails in bundle; full **artwork** fetched lazily on tap (`v2/artwork/{id}.png` or PokeAPI fallback) into `dex_offline/artwork/`.
+
 ### Journey model highlights
 
 - `trainerName` — display name (may be customized)
@@ -149,8 +150,6 @@ User picks directory (Settings)
 
 `JourneyRepository` — JSON in `shared_preferences`.
 
-Helpers on `HgssParser`: `encodeJourneyJson` / `decodeJourneyJson` (export/import UI not wired yet).
-
 ### 3. Save parser adapter
 
 `ParsedSaveSummary` → `toJourney()` merges into `CurrentJourney`.
@@ -159,13 +158,16 @@ Helpers on `HgssParser`: `encodeJourneyJson` / `decodeJourneyJson` (export/impor
 
 - SoulSilver only; game string hardcoded
 - Johto badges only (Kanto `0x83` not read)
-- Timeline replaced on import (merge TODO)
 - Partial Gen IV charset; ASCII trainer names only decode cleanly
 - Retail 524 288 bytes only
 
 See `PARSER_PROPOSAL.md` for full boundary.
 
-### 4. Cloud sync adapter
+### 4. Dex CDN layer (live)
+
+R2 bucket `titodex-dex` behind Worker `tito-dex` at `dex.tito.cafe`. See `CLOUDFLARE_DEX_CDN.md`.
+
+### 5. Journey cloud sync
 
 Not implemented. See `CLOUD_SYNC_PROPOSAL.md`.
 
@@ -173,19 +175,21 @@ Not implemented. See `CLOUD_SYNC_PROPOSAL.md`.
 
 | Route | Screen | Status |
 | --- | --- | --- |
-| `/` | Home — trainer, continue, party, timeline | ✅ |
-| `/team` | Team | Placeholder |
-| `/journey` | Journey | Placeholder |
-| `/settings` | Trainer, save folder, journey snapshot | ✅ |
+| `/` | Home — trainer, continue, party, quick actions | ✅ |
+| `/team` | Party list | ✅ |
+| `/journey` | Timeline | ✅ |
+| `/dex` | National dex grid | ✅ |
+| `/dex/:id` | Detail — 4 tabs | ✅ |
+| `/search` | Search | ✅ |
+| `/settings` | Save sync, dex offline, journey tools | ✅ |
 
-React mock also had `/dex` and `/search` — not ported yet.
-
-**Continue button:** opens bottom sheet stub; emulator launch is Phase B.
+**Continue button:** picks / remembers emulator app and launches on subsequent taps.
 
 ## Responsive Strategy
 
 - `DeviceShell` wraps all routes
-- `ListView` / `Column` home layout; grid dashboard on wider viewports
+- `DeviceLayout` — phone vs RG square vs compact handheld
+- `HandheldInputShell` — D-pad / keyboard focus on RG
 - `SafeArea` for notches and system bars
 - Test at 360×780 phone and 720×720 square (RG Rotate)
 
@@ -198,6 +202,7 @@ React mock also had `/dex` and `/search` — not ported yet.
 | Directory pick | `file_picker` in `app.dart` | |
 | Save file read | `save_sync_service.dart` | `dart:io` — not on web |
 | Parser | `hgss_parser.dart` | pure Dart |
+| Dex bundle | `dex_bundle_installer.dart` | HTTP + zstd + tar |
 
 ## Testing
 
@@ -208,15 +213,17 @@ cd flutter && flutter test
 | Test | Covers |
 | --- | --- |
 | `hgss_parser_test.dart` | Full PKMSS fixture |
-| `hgss_map_lookup_test.dart` | Map ID 76 → 满金市, trainer name preservation |
+| `dex_cdn_config_test.dart` | CDN URLs, manifest parsing |
+| `device_layout_test.dart` | RG square / compact |
 | `save_scanner_test.dart` | Newest-by-mtime, size filter |
 | `widget_test.dart` | App boot loading shell |
 
-Manual: Settings import, directory sync on Android device with emulator save folder.
+Manual: Settings import, directory sync on Android device with emulator save folder; CDN bundle download on RG.
 
 ## Related Documents
 
 - [Stack Decision](./STACK_DECISION.md) — status table, gaps, decision log
 - [Flutter README](../flutter/README.md) — dev quick start
+- [Cloudflare Dex CDN](./CLOUDFLARE_DEX_CDN.md) — R2 layout, build, deploy
 - [Parser Proposal](./PARSER_PROPOSAL.md) — HGSS offsets and limits
 - [Design System](./DESIGN_SYSTEM.md) — tokens ported to `tito_colors.dart`

@@ -82,7 +82,7 @@ CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
 
 ```json
 {
-  "bundleVersion": 2,
+  "bundleVersion": 4,
   "pokemonCount": 493,
   "archiveUrl": "https://dex.<你的域名>/v2/bundle.tar.zst",
   "archiveSha256": "<sha256>",
@@ -95,7 +95,7 @@ CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
 
 ```json
 {
-  "version": 2,
+  "version": 4,
   "complete": true,
   "preferOffline": true,
   "downloadedAt": "2026-07-09T00:00:00Z",
@@ -148,7 +148,8 @@ dex_offline/
 
 | URL | 内容 |
 | --- | --- |
-| `https://dex.<域名>/v2/sprites/{id}.png` | 精灵图 |
+| `https://dex.<域名>/v2/sprites/{id}.png` | 精灵缩略图 |
+| `https://dex.<域名>/v2/artwork/{id}.png` | 精灵大图（按需，不进 bundle） |
 | `https://dex.<域名>/v2/type_icons/{type}.png` | 属性图标 |
 | `https://dex.<域名>/v2/details/{id}.json` | 详情 JSON |
 | `https://dex.<域名>/v2/summaries.json` | 摘要列表 |
@@ -161,6 +162,7 @@ dex_offline/
 | 路径 | TTL | Cache-Control |
 | --- | --- | --- |
 | `/v2/sprites/*` | 1 年 | `public, max-age=31536000, immutable` |
+| `/v2/artwork/*` | 1 年 | 同上 |
 | `/v2/type_icons/*` | 1 年 | 同上 |
 | `/v2/details/*` | 1 年 | 同上 |
 | `/v2/bundle.tar.zst` | 1 年 | 同上（带版本号路径） |
@@ -234,7 +236,10 @@ wrangler r2 object put titodex-dex/v2/bundle.tar.zst --file=../../dist/dex-v2/up
 
 ### 体积目标
 
-完整包 **< 30 MB**（JPEG quality 78，精灵宽 ≤220px）。
+- 离线 bundle **~20 MB**（PNG 缩略图宽 ≤220px，493 只 + JSON）
+- CDN `v2/artwork/` 另计 **~40 MB**（全尺寸 PNG，按需加载，不进 tar）
+
+Legacy JPEG（`*.jpg`）已从 R2 清理；仅保留 PNG。
 
 ---
 
@@ -285,4 +290,5 @@ TITODEX_DEX_BUNDLE_VERSION=4
 | `tools/upload_dex_bundle.sh` | Wrangler 批量上传 |
 | `cloudflare/dex-cdn/` | Worker + wrangler.toml |
 | `flutter/lib/features/dex/dex_cache_store.dart` | App 本地离线目录布局 |
-| `flutter/lib/features/dex/dex_models.dart` | JSON schema（`DexCacheManifest.currentVersion = 2`） |
+| `flutter/lib/features/dex/dex_models.dart` | JSON schema（本地 cache schema v2；CDN bundleVersion 4） |
+| `tools/cleanup_r2_jpg.py` | 清理 R2 遗留 JPEG（一次性） |
