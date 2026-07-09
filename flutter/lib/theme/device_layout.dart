@@ -15,14 +15,29 @@ abstract final class DeviceLayout {
     return size.width > size.height;
   }
 
-  /// ~Square screen by aspect ratio (layout), including web preview at 720×720.
-  static bool isSquareScreen(BuildContext context) {
+  /// Handheld dashboard: 1:1, 4:3 landscape, or 3:4 portrait — one screen, no scroll.
+  static bool useSquareDashboard(BuildContext context) {
     final size = sizeOf(context);
-    if (size.shortestSide < 520) {
+    if (size.shortestSide < 360) {
       return false;
     }
-    final ratio = size.width / size.height;
-    return ratio > 0.82 && ratio < 1.22;
+    return isHandheldAspectRatio(size.width / size.height);
+  }
+
+  /// True for ~1:1, ~4:3 (landscape), and ~3:4 (portrait) panels.
+  static bool isHandheldAspectRatio(double ratio) {
+    return _nearAspect(ratio, 1.0, 0.18) ||
+        _nearAspect(ratio, 4 / 3, 0.1) ||
+        _nearAspect(ratio, 3 / 4, 0.1);
+  }
+
+  static bool _nearAspect(double ratio, double target, double tolerance) {
+    return (ratio - target).abs() <= tolerance;
+  }
+
+  /// ~Square screen by aspect ratio (alias for dashboard detection).
+  static bool isSquareScreen(BuildContext context) {
+    return useSquareDashboard(context);
   }
 
   /// RG Rotate native square handheld.
@@ -35,17 +50,12 @@ abstract final class DeviceLayout {
     return sizeOf(context).height < 560;
   }
 
-  /// True on RG-like screens: square, short height, or narrow width.
+  /// True on RG-like screens: handheld aspect, short height, or narrow width.
   static bool isCompact(BuildContext context) {
     final size = sizeOf(context);
-    return isSquareScreen(context) ||
+    return useSquareDashboard(context) ||
         isShortScreen(context) ||
         size.shortestSide < 520;
-  }
-
-  /// Dashboard home for square screens — single-screen, no scroll.
-  static bool useSquareDashboard(BuildContext context) {
-    return isSquareScreen(context);
   }
 
   static EdgeInsets pagePadding(BuildContext context) {
