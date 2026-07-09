@@ -24,6 +24,16 @@ class DexSpriteImage extends StatelessWidget {
       return SizedBox(height: height, width: width);
     }
 
+    if (source!.startsWith('assets/')) {
+      return Image.asset(
+        source!,
+        height: height,
+        width: width,
+        fit: fit,
+        errorBuilder: (_, __, ___) => SizedBox(height: height, width: width),
+      );
+    }
+
     final uri = Uri.tryParse(source!);
     if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
       return Image.network(

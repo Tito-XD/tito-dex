@@ -49,7 +49,7 @@ class _WifiIcon extends StatelessWidget {
     return Icon(
       onWifi ? Icons.wifi_rounded : Icons.wifi_off_rounded,
       size: compact ? 14 : 16,
-      color: onWifi ? TitoColors.softYellow : TitoColors.skyBlue,
+      color: onWifi ? TitoColors.deepBlue : TitoColors.deepBlue.withValues(alpha: 0.45),
     );
   }
 }
@@ -73,6 +73,7 @@ class _BatteryIndicator extends StatelessWidget {
       < 40 => TitoColors.coral,
       _ => charging ? TitoColors.mint : TitoColors.softYellow,
     };
+    const borderColor = TitoColors.deepBlue;
 
     final bodyWidth = compact ? 18.0 : 20.0;
     final bodyHeight = compact ? 10.0 : 11.0;
@@ -94,7 +95,7 @@ class _BatteryIndicator extends StatelessWidget {
                 width: bodyWidth,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    border: Border.all(color: TitoColors.skyBlue, width: 1.5),
+                    border: Border.all(color: borderColor, width: 1.5),
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: Align(
@@ -118,7 +119,7 @@ class _BatteryIndicator extends StatelessWidget {
                   width: 2,
                   height: bodyHeight * 0.44,
                   decoration: BoxDecoration(
-                    color: TitoColors.skyBlue,
+                    color: borderColor,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
@@ -141,7 +142,7 @@ class _BatteryIndicator extends StatelessWidget {
             style: TitoTypography.style(
               fontSize: compact ? 9 : 10,
               fontWeight: FontWeight.w800,
-              color: TitoColors.skyBlue,
+              color: TitoColors.deepBlue,
             ),
           ),
         ],

@@ -106,6 +106,7 @@ class HgssParser {
           .map(
             (member) => PartyMember(
               species: localizeSpecies(member.speciesName),
+              speciesId: member.speciesId,
               level: member.level,
             ),
           )
