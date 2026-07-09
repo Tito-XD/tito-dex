@@ -47,20 +47,23 @@ abstract final class TitoTypography {
     );
   }
 
-  static double _sz(BuildContext context, double normal, double square) {
-    return DeviceLayout.useSquareDashboard(context) ? square : normal;
+  static double _sz(BuildContext context, double phone, double handheld) {
+    if (DeviceLayout.isNativeTarget || DeviceLayout.useSquareDashboard(context)) {
+      return handheld;
+    }
+    return phone;
   }
 
   /// Large titles on the blue gradient shell (Dex, Search, etc.).
   static TextStyle pageTitleOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 22, 14),
+        fontSize: _sz(context, 22, 18),
         fontWeight: FontWeight.w800,
         color: TitoColors.card,
         letterSpacing: -0.3,
       );
 
   static TextStyle pageSubtitleOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
+        fontSize: _sz(context, 14, 11),
         fontWeight: FontWeight.w600,
         color: TitoColors.card,
         height: 1.35,
@@ -224,7 +227,7 @@ abstract final class TitoTypography {
       );
 
   static TextStyle quickTileLabel(BuildContext context) => _base(
-        fontSize: _sz(context, 13, 9),
+        fontSize: _sz(context, 13, 10),
         fontWeight: FontWeight.w800,
         color: TitoColors.deepBlue,
       );

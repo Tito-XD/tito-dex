@@ -32,8 +32,8 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
-    final spriteSize = compact ? 52.0 : 64.0;
-    final padding = compact ? 6.0 : 10.0;
+    final spriteSize = compact ? 44.0 : 64.0;
+    final padding = compact ? 4.0 : 10.0;
 
     return GestureDetector(
       onTap: onTap ?? () => context.push('/dex/${summary.id}'),

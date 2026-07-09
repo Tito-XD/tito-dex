@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/companion/companion_art.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 
@@ -18,7 +19,8 @@ class CompanionSticker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final spriteSize = compact ? 52.0 : 72.0;
+    final square = DeviceLayout.useSquareDashboard(context);
+    final spriteSize = square ? 52.0 : (compact ? 52.0 : 72.0);
 
     return Semantics(
       button: onTap != null,
@@ -68,19 +70,23 @@ class FloatingCompanion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).shortestSide < 520;
+    final square = DeviceLayout.useSquareDashboard(context);
+    final compact = !square && MediaQuery.sizeOf(context).shortestSide < 520;
 
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: Padding(
-        padding: EdgeInsets.only(
-          right: compact ? 6 : 10,
-          bottom: compact ? 6 : 10,
-        ),
-        child: CompanionSticker(
-          name: name,
-          compact: compact,
-          onTap: onTap,
+    return SafeArea(
+      top: false,
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: EdgeInsets.only(
+            right: square ? 8 : (compact ? 6 : 10),
+            bottom: DeviceLayout.companionOverlayBottom(context),
+          ),
+          child: CompanionSticker(
+            name: name,
+            compact: compact,
+            onTap: onTap,
+          ),
         ),
       ),
     );

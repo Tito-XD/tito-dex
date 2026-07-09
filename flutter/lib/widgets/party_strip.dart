@@ -19,6 +19,7 @@ class PartyStrip extends StatelessWidget {
     this.vertical = false,
     this.square = false,
     this.gridMode = false,
+    this.listMode = false,
   });
 
   final List<PartyMember> party;
@@ -26,6 +27,7 @@ class PartyStrip extends StatelessWidget {
   final bool vertical;
   final bool square;
   final bool gridMode;
+  final bool listMode;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class PartyStrip extends StatelessWidget {
         ? context.tito.cardSectionTitle
         : context.tito.cardTitle;
 
-    if (party.isEmpty && !gridMode) {
+    if (party.isEmpty && !gridMode && !listMode) {
       return StickerCard(
         padding: DeviceLayout.cardPadding(context),
         child: Text(AppZh.currentParty, style: titleStyle),
@@ -48,11 +50,15 @@ class PartyStrip extends StatelessWidget {
     return StickerCard(
       padding: padding ?? const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(AppZh.currentParty, style: titleStyle),
           SizedBox(height: square ? 4 : (compact ? 8 : 10)),
-          if (gridMode)
+          if (listMode)
+            Expanded(
+              child: _PartySlotList(party: party, compact: compact || square),
+            )
+          else if (gridMode)
             Expanded(
               child: _PartyGrid(party: party, compact: compact || square),
             )
@@ -88,6 +94,54 @@ class PartyStrip extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _PartySlotList extends StatelessWidget {
+  const _PartySlotList({required this.party, required this.compact});
+
+  final List<PartyMember> party;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    const slotCount = 6;
+    final visibleParty = party.take(slotCount).toList(growable: false);
+
+    return Column(
+      children: [
+        for (var index = 0; index < slotCount; index++) ...[
+          if (index > 0) const SizedBox(height: 3),
+          Expanded(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: index < visibleParty.length
+                    ? TitoColors.card.withValues(alpha: 0.52)
+                    : TitoColors.card.withValues(alpha: 0.28),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                border: Border.all(
+                  color: index < visibleParty.length
+                      ? TitoColors.ink
+                      : TitoColors.ink.withValues(alpha: 0.45),
+                  width: 2,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: index < visibleParty.length
+                    ? _PartyOrb(
+                        member: visibleParty[index],
+                        compact: compact,
+                        horizontal: true,
+                        mini: true,
+                      )
+                    : const Center(child: _EmptyPartySlot()),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -142,20 +196,10 @@ class _EmptyPartySlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.28),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.45),
-          width: 2,
-        ),
-      ),
-      child: Icon(
-        Icons.add_circle_outline_rounded,
-        color: TitoColors.mutedInk.withValues(alpha: 0.65),
-        size: 16,
-      ),
+    return Icon(
+      Icons.add_circle_outline_rounded,
+      color: TitoColors.mutedInk.withValues(alpha: 0.65),
+      size: 16,
     );
   }
 }
@@ -176,7 +220,7 @@ class _PartyOrb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
-    final orbSize = mini ? 30.0 : (compact ? 40.0 : 48.0);
+    final orbSize = mini ? 28.0 : (compact ? 40.0 : 48.0);
     final slotWidth = mini ? 52.0 : (compact ? 58.0 : 64.0);
 
     final avatar = _PartyMemberAvatar(
@@ -190,7 +234,7 @@ class _PartyOrb extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: mini
-          ? context.tito.captionStrong.copyWith(fontSize: 8)
+          ? context.tito.captionStrong.copyWith(fontSize: 9)
           : context.tito.captionStrong,
     );
 
@@ -207,10 +251,11 @@ class _PartyOrb extends StatelessWidget {
       return Row(
         children: [
           avatar,
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [name, if (level != null) level],
             ),
           ),

@@ -26,22 +26,25 @@ class AppHeader extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(bottom: square ? 4 : (compact ? 8 : 16)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              AppZh.appTitle,
-              style: context.tito.pageTitleOnGradient.copyWith(
-                letterSpacing: -0.5,
-                shadows: const [
-                  Shadow(
-                    color: Color(0x4018283B),
-                    offset: Offset(0, 2),
-                  ),
-                ],
+      child: SizedBox(
+        height: square ? 40 : null,
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                AppZh.appTitle,
+                style: context.tito.pageTitleOnGradient.copyWith(
+                  fontSize: DeviceLayout.headerTitleSize(context),
+                  letterSpacing: -0.5,
+                  shadows: const [
+                    Shadow(
+                      color: Color(0x4018283B),
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           if (!square)
             TitoBadgePill(
               label: gameBadge,
@@ -49,8 +52,8 @@ class AppHeader extends StatelessWidget {
               compact: compact,
             ),
           if (DeviceLayout.isNativeTarget) ...[
-            SizedBox(width: square ? 4 : 8),
-            HandheldStatusIcons(compact: compact),
+            SizedBox(width: square ? 6 : 8),
+            HandheldStatusIcons(compact: square || compact),
           ],
           if (showSettings) ...[
             SizedBox(width: square ? 4 : 8),
@@ -61,7 +64,8 @@ class AppHeader extends StatelessWidget {
               compact: compact,
             ),
           ],
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -83,8 +87,8 @@ class _HeaderIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final square = DeviceLayout.useSquareDashboard(context);
-    final size = square ? 28.0 : (compact ? 34.0 : 40.0);
-    final iconSize = square ? 16.0 : (compact ? 18.0 : 22.0);
+    final size = DeviceLayout.headerIconSize(context);
+    final iconSize = square ? 22.0 : (compact ? 18.0 : 22.0);
 
     return HandheldFocusDecorator(
       onActivate: onTap,

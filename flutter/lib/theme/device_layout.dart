@@ -151,10 +151,81 @@ abstract final class DeviceLayout {
   }
 
   static double squareQuickTileHeight(BuildContext context) {
-    return useSquareDashboard(context) ? 42 : 56;
+    final width = sizeOf(context).width;
+    final gap = sectionSpacing(context);
+    return useSquareDashboard(context) ? (width - gap * 3) / 4 : 56;
   }
+
+  /// Native handheld UI ignores system font/display scaling — fixed logical layout.
   static TextScaler clampedTextScaler(BuildContext context) {
-    final maxScale = useSquareDashboard(context) ? 1.0 : 1.12;
-    return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: maxScale);
+    if (isNativeTarget) {
+      return TextScaler.noScaling;
+    }
+    return MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.12);
+  }
+
+  static double headerIconSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 36;
+    }
+    if (isCompact(context)) {
+      return 34;
+    }
+    return 40;
+  }
+
+  static double headerTitleSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 22;
+    }
+    if (isCompact(context)) {
+      return 20;
+    }
+    return 26;
+  }
+
+  static double dexBackControlSize(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return 16;
+    }
+    if (isCompact(context)) {
+      return 15;
+    }
+    return 16;
+  }
+
+  static int dexGridColumns(BuildContext context) {
+    final size = sizeOf(context);
+    if (useSquareDashboard(context)) {
+      return size.width >= 560 ? 4 : 3;
+    }
+    if (size.width >= 680 || (size.width > size.height && size.width >= 520)) {
+      return 4;
+    }
+    if (size.width >= 390) {
+      return 3;
+    }
+    return 2;
+  }
+
+  static double dexCardAspectRatio(BuildContext context) {
+    final columns = dexGridColumns(context);
+    if (columns >= 4) {
+      return 0.88;
+    }
+    if (columns == 3) {
+      return 0.92;
+    }
+    return 1.0;
+  }
+
+  static double companionOverlayBottom(BuildContext context) {
+    if (useSquareDashboard(context)) {
+      return squareQuickTileHeight(context) + sectionSpacing(context) + 4;
+    }
+    if (isCompact(context)) {
+      return 12;
+    }
+    return 16;
   }
 }

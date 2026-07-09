@@ -18,6 +18,7 @@ class ContinueJourneyCard extends StatelessWidget {
     this.compact = false,
     this.dense = false,
     this.mergeContinue = false,
+    this.showIllustration = true,
   });
 
   final CurrentJourney journey;
@@ -26,12 +27,14 @@ class ContinueJourneyCard extends StatelessWidget {
   final bool dense;
   /// Map thumbnail acts as the continue button (no separate CTA).
   final bool mergeContinue;
+  final bool showIllustration;
 
   @override
   Widget build(BuildContext context) {
     final padding = (compact || dense)
         ? DeviceLayout.cardPadding(context)
         : null;
+    final useIllustration = showIllustration && !dense;
 
     final card = StickerCard(
       variant: StickerVariant.deep,
@@ -59,25 +62,28 @@ class ContinueJourneyCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
-          Expanded(
-            child: mergeContinue
-                ? HandheldFocusDecorator(
-                    onActivate: onContinue,
-                    borderRadius: BorderRadius.circular(TitoRadii.md),
-                    child: CityIllustration(
+          if (useIllustration)
+            Expanded(
+              child: mergeContinue
+                  ? HandheldFocusDecorator(
+                      onActivate: onContinue,
+                      borderRadius: BorderRadius.circular(TitoRadii.md),
+                      child: CityIllustration(
+                        location: journey.location,
+                        compact: compact,
+                        dense: dense,
+                        onTap: onContinue,
+                        showContinueHint: onContinue != null,
+                      ),
+                    )
+                  : CityIllustration(
                       location: journey.location,
                       compact: compact,
                       dense: dense,
-                      onTap: onContinue,
-                      showContinueHint: onContinue != null,
                     ),
-                  )
-                : CityIllustration(
-                    location: journey.location,
-                    compact: compact,
-                    dense: dense,
-                  ),
-          ),
+            )
+          else
+            const Spacer(),
           SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
           Row(
             children: [
@@ -102,13 +108,22 @@ class ContinueJourneyCard extends StatelessWidget {
                 ),
             ],
           ),
-          if (!mergeContinue && !compact && !dense) ...[
+          if ((!mergeContinue || !useIllustration) && !compact && !dense) ...[
             const Spacer(),
             SizedBox(height: compact ? 10 : 16),
             _ContinueButton(
               onContinue: onContinue,
               compact: compact,
               dense: dense,
+            ),
+          ],
+          if (mergeContinue && !useIllustration) ...[
+            SizedBox(height: dense ? 6 : 8),
+            _ContinueButton(
+              onContinue: onContinue,
+              compact: compact,
+              dense: dense,
+              expanded: true,
             ),
           ],
         ],
@@ -124,15 +139,17 @@ class _ContinueButton extends StatelessWidget {
     required this.onContinue,
     required this.compact,
     required this.dense,
+    this.expanded = false,
   });
 
   final VoidCallback? onContinue;
   final bool compact;
   final bool dense;
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
-    return HandheldFocusDecorator(
+    final button = HandheldFocusDecorator(
       onActivate: onContinue,
       child: Material(
         color: TitoColors.deepBlue,
@@ -141,9 +158,10 @@ class _ContinueButton extends StatelessWidget {
           onTap: onContinue,
           borderRadius: BorderRadius.circular(TitoRadii.md),
           child: Container(
-            width: double.infinity,
+            width: expanded ? double.infinity : null,
             padding: EdgeInsets.symmetric(
-              vertical: dense ? 8 : (compact ? 10 : 14),
+              vertical: dense ? 12 : (compact ? 10 : 14),
+              horizontal: dense ? 12 : 16,
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -151,20 +169,21 @@ class _ContinueButton extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
               children: [
                 Text(
                   AppZh.continueButton,
                   style: TitoTypography.style(
                     color: TitoColors.card,
                     fontWeight: FontWeight.w800,
-                    fontSize: dense ? 12 : (compact ? 14 : 16),
+                    fontSize: dense ? 14 : (compact ? 14 : 16),
                   ),
                 ),
-                SizedBox(width: dense ? 4 : 6),
+                SizedBox(width: dense ? 6 : 8),
                 Icon(
                   Icons.play_arrow_rounded,
                   color: TitoColors.card,
-                  size: dense ? 16 : (compact ? 18 : 22),
+                  size: dense ? 20 : (compact ? 18 : 22),
                 ),
               ],
             ),
@@ -172,6 +191,11 @@ class _ContinueButton extends StatelessWidget {
         ),
       ),
     );
+
+    if (expanded) {
+      return SizedBox(width: double.infinity, child: button);
+    }
+    return button;
   }
 }
 
