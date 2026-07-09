@@ -20,8 +20,8 @@ class DexCachePaths {
   Directory get typeIconsDir => Directory('${root.path}/type_icons');
 
   File detailFile(int id) => File('${detailsDir.path}/$id.json');
-  File spriteFile(int id) => File('${spritesDir.path}/$id.jpg');
-  File typeIconFile(String type) => File('${typeIconsDir.path}/$type.jpg');
+  File spriteFile(int id) => File('${spritesDir.path}/$id.png');
+  File typeIconFile(String type) => File('${typeIconsDir.path}/$type.png');
 
   static Future<DexCachePaths> resolve() async {
     final documents = await getApplicationDocumentsDirectory();
@@ -189,7 +189,7 @@ class DexCacheStore {
     if (!await file.exists()) {
       return null;
     }
-    return 'sprites/$id.jpg';
+    return 'sprites/$id.png';
   }
 
   Future<String?> typeIconRelativePath(String type) async {
@@ -198,7 +198,7 @@ class DexCacheStore {
     if (!await file.exists()) {
       return null;
     }
-    return 'type_icons/$type.jpg';
+    return 'type_icons/$type.png';
   }
 
   Future<String?> absolutePathForRelative(String relativePath) async {

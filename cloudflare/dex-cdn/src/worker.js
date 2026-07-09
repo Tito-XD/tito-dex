@@ -86,7 +86,7 @@ export default {
         JSON.stringify({
           ok: true,
           service: 'tito-dex-cdn',
-          rev: '2026-07-09d',
+          rev: '2026-07-09e',
           bucket: 'titodex-dex',
         }),
         { status: 200, headers },

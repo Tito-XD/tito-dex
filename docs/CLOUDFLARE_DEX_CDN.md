@@ -68,9 +68,9 @@ titodex-dex/
     ├── details/
     │   └── 1.json … 493.json
     ├── sprites/
-    │   └── 1.jpg … 493.jpg       # JPEG，quality ~78，宽 ≤220px
+    │   └── 1.png … 493.png       # PNG，保留透明通道，宽 ≤220px
     └── type_icons/
-        └── fire.jpg …            # 18 种属性
+        └── fire.png …            # 18 种属性
 ```
 
 ### `bundle-manifest.json`（CDN 根目录 / R2 根）
@@ -108,8 +108,8 @@ titodex-dex/
   "nameEn": "Cyndaquil",
   "nameZh": "火球鼠",
   "types": ["fire"],
-  "spriteUrl": "https://dex.<域名>/v2/sprites/155.jpg",
-  "localSpritePath": "sprites/155.jpg"
+  "spriteUrl": "https://dex.<域名>/v2/sprites/155.png",
+  "localSpritePath": "sprites/155.png"
 }
 ```
 

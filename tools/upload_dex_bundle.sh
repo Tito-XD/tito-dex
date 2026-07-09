@@ -16,7 +16,7 @@ BUCKET="${WRANGLER_R2_BUCKET:-titodex-dex}"
 mime_for() {
   case "$1" in
     *.json) echo "application/json" ;;
-    *.jpg) echo "image/jpeg" ;;
+    *.png) echo "image/png" ;;
     *.zst) echo "application/octet-stream" ;;
     *) echo "application/octet-stream" ;;
   esac
@@ -65,4 +65,4 @@ done
 echo ""
 echo "Upload complete. Purge CDN cache for /bundle-manifest.json and verify:"
 echo "  curl -I https://dex.<domain>/bundle-manifest.json"
-echo "  curl -I https://dex.<domain>/v2/sprites/25.jpg"
+echo "  curl -I https://dex.<domain>/v2/sprites/25.png"
