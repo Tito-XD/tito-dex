@@ -233,17 +233,13 @@ class _PartyOrb extends StatelessWidget {
       label,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: mini
-          ? context.tito.captionStrong.copyWith(fontSize: 9)
-          : context.tito.captionStrong,
+      style: context.tito.captionStrong,
     );
 
     final level = member.level != null
         ? Text(
             '${AppZh.level}${member.level}',
-            style: mini
-                ? context.tito.caption.copyWith(fontSize: 8)
-                : context.tito.caption,
+            style: context.tito.caption,
           )
         : null;
 
@@ -253,10 +249,14 @@ class _PartyOrb extends StatelessWidget {
           avatar,
           const SizedBox(width: 6),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [name, if (level != null) level],
+            child: Row(
+              children: [
+                Expanded(child: name),
+                if (level != null) ...[
+                  const SizedBox(width: 4),
+                  level,
+                ],
+              ],
             ),
           ),
         ],
@@ -269,8 +269,16 @@ class _PartyOrb extends StatelessWidget {
         children: [
           avatar,
           SizedBox(height: mini ? 2 : 4),
-          name,
-          if (level != null) level,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(child: name),
+              if (level != null) ...[
+                const SizedBox(width: 2),
+                level,
+              ],
+            ],
+          ),
         ],
       ),
     );

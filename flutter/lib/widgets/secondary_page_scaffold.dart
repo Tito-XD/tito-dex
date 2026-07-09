@@ -59,6 +59,8 @@ class SecondaryPageAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final path = GoRouterState.of(context).uri.path;
     final canOpenSettings = showSettings && path != '/settings';
+    final backIconSize = DeviceLayout.dexBackIconSize(context);
+    final backFontSize = DeviceLayout.dexBackControlSize(context);
 
     return Row(
       children: [
@@ -66,10 +68,12 @@ class SecondaryPageAppBar extends StatelessWidget {
           child: _BackTitleButton(
             title: title,
             onTap: () => _handleBack(context, path),
+            iconSize: backIconSize,
+            fontSize: backFontSize,
           ),
         ),
         if (canOpenSettings) ...[
-          const SizedBox(width: 8),
+          SizedBox(width: DeviceLayout.useSquareDashboard(context) ? 10 : 8),
           _SecondaryHeaderIconButton(
             icon: Icons.settings_rounded,
             label: AppZh.navSettings,
@@ -91,16 +95,24 @@ class SecondaryPageAppBar extends StatelessWidget {
 }
 
 class _BackTitleButton extends StatelessWidget {
-  const _BackTitleButton({required this.title, required this.onTap});
+  const _BackTitleButton({
+    required this.title,
+    required this.onTap,
+    required this.iconSize,
+    required this.fontSize,
+  });
 
   final String title;
   final VoidCallback onTap;
+  final double iconSize;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
+    final radius = DeviceLayout.rMd(context);
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      borderRadius: BorderRadius.circular(radius),
       child: Semantics(
         button: true,
         label: '$title · ${AppZh.navHome}',
@@ -108,23 +120,24 @@ class _BackTitleButton extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(TitoRadii.md),
+            borderRadius: BorderRadius.circular(radius),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.arrow_back_rounded,
                     color: TitoColors.card,
-                    size: 24,
+                    size: iconSize,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: iconSize * 0.15),
                   Expanded(
                     child: Text(
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: context.tito.pageTitleOnGradient.copyWith(
+                        fontSize: fontSize,
                         letterSpacing: -0.5,
                         shadows: const [
                           Shadow(
@@ -158,10 +171,8 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = DeviceLayout.isCompact(context);
-    final square = DeviceLayout.useSquareDashboard(context);
-    final size = square ? 28.0 : (compact ? 34.0 : 40.0);
-    final iconSize = square ? 16.0 : (compact ? 18.0 : 22.0);
+    final size = DeviceLayout.headerIconSize(context);
+    final iconSize = size * 0.55;
 
     return HandheldFocusDecorator(
       onActivate: onTap,

@@ -15,10 +15,16 @@ class HomePage extends StatelessWidget {
     super.key,
     required this.journey,
     required this.onContinue,
+    this.gameBadge = 'HGSS',
+    this.onGameBadgeTap,
+    this.onAvatarTap,
   });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
+  final String gameBadge;
+  final VoidCallback? onGameBadgeTap;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,17 +33,22 @@ class HomePage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final padding = DeviceLayout.pagePadding(context);
+    final header = AppHeader(
+      gameBadge: gameBadge,
+      onGameBadgeTap: onGameBadgeTap,
+    );
 
     if (DeviceLayout.useSquareDashboard(context)) {
       return Padding(
         padding: padding,
         child: Column(
           children: [
-            const AppHeader(),
+            header,
             Expanded(
               child: _SquareHomeLayout(
                 journey: journey,
                 onContinue: onContinue,
+                onAvatarTap: onAvatarTap,
               ),
             ),
           ],
@@ -49,11 +60,12 @@ class HomePage extends StatelessWidget {
       padding: padding,
       child: Column(
         children: [
-          const AppHeader(),
+          header,
           Expanded(
             child: _PortraitHomeLayout(
               journey: journey,
               onContinue: onContinue,
+              onAvatarTap: onAvatarTap,
             ),
           ),
         ],
@@ -65,10 +77,15 @@ class HomePage extends StatelessWidget {
 /// Portrait H4 layout:
 /// trainer card -> continue card -> horizontal party strip -> 2x2 quick grid.
 class _PortraitHomeLayout extends StatelessWidget {
-  const _PortraitHomeLayout({required this.journey, required this.onContinue});
+  const _PortraitHomeLayout({
+    required this.journey,
+    required this.onContinue,
+    this.onAvatarTap,
+  });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +100,12 @@ class _PortraitHomeLayout extends StatelessWidget {
         final column = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TrainerCard(journey: journey, compact: true, dense: true),
+            TrainerCard(
+              journey: journey,
+              compact: true,
+              dense: true,
+              onAvatarTap: onAvatarTap,
+            ),
             SizedBox(height: gap),
             SizedBox(
               height: continueHeight,
@@ -117,10 +139,15 @@ class _PortraitHomeLayout extends StatelessWidget {
 /// Square / 4:3 / 3:4 handheld layout (H5):
 /// [ Trainer + Continue | Party ] + square quick actions.
 class _SquareHomeLayout extends StatelessWidget {
-  const _SquareHomeLayout({required this.journey, required this.onContinue});
+  const _SquareHomeLayout({
+    required this.journey,
+    required this.onContinue,
+    this.onAvatarTap,
+  });
 
   final CurrentJourney journey;
   final VoidCallback onContinue;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +161,7 @@ class _SquareHomeLayout extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 11,
+                flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -143,6 +170,7 @@ class _SquareHomeLayout extends StatelessWidget {
                       compact: true,
                       dense: true,
                       micro: true,
+                      onAvatarTap: onAvatarTap,
                     ),
                     SizedBox(height: gap),
                     Expanded(
@@ -160,7 +188,7 @@ class _SquareHomeLayout extends StatelessWidget {
               ),
               SizedBox(width: gap),
               Expanded(
-                flex: 9,
+                flex: 1,
                 child: PartyStrip(
                   party: journey.party,
                   compact: true,

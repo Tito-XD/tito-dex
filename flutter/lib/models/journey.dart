@@ -77,6 +77,8 @@ class CurrentJourney {
     this.nextReminder,
     this.saveTrainerName,
     this.trainerNameCustomized = false,
+    this.trainerAvatarPath,
+    this.trainerAvatarCustomized = false,
   });
 
   final String game;
@@ -91,6 +93,8 @@ class CurrentJourney {
   final String? nextReminder;
   final String? saveTrainerName;
   final bool trainerNameCustomized;
+  final String? trainerAvatarPath;
+  final bool trainerAvatarCustomized;
 
   CurrentJourney copyWith({
     String? game,
@@ -105,6 +109,8 @@ class CurrentJourney {
     String? nextReminder,
     String? saveTrainerName,
     bool? trainerNameCustomized,
+    String? trainerAvatarPath,
+    bool? trainerAvatarCustomized,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -120,6 +126,9 @@ class CurrentJourney {
       saveTrainerName: saveTrainerName ?? this.saveTrainerName,
       trainerNameCustomized:
           trainerNameCustomized ?? this.trainerNameCustomized,
+      trainerAvatarPath: trainerAvatarPath ?? this.trainerAvatarPath,
+      trainerAvatarCustomized:
+          trainerAvatarCustomized ?? this.trainerAvatarCustomized,
     );
   }
 
@@ -136,6 +145,8 @@ class CurrentJourney {
         if (nextReminder != null) 'nextReminder': nextReminder,
         if (saveTrainerName != null) 'saveTrainerName': saveTrainerName,
         if (trainerNameCustomized) 'trainerNameCustomized': true,
+        if (trainerAvatarPath != null) 'trainerAvatarPath': trainerAvatarPath,
+        if (trainerAvatarCustomized) 'trainerAvatarCustomized': true,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -158,6 +169,9 @@ class CurrentJourney {
         nextReminder: json['nextReminder'] as String?,
         saveTrainerName: json['saveTrainerName'] as String?,
         trainerNameCustomized: json['trainerNameCustomized'] as bool? ?? false,
+        trainerAvatarPath: json['trainerAvatarPath'] as String?,
+        trainerAvatarCustomized:
+            json['trainerAvatarCustomized'] as bool? ?? false,
       );
 
   static CurrentJourney mock() => const CurrentJourney(

@@ -4,6 +4,12 @@ library;
 const gameTitlesZh = <String, String>{
   'SoulSilver': '宝可梦 魂银',
   'HeartGold': '宝可梦 心金',
+  'Platinum': '宝可梦 白金',
+  'BlackWhite': '宝可梦 黑/白',
+  'Black2White2': '宝可梦 黑2/白2',
+  'XY': '宝可梦 X/Y',
+  'ORAS': '宝可梦 ΩR/αS',
+  'USUM': '宝可梦 究极日月',
 };
 
 const locationNamesZh = <String, String>{
