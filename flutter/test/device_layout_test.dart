@@ -74,9 +74,29 @@ void main() {
       ),
     );
 
-    expect(square, isFalse);
+    expect(square, isTrue);
     expect(compact, isTrue);
     expect(short, isTrue);
+  });
+
+  testWidgets('detects 3:4 portrait handheld', (tester) async {
+    late bool square;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(size: Size(480, 640)),
+          child: Builder(
+            builder: (context) {
+              square = DeviceLayout.useSquareDashboard(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(square, isTrue);
   });
 
   testWidgets('phone portrait is not square dashboard', (tester) async {

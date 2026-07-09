@@ -113,8 +113,8 @@ class _PortraitHomeLayout extends StatelessWidget {
   }
 }
 
-/// Square H5 layout:
-/// continue + party grid on top, colorful polaroid quick tiles below.
+/// Square / 4:3 / 3:4 handheld layout (H5):
+/// [ Trainer + Continue | Party ] + quick actions.
 class _SquareHomeLayout extends StatelessWidget {
   const _SquareHomeLayout({required this.journey, required this.onContinue});
 
@@ -124,31 +124,40 @@ class _SquareHomeLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
-    final compact = DeviceLayout.isCompact(context);
+    final landscape = DeviceLayout.isLandscape(context);
 
     return Column(
       children: [
         Expanded(
-          flex: 14,
+          flex: landscape ? 16 : 15,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 13,
-                child: ContinueJourneyCard(
-                  journey: journey,
-                  onContinue: onContinue,
-                  compact: compact,
-                  dense: true,
-                  mergeContinue: true,
+                flex: 11,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TrainerCard(journey: journey, compact: true, dense: true),
+                    SizedBox(height: gap),
+                    Expanded(
+                      child: ContinueJourneyCard(
+                        journey: journey,
+                        onContinue: onContinue,
+                        compact: true,
+                        dense: true,
+                        mergeContinue: true,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(width: gap),
               Expanded(
-                flex: 10,
+                flex: 9,
                 child: PartyStrip(
                   party: journey.party,
-                  compact: compact,
+                  compact: true,
                   square: true,
                   gridMode: true,
                 ),
@@ -158,12 +167,70 @@ class _SquareHomeLayout extends StatelessWidget {
         ),
         SizedBox(height: gap),
         Expanded(
-          flex: 10,
-          child: _QuickActionsGrid(dense: true, polaroid: true),
+          flex: landscape ? 6 : 8,
+          child: _QuickActionsBar(landscape: landscape),
         ),
       ],
     );
   }
+}
+
+/// Bottom quick bar — one row on 4:3 landscape, 2×2 on 1:1 / 3:4.
+class _QuickActionsBar extends StatelessWidget {
+  const _QuickActionsBar({required this.landscape});
+
+  final bool landscape;
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = _quickActions();
+    final gap = DeviceLayout.sectionSpacing(context);
+
+    if (landscape) {
+      return Row(
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) SizedBox(width: gap),
+            Expanded(
+              child: TitoQuickTile(
+                label: actions[index].label,
+                icon: actions[index].icon,
+                onTap: () => _openRoute(context, actions[index].route),
+                compact: true,
+                dense: true,
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: gap,
+        mainAxisSpacing: gap,
+        childAspectRatio: 1.25,
+      ),
+      itemCount: actions.length,
+      itemBuilder: (context, index) {
+        final action = actions[index];
+        return TitoPolaroidQuickTile(
+          label: action.label,
+          icon: action.icon,
+          onTap: () => _openRoute(context, action.route),
+          tone: action.tone,
+          compact: true,
+          tiltDegrees: const [-2.5, 2.0, 1.5, -1.75][index],
+        );
+      },
+    );
+  }
+}
+
+void _openRoute(BuildContext context, String route) {
+  context.push(route);
 }
 
 class _QuickActionsGrid extends StatelessWidget {
@@ -193,7 +260,7 @@ class _QuickActionsGrid extends StatelessWidget {
           return TitoPolaroidQuickTile(
             label: action.label,
             icon: action.icon,
-            onTap: () => context.push(action.route),
+            onTap: () => _openRoute(context, action.route),
             tone: action.tone,
             compact: dense,
             tiltDegrees: rotations[index],
@@ -203,7 +270,7 @@ class _QuickActionsGrid extends StatelessWidget {
         return TitoQuickTile(
           label: action.label,
           icon: action.icon,
-          onTap: () => context.push(action.route),
+          onTap: () => _openRoute(context, action.route),
           compact: true,
           dense: dense,
         );
