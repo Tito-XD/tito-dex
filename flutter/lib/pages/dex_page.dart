@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/companion/companion_art.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -24,16 +26,19 @@ class DexPage extends StatefulWidget {
   State<DexPage> createState() => _DexPageState();
 }
 
-enum _DexListFilter { all, journey, caught }
+enum _DexListFilter { all, seen, journey, caught }
 
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 12;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
+  bool _loadingFilter = false;
   _DexListFilter _filter = _DexListFilter.all;
   List<PokemonSummary> _summaries = const [];
+  List<PokemonSummary> _filteredSummaries = const [];
   Set<int> _caughtIds = const {};
+  Set<int> _journeyIds = const {};
   String? _error;
 
   @override
@@ -44,6 +49,7 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _bootstrap() async {
     try {
+      _journeyIds = _resolveJourneyIds();
       final caught = await dexRepository.journeyCaughtIds(widget.journey);
       if (!mounted) {
         return;
@@ -59,6 +65,26 @@ class _DexPageState extends State<DexPage> {
   }
 
   String _formatDexError(Object error) => formatUserFacingError(error);
+
+  Set<int> _resolveJourneyIds() {
+    final ids = <int>{};
+    for (final member in widget.journey.party) {
+      final id = member.speciesId ??
+          speciesIdForName(member.species) ??
+          knownSpeciesIdForLabel(member.species);
+      if (id != null) {
+        ids.add(id);
+      }
+    }
+    final companionId = speciesIdForName(widget.journey.companion) ??
+        knownSpeciesIdForLabel(widget.journey.companion);
+    if (companionId != null) {
+      ids.add(companionId);
+    }
+    return ids;
+  }
+
+  Set<int> get _seenIds => {..._caughtIds, ..._journeyIds};
 
   Future<void> _loadMore() async {
     if (_loadingChunk || _loadedThrough >= hgssMaxNationalDexId) {
@@ -89,30 +115,78 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
+  Future<void> _setFilter(_DexListFilter filter) async {
+    if (_filter == filter && filter == _DexListFilter.all) {
+      return;
+    }
+
+    setState(() {
+      _filter = filter;
+      _error = null;
+      if (filter == _DexListFilter.all) {
+        _filteredSummaries = const [];
+        _loadingFilter = false;
+      } else {
+        _loadingFilter = true;
+      }
+    });
+
+    if (filter == _DexListFilter.all) {
+      return;
+    }
+
+    final ids = switch (filter) {
+      _DexListFilter.seen => _seenIds,
+      _DexListFilter.journey => _journeyIds,
+      _DexListFilter.caught => _caughtIds,
+      _DexListFilter.all => <int>{},
+    };
+
+    try {
+      final entries = await dexRepository.getSummariesForIds(ids);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _filteredSummaries = entries;
+        _loadingFilter = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = _formatDexError(error);
+        _loadingFilter = false;
+        _filteredSummaries = const [];
+      });
+    }
+  }
+
   List<PokemonSummary> get _visibleEntries {
     return switch (_filter) {
       _DexListFilter.all => _summaries,
-      _DexListFilter.journey => _summaries
-          .where((entry) => _journeyPartyIds.contains(entry.id))
-          .toList(),
-      _DexListFilter.caught =>
-        _summaries.where((entry) => _caughtIds.contains(entry.id)).toList(),
+      _ => _filteredSummaries,
     };
   }
 
-  Set<int> get _journeyPartyIds => widget.journey.party
-      .map((member) => member.speciesId)
-      .whereType<int>()
-      .toSet();
+  String _emptyMessageForFilter() {
+    return switch (_filter) {
+      _DexListFilter.journey => AppZh.dexJourneyEmpty,
+      _DexListFilter.caught => AppZh.dexCaughtEmpty,
+      _DexListFilter.seen => AppZh.dexSeenEmpty,
+      _DexListFilter.all => AppZh.dexJourneyEmpty,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final caughtCount = _caughtIds.length;
-    final seenCount = _loadedThrough > caughtCount
-        ? _loadedThrough
-        : caughtCount;
+    final seenCount = _seenIds.length;
     final visible = _visibleEntries;
     final wideGrid = _useWideGrid(context);
+    final aspectRatio = _dexCardAspectRatio(context);
+    final loading = _filter == _DexListFilter.all ? _loadingChunk : _loadingFilter;
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
@@ -141,11 +215,16 @@ class _DexPageState extends State<DexPage> {
                   style: context.tito.pageSubtitleOnGradient,
                 ),
                 const SizedBox(height: 12),
-                _DexStatsRow(seenCount: seenCount, caughtCount: caughtCount),
+                _DexStatsRow(
+                  seenCount: seenCount,
+                  caughtCount: caughtCount,
+                  selected: _filter,
+                  onSelected: _setFilter,
+                ),
                 const SizedBox(height: 12),
                 _DexFilterBar(
                   current: _filter,
-                  onSelected: (filter) => setState(() => _filter = filter),
+                  onSelected: _setFilter,
                 ),
                 const SizedBox(height: 12),
                 if (_error != null)
@@ -163,24 +242,26 @@ class _DexPageState extends State<DexPage> {
                         FilledButton(
                           onPressed: () {
                             setState(() => _error = null);
-                            _loadMore();
+                            if (_filter == _DexListFilter.all) {
+                              _loadMore();
+                            } else {
+                              _setFilter(_filter);
+                            }
                           },
                           child: const Text(AppZh.dexRetry),
                         ),
                       ],
                     ),
                   )
-                else if (visible.isEmpty && _loadingChunk)
+                else if (visible.isEmpty && loading)
                   TitoDexGridSkeleton(
                     crossAxisCount: wideGrid ? 3 : 2,
-                    childAspectRatio: DeviceLayout.isCompact(context)
-                        ? 0.72
-                        : 0.78,
+                    childAspectRatio: aspectRatio,
                   )
                 else if (visible.isEmpty)
                   StickerCard(
                     child: Text(
-                      AppZh.dexJourneyEmpty,
+                      _emptyMessageForFilter(),
                       style: context.tito.cardBodyStrong,
                     ),
                   )
@@ -190,11 +271,9 @@ class _DexPageState extends State<DexPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: wideGrid ? 3 : 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: DeviceLayout.isCompact(context)
-                          ? 0.72
-                          : 0.78,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: aspectRatio,
                     ),
                     itemCount: visible.length,
                     itemBuilder: (context, index) {
@@ -203,17 +282,21 @@ class _DexPageState extends State<DexPage> {
                         entry.id,
                         _caughtIds,
                       );
-                      return PokemonMiniCard(summary: entry, status: status);
+                      return PokemonMiniCard(
+                        summary: entry,
+                        status: status,
+                        compact: DeviceLayout.isCompact(context),
+                      );
                     },
                   ),
-                if (_loadingChunk && visible.isNotEmpty) ...[
-                  const SizedBox(height: 16),
+                if (_filter == _DexListFilter.all &&
+                    _loadingChunk &&
+                    visible.isNotEmpty) ...[
+                  const SizedBox(height: 12),
                   TitoDexGridSkeleton(
                     crossAxisCount: wideGrid ? 3 : 2,
                     itemCount: wideGrid ? 3 : 2,
-                    childAspectRatio: DeviceLayout.isCompact(context)
-                        ? 0.72
-                        : 0.78,
+                    childAspectRatio: aspectRatio,
                   ),
                 ],
                 if (_filter == _DexListFilter.all &&
@@ -270,6 +353,16 @@ class _DexPageState extends State<DexPage> {
     final size = MediaQuery.sizeOf(context);
     return size.width >= 680 || (size.width > size.height && size.width >= 520);
   }
+
+  double _dexCardAspectRatio(BuildContext context) {
+    if (DeviceLayout.useSquareDashboard(context)) {
+      return 1.18;
+    }
+    if (DeviceLayout.isCompact(context)) {
+      return 1.02;
+    }
+    return 1.08;
+  }
 }
 
 class _DexFilterBar extends StatelessWidget {
@@ -282,7 +375,7 @@ class _DexFilterBar extends StatelessWidget {
   final ValueChanged<_DexListFilter> onSelected;
 
   static const _options = [
-    ( _DexListFilter.all, AppZh.dexTabNational, Icons.grid_view_rounded),
+    (_DexListFilter.all, AppZh.dexTabNational, Icons.grid_view_rounded),
     (_DexListFilter.journey, AppZh.dexTabJourney, Icons.groups_rounded),
     (_DexListFilter.caught, AppZh.dexCaught, Icons.catching_pokemon_rounded),
   ];
@@ -351,10 +444,17 @@ class _DexBackBar extends StatelessWidget {
 }
 
 class _DexStatsRow extends StatelessWidget {
-  const _DexStatsRow({required this.seenCount, required this.caughtCount});
+  const _DexStatsRow({
+    required this.seenCount,
+    required this.caughtCount,
+    required this.selected,
+    required this.onSelected,
+  });
 
   final int seenCount;
   final int caughtCount;
+  final _DexListFilter selected;
+  final ValueChanged<_DexListFilter> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -365,6 +465,8 @@ class _DexStatsRow extends StatelessWidget {
             label: AppZh.dexSeen,
             value: '$seenCount',
             variant: StickerVariant.sky,
+            selected: selected == _DexListFilter.seen,
+            onTap: () => onSelected(_DexListFilter.seen),
           ),
         ),
         const SizedBox(width: 8),
@@ -373,6 +475,8 @@ class _DexStatsRow extends StatelessWidget {
             label: AppZh.dexCaught,
             value: '$caughtCount',
             variant: StickerVariant.mint,
+            selected: selected == _DexListFilter.caught,
+            onTap: () => onSelected(_DexListFilter.caught),
           ),
         ),
         const SizedBox(width: 8),
@@ -381,6 +485,8 @@ class _DexStatsRow extends StatelessWidget {
             label: '全国',
             value: '$hgssMaxNationalDexId',
             variant: StickerVariant.cream,
+            selected: selected == _DexListFilter.all,
+            onTap: () => onSelected(_DexListFilter.all),
           ),
         ),
       ],
@@ -393,34 +499,53 @@ class _DexStatCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.variant,
+    required this.selected,
+    required this.onTap,
   });
 
   final String label;
   final String value;
   final StickerVariant variant;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return StickerCard(
-      variant: variant,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      child: Column(
-        children: [
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: context.tito.captionStrong,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: context.tito.cardValueLarge.copyWith(
-              fontWeight: FontWeight.w900,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        child: StickerCard(
+          variant: variant,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
+              border: selected
+                  ? Border.all(color: TitoColors.deepBlue, width: 3)
+                  : null,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: context.tito.captionStrong,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: context.tito.cardValueLarge.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import '../../l10n/game_zh.dart';
+
 const _blockPosition = <int>[
   0, 1, 2, 3, 0, 1, 3, 2, 0, 2, 1, 3, 0, 3, 1, 2, 0, 2, 3, 1, 0, 3, 2, 1, 1, 0, 2, 3, 1, 0, 3, 2,
   2, 0, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 3, 0, 2, 1, 1, 2, 0, 3, 1, 3, 0, 2, 2, 1, 0, 3, 3, 1, 0, 2,
@@ -22,6 +24,24 @@ const _speciesNames = <int, String>{
 
 String speciesNameFor(int speciesId) =>
     _speciesNames[speciesId] ?? 'Species #$speciesId';
+
+int? knownSpeciesIdForLabel(String label) {
+  final trimmed = label.trim();
+  if (trimmed.isEmpty) {
+    return null;
+  }
+
+  for (final entry in _speciesNames.entries) {
+    if (entry.value.toLowerCase() == trimmed.toLowerCase()) {
+      return entry.key;
+    }
+    if (localizeSpecies(entry.value) == trimmed) {
+      return entry.key;
+    }
+  }
+
+  return null;
+}
 
 String decodeGen4Text(List<int> buffer) {
   final chars = <String>[];

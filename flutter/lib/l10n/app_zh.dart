@@ -36,6 +36,8 @@ abstract final class AppZh {
   static const dexTabNational = '全国图鉴';
   static const dexTabJourney = '旅程同行';
   static const dexJourneyEmpty = '当前旅程同行里还没有载入图鉴条目，试试全国图鉴。';
+  static const dexCaughtEmpty = '还没有已捕获的图鉴条目，同行宝可梦会自动标记为已捕获。';
+  static const dexSeenEmpty = '还没有已见过的图鉴条目。';
   static String dexLoadingProgress(int loaded, int total) =>
       '正在加载图鉴 $loaded / $total…';
   static const dexLoadingDetail = '正在从 PokeAPI 拉取详情…';
