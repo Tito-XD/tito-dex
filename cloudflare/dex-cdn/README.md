@@ -2,39 +2,27 @@
 
 Proxy R2 bucket `titodex-dex` with CORS + cache headers.
 
-Full setup guide: [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)
+## Auto-deploy (recommended)
 
-## Prerequisites
+Connect this repo in **Cloudflare Workers Builds**:
 
-- Cloudflare account with R2 enabled
-- Bucket `titodex-dex` created and populated (`tools/build_dex_bundle.py` + `tools/upload_dex_bundle.sh`)
-- Wrangler CLI: `npm i -g wrangler`
+| Setting | Value |
+| --- | --- |
+| Production branch | **`deploy/dex-cdn`** |
+| Root directory | `cloudflare/dex-cdn` |
+| Deploy command | `npx wrangler deploy` |
 
-## Configure
+Step-by-step: **[DEPLOY.md](./DEPLOY.md)**
 
-1. Copy and edit `wrangler.toml` — set `account_id` and custom route domain.
-2. Authenticate: `wrangler login`
-
-## Deploy
+## Manual deploy
 
 ```bash
 cd cloudflare/dex-cdn
-wrangler deploy
+npm ci
+npx wrangler deploy
 ```
 
-## Bindings
+## Docs
 
-| Binding | Type | Purpose |
-| --- | --- | --- |
-| `DEX_BUCKET` | R2 | `titodex-dex` objects |
-
-## Routes
-
-| Path | Behavior |
-| --- | --- |
-| `/bundle/latest` | 302 → `archiveUrl` from root `bundle-manifest.json` |
-| `/*` | R2 GET with CORS |
-
-## Alternative: R2 public bucket
-
-If you enable R2 public access + custom domain without Worker, configure CORS and Cache Rules in the Cloudflare dashboard per `docs/CLOUDFLARE_DEX_CDN.md`.
+- [DEPLOY.md](./DEPLOY.md) — Dashboard / Git integration
+- [CLOUDFLARE_DEX_CDN.md](../../docs/CLOUDFLARE_DEX_CDN.md) — R2 layout + bundle build
