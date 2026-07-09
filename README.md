@@ -60,6 +60,7 @@ Start here:
 - [Stack decision](./docs/STACK_DECISION.md)
 - [Parser proposal](./docs/PARSER_PROPOSAL.md)
 - [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md)
+- [Cloudflare dex CDN setup](./docs/CLOUDFLARE_DEX_CDN.md)
 
 ## Development
 
