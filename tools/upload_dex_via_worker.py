@@ -50,7 +50,7 @@ def main() -> None:
     put_file(session, "bundle-manifest.json", upload_dir / "bundle-manifest.json")
     for name in ("manifest.json", "summaries.json", "types.json", "moves.json", "bundle.tar.zst"):
         put_file(session, f"v2/{name}", v2 / name)
-    for folder in ("details", "sprites", "type_icons"):
+    for folder in ("details", "sprites", "type_icons", "artwork"):
         for file in sorted((v2 / folder).rglob("*")):
             if file.is_file():
                 rel = file.relative_to(v2).as_posix()

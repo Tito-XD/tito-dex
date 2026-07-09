@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'dex_game_scope.dart';
 import 'dex_models.dart';
+import 'dex_sprite_codec.dart';
 import 'type_chart.dart';
 
 class PokeApiClient {
@@ -56,6 +57,8 @@ class PokeApiClient {
       ),
       types: _extractTypes(pokemon['types'] as List<dynamic>),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
+      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+          pokeApiOfficialArtworkUrl(pokemon['id'] as int),
     );
   }
 
@@ -75,6 +78,8 @@ class PokeApiClient {
       ),
       types: _extractTypes(pokemon['types'] as List<dynamic>),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
+      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+          pokeApiOfficialArtworkUrl(pokemon['id'] as int),
     );
 
     final profile = computeDefensiveProfile(summary.types, relations);
@@ -366,6 +371,8 @@ class PokeApiClient {
         fallback: species['name'] as String,
       ),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
+      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+          pokeApiOfficialArtworkUrl(speciesId),
       evolvesFrom: triggerZh,
       triggerZh: triggerZh,
       children: children,
@@ -385,11 +392,14 @@ class PokeApiClient {
         .toList();
   }
 
-  String? _spriteUrl(Map<String, dynamic> sprites) {
+  String? _artworkUrl(Map<String, dynamic> sprites) {
     final other = sprites['other'] as Map<String, dynamic>?;
     final artwork = other?['official-artwork'] as Map<String, dynamic>?;
-    return artwork?['front_default'] as String? ??
-        sprites['front_default'] as String?;
+    return artwork?['front_default'] as String?;
+  }
+
+  String? _spriteUrl(Map<String, dynamic> sprites) {
+    return _artworkUrl(sprites) ?? sprites['front_default'] as String?;
   }
 
   String _localizedName(List<dynamic> names, {required String fallback}) {

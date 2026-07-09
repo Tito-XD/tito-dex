@@ -11,6 +11,7 @@ class PokemonSummary {
     required this.nameZh,
     required this.types,
     this.spriteUrl,
+    this.artworkUrl,
     this.localSpritePath,
   });
 
@@ -19,6 +20,7 @@ class PokemonSummary {
   final String nameZh;
   final List<String> types;
   final String? spriteUrl;
+  final String? artworkUrl;
   final String? localSpritePath;
 
   String get typesLabel => types.map(typeNameZh).join('/');
@@ -31,6 +33,7 @@ class PokemonSummary {
         'nameZh': nameZh,
         'types': types,
         if (spriteUrl != null) 'spriteUrl': spriteUrl,
+        if (artworkUrl != null) 'artworkUrl': artworkUrl,
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
       };
 
@@ -40,11 +43,13 @@ class PokemonSummary {
         nameZh: json['nameZh'] as String,
         types: (json['types'] as List<dynamic>).cast<String>(),
         spriteUrl: json['spriteUrl'] as String?,
+        artworkUrl: json['artworkUrl'] as String?,
         localSpritePath: json['localSpritePath'] as String?,
       );
 
   PokemonSummary copyWith({
     String? spriteUrl,
+    String? artworkUrl,
     String? localSpritePath,
   }) {
     return PokemonSummary(
@@ -53,6 +58,7 @@ class PokemonSummary {
       nameZh: nameZh,
       types: types,
       spriteUrl: spriteUrl ?? this.spriteUrl,
+      artworkUrl: artworkUrl ?? this.artworkUrl,
       localSpritePath: localSpritePath ?? this.localSpritePath,
     );
   }
@@ -442,6 +448,7 @@ class EvolutionNode {
     required this.nameEn,
     required this.nameZh,
     this.spriteUrl,
+    this.artworkUrl,
     this.localSpritePath,
     this.evolvesFrom,
     this.triggerZh,
@@ -452,6 +459,7 @@ class EvolutionNode {
   final String nameEn;
   final String nameZh;
   final String? spriteUrl;
+  final String? artworkUrl;
   final String? localSpritePath;
   final String? evolvesFrom;
   final String? triggerZh;
@@ -471,6 +479,7 @@ class EvolutionNode {
         'nameEn': nameEn,
         'nameZh': nameZh,
         if (spriteUrl != null) 'spriteUrl': spriteUrl,
+        if (artworkUrl != null) 'artworkUrl': artworkUrl,
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
         if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
         if (triggerZh != null) 'triggerZh': triggerZh,
@@ -482,6 +491,7 @@ class EvolutionNode {
         nameEn: json['nameEn'] as String,
         nameZh: json['nameZh'] as String,
         spriteUrl: json['spriteUrl'] as String?,
+        artworkUrl: json['artworkUrl'] as String?,
         localSpritePath: json['localSpritePath'] as String?,
         evolvesFrom: json['evolvesFrom'] as String?,
         triggerZh: json['triggerZh'] as String?,
@@ -496,6 +506,7 @@ class EvolutionNode {
       nameEn: nameEn,
       nameZh: nameZh,
       spriteUrl: spriteUrl,
+      artworkUrl: artworkUrl,
       localSpritePath: path,
       evolvesFrom: evolvesFrom,
       triggerZh: triggerZh,

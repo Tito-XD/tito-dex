@@ -28,7 +28,7 @@ TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
     "sprites/types/generation-iii/colosseum"
 )
-BUNDLE_VERSION = 3
+BUNDLE_VERSION = 4
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
 JOHTO_POKEDEX_NAMES = {"original-johto", "updated-johto"}
@@ -185,6 +185,7 @@ class PokeApiBuilder:
         types = extract_types(pokemon["types"])
         sprite_remote = sprite_url(pokemon["sprites"])
         sprite_cdn = f"{cdn_base}/v2/sprites/{pokemon_id}.png"
+        artwork_cdn = f"{cdn_base}/v2/artwork/{pokemon_id}.png"
 
         summary = {
             "id": pokemon_id,
@@ -192,6 +193,7 @@ class PokeApiBuilder:
             "nameZh": localized_name(species.get("names", []), pokemon["name"]),
             "types": types,
             "spriteUrl": sprite_cdn,
+            "artworkUrl": artwork_cdn,
             "localSpritePath": f"sprites/{pokemon_id}.png",
         }
 
@@ -483,6 +485,7 @@ def parse_evolution_node(
         "nameEn": capitalize(species["name"]),
         "nameZh": localized_name(species_detail.get("names", []), species["name"]),
         "spriteUrl": f"{cdn_base}/v2/sprites/{species_id}.png",
+        "artworkUrl": f"{cdn_base}/v2/artwork/{species_id}.png",
         "localSpritePath": f"sprites/{species_id}.png",
         **({"evolvesFrom": trigger_zh} if trigger_zh else {}),
         **({"triggerZh": trigger_zh} if trigger_zh else {}),
@@ -490,12 +493,12 @@ def parse_evolution_node(
     }
 
 
-def optimize_png(png_bytes: bytes, *, max_width: int = 220) -> bytes:
+def optimize_png(png_bytes: bytes, *, max_width: int | None = 220) -> bytes:
     """Resize PNG while preserving alpha (no white JPEG matte)."""
     image = Image.open(io.BytesIO(png_bytes))
     if image.mode not in ("RGB", "RGBA"):
         image = image.convert("RGBA")
-    if image.width > max_width:
+    if max_width is not None and image.width > max_width:
         ratio = max_width / image.width
         image = image.resize((max_width, int(image.height * ratio)), Image.Resampling.LANCZOS)
     out = io.BytesIO()
@@ -553,12 +556,18 @@ def build_bundle(
     cdn_base = cdn_base.rstrip("/")
     staging = output_dir / "staging"
     upload_v2 = output_dir / "upload" / "v2"
+    artwork_staging = output_dir / "artwork_staging"
 
     if staging.exists():
         import shutil
 
         shutil.rmtree(staging)
+    if artwork_staging.exists():
+        import shutil
+
+        shutil.rmtree(artwork_staging)
     staging.mkdir(parents=True)
+    artwork_staging.mkdir(parents=True)
     (staging / "details").mkdir()
     (staging / "sprites").mkdir()
     (staging / "type_icons").mkdir()
@@ -602,8 +611,12 @@ def build_bundle(
         if sprite_remote:
             try:
                 png = download_bytes(session, sprite_remote)
-                optimized = optimize_png(png)
-                (staging / "sprites" / f"{pokemon_id}.png").write_bytes(optimized)
+                (staging / "sprites" / f"{pokemon_id}.png").write_bytes(
+                    optimize_png(png, max_width=220)
+                )
+                (artwork_staging / f"{pokemon_id}.png").write_bytes(
+                    optimize_png(png, max_width=None)
+                )
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
 
@@ -634,6 +647,7 @@ def build_bundle(
     if upload_v2.exists():
         shutil.rmtree(upload_v2.parent)
     upload_v2.mkdir(parents=True)
+    shutil.copytree(artwork_staging, upload_v2 / "artwork")
     for name in (
         "manifest.json",
         "summaries.json",

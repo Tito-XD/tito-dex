@@ -9,6 +9,7 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
+import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
 
@@ -74,10 +75,19 @@ class PokemonDetailHeader extends StatelessWidget {
                   icon: const Icon(Icons.settings_rounded, color: TitoColors.card),
                   tooltip: AppZh.navSettings,
                 ),
-              DexSpriteImage(
-                source: summary.displaySpritePath,
-                width: compact ? 84 : 108,
-                height: compact ? 84 : 108,
+              GestureDetector(
+                onTap: () => showPokemonArtworkViewer(
+                  context,
+                  pokemonId: summary.id,
+                  nameZh: summary.nameZh,
+                  artworkUrl: summary.artworkUrl,
+                  thumbSource: summary.displaySpritePath,
+                ),
+                child: DexSpriteImage(
+                  source: summary.displaySpritePath,
+                  width: compact ? 84 : 108,
+                  height: compact ? 84 : 108,
+                ),
               ),
             ],
           ),
