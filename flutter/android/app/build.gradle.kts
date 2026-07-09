@@ -8,7 +8,8 @@ plugins {
 android {
     namespace = "com.tito.titodex"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Match plugin requirements; backward compatible with Flutter's default NDK.
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -22,9 +23,8 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.tito.titodex"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // minSdk 24+ keeps native .so Stored (uncompressed) in the APK — required for RG sideload.
+        minSdk = maxOf(24, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -35,6 +35,14 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // RG handhelds reject APKs when native libs are zip-compressed (Defl:N).
+    // minSdk 24+ plus legacy packaging off keeps .so Stored — matches v0.2.11 builds.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
         }
     }
 }
