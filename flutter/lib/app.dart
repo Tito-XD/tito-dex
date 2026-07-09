@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import 'features/companion/companion_art.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -27,6 +28,7 @@ import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
+import 'widgets/shell_companion_overlay.dart';
 import 'widgets/tito_page_container.dart';
 
 class TitoDexApp extends StatefulWidget {
@@ -63,9 +65,23 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 }
                 TitoBackNavigation.navigateBack(context, state.uri.path);
               },
-              child: HandheldInputShell(
-                location: state.uri.path,
-                child: DeviceShell(child: child),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  HandheldInputShell(
+                    location: state.uri.path,
+                    child: DeviceShell(child: child),
+                  ),
+                  Positioned.fill(
+                    child: ShellCompanionOverlay(
+                      onHome: TitoBackNavigation.isHome(state.uri.path),
+                      companionName: _journey.companion,
+                      onTap: () => _onCompanionChanged(
+                        cycleCompanion(_journey.companion),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -78,7 +94,6 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: HomePage(
                     journey: _journey,
                     onContinue: _onContinue,
-                    onCompanionChanged: _onCompanionChanged,
                   ),
                 ),
               ),
