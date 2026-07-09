@@ -58,4 +58,6 @@ Implementation plan from discussion — items 1–9, plus follow-up CDN work.
 
 ## Releases
 
-Latest RG APK: [v0.2.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25) — `releases/TitoDex-0.2.25-rg-arm64.apk`
+Latest RG APK: [v0.2.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25) — `releases/TitoDex-0.2.25-rg-arm64.apk` (arm64-v8a, ~22 MB).
+
+**Agents:** same naming as 0.2.1–0.2.11; build with `flutter build apk --release --target-platform android-arm64`. Do **not** use `--split-per-abi` (RG rejects compressed native libs). Details: [AI_READFIRST.md](./AI_READFIRST.md) · [flutter/README.md](../flutter/README.md).

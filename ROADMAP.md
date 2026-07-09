@@ -8,7 +8,7 @@
 | --- | --- |
 | `v0.1.x` | Phase 2 debug / early APK |
 | `v0.2.x` | **Current pre-release** — RG handheld builds (UI polish, offline dex, CDN v4) |
-| `v0.2.25` | **Latest** — UI overhaul + PNG CDN bundle + artwork viewer ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25)) |
+| `v0.2.25` | **Latest** — UI overhaul + PNG CDN bundle + artwork viewer; RG APK arm64-v8a fix ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25)) |
 | `v1.0.0` | Reserved for **feature-complete** public release (stable offline dex, emulator launch, save workflow, polish) |
 
 Early builds were briefly tagged `v1.0.x` by mistake; they map 1:1 to `v0.2.x` on the same commits.

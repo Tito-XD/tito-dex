@@ -4,6 +4,8 @@
 
 **Release:** v0.2.25 · Dex CDN bundle v4 at `https://dex.tito.cafe`
 
+**RG APK:** `TitoDex-<ver>-rg-arm64.apk` (arm64-v8a, ~20–22 MB). Build with `--target-platform android-arm64`; never `--split-per-abi`. See [flutter/README.md](../flutter/README.md).
+
 ## Recommended Stack
 
 **Flutter + Dart** (`flutter/` subdirectory)
@@ -83,7 +85,7 @@ Repo-level tooling & CDN:
 
 ```txt
 fixtures/PKMSS.sav
-releases/TitoDex-*-rg-*.apk
+releases/TitoDex-<ver>-rg-arm64.apk   # arm64-v8a only; see flutter/README.md
 tools/
   build_dex_bundle.py             # CDN bundle v4 builder
   upload_dex_via_worker.py
@@ -218,7 +220,7 @@ cd flutter && flutter test
 | `save_scanner_test.dart` | Newest-by-mtime, size filter |
 | `widget_test.dart` | App boot loading shell |
 
-Manual: Settings import, directory sync on Android device with emulator save folder; CDN bundle download on RG.
+Manual: Settings import, directory sync on Android device with emulator save folder; CDN bundle download on RG; sideload `TitoDex-*-rg-arm64.apk` (verify `.so` are Stored with `unzip -lv`).
 
 ## Related Documents
 
