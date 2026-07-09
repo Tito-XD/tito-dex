@@ -35,7 +35,7 @@ TYPE_NAMES = [
 
 def delete_key(session: requests.Session, key: str) -> bool:
     url = f"{CDN_BASE}/_delete/{key}"
-    response = session.post(url, headers={"x-bootstrap-key": BOOTSTRAP_KEY}, timeout=60)
+    response = session.delete(url, headers={"x-bootstrap-key": BOOTSTRAP_KEY}, timeout=60)
     if response.status_code == 200:
         print(f"✓ deleted {key}")
         return True
