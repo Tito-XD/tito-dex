@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'dex_bundle_installer.dart';
 import 'dex_cache_store.dart';
+import 'dex_cdn_config.dart';
 import 'dex_models.dart';
 import 'dex_sprite_codec.dart';
 import 'poke_api_throttle.dart';
@@ -16,18 +18,32 @@ class DexOfflineService {
     PokeApiClient? client,
     DexCacheStore? store,
     DexSpriteCodec? codec,
+    DexCdnConfig? cdnConfig,
+    DexBundleInstaller? bundleInstaller,
     this.pokemonRetryAttempts = 5,
     this.checkpointEvery = 5,
   })  : _client = client ?? PokeApiClient(),
         _store = store ?? DexCacheStore(),
-        _codec = codec ?? const DexSpriteCodec();
+        _codec = codec ?? const DexSpriteCodec(),
+        _cdnConfig = cdnConfig ?? const DexCdnConfig(),
+        _explicitBundleInstaller = bundleInstaller;
 
   final PokeApiClient _client;
   final DexCacheStore _store;
   final DexSpriteCodec _codec;
+  final DexCdnConfig _cdnConfig;
+  final DexBundleInstaller? _explicitBundleInstaller;
+  DexBundleInstaller? _resolvedBundleInstaller;
   final http.Client _http = http.Client();
   final int pokemonRetryAttempts;
   final int checkpointEvery;
+
+  DexBundleInstaller get _bundleInstaller =>
+      _explicitBundleInstaller ??
+      (_resolvedBundleInstaller ??= DexBundleInstaller(
+        store: _store,
+        config: _cdnConfig,
+      ));
 
   bool _downloading = false;
   DexCacheProgress? _progress;
@@ -101,6 +117,27 @@ class DexOfflineService {
       return null;
     }
     return _store.absolutePathForRelative(relative);
+  }
+
+  Stream<DexCacheProgress> downloadFromCdnBundle() async* {
+    if (_downloading) {
+      return;
+    }
+    _downloading = true;
+
+    try {
+      await for (final progress in _bundleInstaller.install()) {
+        yield _setProgress(
+          phase: progress.phase,
+          current: progress.current,
+          total: progress.total,
+          label: progress.label,
+        );
+      }
+    } finally {
+      _downloading = false;
+      _progress = null;
+    }
   }
 
   Stream<DexCacheProgress> downloadAll() async* {
@@ -378,14 +415,15 @@ class DexOfflineService {
 
   Future<PokemonSummary> _attachAbsoluteSprite(PokemonSummary summary) async {
     final relative = summary.localSpritePath;
-    if (relative == null) {
+    if (relative != null && !relative.startsWith('http')) {
+      final absolute = await _store.absolutePathForRelative(relative);
+      if (absolute != null) {
+        return summary.copyWith(localSpritePath: absolute);
+      }
+    } else if (relative != null) {
       return summary;
     }
-    final absolute = await _store.absolutePathForRelative(relative);
-    if (absolute == null) {
-      return summary;
-    }
-    return summary.copyWith(localSpritePath: absolute);
+    return summary.copyWith(localSpritePath: _cdnConfig.spriteUrl(summary.id));
   }
 
   Future<PokemonDetail> _attachAbsoluteSpritesToDetail(
@@ -423,10 +461,13 @@ class DexOfflineService {
       return null;
     }
     String? absolute;
-    if (node.localSpritePath != null) {
-      absolute = await _store.absolutePathForRelative(node.localSpritePath!) ??
-          node.localSpritePath;
+    if (node.localSpritePath != null &&
+        !node.localSpritePath!.startsWith('http')) {
+      absolute = await _store.absolutePathForRelative(node.localSpritePath!);
+    } else if (node.localSpritePath != null) {
+      absolute = node.localSpritePath;
     }
+    absolute ??= _cdnConfig.spriteUrl(node.id);
     final children = <EvolutionNode>[];
     for (final child in node.children) {
       final localized = await _attachAbsoluteSpritesToEvolution(child);
