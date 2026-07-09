@@ -28,7 +28,7 @@ TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
     "sprites/types/generation-iii/colosseum"
 )
-BUNDLE_VERSION = 2
+BUNDLE_VERSION = 3
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
 JOHTO_POKEDEX_NAMES = {"original-johto", "updated-johto"}
@@ -184,7 +184,7 @@ class PokeApiBuilder:
 
         types = extract_types(pokemon["types"])
         sprite_remote = sprite_url(pokemon["sprites"])
-        sprite_cdn = f"{cdn_base}/v2/sprites/{pokemon_id}.jpg"
+        sprite_cdn = f"{cdn_base}/v2/sprites/{pokemon_id}.png"
 
         summary = {
             "id": pokemon_id,
@@ -192,7 +192,7 @@ class PokeApiBuilder:
             "nameZh": localized_name(species.get("names", []), pokemon["name"]),
             "types": types,
             "spriteUrl": sprite_cdn,
-            "localSpritePath": f"sprites/{pokemon_id}.jpg",
+            "localSpritePath": f"sprites/{pokemon_id}.png",
         }
 
         profile = compute_defensive_profile(types, relations)
@@ -482,29 +482,24 @@ def parse_evolution_node(
         "id": species_id,
         "nameEn": capitalize(species["name"]),
         "nameZh": localized_name(species_detail.get("names", []), species["name"]),
-        "spriteUrl": f"{cdn_base}/v2/sprites/{species_id}.jpg",
-        "localSpritePath": f"sprites/{species_id}.jpg",
+        "spriteUrl": f"{cdn_base}/v2/sprites/{species_id}.png",
+        "localSpritePath": f"sprites/{species_id}.png",
         **({"evolvesFrom": trigger_zh} if trigger_zh else {}),
         **({"triggerZh": trigger_zh} if trigger_zh else {}),
         "children": children,
     }
 
 
-def compress_png_to_jpeg(png_bytes: bytes, *, max_width: int = 220, quality: int = 78) -> bytes:
+def optimize_png(png_bytes: bytes, *, max_width: int = 220) -> bytes:
+    """Resize PNG while preserving alpha (no white JPEG matte)."""
     image = Image.open(io.BytesIO(png_bytes))
     if image.mode not in ("RGB", "RGBA"):
         image = image.convert("RGBA")
     if image.width > max_width:
         ratio = max_width / image.width
         image = image.resize((max_width, int(image.height * ratio)), Image.Resampling.LANCZOS)
-    if image.mode == "RGBA":
-        background = Image.new("RGB", image.size, (255, 255, 255))
-        background.paste(image, mask=image.split()[3])
-        image = background
-    else:
-        image = image.convert("RGB")
     out = io.BytesIO()
-    image.save(out, format="JPEG", quality=quality, optimize=True)
+    image.save(out, format="PNG", optimize=True)
     return out.getvalue()
 
 
@@ -592,8 +587,8 @@ def build_bundle(
                 print(f"  warn: no colosseum icon for {type_name}", file=sys.stderr)
                 continue
             png = download_bytes(session, icon_url)
-            jpeg = compress_png_to_jpeg(png, max_width=64, quality=80)
-            (staging / "type_icons" / f"{type_name}.jpg").write_bytes(jpeg)
+            optimized = optimize_png(png, max_width=64)
+            (staging / "type_icons" / f"{type_name}.png").write_bytes(optimized)
         except requests.RequestException as exc:
             print(f"  warn: type icon {type_name}: {exc}", file=sys.stderr)
 
@@ -607,8 +602,8 @@ def build_bundle(
         if sprite_remote:
             try:
                 png = download_bytes(session, sprite_remote)
-                jpeg = compress_png_to_jpeg(png)
-                (staging / "sprites" / f"{pokemon_id}.jpg").write_bytes(jpeg)
+                optimized = optimize_png(png)
+                (staging / "sprites" / f"{pokemon_id}.png").write_bytes(optimized)
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
 
