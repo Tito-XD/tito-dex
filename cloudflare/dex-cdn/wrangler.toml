@@ -2,7 +2,7 @@
 # Deploy via Cloudflare Workers Builds → branch: deploy/dex-cdn
 # See DEPLOY.md for Dashboard setup.
 
-name = "titodex-dex-cdn"
+name = "tito-dex"
 main = "src/worker.js"
 compatibility_date = "2024-09-23"
 
@@ -21,3 +21,4 @@ zone_name = "tito.cafe"
 [vars]
 CDN_VERSION = "2"
 CDN_BASE_URL = "https://dex.tito.cafe"
+DEPLOY_REV = "2026-07-09a"
