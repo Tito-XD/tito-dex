@@ -181,10 +181,7 @@ class _CompactPokemonHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = detail.summary;
     final square = DeviceLayout.useSquareDashboard(context);
-    final dexLabel = [
-      if (detail.johtoDexLabel != null) detail.johtoDexLabel,
-      detail.nationalDexLabel,
-    ].join(' · ');
+    final compactTitle = '${summary.nameZh} · ${detail.nationalDexLabel}';
 
     return StickerCard(
       variant: StickerVariant.deep,
@@ -196,7 +193,7 @@ class _CompactPokemonHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              '$dexLabel · ${summary.nameZh}',
+              compactTitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: context.tito.onDeepHeading.copyWith(
