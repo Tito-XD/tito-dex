@@ -456,6 +456,83 @@ class TypeEffectivenessGrid extends StatelessWidget {
   }
 }
 
+class AbilitiesCard extends StatelessWidget {
+  const AbilitiesCard({super.key, required this.abilities});
+
+  final List<PokemonAbility> abilities;
+
+  @override
+  Widget build(BuildContext context) {
+    if (abilities.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.dexAbilities,
+            style: SecondaryTypography.onCard.h15,
+          ),
+          const SizedBox(height: 10),
+          ...abilities.map(
+            (ability) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          ability.nameZh,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      if (ability.isHidden)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: TitoColors.skyBlue.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: TitoColors.ink, width: 1),
+                          ),
+                          child: Text(
+                            AppZh.dexAbilityHidden,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (ability.descriptionZh.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      ability.descriptionZh,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class ObtainLocationsCard extends StatelessWidget {
   const ObtainLocationsCard({super.key, required this.locations});
 

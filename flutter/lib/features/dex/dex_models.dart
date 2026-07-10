@@ -221,6 +221,34 @@ class FlavorTextEntry {
       );
 }
 
+class PokemonAbility {
+  const PokemonAbility({
+    required this.nameEn,
+    required this.nameZh,
+    required this.descriptionZh,
+    this.isHidden = false,
+  });
+
+  final String nameEn;
+  final String nameZh;
+  final String descriptionZh;
+  final bool isHidden;
+
+  Map<String, dynamic> toJson() => {
+        'nameEn': nameEn,
+        'nameZh': nameZh,
+        'descriptionZh': descriptionZh,
+        if (isHidden) 'isHidden': true,
+      };
+
+  factory PokemonAbility.fromJson(Map<String, dynamic> json) => PokemonAbility(
+        nameEn: json['nameEn'] as String,
+        nameZh: json['nameZh'] as String,
+        descriptionZh: json['descriptionZh'] as String? ?? '',
+        isHidden: json['isHidden'] as bool? ?? false,
+      );
+}
+
 class ObtainLocationEntry {
   const ObtainLocationEntry({
     required this.areaSlug,
@@ -338,6 +366,7 @@ class PokemonDetail {
     this.typeMultipliers = const {},
     this.flavorEntries = const [],
     this.obtainLocations = const [],
+    this.abilities = const [],
     this.moveSet = const PokemonMoveSet(),
     this.genderFemalePercent,
     this.eggGroups = const [],
@@ -358,6 +387,7 @@ class PokemonDetail {
   final Map<String, double> typeMultipliers;
   final List<FlavorTextEntry> flavorEntries;
   final List<ObtainLocationEntry> obtainLocations;
+  final List<PokemonAbility> abilities;
   final PokemonMoveSet moveSet;
   final double? genderFemalePercent;
   final List<String> eggGroups;
@@ -390,6 +420,7 @@ class PokemonDetail {
             flavorEntries.map((entry) => entry.toJson()).toList(),
         'obtainLocations':
             obtainLocations.map((entry) => entry.toJson()).toList(),
+        'abilities': abilities.map((entry) => entry.toJson()).toList(),
         'moveSet': moveSet.toJson(),
         if (genderFemalePercent != null)
           'genderFemalePercent': genderFemalePercent,
@@ -469,6 +500,9 @@ class PokemonDetail {
           .map(
             (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
           )
+          .toList(),
+      abilities: (json['abilities'] as List<dynamic>? ?? const [])
+          .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
       moveSet: resolvedMoveSet,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),

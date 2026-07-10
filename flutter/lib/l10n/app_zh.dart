@@ -29,10 +29,19 @@ abstract final class AppZh {
   static const widgetContinue = '继续';
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
-  static const dexScopeNote = '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；同行宝可梦标记为已捕获。';
+  static const dexScopeNote =
+      '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；已捕获/已见过状态来自存档与同行队伍。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
-  static const dexUnknown = '未捕获';
+  static const dexUnknown = '未见过';
+  static const dexFilterAll = '全部';
+  static const dexFilterCaught = '已捕获';
+  static const dexFilterSeen = '仅见过';
+  static const dexFilterUnseen = '未见过';
+  static String dexScopeProgress(int caught, int seen, int total) =>
+      '捕获 $caught · 见过 $seen / $total';
+  static const dexAbilities = '特性';
+  static const dexAbilityHidden = '隐藏特性';
   static const dexTabNational = '全国图鉴';
   static const dexTabJourney = '旅程同行';
   static const dexRegionNational = '全国';

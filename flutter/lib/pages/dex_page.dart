@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/companion/companion_art.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
+import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
@@ -40,9 +41,10 @@ class _DexPageState extends State<DexPage> {
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
   DexRegionalScope _region = DexRegionalScope.national;
+  DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
-  Set<int> _caughtIds = const {};
+  DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   Set<int> _journeyIds = const {};
   String? _error;
 
@@ -55,11 +57,11 @@ class _DexPageState extends State<DexPage> {
   Future<void> _bootstrap() async {
     try {
       _journeyIds = _resolveJourneyIds();
-      final caught = await dexRepository.journeyCaughtIds(widget.journey);
+      final progress = dexRepository.progressFor(widget.journey);
       if (!mounted) {
         return;
       }
-      setState(() => _caughtIds = caught);
+      setState(() => _progress = progress);
       await _loadMore();
     } catch (error) {
       if (!mounted) {
@@ -167,25 +169,32 @@ class _DexPageState extends State<DexPage> {
   }
 
   List<PokemonSummary> get _visibleEntries {
-    if (_mode == _DexMode.journey) {
-      return _journeySummaries;
-    }
+    final entries = _mode == _DexMode.journey
+        ? _journeySummaries
+        : _summaries.where((entry) {
+            final (start, end) = regionalDexIdRange(_region);
+            return entry.id >= start && entry.id <= end;
+          });
 
-    final (start, end) = regionalDexIdRange(_region);
-    return _summaries
-        .where((entry) => entry.id >= start && entry.id <= end)
-        .toList(growable: false);
+    return dexRepository.filterSummaries(
+      entries,
+      _progress,
+      _encounterFilter,
+    );
   }
 
-  int get _nationalScopeTotal {
-    final (start, end) = regionalDexIdRange(_region);
-    return end - start + 1;
-  }
+  DexScopeStats get _scopeStats => _progress.statsFor(_region);
 
   String _emptyMessageForMode() {
-    return _mode == _DexMode.journey
-        ? AppZh.dexJourneyEmpty
-        : AppZh.dexJourneyEmpty;
+    if (_mode == _DexMode.journey) {
+      return AppZh.dexJourneyEmpty;
+    }
+    return switch (_encounterFilter) {
+      DexEncounterFilter.caught => AppZh.dexCaughtEmpty,
+      DexEncounterFilter.seen => AppZh.dexSeenEmpty,
+      DexEncounterFilter.unseen => AppZh.dexUnknown,
+      DexEncounterFilter.all => AppZh.dexJourneyEmpty,
+    };
   }
 
   @override
@@ -229,11 +238,20 @@ class _DexPageState extends State<DexPage> {
                   _DexScopeBar(
                     mode: _mode,
                     region: _region,
-                    nationalTotal: _nationalScopeTotal,
+                    scopeStats: _scopeStats,
                     journeyCount: _journeyIds.length,
                     onModeSelected: _setMode,
                     onRegionSelected: _setRegion,
                   ),
+                  if (_mode == _DexMode.national) ...[
+                    SizedBox(height: squareGap(context)),
+                    _DexEncounterFilterBar(
+                      filter: _encounterFilter,
+                      onSelected: (filter) {
+                        setState(() => _encounterFilter = filter);
+                      },
+                    ),
+                  ],
                   SizedBox(height: squareGap(context)),
                   if (_error != null)
                     StickerCard(
@@ -296,7 +314,7 @@ class _DexPageState extends State<DexPage> {
                       final entry = visible[index];
                       final status = dexRepository.statusFor(
                         entry.id,
-                        _caughtIds,
+                        _progress,
                       );
                       return PokemonMiniCard(
                         summary: entry,
@@ -440,7 +458,7 @@ class _DexScopeBar extends StatelessWidget {
   const _DexScopeBar({
     required this.mode,
     required this.region,
-    required this.nationalTotal,
+    required this.scopeStats,
     required this.journeyCount,
     required this.onModeSelected,
     required this.onRegionSelected,
@@ -448,7 +466,7 @@ class _DexScopeBar extends StatelessWidget {
 
   final _DexMode mode;
   final DexRegionalScope region;
-  final int nationalTotal;
+  final DexScopeStats scopeStats;
   final int journeyCount;
   final ValueChanged<_DexMode> onModeSelected;
   final ValueChanged<DexRegionalScope> onRegionSelected;
@@ -461,8 +479,12 @@ class _DexScopeBar extends StatelessWidget {
           child: _DexModeTab(
             selected: mode == _DexMode.national,
             title: AppZh.dexTabNational,
-            subtitle: regionalScopeLabelZh(region),
-            count: nationalTotal,
+            subtitle: AppZh.dexScopeProgress(
+              scopeStats.caught,
+              scopeStats.seen,
+              scopeStats.total,
+            ),
+            count: scopeStats.total,
             showRegionMenu: true,
             region: region,
             onTap: () => onModeSelected(_DexMode.national),
@@ -480,6 +502,51 @@ class _DexScopeBar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DexEncounterFilterBar extends StatelessWidget {
+  const _DexEncounterFilterBar({
+    required this.filter,
+    required this.onSelected,
+  });
+
+  final DexEncounterFilter filter;
+  final ValueChanged<DexEncounterFilter> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: DexEncounterFilter.values.map((entry) {
+        final label = switch (entry) {
+          DexEncounterFilter.all => AppZh.dexFilterAll,
+          DexEncounterFilter.caught => AppZh.dexFilterCaught,
+          DexEncounterFilter.seen => AppZh.dexFilterSeen,
+          DexEncounterFilter.unseen => AppZh.dexFilterUnseen,
+        };
+        final selected = filter == entry;
+        return ChoiceChip(
+          label: Text(label),
+          selected: selected,
+          onSelected: (_) => onSelected(entry),
+          labelStyle: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+            color: selected ? TitoColors.ink : TitoColors.mutedInk,
+          ),
+          selectedColor: TitoColors.softYellow,
+          backgroundColor: TitoColors.card,
+          side: BorderSide(
+            color: TitoColors.ink,
+            width: selected ? 2 : 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+          ),
+        );
+      }).toList(),
     );
   }
 }
