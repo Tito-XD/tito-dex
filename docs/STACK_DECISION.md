@@ -266,7 +266,7 @@ References: [Project Pokémon HGSS save structure](https://projectpokemon.org/ho
 | Jul 2026 | Dex UI + offline cache + RG handheld polish (v0.2.20–0.2.23) |
 | Jul 2026 | **Cloudflare dex CDN** live — `dex.tito.cafe`, bundle v4 PNG, Worker `tito-dex` |
 | Jul 2026 | **v0.2.25** — UI merge + artwork viewer + RG APK release |
-| Jul 2026 | **RG APK packaging** — arm64-v8a only, `minSdk 24`, no `--split-per-abi` (Stored `.so`; fixes「安装包无效」) |
+| Jul 2026 | **RG APK packaging** — SDK 36, `abiFilters arm64-v8a`, project upload keystore; uninstall before upgrade from local builds |
 
 ## Related Documents
 

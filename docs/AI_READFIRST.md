@@ -24,12 +24,13 @@ When building or publishing RG handheld APKs:
 
 | Rule | Detail |
 | --- | --- |
-| **ABI** | **arm64-v8a only** (same as 0.2.1–0.2.11) |
-| **Filename** | `releases/TitoDex-<ver>-rg-arm64.apk` — do not rename to split-per-abi output names |
-| **Build** | `flutter build apk --release --target-platform android-arm64` |
-| **Do not** | `--split-per-abi` — compresses native `.so` → RG sideload shows「安装包无效」 |
-| **Gradle** | `android/app/build.gradle.kts`: `minSdk = maxOf(24, …)`, `useLegacyPackaging = false` (`.so` must be **Stored**, not Defl:N) |
-| **GitHub Release** | One asset: `TitoDex-<ver>-rg-arm64.apk` (~20–22 MB). No armv7 for 0.2.x track. |
+| **ABI** | **arm64-v8a only** (`ndk.abiFilters`) — RG Rotate / Unisoc |
+| **Filename** | `releases/TitoDex-<ver>-rg-arm64.apk` |
+| **SDK** | `compileSdk = 36`, `targetSdk = 36`, `minSdk = 24` (matches working 0.2.11 / local 0.2.23) |
+| **Build** | `flutter build apk --release` (no `--split-per-abi`, no `--target-platform`) |
+| **Signing** | `android/key.properties` + `titodex-upload.keystore` (committed; not per-machine debug) |
+| **Native libs** | `.so` must be **Stored** (`useLegacyPackaging = false`, `minSdk 24`) |
+| **Upgrade** | User must **uninstall** locally-built 0.2.x before sideloading CI APK (signature differs) |
 
 Full build notes: [flutter/README.md](../flutter/README.md).
 

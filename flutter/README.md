@@ -17,14 +17,16 @@ flutter run              # Android device / emulator
 
 ## Build release APK (RG handheld)
 
-Same convention as 0.2.1–0.2.11: **arm64-v8a only**, filename `TitoDex-<ver>-rg-arm64.apk`.
+Same as working 0.2.11 / local 0.2.23: **arm64-v8a only**, ~20 MB, `TitoDex-<ver>-rg-arm64.apk`.
 
 ```bash
-flutter build apk --release --target-platform android-arm64
+flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
 
-Do **not** use `--split-per-abi` for RG releases. With default `minSdk 21`, native `.so` files get zip-compressed and sideload fails with「安装包无效」. `android/app/build.gradle.kts` sets `minSdk = 24` and `useLegacyPackaging = false` so `.so` stay **Stored** (uncompressed), matching v0.2.11 builds.
+`android/app/build.gradle.kts`: `compileSdk/targetSdk 36`, `minSdk 24`, `abiFilters arm64-v8a`, release keystore in `android/key.properties`. No `--split-per-abi`.
+
+**Upgrade:** uninstall any locally-built 0.2.x before sideloading (CI keystore ≠ your machine debug key).
 
 Requires Android SDK (`flutter doctor --android-licenses`).
 
