@@ -257,24 +257,25 @@ class _DexPageState extends State<DexPage> {
                     onSearch: () => context.push('/search'),
                   ),
                   SizedBox(height: squareGap(context)),
-                  // Square handheld: keep the top area short — one info line
-                  // (region progress when a regional dex is active).
-                  if (_regionProgressLine != null)
+                  // Square handheld: keep the top area short — at most one
+                  // info line (region progress when 城都/关东 is active).
+                  if (_regionProgressLine != null) ...[
                     Text(
                       _regionProgressLine!,
                       style: SecondaryTypography.onGradient.body14,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                    )
-                  else
+                    ),
+                    SizedBox(height: squareGap(context)),
+                  ] else if (!DeviceLayout.useSquareDashboard(context)) ...[
                     Text(
                       AppZh.dexScopeNote,
                       style: SecondaryTypography.onGradient.body14,
-                      maxLines:
-                          DeviceLayout.useSquareDashboard(context) ? 1 : 3,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  SizedBox(height: squareGap(context)),
+                    SizedBox(height: squareGap(context)),
+                  ],
                   _DexScopeBar(
                     mode: _mode,
                     region: _region,
