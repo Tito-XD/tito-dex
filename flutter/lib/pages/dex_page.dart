@@ -48,6 +48,8 @@ class _DexPageState extends State<DexPage> {
   _DexStatusFilter _statusFilter = _DexStatusFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
+  final Map<DexRegionalScope, List<PokemonSummary>> _regionCache = {};
+  bool _loadingRegion = false;
   Set<int> _caughtIds = const {};
   Set<int> _journeyIds = const {};
   String? _error;
@@ -175,6 +177,38 @@ class _DexPageState extends State<DexPage> {
       _mode = _DexMode.national;
       _error = null;
     });
+    if (region != DexRegionalScope.national) {
+      _loadRegion(region);
+    }
+  }
+
+  /// Regional scopes start mid-list (城都 = #152+), so waiting for the chunked
+  /// national loader would leave the grid empty. Fetch the whole range —
+  /// one summaries.json via the CDN fast path.
+  Future<void> _loadRegion(DexRegionalScope region) async {
+    if (_regionCache.containsKey(region) || _loadingRegion) {
+      return;
+    }
+    setState(() => _loadingRegion = true);
+    try {
+      final (start, end) = regionalDexIdRange(region);
+      final entries = await dexRepository.getSummaryRange(start, end);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _regionCache[region] = entries;
+        _loadingRegion = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = _formatDexError(error);
+        _loadingRegion = false;
+      });
+    }
   }
 
   bool _matchesStatusFilter(int id) {
@@ -195,7 +229,8 @@ class _DexPageState extends State<DexPage> {
     }
 
     final (start, end) = regionalDexIdRange(_region);
-    return _summaries
+    final source = _regionCache[_region] ?? _summaries;
+    return source
         .where(
           (entry) =>
               entry.id >= start &&
@@ -236,8 +271,9 @@ class _DexPageState extends State<DexPage> {
     final visible = _visibleEntries;
     final columns = DeviceLayout.dexGridColumns(context);
     final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
-    final loading =
-        _mode == _DexMode.national ? _loadingChunk : _loadingJourney;
+    final loading = _mode == _DexMode.national
+        ? (_loadingChunk || _loadingRegion)
+        : _loadingJourney;
     final padding = DeviceLayout.pagePadding(context);
 
     return TitoFontScale(
@@ -383,6 +419,7 @@ class _DexPageState extends State<DexPage> {
                 ),
               ),
             if (_mode == _DexMode.national &&
+                _region == DexRegionalScope.national &&
                 _loadedThrough < hgssMaxNationalDexId)
               SliverPadding(
                 padding: padding.copyWith(top: 8, bottom: 4),
