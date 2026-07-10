@@ -4,6 +4,7 @@ import '../../models/journey.dart';
 import 'dex_cdn_data_source.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
+import 'dex_progress.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
@@ -29,6 +30,9 @@ class DexRepository {
   List<PokemonSummary>? _allSummaries;
   Future<List<PokemonSummary>>? _allSummariesFuture;
   bool _cdnSummariesUnavailable = false;
+
+  DexProgress progressFor(CurrentJourney journey) =>
+      DexProgress.fromJourney(journey);
 
   Future<PokemonSummary> getSummary(int id) async {
     if (_summaryCache.containsKey(id)) {
@@ -229,46 +233,9 @@ class DexRepository {
     }).toList();
   }
 
+  /// Party + companion species treated as caught (legacy helper).
   Future<Set<int>> journeyCaughtIds(CurrentJourney journey) async {
-    final ids = <int>{};
-
-    for (final member in journey.party) {
-      final id = member.speciesId ??
-          speciesIdForName(member.species) ??
-          knownSpeciesIdForLabel(member.species);
-      if (id != null) {
-        ids.add(id);
-      }
-    }
-
-    final companionId = speciesIdForName(journey.companion) ??
-        knownSpeciesIdForLabel(journey.companion);
-    if (companionId != null) {
-      ids.add(companionId);
-    }
-
-    final names = <String>{
-      ...journey.party.map((member) => member.species),
-      journey.companion,
-    };
-
-    for (final name in names) {
-      if (speciesIdForName(name) != null ||
-          knownSpeciesIdForLabel(name) != null) {
-        continue;
-      }
-      final cached = _nameToIdCache[name.toLowerCase()];
-      if (cached != null) {
-        ids.add(cached);
-        continue;
-      }
-      final id = await _client.resolveSpeciesId(name);
-      if (id != null) {
-        ids.add(id);
-        _nameToIdCache[name.toLowerCase()] = id;
-      }
-    }
-    return ids;
+    return progressFor(journey).caughtIds;
   }
 
   Future<List<PokemonSummary>> getSummariesForIds(Iterable<int> ids) async {
@@ -279,11 +246,17 @@ class DexRepository {
     return Future.wait(unique.map(getSummary));
   }
 
-  DexEncounterStatus statusFor(int id, Set<int> caughtIds) {
-    if (caughtIds.contains(id)) {
-      return DexEncounterStatus.caught;
-    }
-    return DexEncounterStatus.unknown;
+  DexEncounterStatus statusFor(int id, DexProgress progress) =>
+      progress.statusFor(id);
+
+  List<PokemonSummary> filterSummaries(
+    Iterable<PokemonSummary> entries,
+    DexProgress progress,
+    DexEncounterFilter filter,
+  ) {
+    return entries
+        .where((entry) => progress.matchesFilter(entry.id, filter))
+        .toList(growable: false);
   }
 
   void clearMemoryCache() {

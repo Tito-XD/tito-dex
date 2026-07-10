@@ -132,6 +132,7 @@ class PokeApiClient {
       species['flavor_text_entries'] as List<dynamic>,
     );
     final obtainLocations = await _fetchHgssObtainLocations(id);
+    final abilities = await _fetchAbilities(pokemon['abilities'] as List<dynamic>);
     final moveSet = await _fetchHgssMoveSet(pokemon['moves'] as List<dynamic>);
     final genderFemalePercent = _genderFemalePercent(
       species['gender_rate'] as int?,
@@ -160,6 +161,7 @@ class PokeApiClient {
       typeMultipliers: multipliers,
       flavorEntries: flavorEntries,
       obtainLocations: obtainLocations,
+      abilities: abilities,
       moveSet: moveSet,
       genderFemalePercent: genderFemalePercent,
       eggGroups: eggGroups,
@@ -265,6 +267,87 @@ class PokeApiClient {
 
   bool _looksChinese(String text) {
     return RegExp(r'[\u4e00-\u9fff]').hasMatch(text);
+  }
+
+  Future<List<PokemonAbility>> _fetchAbilities(List<dynamic> entries) async {
+    final abilities = <PokemonAbility>[];
+    for (final entry in entries) {
+      final map = entry as Map<String, dynamic>;
+      final abilityMap = map['ability'] as Map<String, dynamic>;
+      final slug = abilityMap['name'] as String;
+      final isHidden = map['is_hidden'] as bool? ?? false;
+      abilities.add(await _fetchAbility(slug, isHidden: isHidden));
+    }
+    abilities.sort((a, b) {
+      if (a.isHidden == b.isHidden) {
+        return a.nameZh.compareTo(b.nameZh);
+      }
+      return a.isHidden ? 1 : -1;
+    });
+    return abilities;
+  }
+
+  final Map<String, PokemonAbility> _abilityCache = {};
+
+  Future<PokemonAbility> _fetchAbility(
+    String slug, {
+    required bool isHidden,
+  }) async {
+    final cacheKey = '$slug:${isHidden ? 1 : 0}';
+    if (_abilityCache.containsKey(cacheKey)) {
+      return _abilityCache[cacheKey]!;
+    }
+
+    final detail = await _getJson('/ability/$slug');
+    final ability = PokemonAbility(
+      nameEn: _capitalize(detail['name'] as String),
+      nameZh: _localizedName(
+        detail['names'] as List<dynamic>,
+        fallback: detail['name'] as String,
+      ),
+      descriptionZh: _abilityDescriptionZh(detail),
+      isHidden: isHidden,
+    );
+    _abilityCache[cacheKey] = ability;
+    return ability;
+  }
+
+  String _abilityDescriptionZh(Map<String, dynamic> detail) {
+    for (final entry in detail['effect_entries'] as List<dynamic>? ?? const []) {
+      final map = entry as Map<String, dynamic>;
+      final language = (map['language'] as Map<String, dynamic>)['name'];
+      if (language == 'zh-Hans' || language == 'zh-hans') {
+        final short = (map['short_effect'] as String?)?.trim();
+        if (short != null && short.isNotEmpty) {
+          return short;
+        }
+        final effect = (map['effect'] as String?)?.trim();
+        if (effect != null && effect.isNotEmpty) {
+          return effect;
+        }
+      }
+    }
+    for (final entry in detail['flavor_text_entries'] as List<dynamic>? ??
+        const []) {
+      final map = entry as Map<String, dynamic>;
+      final language = (map['language'] as Map<String, dynamic>)['name'];
+      if (language == 'zh-Hans' || language == 'zh-hans') {
+        final text = (map['flavor_text'] as String?)?.trim();
+        if (text != null && text.isNotEmpty) {
+          return text;
+        }
+      }
+    }
+    for (final entry in detail['effect_entries'] as List<dynamic>? ?? const []) {
+      final map = entry as Map<String, dynamic>;
+      if ((map['language'] as Map<String, dynamic>)['name'] == 'en') {
+        final short = (map['short_effect'] as String?)?.trim();
+        if (short != null && short.isNotEmpty) {
+          return short;
+        }
+      }
+    }
+    return '';
   }
 
   Future<List<ObtainLocationEntry>> _fetchHgssObtainLocations(int id) async {
