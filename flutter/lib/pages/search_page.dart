@@ -152,7 +152,11 @@ class _SearchPageState extends State<SearchPage> {
 
     return TitoFontScale(
       multiplier: 1.0,
-      child: SecondaryPageScaffold(
+      // TextField requires a Material ancestor; the route shell doesn't
+      // provide one (pages render straight into TitoPageContainer).
+      child: Material(
+        type: MaterialType.transparency,
+        child: SecondaryPageScaffold(
         title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
         children: [
         StickerCard(
@@ -278,6 +282,7 @@ class _SearchPageState extends State<SearchPage> {
             },
           ),
       ],
+        ),
       ),
     );
   }
