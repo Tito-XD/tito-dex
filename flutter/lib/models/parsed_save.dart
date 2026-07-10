@@ -32,6 +32,8 @@ class ParsedSaveSummary {
     this.warnings = const [],
     this.tid,
     this.mapHeaderId,
+    this.dexCaughtIds = const {},
+    this.dexSeenIds = const {},
   });
 
   final String game;
@@ -46,4 +48,6 @@ class ParsedSaveSummary {
   final List<String> warnings;
   final int? tid;
   final int? mapHeaderId;
+  final Set<int> dexCaughtIds;
+  final Set<int> dexSeenIds;
 }

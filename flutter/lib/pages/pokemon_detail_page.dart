@@ -140,6 +140,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         const AbilityPlaceholderCard(),
         const SizedBox(height: 12),
         IntroMetaCard(detail: detail),
+        if (detail.abilities.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          AbilitiesCard(abilities: detail.abilities),
+        ],
         const SizedBox(height: 12),
         StickerCard(
           child: Text(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/companion/companion_art.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
+import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
@@ -32,11 +33,6 @@ class DexPage extends StatefulWidget {
 
 enum _DexMode { national, journey }
 
-/// Seen / caught filter — UI + local state; real seen flags land with the
-/// HGSS `.sav` dex parser (docs/PARSER_PROPOSAL.md). Until then "seen" is
-/// stubbed from journey-caught ids.
-enum _DexStatusFilter { all, seen, caught, unseen }
-
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
 
@@ -45,12 +41,12 @@ class _DexPageState extends State<DexPage> {
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
   DexRegionalScope _region = DexRegionalScope.national;
-  _DexStatusFilter _statusFilter = _DexStatusFilter.all;
+  DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
   final Map<DexRegionalScope, List<PokemonSummary>> _regionCache = {};
   bool _loadingRegion = false;
-  Set<int> _caughtIds = const {};
+  DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   Set<int> _journeyIds = const {};
   String? _error;
 
@@ -63,11 +59,11 @@ class _DexPageState extends State<DexPage> {
   Future<void> _bootstrap() async {
     try {
       _journeyIds = _resolveJourneyIds();
-      final caught = await dexRepository.journeyCaughtIds(widget.journey);
+      final progress = dexRepository.progressFor(widget.journey);
       if (!mounted) {
         return;
       }
-      setState(() => _caughtIds = caught);
+      setState(() => _progress = progress);
       await _loadMore();
     } catch (error) {
       if (!mounted) {
@@ -211,47 +207,41 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
-  bool _matchesStatusFilter(int id) {
-    return switch (_statusFilter) {
-      _DexStatusFilter.all => true,
-      // Seen stubbed to caught until the save parser provides seen flags.
-      _DexStatusFilter.seen => _caughtIds.contains(id),
-      _DexStatusFilter.caught => _caughtIds.contains(id),
-      _DexStatusFilter.unseen => !_caughtIds.contains(id),
-    };
-  }
-
   List<PokemonSummary> get _visibleEntries {
+    final Iterable<PokemonSummary> entries;
     if (_mode == _DexMode.journey) {
-      return _journeySummaries
-          .where((entry) => _matchesStatusFilter(entry.id))
-          .toList(growable: false);
+      entries = _journeySummaries;
+    } else if (_region != DexRegionalScope.national &&
+        _regionCache.containsKey(_region)) {
+      entries = _regionCache[_region]!;
+    } else {
+      final (start, end) = regionalDexIdRange(_region);
+      entries = _summaries.where(
+        (entry) => entry.id >= start && entry.id <= end,
+      );
     }
 
-    final (start, end) = regionalDexIdRange(_region);
-    final source = _regionCache[_region] ?? _summaries;
-    return source
-        .where(
-          (entry) =>
-              entry.id >= start &&
-              entry.id <= end &&
-              _matchesStatusFilter(entry.id),
-        )
-        .toList(growable: false);
+    return dexRepository.filterSummaries(
+      entries,
+      _progress,
+      _encounterFilter,
+    );
   }
 
-  int get _nationalScopeTotal {
-    final (start, end) = regionalDexIdRange(_region);
-    return end - start + 1;
-  }
+  DexScopeStats get _scopeStats => _progress.statsFor(_region);
 
   String _emptyMessageForMode() {
-    if (_statusFilter != _DexStatusFilter.all) {
-      return AppZh.dexFilterEmpty;
+    if (_mode == _DexMode.journey) {
+      return _encounterFilter == DexEncounterFilter.all
+          ? AppZh.dexJourneyEmpty
+          : AppZh.dexFilterEmpty;
     }
-    return _mode == _DexMode.journey
-        ? AppZh.dexJourneyEmpty
-        : AppZh.dexJourneyEmpty;
+    return switch (_encounterFilter) {
+      DexEncounterFilter.caught => AppZh.dexCaughtEmpty,
+      DexEncounterFilter.seen => AppZh.dexSeenEmpty,
+      DexEncounterFilter.unseen => AppZh.dexUnknown,
+      DexEncounterFilter.all => AppZh.dexJourneyEmpty,
+    };
   }
 
   /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
@@ -259,11 +249,15 @@ class _DexPageState extends State<DexPage> {
     if (_mode != _DexMode.national || _region == DexRegionalScope.national) {
       return null;
     }
+    final stats = _scopeStats;
     final (start, end) = regionalDexIdRange(_region);
-    final caught =
-        _caughtIds.where((id) => id >= start && id <= end).length;
-    // Seen == caught until the .sav dex parser lands.
-    return AppZh.dexRegionProgress(start, end, caught, caught, end - start + 1);
+    return AppZh.dexRegionProgress(
+      start,
+      end,
+      stats.seen,
+      stats.caught,
+      stats.total,
+    );
   }
 
   @override
@@ -320,17 +314,20 @@ class _DexPageState extends State<DexPage> {
                   _DexScopeBar(
                     mode: _mode,
                     region: _region,
-                    nationalTotal: _nationalScopeTotal,
+                    scopeStats: _scopeStats,
                     journeyCount: _journeyIds.length,
                     onModeSelected: _setMode,
                     onRegionSelected: _setRegion,
                   ),
-                  SizedBox(height: squareGap(context)),
-                  _DexStatusFilterBar(
-                    selected: _statusFilter,
-                    onSelected: (filter) =>
-                        setState(() => _statusFilter = filter),
-                  ),
+                  if (_mode == _DexMode.national) ...[
+                    SizedBox(height: squareGap(context)),
+                    _DexEncounterFilterBar(
+                      filter: _encounterFilter,
+                      onSelected: (filter) {
+                        setState(() => _encounterFilter = filter);
+                      },
+                    ),
+                  ],
                   SizedBox(height: squareGap(context)),
                   if (_error != null)
                     StickerCard(
@@ -393,7 +390,7 @@ class _DexPageState extends State<DexPage> {
                       final entry = visible[index];
                       final status = dexRepository.statusFor(
                         entry.id,
-                        _caughtIds,
+                        _progress,
                       );
                       return PokemonMiniCard(
                         summary: entry,
@@ -538,7 +535,7 @@ class _DexScopeBar extends StatelessWidget {
   const _DexScopeBar({
     required this.mode,
     required this.region,
-    required this.nationalTotal,
+    required this.scopeStats,
     required this.journeyCount,
     required this.onModeSelected,
     required this.onRegionSelected,
@@ -546,7 +543,7 @@ class _DexScopeBar extends StatelessWidget {
 
   final _DexMode mode;
   final DexRegionalScope region;
-  final int nationalTotal;
+  final DexScopeStats scopeStats;
   final int journeyCount;
   final ValueChanged<_DexMode> onModeSelected;
   final ValueChanged<DexRegionalScope> onRegionSelected;
@@ -559,8 +556,12 @@ class _DexScopeBar extends StatelessWidget {
           child: _DexModeTab(
             selected: mode == _DexMode.national,
             title: AppZh.dexTabNational,
-            subtitle: regionalScopeLabelZh(region),
-            count: nationalTotal,
+            subtitle: AppZh.dexScopeProgress(
+              scopeStats.caught,
+              scopeStats.seen,
+              scopeStats.total,
+            ),
+            count: scopeStats.total,
             showRegionMenu: true,
             region: region,
             onTap: () => onModeSelected(_DexMode.national),
@@ -577,6 +578,48 @@ class _DexScopeBar extends StatelessWidget {
             onTap: () => onModeSelected(_DexMode.journey),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _DexEncounterFilterBar extends StatelessWidget {
+  const _DexEncounterFilterBar({
+    required this.filter,
+    required this.onSelected,
+  });
+
+  final DexEncounterFilter filter;
+  final ValueChanged<DexEncounterFilter> onSelected;
+
+  static const _order = [
+    DexEncounterFilter.all,
+    DexEncounterFilter.seen,
+    DexEncounterFilter.caught,
+    DexEncounterFilter.unseen,
+  ];
+
+  static const _labels = {
+    DexEncounterFilter.all: AppZh.dexFilterAll,
+    DexEncounterFilter.seen: AppZh.dexFilterSeen,
+    DexEncounterFilter.caught: AppZh.dexFilterCaught,
+    DexEncounterFilter.unseen: AppZh.dexFilterUnseen,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final entry in _order) ...[
+          if (entry != _order.first) const SizedBox(width: 5),
+          Expanded(
+            child: _DexFilterChip(
+              label: _labels[entry]!,
+              selected: filter == entry,
+              onTap: () => onSelected(entry),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -699,41 +742,6 @@ class _DexModeTab extends StatelessWidget {
             size: 18,
             color: TitoColors.ink,
           ),
-      ],
-    );
-  }
-}
-
-class _DexStatusFilterBar extends StatelessWidget {
-  const _DexStatusFilterBar({
-    required this.selected,
-    required this.onSelected,
-  });
-
-  final _DexStatusFilter selected;
-  final ValueChanged<_DexStatusFilter> onSelected;
-
-  static const _labels = <_DexStatusFilter, String>{
-    _DexStatusFilter.all: AppZh.dexFilterAll,
-    _DexStatusFilter.seen: AppZh.dexFilterSeen,
-    _DexStatusFilter.caught: AppZh.dexFilterCaught,
-    _DexStatusFilter.unseen: AppZh.dexFilterUnseen,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final filter in _DexStatusFilter.values) ...[
-          if (filter != _DexStatusFilter.values.first) const SizedBox(width: 5),
-          Expanded(
-            child: _DexFilterChip(
-              label: _labels[filter]!,
-              selected: filter == selected,
-              onTap: () => onSelected(filter),
-            ),
-          ),
-        ],
       ],
     );
   }

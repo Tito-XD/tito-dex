@@ -30,5 +30,8 @@ void main() {
     expect(summary.locationLabel, '满金市');
     expect(summary.mapHeaderId, 76);
     expect(summary.saveHash, isNotEmpty);
+    expect(summary.dexCaughtIds, containsAll([156, 175]));
+    expect(summary.dexSeenIds.length, 46);
+    expect(summary.dexSeenIds, containsAll(summary.dexCaughtIds));
   });
 }
