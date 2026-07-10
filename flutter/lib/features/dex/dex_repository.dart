@@ -1,27 +1,34 @@
 import '../companion/companion_art.dart';
 import '../parser/hgss_format.dart';
 import '../../models/journey.dart';
+import 'dex_cdn_data_source.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
+/// Data priority: Settings-installed offline bundle → live CF R2 CDN
+/// (`dex.tito.cafe`, one summaries.json + per-id details.json) → PokeAPI.
 class DexRepository {
   DexRepository({
     PokeApiClient? client,
     DexOfflineService? offline,
+    DexCdnDataSource? cdn,
     this.summaryBatchSize = 4,
   })  : _client = client ?? PokeApiClient(),
-        _offline = offline ?? dexOfflineService;
+        _offline = offline ?? dexOfflineService,
+        _cdn = cdn ?? DexCdnDataSource();
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
+  final DexCdnDataSource _cdn;
   final int summaryBatchSize;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
   final Map<String, int> _nameToIdCache = {};
   List<PokemonSummary>? _allSummaries;
   Future<List<PokemonSummary>>? _allSummariesFuture;
+  bool _cdnSummariesUnavailable = false;
 
   Future<PokemonSummary> getSummary(int id) async {
     if (_summaryCache.containsKey(id)) {
@@ -36,6 +43,12 @@ class DexRepository {
       }
     }
 
+    // CDN: one summaries.json download covers every id.
+    final fromCdn = await _summaryFromCdn(id);
+    if (fromCdn != null) {
+      return fromCdn;
+    }
+
     try {
       final summary = await _client.fetchSummary(id);
       _rememberSummary(summary);
@@ -47,6 +60,23 @@ class DexRepository {
         return cached;
       }
       rethrow;
+    }
+  }
+
+  Future<PokemonSummary?> _summaryFromCdn(int id) async {
+    if (_cdnSummariesUnavailable) {
+      return null;
+    }
+    try {
+      final all = await _cdn.fetchAllSummaries();
+      for (final summary in all) {
+        _rememberSummary(summary);
+      }
+      return _summaryCache[id];
+    } catch (_) {
+      // CDN unreachable — remember and fall back to PokeAPI for this session.
+      _cdnSummariesUnavailable = true;
+      return null;
     }
   }
 
@@ -64,8 +94,17 @@ class DexRepository {
           return cached;
         }
       } catch (_) {
-        // Corrupt partial offline cache — fall through to live API.
+        // Corrupt partial offline cache — fall through to live sources.
       }
+    }
+
+    try {
+      final detail = await _cdn.fetchDetail(id);
+      _detailCache[id] = detail;
+      _rememberSummary(detail.summary);
+      return detail;
+    } catch (_) {
+      // CDN miss/unreachable — fall through to PokeAPI.
     }
 
     try {
@@ -105,6 +144,19 @@ class DexRepository {
       return _allSummaries!;
     }
 
+    if (!_cdnSummariesUnavailable) {
+      try {
+        final all = await _cdn.fetchAllSummaries();
+        for (final summary in all) {
+          _rememberSummary(summary);
+        }
+        _allSummaries = all;
+        return all;
+      } catch (_) {
+        _cdnSummariesUnavailable = true;
+      }
+    }
+
     final summaries = <PokemonSummary>[];
 
     for (var start = 1; start <= hgssMaxNationalDexId; start += summaryBatchSize) {
@@ -119,6 +171,18 @@ class DexRepository {
   Future<List<PokemonSummary>> getSummaryRange(int start, int end) async {
     final safeStart = start.clamp(1, hgssMaxNationalDexId);
     final safeEnd = end.clamp(safeStart, hgssMaxNationalDexId);
+
+    // Fast path: the CDN summary list covers the whole range at once.
+    if (!_cdnSummariesUnavailable) {
+      final fromCdn = await _summaryFromCdn(safeStart);
+      if (fromCdn != null) {
+        return [
+          for (var id = safeStart; id <= safeEnd; id++)
+            if (_summaryCache.containsKey(id)) _summaryCache[id]!,
+        ];
+      }
+    }
+
     final summaries = <PokemonSummary>[];
 
     for (var id = safeStart; id <= safeEnd; id += summaryBatchSize) {
