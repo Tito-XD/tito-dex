@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
-import '../features/dex/dex_offline_service.dart';
-import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
-import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
+import 'handheld_input.dart';
 import 'sticker_card.dart';
-import 'tito_sprite_sticker.dart';
+import 'type_badge.dart';
 
 class PokemonMiniCard extends StatelessWidget {
   const PokemonMiniCard({
@@ -34,99 +32,80 @@ class PokemonMiniCard extends StatelessWidget {
       DexEncounterStatus.seen => StickerVariant.sky,
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
-    final spriteSize = compact ? DeviceLayout.dim(context, 44.0) : 64.0;
-    final padding = compact ? DeviceLayout.dim(context, 4.0) : 10.0;
+    final activate = onTap ?? () => context.push('/dex/${summary.id}');
+    final padding = compact ? 6.0 : 10.0;
+    final checkSize = compact ? 14.0 : 18.0;
+    final radius = DeviceLayout.rLg(context);
 
-    final checkSize = compact ? DeviceLayout.dim(context, 14.0) : 18.0;
-
-    return GestureDetector(
-      onTap: onTap ?? () => context.push('/dex/${summary.id}'),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          StickerCard(
-            variant: variant,
-            padding: EdgeInsets.all(padding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TitoSpriteSticker(
-                  source: summary.displaySpritePath,
-                  size: spriteSize,
-                  padding: 2,
-                ),
-                SizedBox(height: compact ? 2 : 4),
-                Text(
-                  '#${summary.id.toString().padLeft(3, '0')}',
-                  style: context.secondary.body14(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w700,
+    return HandheldFocusDecorator(
+      onActivate: activate,
+      borderRadius: BorderRadius.circular(radius),
+      child: GestureDetector(
+        onTap: activate,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            StickerCard(
+              variant: variant,
+              padding: EdgeInsets.fromLTRB(padding, padding, padding, padding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Flexible sprite area — absorbs any extra tile height so the
+                  // card always fills its grid cell without overflowing.
+                  Expanded(
+                    child: DexSpriteImage(
+                      source: summary.displaySpritePath,
+                      height: null,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  summary.nameZh,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.secondary.body14(fontWeight: FontWeight.w800),
-                ),
-                _PokemonTypeRow(types: summary.types),
-              ],
-            ),
-          ),
-          if (status == DexEncounterStatus.caught)
-            Positioned(
-              top: 2,
-              right: 2,
-              child: Icon(
-                Icons.check_circle_rounded,
-                color: TitoColors.mint,
-                size: checkSize,
+                  SizedBox(height: compact ? 2 : 4),
+                  Text(
+                    '#${summary.id.toString().padLeft(3, '0')}',
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    style: TitoTypography.style(
+                      fontSize: compact ? 10 : 12,
+                      fontWeight: FontWeight.w700,
+                      color: TitoColors.mutedInk,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    summary.nameZh,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TitoTypography.style(
+                      fontSize: compact ? 12 : 14,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: compact ? 3 : 4),
+                  TitoTypeBadgeRow(
+                    typesEn: summary.types,
+                    size: TypeBadgeSize.small,
+                  ),
+                ],
               ),
             ),
-        ],
+            if (status == DexEncounterStatus.caught)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: TitoColors.mint,
+                  size: checkSize,
+                ),
+              ),
+          ],
+        ),
       ),
     );
-  }
-}
-
-class _PokemonTypeRow extends StatelessWidget {
-  const _PokemonTypeRow({required this.types});
-
-  final List<String> types;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, String?>>(
-      future: _iconPaths(),
-      builder: (context, snapshot) {
-        final icons = snapshot.data ?? const {};
-        return Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 4,
-          children: types
-              .map(
-                (type) => DexTypeIcon(
-                  typeEn: type,
-                  labelZh: typeNameZh(type),
-                  iconPath: icons[type],
-                  compact: true,
-                ),
-              )
-              .toList(),
-        );
-      },
-    );
-  }
-
-  Future<Map<String, String?>> _iconPaths() async {
-    final paths = <String, String?>{};
-    for (final type in types) {
-      paths[type] = await dexOfflineService.typeIconPath(type);
-    }
-    return paths;
   }
 }
 
@@ -151,63 +130,35 @@ class TypeChipRow extends StatelessWidget {
       );
     }
 
-    return FutureBuilder<Map<String, String?>>(
-      future: _iconPaths(),
-      builder: (context, snapshot) {
-        final icons = snapshot.data ?? const {};
-        return Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: List.generate(types.length, (index) {
-            final label = types[index];
-            final key = typeKeys != null && index < typeKeys!.length
-                ? typeKeys![index]
-                : null;
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: switch (tone) {
-                  TypeChipTone.weak => const Color(0xFFFFD6C8),
-                  TypeChipTone.resist => const Color(0xFFD4E9FF),
-                  TypeChipTone.immune => const Color(0xFFE6E0F0),
-                  TypeChipTone.neutral => TitoColors.skyBlue,
-                },
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: TitoColors.ink, width: 2),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (key != null && icons[key] != null) ...[
-                    DexSpriteImage(
-                      source: icons[key],
-                      height: 14,
-                      width: 14,
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                  Text(
-                    label,
-                    style: context.tito.chip,
-                  ),
-                ],
-              ),
-            );
-          }),
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: List.generate(types.length, (index) {
+        final key = typeKeys != null && index < typeKeys!.length
+            ? typeKeys![index]
+            : null;
+        if (key != null) {
+          return TitoTypeBadge(typeEn: key);
+        }
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: switch (tone) {
+              TypeChipTone.weak => const Color(0xFFFFD6C8),
+              TypeChipTone.resist => const Color(0xFFD4E9FF),
+              TypeChipTone.immune => const Color(0xFFE6E0F0),
+              TypeChipTone.neutral => TitoColors.skyBlue,
+            },
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          child: Text(
+            types[index],
+            style: context.tito.chip,
+          ),
         );
-      },
+      }),
     );
-  }
-
-  Future<Map<String, String?>> _iconPaths() async {
-    if (typeKeys == null) {
-      return const {};
-    }
-    final paths = <String, String?>{};
-    for (final type in typeKeys!) {
-      paths[type] = await dexOfflineService.typeIconPath(type);
-    }
-    return paths;
   }
 }
 
@@ -275,33 +226,39 @@ class _EvolutionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push('/dex/${node.id}'),
-      child: StickerCard(
-        variant: highlighted ? StickerVariant.mint : StickerVariant.cream,
-        padding: const EdgeInsets.all(12),
-        child: SizedBox(
-          width: 96,
-          child: Column(
-            children: [
-              DexSpriteImage(
-                source: node.displaySpritePath,
-                height: 64,
-              ),
-              Text(
-                node.nameZh,
-                textAlign: TextAlign.center,
-                style: context.tito.cardBodyEmphasis,
-              ),
-              if (node.triggerZh != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  node.triggerZh!,
-                  textAlign: TextAlign.center,
-                  style: context.tito.caption,
+    final compact = DeviceLayout.useSquareDashboard(context);
+
+    return HandheldFocusDecorator(
+      onActivate: () => context.push('/dex/${node.id}'),
+      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+      child: GestureDetector(
+        onTap: () => context.push('/dex/${node.id}'),
+        child: StickerCard(
+          variant: highlighted ? StickerVariant.mint : StickerVariant.cream,
+          padding: EdgeInsets.all(compact ? 8 : 12),
+          child: SizedBox(
+            width: compact ? 84 : 96,
+            child: Column(
+              children: [
+                DexSpriteImage(
+                  source: node.displaySpritePath,
+                  height: compact ? 56 : 64,
                 ),
+                Text(
+                  node.nameZh,
+                  textAlign: TextAlign.center,
+                  style: context.tito.cardBodyEmphasis,
+                ),
+                if (node.triggerZh != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    node.triggerZh!,
+                    textAlign: TextAlign.center,
+                    style: context.tito.caption,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
