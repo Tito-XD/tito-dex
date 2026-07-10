@@ -126,6 +126,11 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _setMode(_DexMode mode) async {
     if (_mode == mode && mode == _DexMode.national) {
+      // Re-activating the selected national tab cycles the regional scope —
+      // reachable with a plain A-press on the D-pad (no tiny dropdown needed).
+      final scopes = DexRegionalScope.values;
+      final next = scopes[(scopes.indexOf(_region) + 1) % scopes.length];
+      _setRegion(next);
       return;
     }
 
@@ -609,52 +614,55 @@ class _DexModeTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.meta14.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: TitoColors.mutedInk,
-                      ),
-                    ),
-                  ),
-                  if (showRegionMenu && selected)
-                    PopupMenuButton<DexRegionalScope>(
-                      padding: EdgeInsets.zero,
-                      tooltip: '切换地区图鉴',
-                      onSelected: onRegionSelected,
-                      itemBuilder: (context) {
-                        return DexRegionalScope.values
-                            .map(
-                              (scope) => PopupMenuItem(
-                                value: scope,
-                                child: Text(regionalScopeLabelZh(scope)),
-                              ),
-                            )
-                            .toList();
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
-                            size: 18,
-                            color: TitoColors.ink,
+              if (showRegionMenu && selected)
+                // Whole subtitle line opens the region menu — big tap target.
+                PopupMenuButton<DexRegionalScope>(
+                  padding: EdgeInsets.zero,
+                  tooltip: '切换地区图鉴',
+                  onSelected: onRegionSelected,
+                  itemBuilder: (context) {
+                    return DexRegionalScope.values
+                        .map(
+                          (scope) => PopupMenuItem(
+                            value: scope,
+                            child: Text(regionalScopeLabelZh(scope)),
                           ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                        )
+                        .toList();
+                  },
+                  child: _subtitleRow(context, withMenuArrow: true),
+                )
+              else
+                _subtitleRow(context),
             ],
           ),
         ),
       ),
       ),
+    );
+  }
+
+  Widget _subtitleRow(BuildContext context, {bool withMenuArrow = false}) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: SecondaryTypography.onCard.meta14.copyWith(
+              fontWeight: FontWeight.w600,
+              color: TitoColors.mutedInk,
+            ),
+          ),
+        ),
+        if (withMenuArrow)
+          const Icon(
+            Icons.arrow_drop_down_rounded,
+            size: 18,
+            color: TitoColors.ink,
+          ),
+      ],
     );
   }
 }
