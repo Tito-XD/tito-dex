@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,10 +8,16 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.tito.titodex"
-    compileSdk = flutter.compileSdkVersion
-    // Match plugin requirements; backward compatible with Flutter's default NDK.
+    // Match working RG builds (0.2.11 / local 0.2.23): compile/target SDK 36.
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -21,25 +30,33 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.tito.titodex"
-        // minSdk 24+ keeps native .so Stored (uncompressed) in the APK — required for RG sideload.
+        // minSdk 24 keeps native .so Stored (uncompressed) — required for RG sideload.
         minSdk = maxOf(24, flutter.minSdkVersion)
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        ndk {
+            // RG Rotate (Unisoc arm64-v8a) — same ABI layout as historical -rg-arm64.apk.
+            abiFilters += listOf("arm64-v8a")
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storePassword = keystoreProperties["storePassword"] as String
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
-    // RG handhelds reject APKs when native libs are zip-compressed (Defl:N).
-    // minSdk 24+ plus legacy packaging off keeps .so Stored — matches v0.2.11 builds.
     packaging {
         jniLibs {
             useLegacyPackaging = false

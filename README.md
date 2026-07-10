@@ -56,19 +56,18 @@ Pre-built Android APKs live under [`releases/`](releases/) and on [GitHub Releas
 
 | File | Use |
 | --- | --- |
-| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate** — arm64-v8a (same naming as 0.2.1–0.2.11) |
+| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate** — arm64-v8a (~20 MB; SDK 36) |
 
 Build locally:
 
 ```bash
 cd flutter
 flutter pub get
-# arm64-v8a only — copy output to releases/TitoDex-<ver>-rg-arm64.apk
-flutter build apk --release --target-platform android-arm64
+flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
 
-Do not use `--split-per-abi`; see [flutter/README.md](flutter/README.md) for RG packaging notes.
+**Sideload:** uninstall any locally-built 0.2.x first (CI signing key differs). See [flutter/README.md](flutter/README.md).
 
 ## Dex CDN (production)
 

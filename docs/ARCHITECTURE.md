@@ -4,7 +4,7 @@
 
 **Release:** v0.2.25 · Dex CDN bundle v4 at `https://dex.tito.cafe`
 
-**RG APK:** `TitoDex-<ver>-rg-arm64.apk` (arm64-v8a, ~20–22 MB). Build with `--target-platform android-arm64`; never `--split-per-abi`. See [flutter/README.md](../flutter/README.md).
+**RG APK:** `TitoDex-<ver>-rg-arm64.apk` — arm64-v8a only, SDK 36, ~20 MB. `flutter build apk --release`. Uninstall local builds before sideloading CI APK.
 
 ## Recommended Stack
 
