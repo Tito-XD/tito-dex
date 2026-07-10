@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
-import '../features/dex/dex_offline_service.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -15,6 +14,7 @@ import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
+import 'type_badge.dart';
 
 class PokemonDetailHeader extends StatelessWidget {
   const PokemonDetailHeader({
@@ -375,71 +375,57 @@ class TypeEffectivenessGrid extends StatelessWidget {
             style: SecondaryTypography.onCard.h15,
           ),
           const SizedBox(height: 12),
-          FutureBuilder<Map<String, String?>>(
-            future: _iconPaths(),
-            builder: (context, snapshot) {
-              final icons = snapshot.data ?? const {};
-              return GridView.count(
-                crossAxisCount: 6,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 6,
-                childAspectRatio: 0.68,
-                children: typeGridOrder.map((type) {
-                  final multiplier = multipliers[type] ?? 1;
-                  final label = formatTypeMultiplier(multiplier);
-                  return Column(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: typeTileColor(type),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: TitoColors.ink, width: 2),
-                        ),
-                        padding: const EdgeInsets.all(4),
-                        child: DexSpriteImage(
-                          source: icons[type],
-                          width: 28,
-                          height: 28,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        typeNameZh(type),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        label,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: _multiplierColor(multiplier),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
+          GridView.count(
+            crossAxisCount: 6,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 6,
+            childAspectRatio: 0.68,
+            children: typeGridOrder.map((type) {
+              final multiplier = multipliers[type] ?? 1;
+              final label = formatTypeMultiplier(multiplier);
+              return Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: typeTileColor(type),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: TitoColors.ink, width: 2),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      typeIconData(type),
+                      size: 24,
+                      color: TitoColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    typeNameZh(type),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    label,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: _multiplierColor(multiplier),
+                    ),
+                  ),
+                ],
               );
-            },
+            }).toList(),
           ),
         ],
       ),
     );
-  }
-
-  Future<Map<String, String?>> _iconPaths() async {
-    final paths = <String, String?>{};
-    for (final type in typeGridOrder) {
-      paths[type] = await dexOfflineService.typeIconPath(type);
-    }
-    return paths;
   }
 
   Color _multiplierColor(double multiplier) {
@@ -624,32 +610,61 @@ class _MoveTile extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          FutureBuilder<String?>(
-            future: dexOfflineService.typeIconPath(entry.move.type),
-            builder: (context, snapshot) {
-              return Row(
-                children: [
-                  if (snapshot.data != null)
-                    DexSpriteImage(
-                      source: snapshot.data,
-                      width: 14,
-                      height: 14,
-                    ),
-                  if (snapshot.data != null) const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      typeNameZh(entry.move.type),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TitoTypeBadge(
+              typeEn: entry.move.type,
+              size: TypeBadgeSize.small,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// UI shell for species abilities — data wiring lands with a later bundle.
+class AbilityPlaceholderCard extends StatelessWidget {
+  const AbilityPlaceholderCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.dexAbilities,
+            style: SecondaryTypography.onCard.h15,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: TitoColors.skyBlue,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: TitoColors.ink, width: 2),
+                ),
+                child: Text(
+                  AppZh.dexAbilityUnknownName,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
-                ],
-              );
-            },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  AppZh.dexAbilityPlaceholder,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

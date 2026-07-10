@@ -32,6 +32,11 @@ class DexPage extends StatefulWidget {
 
 enum _DexMode { national, journey }
 
+/// Seen / caught filter — UI + local state; real seen flags land with the
+/// HGSS `.sav` dex parser (docs/PARSER_PROPOSAL.md). Until then "seen" is
+/// stubbed from journey-caught ids.
+enum _DexStatusFilter { all, seen, caught, unseen }
+
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
 
@@ -40,6 +45,7 @@ class _DexPageState extends State<DexPage> {
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
   DexRegionalScope _region = DexRegionalScope.national;
+  _DexStatusFilter _statusFilter = _DexStatusFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
   Set<int> _caughtIds = const {};
@@ -166,14 +172,31 @@ class _DexPageState extends State<DexPage> {
     });
   }
 
+  bool _matchesStatusFilter(int id) {
+    return switch (_statusFilter) {
+      _DexStatusFilter.all => true,
+      // Seen stubbed to caught until the save parser provides seen flags.
+      _DexStatusFilter.seen => _caughtIds.contains(id),
+      _DexStatusFilter.caught => _caughtIds.contains(id),
+      _DexStatusFilter.unseen => !_caughtIds.contains(id),
+    };
+  }
+
   List<PokemonSummary> get _visibleEntries {
     if (_mode == _DexMode.journey) {
-      return _journeySummaries;
+      return _journeySummaries
+          .where((entry) => _matchesStatusFilter(entry.id))
+          .toList(growable: false);
     }
 
     final (start, end) = regionalDexIdRange(_region);
     return _summaries
-        .where((entry) => entry.id >= start && entry.id <= end)
+        .where(
+          (entry) =>
+              entry.id >= start &&
+              entry.id <= end &&
+              _matchesStatusFilter(entry.id),
+        )
         .toList(growable: false);
   }
 
@@ -183,9 +206,24 @@ class _DexPageState extends State<DexPage> {
   }
 
   String _emptyMessageForMode() {
+    if (_statusFilter != _DexStatusFilter.all) {
+      return AppZh.dexFilterEmpty;
+    }
     return _mode == _DexMode.journey
         ? AppZh.dexJourneyEmpty
         : AppZh.dexJourneyEmpty;
+  }
+
+  /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
+  String? get _regionProgressLine {
+    if (_mode != _DexMode.national || _region == DexRegionalScope.national) {
+      return null;
+    }
+    final (start, end) = regionalDexIdRange(_region);
+    final caught =
+        _caughtIds.where((id) => id >= start && id <= end).length;
+    // Seen == caught until the .sav dex parser lands.
+    return AppZh.dexRegionProgress(start, end, caught, caught, end - start + 1);
   }
 
   @override
@@ -219,12 +257,23 @@ class _DexPageState extends State<DexPage> {
                     onSearch: () => context.push('/search'),
                   ),
                   SizedBox(height: squareGap(context)),
-                  Text(
-                    AppZh.dexScopeNote,
-                    style: SecondaryTypography.onGradient.body14,
-                    maxLines: DeviceLayout.useSquareDashboard(context) ? 2 : 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // Square handheld: keep the top area short — one info line
+                  // (region progress when a regional dex is active).
+                  if (_regionProgressLine != null)
+                    Text(
+                      _regionProgressLine!,
+                      style: SecondaryTypography.onGradient.body14,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  else
+                    Text(
+                      AppZh.dexScopeNote,
+                      style: SecondaryTypography.onGradient.body14,
+                      maxLines:
+                          DeviceLayout.useSquareDashboard(context) ? 1 : 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   SizedBox(height: squareGap(context)),
                   _DexScopeBar(
                     mode: _mode,
@@ -233,6 +282,12 @@ class _DexPageState extends State<DexPage> {
                     journeyCount: _journeyIds.length,
                     onModeSelected: _setMode,
                     onRegionSelected: _setRegion,
+                  ),
+                  SizedBox(height: squareGap(context)),
+                  _DexStatusFilterBar(
+                    selected: _statusFilter,
+                    onSelected: (filter) =>
+                        setState(() => _statusFilter = filter),
                   ),
                   SizedBox(height: squareGap(context)),
                   if (_error != null)
@@ -508,11 +563,16 @@ class _DexModeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
+    final square = DeviceLayout.useSquareDashboard(context);
 
-    return Material(
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(radius),
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        canRequestFocus: false,
         borderRadius: BorderRadius.circular(radius),
         child: Ink(
           decoration: BoxDecoration(
@@ -520,7 +580,10 @@ class _DexModeTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: TitoColors.ink, width: 2),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: square ? 5 : 8,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -587,6 +650,89 @@ class _DexModeTab extends StatelessWidget {
                 ],
               ),
             ],
+          ),
+        ),
+      ),
+      ),
+    );
+  }
+}
+
+class _DexStatusFilterBar extends StatelessWidget {
+  const _DexStatusFilterBar({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final _DexStatusFilter selected;
+  final ValueChanged<_DexStatusFilter> onSelected;
+
+  static const _labels = <_DexStatusFilter, String>{
+    _DexStatusFilter.all: AppZh.dexFilterAll,
+    _DexStatusFilter.seen: AppZh.dexFilterSeen,
+    _DexStatusFilter.caught: AppZh.dexFilterCaught,
+    _DexStatusFilter.unseen: AppZh.dexFilterUnseen,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final filter in _DexStatusFilter.values) ...[
+          if (filter != _DexStatusFilter.values.first) const SizedBox(width: 5),
+          Expanded(
+            child: _DexFilterChip(
+              label: _labels[filter]!,
+              selected: filter == selected,
+              onTap: () => onSelected(filter),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _DexFilterChip extends StatelessWidget {
+  const _DexFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          canRequestFocus: false,
+          borderRadius: BorderRadius.circular(999),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            decoration: BoxDecoration(
+              color: selected ? TitoColors.softYellow : TitoColors.card,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: TitoColors.ink, width: 2),
+            ),
+            child: Text(
+              label,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TitoTypography.style(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+              ),
+            ),
           ),
         ),
       ),

@@ -83,22 +83,27 @@ class TitoDexMiniCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Mirrors PokemonMiniCard: flexible sprite slot, number, name, type row.
     return StickerCard(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(6),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TitoSkeletonBox(
-            height: 56,
-            width: 56,
-            radius: TitoRadii.sm,
+          const Expanded(
+            child: Center(
+              child: TitoSkeletonBox(
+                height: 40,
+                width: 40,
+                radius: TitoRadii.sm,
+              ),
+            ),
           ),
-          const SizedBox(height: 8),
-          const TitoSkeletonBox(height: 10, width: 40),
-          const SizedBox(height: 6),
-          const TitoSkeletonBox(height: 12, width: 72),
-          const Spacer(),
-          const TitoSkeletonBox(height: 10, width: 48),
+          const SizedBox(height: 4),
+          const TitoSkeletonBox(height: 9, width: 32),
+          const SizedBox(height: 4),
+          const TitoSkeletonBox(height: 11, width: 56),
+          const SizedBox(height: 5),
+          const TitoSkeletonBox(height: 13, width: 64),
         ],
       ),
     );
@@ -124,8 +129,9 @@ class TitoDexGridSkeleton extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
+        // Match the live dex grid so the swap doesn't shift layout.
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 6,
         childAspectRatio: childAspectRatio,
       ),
       itemCount: itemCount,
