@@ -5,14 +5,15 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
-import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
@@ -94,7 +95,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     : ListView(
                         padding: padding.copyWith(bottom: 12),
                         children: [
-                          _DexBackBar(path: '/dex/${widget.pokemonId}'),
+                          // Same size as second-level page headers (Dex list).
+                          const SecondaryPageAppBar(
+                            title: AppZh.navDex,
+                            showSettings: false,
+                          ),
                           const SizedBox(height: 8),
                           PokemonDetailHeader(
                             detail: detail,
@@ -131,6 +136,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   List<Widget> _introSections(PokemonDetail detail) => [
         FlavorTextCarousel(entries: detail.flavorEntries),
+        const SizedBox(height: 12),
+        const AbilityPlaceholderCard(),
         const SizedBox(height: 12),
         IntroMetaCard(detail: detail),
         if (detail.abilities.isNotEmpty) ...[
@@ -277,33 +284,6 @@ class _ErrorBody extends StatelessWidget {
   }
 }
 
-class _DexBackBar extends StatelessWidget {
-  const _DexBackBar({required this.path});
-
-  final String path;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: TextButton(
-        onPressed: () => TitoBackNavigation.navigateBack(context, path),
-        style: TextButton.styleFrom(
-          foregroundColor: TitoColors.card,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          visualDensity: VisualDensity.compact,
-        ),
-        child: Text(
-          '← 图鉴',
-          style: SecondaryTypography.onGradient.body14.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _DetailBottomTabs extends StatelessWidget {
   const _DetailBottomTabs({
     required this.currentIndex,
@@ -338,24 +318,29 @@ class _DetailBottomTabs extends StatelessWidget {
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Material(
-                    color: selected
-                        ? TitoColors.softYellow
-                        : Colors.transparent,
+                  child: HandheldFocusDecorator(
+                    onActivate: () => onSelected(index),
                     borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    child: InkWell(
-                      onTap: () => onSelected(index),
+                    child: Material(
+                      color: selected
+                          ? TitoColors.softYellow
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(TitoRadii.sm),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          _tabs[index],
-                          textAlign: TextAlign.center,
-                          style: SecondaryTypography.onCard.small12.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: selected
-                                ? TitoColors.deepBlue
-                                : TitoColors.card,
+                      child: InkWell(
+                        onTap: () => onSelected(index),
+                        canRequestFocus: false,
+                        borderRadius: BorderRadius.circular(TitoRadii.sm),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            _tabs[index],
+                            textAlign: TextAlign.center,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: selected
+                                  ? TitoColors.deepBlue
+                                  : TitoColors.card,
+                            ),
                           ),
                         ),
                       ),

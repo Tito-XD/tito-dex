@@ -78,11 +78,19 @@ class DexOfflineService {
   }
 
   Future<bool> isReady() async {
+    if (kIsWeb) {
+      return false;
+    }
     final manifest = await _store.readManifest();
     return manifest.complete;
   }
 
   Future<bool> shouldPreferOffline() async {
+    // Web preview has no file-backed offline cache (`path_provider`
+    // unsupported) — always fall back to live PokeAPI there.
+    if (kIsWeb) {
+      return false;
+    }
     final manifest = await _store.readManifest();
     if (!manifest.preferOffline) {
       return false;
@@ -90,9 +98,13 @@ class DexOfflineService {
     return manifest.complete || manifest.pokemonCount > 0;
   }
 
-  Future<List<PokemonSummary>> readAllSummaries() => _store.readSummaries();
+  Future<List<PokemonSummary>> readAllSummaries() =>
+      kIsWeb ? Future.value(const <PokemonSummary>[]) : _store.readSummaries();
 
   Future<PokemonSummary?> readSummary(int id) async {
+    if (kIsWeb) {
+      return null;
+    }
     final summaries = await _store.readSummaries();
     for (final entry in summaries) {
       if (entry.id == id) {
@@ -104,6 +116,9 @@ class DexOfflineService {
   }
 
   Future<PokemonDetail?> readDetail(int id) async {
+    if (kIsWeb) {
+      return null;
+    }
     final detail = await _store.readDetail(id);
     if (detail == null) {
       return null;

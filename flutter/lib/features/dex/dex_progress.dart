@@ -68,8 +68,7 @@ class DexProgress {
     return switch (filter) {
       DexEncounterFilter.all => true,
       DexEncounterFilter.caught => caughtIds.contains(id),
-      DexEncounterFilter.seen =>
-        seenIds.contains(id) && !caughtIds.contains(id),
+      DexEncounterFilter.seen => seenIds.contains(id),
       DexEncounterFilter.unseen => !seenIds.contains(id),
     };
   }
