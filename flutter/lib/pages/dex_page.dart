@@ -44,6 +44,8 @@ class _DexPageState extends State<DexPage> {
   DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
+  final Map<DexRegionalScope, List<PokemonSummary>> _regionCache = {};
+  bool _loadingRegion = false;
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   Set<int> _journeyIds = const {};
   String? _error;
@@ -122,6 +124,11 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _setMode(_DexMode mode) async {
     if (_mode == mode && mode == _DexMode.national) {
+      // Re-activating the selected national tab cycles the regional scope —
+      // reachable with a plain A-press on the D-pad (no tiny dropdown needed).
+      final scopes = DexRegionalScope.values;
+      final next = scopes[(scopes.indexOf(_region) + 1) % scopes.length];
+      _setRegion(next);
       return;
     }
 
@@ -166,15 +173,53 @@ class _DexPageState extends State<DexPage> {
       _mode = _DexMode.national;
       _error = null;
     });
+    if (region != DexRegionalScope.national) {
+      _loadRegion(region);
+    }
+  }
+
+  /// Regional scopes start mid-list (城都 = #152+), so waiting for the chunked
+  /// national loader would leave the grid empty. Fetch the whole range —
+  /// one summaries.json via the CDN fast path.
+  Future<void> _loadRegion(DexRegionalScope region) async {
+    if (_regionCache.containsKey(region) || _loadingRegion) {
+      return;
+    }
+    setState(() => _loadingRegion = true);
+    try {
+      final (start, end) = regionalDexIdRange(region);
+      final entries = await dexRepository.getSummaryRange(start, end);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _regionCache[region] = entries;
+        _loadingRegion = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = _formatDexError(error);
+        _loadingRegion = false;
+      });
+    }
   }
 
   List<PokemonSummary> get _visibleEntries {
-    final entries = _mode == _DexMode.journey
-        ? _journeySummaries
-        : _summaries.where((entry) {
-            final (start, end) = regionalDexIdRange(_region);
-            return entry.id >= start && entry.id <= end;
-          });
+    final Iterable<PokemonSummary> entries;
+    if (_mode == _DexMode.journey) {
+      entries = _journeySummaries;
+    } else if (_region != DexRegionalScope.national &&
+        _regionCache.containsKey(_region)) {
+      entries = _regionCache[_region]!;
+    } else {
+      final (start, end) = regionalDexIdRange(_region);
+      entries = _summaries.where(
+        (entry) => entry.id >= start && entry.id <= end,
+      );
+    }
 
     return dexRepository.filterSummaries(
       entries,
@@ -187,7 +232,9 @@ class _DexPageState extends State<DexPage> {
 
   String _emptyMessageForMode() {
     if (_mode == _DexMode.journey) {
-      return AppZh.dexJourneyEmpty;
+      return _encounterFilter == DexEncounterFilter.all
+          ? AppZh.dexJourneyEmpty
+          : AppZh.dexFilterEmpty;
     }
     return switch (_encounterFilter) {
       DexEncounterFilter.caught => AppZh.dexCaughtEmpty,
@@ -197,13 +244,30 @@ class _DexPageState extends State<DexPage> {
     };
   }
 
+  /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
+  String? get _regionProgressLine {
+    if (_mode != _DexMode.national || _region == DexRegionalScope.national) {
+      return null;
+    }
+    final stats = _scopeStats;
+    final (start, end) = regionalDexIdRange(_region);
+    return AppZh.dexRegionProgress(
+      start,
+      end,
+      stats.seen,
+      stats.caught,
+      stats.total,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final visible = _visibleEntries;
     final columns = DeviceLayout.dexGridColumns(context);
     final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
-    final loading =
-        _mode == _DexMode.national ? _loadingChunk : _loadingJourney;
+    final loading = _mode == _DexMode.national
+        ? (_loadingChunk || _loadingRegion)
+        : _loadingJourney;
     final padding = DeviceLayout.pagePadding(context);
 
     return TitoFontScale(
@@ -228,13 +292,25 @@ class _DexPageState extends State<DexPage> {
                     onSearch: () => context.push('/search'),
                   ),
                   SizedBox(height: squareGap(context)),
-                  Text(
-                    AppZh.dexScopeNote,
-                    style: SecondaryTypography.onGradient.body14,
-                    maxLines: DeviceLayout.useSquareDashboard(context) ? 2 : 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: squareGap(context)),
+                  // Square handheld: keep the top area short — at most one
+                  // info line (region progress when 城都/关东 is active).
+                  if (_regionProgressLine != null) ...[
+                    Text(
+                      _regionProgressLine!,
+                      style: SecondaryTypography.onGradient.body14,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: squareGap(context)),
+                  ] else if (!DeviceLayout.useSquareDashboard(context)) ...[
+                    Text(
+                      AppZh.dexScopeNote,
+                      style: SecondaryTypography.onGradient.body14,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: squareGap(context)),
+                  ],
                   _DexScopeBar(
                     mode: _mode,
                     region: _region,
@@ -340,6 +416,7 @@ class _DexPageState extends State<DexPage> {
                 ),
               ),
             if (_mode == _DexMode.national &&
+                _region == DexRegionalScope.national &&
                 _loadedThrough < hgssMaxNationalDexId)
               SliverPadding(
                 padding: padding.copyWith(top: 8, bottom: 4),
@@ -515,38 +592,35 @@ class _DexEncounterFilterBar extends StatelessWidget {
   final DexEncounterFilter filter;
   final ValueChanged<DexEncounterFilter> onSelected;
 
+  static const _order = [
+    DexEncounterFilter.all,
+    DexEncounterFilter.seen,
+    DexEncounterFilter.caught,
+    DexEncounterFilter.unseen,
+  ];
+
+  static const _labels = {
+    DexEncounterFilter.all: AppZh.dexFilterAll,
+    DexEncounterFilter.seen: AppZh.dexFilterSeen,
+    DexEncounterFilter.caught: AppZh.dexFilterCaught,
+    DexEncounterFilter.unseen: AppZh.dexFilterUnseen,
+  };
+
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: DexEncounterFilter.values.map((entry) {
-        final label = switch (entry) {
-          DexEncounterFilter.all => AppZh.dexFilterAll,
-          DexEncounterFilter.caught => AppZh.dexFilterCaught,
-          DexEncounterFilter.seen => AppZh.dexFilterSeen,
-          DexEncounterFilter.unseen => AppZh.dexFilterUnseen,
-        };
-        final selected = filter == entry;
-        return ChoiceChip(
-          label: Text(label),
-          selected: selected,
-          onSelected: (_) => onSelected(entry),
-          labelStyle: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
-            color: selected ? TitoColors.ink : TitoColors.mutedInk,
+    return Row(
+      children: [
+        for (final entry in _order) ...[
+          if (entry != _order.first) const SizedBox(width: 5),
+          Expanded(
+            child: _DexFilterChip(
+              label: _labels[entry]!,
+              selected: filter == entry,
+              onTap: () => onSelected(entry),
+            ),
           ),
-          selectedColor: TitoColors.softYellow,
-          backgroundColor: TitoColors.card,
-          side: BorderSide(
-            color: TitoColors.ink,
-            width: selected ? 2 : 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-          ),
-        );
-      }).toList(),
+        ],
+      ],
     );
   }
 }
@@ -575,11 +649,16 @@ class _DexModeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
+    final square = DeviceLayout.useSquareDashboard(context);
 
-    return Material(
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(radius),
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
+        canRequestFocus: false,
         borderRadius: BorderRadius.circular(radius),
         child: Ink(
           decoration: BoxDecoration(
@@ -587,7 +666,10 @@ class _DexModeTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: TitoColors.ink, width: 2),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: square ? 5 : 8,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -612,48 +694,99 @@ class _DexModeTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.meta14.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: TitoColors.mutedInk,
-                      ),
-                    ),
-                  ),
-                  if (showRegionMenu && selected)
-                    PopupMenuButton<DexRegionalScope>(
-                      padding: EdgeInsets.zero,
-                      tooltip: '切换地区图鉴',
-                      onSelected: onRegionSelected,
-                      itemBuilder: (context) {
-                        return DexRegionalScope.values
-                            .map(
-                              (scope) => PopupMenuItem(
-                                value: scope,
-                                child: Text(regionalScopeLabelZh(scope)),
-                              ),
-                            )
-                            .toList();
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.arrow_drop_down_rounded,
-                            size: 18,
-                            color: TitoColors.ink,
+              if (showRegionMenu && selected)
+                // Whole subtitle line opens the region menu — big tap target.
+                PopupMenuButton<DexRegionalScope>(
+                  padding: EdgeInsets.zero,
+                  tooltip: '切换地区图鉴',
+                  onSelected: onRegionSelected,
+                  itemBuilder: (context) {
+                    return DexRegionalScope.values
+                        .map(
+                          (scope) => PopupMenuItem(
+                            value: scope,
+                            child: Text(regionalScopeLabelZh(scope)),
                           ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                        )
+                        .toList();
+                  },
+                  child: _subtitleRow(context, withMenuArrow: true),
+                )
+              else
+                _subtitleRow(context),
             ],
+          ),
+        ),
+      ),
+      ),
+    );
+  }
+
+  Widget _subtitleRow(BuildContext context, {bool withMenuArrow = false}) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            subtitle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: SecondaryTypography.onCard.meta14.copyWith(
+              fontWeight: FontWeight.w600,
+              color: TitoColors.mutedInk,
+            ),
+          ),
+        ),
+        if (withMenuArrow)
+          const Icon(
+            Icons.arrow_drop_down_rounded,
+            size: 18,
+            color: TitoColors.ink,
+          ),
+      ],
+    );
+  }
+}
+
+class _DexFilterChip extends StatelessWidget {
+  const _DexFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          canRequestFocus: false,
+          borderRadius: BorderRadius.circular(999),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            decoration: BoxDecoration(
+              color: selected ? TitoColors.softYellow : TitoColors.card,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: TitoColors.ink, width: 2),
+            ),
+            child: Text(
+              label,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TitoTypography.style(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+              ),
+            ),
           ),
         ),
       ),
