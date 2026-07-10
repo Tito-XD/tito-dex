@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
@@ -39,22 +40,22 @@ class _SearchPageState extends State<SearchPage> {
   bool _searching = false;
   String? _error;
   List<PokemonSummary> _results = const [];
-  Set<int> _caughtIds = const {};
+  DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
 
   @override
   void initState() {
     super.initState();
-    _loadCaughtIds();
+    _loadProgress();
     _loadRecentQueries();
   }
 
-  Future<void> _loadCaughtIds() async {
-    final caught = await dexRepository.journeyCaughtIds(widget.journey);
+  Future<void> _loadProgress() async {
+    final progress = dexRepository.progressFor(widget.journey);
     if (!mounted) {
       return;
     }
-    setState(() => _caughtIds = caught);
+    setState(() => _progress = progress);
   }
 
   Future<void> _loadRecentQueries() async {
@@ -267,7 +268,7 @@ class _SearchPageState extends State<SearchPage> {
             itemCount: _results.length,
             itemBuilder: (context, index) {
               final entry = _results[index];
-              final status = dexRepository.statusFor(entry.id, _caughtIds);
+              final status = dexRepository.statusFor(entry.id, _progress);
               return _SearchResultRow(
                 entry: entry,
                 status: status,
