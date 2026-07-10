@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/theme/device_layout.dart';
+import 'package:titodex/theme/tito_colors.dart';
+import 'package:titodex/widgets/handheld_input.dart';
 import 'package:titodex/widgets/pokemon_card.dart';
 import 'package:titodex/widgets/pokemon_detail_sections.dart';
 import 'package:titodex/widgets/tito_progress_bar.dart';
@@ -110,6 +113,58 @@ void main() {
     final trackWidth = tester.getSize(containers.first).width;
     final fillWidth = tester.getSize(containers.last).width;
     expect(fillWidth, moreOrLessEquals(trackWidth * 0.5, epsilon: 1));
+  });
+
+  testWidgets('mini card shows yellow focus ring on D-pad focus',
+      (tester) async {
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    addTearDown(() {
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.automatic;
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 120,
+            height: 140,
+            child: PokemonMiniCard(
+              summary: _summary(1, '妙蛙种子', ['grass', 'poison']),
+              status: DexEncounterStatus.unknown,
+              compact: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.descendant(
+        of: find.byType(PokemonMiniCard),
+        matching: find.byType(FocusableActionDetector),
+      ),
+      findsOneWidget,
+    );
+
+    // D-pad/keyboard traversal moves focus onto the card.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+
+    final ringFinder = find.descendant(
+      of: find.byType(HandheldFocusDecorator),
+      matching: find.byWidgetPredicate((widget) {
+        if (widget is! DecoratedBox) {
+          return false;
+        }
+        final decoration = widget.decoration;
+        return decoration is BoxDecoration &&
+            decoration.border != null &&
+            decoration.border!.top.color == TitoColors.softYellow;
+      }),
+    );
+    expect(ringFinder, findsWidgets);
   });
 
   testWidgets('BaseStatsCard renders six visible stat bars', (tester) async {
