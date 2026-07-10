@@ -36,7 +36,7 @@ abstract final class AppZh {
   static const dexUnknown = '未见过';
   static const dexFilterAll = '全部';
   static const dexFilterCaught = '已捕获';
-  static const dexFilterSeen = '仅见过';
+  static const dexFilterSeen = '已见过';
   static const dexFilterUnseen = '未见过';
   static String dexScopeProgress(int caught, int seen, int total) =>
       '捕获 $caught · 见过 $seen / $total';
