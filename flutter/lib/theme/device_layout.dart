@@ -286,6 +286,10 @@ abstract final class DeviceLayout {
 
   static double dexCardAspectRatio(BuildContext context) {
     final columns = dexGridColumns(context);
+    if (useSquareDashboard(context)) {
+      // RG square: shorter cards → two full rows visible under the scope bar.
+      return columns >= 4 ? 0.92 : 0.95;
+    }
     if (columns >= 4) {
       return 0.82;
     }

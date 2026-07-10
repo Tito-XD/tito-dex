@@ -16,8 +16,10 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_font_scale.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/dex_sprite_image.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -151,7 +153,11 @@ class _SearchPageState extends State<SearchPage> {
 
     return TitoFontScale(
       multiplier: 1.0,
-      child: SecondaryPageScaffold(
+      // TextField requires a Material ancestor; the route shell doesn't
+      // provide one (pages render straight into TitoPageContainer).
+      child: Material(
+        type: MaterialType.transparency,
+        child: SecondaryPageScaffold(
         title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
         children: [
         StickerCard(
@@ -277,6 +283,7 @@ class _SearchPageState extends State<SearchPage> {
             },
           ),
       ],
+        ),
       ),
     );
   }
@@ -341,54 +348,58 @@ class _SearchResultRow extends StatelessWidget {
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          StickerCard(
-            variant: variant,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                DexSpriteImage(
-                  source: entry.displaySpritePath,
-                  height: 48,
-                  width: 48,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      TypeChipRow(
-                        types: entry.types.map(typeNameZh).toList(),
-                        typeKeys: entry.types,
-                      ),
-                    ],
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            StickerCard(
+              variant: variant,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  DexSpriteImage(
+                    source: entry.displaySpritePath,
+                    height: 48,
+                    width: 48,
                   ),
-                ),
-              ],
-            ),
-          ),
-          if (status == DexEncounterStatus.caught)
-            const Positioned(
-              top: 6,
-              right: 6,
-              child: Icon(
-                Icons.check_circle_rounded,
-                color: TitoColors.mint,
-                size: 18,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        TypeChipRow(
+                          types: entry.types.map(typeNameZh).toList(),
+                          typeKeys: entry.types,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-        ],
+            if (status == DexEncounterStatus.caught)
+              const Positioned(
+                top: 6,
+                right: 6,
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: TitoColors.mint,
+                  size: 18,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

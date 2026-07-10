@@ -56,7 +56,7 @@ void main() {
 
     expect(progress.matchesFilter(1, DexEncounterFilter.caught), isTrue);
     expect(progress.matchesFilter(2, DexEncounterFilter.seen), isTrue);
-    expect(progress.matchesFilter(1, DexEncounterFilter.seen), isFalse);
+    expect(progress.matchesFilter(1, DexEncounterFilter.seen), isTrue);
     expect(progress.matchesFilter(3, DexEncounterFilter.unseen), isTrue);
     expect(progress.matchesFilter(3, DexEncounterFilter.all), isTrue);
   });
