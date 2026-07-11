@@ -15,7 +15,6 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
-import '../theme/tito_typography.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
@@ -242,10 +241,18 @@ class _DexPageState extends State<DexPage> {
                         children: [
                           Text(
                             AppZh.dexLoadFailed,
-                            style: context.tito.cardBodyEmphasis,
+                            style: SecondaryTypography.onCard.body14.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                           const SizedBox(height: 8),
-                          Text(_error!, style: context.tito.errorDetail),
+                          Text(
+                            _error!,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              color: TitoColors.mutedInk,
+                              height: 1.45,
+                            ),
+                          ),
                           const SizedBox(height: 12),
                           FilledButton(
                             onPressed: () {
@@ -270,7 +277,9 @@ class _DexPageState extends State<DexPage> {
                     StickerCard(
                       child: Text(
                         _emptyMessageForMode(),
-                        style: context.tito.cardBodyStrong,
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                 ]),
@@ -332,7 +341,9 @@ class _DexPageState extends State<DexPage> {
                       hgssMaxNationalDexId,
                     ),
                     textAlign: TextAlign.center,
-                    style: context.tito.pageSubtitleOnGradient,
+                    style: SecondaryTypography.onGradient.body14.copyWith(
+                      color: TitoColors.skyBlue,
+                    ),
                   ),
                 ),
               ),
@@ -538,7 +549,7 @@ class _DexModeTab extends StatelessWidget {
                   ),
                   Text(
                     '$count',
-                    style: context.tito.cardValue.copyWith(
+                    style: SecondaryTypography.onCard.meta14.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),

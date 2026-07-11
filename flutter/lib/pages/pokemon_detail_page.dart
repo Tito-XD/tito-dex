@@ -10,7 +10,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
-import '../theme/tito_typography.dart';
+import '../theme/tito_font_scale.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/sticker_card.dart';
@@ -69,9 +69,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final errorCopy = _errorCopy;
     final padding = DeviceLayout.pagePadding(context);
 
-    return Column(
-      children: [
-        Expanded(
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: Column(
+        children: [
+          Expanded(
           child: TitoSkeletonGate(
             loading: _loading,
             skeleton: ListView(
@@ -116,7 +118,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             }
           },
         ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -257,9 +260,20 @@ class _ErrorBody extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(copy.$1, style: context.tito.cardBodyEmphasis),
+              Text(
+                copy.$1,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 8),
-              Text(copy.$2, style: context.tito.errorDetail),
+              Text(
+                copy.$2,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                  height: 1.45,
+                ),
+              ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: onRetry,
