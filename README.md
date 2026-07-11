@@ -4,7 +4,7 @@ TitoDex is a personal Pokémon journey companion app: **Tito + Pokédex**, but n
 
 It is designed as a warm companion device for Tito's own Pokémon playthroughs, starting with **Pokémon SoulSilver / HeartGold-SoulSilver context** and expanding only when the journey reaches later games.
 
-**Current release:** [v0.2.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25) · App `0.2.25+27` · Dex CDN bundle **v4**
+**Current release:** [v0.2.28](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28) · App `0.2.28+30` · Dex CDN bundle **v4**
 
 ## Product North Star
 
@@ -56,7 +56,7 @@ Pre-built Android APKs live under [`releases/`](releases/) and on [GitHub Releas
 
 | File | Use |
 | --- | --- |
-| `TitoDex-0.2.25-rg-arm64.apk` | **RG Rotate** — arm64-v8a (~20 MB; SDK 36) |
+| `TitoDex-0.2.28-rg-arm64.apk` | **RG Rotate** — arm64-v8a (~23 MB; SDK 36) |
 
 Build locally:
 
