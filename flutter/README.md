@@ -2,7 +2,7 @@
 
 Personal Pokémon journey companion — Flutter implementation.
 
-**Version:** `0.2.25+27` · [GitHub Release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.25)
+**Version:** `0.2.28+30` · [GitHub Release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28)
 
 Parent repo docs: [../README.md](../README.md) · [Stack decision](../docs/STACK_DECISION.md) · [Architecture](../docs/ARCHITECTURE.md) · [Dex CDN](../docs/CLOUDFLARE_DEX_CDN.md)
 
