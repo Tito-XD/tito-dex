@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -356,6 +358,304 @@ class BaseStatsCard extends StatelessWidget {
       return TitoColors.hpGreen;
     }
     return TitoColors.skyBlue;
+  }
+}
+
+/// Hexagonal radar chart for six base stats, normalized to [maxBaseStatValue].
+class BaseStatsRadarChart extends StatelessWidget {
+  const BaseStatsRadarChart({super.key, required this.stats});
+
+  final PokemonBaseStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.dexBaseStatsRadar,
+            style: SecondaryTypography.onCard.h15,
+          ),
+          const SizedBox(height: 8),
+          AspectRatio(
+            aspectRatio: 1,
+            child: CustomPaint(
+              painter: _BaseStatsRadarPainter(stats: stats),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final center = Offset(
+                      constraints.maxWidth / 2,
+                      constraints.maxHeight / 2,
+                    );
+                    final radius =
+                        (constraints.maxWidth < constraints.maxHeight
+                                ? constraints.maxWidth
+                                : constraints.maxHeight) /
+                            2 -
+                        18;
+                    final labels = stats.entries.toList();
+                    return Stack(
+                      children: [
+                        for (var i = 0; i < labels.length; i++)
+                          _RadarStatLabel(
+                            label: statLabelsZh[labels[i].key] ?? labels[i].key,
+                            value: labels[i].value,
+                            center: center,
+                            radius: radius + 16,
+                            index: i,
+                            total: labels.length,
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RadarStatLabel extends StatelessWidget {
+  const _RadarStatLabel({
+    required this.label,
+    required this.value,
+    required this.center,
+    required this.radius,
+    required this.index,
+    required this.total,
+  });
+
+  final String label;
+  final int value;
+  final Offset center;
+  final double radius;
+  final int index;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final angle = -math.pi / 2 + (2 * math.pi * index / total);
+    final x = center.dx + radius * math.cos(angle);
+    final y = center.dy + radius * math.sin(angle);
+    return Positioned(
+      left: x - 20,
+      top: y - 10,
+      width: 40,
+      child: Text(
+        '$label\n$value',
+        textAlign: TextAlign.center,
+        style: SecondaryTypography.onCard.small12.copyWith(
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+          height: 1.1,
+        ),
+      ),
+    );
+  }
+}
+
+class _BaseStatsRadarPainter extends CustomPainter {
+  _BaseStatsRadarPainter({required this.stats});
+
+  final PokemonBaseStats stats;
+
+  static const _gridLevels = [0.25, 0.5, 0.75, 1.0];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.shortestSide / 2 - 24;
+    final values = stats.entries.map((e) => e.value).toList();
+    final count = values.length;
+    if (count == 0) {
+      return;
+    }
+
+    final gridPaint = Paint()
+      ..color = TitoColors.mutedInk.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    final axisPaint = Paint()
+      ..color = TitoColors.mutedInk.withValues(alpha: 0.35)
+      ..strokeWidth = 1;
+
+    for (final level in _gridLevels) {
+      final path = Path();
+      for (var i = 0; i < count; i++) {
+        final angle = -math.pi / 2 + (2 * math.pi * i / count);
+        final point = Offset(
+          center.dx + radius * level * math.cos(angle),
+          center.dy + radius * level * math.sin(angle),
+        );
+        if (i == 0) {
+          path.moveTo(point.dx, point.dy);
+        } else {
+          path.lineTo(point.dx, point.dy);
+        }
+      }
+      path.close();
+      canvas.drawPath(path, gridPaint);
+    }
+
+    for (var i = 0; i < count; i++) {
+      final angle = -math.pi / 2 + (2 * math.pi * i / count);
+      canvas.drawLine(
+        center,
+        Offset(
+          center.dx + radius * math.cos(angle),
+          center.dy + radius * math.sin(angle),
+        ),
+        axisPaint,
+      );
+    }
+
+    final fillPath = Path();
+    for (var i = 0; i < count; i++) {
+      final ratio = (values[i] / maxBaseStatValue).clamp(0.0, 1.0);
+      final angle = -math.pi / 2 + (2 * math.pi * i / count);
+      final point = Offset(
+        center.dx + radius * ratio * math.cos(angle),
+        center.dy + radius * ratio * math.sin(angle),
+      );
+      if (i == 0) {
+        fillPath.moveTo(point.dx, point.dy);
+      } else {
+        fillPath.lineTo(point.dx, point.dy);
+      }
+    }
+    fillPath.close();
+
+    canvas.drawPath(
+      fillPath,
+      Paint()
+        ..color = TitoColors.coral.withValues(alpha: 0.35)
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawPath(
+      fillPath,
+      Paint()
+        ..color = TitoColors.coral
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BaseStatsRadarPainter oldDelegate) {
+    return oldDelegate.stats != stats;
+  }
+}
+
+/// Bar chart + radar layout; on square handheld, toggle between views.
+class BaseStatsSection extends StatefulWidget {
+  const BaseStatsSection({super.key, required this.stats});
+
+  final PokemonBaseStats stats;
+
+  @override
+  State<BaseStatsSection> createState() => _BaseStatsSectionState();
+}
+
+class _BaseStatsSectionState extends State<BaseStatsSection> {
+  bool _showRadar = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
+
+    if (square) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _StatsViewChip(
+                  label: AppZh.dexBaseStatsBars,
+                  selected: !_showRadar,
+                  onTap: () => setState(() => _showRadar = false),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _StatsViewChip(
+                  label: AppZh.dexBaseStatsRadar,
+                  selected: _showRadar,
+                  onTap: () => setState(() => _showRadar = true),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _showRadar
+                ? BaseStatsRadarChart(
+                    key: const ValueKey('radar'),
+                    stats: widget.stats,
+                  )
+                : BaseStatsCard(
+                    key: const ValueKey('bars'),
+                    stats: widget.stats,
+                  ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: BaseStatsCard(stats: widget.stats)),
+        const SizedBox(width: 8),
+        Expanded(child: BaseStatsRadarChart(stats: widget.stats)),
+      ],
+    );
+  }
+}
+
+class _StatsViewChip extends StatelessWidget {
+  const _StatsViewChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: selected ? TitoColors.softYellow : TitoColors.card,
+            borderRadius: BorderRadius.circular(TitoRadii.sm),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

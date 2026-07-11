@@ -33,6 +33,20 @@ void main() {
     expect(progress.fromSave, isTrue);
   });
 
+  test('DexProgress statsFor national scope still uses HGSS save cap', () {
+    const progress = DexProgress(
+      caughtIds: {1, 493},
+      seenIds: {1, 2, 493},
+    );
+
+    final stats = progress.statsFor(DexRegionalScope.national);
+
+    expect(stats.total, hgssMaxNationalDexId);
+    expect(stats.caught, 2);
+    expect(stats.seenOnly, 1);
+    expect(stats.unseen, hgssMaxNationalDexId - 3);
+  });
+
   test('DexProgress statsFor johto scope counts regional ids', () {
     const progress = DexProgress(
       caughtIds: {152, 155, 251},

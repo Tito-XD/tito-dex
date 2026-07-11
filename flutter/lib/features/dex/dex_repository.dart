@@ -5,6 +5,8 @@ import 'dex_cdn_data_source.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
 import 'dex_progress.dart';
+import 'dex_scope.dart';
+import 'dex_settings_repository.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
@@ -30,9 +32,31 @@ class DexRepository {
   List<PokemonSummary>? _allSummaries;
   Future<List<PokemonSummary>>? _allSummariesFuture;
   bool _cdnSummariesUnavailable = false;
+  Map<int, CachedMove>? _allMovesCache;
+  Future<Map<int, CachedMove>>? _allMovesFuture;
+  Map<int, CachedAbility>? _allAbilitiesCache;
+  Future<Map<int, CachedAbility>>? _allAbilitiesFuture;
 
   DexProgress progressFor(CurrentJourney journey) =>
       DexProgress.fromJourney(journey);
+
+  Future<DexScope> getDefaultScope() => dexSettingsRepository.loadDefaultScope();
+
+  Future<List<PokemonSummary>> getScopeSummaries(DexScope scope) async {
+    final all = await getAllSummaries();
+    final filtered =
+        all.where(scope.speciesInScope).toList(growable: false);
+    filtered.sort((a, b) {
+      final aNumber = scope.regionalNumberFor(a) ?? a.id;
+      final bNumber = scope.regionalNumberFor(b) ?? b.id;
+      final numberCompare = aNumber.compareTo(bNumber);
+      if (numberCompare != 0) {
+        return numberCompare;
+      }
+      return a.id.compareTo(b.id);
+    });
+    return filtered;
+  }
 
   Future<PokemonSummary> getSummary(int id) async {
     if (_summaryCache.containsKey(id)) {
@@ -163,8 +187,8 @@ class DexRepository {
 
     final summaries = <PokemonSummary>[];
 
-    for (var start = 1; start <= hgssMaxNationalDexId; start += summaryBatchSize) {
-      final end = (start + summaryBatchSize - 1).clamp(1, hgssMaxNationalDexId);
+    for (var start = 1; start <= titodexMaxNationalDexId; start += summaryBatchSize) {
+      final end = (start + summaryBatchSize - 1).clamp(1, titodexMaxNationalDexId);
       summaries.addAll(await getSummaryRange(start, end));
     }
 
@@ -173,8 +197,8 @@ class DexRepository {
   }
 
   Future<List<PokemonSummary>> getSummaryRange(int start, int end) async {
-    final safeStart = start.clamp(1, hgssMaxNationalDexId);
-    final safeEnd = end.clamp(safeStart, hgssMaxNationalDexId);
+    final safeStart = start.clamp(1, titodexMaxNationalDexId);
+    final safeEnd = end.clamp(safeStart, titodexMaxNationalDexId);
 
     // Fast path: the CDN summary list covers the whole range at once.
     if (!_cdnSummariesUnavailable) {
@@ -259,12 +283,73 @@ class DexRepository {
         .toList(growable: false);
   }
 
+  Future<List<CachedMove>> getAllMoves() async {
+    if (_allMovesCache != null) {
+      return _allMovesCache!.values.toList()
+        ..sort((a, b) => a.id.compareTo(b.id));
+    }
+
+    _allMovesFuture ??= _loadAllMoves();
+    final moves = await _allMovesFuture!;
+    return moves.values.toList()..sort((a, b) => a.id.compareTo(b.id));
+  }
+
+  Future<Map<int, CachedMove>> _loadAllMoves() async {
+    if (_allMovesCache != null) {
+      return _allMovesCache!;
+    }
+    try {
+      final moves = await _cdn.fetchAllMoves();
+      _allMovesCache = moves;
+      return moves;
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  Future<List<CachedAbility>> getAllAbilities() async {
+    if (_allAbilitiesCache != null) {
+      return _allAbilitiesCache!.values.toList()
+        ..sort((a, b) => a.id.compareTo(b.id));
+    }
+
+    _allAbilitiesFuture ??= _loadAllAbilities();
+    final abilities = await _allAbilitiesFuture!;
+    return abilities.values.toList()..sort((a, b) => a.id.compareTo(b.id));
+  }
+
+  Future<CachedAbility> fetchAbilityEncyclopedia(int id) async {
+    final abilities = await _loadAllAbilities();
+    final entry = abilities[id];
+    if (entry != null) {
+      return entry;
+    }
+    return _cdn.fetchAbilityEncyclopedia(id);
+  }
+
+  Future<Map<int, CachedAbility>> _loadAllAbilities() async {
+    if (_allAbilitiesCache != null) {
+      return _allAbilitiesCache!;
+    }
+    try {
+      final abilities = await _cdn.fetchAllAbilities();
+      _allAbilitiesCache = abilities;
+      return abilities;
+    } catch (_) {
+      return const {};
+    }
+  }
+
   void clearMemoryCache() {
     _summaryCache.clear();
     _detailCache.clear();
     _nameToIdCache.clear();
     _allSummaries = null;
     _allSummariesFuture = null;
+    _allMovesCache = null;
+    _allMovesFuture = null;
+    _allAbilitiesCache = null;
+    _allAbilitiesFuture = null;
   }
 
   void _rememberSummary(PokemonSummary summary) {

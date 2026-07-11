@@ -185,4 +185,101 @@ void main() {
     expect(find.text('318'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('BaseStatsRadarChart renders without overflow', (tester) async {
+    tester.view.physicalSize = const Size(720, 720);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(tester.view.reset);
+
+    const stats = PokemonBaseStats(
+      hp: 45,
+      attack: 49,
+      defense: 49,
+      specialAttack: 65,
+      specialDefense: 65,
+      speed: 45,
+    );
+
+    await tester.pumpWidget(
+      _wrap(
+        SingleChildScrollView(
+          child: const BaseStatsRadarChart(stats: stats),
+        ),
+        size: const Size(360, 360),
+      ),
+    );
+
+    expect(find.byType(CustomPaint), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('BaseStatsSection side-by-side on wide layout', (tester) async {
+    const stats = PokemonBaseStats(
+      hp: 80,
+      attack: 80,
+      defense: 80,
+      specialAttack: 80,
+      specialDefense: 80,
+      speed: 80,
+    );
+
+    await tester.pumpWidget(
+      _wrap(
+        SingleChildScrollView(
+          child: const BaseStatsSection(stats: stats),
+        ),
+        size: const Size(800, 400),
+      ),
+    );
+
+    expect(find.byType(BaseStatsCard), findsOneWidget);
+    expect(find.byType(BaseStatsRadarChart), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('AbilitiesCard shown without AbilityPlaceholderCard when data present',
+      (tester) async {
+    const detail = PokemonDetail(
+      summary: PokemonSummary(
+        id: 1,
+        nameEn: 'bulbasaur',
+        nameZh: '妙蛙种子',
+        types: ['grass', 'poison'],
+      ),
+      genusZh: '种子宝可梦',
+      heightDm: 70,
+      weightHg: 69,
+      weaknesses: const [],
+      resistances: const [],
+      immunities: const [],
+      stabSuperEffective: const [],
+      evolutionChain: null,
+      abilities: [
+        PokemonAbility(
+          nameEn: 'overgrow',
+          nameZh: '茂盛',
+          descriptionZh: 'HP减少时，草属性招式的威力会提高。',
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListView(
+            children: [
+              AbilitiesCard(abilities: detail.abilities),
+              if (detail.abilities.isEmpty)
+                const AbilityPlaceholderCard(),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(AbilitiesCard), findsOneWidget);
+    expect(find.byType(AbilityPlaceholderCard), findsNothing);
+    expect(find.text('茂盛'), findsOneWidget);
+    expect(find.text('待收录'), findsNothing);
+  });
 }

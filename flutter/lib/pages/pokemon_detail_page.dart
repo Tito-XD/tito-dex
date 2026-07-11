@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_scope.dart';
+import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -32,11 +34,21 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   (String, String)? _errorCopy;
   bool _loading = true;
   int _currentTabIndex = 0;
+  DexGameVersion _moveGameVersion = DexGameVersion.hgss;
 
   @override
   void initState() {
     super.initState();
+    _loadDefaultMoveVersion();
     _loadDetail();
+  }
+
+  Future<void> _loadDefaultMoveVersion() async {
+    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _moveGameVersion = version);
   }
 
   Future<void> _loadDetail() async {
@@ -140,8 +152,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _introSections(PokemonDetail detail) => [
         FlavorTextCarousel(entries: detail.flavorEntries),
         const SizedBox(height: 12),
-        const AbilityPlaceholderCard(),
-        const SizedBox(height: 12),
         IntroMetaCard(detail: detail),
         if (detail.abilities.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -162,7 +172,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _basicSections(PokemonDetail detail) {
     return [
       if (detail.baseStats != null) ...[
-        BaseStatsCard(stats: detail.baseStats!),
+        BaseStatsSection(stats: detail.baseStats!),
         const SizedBox(height: 12),
       ],
       if (detail.typeMultipliers.isNotEmpty) ...[
@@ -230,10 +240,32 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _movesSections(PokemonDetail detail) {
-    final moveSet = detail.moveSet;
+    final moveSetKey = gameVersionMoveSetKey(_moveGameVersion);
+    final moveSet = detail.moveSetForKey(moveSetKey);
+    final availableVersions = [
+      for (final version in const [
+        DexGameVersion.hgss,
+        DexGameVersion.sv,
+        DexGameVersion.swsh,
+      ])
+        if (_moveSetHasData(detail, version)) version,
+    ];
+
     return [
+      if (detail.hasMultipleMoveSets || availableVersions.length > 1) ...[
+        _MoveGameVersionBar(
+          selected: _moveGameVersion,
+          available: availableVersions.isEmpty
+              ? const [DexGameVersion.hgss]
+              : availableVersions,
+          onSelected: (version) {
+            setState(() => _moveGameVersion = version);
+          },
+        ),
+        const SizedBox(height: 12),
+      ],
       Text(
-        AppZh.dexMovesHgssScope,
+        AppZh.dexMovesScope(gameVersionLabelZh(_moveGameVersion)),
         style: SecondaryTypography.onGradient.body14,
       ),
       const SizedBox(height: 12),
@@ -253,6 +285,64 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         moves: moveSet.egg,
       ),
     ];
+  }
+
+  bool _moveSetHasData(PokemonDetail detail, DexGameVersion version) {
+    final set = detail.moveSetForKey(gameVersionMoveSetKey(version));
+    return set.levelUp.isNotEmpty ||
+        set.machine.isNotEmpty ||
+        set.egg.isNotEmpty;
+  }
+}
+
+class _MoveGameVersionBar extends StatelessWidget {
+  const _MoveGameVersionBar({
+    required this.selected,
+    required this.available,
+    required this.onSelected,
+  });
+
+  final DexGameVersion selected;
+  final List<DexGameVersion> available;
+  final ValueChanged<DexGameVersion> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final version in available) ...[
+          if (version != available.first) const SizedBox(width: 6),
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSelected(version),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                child: Ink(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected == version
+                        ? TitoColors.softYellow
+                        : TitoColors.card,
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    border: Border.all(color: TitoColors.ink, width: 2),
+                  ),
+                  child: Text(
+                    gameVersionLabelZh(version),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
 

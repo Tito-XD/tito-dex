@@ -91,6 +91,15 @@ enum DexRegionalScope { national, johto, kanto }
 
 (int, int) regionalDexIdRange(DexRegionalScope scope) {
   return switch (scope) {
+    DexRegionalScope.national => (1, titodexMaxNationalDexId),
+    DexRegionalScope.johto => (152, 251),
+    DexRegionalScope.kanto => (1, 151),
+  };
+}
+
+/// HGSS save-linked dex progress still caps at Gen IV national dex size.
+(int, int) hgssSaveDexIdRange(DexRegionalScope scope) {
+  return switch (scope) {
     DexRegionalScope.national => (1, hgssMaxNationalDexId),
     DexRegionalScope.johto => (152, 251),
     DexRegionalScope.kanto => (1, 151),
