@@ -161,6 +161,56 @@ abstract final class AppZh {
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
 
+  static const companionToolsTitle = '对战助手';
+  static String companionToolsSubtitle(String gameTitle) =>
+      '跟随当前游戏：$gameTitle';
+  static String companionToolsFacility(String facility) =>
+      '参考场景：$facility';
+  static const companionToolDex = '打开图鉴';
+  static const companionToolDexHint = '查种族值、属性、招式与克制关系';
+  static const companionToolTypeMatchup = '属性克制速查';
+  static const companionToolTypeMatchupHint = '选防守方属性，看弱点与抗性';
+  static const companionToolStatCalc = '能力值计算';
+  static const companionToolStatCalcHint = '等级、个体值、努力值与性格 → 实际数值';
+  static String companionToolQuickDamageHint(String facility) =>
+      '估算能不能秒 / 能不能扛（$facility 参考）';
+  static const companionToolQuickDamage = '伤害速算';
+  static const companionPokemonSearchHint = '搜索宝可梦填入属性或种族值…';
+  static const companionTypeDefenderTitle = '防守方';
+  static const companionTypeManualPick = '手动选择属性（最多 2 个）';
+  static const companionTypeSummaryTitle = '克制摘要';
+  static const companionTypeAttackerTitle = '进攻方（可选）';
+  static const companionTypeAttackerPick = '攻击方属性（本系克制参考）';
+  static const companionStatInputsTitle = '输入';
+  static String companionStatFacilityNote(String facility) =>
+      '默认等级按 $facility 常见配置（Lv.50）';
+  static const companionStatBase = '种族值';
+  static const companionStatLevel = '等级';
+  static const companionStatIv = '个体值';
+  static const companionStatEv = '努力值';
+  static const companionStatResultTitle = '计算结果';
+  static const companionStatResultHint =
+      '此为理论值；对战设施对手的实际数值可能含道具或强化。';
+  static const companionDamageInputsTitle = '对战双方';
+  static String companionDamageFacility(String facility) => '场景：$facility';
+  static const companionAttackerSearchHint = '搜索攻击方（填入种族值参考）…';
+  static const companionDefenderSearchHint = '搜索防守方（填入种族值参考）…';
+  static const companionMoveType = '招式属性';
+  static const companionMovePower = '招式威力';
+  static const companionAttackStat = '攻击';
+  static const companionSpAttackStat = '特攻';
+  static const companionDefenseStat = '防御';
+  static const companionSpDefenseStat = '特防';
+  static const companionDefenderHp = '防守方 HP';
+  static const companionDamageResultTitle = '估算结果';
+  static String companionDamageRange(int min, int max) => '伤害 $min ~ $max';
+  static String companionDamagePercent(double min, double max) =>
+      '约占 HP ${min.toStringAsFixed(1)}% ~ ${max.toStringAsFixed(1)}%';
+  static const companionDamageOffense = '进攻';
+  static const companionDamageDefense = '防守';
+  static String companionDamageModifiers(String type, String stab) =>
+      '属性倍率 ×$type · 本系 ×$stab · 随机 85%–100%';
+
   static const recentTimeline = '最近动态';
   static const nextPrefix = '下一步：';
   static const journeyTimelineEmpty = '还没有旅程记录';
