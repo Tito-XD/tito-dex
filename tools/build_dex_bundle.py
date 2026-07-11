@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Build TitoDex offline dex bundle v2 for Cloudflare R2 / CDN.
+"""Build TitoDex offline dex bundle v5 for Cloudflare R2 / CDN.
 
 Output matches flutter/lib/features/dex/dex_cache_store.dart layout.
+Published under {cdn_base}/v3/ (bundle v5; v2 remains for older clients).
 """
 
 from __future__ import annotations
@@ -10,6 +11,7 @@ import argparse
 import hashlib
 import io
 import json
+import re
 import sys
 import tarfile
 import time
@@ -28,11 +30,39 @@ TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
     "sprites/types/generation-iii/colosseum"
 )
-BUNDLE_VERSION = 4
+BUNDLE_VERSION = 5
+BUNDLE_CDN_PREFIX = "v3"
+TITODEX_MAX_NATIONAL_ID = 1025
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
+SV_VERSION_GROUP = "scarlet-violet"
+SS_VERSION_GROUP = "sword-shield"
 JOHTO_POKEDEX_NAMES = {"original-johto", "updated-johto"}
 HGSS_FLAVOR_VERSIONS = ["gold", "silver", "crystal", "heartgold", "soulsilver"]
+HGSS_ENCOUNTER_VERSIONS = {"heartgold", "soulsilver"}
+SV_ENCOUNTER_VERSIONS = {"scarlet", "violet"}
+SS_ENCOUNTER_VERSIONS = {"sword", "shield"}
+
+ENCOUNTER_AREA_LABELS_ZH = {
+    "pallet-town-area": "真新镇",
+    "viridian-city-area": "常磐市",
+    "viridian-forest-area": "常磐森林",
+    "pewter-city-area": "尼比市",
+    "route-1-area": "1号道路",
+    "route-2-area": "2号道路",
+    "route-24-area": "24号道路",
+    "route-25-area": "25号道路",
+    "safari-zone-area": "狩猎地带",
+    "mt-silver-area": "白银山",
+    "national-park-area": "自然公园",
+    "bell-tower-1f": "铃铛塔",
+    "burned-tower-1f": "烧焦塔",
+    "ice-path-1f": "冰雪小径",
+    "mt-mortar-1f": "擂钵山",
+    "dark-cave-area": "黑暗洞窟",
+    "union-cave-1f": "连接洞窟",
+    "slowpoke-well-1f": "呆呆兽之井",
+}
 
 TYPE_NAMES = [
     "normal",
@@ -112,9 +142,17 @@ class PokeApiBuilder:
         self.session.headers["User-Agent"] = "TitoDex-dex-bundle-builder/1.0"
         self.delay_s = delay_s
         self.move_cache: dict[int, dict[str, Any]] = {}
+        self.ability_index: dict[int, dict[str, Any]] = {}
         self.type_relations: dict[str, TypeDamageRelations] = {}
 
     def _get_json(self, path: str) -> dict[str, Any]:
+        url = path if path.startswith("http") else f"{POKEAPI_BASE}{path}"
+        time.sleep(self.delay_s)
+        response = self.session.get(url, timeout=60)
+        response.raise_for_status()
+        return response.json()
+
+    def _get_json_list(self, path: str) -> list[Any]:
         url = path if path.startswith("http") else f"{POKEAPI_BASE}{path}"
         time.sleep(self.delay_s)
         response = self.session.get(url, timeout=60)
@@ -175,17 +213,63 @@ class PokeApiBuilder:
         self.move_cache[move_id] = cached
         return cached
 
+    def fetch_ability(self, slug: str, *, is_hidden: bool) -> dict[str, Any]:
+        detail = self._get_json(f"/ability/{slug}")
+        ability_id = detail["id"]
+        return {
+            "id": ability_id,
+            "nameEn": capitalize(detail["name"]),
+            "nameZh": localized_name(detail.get("names", []), detail["name"]),
+            "descriptionZh": ability_description_zh(detail),
+            "isHidden": is_hidden,
+        }
+
+    def register_ability(self, ability: dict[str, Any], pokemon_id: int) -> None:
+        ability_id = ability["id"]
+        entry = self.ability_index.setdefault(
+            ability_id,
+            {
+                "nameEn": ability["nameEn"],
+                "nameZh": ability["nameZh"],
+                "descriptionZh": ability["descriptionZh"],
+                "pokemonIds": [],
+            },
+        )
+        if pokemon_id not in entry["pokemonIds"]:
+            entry["pokemonIds"].append(pokemon_id)
+
+    def fetch_abilities(
+        self, ability_entries: list[dict[str, Any]], pokemon_id: int
+    ) -> list[dict[str, Any]]:
+        abilities: list[dict[str, Any]] = []
+        for entry in ability_entries:
+            slug = entry["ability"]["name"]
+            is_hidden = entry.get("is_hidden", False)
+            ability = self.fetch_ability(slug, is_hidden=is_hidden)
+            self.register_ability(ability, pokemon_id)
+            abilities.append(
+                {
+                    "nameEn": ability["nameEn"],
+                    "nameZh": ability["nameZh"],
+                    "descriptionZh": ability["descriptionZh"],
+                    "isHidden": is_hidden,
+                }
+            )
+        abilities.sort(key=lambda item: (item["isHidden"], item["nameZh"]))
+        return abilities
+
     def build_detail(
         self, pokemon_id: int, cdn_base: str
     ) -> tuple[dict, dict, str | None]:
         pokemon = self._get_json(f"/pokemon/{pokemon_id}")
         species = self._get_json(f"/pokemon-species/{pokemon_id}")
         relations = self.load_type_relations()
+        cdn_prefix = BUNDLE_CDN_PREFIX
 
         types = extract_types(pokemon["types"])
         sprite_remote = sprite_url(pokemon["sprites"])
-        sprite_cdn = f"{cdn_base}/v2/sprites/{pokemon_id}.png"
-        artwork_cdn = f"{cdn_base}/v2/artwork/{pokemon_id}.png"
+        sprite_cdn = f"{cdn_base}/{cdn_prefix}/sprites/{pokemon_id}.png"
+        artwork_cdn = f"{cdn_base}/{cdn_prefix}/artwork/{pokemon_id}.png"
 
         summary = {
             "id": pokemon_id,
@@ -195,6 +279,7 @@ class PokeApiBuilder:
             "spriteUrl": sprite_cdn,
             "artworkUrl": artwork_cdn,
             "localSpritePath": f"sprites/{pokemon_id}.png",
+            "pokedexNumbers": parse_pokedex_numbers(species.get("pokedex_numbers", [])),
         }
 
         profile = compute_defensive_profile(types, relations)
@@ -203,7 +288,25 @@ class PokeApiBuilder:
         base_stats = parse_base_stats(pokemon["stats"])
         johto = johto_dex_number(species.get("pokedex_numbers", []))
         flavor_entries = parse_flavor_entries(species.get("flavor_text_entries", []))
-        move_set = fetch_hgss_move_set(self, pokemon.get("moves", []))
+        move_entries = pokemon.get("moves", [])
+        move_set = fetch_move_set_for_version_group(self, move_entries, HGSS_VERSION_GROUP)
+        move_sets: dict[str, dict[str, list[dict[str, Any]]]] = {
+            HGSS_VERSION_GROUP: move_set,
+        }
+        if pokemon_id > HGSS_MAX_ID:
+            sv_moves = fetch_move_set_for_version_group(
+                self, move_entries, SV_VERSION_GROUP
+            )
+            if any(sv_moves.values()):
+                move_sets[SV_VERSION_GROUP] = sv_moves
+            ss_moves = fetch_move_set_for_version_group(
+                self, move_entries, SS_VERSION_GROUP
+            )
+            if any(ss_moves.values()):
+                move_sets[SS_VERSION_GROUP] = ss_moves
+
+        abilities = self.fetch_abilities(pokemon.get("abilities", []), pokemon_id)
+        obtain_locations = fetch_obtain_locations(self, pokemon_id)
         gender_female = gender_female_percent(species.get("gender_rate"))
         egg_groups = [
             EGG_GROUP_ZH.get(g["name"], g["name"]) for g in species.get("egg_groups", [])
@@ -227,6 +330,9 @@ class PokeApiBuilder:
             "typeMultipliers": multipliers,
             "flavorEntries": flavor_entries,
             "moveSet": move_set,
+            "moveSets": move_sets,
+            "abilities": abilities,
+            "obtainLocations": obtain_locations,
             "eggGroups": egg_groups,
         }
         if johto is not None:
@@ -286,6 +392,110 @@ def johto_dex_number(entries: list[dict[str, Any]]) -> int | None:
         if entry.get("pokedex", {}).get("name") in JOHTO_POKEDEX_NAMES:
             return entry["entry_number"]
     return None
+
+
+def parse_pokedex_numbers(entries: list[dict[str, Any]]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for entry in entries:
+        slug = entry.get("pokedex", {}).get("name")
+        if slug:
+            result[slug] = entry["entry_number"]
+    return result
+
+
+def encounter_area_label_zh(slug: str) -> str:
+    if slug in ENCOUNTER_AREA_LABELS_ZH:
+        return ENCOUNTER_AREA_LABELS_ZH[slug]
+    route_match = re.match(r"^route-(\d+)-", slug)
+    if route_match:
+        return f"{route_match.group(1)}号道路"
+    return slug.replace("-area", "").replace("-", " ")
+
+
+def ability_description_zh(detail: dict[str, Any]) -> str:
+    for entry in detail.get("effect_entries", []):
+        language = entry.get("language", {}).get("name", "")
+        if language in ("zh-Hans", "zh-hans"):
+            short = (entry.get("short_effect") or "").strip()
+            if short:
+                return short
+            effect = (entry.get("effect") or "").strip()
+            if effect:
+                return effect
+    for entry in detail.get("flavor_text_entries", []):
+        language = entry.get("language", {}).get("name", "")
+        if language in ("zh-Hans", "zh-hans"):
+            text = (entry.get("flavor_text") or "").strip()
+            if text:
+                return text
+    for entry in detail.get("effect_entries", []):
+        if entry.get("language", {}).get("name") == "en":
+            short = (entry.get("short_effect") or "").strip()
+            if short:
+                return short
+    return ""
+
+
+def fetch_version_obtain_locations(
+    builder: PokeApiBuilder,
+    pokemon_id: int,
+    versions: set[str],
+) -> list[dict[str, Any]]:
+    try:
+        encounters = builder._get_json_list(f"/pokemon/{pokemon_id}/encounters")
+    except requests.RequestException:
+        return []
+
+    merged: dict[str, dict[str, Any]] = {}
+    for encounter in encounters:
+        area_url = (encounter.get("location_area") or {}).get("url")
+        if not area_url:
+            continue
+        slug = area_url.rstrip("/").split("/")[-1]
+        min_level = 100
+        max_chance = 0
+        in_scope = False
+
+        for detail in encounter.get("version_details", []):
+            version = detail.get("version", {}).get("name", "")
+            if version not in versions:
+                continue
+            in_scope = True
+            chance = detail.get("max_chance") or 0
+            if chance > max_chance:
+                max_chance = chance
+            for encounter_detail in detail.get("encounter_details", []):
+                level = encounter_detail.get("min_level") or 100
+                if level < min_level:
+                    min_level = level
+
+        if not in_scope:
+            continue
+
+        entry: dict[str, Any] = {
+            "areaSlug": slug,
+            "areaLabelZh": encounter_area_label_zh(slug),
+            "maxChance": max_chance,
+        }
+        if min_level != 100:
+            entry["minLevel"] = min_level
+        merged[slug] = entry
+
+    results = sorted(merged.values(), key=lambda item: item["areaLabelZh"])
+    return results
+
+
+def fetch_obtain_locations(
+    builder: PokeApiBuilder, pokemon_id: int
+) -> list[dict[str, Any]]:
+    if pokemon_id <= HGSS_MAX_ID:
+        return fetch_version_obtain_locations(
+            builder, pokemon_id, HGSS_ENCOUNTER_VERSIONS
+        )
+    sv = fetch_version_obtain_locations(builder, pokemon_id, SV_ENCOUNTER_VERSIONS)
+    if sv:
+        return sv
+    return fetch_version_obtain_locations(builder, pokemon_id, SS_ENCOUNTER_VERSIONS)
 
 
 def parse_base_stats(stats: list[dict[str, Any]]) -> dict[str, int]:
@@ -395,8 +605,10 @@ def compute_stab_super_effective(
     return sorted(type_name_zh(name) for name in effective)
 
 
-def fetch_hgss_move_set(
-    builder: PokeApiBuilder, move_entries: list[dict[str, Any]]
+def fetch_move_set_for_version_group(
+    builder: PokeApiBuilder,
+    move_entries: list[dict[str, Any]],
+    version_group: str,
 ) -> dict[str, list[dict[str, Any]]]:
     level_up: dict[int, dict[str, Any]] = {}
     machine: dict[int, dict[str, Any]] = {}
@@ -405,7 +617,7 @@ def fetch_hgss_move_set(
     for entry in move_entries:
         move_id = id_from_url(entry["move"]["url"])
         for detail in entry.get("version_group_details", []):
-            if detail.get("version_group", {}).get("name") != HGSS_VERSION_GROUP:
+            if detail.get("version_group", {}).get("name") != version_group:
                 continue
             method = detail.get("move_learn_method", {}).get("name")
             if method not in ("level-up", "machine", "egg"):
@@ -436,6 +648,12 @@ def fetch_hgss_move_set(
         "machine": sort_refs(machine, by_level=False),
         "egg": sort_refs(egg, by_level=False),
     }
+
+
+def fetch_hgss_move_set(
+    builder: PokeApiBuilder, move_entries: list[dict[str, Any]]
+) -> dict[str, list[dict[str, Any]]]:
+    return fetch_move_set_for_version_group(builder, move_entries, HGSS_VERSION_GROUP)
 
 
 def evolution_trigger_zh(detail: dict[str, Any]) -> str | None:
@@ -484,8 +702,8 @@ def parse_evolution_node(
         "id": species_id,
         "nameEn": capitalize(species["name"]),
         "nameZh": localized_name(species_detail.get("names", []), species["name"]),
-        "spriteUrl": f"{cdn_base}/v2/sprites/{species_id}.png",
-        "artworkUrl": f"{cdn_base}/v2/artwork/{species_id}.png",
+        "spriteUrl": f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/{species_id}.png",
+        "artworkUrl": f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/{species_id}.png",
         "localSpritePath": f"sprites/{species_id}.png",
         **({"evolvesFrom": trigger_zh} if trigger_zh else {}),
         **({"triggerZh": trigger_zh} if trigger_zh else {}),
@@ -555,7 +773,7 @@ def build_bundle(
 ) -> None:
     cdn_base = cdn_base.rstrip("/")
     staging = output_dir / "staging"
-    upload_v2 = output_dir / "upload" / "v2"
+    upload_bundle = output_dir / "upload" / BUNDLE_CDN_PREFIX
     artwork_staging = output_dir / "artwork_staging"
 
     if staging.exists():
@@ -623,16 +841,25 @@ def build_bundle(
     write_json(staging / "summaries.json", summaries)
     moves_payload = {str(move_id): move for move_id, move in builder.move_cache.items()}
     write_json(staging / "moves.json", moves_payload)
+    abilities_payload = {
+        str(ability_id): {
+            **{key: value for key, value in data.items() if key != "pokemonIds"},
+            "pokemonIds": sorted(data["pokemonIds"]),
+        }
+        for ability_id, data in sorted(builder.ability_index.items())
+    }
+    write_json(staging / "abilities.json", abilities_payload)
 
     size_bytes = directory_size(staging)
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     manifest = {
         "version": BUNDLE_VERSION,
-        "complete": max_id >= HGSS_MAX_ID and min_id == 1,
+        "complete": max_id >= TITODEX_MAX_NATIONAL_ID and min_id == 1,
         "preferOffline": True,
         "downloadedAt": published_at,
         "pokemonCount": len(summaries),
         "moveCount": len(moves_payload),
+        "abilityCount": len(abilities_payload),
         "sizeBytes": size_bytes,
     }
     write_json(staging / "manifest.json", manifest)
@@ -641,39 +868,40 @@ def build_bundle(
     print("Creating bundle.tar.zst…")
     create_zst_tar(staging, archive_path)
 
-    # Copy to upload/v2 (exclude bundle from inner tar sources duplication)
+    # Copy to upload/{BUNDLE_CDN_PREFIX} (v2 clients keep using prior upload/v2 builds)
     import shutil
 
-    if upload_v2.exists():
-        shutil.rmtree(upload_v2.parent)
-    upload_v2.mkdir(parents=True)
-    shutil.copytree(artwork_staging, upload_v2 / "artwork")
+    if upload_bundle.exists():
+        shutil.rmtree(upload_bundle.parent)
+    upload_bundle.mkdir(parents=True)
+    shutil.copytree(artwork_staging, upload_bundle / "artwork")
     for name in (
         "manifest.json",
         "summaries.json",
         "types.json",
         "moves.json",
+        "abilities.json",
         "bundle.tar.zst",
     ):
-        shutil.copy2(staging / name, upload_v2 / name)
-    shutil.copytree(staging / "details", upload_v2 / "details")
-    shutil.copytree(staging / "sprites", upload_v2 / "sprites")
-    shutil.copytree(staging / "type_icons", upload_v2 / "type_icons")
+        shutil.copy2(staging / name, upload_bundle / name)
+    shutil.copytree(staging / "details", upload_bundle / "details")
+    shutil.copytree(staging / "sprites", upload_bundle / "sprites")
+    shutil.copytree(staging / "type_icons", upload_bundle / "type_icons")
 
-    archive_sha = sha256_file(upload_v2 / "bundle.tar.zst")
+    archive_sha = sha256_file(upload_bundle / "bundle.tar.zst")
     bundle_manifest = {
         "bundleVersion": BUNDLE_VERSION,
         "pokemonCount": len(summaries),
-        "archiveUrl": f"{cdn_base}/v2/bundle.tar.zst",
+        "archiveUrl": f"{cdn_base}/{BUNDLE_CDN_PREFIX}/bundle.tar.zst",
         "archiveSha256": archive_sha,
-        "archiveSizeBytes": (upload_v2 / "bundle.tar.zst").stat().st_size,
+        "archiveSizeBytes": (upload_bundle / "bundle.tar.zst").stat().st_size,
         "publishedAt": published_at,
     }
     write_json(output_dir / "upload" / "bundle-manifest.json", bundle_manifest)
 
     print("\nDone.")
     print(f"  staging:          {staging}")
-    print(f"  upload/v2:        {upload_v2}")
+    print(f"  upload/{BUNDLE_CDN_PREFIX}: {upload_bundle}")
     print(f"  bundle-manifest:  {output_dir / 'upload' / 'bundle-manifest.json'}")
     print(f"  SHA256:           {archive_sha}")
     print(f"  archive size:     {bundle_manifest['archiveSizeBytes']:,} bytes")
@@ -681,7 +909,7 @@ def build_bundle(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v2")
+    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v5")
     parser.add_argument(
         "--cdn-base",
         default="https://dex.example.com",
@@ -690,11 +918,11 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("dist/dex-v2"),
+        default=Path("dist/dex-v5"),
         help="Output directory",
     )
     parser.add_argument("--min-id", type=int, default=1)
-    parser.add_argument("--max-id", type=int, default=HGSS_MAX_ID)
+    parser.add_argument("--max-id", type=int, default=TITODEX_MAX_NATIONAL_ID)
     parser.add_argument(
         "--delay",
         type=float,

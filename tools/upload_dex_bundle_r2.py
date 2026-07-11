@@ -10,9 +10,25 @@ import subprocess
 import sys
 from pathlib import Path
 
+DEFAULT_CDN_PREFIX = "v3"
+LEGACY_CDN_PREFIX = "v2"
 
-def upload_with_wrangler(upload_dir: Path, bucket: str) -> None:
-    v2 = upload_dir / "v2"
+
+def resolve_bundle_dir(upload_dir: Path, cdn_prefix: str) -> Path:
+    bundle_dir = upload_dir / cdn_prefix
+    if bundle_dir.is_dir():
+        return bundle_dir
+    if cdn_prefix == DEFAULT_CDN_PREFIX and (upload_dir / LEGACY_CDN_PREFIX).is_dir():
+        print(
+            f"Note: {bundle_dir} missing; falling back to upload/{LEGACY_CDN_PREFIX}",
+            file=sys.stderr,
+        )
+        return upload_dir / LEGACY_CDN_PREFIX
+    raise FileNotFoundError(f"Missing bundle directory: {bundle_dir}")
+
+
+def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None:
+    bundle_dir = resolve_bundle_dir(upload_dir, cdn_prefix)
     wrangler = os.environ.get("WRANGLER", "wrangler")
     if subprocess.run(["which", wrangler], capture_output=True).returncode != 0:
         wrangler = "npx"
@@ -28,9 +44,22 @@ def upload_with_wrangler(upload_dir: Path, bucket: str) -> None:
         subprocess.run(cmd, check=True)
 
     put("bundle-manifest.json", upload_dir / "bundle-manifest.json", "application/json")
-    for name in ("manifest.json", "summaries.json", "types.json", "moves.json", "bundle.tar.zst"):
+    for name in (
+        "manifest.json",
+        "summaries.json",
+        "types.json",
+        "moves.json",
+        "abilities.json",
+        "bundle.tar.zst",
+    ):
+        file = bundle_dir / name
+        if not file.exists():
+            if name == "abilities.json":
+                print(f"  skip missing {name} (pre-v5 bundle)", file=sys.stderr)
+                continue
+            raise FileNotFoundError(file)
         ct = "application/json" if name.endswith(".json") else "application/octet-stream"
-        put(f"v2/{name}", v2 / name, ct)
+        put(f"{cdn_prefix}/{name}", file, ct)
 
     for folder, default_ct in (
         ("details", "application/json"),
@@ -38,13 +67,18 @@ def upload_with_wrangler(upload_dir: Path, bucket: str) -> None:
         ("artwork", "image/png"),
         ("type_icons", "image/png"),
     ):
-        for file in sorted((v2 / folder).rglob("*")):
+        folder_path = bundle_dir / folder
+        if not folder_path.exists():
+            continue
+        for file in sorted(folder_path.rglob("*")):
             if file.is_file():
-                rel = file.relative_to(v2).as_posix()
-                put(f"v2/{rel}", file, default_ct)
+                rel = file.relative_to(bundle_dir).as_posix()
+                put(f"{cdn_prefix}/{rel}", file, default_ct)
 
 
-def upload_with_boto3(upload_dir: Path, bucket: str, endpoint: str) -> None:
+def upload_with_boto3(
+    upload_dir: Path, bucket: str, endpoint: str, cdn_prefix: str
+) -> None:
     import boto3
     from botocore.config import Config
 
@@ -56,7 +90,7 @@ def upload_with_boto3(upload_dir: Path, bucket: str, endpoint: str) -> None:
         config=Config(signature_version="s3v4"),
         region_name="auto",
     )
-    v2 = upload_dir / "v2"
+    bundle_dir = resolve_bundle_dir(upload_dir, cdn_prefix)
 
     def put(key: str, file: Path) -> None:
         ct = mimetypes.guess_type(str(file))[0] or "application/octet-stream"
@@ -64,19 +98,35 @@ def upload_with_boto3(upload_dir: Path, bucket: str, endpoint: str) -> None:
         client.upload_file(str(file), bucket, key, ExtraArgs={"ContentType": ct})
 
     put("bundle-manifest.json", upload_dir / "bundle-manifest.json")
-    for file in v2.rglob("*"):
+    for file in bundle_dir.rglob("*"):
         if file.is_file():
-            put(f"v2/{file.relative_to(v2).as_posix()}", file)
+            put(f"{cdn_prefix}/{file.relative_to(bundle_dir).as_posix()}", file)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("upload_dir", type=Path, default=Path("dist/dex-v2/upload"), nargs="?")
+    parser.add_argument(
+        "upload_dir",
+        type=Path,
+        default=Path("dist/dex-v5/upload"),
+        nargs="?",
+    )
     parser.add_argument("--bucket", default="titodex-dex")
+    parser.add_argument(
+        "--cdn-prefix",
+        default=DEFAULT_CDN_PREFIX,
+        help=f"CDN path prefix under bucket (default: {DEFAULT_CDN_PREFIX}; use v2 for legacy)",
+    )
     args = parser.parse_args()
 
     if not args.upload_dir.exists():
         print(f"Missing {args.upload_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        resolve_bundle_dir(args.upload_dir, args.cdn_prefix)
+    except FileNotFoundError as exc:
+        print(exc, file=sys.stderr)
         sys.exit(1)
 
     account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
@@ -85,9 +135,10 @@ def main() -> None:
             args.upload_dir,
             args.bucket,
             f"https://{account_id}.r2.cloudflarestorage.com",
+            args.cdn_prefix,
         )
     elif os.environ.get("CLOUDFLARE_API_TOKEN") and account_id:
-        upload_with_wrangler(args.upload_dir, args.bucket)
+        upload_with_wrangler(args.upload_dir, args.bucket, args.cdn_prefix)
     else:
         print(
             "Set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID (wrangler)\n"
