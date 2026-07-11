@@ -18,6 +18,7 @@ import '../theme/error_text.dart';
 import '../theme/tito_font_scale.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_typography.dart';
+import '../widgets/companion_tools_panel.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
@@ -282,6 +283,8 @@ class _SearchPageState extends State<SearchPage> {
               );
             },
           ),
+        const SizedBox(height: 16),
+        CompanionToolsPanel(journey: widget.journey),
       ],
         ),
       ),

@@ -22,6 +22,9 @@ import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/companion/quick_damage_page.dart';
+import 'pages/companion/stat_calc_page.dart';
+import 'pages/companion/type_matchup_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
@@ -155,6 +158,35 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: SearchPage(journey: _journey),
                 ),
               ),
+              routes: [
+                GoRoute(
+                  path: 'companion/type-matchup',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: TypeMatchupPage(journey: _journey),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'companion/stat-calc',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: StatCalcPage(journey: _journey),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'companion/quick-damage',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: QuickDamagePage(journey: _journey),
+                    ),
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '/settings',
