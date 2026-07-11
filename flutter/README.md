@@ -4,6 +4,8 @@ Personal Pokémon journey companion — Flutter implementation.
 
 **Version:** `0.2.28+30` · [GitHub Release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28)
 
+**Planned v0.3.0:** National dex **1–1025**, CDN bundle **v5** at `/v3/`, **`DexScope`** (game + regional filters)
+
 Parent repo docs: [../README.md](../README.md) · [Stack decision](../docs/STACK_DECISION.md) · [Architecture](../docs/ARCHITECTURE.md) · [Dex CDN](../docs/CLOUDFLARE_DEX_CDN.md)
 
 ## Quick start
@@ -41,12 +43,17 @@ Requires Android SDK (`flutter doctor --android-licenses`).
 | HGSS parser | Retail 512 KB `.sav` — trainer, badges, time, party, map location |
 | Save directory sync | Pick folder → auto-load newest `.sav` on startup |
 | Emulator launcher | Continue → pick / remember / launch Android emulator app |
-| **National dex 1–493** | Browse, search, 4-tab detail (简介 / 基本信息 / 获取 / 招式) |
+| **National dex 1–493** | Browse, search, 4-tab detail — **shipped v0.2.28** |
+| **National dex 1–1025** | 🚧 v0.3.0 + CDN bundle v5 |
+| **DexScope / regional browse** | Johto 251 + Kanto 151 filters ✅; multi-game version scope 🚧 v0.3.0 |
+| Save-linked seen/caught | From `.sav` + party markers ✅ |
+| Abilities + obtain locations | Detail tabs ✅ (CDN v5 enriches offline JSON) |
 | Type chart + HGSS moves | Weak/resist/immune, level/TM/egg move sets |
 | Offline dex | PokeAPI batch download **or** one-tap **CDN bundle v4** |
 | **PNG sprites** | Transparent thumbnails; tap header sprite → fullscreen artwork (lazy CDN/PokeAPI) |
 | Settings | Trainer name, save folder, fixture import, journey JSON, dex cache |
 | Chinese UI | `lib/l10n/app_zh.dart`, `game_zh.dart`, bundled Nunito |
+| Battle companion tools | Search: type matchup, stat calc, quick damage (partial, v0.2.28) |
 | Tests | Parser, dex CDN config, save sync, device layout, typography, widget smoke |
 
 ## Navigation
@@ -58,22 +65,22 @@ Requires Android SDK (`flutter doctor --android-licenses`).
 | `/journey` | Timeline |
 | `/dex` | National dex grid |
 | `/dex/:id` | Pokémon detail (4 tabs) |
-| `/search` | Search + quick filters |
+| `/search` | Search + companion battle tools |
 | `/settings` | Save sync, dex offline, journey tools |
 
 ## Dex offline data
 
 Two ways to populate `dex_offline/`:
 
-1. **CDN bundle (recommended on RG)** — Settings → 图鉴离线包 → downloads `bundle.tar.zst` from `dex.tito.cafe`, verifies SHA256, extracts to app documents.
+1. **CDN bundle (recommended on RG)** — Settings → 图鉴离线包 → downloads `bundle.tar.zst` from `dex.tito.cafe` (`/v2/` bundle v4 today; v0.3.0 → `/v3/` bundle v5, 1025 species), verifies SHA256, extracts to app documents.
 2. **PokeAPI batch** — legacy per-species download with throttle/retry (Settings).
 
 Config defaults in `lib/features/dex/dex_cdn_config.dart`:
 
 ```dart
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst   // v0.3.0 → /v3/
+TITODEX_DEX_BUNDLE_VERSION=4                                     // v0.3.0 → 5
 ```
 
 Local layout matches CDN bundle (`lib/features/dex/dex_cache_store.dart`):
@@ -84,6 +91,7 @@ dex_offline/
 ├── summaries.json
 ├── types.json
 ├── moves.json
+├── abilities.json      # CDN v5+
 ├── details/{id}.json
 ├── sprites/{id}.png      # 220px thumbnails
 ├── type_icons/{type}.png
@@ -145,7 +153,9 @@ python3 ../tools/probe_hgss_save.py ../fixtures/PKMSS.sav
 ## Not yet implemented
 
 - Custom launcher icon / splash polish
-- HeartGold detection, Kanto badges, save dex seen/caught flags
+- HeartGold detection, Kanto badges
 - Single-file `.sav` picker (directory only today)
+- National dex **1025** grid + CDN v5 app defaults (v0.3.0)
+- Full `DexScope` game version switcher + move/ability encyclopedia browse
+- Radar chart for base stats (bars only today)
 - Journey cloud sync ([proposal](../docs/CLOUD_SYNC_PROPOSAL.md))
-- Capture locations / abilities on dex detail

@@ -2,7 +2,7 @@
 
 > **受众：** Cloudflare 侧 Agent / 运维。只负责 **R2 + CDN + 离线图鉴包**，不涉及 App UI。
 >
-> **App 对齐：** 离线目录格式与 `flutter/lib/features/dex/dex_cache_store.dart` 一致（schema **v2**）。
+> **App 对齐：** 离线目录格式与 `flutter/lib/features/dex/dex_cache_store.dart` 一致。
 
 ---
 
@@ -10,19 +10,35 @@
 
 为 TitoDex（Flutter 掌机 App）提供：
 
-1. **预构建离线图鉴包** — 全国图鉴 #1–493（魂银范围）
+1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（Gen IX 上限；v0.2.28 APK 仍用 v4 / 493）
 2. **CDN 加速** — 精灵图、属性图标、单条详情 JSON
 3. **一次下载完整包** — 掌机不必逐条请求 PokeAPI
 
-App 侧将来读取三个环境变量（由你交付给 App 开发者）：
+App 侧环境变量（由 CDN 部署交付）：
 
 ```bash
+# Production (v0.2.28 APK)
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=4
+
+# Planned v0.3.0 (1025 species)
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=5
 ```
 
 自定义域名配置详解：[`cloudflare/dex-cdn/DOMAIN.md`](../cloudflare/dex-cdn/DOMAIN.md)
+
+---
+
+## CDN 路径版本
+
+| R2 / CDN 前缀 | bundleVersion | 物种数 | 说明 |
+| --- | --- | --- | --- |
+| **`/v2/`** | **4** | 493 | **当前生产** — v0.2.28 APK 默认 |
+| **`/v3/`** | **5** | **1025** | **v0.3.0** — 扩展 JSON schema，保留 v2 兼容 |
+
+v5 与 v4 可并存：旧客户端继续读 `/v2/`；新客户端读 `/v3/` 与 `bundle-manifest.json` 中的 `archiveUrl`。
 
 ---
 
@@ -44,10 +60,10 @@ TITODEX_DEX_BUNDLE_VERSION=4
 
 | 项目 | 说明 |
 | --- | --- |
-| 宝可梦 | 全国图鉴 #1–493 |
-| 元数据 | 中英文名、属性、详情、HGSS 招式、进化链（来源 PokeAPI） |
+| 宝可梦 | 全国图鉴 #1–**1025**（bundle v5）；#1–493（bundle v4 遗留） |
+| 元数据 | 中英文名、属性、详情、多版本招式、进化链（来源 PokeAPI） |
 | 精灵图 | `official-artwork.front_default`，无则 `front_default` |
-| 属性图标 | PokeAPI `type` → `sprites.generation-iii.colosseum.name_icon`（按 type id，非名称路径） |
+| 属性图标 | PokeAPI `type` → `sprites.generation-iii.colosseum.name_icon` |
 | 中文名 | `pokemon-species` → `names` 里 `zh-Hans` |
 
 ---
@@ -58,36 +74,42 @@ TITODEX_DEX_BUNDLE_VERSION=4
 
 ```txt
 titodex-dex/
-├── bundle-manifest.json          # latest 指针（短 TTL）
-└── v2/
-    ├── manifest.json             # 与 App 本地 dex_offline/manifest.json 一致
+├── bundle-manifest.json          # latest 指针（短 TTL；archiveUrl 指向活跃 bundle）
+├── v2/                           # bundle v4 — 493 物种（当前生产）
+│   ├── manifest.json
+│   ├── summaries.json
+│   ├── types.json
+│   ├── moves.json
+│   ├── bundle.tar.zst
+│   ├── details/1.json … 493.json
+│   ├── sprites/1.png … 493.png
+│   └── type_icons/*.png
+└── v3/                           # bundle v5 — 1025 物种（v0.3.0）
+    ├── manifest.json
     ├── summaries.json
     ├── types.json
     ├── moves.json
-    ├── bundle.tar.zst            # 完整离线包（推荐 App 一次下载）
-    ├── details/
-    │   └── 1.json … 493.json
-    ├── sprites/
-    │   └── 1.png … 493.png       # PNG 缩略图，宽 ≤220px
-    └── type_icons/
-        └── fire.png …            # 18 种属性
+    ├── abilities.json            # 特性索引（v5 新增）
+    ├── bundle.tar.zst
+    ├── details/1.json … 1025.json
+    ├── sprites/1.png … 1025.png
+    └── type_icons/*.png
 
-CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
+CDN 大图（按需，不进 bundle.tar.zst）：
 
-    upload/v2/artwork/
-        └── 1.png … 493.png       # PNG 原尺寸 official-artwork
+    v2/artwork/ … v3/artwork/
 ```
 
 ### `bundle-manifest.json`（CDN 根目录 / R2 根）
 
 ```json
 {
-  "bundleVersion": 4,
-  "pokemonCount": 493,
-  "archiveUrl": "https://dex.<你的域名>/v2/bundle.tar.zst",
+  "bundleVersion": 5,
+  "pokemonCount": 1025,
+  "archiveUrl": "https://dex.tito.cafe/v3/bundle.tar.zst",
   "archiveSha256": "<sha256>",
   "archiveSizeBytes": 0,
-  "publishedAt": "2026-07-09T00:00:00Z"
+  "publishedAt": "2026-07-11T00:00:00Z"
 }
 ```
 
@@ -95,17 +117,28 @@ CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
 
 ```json
 {
-  "version": 4,
+  "version": 5,
   "complete": true,
   "preferOffline": true,
-  "downloadedAt": "2026-07-09T00:00:00Z",
-  "pokemonCount": 493,
+  "downloadedAt": "2026-07-11T00:00:00Z",
+  "pokemonCount": 1025,
   "moveCount": 0,
+  "abilityCount": 0,
   "sizeBytes": 0
 }
 ```
 
-### `summaries.json` 单条格式
+### Bundle v5 schema 变更（相对 v4）
+
+| 字段 | 位置 | 说明 |
+| --- | --- | --- |
+| `pokedexNumbers` | `summaries.json` 每条 | PokeAPI pokedex name → regional number，供 `DexScope` 地区过滤 |
+| `abilities` | `details/{id}.json` | 特性名/描述/是否隐藏 |
+| `obtainLocations` | `details/{id}.json` | 按游戏版本的遭遇地点列表 |
+| `moveSets` | `details/{id}.json` | 多 version-group（HGSS / SV / SwSh）招式表 |
+| `abilities.json` | bundle 根 | 特性百科索引 + `pokemonIds` 反向列表 |
+
+### `summaries.json` 单条格式（v5）
 
 ```json
 {
@@ -113,8 +146,12 @@ CDN 另提供大图（不进离线 bundle.tar.zst，按需加载）：
   "nameEn": "Cyndaquil",
   "nameZh": "火球鼠",
   "types": ["fire"],
-  "spriteUrl": "https://dex.<域名>/v2/sprites/155.png",
-  "artworkUrl": "https://dex.<域名>/v2/artwork/155.png",
+  "pokedexNumbers": {
+    "national": 155,
+    "original-johto": 155
+  },
+  "spriteUrl": "https://dex.tito.cafe/v3/sprites/155.png",
+  "artworkUrl": "https://dex.tito.cafe/v3/artwork/155.png",
   "localSpritePath": "sprites/155.png"
 }
 ```
@@ -129,43 +166,39 @@ dex_offline/
 ├── summaries.json
 ├── types.json
 ├── moves.json
+├── abilities.json       # v5+
 ├── details/{id}.json
 ├── sprites/{id}.png
 └── type_icons/{type}.png
 ```
 
-> 仓库内 `tools/build_dex_bundle.py` 生成的 tar 根目录即为上述结构（无 `v2/` 前缀）。
+> 仓库内 `tools/build_dex_bundle.py` 生成的 tar 根目录即为上述结构（无 `v3/` 前缀）。
 
 ---
 
-## CDN 配置
-
-### 自定义域名
-
-`dex.<你的域名>` → R2 bucket `titodex-dex`（Public access **或** Worker 代理，见 `cloudflare/dex-cdn/`）
-
-### 直链规则
+## CDN 直链规则
 
 | URL | 内容 |
 | --- | --- |
-| `https://dex.<域名>/v2/sprites/{id}.png` | 精灵缩略图 |
-| `https://dex.<域名>/v2/artwork/{id}.png` | 精灵大图（按需，不进 bundle） |
-| `https://dex.<域名>/v2/type_icons/{type}.png` | 属性图标 |
-| `https://dex.<域名>/v2/details/{id}.json` | 详情 JSON |
-| `https://dex.<域名>/v2/summaries.json` | 摘要列表 |
-| `https://dex.<域名>/v2/bundle.tar.zst` | 完整离线包 |
+| `https://dex.<域名>/v3/sprites/{id}.png` | 精灵缩略图（v5） |
+| `https://dex.<域名>/v3/artwork/{id}.png` | 精灵大图（v5） |
+| `https://dex.<域名>/v3/type_icons/{type}.png` | 属性图标 |
+| `https://dex.<域名>/v3/details/{id}.json` | 详情 JSON |
+| `https://dex.<域名>/v3/summaries.json` | 摘要列表 |
+| `https://dex.<域名>/v3/bundle.tar.zst` | 完整离线包 v5 |
+| `https://dex.<域名>/v2/...` | 同上结构 — bundle v4（493） |
 | `https://dex.<域名>/bundle-manifest.json` | 版本索引 |
-| `https://dex.<域名>/bundle/latest` | Worker 302 → `archiveUrl`（可选） |
+| `https://dex.<域名>/bundle/latest` | Worker 302 → `archiveUrl` |
 
 ### Cache Rules
 
 | 路径 | TTL | Cache-Control |
 | --- | --- | --- |
-| `/v2/sprites/*` | 1 年 | `public, max-age=31536000, immutable` |
-| `/v2/artwork/*` | 1 年 | 同上 |
-| `/v2/type_icons/*` | 1 年 | 同上 |
-| `/v2/details/*` | 1 年 | 同上 |
-| `/v2/bundle.tar.zst` | 1 年 | 同上（带版本号路径） |
+| `/v2/sprites/*`, `/v3/sprites/*` | 1 年 | `public, max-age=31536000, immutable` |
+| `/v2/artwork/*`, `/v3/artwork/*` | 1 年 | 同上 |
+| `/v2/type_icons/*`, `/v3/type_icons/*` | 1 年 | 同上 |
+| `/v2/details/*`, `/v3/details/*` | 1 年 | 同上 |
+| `/v2/bundle.tar.zst`, `/v3/bundle.tar.zst` | 1 年 | 同上 |
 | `/bundle-manifest.json` | 5 分钟 | `public, max-age=300` |
 
 ### CORS
@@ -174,8 +207,6 @@ dex_offline/
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET, HEAD
 ```
-
-Android App 使用 `http` 包 GET，需允许跨域。若用本仓库 Worker，CORS 已在 Worker 内注入。
 
 ---
 
@@ -187,75 +218,47 @@ Android App 使用 `http` 包 GET，需允许跨域。若用本仓库 Worker，C
 pip install -r tools/dex_bundle_requirements.txt
 ```
 
-### 构建完整 v2 包
+### 构建 bundle v5（1025 只）
 
 ```bash
-python tools/build_dex_bundle.py \
-  --cdn-base https://dex.example.com \
-  --output dist/dex-v2
+python3 tools/build_dex_bundle.py \
+  --cdn-base https://dex.tito.cafe \
+  --output dist/dex-v5 \
+  --max-id 1025
 ```
 
 产物：
 
-- `dist/dex-v2/staging/` — 与 `dex_offline/` 同结构的明文目录
-- `dist/dex-v2/upload/v2/` — 待上传 R2 的 `v2/` 前缀内容
-- `dist/dex-v2/upload/bundle-manifest.json` — 根 manifest
+- `dist/dex-v5/staging/` — 与 `dex_offline/` 同结构的明文目录
+- `dist/dex-v5/upload/v3/` — 待上传 R2 的 **v3** 前缀内容
+- `dist/dex-v5/upload/bundle-manifest.json` — 根 manifest
 
 ### 冒烟构建（仅前 3 只）
 
 ```bash
-python tools/build_dex_bundle.py --cdn-base https://dex.example.com --max-id 3
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --max-id 3
 ```
+
+### 遗留 v4 构建（493）
+
+```bash
+python3 tools/build_dex_bundle.py \
+  --cdn-base https://dex.tito.cafe \
+  --output dist/dex-v4 \
+  --max-id 493
+```
+
+（构建脚本默认 `BUNDLE_VERSION=5` / `v3`；如需纯 v4 产物请使用 main 上 v0.2.28 对应 commit 或手动改常量。）
 
 ### 上传 R2
 
 ```bash
 export CLOUDFLARE_ACCOUNT_ID=...
 export WRANGLER_R2_BUCKET=titodex-dex
-./tools/upload_dex_bundle.sh dist/dex-v2/upload
-```
-
-或使用 Wrangler：
-
-```bash
-cd cloudflare/dex-cdn
-wrangler r2 object put titodex-dex/v2/bundle.tar.zst --file=../../dist/dex-v2/upload/v2/bundle.tar.zst
+./tools/upload_dex_bundle.sh dist/dex-v5/upload
 ```
 
 上传后 **Purge CDN cache**（至少 purge `/bundle-manifest.json`）。
-
-### 原始数据来源
-
-| 用途 | URL |
-| --- | --- |
-| 元数据 | `https://pokeapi.co/api/v2` |
-| 精灵图 | `sprites.other.official-artwork.front_default` ?? `front_default` |
-| 属性图标 | `GET /type/{name}` → `sprites.generation-iii.colosseum.name_icon` |
-
-构建脚本默认 **350ms** 请求间隔，避免 PokeAPI 限流。
-
-### 体积目标
-
-- 离线 bundle **~20 MB**（PNG 缩略图宽 ≤220px，493 只 + JSON）
-- CDN `v2/artwork/` 另计 **~40 MB**（全尺寸 PNG，按需加载，不进 tar）
-
-Legacy JPEG（`*.jpg`）已从 R2 清理；仅保留 PNG。
-
----
-
-## Worker（可选）
-
-见 `cloudflare/dex-cdn/src/worker.js`：
-
-- `GET /bundle/latest` → 302 到 `bundle-manifest.json` 里的 `archiveUrl`
-- 其余路径 → R2 对象 + CORS + 长缓存头
-
-部署：
-
-```bash
-cd cloudflare/dex-cdn
-wrangler deploy
-```
 
 ---
 
@@ -263,22 +266,13 @@ wrangler deploy
 
 | 项 | 验收 |
 | --- | --- |
-| R2 bucket `titodex-dex` | 已创建，v2 资源已上传 |
-| 自定义域名 `dex.<域名>` | 已绑定 |
-| `bundle-manifest.json` | 公网可 GET |
-| `bundle.tar.zst` | 可下载，SHA256 与 manifest 一致 |
-| 解压后 | `manifest.complete=true`，`pokemonCount=493` |
-| 抽测 CDN | #1 #25 #155 #447 #493 精灵图可直链 |
-| CORS | 已开 |
-| Cache Rules | 已配 |
-
-### 交给 App 侧的三个值
-
-```bash
-TITODEX_DEX_CDN_BASE=https://dex.<你的域名>
-TITODEX_DEX_BUNDLE_URL=https://dex.<你的域名>/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4
-```
+| R2 bucket `titodex-dex` | v2 + v3 资源已上传 |
+| 自定义域名 `dex.tito.cafe` | 已绑定 |
+| `bundle-manifest.json` | 公网可 GET，`archiveUrl` 正确 |
+| v3 `bundle.tar.zst` | 可下载，SHA256 与 manifest 一致 |
+| 解压后 | `manifest.complete=true`，`pokemonCount=1025` |
+| 抽测 CDN | #1 #25 #155 #493 #1000 #1025 精灵图可直链 |
+| CORS + Cache Rules | 已配 |
 
 ---
 
@@ -286,9 +280,9 @@ TITODEX_DEX_BUNDLE_VERSION=4
 
 | 路径 | 说明 |
 | --- | --- |
-| `tools/build_dex_bundle.py` | 一次性构建脚本（与 App 格式对齐） |
+| `tools/build_dex_bundle.py` | 构建脚本（`--max-id 1025`） |
 | `tools/upload_dex_bundle.sh` | Wrangler 批量上传 |
 | `cloudflare/dex-cdn/` | Worker + wrangler.toml |
 | `flutter/lib/features/dex/dex_cache_store.dart` | App 本地离线目录布局 |
-| `flutter/lib/features/dex/dex_models.dart` | JSON schema（本地 cache schema v2；CDN bundleVersion 4） |
-| `tools/cleanup_r2_jpg.py` | 清理 R2 遗留 JPEG（一次性） |
+| `flutter/lib/features/dex/dex_models.dart` | JSON schema |
+| `flutter/lib/features/dex/dex_scope.dart` | `DexScope` / 1025 browse |

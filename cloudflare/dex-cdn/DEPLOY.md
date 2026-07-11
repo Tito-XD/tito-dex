@@ -85,9 +85,25 @@ Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4
-python3 tools/upload_dex_via_worker.py dist/dex-v4/upload   # 需临时 bootstrap 路由，或 wrangler / CI
+
+# 当前生产 v4（493 物种 → R2 /v2/）
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
+
+# v0.3.0 bundle v5（1025 物种 → R2 /v3/）
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v5 --max-id 1025
+
+python3 tools/upload_dex_via_worker.py dist/dex-v5/upload   # 需临时 bootstrap 路由，或 wrangler / CI
 ```
+
+上传目录结构：
+
+| 本地路径 | R2 前缀 | 说明 |
+| --- | --- | --- |
+| `upload/v2/` | `v2/` | bundle **v4**，493 物种（v0.2.28 生产） |
+| `upload/v3/` | `v3/` | bundle **v5**，1025 物种（v0.3.0） |
+| `upload/bundle-manifest.json` | 根 | 指向当前 `archiveUrl` |
+
+Bundle v5 相对 v4 新增：`abilities.json`，summary 内 `pokedexNumbers`，detail 内 `abilities` / `obtainLocations` / 多版本 `moveSets`。
 
 详见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
@@ -115,11 +131,15 @@ Worker + R2 资源就绪后：
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
+# v0.2.28 生产：
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=4
+# v0.3.0 计划：
+# TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
+# TITODEX_DEX_BUNDLE_VERSION=5
 ```
 
-当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
+当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25/v0.2.28](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
 
 ---
 

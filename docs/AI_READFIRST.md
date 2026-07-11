@@ -16,7 +16,8 @@ Key points:
 - **Chinese UI** is the default (`lib/l10n/app_zh.dart`, `game_zh.dart`).
 - HGSS parser and save-directory sync are **implemented** — check status table in Stack Decision before assuming gaps.
 - Flutter nav: **Home, Team, Journey, Dex, Search, Settings** — Dex + Search shipped in v0.2.x.
-- **Dex CDN** is live at `https://dex.tito.cafe` (bundle v4, PNG). App downloads via Settings.
+- **Dex CDN** is live at `https://dex.tito.cafe` — production bundle **v4** at `/v2/` (493 species). **v0.3.0** targets bundle **v5** at `/v3/` (1025 species; `abilities`, `obtainLocations`, `pokedexNumbers`).
+- **DexScope** — `DexRegionalScope` (全国 / 城都 / 关东) shipped; `DexGameVersion` + full scope switcher planned v0.3.0.
 
 ## RG APK Release (agents)
 
