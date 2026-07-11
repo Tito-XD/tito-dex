@@ -4,6 +4,8 @@ import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_scope.dart';
+import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
@@ -64,6 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _journeyDirty = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
+  DexGameVersion _defaultDexGameVersion = DexGameVersion.hgss;
 
   @override
   void initState() {
@@ -80,6 +83,26 @@ class _SettingsPageState extends State<SettingsPage> {
       text: widget.journey.nextReminder ?? '',
     );
     _refreshDexCacheStatus();
+    _loadDexSettings();
+  }
+
+  Future<void> _loadDexSettings() async {
+    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _defaultDexGameVersion = version);
+  }
+
+  Future<void> _setDefaultDexGameVersion(DexGameVersion? version) async {
+    if (version == null) {
+      return;
+    }
+    await dexSettingsRepository.saveDefaultGameVersion(version);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _defaultDexGameVersion = version);
   }
 
   Future<void> _refreshDexCacheStatus() async {
@@ -529,6 +552,35 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ],
+              const SizedBox(height: 12),
+              Text(
+                AppZh.settingsDexDefaultGameVersion,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                AppZh.settingsDexDefaultGameVersionHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<DexGameVersion>(
+                value: _defaultDexGameVersion,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  for (final version in DexGameVersion.values)
+                    DropdownMenuItem(
+                      value: version,
+                      child: Text(version.labelZh),
+                    ),
+                ],
+                onChanged: _dexDownloading ? null : _setDefaultDexGameVersion,
+              ),
               const SizedBox(height: 12),
               Text(
                 AppZh.settingsDexCdnDownloadHint,

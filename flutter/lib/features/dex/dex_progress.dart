@@ -74,7 +74,7 @@ class DexProgress {
   }
 
   DexScopeStats statsFor(DexRegionalScope scope) {
-    final (start, end) = regionalDexIdRange(scope);
+    final (start, end) = hgssSaveDexIdRange(scope);
     var caught = 0;
     var seenOnly = 0;
     for (var id = start; id <= end; id++) {

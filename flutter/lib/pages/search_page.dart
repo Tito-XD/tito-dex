@@ -296,6 +296,33 @@ class _SearchPageState extends State<SearchPage> {
             },
           ),
         const SizedBox(height: 16),
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexReferenceTitle,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ActionChip(
+                    onPressed: () => context.push('/dex/moves'),
+                    label: Text(AppZh.dexReferenceMoves),
+                  ),
+                  ActionChip(
+                    onPressed: () => context.push('/dex/abilities'),
+                    label: Text(AppZh.dexReferenceAbilities),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
         CompanionToolsPanel(journey: widget.journey),
       ],
         ),

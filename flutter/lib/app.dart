@@ -18,6 +18,8 @@ import 'l10n/game_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
+import 'pages/dex/ability_encyclopedia_page.dart';
+import 'pages/dex/move_encyclopedia_page.dart';
 import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
@@ -135,6 +137,24 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
               ),
               routes: [
+                GoRoute(
+                  path: 'moves',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: const TitoPageContainer(
+                      child: MoveEncyclopediaPage(),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'abilities',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: const TitoPageContainer(
+                      child: AbilityEncyclopediaPage(),
+                    ),
+                  ),
+                ),
                 GoRoute(
                   path: ':id',
                   pageBuilder: (context, state) => titoSlidePage(

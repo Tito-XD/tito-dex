@@ -6,6 +6,8 @@ import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_scope.dart';
+import '../features/dex/dex_settings_repository.dart';
 import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
@@ -40,6 +42,7 @@ class _DexPageState extends State<DexPage> {
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
   DexRegionalScope _region = DexRegionalScope.national;
+  DexGameVersion _gameVersion = DexGameVersion.hgss;
   DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
@@ -52,7 +55,16 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
+    _loadDefaultGameVersion();
     _bootstrap();
+  }
+
+  Future<void> _loadDefaultGameVersion() async {
+    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _gameVersion = version);
   }
 
   Future<void> _bootstrap() async {
@@ -93,14 +105,14 @@ class _DexPageState extends State<DexPage> {
   }
 
   Future<void> _loadMore() async {
-    if (_loadingChunk || _loadedThrough >= hgssMaxNationalDexId) {
+    if (_loadingChunk || _loadedThrough >= titodexMaxNationalDexId) {
       return;
     }
 
     setState(() => _loadingChunk = true);
     try {
       final start = _loadedThrough + 1;
-      final end = (_loadedThrough + _chunkSize).clamp(1, hgssMaxNationalDexId);
+      final end = (_loadedThrough + _chunkSize).clamp(1, titodexMaxNationalDexId);
       final chunk = await dexRepository.getSummaryRange(start, end);
       if (!mounted) {
         return;
@@ -214,9 +226,8 @@ class _DexPageState extends State<DexPage> {
         _regionCache.containsKey(_region)) {
       entries = _regionCache[_region]!;
     } else {
-      final (start, end) = regionalDexIdRange(_region);
       entries = _summaries.where(
-        (entry) => entry.id >= start && entry.id <= end,
+        (entry) => summaryMatchesRegionalScope(entry, _region),
       );
     }
 
@@ -289,6 +300,15 @@ class _DexPageState extends State<DexPage> {
                   _DexTopBar(
                     gameTitle: localizeGame(widget.journey.game),
                     onSearch: () => context.push('/search'),
+                    onReference: () => _showReferenceMenu(context),
+                  ),
+                  SizedBox(height: squareGap(context)),
+                  _DexGameVersionBar(
+                    selected: _gameVersion,
+                    onSelected: (version) async {
+                      setState(() => _gameVersion = version);
+                      await dexSettingsRepository.saveDefaultGameVersion(version);
+                    },
                   ),
                   SizedBox(height: squareGap(context)),
                   // Square handheld: keep the top area short — at most one
@@ -426,14 +446,14 @@ class _DexPageState extends State<DexPage> {
               ),
             if (_mode == _DexMode.national &&
                 _region == DexRegionalScope.national &&
-                _loadedThrough < hgssMaxNationalDexId)
+                _loadedThrough < titodexMaxNationalDexId)
               SliverPadding(
                 padding: padding.copyWith(top: 8, bottom: 4),
                 sliver: SliverToBoxAdapter(
                   child: Text(
                     AppZh.dexLoadingProgress(
                       _loadedThrough,
-                      hgssMaxNationalDexId,
+                      titodexMaxNationalDexId,
                     ),
                     textAlign: TextAlign.center,
                     style: SecondaryTypography.onGradient.body14.copyWith(
@@ -450,16 +470,50 @@ class _DexPageState extends State<DexPage> {
 
   double squareGap(BuildContext context) =>
       DeviceLayout.useSquareDashboard(context) ? 6 : 8;
+
+  void _showReferenceMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.sports_martial_arts_rounded),
+                title: Text(AppZh.dexReferenceMoves),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/dex/moves');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.auto_awesome_rounded),
+                title: Text(AppZh.dexReferenceAbilities),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/dex/abilities');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _DexTopBar extends StatelessWidget {
   const _DexTopBar({
     required this.gameTitle,
     required this.onSearch,
+    required this.onReference,
   });
 
   final String gameTitle;
   final VoidCallback onSearch;
+  final VoidCallback onReference;
 
   @override
   Widget build(BuildContext context) {
@@ -537,6 +591,64 @@ class _DexTopBar extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(width: 6),
+        HandheldFocusDecorator(
+          onActivate: onReference,
+          borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onReference,
+              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+                  border: Border.all(color: TitoColors.card, width: 2),
+                ),
+                child: Text(
+                  AppZh.dexReferenceTitle,
+                  style: SecondaryTypography.onGradient.small12.copyWith(
+                    color: TitoColors.card,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DexGameVersionBar extends StatelessWidget {
+  const _DexGameVersionBar({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final DexGameVersion selected;
+  final ValueChanged<DexGameVersion> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (final version in const [
+          DexGameVersion.hgss,
+          DexGameVersion.sv,
+          DexGameVersion.swsh,
+        ]) ...[
+          if (version != DexGameVersion.hgss) const SizedBox(width: 5),
+          Expanded(
+            child: _DexFilterChip(
+              label: gameVersionLabelZh(version),
+              selected: selected == version,
+              onTap: () => onSelected(version),
+            ),
+          ),
+        ],
       ],
     );
   }

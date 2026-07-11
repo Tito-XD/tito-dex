@@ -14,23 +14,48 @@ class DexCdnConfig {
     defaultValue: 'https://dex.tito.cafe',
   );
 
+  static const String bundleVersionPrefix = 'v3';
+
+  static const String legacyBundleVersionPrefix = 'v2';
+
   static const String bundleUrl = String.fromEnvironment(
     'TITODEX_DEX_BUNDLE_URL',
-    defaultValue: 'https://dex.tito.cafe/v2/bundle.tar.zst',
+    defaultValue: 'https://dex.tito.cafe/v3/bundle.tar.zst',
   );
+
+  static const String legacyBundleUrl =
+      'https://dex.tito.cafe/v2/bundle.tar.zst';
 
   static const int bundleVersion = int.fromEnvironment(
     'TITODEX_DEX_BUNDLE_VERSION',
-    defaultValue: 4,
+    defaultValue: 5,
   );
 
   String get manifestUrl => '$cdnBase/bundle-manifest.json';
 
-  String spriteUrl(int id) => '$cdnBase/v2/sprites/$id.png';
+  String summariesUrl({String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/summaries.json';
 
-  String artworkUrl(int id) => '$cdnBase/v2/artwork/$id.png';
+  String detailUrl(int id, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/details/$id.json';
 
-  String typeIconUrl(String type) => '$cdnBase/v2/type_icons/$type.png';
+  String movesUrl({String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/moves.json';
+
+  String abilitiesUrl({String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/abilities.json';
+
+  String bundleArchiveUrl({String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/bundle.tar.zst';
+
+  String spriteUrl(int id, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/sprites/$id.png';
+
+  String artworkUrl(int id, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/artwork/$id.png';
+
+  String typeIconUrl(String type, {String prefix = legacyBundleVersionPrefix}) =>
+      '$cdnBase/$prefix/type_icons/$type.png';
 
   DexBundleManifest fallbackManifest() => DexBundleManifest(
         bundleVersion: bundleVersion,

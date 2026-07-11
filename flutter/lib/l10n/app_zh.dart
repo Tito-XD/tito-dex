@@ -30,7 +30,7 @@ abstract final class AppZh {
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
   static const dexScopeNote =
-      '全国图鉴 1–493（魂银），中文名与属性来自 PokeAPI；已捕获/已见过状态来自存档与同行队伍。';
+      '全国图鉴 1–1025，中文名与属性来自 CDN / PokeAPI；已捕获/已见过状态来自存档与同行队伍。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
   static const dexUnknown = '未见过';
@@ -104,6 +104,37 @@ abstract final class AppZh {
   static const dexHatchSteps = '孵化步数';
   static const dexNoEvolution = '没有进化链记录。';
   static const dexMovesHgssScope = '以下招式范围：心金 / 魂银';
+  static String dexMovesScope(String gameLabel) => '以下招式范围：$gameLabel';
+  static const dexBaseStatsRadar = '能力雷达';
+  static const dexBaseStatsBars = '种族值条';
+  static const dexReferenceTitle = '常用资料';
+  static const dexReferenceMoves = '招式图鉴';
+  static const dexReferenceAbilities = '特性图鉴';
+  static const dexReferenceSearchHint = '搜索名称或编号…';
+  static const dexReferenceEmpty = '没有匹配的资料条目。';
+  static const dexReferenceNoDescription = '暂无特性说明。';
+  static const dexReferenceFindPokemon = '搜索拥有此资料的宝可梦';
+  static String dexReferenceMoveMeta(
+    String category,
+    int? power,
+    int? accuracy,
+    int? pp,
+  ) {
+    final parts = <String>[category];
+    if (power != null) {
+      parts.add('威力 $power');
+    }
+    if (accuracy != null) {
+      parts.add('命中 $accuracy');
+    }
+    if (pp != null) {
+      parts.add('PP $pp');
+    }
+    return parts.join(' · ');
+  }
+  static const dexGameVersionHgss = '心金·魂银';
+  static const dexGameVersionSv = '朱紫';
+  static const dexGameVersionSwsh = '剑盾';
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
@@ -145,6 +176,9 @@ abstract final class AppZh {
   static const settingsDexCdnDownloadHint =
       '从 dex.tito.cafe 下载预打包图鉴（更快，含全部 493 只立绘与数据）';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
+  static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
+  static const settingsDexDefaultGameVersionHint =
+      '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组';
   static const snackDexCdnDone = 'CDN 图鉴包已安装完成';
   static const snackDexCdnFailed = 'CDN 图鉴包下载失败';
 
@@ -156,7 +190,7 @@ abstract final class AppZh {
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
   static const searchPrompt = '搜索宝可梦';
-  static const searchEmptyHint = '可搜索 1–493 号宝可梦的中文名、英文名、编号或属性。';
+  static const searchEmptyHint = '可搜索 1–1025 号宝可梦的中文名、英文名、编号或属性。';
   static const searchRecent = '最近搜索';
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';

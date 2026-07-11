@@ -1,8 +1,11 @@
 import 'dex_game_scope.dart';
 import 'type_chart.dart';
 
-// HGSS national dex scope (Gen IV).
+// HGSS-era national dex cap (Gen IV); browse extends to [titodexMaxNationalDexId].
 const hgssMaxNationalDexId = 493;
+
+/// Gen IX national dex upper bound for TitoDex browse.
+const titodexMaxNationalDexId = 1025;
 
 // Data models for the national dex backed by PokeAPI.
 class PokemonSummary {
@@ -14,6 +17,7 @@ class PokemonSummary {
     this.spriteUrl,
     this.artworkUrl,
     this.localSpritePath,
+    this.pokedexNumbers,
   });
 
   final int id;
@@ -23,6 +27,7 @@ class PokemonSummary {
   final String? spriteUrl;
   final String? artworkUrl;
   final String? localSpritePath;
+  final Map<String, int>? pokedexNumbers;
 
   String get typesLabel => types.map(typeNameZh).join('/');
 
@@ -36,22 +41,33 @@ class PokemonSummary {
         if (spriteUrl != null) 'spriteUrl': spriteUrl,
         if (artworkUrl != null) 'artworkUrl': artworkUrl,
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
+        if (pokedexNumbers != null && pokedexNumbers!.isNotEmpty)
+          'pokedexNumbers': pokedexNumbers,
       };
 
-  factory PokemonSummary.fromJson(Map<String, dynamic> json) => PokemonSummary(
-        id: json['id'] as int,
-        nameEn: json['nameEn'] as String,
-        nameZh: json['nameZh'] as String,
-        types: (json['types'] as List<dynamic>).cast<String>(),
-        spriteUrl: json['spriteUrl'] as String?,
-        artworkUrl: json['artworkUrl'] as String?,
-        localSpritePath: json['localSpritePath'] as String?,
-      );
+  factory PokemonSummary.fromJson(Map<String, dynamic> json) {
+    final pokedexRaw = json['pokedexNumbers'] as Map<String, dynamic>?;
+    final pokedexNumbers = pokedexRaw?.map(
+      (key, value) => MapEntry(key, (value as num).toInt()),
+    );
+
+    return PokemonSummary(
+      id: json['id'] as int,
+      nameEn: json['nameEn'] as String,
+      nameZh: json['nameZh'] as String,
+      types: (json['types'] as List<dynamic>).cast<String>(),
+      spriteUrl: json['spriteUrl'] as String?,
+      artworkUrl: json['artworkUrl'] as String?,
+      localSpritePath: json['localSpritePath'] as String?,
+      pokedexNumbers: pokedexNumbers,
+    );
+  }
 
   PokemonSummary copyWith({
     String? spriteUrl,
     String? artworkUrl,
     String? localSpritePath,
+    Map<String, int>? pokedexNumbers,
   }) {
     return PokemonSummary(
       id: id,
@@ -61,6 +77,7 @@ class PokemonSummary {
       spriteUrl: spriteUrl ?? this.spriteUrl,
       artworkUrl: artworkUrl ?? this.artworkUrl,
       localSpritePath: localSpritePath ?? this.localSpritePath,
+      pokedexNumbers: pokedexNumbers ?? this.pokedexNumbers,
     );
   }
 }
@@ -69,6 +86,44 @@ enum DexEncounterStatus {
   caught,
   seen,
   unknown,
+}
+
+class CachedAbility {
+  const CachedAbility({
+    required this.id,
+    required this.nameEn,
+    required this.nameZh,
+    required this.descriptionZh,
+    this.pokemonIds = const [],
+  });
+
+  final int id;
+  final String nameEn;
+  final String nameZh;
+  final String descriptionZh;
+  final List<int> pokemonIds;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nameEn': nameEn,
+        'nameZh': nameZh,
+        'descriptionZh': descriptionZh,
+        if (pokemonIds.isNotEmpty) 'pokemonIds': pokemonIds,
+      };
+
+  factory CachedAbility.fromJson(
+    Map<String, dynamic> json, {
+    int? fallbackId,
+  }) =>
+      CachedAbility(
+        id: json['id'] as int? ?? fallbackId ?? 0,
+        nameEn: json['nameEn'] as String,
+        nameZh: json['nameZh'] as String,
+        descriptionZh: json['descriptionZh'] as String? ?? '',
+        pokemonIds: (json['pokemonIds'] as List<dynamic>? ?? const [])
+            .map((value) => (value as num).toInt())
+            .toList(growable: false),
+      );
 }
 
 class CachedMove {
@@ -368,6 +423,7 @@ class PokemonDetail {
     this.obtainLocations = const [],
     this.abilities = const [],
     this.moveSet = const PokemonMoveSet(),
+    this.moveSets = const {},
     this.genderFemalePercent,
     this.eggGroups = const [],
     this.hatchCounter,
@@ -389,6 +445,7 @@ class PokemonDetail {
   final List<ObtainLocationEntry> obtainLocations;
   final List<PokemonAbility> abilities;
   final PokemonMoveSet moveSet;
+  final Map<String, PokemonMoveSet> moveSets;
   final double? genderFemalePercent;
   final List<String> eggGroups;
   final int? hatchCounter;
@@ -401,6 +458,14 @@ class PokemonDetail {
   String? get johtoDexLabel => johtoDexNumber == null
       ? null
       : '城都 #${johtoDexNumber!.toString().padLeft(3, '0')}';
+
+  /// Move set for a game version group key (e.g. `heartgold-soulsilver`).
+  PokemonMoveSet moveSetForKey(String versionGroupKey) {
+    return moveSets[versionGroupKey] ??
+        (versionGroupKey == 'heartgold-soulsilver' ? moveSet : const PokemonMoveSet());
+  }
+
+  bool get hasMultipleMoveSets => moveSets.length > 1;
 
   Map<String, dynamic> toJson() => {
         'summary': summary.toJson(),
@@ -422,6 +487,10 @@ class PokemonDetail {
             obtainLocations.map((entry) => entry.toJson()).toList(),
         'abilities': abilities.map((entry) => entry.toJson()).toList(),
         'moveSet': moveSet.toJson(),
+        if (moveSets.isNotEmpty)
+          'moveSets': moveSets.map(
+            (key, value) => MapEntry(key, value.toJson()),
+          ),
         if (genderFemalePercent != null)
           'genderFemalePercent': genderFemalePercent,
         'eggGroups': eggGroups,
@@ -470,6 +539,23 @@ class PokemonDetail {
       resolvedMoveSet = PokemonMoveSet(levelUp: legacyMoves);
     }
 
+    final moveSetsJson = json['moveSets'] as Map<String, dynamic>?;
+    final resolvedMoveSets = <String, PokemonMoveSet>{};
+    if (moveSetsJson != null) {
+      for (final entry in moveSetsJson.entries) {
+        resolvedMoveSets[entry.key] = PokemonMoveSet.fromJson(
+          entry.value as Map<String, dynamic>,
+          moveLookup: moveLookup,
+        );
+      }
+    }
+    if (resolvedMoveSets.isEmpty &&
+        (resolvedMoveSet.levelUp.isNotEmpty ||
+            resolvedMoveSet.machine.isNotEmpty ||
+            resolvedMoveSet.egg.isNotEmpty)) {
+      resolvedMoveSets['heartgold-soulsilver'] = resolvedMoveSet;
+    }
+
     return PokemonDetail(
       summary: PokemonSummary.fromJson(
         json['summary'] as Map<String, dynamic>,
@@ -505,6 +591,7 @@ class PokemonDetail {
           .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
       moveSet: resolvedMoveSet,
+      moveSets: resolvedMoveSets,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),
       eggGroups:
           (json['eggGroups'] as List<dynamic>? ?? const []).cast<String>(),
