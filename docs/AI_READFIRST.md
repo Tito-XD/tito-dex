@@ -15,7 +15,24 @@ Key points:
 - **DeviceShell stays** — it is intentional product identity.
 - **Chinese UI** is the default (`lib/l10n/app_zh.dart`, `game_zh.dart`).
 - HGSS parser and save-directory sync are **implemented** — check status table in Stack Decision before assuming gaps.
-- Flutter nav: Home, Team, Journey, Settings — Dex/Search not ported yet.
+- Flutter nav: **Home, Team, Journey, Dex, Search, Settings** — Dex + Search shipped in v0.2.x.
+- **Dex CDN** is live at `https://dex.tito.cafe` (bundle v4, PNG). App downloads via Settings.
+
+## RG APK Release (agents)
+
+When building or publishing RG handheld APKs:
+
+| Rule | Detail |
+| --- | --- |
+| **ABI** | **arm64-v8a only** (`ndk.abiFilters`) — RG Rotate / Unisoc |
+| **Filename** | `releases/TitoDex-<ver>-rg-arm64.apk` |
+| **SDK** | `compileSdk = 36`, `targetSdk = 36`, `minSdk = 24` (matches working 0.2.11 / local 0.2.23) |
+| **Build** | `flutter build apk --release` (no `--split-per-abi`, no `--target-platform`) |
+| **Signing** | `android/key.properties` + `titodex-upload.keystore` (committed; not per-machine debug) |
+| **Native libs** | `.so` must be **Stored** (`useLegacyPackaging = false`, `minSdk 24`) |
+| **Upgrade** | User must **uninstall** locally-built 0.2.x before sideloading CI APK (signature differs) |
+
+Full build notes: [flutter/README.md](../flutter/README.md).
 
 ## Communication Defaults
 
@@ -133,7 +150,7 @@ Allowed:
 Do not build yet:
 
 - all-generation parser
-- cloud sync implementation
+- journey cloud sync implementation (dex CDN is done; see `CLOUDFLARE_DEX_CDN.md`)
 - complete encyclopedia
 - OCR
 - complex account system

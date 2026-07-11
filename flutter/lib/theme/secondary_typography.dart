@@ -8,7 +8,8 @@ import 'tito_typography.dart';
 /// ## Dex Typography Spec (secondary pages)
 ///
 /// Reference: Pokédex list/detail (v0.2.23+). Use with [TitoFontScale] `multiplier: 1.0`
-/// on every secondary route except the home dashboard.
+/// on every secondary route except the home dashboard (Team, Journey, Dex, Search,
+/// Settings, companion battle tools, …).
 ///
 /// | Tier | px | Token | Use |
 /// |------|-----|-------|-----|

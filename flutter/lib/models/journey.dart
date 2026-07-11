@@ -79,6 +79,9 @@ class CurrentJourney {
     this.trainerNameCustomized = false,
     this.trainerAvatarPath,
     this.trainerAvatarCustomized = false,
+    this.saveDexCaughtIds = const [],
+    this.saveDexSeenIds = const [],
+    this.saveDexHash,
   });
 
   final String game;
@@ -95,6 +98,9 @@ class CurrentJourney {
   final bool trainerNameCustomized;
   final String? trainerAvatarPath;
   final bool trainerAvatarCustomized;
+  final List<int> saveDexCaughtIds;
+  final List<int> saveDexSeenIds;
+  final String? saveDexHash;
 
   CurrentJourney copyWith({
     String? game,
@@ -111,6 +117,9 @@ class CurrentJourney {
     bool? trainerNameCustomized,
     String? trainerAvatarPath,
     bool? trainerAvatarCustomized,
+    List<int>? saveDexCaughtIds,
+    List<int>? saveDexSeenIds,
+    String? saveDexHash,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -129,6 +138,9 @@ class CurrentJourney {
       trainerAvatarPath: trainerAvatarPath ?? this.trainerAvatarPath,
       trainerAvatarCustomized:
           trainerAvatarCustomized ?? this.trainerAvatarCustomized,
+      saveDexCaughtIds: saveDexCaughtIds ?? this.saveDexCaughtIds,
+      saveDexSeenIds: saveDexSeenIds ?? this.saveDexSeenIds,
+      saveDexHash: saveDexHash ?? this.saveDexHash,
     );
   }
 
@@ -147,6 +159,10 @@ class CurrentJourney {
         if (trainerNameCustomized) 'trainerNameCustomized': true,
         if (trainerAvatarPath != null) 'trainerAvatarPath': trainerAvatarPath,
         if (trainerAvatarCustomized) 'trainerAvatarCustomized': true,
+        if (saveDexCaughtIds.isNotEmpty)
+          'saveDexCaughtIds': saveDexCaughtIds,
+        if (saveDexSeenIds.isNotEmpty) 'saveDexSeenIds': saveDexSeenIds,
+        if (saveDexHash != null) 'saveDexHash': saveDexHash,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -172,6 +188,13 @@ class CurrentJourney {
         trainerAvatarPath: json['trainerAvatarPath'] as String?,
         trainerAvatarCustomized:
             json['trainerAvatarCustomized'] as bool? ?? false,
+        saveDexCaughtIds: (json['saveDexCaughtIds'] as List<dynamic>? ?? const [])
+            .map((value) => (value as num).toInt())
+            .toList(),
+        saveDexSeenIds: (json['saveDexSeenIds'] as List<dynamic>? ?? const [])
+            .map((value) => (value as num).toInt())
+            .toList(),
+        saveDexHash: json['saveDexHash'] as String?,
       );
 
   static CurrentJourney mock() => const CurrentJourney(

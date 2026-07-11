@@ -35,6 +35,32 @@ String? typeEnForZh(String labelZh) {
   return null;
 }
 
+/// Friendly symbol per type — icon + Chinese label combo (52poke style).
+///
+/// PokeAPI's `type` sprites only ship English *name* badges
+/// (`name_icon`), so TitoDex draws its own sticker-style symbols instead.
+IconData typeIconData(String type) => switch (type) {
+      'normal' => Icons.circle_outlined,
+      'fire' => Icons.local_fire_department,
+      'water' => Icons.water_drop,
+      'electric' => Icons.bolt,
+      'grass' => Icons.grass,
+      'ice' => Icons.ac_unit,
+      'fighting' => Icons.sports_mma,
+      'poison' => Icons.science,
+      'ground' => Icons.terrain,
+      'flying' => Icons.air,
+      'psychic' => Icons.psychology,
+      'bug' => Icons.bug_report,
+      'rock' => Icons.diamond,
+      'ghost' => Icons.blur_on,
+      'dragon' => Icons.cyclone,
+      'dark' => Icons.dark_mode,
+      'steel' => Icons.shield,
+      'fairy' => Icons.auto_awesome,
+      _ => Icons.help_outline,
+    };
+
 Color typeTileColor(String type) => switch (type) {
       'normal' => const Color(0xFFD8D3C3),
       'fire' => const Color(0xFFF5A26F),

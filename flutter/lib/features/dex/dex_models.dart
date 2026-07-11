@@ -12,6 +12,7 @@ class PokemonSummary {
     required this.nameZh,
     required this.types,
     this.spriteUrl,
+    this.artworkUrl,
     this.localSpritePath,
   });
 
@@ -20,6 +21,7 @@ class PokemonSummary {
   final String nameZh;
   final List<String> types;
   final String? spriteUrl;
+  final String? artworkUrl;
   final String? localSpritePath;
 
   String get typesLabel => types.map(typeNameZh).join('/');
@@ -32,6 +34,7 @@ class PokemonSummary {
         'nameZh': nameZh,
         'types': types,
         if (spriteUrl != null) 'spriteUrl': spriteUrl,
+        if (artworkUrl != null) 'artworkUrl': artworkUrl,
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
       };
 
@@ -41,11 +44,13 @@ class PokemonSummary {
         nameZh: json['nameZh'] as String,
         types: (json['types'] as List<dynamic>).cast<String>(),
         spriteUrl: json['spriteUrl'] as String?,
+        artworkUrl: json['artworkUrl'] as String?,
         localSpritePath: json['localSpritePath'] as String?,
       );
 
   PokemonSummary copyWith({
     String? spriteUrl,
+    String? artworkUrl,
     String? localSpritePath,
   }) {
     return PokemonSummary(
@@ -54,6 +59,7 @@ class PokemonSummary {
       nameZh: nameZh,
       types: types,
       spriteUrl: spriteUrl ?? this.spriteUrl,
+      artworkUrl: artworkUrl ?? this.artworkUrl,
       localSpritePath: localSpritePath ?? this.localSpritePath,
     );
   }
@@ -215,6 +221,34 @@ class FlavorTextEntry {
       );
 }
 
+class PokemonAbility {
+  const PokemonAbility({
+    required this.nameEn,
+    required this.nameZh,
+    required this.descriptionZh,
+    this.isHidden = false,
+  });
+
+  final String nameEn;
+  final String nameZh;
+  final String descriptionZh;
+  final bool isHidden;
+
+  Map<String, dynamic> toJson() => {
+        'nameEn': nameEn,
+        'nameZh': nameZh,
+        'descriptionZh': descriptionZh,
+        if (isHidden) 'isHidden': true,
+      };
+
+  factory PokemonAbility.fromJson(Map<String, dynamic> json) => PokemonAbility(
+        nameEn: json['nameEn'] as String,
+        nameZh: json['nameZh'] as String,
+        descriptionZh: json['descriptionZh'] as String? ?? '',
+        isHidden: json['isHidden'] as bool? ?? false,
+      );
+}
+
 class ObtainLocationEntry {
   const ObtainLocationEntry({
     required this.areaSlug,
@@ -332,6 +366,7 @@ class PokemonDetail {
     this.typeMultipliers = const {},
     this.flavorEntries = const [],
     this.obtainLocations = const [],
+    this.abilities = const [],
     this.moveSet = const PokemonMoveSet(),
     this.genderFemalePercent,
     this.eggGroups = const [],
@@ -352,6 +387,7 @@ class PokemonDetail {
   final Map<String, double> typeMultipliers;
   final List<FlavorTextEntry> flavorEntries;
   final List<ObtainLocationEntry> obtainLocations;
+  final List<PokemonAbility> abilities;
   final PokemonMoveSet moveSet;
   final double? genderFemalePercent;
   final List<String> eggGroups;
@@ -384,6 +420,7 @@ class PokemonDetail {
             flavorEntries.map((entry) => entry.toJson()).toList(),
         'obtainLocations':
             obtainLocations.map((entry) => entry.toJson()).toList(),
+        'abilities': abilities.map((entry) => entry.toJson()).toList(),
         'moveSet': moveSet.toJson(),
         if (genderFemalePercent != null)
           'genderFemalePercent': genderFemalePercent,
@@ -464,6 +501,9 @@ class PokemonDetail {
             (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
           )
           .toList(),
+      abilities: (json['abilities'] as List<dynamic>? ?? const [])
+          .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
+          .toList(),
       moveSet: resolvedMoveSet,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),
       eggGroups:
@@ -482,6 +522,7 @@ class EvolutionNode {
     required this.nameEn,
     required this.nameZh,
     this.spriteUrl,
+    this.artworkUrl,
     this.localSpritePath,
     this.evolvesFrom,
     this.triggerZh,
@@ -492,6 +533,7 @@ class EvolutionNode {
   final String nameEn;
   final String nameZh;
   final String? spriteUrl;
+  final String? artworkUrl;
   final String? localSpritePath;
   final String? evolvesFrom;
   final String? triggerZh;
@@ -511,6 +553,7 @@ class EvolutionNode {
         'nameEn': nameEn,
         'nameZh': nameZh,
         if (spriteUrl != null) 'spriteUrl': spriteUrl,
+        if (artworkUrl != null) 'artworkUrl': artworkUrl,
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
         if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
         if (triggerZh != null) 'triggerZh': triggerZh,
@@ -522,6 +565,7 @@ class EvolutionNode {
         nameEn: json['nameEn'] as String,
         nameZh: json['nameZh'] as String,
         spriteUrl: json['spriteUrl'] as String?,
+        artworkUrl: json['artworkUrl'] as String?,
         localSpritePath: json['localSpritePath'] as String?,
         evolvesFrom: json['evolvesFrom'] as String?,
         triggerZh: json['triggerZh'] as String?,
@@ -536,6 +580,7 @@ class EvolutionNode {
       nameEn: nameEn,
       nameZh: nameZh,
       spriteUrl: spriteUrl,
+      artworkUrl: artworkUrl,
       localSpritePath: path,
       evolvesFrom: evolvesFrom,
       triggerZh: triggerZh,

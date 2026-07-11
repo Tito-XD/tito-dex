@@ -8,6 +8,7 @@ import '../../models/parsed_save.dart';
 import '../../l10n/game_zh.dart';
 import 'hgss_format.dart';
 import 'hgss_map_lookup.dart';
+import 'hgss_pokedex.dart';
 
 const _partitionSize = 0x40000;
 const _retailSaveSize = 524288;
@@ -36,6 +37,9 @@ class HgssParser {
     final seconds = bytes[base + 0x89];
     final partyCount = bytes[base + 0x94];
     final mapId = readUint16(bytes, base + 0x1234);
+    final pokedex = HgssPokedexFlags.fromPartition(
+      bytes.sublist(base, base + _partitionSize),
+    );
 
     if (trainerName.trim().isEmpty) {
       warnings.add('Trainer name could not be decoded cleanly.');
@@ -79,6 +83,8 @@ class HgssParser {
       warnings: warnings,
       tid: tid,
       mapHeaderId: mapId,
+      dexCaughtIds: pokedex.caughtIds,
+      dexSeenIds: pokedex.seenIds,
     );
   }
 
@@ -121,6 +127,9 @@ class HgssParser {
           .toList(),
       timeline: _mergeTimeline(existing?.timeline ?? const [], syncEntry),
       nextReminder: existing?.nextReminder ?? '继续城都地区的旅程',
+      saveDexCaughtIds: summary.dexCaughtIds.toList()..sort(),
+      saveDexSeenIds: summary.dexSeenIds.toList()..sort(),
+      saveDexHash: summary.saveHash,
     );
   }
 

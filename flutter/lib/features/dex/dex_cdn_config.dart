@@ -21,14 +21,16 @@ class DexCdnConfig {
 
   static const int bundleVersion = int.fromEnvironment(
     'TITODEX_DEX_BUNDLE_VERSION',
-    defaultValue: 2,
+    defaultValue: 4,
   );
 
   String get manifestUrl => '$cdnBase/bundle-manifest.json';
 
-  String spriteUrl(int id) => '$cdnBase/v2/sprites/$id.jpg';
+  String spriteUrl(int id) => '$cdnBase/v2/sprites/$id.png';
 
-  String typeIconUrl(String type) => '$cdnBase/v2/type_icons/$type.jpg';
+  String artworkUrl(int id) => '$cdnBase/v2/artwork/$id.png';
+
+  String typeIconUrl(String type) => '$cdnBase/v2/type_icons/$type.png';
 
   DexBundleManifest fallbackManifest() => DexBundleManifest(
         bundleVersion: bundleVersion,

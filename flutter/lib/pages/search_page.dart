@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
@@ -14,8 +15,11 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
+import '../theme/device_layout.dart';
 import '../theme/tito_font_scale.dart';
+import '../widgets/companion_tools_panel.dart';
 import '../widgets/dex_sprite_image.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -38,22 +42,22 @@ class _SearchPageState extends State<SearchPage> {
   bool _searching = false;
   String? _error;
   List<PokemonSummary> _results = const [];
-  Set<int> _caughtIds = const {};
+  DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
 
   @override
   void initState() {
     super.initState();
-    _loadCaughtIds();
+    _loadProgress();
     _loadRecentQueries();
   }
 
-  Future<void> _loadCaughtIds() async {
-    final caught = await dexRepository.journeyCaughtIds(widget.journey);
+  Future<void> _loadProgress() async {
+    final progress = dexRepository.progressFor(widget.journey);
     if (!mounted) {
       return;
     }
-    setState(() => _caughtIds = caught);
+    setState(() => _progress = progress);
   }
 
   Future<void> _loadRecentQueries() async {
@@ -149,7 +153,11 @@ class _SearchPageState extends State<SearchPage> {
 
     return TitoFontScale(
       multiplier: 1.0,
-      child: SecondaryPageScaffold(
+      // TextField requires a Material ancestor; the route shell doesn't
+      // provide one (pages render straight into TitoPageContainer).
+      child: Material(
+        type: MaterialType.transparency,
+        child: SecondaryPageScaffold(
         title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
         children: [
         StickerCard(
@@ -279,7 +287,7 @@ class _SearchPageState extends State<SearchPage> {
             itemCount: _results.length,
             itemBuilder: (context, index) {
               final entry = _results[index];
-              final status = dexRepository.statusFor(entry.id, _caughtIds);
+              final status = dexRepository.statusFor(entry.id, _progress);
               return _SearchResultRow(
                 entry: entry,
                 status: status,
@@ -287,7 +295,10 @@ class _SearchPageState extends State<SearchPage> {
               );
             },
           ),
+        const SizedBox(height: 16),
+        CompanionToolsPanel(journey: widget.journey),
       ],
+        ),
       ),
     );
   }
@@ -352,54 +363,58 @@ class _SearchResultRow extends StatelessWidget {
       DexEncounterStatus.unknown => StickerVariant.cream,
     };
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          StickerCard(
-            variant: variant,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                DexSpriteImage(
-                  source: entry.displaySpritePath,
-                  height: 48,
-                  width: 48,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      TypeChipRow(
-                        types: entry.types.map(typeNameZh).toList(),
-                        typeKeys: entry.types,
-                      ),
-                    ],
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            StickerCard(
+              variant: variant,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  DexSpriteImage(
+                    source: entry.displaySpritePath,
+                    height: 48,
+                    width: 48,
                   ),
-                ),
-              ],
-            ),
-          ),
-          if (status == DexEncounterStatus.caught)
-            const Positioned(
-              top: 6,
-              right: 6,
-              child: Icon(
-                Icons.check_circle_rounded,
-                color: TitoColors.mint,
-                size: 18,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        TypeChipRow(
+                          types: entry.types.map(typeNameZh).toList(),
+                          typeKeys: entry.types,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-        ],
+            if (status == DexEncounterStatus.caught)
+              const Positioned(
+                top: 6,
+                right: 6,
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: TitoColors.mint,
+                  size: 18,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
