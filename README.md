@@ -4,7 +4,9 @@ TitoDex is a personal Pokémon journey companion app: **Tito + Pokédex**, but n
 
 It is designed as a warm companion device for Tito's own Pokémon playthroughs, starting with **Pokémon SoulSilver / HeartGold-SoulSilver context** and expanding only when the journey reaches later games.
 
-**Current release:** [v0.2.28](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28) · App `0.2.28+30` · Dex CDN bundle **v4**
+**Current release:** [v0.2.28](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28) · App `0.2.28+30` · Dex CDN bundle **v4** (`/v2/`)
+
+**Next (planned v0.3.0):** National dex **1–1025**, CDN bundle **v5** at `dex.tito.cafe/v3/`, **`DexScope`** multi-game regional browse
 
 ## Product North Star
 
@@ -46,7 +48,8 @@ See [Stack Decision](./docs/STACK_DECISION.md) for migration history and current
 | Persistence | `shared_preferences` — journey JSON + save-directory config |
 | Save parsing | Dart `HgssParser` — retail 512 KB `.sav` |
 | Save sync | Directory watch — newest `.sav` by mtime, startup auto-load |
-| Dex data | PokeAPI + **Cloudflare CDN** offline bundle (`dex.tito.cafe`) |
+| Dex data | PokeAPI + **Cloudflare CDN** offline bundle (`dex.tito.cafe`; v4 `/v2/` today, v5 `/v3/` planned) |
+| Dex scope | National **1–493** shipped; **1–1025** + `DexScope` (HGSS / Johto / Kanto / SV move sets) in v0.3.0 |
 | Dex sprites | **PNG** thumbnails + lazy-loaded full **artwork** |
 | Localization | Simplified Chinese UI (`lib/l10n/`) |
 
@@ -74,16 +77,17 @@ cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-ar
 | Item | Value |
 | --- | --- |
 | Base URL | `https://dex.tito.cafe` |
-| Offline bundle | `https://dex.tito.cafe/v2/bundle.tar.zst` |
-| Bundle version | **4** (PNG sprites, no legacy JPEG) |
+| Offline bundle (production) | `https://dex.tito.cafe/v2/bundle.tar.zst` — bundle **v4**, 493 species |
+| Offline bundle (v0.3.0) | `https://dex.tito.cafe/v3/bundle.tar.zst` — bundle **v5**, **1025** species |
+| Bundle versions | **v4** `/v2/` (current APK) · **v5** `/v3/` (planned; adds `abilities`, `obtainLocations`, `pokedexNumbers`) |
 | Worker branch | `deploy/dex-cdn` |
 
 App compile-time defaults (`flutter/lib/features/dex/dex_cdn_config.dart`):
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst   # v0.3.0 → /v3/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=4                                     # v0.3.0 → 5
 ```
 
 Setup & upload: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md)
@@ -121,7 +125,7 @@ flutter run                # connected Android device / emulator
 
 **Import test save:** Settings → 旅程数据 → 导入内置 PKMSS.sav
 
-**Dex offline pack:** Settings → 图鉴离线包 → 从 CDN 下载（`dex.tito.cafe` bundle v4）
+**Dex offline pack:** Settings → 图鉴离线包 → 从 CDN 下载（production: `dex.tito.cafe` bundle v4 at `/v2/`; v0.3.0 targets v5 at `/v3/`, 1025 species)
 
 **Auto-sync from emulator folder:** Settings → 存档目录 → pick a folder containing `.sav` files → enable 启动时自动加载. On startup, TitoDex picks the newest 524 288-byte `.sav` and refreshes the home screen.
 
@@ -131,11 +135,14 @@ Probe a save file from the command line:
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
 ```
 
-Build dex CDN bundle (493 Pokémon):
+Build dex CDN bundle:
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4
+# Production v4 (493, /v2/) — current APK default
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
+# v0.3.0 v5 (1025, /v3/)
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v5 --max-id 1025
 ```
 
 ### HGSS save fixtures

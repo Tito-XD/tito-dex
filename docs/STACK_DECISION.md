@@ -20,7 +20,7 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 | **A — Persistence + native feel** | Local journey store, splash/icon/back | ⚠️ Partial — persistence + back; custom icon/splash pending |
 | **B — Useful companion** | Emulator launcher, Settings, JSON I/O | ✅ Done |
 | **C — HGSS parser** | Parse `.sav`, drive home | ✅ Parser + directory sync + timeline merge |
-| **D — Dex + CDN** | Offline dex, Cloudflare bundle, PNG artwork | ✅ v0.2.25 |
+| **D — Dex + CDN** | Offline dex, Cloudflare bundle, PNG artwork | ✅ v0.2.28 (493, v4 `/v2/`) · 🚧 v0.3.0 (1025, v5 `/v3/`) |
 
 ### Shipped in `flutter/`
 
@@ -34,8 +34,12 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 - **Settings** — trainer name, journey edits, emulator picker, save folder, fixture import, JSON export/import
 - **Continue** — first tap picks Android emulator; later taps launch remembered app
 - **Team / Journey pages** — party slots, timeline, journey stats
-- **Dex 1–493** — grid, search, 4-tab detail, type chart, HGSS moves, evolution chain
-- **Offline dex** — PokeAPI batch download **or** one-tap CDN bundle from `dex.tito.cafe`
+- **Dex 1–493** — grid, search, 4-tab detail, type chart, HGSS moves, evolution chain (**shipped v0.2.28**)
+- **Dex 1–1025 + DexScope** — national expansion, Johto/Kanto regional filters, multi-game move sets (**v0.3.0**)
+- **Save dex seen/caught** — from HGSS `.sav` flags + party markers on grid
+- **Abilities + obtain locations** — detail tabs; CDN v5 bundles enriched JSON
+- **Battle companion tools (partial)** — Search page: type matchup, stat calc, quick damage (v0.2.28)
+- **Offline dex** — PokeAPI batch download **or** one-tap CDN bundle from `dex.tito.cafe` (v4 `/v2/`; v5 `/v3/` planned)
 - **PNG sprites + artwork viewer** — transparent thumbnails; tap header for lazy full-size PNG
 - **Tests** — `flutter test` (40+ tests)
 
@@ -43,7 +47,8 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 
 - Custom launcher icon (default Flutter icon remains)
 - HeartGold detection, Kanto badge count, single-file `.sav` picker
-- Save dex seen/caught flags from `.sav`
+- National dex **1025** browse + CDN v5 app defaults (v0.3.0)
+- Full `DexScope` version switcher, radar chart, move/ability encyclopedia UI
 - Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`)
 
 ### Navigation (current)
@@ -144,8 +149,9 @@ Phase 0 — Flutter scaffold                    ✅
 Phase A — Native feel + persistence           ⚠️ icon/splash pending
 Phase B — Useful companion                    ✅
 Phase C — HGSS parser + save directory sync   ✅
-Phase D — Dex + Cloudflare CDN v4             ✅
-Next    — Save dex flags, Johto 251 browse, web pokedex
+Phase D — Dex + Cloudflare CDN v4 (493)        ✅ v0.2.28
+Phase D+ — Dex v5 / 1025 / CDN v3              🚧 v0.3.0
+Next    — Ship CDN v5, DexScope UI, radar chart, reference lists, web pokedex
 ```
 
 Original phase definitions (for planning):
@@ -265,7 +271,8 @@ References: [Project Pokémon HGSS save structure](https://projectpokemon.org/ho
 | Jul 2026 | Save-directory auto-load on startup added (newest `.sav` by mtime) |
 | Jul 2026 | Dex UI + offline cache + RG handheld polish (v0.2.20–0.2.23) |
 | Jul 2026 | **Cloudflare dex CDN** live — `dex.tito.cafe`, bundle v4 PNG, Worker `tito-dex` |
-| Jul 2026 | **v0.2.25** — UI merge + artwork viewer + RG APK release |
+| Jul 2026 | **v0.2.28** — typography spec, save dex flags, battle companion tools on Search |
+| Jul 2026 | **Dex v5 expansion (planned v0.3.0)** — national 1–1025, CDN `/v3/` bundle v5, `DexScope` |
 | Jul 2026 | **RG APK packaging** — SDK 36, `abiFilters arm64-v8a`, project upload keystore; uninstall before upgrade from local builds |
 
 ## Related Documents

@@ -88,12 +88,13 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - Trainer Card feeling.
 - Riolu companion presence.
 - Compact widget dashboard.
-- **HGSS national dex 1–493** with offline CDN bundle (`dex.tito.cafe` v4).
+- **National dex 1–493** with offline CDN bundle v4 (`dex.tito.cafe/v2/`) — shipped v0.2.28.
+- **National dex 1–1025** + CDN bundle v5 (`/v3/`) + **`DexScope`** multi-game browse — planned v0.3.0.
 - Journey timeline.
 
 ### Could Have Later
 
-- Save dex seen/caught flags from `.sav`.
+- Save dex seen/caught flags from `.sav` — **shipped v0.2.28**.
 - Local backup browsing.
 - Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`).
 - Route notes.
@@ -109,9 +110,18 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - OCR
 - large public content ingestion
 
-### Shipped (v0.2.25)
+### Shipped (v0.2.28)
 
-- Save parser integration (HGSS retail `.sav`)
+- Save parser integration (HGSS retail `.sav`) + **save dex seen/caught flags**
 - Emulator launcher (Continue → pick / remember app)
-- Mock Dex → **real offline dex** with PNG sprites + artwork viewer
-- RG release APK: `TitoDex-0.2.25-rg-arm64.apk` (arm64-v8a; see `flutter/README.md` for build guardrails)
+- Mock Dex → **real offline dex** with PNG sprites + artwork viewer (493; CDN v4)
+- **Abilities + obtain locations** on detail tabs
+- **Regional browse** — Johto 251 / Kanto 151 filters
+- **Battle companion tools (partial)** — Search: type matchup, stat calc, quick damage
+- RG release APK: `TitoDex-0.2.28-rg-arm64.apk` (arm64-v8a; see `flutter/README.md`)
+
+### Planned (v0.3.0)
+
+- National dex **1–1025**, CDN bundle **v5** at `dex.tito.cafe/v3/`
+- **`DexScope`** game version switcher (HGSS / SV / SwSh move sets)
+- Radar chart, move/ability encyclopedia browse

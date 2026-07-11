@@ -57,3 +57,29 @@ Root `package.json` scripts: `npm run dev` (Vite at `http://localhost:5173`),
   `python3 tools/probe_hgss_save.py fixtures/PKMSS.sav`.
 - Cloudflare R2-proxy Worker in `cloudflare/dex-cdn/` (deps installed via
   `npm install` there; `npx wrangler ...`). Deploying needs Cloudflare secrets.
+
+### Dex CDN bundles (agents)
+
+| Path | Bundle | Species | Status |
+| --- | --- | --- | --- |
+| `dex.tito.cafe/v2/` | **v4** | 493 (HGSS national) | **Production** — current APK default |
+| `dex.tito.cafe/v3/` | **v5** | **1025** (Gen IX national) | **Planned v0.3.0** |
+
+**National dex scope:** App models use `titodexMaxNationalDexId = 1025` for browse;
+production APK v0.2.28 still defaults to CDN v4 (493) until v0.3.0 ships.
+
+**Build full v5 bundle** (from repo root, venv at `~/.venv-titodex-tools`):
+
+```bash
+pip install -r tools/dex_bundle_requirements.txt
+python3 tools/build_dex_bundle.py \
+  --cdn-base https://dex.tito.cafe \
+  --output dist/dex-v5 \
+  --max-id 1025
+```
+
+Upload staging goes to `dist/dex-v5/upload/v3/` (bundle v5 schema adds
+`abilities`, `obtainLocations`, `pokedexNumbers` on summaries/details plus root
+`abilities.json`). Legacy v4 clients keep using `/v2/`.
+
+See `docs/CLOUDFLARE_DEX_CDN.md` and `cloudflare/dex-cdn/DEPLOY.md`.
