@@ -6,7 +6,6 @@ import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
@@ -36,7 +35,12 @@ class SecondaryPageScaffold extends StatelessWidget {
         SecondaryPageAppBar(title: title, showSettings: showSettings),
         if (subtitle != null) ...[
           const SizedBox(height: 6),
-          Text(subtitle!, style: context.tito.pageSubtitleOnGradient),
+          Text(
+            subtitle!,
+            style: SecondaryTypography.onGradient.body14.copyWith(
+              color: TitoColors.skyBlue,
+            ),
+          ),
         ],
         const SizedBox(height: 12),
         ...children,

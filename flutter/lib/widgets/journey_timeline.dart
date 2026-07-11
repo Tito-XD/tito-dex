@@ -5,7 +5,6 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
 class JourneyTimeline extends StatelessWidget {
@@ -23,7 +22,12 @@ class JourneyTimeline extends StatelessWidget {
           Text(AppZh.recentTimeline, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
           if (entries.isEmpty)
-            Text(AppZh.journeyTimelineEmpty, style: context.tito.cardMuted)
+            Text(
+              AppZh.journeyTimelineEmpty,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+              ),
+            )
           else
             for (var i = 0; i < entries.length; i++)
               _TimelineEntryTile(
@@ -42,7 +46,9 @@ class JourneyTimeline extends StatelessWidget {
               ),
               child: Text(
                 '${AppZh.nextPrefix}${localizeReminder(nextReminder)}',
-                style: context.tito.cardBodyStrong,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],

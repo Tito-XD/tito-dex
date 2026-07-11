@@ -172,7 +172,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   Widget build(BuildContext context) {
     if (widget.entries.isEmpty) {
       return StickerCard(
-        child: Text(AppZh.dexFlavorEmpty, style: context.tito.cardBodyStrong),
+        child: Text(AppZh.dexFlavorEmpty, style: SecondaryTypography.onCard.body14),
       );
     }
 
@@ -674,14 +674,14 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexGenderRatio,
-                  style: context.tito.cardLabel.copyWith(
+                  style: SecondaryTypography.onCard.team12.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   AppZh.dexGenderFemale(female),
-                  style: context.tito.cardValue,
+                  style: SecondaryTypography.onCard.meta14,
                 ),
               ],
             ),
@@ -692,14 +692,14 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexEggGroups,
-                  style: context.tito.cardLabel.copyWith(
+                  style: SecondaryTypography.onCard.team12.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   detail.eggGroups.join(' / '),
-                  style: context.tito.cardValue,
+                  style: SecondaryTypography.onCard.meta14,
                 ),
               ],
             ),
@@ -710,14 +710,14 @@ class IntroMetaCard extends StatelessWidget {
               children: [
                 Text(
                   AppZh.dexHatchSteps,
-                  style: context.tito.cardLabel.copyWith(
+                  style: SecondaryTypography.onCard.team12.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const Spacer(),
                 Text(
                   '${detail.hatchCounter} (${detail.hatchSteps})',
-                  style: context.tito.cardValue,
+                  style: SecondaryTypography.onCard.meta14,
                 ),
               ],
             ),
@@ -741,9 +741,11 @@ class _MetaTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: context.tito.cardLabel.copyWith(fontWeight: FontWeight.w700),
+          style: SecondaryTypography.onCard.team12.copyWith(
+            color: TitoColors.mutedInk,
+          ),
         ),
-        Text(value, style: context.tito.cardValueLarge),
+        Text(value, style: SecondaryTypography.onCard.h15),
       ],
     );
   }

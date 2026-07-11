@@ -6,7 +6,6 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
-import '../theme/tito_typography.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -109,12 +108,17 @@ class _StatRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: context.tito.cardLabel),
+          Text(
+            label,
+            style: SecondaryTypography.onCard.team12.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: context.tito.cardValue,
+              style: SecondaryTypography.onCard.meta14,
             ),
           ),
         ],

@@ -5,7 +5,22 @@ import 'tito_typography.dart';
 
 /// Fixed logical-pixel typography for secondary routes (Team, Journey, Dex, …).
 ///
-/// Sizes are not scaled by uiScale or device font multipliers.
+/// ## Dex Typography Spec (secondary pages)
+///
+/// Reference: Pokédex list/detail (v0.2.23+). Use with [TitoFontScale] `multiplier: 1.0`
+/// on every secondary route except the home dashboard.
+///
+/// | Tier | px | Token | Use |
+/// |------|-----|-------|-----|
+/// | Page title | 22.5 | `onGradient.title` | App bar «← 图鉴» |
+/// | Section | 15 | `h15` | Card headings, tab context |
+/// | Body / meta | 14 | `body14` / `meta14` | Descriptions, values, tab labels |
+/// | Small / team | 12 | `small12` / `team12` | Hints, HP row, bottom tabs |
+///
+/// **Home dashboard** intentionally uses a separate scale (1.5×–2.25×) — do not apply
+/// this spec there. See `docs/TYPOGRAPHY.md`.
+///
+/// Sizes are not scaled by [DeviceLayout.handheldUiScale] when using these tokens directly.
 abstract final class SecondaryTypography {
   static const onGradient = _SecondaryOnGradient();
   static const onCard = _SecondaryOnCard();

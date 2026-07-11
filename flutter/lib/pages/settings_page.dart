@@ -9,8 +9,9 @@ import '../features/save/save_types.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
+import '../theme/tito_font_scale.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_bar.dart';
@@ -301,15 +302,17 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
 
-    return SecondaryPageScaffold(
-      title: AppZh.navSettings,
-      subtitle: localizeGame(widget.journey.game),
-      children: [
+    return TitoFontScale(
+      multiplier: 1.0,
+      child: SecondaryPageScaffold(
+        title: AppZh.navSettings,
+        subtitle: localizeGame(widget.journey.game),
+        children: [
         StickerCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppZh.settingsGroupTrainer, style: context.tito.cardTitle),
+              Text(AppZh.settingsGroupTrainer, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 12),
               TextField(
                 controller: _trainerController,
@@ -342,7 +345,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 16),
               Text(
                 AppZh.settingsEditJourney,
-                style: context.tito.cardSectionTitle,
+                style: SecondaryTypography.onCard.h15,
               ),
               const SizedBox(height: 10),
               TextField(
@@ -407,16 +410,18 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppZh.settingsGroupSaveSync, style: context.tito.cardTitle),
+              Text(AppZh.settingsGroupSaveSync, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsSaveDirectoryHint,
-                style: context.tito.cardMuted,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 directoryPath ?? AppZh.settingsSaveDirectoryUnset,
-                style: context.tito.cardBodyEmphasis.copyWith(
+                style: SecondaryTypography.onCard.body14.copyWith(
                   color: directoryPath == null
                       ? TitoColors.mutedInk
                       : TitoColors.ink,
@@ -444,7 +449,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Expanded(
                     child: Text(
                       AppZh.settingsAutoLoadOnStartup,
-                      style: context.tito.cardBody,
+                      style: SecondaryTypography.onCard.body14,
                     ),
                   ),
                   Switch(
@@ -457,7 +462,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 lastSynced != null
                     ? AppZh.settingsLastSynced(lastSynced)
                     : AppZh.settingsLastSyncedNone,
-                style: context.tito.cardMuted,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
@@ -474,9 +481,14 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppZh.settingsDexOffline, style: context.tito.cardTitle),
+              Text(AppZh.settingsDexOffline, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
-              Text(AppZh.settingsDexOfflineHint, style: context.tito.cardMuted),
+              Text(
+                AppZh.settingsDexOfflineHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 dexManifest != null && dexManifest.complete
@@ -489,7 +501,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     : dexManifest != null && dexManifest.pokemonCount > 0
                     ? AppZh.settingsDexOfflinePartial(dexManifest.pokemonCount)
                     : AppZh.settingsDexOfflineUnset,
-                style: context.tito.cardBodyEmphasis,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               if (_dexDownloading && dexProgress != null) ...[
                 const SizedBox(height: 12),
@@ -501,17 +515,26 @@ class _SettingsPageState extends State<SettingsPage> {
                     dexProgress.current,
                     dexProgress.total,
                   ),
-                  style: context.tito.cardMuted,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
                 ),
                 if (dexProgress.label != null) ...[
                   const SizedBox(height: 4),
-                  Text(dexProgress.label!, style: context.tito.caption),
+                  Text(
+                    dexProgress.label!,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
                 ],
               ],
               const SizedBox(height: 12),
               Text(
                 AppZh.settingsDexCdnDownloadHint,
-                style: context.tito.cardMuted,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
               ),
               const SizedBox(height: 12),
               FilledButton(
@@ -540,7 +563,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child: Text(
                         AppZh.settingsDexOfflinePrefer,
-                        style: context.tito.cardBody,
+                        style: SecondaryTypography.onCard.body14,
                       ),
                     ),
                     Switch(
@@ -563,15 +586,22 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppZh.settingsEmulator, style: context.tito.cardTitle),
+              Text(AppZh.settingsEmulator, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
-              Text(AppZh.settingsEmulatorHint, style: context.tito.cardMuted),
+              Text(
+                AppZh.settingsEmulatorHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 emulator != null
                     ? AppZh.settingsEmulatorSelected(emulator.appName)
                     : AppZh.settingsEmulatorUnset,
-                style: context.tito.cardBodyEmphasis,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 12),
               FilledButton(
@@ -597,7 +627,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(AppZh.settingsGroupAdvanced, style: context.tito.cardTitle),
+              Text(AppZh.settingsGroupAdvanced, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
               _Row(
                 label: AppZh.settingsCurrentGame,
@@ -643,6 +673,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ],
+      ),
     );
   }
 }
@@ -660,12 +691,17 @@ class _Row extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: context.tito.cardLabel),
+          Text(
+            label,
+            style: SecondaryTypography.onCard.team12.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
           Flexible(
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: context.tito.cardValue,
+              style: SecondaryTypography.onCard.meta14,
             ),
           ),
         ],

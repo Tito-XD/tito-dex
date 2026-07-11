@@ -15,7 +15,6 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/tito_font_scale.dart';
-import '../theme/tito_typography.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -218,7 +217,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppZh.searchRecent, style: context.tito.cardTitle),
+                Text(AppZh.searchRecent, style: SecondaryTypography.onCard.h15),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -246,9 +245,20 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppZh.dexLoadFailed, style: context.tito.cardBodyEmphasis),
+                Text(
+                  AppZh.dexLoadFailed,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(_error!, style: context.tito.errorDetail),
+                Text(
+                  _error!,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    height: 1.45,
+                  ),
+                ),
               ],
             ),
           )
@@ -256,7 +266,9 @@ class _SearchPageState extends State<SearchPage> {
           StickerCard(
             child: Text(
               AppZh.searchNoResults,
-              style: context.tito.cardBodyStrong,
+              style: SecondaryTypography.onCard.body14.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
           )
         else
