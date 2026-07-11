@@ -66,7 +66,12 @@ void main() {
         config.manifestUrl,
         '${DexCdnConfig.cdnBase}/bundle-manifest.json',
       );
-      expect(config.spriteUrl(25), '${DexCdnConfig.cdnBase}/v2/sprites/25.jpg');
+      expect(config.spriteUrl(25), '${DexCdnConfig.cdnBase}/v2/sprites/25.png');
+      expect(config.artworkUrl(25), '${DexCdnConfig.cdnBase}/v2/artwork/25.png');
+      expect(
+        config.typeIconUrl('fire'),
+        '${DexCdnConfig.cdnBase}/v2/type_icons/fire.png',
+      );
     });
 
     test('fallbackManifest uses compile-time defaults', () {

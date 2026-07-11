@@ -1,0 +1,6 @@
+# Dependencies installed by Cloudflare Workers Builds (npm ci)
+node_modules/
+
+# Wrangler local state
+.wrangler/
+.dev.vars

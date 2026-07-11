@@ -2,27 +2,38 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-/// Compress remote sprite bytes into compact WebP for offline storage.
+/// Resize PNG sprites for offline storage while preserving alpha.
 class DexSpriteCodec {
   const DexSpriteCodec({
-    this.maxWidth = 220,
-    this.quality = 78,
+    this.thumbMaxWidth = 220,
+    this.artworkMaxWidth,
   });
 
-  final int maxWidth;
-  final int quality;
+  final int thumbMaxWidth;
+  final int? artworkMaxWidth;
 
-  Uint8List? compressPngBytes(Uint8List bytes) {
+  Uint8List? compressThumbPngBytes(Uint8List bytes) {
+    return _encodePng(bytes, maxWidth: thumbMaxWidth);
+  }
+
+  Uint8List? compressArtworkPngBytes(Uint8List bytes) {
+    return _encodePng(bytes, maxWidth: artworkMaxWidth);
+  }
+
+  /// Backward-compatible alias used by offline bulk download.
+  Uint8List? compressPngBytes(Uint8List bytes) => compressThumbPngBytes(bytes);
+
+  Uint8List? _encodePng(Uint8List bytes, {required int? maxWidth}) {
     final decoded = img.decodeImage(bytes);
     if (decoded == null) {
       return null;
     }
 
-    final resized = decoded.width > maxWidth
+    final resized = maxWidth != null && decoded.width > maxWidth
         ? img.copyResize(decoded, width: maxWidth)
         : decoded;
 
-    return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
+    return Uint8List.fromList(img.encodePng(resized));
   }
 }
 
@@ -35,3 +46,6 @@ String formatCacheSize(int bytes) {
   }
   return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 }
+
+String pokeApiOfficialArtworkUrl(int id) =>
+    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$id.png';

@@ -38,6 +38,7 @@ This keeps any remaining `context.tito` fallbacks at ×1.0 on RG instead of ×1.
 | Journey | ✅ |
 | Search | ✅ |
 | Settings | ✅ |
+| Companion tools (type matchup / stat calc / quick damage) | ✅ |
 
 ### Home dashboard (exception)
 
