@@ -8,6 +8,7 @@ import mimetypes
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 DEFAULT_CDN_PREFIX = "v3"
@@ -40,7 +41,25 @@ def resolve_bundle_dir(upload_dir: Path, cdn_prefix: str) -> Path:
     raise FileNotFoundError(f"Missing bundle directory: {bundle_dir}")
 
 
-def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None:
+def load_uploaded_keys(log_path: Path | None) -> set[str]:
+    uploaded: set[str] = set()
+    if log_path is None or not log_path.exists():
+        return uploaded
+    for line in log_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line.startswith("→ "):
+            uploaded.add(line[2:].strip())
+    return uploaded
+
+
+def upload_with_wrangler(
+    upload_dir: Path,
+    bucket: str,
+    cdn_prefix: str,
+    *,
+    resume: bool = False,
+    resume_log: Path | None = None,
+) -> None:
     bundle_dir = resolve_bundle_dir(upload_dir, cdn_prefix)
     wrangler = os.environ.get("WRANGLER", "wrangler")
     if subprocess.run(["which", wrangler], capture_output=True).returncode != 0:
@@ -49,7 +68,12 @@ def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None
     else:
         prefix = [wrangler]
 
+    uploaded = load_uploaded_keys(resume_log) if resume else set()
+
     def put(key: str, file: Path, content_type: str | None = None) -> None:
+        if resume and key in uploaded:
+            print(f"  skip {key} (already uploaded)", flush=True)
+            return
         cmd = [
             *prefix,
             "r2",
@@ -61,8 +85,23 @@ def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None
         ]
         if content_type:
             cmd.append(f"--content-type={content_type}")
-        print(f"→ {key}", flush=True)
-        subprocess.run(cmd, check=True)
+        last_error: Exception | None = None
+        for attempt in range(6):
+            try:
+                print(f"→ {key}", flush=True)
+                subprocess.run(cmd, check=True)
+                uploaded.add(key)
+                return
+            except subprocess.CalledProcessError as exc:
+                last_error = exc
+                wait = min(60.0, 2.0 ** attempt)
+                print(
+                    f"  warn: upload retry {attempt + 1}/6 {key}: {exc}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                time.sleep(wait)
+        raise last_error  # type: ignore[misc]
 
     put("bundle-manifest.json", upload_dir / "bundle-manifest.json", "application/json")
     for name in (
@@ -147,6 +186,17 @@ def main() -> None:
         default=DEFAULT_CDN_PREFIX,
         help=f"CDN path prefix under bucket (default: {DEFAULT_CDN_PREFIX}; use v2 for legacy)",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip keys already listed with → in --resume-log",
+    )
+    parser.add_argument(
+        "--resume-log",
+        type=Path,
+        default=Path("/tmp/dex-upload.log"),
+        help="Log file listing prior successful uploads (default: /tmp/dex-upload.log)",
+    )
     args = parser.parse_args()
 
     if not args.upload_dir.exists():
@@ -168,7 +218,13 @@ def main() -> None:
             args.cdn_prefix,
         )
     elif os.environ.get("CLOUDFLARE_API_TOKEN") or _wrangler_oauth_ready():
-        upload_with_wrangler(args.upload_dir, args.bucket, args.cdn_prefix)
+        upload_with_wrangler(
+            args.upload_dir,
+            args.bucket,
+            args.cdn_prefix,
+            resume=args.resume,
+            resume_log=args.resume_log,
+        )
     else:
         print(
             "Run `wrangler login`, or set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID,\n"
