@@ -379,17 +379,35 @@ class PokeApiBuilder:
 
     def _get_json(self, path: str) -> dict[str, Any]:
         url = path if path.startswith("http") else f"{POKEAPI_BASE}{path}"
-        time.sleep(self.delay_s)
-        response = self.session.get(url, timeout=60)
-        response.raise_for_status()
-        return response.json()
+        last_error: Exception | None = None
+        for attempt in range(5):
+            time.sleep(self.delay_s)
+            try:
+                response = self.session.get(url, timeout=90)
+                response.raise_for_status()
+                return response.json()
+            except requests.RequestException as exc:
+                last_error = exc
+                wait = min(30.0, 2.0 ** attempt)
+                print(f"  warn: retry {attempt + 1}/5 {path}: {exc}", file=sys.stderr)
+                time.sleep(wait)
+        raise last_error  # type: ignore[misc]
 
     def _get_json_list(self, path: str) -> list[Any]:
         url = path if path.startswith("http") else f"{POKEAPI_BASE}{path}"
-        time.sleep(self.delay_s)
-        response = self.session.get(url, timeout=60)
-        response.raise_for_status()
-        return response.json()
+        last_error: Exception | None = None
+        for attempt in range(5):
+            time.sleep(self.delay_s)
+            try:
+                response = self.session.get(url, timeout=90)
+                response.raise_for_status()
+                return response.json()
+            except requests.RequestException as exc:
+                last_error = exc
+                wait = min(30.0, 2.0 ** attempt)
+                print(f"  warn: retry {attempt + 1}/5 {path}: {exc}", file=sys.stderr)
+                time.sleep(wait)
+        raise last_error  # type: ignore[misc]
 
     def load_type_relations(self) -> dict[str, TypeDamageRelations]:
         if self.type_relations:
@@ -1186,6 +1204,63 @@ def download_game_icons(
             print(f"  warn: game icon {edition.icon_slug}: {exc}", file=sys.stderr)
 
 
+def collect_move_ids_from_detail(detail: dict[str, Any]) -> set[int]:
+    move_ids: set[int] = set()
+
+    def scan_move_set(move_set: dict[str, Any]) -> None:
+        for key in ("levelUp", "machine", "egg", "tutor"):
+            for ref in move_set.get(key, []):
+                move_id = ref.get("moveId")
+                if move_id is not None:
+                    move_ids.add(int(move_id))
+
+    scan_move_set(detail.get("moveSet") or {})
+    for move_set in (detail.get("moveSets") or {}).values():
+        scan_move_set(move_set)
+    return move_ids
+
+
+def warm_builder_caches_from_details(
+    builder: PokeApiBuilder, staging: Path, max_id: int
+) -> None:
+    details_dir = staging / "details"
+    if not details_dir.is_dir():
+        return
+    print("Warming move/ability caches from existing details…")
+    for pokemon_id in range(1, max_id + 1):
+        detail_path = details_dir / f"{pokemon_id}.json"
+        if not detail_path.exists():
+            continue
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        for move_id in collect_move_ids_from_detail(detail):
+            try:
+                builder.fetch_move(move_id)
+            except requests.RequestException as exc:
+                print(f"  warn: move #{move_id}: {exc}", file=sys.stderr)
+        for ability in detail.get("abilities", []):
+            slug = str(ability.get("nameEn", "")).lower().replace(" ", "-")
+            if not slug:
+                continue
+            try:
+                fetched = builder.fetch_ability(slug, is_hidden=ability.get("isHidden", False))
+                builder.register_ability(fetched, pokemon_id)
+            except requests.RequestException as exc:
+                print(f"  warn: ability {slug}: {exc}", file=sys.stderr)
+
+
+def summaries_from_details(staging: Path, max_id: int) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for pokemon_id in range(1, max_id + 1):
+        detail_path = staging / "details" / f"{pokemon_id}.json"
+        if not detail_path.exists():
+            continue
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        summary = detail.get("summary")
+        if summary:
+            summaries.append(summary)
+    return summaries
+
+
 def build_bundle(
     *,
     cdn_base: str,
@@ -1193,76 +1268,89 @@ def build_bundle(
     min_id: int,
     max_id: int,
     delay_s: float,
+    resume: bool = False,
 ) -> None:
     cdn_base = cdn_base.rstrip("/")
     staging = output_dir / "staging"
     upload_bundle = output_dir / "upload" / BUNDLE_CDN_PREFIX
     artwork_staging = output_dir / "artwork_staging"
 
-    if staging.exists():
-        import shutil
+    import shutil
 
-        shutil.rmtree(staging)
-    if artwork_staging.exists():
-        import shutil
+    if resume and staging.exists():
+        print(f"Resuming into existing staging at {staging}")
+    else:
+        if staging.exists():
+            shutil.rmtree(staging)
+        if artwork_staging.exists():
+            shutil.rmtree(artwork_staging)
 
-        shutil.rmtree(artwork_staging)
-    staging.mkdir(parents=True)
-    artwork_staging.mkdir(parents=True)
-    (staging / "details").mkdir()
-    (staging / "sprites").mkdir()
-    (staging / "type_icons").mkdir()
-    (staging / "game_icons").mkdir()
+    staging.mkdir(parents=True, exist_ok=True)
+    artwork_staging.mkdir(parents=True, exist_ok=True)
+    (staging / "details").mkdir(exist_ok=True)
+    (staging / "sprites").mkdir(exist_ok=True)
+    (staging / "type_icons").mkdir(exist_ok=True)
+    (staging / "game_icons").mkdir(exist_ok=True)
 
     builder = PokeApiBuilder(delay_s=delay_s)
     session = builder.session
 
-    print("Loading type relations…")
-    relations = builder.load_type_relations()
-    types_payload = {
-        name: {
-            "doubleDamageTo": sorted(relations[name].double_damage_to),
-            "halfDamageTo": sorted(relations[name].half_damage_to),
-            "noDamageTo": sorted(relations[name].no_damage_to),
+    if not (staging / "types.json").exists():
+        print("Loading type relations…")
+        relations = builder.load_type_relations()
+        types_payload = {
+            name: {
+                "doubleDamageTo": sorted(relations[name].double_damage_to),
+                "halfDamageTo": sorted(relations[name].half_damage_to),
+                "noDamageTo": sorted(relations[name].no_damage_to),
+            }
+            for name in TYPE_NAMES
+            if name in relations
         }
-        for name in TYPE_NAMES
-        if name in relations
-    }
-    write_json(staging / "types.json", types_payload)
+        write_json(staging / "types.json", types_payload)
+    else:
+        builder.load_type_relations()
 
-    print("Building global indexes…")
-    write_json(staging / "games.json", build_games_json(cdn_base))
-    write_json(staging / "natures.json", fetch_natures_index(builder))
-    write_json(staging / "egg_groups.json", fetch_egg_groups_index(builder))
-    write_json(staging / "status_conditions.json", STATUS_CONDITIONS)
-    write_json(staging / "weather.json", WEATHER_CONDITIONS)
-    write_json(staging / "terrains.json", TERRAIN_CONDITIONS)
-    write_json(staging / "items.json", fetch_items_index(builder))
+    if not (staging / "games.json").exists():
+        print("Building global indexes…")
+        write_json(staging / "games.json", build_games_json(cdn_base))
+        write_json(staging / "natures.json", fetch_natures_index(builder))
+        write_json(staging / "egg_groups.json", fetch_egg_groups_index(builder))
+        write_json(staging / "status_conditions.json", STATUS_CONDITIONS)
+        write_json(staging / "weather.json", WEATHER_CONDITIONS)
+        write_json(staging / "terrains.json", TERRAIN_CONDITIONS)
+        write_json(staging / "items.json", fetch_items_index(builder))
 
-    print("Downloading type icons…")
-    for type_name in TYPE_NAMES:
-        try:
-            icon_url = builder.type_icon_url(type_name)
-            if not icon_url:
-                print(f"  warn: no colosseum icon for {type_name}", file=sys.stderr)
-                continue
-            png = download_bytes(session, icon_url)
-            optimized = optimize_png(png, max_width=64)
-            (staging / "type_icons" / f"{type_name}.png").write_bytes(optimized)
-        except requests.RequestException as exc:
-            print(f"  warn: type icon {type_name}: {exc}", file=sys.stderr)
+    if not any((staging / "type_icons").glob("*.png")):
+        print("Downloading type icons…")
+        for type_name in TYPE_NAMES:
+            try:
+                icon_url = builder.type_icon_url(type_name)
+                if not icon_url:
+                    print(f"  warn: no colosseum icon for {type_name}", file=sys.stderr)
+                    continue
+                png = download_bytes(session, icon_url)
+                optimized = optimize_png(png, max_width=64)
+                (staging / "type_icons" / f"{type_name}.png").write_bytes(optimized)
+            except requests.RequestException as exc:
+                print(f"  warn: type icon {type_name}: {exc}", file=sys.stderr)
 
-    print("Downloading game icons…")
-    download_game_icons(builder, session, staging)
+    if not any((staging / "game_icons").glob("*.png")):
+        print("Downloading game icons…")
+        download_game_icons(builder, session, staging)
 
-    summaries: list[dict[str, Any]] = []
+    if resume:
+        warm_builder_caches_from_details(builder, staging, max_id)
+
     for pokemon_id in range(min_id, max_id + 1):
-        print(f"#{pokemon_id}/{max_id}…")
+        detail_path = staging / "details" / f"{pokemon_id}.json"
+        if resume and detail_path.exists():
+            continue
+        print(f"#{pokemon_id}/{max_id}…", flush=True)
         summary, detail, sprite_remote = builder.build_detail(pokemon_id, cdn_base)
-        summaries.append(summary)
-        write_json(staging / "details" / f"{pokemon_id}.json", detail)
+        write_json(detail_path, detail)
 
-        if sprite_remote:
+        if sprite_remote and not (staging / "sprites" / f"{pokemon_id}.png").exists():
             try:
                 png = download_bytes(session, sprite_remote)
                 (staging / "sprites" / f"{pokemon_id}.png").write_bytes(
@@ -1274,6 +1362,7 @@ def build_bundle(
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
 
+    summaries = summaries_from_details(staging, max_id)
     write_json(staging / "summaries.json", summaries)
     moves_payload = {str(move_id): move for move_id, move in builder.move_cache.items()}
     write_json(staging / "moves.json", moves_payload)
@@ -1297,7 +1386,8 @@ def build_bundle(
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     manifest = {
         "version": BUNDLE_VERSION,
-        "complete": max_id >= TITODEX_MAX_NATIONAL_ID and min_id == 1,
+        "complete": max_id >= TITODEX_MAX_NATIONAL_ID
+        and len(summaries) >= TITODEX_MAX_NATIONAL_ID,
         "preferOffline": True,
         "downloadedAt": published_at,
         "pokemonCount": len(summaries),
@@ -1384,6 +1474,11 @@ def main() -> None:
         default=0.35,
         help="Delay between PokeAPI requests (seconds)",
     )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Continue into existing staging/; skip completed detail JSON files",
+    )
     args = parser.parse_args()
 
     build_bundle(
@@ -1392,6 +1487,7 @@ def main() -> None:
         min_id=args.min_id,
         max_id=args.max_id,
         delay_s=args.delay,
+        resume=args.resume,
     )
 
 
