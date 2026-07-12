@@ -1,9 +1,12 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../game/game_edition.dart';
 import 'dex_scope.dart';
 
 const _gameVersionKey = 'titodex.dex.default_game_version';
 const _regionalScopeKey = 'titodex.dex.default_regional_scope';
+// v0.4.0: Single global game edition (B2) — shared by home/dex/settings.
+const _globalEditionKey = 'titodex.game.global_edition';
 
 class DexSettingsRepository {
   Future<DexScope> loadDefaultScope() async {
@@ -37,6 +40,19 @@ class DexSettingsRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_gameVersionKey, scope.gameVersion.name);
     await prefs.setString(_regionalScopeKey, scope.regionalScope.name);
+  }
+
+  /// v0.4.0: Load persisted global [GameEdition] (falls back to HGSS).
+  Future<GameEdition> loadGlobalEdition() async {
+    final prefs = await SharedPreferences.getInstance();
+    return GameEdition.fromStorageKey(prefs.getString(_globalEditionKey)) ??
+        GameEdition.hgss;
+  }
+
+  /// v0.4.0: Persist global [GameEdition] for router refresh + dex bar.
+  Future<void> saveGlobalEdition(GameEdition edition) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_globalEditionKey, edition.name);
   }
 }
 

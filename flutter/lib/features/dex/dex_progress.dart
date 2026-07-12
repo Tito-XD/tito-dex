@@ -3,6 +3,7 @@ import '../companion/companion_art.dart';
 import '../parser/hgss_format.dart';
 import 'dex_game_scope.dart';
 import 'dex_models.dart';
+import 'dex_scope.dart';
 
 /// Encounter filter for dex list views.
 enum DexEncounterFilter {
@@ -73,20 +74,79 @@ class DexProgress {
     };
   }
 
-  DexScopeStats statsFor(DexRegionalScope scope) {
-    final (start, end) = hgssSaveDexIdRange(scope);
+  /// v0.4.0: Progress stats for any [DexRegionalPokedex] (11 regions).
+  ///
+  /// HGSS save-linked ranges still apply for national/kanto/johto; extended
+  /// regions use [statsForSummaries] once browse data is loaded.
+  DexScopeStats statsFor(
+    DexRegionalPokedex region, {
+    DexGameVersion gameVersion = DexGameVersion.hgss,
+  }) {
+    if (region == DexRegionalPokedex.national ||
+        region == DexRegionalPokedex.kanto ||
+        region == DexRegionalPokedex.johto) {
+      final (start, end) = switch (region) {
+        DexRegionalPokedex.national =>
+          hgssSaveDexIdRange(DexRegionalScope.national),
+        DexRegionalPokedex.kanto => hgssSaveDexIdRange(DexRegionalScope.kanto),
+        DexRegionalPokedex.johto => hgssSaveDexIdRange(DexRegionalScope.johto),
+        _ => throw StateError('Unreachable regional scope: $region'),
+      };
+      var caught = 0;
+      var seenOnly = 0;
+      for (var id = start; id <= end; id++) {
+        if (caughtIds.contains(id)) {
+          caught++;
+        } else if (seenIds.contains(id)) {
+          seenOnly++;
+        }
+      }
+      final total = end - start + 1;
+      return DexScopeStats(
+        region: region,
+        total: total,
+        caught: caught,
+        seenOnly: seenOnly,
+        unseen: total - caught - seenOnly,
+      );
+    }
+
+    // v0.4.0: Non-HGSS regional dexes have no save id range — empty until summaries load.
+    return DexScopeStats(
+      region: region,
+      total: 0,
+      caught: 0,
+      seenOnly: 0,
+      unseen: 0,
+    );
+  }
+
+  /// v0.4.0: Count caught/seen against loaded summaries for extended regions.
+  DexScopeStats statsForSummaries({
+    required DexRegionalPokedex region,
+    required DexGameVersion gameVersion,
+    required Iterable<PokemonSummary> summaries,
+  }) {
+    final scope = DexScope(
+      gameVersion: gameVersion,
+      regionalScope: region,
+    );
     var caught = 0;
     var seenOnly = 0;
-    for (var id = start; id <= end; id++) {
-      if (caughtIds.contains(id)) {
+    var total = 0;
+    for (final summary in summaries) {
+      if (!scope.speciesInScope(summary)) {
+        continue;
+      }
+      total++;
+      if (caughtIds.contains(summary.id)) {
         caught++;
-      } else if (seenIds.contains(id)) {
+      } else if (seenIds.contains(summary.id)) {
         seenOnly++;
       }
     }
-    final total = end - start + 1;
     return DexScopeStats(
-      scope: scope,
+      region: region,
       total: total,
       caught: caught,
       seenOnly: seenOnly,
@@ -97,14 +157,15 @@ class DexProgress {
 
 class DexScopeStats {
   const DexScopeStats({
-    required this.scope,
+    required this.region,
     required this.total,
     required this.caught,
     required this.seenOnly,
     required this.unseen,
   });
 
-  final DexRegionalScope scope;
+  /// v0.4.0: Regional pokedex key (replaces legacy 3-value [DexRegionalScope]).
+  final DexRegionalPokedex region;
   final int total;
   final int caught;
   final int seenOnly;
