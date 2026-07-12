@@ -36,6 +36,32 @@ function cacheControlForKey(key) {
   ) {
     return LONG_CACHE;
   }
+  if (
+    key.startsWith('v3/sprites/') ||
+    key.startsWith('v3/artwork/') ||
+    key.startsWith('v3/type_icons/') ||
+    key.startsWith('v3/game_icons/') ||
+    key.startsWith('v3/details/') ||
+    key === 'v3/bundle.tar.zst'
+  ) {
+    return LONG_CACHE;
+  }
+  if (
+    key.startsWith('v3/summaries.json') ||
+    key.startsWith('v3/types.json') ||
+    key.startsWith('v3/moves.json') ||
+    key.startsWith('v3/manifest.json') ||
+    key.startsWith('v3/abilities.json') ||
+    key.startsWith('v3/games.json') ||
+    key.startsWith('v3/natures.json') ||
+    key.startsWith('v3/egg_groups.json') ||
+    key.startsWith('v3/status_conditions.json') ||
+    key.startsWith('v3/weather.json') ||
+    key.startsWith('v3/terrains.json') ||
+    key.startsWith('v3/items.json')
+  ) {
+    return LONG_CACHE;
+  }
   return SHORT_CACHE;
 }
 
