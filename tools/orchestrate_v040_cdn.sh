@@ -72,7 +72,7 @@ upload_bundle() {
   log "UPLOAD starting → R2 titodex-dex/v3/"
   cd /workspace
   source ~/.venv-titodex-tools/bin/activate
-  if python3 tools/upload_dex_bundle_r2.py dist/dex-v5/upload --cdn-prefix v3 2>&1 | tee /tmp/dex-upload.log; then
+  if python3 tools/upload_dex_bundle_r2.py dist/dex-v5/upload --cdn-prefix v3 --resume 2>&1 | tee -a /tmp/dex-upload.log; then
     local files
     files=$(grep -c '^→' /tmp/dex-upload.log || echo 0)
     log "UPLOAD done — ${files} objects"
