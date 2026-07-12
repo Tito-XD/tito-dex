@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate dex bundle v5 output shape (abilities, obtainLocations, pokedexNumbers)."""
+"""Validate dex bundle v5/v0.4.0 output shape."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ sys.path.insert(0, str(REPO_ROOT / "tools"))
 from build_dex_bundle import (  # noqa: E402
     BUNDLE_CDN_PREFIX,
     BUNDLE_VERSION,
+    GAME_EDITIONS,
     ability_description_zh,
     encounter_area_label_zh,
     parse_pokedex_numbers,
@@ -47,6 +48,9 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         }
         self.assertEqual(ability_description_zh(detail), "静电")
 
+    def test_game_editions_count(self) -> None:
+        self.assertEqual(len(GAME_EDITIONS), 23)
+
     def test_sample_detail_json_has_v5_fields(self) -> None:
         bundle_dir = REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX
         detail_path = bundle_dir / "details" / "1.json"
@@ -54,15 +58,38 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             self.skipTest(f"Smoke build not found at {detail_path}")
 
         detail = json.loads(detail_path.read_text(encoding="utf-8"))
-        self.assertIn("abilities", detail)
-        self.assertIn("obtainLocations", detail)
-        self.assertIn("moveSets", detail)
+        for key in (
+            "abilities",
+            "obtainLocations",
+            "obtainLocationsByGame",
+            "moveSets",
+            "baseHappiness",
+            "captureRate",
+            "evYield",
+        ):
+            self.assertIn(key, detail, f"missing {key}")
+
         self.assertIsInstance(detail["abilities"], list)
         self.assertIsInstance(detail["obtainLocations"], list)
+        self.assertIsInstance(detail["obtainLocationsByGame"], dict)
+        self.assertIn("heartgold-soulsilver", detail["obtainLocationsByGame"])
+
         if detail["abilities"]:
             ability = detail["abilities"][0]
             for key in ("nameEn", "nameZh", "descriptionZh", "isHidden"):
                 self.assertIn(key, ability)
+
+        if detail["flavorEntries"]:
+            flavor = detail["flavorEntries"][0]
+            for key in (
+                "gameEdition",
+                "versionGroup",
+                "version",
+                "labelZh",
+                "iconUrl",
+                "text",
+            ):
+                self.assertIn(key, flavor, f"flavor missing {key}")
 
         summaries_path = bundle_dir / "summaries.json"
         summaries = json.loads(summaries_path.read_text(encoding="utf-8"))
@@ -77,6 +104,28 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         first = next(iter(abilities_index.values()))
         self.assertIn("pokemonIds", first)
 
+        games = json.loads((bundle_dir / "games.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(games), 23)
+        self.assertIn("slug", games[0])
+        self.assertIn("iconUrl", games[0])
+
+        natures = json.loads((bundle_dir / "natures.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(natures), 25)
+
+        egg_groups = json.loads(
+            (bundle_dir / "egg_groups.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(len(egg_groups), 15)
+
+        for index_name in (
+            "status_conditions.json",
+            "weather.json",
+            "terrains.json",
+            "items.json",
+        ):
+            payload = json.loads((bundle_dir / index_name).read_text(encoding="utf-8"))
+            self.assertTrue(payload, index_name)
+
         manifest = json.loads(
             (REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / "bundle-manifest.json").read_text(
                 encoding="utf-8"
@@ -88,17 +137,32 @@ class DexBundleV5ValidationTests(unittest.TestCase):
 
 def validate_detail_dir(details_dir: Path) -> list[str]:
     errors: list[str] = []
-    for detail_file in sorted(details_dir.glob("*.json")):
+    if details_dir.is_file():
+        detail_files = [details_dir]
+    else:
+        detail_files = sorted(details_dir.glob("*.json"))
+    for detail_file in detail_files:
         detail = json.loads(detail_file.read_text(encoding="utf-8"))
-        for key in ("abilities", "obtainLocations"):
+        for key in ("abilities", "obtainLocations", "obtainLocationsByGame"):
             if key not in detail:
                 errors.append(f"{detail_file.name}: missing {key}")
+        for key in ("baseHappiness", "captureRate", "evYield"):
+            if key not in detail:
+                errors.append(f"{detail_file.name}: missing {key}")
+        if detail.get("flavorEntries"):
+            flavor = detail["flavorEntries"][0]
+            if "gameEdition" not in flavor:
+                errors.append(f"{detail_file.name}: flavorEntries missing gameEdition")
     return errors
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--check":
-        target = Path(sys.argv[2]) if len(sys.argv) > 2 else REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX / "details"
+        target = (
+            Path(sys.argv[2])
+            if len(sys.argv) > 2
+            else REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX / "details"
+        )
         errors = validate_detail_dir(target)
         if errors:
             print("\n".join(errors), file=sys.stderr)

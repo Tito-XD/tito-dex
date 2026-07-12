@@ -35,13 +35,245 @@ BUNDLE_CDN_PREFIX = "v3"
 TITODEX_MAX_NATIONAL_ID = 1025
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
-SV_VERSION_GROUP = "scarlet-violet"
-SS_VERSION_GROUP = "sword-shield"
 JOHTO_POKEDEX_NAMES = {"original-johto", "updated-johto"}
-HGSS_FLAVOR_VERSIONS = ["gold", "silver", "crystal", "heartgold", "soulsilver"]
 HGSS_ENCOUNTER_VERSIONS = {"heartgold", "soulsilver"}
-SV_ENCOUNTER_VERSIONS = {"scarlet", "violet"}
-SS_ENCOUNTER_VERSIONS = {"sword", "shield"}
+MOVE_LEARN_METHODS = ("level-up", "machine", "egg", "tutor")
+
+EV_STAT_KEYS = {
+    "hp": "hp",
+    "attack": "attack",
+    "defense": "defense",
+    "special-attack": "specialAttack",
+    "special-defense": "specialDefense",
+    "speed": "speed",
+}
+
+
+@dataclass(frozen=True)
+class GameEdition:
+    slug: str
+    label_zh: str
+    version_group: str | None
+    flavor_versions: tuple[str, ...]
+    encounter_versions: frozenset[str]
+    icon_slug: str
+    fallback_slug: str | None = None
+
+
+GAME_EDITIONS: tuple[GameEdition, ...] = (
+    GameEdition(
+        "rgb", "红/绿/蓝", "red-blue", ("red", "blue"),
+        frozenset({"red", "blue"}), "red-blue",
+    ),
+    GameEdition(
+        "yellow", "皮卡丘", "yellow", ("yellow",),
+        frozenset({"yellow"}), "yellow",
+    ),
+    GameEdition(
+        "gs", "金/银", "gold-silver", ("gold", "silver"),
+        frozenset({"gold", "silver"}), "gold-silver",
+    ),
+    GameEdition(
+        "crystal", "水晶", "crystal", ("crystal",),
+        frozenset({"crystal"}), "crystal",
+    ),
+    GameEdition(
+        "rs", "红宝石/蓝宝石", "ruby-sapphire", ("ruby", "sapphire"),
+        frozenset({"ruby", "sapphire"}), "ruby-sapphire",
+    ),
+    GameEdition(
+        "emerald", "绿宝石", "emerald", ("emerald",),
+        frozenset({"emerald"}), "emerald",
+    ),
+    GameEdition(
+        "frlg", "火红/叶绿", "firered-leafgreen", ("firered", "leafgreen"),
+        frozenset({"firered", "leafgreen"}), "firered-leafgreen",
+    ),
+    GameEdition(
+        "dp", "钻石/珍珠", "diamond-pearl", ("diamond", "pearl"),
+        frozenset({"diamond", "pearl"}), "diamond-pearl",
+    ),
+    GameEdition(
+        "pt", "白金", "platinum", ("platinum",),
+        frozenset({"platinum"}), "platinum",
+    ),
+    GameEdition(
+        "hgss", "心金/魂银", "heartgold-soulsilver",
+        ("heartgold", "soulsilver"),
+        frozenset({"heartgold", "soulsilver"}), "heartgold-soulsilver",
+    ),
+    GameEdition(
+        "bw", "黑/白", "black-white", ("black", "white"),
+        frozenset({"black", "white"}), "black-white",
+    ),
+    GameEdition(
+        "bw2", "黑2/白2", "black-2-white-2", ("black-2", "white-2"),
+        frozenset({"black-2", "white-2"}), "black-2-white-2",
+    ),
+    GameEdition(
+        "xy", "X/Y", "x-y", ("x", "y"),
+        frozenset({"x", "y"}), "x-y",
+    ),
+    GameEdition(
+        "oras", "欧米加红宝石/阿尔法蓝宝石", "omega-ruby-alpha-sapphire",
+        ("omega-ruby", "alpha-sapphire"),
+        frozenset({"omega-ruby", "alpha-sapphire"}), "omega-ruby-alpha-sapphire",
+    ),
+    GameEdition(
+        "sm", "太阳/月亮", "sun-moon", ("sun", "moon"),
+        frozenset({"sun", "moon"}), "sun-moon",
+    ),
+    GameEdition(
+        "usum", "究极之日/月", "ultra-sun-ultra-moon",
+        ("ultra-sun", "ultra-moon"),
+        frozenset({"ultra-sun", "ultra-moon"}), "ultra-sun-ultra-moon",
+    ),
+    GameEdition(
+        "lgpe", "Let's Go 皮卡丘/伊布", "lets-go-pikachu-lets-go-eevee",
+        ("lets-go-pikachu", "lets-go-eevee"),
+        frozenset({"lets-go-pikachu", "lets-go-eevee"}),
+        "lets-go-pikachu-lets-go-eevee",
+    ),
+    GameEdition(
+        "swsh", "剑/盾", "sword-shield", ("sword", "shield"),
+        frozenset({"sword", "shield"}), "sword-shield",
+    ),
+    GameEdition(
+        "bdsp", "晶灿钻石/明亮珍珠", "brilliant-diamond-shining-pearl",
+        ("brilliant-diamond", "shining-pearl"),
+        frozenset({"brilliant-diamond", "shining-pearl"}),
+        "brilliant-diamond-shining-pearl", "pt",
+    ),
+    GameEdition(
+        "pla", "传说阿尔宙斯", "legends-arceus", ("legends-arceus",),
+        frozenset({"legends-arceus"}), "legends-arceus",
+    ),
+    GameEdition(
+        "sv", "朱/紫", "scarlet-violet", ("scarlet", "violet"),
+        frozenset({"scarlet", "violet"}), "scarlet-violet",
+    ),
+    GameEdition("lza", "传说 Z-A", None, (), frozenset(), "lza", "sv"),
+    GameEdition("champions", "Champions", None, (), frozenset(), "champions", "sv"),
+)
+
+ALL_VERSION_GROUPS = tuple(
+    edition.version_group for edition in GAME_EDITIONS if edition.version_group
+)
+
+ICON_SLUG_TO_POKEAPI_VERSION = {
+    "red-blue": "red",
+    "gold-silver": "gold",
+    "ruby-sapphire": "ruby",
+    "firered-leafgreen": "firered",
+    "diamond-pearl": "diamond",
+    "heartgold-soulsilver": "heartgold",
+    "black-white": "black",
+    "black-2-white-2": "black-2",
+    "x-y": "x",
+    "omega-ruby-alpha-sapphire": "omega-ruby",
+    "sun-moon": "sun",
+    "ultra-sun-ultra-moon": "ultra-sun",
+    "lets-go-pikachu-lets-go-eevee": "lets-go-pikachu",
+    "sword-shield": "sword",
+    "brilliant-diamond-shining-pearl": "brilliant-diamond",
+    "legends-arceus": "legends-arceus",
+    "scarlet-violet": "scarlet",
+    "yellow": "yellow",
+    "crystal": "crystal",
+    "emerald": "emerald",
+    "platinum": "platinum",
+}
+
+STATUS_CONDITIONS = [
+    {"slug": "burn", "nameEn": "Burn", "nameZh": "灼伤"},
+    {"slug": "freeze", "nameEn": "Freeze", "nameZh": "冰冻"},
+    {"slug": "paralysis", "nameEn": "Paralysis", "nameZh": "麻痹"},
+    {"slug": "poison", "nameEn": "Poison", "nameZh": "中毒"},
+    {"slug": "bad-poison", "nameEn": "Badly Poisoned", "nameZh": "剧毒"},
+    {"slug": "sleep", "nameEn": "Sleep", "nameZh": "睡眠"},
+    {"slug": "confusion", "nameEn": "Confusion", "nameZh": "混乱"},
+    {"slug": "flinch", "nameEn": "Flinch", "nameZh": "畏缩"},
+    {"slug": "trap", "nameEn": "Trapped", "nameZh": "束缚"},
+    {"slug": "leech-seed", "nameEn": "Leech Seed", "nameZh": "寄生种子"},
+    {"slug": "curse", "nameEn": "Curse", "nameZh": "诅咒"},
+    {"slug": "nightmare", "nameEn": "Nightmare", "nameZh": "噩梦"},
+    {"slug": "infatuation", "nameEn": "Infatuation", "nameZh": "着迷"},
+    {"slug": "torment", "nameEn": "Torment", "nameZh": "无理取闹"},
+    {"slug": "disable", "nameEn": "Disable", "nameZh": "定身法"},
+    {"slug": "encore", "nameEn": "Encore", "nameZh": "再来一次"},
+    {"slug": "perish-song", "nameEn": "Perish Song", "nameZh": "灭亡之歌"},
+    {"slug": "bound", "nameEn": "Bound", "nameZh": "紧束"},
+    {"slug": "yawn", "nameEn": "Drowsy", "nameZh": "瞌睡"},
+    {"slug": "taunt", "nameEn": "Taunt", "nameZh": "挑衅"},
+    {"slug": "embargo", "nameEn": "Embargo", "nameZh": "查封"},
+    {"slug": "heal-block", "nameEn": "Heal Block", "nameZh": "回复封锁"},
+]
+
+WEATHER_CONDITIONS = [
+    {"slug": "sun", "nameEn": "Harsh Sunlight", "nameZh": "大晴天"},
+    {"slug": "rain", "nameEn": "Rain", "nameZh": "下雨"},
+    {"slug": "sandstorm", "nameEn": "Sandstorm", "nameZh": "沙暴"},
+    {"slug": "hail", "nameEn": "Hail", "nameZh": "冰雹"},
+    {"slug": "snow", "nameEn": "Snow", "nameZh": "下雪"},
+    {"slug": "fog", "nameEn": "Fog", "nameZh": "浓雾"},
+    {"slug": "strong-winds", "nameEn": "Strong Winds", "nameZh": "乱流"},
+    {"slug": "heavy-rain", "nameEn": "Heavy Rain", "nameZh": "大雨"},
+    {"slug": "harsh-sunlight", "nameEn": "Extremely Harsh Sunlight", "nameZh": "大日照"},
+    {"slug": "strong-winds-primal", "nameEn": "Strong Winds", "nameZh": "德尔塔气流"},
+]
+
+TERRAIN_CONDITIONS = [
+    {"slug": "electric", "nameEn": "Electric Terrain", "nameZh": "电气场地"},
+    {"slug": "grassy", "nameEn": "Grassy Terrain", "nameZh": "青草场地"},
+    {"slug": "psychic", "nameEn": "Psychic Terrain", "nameZh": "精神场地"},
+    {"slug": "misty", "nameEn": "Misty Terrain", "nameZh": "薄雾场地"},
+]
+
+CURATED_ITEM_SLUGS = [
+    "potion", "super-potion", "hyper-potion", "max-potion", "full-restore",
+    "revive", "max-revive", "antidote", "paralyze-heal", "awakening",
+    "burn-heal", "ice-heal", "full-heal", "ether", "max-ether", "elixir",
+    "max-elixir", "fresh-water", "soda-pop", "lemonade", "moomoo-milk",
+    "x-attack", "x-defense", "x-sp-atk", "x-sp-def", "x-speed", "x-accuracy",
+    "dire-hit", "guard-spec", "leftovers", "choice-band", "choice-specs",
+    "choice-scarf", "life-orb", "focus-sash", "focus-band", "rocky-helmet",
+    "assault-vest", "eviolite", "expert-belt", "muscle-band", "wise-glasses",
+    "bright-powder", "quick-claw", "scope-lens", "wide-lens", "zoom-lens",
+    "sitrus-berry", "lum-berry", "chesto-berry", "pecha-berry", "rawst-berry",
+    "aspear-berry", "persim-berry", "leppa-berry", "oran-berry", "figy-berry",
+    "wiki-berry", "mago-berry", "aguav-berry", "iapapa-berry", "liechi-berry",
+    "ganlon-berry", "salac-berry", "petaya-berry", "apicot-berry", "lansat-berry",
+    "starf-berry", "enigma-berry", "occa-berry", "passho-berry", "wacan-berry",
+    "rindo-berry", "yache-berry", "chople-berry", "kebia-berry", "shuca-berry",
+    "coba-berry", "payapa-berry", "tanga-berry", "charti-berry", "kasib-berry",
+    "haban-berry", "colbur-berry", "babiri-berry", "chilan-berry", "roseli-berry",
+    "black-sludge", "toxic-orb", "flame-orb", "sticky-barb", "iron-ball",
+    "lagging-tail", "macho-brace", "power-weight", "power-bracer", "power-belt",
+    "power-lens", "power-band", "power-anklet", "destiny-knot", "everstone",
+    "light-clay", "heat-rock", "damp-rock", "smooth-rock", "icy-rock",
+    "terrain-extender", "red-card", "eject-button", "eject-pack", "air-balloon",
+    "weakness-policy", "blunder-policy", "throat-spray", "room-service",
+    "clear-amulet", "covert-cloak", "punching-glove", "loaded-dice",
+    "safety-goggles", "protective-pads", "heavy-duty-boots", "utility-umbrella",
+    "kings-rock", "razor-claw", "razor-fang", "metal-coat", "dragon-scale",
+    "upgrade", "dubious-disc", "protector", "electirizer", "magmarizer",
+    "reaper-cloth", "prism-scale", "sachet", "whipped-dream", "oval-stone",
+    "moon-stone", "sun-stone", "fire-stone", "water-stone", "thunder-stone",
+    "leaf-stone", "shiny-stone", "dusk-stone", "dawn-stone", "ice-stone",
+    "sweet-apple", "tart-apple", "cracked-pot", "chipped-pot", "galarica-cuff",
+    "galarica-wreath",     "auspicious-armor", "malicious-armor", "peat-block",
+    "black-augurite", "linking-cord", "scroll-of-darkness",
+    "scroll-of-waters", "metal-alloy", "ability-shield", "booster-energy",
+    "mirror-herb", "ability-patch", "ability-capsule",
+    "pp-up", "pp-max", "rare-candy", "exp-share", "lucky-egg", "amulet-coin",
+    "smoke-ball", "cleanse-tag", "repel", "super-repel", "max-repel",
+    "escape-rope", "poke-ball", "great-ball", "ultra-ball", "master-ball",
+    "safari-ball", "net-ball", "dive-ball", "nest-ball", "repeat-ball",
+    "timer-ball", "luxury-ball", "premier-ball", "dusk-ball", "heal-ball",
+    "quick-ball", "cherish-ball", "fast-ball", "level-ball", "lure-ball",
+    "heavy-ball", "love-ball", "friend-ball", "moon-ball", "sport-ball",
+    "park-ball", "dream-ball", "beast-ball", "strange-ball",
+]
 
 ENCOUNTER_AREA_LABELS_ZH = {
     "pallet-town-area": "真新镇",
@@ -287,31 +519,39 @@ class PokeApiBuilder:
         stab = compute_stab_super_effective(types, relations)
         base_stats = parse_base_stats(pokemon["stats"])
         johto = johto_dex_number(species.get("pokedex_numbers", []))
-        flavor_entries = parse_flavor_entries(species.get("flavor_text_entries", []))
+        flavor_entries = parse_flavor_entries(
+            species.get("flavor_text_entries", []), cdn_base
+        )
         move_entries = pokemon.get("moves", [])
-        move_set = fetch_move_set_for_version_group(self, move_entries, HGSS_VERSION_GROUP)
-        move_sets: dict[str, dict[str, list[dict[str, Any]]]] = {
-            HGSS_VERSION_GROUP: move_set,
-        }
-        if pokemon_id > HGSS_MAX_ID:
-            sv_moves = fetch_move_set_for_version_group(
-                self, move_entries, SV_VERSION_GROUP
+        move_set = fetch_move_set_for_version_group(
+            self, move_entries, HGSS_VERSION_GROUP
+        )
+        move_sets: dict[str, dict[str, list[dict[str, Any]]]] = {}
+        for version_group in ALL_VERSION_GROUPS:
+            group_moves = fetch_move_set_for_version_group(
+                self, move_entries, version_group
             )
-            if any(sv_moves.values()):
-                move_sets[SV_VERSION_GROUP] = sv_moves
-            ss_moves = fetch_move_set_for_version_group(
-                self, move_entries, SS_VERSION_GROUP
-            )
-            if any(ss_moves.values()):
-                move_sets[SS_VERSION_GROUP] = ss_moves
+            if any(group_moves.values()):
+                move_sets[version_group] = group_moves
+        if HGSS_VERSION_GROUP not in move_sets:
+            move_sets[HGSS_VERSION_GROUP] = move_set
 
         abilities = self.fetch_abilities(pokemon.get("abilities", []), pokemon_id)
-        obtain_locations = fetch_obtain_locations(self, pokemon_id)
+        obtain_locations_by_game = fetch_obtain_locations_by_game(self, pokemon_id)
+        obtain_locations = obtain_locations_by_game.get(
+            HGSS_VERSION_GROUP,
+            fetch_version_obtain_locations(
+                self, pokemon_id, HGSS_ENCOUNTER_VERSIONS
+            ),
+        )
         gender_female = gender_female_percent(species.get("gender_rate"))
         egg_groups = [
             EGG_GROUP_ZH.get(g["name"], g["name"]) for g in species.get("egg_groups", [])
         ]
         hatch_counter = species.get("hatch_counter")
+        base_happiness = species.get("base_happiness")
+        capture_rate = species.get("capture_rate")
+        ev_yield = parse_ev_yield(species.get("ev_yield", []))
 
         evolution_url = species.get("evolution_chain", {}).get("url")
         evolution = None
@@ -333,8 +573,15 @@ class PokeApiBuilder:
             "moveSets": move_sets,
             "abilities": abilities,
             "obtainLocations": obtain_locations,
+            "obtainLocationsByGame": obtain_locations_by_game,
             "eggGroups": egg_groups,
         }
+        if base_happiness is not None:
+            detail["baseHappiness"] = base_happiness
+        if capture_rate is not None:
+            detail["captureRate"] = capture_rate
+        if ev_yield:
+            detail["evYield"] = ev_yield
         if johto is not None:
             detail["johtoDexNumber"] = johto
         if base_stats:
@@ -485,17 +732,77 @@ def fetch_version_obtain_locations(
     return results
 
 
-def fetch_obtain_locations(
+def fetch_obtain_locations_by_game(
     builder: PokeApiBuilder, pokemon_id: int
-) -> list[dict[str, Any]]:
-    if pokemon_id <= HGSS_MAX_ID:
-        return fetch_version_obtain_locations(
-            builder, pokemon_id, HGSS_ENCOUNTER_VERSIONS
+) -> dict[str, list[dict[str, Any]]]:
+    by_game: dict[str, list[dict[str, Any]]] = {}
+    for edition in GAME_EDITIONS:
+        if not edition.version_group or not edition.encounter_versions:
+            continue
+        locations = fetch_version_obtain_locations(
+            builder, pokemon_id, edition.encounter_versions
         )
-    sv = fetch_version_obtain_locations(builder, pokemon_id, SV_ENCOUNTER_VERSIONS)
-    if sv:
-        return sv
-    return fetch_version_obtain_locations(builder, pokemon_id, SS_ENCOUNTER_VERSIONS)
+        by_game[edition.version_group] = locations
+    return by_game
+
+
+def parse_ev_yield(entries: list[dict[str, Any]]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for entry in entries:
+        stat_name = entry.get("stat", {}).get("name", "")
+        effort = entry.get("effort", 0)
+        key = EV_STAT_KEYS.get(stat_name)
+        if key and effort > 0:
+            result[key] = effort
+    return result
+
+
+def normalize_flavor_text(text: str) -> str:
+    return " ".join(text.replace("\n", " ").replace("\f", " ").split())
+
+
+def pick_flavor_text(lang_map: dict[str, str]) -> str | None:
+    return (
+        lang_map.get("zh-Hans")
+        or lang_map.get("zh-hans")
+        or lang_map.get("zh-Hant")
+        or lang_map.get("en")
+    )
+
+
+def parse_flavor_entries(
+    entries: list[dict[str, Any]], cdn_base: str
+) -> list[dict[str, Any]]:
+    by_version: dict[str, dict[str, str]] = {}
+    for entry in entries:
+        version = entry.get("version", {}).get("name", "")
+        language = entry.get("language", {}).get("name", "")
+        text = normalize_flavor_text(entry.get("flavor_text", ""))
+        if not version or not text:
+            continue
+        by_version.setdefault(version, {})[language] = text
+
+    result: list[dict[str, Any]] = []
+    cdn_prefix = BUNDLE_CDN_PREFIX
+    for edition in GAME_EDITIONS:
+        if not edition.version_group:
+            continue
+        icon_url = f"{cdn_base}/{cdn_prefix}/game_icons/{edition.icon_slug}.png"
+        for version in edition.flavor_versions:
+            text = pick_flavor_text(by_version.get(version, {}))
+            if not text:
+                continue
+            result.append(
+                {
+                    "gameEdition": edition.slug,
+                    "versionGroup": edition.version_group,
+                    "version": version,
+                    "labelZh": edition.label_zh,
+                    "iconUrl": icon_url,
+                    "text": text,
+                }
+            )
+    return result
 
 
 def parse_base_stats(stats: list[dict[str, Any]]) -> dict[str, int]:
@@ -511,29 +818,6 @@ def parse_base_stats(stats: list[dict[str, Any]]) -> dict[str, int]:
         "specialDefense": values.get("special-defense", 0),
         "speed": values.get("speed", 0),
     }
-
-
-def parse_flavor_entries(entries: list[dict[str, Any]]) -> list[dict[str, str]]:
-    result: list[dict[str, str]] = []
-    for version in HGSS_FLAVOR_VERSIONS:
-        zh_hans = zh_hant = english = None
-        for entry in entries:
-            if entry.get("version", {}).get("name") != version:
-                continue
-            language = entry.get("language", {}).get("name", "")
-            text = " ".join(entry.get("flavor_text", "").replace("\n", " ").split())
-            if not text:
-                continue
-            if language in ("zh-Hans", "zh-hans"):
-                zh_hans = text
-            elif language == "zh-Hant":
-                zh_hant = text
-            elif language == "en":
-                english = text
-        chosen = zh_hans or zh_hant or english
-        if chosen:
-            result.append({"version": version, "text": chosen})
-    return result
 
 
 def gender_female_percent(gender_rate: int | None) -> float | None:
@@ -613,6 +897,7 @@ def fetch_move_set_for_version_group(
     level_up: dict[int, dict[str, Any]] = {}
     machine: dict[int, dict[str, Any]] = {}
     egg: dict[int, dict[str, Any]] = {}
+    tutor: dict[int, dict[str, Any]] = {}
 
     for entry in move_entries:
         move_id = id_from_url(entry["move"]["url"])
@@ -620,10 +905,15 @@ def fetch_move_set_for_version_group(
             if detail.get("version_group", {}).get("name") != version_group:
                 continue
             method = detail.get("move_learn_method", {}).get("name")
-            if method not in ("level-up", "machine", "egg"):
+            if method not in MOVE_LEARN_METHODS:
                 continue
             level = detail.get("level_learned_at") or 0
-            target = {"level-up": level_up, "machine": machine, "egg": egg}[method]
+            target = {
+                "level-up": level_up,
+                "machine": machine,
+                "egg": egg,
+                "tutor": tutor,
+            }[method]
             existing = target.get(move_id)
             if method == "level-up" and existing and (existing.get("level") or 0) >= level:
                 continue
@@ -647,6 +937,7 @@ def fetch_move_set_for_version_group(
         "levelUp": sort_refs(level_up, by_level=True),
         "machine": sort_refs(machine, by_level=False),
         "egg": sort_refs(egg, by_level=False),
+        "tutor": sort_refs(tutor, by_level=False),
     }
 
 
@@ -763,6 +1054,138 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def build_games_json(cdn_base: str) -> list[dict[str, Any]]:
+    games: list[dict[str, Any]] = []
+    for edition in GAME_EDITIONS:
+        entry: dict[str, Any] = {
+            "slug": edition.slug,
+            "labelZh": edition.label_zh,
+            "versionGroup": edition.version_group,
+            "flavorVersions": list(edition.flavor_versions),
+            "encounterVersions": sorted(edition.encounter_versions),
+            "iconSlug": edition.icon_slug,
+            "iconUrl": (
+                f"{cdn_base}/{BUNDLE_CDN_PREFIX}/game_icons/{edition.icon_slug}.png"
+            ),
+        }
+        if edition.fallback_slug:
+            entry["fallbackSlug"] = edition.fallback_slug
+        games.append(entry)
+    return games
+
+
+def fetch_natures_index(builder: PokeApiBuilder) -> list[dict[str, Any]]:
+    index = builder._get_json("/nature?limit=50")
+    natures: list[dict[str, Any]] = []
+    for result in index["results"]:
+        detail = builder._get_json(f"/nature/{result['name']}")
+        increased = detail.get("increased_stat")
+        decreased = detail.get("decreased_stat")
+        entry: dict[str, Any] = {
+            "id": detail["id"],
+            "slug": detail["name"],
+            "nameEn": capitalize(detail["name"].replace("-", " ")),
+            "nameZh": localized_name(detail.get("names", []), detail["name"]),
+        }
+        if increased:
+            entry["increasedStat"] = EV_STAT_KEYS.get(
+                increased["name"], increased["name"]
+            )
+        if decreased:
+            entry["decreasedStat"] = EV_STAT_KEYS.get(
+                decreased["name"], decreased["name"]
+            )
+        likes = detail.get("likes_flavor")
+        hates = detail.get("hates_flavor")
+        if likes:
+            entry["likesFlavor"] = likes["name"]
+        if hates:
+            entry["hatesFlavor"] = hates["name"]
+        natures.append(entry)
+    return sorted(natures, key=lambda item: item["id"])
+
+
+def fetch_egg_groups_index(builder: PokeApiBuilder) -> list[dict[str, Any]]:
+    index = builder._get_json("/egg-group?limit=20")
+    groups: list[dict[str, Any]] = []
+    for result in index["results"]:
+        detail = builder._get_json(f"/egg-group/{result['name']}")
+        groups.append(
+            {
+                "id": detail["id"],
+                "slug": detail["name"],
+                "nameEn": capitalize(detail["name"].replace("-", " ")),
+                "nameZh": EGG_GROUP_ZH.get(
+                    detail["name"],
+                    localized_name(detail.get("names", []), detail["name"]),
+                ),
+            }
+        )
+    return sorted(groups, key=lambda item: item["id"])
+
+
+def fetch_items_index(builder: PokeApiBuilder) -> dict[str, dict[str, Any]]:
+    items: dict[str, dict[str, Any]] = {}
+    seen: set[str] = set()
+    for slug in CURATED_ITEM_SLUGS:
+        if slug in seen:
+            continue
+        seen.add(slug)
+        try:
+            detail = builder._get_json(f"/item/{slug}")
+        except requests.RequestException:
+            continue
+        item_id = detail["id"]
+        entry: dict[str, Any] = {
+            "id": item_id,
+            "slug": detail["name"],
+            "nameEn": capitalize(detail["name"].replace("-", " ")),
+            "nameZh": localized_name(detail.get("names", []), detail["name"]),
+        }
+        category = detail.get("category", {}).get("name")
+        if category:
+            entry["category"] = category
+        cost = detail.get("cost")
+        if cost is not None:
+            entry["cost"] = cost
+        items[str(item_id)] = entry
+    return items
+
+
+def fetch_version_sprite_url(builder: PokeApiBuilder, icon_slug: str) -> str | None:
+    version_name = ICON_SLUG_TO_POKEAPI_VERSION.get(icon_slug, icon_slug)
+    try:
+        detail = builder._get_json(f"/version/{version_name}")
+    except requests.RequestException:
+        return None
+    return detail.get("sprites", {}).get("default")
+
+
+def download_game_icons(
+    builder: PokeApiBuilder,
+    session: requests.Session,
+    staging: Path,
+) -> None:
+    icons_dir = staging / "game_icons"
+    icons_dir.mkdir(parents=True, exist_ok=True)
+    for edition in GAME_EDITIONS:
+        if not edition.version_group:
+            continue
+        icon_url = fetch_version_sprite_url(builder, edition.icon_slug)
+        if not icon_url:
+            print(
+                f"  warn: no game icon for {edition.icon_slug}",
+                file=sys.stderr,
+            )
+            continue
+        try:
+            png = download_bytes(session, icon_url)
+            optimized = optimize_png(png, max_width=64)
+            (icons_dir / f"{edition.icon_slug}.png").write_bytes(optimized)
+        except requests.RequestException as exc:
+            print(f"  warn: game icon {edition.icon_slug}: {exc}", file=sys.stderr)
+
+
 def build_bundle(
     *,
     cdn_base: str,
@@ -789,6 +1212,7 @@ def build_bundle(
     (staging / "details").mkdir()
     (staging / "sprites").mkdir()
     (staging / "type_icons").mkdir()
+    (staging / "game_icons").mkdir()
 
     builder = PokeApiBuilder(delay_s=delay_s)
     session = builder.session
@@ -806,6 +1230,15 @@ def build_bundle(
     }
     write_json(staging / "types.json", types_payload)
 
+    print("Building global indexes…")
+    write_json(staging / "games.json", build_games_json(cdn_base))
+    write_json(staging / "natures.json", fetch_natures_index(builder))
+    write_json(staging / "egg_groups.json", fetch_egg_groups_index(builder))
+    write_json(staging / "status_conditions.json", STATUS_CONDITIONS)
+    write_json(staging / "weather.json", WEATHER_CONDITIONS)
+    write_json(staging / "terrains.json", TERRAIN_CONDITIONS)
+    write_json(staging / "items.json", fetch_items_index(builder))
+
     print("Downloading type icons…")
     for type_name in TYPE_NAMES:
         try:
@@ -818,6 +1251,9 @@ def build_bundle(
             (staging / "type_icons" / f"{type_name}.png").write_bytes(optimized)
         except requests.RequestException as exc:
             print(f"  warn: type icon {type_name}: {exc}", file=sys.stderr)
+
+    print("Downloading game icons…")
+    download_game_icons(builder, session, staging)
 
     summaries: list[dict[str, Any]] = []
     for pokemon_id in range(min_id, max_id + 1):
@@ -850,6 +1286,13 @@ def build_bundle(
     }
     write_json(staging / "abilities.json", abilities_payload)
 
+    games_payload = json.loads((staging / "games.json").read_text(encoding="utf-8"))
+    natures_payload = json.loads((staging / "natures.json").read_text(encoding="utf-8"))
+    egg_groups_payload = json.loads(
+        (staging / "egg_groups.json").read_text(encoding="utf-8")
+    )
+    items_payload = json.loads((staging / "items.json").read_text(encoding="utf-8"))
+
     size_bytes = directory_size(staging)
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     manifest = {
@@ -860,6 +1303,10 @@ def build_bundle(
         "pokemonCount": len(summaries),
         "moveCount": len(moves_payload),
         "abilityCount": len(abilities_payload),
+        "gameCount": len(games_payload),
+        "natureCount": len(natures_payload),
+        "eggGroupCount": len(egg_groups_payload),
+        "itemCount": len(items_payload),
         "sizeBytes": size_bytes,
     }
     write_json(staging / "manifest.json", manifest)
@@ -881,12 +1328,20 @@ def build_bundle(
         "types.json",
         "moves.json",
         "abilities.json",
+        "games.json",
+        "natures.json",
+        "egg_groups.json",
+        "status_conditions.json",
+        "weather.json",
+        "terrains.json",
+        "items.json",
         "bundle.tar.zst",
     ):
         shutil.copy2(staging / name, upload_bundle / name)
     shutil.copytree(staging / "details", upload_bundle / "details")
     shutil.copytree(staging / "sprites", upload_bundle / "sprites")
     shutil.copytree(staging / "type_icons", upload_bundle / "type_icons")
+    shutil.copytree(staging / "game_icons", upload_bundle / "game_icons")
 
     archive_sha = sha256_file(upload_bundle / "bundle.tar.zst")
     bundle_manifest = {

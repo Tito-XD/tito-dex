@@ -50,12 +50,20 @@ def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None
         "types.json",
         "moves.json",
         "abilities.json",
+        "games.json",
+        "natures.json",
+        "egg_groups.json",
+        "status_conditions.json",
+        "weather.json",
+        "terrains.json",
+        "items.json",
         "bundle.tar.zst",
     ):
         file = bundle_dir / name
         if not file.exists():
-            if name == "abilities.json":
-                print(f"  skip missing {name} (pre-v5 bundle)", file=sys.stderr)
+            if name in ("abilities.json", "games.json", "natures.json", "egg_groups.json",
+                        "status_conditions.json", "weather.json", "terrains.json", "items.json"):
+                print(f"  skip missing {name} (pre-v0.4.0 bundle)", file=sys.stderr)
                 continue
             raise FileNotFoundError(file)
         ct = "application/json" if name.endswith(".json") else "application/octet-stream"
@@ -66,6 +74,7 @@ def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None
         ("sprites", "image/png"),
         ("artwork", "image/png"),
         ("type_icons", "image/png"),
+        ("game_icons", "image/png"),
     ):
         folder_path = bundle_dir / folder
         if not folder_path.exists():
