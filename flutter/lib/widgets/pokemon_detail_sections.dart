@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
+import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
@@ -165,9 +166,16 @@ class PokemonDetailHeader extends StatelessWidget {
 }
 
 class FlavorTextCarousel extends StatefulWidget {
-  const FlavorTextCarousel({super.key, required this.entries});
+  const FlavorTextCarousel({
+    super.key,
+    required this.entries,
+    this.gameEdition,
+    this.onPickEdition,
+  });
 
   final List<FlavorTextEntry> entries;
+  final GameEdition? gameEdition;
+  final VoidCallback? onPickEdition;
 
   @override
   State<FlavorTextCarousel> createState() => _FlavorTextCarouselState();
@@ -192,6 +200,27 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   @override
   Widget build(BuildContext context) {
     if (widget.entries.isEmpty) {
+      final edition = widget.gameEdition;
+      if (edition != null && !edition.hasPokeApiData) {
+        return StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexFlavorNoEdition,
+                style: SecondaryTypography.onCard.body14,
+              ),
+              if (widget.onPickEdition != null) ...[
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: widget.onPickEdition,
+                  child: const Text(AppZh.dexFlavorPickEdition),
+                ),
+              ],
+            ],
+          ),
+        );
+      }
       return StickerCard(
         child: Text(AppZh.dexFlavorEmpty, style: SecondaryTypography.onCard.body14),
       );
@@ -221,11 +250,27 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      flavorVersionLabelZh(entry.version),
-                      style: SecondaryTypography.onCard.meta14.copyWith(
-                        color: TitoColors.coral,
-                      ),
+                    Row(
+                      children: [
+                        if (entry.iconUrl != null) ...[
+                          Image.network(
+                            entry.iconUrl!,
+                            width: 20,
+                            height: 20,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox(width: 20, height: 20),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Expanded(
+                          child: Text(
+                            entry.displayLabel,
+                            style: SecondaryTypography.onCard.meta14.copyWith(
+                              color: TitoColors.coral,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     if (note != null) ...[
                       const SizedBox(height: 4),
@@ -568,54 +613,41 @@ class _BaseStatsSectionState extends State<BaseStatsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final square = DeviceLayout.useSquareDashboard(context);
-
-    if (square) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _StatsViewChip(
-                  label: AppZh.dexBaseStatsBars,
-                  selected: !_showRadar,
-                  onTap: () => setState(() => _showRadar = false),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _StatsViewChip(
-                  label: AppZh.dexBaseStatsRadar,
-                  selected: _showRadar,
-                  onTap: () => setState(() => _showRadar = true),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: _showRadar
-                ? BaseStatsRadarChart(
-                    key: const ValueKey('radar'),
-                    stats: widget.stats,
-                  )
-                : BaseStatsCard(
-                    key: const ValueKey('bars'),
-                    stats: widget.stats,
-                  ),
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(child: BaseStatsCard(stats: widget.stats)),
-        const SizedBox(width: 8),
-        Expanded(child: BaseStatsRadarChart(stats: widget.stats)),
+        Row(
+          children: [
+            Expanded(
+              child: _StatsViewChip(
+                label: AppZh.dexBaseStatsBars,
+                selected: !_showRadar,
+                onTap: () => setState(() => _showRadar = false),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _StatsViewChip(
+                label: AppZh.dexBaseStatsRadar,
+                selected: _showRadar,
+                onTap: () => setState(() => _showRadar = true),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: _showRadar
+              ? BaseStatsRadarChart(
+                  key: const ValueKey('radar'),
+                  stats: widget.stats,
+                )
+              : BaseStatsCard(
+                  key: const ValueKey('bars'),
+                  stats: widget.stats,
+                ),
+        ),
       ],
     );
   }
@@ -743,14 +775,45 @@ class TypeEffectivenessGrid extends StatelessWidget {
 }
 
 class AbilitiesCard extends StatelessWidget {
-  const AbilitiesCard({super.key, required this.abilities});
+  const AbilitiesCard({
+    super.key,
+    required this.abilities,
+    this.gameEdition,
+    this.onPickEdition,
+  });
 
   final List<PokemonAbility> abilities;
+  final GameEdition? gameEdition;
+  final VoidCallback? onPickEdition;
 
   @override
   Widget build(BuildContext context) {
     if (abilities.isEmpty) {
-      return const SizedBox.shrink();
+      return StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppZh.dexAbilities,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              AppZh.dexAbilityEmptyPending,
+              style: SecondaryTypography.onCard.body14.copyWith(
+                color: TitoColors.mutedInk,
+              ),
+            ),
+            if (onPickEdition != null) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: onPickEdition,
+                child: const Text(AppZh.dexFlavorPickEdition),
+              ),
+            ],
+          ],
+        ),
+      );
     }
 
     return StickerCard(
@@ -820,9 +883,14 @@ class AbilitiesCard extends StatelessWidget {
 }
 
 class ObtainLocationsCard extends StatelessWidget {
-  const ObtainLocationsCard({super.key, required this.locations});
+  const ObtainLocationsCard({
+    super.key,
+    required this.locations,
+    this.gameLabel,
+  });
 
   final List<ObtainLocationEntry> locations;
+  final String? gameLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -831,7 +899,9 @@ class ObtainLocationsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppZh.dexObtainHgss,
+            gameLabel == null
+                ? AppZh.dexObtainHgss
+                : AppZh.dexObtainForGame(gameLabel!),
             style: SecondaryTypography.onCard.h15,
           ),
           const SizedBox(height: 10),
@@ -1133,8 +1203,58 @@ class IntroMetaCard extends StatelessWidget {
               ],
             ),
           ],
+          if (detail.baseHappiness != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexBaseHappiness,
+              value: '${detail.baseHappiness}',
+            ),
+          ],
+          if (detail.captureRate != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexCaptureRate,
+              value: '${detail.captureRate}',
+            ),
+          ],
+          if (detail.evYieldLabel != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexEvYield,
+              value: detail.evYieldLabel!,
+            ),
+          ],
         ],
       ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: SecondaryTypography.onCard.team12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const Spacer(),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: SecondaryTypography.onCard.meta14,
+          ),
+        ),
+      ],
     );
   }
 }

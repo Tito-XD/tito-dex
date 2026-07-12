@@ -4,7 +4,7 @@ import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/dex_scope.dart';
+import '../features/game/game_edition.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _journeyDirty = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
-  DexGameVersion _defaultDexGameVersion = DexGameVersion.hgss;
+  GameEdition _defaultGameEdition = defaultGameEdition;
 
   @override
   void initState() {
@@ -87,22 +87,22 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadDexSettings() async {
-    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    final edition = await dexSettingsRepository.loadDefaultGameEdition();
     if (!mounted) {
       return;
     }
-    setState(() => _defaultDexGameVersion = version);
+    setState(() => _defaultGameEdition = edition);
   }
 
-  Future<void> _setDefaultDexGameVersion(DexGameVersion? version) async {
-    if (version == null) {
+  Future<void> _setDefaultGameEdition(GameEdition? edition) async {
+    if (edition == null) {
       return;
     }
-    await dexSettingsRepository.saveDefaultGameVersion(version);
+    await dexSettingsRepository.saveDefaultGameEdition(edition);
     if (!mounted) {
       return;
     }
-    setState(() => _defaultDexGameVersion = version);
+    setState(() => _defaultGameEdition = edition);
   }
 
   Future<void> _refreshDexCacheStatus() async {
@@ -567,19 +567,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<DexGameVersion>(
-                value: _defaultDexGameVersion,
+              DropdownButtonFormField<GameEdition>(
+                value: _defaultGameEdition,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
                 items: [
-                  for (final version in DexGameVersion.values)
+                  for (final edition in GameEdition.all)
                     DropdownMenuItem(
-                      value: version,
-                      child: Text(version.labelZh),
+                      value: edition,
+                      child: Text(edition.labelZh),
                     ),
                 ],
-                onChanged: _dexDownloading ? null : _setDefaultDexGameVersion,
+                onChanged: _dexDownloading ? null : _setDefaultGameEdition,
               ),
               const SizedBox(height: 12),
               Text(

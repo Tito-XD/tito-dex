@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/features/dex/dex_models.dart';
+import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/theme/device_layout.dart';
 import 'package:titodex/theme/tito_colors.dart';
 import 'package:titodex/widgets/handheld_input.dart';
@@ -213,7 +214,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('BaseStatsSection side-by-side on wide layout', (tester) async {
+  testWidgets('BaseStatsSection toggles between bars and radar', (tester) async {
     const stats = PokemonBaseStats(
       hp: 80,
       attack: 80,
@@ -233,6 +234,11 @@ void main() {
     );
 
     expect(find.byType(BaseStatsCard), findsOneWidget);
+    expect(find.byType(BaseStatsRadarChart), findsNothing);
+
+    await tester.tap(find.text(AppZh.dexBaseStatsRadar));
+    await tester.pumpAndSettle();
+
     expect(find.byType(BaseStatsRadarChart), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

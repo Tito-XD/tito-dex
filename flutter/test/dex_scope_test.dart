@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:titodex/features/dex/dex_game_scope.dart';
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/features/dex/dex_scope.dart';
+import 'package:titodex/features/game/game_edition.dart';
 import 'package:titodex/models/journey.dart';
 
 PokemonSummary _summary({
@@ -19,12 +21,13 @@ PokemonSummary _summary({
 
 void main() {
   group('DexScope.defaultForJourney', () {
-    test('returns HGSS national scope', () {
+    test('returns HGSS johto default regional scope', () {
       final scope = DexScope.defaultForJourney(CurrentJourney.mock());
 
       expect(scope.gameVersion, DexGameVersion.hgss);
-      expect(scope.regionalScope, DexRegionalPokedex.national);
-      expect(scope.label, '心金·魂银 · 全国');
+      expect(scope.gameEdition.slug, 'hgss');
+      expect(scope.regionalScope, DexRegionalPokedex.johto);
+      expect(scope.label, contains('城都'));
     });
   });
 
@@ -102,14 +105,14 @@ void main() {
       expect(
         DexScope.idRangeForScope(
           DexRegionalPokedex.johto,
-          gameVersion: DexGameVersion.hgss,
+          gameEdition: GameEdition.hgss,
         ),
         (152, 251),
       );
       expect(
         DexScope.idRangeForScope(
           DexRegionalPokedex.kanto,
-          gameVersion: DexGameVersion.hgss,
+          gameEdition: GameEdition.hgss,
         ),
         (1, 151),
       );

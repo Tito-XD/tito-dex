@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/dex_scope.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/type_chart.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
@@ -19,6 +20,8 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
+
+enum _MoveMethodFilter { level, machine, egg, tutor }
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemonId});
@@ -34,7 +37,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   (String, String)? _errorCopy;
   bool _loading = true;
   int _currentTabIndex = 0;
-  DexGameVersion _moveGameVersion = DexGameVersion.hgss;
+  GameEdition _gameEdition = defaultGameEdition;
+  GameEdition _moveGameEdition = defaultGameEdition;
+  _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
 
   @override
   void initState() {
@@ -44,11 +49,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   Future<void> _loadDefaultMoveVersion() async {
-    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    final edition = await dexSettingsRepository.loadDefaultGameEdition();
     if (!mounted) {
       return;
     }
-    setState(() => _moveGameVersion = version);
+    setState(() {
+      _gameEdition = edition;
+      _moveGameEdition = edition;
+    });
   }
 
   Future<void> _loadDetail() async {
@@ -109,7 +117,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     : ListView(
                         padding: padding.copyWith(bottom: 12),
                         children: [
-                          // Same size as second-level page headers (Dex list).
                           const SecondaryPageAppBar(
                             title: AppZh.navDex,
                             showSettings: false,
@@ -149,14 +156,53 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     };
   }
 
+  List<FlavorTextEntry> _flavorEntriesForEdition(PokemonDetail detail) {
+    if (detail.flavorEntries.isEmpty) {
+      return const [];
+    }
+    final key = _gameEdition.dataVersionGroupKey;
+    final matched = detail.flavorEntries
+        .where(
+          (entry) =>
+              entry.versionGroup == key ||
+              entry.gameEdition == _gameEdition.slug,
+        )
+        .toList();
+    return matched.isEmpty ? detail.flavorEntries : matched;
+  }
+
   List<Widget> _introSections(PokemonDetail detail) => [
-        FlavorTextCarousel(entries: detail.flavorEntries),
+        FlavorTextCarousel(
+          entries: _flavorEntriesForEdition(detail),
+          gameEdition: _gameEdition,
+          onPickEdition: () async {
+            final picked = await showGameEditionPicker(
+              context,
+              selected: _gameEdition,
+            );
+            if (picked != null && mounted) {
+              setState(() => _gameEdition = picked);
+              await dexSettingsRepository.saveDefaultGameEdition(picked);
+            }
+          },
+        ),
         const SizedBox(height: 12),
         IntroMetaCard(detail: detail),
-        if (detail.abilities.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          AbilitiesCard(abilities: detail.abilities),
-        ],
+        const SizedBox(height: 12),
+        AbilitiesCard(
+          abilities: detail.abilities,
+          gameEdition: _gameEdition,
+          onPickEdition: () async {
+            final picked = await showGameEditionPicker(
+              context,
+              selected: _gameEdition,
+            );
+            if (picked != null && mounted) {
+              setState(() => _gameEdition = picked);
+              await dexSettingsRepository.saveDefaultGameEdition(picked);
+            }
+          },
+        ),
         const SizedBox(height: 12),
         StickerCard(
           child: Text(
@@ -202,14 +248,38 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
+    final locations =
+        detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
     final sections = <Widget>[
-      if (detail.obtainLocations.isNotEmpty)
-        ObtainLocationsCard(locations: detail.obtainLocations)
+      if (locations.isNotEmpty)
+        ObtainLocationsCard(
+          locations: locations,
+          gameLabel: _gameEdition.labelZh,
+        )
       else
         StickerCard(
-          child: Text(
-            AppZh.dexObtainEmpty,
-            style: SecondaryTypography.onCard.body14,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexObtainEmptyVersion,
+                style: SecondaryTypography.onCard.body14,
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () async {
+                  final picked = await showGameEditionPicker(
+                    context,
+                    selected: _gameEdition,
+                  );
+                  if (picked != null && mounted) {
+                    setState(() => _gameEdition = picked);
+                    await dexSettingsRepository.saveDefaultGameEdition(picked);
+                  }
+                },
+                child: const Text(AppZh.dexFlavorPickEdition),
+              ),
+            ],
           ),
         ),
     ];
@@ -240,98 +310,180 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _movesSections(PokemonDetail detail) {
-    final moveSetKey = gameVersionMoveSetKey(_moveGameVersion);
+    final moveSetKey = gameEditionMoveSetKey(_moveGameEdition);
     final moveSet = detail.moveSetForKey(moveSetKey);
-    final availableVersions = [
-      for (final version in const [
-        DexGameVersion.hgss,
-        DexGameVersion.sv,
-        DexGameVersion.swsh,
-      ])
-        if (_moveSetHasData(detail, version)) version,
+    final availableEditions = [
+      for (final edition in GameEdition.all)
+        if (_moveSetHasData(detail, edition)) edition,
     ];
 
     return [
-      if (detail.hasMultipleMoveSets || availableVersions.length > 1) ...[
-        _MoveGameVersionBar(
-          selected: _moveGameVersion,
-          available: availableVersions.isEmpty
-              ? const [DexGameVersion.hgss]
-              : availableVersions,
-          onSelected: (version) {
-            setState(() => _moveGameVersion = version);
+      if (detail.hasMultipleMoveSets || availableEditions.length > 1) ...[
+        _MoveGameEditionBar(
+          selected: _moveGameEdition,
+          available: availableEditions.isEmpty
+              ? const [defaultGameEdition]
+              : availableEditions,
+          onSelected: (edition) {
+            setState(() => _moveGameEdition = edition);
           },
         ),
         const SizedBox(height: 12),
       ],
+      _MoveMethodFilterBar(
+        selected: _moveMethodFilter,
+        onSelected: (filter) => setState(() => _moveMethodFilter = filter),
+      ),
+      const SizedBox(height: 12),
       Text(
-        AppZh.dexMovesScope(gameVersionLabelZh(_moveGameVersion)),
+        AppZh.dexMovesScope(gameEditionLabelZh(_moveGameEdition)),
         style: SecondaryTypography.onGradient.body14,
       ),
       const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('level-up'),
-        moves: moveSet.levelUp,
-        showLevel: true,
-      ),
-      const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('machine'),
-        moves: moveSet.machine,
-      ),
-      const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('egg'),
-        moves: moveSet.egg,
-      ),
+      ..._movePanelsForFilter(moveSet),
     ];
   }
 
-  bool _moveSetHasData(PokemonDetail detail, DexGameVersion version) {
-    final set = detail.moveSetForKey(gameVersionMoveSetKey(version));
+  List<Widget> _movePanelsForFilter(PokemonMoveSet moveSet) {
+    return switch (_moveMethodFilter) {
+      _MoveMethodFilter.level => [
+          MoveCategoryPanel(
+            title: moveMethodLabelZh('level-up'),
+            moves: moveSet.levelUp,
+            showLevel: true,
+          ),
+        ],
+      _MoveMethodFilter.machine => [
+          MoveCategoryPanel(
+            title: moveMethodLabelZh('machine'),
+            moves: moveSet.machine,
+          ),
+        ],
+      _MoveMethodFilter.egg => [
+          MoveCategoryPanel(
+            title: moveMethodLabelZh('egg'),
+            moves: moveSet.egg,
+          ),
+        ],
+      _MoveMethodFilter.tutor => [
+          MoveCategoryPanel(
+            title: moveMethodLabelZh('tutor'),
+            moves: moveSet.tutor,
+          ),
+        ],
+    };
+  }
+
+  bool _moveSetHasData(PokemonDetail detail, GameEdition edition) {
+    final set = detail.moveSetForKey(edition.dataVersionGroupKey);
     return set.levelUp.isNotEmpty ||
         set.machine.isNotEmpty ||
-        set.egg.isNotEmpty;
+        set.egg.isNotEmpty ||
+        set.tutor.isNotEmpty;
   }
 }
 
-class _MoveGameVersionBar extends StatelessWidget {
-  const _MoveGameVersionBar({
+class _MoveGameEditionBar extends StatelessWidget {
+  const _MoveGameEditionBar({
     required this.selected,
     required this.available,
     required this.onSelected,
   });
 
-  final DexGameVersion selected;
-  final List<DexGameVersion> available;
-  final ValueChanged<DexGameVersion> onSelected;
+  final GameEdition selected;
+  final List<GameEdition> available;
+  final ValueChanged<GameEdition> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 34,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: available.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          final edition = available[index];
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => onSelected(edition),
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
+              child: Ink(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected.slug == edition.slug
+                      ? TitoColors.softYellow
+                      : TitoColors.card,
+                  borderRadius: BorderRadius.circular(TitoRadii.sm),
+                  border: Border.all(color: TitoColors.ink, width: 2),
+                ),
+                child: Text(
+                  edition.labelZh,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _MoveMethodFilterBar extends StatelessWidget {
+  const _MoveMethodFilterBar({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final _MoveMethodFilter selected;
+  final ValueChanged<_MoveMethodFilter> onSelected;
+
+  static const _order = [
+    _MoveMethodFilter.level,
+    _MoveMethodFilter.machine,
+    _MoveMethodFilter.egg,
+    _MoveMethodFilter.tutor,
+  ];
+
+  static const _labels = {
+    _MoveMethodFilter.level: AppZh.dexMoveFilterLevel,
+    _MoveMethodFilter.machine: AppZh.dexMoveFilterMachine,
+    _MoveMethodFilter.egg: AppZh.dexMoveFilterEgg,
+    _MoveMethodFilter.tutor: AppZh.dexMoveFilterTutor,
+  };
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        for (final version in available) ...[
-          if (version != available.first) const SizedBox(width: 6),
+        for (final entry in _order) ...[
+          if (entry != _order.first) const SizedBox(width: 5),
           Expanded(
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => onSelected(version),
+                onTap: () => onSelected(entry),
                 borderRadius: BorderRadius.circular(TitoRadii.sm),
                 child: Ink(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
-                    color: selected == version
+                    color: selected == entry
                         ? TitoColors.softYellow
                         : TitoColors.card,
                     borderRadius: BorderRadius.circular(TitoRadii.sm),
                     border: Border.all(color: TitoColors.ink, width: 2),
                   ),
                   child: Text(
-                    gameVersionLabelZh(version),
+                    _labels[entry]!,
                     textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -354,12 +506,13 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: DeviceLayout.pagePadding(context),
-      children: [
-        StickerCard(
+    return Center(
+      child: Padding(
+        padding: DeviceLayout.pagePadding(context),
+        child: StickerCard(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 copy.$1,
@@ -376,14 +529,14 @@ class _ErrorBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              TextButton(
+              FilledButton(
                 onPressed: onRetry,
                 child: const Text(AppZh.dexRetry),
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -397,63 +550,51 @@ class _DetailBottomTabs extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelected;
 
-  static const _tabs = [
+  static const _labels = [
     AppZh.dexTabIntro,
-    '基本',
+    AppZh.dexTabBasic,
     AppZh.dexTabObtain,
     AppZh.dexTabMoves,
   ];
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: TitoColors.deepBlue,
-            borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 2),
-          ),
-          child: Row(
-            children: List.generate(_tabs.length, (index) {
-              final selected = index == currentIndex;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: HandheldFocusDecorator(
-                    onActivate: () => onSelected(index),
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    child: Material(
-                      color: selected
-                          ? TitoColors.softYellow
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(TitoRadii.sm),
-                      child: InkWell(
-                        onTap: () => onSelected(index),
-                        canRequestFocus: false,
-                        borderRadius: BorderRadius.circular(TitoRadii.sm),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Text(
-                            _tabs[index],
-                            textAlign: TextAlign.center,
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: selected
-                                  ? TitoColors.deepBlue
-                                  : TitoColors.card,
-                            ),
-                          ),
+    return Container(
+      decoration: const BoxDecoration(
+        color: TitoColors.card,
+        border: Border(
+          top: BorderSide(color: TitoColors.ink, width: 2),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: List.generate(_labels.length, (index) {
+            final selected = index == currentIndex;
+            return Expanded(
+              child: HandheldFocusDecorator(
+                onActivate: () => onSelected(index),
+                child: Material(
+                  color: selected
+                      ? TitoColors.softYellow
+                      : Colors.transparent,
+                  child: InkWell(
+                    onTap: () => onSelected(index),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        _labels[index],
+                        textAlign: TextAlign.center,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );

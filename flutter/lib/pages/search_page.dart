@@ -9,8 +9,9 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/type_chart.dart';
+import '../features/game/game_edition_repository.dart';
+import '../pages/dex/dex_json_reference_page.dart';
 import '../l10n/app_zh.dart';
-import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -44,6 +45,7 @@ class _SearchPageState extends State<SearchPage> {
   List<PokemonSummary> _results = const [];
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
+  int _hubSegment = 0;
 
   @override
   void initState() {
@@ -149,17 +151,33 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final query = _controller.text.trim();
+    final edition = gameEditionRepository.edition;
 
     return TitoFontScale(
       multiplier: 1.0,
-      // TextField requires a Material ancestor; the route shell doesn't
-      // provide one (pages render straight into TitoPageContainer).
       child: Material(
         type: MaterialType.transparency,
         child: SecondaryPageScaffold(
-        title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
-        children: [
+          title: '${AppZh.navSearch} · ${edition.labelZh}',
+          children: [
+            _SearchHubSegmentBar(
+              selected: _hubSegment,
+              onSelected: (index) => setState(() => _hubSegment = index),
+            ),
+            const SizedBox(height: 12),
+            if (_hubSegment == 0) ..._searchSegment(context),
+            if (_hubSegment == 1) ..._referenceSegment(context),
+            if (_hubSegment == 2) ..._battleSegment(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _searchSegment(BuildContext context) {
+    final query = _controller.text.trim();
+
+    return [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -295,36 +313,211 @@ class _SearchPageState extends State<SearchPage> {
               );
             },
           ),
-        const SizedBox(height: 16),
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.dexReferenceTitle,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ActionChip(
-                    onPressed: () => context.push('/dex/moves'),
-                    label: Text(AppZh.dexReferenceMoves),
+    ];
+  }
+
+  List<Widget> _referenceSegment(BuildContext context) {
+    return [
+      StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppZh.searchHubDataTitle, style: SecondaryTypography.onCard.h15),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ActionChip(
+                  onPressed: () => context.push('/dex/moves'),
+                  label: Text(AppZh.dexReferenceMoves),
+                ),
+                ActionChip(
+                  onPressed: () => context.push('/dex/abilities'),
+                  label: Text(AppZh.dexReferenceAbilities),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefNatures,
+                    cdnPath: '/v3/natures.json',
                   ),
-                  ActionChip(
-                    onPressed: () => context.push('/dex/abilities'),
-                    label: Text(AppZh.dexReferenceAbilities),
+                  label: Text(AppZh.searchRefNatures),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefEggGroups,
+                    cdnPath: '/v3/egg_groups.json',
                   ),
-                ],
-              ),
-            ],
-          ),
+                  label: Text(AppZh.searchRefEggGroups),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefItems,
+                    cdnPath: '/v3/items.json',
+                  ),
+                  label: Text(AppZh.searchRefItems),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefWeather,
+                    cdnPath: '/v3/weather.json',
+                  ),
+                  label: Text(AppZh.searchRefWeather),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefTerrains,
+                    cdnPath: '/v3/terrains.json',
+                  ),
+                  label: Text(AppZh.searchRefTerrains),
+                ),
+                ActionChip(
+                  onPressed: () => openDexJsonReference(
+                    context,
+                    title: AppZh.searchRefStatus,
+                    cdnPath: '/v3/status_conditions.json',
+                  ),
+                  label: Text(AppZh.searchRefStatus),
+                ),
+                ActionChip(
+                  onPressed: () => context.push('/dex'),
+                  label: Text(AppZh.searchHubRegionalDex),
+                ),
+              ],
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        CompanionToolsPanel(journey: widget.journey),
-      ],
+      ),
+    ];
+  }
+
+  List<Widget> _battleSegment(BuildContext context) {
+    return [
+      StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppZh.searchHubBattleTitle, style: SecondaryTypography.onCard.h15),
+            const SizedBox(height: 8),
+            _BattleToolLink(
+              title: AppZh.searchBattleTypeMatchup,
+              onTap: () => context.push('/search/companion/type-matchup'),
+            ),
+            const SizedBox(height: 8),
+            _BattleToolLink(
+              title: AppZh.searchBattleStatCalc,
+              onTap: () => context.push('/search/companion/stat-calc'),
+            ),
+            const SizedBox(height: 8),
+            _BattleToolLink(
+              title: AppZh.searchBattleQuickDamage,
+              onTap: () => context.push('/search/companion/quick-damage'),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(height: 12),
+      CompanionToolsPanel(journey: widget.journey),
+    ];
+  }
+}
+
+class _SearchHubSegmentBar extends StatelessWidget {
+  const _SearchHubSegmentBar({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final int selected;
+  final ValueChanged<int> onSelected;
+
+  static const _labels = [
+    AppZh.searchHubSearch,
+    AppZh.searchHubReference,
+    AppZh.searchHubBattle,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: List.generate(_labels.length, (index) {
+        final isSelected = index == selected;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(left: index == 0 ? 0 : 4),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSelected(index),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                child: Ink(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? TitoColors.softYellow : TitoColors.card,
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    border: Border.all(color: TitoColors.ink, width: 2),
+                  ),
+                  child: Text(
+                    _labels[index],
+                    textAlign: TextAlign.center,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _BattleToolLink extends StatelessWidget {
+  const _BattleToolLink({required this.title, required this.onTap});
+
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Material(
+        color: TitoColors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: TitoColors.ink, width: 2),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: TitoColors.mutedInk,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

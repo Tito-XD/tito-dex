@@ -7,6 +7,7 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_typography.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/sticker_card.dart';
 
@@ -26,23 +27,17 @@ class CompanionToolsPanel extends StatelessWidget {
         children: [
           Text(
             AppZh.companionToolsTitle,
-            style: SecondaryTypography.onCard.h15,
+            style: context.tito.onDeepHeading,
           ),
           const SizedBox(height: 4),
           Text(
             AppZh.companionToolsSubtitle(localizeGame(journey.game)),
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w700,
-            ),
+            style: context.tito.onDeepSubtitle,
           ),
           const SizedBox(height: 4),
           Text(
             AppZh.companionToolsFacility(scope.facilityLabel),
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              fontWeight: FontWeight.w700,
-            ),
+            style: context.tito.onDeepSubtitle,
           ),
           const SizedBox(height: 12),
           _CompanionToolTile(

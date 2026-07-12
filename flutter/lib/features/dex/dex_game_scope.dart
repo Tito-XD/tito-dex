@@ -79,6 +79,7 @@ const moveMethodLabelsZh = <String, String>{
   'level-up': '等级提升',
   'machine': '招式学习器',
   'egg': '蛋招式',
+  'tutor': '教学招式',
 };
 
 String flavorVersionLabelZh(String version) =>
@@ -86,6 +87,63 @@ String flavorVersionLabelZh(String version) =>
 
 String moveMethodLabelZh(String method) =>
     moveMethodLabelsZh[method] ?? method;
+
+/// Regional pokedex scopes backed by CDN `pokedexNumbers` keys.
+enum DexRegionalPokedex {
+  national('national', '全国'),
+  kanto('kanto', '关东'),
+  johto('original-johto', '城都'),
+  hoenn('hoenn', '丰缘'),
+  sinnoh('original-sinnoh', '神奥'),
+  unova('unova', '合众'),
+  kalos('kalos-central', '卡洛斯'),
+  alola('original-alola', '阿罗拉'),
+  galar('galar', '伽勒尔'),
+  paldea('paldea', '帕底亚'),
+  hisui('hisui', '洗翠');
+
+  const DexRegionalPokedex(this.primaryPokedexKey, this.labelZh);
+
+  final String primaryPokedexKey;
+  final String labelZh;
+
+  /// All CDN / PokeAPI pokedex name keys that belong to this regional dex.
+  List<String> get pokedexKeys => switch (this) {
+        DexRegionalPokedex.national => const ['national'],
+        DexRegionalPokedex.kanto => const ['kanto'],
+        DexRegionalPokedex.johto => const ['original-johto', 'updated-johto'],
+        DexRegionalPokedex.hoenn => const ['hoenn', 'updated-hoenn'],
+        DexRegionalPokedex.sinnoh => const ['original-sinnoh', 'extended-sinnoh'],
+        DexRegionalPokedex.unova => const ['unova', 'updated-unova'],
+        DexRegionalPokedex.kalos => const [
+            'kalos-central',
+            'kalos-mountain',
+            'kalos-coastal',
+          ],
+        DexRegionalPokedex.alola => const ['original-alola', 'updated-alola'],
+        DexRegionalPokedex.galar => const [
+            'galar',
+            'isle-of-armor',
+            'crown-tundra',
+          ],
+        DexRegionalPokedex.paldea => const ['paldea', 'kitakami', 'blueberry'],
+        DexRegionalPokedex.hisui => const ['hisui'],
+      };
+
+  static DexRegionalPokedex? fromStorageKey(String? key) {
+    if (key == null) {
+      return null;
+    }
+    for (final scope in DexRegionalPokedex.values) {
+      if (scope.name == key) {
+        return scope;
+      }
+    }
+    return null;
+  }
+}
+
+String regionalPokedexLabelZh(DexRegionalPokedex scope) => scope.labelZh;
 
 enum DexRegionalScope { national, johto, kanto }
 
