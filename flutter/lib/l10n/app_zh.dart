@@ -194,6 +194,22 @@ abstract final class AppZh {
   static const searchRecent = '最近搜索';
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
+  // v0.4.0: search hub tabs (§7.4)
+  static const searchHubBattle = '对战资料';
+  static const searchReferenceComingSoon = '即将收录';
+  static const searchReferenceCdnNote = '资料将随后续 CDN 数据包更新。';
+  static const searchReferenceGuideTitle = '指南';
+  static const searchLzaMapTitle = 'LZA 交互地图';
+  static const searchLzaMapHint = '传说 Z-A 社区交互地图（外链）';
+  static const searchLzaMapUrl =
+      'https://maplab.app/pokemon-legends-z-a-interactive-map';
+  static const searchExternalLinkCopy = '复制链接';
+  static const searchExternalLinkCopied = '链接已复制到剪贴板';
+  static const dexReferenceNatures = '性格图鉴';
+  static const dexReferenceItems = '道具图鉴';
+  static const dexReferenceWeather = '天气';
+  static const dexReferenceTerrain = '场地';
+  static const dexReferenceStatus = '状态异常';
 
   static const companionToolsTitle = '对战助手';
   static String companionToolsSubtitle(String gameTitle) =>

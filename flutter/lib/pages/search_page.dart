@@ -17,12 +17,16 @@ import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_font_scale.dart';
-import '../widgets/companion_tools_panel.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import 'search/battle_hub_tab.dart';
+import 'search/reference_hub_tab.dart';
+
+// v0.4.0: §7.4 search hub tabs — search | reference | battle.
+enum _SearchHubTab { search, reference, battle }
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key, required this.journey});
@@ -44,6 +48,8 @@ class _SearchPageState extends State<SearchPage> {
   List<PokemonSummary> _results = const [];
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
+  // v0.4.0: default to search tab.
+  _SearchHubTab _hubTab = _SearchHubTab.search;
 
   @override
   void initState() {
@@ -149,8 +155,6 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final query = _controller.text.trim();
-
     return TitoFontScale(
       multiplier: 1.0,
       // TextField requires a Material ancestor; the route shell doesn't
@@ -158,8 +162,115 @@ class _SearchPageState extends State<SearchPage> {
       child: Material(
         type: MaterialType.transparency,
         child: SecondaryPageScaffold(
-        title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
-        children: [
+          title: '${AppZh.navSearch} · ${localizeGame(widget.journey.game)}',
+          children: [
+            _SearchHubSegmentedControl(
+              selected: _hubTab,
+              onChanged: (tab) => setState(() => _hubTab = tab),
+            ),
+            const SizedBox(height: 16),
+            switch (_hubTab) {
+              _SearchHubTab.search => _SearchTabContent(
+                  controller: _controller,
+                  onQueryChanged: _onQueryChanged,
+                  recentQueries: _recentQueries,
+                  onApplyQuery: _applyQuery,
+                  query: _controller.text.trim(),
+                  searching: _searching,
+                  error: _error,
+                  results: _results,
+                  progress: _progress,
+                ),
+              _SearchHubTab.reference => const ReferenceHubTab(),
+              _SearchHubTab.battle => BattleHubTab(journey: widget.journey),
+            },
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchHubSegmentedControl extends StatelessWidget {
+  const _SearchHubSegmentedControl({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final _SearchHubTab selected;
+  final ValueChanged<_SearchHubTab> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<_SearchHubTab>(
+      segments: const [
+        ButtonSegment(
+          value: _SearchHubTab.search,
+          label: Text(AppZh.navSearch),
+        ),
+        ButtonSegment(
+          value: _SearchHubTab.reference,
+          label: Text(AppZh.dexReferenceTitle),
+        ),
+        ButtonSegment(
+          value: _SearchHubTab.battle,
+          label: Text(AppZh.searchHubBattle),
+        ),
+      ],
+      selected: {selected},
+      onSelectionChanged: (values) => onChanged(values.first),
+      showSelectedIcon: false,
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TitoColors.deepBlue;
+          }
+          return TitoColors.card;
+        }),
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TitoColors.card;
+          }
+          return TitoColors.deepBlue.withValues(alpha: 0.35);
+        }),
+        side: WidgetStateProperty.all(
+          const BorderSide(color: TitoColors.card, width: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchTabContent extends StatelessWidget {
+  const _SearchTabContent({
+    required this.controller,
+    required this.onQueryChanged,
+    required this.recentQueries,
+    required this.onApplyQuery,
+    required this.query,
+    required this.searching,
+    required this.error,
+    required this.results,
+    required this.progress,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onQueryChanged;
+  final List<String> recentQueries;
+  final ValueChanged<String> onApplyQuery;
+  final String query;
+  final bool searching;
+  final String? error;
+  final List<PokemonSummary> results;
+  final DexProgress progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(
@@ -171,8 +282,8 @@ class _SearchPageState extends State<SearchPage> {
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: _controller,
-                onChanged: _onQueryChanged,
+                controller: controller,
+                onChanged: onQueryChanged,
                 spellCheckConfiguration:
                     const SpellCheckConfiguration.disabled(),
                 style: SecondaryTypography.onCard.small12.copyWith(
@@ -219,7 +330,7 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         ),
-        if (_recentQueries.isNotEmpty) ...[
+        if (recentQueries.isNotEmpty) ...[
           const SizedBox(height: 12),
           StickerCard(
             child: Column(
@@ -230,11 +341,11 @@ class _SearchPageState extends State<SearchPage> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: _recentQueries
+                  children: recentQueries
                       .map(
                         (recent) => _SearchQueryChip(
                           label: recent,
-                          onTap: () => _applyQuery(recent),
+                          onTap: () => onApplyQuery(recent),
                         ),
                       )
                       .toList(),
@@ -246,9 +357,9 @@ class _SearchPageState extends State<SearchPage> {
         const SizedBox(height: 16),
         if (query.isEmpty)
           const _SearchIdlePlaceholder()
-        else if (_searching)
+        else if (searching)
           const Center(child: CircularProgressIndicator())
-        else if (_error != null)
+        else if (error != null)
           StickerCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +372,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _error!,
+                  error!,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.mutedInk,
                     height: 1.45,
@@ -270,7 +381,7 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
           )
-        else if (_results.isEmpty)
+        else if (results.isEmpty)
           StickerCard(
             child: Text(
               AppZh.searchNoResults,
@@ -284,10 +395,10 @@ class _SearchPageState extends State<SearchPage> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemCount: _results.length,
+            itemCount: results.length,
             itemBuilder: (context, index) {
-              final entry = _results[index];
-              final status = dexRepository.statusFor(entry.id, _progress);
+              final entry = results[index];
+              final status = dexRepository.statusFor(entry.id, progress);
               return _SearchResultRow(
                 entry: entry,
                 status: status,
@@ -322,11 +433,7 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        CompanionToolsPanel(journey: widget.journey),
       ],
-        ),
-      ),
     );
   }
 }

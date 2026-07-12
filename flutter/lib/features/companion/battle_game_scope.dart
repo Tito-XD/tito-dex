@@ -1,4 +1,5 @@
 import '../game/game_catalog.dart';
+import '../game/game_edition.dart';
 
 /// Battle-tool context derived from the journey's current game.
 class BattleGameScope {
@@ -21,11 +22,13 @@ class BattleGameScope {
   final String damageNote;
 }
 
-BattleGameScope battleScopeForGame(String gameKey) {
-  final badge = badgeForGame(gameKey);
+// v0.4.0: prefer global [GameEdition] when resolving battle-tool context (B2).
+BattleGameScope battleScopeForGame(String gameKey, {GameEdition? edition}) {
+  final effectiveKey = edition?.journeyGameKey ?? gameKey;
+  final badge = edition?.homeBadgeLabel ?? badgeForGame(effectiveKey);
   return switch (badge) {
     'HGSS' || 'Pt' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 4,
         defaultLevel: 50,
@@ -34,7 +37,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第四世代伤害公式估算，适合对战开拓区与高难度战参考。',
       ),
     'B/W' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 5,
         defaultLevel: 50,
@@ -43,7 +46,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第五世代伤害公式估算，适合对战地铁与 N 战参考。',
       ),
     'B2W2' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 5,
         defaultLevel: 50,
@@ -52,7 +55,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第五世代伤害公式估算，适合对战地铁与世界对战参考。',
       ),
     'X/Y' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 6,
         defaultLevel: 50,
@@ -61,7 +64,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第六世代伤害公式估算，适合对战城堡与冠军战参考。',
       ),
     'ORAS' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 6,
         defaultLevel: 50,
@@ -70,7 +73,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第六世代伤害公式估算，适合对战 Maison 参考。',
       ),
     'USUM' => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 7,
         defaultLevel: 50,
@@ -79,7 +82,7 @@ BattleGameScope battleScopeForGame(String gameKey) {
         damageNote: '按第七世代伤害公式估算，适合对战树与究极 Necrozma 战参考。',
       ),
     _ => BattleGameScope(
-        gameKey: gameKey,
+        gameKey: effectiveKey,
         badge: badge,
         generation: 4,
         defaultLevel: 50,
