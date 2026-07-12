@@ -1223,29 +1223,39 @@ def collect_move_ids_from_detail(detail: dict[str, Any]) -> set[int]:
 def warm_builder_caches_from_details(
     builder: PokeApiBuilder, staging: Path, max_id: int
 ) -> None:
+    """Fetch moves/abilities referenced in existing details (end-of-build pass)."""
     details_dir = staging / "details"
     if not details_dir.is_dir():
         return
-    print("Warming move/ability caches from existing details…")
+    print("Collecting move/ability caches from detail files…", flush=True)
+    move_ids: set[int] = set()
+    ability_jobs: list[tuple[str, bool, int]] = []
     for pokemon_id in range(1, max_id + 1):
         detail_path = details_dir / f"{pokemon_id}.json"
         if not detail_path.exists():
             continue
         detail = json.loads(detail_path.read_text(encoding="utf-8"))
-        for move_id in collect_move_ids_from_detail(detail):
-            try:
-                builder.fetch_move(move_id)
-            except requests.RequestException as exc:
-                print(f"  warn: move #{move_id}: {exc}", file=sys.stderr)
+        move_ids.update(collect_move_ids_from_detail(detail))
         for ability in detail.get("abilities", []):
             slug = str(ability.get("nameEn", "")).lower().replace(" ", "-")
-            if not slug:
-                continue
-            try:
-                fetched = builder.fetch_ability(slug, is_hidden=ability.get("isHidden", False))
-                builder.register_ability(fetched, pokemon_id)
-            except requests.RequestException as exc:
-                print(f"  warn: ability {slug}: {exc}", file=sys.stderr)
+            if slug:
+                ability_jobs.append((slug, ability.get("isHidden", False), pokemon_id))
+
+    missing_moves = sorted(mid for mid in move_ids if mid not in builder.move_cache)
+    print(f"  moves to fetch: {len(missing_moves)}", flush=True)
+    for move_id in missing_moves:
+        try:
+            builder.fetch_move(move_id)
+        except requests.RequestException as exc:
+            print(f"  warn: move #{move_id}: {exc}", file=sys.stderr)
+
+    print(f"  abilities to register: {len(ability_jobs)}", flush=True)
+    for slug, is_hidden, pokemon_id in ability_jobs:
+        try:
+            fetched = builder.fetch_ability(slug, is_hidden=is_hidden)
+            builder.register_ability(fetched, pokemon_id)
+        except requests.RequestException as exc:
+            print(f"  warn: ability {slug}: {exc}", file=sys.stderr)
 
 
 def summaries_from_details(staging: Path, max_id: int) -> list[dict[str, Any]]:
@@ -1339,9 +1349,6 @@ def build_bundle(
         print("Downloading game icons…")
         download_game_icons(builder, session, staging)
 
-    if resume:
-        warm_builder_caches_from_details(builder, staging, max_id)
-
     for pokemon_id in range(min_id, max_id + 1):
         detail_path = staging / "details" / f"{pokemon_id}.json"
         if resume and detail_path.exists():
@@ -1362,6 +1369,7 @@ def build_bundle(
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
 
+    warm_builder_caches_from_details(builder, staging, max_id)
     summaries = summaries_from_details(staging, max_id)
     write_json(staging / "summaries.json", summaries)
     moves_payload = {str(move_id): move for move_id, move in builder.move_cache.items()}

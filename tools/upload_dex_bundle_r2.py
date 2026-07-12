@@ -14,6 +14,19 @@ DEFAULT_CDN_PREFIX = "v3"
 LEGACY_CDN_PREFIX = "v2"
 
 
+def _wrangler_oauth_ready() -> bool:
+    wrangler = os.environ.get("WRANGLER", "wrangler")
+    prefix = ["npx", wrangler] if subprocess.run(
+        ["which", wrangler], capture_output=True
+    ).returncode != 0 else [wrangler]
+    result = subprocess.run(
+        [*prefix, "whoami"],
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0 and "logged in" in result.stdout.lower()
+
+
 def resolve_bundle_dir(upload_dir: Path, cdn_prefix: str) -> Path:
     bundle_dir = upload_dir / cdn_prefix
     if bundle_dir.is_dir():
@@ -37,10 +50,18 @@ def upload_with_wrangler(upload_dir: Path, bucket: str, cdn_prefix: str) -> None
         prefix = [wrangler]
 
     def put(key: str, file: Path, content_type: str | None = None) -> None:
-        cmd = [*prefix, "r2", "object", "put", f"{bucket}/{key}", f"--file={file}"]
+        cmd = [
+            *prefix,
+            "r2",
+            "object",
+            "put",
+            f"{bucket}/{key}",
+            f"--file={file}",
+            "--remote",
+        ]
         if content_type:
             cmd.append(f"--content-type={content_type}")
-        print(f"→ {key}")
+        print(f"→ {key}", flush=True)
         subprocess.run(cmd, check=True)
 
     put("bundle-manifest.json", upload_dir / "bundle-manifest.json", "application/json")
@@ -138,20 +159,20 @@ def main() -> None:
         print(exc, file=sys.stderr)
         sys.exit(1)
 
-    account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
-    if os.environ.get("R2_ACCESS_KEY_ID") and os.environ.get("R2_SECRET_ACCESS_KEY") and account_id:
+    account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "e84aed053d6584bebf0f8a6e4870cd8c")
+    if os.environ.get("R2_ACCESS_KEY_ID") and os.environ.get("R2_SECRET_ACCESS_KEY"):
         upload_with_boto3(
             args.upload_dir,
             args.bucket,
             f"https://{account_id}.r2.cloudflarestorage.com",
             args.cdn_prefix,
         )
-    elif os.environ.get("CLOUDFLARE_API_TOKEN") and account_id:
+    elif os.environ.get("CLOUDFLARE_API_TOKEN") or _wrangler_oauth_ready():
         upload_with_wrangler(args.upload_dir, args.bucket, args.cdn_prefix)
     else:
         print(
-            "Set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID (wrangler)\n"
-            "or R2_ACCESS_KEY_ID + R2_SECRET_ACCESS_KEY + CLOUDFLARE_ACCOUNT_ID (boto3)",
+            "Run `wrangler login`, or set CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID,\n"
+            "or R2_ACCESS_KEY_ID + R2_SECRET_ACCESS_KEY + CLOUDFLARE_ACCOUNT_ID",
             file=sys.stderr,
         )
         sys.exit(1)
