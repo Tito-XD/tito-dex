@@ -259,20 +259,41 @@ class FlavorTextEntry {
   const FlavorTextEntry({
     required this.version,
     required this.text,
+    this.gameEdition,
+    this.versionGroup,
+    this.labelZh,
+    this.iconUrl,
   });
 
   final String version;
   final String text;
+  final String? gameEdition;
+  final String? versionGroup;
+  final String? labelZh;
+  final String? iconUrl;
+
+  String get displayLabel =>
+      labelZh ?? flavorVersionLabelZh(version);
 
   Map<String, dynamic> toJson() => {
         'version': version,
         'text': text,
+        if (gameEdition != null) 'gameEdition': gameEdition,
+        if (versionGroup != null) 'versionGroup': versionGroup,
+        if (labelZh != null) 'labelZh': labelZh,
+        if (iconUrl != null) 'iconUrl': iconUrl,
       };
 
   factory FlavorTextEntry.fromJson(Map<String, dynamic> json) =>
       FlavorTextEntry(
-        version: json['version'] as String,
+        version: json['version'] as String? ??
+            json['gameEdition'] as String? ??
+            'unknown',
         text: json['text'] as String,
+        gameEdition: json['gameEdition'] as String?,
+        versionGroup: json['versionGroup'] as String?,
+        labelZh: json['labelZh'] as String?,
+        iconUrl: json['iconUrl'] as String?,
       );
 }
 
@@ -339,16 +360,19 @@ class PokemonMoveSet {
     this.levelUp = const [],
     this.machine = const [],
     this.egg = const [],
+    this.tutor = const [],
   });
 
   final List<PokemonMove> levelUp;
   final List<PokemonMove> machine;
   final List<PokemonMove> egg;
+  final List<PokemonMove> tutor;
 
   Map<String, dynamic> toJson() => {
         'levelUp': _refs(levelUp),
         'machine': _refs(machine),
         'egg': _refs(egg),
+        'tutor': _refs(tutor),
       };
 
   static List<Map<String, dynamic>> _refs(List<PokemonMove> moves) => moves
@@ -389,6 +413,7 @@ class PokemonMoveSet {
       levelUp: parseList('levelUp'),
       machine: parseList('machine'),
       egg: parseList('egg'),
+      tutor: parseList('tutor'),
     );
   }
 
@@ -400,6 +425,9 @@ class PokemonMoveSet {
       yield entry.move;
     }
     for (final entry in egg) {
+      yield entry.move;
+    }
+    for (final entry in tutor) {
       yield entry.move;
     }
   }
@@ -421,9 +449,13 @@ class PokemonDetail {
     this.typeMultipliers = const {},
     this.flavorEntries = const [],
     this.obtainLocations = const [],
+    this.obtainLocationsByGame = const {},
     this.abilities = const [],
     this.moveSet = const PokemonMoveSet(),
     this.moveSets = const {},
+    this.baseHappiness,
+    this.captureRate,
+    this.evYield = const {},
     this.genderFemalePercent,
     this.eggGroups = const [],
     this.hatchCounter,
@@ -443,9 +475,13 @@ class PokemonDetail {
   final Map<String, double> typeMultipliers;
   final List<FlavorTextEntry> flavorEntries;
   final List<ObtainLocationEntry> obtainLocations;
+  final Map<String, List<ObtainLocationEntry>> obtainLocationsByGame;
   final List<PokemonAbility> abilities;
   final PokemonMoveSet moveSet;
   final Map<String, PokemonMoveSet> moveSets;
+  final int? baseHappiness;
+  final int? captureRate;
+  final Map<String, int> evYield;
   final double? genderFemalePercent;
   final List<String> eggGroups;
   final int? hatchCounter;
@@ -467,6 +503,27 @@ class PokemonDetail {
 
   bool get hasMultipleMoveSets => moveSets.length > 1;
 
+  /// Obtain locations for a game version group key.
+  List<ObtainLocationEntry> obtainLocationsForKey(String versionGroupKey) {
+    final byGame = obtainLocationsByGame[versionGroupKey];
+    if (byGame != null) {
+      return byGame;
+    }
+    if (versionGroupKey == 'heartgold-soulsilver') {
+      return obtainLocations;
+    }
+    return const [];
+  }
+
+  String? get evYieldLabel {
+    if (evYield.isEmpty) {
+      return null;
+    }
+    return evYield.entries
+        .map((entry) => '${statLabelsZh[entry.key] ?? entry.key} +${entry.value}')
+        .join(' / ');
+  }
+
   Map<String, dynamic> toJson() => {
         'summary': summary.toJson(),
         'genusZh': genusZh,
@@ -485,12 +542,22 @@ class PokemonDetail {
             flavorEntries.map((entry) => entry.toJson()).toList(),
         'obtainLocations':
             obtainLocations.map((entry) => entry.toJson()).toList(),
+        if (obtainLocationsByGame.isNotEmpty)
+          'obtainLocationsByGame': obtainLocationsByGame.map(
+            (key, value) => MapEntry(
+              key,
+              value.map((entry) => entry.toJson()).toList(),
+            ),
+          ),
         'abilities': abilities.map((entry) => entry.toJson()).toList(),
         'moveSet': moveSet.toJson(),
         if (moveSets.isNotEmpty)
           'moveSets': moveSets.map(
             (key, value) => MapEntry(key, value.toJson()),
           ),
+        if (baseHappiness != null) 'baseHappiness': baseHappiness,
+        if (captureRate != null) 'captureRate': captureRate,
+        if (evYield.isNotEmpty) 'evYield': evYield,
         if (genderFemalePercent != null)
           'genderFemalePercent': genderFemalePercent,
         'eggGroups': eggGroups,
@@ -556,6 +623,25 @@ class PokemonDetail {
       resolvedMoveSets['heartgold-soulsilver'] = resolvedMoveSet;
     }
 
+    final obtainByGameJson =
+        json['obtainLocationsByGame'] as Map<String, dynamic>?;
+    final resolvedObtainByGame = <String, List<ObtainLocationEntry>>{};
+    if (obtainByGameJson != null) {
+      for (final entry in obtainByGameJson.entries) {
+        resolvedObtainByGame[entry.key] = (entry.value as List<dynamic>)
+            .map(
+              (item) =>
+                  ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+    }
+
+    final evYieldJson = json['evYield'] as Map<String, dynamic>? ?? const {};
+    final evYield = evYieldJson.map(
+      (key, value) => MapEntry(key, (value as num).toInt()),
+    );
+
     return PokemonDetail(
       summary: PokemonSummary.fromJson(
         json['summary'] as Map<String, dynamic>,
@@ -587,11 +673,15 @@ class PokemonDetail {
             (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
           )
           .toList(),
+      obtainLocationsByGame: resolvedObtainByGame,
       abilities: (json['abilities'] as List<dynamic>? ?? const [])
           .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
       moveSet: resolvedMoveSet,
       moveSets: resolvedMoveSets,
+      baseHappiness: json['baseHappiness'] as int?,
+      captureRate: json['captureRate'] as int?,
+      evYield: evYield,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),
       eggGroups:
           (json['eggGroups'] as List<dynamic>? ?? const []).cast<String>(),

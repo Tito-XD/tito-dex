@@ -2,24 +2,34 @@
 library;
 
 import '../../models/journey.dart';
+import '../game/game_edition.dart';
 import 'dex_game_scope.dart';
 import 'dex_models.dart';
 
-/// Supported game-version scopes for move sets and dex browse defaults.
+/// Legacy adapter over [GameEdition] for tests and gradual migration.
 enum DexGameVersion {
-  hgss('heartgold-soulsilver', '心金·魂银'),
-  dppt('diamond-pearl-platinum', '钻石·珍珠·白金'),
-  bw('black-white', '黑·白'),
-  xy('x-y', 'X·Y'),
-  sm('sun-moon', '太阳·月亮'),
-  swsh('sword-shield', '剑·盾'),
-  sv('scarlet-violet', '朱·紫'),
-  pla('legends-arceus', '传说阿尔宙斯');
+  hgss,
+  dppt,
+  bw,
+  xy,
+  sm,
+  swsh,
+  sv,
+  pla;
 
-  const DexGameVersion(this.versionGroup, this.labelZh);
+  GameEdition get edition => switch (this) {
+        DexGameVersion.hgss => GameEdition.hgss,
+        DexGameVersion.dppt => gameEditionFromSlug('pt')!,
+        DexGameVersion.bw => gameEditionFromSlug('bw')!,
+        DexGameVersion.xy => gameEditionFromSlug('xy')!,
+        DexGameVersion.sm => gameEditionFromSlug('sm')!,
+        DexGameVersion.swsh => gameEditionFromSlug('swsh')!,
+        DexGameVersion.sv => gameEditionFromSlug('sv')!,
+        DexGameVersion.pla => gameEditionFromSlug('pla')!,
+      };
 
-  final String versionGroup;
-  final String labelZh;
+  String get versionGroup => edition.dataVersionGroupKey;
+  String get labelZh => edition.labelZh;
 
   static DexGameVersion? fromStorageKey(String? key) {
     if (key == null) {
@@ -30,62 +40,17 @@ enum DexGameVersion {
         return version;
       }
     }
-    return null;
+    final edition = gameEditionFromSlug(key);
+    return edition == null ? null : fromGameEdition(edition);
   }
-}
 
-/// Regional pokedex scopes backed by CDN `pokedexNumbers` keys.
-enum DexRegionalPokedex {
-  national('national', '全国'),
-  kanto('kanto', '关东'),
-  johto('original-johto', '城都'),
-  hoenn('hoenn', '丰缘'),
-  sinnoh('original-sinnoh', '神奥'),
-  unova('unova', '合众'),
-  kalos('kalos-central', '卡洛斯'),
-  alola('original-alola', '阿罗拉'),
-  galar('galar', '伽勒尔'),
-  paldea('paldea', '帕底亚'),
-  hisui('hisui', '洗翠');
-
-  const DexRegionalPokedex(this.primaryPokedexKey, this.labelZh);
-
-  final String primaryPokedexKey;
-  final String labelZh;
-
-  /// All CDN / PokeAPI pokedex name keys that belong to this regional dex.
-  List<String> get pokedexKeys => switch (this) {
-        DexRegionalPokedex.national => const ['national'],
-        DexRegionalPokedex.kanto => const ['kanto'],
-        DexRegionalPokedex.johto => const ['original-johto', 'updated-johto'],
-        DexRegionalPokedex.hoenn => const ['hoenn', 'updated-hoenn'],
-        DexRegionalPokedex.sinnoh => const ['original-sinnoh', 'extended-sinnoh'],
-        DexRegionalPokedex.unova => const ['unova', 'updated-unova'],
-        DexRegionalPokedex.kalos => const [
-            'kalos-central',
-            'kalos-mountain',
-            'kalos-coastal',
-          ],
-        DexRegionalPokedex.alola => const ['original-alola', 'updated-alola'],
-        DexRegionalPokedex.galar => const [
-            'galar',
-            'isle-of-armor',
-            'crown-tundra',
-          ],
-        DexRegionalPokedex.paldea => const ['paldea', 'kitakami', 'blueberry'],
-        DexRegionalPokedex.hisui => const ['hisui'],
-      };
-
-  static DexRegionalPokedex? fromStorageKey(String? key) {
-    if (key == null) {
-      return null;
-    }
-    for (final scope in DexRegionalPokedex.values) {
-      if (scope.name == key) {
-        return scope;
+  static DexGameVersion fromGameEdition(GameEdition edition) {
+    for (final version in DexGameVersion.values) {
+      if (version.edition.slug == edition.slug) {
+        return version;
       }
     }
-    return null;
+    return DexGameVersion.hgss;
   }
 }
 
@@ -113,40 +78,44 @@ String gameVersionMoveSetKey(DexGameVersion version) => version.versionGroup;
 /// Combined browse scope for the dex list.
 class DexScope {
   const DexScope({
-    this.gameVersion = DexGameVersion.hgss,
+    this.gameEdition = defaultGameEdition,
     this.regionalScope = DexRegionalPokedex.national,
   });
 
-  final DexGameVersion gameVersion;
+  final GameEdition gameEdition;
   final DexRegionalPokedex regionalScope;
 
   /// Legacy alias used by early Phase E wiring.
-  DexGameVersion get game => gameVersion;
+  DexGameVersion get gameVersion => DexGameVersion.fromGameEdition(gameEdition);
+
+  /// Legacy alias used by early Phase E wiring.
+  GameEdition get game => gameEdition;
 
   /// Legacy alias mapped to the closest HGSS regional scope enum.
   DexRegionalScope get region => regionalScopeFromPokedex(regionalScope);
 
-  String get label => '${gameVersion.labelZh} · ${regionalScope.labelZh}';
+  String get label => '${gameEdition.labelZh} · ${regionalScope.labelZh}';
 
   (int, int) get idRange => idRangeForScope(
         regionalScope,
-        gameVersion: gameVersion,
+        gameEdition: gameEdition,
       );
 
   DexScope copyWith({
-    DexGameVersion? gameVersion,
+    GameEdition? gameEdition,
     DexRegionalPokedex? regionalScope,
   }) {
     return DexScope(
-      gameVersion: gameVersion ?? this.gameVersion,
+      gameEdition: gameEdition ?? this.gameEdition,
       regionalScope: regionalScope ?? this.regionalScope,
     );
   }
 
   static DexScope defaultForJourney(CurrentJourney journey) {
-    return const DexScope(
-      gameVersion: DexGameVersion.hgss,
-      regionalScope: DexRegionalPokedex.national,
+    return DexScope(
+      gameEdition: gameEditionFromJourneyGame(journey.game),
+      regionalScope: gameEditionFromJourneyGame(journey.game)
+          .defaultRegionalPokedex,
     );
   }
 
@@ -186,7 +155,7 @@ class DexScope {
   }
 
   bool _matchesHgssNationalFallback(int id) {
-    if (gameVersion != DexGameVersion.hgss) {
+    if (gameEdition.slug != GameEdition.hgss.slug) {
       return false;
     }
     final (start, end) = _hgssRegionalNationalRange(regionalScope);
@@ -197,7 +166,7 @@ class DexScope {
   }
 
   int? _hgssNationalFallbackRegionalNumber(int id) {
-    if (gameVersion != DexGameVersion.hgss) {
+    if (gameEdition.slug != GameEdition.hgss.slug) {
       return null;
     }
     final (start, end) = _hgssRegionalNationalRange(regionalScope);
@@ -213,13 +182,13 @@ class DexScope {
 
   static (int, int) idRangeForScope(
     DexRegionalPokedex scope, {
-    DexGameVersion gameVersion = DexGameVersion.hgss,
+    GameEdition gameEdition = defaultGameEdition,
   }) {
     if (scope == DexRegionalPokedex.national) {
       return (1, titodexMaxNationalDexId);
     }
 
-    if (gameVersion == DexGameVersion.hgss) {
+    if (gameEdition.slug == GameEdition.hgss.slug) {
       final hgssRange = _hgssRegionalNationalRange(scope);
       if (hgssRange.$1 != null && hgssRange.$2 != null) {
         return (hgssRange.$1!, hgssRange.$2!);
@@ -249,6 +218,13 @@ bool summaryMatchesRegionalScope(
   return DexScope(
     regionalScope: regionalPokedexFromScope(scope),
   ).speciesInScope(summary);
+}
+
+bool summaryMatchesRegionalPokedex(
+  PokemonSummary summary,
+  DexRegionalPokedex scope,
+) {
+  return DexScope(regionalScope: scope).speciesInScope(summary);
 }
 
 bool summaryMatchesDexScope(PokemonSummary summary, DexScope scope) =>

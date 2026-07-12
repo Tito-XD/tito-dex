@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import 'features/companion/companion_art.dart';
 import 'features/game/game_catalog.dart';
+import 'features/game/game_edition.dart';
+import 'features/game/game_edition_repository.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -14,7 +16,6 @@ import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'features/trainer/trainer_avatar_service.dart';
 import 'l10n/app_zh.dart';
-import 'l10n/game_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
@@ -27,6 +28,7 @@ import 'pages/journey_page.dart';
 import 'pages/companion/quick_damage_page.dart';
 import 'pages/companion/stat_calc_page.dart';
 import 'pages/companion/type_matchup_page.dart';
+import 'pages/dex/dex_json_reference_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
@@ -63,6 +65,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   void initState() {
     super.initState();
     _router = GoRouter(
+      refreshListenable: gameEditionRepository,
       routes: [
         ShellRoute(
           builder: (context, state, child) {
@@ -103,7 +106,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: HomePage(
                     journey: _journey,
                     onContinue: _onContinue,
-                    gameBadge: badgeForGame(_journey.game),
+                    gameBadge: badgeForEdition(gameEditionRepository.edition),
                     onGameBadgeTap: _onGameBadgeTap,
                     onAvatarTap: _onTrainerAvatarTap,
                   ),
@@ -206,6 +209,22 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     ),
                   ),
                 ),
+                GoRoute(
+                  path: 'reference/json',
+                  pageBuilder: (context, state) {
+                    final extra = state.extra;
+                    final map = extra is Map<String, String> ? extra : const {};
+                    return titoSlidePage(
+                      key: state.pageKey,
+                      child: TitoPageContainer(
+                        child: DexJsonReferencePage(
+                          title: map['title'] ?? AppZh.searchHubDataTitle,
+                          cdnPath: map['cdnPath'] ?? '/v3/',
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
             GoRoute(
@@ -240,6 +259,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 
   Future<void> _bootstrap() async {
+    await gameEditionRepository.load();
     var journey = await _repository.load();
     if (journey.game == 'SoulSilver' && journey.companion == 'Riolu') {
       journey = journey.copyWith(companion: 'Cyndaquil');
@@ -432,13 +452,21 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 
   Future<void> _onGameBadgeTap() async {
-    final nextGame = cycleGameKey(_journey.game);
-    await _persist(_journey.copyWith(game: nextGame));
+    final current = gameEditionFromJourneyGame(_journey.game);
+    final picked = await showGameEditionPicker(context, selected: current);
+    if (picked == null || !mounted) {
+      return;
+    }
+    await gameEditionRepository.save(picked);
+    final journeyKey = picked.journeyGameKey ?? _journey.game;
+    if (picked.journeyGameKey != null && _journey.game != journeyKey) {
+      await _persist(_journey.copyWith(game: journeyKey));
+    }
     if (!mounted) {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppZh.snackGameSwitched(localizeGame(nextGame)))),
+      SnackBar(content: Text(AppZh.snackGameSwitched(picked.labelZh))),
     );
   }
 

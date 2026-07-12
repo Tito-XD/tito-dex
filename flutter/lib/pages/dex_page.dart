@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
@@ -11,7 +13,6 @@ import '../features/dex/dex_settings_repository.dart';
 import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
-import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
@@ -41,12 +42,12 @@ class _DexPageState extends State<DexPage> {
   bool _loadingChunk = false;
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
-  DexRegionalScope _region = DexRegionalScope.national;
-  DexGameVersion _gameVersion = DexGameVersion.hgss;
+  DexRegionalPokedex _region = DexRegionalPokedex.national;
+  GameEdition _gameEdition = defaultGameEdition;
   DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
-  final Map<DexRegionalScope, List<PokemonSummary>> _regionCache = {};
+  final Map<DexRegionalPokedex, List<PokemonSummary>> _regionCache = {};
   bool _loadingRegion = false;
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   Set<int> _journeyIds = const {};
@@ -60,11 +61,14 @@ class _DexPageState extends State<DexPage> {
   }
 
   Future<void> _loadDefaultGameVersion() async {
-    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    final edition = await dexSettingsRepository.loadDefaultGameEdition();
     if (!mounted) {
       return;
     }
-    setState(() => _gameVersion = version);
+    setState(() {
+      _gameEdition = edition;
+      _region = edition.defaultRegionalPokedex;
+    });
   }
 
   Future<void> _bootstrap() async {
@@ -137,7 +141,7 @@ class _DexPageState extends State<DexPage> {
     if (_mode == mode && mode == _DexMode.national) {
       // Re-activating the selected national tab cycles the regional scope —
       // reachable with a plain A-press on the D-pad (no tiny dropdown needed).
-      final scopes = DexRegionalScope.values;
+      final scopes = DexRegionalPokedex.values;
       final next = scopes[(scopes.indexOf(_region) + 1) % scopes.length];
       _setRegion(next);
       return;
@@ -178,13 +182,13 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
-  void _setRegion(DexRegionalScope region) {
+  void _setRegion(DexRegionalPokedex region) {
     setState(() {
       _region = region;
       _mode = _DexMode.national;
       _error = null;
     });
-    if (region != DexRegionalScope.national) {
+    if (region != DexRegionalPokedex.national) {
       _loadRegion(region);
     }
   }
@@ -192,19 +196,25 @@ class _DexPageState extends State<DexPage> {
   /// Regional scopes start mid-list (城都 = #152+), so waiting for the chunked
   /// national loader would leave the grid empty. Fetch the whole range —
   /// one summaries.json via the CDN fast path.
-  Future<void> _loadRegion(DexRegionalScope region) async {
+  Future<void> _loadRegion(DexRegionalPokedex region) async {
     if (_regionCache.containsKey(region) || _loadingRegion) {
       return;
     }
     setState(() => _loadingRegion = true);
     try {
-      final (start, end) = regionalDexIdRange(region);
+      final (start, end) = DexScope.idRangeForScope(
+        region,
+        gameEdition: _gameEdition,
+      );
       final entries = await dexRepository.getSummaryRange(start, end);
+      final filtered = entries
+          .where((entry) => summaryMatchesRegionalPokedex(entry, region))
+          .toList(growable: false);
       if (!mounted) {
         return;
       }
       setState(() {
-        _regionCache[region] = entries;
+        _regionCache[region] = filtered;
         _loadingRegion = false;
       });
     } catch (error) {
@@ -222,12 +232,12 @@ class _DexPageState extends State<DexPage> {
     final Iterable<PokemonSummary> entries;
     if (_mode == _DexMode.journey) {
       entries = _journeySummaries;
-    } else if (_region != DexRegionalScope.national &&
+    } else if (_region != DexRegionalPokedex.national &&
         _regionCache.containsKey(_region)) {
       entries = _regionCache[_region]!;
     } else {
       entries = _summaries.where(
-        (entry) => summaryMatchesRegionalScope(entry, _region),
+        (entry) => summaryMatchesRegionalPokedex(entry, _region),
       );
     }
 
@@ -238,7 +248,34 @@ class _DexPageState extends State<DexPage> {
     );
   }
 
-  DexScopeStats get _scopeStats => _progress.statsFor(_region);
+  DexScopeStats get _scopeStats {
+    final legacyScope = regionalScopeFromPokedex(_region);
+    if (_region == DexRegionalPokedex.national ||
+        _region == DexRegionalPokedex.johto ||
+        _region == DexRegionalPokedex.kanto) {
+      return _progress.statsFor(legacyScope);
+    }
+    final visible = _summaries
+        .where((entry) => summaryMatchesRegionalPokedex(entry, _region));
+    var caught = 0;
+    var seenOnly = 0;
+    for (final entry in visible) {
+      final status = _progress.statusFor(entry.id);
+      if (status == DexEncounterStatus.caught) {
+        caught++;
+      } else if (status == DexEncounterStatus.seen) {
+        seenOnly++;
+      }
+    }
+    final total = visible.length;
+    return DexScopeStats(
+      scope: legacyScope,
+      total: total,
+      caught: caught,
+      seenOnly: seenOnly,
+      unseen: total - caught - seenOnly,
+    );
+  }
 
   String _emptyMessageForMode() {
     if (_mode == _DexMode.journey) {
@@ -256,11 +293,14 @@ class _DexPageState extends State<DexPage> {
 
   /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
   String? get _regionProgressLine {
-    if (_mode != _DexMode.national || _region == DexRegionalScope.national) {
+    if (_mode != _DexMode.national || _region == DexRegionalPokedex.national) {
       return null;
     }
     final stats = _scopeStats;
-    final (start, end) = regionalDexIdRange(_region);
+    final (start, end) = DexScope.idRangeForScope(
+      _region,
+      gameEdition: _gameEdition,
+    );
     return AppZh.dexRegionProgress(
       start,
       end,
@@ -298,16 +338,20 @@ class _DexPageState extends State<DexPage> {
               sliver: SliverList(
                 delegate: SliverChildListDelegate.fixed([
                   _DexTopBar(
-                    gameTitle: localizeGame(widget.journey.game),
+                    gameTitle: _gameEdition.labelZh,
                     onSearch: () => context.push('/search'),
                     onReference: () => _showReferenceMenu(context),
                   ),
                   SizedBox(height: squareGap(context)),
-                  _DexGameVersionBar(
-                    selected: _gameVersion,
-                    onSelected: (version) async {
-                      setState(() => _gameVersion = version);
-                      await dexSettingsRepository.saveDefaultGameVersion(version);
+                  _DexGameEditionBar(
+                    selected: _gameEdition,
+                    onSelected: (edition) async {
+                      setState(() {
+                        _gameEdition = edition;
+                        _region = edition.defaultRegionalPokedex;
+                      });
+                      await dexSettingsRepository.saveDefaultGameEdition(edition);
+                      await gameEditionRepository.save(edition);
                     },
                   ),
                   SizedBox(height: squareGap(context)),
@@ -445,7 +489,7 @@ class _DexPageState extends State<DexPage> {
                 ),
               ),
             if (_mode == _DexMode.national &&
-                _region == DexRegionalScope.national &&
+                _region == DexRegionalPokedex.national &&
                 _loadedThrough < titodexMaxNationalDexId)
               SliverPadding(
                 padding: padding.copyWith(top: 8, bottom: 4),
@@ -622,34 +666,36 @@ class _DexTopBar extends StatelessWidget {
   }
 }
 
-class _DexGameVersionBar extends StatelessWidget {
-  const _DexGameVersionBar({
+class _DexGameEditionBar extends StatelessWidget {
+  const _DexGameEditionBar({
     required this.selected,
     required this.onSelected,
   });
 
-  final DexGameVersion selected;
-  final ValueChanged<DexGameVersion> onSelected;
+  final GameEdition selected;
+  final ValueChanged<GameEdition> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final version in const [
-          DexGameVersion.hgss,
-          DexGameVersion.sv,
-          DexGameVersion.swsh,
-        ]) ...[
-          if (version != DexGameVersion.hgss) const SizedBox(width: 5),
-          Expanded(
+    return SizedBox(
+      height: 34,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: GameEdition.all.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 5),
+        itemBuilder: (context, index) {
+          final edition = GameEdition.all[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: _DexFilterChip(
-              label: gameVersionLabelZh(version),
-              selected: selected == version,
-              onTap: () => onSelected(version),
+              label: edition.labelZh,
+              selected: selected.slug == edition.slug,
+              onTap: () => onSelected(edition),
+              compact: true,
             ),
-          ),
-        ],
-      ],
+          );
+        },
+      ),
     );
   }
 }
@@ -665,11 +711,11 @@ class _DexScopeBar extends StatelessWidget {
   });
 
   final _DexMode mode;
-  final DexRegionalScope region;
+  final DexRegionalPokedex region;
   final DexScopeStats scopeStats;
   final int journeyCount;
   final ValueChanged<_DexMode> onModeSelected;
-  final ValueChanged<DexRegionalScope> onRegionSelected;
+  final ValueChanged<DexRegionalPokedex> onRegionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -756,7 +802,7 @@ class _DexModeTab extends StatelessWidget {
     required this.count,
     required this.onTap,
     this.showRegionMenu = false,
-    this.region = DexRegionalScope.national,
+    this.region = DexRegionalPokedex.national,
     this.onRegionSelected,
   });
 
@@ -766,8 +812,8 @@ class _DexModeTab extends StatelessWidget {
   final int count;
   final VoidCallback onTap;
   final bool showRegionMenu;
-  final DexRegionalScope region;
-  final ValueChanged<DexRegionalScope>? onRegionSelected;
+  final DexRegionalPokedex region;
+  final ValueChanged<DexRegionalPokedex>? onRegionSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -819,16 +865,16 @@ class _DexModeTab extends StatelessWidget {
               const SizedBox(height: 2),
               if (showRegionMenu && selected)
                 // Whole subtitle line opens the region menu — big tap target.
-                PopupMenuButton<DexRegionalScope>(
+                PopupMenuButton<DexRegionalPokedex>(
                   padding: EdgeInsets.zero,
                   tooltip: '切换地区图鉴',
                   onSelected: onRegionSelected,
                   itemBuilder: (context) {
-                    return DexRegionalScope.values
+                    return DexRegionalPokedex.values
                         .map(
                           (scope) => PopupMenuItem(
                             value: scope,
-                            child: Text(regionalScopeLabelZh(scope)),
+                            child: Text(regionalPokedexLabelZh(scope)),
                           ),
                         )
                         .toList();
@@ -875,11 +921,13 @@ class _DexFilterChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.compact = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -893,7 +941,10 @@ class _DexFilterChip extends StatelessWidget {
           canRequestFocus: false,
           borderRadius: BorderRadius.circular(999),
           child: Ink(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 8 : 4,
+              vertical: 4,
+            ),
             decoration: BoxDecoration(
               color: selected ? TitoColors.softYellow : TitoColors.card,
               borderRadius: BorderRadius.circular(999),
@@ -907,6 +958,7 @@ class _DexFilterChip extends StatelessWidget {
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
                 height: 1.2,
+                fontSize: compact ? 10 : 12,
               ),
             ),
           ),

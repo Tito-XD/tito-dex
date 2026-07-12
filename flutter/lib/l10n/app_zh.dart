@@ -94,6 +94,22 @@ abstract final class AppZh {
   static const dexAbilityHidden = '隐藏特性';
   static const dexAbilityUnknownName = '待收录';
   static const dexAbilityPlaceholder = '特性资料整理中，将随后续图鉴数据包更新。';
+  static const dexAbilityEmptyPending =
+      '当前版本暂无特性数据，请切换其他游戏版本查看。';
+  static const dexBaseHappiness = '初始亲密度';
+  static const dexCaptureRate = '捕获率';
+  static const dexEvYield = '基础点数 (EV)';
+  static const dexObtainEmptyVersion =
+      '当前游戏版本暂无出现地点，请切换其他版本查看。';
+  static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
+  static const dexFlavorNoEdition =
+      '当前版本暂无图鉴描述';
+  static const dexFlavorPickEdition = '选择其他版本查看';
+  static const dexMoveFilterAll = '全部';
+  static const dexMoveFilterLevel = '等级';
+  static const dexMoveFilterMachine = '学习器';
+  static const dexMoveFilterEgg = '蛋';
+  static const dexMoveFilterTutor = '教学';
   static const dexBaseStats = '种族值';
   static const dexBaseStatTotal = '种族值合计';
   static const dexTypeGridTitle = '当受到以下属性攻击时';
@@ -194,6 +210,27 @@ abstract final class AppZh {
   static const searchRecent = '最近搜索';
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
+  static const searchHubSearch = '搜索';
+  static const searchHubReference = '常用资料';
+  static const searchHubBattle = '对战资料';
+  static const searchHubGuideTitle = '指南';
+  static const searchHubDataTitle = '资料列表';
+  static const searchHubBattleTitle = '对战工具';
+  static const searchHubBreedTitle = '培育工具';
+  static const searchHubOnlineTitle = '在线资源';
+  static const searchHubRegionalDex = '地区图鉴';
+  static const searchRefNatures = '性格';
+  static const searchRefEggGroups = '生蛋分组';
+  static const searchRefItems = '道具';
+  static const searchRefWeather = '天气';
+  static const searchRefTerrains = '场地';
+  static const searchRefStatus = '状态异常';
+  static const searchRefPlaceholder = '资料加载中，请确保已连接 CDN。';
+  static const searchBattleTypeMatchup = '属性克制';
+  static const searchBattleStatCalc = '能力值计算';
+  static const searchBattleQuickDamage = '伤害速算';
+  static const searchOnlineShowdown = 'Showdown 网页版';
+  static const searchOnlineUsage = '使用率排行';
 
   static const companionToolsTitle = '对战助手';
   static String companionToolsSubtitle(String gameTitle) =>
