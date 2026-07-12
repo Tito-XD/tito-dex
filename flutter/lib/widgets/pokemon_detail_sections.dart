@@ -3,8 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/dex/dex_cdn_config.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
+import '../features/game/game_edition.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -165,9 +167,18 @@ class PokemonDetailHeader extends StatelessWidget {
 }
 
 class FlavorTextCarousel extends StatefulWidget {
-  const FlavorTextCarousel({super.key, required this.entries});
+  const FlavorTextCarousel({
+    super.key,
+    required this.entries,
+    required this.edition,
+    this.initialIndex = 0,
+    this.onPickOtherEdition,
+  });
 
   final List<FlavorTextEntry> entries;
+  final GameEdition edition;
+  final int initialIndex;
+  final VoidCallback? onPickOtherEdition;
 
   @override
   State<FlavorTextCarousel> createState() => _FlavorTextCarouselState();
@@ -175,13 +186,30 @@ class FlavorTextCarousel extends StatefulWidget {
 
 class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   late final PageController _controller;
-  int _index = 0;
+  late int _index;
 
   @override
   void initState() {
     super.initState();
-    _controller = PageController();
+    _index = widget.initialIndex.clamp(0, _maxIndex);
+    _controller = PageController(initialPage: _index);
   }
+
+  @override
+  void didUpdateWidget(covariant FlavorTextCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialIndex != widget.initialIndex &&
+        widget.initialIndex != _index) {
+      final next = widget.initialIndex.clamp(0, _maxIndex);
+      _index = next;
+      if (_controller.hasClients) {
+        _controller.jumpToPage(next);
+      }
+    }
+  }
+
+  int get _maxIndex =>
+      widget.entries.isEmpty ? 0 : widget.entries.length - 1;
 
   @override
   void dispose() {
@@ -191,9 +219,39 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    // v0.4.0: LZA / Champions — no fabricated flavor text.
+    if (!widget.edition.hasPokeApiData) {
+      return StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppZh.dexFlavorTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '当前版本暂无图鉴描述',
+              style: SecondaryTypography.onCard.body14,
+            ),
+            if (widget.onPickOtherEdition != null) ...[
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: widget.onPickOtherEdition,
+                child: const Text('选择其他版本查看'),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
     if (widget.entries.isEmpty) {
       return StickerCard(
-        child: Text(AppZh.dexFlavorEmpty, style: SecondaryTypography.onCard.body14),
+        child: Text(
+          AppZh.dexFlavorEmpty,
+          style: SecondaryTypography.onCard.body14,
+        ),
       );
     }
 
@@ -221,11 +279,34 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      flavorVersionLabelZh(entry.version),
-                      style: SecondaryTypography.onCard.meta14.copyWith(
-                        color: TitoColors.coral,
-                      ),
+                    Row(
+                      children: [
+                        // v0.4.0: game icon when CDN provides iconUrl.
+                        if (entry.iconUrl != null) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(
+                              entry.iconUrl!,
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => const SizedBox(
+                                width: 24,
+                                height: 24,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Expanded(
+                          child: Text(
+                            entry.displayLabelZh,
+                            style: SecondaryTypography.onCard.meta14.copyWith(
+                              color: TitoColors.coral,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     if (note != null) ...[
                       const SizedBox(height: 4),
@@ -553,7 +634,7 @@ class _BaseStatsRadarPainter extends CustomPainter {
   }
 }
 
-/// Bar chart + radar layout; on square handheld, toggle between views.
+/// Bar chart + radar layout with toggle on all screen sizes (v0.4.0).
 class BaseStatsSection extends StatefulWidget {
   const BaseStatsSection({super.key, required this.stats});
 
@@ -568,54 +649,41 @@ class _BaseStatsSectionState extends State<BaseStatsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final square = DeviceLayout.useSquareDashboard(context);
-
-    if (square) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _StatsViewChip(
-                  label: AppZh.dexBaseStatsBars,
-                  selected: !_showRadar,
-                  onTap: () => setState(() => _showRadar = false),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _StatsViewChip(
-                  label: AppZh.dexBaseStatsRadar,
-                  selected: _showRadar,
-                  onTap: () => setState(() => _showRadar = true),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: _showRadar
-                ? BaseStatsRadarChart(
-                    key: const ValueKey('radar'),
-                    stats: widget.stats,
-                  )
-                : BaseStatsCard(
-                    key: const ValueKey('bars'),
-                    stats: widget.stats,
-                  ),
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(child: BaseStatsCard(stats: widget.stats)),
-        const SizedBox(width: 8),
-        Expanded(child: BaseStatsRadarChart(stats: widget.stats)),
+        Row(
+          children: [
+            Expanded(
+              child: _StatsViewChip(
+                label: AppZh.dexBaseStatsBars,
+                selected: !_showRadar,
+                onTap: () => setState(() => _showRadar = false),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _StatsViewChip(
+                label: AppZh.dexBaseStatsRadar,
+                selected: _showRadar,
+                onTap: () => setState(() => _showRadar = true),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: _showRadar
+              ? BaseStatsRadarChart(
+                  key: const ValueKey('radar'),
+                  stats: widget.stats,
+                )
+              : BaseStatsCard(
+                  key: const ValueKey('bars'),
+                  stats: widget.stats,
+                ),
+        ),
       ],
     );
   }
@@ -743,14 +811,42 @@ class TypeEffectivenessGrid extends StatelessWidget {
 }
 
 class AbilitiesCard extends StatelessWidget {
-  const AbilitiesCard({super.key, required this.abilities});
+  const AbilitiesCard({
+    super.key,
+    required this.abilities,
+    this.onPickOtherEdition,
+  });
 
   final List<PokemonAbility> abilities;
+  final VoidCallback? onPickOtherEdition;
 
   @override
   Widget build(BuildContext context) {
+    // v0.4.0: explicit empty state — no fake placeholder abilities.
     if (abilities.isEmpty) {
-      return const SizedBox.shrink();
+      return StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppZh.dexAbilities,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '当前版本暂无特性数据',
+              style: SecondaryTypography.onCard.body14,
+            ),
+            if (onPickOtherEdition != null) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: onPickOtherEdition,
+                child: const Text('选择其他版本查看'),
+              ),
+            ],
+          ],
+        ),
+      );
     }
 
     return StickerCard(
@@ -820,9 +916,14 @@ class AbilitiesCard extends StatelessWidget {
 }
 
 class ObtainLocationsCard extends StatelessWidget {
-  const ObtainLocationsCard({super.key, required this.locations});
+  const ObtainLocationsCard({
+    super.key,
+    required this.locations,
+    required this.title,
+  });
 
   final List<ObtainLocationEntry> locations;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -831,7 +932,7 @@ class ObtainLocationsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppZh.dexObtainHgss,
+            title,
             style: SecondaryTypography.onCard.h15,
           ),
           const SizedBox(height: 10),
@@ -872,6 +973,213 @@ class ObtainLocationsCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// v0.4.0: Single-select move category filter (等级 / 教学 / 蛋 / 学习器).
+enum MoveCategoryFilter { levelUp, tutor, egg, machine }
+
+class MoveSetPanel extends StatefulWidget {
+  const MoveSetPanel({
+    super.key,
+    required this.moveSet,
+    required this.editionLabel,
+  });
+
+  final PokemonMoveSet moveSet;
+  final String editionLabel;
+
+  @override
+  State<MoveSetPanel> createState() => _MoveSetPanelState();
+}
+
+class _MoveSetPanelState extends State<MoveSetPanel> {
+  MoveCategoryFilter _filter = MoveCategoryFilter.levelUp;
+
+  static const _filterLabels = {
+    MoveCategoryFilter.levelUp: '等级',
+    MoveCategoryFilter.tutor: '教学',
+    MoveCategoryFilter.egg: '蛋',
+    MoveCategoryFilter.machine: '学习器',
+  };
+
+  List<PokemonMove> _movesFor(MoveCategoryFilter filter) {
+    return switch (filter) {
+      MoveCategoryFilter.levelUp => widget.moveSet.levelUp,
+      MoveCategoryFilter.tutor => widget.moveSet.tutor,
+      MoveCategoryFilter.egg => widget.moveSet.egg,
+      MoveCategoryFilter.machine => widget.moveSet.machine,
+    };
+  }
+
+  String _titleFor(MoveCategoryFilter filter) {
+    return switch (filter) {
+      MoveCategoryFilter.levelUp => '等级提升',
+      MoveCategoryFilter.tutor => '教学招式',
+      MoveCategoryFilter.egg => '蛋招式',
+      MoveCategoryFilter.machine => '招式学习器',
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final moves = _movesFor(_filter);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          AppZh.dexMovesScope(widget.editionLabel),
+          style: SecondaryTypography.onGradient.body14,
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            for (final filter in MoveCategoryFilter.values) ...[
+              if (filter != MoveCategoryFilter.values.first)
+                const SizedBox(width: 6),
+              Expanded(
+                child: _StatsViewChip(
+                  label: _filterLabels[filter]!,
+                  selected: _filter == filter,
+                  onTap: () => setState(() => _filter = filter),
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 12),
+        MoveCategoryPanel(
+          title: _titleFor(_filter),
+          moves: moves,
+          showLevel: _filter == MoveCategoryFilter.levelUp,
+        ),
+      ],
+    );
+  }
+}
+
+/// v0.4.0: Compact game-edition picker for detail tabs (replaces 3-version bar).
+class CompactGameEditionPicker extends StatelessWidget {
+  const CompactGameEditionPicker({
+    super.key,
+    required this.edition,
+    required this.onEditionChanged,
+  });
+
+  final GameEdition edition;
+  final ValueChanged<GameEdition> onEditionChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showPicker(context),
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: TitoColors.card,
+            borderRadius: BorderRadius.circular(TitoRadii.sm),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Image.network(
+                  edition.gameIconUrl(DexCdnConfig.cdnBase),
+                  width: 22,
+                  height: 22,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const SizedBox(
+                    width: 22,
+                    height: 22,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  edition.labelZh,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.expand_more_rounded,
+                size: 18,
+                color: TitoColors.ink,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showPicker(BuildContext context) async {
+    final picked = await showModalBottomSheet<GameEdition>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.55,
+            minChildSize: 0.35,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return ListView(
+                controller: scrollController,
+                children: [
+                  for (final group in gameEditionPickerGroups.entries) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: Text(
+                        group.key,
+                        style: SecondaryTypography.onCard.team12.copyWith(
+                          color: TitoColors.mutedInk,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    for (final item in group.value)
+                      ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.network(
+                            item.gameIconUrl(DexCdnConfig.cdnBase),
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox(width: 28, height: 28),
+                          ),
+                        ),
+                        title: Text(item.labelZh),
+                        trailing: edition == item
+                            ? const Icon(Icons.check_rounded)
+                            : null,
+                        selected: edition == item,
+                        onTap: () => Navigator.pop(context, item),
+                      ),
+                  ],
+                  const SizedBox(height: 12),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+    if (picked != null) {
+      onEditionChanged(picked);
+    }
   }
 }
 
@@ -1129,6 +1437,70 @@ class IntroMetaCard extends StatelessWidget {
                 Text(
                   '${detail.hatchCounter} (${detail.hatchSteps})',
                   style: SecondaryTypography.onCard.meta14,
+                ),
+              ],
+            ),
+          ],
+          // v0.4.0: capture / happiness / EV yield when CDN provides them.
+          if (detail.baseHappiness != null) ...[
+            const Divider(height: 20),
+            Row(
+              children: [
+                Text(
+                  '初始亲密度',
+                  style: SecondaryTypography.onCard.team12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${detail.baseHappiness}',
+                  style: SecondaryTypography.onCard.meta14,
+                ),
+              ],
+            ),
+          ],
+          if (detail.captureRate != null) ...[
+            const Divider(height: 20),
+            Row(
+              children: [
+                Text(
+                  '捕获率',
+                  style: SecondaryTypography.onCard.team12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${detail.captureRate}',
+                  style: SecondaryTypography.onCard.meta14,
+                ),
+              ],
+            ),
+          ],
+          if (detail.evYield.isNotEmpty) ...[
+            const Divider(height: 20),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '基础点数(EV)',
+                  style: SecondaryTypography.onCard.team12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Spacer(),
+                Flexible(
+                  child: Text(
+                    detail.evYield.entries
+                        .map(
+                          (entry) =>
+                              '${statLabelsZh[entry.key] ?? entry.key} +${entry.value}',
+                        )
+                        .join(' / '),
+                    textAlign: TextAlign.end,
+                    style: SecondaryTypography.onCard.meta14,
+                  ),
                 ),
               ],
             ),

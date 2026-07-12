@@ -213,7 +213,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('BaseStatsSection side-by-side on wide layout', (tester) async {
+  testWidgets('BaseStatsSection toggle shows one chart at a time', (tester) async {
     const stats = PokemonBaseStats(
       hp: 80,
       attack: 80,
@@ -233,6 +233,12 @@ void main() {
     );
 
     expect(find.byType(BaseStatsCard), findsOneWidget);
+    expect(find.byType(BaseStatsRadarChart), findsNothing);
+
+    await tester.tap(find.text('能力雷达'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BaseStatsCard), findsNothing);
     expect(find.byType(BaseStatsRadarChart), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

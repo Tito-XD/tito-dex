@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/dex_scope.dart';
-import '../features/dex/dex_settings_repository.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_edition_controller.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -34,21 +33,74 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   (String, String)? _errorCopy;
   bool _loading = true;
   int _currentTabIndex = 0;
-  DexGameVersion _moveGameVersion = DexGameVersion.hgss;
 
   @override
   void initState() {
     super.initState();
-    _loadDefaultMoveVersion();
+    gameEditionController.addListener(_onEditionChanged);
     _loadDetail();
   }
 
-  Future<void> _loadDefaultMoveVersion() async {
-    final version = await dexSettingsRepository.loadDefaultGameVersion();
-    if (!mounted) {
-      return;
+  @override
+  void dispose() {
+    gameEditionController.removeListener(_onEditionChanged);
+    super.dispose();
+  }
+
+  void _onEditionChanged() {
+    if (mounted) {
+      setState(() {});
     }
-    setState(() => _moveGameVersion = version);
+  }
+
+  Future<void> _pickOtherEdition() async {
+    final edition = gameEditionController.edition;
+    final picked = await showModalBottomSheet<GameEdition>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) {
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.55,
+            minChildSize: 0.35,
+            maxChildSize: 0.9,
+            builder: (context, scrollController) {
+              return ListView(
+                controller: scrollController,
+                children: [
+                  for (final group in gameEditionPickerGroups.entries) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: Text(
+                        group.key,
+                        style: SecondaryTypography.onCard.team12.copyWith(
+                          color: TitoColors.mutedInk,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    for (final item in group.value)
+                      ListTile(
+                        title: Text(item.labelZh),
+                        trailing:
+                            edition == item ? const Icon(Icons.check_rounded) : null,
+                        selected: edition == item,
+                        onTap: () => Navigator.pop(context, item),
+                      ),
+                  ],
+                  const SizedBox(height: 12),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+    if (picked != null && mounted) {
+      await gameEditionController.setEdition(picked);
+    }
   }
 
   Future<void> _loadDetail() async {
@@ -149,25 +201,34 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     };
   }
 
-  List<Widget> _introSections(PokemonDetail detail) => [
-        FlavorTextCarousel(entries: detail.flavorEntries),
-        const SizedBox(height: 12),
-        IntroMetaCard(detail: detail),
-        if (detail.abilities.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          AbilitiesCard(abilities: detail.abilities),
-        ],
-        const SizedBox(height: 12),
-        StickerCard(
-          child: Text(
-            AppZh.dexApiNote,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              height: 1.4,
-            ),
+  List<Widget> _introSections(PokemonDetail detail) {
+    final edition = gameEditionController.edition;
+    return [
+      FlavorTextCarousel(
+        entries: detail.flavorEntries,
+        edition: edition,
+        initialIndex: flavorEntryDefaultIndex(detail, edition),
+        onPickOtherEdition: _pickOtherEdition,
+      ),
+      const SizedBox(height: 12),
+      IntroMetaCard(detail: detail),
+      const SizedBox(height: 12),
+      AbilitiesCard(
+        abilities: detail.abilities,
+        onPickOtherEdition: _pickOtherEdition,
+      ),
+      const SizedBox(height: 12),
+      StickerCard(
+        child: Text(
+          AppZh.dexApiNote,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: TitoColors.mutedInk,
+            height: 1.4,
           ),
         ),
-      ];
+      ),
+    ];
+  }
 
   List<Widget> _basicSections(PokemonDetail detail) {
     return [
@@ -202,14 +263,37 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
+    final edition = gameEditionController.edition;
+    // v0.4.0: filter by obtainLocationsByGame[edition.moveSetKey] with fallback.
+    final locations = obtainLocationsForEdition(detail, edition);
+    final obtainTitle = '${edition.labelZh} 出现地点';
+
     final sections = <Widget>[
-      if (detail.obtainLocations.isNotEmpty)
-        ObtainLocationsCard(locations: detail.obtainLocations)
+      if (locations.isNotEmpty)
+        ObtainLocationsCard(
+          locations: locations,
+          title: obtainTitle,
+        )
       else
         StickerCard(
-          child: Text(
-            AppZh.dexObtainEmpty,
-            style: SecondaryTypography.onCard.body14,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                obtainTitle,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppZh.dexObtainEmpty,
+                style: SecondaryTypography.onCard.body14,
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _pickOtherEdition,
+                child: const Text('选择其他版本查看'),
+              ),
+            ],
           ),
         ),
     ];
@@ -240,109 +324,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _movesSections(PokemonDetail detail) {
-    final moveSetKey = gameVersionMoveSetKey(_moveGameVersion);
-    final moveSet = detail.moveSetForKey(moveSetKey);
-    final availableVersions = [
-      for (final version in const [
-        DexGameVersion.hgss,
-        DexGameVersion.sv,
-        DexGameVersion.swsh,
-      ])
-        if (_moveSetHasData(detail, version)) version,
-    ];
+    final edition = gameEditionController.edition;
+    final moveSet = detail.moveSetForKey(edition.moveSetKey);
 
     return [
-      if (detail.hasMultipleMoveSets || availableVersions.length > 1) ...[
-        _MoveGameVersionBar(
-          selected: _moveGameVersion,
-          available: availableVersions.isEmpty
-              ? const [DexGameVersion.hgss]
-              : availableVersions,
-          onSelected: (version) {
-            setState(() => _moveGameVersion = version);
-          },
-        ),
-        const SizedBox(height: 12),
-      ],
-      Text(
-        AppZh.dexMovesScope(gameVersionLabelZh(_moveGameVersion)),
-        style: SecondaryTypography.onGradient.body14,
+      CompactGameEditionPicker(
+        edition: edition,
+        onEditionChanged: (next) => gameEditionController.setEdition(next),
       ),
       const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('level-up'),
-        moves: moveSet.levelUp,
-        showLevel: true,
-      ),
-      const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('machine'),
-        moves: moveSet.machine,
-      ),
-      const SizedBox(height: 12),
-      MoveCategoryPanel(
-        title: moveMethodLabelZh('egg'),
-        moves: moveSet.egg,
+      MoveSetPanel(
+        moveSet: moveSet,
+        editionLabel: edition.labelZh,
       ),
     ];
-  }
-
-  bool _moveSetHasData(PokemonDetail detail, DexGameVersion version) {
-    final set = detail.moveSetForKey(gameVersionMoveSetKey(version));
-    return set.levelUp.isNotEmpty ||
-        set.machine.isNotEmpty ||
-        set.egg.isNotEmpty;
-  }
-}
-
-class _MoveGameVersionBar extends StatelessWidget {
-  const _MoveGameVersionBar({
-    required this.selected,
-    required this.available,
-    required this.onSelected,
-  });
-
-  final DexGameVersion selected;
-  final List<DexGameVersion> available;
-  final ValueChanged<DexGameVersion> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final version in available) ...[
-          if (version != available.first) const SizedBox(width: 6),
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => onSelected(version),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                child: Ink(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: selected == version
-                        ? TitoColors.softYellow
-                        : TitoColors.card,
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(color: TitoColors.ink, width: 2),
-                  ),
-                  child: Text(
-                    gameVersionLabelZh(version),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
   }
 }
 

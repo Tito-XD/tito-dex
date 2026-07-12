@@ -5,6 +5,8 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_scope.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_edition_controller.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
@@ -66,7 +68,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _journeyDirty = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
-  DexGameVersion _defaultDexGameVersion = DexGameVersion.hgss;
+  // v0.4.0 B2: Settings dropdown mirrors global GameEdition (23 items).
+  GameEdition _globalEdition = GameEdition.hgss;
 
   @override
   void initState() {
@@ -87,22 +90,27 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadDexSettings() async {
-    final version = await dexSettingsRepository.loadDefaultGameVersion();
+    final edition = await dexSettingsRepository.loadGlobalEdition();
     if (!mounted) {
       return;
     }
-    setState(() => _defaultDexGameVersion = version);
+    setState(() => _globalEdition = edition);
   }
 
-  Future<void> _setDefaultDexGameVersion(DexGameVersion? version) async {
-    if (version == null) {
+  /// v0.4.0: Persist global edition + legacy DexGameVersion for CDN move keys.
+  Future<void> _setGlobalEdition(GameEdition? edition) async {
+    if (edition == null) {
       return;
     }
-    await dexSettingsRepository.saveDefaultGameVersion(version);
+    await gameEditionController.setEdition(edition);
+    final dexVersion = edition.toDexGameVersion();
+    if (dexVersion != null) {
+      await dexSettingsRepository.saveDefaultGameVersion(dexVersion);
+    }
     if (!mounted) {
       return;
     }
-    setState(() => _defaultDexGameVersion = version);
+    setState(() => _globalEdition = edition);
   }
 
   Future<void> _refreshDexCacheStatus() async {
@@ -567,19 +575,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<DexGameVersion>(
-                value: _defaultDexGameVersion,
+              // v0.4.0 B2: 23-game global edition selector (single source of truth).
+              DropdownButtonFormField<GameEdition>(
+                value: _globalEdition,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
                 items: [
-                  for (final version in DexGameVersion.values)
+                  for (final edition in GameEdition.values)
                     DropdownMenuItem(
-                      value: version,
-                      child: Text(version.labelZh),
+                      value: edition,
+                      child: Text(edition.labelZh),
                     ),
                 ],
-                onChanged: _dexDownloading ? null : _setDefaultDexGameVersion,
+                onChanged: _dexDownloading ? null : _setGlobalEdition,
               ),
               const SizedBox(height: 12),
               Text(

@@ -1,6 +1,13 @@
 import 'dex_game_scope.dart';
 import 'type_chart.dart';
 
+// v0.4.0: Edition-scoped detail helpers (implemented in game_edition.dart).
+export '../game/game_edition.dart'
+    show
+        flavorEntriesForEdition,
+        flavorEntryDefaultIndex,
+        obtainLocationsForEdition;
+
 // HGSS-era national dex cap (Gen IV); browse extends to [titodexMaxNationalDexId].
 const hgssMaxNationalDexId = 493;
 
@@ -259,20 +266,37 @@ class FlavorTextEntry {
   const FlavorTextEntry({
     required this.version,
     required this.text,
+    // v0.4.0: optional v3 CDN fields; v2 entries only have version + text.
+    this.gameEdition,
+    this.labelZh,
+    this.iconUrl,
   });
 
   final String version;
   final String text;
+  final String? gameEdition;
+  final String? labelZh;
+  final String? iconUrl;
+
+  /// Display label — v3 [labelZh] or legacy [version] mapping.
+  String get displayLabelZh =>
+      labelZh ?? flavorVersionLabelZh(version);
 
   Map<String, dynamic> toJson() => {
         'version': version,
         'text': text,
+        if (gameEdition != null) 'gameEdition': gameEdition,
+        if (labelZh != null) 'labelZh': labelZh,
+        if (iconUrl != null) 'iconUrl': iconUrl,
       };
 
   factory FlavorTextEntry.fromJson(Map<String, dynamic> json) =>
       FlavorTextEntry(
         version: json['version'] as String,
         text: json['text'] as String,
+        gameEdition: json['gameEdition'] as String?,
+        labelZh: json['labelZh'] as String?,
+        iconUrl: json['iconUrl'] as String?,
       );
 }
 
@@ -339,16 +363,20 @@ class PokemonMoveSet {
     this.levelUp = const [],
     this.machine = const [],
     this.egg = const [],
+    // v0.4.0: tutor moves (move tutor / reminder).
+    this.tutor = const [],
   });
 
   final List<PokemonMove> levelUp;
   final List<PokemonMove> machine;
   final List<PokemonMove> egg;
+  final List<PokemonMove> tutor;
 
   Map<String, dynamic> toJson() => {
         'levelUp': _refs(levelUp),
         'machine': _refs(machine),
         'egg': _refs(egg),
+        if (tutor.isNotEmpty) 'tutor': _refs(tutor),
       };
 
   static List<Map<String, dynamic>> _refs(List<PokemonMove> moves) => moves
@@ -389,6 +417,7 @@ class PokemonMoveSet {
       levelUp: parseList('levelUp'),
       machine: parseList('machine'),
       egg: parseList('egg'),
+      tutor: parseList('tutor'),
     );
   }
 
@@ -402,7 +431,16 @@ class PokemonMoveSet {
     for (final entry in egg) {
       yield entry.move;
     }
+    for (final entry in tutor) {
+      yield entry.move;
+    }
   }
+
+  bool get isEmpty =>
+      levelUp.isEmpty &&
+      machine.isEmpty &&
+      egg.isEmpty &&
+      tutor.isEmpty;
 }
 
 class PokemonDetail {
@@ -427,6 +465,11 @@ class PokemonDetail {
     this.genderFemalePercent,
     this.eggGroups = const [],
     this.hatchCounter,
+    // v0.4.0: breeding / capture meta + per-game obtain map.
+    this.baseHappiness,
+    this.captureRate,
+    this.evYield = const {},
+    this.obtainLocationsByGame = const {},
   });
 
   final PokemonSummary summary;
@@ -449,6 +492,10 @@ class PokemonDetail {
   final double? genderFemalePercent;
   final List<String> eggGroups;
   final int? hatchCounter;
+  final int? baseHappiness;
+  final int? captureRate;
+  final Map<String, int> evYield;
+  final Map<String, List<ObtainLocationEntry>> obtainLocationsByGame;
 
   int get hatchSteps => hatchCounter == null ? 0 : hatchCounter! * 256;
 
@@ -495,6 +542,16 @@ class PokemonDetail {
           'genderFemalePercent': genderFemalePercent,
         'eggGroups': eggGroups,
         if (hatchCounter != null) 'hatchCounter': hatchCounter,
+        if (baseHappiness != null) 'baseHappiness': baseHappiness,
+        if (captureRate != null) 'captureRate': captureRate,
+        if (evYield.isNotEmpty) 'evYield': evYield,
+        if (obtainLocationsByGame.isNotEmpty)
+          'obtainLocationsByGame': obtainLocationsByGame.map(
+            (key, value) => MapEntry(
+              key,
+              value.map((entry) => entry.toJson()).toList(),
+            ),
+          ),
         if (evolutionChain != null)
           'evolutionChain': evolutionChain!.toJson(),
       };
@@ -535,6 +592,7 @@ class PokemonDetail {
     if (resolvedMoveSet.levelUp.isEmpty &&
         resolvedMoveSet.machine.isEmpty &&
         resolvedMoveSet.egg.isEmpty &&
+        resolvedMoveSet.tutor.isEmpty &&
         legacyMoves.isNotEmpty) {
       resolvedMoveSet = PokemonMoveSet(levelUp: legacyMoves);
     }
@@ -552,7 +610,8 @@ class PokemonDetail {
     if (resolvedMoveSets.isEmpty &&
         (resolvedMoveSet.levelUp.isNotEmpty ||
             resolvedMoveSet.machine.isNotEmpty ||
-            resolvedMoveSet.egg.isNotEmpty)) {
+            resolvedMoveSet.egg.isNotEmpty ||
+            resolvedMoveSet.tutor.isNotEmpty)) {
       resolvedMoveSets['heartgold-soulsilver'] = resolvedMoveSet;
     }
 
@@ -596,11 +655,42 @@ class PokemonDetail {
       eggGroups:
           (json['eggGroups'] as List<dynamic>? ?? const []).cast<String>(),
       hatchCounter: json['hatchCounter'] as int?,
+      baseHappiness: json['baseHappiness'] as int?,
+      captureRate: json['captureRate'] as int?,
+      evYield: _parseEvYield(json['evYield']),
+      obtainLocationsByGame: _parseObtainLocationsByGame(
+        json['obtainLocationsByGame'],
+      ),
       evolutionChain: json['evolutionChain'] == null
           ? null
           : EvolutionNode.fromJson(json['evolutionChain'] as Map<String, dynamic>),
     );
   }
+}
+
+Map<String, int> _parseEvYield(Object? raw) {
+  if (raw is! Map) {
+    return const {};
+  }
+  return raw.map(
+    (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+  );
+}
+
+Map<String, List<ObtainLocationEntry>> _parseObtainLocationsByGame(
+  Object? raw,
+) {
+  if (raw is! Map) {
+    return const {};
+  }
+  return raw.map((key, value) {
+    final entries = (value as List<dynamic>? ?? const [])
+        .map(
+          (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+        )
+        .toList(growable: false);
+    return MapEntry(key.toString(), entries);
+  });
 }
 
 class EvolutionNode {

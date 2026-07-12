@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/companion/companion_art.dart';
-import 'features/game/game_catalog.dart';
+import 'features/game/game_edition_controller.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -14,7 +14,6 @@ import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'features/trainer/trainer_avatar_service.dart';
 import 'l10n/app_zh.dart';
-import 'l10n/game_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
@@ -37,6 +36,7 @@ import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
 import 'widgets/shell_companion_overlay.dart';
+import 'widgets/game_edition_picker_sheet.dart';
 import 'widgets/tito_page_container.dart';
 
 class TitoDexApp extends StatefulWidget {
@@ -62,7 +62,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
   @override
   void initState() {
     super.initState();
+    // v0.4.0 B1: Rebuild shell routes when global game edition changes.
     _router = GoRouter(
+      refreshListenable: gameEditionController,
       routes: [
         ShellRoute(
           builder: (context, state, child) {
@@ -103,7 +105,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: HomePage(
                     journey: _journey,
                     onContinue: _onContinue,
-                    gameBadge: badgeForGame(_journey.game),
+                    // v0.4.0 B2: Badge reflects global GameEdition, not 7-game cycle.
+                    gameBadge: gameEditionController.edition.homeBadgeLabel,
                     onGameBadgeTap: _onGameBadgeTap,
                     onAvatarTap: _onTrainerAvatarTap,
                   ),
@@ -252,6 +255,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
     final saveConfig = await _saveSync.loadConfig();
     final emulatorChoice = await _emulatorLauncher.loadChoice();
+    // v0.4.0 B2: Restore global GameEdition from prefs (dex/detail/search share this).
+    await gameEditionController.loadFromSettings();
     if (!mounted) {
       return;
     }
@@ -431,14 +436,25 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await _persist(_journey.copyWith(companion: companion));
   }
 
+  /// v0.4.0 B1: 23-item picker replaces cycleGameKey rotation.
   Future<void> _onGameBadgeTap() async {
-    final nextGame = cycleGameKey(_journey.game);
-    await _persist(_journey.copyWith(game: nextGame));
+    final picked = await showGameEditionPickerSheet(
+      context,
+      selected: gameEditionController.edition,
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    await gameEditionController.setEdition(picked);
+    final journeyKey = picked.journeyGameKey;
+    if (_journey.game != journeyKey) {
+      await _persist(_journey.copyWith(game: journeyKey));
+    }
     if (!mounted) {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppZh.snackGameSwitched(localizeGame(nextGame)))),
+      SnackBar(content: Text(AppZh.snackGameSwitched(picked.labelZh))),
     );
   }
 

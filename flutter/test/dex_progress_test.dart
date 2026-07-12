@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:titodex/features/dex/dex_game_scope.dart';
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/features/dex/dex_progress.dart';
+import 'package:titodex/features/dex/dex_scope.dart';
 import 'package:titodex/models/journey.dart';
 
 void main() {
@@ -39,7 +39,7 @@ void main() {
       seenIds: {1, 2, 493},
     );
 
-    final stats = progress.statsFor(DexRegionalScope.national);
+    final stats = progress.statsFor(DexRegionalPokedex.national);
 
     expect(stats.total, hgssMaxNationalDexId);
     expect(stats.caught, 2);
@@ -53,7 +53,7 @@ void main() {
       seenIds: {152, 155, 200, 251},
     );
 
-    final stats = progress.statsFor(DexRegionalScope.johto);
+    final stats = progress.statsFor(DexRegionalPokedex.johto);
 
     expect(stats.total, 100);
     expect(stats.caught, 3);
