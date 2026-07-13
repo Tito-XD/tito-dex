@@ -287,6 +287,81 @@ class DexCacheStore {
     return file.path;
   }
 
+  /// Scan cached detail JSON for species that learn [moveId].
+  Future<List<int>> findPokemonIdsWithMove(int moveId) async {
+    final paths = await _pathsFuture;
+    final dir = paths.detailsDir;
+    if (!await dir.exists()) {
+      return const [];
+    }
+
+    final matches = <int>[];
+    await for (final entity in dir.list()) {
+      if (entity is! File || !entity.path.endsWith('.json')) {
+        continue;
+      }
+      final fileName = entity.uri.pathSegments.last;
+      final id = int.tryParse(fileName.replaceAll('.json', ''));
+      if (id == null) {
+        continue;
+      }
+      try {
+        final json =
+            jsonDecode(await entity.readAsString()) as Map<String, dynamic>;
+        if (_detailJsonContainsMove(json, moveId)) {
+          matches.add(id);
+        }
+      } catch (_) {
+        // Skip corrupt detail files.
+      }
+    }
+    matches.sort();
+    return matches;
+  }
+
+  static bool _detailJsonContainsMove(
+    Map<String, dynamic> json,
+    int moveId,
+  ) {
+    bool listHasMove(List<dynamic>? refs) {
+      if (refs == null) {
+        return false;
+      }
+      for (final ref in refs) {
+        if (ref is! Map) {
+          continue;
+        }
+        if ((ref['moveId'] as num?)?.toInt() == moveId) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    bool moveSetHasMove(Map<String, dynamic>? moveSet) {
+      if (moveSet == null) {
+        return false;
+      }
+      return listHasMove(moveSet['levelUp'] as List<dynamic>?) ||
+          listHasMove(moveSet['machine'] as List<dynamic>?) ||
+          listHasMove(moveSet['egg'] as List<dynamic>?) ||
+          listHasMove(moveSet['tutor'] as List<dynamic>?);
+    }
+
+    if (moveSetHasMove(json['moveSet'] as Map<String, dynamic>?)) {
+      return true;
+    }
+    final moveSets = json['moveSets'] as Map<String, dynamic>?;
+    if (moveSets != null) {
+      for (final entry in moveSets.values) {
+        if (entry is Map<String, dynamic> && moveSetHasMove(entry)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   Future<int> directorySizeBytes() async {
     final paths = await _pathsFuture;
     if (!await paths.root.exists()) {

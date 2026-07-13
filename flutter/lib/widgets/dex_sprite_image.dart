@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../theme/tito_colors.dart';
+
 class DexSpriteImage extends StatelessWidget {
   const DexSpriteImage({
     super.key,
@@ -22,37 +24,49 @@ class DexSpriteImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (source == null || source!.isEmpty) {
-      return SizedBox(height: height, width: width);
+      return _placeholder();
     }
 
     if (source!.startsWith('assets/')) {
-      return Image.asset(
-        source!,
-        height: height,
-        width: width,
-        fit: fit,
-        errorBuilder: (_, __, ___) => SizedBox(height: height, width: width),
-      );
+      return _image(Image.asset(source!, fit: fit));
     }
 
     final uri = Uri.tryParse(source!);
     if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
-      return Image.network(
-        source!,
-        height: height,
-        width: width,
-        fit: fit,
-        errorBuilder: (_, __, ___) => SizedBox(height: height, width: width),
-      );
+      return _image(Image.network(source!, fit: fit));
     }
 
-    final file = File(source!);
-    return Image.file(
-      file,
+    return _image(Image.file(File(source!), fit: fit));
+  }
+
+  Widget _image(Image image) {
+    return Image(
+      image: image.image,
       height: height,
       width: width,
       fit: fit,
-      errorBuilder: (_, __, ___) => SizedBox(height: height, width: width),
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded || frame != null) {
+          return child;
+        }
+        return _placeholder();
+      },
+      errorBuilder: (_, __, ___) => _placeholder(),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: TitoColors.card.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        border: Border.all(
+          color: TitoColors.ink.withValues(alpha: 0.1),
+          width: 2,
+        ),
+      ),
     );
   }
 }

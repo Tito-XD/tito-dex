@@ -157,3 +157,77 @@ String localizeReminder(String? reminder) {
   }
   return localizeTimelineEntry(reminder);
 }
+
+/// PokeAPI berry/flavor slug → Chinese taste label.
+const flavorLabelsZh = <String, String>{
+  'spicy': '辣',
+  'dry': '涩',
+  'sweet': '甜',
+  'bitter': '苦',
+  'sour': '酸',
+};
+
+/// Move damage class slug → Chinese.
+const moveCategoryLabelsZh = <String, String>{
+  'physical': '物理',
+  'special': '特殊',
+  'status': '变化',
+};
+
+/// CDN egg-group slug → Chinese label (matches detail `eggGroups` values).
+const eggGroupLabelsZh = <String, String>{
+  'monster': '怪兽',
+  'water1': '水中1',
+  'bug': '虫',
+  'flying': '飞行',
+  'ground': '陆上',
+  'fairy': '妖精',
+  'plant': '植物',
+  'humanshape': '人形',
+  'water3': '水中3',
+  'mineral': '矿物',
+  'indeterminate': '不定形',
+  'water2': '水中2',
+  'ditto': '百变怪',
+  'dragon': '龙',
+  'no-eggs': '未发现',
+};
+
+String? eggGroupSlugForLabelZh(String label) {
+  for (final entry in eggGroupLabelsZh.entries) {
+    if (entry.value == label) {
+      return entry.key;
+    }
+  }
+  return null;
+}
+
+/// CDN / PokeAPI item category slug → Chinese display label.
+const itemCategoryLabelsZh = <String, String>{
+  'standard-balls': '精灵球',
+  'special-balls': '特殊球',
+  'apricorn-balls': '球果球',
+  'healing': '药品',
+  'medicine': '药品',
+  'picky-healing': '精选药品',
+  'revival': '复活',
+  'status-cures': '状态恢复',
+  'pp-recovery': 'PP恢复',
+  'vitamins': '营养饮料',
+  'stat-boosts': '能力提升',
+  'effort-training': '努力值',
+  'training': '训练',
+  'held-items': '携带道具',
+  'bad-held-items': '负面携带',
+  'choice': '讲究系列',
+  'type-enhancement': '属性强化',
+  'type-protection': '属性防守',
+  'evolution': '进化',
+  'spelunking': '探险',
+  'collectibles': '收集品',
+  'event-items': '活动道具',
+  'gameplay': '对战道具',
+  'other': '其他',
+  'picnic': '野餐',
+  'in-a-pinch': '危急时刻',
+};

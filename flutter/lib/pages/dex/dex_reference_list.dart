@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/dex/dex_filter.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/type_chart.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../widgets/dex_reference_detail.dart';
 import '../../widgets/handheld_input.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -205,47 +207,80 @@ void showMoveDetailSheet(BuildContext context, CachedMove move) {
   showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) {
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                move.nameZh,
-                style: SecondaryTypography.onCard.h15.copyWith(
-                  fontWeight: FontWeight.w900,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  move.nameZh,
+                  style: SecondaryTypography.onCard.h15.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-              ),
-              Text(
-                move.nameEn,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                Text(
+                  move.nameEn,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TitoTypeBadge(typeEn: move.type, size: TypeBadgeSize.medium),
-              const SizedBox(height: 12),
-              Text(
-                AppZh.dexReferenceMoveMeta(
-                  move.category,
-                  move.power,
-                  move.accuracy,
-                  move.pp,
+                const SizedBox(height: 12),
+                TitoTypeBadge(typeEn: move.type, size: TypeBadgeSize.medium),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(
+                      moveCategoryIcon(move.category),
+                      size: 18,
+                      color: TitoColors.ink,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        formatMoveStatLine(
+                          category: move.category,
+                          power: move.power,
+                          accuracy: move.accuracy,
+                          pp: move.pp,
+                        ),
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.push('/search?q=${Uri.encodeComponent(move.nameZh)}');
-                },
-                child: Text(AppZh.dexReferenceFindPokemon),
-              ),
-            ],
+                if (move.descriptionZh?.isNotEmpty == true) ...[
+                  const SizedBox(height: 12),
+                  StickerCard(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      move.descriptionZh!,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  dexFilterController.setFilter(
+                    DexFilter(
+                      learnsMoveId: move.id,
+                      labelZh: AppZh.dexFilterMoveLabel(move.nameZh),
+                    ),
+                  );
+                    context.go('/dex');
+                  },
+                  child: Text(AppZh.dexReferenceViewMoveLearners),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -258,6 +293,7 @@ void showAbilityDetailSheet(BuildContext context, CachedAbility ability) {
     context: context,
     showDragHandle: true,
     builder: (context) {
+      final pokemonCount = ability.pokemonIds.length;
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -284,15 +320,31 @@ void showAbilityDetailSheet(BuildContext context, CachedAbility ability) {
                     : ability.descriptionZh,
                 style: SecondaryTypography.onCard.body14,
               ),
+              if (pokemonCount > 0) ...[
+                const SizedBox(height: 8),
+                Text(
+                  AppZh.dexReferencePokemonCount(pokemonCount),
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.push(
-                    '/search?q=${Uri.encodeComponent(ability.nameZh)}',
+                onPressed: pokemonCount == 0
+                    ? null
+                    : () {
+                        Navigator.pop(context);
+                  dexFilterController.setFilter(
+                    DexFilter(
+                      abilityId: ability.id,
+                      labelZh: AppZh.dexFilterAbilityLabel(ability.nameZh),
+                    ),
                   );
-                },
-                child: Text(AppZh.dexReferenceFindPokemon),
+                        context.go('/dex');
+                      },
+                child: Text(AppZh.dexReferenceViewAbilityPokemon),
               ),
             ],
           ),

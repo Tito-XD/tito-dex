@@ -162,10 +162,6 @@ abstract final class AppZh {
   static const dexReferenceEmpty = '没有匹配的资料条目。';
   static const dexReferenceNoDescription = '暂无特性说明。';
   static const dexReferenceFindPokemon = '搜索拥有此资料的宝可梦';
-  static const dexFilterActive = '已启用图鉴筛选';
-  static const dexFilterClear = '清除筛选';
-  static String dexFilterByMove(String moveName) => '可学会招式：$moveName';
-  static String dexFilterByAbility(String abilityName) => '拥有特性：$abilityName';
   static String dexReferenceMoveMeta(
     String category,
     int? power,
@@ -200,13 +196,13 @@ abstract final class AppZh {
   static const dexReferenceMoveAccuracySymbol = '🎯';
   static const dexReferenceMovePpSymbol = 'PP';
   static String dexReferencePokemonCount(int count) => '共 $count 只宝可梦';
-  static const dexFilterClear = '清除';
-  static const dexFilterActiveGeneric = '图鉴筛选';
-  static String dexFilterActive(String label) => '筛选：$label';
-  static String dexFilterLoading(String label) => '正在筛选：$label…';
-  static String dexFilterEggGroupLabel(String name) => '蛋群 · $name';
-  static String dexFilterAbilityLabel(String name) => '特性 · $name';
-  static String dexFilterMoveLabel(String name) => '招式 · $name';
+  static String dexFilterByEggGroup(String name) => '蛋群：$name';
+  static const dexFilterClear = '清除筛选';
+  static const dexFilterActive = '已启用图鉴筛选';
+  static String dexFilterByMove(String name) => '招式 · $name';
+  static String dexFilterByAbility(String name) => '特性 · $name';
+  static String dexFilterMoveLabel(String name) => dexFilterByMove(name);
+  static String dexFilterAbilityLabel(String name) => dexFilterByAbility(name);
   static const dexGameVersionHgss = '心金·魂银';
   static const dexGameVersionSv = '朱紫';
   static const dexGameVersionSwsh = '剑盾';
