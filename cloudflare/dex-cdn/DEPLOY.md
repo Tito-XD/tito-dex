@@ -86,11 +86,11 @@ Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 
-# 当前生产 v4（493 物种 → R2 /v2/）
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
-
-# v0.3.0 bundle v5（1025 物种 → R2 /v3/）
+# 当前生产 v5（1025 物种 → R2 /v3/，含 l10n/maps/config）
 python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v5 --max-id 1025
+
+# 遗留 v4（493 物种 → R2 /v2/）
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
 
 python3 tools/upload_dex_via_worker.py dist/dex-v5/upload   # 需临时 bootstrap 路由，或 wrangler / CI
 ```

@@ -2,126 +2,58 @@
 
 ## Positioning
 
-TitoDex is a personal companion app for Tito's Pokémon journeys.
+TitoDex is a **journey companion** for Pokémon playthroughs on a handheld (primarily RG / Android).
 
-It is:
+| It is | It is not |
+| --- | --- |
+| Journey dashboard & trainer card | Full Pokédex / wiki |
+| Local save helper (HGSS) | Universal save manager |
+| Lightweight reference (moves, types, items) | Competitive battle platform |
+| Warm device UI | Material-default Android app |
 
-- a journey dashboard
-- a trainer card
-- a local save companion
-- a lightweight game-context helper
-- a warm device UI
+## Primary user story
 
-It is not:
+When I open TitoDex, I see my **current journey** — game, location, badges, party, recent notes — so I can continue without re-orienting.
 
-- a Pokémon encyclopedia
-- a Bulbapedia / 52Poké / Serebii replacement
-- a competitive battle database
-- a universal save manager in Phase 1
-- a public social network
+## Home screen (north star)
 
-## Primary User Story
+1. Trainer card (name, game, companion sprite)  
+2. Continue journey card (location, badges, play time, party snapshot)  
+3. Quick access — Team, Journey, Dex, Search  
+4. Recent timeline / reminders  
 
-As Tito, when I open TitoDex, I want to immediately see my current Pokémon journey so I can continue playing without re-orienting myself manually.
+Reference: [docs/UI_REFERENCE.md](docs/UI_REFERENCE.md)
 
-## Home Screen Structure
+## Shipped (v0.4.6)
 
-The supplied UI reference is the current north star: a deep-blue and cream companion device with a Trainer Card, Goldenrod City Continue Journey card, party panel, quick action tiles, launcher widgets, and Riolu encouragement sticker.
+- HGSS save parser + directory sync + seen/caught on dex grid  
+- National dex **1–1025**, CDN offline bundle v5, 23 game editions, regional filters  
+- Detail tabs: flavor, stats, obtain locations, moves per game  
+- Search hub: encyclopedia (moves, abilities, natures, items, weather, …) with **dex drill-down filters**  
+- Battle tools (partial): type matchup, stat calc, quick damage  
+- Chinese catalog in bundle `l10n/`; update prompts + incremental l10n sync  
+- RG release APK pipeline (~21 MB arm64)
 
+## Priorities
 
-The first home screen should include:
+### Must have
+- Continue journey as dominant home action  
+- Current game context on important surfaces  
+- Offline-first dex & reference where possible  
+- Distinct visual language (DeviceShell, sticker cards)
 
-1. **TitoDex title**
-2. **Trainer Card**
-   - trainer name
-   - current generation / game
-   - companion character, initially Riolu
-3. **Continue Journey card**
-   - current game: SoulSilver
-   - current location: Goldenrod City
-   - badge progress: 3 badges
-   - play time
-   - party summary
-4. **Quick widgets**
-   - Team
-   - Journey
-   - Dex
-   - Search
-5. **Recent timeline**
-   - short journey notes
-   - next reminder
-   - optional local checklist items
+### Should have next
+- Blind-spot / coverage analysis for teams  
+- Richer damage calc; IV tools (lower priority)  
+- Launcher icon & splash polish  
+- HeartGold detection, single-file save pick  
 
-## Phase 1 Mock Data
+### Out of scope (for now)
+- Account system, OCR, journey cloud sync ([proposal](docs/CLOUD_SYNC_PROPOSAL.md))  
+- Usage rankings, full Showdown parity  
+- Runtime scraping of fan wikis in the app  
 
-Phase 1 can hard-code:
+## Platform
 
-```ts
-const currentJourney = {
-  game: 'SoulSilver',
-  location: 'Goldenrod City',
-  badges: 3,
-  playTime: '18:42',
-  party: ['Quilava', 'Riolu', 'Flaaffy', 'Togepi'],
-  timeline: [
-    'Reached Goldenrod City',
-    'Won Hive Badge',
-    'Added Riolu as companion',
-  ],
-};
-```
-
-Mock data is acceptable because the immediate goal is product shape and feeling, not save parser completeness.
-
-## Product Priorities
-
-### Must Have
-
-- Continue Journey as the dominant home action.
-- Current game context visible everywhere important.
-- Responsive Android-first layout.
-- Local-first data assumptions.
-- Visual language distinct from Material Design defaults.
-
-### Should Have
-
-- Trainer Card feeling.
-- Riolu companion presence.
-- Compact widget dashboard.
-- **National dex 1–493** with offline bundle v4 — shipped v0.2.28.
-- **National dex 1–1025** + CDN bundle v5 (`/v3/`) + **`DexScope`** multi-game browse — planned v0.3.0.
-- Journey timeline.
-
-### Could Have Later
-
-- Save dex seen/caught flags from `.sav` — **shipped v0.2.28**.
-- Local backup browsing.
-- Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`).
-- Route notes.
-- Game-specific checklists.
-- Generation-specific data packs.
-- Web companion at `tito.cafe/pokedex` (reuse CDN assets).
-
-### Should Not Have in Phase 1
-
-- full Pokédex encyclopedia (beyond HGSS 493 scope)
-- all-game parser abstraction
-- account system
-- OCR
-- large public content ingestion
-
-### Shipped (v0.2.28)
-
-- Save parser integration (HGSS retail `.sav`) + **save dex seen/caught flags**
-- Emulator launcher (Continue → pick / remember app)
-- Mock Dex → **real offline dex** with PNG sprites + artwork viewer (493; CDN v4)
-- **Abilities + obtain locations** on detail tabs
-- **Regional browse** — Johto 251 / Kanto 151 filters
-- **Battle companion tools (partial)** — Search: type matchup, stat calc, quick damage
-- RG release APK: `TitoDex-0.2.28-rg-arm64.apk` (arm64-v8a; see `flutter/README.md`)
-
-### Planned (v0.3.0)
-
-- National dex **1–1025**, offline bundle **v5**
-- **`DexScope`** game version switcher (HGSS / SV / SwSh move sets)
-- Radar chart, move/ability encyclopedia browse
+- **Now:** Android (phone + RG Rotate), arm64 APK  
+- **Later:** Linux handheld, optional web companion (save sync needs `dart:io` strategy)

@@ -12,19 +12,15 @@
 
 为 TitoDex（Flutter 掌机 App）提供：
 
-1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（Gen IX 上限；v0.2.28 APK 仍用 v4 / 493）
+1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（当前 App v0.4.6 默认 bundle v5）
 2. **CDN 加速** — 精灵图、属性图标、单条详情 JSON
 3. **一次下载完整包** — 掌机不必逐条请求 PokeAPI
 
 App 侧环境变量（由 CDN 部署交付）：
 
 ```bash
-# Production (v0.2.28 APK)
+# Current production (v0.4.6 APK)
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4
-
-# Planned v0.3.0 (1025 species)
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=5
 ```
@@ -37,8 +33,8 @@ TITODEX_DEX_BUNDLE_VERSION=5
 
 | R2 / CDN 前缀 | bundleVersion | 物种数 | 说明 |
 | --- | --- | --- | --- |
-| **`/v2/`** | **4** | 493 | **当前生产** — v0.2.28 APK 默认 |
-| **`/v3/`** | **5** | **1025** | **v0.3.0** — 扩展 JSON schema，保留 v2 兼容 |
+| **`/v2/`** | **4** | 493 | 遗留 — 旧客户端 |
+| **`/v3/`** | **5** | **1025** | **当前生产** — v0.4.x App 默认 |
 
 v5 与 v4 可并存：旧客户端继续读 `/v2/`；新客户端读 `/v3/` 与 `bundle-manifest.json` 中的 `archiveUrl`。
 
@@ -86,7 +82,7 @@ titodex-dex/
 │   ├── details/1.json … 493.json
 │   ├── sprites/1.png … 493.png
 │   └── type_icons/*.png
-└── v3/                           # bundle v5 — 1025 物种（v0.4.5+）
+└── v3/                           # bundle v5 — 1025 物种（v0.4.6+）
     ├── manifest.json
     ├── summaries.json
     ├── types.json
