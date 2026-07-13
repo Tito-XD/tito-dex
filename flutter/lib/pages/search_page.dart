@@ -398,28 +398,29 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Widget> _battleSegment(BuildContext context) {
     return [
-      StickerCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(AppZh.searchHubBattleTitle, style: SecondaryTypography.onCard.h15),
-            const SizedBox(height: 8),
-            _BattleToolLink(
-              title: AppZh.searchBattleTypeMatchup,
-              onTap: () => context.push('/search/companion/type-matchup'),
+      ListenableBuilder(
+        listenable: gameEditionRepository,
+        builder: (context, _) {
+          final edition = gameEditionRepository.edition;
+          return StickerCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppZh.searchHubBattleTitle,
+                  style: SecondaryTypography.onCard.h15,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  AppZh.companionToolsSubtitle(edition.labelZh),
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            _BattleToolLink(
-              title: AppZh.searchBattleStatCalc,
-              onTap: () => context.push('/search/companion/stat-calc'),
-            ),
-            const SizedBox(height: 8),
-            _BattleToolLink(
-              title: AppZh.searchBattleQuickDamage,
-              onTap: () => context.push('/search/companion/quick-damage'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
       const SizedBox(height: 12),
       CompanionToolsPanel(journey: widget.journey),
@@ -475,51 +476,6 @@ class _SearchHubSegmentBar extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-class _BattleToolLink extends StatelessWidget {
-  const _BattleToolLink({required this.title, required this.onTap});
-
-  final String title;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Material(
-        color: TitoColors.card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: TitoColors.ink, width: 2),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: TitoColors.mutedInk,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

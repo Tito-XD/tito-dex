@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dex_bundle_installer.dart';
 import 'dex_cache_store.dart';
 import 'dex_cdn_config.dart';
+import 'dex_cdn_data_source.dart';
 import 'dex_models.dart';
 import 'dex_sprite_codec.dart';
 import 'poke_api_throttle.dart';
@@ -124,6 +125,35 @@ class DexOfflineService {
       return null;
     }
     return _attachAbsoluteSpritesToDetail(detail);
+  }
+
+  Future<List<Map<String, dynamic>>> readReferenceArray(String filename) async {
+    if (kIsWeb) {
+      return const [];
+    }
+    final array = await _store.readJsonArray(filename);
+    if (array.isNotEmpty) {
+      return array;
+    }
+    final object = await _store.readJsonObject(filename);
+    if (object.isEmpty) {
+      return const [];
+    }
+    return DexCdnDataSource.objectEntriesToList(object);
+  }
+
+  Future<Map<int, CachedAbility>> readAbilitiesIndex() async {
+    if (kIsWeb) {
+      return const {};
+    }
+    return _store.readAbilities();
+  }
+
+  Future<Map<int, CachedMove>> readMovesIndex() async {
+    if (kIsWeb) {
+      return const {};
+    }
+    return _store.readMoves();
   }
 
   Future<String?> typeIconPath(String type) async {

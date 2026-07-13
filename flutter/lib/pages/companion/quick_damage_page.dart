@@ -6,8 +6,8 @@ import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
-import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
@@ -48,7 +48,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   @override
   void initState() {
     super.initState();
-    final scope = battleScopeForGame(widget.journey.game);
+    final scope = battleScopeForEdition(gameEditionRepository.edition);
     _levelController.text = scope.defaultLevel.toString();
     _loadRelations();
   }
@@ -158,31 +158,35 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = battleScopeForGame(widget.journey.game);
-    final relations = _relations;
-    DamageEstimate? estimate;
-    if (relations != null) {
-      estimate = estimateDamage(
-        level: _readInt(_levelController, scope.defaultLevel),
-        power: _readInt(_powerController, 80),
-        attack: _readInt(_attackController, 100),
-        defense: _readInt(_defenseController, 100),
-        defenderHp: _readInt(_hpController, 150),
-        moveType: _moveType,
-        attackerTypes: _attackerTypes,
-        defenderTypes: _defenderTypes,
-        relationsByType: relations,
-      );
-    }
+    return ListenableBuilder(
+      listenable: gameEditionRepository,
+      builder: (context, _) {
+        final edition = gameEditionRepository.edition;
+        final scope = battleScopeForEdition(edition);
+        final relations = _relations;
+        DamageEstimate? estimate;
+        if (relations != null) {
+          estimate = estimateDamage(
+            level: _readInt(_levelController, scope.defaultLevel),
+            power: _readInt(_powerController, 80),
+            attack: _readInt(_attackController, 100),
+            defense: _readInt(_defenseController, 100),
+            defenderHp: _readInt(_hpController, 150),
+            moveType: _moveType,
+            attackerTypes: _attackerTypes,
+            defenderTypes: _defenderTypes,
+            relationsByType: relations,
+          );
+        }
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: Material(
-        type: MaterialType.transparency,
-        child: SecondaryPageScaffold(
-        title: AppZh.companionToolQuickDamage,
-        subtitle: localizeGame(widget.journey.game),
-        children: [
+        return TitoFontScale(
+          multiplier: 1.0,
+          child: Material(
+            type: MaterialType.transparency,
+            child: SecondaryPageScaffold(
+              title: AppZh.companionToolQuickDamage,
+              subtitle: edition.labelZh,
+              children: [
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_error != null)
@@ -407,9 +411,11 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
               ),
             ],
           ],
-        ],
-      ),
-      ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

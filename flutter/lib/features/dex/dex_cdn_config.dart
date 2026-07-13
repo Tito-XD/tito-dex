@@ -45,6 +45,10 @@ class DexCdnConfig {
   String abilitiesUrl({String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/abilities.json';
 
+  /// v3 reference indices (natures, weather, items, …).
+  String referenceUrl(String filename, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/$filename';
+
   String bundleArchiveUrl({String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/bundle.tar.zst';
 

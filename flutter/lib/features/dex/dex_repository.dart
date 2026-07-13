@@ -113,6 +113,20 @@ class DexRepository {
       return _detailCache[id]!;
     }
 
+    // Full CDN bundle installed — always serve from local files (airplane mode).
+    if (await _offline.isReady()) {
+      try {
+        final cached = await _offline.readDetail(id);
+        if (cached != null) {
+          _detailCache[id] = cached;
+          _summaryCache[id] = cached.summary;
+          return cached;
+        }
+      } catch (_) {
+        // Corrupt entry — fall through to live sources.
+      }
+    }
+
     if (await _offline.shouldPreferOffline()) {
       try {
         final cached = await _offline.readDetail(id);
@@ -134,6 +148,16 @@ class DexRepository {
     } catch (_) {
       // CDN miss/unreachable — fall through to PokeAPI.
     }
+
+    // Offline bundle fallback even when preferOffline is off (airplane mode).
+    try {
+      final cached = await _offline.readDetail(id);
+      if (cached != null) {
+        _detailCache[id] = cached;
+        _summaryCache[id] = cached.summary;
+        return cached;
+      }
+    } catch (_) {}
 
     try {
       final detail = await _client.fetchDetailWithMoves(id);
@@ -298,11 +322,21 @@ class DexRepository {
     if (_allMovesCache != null) {
       return _allMovesCache!;
     }
+    final offline = await _offline.readMovesIndex();
+    if (offline.isNotEmpty) {
+      _allMovesCache = offline;
+      return offline;
+    }
     try {
       final moves = await _cdn.fetchAllMoves();
       _allMovesCache = moves;
       return moves;
     } catch (_) {
+      final offline = await _offline.readMovesIndex();
+      if (offline.isNotEmpty) {
+        _allMovesCache = offline;
+        return offline;
+      }
       return const {};
     }
   }
@@ -331,12 +365,35 @@ class DexRepository {
     if (_allAbilitiesCache != null) {
       return _allAbilitiesCache!;
     }
+    final offline = await _offline.readAbilitiesIndex();
+    if (offline.isNotEmpty) {
+      _allAbilitiesCache = offline;
+      return offline;
+    }
     try {
       final abilities = await _cdn.fetchAllAbilities();
       _allAbilitiesCache = abilities;
       return abilities;
     } catch (_) {
+      final offline = await _offline.readAbilitiesIndex();
+      if (offline.isNotEmpty) {
+        _allAbilitiesCache = offline;
+        return offline;
+      }
       return const {};
+    }
+  }
+
+  /// Reference hub entries (natures, weather, …) — local bundle first, then CDN.
+  Future<List<Map<String, dynamic>>> getReferenceEntries(String filename) async {
+    final offline = await _offline.readReferenceArray(filename);
+    if (offline.isNotEmpty) {
+      return offline;
+    }
+    try {
+      return await _cdn.fetchReferenceArray(filename);
+    } catch (_) {
+      return const [];
     }
   }
 

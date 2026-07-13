@@ -104,8 +104,11 @@ class DexBundleInstaller {
 
     final cacheManifest = await _store.readManifest();
     final sizeBytes = await _store.directorySizeBytes();
-    final pokemonTotal =
-        bundleManifest.pokemonCount ?? titodexMaxNationalDexId;
+    final summaries = await _store.readSummaries();
+    final moves = await _store.readMoves();
+    final pokemonTotal = summaries.isNotEmpty
+        ? summaries.length
+        : (bundleManifest.pokemonCount ?? titodexMaxNationalDexId);
     await _store.writeManifest(
       DexCacheManifest(
         version: DexCdnConfig.bundleVersion,
@@ -113,10 +116,8 @@ class DexBundleInstaller {
         preferOffline: true,
         downloadedAt:
             cacheManifest.downloadedAt ?? DateTime.now().toIso8601String(),
-        pokemonCount: cacheManifest.pokemonCount > 0
-            ? cacheManifest.pokemonCount
-            : pokemonTotal,
-        moveCount: cacheManifest.moveCount,
+        pokemonCount: pokemonTotal,
+        moveCount: moves.length,
         sizeBytes: sizeBytes,
       ),
     );

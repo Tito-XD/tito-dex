@@ -26,6 +26,9 @@ class DexCdnDataSource {
   Future<List<PokemonSummary>>? _summariesFuture;
   Future<Map<int, CachedMove>>? _movesFuture;
   Future<Map<int, CachedAbility>>? _abilitiesFuture;
+  final Map<String, Future<List<Map<String, dynamic>>>> _referenceArrayFutures =
+      {};
+  final Map<String, Future<Map<String, dynamic>>> _referenceObjectFutures = {};
   String? _activeApiPrefix;
 
   Future<List<PokemonSummary>> fetchAllSummaries() {
@@ -79,6 +82,67 @@ class DexCdnDataSource {
       throw DexCdnException('Ability #$id not found in CDN index');
     }
     return entry;
+  }
+
+  /// Load array-shaped reference JSON (`natures.json`, `egg_groups.json`, …).
+  Future<List<Map<String, dynamic>>> fetchReferenceArray(String filename) {
+    return _referenceArrayFutures.putIfAbsent(filename, () async {
+      try {
+        final prefix = await _resolveApiPrefix();
+        final body =
+            await _getBody(_config.referenceUrl(filename, prefix: prefix));
+        final decoded = jsonDecode(body);
+        if (decoded is List) {
+          return decoded
+              .whereType<Map>()
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList(growable: false);
+        }
+        if (decoded is Map) {
+          return objectEntriesToList(
+            Map<String, dynamic>.from(decoded),
+          );
+        }
+        return const [];
+      } catch (error) {
+        _referenceArrayFutures.remove(filename);
+        throw DexCdnException('Failed to load $filename: $error');
+      }
+    });
+  }
+
+  /// Load object-shaped reference JSON (`items.json`, …).
+  Future<Map<String, dynamic>> fetchReferenceObject(String filename) {
+    return _referenceObjectFutures.putIfAbsent(filename, () async {
+      try {
+        final prefix = await _resolveApiPrefix();
+        final body =
+            await _getBody(_config.referenceUrl(filename, prefix: prefix));
+        final decoded = jsonDecode(body);
+        if (decoded is Map) {
+          return Map<String, dynamic>.from(decoded);
+        }
+        return const {};
+      } catch (error) {
+        _referenceObjectFutures.remove(filename);
+        throw DexCdnException('Failed to load $filename: $error');
+      }
+    });
+  }
+
+  static List<Map<String, dynamic>> objectEntriesToList(
+    Map<String, dynamic> object,
+  ) {
+    return object.entries.map((entry) {
+      final value = entry.value;
+      if (value is Map) {
+        final map = Map<String, dynamic>.from(value);
+        map.putIfAbsent('id', () => int.tryParse(entry.key) ?? entry.key);
+        map.putIfAbsent('slug', () => entry.key);
+        return map;
+      }
+      return {'id': entry.key, 'value': value};
+    }).toList(growable: false);
   }
 
   Future<Map<int, CachedMove>> _fetchMoves() {

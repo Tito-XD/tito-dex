@@ -1,4 +1,6 @@
 /// Simplified Chinese UI copy for TitoDex.
+import '../features/dex/dex_models.dart';
+
 abstract final class AppZh {
   static const appTitle = 'TitoDex';
 
@@ -154,10 +156,10 @@ abstract final class AppZh {
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
-      '一次性下载全国图鉴 1–493：中文名、属性图标、克制关系、进化链、升级招式与压缩立绘。招式按 ID 去重复用，属性图标全局共用。';
+      '一次性下载全国图鉴 1–1025 及全部资料索引（性格/天气/道具等）：中文名、属性、进化链、招式与压缩立绘。';
   static const settingsDexOfflineUnset = '尚未下载离线图鉴';
   static String settingsDexOfflinePartial(int pokemonCount) =>
-      '部分缓存 $pokemonCount / 493，可点「继续下载」补全';
+      '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
   static String settingsDexOfflineReady(
     int pokemonCount,
     int moveCount,
@@ -190,7 +192,7 @@ abstract final class AppZh {
 
   static const settingsDexCdnDownload = '从 CDN 下载图鉴包';
   static const settingsDexCdnDownloadHint =
-      '从 dex.tito.cafe 下载预打包图鉴（更快，含全部 493 只立绘与数据）';
+      '从 dex.tito.cafe 下载预打包图鉴（含 1025 只宝可梦、招式/特性/性格/天气/道具等全部资料，可离线使用）';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
@@ -200,7 +202,7 @@ abstract final class AppZh {
 
   static const snackDexOfflineDone = '离线图鉴已下载完成';
   static String snackDexOfflinePartial(int count) =>
-      '已缓存 $count / 493 只宝可梦，可再次点击继续下载补全';
+      '已缓存 $count / $titodexMaxNationalDexId 只宝可梦，可再次点击继续下载补全';
   static const snackDexOfflineCleared = '已清除离线图鉴缓存';
   static const snackDexOfflineFailed = '离线图鉴下载失败';
 

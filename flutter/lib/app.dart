@@ -219,7 +219,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                       child: TitoPageContainer(
                         child: DexJsonReferencePage(
                           title: map['title'] ?? AppZh.searchHubDataTitle,
-                          cdnPath: map['cdnPath'] ?? '/v3/',
+                          cdnFilename: map['cdnFilename'] ?? 'natures.json',
                         ),
                       ),
                     );

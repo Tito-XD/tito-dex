@@ -394,15 +394,22 @@ class PokemonMoveSet {
           .cast<Map<String, dynamic>>();
       final moves = <PokemonMove>[];
       for (final ref in refs) {
-        final move = moveLookup[ref['moveId'] as int];
-        if (move == null) {
+        final moveId = (ref['moveId'] as num?)?.toInt();
+        if (moveId == null) {
           continue;
         }
+        final move = moveLookup[moveId] ?? CachedMove(
+          id: moveId,
+          nameEn: 'move-$moveId',
+          nameZh: '招式 #$moveId',
+          type: 'normal',
+          category: 'status',
+        );
         moves.add(
           PokemonMove(
             move: move,
-            method: ref['method'] as String,
-            level: ref['level'] as int?,
+            method: ref['method'] as String? ?? key,
+            level: (ref['level'] as num?)?.toInt(),
           ),
         );
       }
@@ -495,24 +502,62 @@ class PokemonDetail {
       ? null
       : '城都 #${johtoDexNumber!.toString().padLeft(3, '0')}';
 
-  /// Move set for a game version group key (e.g. `heartgold-soulsilver`).
+  /// Move set for a game version group key (falls back through legacy moveSet).
   PokemonMoveSet moveSetForKey(String versionGroupKey) {
-    return moveSets[versionGroupKey] ??
-        (versionGroupKey == 'heartgold-soulsilver' ? moveSet : const PokemonMoveSet());
+    final direct = moveSets[versionGroupKey];
+    if (direct != null && !_moveSetIsEmpty(direct)) {
+      return direct;
+    }
+    if (versionGroupKey == 'heartgold-soulsilver' &&
+        !_moveSetIsEmpty(moveSet)) {
+      return moveSet;
+    }
+    for (final entry in moveSets.entries) {
+      if (!_moveSetIsEmpty(entry.value)) {
+        return entry.value;
+      }
+    }
+    return moveSet;
   }
+
+  static bool _moveSetIsEmpty(PokemonMoveSet set) =>
+      set.levelUp.isEmpty &&
+      set.machine.isEmpty &&
+      set.egg.isEmpty &&
+      set.tutor.isEmpty;
 
   bool get hasMultipleMoveSets => moveSets.length > 1;
 
-  /// Obtain locations for a game version group key.
+  /// Obtain locations for a game version group key (empty CDN lists fall through).
   List<ObtainLocationEntry> obtainLocationsForKey(String versionGroupKey) {
     final byGame = obtainLocationsByGame[versionGroupKey];
-    if (byGame != null) {
+    if (byGame != null && byGame.isNotEmpty) {
       return byGame;
     }
-    if (versionGroupKey == 'heartgold-soulsilver') {
+    if (versionGroupKey == 'heartgold-soulsilver' &&
+        obtainLocations.isNotEmpty) {
       return obtainLocations;
     }
-    return const [];
+    // Any non-empty obtain data beats showing nothing (offline-first UX).
+    for (final entry in obtainLocationsByGame.entries) {
+      if (entry.value.isNotEmpty) {
+        return entry.value;
+      }
+    }
+    return obtainLocations;
+  }
+
+  /// First non-empty obtain key + locations (for UI labels).
+  (String?, List<ObtainLocationEntry>) get firstAvailableObtain {
+    for (final entry in obtainLocationsByGame.entries) {
+      if (entry.value.isNotEmpty) {
+        return (entry.key, entry.value);
+      }
+    }
+    if (obtainLocations.isNotEmpty) {
+      return ('heartgold-soulsilver', obtainLocations);
+    }
+    return (null, const []);
   }
 
   String? get evYieldLabel {
@@ -579,15 +624,22 @@ class PokemonDetail {
     final moveRefs = (json['moves'] as List<dynamic>? ?? const [])
         .cast<Map<String, dynamic>>();
     for (final ref in moveRefs) {
-      final move = moveLookup[ref['moveId'] as int];
-      if (move == null) {
+      final moveId = (ref['moveId'] as num?)?.toInt();
+      if (moveId == null) {
         continue;
       }
+      final move = moveLookup[moveId] ?? CachedMove(
+        id: moveId,
+        nameEn: 'move-$moveId',
+        nameZh: '招式 #$moveId',
+        type: 'normal',
+        category: 'status',
+      );
       legacyMoves.add(
         PokemonMove(
           move: move,
-          method: ref['method'] as String,
-          level: ref['level'] as int?,
+          method: ref['method'] as String? ?? 'level-up',
+          level: (ref['level'] as num?)?.toInt(),
         ),
       );
     }
