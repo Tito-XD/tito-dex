@@ -40,7 +40,7 @@ put_object() {
   local file="$2"
   local content_type="$3"
   echo "→ r2://${BUCKET}/${key}"
-  wrangler r2 object put "${BUCKET}/${key}" --file="$file" --content-type="$content_type"
+  wrangler r2 object put --remote "${BUCKET}/${key}" --file="$file" --content-type="$content_type"
 }
 
 put_object "bundle-manifest.json" \

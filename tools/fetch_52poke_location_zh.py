@@ -315,14 +315,19 @@ def main() -> int:
     still_unresolved = sorted(set(still_unresolved))
     write_json(UNRESOLVED_PATH, {"slugs": still_unresolved})
 
-    generated_at = update_manifest(
-        resolved_count=len(resolved),
-        unresolved_count=len(still_unresolved),
-    )
+    generated_at = ""
+    if resolved:
+        generated_at = update_manifest(
+            resolved_count=len(resolved),
+            unresolved_count=len(still_unresolved),
+        )
+    elif MANIFEST_PATH.is_file():
+        manifest = load_json(MANIFEST_PATH)  # type: ignore[assignment]
+        generated_at = str(manifest.get("generatedAt") or "")
 
     print(
-        f"\nDone: resolved={len(resolved)}, unresolved={len(still_unresolved)}, "
-        f"l10nVersion={generated_at}",
+        f"\nDone: resolved={len(resolved)}, unresolved={len(still_unresolved)}"
+        + (f", l10nVersion={generated_at}" if generated_at else ""),
         flush=True,
     )
     if blocked:

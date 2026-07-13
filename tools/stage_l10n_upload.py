@@ -68,6 +68,26 @@ def stage_l10n_upload(output_dir: Path) -> dict[str, str | int]:
     }
 
 
+DEFAULT_MANIFEST_FALLBACK: dict[str, object] = {
+    "bundleVersion": 5,
+    "pokemonCount": 1025,
+    "archiveUrl": "https://dex.tito.cafe/v3/bundle.tar.zst",
+    "archiveSha256": "",
+    "archiveSizeBytes": 0,
+}
+
+
+def _fetch_remote_manifest(url: str) -> dict[str, object]:
+    import urllib.request
+
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "TitoDex-maintainer/1.0 (+https://github.com/Tito-XD/tito-dex)"},
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))  # type: ignore[return-value]
+
+
 def update_bundle_manifest(
     output_dir: Path,
     *,
@@ -80,15 +100,15 @@ def update_bundle_manifest(
     if remote_manifest_path and remote_manifest_path.is_file():
         manifest = json.loads(remote_manifest_path.read_text(encoding="utf-8"))
     else:
-        # Fetch from CDN as fallback when run outside CI with no local copy.
-        import urllib.request
-
         url = "https://dex.tito.cafe/bundle-manifest.json"
         try:
-            with urllib.request.urlopen(url, timeout=30) as response:
-                manifest = json.loads(response.read().decode("utf-8"))
+            manifest = _fetch_remote_manifest(url)
         except OSError as exc:
             print(f"WARN: could not fetch remote manifest: {exc}", file=sys.stderr)
+            manifest = {}
+
+    for key, value in DEFAULT_MANIFEST_FALLBACK.items():
+        manifest.setdefault(key, value)
 
     manifest["l10nVersion"] = l10n_version
     manifest["configVersion"] = config_version
