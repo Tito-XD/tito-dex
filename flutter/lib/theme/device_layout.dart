@@ -34,6 +34,21 @@ abstract final class DeviceLayout {
         _nearAspect(ratio, 3 / 4, 0.1);
   }
 
+  /// RG / square handheld panel by [Size] (either orientation).
+  static bool isHandheldPanelSize(Size size) {
+    if (size.shortestSide < 360) {
+      return false;
+    }
+    final w = size.width;
+    final h = size.height;
+    return isHandheldAspectRatio(w / h) || isHandheldAspectRatio(h / w);
+  }
+
+  /// Handheld chrome: immersive UI, custom Wi‑Fi/battery, square dashboard.
+  static bool useHandheldChrome(BuildContext context) {
+    return isNativeTarget && isHandheldPanelSize(sizeOf(context));
+  }
+
   static bool _nearAspect(double ratio, double target, double tolerance) {
     return (ratio - target).abs() <= tolerance;
   }
@@ -45,7 +60,7 @@ abstract final class DeviceLayout {
 
   /// RG Rotate native square handheld.
   static bool isSquareHandheld(BuildContext context) {
-    return isNativeTarget && isSquareScreen(context);
+    return useHandheldChrome(context);
   }
 
   /// Short landscape screens (e.g. RG35XX 640×480).

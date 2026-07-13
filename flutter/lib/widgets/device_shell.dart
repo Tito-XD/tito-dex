@@ -15,7 +15,7 @@ class DeviceShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-    final handheld = DeviceLayout.isNativeTarget;
+    final handheldChrome = DeviceLayout.useHandheldChrome(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -26,15 +26,19 @@ class DeviceShell extends StatelessWidget {
       ),
       child: MediaQuery(
         data: mq.copyWith(textScaler: DeviceLayout.clampedTextScaler(context)),
-        child: handheld ? _NativeShell(child: child) : _PreviewShell(child: child),
+        child: handheldChrome
+            ? _HandheldNativeShell(child: child)
+            : (DeviceLayout.isNativeTarget
+                ? _RegularNativeShell(child: child)
+                : _PreviewShell(child: child)),
       ),
     );
   }
 }
 
-/// Full-screen layout for RG / Android — no decorative phone bezel.
-class _NativeShell extends StatelessWidget {
-  const _NativeShell({required this.child});
+/// RG 1:1 / 3:4 / 4:3 — immersive, no system bar insets on top/bottom.
+class _HandheldNativeShell extends StatelessWidget {
+  const _HandheldNativeShell({required this.child});
 
   final Widget child;
 
@@ -67,7 +71,36 @@ class _NativeShell extends StatelessWidget {
   }
 }
 
-/// Mock phone frame for web / desktop preview.
+/// Phone / non-handheld native — standard safe areas, system status + nav bars.
+class _RegularNativeShell extends StatelessWidget {
+  const _RegularNativeShell({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: TitoColors.deepBlue,
+      child: SafeArea(
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                TitoColors.skyBlue,
+                TitoColors.slateBlue,
+              ],
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Legacy alias — kept for references.
 class _PreviewShell extends StatelessWidget {
   const _PreviewShell({required this.child});
 

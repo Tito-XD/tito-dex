@@ -118,4 +118,11 @@ void main() {
 
     expect(square, isFalse);
   });
+
+  test('isHandheldPanelSize accepts 1:1 and 3:4 either orientation', () {
+    expect(DeviceLayout.isHandheldPanelSize(const Size(720, 720)), isTrue);
+    expect(DeviceLayout.isHandheldPanelSize(const Size(640, 480)), isTrue);
+    expect(DeviceLayout.isHandheldPanelSize(const Size(480, 640)), isTrue);
+    expect(DeviceLayout.isHandheldPanelSize(const Size(390, 844)), isFalse);
+  });
 }

@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import 'features/companion/companion_art.dart';
 import 'features/game/game_catalog.dart';
-import 'features/game/game_edition.dart';
 import 'features/game/game_edition_repository.dart';
+import 'features/dex/dex_settings_repository.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -39,6 +39,7 @@ import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
 import 'widgets/shell_companion_overlay.dart';
+import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
 
 class TitoDexApp extends StatefulWidget {
@@ -103,12 +104,19 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoHomePage(
                 key: state.pageKey,
                 child: TitoPageContainer(
-                  child: HomePage(
-                    journey: _journey,
-                    onContinue: _onContinue,
-                    gameBadge: badgeForEdition(gameEditionRepository.edition),
-                    onGameBadgeTap: _onGameBadgeTap,
-                    onAvatarTap: _onTrainerAvatarTap,
+                  child: ListenableBuilder(
+                    listenable: gameEditionRepository,
+                    builder: (context, _) {
+                      return HomePage(
+                        journey: _journey,
+                        onContinue: _onContinue,
+                        gameBadge: homeGameBadgeLabel(
+                          gameEditionRepository.edition,
+                        ),
+                        onGameBadgeTap: _onGameBadgeTap,
+                        onAvatarTap: _onTrainerAvatarTap,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -451,8 +459,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await _persist(_journey.copyWith(companion: companion));
   }
 
-  Future<void> _onGameBadgeTap() async {
-    final picked = await showGameEditionPicker(
+  Future<void> _onGameBadgeTap(BuildContext context) async {
+    final picked = await showGameEditionGridPicker(
       context,
       selected: gameEditionRepository.edition,
     );
@@ -460,6 +468,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     await gameEditionRepository.save(picked);
+    await dexSettingsRepository.saveDefaultGameEdition(picked);
     final journeyKey = picked.journeyGameKey ?? _journey.game;
     if (picked.journeyGameKey != null && _journey.game != journeyKey) {
       await _persist(_journey.copyWith(game: journeyKey));
@@ -596,11 +605,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
       title: AppZh.appTitle,
       theme: buildTitoTheme(),
       builder: (context, child) {
-        return DefaultTextStyle(
-          style: TitoTypography.style().copyWith(
-            decoration: TextDecoration.none,
+        return SystemUiCoordinator(
+          child: DefaultTextStyle(
+            style: TitoTypography.style().copyWith(
+              decoration: TextDecoration.none,
+            ),
+            child: child ?? const SizedBox.shrink(),
           ),
-          child: child ?? const SizedBox.shrink(),
         );
       },
       routerConfig: _router,
