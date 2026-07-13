@@ -15,11 +15,13 @@ class AppHeader extends StatelessWidget {
     this.gameBadge = 'HGSS',
     this.showSettings = true,
     this.onGameBadgeTap,
+    this.trainerName,
   });
 
   final String gameBadge;
   final bool showSettings;
   final VoidCallback? onGameBadgeTap;
+  final String? trainerName;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class AppHeader extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  AppZh.appTitle,
+                  AppZh.displayTitleForTrainer(trainerName ?? ''),
                   style: context.tito.pageTitleOnGradient.copyWith(
                     fontSize: DeviceLayout.headerTitleSize(context),
                     letterSpacing: -0.5,

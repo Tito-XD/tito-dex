@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
-import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
@@ -44,6 +43,8 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   List<String> _defenderTypes = const ['normal'];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  int? _linkedDefenderId;
+  int? _linkedAttackerId;
   bool _defenderTerastallized = false;
   String? _defenderTeraType;
   bool _attackerTerastallized = false;
@@ -53,6 +54,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   BattleStatusCondition _attackerStatus = BattleStatusCondition.none;
   bool _isContactMove = false;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
+  List<DefensiveAbilityOption> _attackerAbilityOptions = const [];
   FieldCondition _weather = FieldCondition.none;
   TerrainCondition _terrain = TerrainCondition.none;
   Map<String, TypeDamageRelations>? _relations;
@@ -147,8 +149,13 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _attackController.text = attackStat.toString();
       _attackerSuggestions = const [];
       _attackerQueryController.text = summary.nameZh;
+      _linkedAttackerId = summary.id;
+      _attackerAbilityOptions = const [];
+      _attackerAbilitySlug = null;
+      _attackerTerastallized = false;
       _attackerTeraType = defaultTeraTypeFor(summary.types, generation);
     });
+    _loadAttackerAbilities(summary.id);
   }
 
   Future<void> _applyDefender(PokemonSummary summary) async {
@@ -160,15 +167,6 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     final defenseStat = _category == MoveCategory.physical
         ? stats.defense
         : stats.specialDefense;
-    final abilityOptions = detail.abilities
-        .map(
-          (ability) => DefensiveAbilityOption(
-            slug: abilitySlugFromNameEn(ability.nameEn),
-            labelZh: ability.nameZh,
-            isHidden: ability.isHidden,
-          ),
-        )
-        .toList(growable: false);
     if (!mounted) {
       return;
     }
@@ -178,14 +176,59 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _hpController.text = stats.hp.toString();
       _defenderSuggestions = const [];
       _defenderQueryController.text = summary.nameZh;
-      _defenderAbilityOptions = abilityOptions;
-      _defenderAbilitySlug =
-          abilityOptions.length == 1 ? abilityOptions.first.slug : null;
+      _linkedDefenderId = summary.id;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
       _defenderTeraType = defaultTeraTypeFor(
         summary.types,
         battleScopeForEdition(gameEditionRepository.edition).generation,
       );
     });
+    _loadDefenderAbilities(summary.id);
+  }
+
+  void _clearLinkedDefender() {
+    setState(() {
+      _linkedDefenderId = null;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
+    });
+  }
+
+  void _clearLinkedAttacker() {
+    setState(() {
+      _linkedAttackerId = null;
+      _attackerAbilityOptions = const [];
+      _attackerAbilitySlug = null;
+    });
+  }
+
+  Future<void> _loadAttackerAbilities(int pokemonId) async {
+    try {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedAttackerId != pokemonId) {
+        return;
+      }
+      final options = attackerAbilityOptionsFromPokemon(abilities);
+      setState(() {
+        _attackerAbilityOptions = options;
+        _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _loadDefenderAbilities(int pokemonId) async {
+    try {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedDefenderId != pokemonId) {
+        return;
+      }
+      final options = defensiveAbilityOptionsFrom(abilities);
+      setState(() {
+        _defenderAbilityOptions = options;
+        _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
+      });
+    } catch (_) {}
   }
 
   int _readInt(TextEditingController controller, int fallback) =>
@@ -264,67 +307,23 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                PokemonSearchField(
                   controller: _attackerQueryController,
-                  onChanged: _searchAttacker,
-                  decoration: InputDecoration(
-                    hintText: AppZh.companionAttackerSearchHint,
-                    filled: true,
-                    fillColor: TitoColors.card,
-                    prefixIcon: const Icon(Icons.sports_martial_arts_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: TitoColors.ink, width: 2),
-                    ),
-                  ),
+                  hintText: AppZh.companionAttackerSearchHint,
+                  suggestions: _attackerSuggestions,
+                  onQueryChanged: _searchAttacker,
+                  onPokemonSelected: _applyAttacker,
+                  prefixIcon: Icons.sports_martial_arts_rounded,
                 ),
-                if (_attackerSuggestions.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _attackerSuggestions
-                        .map(
-                          (entry) => ActionChip(
-                            label: Text(entry.nameZh),
-                            onPressed: () => _applyAttacker(entry),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
                 const SizedBox(height: 12),
-                TextField(
+                PokemonSearchField(
                   controller: _defenderQueryController,
-                  onChanged: _searchDefender,
-                  decoration: InputDecoration(
-                    hintText: AppZh.companionDefenderSearchHint,
-                    filled: true,
-                    fillColor: TitoColors.card,
-                    prefixIcon: const Icon(Icons.shield_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: TitoColors.ink, width: 2),
-                    ),
-                  ),
+                  hintText: AppZh.companionDefenderSearchHint,
+                  suggestions: _defenderSuggestions,
+                  onQueryChanged: _searchDefender,
+                  onPokemonSelected: _applyDefender,
+                  prefixIcon: Icons.shield_rounded,
                 ),
-                if (_defenderSuggestions.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _defenderSuggestions
-                        .map(
-                          (entry) => ActionChip(
-                            label: Text(entry.nameZh),
-                            onPressed: () => _applyDefender(entry),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
                 const SizedBox(height: 12),
                 MoveCategoryPicker(
                   selected: _category,
@@ -342,24 +341,28 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   },
                 ),
                 const SizedBox(height: 12),
-                CollapsibleTypePicker(
+                LinkedOrManualTypePicker(
+                  linkedPokemonId: _linkedAttackerId,
                   label: AppZh.companionTypeAttackerPick,
                   selected: _attackerTypes,
-                  onChanged: (types) => setState(() => _attackerTypes = types),
+                  onManualChanged: (types) {
+                    setState(() => _attackerTypes = types);
+                    _clearLinkedAttacker();
+                  },
                 ),
                 const SizedBox(height: 12),
-                CollapsibleTypePicker(
+                LinkedOrManualTypePicker(
+                  linkedPokemonId: _linkedDefenderId,
                   label: AppZh.companionTypeManualPick,
                   selected: _defenderTypes,
-                  onChanged: (types) {
+                  onManualChanged: (types) {
                     if (types.isNotEmpty) {
                       setState(() {
                         _defenderTypes = types;
-                        _defenderAbilityOptions = const [];
-                        _defenderAbilitySlug = null;
                         _defenderTeraType =
                             defaultTeraTypeFor(types, scope.generation);
                       });
+                      _clearLinkedDefender();
                     }
                   },
                 ),
@@ -391,32 +394,34 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                         setState(() => _attackerTeraType = type),
                   ),
                 ],
-                if (_defenderAbilityOptions.isNotEmpty) ...[
+                if (_defenderAbilityOptions.isNotEmpty ||
+                    _linkedDefenderId == null) ...[
                   const SizedBox(height: 12),
-                  DefensiveAbilityPicker(
-                    selectedSlug: _defenderAbilitySlug,
-                    options: _defenderAbilityOptions,
-                    onChanged: (slug) =>
-                        setState(() => _defenderAbilitySlug = slug),
-                  ),
-                ] else ...[
-                  const SizedBox(height: 12),
-                  ManualAbilityPicker(
-                    label: AppZh.companionManualAbilityPick,
-                    options: kManualDefensiveAbilityOptions,
+                  CompanionAbilitySection(
+                    pokemonLabel: AppZh.companionDefenderAbilityPick,
+                    manualLabel: AppZh.companionManualAbilityPick,
+                    manualOptions: kManualDefensiveAbilityOptions,
+                    pokemonOptions: _defenderAbilityOptions,
+                    linkedPokemonId: _linkedDefenderId,
                     selectedSlug: _defenderAbilitySlug,
                     onChanged: (slug) =>
                         setState(() => _defenderAbilitySlug = slug),
                   ),
                 ],
-                const SizedBox(height: 12),
-                ManualAbilityPicker(
-                  label: AppZh.companionAttackerAbilityPick,
-                  options: kManualAttackerAbilityOptions,
-                  selectedSlug: _attackerAbilitySlug,
-                  onChanged: (slug) =>
-                      setState(() => _attackerAbilitySlug = slug),
-                ),
+                if (_attackerAbilityOptions.isNotEmpty ||
+                    _linkedAttackerId == null) ...[
+                  const SizedBox(height: 12),
+                  CompanionAbilitySection(
+                    pokemonLabel: AppZh.companionAttackerAbilityPick,
+                    manualLabel: AppZh.companionAttackerAbilityPick,
+                    manualOptions: kManualAttackerAbilityOptions,
+                    pokemonOptions: _attackerAbilityOptions,
+                    linkedPokemonId: _linkedAttackerId,
+                    selectedSlug: _attackerAbilitySlug,
+                    onChanged: (slug) =>
+                        setState(() => _attackerAbilitySlug = slug),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 FieldConditionPicker(
                   label: AppZh.companionWeatherPick,

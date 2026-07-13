@@ -328,6 +328,7 @@ class PokemonAbility {
     required this.nameZh,
     required this.descriptionZh,
     this.isHidden = false,
+    this.gameLabelsZh = const [],
   });
 
   final String nameEn;
@@ -335,11 +336,22 @@ class PokemonAbility {
   final String descriptionZh;
   final bool isHidden;
 
+  /// Human-readable game edition labels where this ability appears (e.g. 全版本).
+  final List<String> gameLabelsZh;
+
+  String get displayNameZh {
+    if (gameLabelsZh.isEmpty) {
+      return nameZh;
+    }
+    return '$nameZh（${gameLabelsZh.join('、')}）';
+  }
+
   Map<String, dynamic> toJson() => {
         'nameEn': nameEn,
         'nameZh': nameZh,
         'descriptionZh': descriptionZh,
         if (isHidden) 'isHidden': true,
+        if (gameLabelsZh.isNotEmpty) 'gameLabelsZh': gameLabelsZh,
       };
 
   factory PokemonAbility.fromJson(Map<String, dynamic> json) => PokemonAbility(
@@ -347,7 +359,25 @@ class PokemonAbility {
         nameZh: json['nameZh'] as String,
         descriptionZh: json['descriptionZh'] as String? ?? '',
         isHidden: json['isHidden'] as bool? ?? false,
+        gameLabelsZh: (json['gameLabelsZh'] as List<dynamic>? ?? const [])
+            .cast<String>(),
       );
+
+  PokemonAbility copyWith({
+    String? nameEn,
+    String? nameZh,
+    String? descriptionZh,
+    bool? isHidden,
+    List<String>? gameLabelsZh,
+  }) {
+    return PokemonAbility(
+      nameEn: nameEn ?? this.nameEn,
+      nameZh: nameZh ?? this.nameZh,
+      descriptionZh: descriptionZh ?? this.descriptionZh,
+      isHidden: isHidden ?? this.isHidden,
+      gameLabelsZh: gameLabelsZh ?? this.gameLabelsZh,
+    );
+  }
 }
 
 class ObtainLocationEntry {
@@ -483,6 +513,7 @@ class PokemonDetail {
     this.obtainLocations = const [],
     this.obtainLocationsByGame = const {},
     this.abilities = const [],
+    this.abilitiesByGame = const {},
     this.moveSet = const PokemonMoveSet(),
     this.moveSets = const {},
     this.baseHappiness,
@@ -509,6 +540,7 @@ class PokemonDetail {
   final List<ObtainLocationEntry> obtainLocations;
   final Map<String, List<ObtainLocationEntry>> obtainLocationsByGame;
   final List<PokemonAbility> abilities;
+  final Map<String, List<PokemonAbility>> abilitiesByGame;
   final PokemonMoveSet moveSet;
   final Map<String, PokemonMoveSet> moveSets;
   final int? baseHappiness;
@@ -620,6 +652,13 @@ class PokemonDetail {
             ),
           ),
         'abilities': abilities.map((entry) => entry.toJson()).toList(),
+        if (abilitiesByGame.isNotEmpty)
+          'abilitiesByGame': abilitiesByGame.map(
+            (key, value) => MapEntry(
+              key,
+              value.map((entry) => entry.toJson()).toList(),
+            ),
+          ),
         'moveSet': moveSet.toJson(),
         if (moveSets.isNotEmpty)
           'moveSets': moveSets.map(
@@ -714,6 +753,19 @@ class PokemonDetail {
       }
     }
 
+    final abilitiesByGameJson =
+        json['abilitiesByGame'] as Map<String, dynamic>?;
+    final resolvedAbilitiesByGame = <String, List<PokemonAbility>>{};
+    if (abilitiesByGameJson != null) {
+      for (final entry in abilitiesByGameJson.entries) {
+        resolvedAbilitiesByGame[entry.key] = (entry.value as List<dynamic>)
+            .map(
+              (item) => PokemonAbility.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+    }
+
     final evYieldJson = json['evYield'] as Map<String, dynamic>? ?? const {};
     final evYield = evYieldJson.map(
       (key, value) => MapEntry(key, (value as num).toInt()),
@@ -754,6 +806,7 @@ class PokemonDetail {
       abilities: (json['abilities'] as List<dynamic>? ?? const [])
           .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
+      abilitiesByGame: resolvedAbilitiesByGame,
       moveSet: resolvedMoveSet,
       moveSets: resolvedMoveSets,
       baseHappiness: json['baseHappiness'] as int?,

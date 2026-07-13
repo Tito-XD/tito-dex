@@ -3,6 +3,7 @@ import 'package:titodex/features/companion/battle_math.dart';
 import 'package:titodex/features/dex/battle_effectiveness.dart';
 import 'package:titodex/features/dex/generation_type_chart.dart';
 import 'package:titodex/features/dex/type_chart.dart';
+import 'package:titodex/widgets/companion_tool_fields.dart';
 
 void main() {
   final relations = <String, TypeDamageRelations>{
@@ -269,5 +270,31 @@ void main() {
       minMembers: 2,
     );
     expect(shared, contains('火'));
+  });
+
+  test('defaultAbilitySlugForOptions auto-selects single ability', () {
+    expect(
+      defaultAbilitySlugForOptions(const [
+        DefensiveAbilityOption(slug: 'levitate', labelZh: '漂浮'),
+      ]),
+      'levitate',
+    );
+    expect(
+      defaultAbilitySlugForOptions(const [
+        DefensiveAbilityOption(slug: 'levitate', labelZh: '漂浮'),
+        DefensiveAbilityOption(slug: 'heatproof', labelZh: '耐热'),
+      ]),
+      isNull,
+    );
+  });
+
+  test('levitate makes ground immune for psychic Cresselia profile', () {
+    final input = BattleEffectivenessInput(
+      defenderTypes: const ['psychic'],
+      relationsByType: relations,
+      defenderAbilitySlug: 'levitate',
+      generation: 9,
+    );
+    expect(formatTypeMultiplier(computeBattleTypeMultipliers(input)['ground'] ?? 1), '0');
   });
 }

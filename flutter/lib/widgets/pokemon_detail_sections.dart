@@ -751,68 +751,125 @@ class _StatsViewChip extends StatelessWidget {
 }
 
 class TypeEffectivenessGrid extends StatelessWidget {
-  const TypeEffectivenessGrid({super.key, required this.multipliers});
+  const TypeEffectivenessGrid({
+    super.key,
+    required this.multipliers,
+    this.weaknesses,
+    this.resistances,
+    this.immunities,
+  });
 
   final Map<String, double> multipliers;
+  final List<String>? weaknesses;
+  final List<String>? resistances;
+  final List<String>? immunities;
+
+  bool get _hasSummary =>
+      weaknesses != null && resistances != null && immunities != null;
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            AppZh.dexTypeGridTitle,
-            style: SecondaryTypography.onCard.h15,
-          ),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 6,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 6,
-            childAspectRatio: 0.68,
-            children: typeGridOrder.map((type) {
-              final multiplier = multipliers[type] ?? 1;
-              final label = formatTypeMultiplier(multiplier);
-              return Column(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: typeTileColor(type),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      typeIconData(type),
-                      size: 24,
-                      color: TitoColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    typeNameZh(type),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  Text(
-                    label,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: _multiplierColor(multiplier),
-                    ),
-                  ),
-                ],
+          if (_hasSummary) ...[
+            Text(
+              AppZh.companionTypeSummaryTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              profileLine(AppZh.dexWeaknesses, weaknesses!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              profileLine(AppZh.dexResistances, resistances!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              profileLine(AppZh.dexImmunities, immunities!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppZh.dexTypeGridTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 12),
+          ] else ...[
+            Text(
+              AppZh.dexTypeGridTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 12),
+          ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const crossAxisCount = 6;
+              const crossAxisSpacing = 6.0;
+              const mainAxisSpacing = 8.0;
+              const tileHeight = 68.0;
+              final tileWidth = (constraints.maxWidth -
+                      crossAxisSpacing * (crossAxisCount - 1)) /
+                  crossAxisCount;
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: crossAxisSpacing,
+                  mainAxisSpacing: mainAxisSpacing,
+                  childAspectRatio: tileWidth / tileHeight,
+                ),
+                itemCount: typeGridOrder.length,
+                itemBuilder: (context, index) {
+                  final type = typeGridOrder[index];
+                  final multiplier = multipliers[type] ?? 1;
+                  final label = formatTypeMultiplier(multiplier);
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: tileWidth.clamp(32, 56),
+                        height: tileWidth.clamp(32, 56),
+                        decoration: BoxDecoration(
+                          color: typeTileColor(type),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: TitoColors.ink, width: 2),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          typeIconData(type),
+                          size: (tileWidth * 0.55).clamp(18, 28),
+                          color: TitoColors.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        typeNameZh(type),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        label,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: _multiplierColor(multiplier),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               );
-            }).toList(),
+            },
           ),
         ],
       ),
@@ -837,13 +894,9 @@ class AbilitiesCard extends StatelessWidget {
   const AbilitiesCard({
     super.key,
     required this.abilities,
-    this.gameEdition,
-    this.onPickEdition,
   });
 
   final List<PokemonAbility> abilities;
-  final GameEdition? gameEdition;
-  final VoidCallback? onPickEdition;
 
   @override
   Widget build(BuildContext context) {
@@ -863,13 +916,6 @@ class AbilitiesCard extends StatelessWidget {
                 color: TitoColors.mutedInk,
               ),
             ),
-            if (onPickEdition != null) ...[
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: onPickEdition,
-                child: const Text(AppZh.dexFlavorPickEdition),
-              ),
-            ],
           ],
         ),
       );
@@ -894,7 +940,7 @@ class AbilitiesCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          ability.nameZh,
+                          ability.displayNameZh,
                           style: SecondaryTypography.onCard.body14.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -1347,11 +1393,13 @@ class InteractiveTypeEffectivenessCard extends StatefulWidget {
     required this.types,
     required this.abilities,
     required this.generation,
+    this.abilityPickerLabel = AppZh.companionDefenderAbilityPick,
   });
 
   final List<String> types;
   final List<PokemonAbility> abilities;
   final int generation;
+  final String abilityPickerLabel;
 
   @override
   State<InteractiveTypeEffectivenessCard> createState() =>
@@ -1369,6 +1417,7 @@ class _InteractiveTypeEffectivenessCardState
   @override
   void initState() {
     super.initState();
+    _syncDefaultAbility();
     _load();
   }
 
@@ -1376,11 +1425,21 @@ class _InteractiveTypeEffectivenessCardState
   void didUpdateWidget(covariant InteractiveTypeEffectivenessCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.generation != widget.generation ||
-        oldWidget.types != widget.types) {
+        oldWidget.types != widget.types ||
+        oldWidget.abilities != widget.abilities) {
       setState(() {
         _defenderTeraType =
             defaultTeraTypeFor(widget.types, widget.generation);
+        _syncDefaultAbility(force: oldWidget.abilities != widget.abilities);
       });
+    }
+  }
+
+  void _syncDefaultAbility({bool force = false}) {
+    final options = defensiveAbilityOptionsFrom(widget.abilities);
+    final defaultSlug = defaultAbilitySlugForOptions(options);
+    if (defaultSlug != null && (_abilitySlug == null || force)) {
+      _abilitySlug = defaultSlug;
     }
   }
 
@@ -1414,15 +1473,7 @@ class _InteractiveTypeEffectivenessCardState
       return const SizedBox.shrink();
     }
 
-    final options = widget.abilities
-        .map(
-          (ability) => DefensiveAbilityOption(
-            slug: abilitySlugFromNameEn(ability.nameEn),
-            labelZh: ability.nameZh,
-            isHidden: ability.isHidden,
-          ),
-        )
-        .toList(growable: false);
+    final options = defensiveAbilityOptionsFrom(widget.abilities);
 
     final input = BattleEffectivenessInput(
       defenderTypes: widget.types,
@@ -1438,21 +1489,21 @@ class _InteractiveTypeEffectivenessCardState
     final normalized =
         normalizeTypesForGeneration(widget.types, widget.generation);
 
-    return Column(
-      children: [
-        if (options.isNotEmpty) ...[
-          StickerCard(
-            child: DefensiveAbilityPicker(
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (options.isNotEmpty) ...[
+            AbilityChipPicker(
+              label: widget.abilityPickerLabel,
               selectedSlug: _abilitySlug,
               options: options,
               onChanged: (slug) => setState(() => _abilitySlug = slug),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (widget.generation >= 9) ...[
-          StickerCard(
-            child: TerastalPicker(
+            const SizedBox(height: 12),
+          ],
+          if (widget.generation >= 9) ...[
+            TerastalPicker(
               label: AppZh.companionDefenderTerastal,
               enabled: true,
               terastallized: _defenderTerastallized,
@@ -1464,51 +1515,29 @@ class _InteractiveTypeEffectivenessCardState
               onTeraTypeChanged: (type) =>
                   setState(() => _defenderTeraType = type),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (widget.generation < 6)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '世代修正：${normalized.map(typeNameZh).join('/')}',
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+            const SizedBox(height: 12),
+          ],
+          if (widget.generation < 6)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '世代修正：${normalized.map(typeNameZh).join('/')}',
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
               ),
             ),
+          TypeEffectivenessGrid(
+            multipliers: multipliers,
+            weaknesses: profile.weaknesses,
+            resistances: profile.resistances,
+            immunities: profile.immunities,
           ),
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.companionTypeSummaryTitle,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                profileLine(AppZh.dexWeaknesses, profile.weaknesses),
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                profileLine(AppZh.dexResistances, profile.resistances),
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                profileLine(AppZh.dexImmunities, profile.immunities),
-                style: SecondaryTypography.onCard.body14,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        TypeEffectivenessGrid(multipliers: multipliers),
-      ],
+        ],
+      ),
     );
   }
 }

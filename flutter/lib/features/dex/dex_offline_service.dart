@@ -50,10 +50,16 @@ class DexOfflineService {
       ));
 
   bool _downloading = false;
+  bool _cancelRequested = false;
   DexCacheProgress? _progress;
 
   bool get isDownloading => _downloading;
   DexCacheProgress? get progress => _progress;
+  bool get cancelRequested => _cancelRequested;
+
+  void requestCancelDownload() {
+    _cancelRequested = true;
+  }
 
   Future<DexCacheStatus> getStatus() async {
     final manifest = await _store.readManifest();
@@ -210,9 +216,19 @@ class DexOfflineService {
       return;
     }
     _downloading = true;
+    _cancelRequested = false;
 
     try {
       await for (final progress in _bundleInstaller.install()) {
+        if (_cancelRequested) {
+          yield _setProgress(
+            phase: 'cancelled',
+            current: progress.current,
+            total: progress.total,
+            label: progress.label,
+          );
+          return;
+        }
         yield _setProgress(
           phase: progress.phase,
           current: progress.current,
@@ -222,6 +238,7 @@ class DexOfflineService {
       }
     } finally {
       _downloading = false;
+      _cancelRequested = false;
       _progress = null;
     }
   }
@@ -231,6 +248,7 @@ class DexOfflineService {
       return;
     }
     _downloading = true;
+    _cancelRequested = false;
 
     try {
       yield _setProgress(
@@ -241,10 +259,22 @@ class DexOfflineService {
       );
 
       final relations = await _client.loadAllTypeRelations();
+      if (_cancelRequested) {
+        yield _setProgress(phase: 'cancelled', current: 0, total: 1);
+        return;
+      }
       await _store.writeTypeRelations(relations);
 
       var typeIndex = 0;
       for (final type in typeNamesZh.keys) {
+        if (_cancelRequested) {
+          yield _setProgress(
+            phase: 'cancelled',
+            current: typeIndex,
+            total: typeNamesZh.length,
+          );
+          return;
+        }
         typeIndex++;
         await _downloadTypeIcon(type);
         yield _setProgress(
@@ -263,6 +293,14 @@ class DexOfflineService {
       final failedIds = <int>[];
 
       for (var id = 1; id <= hgssMaxNationalDexId; id++) {
+        if (_cancelRequested) {
+          yield _setProgress(
+            phase: 'cancelled',
+            current: id,
+            total: hgssMaxNationalDexId,
+          );
+          return;
+        }
         if (completedIds.contains(id)) {
           continue;
         }
