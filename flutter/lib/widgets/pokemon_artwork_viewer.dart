@@ -2,118 +2,238 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../features/dex/dex_artwork_service.dart';
+import '../features/dex/dex_models.dart';
+import '../features/dex/sprite_generation_catalog.dart';
 import '../theme/tito_colors.dart';
+import 'dex_sprite_image.dart';
 
 Future<void> showPokemonArtworkViewer(
   BuildContext context, {
-  required int pokemonId,
-  required String nameZh,
-  String? artworkUrl,
-  String? thumbSource,
+  required PokemonSummary summary,
 }) {
   return showDialog<void>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.88),
-    builder: (context) => _PokemonArtworkViewer(
-      pokemonId: pokemonId,
-      nameZh: nameZh,
-      artworkUrl: artworkUrl,
-      thumbSource: thumbSource,
-    ),
+    builder: (context) => _PokemonArtworkViewer(summary: summary),
   );
 }
 
 class _PokemonArtworkViewer extends StatefulWidget {
-  const _PokemonArtworkViewer({
-    required this.pokemonId,
-    required this.nameZh,
-    this.artworkUrl,
-    this.thumbSource,
-  });
+  const _PokemonArtworkViewer({required this.summary});
 
-  final int pokemonId;
-  final String nameZh;
-  final String? artworkUrl;
-  final String? thumbSource;
+  final PokemonSummary summary;
 
   @override
   State<_PokemonArtworkViewer> createState() => _PokemonArtworkViewerState();
 }
 
 class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
-  String? _source;
-  bool _loading = true;
+  late String? _mainSource;
+  late bool _showAnimated;
+  late final List<SpriteEditionOption> _options;
+  late final Map<int, List<SpriteEditionOption>> _grouped;
 
   @override
   void initState() {
     super.initState();
-    _source = widget.thumbSource;
-    _loadArtwork();
+    _options = spriteEditionOptions(
+      spriteUrlsByVersion: widget.summary.spriteUrlsByVersion,
+      fallbackSpriteUrl:
+          widget.summary.displaySpritePath ?? widget.summary.spriteUrl,
+      animatedSpriteUrl: widget.summary.animatedSpriteUrl,
+    );
+    _grouped = groupSpriteOptionsByGeneration(_options);
+    _mainSource = widget.summary.artworkUrl ??
+        widget.summary.displaySpritePath ??
+        widget.summary.spriteUrl ??
+        (_options.isNotEmpty ? _options.last.spriteUrl : null);
+    _showAnimated = false;
   }
 
-  Future<void> _loadArtwork() async {
-    final resolved = await dexArtworkService.resolveArtworkSource(
-      pokemonId: widget.pokemonId,
-      artworkUrl: widget.artworkUrl,
-      thumbSource: widget.thumbSource,
-    );
-    if (!mounted) {
-      return;
-    }
+  void _selectOption(SpriteEditionOption option, {bool animated = false}) {
     setState(() {
-      _source = resolved;
-      _loading = false;
+      _showAnimated = animated;
+      _mainSource = animated ? (option.animatedUrl ?? option.spriteUrl) : option.spriteUrl;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final summary = widget.summary;
+
     return Dialog.fullscreen(
       backgroundColor: Colors.transparent,
       child: SafeArea(
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: _source == null
-                  ? const Icon(Icons.image_not_supported_outlined,
-                      color: TitoColors.card, size: 48)
-                  : InteractiveViewer(
-                      minScale: 0.8,
-                      maxScale: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: _ArtworkImage(source: _source!),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      summary.nameZh,
+                      style: const TextStyle(
+                        color: TitoColors.card,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
                       ),
                     ),
-            ),
-            if (_loading)
-              const Center(
-                child: CircularProgressIndicator(color: TitoColors.card),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded, color: TitoColors.card),
+                    tooltip: '关闭',
+                  ),
+                ],
               ),
-            Positioned(
-              top: 8,
-              left: 16,
-              child: Text(
-                widget.nameZh,
-                style: const TextStyle(
-                  color: TitoColors.card,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 18,
+            ),
+            Expanded(
+              child: Center(
+                child: _mainSource == null
+                    ? const Icon(
+                        Icons.image_not_supported_outlined,
+                        color: TitoColors.card,
+                        size: 48,
+                      )
+                    : InteractiveViewer(
+                        minScale: 0.8,
+                        maxScale: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _ArtworkImage(source: _mainSource!),
+                        ),
+                      ),
+              ),
+            ),
+            if (_options.isNotEmpty)
+              SizedBox(
+                height: 168,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                  children: [
+                    for (final entry in _grouped.entries) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, bottom: 6),
+                        child: Text(
+                          generationRomanLabel(entry.key),
+                          style: const TextStyle(
+                            color: TitoColors.softYellow,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 92,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: entry.value.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            final option = entry.value[index];
+                            final selected = !_showAnimated &&
+                                _mainSource == option.spriteUrl;
+                            return _SpritePickerTile(
+                              option: option,
+                              selected: selected,
+                              animatedSelected:
+                                  _showAnimated && _mainSource == option.animatedUrl,
+                              onSelectStatic: () =>
+                                  _selectOption(option, animated: false),
+                              onSelectAnimated: option.animatedUrl == null
+                                  ? null
+                                  : () => _selectOption(option, animated: true),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SpritePickerTile extends StatelessWidget {
+  const _SpritePickerTile({
+    required this.option,
+    required this.selected,
+    required this.animatedSelected,
+    required this.onSelectStatic,
+    this.onSelectAnimated,
+  });
+
+  final SpriteEditionOption option;
+  final bool selected;
+  final bool animatedSelected;
+  final VoidCallback onSelectStatic;
+  final VoidCallback? onSelectAnimated;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = selected || animatedSelected
+        ? TitoColors.softYellow
+        : TitoColors.card.withValues(alpha: 0.35);
+
+    return SizedBox(
+      width: 72,
+      child: Column(
+        children: [
+          Expanded(
+            child: Material(
+              color: TitoColors.ink.withValues(alpha: 0.35),
+              borderRadius: BorderRadius.circular(10),
+              child: InkWell(
+                onTap: onSelectStatic,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: borderColor, width: 2),
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: DexSpriteImage(
+                    source: option.spriteUrl,
+                    width: 56,
+                    height: 56,
+                  ),
                 ),
               ),
             ),
-            Positioned(
-              top: 4,
-              right: 4,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close_rounded, color: TitoColors.card),
-                tooltip: '关闭',
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            option.editionLabelZh,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: TitoColors.card.withValues(alpha: 0.92),
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              height: 1.1,
             ),
-          ],
-        ),
+          ),
+          if (onSelectAnimated != null)
+            TextButton(
+              onPressed: onSelectAnimated,
+              style: TextButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 0),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                foregroundColor: animatedSelected
+                    ? TitoColors.softYellow
+                    : TitoColors.skyBlue,
+              ),
+              child: const Text('GIF', style: TextStyle(fontSize: 9)),
+            ),
+        ],
       ),
     );
   }

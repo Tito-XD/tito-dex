@@ -36,8 +36,11 @@ abstract final class TrainerAvatarService {
             toolbarColor: TitoColors.deepBlue,
             toolbarWidgetColor: TitoColors.card,
             activeControlsWidgetColor: TitoColors.softYellow,
+            statusBarColor: TitoColors.deepBlue,
+            backgroundColor: TitoColors.deepBlue,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,
+            hideBottomControls: false,
           ),
           IOSUiSettings(
             title: '裁切头像',
