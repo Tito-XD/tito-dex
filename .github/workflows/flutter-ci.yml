@@ -1,0 +1,61 @@
+name: Flutter CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - flutter/**
+      - .github/workflows/flutter-ci.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - flutter/**
+      - .github/workflows/flutter-ci.yml
+
+concurrency:
+  group: flutter-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Analyze, test, and build web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: flutter
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.6"
+          cache: true
+          pub-cache: true
+
+      - name: Show Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        # Keep errors fatal while the repository's known warning/info baseline
+        # is cleaned up separately.
+        run: flutter analyze --no-pub --no-fatal-warnings --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --no-pub
+
+      - name: Build web release
+        run: flutter build web --release --no-pub
