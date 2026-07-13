@@ -310,9 +310,53 @@ Suggested implementation order:
 
 ### Still TBD at implementation
 
-1. Party vs save **merge on re-sync** — overwrite user edits or merge by slot?
-2. Emulator launch entry — Settings only vs small button on journey detail?
-3. Manual mode dex seen/caught — disable save flags entirely?
+~~Party vs save merge on re-sync~~ → **Do not overwrite** user-edited party; show banner「与最新存档不同 · 点击同步」  
+~~Emulator launch entry~~ → **Journey detail page** top hint / prompt  
+~~Manual mode dex seen/caught~~ → **Long-press cycle** on dex grid: 未见 → 已见 → 已捕 → 清除  
+
+### Pokémon Sleep
+
+**Tier A only** — static helpers / links (calculators, recipe refs) using public game data; no account sync.
+
+---
+
+## 11. Manual mode — dex encounter markers (Tito confirmed)
+
+When `JourneyCapability.manual` (NS / mobile / no save):
+
+- Save-linked seen/caught flags from `.sav` **not used**
+- User marks progress on dex grid via **long-press cycle**:
+
+| State | Action |
+| --- | --- |
+| 未见 (default) | Long press → **已见** |
+| 已见 | Long press → **已捕** |
+| 已捕 | Long press → **清除** (back to 未见) |
+
+Persist manual markers separately (e.g. `manualDexSeenIds` / `manualDexCaughtIds` on journey or prefs) — do not mix with save bitfields.
+
+UI: optional haptic + small toast on state change; filter chips (已见/已捕) on dex list still apply.
+
+---
+
+## 12. Save re-sync vs user-edited party (Tito confirmed)
+
+On save sync when user has edited party slots (`userEdited` / differs from parsed save):
+
+1. **Do not auto-overwrite** user party
+2. Show non-blocking banner on **Team page** and/or **Journey detail**:  
+   **「与最新存档不同 · 点击同步」**
+3. Tap → confirm sheet → replace party from latest save (one-shot)
+
+Location / badges / play time from save can still update on sync (read-only journey fields) — only **party** is protected unless user confirms.
+
+---
+
+## 13. Emulator entry (Tito confirmed)
+
+- **Not** on home journey card primary tap
+- **Journey detail page** (`/journey` push from home card): **top prompt** — e.g.「从模拟器继续」+ pick/launch emulator (existing `EmulatorLauncher` flow)
+- Settings retains emulator pick / remember as today
 
 ---
 

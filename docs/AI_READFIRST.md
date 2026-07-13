@@ -66,7 +66,9 @@ See **[JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md)**.
 - **Team:** editable in **all** modes; default from save; **full summary card** (BST, type coverage, weaknesses, damage hint)
 - **Nav:** 4-tab (Team/Home/Dex/Search) + 3 quick tiles; **no Journey tab**
 - **Home:** merge Journey into **journey card** (▶ tap → detail); remove city illustrations; trainer card = time greeting + badges on right
-- **Sleep:** no official user API — Tier A reference tools or Tier B Health Connect sleep line only
+- **Sleep:** Tier A only (static tools/links); manual dex **long-press** seen/caught/clear
+- **Sync:** user party not overwritten; banner「与最新存档不同 · 点击同步」
+- **Master checklist:** [IMPLEMENTATION_BATCH_PLAN.md](./IMPLEMENTATION_BATCH_PLAN.md)
 
 ## Communication Defaults
 
