@@ -5,8 +5,19 @@ abstract final class AppZh {
   static const appTitle = 'TitoDex';
   static const bootstrapLoading = '正在准备你的旅程…';
   static const companionLoading = '正在加载对战数据…';
+  static const progressDialogTitle = '正在处理…';
+  static const snackDownloadCancelled = '下载已取消';
   static const searchLoading = '正在搜索…';
   static const referenceLoading = '正在加载资料…';
+
+  /// Home header title — default TitoDex; custom trainer → «Name»Dex.
+  static String displayTitleForTrainer(String trainerName) {
+    final trimmed = trainerName.trim();
+    if (trimmed.isEmpty || trimmed == 'Tito' || trimmed == 'Trainer') {
+      return appTitle;
+    }
+    return '${trimmed}Dex';
+  }
 
   static const navHome = '首页';
   static const navTeam = '队伍';
@@ -30,11 +41,11 @@ abstract final class AppZh {
   }
 
   static String trainerGreeting(String trainerName, [DateTime? time]) =>
-      '${timeGreeting(time ?? DateTime.now())}，训练家 $trainerName';
+      '${timeGreeting(time ?? DateTime.now())}，训练家！$trainerName';
 
   static String trainerNameLine(String trainerName) {
     final name = trainerName.isNotEmpty ? trainerName : 'Tito';
-    return '训练家 $name';
+    return '训练家！$name';
   }
 
   static const journeyCardTitle = '旅程';
@@ -133,15 +144,16 @@ abstract final class AppZh {
   static const dexFlavorEmpty = '暂无可用图鉴描述（PokeAPI 未提供该版本中文文案时会显示英文）。';
   static const dexAbilities = '特性';
   static const dexAbilityHidden = '隐藏特性';
+  static const dexAbilityAllVersions = '全版本';
+  static const dexAbilitySinceGen5 = '第五世代起';
+  static const dexAbilityFilter = '特性筛选';
   static const dexAbilityUnknownName = '待收录';
   static const dexAbilityPlaceholder = '特性资料整理中，将随后续图鉴数据包更新。';
-  static const dexAbilityEmptyPending =
-      '当前版本暂无特性数据，请切换其他游戏版本查看。';
+  static const dexAbilityEmptyPending = '暂无特性数据。';
   static const dexBaseHappiness = '初始亲密度';
   static const dexCaptureRate = '捕获率';
   static const dexEvYield = '基础点数 (EV)';
-  static const dexObtainEmptyVersion =
-      '当前游戏版本暂无出现地点，请切换其他版本查看。';
+  static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
   static const dexFlavorNoEdition =
       '当前版本暂无图鉴描述';
@@ -219,7 +231,9 @@ abstract final class AppZh {
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
       '离线图鉴缓存包含以下内容（可在下方勾选要下载/保留的部分）。推荐先下载 CDN 预打包数据包；手绘导航图标仍随 APK 内置。';
-  static const settingsDexCacheContentsTitle = '缓存内容说明';
+  static const settingsDexCacheContentsTitle = '缓存内容筛选';
+  static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
+  static const settingsDexAdvancedOptions = '高级选项';
   static const settingsDexCacheOptionJson =
       '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
   static const settingsDexCacheOptionSprites =
@@ -341,7 +355,8 @@ abstract final class AppZh {
   static String companionToolQuickDamageHint(String facility) =>
       '估算能不能秒 / 能不能扛（$facility 参考）';
   static const companionToolQuickDamage = '伤害速算';
-  static const companionPokemonSearchHint = '搜索宝可梦填入属性或种族值…';
+  static const companionPokemonSearchHint = '搜索宝可梦…';
+  static const companionLinkedTypes = '属性';
   static const companionTypeDefenderTitle = '防守方';
   static const companionTypeManualPick = '手动选择属性（最多 2 个）';
   static const companionTypeSummaryTitle = '克制摘要';
@@ -378,8 +393,8 @@ abstract final class AppZh {
       '此为理论值；对战设施对手的实际数值可能含道具或强化。';
   static const companionDamageInputsTitle = '对战双方';
   static String companionDamageFacility(String facility) => '场景：$facility';
-  static const companionAttackerSearchHint = '搜索攻击方（填入种族值参考）…';
-  static const companionDefenderSearchHint = '搜索防守方（填入种族值参考）…';
+  static const companionAttackerSearchHint = '搜索进攻方宝可梦…';
+  static const companionDefenderSearchHint = '搜索防守方宝可梦…';
   static const companionMoveType = '招式属性';
   static const companionMovePower = '招式威力';
   static const companionAttackStat = '攻击';
@@ -412,6 +427,11 @@ abstract final class AppZh {
   static const teamEditTitle = '编辑同行';
   static const teamEditLevel = '等级';
   static const teamEditNickname = '昵称';
+  static const teamEditTypes = '属性';
+  static const teamEditAbility = '特性';
+  static const teamEditDelete = '移出队伍';
+  static const teamEditSwapPrev = '与前一位交换';
+  static const teamEditSwapNext = '与后一位交换';
   static const teamAddTitle = '添加宝可梦';
   static const teamAddByIdHint = '全国图鉴编号（1–1025）';
   static const teamAddPick = '从列表选择';

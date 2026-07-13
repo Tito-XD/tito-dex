@@ -33,6 +33,7 @@ class HomePage extends StatelessWidget {
     final saveLinked = gameEditionRepository.edition.isSaveLinked;
     final header = AppHeader(
       gameBadge: gameBadge,
+      trainerName: journey.trainerName,
       onGameBadgeTap: onGameBadgeTap == null
           ? null
           : () => onGameBadgeTap!(context),

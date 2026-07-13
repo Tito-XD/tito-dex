@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../l10n/app_zh.dart';
 import '../features/companion/battle_math.dart';
+import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/battle_effectiveness.dart';
+import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -480,14 +482,207 @@ class DefensiveAbilityOption {
   final bool isHidden;
 }
 
-class DefensiveAbilityPicker extends StatelessWidget {
-  const DefensiveAbilityPicker({
+List<DefensiveAbilityOption> defensiveAbilityOptionsFrom(
+  List<PokemonAbility> abilities,
+) {
+  return abilities
+      .map(
+        (ability) => DefensiveAbilityOption(
+          slug: abilitySlugFromNameEn(ability.nameEn),
+          labelZh: ability.nameZh,
+          isHidden: ability.isHidden,
+        ),
+      )
+      .toList(growable: false);
+}
+
+/// Auto-select when the Pokémon has exactly one ability (e.g. Cresselia → Levitate).
+String? defaultAbilitySlugForOptions(List<DefensiveAbilityOption> options) {
+  if (options.length == 1) {
+    return options.first.slug;
+  }
+  return null;
+}
+
+List<DefensiveAbilityOption> attackerAbilityOptionsFromPokemon(
+  List<PokemonAbility> abilities,
+) {
+  return defensiveAbilityOptionsFrom(abilities)
+      .where((option) => kManualAttackerAbilityOptions.containsKey(option.slug))
+      .toList(growable: false);
+}
+
+const kStatRelevantAbilitySlugs = {'huge-power', 'pure-power'};
+
+List<DefensiveAbilityOption> statAbilityOptionsFromPokemon(
+  List<PokemonAbility> abilities,
+) {
+  return defensiveAbilityOptionsFrom(abilities)
+      .where((option) => kStatRelevantAbilitySlugs.contains(option.slug))
+      .toList(growable: false);
+}
+
+class PokemonSearchField extends StatelessWidget {
+  const PokemonSearchField({
     super.key,
+    required this.controller,
+    required this.hintText,
+    required this.suggestions,
+    required this.onQueryChanged,
+    required this.onPokemonSelected,
+    this.prefixIcon = Icons.search_rounded,
+  });
+
+  final TextEditingController controller;
+  final String hintText;
+  final List<PokemonSummary> suggestions;
+  final ValueChanged<String> onQueryChanged;
+  final ValueChanged<PokemonSummary> onPokemonSelected;
+  final IconData prefixIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: controller,
+          onChanged: onQueryChanged,
+          decoration: InputDecoration(
+            hintText: hintText,
+            filled: true,
+            fillColor: TitoColors.card,
+            prefixIcon: Icon(prefixIcon),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+            ),
+          ),
+        ),
+        if (suggestions.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: suggestions
+                .map(
+                  (entry) => ActionChip(
+                    label: Text(entry.nameZh),
+                    onPressed: () => onPokemonSelected(entry),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class LinkedPokemonTypesRow extends StatelessWidget {
+  const LinkedPokemonTypesRow({
+    super.key,
+    required this.types,
+  });
+
+  final List<String> types;
+
+  @override
+  Widget build(BuildContext context) {
+    if (types.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Text(
+      '${AppZh.companionLinkedTypes}：${types.map(typeNameZh).join(' / ')}',
+      style: SecondaryTypography.onCard.body14.copyWith(
+        fontWeight: FontWeight.w800,
+      ),
+    );
+  }
+}
+
+class LinkedOrManualTypePicker extends StatelessWidget {
+  const LinkedOrManualTypePicker({
+    super.key,
+    required this.linkedPokemonId,
+    required this.label,
+    required this.selected,
+    required this.onManualChanged,
+    this.maxSelected = 2,
+  });
+
+  final int? linkedPokemonId;
+  final String label;
+  final List<String> selected;
+  final ValueChanged<List<String>> onManualChanged;
+  final int maxSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    if (linkedPokemonId != null) {
+      return LinkedPokemonTypesRow(types: selected);
+    }
+    return CollapsibleTypePicker(
+      label: label,
+      selected: selected,
+      maxSelected: maxSelected,
+      onChanged: onManualChanged,
+    );
+  }
+}
+
+class CompanionAbilitySection extends StatelessWidget {
+  const CompanionAbilitySection({
+    super.key,
+    required this.pokemonLabel,
+    required this.manualLabel,
+    required this.manualOptions,
+    required this.pokemonOptions,
+    required this.linkedPokemonId,
+    required this.selectedSlug,
+    required this.onChanged,
+  });
+
+  final String pokemonLabel;
+  final String manualLabel;
+  final Map<String, String> manualOptions;
+  final List<DefensiveAbilityOption> pokemonOptions;
+  final int? linkedPokemonId;
+  final String? selectedSlug;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    if (pokemonOptions.isNotEmpty) {
+      return AbilityChipPicker(
+        label: pokemonLabel,
+        selectedSlug: selectedSlug,
+        options: pokemonOptions,
+        onChanged: onChanged,
+      );
+    }
+    if (linkedPokemonId != null) {
+      return const SizedBox.shrink();
+    }
+    return ManualAbilityPicker(
+      label: manualLabel,
+      options: manualOptions,
+      selectedSlug: selectedSlug,
+      onChanged: onChanged,
+    );
+  }
+}
+
+class AbilityChipPicker extends StatelessWidget {
+  const AbilityChipPicker({
+    super.key,
+    required this.label,
     required this.selectedSlug,
     required this.options,
     required this.onChanged,
   });
 
+  final String label;
   final String? selectedSlug;
   final List<DefensiveAbilityOption> options;
   final ValueChanged<String?> onChanged;
@@ -502,7 +697,7 @@ class DefensiveAbilityPicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppZh.companionDefenderAbilityPick,
+          label,
           style: SecondaryTypography.onCard.small12.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -531,6 +726,31 @@ class DefensiveAbilityPicker extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class DefensiveAbilityPicker extends StatelessWidget {
+  const DefensiveAbilityPicker({
+    super.key,
+    required this.selectedSlug,
+    required this.options,
+    required this.onChanged,
+    this.label,
+  });
+
+  final String? label;
+  final String? selectedSlug;
+  final List<DefensiveAbilityOption> options;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return AbilityChipPicker(
+      label: label ?? AppZh.companionDefenderAbilityPick,
+      selectedSlug: selectedSlug,
+      options: options,
+      onChanged: onChanged,
     );
   }
 }

@@ -96,12 +96,16 @@ class DexBundleInstaller {
       final outFile = File('${paths.root.path}/${entry.name}');
       await outFile.parent.create(recursive: true);
       await outFile.writeAsBytes(entry.content as List<int>);
-      yield _progress(
-        phase: 'cdn_extract',
-        current: i + 1,
-        total: fileCount,
-        label: entry.name,
-      );
+      final shouldReport =
+          i == 0 || i + 1 == fileCount || (i + 1) % 50 == 0;
+      if (shouldReport) {
+        yield _progress(
+          phase: 'cdn_extract',
+          current: i + 1,
+          total: fileCount,
+          label: null,
+        );
+      }
     }
 
     final cacheManifest = await _store.readManifest();
