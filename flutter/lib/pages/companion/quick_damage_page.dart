@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
+import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
@@ -39,6 +40,8 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   String _moveType = 'normal';
   List<String> _attackerTypes = const ['normal'];
   List<String> _defenderTypes = const ['normal'];
+  String? _defenderAbilitySlug;
+  List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
   bool _loading = true;
@@ -141,6 +144,15 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     final defenseStat = _category == MoveCategory.physical
         ? stats.defense
         : stats.specialDefense;
+    final abilityOptions = detail.abilities
+        .map(
+          (ability) => DefensiveAbilityOption(
+            slug: abilitySlugFromNameEn(ability.nameEn),
+            labelZh: ability.nameZh,
+            isHidden: ability.isHidden,
+          ),
+        )
+        .toList(growable: false);
     if (!mounted) {
       return;
     }
@@ -150,6 +162,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _hpController.text = stats.hp.toString();
       _defenderSuggestions = const [];
       _defenderQueryController.text = summary.nameZh;
+      _defenderAbilityOptions = abilityOptions;
+      _defenderAbilitySlug =
+          abilityOptions.length == 1 ? abilityOptions.first.slug : null;
     });
   }
 
@@ -176,6 +191,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             attackerTypes: _attackerTypes,
             defenderTypes: _defenderTypes,
             relationsByType: relations,
+            defenderAbilitySlug: _defenderAbilitySlug,
           );
         }
 
@@ -301,10 +317,23 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   selected: _defenderTypes,
                   onChanged: (types) {
                     if (types.isNotEmpty) {
-                      setState(() => _defenderTypes = types);
+                      setState(() {
+                        _defenderTypes = types;
+                        _defenderAbilityOptions = const [];
+                        _defenderAbilitySlug = null;
+                      });
                     }
                   },
                 ),
+                if (_defenderAbilityOptions.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  DefensiveAbilityPicker(
+                    selectedSlug: _defenderAbilitySlug,
+                    options: _defenderAbilityOptions,
+                    onChanged: (slug) =>
+                        setState(() => _defenderAbilitySlug = slug),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 CompanionNumberField(
                   label: AppZh.companionStatLevel,

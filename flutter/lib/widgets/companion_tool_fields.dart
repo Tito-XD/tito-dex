@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/app_zh.dart';
 import '../features/companion/battle_math.dart';
+import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/type_chart.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -464,4 +466,71 @@ String profileLine(String title, List<String> items) {
     return '$title：无';
   }
   return '$title：${items.join('、')}';
+}
+
+class DefensiveAbilityOption {
+  const DefensiveAbilityOption({
+    required this.slug,
+    required this.labelZh,
+    this.isHidden = false,
+  });
+
+  final String slug;
+  final String labelZh;
+  final bool isHidden;
+}
+
+class DefensiveAbilityPicker extends StatelessWidget {
+  const DefensiveAbilityPicker({
+    super.key,
+    required this.selectedSlug,
+    required this.options,
+    required this.onChanged,
+  });
+
+  final String? selectedSlug;
+  final List<DefensiveAbilityOption> options;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    if (options.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppZh.companionDefenderAbilityPick,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (final option in options)
+              FilterChip(
+                selected: selectedSlug == option.slug,
+                showCheckmark: false,
+                label: Text(
+                  option.isHidden
+                      ? '${option.labelZh}（隐藏）'
+                      : option.labelZh,
+                ),
+                selectedColor: TitoColors.mint,
+                backgroundColor: TitoColors.card,
+                side: const BorderSide(color: TitoColors.ink, width: 2),
+                onSelected: (next) {
+                  onChanged(next ? option.slug : null);
+                },
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 }
