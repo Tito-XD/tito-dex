@@ -21,6 +21,7 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
+import '../widgets/tito_animated_size_switcher.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
 
@@ -148,7 +149,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                             showSettingsAction: false,
                           ),
                           const SizedBox(height: 12),
-                          ..._tabSections(detail, _currentTabIndex),
+                          // v0.4.1: AnimatedSize tab body (experimental)
+                          TitoAnimatedSizeSwitcher(
+                            switchKey: ValueKey<int>(_currentTabIndex),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: _tabSections(detail, _currentTabIndex),
+                            ),
+                          ),
                           const SizedBox(height: 72),
                         ],
                       ),
@@ -394,7 +402,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         style: SecondaryTypography.onGradient.body14,
       ),
       const SizedBox(height: 12),
-      ..._movePanelsForFilter(moveSet),
+      // v0.4.1: AnimatedSize move method panels (experimental)
+      TitoAnimatedSizeSwitcher(
+        switchKey: ValueKey<_MoveMethodFilter>(_moveMethodFilter),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: _movePanelsForFilter(moveSet),
+        ),
+      ),
     ];
   }
 
