@@ -381,13 +381,8 @@ class DexRepository {
       return summary;
     }
 
-    final edition = await gameEditionRepository.loadEdition();
-    final versionGroup = edition.spriteVersionGroup;
-    final editionSprite = summary.spriteUrlForVersionGroup(versionGroup) ??
-        _cdnConfig.spriteUrlForVersionGroup(summary.id, versionGroup);
-    final fallback = editionSprite ??
-        summary.spriteUrl ??
-        _cdnConfig.spriteUrl(summary.id);
+    final fallback =
+        summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id);
     return summary.copyWith(localSpritePath: fallback);
   }
 

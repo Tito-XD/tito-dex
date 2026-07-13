@@ -90,10 +90,7 @@ class PokemonDetailHeader extends StatelessWidget {
             GestureDetector(
               onTap: () => showPokemonArtworkViewer(
                 context,
-                pokemonId: summary.id,
-                nameZh: summary.nameZh,
-                artworkUrl: summary.artworkUrl,
-                thumbSource: summary.displaySpritePath,
+                summary: summary,
               ),
               child: DexSpriteImage(
                 source: summary.displaySpritePath,
@@ -146,10 +143,7 @@ class PokemonDetailHeader extends StatelessWidget {
               GestureDetector(
                 onTap: () => showPokemonArtworkViewer(
                   context,
-                  pokemonId: summary.id,
-                  nameZh: summary.nameZh,
-                  artworkUrl: summary.artworkUrl,
-                  thumbSource: summary.displaySpritePath,
+                  summary: summary,
                 ),
                 child: DexSpriteImage(
                   source: summary.displaySpritePath,

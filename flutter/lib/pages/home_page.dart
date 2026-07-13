@@ -102,6 +102,7 @@ class _PortraitHomeLayout extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final column = Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TrainerCard(
@@ -131,9 +132,20 @@ class _PortraitHomeLayout extends StatelessWidget {
           ],
         );
 
-        return SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          child: column,
+        return Center(
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 520,
+                minHeight: constraints.maxHeight,
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: column,
+              ),
+            ),
+          ),
         );
       },
     );

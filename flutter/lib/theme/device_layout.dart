@@ -268,11 +268,14 @@ abstract final class DeviceLayout {
   static double trainerMicroCardHeight(BuildContext context) =>
       dim(context, 116.0);
 
+  static double trainerDenseCardHeight(BuildContext context) =>
+      dim(context, 168.0);
+
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);
 
   static double trainerDenseAvatarSize(BuildContext context) =>
-      dim(context, 44.0);
+      dim(context, 88.0);
 
   static double quickTileIconSize(BuildContext context, {bool square = false}) {
     final raw = square ? 30.0 : 18.0;
