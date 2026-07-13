@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../l10n/app_zh.dart';
 import '../features/companion/battle_math.dart';
-import '../features/dex/ability_type_modifiers.dart';
+import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/type_chart.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -529,6 +529,140 @@ class DefensiveAbilityPicker extends StatelessWidget {
                 },
               ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class ManualAbilityPicker extends StatelessWidget {
+  const ManualAbilityPicker({
+    super.key,
+    required this.label,
+    required this.options,
+    required this.selectedSlug,
+    required this.onChanged,
+  });
+
+  final String label;
+  final Map<String, String> options;
+  final String? selectedSlug;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: options.entries.map((entry) {
+            return FilterChip(
+              selected: selectedSlug == entry.key,
+              showCheckmark: false,
+              label: Text(entry.value),
+              selectedColor: TitoColors.mint,
+              backgroundColor: TitoColors.card,
+              side: const BorderSide(color: TitoColors.ink, width: 2),
+              onSelected: (next) => onChanged(next ? entry.key : null),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class FieldConditionPicker extends StatelessWidget {
+  const FieldConditionPicker({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final String label;
+  final FieldCondition selected;
+  final ValueChanged<FieldCondition> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: FieldCondition.values.map((condition) {
+            return FilterChip(
+              selected: selected == condition,
+              showCheckmark: false,
+              label: Text(condition.labelZh),
+              selectedColor: TitoColors.softYellow,
+              backgroundColor: TitoColors.card,
+              side: const BorderSide(color: TitoColors.ink, width: 2),
+              onSelected: (_) => onChanged(condition),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class TerrainConditionPicker extends StatelessWidget {
+  const TerrainConditionPicker({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final String label;
+  final TerrainCondition selected;
+  final ValueChanged<TerrainCondition> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: TerrainCondition.values.map((condition) {
+            return FilterChip(
+              selected: selected == condition,
+              showCheckmark: false,
+              label: Text(condition.labelZh),
+              selectedColor: TitoColors.softYellow,
+              backgroundColor: TitoColors.card,
+              side: const BorderSide(color: TitoColors.ink, width: 2),
+              onSelected: (_) => onChanged(condition),
+            );
+          }).toList(),
         ),
       ],
     );

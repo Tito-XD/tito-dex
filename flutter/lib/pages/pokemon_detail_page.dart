@@ -284,10 +284,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         BaseStatsSection(stats: detail.baseStats!),
         const SizedBox(height: 12),
       ],
-      if (detail.typeMultipliers.isNotEmpty) ...[
-        TypeEffectivenessGrid(multipliers: detail.typeMultipliers),
-        const SizedBox(height: 12),
-      ],
+      InteractiveTypeEffectivenessCard(
+        types: detail.summary.types,
+        abilities: detail.abilities,
+        generation: _gameEdition.generation,
+      ),
+      const SizedBox(height: 12),
       StickerCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/ability_type_modifiers.dart';
+import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
+import '../../features/dex/generation_type_chart.dart';
 import '../../features/dex/type_chart.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
@@ -32,6 +34,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
   List<String> _defenderTypes = const ['fire'];
   List<String> _attackerTypes = const [];
   String? _defenderAbilitySlug;
+  String? _attackerAbilitySlug;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
@@ -115,9 +118,20 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
         _defenderAbilitySlug =
             options.length == 1 ? options.first.slug : null;
       });
-    } catch (_) {
-      // Ability list is optional for manual type picks.
-    }
+    } catch (_) {}
+  }
+
+  BattleEffectivenessInput _defenderInput(
+    Map<String, TypeDamageRelations> relations,
+    int generation,
+  ) {
+    return BattleEffectivenessInput(
+      defenderTypes: _defenderTypes,
+      relationsByType: relations,
+      defenderAbilitySlug: _defenderAbilitySlug,
+      attackerAbilitySlug: _attackerAbilitySlug,
+      generation: generation,
+    );
   }
 
   @override
@@ -128,6 +142,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
         final edition = gameEditionRepository.edition;
         final scope = battleScopeForEdition(edition);
         final relations = _relations;
+        final generation = scope.generation;
 
         return TitoFontScale(
           multiplier: 1.0,
@@ -137,153 +152,192 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
               title: AppZh.companionToolTypeMatchup,
               subtitle: edition.labelZh,
               children: [
-          if (_loading)
-            const Center(child: CircularProgressIndicator())
-          else if (_error != null)
-            StickerCard(
-              child: Text(
-                _error!,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                  height: 1.45,
-                ),
-              ),
-            )
-          else if (relations != null) ...[
-            CompanionSectionCard(
-              title: AppZh.companionTypeDefenderTitle,
-              subtitle: scope.typeChartNote,
-              children: [
-                TextField(
-                  controller: _queryController,
-                  onChanged: _searchPokemon,
-                  decoration: InputDecoration(
-                    hintText: AppZh.companionPokemonSearchHint,
-                    filled: true,
-                    fillColor: TitoColors.card,
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: TitoColors.ink, width: 2),
-                    ),
-                  ),
-                ),
-                if (_suggestions.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _suggestions
-                        .map(
-                          (entry) => ActionChip(
-                            label: Text(entry.nameZh),
-                            onPressed: () => _applyPokemon(entry),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                CollapsibleTypePicker(
-                  label: AppZh.companionTypeManualPick,
-                  selected: _defenderTypes,
-                  onChanged: (types) {
-                    if (types.isNotEmpty) {
-                      setState(() {
-                        _defenderTypes = types;
-                        _defenderAbilityOptions = const [];
-                        _defenderAbilitySlug = null;
-                      });
-                    }
-                  },
-                ),
-                if (_defenderAbilityOptions.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  DefensiveAbilityPicker(
-                    selectedSlug: _defenderAbilitySlug,
-                    options: _defenderAbilityOptions,
-                    onChanged: (slug) =>
-                        setState(() => _defenderAbilitySlug = slug),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 12),
-            Builder(
-              builder: (context) {
-                final profile = computeDefensiveProfile(
-                  _defenderTypes,
-                  relations,
-                  defenderAbilitySlug: _defenderAbilitySlug,
-                );
-                final multipliers = computeDefensiveMultipliersWithAbility(
-                  defenderTypes: _defenderTypes,
-                  relationsByType: relations,
-                  defenderAbilitySlug: _defenderAbilitySlug,
-                );
-                return Column(
-                  children: [
-                    StickerCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppZh.companionTypeSummaryTitle,
-                            style: SecondaryTypography.onCard.h15,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            profileLine(AppZh.dexWeaknesses, profile.weaknesses),
-                            style: SecondaryTypography.onCard.body14,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profileLine(
-                              AppZh.dexResistances,
-                              profile.resistances,
-                            ),
-                            style: SecondaryTypography.onCard.body14,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profileLine(AppZh.dexImmunities, profile.immunities),
-                            style: SecondaryTypography.onCard.body14,
-                          ),
-                        ],
+                if (_loading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_error != null)
+                  StickerCard(
+                    child: Text(
+                      _error!,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        height: 1.45,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    TypeEffectivenessGrid(multipliers: multipliers),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-            CompanionSectionCard(
-              title: AppZh.companionTypeAttackerTitle,
-              children: [
-                CollapsibleTypePicker(
-                  label: AppZh.companionTypeAttackerPick,
-                  selected: _attackerTypes,
-                  maxSelected: 2,
-                  onChanged: (types) => setState(() => _attackerTypes = types),
-                ),
-                if (_attackerTypes.isNotEmpty) ...[
+                  )
+                else if (relations != null) ...[
+                  CompanionSectionCard(
+                    title: AppZh.companionTypeDefenderTitle,
+                    subtitle:
+                        '${scope.typeChartNote}\n${AppZh.companionGenerationTypeNote}',
+                    children: [
+                      TextField(
+                        controller: _queryController,
+                        onChanged: _searchPokemon,
+                        decoration: InputDecoration(
+                          hintText: AppZh.companionPokemonSearchHint,
+                          filled: true,
+                          fillColor: TitoColors.card,
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: TitoColors.ink,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (_suggestions.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _suggestions
+                              .map(
+                                (entry) => ActionChip(
+                                  label: Text(entry.nameZh),
+                                  onPressed: () => _applyPokemon(entry),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                      const SizedBox(height: 12),
+                      CollapsibleTypePicker(
+                        label: AppZh.companionTypeManualPick,
+                        selected: _defenderTypes,
+                        onChanged: (types) {
+                          if (types.isNotEmpty) {
+                            setState(() {
+                              _defenderTypes = types;
+                              _defenderAbilityOptions = const [];
+                              _defenderAbilitySlug = null;
+                            });
+                          }
+                        },
+                      ),
+                      if (_defenderAbilityOptions.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        DefensiveAbilityPicker(
+                          selectedSlug: _defenderAbilitySlug,
+                          options: _defenderAbilityOptions,
+                          onChanged: (slug) =>
+                              setState(() => _defenderAbilitySlug = slug),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 12),
+                        ManualAbilityPicker(
+                          label: AppZh.companionManualAbilityPick,
+                          options: kManualDefensiveAbilityOptions,
+                          selectedSlug: _defenderAbilitySlug,
+                          onChanged: (slug) =>
+                              setState(() => _defenderAbilitySlug = slug),
+                        ),
+                      ],
+                    ],
+                  ),
                   const SizedBox(height: 12),
-                  Text(
-                    profileLine(
-                      AppZh.dexStabEffective,
-                      computeStabSuperEffective(_attackerTypes, relations),
-                    ),
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final input = _defenderInput(relations, generation);
+                      final profile = computeBattleDefensiveProfile(input);
+                      final multipliers = computeBattleTypeMultipliers(input);
+                      final normalized = normalizeTypesForGeneration(
+                        _defenderTypes,
+                        generation,
+                      );
+
+                      return Column(
+                        children: [
+                          if (generation < 6)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                '世代修正：${normalized.map(typeNameZh).join('/')}',
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(color: TitoColors.mutedInk),
+                              ),
+                            ),
+                          StickerCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppZh.companionTypeSummaryTitle,
+                                  style: SecondaryTypography.onCard.h15,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  profileLine(
+                                    AppZh.dexWeaknesses,
+                                    profile.weaknesses,
+                                  ),
+                                  style: SecondaryTypography.onCard.body14,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  profileLine(
+                                    AppZh.dexResistances,
+                                    profile.resistances,
+                                  ),
+                                  style: SecondaryTypography.onCard.body14,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  profileLine(
+                                    AppZh.dexImmunities,
+                                    profile.immunities,
+                                  ),
+                                  style: SecondaryTypography.onCard.body14,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TypeEffectivenessGrid(multipliers: multipliers),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  CompanionSectionCard(
+                    title: AppZh.companionTypeAttackerTitle,
+                    children: [
+                      CollapsibleTypePicker(
+                        label: AppZh.companionTypeAttackerPick,
+                        selected: _attackerTypes,
+                        maxSelected: 2,
+                        onChanged: (types) =>
+                            setState(() => _attackerTypes = types),
+                      ),
+                      const SizedBox(height: 12),
+                      ManualAbilityPicker(
+                        label: AppZh.companionAttackerAbilityPick,
+                        options: kManualAttackerAbilityOptions,
+                        selectedSlug: _attackerAbilitySlug,
+                        onChanged: (slug) =>
+                            setState(() => _attackerAbilitySlug = slug),
+                      ),
+                      if (_attackerTypes.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          profileLine(
+                            AppZh.companionOffensiveBlindSpots,
+                            computeOffensiveBlindSpots(
+                              _attackerTypes,
+                              relations,
+                              generation: generation,
+                              attackerAbilitySlug: _attackerAbilitySlug,
+                            ),
+                          ),
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
-              ],
-            ),
-          ],
               ],
             ),
           ),

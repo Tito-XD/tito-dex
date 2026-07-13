@@ -4,6 +4,7 @@ import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/ability_type_modifiers.dart';
+import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
@@ -41,7 +42,10 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   List<String> _attackerTypes = const ['normal'];
   List<String> _defenderTypes = const ['normal'];
   String? _defenderAbilitySlug;
+  String? _attackerAbilitySlug;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
+  FieldCondition _weather = FieldCondition.none;
+  TerrainCondition _terrain = TerrainCondition.none;
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
   bool _loading = true;
@@ -192,6 +196,11 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             defenderTypes: _defenderTypes,
             relationsByType: relations,
             defenderAbilitySlug: _defenderAbilitySlug,
+            attackerAbilitySlug: _attackerAbilitySlug,
+            generation: scope.generation,
+            weatherSlug: _weather.slug.isEmpty ? null : _weather.slug,
+            terrainSlug: _terrain.slug.isEmpty ? null : _terrain.slug,
+            category: _category,
           );
         }
 
@@ -333,7 +342,36 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                     onChanged: (slug) =>
                         setState(() => _defenderAbilitySlug = slug),
                   ),
+                ] else ...[
+                  const SizedBox(height: 12),
+                  ManualAbilityPicker(
+                    label: AppZh.companionManualAbilityPick,
+                    options: kManualDefensiveAbilityOptions,
+                    selectedSlug: _defenderAbilitySlug,
+                    onChanged: (slug) =>
+                        setState(() => _defenderAbilitySlug = slug),
+                  ),
                 ],
+                const SizedBox(height: 12),
+                ManualAbilityPicker(
+                  label: AppZh.companionAttackerAbilityPick,
+                  options: kManualAttackerAbilityOptions,
+                  selectedSlug: _attackerAbilitySlug,
+                  onChanged: (slug) =>
+                      setState(() => _attackerAbilitySlug = slug),
+                ),
+                const SizedBox(height: 12),
+                FieldConditionPicker(
+                  label: AppZh.companionWeatherPick,
+                  selected: _weather,
+                  onChanged: (value) => setState(() => _weather = value),
+                ),
+                const SizedBox(height: 12),
+                TerrainConditionPicker(
+                  label: AppZh.companionTerrainPick,
+                  selected: _terrain,
+                  onChanged: (value) => setState(() => _terrain = value),
+                ),
                 const SizedBox(height: 12),
                 CompanionNumberField(
                   label: AppZh.companionStatLevel,
@@ -435,6 +473,18 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    if (estimate.extraMultiplier != 1) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        AppZh.companionDamageExtra(
+                          estimate.extraMultiplier.toStringAsFixed(2),
+                        ),
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

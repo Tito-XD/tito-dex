@@ -21,6 +21,7 @@ const kAbilityDefensiveTypeModifiers = <String, Map<String, double>>{
   'dry-skin': {'water': 0, 'fire': 1.25},
   'fluffy': {'fire': 2},
   'purifying-salt': {'ghost': 0.5},
+  'wonder-guard': {}, // handled specially in battle_effectiveness.dart
 };
 
 String abilitySlugFromNameEn(String nameEn) =>
