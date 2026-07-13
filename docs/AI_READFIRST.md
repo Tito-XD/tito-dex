@@ -17,7 +17,7 @@ Key points:
 - HGSS parser and save-directory sync are **implemented** — check status table in Stack Decision before assuming gaps.
 - Flutter nav: **Home, Team, Journey, Dex, Search, Settings** — Dex + Search shipped in v0.2.x.
 - **Dex offline bundle** — production bundle **v4** (493 species); app default **v5** (1025 species; `abilities`, `obtainLocations`, `pokedexNumbers`).
-- **DexScope** — `DexRegionalScope` (全国 / 城都 / 关东) shipped; `DexGameVersion` + full scope switcher planned v0.3.0.
+- **DexScope** — 11 regional dexes + bottom-sheet picker shipped (v0.4.1); **dex list game bar removal planned** (see ROADMAP Phase E).
 
 ## RG APK Release (agents)
 
@@ -34,6 +34,15 @@ When building or publishing RG handheld APKs:
 | **Upgrade** | User must **uninstall** locally-built 0.2.x before sideloading CI APK (signature differs) |
 
 Full build notes: [flutter/README.md](../flutter/README.md).
+
+## Dex list UX (planned — do not implement until batched)
+
+Tito confirmed: **remove game-edition filter from the dex list**; regional pokedex picker is enough.
+
+- **List page:** `_region` only (全国 / 城都 / … / 帕底亚). No `_DexGameEditionBar`.
+- **Game version stays** on detail (moves / obtain / flavor), home, Search battle tools, Settings.
+- **Why:** game tap resets region but region pick does not reset game — confusing dual control.
+- **Track:** [ROADMAP.md](../ROADMAP.md) → Phase E → “Planned UX — Dex list”.
 
 ## Communication Defaults
 

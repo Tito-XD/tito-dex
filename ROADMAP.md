@@ -114,6 +114,25 @@ Cross-filter dex like Pocket Gallery’s **地区图鉴** + per-game move/flavor
 | Scoped offline packs (HGSS / SV / …) | 🚧 |
 | Settings: default game version for dex | 🚧 |
 
+### Planned UX — Dex list (Tito confirmed, not implemented)
+
+**Remove the horizontal game-edition bar from the dex list page.** Browse by **regional pokedex only** (全国 + 10 regional dexes via bottom-sheet picker).
+
+| Keep on dex list | Move elsewhere |
+| --- | --- |
+| Regional scope tab + picker (`_region`) | Global `GameEdition` — detail page, Search battle tools, Settings / home |
+| Journey tab | Obtain locations & move sets per game (detail tabs) |
+
+**Rationale (2026-07):** Game chip and region picker overlap — tapping a game forces `_region` to that edition’s default regional dex, but picking 全国 does not reset the game. Two controls on one axis confuses users. List view = *which dex*; detail view = *which game’s data*.
+
+**Implementation notes (when batching with other dex UX):**
+
+- Remove `_DexGameEditionBar` from `dex_page.dart`.
+- Stop syncing `_region = edition.defaultRegionalPokedex` on game tap in list context.
+- Title bar: prefer region label or plain「图鉴」, not「图鉴 · {game}``.
+- Init: do not force `_region` from saved game on open — or default list to 全国 unless user last picked a region (TBD with other changes).
+- Global `gameEditionRepository` still updated from home / detail / settings.
+
 ## Phase F — Reference Data (“常用资料”)
 
 Standalone lists — lower priority than journey loop; can live under Search or Settings.
