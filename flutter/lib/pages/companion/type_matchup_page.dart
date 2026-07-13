@@ -35,6 +35,10 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
   List<String> _attackerTypes = const [];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  bool _defenderTerastallized = false;
+  String? _defenderTeraType;
+  bool _attackerTerastallized = false;
+  String? _attackerTeraType;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
@@ -94,6 +98,8 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
       _queryController.text = summary.nameZh;
       _defenderAbilityOptions = const [];
       _defenderAbilitySlug = null;
+      _defenderTerastallized = false;
+      _defenderTeraType = defaultTeraTypeFor(summary.types, 9);
     });
     _loadDefenderAbilities(summary.id);
   }
@@ -131,6 +137,10 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
       defenderAbilitySlug: _defenderAbilitySlug,
       attackerAbilitySlug: _attackerAbilitySlug,
       generation: generation,
+      defenderTerastallized: _defenderTerastallized,
+      defenderTeraType: _defenderTeraType,
+      attackerTerastallized: _attackerTerastallized,
+      attackerTeraType: _attackerTeraType,
     );
   }
 
@@ -212,10 +222,28 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                               _defenderTypes = types;
                               _defenderAbilityOptions = const [];
                               _defenderAbilitySlug = null;
+                              _defenderTeraType =
+                                  defaultTeraTypeFor(types, generation);
                             });
                           }
                         },
                       ),
+                      if (generation >= 9) ...[
+                        const SizedBox(height: 12),
+                        TerastalPicker(
+                          label: AppZh.companionDefenderTerastal,
+                          enabled: true,
+                          terastallized: _defenderTerastallized,
+                          teraType: _defenderTeraType,
+                          fallbackTypes: _defenderTypes,
+                          generation: generation,
+                          onTerastallizedChanged: (value) => setState(
+                            () => _defenderTerastallized = value,
+                          ),
+                          onTeraTypeChanged: (type) =>
+                              setState(() => _defenderTeraType = type),
+                        ),
+                      ],
                       if (_defenderAbilityOptions.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         DefensiveAbilityPicker(
@@ -318,6 +346,22 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                         onChanged: (slug) =>
                             setState(() => _attackerAbilitySlug = slug),
                       ),
+                      if (generation >= 9) ...[
+                        const SizedBox(height: 12),
+                        TerastalPicker(
+                          label: AppZh.companionAttackerTerastal,
+                          enabled: true,
+                          terastallized: _attackerTerastallized,
+                          teraType: _attackerTeraType,
+                          fallbackTypes: _attackerTypes,
+                          generation: generation,
+                          onTerastallizedChanged: (value) => setState(
+                            () => _attackerTerastallized = value,
+                          ),
+                          onTeraTypeChanged: (type) =>
+                              setState(() => _attackerTeraType = type),
+                        ),
+                      ],
                       if (_attackerTypes.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         Text(
@@ -328,6 +372,8 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                               relations,
                               generation: generation,
                               attackerAbilitySlug: _attackerAbilitySlug,
+                              attackerTerastallized: _attackerTerastallized,
+                              attackerTeraType: _attackerTeraType,
                             ),
                           ),
                           style: SecondaryTypography.onCard.body14.copyWith(
