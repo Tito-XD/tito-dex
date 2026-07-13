@@ -18,6 +18,7 @@ import time
 from pathlib import Path
 
 import requests
+from PIL import UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -70,6 +71,7 @@ def build_assets(
         "artwork": 0,
         "animated": 0,
         "default_sprites": 0,
+        "sprites_skipped": 0,
     }
     sprite_index: dict[str, dict[str, str]] = {}
 
@@ -83,10 +85,18 @@ def build_assets(
         default_url = sprite_url_for_version_group(sprites, "heartgold-soulsilver")
         if default_url:
             default_dir.mkdir(parents=True, exist_ok=True)
-            png = download_bytes(session, default_url)
-            optimized = optimize_png(png, max_width=220)
-            (default_dir / f"{pokemon_id}.png").write_bytes(optimized)
-            stats["default_sprites"] += 1
+            dest = default_dir / f"{pokemon_id}.png"
+            if not dest.exists():
+                try:
+                    png = download_bytes(session, default_url)
+                    dest.write_bytes(optimize_png(png, max_width=220))
+                    stats["default_sprites"] += 1
+                except (requests.RequestException, UnidentifiedImageError, OSError) as exc:
+                    stats["sprites_skipped"] += 1
+                    print(
+                        f"  warn default sprite #{pokemon_id}: {exc}",
+                        file=sys.stderr,
+                    )
 
         vg_urls: dict[str, str] = {}
         for vg in version_groups:
@@ -104,7 +114,8 @@ def build_assets(
                 dest.write_bytes(optimize_png(png, max_width=220))
                 vg_urls[vg] = f"sprites/by-version/{vg}/{pokemon_id}.png"
                 stats["sprites_by_version"] += 1
-            except requests.RequestException as exc:
+            except (requests.RequestException, UnidentifiedImageError, OSError) as exc:
+                stats["sprites_skipped"] += 1
                 print(f"  warn sprite {vg} #{pokemon_id}: {exc}", file=sys.stderr)
 
         if include_artwork:
@@ -117,7 +128,8 @@ def build_assets(
                         png = download_bytes(session, art_url)
                         dest.write_bytes(optimize_png(png, max_width=None))
                         stats["artwork"] += 1
-                    except requests.RequestException as exc:
+                    except (requests.RequestException, UnidentifiedImageError, OSError) as exc:
+                        stats["sprites_skipped"] += 1
                         print(f"  warn artwork #{pokemon_id}: {exc}", file=sys.stderr)
 
         if include_animated:

@@ -12,6 +12,7 @@ import hashlib
 import io
 import json
 import re
+import struct
 import sys
 import tarfile
 import time
@@ -23,7 +24,7 @@ from urllib.parse import urlparse
 
 import requests
 import zstandard as zstd
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -1118,9 +1119,40 @@ def parse_evolution_node(
     }
 
 
+def strip_png_chunks(png_bytes: bytes, drop_types: set[bytes]) -> bytes:
+    """Drop ancillary PNG chunks (e.g. broken iCCP from PokeAPI sprites)."""
+    if not png_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        return png_bytes
+    out = bytearray(b"\x89PNG\r\n\x1a\n")
+    pos = 8
+    while pos + 8 <= len(png_bytes):
+        length = struct.unpack(">I", png_bytes[pos : pos + 4])[0]
+        chunk_type = png_bytes[pos + 4 : pos + 8]
+        chunk_end = pos + 12 + length
+        if chunk_end > len(png_bytes):
+            break
+        if chunk_type not in drop_types:
+            out.extend(png_bytes[pos:chunk_end])
+        pos = chunk_end
+    return bytes(out)
+
+
+def open_png_image(png_bytes: bytes) -> Image.Image:
+    """Open PNG bytes, repairing common PokeAPI sprite metadata issues."""
+    try:
+        image = Image.open(io.BytesIO(png_bytes))
+        image.load()
+        return image
+    except UnidentifiedImageError:
+        repaired = strip_png_chunks(png_bytes, {b"iCCP", b"cHRM", b"sRGB", b"gAMA"})
+        image = Image.open(io.BytesIO(repaired))
+        image.load()
+        return image
+
+
 def optimize_png(png_bytes: bytes, *, max_width: int | None = 220) -> bytes:
     """Resize PNG while preserving alpha (no white JPEG matte)."""
-    image = Image.open(io.BytesIO(png_bytes))
+    image = open_png_image(png_bytes)
     if image.mode not in ("RGB", "RGBA"):
         image = image.convert("RGBA")
     if max_width is not None and image.width > max_width:
