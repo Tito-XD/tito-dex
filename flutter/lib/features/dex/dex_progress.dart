@@ -24,7 +24,21 @@ class DexProgress {
   final Set<int> seenIds;
   final bool fromSave;
 
-  factory DexProgress.fromJourney(CurrentJourney journey) {
+  factory DexProgress.fromJourney(
+    CurrentJourney journey, {
+    bool manualDexMarks = false,
+  }) {
+    if (manualDexMarks) {
+      final caught = journey.manualDexCaughtIds.toSet();
+      final seen = journey.manualDexSeenIds.toSet();
+      seen.addAll(caught);
+      return DexProgress(
+        caughtIds: caught,
+        seenIds: seen,
+        fromSave: false,
+      );
+    }
+
     final caught = journey.saveDexCaughtIds.toSet();
     final seen = journey.saveDexSeenIds.toSet();
     seen.addAll(caught);

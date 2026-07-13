@@ -70,4 +70,82 @@ void main() {
     );
     expect(journey.nextReminder, existing.nextReminder);
   });
+
+  test('toJourney preserves user-edited party when partyUserOverride is set', () {
+    const parser = HgssParser();
+    final summary = ParsedSaveSummary(
+      game: 'SoulSilver',
+      trainerName: 'ETeZ',
+      playTime: '7:03:41',
+      badges: 3,
+      maxBadges: 8,
+      locationLabel: '桔梗市',
+      party: const [
+        ParsedPartyMember(
+          speciesId: 25,
+          speciesName: 'Pikachu',
+          level: 30,
+        ),
+      ],
+      saveHash: 'abc123',
+      parsedAt: DateTime.utc(2026, 1, 1),
+    );
+
+    final existing = CurrentJourney.mock().copyWith(
+      partyUserOverride: true,
+      party: const [
+        PartyMember(
+          species: '火岩鼠',
+          speciesId: 156,
+          level: 99,
+          userEdited: true,
+        ),
+      ],
+      saveSyncedParty: const [
+        PartyMember(species: '皮卡丘', speciesId: 25, level: 10),
+      ],
+    );
+
+    final journey = parser.toJourney(summary, existing: existing);
+
+    expect(journey.party.first.speciesId, 156);
+    expect(journey.party.first.level, 99);
+    expect(journey.saveSyncedParty.first.speciesId, 25);
+    expect(journey.partyUserOverride, isTrue);
+    expect(journey.location, '桔梗市');
+  });
+
+  test('toJourney replaces party when partyUserOverride is false', () {
+    const parser = HgssParser();
+    final summary = ParsedSaveSummary(
+      game: 'SoulSilver',
+      trainerName: 'ETeZ',
+      playTime: '7:03:41',
+      badges: 3,
+      maxBadges: 8,
+      locationLabel: '满金市',
+      party: const [
+        ParsedPartyMember(
+          speciesId: 25,
+          speciesName: 'Pikachu',
+          level: 30,
+        ),
+      ],
+      saveHash: 'abc123',
+      parsedAt: DateTime.utc(2026, 1, 1),
+    );
+
+    final existing = CurrentJourney.mock().copyWith(
+      partyUserOverride: false,
+      party: const [
+        PartyMember(species: '火岩鼠', speciesId: 156, level: 99),
+      ],
+    );
+
+    final journey = parser.toJourney(summary, existing: existing);
+
+    expect(journey.party.first.speciesId, 25);
+    expect(journey.saveSyncedParty.first.speciesId, 25);
+    expect(journey.partyUserOverride, isFalse);
+  });
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -178,6 +179,8 @@ class _SearchPageState extends State<SearchPage> {
                 },
               ),
             ),
+            const SizedBox(height: 16),
+            _SleepToolsSection(),
           ],
         ),
       ),
@@ -631,6 +634,60 @@ class _SearchResultRow extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SleepToolsSection extends StatelessWidget {
+  const _SleepToolsSection();
+
+  static const _links = [
+    (AppZh.sleepToolsMain, 'https://nerolislab.com'),
+    (AppZh.sleepToolsGuides, 'https://nerolislab.com/guides/'),
+    (AppZh.sleepToolsDocs, 'https://docs.nerolislab.com'),
+  ];
+
+  Future<void> _openLink(BuildContext context, String url) async {
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$url · ${AppZh.sleepLinkCopied}')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.sleepToolsTitle,
+            style: SecondaryTypography.onCard.h15,
+          ),
+          const SizedBox(height: 4),
+          for (final (label, url) in _links)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                label,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              subtitle: Text(
+                url,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+              trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+              onTap: () => _openLink(context, url),
+            ),
+        ],
       ),
     );
   }

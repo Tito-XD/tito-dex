@@ -17,12 +17,14 @@ class PokemonMiniCard extends StatelessWidget {
     required this.summary,
     required this.status,
     this.onTap,
+    this.onLongPress,
     this.compact = false,
   });
 
   final PokemonSummary summary;
   final DexEncounterStatus status;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool compact;
 
   @override
@@ -42,6 +44,7 @@ class PokemonMiniCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(radius),
       child: GestureDetector(
         onTap: activate,
+        onLongPress: onLongPress,
         child: Stack(
           fit: StackFit.expand,
           children: [
