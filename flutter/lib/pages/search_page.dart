@@ -24,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sleep_tools_section.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 
@@ -452,6 +453,8 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),
+      const SizedBox(height: 12),
+      const SleepToolsSection(),
     ];
   }
 

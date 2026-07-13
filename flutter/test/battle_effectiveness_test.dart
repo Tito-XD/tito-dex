@@ -147,4 +147,127 @@ void main() {
     );
     expect(estimate.extraMultiplier, closeTo(0.75, 0.001));
   });
+
+  test('defender terastallized uses single tera type for chart', () {
+    final input = BattleEffectivenessInput(
+      defenderTypes: const ['water', 'fairy'],
+      relationsByType: relations,
+      generation: 9,
+      defenderTerastallized: true,
+      defenderTeraType: 'steel',
+    );
+    final multipliers = computeBattleTypeMultipliers(input);
+    expect(formatTypeMultiplier(multipliers['fire'] ?? 1), '2');
+    expect(formatTypeMultiplier(multipliers['grass'] ?? 1), '1/2');
+  });
+
+  test('attacker terastallized grants double stab on tera type', () {
+    final stab = terastalStabMultiplier(
+      moveType: 'water',
+      attackerTypes: const ['grass'],
+      generation: 9,
+      attackerTerastallized: true,
+      attackerTeraType: 'water',
+    );
+    expect(stab, 2.0);
+  });
+
+  test('burn halves physical attack in damage estimate', () {
+    final normal = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+      category: MoveCategory.physical,
+    );
+    final burned = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+      category: MoveCategory.physical,
+      attackerStatus: BattleStatusCondition.burn,
+    );
+    expect(burned.maxDamage, lessThan(normal.maxDamage));
+  });
+
+  test('fur coat halves physical damage', () {
+    final normal = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+      category: MoveCategory.physical,
+    );
+    final furCoat = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+      category: MoveCategory.physical,
+      defenderAbilitySlug: 'fur-coat',
+    );
+    expect(furCoat.maxDamage, lessThan(normal.maxDamage));
+  });
+
+  test('life orb boosts damage by 1.3x', () {
+    final normal = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+    );
+    final lifeOrb = estimateDamage(
+      level: 50,
+      power: 80,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'water',
+      attackerTypes: const ['water'],
+      defenderTypes: const ['fire'],
+      relationsByType: relations,
+      attackerHeldItem: BattleHeldItem.lifeOrb,
+    );
+    expect(lifeOrb.extraMultiplier, closeTo(1.3, 0.001));
+    expect(lifeOrb.maxDamage, greaterThan(normal.maxDamage));
+  });
+
+  test('computeTeamSharedWeaknesses finds overlapping weaknesses', () {
+    final shared = computeTeamSharedWeaknesses(
+      const [
+        ['grass'],
+        ['grass', 'poison'],
+      ],
+      relations,
+      generation: 9,
+      minMembers: 2,
+    );
+    expect(shared, contains('火'));
+  });
 }

@@ -668,3 +668,209 @@ class TerrainConditionPicker extends StatelessWidget {
     );
   }
 }
+
+class TerastalPicker extends StatelessWidget {
+  const TerastalPicker({
+    super.key,
+    required this.label,
+    required this.enabled,
+    required this.terastallized,
+    required this.teraType,
+    required this.fallbackTypes,
+    required this.generation,
+    required this.onTerastallizedChanged,
+    required this.onTeraTypeChanged,
+  });
+
+  final String label;
+  final bool enabled;
+  final bool terastallized;
+  final String? teraType;
+  final List<String> fallbackTypes;
+  final int generation;
+  final ValueChanged<bool> onTerastallizedChanged;
+  final ValueChanged<String?> onTeraTypeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) {
+      return const SizedBox.shrink();
+    }
+
+    final effectiveType = teraType ??
+        (fallbackTypes.isNotEmpty
+            ? defaultTeraTypeFor(fallbackTypes, generation)
+            : 'normal');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        FilterChip(
+          selected: terastallized,
+          showCheckmark: false,
+          label: Text(AppZh.companionTerastalToggle),
+          avatar: Icon(
+            Icons.diamond_rounded,
+            size: 16,
+            color: terastallized ? TitoColors.ink : TitoColors.mutedInk,
+          ),
+          selectedColor: TitoColors.softYellow,
+          backgroundColor: TitoColors.card,
+          side: const BorderSide(color: TitoColors.ink, width: 2),
+          onSelected: (next) {
+            onTerastallizedChanged(next);
+            if (next && teraType == null) {
+              onTeraTypeChanged(effectiveType);
+            }
+          },
+        ),
+        if (terastallized) ...[
+          const SizedBox(height: 8),
+          CollapsibleTypePicker(
+            label: AppZh.companionTerastalType,
+            selected: [effectiveType],
+            maxSelected: 1,
+            onChanged: (types) {
+              if (types.isNotEmpty) {
+                onTeraTypeChanged(types.first);
+              }
+            },
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class HeldItemPicker extends StatelessWidget {
+  const HeldItemPicker({
+    super.key,
+    required this.selected,
+    required this.onChanged,
+    this.typeBoostItemType,
+    this.onTypeBoostChanged,
+  });
+
+  final BattleHeldItem selected;
+  final ValueChanged<BattleHeldItem> onChanged;
+  final String? typeBoostItemType;
+  final ValueChanged<String?>? onTypeBoostChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppZh.companionHeldItemPick,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: BattleHeldItem.values.map((item) {
+            return FilterChip(
+              selected: selected == item,
+              showCheckmark: false,
+              label: Text(item.labelZh),
+              selectedColor: TitoColors.mint,
+              backgroundColor: TitoColors.card,
+              side: const BorderSide(color: TitoColors.ink, width: 2),
+              onSelected: (_) => onChanged(item),
+            );
+          }).toList(),
+        ),
+        if (selected == BattleHeldItem.typeBoost &&
+            onTypeBoostChanged != null) ...[
+          const SizedBox(height: 8),
+          CollapsibleTypePicker(
+            label: AppZh.companionTypeBoostItemType,
+            selected: [typeBoostItemType ?? 'normal'],
+            maxSelected: 1,
+            onChanged: (types) {
+              if (types.isNotEmpty) {
+                onTypeBoostChanged!(types.first);
+              }
+            },
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class StatusConditionPicker extends StatelessWidget {
+  const StatusConditionPicker({
+    super.key,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final BattleStatusCondition selected;
+  final ValueChanged<BattleStatusCondition> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppZh.companionStatusPick,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: BattleStatusCondition.values.map((status) {
+            return FilterChip(
+              selected: selected == status,
+              showCheckmark: false,
+              label: Text(status.labelZh),
+              selectedColor: TitoColors.softYellow,
+              backgroundColor: TitoColors.card,
+              side: const BorderSide(color: TitoColors.ink, width: 2),
+              onSelected: (_) => onChanged(status),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class ContactMoveToggle extends StatelessWidget {
+  const ContactMoveToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      selected: value,
+      showCheckmark: false,
+      label: Text(AppZh.companionContactMove),
+      selectedColor: TitoColors.mint,
+      backgroundColor: TitoColors.card,
+      side: const BorderSide(color: TitoColors.ink, width: 2),
+      onSelected: onChanged,
+    );
+  }
+}

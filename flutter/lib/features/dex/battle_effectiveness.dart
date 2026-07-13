@@ -1,4 +1,4 @@
-/// Unified type effectiveness for battle tools (generation, abilities, weather).
+/// Unified type effectiveness for battle tools (generation, abilities, weather, Tera).
 library;
 
 import 'ability_type_modifiers.dart';
@@ -19,7 +19,6 @@ const kFieldMoveTypeModifiers = <String, Map<String, double>>{
   'misty': {'dragon': 0.5},
 };
 
-/// Attacker abilities that change Normal move type for effectiveness.
 const kAbilityMoveTypeConversion = <String, String>{
   'pixilate': 'fairy',
   'aerilate': 'flying',
@@ -27,7 +26,6 @@ const kAbilityMoveTypeConversion = <String, String>{
   'galvanize': 'electric',
 };
 
-/// Attacker abilities that bypass Ghost immunity (Normal/Fighting).
 const kAttackerGhostBypassAbilities = {
   'scrappy',
   'mind-s-eye',
@@ -35,7 +33,6 @@ const kAttackerGhostBypassAbilities = {
   'foresight',
 };
 
-/// Defender / attacker abilities that alter final damage (not the 18-type grid).
 const kDefenderSuperEffectiveReductionAbilities = {
   'filter',
   'solid-rock',
@@ -46,6 +43,86 @@ const kAttackerResistDoublingAbilities = {'tinted-lens'};
 
 const kAttackerPhysicalDoubleAbilities = {'huge-power', 'pure-power'};
 
+const kDefenderPhysicalHalvingAbilities = {'fur-coat'};
+
+const kDefenderSpecialHalvingAbilities = {'ice-scales'};
+
+enum BattleHeldItem {
+  none,
+  lifeOrb,
+  choiceBand,
+  choiceSpecs,
+  expertBelt,
+  typeBoost,
+}
+
+extension BattleHeldItemLabel on BattleHeldItem {
+  String get slug => name;
+
+  String get labelZh => switch (this) {
+        BattleHeldItem.none => '无',
+        BattleHeldItem.lifeOrb => '生命宝珠',
+        BattleHeldItem.choiceBand => '讲究头带',
+        BattleHeldItem.choiceSpecs => '讲究眼镜',
+        BattleHeldItem.expertBelt => '达人带',
+        BattleHeldItem.typeBoost => '属性强化道具',
+      };
+}
+
+enum BattleStatusCondition {
+  none,
+  burn,
+  paralysis,
+}
+
+extension BattleStatusConditionLabel on BattleStatusCondition {
+  String get labelZh => switch (this) {
+        BattleStatusCondition.none => '无',
+        BattleStatusCondition.burn => '灼伤',
+        BattleStatusCondition.paralysis => '麻痹',
+      };
+}
+
+enum FieldCondition { none, sun, rain, sandstorm, snow }
+
+extension FieldConditionLabel on FieldCondition {
+  String get slug => switch (this) {
+        FieldCondition.none => '',
+        FieldCondition.sun => 'sun',
+        FieldCondition.rain => 'rain',
+        FieldCondition.sandstorm => 'sandstorm',
+        FieldCondition.snow => 'snow',
+      };
+
+  String get labelZh => switch (this) {
+        FieldCondition.none => '无',
+        FieldCondition.sun => '大晴天',
+        FieldCondition.rain => '下雨',
+        FieldCondition.sandstorm => '沙暴',
+        FieldCondition.snow => '下雪',
+      };
+}
+
+enum TerrainCondition { none, electric, grassy, psychic, misty }
+
+extension TerrainConditionLabel on TerrainCondition {
+  String get slug => switch (this) {
+        TerrainCondition.none => '',
+        TerrainCondition.electric => 'electric',
+        TerrainCondition.grassy => 'grassy',
+        TerrainCondition.psychic => 'psychic',
+        TerrainCondition.misty => 'misty',
+      };
+
+  String get labelZh => switch (this) {
+        TerrainCondition.none => '无',
+        TerrainCondition.electric => '电气场地',
+        TerrainCondition.grassy => '青草场地',
+        TerrainCondition.psychic => '精神场地',
+        TerrainCondition.misty => '薄雾场地',
+      };
+}
+
 class BattleEffectivenessInput {
   const BattleEffectivenessInput({
     required this.defenderTypes,
@@ -55,6 +132,10 @@ class BattleEffectivenessInput {
     this.generation = 9,
     this.weatherSlug,
     this.terrainSlug,
+    this.defenderTerastallized = false,
+    this.defenderTeraType,
+    this.attackerTerastallized = false,
+    this.attackerTeraType,
   });
 
   final List<String> defenderTypes;
@@ -64,12 +145,28 @@ class BattleEffectivenessInput {
   final int generation;
   final String? weatherSlug;
   final String? terrainSlug;
+  final bool defenderTerastallized;
+  final String? defenderTeraType;
+  final bool attackerTerastallized;
+  final String? attackerTeraType;
 
   List<String> get normalizedDefenderTypes =>
       normalizeTypesForGeneration(defenderTypes, generation);
 
+  List<String> get effectiveDefenderTypes {
+    if (defenderTerastallized &&
+        defenderTeraType != null &&
+        defenderTeraType!.isNotEmpty &&
+        generation >= 9) {
+      return [defenderTeraType!];
+    }
+    return normalizedDefenderTypes;
+  }
+
   Map<String, TypeDamageRelations> get generationRelations =>
       typeRelationsForGeneration(relationsByType, generation);
+
+  bool get supportsTerastal => generation >= 9;
 }
 
 String effectiveMoveType(String moveType, String? attackerAbilitySlug) {
@@ -83,6 +180,9 @@ String effectiveMoveType(String moveType, String? attackerAbilitySlug) {
   return moveType;
 }
 
+bool hasStab(String moveType, List<String> attackerTypes) =>
+    attackerTypes.contains(moveType);
+
 void _applyAttackerImmunityBypass(
   Map<String, double> multipliers,
   BattleEffectivenessInput input,
@@ -91,7 +191,7 @@ void _applyAttackerImmunityBypass(
   if (slug == null) {
     return;
   }
-  final defenderTypes = input.normalizedDefenderTypes;
+  final defenderTypes = input.effectiveDefenderTypes;
 
   if (defenderTypes.contains('ghost') &&
       kAttackerGhostBypassAbilities.contains(slug)) {
@@ -119,7 +219,7 @@ void _applyWonderGuard(Map<String, double> multipliers) {
 
 Map<String, double> computeBattleTypeMultipliers(BattleEffectivenessInput input) {
   final multipliers = computeDefensiveMultipliers(
-    input.normalizedDefenderTypes,
+    input.effectiveDefenderTypes,
     input.generationRelations,
   );
 
@@ -188,7 +288,6 @@ double fieldMoveTypeModifier(String moveType, BattleEffectivenessInput input) {
   return modifier;
 }
 
-/// Extra damage multiplier from abilities (Filter, Tinted Lens, …).
 double abilityDamageMultiplier({
   required double typeMultiplier,
   required String? defenderAbilitySlug,
@@ -212,6 +311,31 @@ double abilityDamageMultiplier({
   return modifier;
 }
 
+double defenderAbilityDamageMultiplier({
+  required bool isPhysical,
+  required String? defenderAbilitySlug,
+  bool isContactMove = false,
+}) {
+  var modifier = 1.0;
+  if (defenderAbilitySlug == null) {
+    return modifier;
+  }
+  if (isPhysical &&
+      kDefenderPhysicalHalvingAbilities.contains(defenderAbilitySlug)) {
+    modifier *= 0.5;
+  }
+  if (!isPhysical &&
+      kDefenderSpecialHalvingAbilities.contains(defenderAbilitySlug)) {
+    modifier *= 0.5;
+  }
+  if (isPhysical &&
+      isContactMove &&
+      defenderAbilitySlug == 'fluffy') {
+    modifier *= 0.5;
+  }
+  return modifier;
+}
+
 int applyAttackerAbilityToAttackStat(
   int attack,
   bool isPhysical,
@@ -225,16 +349,135 @@ int applyAttackerAbilityToAttackStat(
   return attack;
 }
 
-/// Types that resist all of [attackerTypes] STAB (max multiplier < 2 vs single-type).
+int applyHeldItemToAttackStat(
+  int attack,
+  bool isPhysical,
+  BattleHeldItem heldItem,
+) {
+  return switch (heldItem) {
+    BattleHeldItem.choiceBand when isPhysical => (attack * 1.5).floor(),
+    BattleHeldItem.choiceSpecs when !isPhysical => (attack * 1.5).floor(),
+    _ => attack,
+  };
+}
+
+int applyStatusToAttackStat(
+  int attack,
+  bool isPhysical,
+  BattleStatusCondition status,
+) {
+  if (isPhysical && status == BattleStatusCondition.burn) {
+    return attack ~/ 2;
+  }
+  return attack;
+}
+
+int applyStatusToSpeedStat(int speed, BattleStatusCondition status) {
+  if (status == BattleStatusCondition.paralysis) {
+    return speed ~/ 2;
+  }
+  return speed;
+}
+
+double heldItemDamageMultiplier({
+  required BattleHeldItem heldItem,
+  required double typeMultiplier,
+  required String moveType,
+  String? typeBoostItemType,
+}) {
+  return switch (heldItem) {
+    BattleHeldItem.lifeOrb => 1.3,
+    BattleHeldItem.expertBelt when typeMultiplier >= 2 => 1.2,
+    BattleHeldItem.typeBoost
+        when typeBoostItemType != null && typeBoostItemType == moveType =>
+      1.2,
+    _ => 1.0,
+  };
+}
+
+/// Gen IX Terastallization STAB: Tera-type moves ×2, original-type moves ×1.5.
+double terastalStabMultiplier({
+  required String moveType,
+  required List<String> attackerTypes,
+  required int generation,
+  String? attackerAbilitySlug,
+  bool attackerTerastallized = false,
+  String? attackerTeraType,
+}) {
+  final effective = effectiveMoveType(moveType, attackerAbilitySlug);
+  final normalized = normalizeTypesForGeneration(attackerTypes, generation);
+  final hasConvertedStab = moveType == 'normal' &&
+      attackerAbilitySlug != null &&
+      kAbilityMoveTypeConversion.containsKey(attackerAbilitySlug);
+
+  if (!attackerTerastallized ||
+      attackerTeraType == null ||
+      attackerTeraType.isEmpty ||
+      generation < 9) {
+    return hasStab(effective, normalized) || hasConvertedStab ? 1.5 : 1.0;
+  }
+
+  if (effective == attackerTeraType) {
+    return 2.0;
+  }
+  if (normalized.contains(effective)) {
+    return 1.5;
+  }
+  return 1.0;
+}
+
+/// Best STAB multiplier an attacker can reach against a single-type defender.
+double bestStabMultiplierAgainstDefender({
+  required List<String> attackerTypes,
+  required String defenderSingleType,
+  required Map<String, TypeDamageRelations> relationsByType,
+  required int generation,
+  String? attackerAbilitySlug,
+  bool attackerTerastallized = false,
+  String? attackerTeraType,
+}) {
+  final candidates = <String>{
+    ...normalizeTypesForGeneration(attackerTypes, generation),
+    if (attackerTerastallized && attackerTeraType != null) attackerTeraType!,
+  };
+
+  var best = 0.0;
+  for (final moveType in candidates) {
+    final input = BattleEffectivenessInput(
+      defenderTypes: [defenderSingleType],
+      relationsByType: relationsByType,
+      attackerAbilitySlug: attackerAbilitySlug,
+      generation: generation,
+    );
+    final typeMult = typeMultiplierForBattleMove(moveType, input);
+    final stab = terastalStabMultiplier(
+      moveType: moveType,
+      attackerTypes: attackerTypes,
+      generation: generation,
+      attackerAbilitySlug: attackerAbilitySlug,
+      attackerTerastallized: attackerTerastallized,
+      attackerTeraType: attackerTeraType,
+    );
+    final combined = typeMult * stab;
+    if (combined > best) {
+      best = combined;
+    }
+  }
+  return best;
+}
+
 List<String> computeOffensiveBlindSpots(
   List<String> attackerTypes,
   Map<String, TypeDamageRelations> relationsByType, {
   int generation = 9,
   String? attackerAbilitySlug,
+  bool attackerTerastallized = false,
+  String? attackerTeraType,
 }) {
   final normalizedAttacker =
       normalizeTypesForGeneration(attackerTypes, generation);
-  if (normalizedAttacker.isEmpty) {
+  if (normalizedAttacker.isEmpty &&
+      !(attackerTerastallized && attackerTeraType != null)) {
     return const [];
   }
 
@@ -242,20 +485,16 @@ List<String> computeOffensiveBlindSpots(
   final blindSpots = <String>[];
 
   for (final targetType in attackTypes) {
-    var bestStab = 0.0;
-    for (final stabType in normalizedAttacker) {
-      final input = BattleEffectivenessInput(
-        defenderTypes: [targetType],
-        relationsByType: relationsByType,
-        attackerAbilitySlug: attackerAbilitySlug,
-        generation: generation,
-      );
-      final mult = typeMultiplierForBattleMove(stabType, input);
-      if (mult > bestStab) {
-        bestStab = mult;
-      }
-    }
-    if (bestStab < 2) {
+    final best = bestStabMultiplierAgainstDefender(
+      attackerTypes: attackerTypes,
+      defenderSingleType: targetType,
+      relationsByType: relationsByType,
+      generation: generation,
+      attackerAbilitySlug: attackerAbilitySlug,
+      attackerTerastallized: attackerTerastallized,
+      attackerTeraType: attackerTeraType,
+    );
+    if (best < 2) {
       blindSpots.add(typeNameZh(targetType));
     }
   }
@@ -264,12 +503,36 @@ List<String> computeOffensiveBlindSpots(
   return blindSpots;
 }
 
-/// Types that hit [defenderTypes] for ≥2× (weaknesses under current modifiers).
 List<String> computeDefensiveBlindSpots(BattleEffectivenessInput input) {
   return computeBattleDefensiveProfile(input).weaknesses;
 }
 
-/// Common type-affecting abilities for manual pick (slug → zh label).
+/// Shared weaknesses appearing on at least [minMembers] party Pokémon.
+List<String> computeTeamSharedWeaknesses(
+  Iterable<List<String>> memberTypesList,
+  Map<String, TypeDamageRelations> relationsByType, {
+  int generation = 9,
+  int minMembers = 2,
+}) {
+  final counts = <String, int>{};
+  for (final types in memberTypesList) {
+    final input = BattleEffectivenessInput(
+      defenderTypes: types,
+      relationsByType: relationsByType,
+      generation: generation,
+    );
+    for (final weakness in computeBattleDefensiveProfile(input).weaknesses) {
+      counts[weakness] = (counts[weakness] ?? 0) + 1;
+    }
+  }
+  final shared = counts.entries
+      .where((entry) => entry.value >= minMembers)
+      .map((entry) => entry.key)
+      .toList()
+    ..sort();
+  return shared;
+}
+
 const kManualDefensiveAbilityOptions = <String, String>{
   'sap-sipper': '食草',
   'thick-fat': '厚脂肪',
@@ -291,6 +554,8 @@ const kManualDefensiveAbilityOptions = <String, String>{
   'filter': '过滤',
   'solid-rock': '坚硬岩石',
   'prism-armor': '棱镜装甲',
+  'fur-coat': '毛皮大衣',
+  'ice-scales': '冰鳞粉',
 };
 
 const kManualAttackerAbilityOptions = <String, String>{
@@ -306,42 +571,7 @@ const kManualAttackerAbilityOptions = <String, String>{
   'pure-power': '瑜伽之力',
 };
 
-enum FieldCondition { none, sun, rain, sandstorm, snow }
-
-extension FieldConditionLabel on FieldCondition {
-  String get slug => switch (this) {
-        FieldCondition.none => '',
-        FieldCondition.sun => 'sun',
-        FieldCondition.rain => 'rain',
-        FieldCondition.sandstorm => 'sandstorm',
-        FieldCondition.snow => 'snow',
-      };
-
-  String get labelZh => switch (this) {
-        FieldCondition.none => '无',
-        FieldCondition.sun => '大晴天',
-        FieldCondition.rain => '下雨',
-        FieldCondition.sandstorm => '沙暴',
-        FieldCondition.snow => '下雪',
-      };
-}
-
-enum TerrainCondition { none, electric, grassy, psychic, misty }
-
-extension TerrainConditionLabel on TerrainCondition {
-  String get slug => switch (this) {
-        TerrainCondition.none => '',
-        TerrainCondition.electric => 'electric',
-        TerrainCondition.grassy => 'grassy',
-        TerrainCondition.psychic => 'psychic',
-        TerrainCondition.misty => 'misty',
-      };
-
-  String get labelZh => switch (this) {
-        TerrainCondition.none => '无',
-        TerrainCondition.electric => '电气场地',
-        TerrainCondition.grassy => '青草场地',
-        TerrainCondition.psychic => '精神场地',
-        TerrainCondition.misty => '薄雾场地',
-      };
+String defaultTeraTypeFor(List<String> types, int generation) {
+  final normalized = normalizeTypesForGeneration(types, generation);
+  return normalized.isNotEmpty ? normalized.first : 'normal';
 }

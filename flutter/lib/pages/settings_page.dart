@@ -21,7 +21,6 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_bar.dart';
 
@@ -551,128 +550,137 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ],
               const SizedBox(height: 12),
-              Text(
-                AppZh.settingsDexCacheContentsTitle,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  initiallyExpanded: false,
+                  title: Text(
+                    AppZh.settingsDexCacheContentsTitle,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  subtitle: Text(
+                    AppZh.settingsDexCacheEstimate(
+                      _cachePreferences.estimateLabelZh(),
+                    ),
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
+                  children: [
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionJson,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheJsonData,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheJsonData: value ?? true),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionSprites,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheSprites,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheSprites: value ?? true),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionSpritesAllVersions,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheSpritesAllVersions,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(
+                                  cacheSpritesAllVersions: value ?? false,
+                                ),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionArtwork,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheArtwork,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheArtwork: value ?? true),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionAnimated,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheAnimatedSprites,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(
+                                  cacheAnimatedSprites: value ?? false,
+                                ),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionL10n,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheL10n,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheL10n: value ?? true),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionTypeIcons,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheTypeIcons,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheTypeIcons: value ?? true),
+                              ),
+                    ),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppZh.settingsDexCacheOptionConfig,
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      value: _cachePreferences.cacheConfig,
+                      onChanged: _dexDownloading
+                          ? null
+                          : (value) => _updateCachePreference(
+                                (p) => p.copyWith(cacheConfig: value ?? true),
+                              ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                AppZh.settingsDexCacheEstimate(
-                  _cachePreferences.estimateLabelZh(),
-                ),
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionJson,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheJsonData,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheJsonData: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionSprites,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheSprites,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheSprites: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionSpritesAllVersions,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheSpritesAllVersions,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(
-                            cacheSpritesAllVersions: value ?? false,
-                          ),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionArtwork,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheArtwork,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheArtwork: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionAnimated,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheAnimatedSprites,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(
-                            cacheAnimatedSprites: value ?? false,
-                          ),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionL10n,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheL10n,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheL10n: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionTypeIcons,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheTypeIcons,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheTypeIcons: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionConfig,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheConfig,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheConfig: value ?? true),
-                        ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -796,8 +804,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        const SleepToolsSection(),
         const SizedBox(height: 16),
         StickerCard(
           child: Column(

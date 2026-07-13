@@ -35,6 +35,8 @@ class _StatCalcPageState extends State<StatCalcPage> {
   BattleStat _stat = BattleStat.attack;
   NatureModifier _nature = battleNatures.firstWhere((n) => n.key == 'serious');
   String? _attackerAbilitySlug;
+  BattleHeldItem _heldItem = BattleHeldItem.none;
+  BattleStatusCondition _status = BattleStatusCondition.none;
   List<PokemonSummary> _suggestions = const [];
 
   @override
@@ -118,6 +120,8 @@ class _StatCalcPageState extends State<StatCalcPage> {
           nature: _nature,
           attackerAbilitySlug: _attackerAbilitySlug,
           isPhysicalStat: _stat == BattleStat.attack,
+          heldItem: _heldItem,
+          status: _status,
         );
 
         return TitoFontScale(
@@ -214,6 +218,16 @@ class _StatCalcPageState extends State<StatCalcPage> {
                 selectedSlug: _attackerAbilitySlug,
                 onChanged: (slug) =>
                     setState(() => _attackerAbilitySlug = slug),
+              ),
+              const SizedBox(height: 12),
+              HeldItemPicker(
+                selected: _heldItem,
+                onChanged: (value) => setState(() => _heldItem = value),
+              ),
+              const SizedBox(height: 12),
+              StatusConditionPicker(
+                selected: _status,
+                onChanged: (value) => setState(() => _status = value),
               ),
             ],
           ),

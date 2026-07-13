@@ -1362,6 +1362,8 @@ class _InteractiveTypeEffectivenessCardState
     extends State<InteractiveTypeEffectivenessCard> {
   Map<String, TypeDamageRelations>? _relations;
   String? _abilitySlug;
+  bool _defenderTerastallized = false;
+  String? _defenderTeraType;
   bool _loading = true;
 
   @override
@@ -1375,7 +1377,10 @@ class _InteractiveTypeEffectivenessCardState
     super.didUpdateWidget(oldWidget);
     if (oldWidget.generation != widget.generation ||
         oldWidget.types != widget.types) {
-      setState(() {});
+      setState(() {
+        _defenderTeraType =
+            defaultTeraTypeFor(widget.types, widget.generation);
+      });
     }
   }
 
@@ -1424,6 +1429,9 @@ class _InteractiveTypeEffectivenessCardState
       relationsByType: relations,
       defenderAbilitySlug: _abilitySlug,
       generation: widget.generation,
+      defenderTerastallized: _defenderTerastallized,
+      defenderTeraType: _defenderTeraType ??
+          defaultTeraTypeFor(widget.types, widget.generation),
     );
     final profile = computeBattleDefensiveProfile(input);
     final multipliers = computeBattleTypeMultipliers(input);
@@ -1438,6 +1446,23 @@ class _InteractiveTypeEffectivenessCardState
               selectedSlug: _abilitySlug,
               options: options,
               onChanged: (slug) => setState(() => _abilitySlug = slug),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (widget.generation >= 9) ...[
+          StickerCard(
+            child: TerastalPicker(
+              label: AppZh.companionDefenderTerastal,
+              enabled: true,
+              terastallized: _defenderTerastallized,
+              teraType: _defenderTeraType,
+              fallbackTypes: widget.types,
+              generation: widget.generation,
+              onTerastallizedChanged: (value) =>
+                  setState(() => _defenderTerastallized = value),
+              onTeraTypeChanged: (type) =>
+                  setState(() => _defenderTeraType = type),
             ),
           ),
           const SizedBox(height: 12),

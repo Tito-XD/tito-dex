@@ -86,6 +86,8 @@ int computeBattleStat({
   required NatureModifier nature,
   String? attackerAbilitySlug,
   bool isPhysicalStat = false,
+  BattleHeldItem heldItem = BattleHeldItem.none,
+  BattleStatusCondition status = BattleStatusCondition.none,
 }) {
   final safeIv = clampIvEv(iv, 31);
   final safeEv = clampIvEv(ev, 252);
@@ -103,11 +105,13 @@ int computeBattleStat({
   }
 
   if (stat == BattleStat.attack && isPhysicalStat) {
-    value = applyAttackerAbilityToAttackStat(
-      value,
-      true,
-      attackerAbilitySlug,
-    );
+    value = applyAttackerAbilityToAttackStat(value, true, attackerAbilitySlug);
+    value = applyHeldItemToAttackStat(value, true, heldItem);
+    value = applyStatusToAttackStat(value, true, status);
+  } else if (stat == BattleStat.specialAttack && !isPhysicalStat) {
+    value = applyHeldItemToAttackStat(value, false, heldItem);
+  } else if (stat == BattleStat.speed) {
+    value = applyStatusToSpeedStat(value, status);
   }
 
   return value;
@@ -120,6 +124,8 @@ double typeMultiplierForMove(
   String? defenderAbilitySlug,
   String? attackerAbilitySlug,
   int generation = 9,
+  bool defenderTerastallized = false,
+  String? defenderTeraType,
 }) {
   final input = BattleEffectivenessInput(
     defenderTypes: defenderTypes,
@@ -127,12 +133,11 @@ double typeMultiplierForMove(
     defenderAbilitySlug: defenderAbilitySlug,
     attackerAbilitySlug: attackerAbilitySlug,
     generation: generation,
+    defenderTerastallized: defenderTerastallized,
+    defenderTeraType: defenderTeraType,
   );
   return typeMultiplierForBattleMove(moveType, input);
 }
-
-bool hasStab(String moveType, List<String> attackerTypes) =>
-    attackerTypes.contains(moveType);
 
 int computeBaseDamage({
   required int level,
@@ -187,12 +192,32 @@ DamageEstimate estimateDamage({
   String? weatherSlug,
   String? terrainSlug,
   MoveCategory category = MoveCategory.physical,
+  bool defenderTerastallized = false,
+  String? defenderTeraType,
+  bool attackerTerastallized = false,
+  String? attackerTeraType,
+  BattleHeldItem attackerHeldItem = BattleHeldItem.none,
+  String? typeBoostItemType,
+  BattleStatusCondition attackerStatus = BattleStatusCondition.none,
+  bool isContactMove = false,
   double otherMultiplier = 1,
 }) {
-  final effectiveAttack = applyAttackerAbilityToAttackStat(
+  final isPhysical = category == MoveCategory.physical;
+
+  var effectiveAttack = applyAttackerAbilityToAttackStat(
     attack,
-    category == MoveCategory.physical,
+    isPhysical,
     attackerAbilitySlug,
+  );
+  effectiveAttack = applyHeldItemToAttackStat(
+    effectiveAttack,
+    isPhysical,
+    attackerHeldItem,
+  );
+  effectiveAttack = applyStatusToAttackStat(
+    effectiveAttack,
+    isPhysical,
+    attackerStatus,
   );
 
   final base = computeBaseDamage(
@@ -202,16 +227,14 @@ DamageEstimate estimateDamage({
     defense: defense,
   );
 
-  final normalizedAttacker =
-      normalizeTypesForGeneration(attackerTypes, generation);
-  final effectiveMove = effectiveMoveType(moveType, attackerAbilitySlug);
-  final stabTypes = normalizedAttacker;
-  final stab = hasStab(effectiveMove, stabTypes) ||
-          (moveType == 'normal' &&
-              attackerAbilitySlug != null &&
-              kAbilityMoveTypeConversion.containsKey(attackerAbilitySlug))
-      ? 1.5
-      : 1.0;
+  final stab = terastalStabMultiplier(
+    moveType: moveType,
+    attackerTypes: attackerTypes,
+    generation: generation,
+    attackerAbilitySlug: attackerAbilitySlug,
+    attackerTerastallized: attackerTerastallized,
+    attackerTeraType: attackerTeraType,
+  );
 
   final input = BattleEffectivenessInput(
     defenderTypes: defenderTypes,
@@ -221,7 +244,12 @@ DamageEstimate estimateDamage({
     generation: generation,
     weatherSlug: weatherSlug,
     terrainSlug: terrainSlug,
+    defenderTerastallized: defenderTerastallized,
+    defenderTeraType: defenderTeraType,
+    attackerTerastallized: attackerTerastallized,
+    attackerTeraType: attackerTeraType,
   );
+  final effectiveMove = effectiveMoveType(moveType, attackerAbilitySlug);
   final type = typeMultiplierForBattleMove(moveType, input);
   final fieldMod = fieldMoveTypeModifier(effectiveMove, input);
   final abilityMod = abilityDamageMultiplier(
@@ -229,7 +257,18 @@ DamageEstimate estimateDamage({
     defenderAbilitySlug: defenderAbilitySlug,
     attackerAbilitySlug: attackerAbilitySlug,
   );
-  final extra = fieldMod * abilityMod * otherMultiplier;
+  final defenderMod = defenderAbilityDamageMultiplier(
+    isPhysical: isPhysical,
+    defenderAbilitySlug: defenderAbilitySlug,
+    isContactMove: isContactMove,
+  );
+  final itemMod = heldItemDamageMultiplier(
+    heldItem: attackerHeldItem,
+    typeMultiplier: type,
+    moveType: moveType,
+    typeBoostItemType: typeBoostItemType,
+  );
+  final extra = fieldMod * abilityMod * defenderMod * itemMod * otherMultiplier;
   final modifier = stab * type * extra;
   final minDamage = (base * modifier * 0.85).floor();
   final maxDamage = (base * modifier).floor();

@@ -352,6 +352,14 @@ abstract final class AppZh {
   static const companionManualAbilityPick = '手动选特性（未搜宝可梦时）';
   static const companionWeatherPick = '天气';
   static const companionTerrainPick = '场地';
+  static const companionTerastalToggle = '太晶化';
+  static const companionTerastalType = '太晶属性';
+  static const companionDefenderTerastal = '防守方太晶化';
+  static const companionAttackerTerastal = '进攻方太晶化';
+  static const companionHeldItemPick = '携带道具';
+  static const companionTypeBoostItemType = '属性强化道具类型';
+  static const companionStatusPick = '异常状态（攻击方）';
+  static const companionContactMove = '接触类招式（毛茸茸等）';
   static const companionToolBlindSpot = '打击 / 联防盲点';
   static const companionToolBlindSpotHint = '本系打不动谁、谁克你';
   static const companionOffensiveBlindSpots = '打击盲点';
@@ -400,6 +408,7 @@ abstract final class AppZh {
   static String teamSummaryBstSum(int sum) => '种族值合计 $sum';
   static String teamSummaryTypeCoverage(int count) => '属性覆盖 $count/18';
   static String teamSummaryWeaknesses(String types) => '常见弱点：$types';
+  static String teamSummarySharedWeaknesses(String types) => '共同弱点（≥2 只）：$types';
   static const teamEditTitle = '编辑同行';
   static const teamEditLevel = '等级';
   static const teamEditNickname = '昵称';
