@@ -12,7 +12,9 @@ Resume behaviour (CI-friendly):
 Usage:
   python3 tools/build_pokeapi_assets.py --output dist/pokeapi-assets --max-id 50
   python3 tools/build_pokeapi_assets.py --upload  # requires CLOUDFLARE_* env
-  python3 tools/build_pokeapi_assets.py --upload --min-id 678  # continue a range
+  python3 tools/build_pokeapi_assets.py --upload --version-groups scarlet-violet \\
+      --no-default-sprites --no-artwork --no-animated --no-index
+  python3 tools/build_pokeapi_assets.py --upload --no-by-version  # shared sprites only
 """
 
 from __future__ import annotations
@@ -157,8 +159,11 @@ def build_assets(
     max_id: int,
     version_groups: tuple[str, ...],
     delay_s: float,
+    include_default_sprites: bool,
+    include_by_version: bool,
     include_artwork: bool,
     include_animated: bool,
+    include_index: bool,
     skip_existing_cdn: bool,
     upload: bool,
 ) -> dict[str, int]:
@@ -193,7 +198,7 @@ def build_assets(
         stats["pokemon"] += 1
 
         default_url = sprite_url_for_version_group(sprites, "heartgold-soulsilver")
-        if default_url:
+        if include_default_sprites and default_url:
             default_dir.mkdir(parents=True, exist_ok=True)
             dest = default_dir / f"{pokemon_id}.png"
             rel = f"sprites/{pokemon_id}.png"
@@ -223,38 +228,39 @@ def build_assets(
                     )
 
         vg_urls: dict[str, str] = {}
-        for vg in version_groups:
-            url = sprite_url_for_version_group(sprites, vg)
-            if not url:
-                continue
-            dest_dir = vg_root / vg
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            dest = dest_dir / f"{pokemon_id}.png"
-            rel = f"sprites/by-version/{vg}/{pokemon_id}.png"
-            if asset_ready(
-                session=session,
-                local_path=dest,
-                rel_path=rel,
-                skip_existing_cdn=skip_existing_cdn,
-                stats=stats,
-            ):
-                vg_urls[vg] = rel
-                continue
-            try:
-                png = download_bytes(session, url)
-                dest.write_bytes(optimize_png(png, max_width=220))
-                vg_urls[vg] = rel
-                stats["sprites_by_version"] += 1
-                maybe_publish(
+        if include_by_version:
+            for vg in version_groups:
+                url = sprite_url_for_version_group(sprites, vg)
+                if not url:
+                    continue
+                dest_dir = vg_root / vg
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                dest = dest_dir / f"{pokemon_id}.png"
+                rel = f"sprites/by-version/{vg}/{pokemon_id}.png"
+                if asset_ready(
+                    session=session,
                     local_path=dest,
                     rel_path=rel,
-                    upload=upload,
-                    wr_env=wr_env,
+                    skip_existing_cdn=skip_existing_cdn,
                     stats=stats,
-                )
-            except (requests.RequestException, UnidentifiedImageError, OSError) as exc:
-                stats["sprites_skipped"] += 1
-                print(f"  warn sprite {vg} #{pokemon_id}: {exc}", file=sys.stderr)
+                ):
+                    vg_urls[vg] = rel
+                    continue
+                try:
+                    png = download_bytes(session, url)
+                    dest.write_bytes(optimize_png(png, max_width=220))
+                    vg_urls[vg] = rel
+                    stats["sprites_by_version"] += 1
+                    maybe_publish(
+                        local_path=dest,
+                        rel_path=rel,
+                        upload=upload,
+                        wr_env=wr_env,
+                        stats=stats,
+                    )
+                except (requests.RequestException, UnidentifiedImageError, OSError) as exc:
+                    stats["sprites_skipped"] += 1
+                    print(f"  warn sprite {vg} #{pokemon_id}: {exc}", file=sys.stderr)
 
         if include_artwork:
             art_url = official_artwork_url(sprites)
@@ -310,16 +316,21 @@ def build_assets(
                     except requests.RequestException as exc:
                         print(f"  warn animated #{pokemon_id}: {exc}", file=sys.stderr)
 
-        sprite_index[str(pokemon_id)] = {
-            "spriteUrlsByVersion": build_sprite_url_map(sprites, version_groups),
-            "cdnPathsByVersion": vg_urls,
-            "artworkUrl": official_artwork_url(sprites),
-            "animatedUrl": animated_sprite_url(sprites),
-        }
-        save_sprite_index(output_dir, sprite_index)
+        if include_index:
+            existing = sprite_index.get(str(pokemon_id), {})
+            merged_paths = dict(existing.get("cdnPathsByVersion") or {})
+            merged_paths.update(vg_urls)
+            sprite_index[str(pokemon_id)] = {
+                **existing,
+                "spriteUrlsByVersion": build_sprite_url_map(sprites, version_groups),
+                "cdnPathsByVersion": merged_paths,
+                "artworkUrl": official_artwork_url(sprites),
+                "animatedUrl": animated_sprite_url(sprites),
+            }
+            save_sprite_index(output_dir, sprite_index)
         time.sleep(delay_s)
 
-    if upload and wr_env is not None:
+    if include_index and upload and wr_env is not None:
         index_path = output_dir / BUNDLE_CDN_PREFIX / "sprite_index.json"
         if index_path.is_file():
             upload_one_to_r2(index_path, "sprite_index.json", wr_env)
@@ -334,12 +345,16 @@ def main() -> int:
     parser.add_argument("--min-id", type=int, default=1)
     parser.add_argument("--max-id", type=int, default=1025)
     parser.add_argument("--delay", type=float, default=DEFAULT_DELAY)
+    parser.add_argument("--no-default-sprites", action="store_true")
+    parser.add_argument("--no-by-version", action="store_true")
     parser.add_argument("--no-artwork", action="store_true")
     parser.add_argument("--no-animated", action="store_true")
+    parser.add_argument("--no-index", action="store_true")
     parser.add_argument(
         "--version-groups",
         nargs="*",
         default=list(ALL_SPRITE_VERSION_GROUPS),
+        help="One or more PokeAPI version-group slugs (e.g. scarlet-violet heartgold-soulsilver)",
     )
     parser.add_argument(
         "--skip-existing-cdn",
@@ -350,14 +365,21 @@ def main() -> int:
     parser.add_argument("--upload", action="store_true")
     args = parser.parse_args()
 
+    unknown = set(args.version_groups) - set(ALL_SPRITE_VERSION_GROUPS)
+    if unknown:
+        raise SystemExit(f"Unknown version group(s): {', '.join(sorted(unknown))}")
+
     stats = build_assets(
         args.output,
         min_id=args.min_id,
         max_id=args.max_id,
         version_groups=tuple(args.version_groups),
         delay_s=args.delay,
+        include_default_sprites=not args.no_default_sprites,
+        include_by_version=not args.no_by_version,
         include_artwork=not args.no_artwork,
         include_animated=not args.no_animated,
+        include_index=not args.no_index,
         skip_existing_cdn=args.skip_existing_cdn,
         upload=args.upload,
     )
