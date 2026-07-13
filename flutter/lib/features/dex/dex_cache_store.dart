@@ -21,6 +21,13 @@ class DexCachePaths {
   Directory get spritesDir => Directory('${root.path}/sprites');
   Directory get artworkDir => Directory('${root.path}/artwork');
   Directory get typeIconsDir => Directory('${root.path}/type_icons');
+  Directory get l10nDir => Directory('${root.path}/l10n/zh');
+  Directory get mapsDir => Directory('${root.path}/maps');
+  Directory get configDir => Directory('${root.path}/config');
+
+  File get appConfigFile => File('${configDir.path}/app_config.json');
+  File l10nFile(String filename) => File('${l10nDir.path}/$filename');
+  File mapFile(String filename) => File('${mapsDir.path}/$filename');
 
   File detailFile(int id) => File('${detailsDir.path}/$id.json');
   File spriteFile(int id) => File('${spritesDir.path}/$id.png');

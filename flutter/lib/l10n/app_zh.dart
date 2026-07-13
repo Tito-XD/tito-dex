@@ -186,8 +186,8 @@ abstract final class AppZh {
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
-      '一次性下载全国图鉴 1–1025 及全部资料索引（性格/天气/道具等）：中文名、属性、进化链、招式与压缩立绘。';
-  static const settingsDexOfflineUnset = '尚未下载离线图鉴';
+      '下载后离线可用：全国图鉴 1–1025、招式/特性/性格/天气/道具索引、中文对照表、HGSS 地图名、游戏版本图标与应用配置（Sleep 工具链接等）。手绘导航图标仍随 APK 内置。';
+  static const settingsDexOfflineUnset = '尚未下载离线数据包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
   static String settingsDexOfflineReady(
@@ -195,7 +195,7 @@ abstract final class AppZh {
     int moveCount,
     String size,
     String downloadedAt,
-  ) => '已缓存 $pokemonCount 只 · $moveCount 个招式 · $size · $downloadedAt';
+  ) => '已安装 $pokemonCount 只 · $moveCount 招式 · 含中文对照与配置 · $size · $downloadedAt';
   static const settingsDexOfflineDownload = '下载离线图鉴';
   static const settingsDexOfflineResume = '继续下载离线图鉴';
   static const settingsDexOfflineClear = '清除离线缓存';
@@ -220,15 +220,15 @@ abstract final class AppZh {
     return '正在缓存$phaseLabel $current / $total';
   }
 
-  static const settingsDexCdnDownload = '下载预打包图鉴包';
+  static const settingsDexCdnDownload = '下载预打包数据包';
   static const settingsDexCdnDownloadHint =
-      '一次性下载预打包图鉴（含 1025 只宝可梦、招式/特性/性格/天气/道具等全部资料，安装后可离线使用）';
+      '推荐：一次性下载预打包数据包（图鉴 + 中文对照 + HGSS 地图 + 游戏图标 + 应用配置），安装后完全离线可用；无需逐条请求 PokeAPI。';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
       '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组';
-  static const snackDexCdnDone = '预打包图鉴已安装完成';
-  static const snackDexCdnFailed = '预打包图鉴下载失败';
+  static const snackDexCdnDone = '预打包数据包已安装完成';
+  static const snackDexCdnFailed = '预打包数据包下载失败';
 
   static const snackDexOfflineDone = '离线图鉴已下载完成';
   static String snackDexOfflinePartial(int count) =>

@@ -10,6 +10,8 @@ import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
 import 'dex_models.dart';
 import 'dex_sprite_codec.dart';
+import '../../config/app_config.dart';
+import '../../l10n/zh_catalog.dart';
 import 'poke_api_throttle.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
@@ -381,6 +383,8 @@ class DexOfflineService {
 
   Future<void> clearAll() async {
     await _store.clearAll();
+    await ZhCatalog.instance.reload();
+    await AppConfig.instance.reload();
   }
 
   DexCacheProgress _setProgress({

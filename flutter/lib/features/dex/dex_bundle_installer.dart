@@ -9,6 +9,8 @@ import 'package:zstandard/zstandard.dart';
 import 'dex_cache_store.dart';
 import 'dex_cdn_config.dart';
 import 'dex_models.dart';
+import '../../config/app_config.dart';
+import '../../l10n/zh_catalog.dart';
 
 class DexBundleInstaller {
   DexBundleInstaller({
@@ -121,6 +123,9 @@ class DexBundleInstaller {
         sizeBytes: sizeBytes,
       ),
     );
+
+    await ZhCatalog.instance.reload();
+    await AppConfig.instance.reload();
 
     yield _progress(
       phase: 'done',
