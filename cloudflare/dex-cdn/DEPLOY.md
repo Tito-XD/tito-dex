@@ -102,11 +102,36 @@ Worker → **Settings** → **Variables** → **Secrets**：
 | --- | --- |
 | `GITHUB_DISPATCH_TOKEN` | GitHub PAT，`repo` 范围 + **Actions: Read and write**，用于 cron / admin 触发 workflow |
 | `ADMIN_SECRET` | `/admin/*` 路由的 Bearer token |
-| `ALERT_WEBHOOK_URL` | *(可选)* Discord / Slack incoming webhook，探活失败时通知 |
+| `TELEGRAM_BOT_TOKEN` | *(可选)* Telegram Bot token（@BotFather 创建） |
+| `TELEGRAM_CHAT_ID` | *(可选)* 接收告警的 chat id（私聊或群组） |
+| `ALERT_WEBHOOK_URL` | *(可选)* Discord / Slack webhook（不用 Telegram 时可配） |
 
 **GitHub PAT 创建：** Settings → Developer settings → Fine-grained token → Repository `Tito-XD/tito-dex` → Permissions: **Actions: Read and write**, **Contents: Read**.
 
 l10n 定时已从 GitHub `schedule:` 迁移到 Worker cron；手动触发仍可用 Actions **Run workflow** 或 Worker admin API。
+
+#### Telegram 告警配置（推荐）
+
+1. 在 Telegram 搜索 **@BotFather** → `/newbot` → 按提示取名 → 复制 **bot token**（形如 `123456789:ABCdef...`）
+2. 在 Telegram 搜索你刚创建的 bot → 点 **Start**，随便发一条消息（例如 `hi`）
+3. 浏览器打开（把 `<TOKEN>` 换成 bot token）：
+   `https://api.telegram.org/bot<TOKEN>/getUpdates`
+4. 在返回 JSON 里找 `"chat":{"id":123456789}` → 这个数字就是 **chat id**
+   - 私聊：id 通常是正数
+   - 群组：id 通常是负数（先把 bot 拉进群并 @ 它发一条消息，再查 getUpdates）
+5. Cloudflare Worker Secrets 填入：
+   - `TELEGRAM_BOT_TOKEN` = 步骤 1 的 token
+   - `TELEGRAM_CHAT_ID` = 步骤 4 的 id
+
+验证（本地或任意终端）：
+
+```bash
+curl -s -X POST "https://api.telegram.org/bot<TOKEN>/sendMessage" \
+  -H "Content-Type: application/json" \
+  -d '{"chat_id":"<CHAT_ID>","text":"TitoDex CDN alert test OK"}'
+```
+
+Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会自动发同类通知。
 
 ---
 

@@ -1,4 +1,5 @@
 import { DEPLOY_REV, PROBE_KEYS } from './constants.js';
+import { sendAlert } from './alerts.js';
 
 /**
  * HEAD-check a list of R2 keys.
@@ -85,32 +86,16 @@ export async function buildHealthReport(env, options = {}) {
  * @param {Record<string, unknown>} report
  */
 export async function sendHealthAlert(env, report) {
-  const webhook = env.ALERT_WEBHOOK_URL;
-  if (!webhook) {
-    return;
-  }
-
   const missing = report.probe?.missing ?? [];
   const text = missing.length
     ? `TitoDex CDN probe failed — missing: ${missing.join(', ')}`
     : 'TitoDex CDN probe reported not ok';
 
-  await fetch(webhook, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      content: text,
-      embeds: [
-        {
-          title: 'dex.tito.cafe health alert',
-          description: text,
-          color: 0xff4444,
-          fields: [
-            { name: 'checkedAt', value: String(report.checkedAt), inline: true },
-            { name: 'rev', value: String(report.rev), inline: true },
-          ],
-        },
-      ],
-    }),
+  await sendAlert(env, text, {
+    title: 'dex.tito.cafe health alert',
+    fields: {
+      checkedAt: String(report.checkedAt),
+      rev: String(report.rev),
+    },
   });
 }

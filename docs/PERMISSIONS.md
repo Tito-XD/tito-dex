@@ -88,7 +88,9 @@ These live on the **Worker**, not in GitHub Secrets:
 | --- | --- |
 | `GITHUB_DISPATCH_TOKEN` | Fine-grained PAT: repo `Tito-XD/tito-dex`, **Actions: Read and write** |
 | `ADMIN_SECRET` | Bearer token for `https://dex.tito.cafe/admin/*` |
-| `ALERT_WEBHOOK_URL` | Optional Discord/Slack webhook when scheduled probe fails |
+| `TELEGRAM_BOT_TOKEN` | BotFather token for CDN probe / cron failure alerts |
+| `TELEGRAM_CHAT_ID` | Telegram chat id to receive alerts |
+| `ALERT_WEBHOOK_URL` | Optional Discord/Slack webhook (alternative to Telegram) |
 
 GitHub repository secrets (`CLOUDFLARE_*`) are unchanged — Actions still write R2 directly.
 
