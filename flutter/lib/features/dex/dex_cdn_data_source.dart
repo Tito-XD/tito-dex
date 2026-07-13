@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dex_cdn_config.dart';
 import 'dex_models.dart';
 
-/// Live dex data straight from the Cloudflare R2 CDN (`dex.tito.cafe`).
+/// Live dex data from the pre-built Cloudflare R2 CDN (compile-time base URL).
 ///
 /// Default online path: one `summaries.json` request replaces ~1000 PokeAPI
 /// calls, and per-Pokémon `details/{id}.json` is a single cached edge fetch.

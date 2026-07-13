@@ -8,7 +8,7 @@
 | --- | --- |
 | `v0.1.x` | Phase 2 debug / early APK |
 | `v0.2.x` | **Current pre-release** — RG handheld builds (UI polish, offline dex, CDN v4) |
-| `v0.3.0` | **Latest** — National dex **1–1025**, CDN bundle **v5** at `dex.tito.cafe/v3/`, `DexScope` multi-game browse, radar chart, move/ability encyclopedia ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.3.0)) |
+| `v0.3.0` | National dex **1–1025**, offline bundle **v5**, `DexScope` multi-game browse, radar chart, move/ability encyclopedia ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.3.0)) |
 | `v0.2.28` | Dex detail UI + typography + battle companion tools ([release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.2.28)) |
 | `v1.0.0` | Reserved for **feature-complete** public release (stable offline dex, emulator launch, save workflow, polish) |
 
@@ -94,7 +94,7 @@ Reference: [破壳萌图鉴 / Pocket Gallery](https://eurekaffeine.github.io/poc
 | **PNG sprites** (transparent; legacy JPEG removed from CDN) | ✅ |
 | **Tap header sprite → fullscreen artwork** (lazy CDN / PokeAPI) | ✅ |
 | Journey party → caught marker on dex cards | ✅ |
-| **Cloudflare CDN** `dex.tito.cafe` — Worker + R2 + bundle upload | ✅ |
+| **Cloudflare dex CDN** — Worker + R2 + bundle upload | ✅ |
 | **CDN bundle v4** (`/v2/`, 493 species) — production on v0.2.28 | ✅ |
 | **CDN bundle v5** (`/v3/`, 1025 species; `abilities`, `obtainLocations`, `pokedexNumbers`) | 🚧 v0.3.0 |
 | **Capture locations / encounter tables** | ✅ (detail tab + CDN v5) |
@@ -169,10 +169,10 @@ When the journey reaches each era, extend Phase E scopes:
 
 ## Recommended Next Steps (post-v0.3.0)
 
-1. **Ship CDN bundle v5** — build with `--max-id 1025`, upload to `dex.tito.cafe/v3/`, flip app defaults to bundle v5
+1. **Ship bundle v5** — build with `--max-id 1025`, upload to private CDN, flip app defaults to bundle v5
 2. **Wire `DexScope` in UI** — game version switcher on detail; default scope in Settings
 3. **Radar chart** for base stats on detail (replace or complement bars)
 4. **Move / ability encyclopedia** — browse `moves.json` + `abilities.json` from Search or Settings
 5. **Custom launcher icon** + splash polish
 6. **Full battle tools** — team coverage, richer damage calc (build on v0.2.28 Search companion panel)
-7. **`tito.cafe/pokedex` web** — reuse `dex.tito.cafe` v3 URLs + JSON
+7. **`tito.cafe/pokedex` web** — reuse v3 JSON + assets from private dex CDN

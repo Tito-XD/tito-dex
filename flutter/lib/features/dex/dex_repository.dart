@@ -10,8 +10,8 @@ import 'dex_settings_repository.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
-/// Data priority: Settings-installed offline bundle → live CF R2 CDN
-/// (`dex.tito.cafe`, one summaries.json + per-id details.json) → PokeAPI.
+/// Data priority: Settings-installed offline bundle → live pre-built dex CDN
+/// (summaries + per-id details) → PokeAPI.
 class DexRepository {
   DexRepository({
     PokeApiClient? client,

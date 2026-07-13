@@ -32,7 +32,7 @@ abstract final class AppZh {
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
   static const dexScopeNote =
-      '全国图鉴 1–1025，中文名与属性来自 CDN / PokeAPI；已捕获/已见过状态来自存档与同行队伍。';
+      '全国图鉴 1–1025，中文名与属性来自在线图鉴；已捕获/已见过状态来自存档与同行队伍。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
   static const dexUnknown = '未见过';
@@ -180,8 +180,8 @@ abstract final class AppZh {
     final phaseLabel = switch (phase) {
       'types' => '属性',
       'pokemon' => '宝可梦',
-      'cdn_manifest' => 'CDN 清单',
-      'cdn_download' => 'CDN 下载',
+      'cdn_manifest' => '图鉴包清单',
+      'cdn_download' => '图鉴包下载',
       'cdn_verify' => '校验',
       'cdn_decompress' => '解压',
       'cdn_extract' => '写入',
@@ -192,15 +192,15 @@ abstract final class AppZh {
     return '正在缓存$phaseLabel $current / $total';
   }
 
-  static const settingsDexCdnDownload = '从 CDN 下载图鉴包';
+  static const settingsDexCdnDownload = '下载预打包图鉴包';
   static const settingsDexCdnDownloadHint =
-      '从 dex.tito.cafe 下载预打包图鉴（含 1025 只宝可梦、招式/特性/性格/天气/道具等全部资料，可离线使用）';
+      '一次性下载预打包图鉴（含 1025 只宝可梦、招式/特性/性格/天气/道具等全部资料，安装后可离线使用）';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
       '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组';
-  static const snackDexCdnDone = 'CDN 图鉴包已安装完成';
-  static const snackDexCdnFailed = 'CDN 图鉴包下载失败';
+  static const snackDexCdnDone = '预打包图鉴已安装完成';
+  static const snackDexCdnFailed = '预打包图鉴下载失败';
 
   static const snackDexOfflineDone = '离线图鉴已下载完成';
   static String snackDexOfflinePartial(int count) =>
@@ -229,7 +229,7 @@ abstract final class AppZh {
   static const searchRefWeather = '天气';
   static const searchRefTerrains = '场地';
   static const searchRefStatus = '状态异常';
-  static const searchRefPlaceholder = '资料加载中，请确保已连接 CDN。';
+  static const searchRefPlaceholder = '资料加载中，请先下载预打包图鉴或检查网络。';
   static const searchBattleTypeMatchup = '属性克制';
   static const searchBattleStatCalc = '能力值计算';
   static const searchBattleQuickDamage = '伤害速算';

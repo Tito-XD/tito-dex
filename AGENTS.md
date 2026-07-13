@@ -60,20 +60,19 @@ Root `package.json` scripts: `npm run dev` (Vite at `http://localhost:5173`),
 
 ### Dex CDN bundles (agents)
 
-| Path | Bundle | Species | Status |
+| CDN prefix | Bundle | Species | Status |
 | --- | --- | --- | --- |
-| `dex.tito.cafe/v2/` | **v4** | 493 (HGSS national) | **Production** — current APK default |
-| `dex.tito.cafe/v3/` | **v5** | **1025** (Gen IX national) | **Planned v0.3.0** |
+| `/v2/` | **v4** | 493 (HGSS national) | Legacy |
+| `/v3/` | **v5** | **1025** (Gen IX national) | **Current app default** |
 
-**National dex scope:** App models use `titodexMaxNationalDexId = 1025` for browse;
-production APK v0.2.28 still defaults to CDN v4 (493) until v0.3.0 ships.
+Use `$TITODEX_DEX_CDN_BASE` (private — do not publish in public README / release notes).
 
 **Build full v5 bundle** (from repo root, venv at `~/.venv-titodex-tools`):
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 python3 tools/build_dex_bundle.py \
-  --cdn-base https://dex.tito.cafe \
+  --cdn-base "$TITODEX_DEX_CDN_BASE" \
   --output dist/dex-v5 \
   --max-id 1025
 ```
