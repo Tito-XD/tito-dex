@@ -5,7 +5,6 @@ import '../config/app_config.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import 'sticker_card.dart';
 
 /// Tier A — static Pokémon Sleep tool links (clipboard; no account sync).
 class SleepToolsSection extends StatefulWidget {
@@ -41,41 +40,36 @@ class _SleepToolsSectionState extends State<SleepToolsSection> {
     final config = AppConfig.instance;
     final links = config.sleepToolsLinks;
 
-    return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppZh.sleepToolsTitle,
-            style: SecondaryTypography.onCard.h15,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          config.sleepToolsTierAHint,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: TitoColors.mutedInk,
           ),
-          const SizedBox(height: 4),
-          Text(
-            config.sleepToolsTierAHint,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+        ),
+        for (final link in links)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              link.labelZh,
+              style: SecondaryTypography.onCard.body14.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            subtitle: Text(
+              link.url,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: const Icon(Icons.open_in_new_rounded, size: 18),
+            onTap: () => _openLink(context, link.url),
           ),
-          for (final link in links)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                link.labelZh,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              subtitle: Text(
-                link.url,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              trailing: const Icon(Icons.open_in_new_rounded, size: 18),
-              onTap: () => _openLink(context, link.url),
-            ),
-        ],
-      ),
+      ],
     );
   }
 }
