@@ -57,7 +57,7 @@ class AppHeader extends StatelessWidget {
               compact: compact,
               onTap: onGameBadgeTap,
             ),
-            if (DeviceLayout.isNativeTarget) ...[
+            if (DeviceLayout.useHandheldChrome(context)) ...[
               SizedBox(width: square ? 8 : 10),
               HandheldStatusIcons(compact: square || compact),
             ],

@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
   final CurrentJourney journey;
   final VoidCallback onContinue;
   final String gameBadge;
-  final VoidCallback? onGameBadgeTap;
+  final void Function(BuildContext context)? onGameBadgeTap;
   final VoidCallback? onAvatarTap;
 
   @override
@@ -36,7 +36,9 @@ class HomePage extends StatelessWidget {
     final padding = DeviceLayout.pagePadding(context);
     final header = AppHeader(
       gameBadge: gameBadge,
-      onGameBadgeTap: onGameBadgeTap,
+      onGameBadgeTap: onGameBadgeTap == null
+          ? null
+          : () => onGameBadgeTap!(context),
     );
 
     if (DeviceLayout.useSquareDashboard(context)) {
