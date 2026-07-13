@@ -3,6 +3,10 @@ name: Build PokeAPI assets to R2
 on:
   workflow_dispatch:
     inputs:
+      version_group:
+        description: PokeAPI version-group slug, or "all" for every region (parallel jobs)
+        type: string
+        default: all
       max_id:
         description: Max national dex id (1025 = full)
         type: number
@@ -19,13 +23,62 @@ on:
         description: Skip assets already on dex.tito.cafe (resume-friendly)
         type: boolean
         default: true
+      build_shared:
+        description: Build default sprites, artwork, and animated GIFs
+        type: boolean
+        default: true
   repository_dispatch:
     types: [build-pokeapi-assets]
 
 jobs:
-  build-assets:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 720
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      run_shared: ${{ steps.plan.outputs.run_shared }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Plan version-group matrix
+        id: plan
+        env:
+          VERSION_GROUP: ${{ inputs.version_group || github.event.client_payload.version_group || 'all' }}
+          BUILD_SHARED: ${{ inputs.build_shared || github.event.client_payload.build_shared || 'true' }}
+        run: |
+          python3 <<'PY'
+          import json
+          import os
+          import sys
+
+          sys.path.insert(0, "tools")
+          from pokeapi_assets import ALL_SPRITE_VERSION_GROUPS
+
+          vg = os.environ.get("VERSION_GROUP", "all").strip()
+          if vg == "all":
+              groups = list(ALL_SPRITE_VERSION_GROUPS)
+          elif vg not in ALL_SPRITE_VERSION_GROUPS:
+              print(f"Unknown version group: {vg}", file=sys.stderr)
+              print("Valid groups:", ", ".join(ALL_SPRITE_VERSION_GROUPS), file=sys.stderr)
+              sys.exit(1)
+          else:
+              groups = [vg]
+
+          shared = os.environ.get("BUILD_SHARED", "true").lower() != "false"
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"matrix={json.dumps({'version_group': groups})}\n")
+              out.write(f"run_shared={'true' if shared else 'false'}\n")
+          print("Regions:", ", ".join(groups))
+          PY
+
+  build-shared:
+    needs: prepare
+    if: needs.prepare.outputs.run_shared == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v6
 
@@ -40,25 +93,23 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Cache partial build output
+      - name: Cache shared build output
         uses: actions/cache@v4
         with:
           path: dist/pokeapi-assets
-          key: pokeapi-assets-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-${{ hashFiles('tools/build_pokeapi_assets.py', 'tools/pokeapi_assets.py', 'tools/build_dex_bundle.py') }}
+          key: pokeapi-shared-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-${{ hashFiles('tools/build_pokeapi_assets.py', 'tools/pokeapi_assets.py', 'tools/build_dex_bundle.py') }}
           restore-keys: |
-            pokeapi-assets-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-
+            pokeapi-shared-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-
 
-      - name: Build PokeAPI sprite / artwork / animated assets
+      - name: Build shared sprites (default, artwork, animated)
         env:
           MIN_ID: ${{ inputs.min_id || github.event.client_payload.min_id || 1 }}
           MAX_ID: ${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}
           UPLOAD_FLAG: ${{ inputs.upload || github.event.client_payload.upload || true }}
           SKIP_CDN_FLAG: ${{ inputs.skip_existing_cdn || github.event.client_payload.skip_existing_cdn || true }}
-          DISPATCH_SOURCE: ${{ github.event.client_payload.source || 'manual' }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          echo "Trigger source: ${DISPATCH_SOURCE}"
           UPLOAD=""
           if [ "$UPLOAD_FLAG" = "true" ]; then
             UPLOAD="--upload"
@@ -70,5 +121,64 @@ jobs:
           python3 tools/build_pokeapi_assets.py \
             --min-id "$MIN_ID" \
             --max-id "$MAX_ID" \
+            --no-by-version \
+            $SKIP_CDN \
+            $UPLOAD
+
+  build-region:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install -r tools/dex_bundle_requirements.txt
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Cache region build output
+        uses: actions/cache@v4
+        with:
+          path: dist/pokeapi-assets
+          key: pokeapi-${{ matrix.version_group }}-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-${{ hashFiles('tools/build_pokeapi_assets.py', 'tools/pokeapi_assets.py', 'tools/build_dex_bundle.py') }}
+          restore-keys: |
+            pokeapi-${{ matrix.version_group }}-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-
+
+      - name: Build sprites for ${{ matrix.version_group }}
+        env:
+          MIN_ID: ${{ inputs.min_id || github.event.client_payload.min_id || 1 }}
+          MAX_ID: ${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}
+          UPLOAD_FLAG: ${{ inputs.upload || github.event.client_payload.upload || true }}
+          SKIP_CDN_FLAG: ${{ inputs.skip_existing_cdn || github.event.client_payload.skip_existing_cdn || true }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          UPLOAD=""
+          if [ "$UPLOAD_FLAG" = "true" ]; then
+            UPLOAD="--upload"
+          fi
+          SKIP_CDN="--skip-existing-cdn"
+          if [ "$SKIP_CDN_FLAG" = "false" ]; then
+            SKIP_CDN="--no-skip-existing-cdn"
+          fi
+          python3 tools/build_pokeapi_assets.py \
+            --min-id "$MIN_ID" \
+            --max-id "$MAX_ID" \
+            --version-groups "${{ matrix.version_group }}" \
+            --no-default-sprites \
+            --no-artwork \
+            --no-animated \
+            --no-index \
             $SKIP_CDN \
             $UPLOAD
