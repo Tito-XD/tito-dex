@@ -19,6 +19,7 @@ import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/pokemon_detail_sections.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
+import '../../widgets/tito_loading_panel.dart';
 
 class TypeMatchupPage extends StatefulWidget {
   const TypeMatchupPage({super.key, required this.journey});
@@ -153,7 +154,10 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
               subtitle: edition.labelZh,
               children: [
                 if (_loading)
-                  const Center(child: CircularProgressIndicator())
+                  const TitoLoadingPanel(
+                    message: AppZh.companionLoading,
+                    compact: true,
+                  )
                 else if (_error != null)
                   StickerCard(
                     child: Text(

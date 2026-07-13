@@ -3,6 +3,10 @@ import '../features/dex/dex_models.dart';
 
 abstract final class AppZh {
   static const appTitle = 'TitoDex';
+  static const bootstrapLoading = '正在准备你的旅程…';
+  static const companionLoading = '正在加载对战数据…';
+  static const searchLoading = '正在搜索…';
+  static const referenceLoading = '正在加载资料…';
 
   static const navHome = '首页';
   static const navTeam = '队伍';
@@ -27,6 +31,11 @@ abstract final class AppZh {
 
   static String trainerGreeting(String trainerName, [DateTime? time]) =>
       '${timeGreeting(time ?? DateTime.now())}，训练家 $trainerName';
+
+  static String trainerNameLine(String trainerName) {
+    final name = trainerName.isNotEmpty ? trainerName : 'Tito';
+    return '训练家 $name';
+  }
 
   static const journeyCardTitle = '旅程';
   static const journeyOpenDetail = '查看旅程详情';

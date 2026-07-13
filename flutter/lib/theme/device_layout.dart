@@ -269,7 +269,7 @@ abstract final class DeviceLayout {
       dim(context, 116.0);
 
   static double trainerDenseCardHeight(BuildContext context) =>
-      dim(context, 168.0);
+      dim(context, 200.0);
 
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);
