@@ -97,6 +97,8 @@ class DexBundleManifest {
     required this.archiveSizeBytes,
     this.pokemonCount,
     this.publishedAt,
+    this.l10nVersion,
+    this.configVersion,
   });
 
   final int bundleVersion;
@@ -105,6 +107,8 @@ class DexBundleManifest {
   final int archiveSizeBytes;
   final int? pokemonCount;
   final String? publishedAt;
+  final String? l10nVersion;
+  final int? configVersion;
 
   bool get hasIntegrityCheck => archiveSha256.isNotEmpty;
 
@@ -115,6 +119,8 @@ class DexBundleManifest {
         'archiveSizeBytes': archiveSizeBytes,
         if (pokemonCount != null) 'pokemonCount': pokemonCount,
         if (publishedAt != null) 'publishedAt': publishedAt,
+        if (l10nVersion != null) 'l10nVersion': l10nVersion,
+        if (configVersion != null) 'configVersion': configVersion,
       };
 
   factory DexBundleManifest.fromJson(Map<String, dynamic> json) {
@@ -125,6 +131,8 @@ class DexBundleManifest {
       archiveSizeBytes: json['archiveSizeBytes'] as int? ?? 0,
       pokemonCount: json['pokemonCount'] as int?,
       publishedAt: json['publishedAt'] as String?,
+      l10nVersion: json['l10nVersion'] as String?,
+      configVersion: json['configVersion'] as int?,
     );
   }
 }

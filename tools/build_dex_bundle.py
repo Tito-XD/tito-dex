@@ -1110,8 +1110,11 @@ def create_zst_tar(source_dir: Path, archive_path: Path) -> None:
     buffer = io.BytesIO()
     with tarfile.open(fileobj=buffer, mode="w") as tar:
         for file in sorted(source_dir.rglob("*")):
-            if file.is_file():
-                tar.add(file, arcname=file.relative_to(source_dir).as_posix())
+            if not file.is_file():
+                continue
+            if file.name == "bundle.tar.zst":
+                continue
+            tar.add(file, arcname=file.relative_to(source_dir).as_posix())
     archive_path.write_bytes(compressor.compress(buffer.getvalue()))
 
 
@@ -1121,6 +1124,84 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+APP_CONFIG_VERSION = 1
+
+DEFAULT_APP_CONFIG: dict[str, Any] = {
+    "configVersion": APP_CONFIG_VERSION,
+    "sleepTools": {
+        "tierAHint": "Tier A：静态链接，点击复制到剪贴板",
+        "links": [
+            {"labelZh": "Neroli's Lab 主页", "url": "https://nerolislab.com"},
+            {"labelZh": "攻略指南", "url": "https://nerolislab.com/guides/"},
+            {"labelZh": "开发文档", "url": "https://docs.nerolislab.com"},
+        ],
+    },
+}
+
+
+def build_hgss_map_list_with_zh() -> list[dict[str, str]]:
+    """Merge Project Pokémon map list with zh labels from the catalog."""
+    base_path = ROOT / "tools" / "hgss_map_list.json"
+    zh_path = ROOT / "data" / "l10n" / "zh" / "hgss_map_ids.json"
+    base_list = json.loads(base_path.read_text(encoding="utf-8"))
+    zh_by_id: dict[str, dict[str, Any]] = {}
+    if zh_path.is_file():
+        zh_by_id = json.loads(zh_path.read_text(encoding="utf-8"))
+
+    merged: list[dict[str, str]] = []
+    for index, entry in enumerate(base_list):
+        row: dict[str, str] = {
+            "name": entry.get("name", "Unknown"),
+            "code": entry.get("code", ""),
+        }
+        zh_entry = zh_by_id.get(str(index), {})
+        label_zh = zh_entry.get("labelZh")
+        if label_zh:
+            row["labelZh"] = label_zh
+        merged.append(row)
+    return merged
+
+
+def stage_bundle_reference_data(
+    staging: Path,
+    *,
+    published_at: str,
+) -> dict[str, Any]:
+    """Stage l10n/, maps/, config/ for the offline bundle (no nav icons)."""
+    from generate_zh_catalog_assets import write_compact_l10n
+
+    print("Staging zh l10n catalog…", flush=True)
+    l10n_dir = staging / "l10n" / "zh"
+    l10n_stats = write_compact_l10n(l10n_dir)
+
+    print("Staging HGSS map list…", flush=True)
+    maps_dir = staging / "maps"
+    maps_dir.mkdir(parents=True, exist_ok=True)
+    hgss_map_list = build_hgss_map_list_with_zh()
+    write_json(maps_dir / "hgss_map_list.json", hgss_map_list)
+
+    print("Staging app config…", flush=True)
+    config_dir = staging / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    app_config = {
+        **DEFAULT_APP_CONFIG,
+        "publishedAt": published_at,
+    }
+    write_json(config_dir / "app_config.json", app_config)
+
+    # Keep APK fallback in sync with bundle config.
+    apk_config_dir = ROOT / "flutter" / "assets" / "config"
+    apk_config_dir.mkdir(parents=True, exist_ok=True)
+    write_json(apk_config_dir / "app_config.json", app_config)
+
+    return {
+        "l10nVersion": l10n_stats.get("l10nVersion", published_at),
+        "configVersion": APP_CONFIG_VERSION,
+        "locationLabelKeys": l10n_stats.get("locationLabelKeys", 0),
+        "hgssMapCount": len(hgss_map_list),
+    }
 
 
 def build_games_json(cdn_base: str) -> list[dict[str, Any]]:
@@ -1434,6 +1515,9 @@ def build_bundle(
     }
     write_json(staging / "abilities.json", abilities_payload)
 
+    published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    reference_meta = stage_bundle_reference_data(staging, published_at=published_at)
+
     games_payload = json.loads((staging / "games.json").read_text(encoding="utf-8"))
     natures_payload = json.loads((staging / "natures.json").read_text(encoding="utf-8"))
     egg_groups_payload = json.loads(
@@ -1442,7 +1526,6 @@ def build_bundle(
     items_payload = json.loads((staging / "items.json").read_text(encoding="utf-8"))
 
     size_bytes = directory_size(staging)
-    published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     manifest = {
         "version": BUNDLE_VERSION,
         "complete": max_id >= TITODEX_MAX_NATIONAL_ID
@@ -1456,6 +1539,8 @@ def build_bundle(
         "natureCount": len(natures_payload),
         "eggGroupCount": len(egg_groups_payload),
         "itemCount": len(items_payload),
+        "l10nVersion": reference_meta.get("l10nVersion"),
+        "configVersion": reference_meta.get("configVersion"),
         "sizeBytes": size_bytes,
     }
     write_json(staging / "manifest.json", manifest)
@@ -1491,6 +1576,10 @@ def build_bundle(
     shutil.copytree(staging / "sprites", upload_bundle / "sprites")
     shutil.copytree(staging / "type_icons", upload_bundle / "type_icons")
     shutil.copytree(staging / "game_icons", upload_bundle / "game_icons")
+    for extra_dir in ("l10n", "maps", "config"):
+        src = staging / extra_dir
+        if src.is_dir():
+            shutil.copytree(src, upload_bundle / extra_dir)
 
     archive_sha = sha256_file(upload_bundle / "bundle.tar.zst")
     bundle_manifest = {
@@ -1500,6 +1589,8 @@ def build_bundle(
         "archiveSha256": archive_sha,
         "archiveSizeBytes": (upload_bundle / "bundle.tar.zst").stat().st_size,
         "publishedAt": published_at,
+        "l10nVersion": reference_meta.get("l10nVersion"),
+        "configVersion": reference_meta.get("configVersion"),
     }
     write_json(output_dir / "upload" / "bundle-manifest.json", bundle_manifest)
 

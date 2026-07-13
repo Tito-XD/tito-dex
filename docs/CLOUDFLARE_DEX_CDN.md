@@ -86,16 +86,22 @@ titodex-dex/
 │   ├── details/1.json … 493.json
 │   ├── sprites/1.png … 493.png
 │   └── type_icons/*.png
-└── v3/                           # bundle v5 — 1025 物种（v0.3.0）
+└── v3/                           # bundle v5 — 1025 物种（v0.4.5+）
     ├── manifest.json
     ├── summaries.json
     ├── types.json
     ├── moves.json
     ├── abilities.json            # 特性索引（v5 新增）
-    ├── bundle.tar.zst
+    ├── bundle.tar.zst            # 含 l10n/ maps/ config/ game_icons/
+    ├── l10n/zh/*.json            # 中文对照表（可单独热更新）
+    ├── maps/hgss_map_list.json   # HGSS 地图 id → 中英文名
+    ├── config/app_config.json    # Sleep 工具链接等应用配置
+    ├── game_icons/*.png          # 游戏版本选择图标
     ├── details/1.json … 1025.json
     ├── sprites/1.png … 1025.png
     └── type_icons/*.png
+
+> **不进 CDN：** 手绘底部导航图标（nav icons）随 APK `assets/` 内置，用户自行绘制替换。
 
 CDN 大图（按需，不进 bundle.tar.zst）：
 
@@ -111,7 +117,9 @@ CDN 大图（按需，不进 bundle.tar.zst）：
   "archiveUrl": "https://dex.tito.cafe/v3/bundle.tar.zst",
   "archiveSha256": "<sha256>",
   "archiveSizeBytes": 0,
-  "publishedAt": "2026-07-11T00:00:00Z"
+  "publishedAt": "2026-07-11T00:00:00Z",
+  "l10nVersion": "2026-07-13T04:52:57+00:00",
+  "configVersion": 1
 }
 ```
 
@@ -126,6 +134,8 @@ CDN 大图（按需，不进 bundle.tar.zst）：
   "pokemonCount": 1025,
   "moveCount": 0,
   "abilityCount": 0,
+  "l10nVersion": "2026-07-13T04:52:57+00:00",
+  "configVersion": 1,
   "sizeBytes": 0
 }
 ```
@@ -169,10 +179,21 @@ dex_offline/
 ├── types.json
 ├── moves.json
 ├── abilities.json       # v5+
+├── l10n/zh/             # 中文对照（优先于 APK assets）
+│   ├── location_area_labels.json
+│   ├── hgss_map_labels.json
+│   └── …
+├── maps/
+│   └── hgss_map_list.json
+├── config/
+│   └── app_config.json  # Sleep 工具链接等
+├── game_icons/*.png     # 游戏版本图标
 ├── details/{id}.json
 ├── sprites/{id}.png
 └── type_icons/{type}.png
 ```
+
+**加载顺序：** `dex_offline/`（bundle 安装后）→ APK `assets/` 回退。App 不在运行时抓取 52poke / PokeAPI 更新对照表。
 
 > 仓库内 `tools/build_dex_bundle.py` 生成的 tar 根目录即为上述结构（无 `v3/` 前缀）。
 

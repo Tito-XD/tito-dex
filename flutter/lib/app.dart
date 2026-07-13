@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'features/companion/companion_art.dart';
+import 'config/app_config.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
@@ -66,6 +67,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   void initState() {
     super.initState();
     ZhCatalog.instance.ensureLoaded();
+    AppConfig.instance.ensureLoaded();
     _router = GoRouter(
       refreshListenable: gameEditionRepository,
       routes: [

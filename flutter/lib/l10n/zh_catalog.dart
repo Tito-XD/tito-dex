@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-/// Runtime lookup for Chinese labels from bundled zh catalog assets.
+import '../features/dex/dex_cache_store.dart';
+
+/// Runtime lookup for Chinese labels from offline bundle or bundled APK assets.
 class ZhCatalog {
   ZhCatalog._();
 
@@ -16,25 +19,52 @@ class ZhCatalog {
     return _loading ??= _load();
   }
 
-  Future<void> _load() async {
-    final locationJson = await rootBundle.loadString(
-      'assets/l10n/zh/location_area_labels.json',
-    );
-    final locationRaw = jsonDecode(locationJson) as Map<String, dynamic>;
-    _locationAreaLabels = locationRaw.map(
-      (key, value) => MapEntry(key, value as String),
-    );
+  Future<void> reload() async {
+    _locationAreaLabels = null;
+    _hgssMapLabels = null;
+    _loading = null;
+    await ensureLoaded();
+  }
 
-    try {
-      final hgssJson = await rootBundle.loadString(
-        'assets/l10n/zh/hgss_map_labels.json',
+  Future<void> _load() async {
+    final locationJson = await _readL10nJson('location_area_labels.json');
+    if (locationJson != null) {
+      final locationRaw = jsonDecode(locationJson) as Map<String, dynamic>;
+      _locationAreaLabels = locationRaw.map(
+        (key, value) => MapEntry(key, value as String),
       );
+    } else {
+      _locationAreaLabels = const {};
+    }
+
+    final hgssJson = await _readL10nJson('hgss_map_labels.json');
+    if (hgssJson != null) {
       final hgssRaw = jsonDecode(hgssJson) as Map<String, dynamic>;
       _hgssMapLabels = hgssRaw.map(
         (key, value) => MapEntry(key, value as String),
       );
-    } catch (_) {
+    } else {
       _hgssMapLabels = const {};
+    }
+  }
+
+  Future<String?> _readL10nJson(String filename) async {
+    if (!kIsWeb) {
+      try {
+        final paths = await DexCachePaths.resolve();
+        final offlineFile = paths.l10nFile(filename);
+        if (await offlineFile.exists()) {
+          return offlineFile.readAsString();
+        }
+      } on Object {
+        // Fall back to bundled assets.
+      }
+    }
+
+    try {
+      return await rootBundle.loadString('assets/l10n/zh/$filename');
+    } on Object {
+      return null;
     }
   }
 
