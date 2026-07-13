@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'ability_type_modifiers.dart';
+
 const typeNamesZh = <String, String>{
   'normal': '一般',
   'fire': '火',
@@ -111,29 +113,14 @@ class TypeDamageRelations {
 
 DefensiveProfile computeDefensiveProfile(
   List<String> defenderTypes,
-  Map<String, TypeDamageRelations> relationsByType,
-) {
-  final multipliers = <String, double>{};
-
-  for (final attackType in typeNamesZh.keys) {
-    var multiplier = 1.0;
-    for (final defenderType in defenderTypes) {
-      final relations = relationsByType[attackType];
-      if (relations == null) {
-        continue;
-      }
-      if (relations.noDamageTo.contains(defenderType)) {
-        multiplier = 0;
-        break;
-      }
-      if (relations.doubleDamageTo.contains(defenderType)) {
-        multiplier *= 2;
-      } else if (relations.halfDamageTo.contains(defenderType)) {
-        multiplier *= 0.5;
-      }
-    }
-    multipliers[attackType] = multiplier;
-  }
+  Map<String, TypeDamageRelations> relationsByType, {
+  String? defenderAbilitySlug,
+}) {
+  final multipliers = computeDefensiveMultipliersWithAbility(
+    defenderTypes: defenderTypes,
+    relationsByType: relationsByType,
+    defenderAbilitySlug: defenderAbilitySlug,
+  );
 
   final weaknesses = <String>[];
   final resistances = <String>[];
@@ -187,6 +174,16 @@ Map<String, double> computeDefensiveMultipliers(
     multipliers[attackType] = multiplier;
   }
 
+  return multipliers;
+}
+
+Map<String, double> computeDefensiveMultipliersWithAbility({
+  required List<String> defenderTypes,
+  required Map<String, TypeDamageRelations> relationsByType,
+  String? defenderAbilitySlug,
+}) {
+  final multipliers = computeDefensiveMultipliers(defenderTypes, relationsByType);
+  applyAbilityTypeModifiers(multipliers, defenderAbilitySlug);
   return multipliers;
 }
 

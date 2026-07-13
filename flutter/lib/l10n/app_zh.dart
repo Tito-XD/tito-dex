@@ -338,6 +338,7 @@ abstract final class AppZh {
   static const companionTypeSummaryTitle = '克制摘要';
   static const companionTypeAttackerTitle = '进攻方（可选）';
   static const companionTypeAttackerPick = '攻击方属性（本系克制参考）';
+  static const companionDefenderAbilityPick = '防守方特性（影响属性抗性）';
   static const companionStatInputsTitle = '输入';
   static String companionStatFacilityNote(String facility) =>
       '默认等级按 $facility 常见配置（Lv.50）';

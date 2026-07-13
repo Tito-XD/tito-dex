@@ -1,3 +1,4 @@
+import '../dex/ability_type_modifiers.dart';
 import '../dex/type_chart.dart';
 
 enum BattleStat { hp, attack, defense, specialAttack, specialDefense, speed }
@@ -103,9 +104,14 @@ int computeBattleStat({
 double typeMultiplierForMove(
   String moveType,
   List<String> defenderTypes,
-  Map<String, TypeDamageRelations> relationsByType,
-) {
-  final multipliers = computeDefensiveMultipliers(defenderTypes, relationsByType);
+  Map<String, TypeDamageRelations> relationsByType, {
+  String? defenderAbilitySlug,
+}) {
+  final multipliers = computeDefensiveMultipliersWithAbility(
+    defenderTypes: defenderTypes,
+    relationsByType: relationsByType,
+    defenderAbilitySlug: defenderAbilitySlug,
+  );
   return multipliers[moveType] ?? 1;
 }
 
@@ -157,6 +163,7 @@ DamageEstimate estimateDamage({
   required List<String> attackerTypes,
   required List<String> defenderTypes,
   required Map<String, TypeDamageRelations> relationsByType,
+  String? defenderAbilitySlug,
   double otherMultiplier = 1,
 }) {
   final base = computeBaseDamage(
@@ -166,7 +173,12 @@ DamageEstimate estimateDamage({
     defense: defense,
   );
   final stab = hasStab(moveType, attackerTypes) ? 1.5 : 1.0;
-  final type = typeMultiplierForMove(moveType, defenderTypes, relationsByType);
+  final type = typeMultiplierForMove(
+    moveType,
+    defenderTypes,
+    relationsByType,
+    defenderAbilitySlug: defenderAbilitySlug,
+  );
   final modifier = stab * type * otherMultiplier;
   final minDamage = (base * modifier * 0.85).floor();
   final maxDamage = (base * modifier).floor();

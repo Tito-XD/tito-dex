@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_tools_service.dart';
+import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
@@ -30,6 +31,8 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
   final _queryController = TextEditingController();
   List<String> _defenderTypes = const ['fire'];
   List<String> _attackerTypes = const [];
+  String? _defenderAbilitySlug;
+  List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
   bool _loading = true;
@@ -86,7 +89,35 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
       _defenderTypes = List<String>.from(summary.types);
       _suggestions = const [];
       _queryController.text = summary.nameZh;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
     });
+    _loadDefenderAbilities(summary.id);
+  }
+
+  Future<void> _loadDefenderAbilities(int pokemonId) async {
+    try {
+      final detail = await dexRepository.getDetail(pokemonId);
+      if (!mounted) {
+        return;
+      }
+      final options = detail.abilities
+          .map(
+            (ability) => DefensiveAbilityOption(
+              slug: abilitySlugFromNameEn(ability.nameEn),
+              labelZh: ability.nameZh,
+              isHidden: ability.isHidden,
+            ),
+          )
+          .toList(growable: false);
+      setState(() {
+        _defenderAbilityOptions = options;
+        _defenderAbilitySlug =
+            options.length == 1 ? options.first.slug : null;
+      });
+    } catch (_) {
+      // Ability list is optional for manual type picks.
+    }
   }
 
   @override
@@ -159,19 +190,38 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                   selected: _defenderTypes,
                   onChanged: (types) {
                     if (types.isNotEmpty) {
-                      setState(() => _defenderTypes = types);
+                      setState(() {
+                        _defenderTypes = types;
+                        _defenderAbilityOptions = const [];
+                        _defenderAbilitySlug = null;
+                      });
                     }
                   },
                 ),
+                if (_defenderAbilityOptions.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  DefensiveAbilityPicker(
+                    selectedSlug: _defenderAbilitySlug,
+                    options: _defenderAbilityOptions,
+                    onChanged: (slug) =>
+                        setState(() => _defenderAbilitySlug = slug),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 12),
             Builder(
               builder: (context) {
-                final profile =
-                    computeDefensiveProfile(_defenderTypes, relations);
-                final multipliers =
-                    computeDefensiveMultipliers(_defenderTypes, relations);
+                final profile = computeDefensiveProfile(
+                  _defenderTypes,
+                  relations,
+                  defenderAbilitySlug: _defenderAbilitySlug,
+                );
+                final multipliers = computeDefensiveMultipliersWithAbility(
+                  defenderTypes: _defenderTypes,
+                  relationsByType: relations,
+                  defenderAbilitySlug: _defenderAbilitySlug,
+                );
                 return Column(
                   children: [
                     StickerCard(
