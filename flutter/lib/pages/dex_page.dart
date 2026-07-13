@@ -56,6 +56,7 @@ class _DexPageState extends State<DexPage> {
   List<PokemonSummary> _journeySummaries = const [];
   List<PokemonSummary> _referenceFilteredSummaries = const [];
   bool _loadingReferenceFilter = false;
+  int _filterVisibleCount = 0;
   final Map<DexRegionalPokedex, List<PokemonSummary>> _regionCache = {};
   bool _loadingRegion = false;
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
@@ -113,6 +114,7 @@ class _DexPageState extends State<DexPage> {
       }
       setState(() {
         _referenceFilteredSummaries = const [];
+        _filterVisibleCount = 0;
         _loadingReferenceFilter = false;
       });
       return;
@@ -127,6 +129,7 @@ class _DexPageState extends State<DexPage> {
       }
       setState(() {
         _referenceFilteredSummaries = entries;
+        _filterVisibleCount = _chunkSize.clamp(0, entries.length);
         _loadingReferenceFilter = false;
         _mode = _DexMode.national;
         _error = null;
@@ -229,6 +232,20 @@ class _DexPageState extends State<DexPage> {
         manualDexMarks: true,
       );
     });
+  }
+
+  void _loadMoreVisible() {
+    if (dexFilterController.hasActiveFilter) {
+      if (_filterVisibleCount >= _referenceFilteredSummaries.length) {
+        return;
+      }
+      setState(() {
+        _filterVisibleCount = (_filterVisibleCount + _chunkSize)
+            .clamp(0, _referenceFilteredSummaries.length);
+      });
+      return;
+    }
+    _loadMore();
   }
 
   Future<void> _loadMore() async {
@@ -366,11 +383,15 @@ class _DexPageState extends State<DexPage> {
 
   List<PokemonSummary> get _visibleEntries {
     if (dexFilterController.hasActiveFilter) {
-      return dexRepository.filterByEncounter(
+      final filtered = dexRepository.filterByEncounter(
         _referenceFilteredSummaries,
         _progress,
         _encounterFilter,
       );
+      if (_filterVisibleCount <= 0) {
+        return filtered;
+      }
+      return filtered.take(_filterVisibleCount).toList(growable: false);
     }
 
     final Iterable<PokemonSummary> entries;
@@ -435,6 +456,17 @@ class _DexPageState extends State<DexPage> {
     };
   }
 
+  int get _filteredTotalCount {
+    if (!dexFilterController.hasActiveFilter) {
+      return 0;
+    }
+    return dexRepository.filterByEncounter(
+      _referenceFilteredSummaries,
+      _progress,
+      _encounterFilter,
+    ).length;
+  }
+
   /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
   String? get _regionProgressLine {
     if (_mode != _DexMode.national || _region == DexRegionalPokedex.national) {
@@ -471,10 +503,8 @@ class _DexPageState extends State<DexPage> {
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification.metrics.pixels >=
-                  notification.metrics.maxScrollExtent - 240 &&
-              _mode == _DexMode.national &&
-              !dexFilterController.hasActiveFilter) {
-            _loadMore();
+                  notification.metrics.maxScrollExtent - 240) {
+            _loadMoreVisible();
           }
           return false;
         },
@@ -641,6 +671,23 @@ class _DexPageState extends State<DexPage> {
                     crossAxisCount: columns,
                     itemCount: columns,
                     childAspectRatio: aspectRatio,
+                  ),
+                ),
+              ),
+            if (dexFilterController.hasActiveFilter &&
+                _filterVisibleCount < _filteredTotalCount)
+              SliverPadding(
+                padding: padding.copyWith(top: 8, bottom: 4),
+                sliver: SliverToBoxAdapter(
+                  child: Text(
+                    AppZh.dexLoadingProgress(
+                      _filterVisibleCount,
+                      _filteredTotalCount,
+                    ),
+                    textAlign: TextAlign.center,
+                    style: SecondaryTypography.onGradient.body14.copyWith(
+                      color: TitoColors.skyBlue,
+                    ),
                   ),
                 ),
               ),

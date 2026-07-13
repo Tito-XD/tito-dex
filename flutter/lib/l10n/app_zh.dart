@@ -220,7 +220,9 @@ abstract final class AppZh {
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
       '离线图鉴缓存包含以下内容（可在下方勾选要下载/保留的部分）。推荐先下载 CDN 预打包数据包；手绘导航图标仍随 APK 内置。';
-  static const settingsDexCacheContentsTitle = '缓存内容说明';
+  static const settingsDexCacheContentsTitle = '缓存内容筛选';
+  static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
+  static const settingsDexAdvancedOptions = '高级选项';
   static const settingsDexCacheOptionJson =
       '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
   static const settingsDexCacheOptionSprites =

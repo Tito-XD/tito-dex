@@ -21,6 +21,7 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/settings_expandable_section.dart';
 import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_bar.dart';
@@ -528,7 +529,10 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               if (_dexDownloading && dexProgress != null) ...[
                 const SizedBox(height: 12),
-                TitoProgressBar(value: dexProgress.fraction, height: 10),
+                TitoProgressBar(
+                  value: dexProgress.fraction.clamp(0.0, 1.0),
+                  height: 10,
+                ),
                 const SizedBox(height: 6),
                 Text(
                   AppZh.settingsDexOfflineProgress(
@@ -537,13 +541,17 @@ class _SettingsPageState extends State<SettingsPage> {
                     dexProgress.total,
                   ),
                   style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
-                ),
-                if (dexProgress.label != null) ...[
+                if (dexProgress.label != null &&
+                    (dexProgress.phase == 'cdn_download' ||
+                        dexProgress.phase == 'cdn_manifest')) ...[
                   const SizedBox(height: 4),
                   Text(
                     dexProgress.label!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.mutedInk,
                     ),
@@ -552,12 +560,38 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               const SizedBox(height: 12),
               Text(
-                AppZh.settingsDexCacheContentsTitle,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                AppZh.settingsDexCdnDownloadHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: _dexDownloading ? null : _downloadDexCdnBundle,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.coral,
+                  foregroundColor: TitoColors.ink,
+                ),
+                child: const Text(AppZh.settingsDexCdnDownload),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SettingsExpandableSection(
+          title: AppZh.settingsDexCacheContentsTitle,
+          subtitle: _cachePreferences.estimateLabelZh(),
+          variant: StickerVariant.mint,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.settingsDexCacheExpandHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 AppZh.settingsDexCacheEstimate(
                   _cachePreferences.estimateLabelZh(),
@@ -602,9 +636,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: _dexDownloading
                     ? null
                     : (value) => _updateCachePreference(
-                          (p) => p.copyWith(
-                            cacheSpritesAllVersions: value ?? false,
-                          ),
+                          (p) =>
+                              p.copyWith(cacheSpritesAllVersions: value ?? false),
                         ),
               ),
               CheckboxListTile(
@@ -630,9 +663,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: _dexDownloading
                     ? null
                     : (value) => _updateCachePreference(
-                          (p) => p.copyWith(
-                            cacheAnimatedSprites: value ?? false,
-                          ),
+                          (p) => p.copyWith(cacheAnimatedSprites: value ?? false),
                         ),
               ),
               CheckboxListTile(
@@ -674,7 +705,17 @@ class _SettingsPageState extends State<SettingsPage> {
                           (p) => p.copyWith(cacheConfig: value ?? true),
                         ),
               ),
-              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SettingsExpandableSection(
+          title: AppZh.settingsDexAdvancedOptions,
+          subtitle: _defaultGameEdition.labelZh,
+          variant: StickerVariant.mint,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Text(
                 AppZh.settingsDexDefaultGameVersion,
                 style: SecondaryTypography.onCard.body14.copyWith(
@@ -704,22 +745,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: _dexDownloading ? null : _setDefaultGameEdition,
               ),
               const SizedBox(height: 12),
-              Text(
-                AppZh.settingsDexCdnDownloadHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: _dexDownloading ? null : _downloadDexCdnBundle,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.coral,
-                  foregroundColor: TitoColors.ink,
-                ),
-                child: const Text(AppZh.settingsDexCdnDownload),
-              ),
-              const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: _dexDownloading ? null : _downloadDexOffline,
                 child: Text(
@@ -797,7 +822,11 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         const SizedBox(height: 16),
-        const SleepToolsSection(),
+        SettingsExpandableSection(
+          title: AppZh.sleepToolsTitle,
+          subtitle: AppZh.sleepToolsTierAHint,
+          child: const SleepToolsSection(),
+        ),
         const SizedBox(height: 16),
         StickerCard(
           child: Column(
