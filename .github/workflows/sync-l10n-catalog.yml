@@ -44,6 +44,16 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Verify Cloudflare R2 token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          cd cloudflare/dex-cdn
+          npm ci
+          npx wrangler r2 bucket list --remote
+          echo "R2 token OK (see docs/PERMISSIONS.md if this step 403s)"
+
       - name: Upload l10n slice to R2
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
