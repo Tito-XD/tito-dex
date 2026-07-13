@@ -189,6 +189,30 @@ class DexRepository {
     }
   }
 
+  /// Abilities for a species — detail JSON first, then reverse lookup in abilities index.
+  Future<List<PokemonAbility>> abilitiesForPokemon(int pokemonId) async {
+    final detail = await getDetail(pokemonId);
+    if (detail.abilities.isNotEmpty) {
+      return detail.abilities;
+    }
+
+    final index = await _loadAllAbilities();
+    final fromIndex = <PokemonAbility>[];
+    for (final entry in index.values) {
+      if (entry.pokemonIds.contains(pokemonId)) {
+        fromIndex.add(
+          PokemonAbility(
+            nameEn: entry.nameEn,
+            nameZh: entry.nameZh,
+            descriptionZh: entry.descriptionZh,
+          ),
+        );
+      }
+    }
+    fromIndex.sort((a, b) => a.nameZh.compareTo(b.nameZh));
+    return fromIndex;
+  }
+
   Future<List<PokemonSummary>> getAllSummaries() async {
     if (await _offline.shouldPreferOffline()) {
       final cached = await _offline.readAllSummaries();
