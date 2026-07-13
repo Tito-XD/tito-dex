@@ -41,11 +41,11 @@ abstract final class AppZh {
   }
 
   static String trainerGreeting(String trainerName, [DateTime? time]) =>
-      '${timeGreeting(time ?? DateTime.now())}，训练家！$trainerName';
+      '${timeGreeting(time ?? DateTime.now())}，训练家 $trainerName';
 
   static String trainerNameLine(String trainerName) {
     final name = trainerName.isNotEmpty ? trainerName : 'Tito';
-    return '训练家！$name';
+    return '训练家 $name';
   }
 
   static const journeyCardTitle = '旅程';
