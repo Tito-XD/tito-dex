@@ -339,6 +339,16 @@ abstract final class AppZh {
   static const companionTypeAttackerTitle = '进攻方（可选）';
   static const companionTypeAttackerPick = '攻击方属性（本系克制参考）';
   static const companionDefenderAbilityPick = '防守方特性（影响属性抗性）';
+  static const companionAttackerAbilityPick = '进攻方特性（破免疫 / 皮肤 / 大力士等）';
+  static const companionManualAbilityPick = '手动选特性（未搜宝可梦时）';
+  static const companionWeatherPick = '天气';
+  static const companionTerrainPick = '场地';
+  static const companionToolBlindSpot = '打击 / 联防盲点';
+  static const companionToolBlindSpotHint = '本系打不动谁、谁克你';
+  static const companionOffensiveBlindSpots = '打击盲点';
+  static const companionDefensiveBlindSpots = '联防盲点';
+  static const companionGenerationTypeNote = '属性按当前游戏世代修正（Gen 4/5 无妖精）';
+  static String companionDamageExtra(String extra) => '环境/特性修正 ×$extra';
   static const companionStatInputsTitle = '输入';
   static String companionStatFacilityNote(String facility) =>
       '默认等级按 $facility 常见配置（Lv.50）';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
+import '../../features/dex/battle_effectiveness.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
@@ -33,6 +34,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
 
   BattleStat _stat = BattleStat.attack;
   NatureModifier _nature = battleNatures.firstWhere((n) => n.key == 'serious');
+  String? _attackerAbilitySlug;
   List<PokemonSummary> _suggestions = const [];
 
   @override
@@ -114,6 +116,8 @@ class _StatCalcPageState extends State<StatCalcPage> {
           iv: _readIv(),
           ev: _readEv(),
           nature: _nature,
+          attackerAbilitySlug: _attackerAbilitySlug,
+          isPhysicalStat: _stat == BattleStat.attack,
         );
 
         return TitoFontScale(
@@ -202,6 +206,14 @@ class _StatCalcPageState extends State<StatCalcPage> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              ManualAbilityPicker(
+                label: AppZh.companionAttackerAbilityPick,
+                options: kManualAttackerAbilityOptions,
+                selectedSlug: _attackerAbilitySlug,
+                onChanged: (slug) =>
+                    setState(() => _attackerAbilitySlug = slug),
               ),
             ],
           ),

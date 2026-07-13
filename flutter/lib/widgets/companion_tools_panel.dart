@@ -60,6 +60,13 @@ class CompanionToolsPanel extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _CompanionToolTile(
+                icon: Icons.radar_rounded,
+                title: AppZh.companionToolBlindSpot,
+                subtitle: AppZh.companionToolBlindSpotHint,
+                onTap: () => context.push('/search/companion/blind-spot'),
+              ),
+              const SizedBox(height: 8),
+              _CompanionToolTile(
                 icon: Icons.flash_on_rounded,
                 title: AppZh.companionToolQuickDamage,
                 subtitle: AppZh.companionToolQuickDamageHint(scope.facilityLabel),

@@ -1,4 +1,5 @@
-import '../dex/ability_type_modifiers.dart';
+import '../dex/battle_effectiveness.dart';
+import '../dex/generation_type_chart.dart';
 import '../dex/type_chart.dart';
 
 enum BattleStat { hp, attack, defense, specialAttack, specialDefense, speed }
@@ -83,6 +84,8 @@ int computeBattleStat({
   required int iv,
   required int ev,
   required NatureModifier nature,
+  String? attackerAbilitySlug,
+  bool isPhysicalStat = false,
 }) {
   final safeIv = clampIvEv(iv, 31);
   final safeEv = clampIvEv(ev, 252);
@@ -98,6 +101,15 @@ int computeBattleStat({
   } else if (nature.drop == stat) {
     value = (value * 0.9).floor();
   }
+
+  if (stat == BattleStat.attack && isPhysicalStat) {
+    value = applyAttackerAbilityToAttackStat(
+      value,
+      true,
+      attackerAbilitySlug,
+    );
+  }
+
   return value;
 }
 
@@ -106,13 +118,17 @@ double typeMultiplierForMove(
   List<String> defenderTypes,
   Map<String, TypeDamageRelations> relationsByType, {
   String? defenderAbilitySlug,
+  String? attackerAbilitySlug,
+  int generation = 9,
 }) {
-  final multipliers = computeDefensiveMultipliersWithAbility(
+  final input = BattleEffectivenessInput(
     defenderTypes: defenderTypes,
     relationsByType: relationsByType,
     defenderAbilitySlug: defenderAbilitySlug,
+    attackerAbilitySlug: attackerAbilitySlug,
+    generation: generation,
   );
-  return multipliers[moveType] ?? 1;
+  return typeMultiplierForBattleMove(moveType, input);
 }
 
 bool hasStab(String moveType, List<String> attackerTypes) =>
@@ -141,6 +157,7 @@ class DamageEstimate {
     required this.tankVerdictZh,
     required this.typeMultiplier,
     required this.stabMultiplier,
+    required this.extraMultiplier,
   });
 
   final int minDamage;
@@ -151,6 +168,7 @@ class DamageEstimate {
   final String tankVerdictZh;
   final double typeMultiplier;
   final double stabMultiplier;
+  final double extraMultiplier;
 }
 
 DamageEstimate estimateDamage({
@@ -164,22 +182,55 @@ DamageEstimate estimateDamage({
   required List<String> defenderTypes,
   required Map<String, TypeDamageRelations> relationsByType,
   String? defenderAbilitySlug,
+  String? attackerAbilitySlug,
+  int generation = 9,
+  String? weatherSlug,
+  String? terrainSlug,
+  MoveCategory category = MoveCategory.physical,
   double otherMultiplier = 1,
 }) {
+  final effectiveAttack = applyAttackerAbilityToAttackStat(
+    attack,
+    category == MoveCategory.physical,
+    attackerAbilitySlug,
+  );
+
   final base = computeBaseDamage(
     level: level,
     power: power,
-    attack: attack,
+    attack: effectiveAttack,
     defense: defense,
   );
-  final stab = hasStab(moveType, attackerTypes) ? 1.5 : 1.0;
-  final type = typeMultiplierForMove(
-    moveType,
-    defenderTypes,
-    relationsByType,
+
+  final normalizedAttacker =
+      normalizeTypesForGeneration(attackerTypes, generation);
+  final effectiveMove = effectiveMoveType(moveType, attackerAbilitySlug);
+  final stabTypes = normalizedAttacker;
+  final stab = hasStab(effectiveMove, stabTypes) ||
+          (moveType == 'normal' &&
+              attackerAbilitySlug != null &&
+              kAbilityMoveTypeConversion.containsKey(attackerAbilitySlug))
+      ? 1.5
+      : 1.0;
+
+  final input = BattleEffectivenessInput(
+    defenderTypes: defenderTypes,
+    relationsByType: relationsByType,
     defenderAbilitySlug: defenderAbilitySlug,
+    attackerAbilitySlug: attackerAbilitySlug,
+    generation: generation,
+    weatherSlug: weatherSlug,
+    terrainSlug: terrainSlug,
   );
-  final modifier = stab * type * otherMultiplier;
+  final type = typeMultiplierForBattleMove(moveType, input);
+  final fieldMod = fieldMoveTypeModifier(effectiveMove, input);
+  final abilityMod = abilityDamageMultiplier(
+    typeMultiplier: type,
+    defenderAbilitySlug: defenderAbilitySlug,
+    attackerAbilitySlug: attackerAbilitySlug,
+  );
+  final extra = fieldMod * abilityMod * otherMultiplier;
+  final modifier = stab * type * extra;
   final minDamage = (base * modifier * 0.85).floor();
   final maxDamage = (base * modifier).floor();
   final safeHp = defenderHp <= 0 ? 1 : defenderHp;
@@ -195,6 +246,7 @@ DamageEstimate estimateDamage({
     tankVerdictZh: _tankVerdict(minDamage, maxDamage, safeHp),
     typeMultiplier: type,
     stabMultiplier: stab,
+    extraMultiplier: extra,
   );
 }
 

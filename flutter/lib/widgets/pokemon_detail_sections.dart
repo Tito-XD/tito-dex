@@ -5,7 +5,12 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
+import '../features/companion/battle_tools_service.dart';
+import '../features/dex/ability_type_modifiers.dart';
+import '../features/dex/battle_effectiveness.dart';
+import '../features/dex/generation_type_chart.dart';
 import '../features/dex/type_chart.dart';
+import '../widgets/companion_tool_fields.dart';
 import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -1330,6 +1335,152 @@ class _MetaTile extends StatelessWidget {
           ),
         ),
         Text(value, style: SecondaryTypography.onCard.h15),
+      ],
+    );
+  }
+}
+
+class InteractiveTypeEffectivenessCard extends StatefulWidget {
+  const InteractiveTypeEffectivenessCard({
+    super.key,
+    required this.types,
+    required this.abilities,
+    required this.generation,
+  });
+
+  final List<String> types;
+  final List<PokemonAbility> abilities;
+  final int generation;
+
+  @override
+  State<InteractiveTypeEffectivenessCard> createState() =>
+      _InteractiveTypeEffectivenessCardState();
+}
+
+class _InteractiveTypeEffectivenessCardState
+    extends State<InteractiveTypeEffectivenessCard> {
+  Map<String, TypeDamageRelations>? _relations;
+  String? _abilitySlug;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant InteractiveTypeEffectivenessCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.generation != widget.generation ||
+        oldWidget.types != widget.types) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _load() async {
+    try {
+      final relations = await battleToolsService.loadTypeRelations();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _relations = relations;
+        _loading = false;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const StickerCard(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final relations = _relations;
+    if (relations == null) {
+      return const SizedBox.shrink();
+    }
+
+    final options = widget.abilities
+        .map(
+          (ability) => DefensiveAbilityOption(
+            slug: abilitySlugFromNameEn(ability.nameEn),
+            labelZh: ability.nameZh,
+            isHidden: ability.isHidden,
+          ),
+        )
+        .toList(growable: false);
+
+    final input = BattleEffectivenessInput(
+      defenderTypes: widget.types,
+      relationsByType: relations,
+      defenderAbilitySlug: _abilitySlug,
+      generation: widget.generation,
+    );
+    final profile = computeBattleDefensiveProfile(input);
+    final multipliers = computeBattleTypeMultipliers(input);
+    final normalized =
+        normalizeTypesForGeneration(widget.types, widget.generation);
+
+    return Column(
+      children: [
+        if (options.isNotEmpty) ...[
+          StickerCard(
+            child: DefensiveAbilityPicker(
+              selectedSlug: _abilitySlug,
+              options: options,
+              onChanged: (slug) => setState(() => _abilitySlug = slug),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (widget.generation < 6)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '世代修正：${normalized.map(typeNameZh).join('/')}',
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+            ),
+          ),
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.companionTypeSummaryTitle,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                profileLine(AppZh.dexWeaknesses, profile.weaknesses),
+                style: SecondaryTypography.onCard.body14,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                profileLine(AppZh.dexResistances, profile.resistances),
+                style: SecondaryTypography.onCard.body14,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                profileLine(AppZh.dexImmunities, profile.immunities),
+                style: SecondaryTypography.onCard.body14,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        TypeEffectivenessGrid(multipliers: multipliers),
       ],
     );
   }

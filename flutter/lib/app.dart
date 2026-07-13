@@ -29,6 +29,7 @@ import 'pages/dex_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/companion/blind_spot_page.dart';
 import 'pages/companion/quick_damage_page.dart';
 import 'pages/companion/stat_calc_page.dart';
 import 'pages/companion/type_matchup_page.dart';
@@ -219,6 +220,15 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: StatCalcPage(journey: _journey),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'companion/blind-spot',
+                  pageBuilder: (context, state) => titoSlidePage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: BlindSpotPage(journey: _journey),
                     ),
                   ),
                 ),
