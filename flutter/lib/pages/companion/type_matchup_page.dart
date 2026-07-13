@@ -5,8 +5,8 @@ import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
-import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
@@ -91,17 +91,21 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = battleScopeForGame(widget.journey.game);
-    final relations = _relations;
+    return ListenableBuilder(
+      listenable: gameEditionRepository,
+      builder: (context, _) {
+        final edition = gameEditionRepository.edition;
+        final scope = battleScopeForEdition(edition);
+        final relations = _relations;
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: Material(
-        type: MaterialType.transparency,
-        child: SecondaryPageScaffold(
-        title: AppZh.companionToolTypeMatchup,
-        subtitle: localizeGame(widget.journey.game),
-        children: [
+        return TitoFontScale(
+          multiplier: 1.0,
+          child: Material(
+            type: MaterialType.transparency,
+            child: SecondaryPageScaffold(
+              title: AppZh.companionToolTypeMatchup,
+              subtitle: edition.labelZh,
+              children: [
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_error != null)
@@ -230,9 +234,11 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
               ],
             ),
           ],
-        ],
-      ),
-      ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

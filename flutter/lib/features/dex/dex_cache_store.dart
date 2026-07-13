@@ -15,6 +15,8 @@ class DexCachePaths {
   File get summariesFile => File('${root.path}/summaries.json');
   File get typesFile => File('${root.path}/types.json');
   File get movesFile => File('${root.path}/moves.json');
+  File get abilitiesFile => File('${root.path}/abilities.json');
+  File jsonFile(String name) => File('${root.path}/$name');
   Directory get detailsDir => Directory('${root.path}/details');
   Directory get spritesDir => Directory('${root.path}/sprites');
   Directory get artworkDir => Directory('${root.path}/artwork');
@@ -155,6 +157,53 @@ class DexCacheStore {
       moves[id] = CachedMove.fromJson(entry.value as Map<String, dynamic>);
     }
     return moves;
+  }
+
+  /// Read CDN reference indices bundled offline (natures, weather, items, …).
+  Future<List<Map<String, dynamic>>> readJsonArray(String filename) async {
+    final paths = await _pathsFuture;
+    final file = paths.jsonFile(filename);
+    if (!await file.exists()) {
+      return const [];
+    }
+    final decoded = jsonDecode(await file.readAsString());
+    if (decoded is! List) {
+      return const [];
+    }
+    return decoded
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: false);
+  }
+
+  /// Read object-shaped CDN indices (items.json, moves.json, …).
+  Future<Map<String, dynamic>> readJsonObject(String filename) async {
+    final paths = await _pathsFuture;
+    final file = paths.jsonFile(filename);
+    if (!await file.exists()) {
+      return const {};
+    }
+    final decoded = jsonDecode(await file.readAsString());
+    if (decoded is! Map) {
+      return const {};
+    }
+    return Map<String, dynamic>.from(decoded);
+  }
+
+  Future<Map<int, CachedAbility>> readAbilities() async {
+    final json = await readJsonObject('abilities.json');
+    final abilities = <int, CachedAbility>{};
+    for (final entry in json.entries) {
+      final id = int.tryParse(entry.key);
+      if (id == null) {
+        continue;
+      }
+      abilities[id] = CachedAbility.fromJson(
+        entry.value as Map<String, dynamic>,
+        fallbackId: id,
+      );
+    }
+    return abilities;
   }
 
   Future<void> writeDetail(int id, PokemonDetail detail) async {

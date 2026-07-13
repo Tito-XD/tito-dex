@@ -4,8 +4,8 @@ import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
-import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
@@ -38,7 +38,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
   @override
   void initState() {
     super.initState();
-    final scope = battleScopeForGame(widget.journey.game);
+    final scope = battleScopeForEdition(gameEditionRepository.edition);
     _levelController.text = scope.defaultLevel.toString();
   }
 
@@ -92,7 +92,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
   int _readBase() => int.tryParse(_baseController.text.trim()) ?? 0;
 
   int _readLevel() {
-    final scope = battleScopeForGame(widget.journey.game);
+    final scope = battleScopeForEdition(gameEditionRepository.edition);
     return int.tryParse(_levelController.text.trim()) ?? scope.defaultLevel;
   }
 
@@ -102,24 +102,28 @@ class _StatCalcPageState extends State<StatCalcPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = battleScopeForGame(widget.journey.game);
-    final result = computeBattleStat(
-      stat: _stat,
-      base: _readBase(),
-      level: _readLevel(),
-      iv: _readIv(),
-      ev: _readEv(),
-      nature: _nature,
-    );
+    return ListenableBuilder(
+      listenable: gameEditionRepository,
+      builder: (context, _) {
+        final edition = gameEditionRepository.edition;
+        final scope = battleScopeForEdition(edition);
+        final result = computeBattleStat(
+          stat: _stat,
+          base: _readBase(),
+          level: _readLevel(),
+          iv: _readIv(),
+          ev: _readEv(),
+          nature: _nature,
+        );
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: Material(
-        type: MaterialType.transparency,
-        child: SecondaryPageScaffold(
-        title: AppZh.companionToolStatCalc,
-        subtitle: localizeGame(widget.journey.game),
-        children: [
+        return TitoFontScale(
+          multiplier: 1.0,
+          child: Material(
+            type: MaterialType.transparency,
+            child: SecondaryPageScaffold(
+              title: AppZh.companionToolStatCalc,
+              subtitle: edition.labelZh,
+              children: [
           CompanionSectionCard(
             title: AppZh.companionStatInputsTitle,
             subtitle: AppZh.companionStatFacilityNote(scope.facilityLabel),
@@ -230,8 +234,10 @@ class _StatCalcPageState extends State<StatCalcPage> {
             ),
           ),
         ],
-      ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

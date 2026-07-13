@@ -313,20 +313,41 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              widget.entries.length,
-              (index) => Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: index == _index
-                      ? TitoColors.coral
-                      : TitoColors.mutedInk.withValues(alpha: 0.35),
+            children: [
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                onPressed: _index > 0
+                    ? () => _controller.previousPage(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOut,
+                        )
+                    : null,
+                icon: const Icon(Icons.chevron_left_rounded),
+                color: TitoColors.coral,
+              ),
+              Text(
+                '${_index + 1}/${widget.entries.length}',
+                style: SecondaryTypography.onCard.meta14.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: TitoColors.coral,
                 ),
               ),
-            ),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                onPressed: _index < widget.entries.length - 1
+                    ? () => _controller.nextPage(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOut,
+                        )
+                    : null,
+                icon: const Icon(Icons.chevron_right_rounded),
+                color: TitoColors.coral,
+              ),
+            ],
           ),
         ],
       ),
@@ -432,52 +453,65 @@ class BaseStatsRadarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppZh.dexBaseStatsRadar,
-            style: SecondaryTypography.onCard.h15,
-          ),
-          const SizedBox(height: 8),
-          AspectRatio(
-            aspectRatio: 1,
-            child: CustomPaint(
-              painter: _BaseStatsRadarPainter(stats: stats),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final center = Offset(
-                      constraints.maxWidth / 2,
-                      constraints.maxHeight / 2,
-                    );
-                    final radius =
-                        (constraints.maxWidth < constraints.maxHeight
-                                ? constraints.maxWidth
-                                : constraints.maxHeight) /
-                            2 -
-                        18;
-                    final labels = stats.entries.toList();
-                    return Stack(
-                      children: [
-                        for (var i = 0; i < labels.length; i++)
-                          _RadarStatLabel(
-                            label: statLabelsZh[labels[i].key] ?? labels[i].key,
-                            value: labels[i].value,
-                            center: center,
-                            radius: radius + 16,
-                            index: i,
-                            total: labels.length,
-                          ),
-                      ],
-                    );
-                  },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const titleBlock = 44.0;
+          final boundedHeight = constraints.maxHeight.isFinite
+              ? constraints.maxHeight - titleBlock
+              : constraints.maxWidth;
+          final chartSize = math.min(constraints.maxWidth, boundedHeight);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppZh.dexBaseStatsRadar,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: chartSize,
+                height: chartSize,
+                child: CustomPaint(
+                  painter: _BaseStatsRadarPainter(stats: stats),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: LayoutBuilder(
+                      builder: (context, inner) {
+                        final center = Offset(
+                          inner.maxWidth / 2,
+                          inner.maxHeight / 2,
+                        );
+                        final radius =
+                            (inner.maxWidth < inner.maxHeight
+                                    ? inner.maxWidth
+                                    : inner.maxHeight) /
+                                2 -
+                            18;
+                        final labels = stats.entries.toList();
+                        return Stack(
+                          children: [
+                            for (var i = 0; i < labels.length; i++)
+                              _RadarStatLabel(
+                                label:
+                                    statLabelsZh[labels[i].key] ?? labels[i].key,
+                                value: labels[i].value,
+                                center: center,
+                                radius: radius + 16,
+                                index: i,
+                                total: labels.length,
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -653,17 +687,25 @@ class _BaseStatsSectionState extends State<BaseStatsSection> {
           ],
         ),
         const SizedBox(height: 8),
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: _showRadar
-              ? BaseStatsRadarChart(
-                  key: const ValueKey('radar'),
-                  stats: widget.stats,
-                )
-              : BaseStatsCard(
-                  key: const ValueKey('bars'),
-                  stats: widget.stats,
-                ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            layoutBuilder: (current, previous) =>
+                current ?? const SizedBox.shrink(),
+            child: _showRadar
+                ? SizedBox(
+                    key: const ValueKey('radar'),
+                    height: 280,
+                    child: BaseStatsRadarChart(stats: widget.stats),
+                  )
+                : BaseStatsCard(
+                    key: const ValueKey('bars'),
+                    stats: widget.stats,
+                  ),
+          ),
         ),
       ],
     );

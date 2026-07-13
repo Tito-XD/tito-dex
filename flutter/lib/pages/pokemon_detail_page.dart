@@ -206,17 +206,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<ObtainLocationEntry> _obtainForEdition(PokemonDetail detail) {
-    var locations =
-        detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
-    if (locations.isNotEmpty) {
-      return locations;
+    return detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
+  }
+
+  String? _obtainSourceLabel(PokemonDetail detail) {
+    final key = _gameEdition.dataVersionGroupKey;
+    final direct = detail.obtainLocationsByGame[key];
+    if (direct != null && direct.isNotEmpty) {
+      return _gameEdition.labelZh;
     }
-    final fallback = gameEditionFromSlug(_gameEdition.fallbackSlug);
-    if (fallback != null && fallback.slug != _gameEdition.slug) {
-      locations =
-          detail.obtainLocationsForKey(fallback.dataVersionGroupKey);
+    final (fallbackKey, _) = detail.firstAvailableObtain;
+    if (fallbackKey == null) {
+      return null;
     }
-    return locations;
+    if (fallbackKey == key) {
+      return _gameEdition.labelZh;
+    }
+    return fallbackKey;
   }
 
   List<Widget> _introSections(PokemonDetail detail) => [
@@ -302,7 +308,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       if (locations.isNotEmpty)
         ObtainLocationsCard(
           locations: locations,
-          gameLabel: _gameEdition.labelZh,
+          gameLabel: _obtainSourceLabel(detail) ?? _gameEdition.labelZh,
         )
       else
         StickerCard(

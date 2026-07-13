@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/companion/battle_game_scope.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
-import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -18,57 +19,56 @@ class CompanionToolsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scope = battleScopeForGame(journey.game);
+    return ListenableBuilder(
+      listenable: gameEditionRepository,
+      builder: (context, _) {
+        final edition = gameEditionRepository.edition;
+        final scope = battleScopeForEdition(edition);
 
-    return StickerCard(
-      variant: StickerVariant.deep,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppZh.companionToolsTitle,
-            style: context.tito.onDeepHeading,
+        return StickerCard(
+          variant: StickerVariant.deep,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.companionToolsTitle,
+                style: context.tito.onDeepHeading,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                AppZh.companionToolsSubtitle(edition.labelZh),
+                style: context.tito.onDeepSubtitle,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                AppZh.companionToolsFacility(scope.facilityLabel),
+                style: context.tito.onDeepSubtitle,
+              ),
+              const SizedBox(height: 12),
+              _CompanionToolTile(
+                icon: Icons.bolt_rounded,
+                title: AppZh.companionToolTypeMatchup,
+                subtitle: AppZh.companionToolTypeMatchupHint,
+                onTap: () => context.push('/search/companion/type-matchup'),
+              ),
+              const SizedBox(height: 8),
+              _CompanionToolTile(
+                icon: Icons.calculate_rounded,
+                title: AppZh.companionToolStatCalc,
+                subtitle: AppZh.companionToolStatCalcHint,
+                onTap: () => context.push('/search/companion/stat-calc'),
+              ),
+              const SizedBox(height: 8),
+              _CompanionToolTile(
+                icon: Icons.flash_on_rounded,
+                title: AppZh.companionToolQuickDamage,
+                subtitle: AppZh.companionToolQuickDamageHint(scope.facilityLabel),
+                onTap: () => context.push('/search/companion/quick-damage'),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            AppZh.companionToolsSubtitle(localizeGame(journey.game)),
-            style: context.tito.onDeepSubtitle,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            AppZh.companionToolsFacility(scope.facilityLabel),
-            style: context.tito.onDeepSubtitle,
-          ),
-          const SizedBox(height: 12),
-          _CompanionToolTile(
-            icon: Icons.auto_stories_rounded,
-            title: AppZh.companionToolDex,
-            subtitle: AppZh.companionToolDexHint,
-            onTap: () => context.push('/dex'),
-          ),
-          const SizedBox(height: 8),
-          _CompanionToolTile(
-            icon: Icons.bolt_rounded,
-            title: AppZh.companionToolTypeMatchup,
-            subtitle: AppZh.companionToolTypeMatchupHint,
-            onTap: () => context.push('/search/companion/type-matchup'),
-          ),
-          const SizedBox(height: 8),
-          _CompanionToolTile(
-            icon: Icons.calculate_rounded,
-            title: AppZh.companionToolStatCalc,
-            subtitle: AppZh.companionToolStatCalcHint,
-            onTap: () => context.push('/search/companion/stat-calc'),
-          ),
-          const SizedBox(height: 8),
-          _CompanionToolTile(
-            icon: Icons.flash_on_rounded,
-            title: AppZh.companionToolQuickDamage,
-            subtitle: AppZh.companionToolQuickDamageHint(scope.facilityLabel),
-            onTap: () => context.push('/search/companion/quick-damage'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
