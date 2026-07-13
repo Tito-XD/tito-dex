@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../features/companion/battle_game_scope.dart';
 import '../features/companion/battle_tools_service.dart';
+import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/type_chart.dart';
+import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
@@ -64,48 +67,62 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
   Widget build(BuildContext context) {
     final body14 = SecondaryTypography.onCard.body14;
 
-    return StickerCard(
-      variant: StickerVariant.cream,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppZh.teamSummaryTitle,
-            style: SecondaryTypography.onCard.h15,
-          ),
-          const SizedBox(height: 8),
-          if (widget.party.isEmpty)
-            Text(
-              AppZh.teamEmptySlot,
-              style: body14.copyWith(color: TitoColors.mutedInk),
-            )
-          else if (_loading && _data == null)
-            const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else if (_data != null) ...[
-            Text(AppZh.teamSummaryAvgLevel(_data!.avgLevel), style: body14),
-            const SizedBox(height: 4),
-            Text(AppZh.teamSummaryBstSum(_data!.bstSum), style: body14),
-            const SizedBox(height: 4),
-            Text(
-              AppZh.teamSummaryTypeCoverage(_data!.typeCoverage),
-              style: body14,
-            ),
-            if (_data!.weaknessLine.isNotEmpty) ...[
-              const SizedBox(height: 4),
+    return ListenableBuilder(
+      listenable: gameEditionRepository,
+      builder: (context, _) {
+        return StickerCard(
+          variant: StickerVariant.cream,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                _data!.weaknessLine,
-                style: body14.copyWith(color: TitoColors.mutedInk),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                AppZh.teamSummaryTitle,
+                style: SecondaryTypography.onCard.h15,
               ),
+              const SizedBox(height: 8),
+              if (widget.party.isEmpty)
+                Text(
+                  AppZh.teamEmptySlot,
+                  style: body14.copyWith(color: TitoColors.mutedInk),
+                )
+              else if (_loading && _data == null)
+                const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else if (_data != null) ...[
+                Text(AppZh.teamSummaryAvgLevel(_data!.avgLevel), style: body14),
+                const SizedBox(height: 4),
+                Text(AppZh.teamSummaryBstSum(_data!.bstSum), style: body14),
+                const SizedBox(height: 4),
+                Text(
+                  AppZh.teamSummaryTypeCoverage(_data!.typeCoverage),
+                  style: body14,
+                ),
+                if (_data!.weaknessLine.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _data!.weaknessLine,
+                    style: body14.copyWith(color: TitoColors.mutedInk),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                if (_data!.sharedWeaknessLine.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _data!.sharedWeaknessLine,
+                    style: body14.copyWith(color: TitoColors.mutedInk),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
             ],
-          ],
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -116,12 +133,14 @@ class _TeamSummaryData {
     required this.bstSum,
     required this.typeCoverage,
     required this.weaknessLine,
+    required this.sharedWeaknessLine,
   });
 
   final double avgLevel;
   final int bstSum;
   final int typeCoverage;
   final String weaknessLine;
+  final String sharedWeaknessLine;
 }
 
 Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
@@ -129,7 +148,10 @@ Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
   var bstSum = 0;
   final types = <String>{};
   final weaknessCounts = <String, int>{};
+  final memberTypes = <List<String>>[];
   final relations = await battleToolsService.loadTypeRelations();
+  final generation =
+      battleScopeForEdition(gameEditionRepository.edition).generation;
 
   for (final member in party) {
     final id = member.speciesId;
@@ -142,12 +164,17 @@ Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
 
     final summary = await dexRepository.getSummary(id);
     types.addAll(summary.types);
+    memberTypes.add(summary.types);
 
     final detail = await dexRepository.getDetail(id);
     bstSum += detail.baseStats?.total ?? 0;
 
-    final profile = computeDefensiveProfile(summary.types, relations);
-    for (final weakness in profile.weaknesses) {
+    final input = BattleEffectivenessInput(
+      defenderTypes: summary.types,
+      relationsByType: relations,
+      generation: generation,
+    );
+    for (final weakness in computeBattleDefensiveProfile(input).weaknesses) {
       weaknessCounts[weakness] = (weaknessCounts[weakness] ?? 0) + 1;
     }
   }
@@ -164,11 +191,21 @@ Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
     weaknessLine = AppZh.teamSummaryWeaknesses(top);
   }
 
+  final shared = computeTeamSharedWeaknesses(
+    memberTypes,
+    relations,
+    generation: generation,
+  );
+  final sharedWeaknessLine = shared.isEmpty
+      ? ''
+      : AppZh.teamSummarySharedWeaknesses(shared.join('、'));
+
   return _TeamSummaryData(
     avgLevel: avgLevel,
     bstSum: bstSum,
     typeCoverage: types.length,
     weaknessLine: weaknessLine,
+    sharedWeaknessLine: sharedWeaknessLine,
   );
 }
 
