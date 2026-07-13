@@ -8,7 +8,9 @@ import 'config/app_config.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
+import 'features/dex/dex_offline_service.dart';
 import 'features/dex/dex_settings_repository.dart';
+import 'features/dex/dex_update_service.dart';
 import 'l10n/zh_catalog.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
@@ -40,6 +42,7 @@ import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
+import 'widgets/offline_data_prompt.dart';
 import 'widgets/shell_companion_overlay.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
@@ -302,6 +305,33 @@ class _TitoDexAppState extends State<TitoDexApp> {
       _emulatorChoice = emulatorChoice;
       _ready = true;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkOfflineDataPrompts();
+    });
+  }
+
+  Future<void> _checkOfflineDataPrompts() async {
+    if (!mounted) {
+      return;
+    }
+
+    final offlineReady = await dexOfflineService.isReady();
+    if (!offlineReady) {
+      if (mounted) {
+        await showOfflineDataPrompt(context);
+      }
+      return;
+    }
+
+    try {
+      final updateInfo = await dexUpdateService.checkForUpdates();
+      if (!mounted || !updateInfo.hasUpdate) {
+        return;
+      }
+      await showUpdateAvailableDialog(context);
+    } catch (_) {
+      // Network unavailable — skip silently.
+    }
   }
 
   Future<void> _persist(CurrentJourney journey) async {

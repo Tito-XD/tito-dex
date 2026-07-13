@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'dex_bundle_installer.dart';
+import 'dex_l10n_installer.dart';
 import 'dex_cache_store.dart';
 import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
@@ -158,12 +159,50 @@ class DexOfflineService {
     return _store.readMoves();
   }
 
+  Future<String?> absolutePathForRelative(String relativePath) =>
+      _store.absolutePathForRelative(relativePath);
+
+  String spriteUrlFor(int id) => _cdnConfig.spriteUrl(id);
+
+  Future<List<int>> findPokemonIdsWithMove(int moveId) async {
+    if (kIsWeb) {
+      return const [];
+    }
+    return _store.findPokemonIdsWithMove(moveId);
+  }
+
   Future<String?> typeIconPath(String type) async {
     final relative = await _store.typeIconRelativePath(type);
     if (relative != null) {
       return _store.absolutePathForRelative(relative);
     }
     return _cdnConfig.typeIconUrl(type);
+  }
+
+  Stream<DexCacheProgress> downloadL10nFromCdn({DexBundleManifest? manifest}) async* {
+    if (_downloading) {
+      return;
+    }
+    _downloading = true;
+
+    final installer = DexL10nInstaller(
+      store: _store,
+      config: _cdnConfig,
+    );
+
+    try {
+      await for (final progress in installer.install(remoteManifest: manifest)) {
+        yield _setProgress(
+          phase: progress.phase,
+          current: progress.current,
+          total: progress.total,
+          label: progress.label,
+        );
+      }
+    } finally {
+      _downloading = false;
+      _progress = null;
+    }
   }
 
   Stream<DexCacheProgress> downloadFromCdnBundle() async* {

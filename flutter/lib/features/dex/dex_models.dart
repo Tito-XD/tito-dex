@@ -136,6 +136,7 @@ class CachedMove {
     this.power,
     this.accuracy,
     this.pp,
+    this.descriptionZh,
   });
 
   final int id;
@@ -146,6 +147,7 @@ class CachedMove {
   final int? power;
   final int? accuracy;
   final int? pp;
+  final String? descriptionZh;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -156,6 +158,7 @@ class CachedMove {
         if (power != null) 'power': power,
         if (accuracy != null) 'accuracy': accuracy,
         if (pp != null) 'pp': pp,
+        if (descriptionZh != null) 'descriptionZh': descriptionZh,
       };
 
   factory CachedMove.fromJson(Map<String, dynamic> json) => CachedMove(
@@ -167,6 +170,7 @@ class CachedMove {
         power: json['power'] as int?,
         accuracy: json['accuracy'] as int?,
         pp: json['pp'] as int?,
+        descriptionZh: json['descriptionZh'] as String?,
       );
 }
 
@@ -827,6 +831,8 @@ class DexCacheManifest {
     this.pokemonCount = 0,
     this.moveCount = 0,
     this.sizeBytes = 0,
+    this.l10nVersion,
+    this.configVersion,
   });
 
   static const currentVersion = 2;
@@ -838,6 +844,8 @@ class DexCacheManifest {
   final int pokemonCount;
   final int moveCount;
   final int sizeBytes;
+  final String? l10nVersion;
+  final int? configVersion;
 
   Map<String, dynamic> toJson() => {
         'version': version,
@@ -847,6 +855,8 @@ class DexCacheManifest {
         'pokemonCount': pokemonCount,
         'moveCount': moveCount,
         'sizeBytes': sizeBytes,
+        if (l10nVersion != null) 'l10nVersion': l10nVersion,
+        if (configVersion != null) 'configVersion': configVersion,
       };
 
   factory DexCacheManifest.fromJson(Map<String, dynamic> json) =>
@@ -858,6 +868,8 @@ class DexCacheManifest {
         pokemonCount: json['pokemonCount'] as int? ?? 0,
         moveCount: json['moveCount'] as int? ?? 0,
         sizeBytes: json['sizeBytes'] as int? ?? 0,
+        l10nVersion: json['l10nVersion'] as String?,
+        configVersion: json['configVersion'] as int?,
       );
 }
 

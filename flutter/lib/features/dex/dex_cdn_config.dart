@@ -61,6 +61,15 @@ class DexCdnConfig {
   String typeIconUrl(String type, {String prefix = legacyBundleVersionPrefix}) =>
       '$cdnBase/$prefix/type_icons/$type.png';
 
+  String l10nFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/l10n/zh/$filename';
+
+  String mapFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/maps/$filename';
+
+  String configFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/config/$filename';
+
   DexBundleManifest fallbackManifest() => DexBundleManifest(
         bundleVersion: bundleVersion,
         archiveUrl: bundleUrl,
