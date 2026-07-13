@@ -1,0 +1,2240 @@
+{
+  "1": {
+    "descriptionZh": "Has a 10% chance of making target Pokémon flinch with each hit.",
+    "nameEn": "Stench",
+    "nameZh": "恶臭",
+    "slug": "stench"
+  },
+  "10": {
+    "descriptionZh": "Absorbs Electric moves, healing for 1/4 max HP.",
+    "nameEn": "Volt Absorb",
+    "nameZh": "蓄电",
+    "slug": "volt-absorb"
+  },
+  "100": {
+    "descriptionZh": "Makes the Pokémon move last within its move's priority bracket.",
+    "nameEn": "Stall",
+    "nameZh": "慢出",
+    "slug": "stall"
+  },
+  "10001": {
+    "descriptionZh": "",
+    "nameEn": "Mountaineer",
+    "nameZh": "Mountaineer",
+    "slug": "mountaineer"
+  },
+  "10002": {
+    "descriptionZh": "",
+    "nameEn": "Wave Rider",
+    "nameZh": "Wave Rider",
+    "slug": "wave-rider"
+  },
+  "10003": {
+    "descriptionZh": "",
+    "nameEn": "Skater",
+    "nameZh": "Skater",
+    "slug": "skater"
+  },
+  "10004": {
+    "descriptionZh": "",
+    "nameEn": "Thrust",
+    "nameZh": "Thrust",
+    "slug": "thrust"
+  },
+  "10005": {
+    "descriptionZh": "",
+    "nameEn": "Perception",
+    "nameZh": "Perception",
+    "slug": "perception"
+  },
+  "10006": {
+    "descriptionZh": "",
+    "nameEn": "Parry",
+    "nameZh": "Parry",
+    "slug": "parry"
+  },
+  "10007": {
+    "descriptionZh": "",
+    "nameEn": "Instinct",
+    "nameZh": "Instinct",
+    "slug": "instinct"
+  },
+  "10008": {
+    "descriptionZh": "",
+    "nameEn": "Dodge",
+    "nameZh": "Dodge",
+    "slug": "dodge"
+  },
+  "10009": {
+    "descriptionZh": "",
+    "nameEn": "Jagged Edge",
+    "nameZh": "Jagged Edge",
+    "slug": "jagged-edge"
+  },
+  "10010": {
+    "descriptionZh": "",
+    "nameEn": "Frostbite",
+    "nameZh": "Frostbite",
+    "slug": "frostbite"
+  },
+  "10011": {
+    "descriptionZh": "",
+    "nameEn": "Tenacity",
+    "nameZh": "Tenacity",
+    "slug": "tenacity"
+  },
+  "10012": {
+    "descriptionZh": "",
+    "nameEn": "Pride",
+    "nameZh": "Pride",
+    "slug": "pride"
+  },
+  "10013": {
+    "descriptionZh": "",
+    "nameEn": "Deep Sleep",
+    "nameZh": "Deep Sleep",
+    "slug": "deep-sleep"
+  },
+  "10014": {
+    "descriptionZh": "",
+    "nameEn": "Power Nap",
+    "nameZh": "Power Nap",
+    "slug": "power-nap"
+  },
+  "10015": {
+    "descriptionZh": "",
+    "nameEn": "Spirit",
+    "nameZh": "Spirit",
+    "slug": "spirit"
+  },
+  "10016": {
+    "descriptionZh": "",
+    "nameEn": "Warm Blanket",
+    "nameZh": "Warm Blanket",
+    "slug": "warm-blanket"
+  },
+  "10017": {
+    "descriptionZh": "",
+    "nameEn": "Gulp",
+    "nameZh": "Gulp",
+    "slug": "gulp"
+  },
+  "10018": {
+    "descriptionZh": "",
+    "nameEn": "Herbivore",
+    "nameZh": "Herbivore",
+    "slug": "herbivore"
+  },
+  "10019": {
+    "descriptionZh": "",
+    "nameEn": "Sandpit",
+    "nameZh": "Sandpit",
+    "slug": "sandpit"
+  },
+  "10020": {
+    "descriptionZh": "",
+    "nameEn": "Hot Blooded",
+    "nameZh": "Hot Blooded",
+    "slug": "hot-blooded"
+  },
+  "10021": {
+    "descriptionZh": "",
+    "nameEn": "Medic",
+    "nameZh": "Medic",
+    "slug": "medic"
+  },
+  "10022": {
+    "descriptionZh": "",
+    "nameEn": "Life Force",
+    "nameZh": "Life Force",
+    "slug": "life-force"
+  },
+  "10023": {
+    "descriptionZh": "",
+    "nameEn": "Lunchbox",
+    "nameZh": "Lunchbox",
+    "slug": "lunchbox"
+  },
+  "10024": {
+    "descriptionZh": "",
+    "nameEn": "Nurse",
+    "nameZh": "Nurse",
+    "slug": "nurse"
+  },
+  "10025": {
+    "descriptionZh": "",
+    "nameEn": "Melee",
+    "nameZh": "Melee",
+    "slug": "melee"
+  },
+  "10026": {
+    "descriptionZh": "",
+    "nameEn": "Sponge",
+    "nameZh": "Sponge",
+    "slug": "sponge"
+  },
+  "10027": {
+    "descriptionZh": "",
+    "nameEn": "Bodyguard",
+    "nameZh": "Bodyguard",
+    "slug": "bodyguard"
+  },
+  "10028": {
+    "descriptionZh": "",
+    "nameEn": "Hero",
+    "nameZh": "Hero",
+    "slug": "hero"
+  },
+  "10029": {
+    "descriptionZh": "",
+    "nameEn": "Last Bastion",
+    "nameZh": "Last Bastion",
+    "slug": "last-bastion"
+  },
+  "10030": {
+    "descriptionZh": "",
+    "nameEn": "Stealth",
+    "nameZh": "Stealth",
+    "slug": "stealth"
+  },
+  "10031": {
+    "descriptionZh": "",
+    "nameEn": "Vanguard",
+    "nameZh": "Vanguard",
+    "slug": "vanguard"
+  },
+  "10032": {
+    "descriptionZh": "",
+    "nameEn": "Nomad",
+    "nameZh": "Nomad",
+    "slug": "nomad"
+  },
+  "10033": {
+    "descriptionZh": "",
+    "nameEn": "Sequence",
+    "nameZh": "Sequence",
+    "slug": "sequence"
+  },
+  "10034": {
+    "descriptionZh": "",
+    "nameEn": "Grass Cloak",
+    "nameZh": "Grass Cloak",
+    "slug": "grass-cloak"
+  },
+  "10035": {
+    "descriptionZh": "",
+    "nameEn": "Celebrate",
+    "nameZh": "Celebrate",
+    "slug": "celebrate"
+  },
+  "10036": {
+    "descriptionZh": "",
+    "nameEn": "Lullaby",
+    "nameZh": "Lullaby",
+    "slug": "lullaby"
+  },
+  "10037": {
+    "descriptionZh": "",
+    "nameEn": "Calming",
+    "nameZh": "Calming",
+    "slug": "calming"
+  },
+  "10038": {
+    "descriptionZh": "",
+    "nameEn": "Daze",
+    "nameZh": "Daze",
+    "slug": "daze"
+  },
+  "10039": {
+    "descriptionZh": "",
+    "nameEn": "Frighten",
+    "nameZh": "Frighten",
+    "slug": "frighten"
+  },
+  "10040": {
+    "descriptionZh": "",
+    "nameEn": "Interference",
+    "nameZh": "Interference",
+    "slug": "interference"
+  },
+  "10041": {
+    "descriptionZh": "",
+    "nameEn": "Mood Maker",
+    "nameZh": "Mood Maker",
+    "slug": "mood-maker"
+  },
+  "10042": {
+    "descriptionZh": "",
+    "nameEn": "Confidence",
+    "nameZh": "Confidence",
+    "slug": "confidence"
+  },
+  "10043": {
+    "descriptionZh": "",
+    "nameEn": "Fortune",
+    "nameZh": "Fortune",
+    "slug": "fortune"
+  },
+  "10044": {
+    "descriptionZh": "",
+    "nameEn": "Bonanza",
+    "nameZh": "Bonanza",
+    "slug": "bonanza"
+  },
+  "10045": {
+    "descriptionZh": "",
+    "nameEn": "Explode",
+    "nameZh": "Explode",
+    "slug": "explode"
+  },
+  "10046": {
+    "descriptionZh": "",
+    "nameEn": "Omnipotent",
+    "nameZh": "Omnipotent",
+    "slug": "omnipotent"
+  },
+  "10047": {
+    "descriptionZh": "",
+    "nameEn": "Share",
+    "nameZh": "Share",
+    "slug": "share"
+  },
+  "10048": {
+    "descriptionZh": "",
+    "nameEn": "Black Hole",
+    "nameZh": "Black Hole",
+    "slug": "black-hole"
+  },
+  "10049": {
+    "descriptionZh": "",
+    "nameEn": "Shadow Dash",
+    "nameZh": "Shadow Dash",
+    "slug": "shadow-dash"
+  },
+  "10050": {
+    "descriptionZh": "",
+    "nameEn": "Sprint",
+    "nameZh": "Sprint",
+    "slug": "sprint"
+  },
+  "10051": {
+    "descriptionZh": "",
+    "nameEn": "Disgust",
+    "nameZh": "Disgust",
+    "slug": "disgust"
+  },
+  "10052": {
+    "descriptionZh": "",
+    "nameEn": "High-rise",
+    "nameZh": "High-rise",
+    "slug": "high-rise"
+  },
+  "10053": {
+    "descriptionZh": "",
+    "nameEn": "Climber",
+    "nameZh": "Climber",
+    "slug": "climber"
+  },
+  "10054": {
+    "descriptionZh": "",
+    "nameEn": "Flame Boost",
+    "nameZh": "Flame Boost",
+    "slug": "flame-boost"
+  },
+  "10055": {
+    "descriptionZh": "",
+    "nameEn": "Aqua Boost",
+    "nameZh": "Aqua Boost",
+    "slug": "aqua-boost"
+  },
+  "10056": {
+    "descriptionZh": "",
+    "nameEn": "Run Up",
+    "nameZh": "Run Up",
+    "slug": "run-up"
+  },
+  "10057": {
+    "descriptionZh": "",
+    "nameEn": "Conqueror",
+    "nameZh": "Conqueror",
+    "slug": "conqueror"
+  },
+  "10058": {
+    "descriptionZh": "",
+    "nameEn": "Shackle",
+    "nameZh": "Shackle",
+    "slug": "shackle"
+  },
+  "10059": {
+    "descriptionZh": "",
+    "nameEn": "Decoy",
+    "nameZh": "Decoy",
+    "slug": "decoy"
+  },
+  "10060": {
+    "descriptionZh": "",
+    "nameEn": "Shield",
+    "nameZh": "Shield",
+    "slug": "shield"
+  },
+  "101": {
+    "descriptionZh": "Strengthens moves of 60 base power or less to 1.5× their power.",
+    "nameEn": "Technician",
+    "nameZh": "技术高手",
+    "slug": "technician"
+  },
+  "102": {
+    "descriptionZh": "Protects against major status ailments during strong sunlight.",
+    "nameEn": "Leaf Guard",
+    "nameZh": "叶子防守",
+    "slug": "leaf-guard"
+  },
+  "103": {
+    "descriptionZh": "Prevents the Pokémon from using its held item in battle.",
+    "nameEn": "Klutz",
+    "nameZh": "笨拙",
+    "slug": "klutz"
+  },
+  "104": {
+    "descriptionZh": "Bypasses targets' abilities if they could hinder or prevent a move.",
+    "nameEn": "Mold Breaker",
+    "nameZh": "破格",
+    "slug": "mold-breaker"
+  },
+  "105": {
+    "descriptionZh": "Raises moves' critical hit rates one stage.",
+    "nameEn": "Super Luck",
+    "nameZh": "超幸运",
+    "slug": "super-luck"
+  },
+  "106": {
+    "descriptionZh": "Damages the attacker for 1/4 its max HP when knocked out by a contact move.",
+    "nameEn": "Aftermath",
+    "nameZh": "引爆",
+    "slug": "aftermath"
+  },
+  "107": {
+    "descriptionZh": "Notifies all trainers upon entering battle if an opponent has a super-effective move, Self-Destruct, Explosion, or a one-hit KO move.",
+    "nameEn": "Anticipation",
+    "nameZh": "危险预知",
+    "slug": "anticipation"
+  },
+  "108": {
+    "descriptionZh": "Reveals the opponents' strongest move upon entering battle.",
+    "nameEn": "Forewarn",
+    "nameZh": "预知梦",
+    "slug": "forewarn"
+  },
+  "109": {
+    "descriptionZh": "Ignores other Pokémon's stat modifiers for damage and accuracy calculation.",
+    "nameEn": "Unaware",
+    "nameZh": "纯朴",
+    "slug": "unaware"
+  },
+  "11": {
+    "descriptionZh": "Absorbs Water moves, healing for 1/4 max HP.",
+    "nameEn": "Water Absorb",
+    "nameZh": "储水",
+    "slug": "water-absorb"
+  },
+  "110": {
+    "descriptionZh": "Doubles damage inflicted with not-very-effective moves.",
+    "nameEn": "Tinted Lens",
+    "nameZh": "有色眼镜",
+    "slug": "tinted-lens"
+  },
+  "111": {
+    "descriptionZh": "Decreases damage taken from super-effective moves by 1/4.",
+    "nameEn": "Filter",
+    "nameZh": "过滤",
+    "slug": "filter"
+  },
+  "112": {
+    "descriptionZh": "Halves Attack and Speed for five turns upon entering battle.",
+    "nameEn": "Slow Start",
+    "nameZh": "慢启动",
+    "slug": "slow-start"
+  },
+  "113": {
+    "descriptionZh": "Lets the Pokémon's Normal and Fighting moves hit Ghost Pokémon.",
+    "nameEn": "Scrappy",
+    "nameZh": "胆量",
+    "slug": "scrappy"
+  },
+  "114": {
+    "descriptionZh": "Redirects single-target Water moves to this Pokémon where possible.  Absorbs Water moves, raising Special Attack one stage.",
+    "nameEn": "Storm Drain",
+    "nameZh": "引水",
+    "slug": "storm-drain"
+  },
+  "115": {
+    "descriptionZh": "Heals for 1/16 max HP after each turn during hail.  Protects against hail damage.",
+    "nameEn": "Ice Body",
+    "nameZh": "冰冻之躯",
+    "slug": "ice-body"
+  },
+  "116": {
+    "descriptionZh": "Decreases damage taken from super-effective moves by 1/4.",
+    "nameEn": "Solid Rock",
+    "nameZh": "坚硬岩石",
+    "slug": "solid-rock"
+  },
+  "117": {
+    "descriptionZh": "Summons hail that lasts indefinitely upon entering battle.",
+    "nameEn": "Snow Warning",
+    "nameZh": "降雪",
+    "slug": "snow-warning"
+  },
+  "118": {
+    "descriptionZh": "The Pokémon may pick up Honey after battle.",
+    "nameEn": "Honey Gather",
+    "nameZh": "采蜜",
+    "slug": "honey-gather"
+  },
+  "119": {
+    "descriptionZh": "Reveals an opponent's held item upon entering battle.",
+    "nameEn": "Frisk",
+    "nameZh": "察觉",
+    "slug": "frisk"
+  },
+  "12": {
+    "descriptionZh": "Prevents infatuation and protects against Captivate.",
+    "nameEn": "Oblivious",
+    "nameZh": "迟钝",
+    "slug": "oblivious"
+  },
+  "120": {
+    "descriptionZh": "Strengthens recoil moves to 1.2× their power.",
+    "nameEn": "Reckless",
+    "nameZh": "舍身",
+    "slug": "reckless"
+  },
+  "121": {
+    "descriptionZh": "Changes Arceus's type and form to match its held Plate.",
+    "nameEn": "Multitype",
+    "nameZh": "多属性",
+    "slug": "multitype"
+  },
+  "122": {
+    "descriptionZh": "Increases friendly Pokémon's Attack and Special Defense to 1.5× during strong sunlight.",
+    "nameEn": "Flower Gift",
+    "nameZh": "花之礼",
+    "slug": "flower-gift"
+  },
+  "123": {
+    "descriptionZh": "Damages sleeping opponents for 1/8 their max HP after each turn.",
+    "nameEn": "Bad Dreams",
+    "nameZh": "梦魇",
+    "slug": "bad-dreams"
+  },
+  "124": {
+    "descriptionZh": "Steals attacking Pokémon's held items on contact.",
+    "nameEn": "Pickpocket",
+    "nameZh": "顺手牵羊",
+    "slug": "pickpocket"
+  },
+  "125": {
+    "descriptionZh": "Strengthens moves with extra effects to 1.3× their power, but prevents their extra effects.",
+    "nameEn": "Sheer Force",
+    "nameZh": "强行",
+    "slug": "sheer-force"
+  },
+  "126": {
+    "descriptionZh": "Inverts stat changes.",
+    "nameEn": "Contrary",
+    "nameZh": "唱反调",
+    "slug": "contrary"
+  },
+  "127": {
+    "descriptionZh": "Prevents opposing Pokémon from eating held Berries.",
+    "nameEn": "Unnerve",
+    "nameZh": "紧张感",
+    "slug": "unnerve"
+  },
+  "128": {
+    "descriptionZh": "Raises Attack two stages upon having any stat lowered.",
+    "nameEn": "Defiant",
+    "nameZh": "不服输",
+    "slug": "defiant"
+  },
+  "129": {
+    "descriptionZh": "Halves Attack and Special Attack at 50% max HP or less.",
+    "nameEn": "Defeatist",
+    "nameZh": "软弱",
+    "slug": "defeatist"
+  },
+  "13": {
+    "descriptionZh": "Negates all effects of weather, but does not prevent the weather itself.",
+    "nameEn": "Cloud Nine",
+    "nameZh": "无关天气",
+    "slug": "cloud-nine"
+  },
+  "130": {
+    "descriptionZh": "Has a 30% chance of Disabling any move that hits the Pokémon.",
+    "nameEn": "Cursed Body",
+    "nameZh": "诅咒之躯",
+    "slug": "cursed-body"
+  },
+  "131": {
+    "descriptionZh": "Has a 30% chance of curing each adjacent ally of any major status ailment after each turn.",
+    "nameEn": "Healer",
+    "nameZh": "治愈之心",
+    "slug": "healer"
+  },
+  "132": {
+    "descriptionZh": "Decreases all direct damage taken by friendly Pokémon to 0.75×.",
+    "nameEn": "Friend Guard",
+    "nameZh": "友情防守",
+    "slug": "friend-guard"
+  },
+  "133": {
+    "descriptionZh": "Raises Speed and lowers Defense by one stage each upon being hit by a physical move.",
+    "nameEn": "Weak Armor",
+    "nameZh": "碎裂铠甲",
+    "slug": "weak-armor"
+  },
+  "134": {
+    "descriptionZh": "Doubles the Pokémon's weight.",
+    "nameEn": "Heavy Metal",
+    "nameZh": "重金属",
+    "slug": "heavy-metal"
+  },
+  "135": {
+    "descriptionZh": "Halves the Pokémon's weight.",
+    "nameEn": "Light Metal",
+    "nameZh": "轻金属",
+    "slug": "light-metal"
+  },
+  "136": {
+    "descriptionZh": "Halves damage taken from full HP.",
+    "nameEn": "Multiscale",
+    "nameZh": "多重鳞片",
+    "slug": "multiscale"
+  },
+  "137": {
+    "descriptionZh": "Increases Attack to 1.5× when poisoned.",
+    "nameEn": "Toxic Boost",
+    "nameZh": "中毒激升",
+    "slug": "toxic-boost"
+  },
+  "138": {
+    "descriptionZh": "Increases Special Attack to 1.5× when burned.",
+    "nameEn": "Flare Boost",
+    "nameZh": "受热激升",
+    "slug": "flare-boost"
+  },
+  "139": {
+    "descriptionZh": "Has a 50% chance of restoring a used Berry after each turn if the Pokémon has held no items in the meantime.",
+    "nameEn": "Harvest",
+    "nameZh": "收获",
+    "slug": "harvest"
+  },
+  "14": {
+    "descriptionZh": "Increases moves' accuracy to 1.3×.",
+    "nameEn": "Compound Eyes",
+    "nameZh": "复眼",
+    "slug": "compound-eyes"
+  },
+  "140": {
+    "descriptionZh": "Protects against friendly Pokémon's damaging moves.",
+    "nameEn": "Telepathy",
+    "nameZh": "心灵感应",
+    "slug": "telepathy"
+  },
+  "141": {
+    "descriptionZh": "Raises a random stat two stages and lowers another one stage after each turn.",
+    "nameEn": "Moody",
+    "nameZh": "心情不定",
+    "slug": "moody"
+  },
+  "142": {
+    "descriptionZh": "Protects against damage from weather.",
+    "nameEn": "Overcoat",
+    "nameZh": "防尘",
+    "slug": "overcoat"
+  },
+  "143": {
+    "descriptionZh": "Has a 30% chance of poisoning target Pokémon upon contact.",
+    "nameEn": "Poison Touch",
+    "nameZh": "毒手",
+    "slug": "poison-touch"
+  },
+  "144": {
+    "descriptionZh": "Heals for 1/3 max HP upon switching out.",
+    "nameEn": "Regenerator",
+    "nameZh": "再生力",
+    "slug": "regenerator"
+  },
+  "145": {
+    "descriptionZh": "Protects against Defense drops.",
+    "nameEn": "Big Pecks",
+    "nameZh": "健壮胸肌",
+    "slug": "big-pecks"
+  },
+  "146": {
+    "descriptionZh": "Doubles Speed during a sandstorm.  Protects against sandstorm damage.",
+    "nameEn": "Sand Rush",
+    "nameZh": "拨沙",
+    "slug": "sand-rush"
+  },
+  "147": {
+    "descriptionZh": "Lowers incoming non-damaging moves' base accuracy to exactly 50%.",
+    "nameEn": "Wonder Skin",
+    "nameZh": "奇迹皮肤",
+    "slug": "wonder-skin"
+  },
+  "148": {
+    "descriptionZh": "Strengthens moves to 1.3× their power when moving last.",
+    "nameEn": "Analytic",
+    "nameZh": "分析",
+    "slug": "analytic"
+  },
+  "149": {
+    "descriptionZh": "Takes the appearance of the last conscious party Pokémon upon being sent out until hit by a damaging move.",
+    "nameEn": "Illusion",
+    "nameZh": "幻觉",
+    "slug": "illusion"
+  },
+  "15": {
+    "descriptionZh": "Prevents sleep.",
+    "nameEn": "Insomnia",
+    "nameZh": "不眠",
+    "slug": "insomnia"
+  },
+  "150": {
+    "descriptionZh": "Transforms upon entering battle.",
+    "nameEn": "Imposter",
+    "nameZh": "变身者",
+    "slug": "imposter"
+  },
+  "151": {
+    "descriptionZh": "Bypasses Light Screen, Reflect, and Safeguard.",
+    "nameEn": "Infiltrator",
+    "nameZh": "穿透",
+    "slug": "infiltrator"
+  },
+  "152": {
+    "descriptionZh": "Changes attacking Pokémon's abilities to Mummy on contact.",
+    "nameEn": "Mummy",
+    "nameZh": "木乃伊",
+    "slug": "mummy"
+  },
+  "153": {
+    "descriptionZh": "Raises Attack one stage upon KOing a Pokémon.",
+    "nameEn": "Moxie",
+    "nameZh": "自信过度",
+    "slug": "moxie"
+  },
+  "154": {
+    "descriptionZh": "Raises Attack one stage upon taking damage from a Dark move.",
+    "nameEn": "Justified",
+    "nameZh": "正义之心",
+    "slug": "justified"
+  },
+  "155": {
+    "descriptionZh": "Raises Speed one stage upon being hit by a Dark, Ghost, or Bug move.",
+    "nameEn": "Rattled",
+    "nameZh": "胆怯",
+    "slug": "rattled"
+  },
+  "156": {
+    "descriptionZh": "Reflects most non-damaging moves back at their user.",
+    "nameEn": "Magic Bounce",
+    "nameZh": "魔法镜",
+    "slug": "magic-bounce"
+  },
+  "157": {
+    "descriptionZh": "Absorbs Grass moves, raising Attack one stage.",
+    "nameEn": "Sap Sipper",
+    "nameZh": "食草",
+    "slug": "sap-sipper"
+  },
+  "158": {
+    "descriptionZh": "Raises non-damaging moves' priority by one stage.",
+    "nameEn": "Prankster",
+    "nameZh": "恶作剧之心",
+    "slug": "prankster"
+  },
+  "159": {
+    "descriptionZh": "Strengthens Rock, Ground, and Steel moves to 1.3× their power during a sandstorm.  Protects against sandstorm damage.",
+    "nameEn": "Sand Force",
+    "nameZh": "沙之力",
+    "slug": "sand-force"
+  },
+  "16": {
+    "descriptionZh": "Changes type to match when hit by a damaging move.",
+    "nameEn": "Color Change",
+    "nameZh": "变色",
+    "slug": "color-change"
+  },
+  "160": {
+    "descriptionZh": "Damages attacking Pokémon for 1/8 their max HP on contact.",
+    "nameEn": "Iron Barbs",
+    "nameZh": "铁刺",
+    "slug": "iron-barbs"
+  },
+  "161": {
+    "descriptionZh": "Changes Darmanitan's form after each turn depending on its HP: Zen Mode below 50% max HP, and Standard Mode otherwise.",
+    "nameEn": "Zen Mode",
+    "nameZh": "达摩模式",
+    "slug": "zen-mode"
+  },
+  "162": {
+    "descriptionZh": "Increases moves' accuracy to 1.1× for friendly Pokémon.",
+    "nameEn": "Victory Star",
+    "nameZh": "胜利之星",
+    "slug": "victory-star"
+  },
+  "163": {
+    "descriptionZh": "Bypasses targets' abilities if they could hinder or prevent moves.",
+    "nameEn": "Turboblaze",
+    "nameZh": "涡轮火焰",
+    "slug": "turboblaze"
+  },
+  "164": {
+    "descriptionZh": "Bypasses targets' abilities if they could hinder or prevent moves.",
+    "nameEn": "Teravolt",
+    "nameZh": "兆级电压",
+    "slug": "teravolt"
+  },
+  "165": {
+    "descriptionZh": "Protects allies against moves that affect their mental state.",
+    "nameEn": "Aroma Veil",
+    "nameZh": "芳香幕",
+    "slug": "aroma-veil"
+  },
+  "166": {
+    "descriptionZh": "Protects friendly Grass Pokémon from having their stats lowered by other Pokémon.",
+    "nameEn": "Flower Veil",
+    "nameZh": "花幕",
+    "slug": "flower-veil"
+  },
+  "167": {
+    "descriptionZh": "Restores HP upon eating a Berry, in addition to the Berry's effect.",
+    "nameEn": "Cheek Pouch",
+    "nameZh": "颊囊",
+    "slug": "cheek-pouch"
+  },
+  "168": {
+    "descriptionZh": "Changes the bearer's type to match each move it uses.",
+    "nameEn": "Protean",
+    "nameZh": "变幻自如",
+    "slug": "protean"
+  },
+  "169": {
+    "descriptionZh": "Halves damage from physical attacks.",
+    "nameEn": "Fur Coat",
+    "nameZh": "毛皮大衣",
+    "slug": "fur-coat"
+  },
+  "17": {
+    "descriptionZh": "Prevents poison.",
+    "nameEn": "Immunity",
+    "nameZh": "免疫",
+    "slug": "immunity"
+  },
+  "170": {
+    "descriptionZh": "Steals the target's held item when the bearer uses a damaging move.",
+    "nameEn": "Magician",
+    "nameZh": "魔术师",
+    "slug": "magician"
+  },
+  "171": {
+    "descriptionZh": "Protects against bullet, ball, and bomb-based moves.",
+    "nameEn": "Bulletproof",
+    "nameZh": "防弹",
+    "slug": "bulletproof"
+  },
+  "172": {
+    "descriptionZh": "Raises Special Attack by two stages upon having any stat lowered.",
+    "nameEn": "Competitive",
+    "nameZh": "好胜",
+    "slug": "competitive"
+  },
+  "173": {
+    "descriptionZh": "Strengthens biting moves to 1.5× their power.",
+    "nameEn": "Strong Jaw",
+    "nameZh": "强壮之颚",
+    "slug": "strong-jaw"
+  },
+  "174": {
+    "descriptionZh": "Turns the bearer's Normal moves into Ice moves and strengthens them to 1.3× their power.",
+    "nameEn": "Refrigerate",
+    "nameZh": "冰冻皮肤",
+    "slug": "refrigerate"
+  },
+  "175": {
+    "descriptionZh": "Prevents friendly Pokémon from sleeping.",
+    "nameEn": "Sweet Veil",
+    "nameZh": "甜幕",
+    "slug": "sweet-veil"
+  },
+  "176": {
+    "descriptionZh": "Changes Aegislash to Blade Forme before using a damaging move, or Shield Forme before using King’s Shield.",
+    "nameEn": "Stance Change",
+    "nameZh": "战斗切换",
+    "slug": "stance-change"
+  },
+  "177": {
+    "descriptionZh": "Raises Flying moves' priority by one stage.",
+    "nameEn": "Gale Wings",
+    "nameZh": "疾风之翼",
+    "slug": "gale-wings"
+  },
+  "178": {
+    "descriptionZh": "Strengthens aura and pulse moves to 1.5× their power.",
+    "nameEn": "Mega Launcher",
+    "nameZh": "超级发射器",
+    "slug": "mega-launcher"
+  },
+  "179": {
+    "descriptionZh": "Boosts Defense while Grassy Terrain is in effect.",
+    "nameEn": "Grass Pelt",
+    "nameZh": "草之毛皮",
+    "slug": "grass-pelt"
+  },
+  "18": {
+    "descriptionZh": "Protects against Fire moves.  Once one has been blocked, the Pokémon's own Fire moves inflict 1.5× damage until it leaves battle.",
+    "nameEn": "Flash Fire",
+    "nameZh": "引火",
+    "slug": "flash-fire"
+  },
+  "180": {
+    "descriptionZh": "Passes the bearer's held item to an ally when the ally uses up its item.",
+    "nameEn": "Symbiosis",
+    "nameZh": "共生",
+    "slug": "symbiosis"
+  },
+  "181": {
+    "descriptionZh": "Strengthens moves that make contact to 1.33× their power.",
+    "nameEn": "Tough Claws",
+    "nameZh": "硬爪",
+    "slug": "tough-claws"
+  },
+  "182": {
+    "descriptionZh": "Turns the bearer's Normal moves into Fairy moves and strengthens them to 1.3× their power.",
+    "nameEn": "Pixilate",
+    "nameZh": "妖精皮肤",
+    "slug": "pixilate"
+  },
+  "183": {
+    "descriptionZh": "Lowers attacking Pokémon's Speed by one stage on contact.",
+    "nameEn": "Gooey",
+    "nameZh": "黏滑",
+    "slug": "gooey"
+  },
+  "184": {
+    "descriptionZh": "Turns the bearer's Normal moves into Flying moves and strengthens them to 1.3× their power.",
+    "nameEn": "Aerilate",
+    "nameZh": "飞行皮肤",
+    "slug": "aerilate"
+  },
+  "185": {
+    "descriptionZh": "Lets the bearer hit twice with damaging moves.  The second hit has half power.",
+    "nameEn": "Parental Bond",
+    "nameZh": "亲子爱",
+    "slug": "parental-bond"
+  },
+  "186": {
+    "descriptionZh": "Strengthens Dark moves to 1.33× their power for all friendly and opposing Pokémon.",
+    "nameEn": "Dark Aura",
+    "nameZh": "暗黑气场",
+    "slug": "dark-aura"
+  },
+  "187": {
+    "descriptionZh": "Strengthens Fairy moves to 1.33× their power for all friendly and opposing Pokémon.",
+    "nameEn": "Fairy Aura",
+    "nameZh": "妖精气场",
+    "slug": "fairy-aura"
+  },
+  "188": {
+    "descriptionZh": "Makes Dark Aura and Fairy Aura weaken moves of their respective types.",
+    "nameEn": "Aura Break",
+    "nameZh": "气场破坏",
+    "slug": "aura-break"
+  },
+  "189": {
+    "descriptionZh": "Creates heavy rain, which has all the properties of Rain Dance, cannot be replaced, and causes damaging Fire moves to fail.",
+    "nameEn": "Primordial Sea",
+    "nameZh": "始源之海",
+    "slug": "primordial-sea"
+  },
+  "19": {
+    "descriptionZh": "Protects against incoming moves' extra effects.",
+    "nameEn": "Shield Dust",
+    "nameZh": "鳞粉",
+    "slug": "shield-dust"
+  },
+  "190": {
+    "descriptionZh": "Creates extremely harsh sunlight, which has all the properties of Sunny Day, cannot be replaced, and causes damaging Water moves to fail.",
+    "nameEn": "Desolate Land",
+    "nameZh": "终结之地",
+    "slug": "desolate-land"
+  },
+  "191": {
+    "descriptionZh": "Creates a mysterious air current, which cannot be replaced and causes moves to never be super effective against Flying Pokémon.",
+    "nameEn": "Delta Stream",
+    "nameZh": "德尔塔气流",
+    "slug": "delta-stream"
+  },
+  "192": {
+    "descriptionZh": "Raises this Pokémon's Defense by one stage when it takes damage from a move.",
+    "nameEn": "Stamina",
+    "nameZh": "持久力",
+    "slug": "stamina"
+  },
+  "193": {
+    "descriptionZh": "This Pokémon automatically switches out when its HP drops below half.",
+    "nameEn": "Wimp Out",
+    "nameZh": "跃跃欲逃",
+    "slug": "wimp-out"
+  },
+  "194": {
+    "descriptionZh": "This Pokémon automatically switches out when its HP drops below half.",
+    "nameEn": "Emergency Exit",
+    "nameZh": "危险回避",
+    "slug": "emergency-exit"
+  },
+  "195": {
+    "descriptionZh": "Raises this Pokémon's Defense by two stages when it's hit by a Water move.",
+    "nameEn": "Water Compaction",
+    "nameZh": "遇水凝固",
+    "slug": "water-compaction"
+  },
+  "196": {
+    "descriptionZh": "This Pokémon's moves critical hit against poisoned targets.",
+    "nameEn": "Merciless",
+    "nameZh": "不仁不义",
+    "slug": "merciless"
+  },
+  "197": {
+    "descriptionZh": "Transforms this Minior between Core Form and Meteor Form.  Prevents major status ailments and drowsiness while in Meteor Form.",
+    "nameEn": "Shields Down",
+    "nameZh": "界限盾壳",
+    "slug": "shields-down"
+  },
+  "198": {
+    "descriptionZh": "This Pokémon's moves have double power against Pokémon that switched in this turn.",
+    "nameEn": "Stakeout",
+    "nameZh": "蹲守",
+    "slug": "stakeout"
+  },
+  "199": {
+    "descriptionZh": "Halves damage from Fire moves, doubles damage of Water moves, and prevents burns.",
+    "nameEn": "Water Bubble",
+    "nameZh": "水泡",
+    "slug": "water-bubble"
+  },
+  "2": {
+    "descriptionZh": "Summons rain that lasts indefinitely upon entering battle.",
+    "nameEn": "Drizzle",
+    "nameZh": "降雨",
+    "slug": "drizzle"
+  },
+  "20": {
+    "descriptionZh": "Prevents confusion.",
+    "nameEn": "Own Tempo",
+    "nameZh": "我行我素",
+    "slug": "own-tempo"
+  },
+  "200": {
+    "descriptionZh": "This Pokémon's Steel moves have 1.5× power.",
+    "nameEn": "Steelworker",
+    "nameZh": "钢能力者",
+    "slug": "steelworker"
+  },
+  "201": {
+    "descriptionZh": "Raises this Pokémon's Special Attack by one stage every time its HP drops below half.",
+    "nameEn": "Berserk",
+    "nameZh": "怒火冲天",
+    "slug": "berserk"
+  },
+  "202": {
+    "descriptionZh": "During Hail, this Pokémon has double Speed.",
+    "nameEn": "Slush Rush",
+    "nameZh": "拨雪",
+    "slug": "slush-rush"
+  },
+  "203": {
+    "descriptionZh": "This Pokémon's moves do not make contact.",
+    "nameEn": "Long Reach",
+    "nameZh": "远隔",
+    "slug": "long-reach"
+  },
+  "204": {
+    "descriptionZh": "Sound-based moves become Water-type.",
+    "nameEn": "Liquid Voice",
+    "nameZh": "湿润之声",
+    "slug": "liquid-voice"
+  },
+  "205": {
+    "descriptionZh": "This Pokémon's healing moves have their priority increased by 3.",
+    "nameEn": "Triage",
+    "nameZh": "先行治疗",
+    "slug": "triage"
+  },
+  "206": {
+    "descriptionZh": "This Pokémon's Normal moves are Electric and have their power increased to 1.2×.",
+    "nameEn": "Galvanize",
+    "nameZh": "电气皮肤",
+    "slug": "galvanize"
+  },
+  "207": {
+    "descriptionZh": "Doubles this Pokémon's Speed on Electric Terrain.",
+    "nameEn": "Surge Surfer",
+    "nameZh": "冲浪之尾",
+    "slug": "surge-surfer"
+  },
+  "208": {
+    "descriptionZh": "Wishiwashi becomes Schooling Form when its HP is 25% or higher.",
+    "nameEn": "Schooling",
+    "nameZh": "鱼群",
+    "slug": "schooling"
+  },
+  "209": {
+    "descriptionZh": "Prevents the first instance of battle damage.",
+    "nameEn": "Disguise",
+    "nameZh": "画皮",
+    "slug": "disguise"
+  },
+  "21": {
+    "descriptionZh": "Prevents being forced out of battle by other Pokémon's moves.",
+    "nameEn": "Suction Cups",
+    "nameZh": "吸盘",
+    "slug": "suction-cups"
+  },
+  "210": {
+    "descriptionZh": "Transforms this Pokémon into Ash-Greninja after fainting an opponent.  Water Shuriken's power is 20 and always hits three times.",
+    "nameEn": "Battle Bond",
+    "nameZh": "牵绊变身",
+    "slug": "battle-bond"
+  },
+  "211": {
+    "descriptionZh": "Transforms 10% or 50% Zygarde into Complete Forme when its HP is below 50%.",
+    "nameEn": "Power Construct",
+    "nameZh": "群聚变形",
+    "slug": "power-construct"
+  },
+  "212": {
+    "descriptionZh": "This Pokémon can inflict poison on Poison and Steel Pokémon.",
+    "nameEn": "Corrosion",
+    "nameZh": "腐蚀",
+    "slug": "corrosion"
+  },
+  "213": {
+    "descriptionZh": "This Pokémon always  acts as though it were Asleep.",
+    "nameEn": "Comatose",
+    "nameZh": "绝对睡眠",
+    "slug": "comatose"
+  },
+  "214": {
+    "descriptionZh": "Opposing Pokémon cannot use priority attacks.",
+    "nameEn": "Queenly Majesty",
+    "nameZh": "女王的威严",
+    "slug": "queenly-majesty"
+  },
+  "215": {
+    "descriptionZh": "When this Pokémon faints from an opponent's move, that opponent takes damage equal to the HP this Pokémon had remaining.",
+    "nameEn": "Innards Out",
+    "nameZh": "飞出的内在物",
+    "slug": "innards-out"
+  },
+  "216": {
+    "descriptionZh": "Whenever another Pokémon uses a dance move, this Pokémon will use the same move immediately afterwards.",
+    "nameEn": "Dancer",
+    "nameZh": "舞者",
+    "slug": "dancer"
+  },
+  "217": {
+    "descriptionZh": "Ally Pokémon's moves have their power increased to 1.3×.",
+    "nameEn": "Battery",
+    "nameZh": "蓄电池",
+    "slug": "battery"
+  },
+  "218": {
+    "descriptionZh": "Damage from contact moves is halved.  Damage from Fire moves is doubled.",
+    "nameEn": "Fluffy",
+    "nameZh": "毛茸茸",
+    "slug": "fluffy"
+  },
+  "219": {
+    "descriptionZh": "Opposing Pokémon cannot use priority attacks.",
+    "nameEn": "Dazzling",
+    "nameZh": "鲜艳之躯",
+    "slug": "dazzling"
+  },
+  "22": {
+    "descriptionZh": "Lowers opponents' Attack one stage upon entering battle.",
+    "nameEn": "Intimidate",
+    "nameZh": "威吓",
+    "slug": "intimidate"
+  },
+  "220": {
+    "descriptionZh": "This Pokémon's Special Attack rises by one stage every time any Pokémon faints.",
+    "nameEn": "Soul-Heart",
+    "nameZh": "魂心",
+    "slug": "soul-heart"
+  },
+  "221": {
+    "descriptionZh": "When this Pokémon takes regular damage from a contact move, the attacking Pokémon's Speed lowers by one stage.",
+    "nameEn": "Tangling Hair",
+    "nameZh": "卷发",
+    "slug": "tangling-hair"
+  },
+  "222": {
+    "descriptionZh": "When an ally faints, this Pokémon gains its Ability.",
+    "nameEn": "Receiver",
+    "nameZh": "接球手",
+    "slug": "receiver"
+  },
+  "223": {
+    "descriptionZh": "When an ally faints, this Pokémon gains its Ability.",
+    "nameEn": "Power of Alchemy",
+    "nameZh": "化学之力",
+    "slug": "power-of-alchemy"
+  },
+  "224": {
+    "descriptionZh": "Raises this Pokémon's highest stat by one stage when it faints another Pokémon.",
+    "nameEn": "Beast Boost",
+    "nameZh": "异兽提升",
+    "slug": "beast-boost"
+  },
+  "225": {
+    "descriptionZh": "Changes this Pokémon's type to match its held Memory.",
+    "nameEn": "RKS System",
+    "nameZh": "ＡＲ系统",
+    "slug": "rks-system"
+  },
+  "226": {
+    "descriptionZh": "When this Pokémon enters battle, it changes the terrain to Electric Terrain.",
+    "nameEn": "Electric Surge",
+    "nameZh": "电气制造者",
+    "slug": "electric-surge"
+  },
+  "227": {
+    "descriptionZh": "When this Pokémon enters battle, it changes the terrain to Psychic Terrain.",
+    "nameEn": "Psychic Surge",
+    "nameZh": "精神制造者",
+    "slug": "psychic-surge"
+  },
+  "228": {
+    "descriptionZh": "When this Pokémon enters battle, it changes the terrain to Misty Terrain.",
+    "nameEn": "Misty Surge",
+    "nameZh": "薄雾制造者",
+    "slug": "misty-surge"
+  },
+  "229": {
+    "descriptionZh": "When this Pokémon enters battle, it changes the terrain to Grassy Terrain.",
+    "nameEn": "Grassy Surge",
+    "nameZh": "青草制造者",
+    "slug": "grassy-surge"
+  },
+  "23": {
+    "descriptionZh": "Prevents opponents from fleeing or switching out.",
+    "nameEn": "Shadow Tag",
+    "nameZh": "踩影",
+    "slug": "shadow-tag"
+  },
+  "230": {
+    "descriptionZh": "Other Pokémon cannot lower this Pokémon's stats.",
+    "nameEn": "Full Metal Body",
+    "nameZh": "金属防护",
+    "slug": "full-metal-body"
+  },
+  "231": {
+    "descriptionZh": "When this Pokémon has full HP, regular damage from moves is halved.",
+    "nameEn": "Shadow Shield",
+    "nameZh": "幻影防守",
+    "slug": "shadow-shield"
+  },
+  "232": {
+    "descriptionZh": "Reduces super-effective damage to 0.75×.",
+    "nameEn": "Prism Armor",
+    "nameZh": "棱镜装甲",
+    "slug": "prism-armor"
+  },
+  "233": {
+    "descriptionZh": "Increases super-effective damage dealt to 1.25×.",
+    "nameEn": "Neuroforce",
+    "nameZh": "脑核之力",
+    "slug": "neuroforce"
+  },
+  "234": {
+    "descriptionZh": "Boosts Attack in battle.",
+    "nameEn": "Intrepid Sword",
+    "nameZh": "不挠之剑",
+    "slug": "intrepid-sword"
+  },
+  "235": {
+    "descriptionZh": "Boosts Defense in battle.",
+    "nameEn": "Dauntless Shield",
+    "nameZh": "不屈之盾",
+    "slug": "dauntless-shield"
+  },
+  "236": {
+    "descriptionZh": "Libero changes the Pokémon's type to that of its previously used attack.",
+    "nameEn": "Libero",
+    "nameZh": "自由者",
+    "slug": "libero"
+  },
+  "237": {
+    "descriptionZh": "If the Pokémon is not holding an item, it will fetch the Poké Ball from the first failed throw of the battle.",
+    "nameEn": "Ball Fetch",
+    "nameZh": "捡球",
+    "slug": "ball-fetch"
+  },
+  "238": {
+    "descriptionZh": "When Ignores moves and abilities that draw in moves.",
+    "nameEn": "Cotton Down",
+    "nameZh": "棉絮",
+    "slug": "cotton-down"
+  },
+  "239": {
+    "descriptionZh": "Ignores moves and abilities that draw in moves.",
+    "nameEn": "Propeller Tail",
+    "nameZh": "螺旋尾鳍",
+    "slug": "propeller-tail"
+  },
+  "24": {
+    "descriptionZh": "Damages attacking Pokémon for 1/8 their max HP on contact.",
+    "nameEn": "Rough Skin",
+    "nameZh": "粗糙皮肤",
+    "slug": "rough-skin"
+  },
+  "240": {
+    "descriptionZh": "Reflects any stat-lowering effects.",
+    "nameEn": "Mirror Armor",
+    "nameZh": "镜甲",
+    "slug": "mirror-armor"
+  },
+  "241": {
+    "descriptionZh": "If a Cramorant with Gulp Missile uses Surf or Dive, it catches prey and changes its form depending on its remaining HP.",
+    "nameEn": "Gulp Missile",
+    "nameZh": "一口导弹",
+    "slug": "gulp-missile"
+  },
+  "242": {
+    "descriptionZh": "Ignores moves and abilities that draw in moves.",
+    "nameEn": "Stalwart",
+    "nameZh": "坚毅",
+    "slug": "stalwart"
+  },
+  "243": {
+    "descriptionZh": "Boosts the Speed stat drastically when the Pokémon is hit by a Fire- or Water-type move.",
+    "nameEn": "Steam Engine",
+    "nameZh": "蒸汽机",
+    "slug": "steam-engine"
+  },
+  "244": {
+    "descriptionZh": "Boosts sound-based moves and halves damage from the same moves.",
+    "nameEn": "Punk Rock",
+    "nameZh": "庞克摇滚",
+    "slug": "punk-rock"
+  },
+  "245": {
+    "descriptionZh": "Creates a sandstorm when hit by an attack.",
+    "nameEn": "Sand Spit",
+    "nameZh": "吐沙",
+    "slug": "sand-spit"
+  },
+  "246": {
+    "descriptionZh": "Halves damage from Special moves.",
+    "nameEn": "Ice Scales",
+    "nameZh": "冰鳞粉",
+    "slug": "ice-scales"
+  },
+  "247": {
+    "descriptionZh": "Doubles the effect of berries.",
+    "nameEn": "Ripen",
+    "nameZh": "熟成",
+    "slug": "ripen"
+  },
+  "248": {
+    "descriptionZh": "The Pokémon’s ice head can take a physical attack as a substitute, but the attack also changes the Pokémon’s appearance. The ice will be restored when it snows.",
+    "nameEn": "Ice Face",
+    "nameZh": "结冻头",
+    "slug": "ice-face"
+  },
+  "249": {
+    "descriptionZh": "Just being next to the Pokémon powers up moves.",
+    "nameEn": "Power Spot",
+    "nameZh": "能量点",
+    "slug": "power-spot"
+  },
+  "25": {
+    "descriptionZh": "Protects against damaging moves that are not super effective.",
+    "nameEn": "Wonder Guard",
+    "nameZh": "神奇守护",
+    "slug": "wonder-guard"
+  },
+  "250": {
+    "descriptionZh": "Changes type depending on the terrain.",
+    "nameEn": "Mimicry",
+    "nameZh": "拟态",
+    "slug": "mimicry"
+  },
+  "251": {
+    "descriptionZh": "Nullifies effects of Light Screen, Reflect, and Aurora Veil.",
+    "nameEn": "Screen Cleaner",
+    "nameZh": "除障",
+    "slug": "screen-cleaner"
+  },
+  "252": {
+    "descriptionZh": "Powers up ally Pokémon's Steel-type moves.",
+    "nameEn": "Steely Spirit",
+    "nameZh": "钢之意志",
+    "slug": "steely-spirit"
+  },
+  "253": {
+    "descriptionZh": "When hit by a move that makes direct contact, the Pokémon and the attacker will faint after three turns unless they switch out of battle.",
+    "nameEn": "Perish Body",
+    "nameZh": "灭亡之躯",
+    "slug": "perish-body"
+  },
+  "254": {
+    "descriptionZh": "Swaps abilities with opponents on contact.",
+    "nameEn": "Wandering Spirit",
+    "nameZh": "游魂",
+    "slug": "wandering-spirit"
+  },
+  "255": {
+    "descriptionZh": "Boosts the Pokémon's Attack stat but only allows the use of the first selected move.",
+    "nameEn": "Gorilla Tactics",
+    "nameZh": "一猩一意",
+    "slug": "gorilla-tactics"
+  },
+  "256": {
+    "descriptionZh": "Neutralizes abilities of all Pokémon in battle.",
+    "nameEn": "Neutralizing Gas",
+    "nameZh": "化学变化气体",
+    "slug": "neutralizing-gas"
+  },
+  "257": {
+    "descriptionZh": "Prevents the Pokémon and its allies from being poisoned.",
+    "nameEn": "Pastel Veil",
+    "nameZh": "粉彩护幕",
+    "slug": "pastel-veil"
+  },
+  "258": {
+    "descriptionZh": "Causes Morpeko to change its form each turn, alternating between Full Belly Mode and Hangry Mode",
+    "nameEn": "Hunger Switch",
+    "nameZh": "饱了又饿",
+    "slug": "hunger-switch"
+  },
+  "259": {
+    "descriptionZh": "Enables the Pokémon to move first occasionally.",
+    "nameEn": "Quick Draw",
+    "nameZh": "速击",
+    "slug": "quick-draw"
+  },
+  "26": {
+    "descriptionZh": "Evades Ground moves.",
+    "nameEn": "Levitate",
+    "nameZh": "飘浮",
+    "slug": "levitate"
+  },
+  "260": {
+    "descriptionZh": "Contact moves can strike through Protect/Detect.",
+    "nameEn": "Unseen Fist",
+    "nameZh": "无形拳",
+    "slug": "unseen-fist"
+  },
+  "261": {
+    "descriptionZh": "Resets all stat changes upon entering battlefield.",
+    "nameEn": "Curious Medicine",
+    "nameZh": "怪药",
+    "slug": "curious-medicine"
+  },
+  "262": {
+    "descriptionZh": "Powers up Electric-type moves.",
+    "nameEn": "Transistor",
+    "nameZh": "电晶体",
+    "slug": "transistor"
+  },
+  "263": {
+    "descriptionZh": "Powers up Dragon-type moves.",
+    "nameEn": "Dragon’s Maw",
+    "nameZh": "龙颚",
+    "slug": "dragons-maw"
+  },
+  "264": {
+    "descriptionZh": "Boosts Attack after knocking out a Pokémon.",
+    "nameEn": "Chilling Neigh",
+    "nameZh": "苍白嘶鸣",
+    "slug": "chilling-neigh"
+  },
+  "265": {
+    "descriptionZh": "Boosts Special Attack after knocking out a Pokémon.",
+    "nameEn": "Grim Neigh",
+    "nameZh": "漆黑嘶鸣",
+    "slug": "grim-neigh"
+  },
+  "266": {
+    "descriptionZh": "",
+    "nameEn": "As One",
+    "nameZh": "人马一体",
+    "slug": "as-one-glastrier"
+  },
+  "267": {
+    "descriptionZh": "",
+    "nameEn": "As One",
+    "nameZh": "人马一体",
+    "slug": "as-one-spectrier"
+  },
+  "268": {
+    "descriptionZh": "Contact changes the attacker's Ability to Lingering Aroma.",
+    "nameEn": "Lingering Aroma",
+    "nameZh": "甩不掉的气味",
+    "slug": "lingering-aroma"
+  },
+  "269": {
+    "descriptionZh": "Turns the ground into Grassy Terrain when the Pokémon is hit by an attack.",
+    "nameEn": "Seed Sower",
+    "nameZh": "掉出种子",
+    "slug": "seed-sower"
+  },
+  "27": {
+    "descriptionZh": "Has a 30% chance of inflcting either paralysis, poison, or sleep on attacking Pokémon on contact.",
+    "nameEn": "Effect Spore",
+    "nameZh": "孢子",
+    "slug": "effect-spore"
+  },
+  "270": {
+    "descriptionZh": "Raises Attack when hit by a Fire-type move. Cannot be burned.",
+    "nameEn": "Thermal Exchange",
+    "nameZh": "热交换",
+    "slug": "thermal-exchange"
+  },
+  "271": {
+    "descriptionZh": "When the Pokémon's HP drops below half, Anger Shell lowers its Defense and Special Defense but its Attack, Special Attack and Speed are raised.",
+    "nameEn": "Anger Shell",
+    "nameZh": "愤怒甲壳",
+    "slug": "anger-shell"
+  },
+  "272": {
+    "descriptionZh": "Protects from status conditions and halves damage from Ghost-type moves.",
+    "nameEn": "Purifying Salt",
+    "nameZh": "洁净之盐",
+    "slug": "purifying-salt"
+  },
+  "273": {
+    "descriptionZh": "Immune to Fire-type moves, and Defense is sharply boosted.",
+    "nameEn": "Well-Baked Body",
+    "nameZh": "焦香之躯",
+    "slug": "well-baked-body"
+  },
+  "274": {
+    "descriptionZh": "Gives immunity to wind moves, and causes the Pokémon's Attack to increase by one stage when hit by one.",
+    "nameEn": "Wind Rider",
+    "nameZh": "乘风",
+    "slug": "wind-rider"
+  },
+  "275": {
+    "descriptionZh": "Boosts Attack if intimidated, and prevents being forced to switch out.",
+    "nameEn": "Guard Dog",
+    "nameZh": "看门犬",
+    "slug": "guard-dog"
+  },
+  "276": {
+    "descriptionZh": "Powers up Rock-type moves.",
+    "nameEn": "Rocky Payload",
+    "nameZh": "搬岩",
+    "slug": "rocky-payload"
+  },
+  "277": {
+    "descriptionZh": "When hit by a wind move, the power of the next Electric-type move it uses is doubled.",
+    "nameEn": "Wind Power",
+    "nameZh": "风力发电",
+    "slug": "wind-power"
+  },
+  "278": {
+    "descriptionZh": "Transforms into its Hero Form when switching out.",
+    "nameEn": "Zero to Hero",
+    "nameZh": "全能变身",
+    "slug": "zero-to-hero"
+  },
+  "279": {
+    "descriptionZh": "Goes inside the mouth of an ally Dondozo if one is on the field.",
+    "nameEn": "Commander",
+    "nameZh": "发号施令",
+    "slug": "commander"
+  },
+  "28": {
+    "descriptionZh": "Copies burns, paralysis, and poison received onto the Pokémon that inflicted them.",
+    "nameEn": "Synchronize",
+    "nameZh": "同步",
+    "slug": "synchronize"
+  },
+  "280": {
+    "descriptionZh": "When hit by an attack, the power of the next Electric-type move it uses is doubled.",
+    "nameEn": "Electromorphosis",
+    "nameZh": "电力转换",
+    "slug": "electromorphosis"
+  },
+  "281": {
+    "descriptionZh": "Raises highest stat in harsh sunlight, or if holding Booster Energy.",
+    "nameEn": "Protosynthesis",
+    "nameZh": "古代活性",
+    "slug": "protosynthesis"
+  },
+  "282": {
+    "descriptionZh": "Raises highest stat on Electric Terrain, or if holding Booster Energy.",
+    "nameEn": "Quark Drive",
+    "nameZh": "夸克充能",
+    "slug": "quark-drive"
+  },
+  "283": {
+    "descriptionZh": "Gives immunity to status moves.",
+    "nameEn": "Good as Gold",
+    "nameZh": "黄金之躯",
+    "slug": "good-as-gold"
+  },
+  "284": {
+    "descriptionZh": "Lowers Special Attack of all Pokémon except itself.",
+    "nameEn": "Vessel of Ruin",
+    "nameZh": "灾祸之鼎",
+    "slug": "vessel-of-ruin"
+  },
+  "285": {
+    "descriptionZh": "Lowers Defense of all Pokémon except itself.",
+    "nameEn": "Sword of Ruin",
+    "nameZh": "灾祸之剑",
+    "slug": "sword-of-ruin"
+  },
+  "286": {
+    "descriptionZh": "Lowers Attack of all Pokémon except itself.",
+    "nameEn": "Tablets of Ruin",
+    "nameZh": "灾祸之简",
+    "slug": "tablets-of-ruin"
+  },
+  "287": {
+    "descriptionZh": "Lowers Special Defense of all Pokémon except itself.",
+    "nameEn": "Beads of Ruin",
+    "nameZh": "灾祸之玉",
+    "slug": "beads-of-ruin"
+  },
+  "288": {
+    "descriptionZh": "Turns the sunlight harsh when entering battle, and boosts Attack while active.",
+    "nameEn": "Orichalcum Pulse",
+    "nameZh": "绯红脉动",
+    "slug": "orichalcum-pulse"
+  },
+  "289": {
+    "descriptionZh": "Creates an Electric Terrain when entering battle, and boosts Special Attack while active.",
+    "nameEn": "Hadron Engine",
+    "nameZh": "强子引擎",
+    "slug": "hadron-engine"
+  },
+  "29": {
+    "descriptionZh": "Prevents stats from being lowered by other Pokémon.",
+    "nameEn": "Clear Body",
+    "nameZh": "恒净之躯",
+    "slug": "clear-body"
+  },
+  "290": {
+    "descriptionZh": "Copies stat boosts by the opponent.",
+    "nameEn": "Opportunist",
+    "nameZh": "跟风",
+    "slug": "opportunist"
+  },
+  "291": {
+    "descriptionZh": "Causes the Pokémon to reuse an already consumed Berry at the end of the next turn.",
+    "nameEn": "Cud Chew",
+    "nameZh": "反刍",
+    "slug": "cud-chew"
+  },
+  "292": {
+    "descriptionZh": "Powers up slicing moves.",
+    "nameEn": "Sharpness",
+    "nameZh": "锋锐",
+    "slug": "sharpness"
+  },
+  "293": {
+    "descriptionZh": "Attack and Special Attack are boosted for each party Pokémon that has been defeated.",
+    "nameEn": "Supreme Overlord",
+    "nameZh": "大将",
+    "slug": "supreme-overlord"
+  },
+  "294": {
+    "descriptionZh": "Copies ally's stat changes on entering battle.",
+    "nameEn": "Costar",
+    "nameZh": "同台共演",
+    "slug": "costar"
+  },
+  "295": {
+    "descriptionZh": "Scatters poison spikes at the feet of the opposing team when the Pokémon takes damage from physical moves.",
+    "nameEn": "Toxic Debris",
+    "nameZh": "毒满地",
+    "slug": "toxic-debris"
+  },
+  "296": {
+    "descriptionZh": "Prevents the opponent from using any moves that have priority, such as Quick Attack.",
+    "nameEn": "Armor Tail",
+    "nameZh": "尾甲",
+    "slug": "armor-tail"
+  },
+  "297": {
+    "descriptionZh": "Restores HP when hit by a Ground-type move.",
+    "nameEn": "Earth Eater",
+    "nameZh": "食土",
+    "slug": "earth-eater"
+  },
+  "298": {
+    "descriptionZh": "Status moves go last, but are not affected by the opponent's ability.",
+    "nameEn": "Mycelium Might",
+    "nameZh": "菌丝之力",
+    "slug": "mycelium-might"
+  },
+  "299": {
+    "descriptionZh": "The Pokémon ignores changes to opponents' evasiveness, its accuracy can't be lowered, and it can hit Ghost types with Normal- and Fighting-type moves.",
+    "nameEn": "Mind’s Eye",
+    "nameZh": "心眼",
+    "slug": "minds-eye"
+  },
+  "3": {
+    "descriptionZh": "Raises Speed one stage after each turn.",
+    "nameEn": "Speed Boost",
+    "nameZh": "加速",
+    "slug": "speed-boost"
+  },
+  "30": {
+    "descriptionZh": "Cures any major status ailment upon switching out.",
+    "nameEn": "Natural Cure",
+    "nameZh": "自然回复",
+    "slug": "natural-cure"
+  },
+  "300": {
+    "descriptionZh": "Once per battle, when a Pokémon with Supersweet Syrup enters the battle, it lowers the evasion stat of all adjacent opponents by one stage.",
+    "nameEn": "Supersweet Syrup",
+    "nameZh": "甘露之蜜",
+    "slug": "supersweet-syrup"
+  },
+  "301": {
+    "descriptionZh": "When a Pokémon with Hospitality enters a battle, it restores HP for an ally by 25%.",
+    "nameEn": "Hospitality",
+    "nameZh": "款待",
+    "slug": "hospitality"
+  },
+  "302": {
+    "descriptionZh": "May cause bad poisoning when the Pokémon hits an opponent with a move.",
+    "nameEn": "Toxic Chain",
+    "nameZh": "毒锁链",
+    "slug": "toxic-chain"
+  },
+  "303": {
+    "descriptionZh": "Embody Aspect boosts a particular stat, depending on the form of a Terastallized Ogerpon",
+    "nameEn": "Embody Aspect",
+    "nameZh": "面影辉映",
+    "slug": "embody-aspect"
+  },
+  "304": {
+    "descriptionZh": "When Terapagos enters the battle, it turns into its Terastal Form until the end of the battle.",
+    "nameEn": "Tera Shift",
+    "nameZh": "太晶变形",
+    "slug": "tera-shift"
+  },
+  "305": {
+    "descriptionZh": "All damage-dealing moves that hit the Pokémon when its HP is full will not be very effective.",
+    "nameEn": "Tera Shell",
+    "nameZh": "太晶甲壳",
+    "slug": "tera-shell"
+  },
+  "306": {
+    "descriptionZh": "As soon as Terapagos assumes its Stellar Form, it will immediately neutralize weather and terrain effects.",
+    "nameEn": "Teraform Zero",
+    "nameZh": "归零化境",
+    "slug": "teraform-zero"
+  },
+  "307": {
+    "descriptionZh": "Pokémon poisoned by Pecharunt's moves will also become confused.",
+    "nameEn": "Poison Puppeteer",
+    "nameZh": "毒傀儡",
+    "slug": "poison-puppeteer"
+  },
+  "308": {
+    "descriptionZh": "When the Pokémon uses contact moves, it can hit even targets that are protecting themselves.",
+    "nameEn": "Piercing Drill",
+    "nameZh": "贯穿钻",
+    "slug": "piercing-drill"
+  },
+  "309": {
+    "descriptionZh": "The Pokémon's Normal-type moves become Dragon-type moves and their power is boosted by 20%.",
+    "nameEn": "Dragonize",
+    "nameZh": "龙皮肤",
+    "slug": "dragonize"
+  },
+  "31": {
+    "descriptionZh": "Redirects single-target Electric moves to this Pokémon where possible.  Absorbs Electric moves, raising Special Attack one stage.",
+    "nameEn": "Lightning Rod",
+    "nameZh": "避雷针",
+    "slug": "lightning-rod"
+  },
+  "310": {
+    "descriptionZh": "The Pokémon can use its moves as if the weather were harsh sunlight.",
+    "nameEn": "Mega Sol",
+    "nameZh": "超级日光",
+    "slug": "mega-sol"
+  },
+  "311": {
+    "descriptionZh": "When the Pokémon takes damage from a move, it burns the attacker.",
+    "nameEn": "Spicy Spray",
+    "nameZh": "辣椒喷发",
+    "slug": "spicy-spray"
+  },
+  "312": {
+    "descriptionZh": "The Pokémon floats off the ground, making it immune to Ground-type moves, as well as the Spikes, Toxic Spikes, and Sticky Web statuses. When the Pokémon knocks out a target with an attack, its highest stat is boosted by 1 stage.",
+    "nameEn": "Eelevate",
+    "nameZh": "Eelevate",
+    "slug": "eelevate"
+  },
+  "313": {
+    "descriptionZh": "Boosts the power of the Pokémon's Fire-type moves by 50%.",
+    "nameEn": "Fire Mane",
+    "nameZh": "Fire Mane",
+    "slug": "fire-mane"
+  },
+  "32": {
+    "descriptionZh": "Doubles the chance of moves' extra effects occurring.",
+    "nameEn": "Serene Grace",
+    "nameZh": "天恩",
+    "slug": "serene-grace"
+  },
+  "33": {
+    "descriptionZh": "Doubles Speed during rain.",
+    "nameEn": "Swift Swim",
+    "nameZh": "悠游自如",
+    "slug": "swift-swim"
+  },
+  "34": {
+    "descriptionZh": "Doubles Speed during strong sunlight.",
+    "nameEn": "Chlorophyll",
+    "nameZh": "叶绿素",
+    "slug": "chlorophyll"
+  },
+  "35": {
+    "descriptionZh": "Doubles the wild encounter rate.",
+    "nameEn": "Illuminate",
+    "nameZh": "发光",
+    "slug": "illuminate"
+  },
+  "36": {
+    "descriptionZh": "Copies an opponent's ability upon entering battle.",
+    "nameEn": "Trace",
+    "nameZh": "复制",
+    "slug": "trace"
+  },
+  "37": {
+    "descriptionZh": "Doubles Attack in battle.",
+    "nameEn": "Huge Power",
+    "nameZh": "大力士",
+    "slug": "huge-power"
+  },
+  "38": {
+    "descriptionZh": "Has a 30% chance of poisoning attacking Pokémon on contact.",
+    "nameEn": "Poison Point",
+    "nameZh": "毒刺",
+    "slug": "poison-point"
+  },
+  "39": {
+    "descriptionZh": "Prevents flinching.",
+    "nameEn": "Inner Focus",
+    "nameZh": "精神力",
+    "slug": "inner-focus"
+  },
+  "4": {
+    "descriptionZh": "Protects against critical hits.",
+    "nameEn": "Battle Armor",
+    "nameZh": "战斗盔甲",
+    "slug": "battle-armor"
+  },
+  "40": {
+    "descriptionZh": "Prevents freezing.",
+    "nameEn": "Magma Armor",
+    "nameZh": "熔岩铠甲",
+    "slug": "magma-armor"
+  },
+  "41": {
+    "descriptionZh": "Prevents burns.",
+    "nameEn": "Water Veil",
+    "nameZh": "水幕",
+    "slug": "water-veil"
+  },
+  "42": {
+    "descriptionZh": "Prevents Steel opponents from fleeing or switching out.",
+    "nameEn": "Magnet Pull",
+    "nameZh": "磁力",
+    "slug": "magnet-pull"
+  },
+  "43": {
+    "descriptionZh": "Protects against sound-based moves.",
+    "nameEn": "Soundproof",
+    "nameZh": "隔音",
+    "slug": "soundproof"
+  },
+  "44": {
+    "descriptionZh": "Heals for 1/16 max HP after each turn during rain.",
+    "nameEn": "Rain Dish",
+    "nameZh": "雨盘",
+    "slug": "rain-dish"
+  },
+  "45": {
+    "descriptionZh": "Summons a sandstorm that lasts indefinitely upon entering battle.",
+    "nameEn": "Sand Stream",
+    "nameZh": "扬沙",
+    "slug": "sand-stream"
+  },
+  "46": {
+    "descriptionZh": "Increases the PP cost of moves targetting the Pokémon by one.",
+    "nameEn": "Pressure",
+    "nameZh": "压迫感",
+    "slug": "pressure"
+  },
+  "47": {
+    "descriptionZh": "Halves damage from Fire and Ice moves.",
+    "nameEn": "Thick Fat",
+    "nameZh": "厚脂肪",
+    "slug": "thick-fat"
+  },
+  "48": {
+    "descriptionZh": "Makes sleep pass twice as quickly.",
+    "nameEn": "Early Bird",
+    "nameZh": "早起",
+    "slug": "early-bird"
+  },
+  "49": {
+    "descriptionZh": "Has a 30% chance of burning attacking Pokémon on contact.",
+    "nameEn": "Flame Body",
+    "nameZh": "火焰之躯",
+    "slug": "flame-body"
+  },
+  "5": {
+    "descriptionZh": "Prevents being KOed from full HP, leaving 1 HP instead.  Protects against the one-hit KO moves regardless of HP.",
+    "nameEn": "Sturdy",
+    "nameZh": "结实",
+    "slug": "sturdy"
+  },
+  "50": {
+    "descriptionZh": "Ensures success fleeing from wild battles.",
+    "nameEn": "Run Away",
+    "nameZh": "逃跑",
+    "slug": "run-away"
+  },
+  "51": {
+    "descriptionZh": "Prevents accuracy from being lowered.",
+    "nameEn": "Keen Eye",
+    "nameZh": "锐利目光",
+    "slug": "keen-eye"
+  },
+  "52": {
+    "descriptionZh": "Prevents Attack from being lowered by other Pokémon.",
+    "nameEn": "Hyper Cutter",
+    "nameZh": "怪力钳",
+    "slug": "hyper-cutter"
+  },
+  "53": {
+    "descriptionZh": "Picks up other Pokémon's used and Flung held items.  May also pick up an item after battle.",
+    "nameEn": "Pickup",
+    "nameZh": "捡拾",
+    "slug": "pickup"
+  },
+  "54": {
+    "descriptionZh": "Skips every second turn.",
+    "nameEn": "Truant",
+    "nameZh": "懒惰",
+    "slug": "truant"
+  },
+  "55": {
+    "descriptionZh": "Strengthens physical moves to inflict 1.5× damage, but decreases their accuracy to 0.8×.",
+    "nameEn": "Hustle",
+    "nameZh": "活力",
+    "slug": "hustle"
+  },
+  "56": {
+    "descriptionZh": "Has a 30% chance of infatuating attacking Pokémon on contact.",
+    "nameEn": "Cute Charm",
+    "nameZh": "迷人之躯",
+    "slug": "cute-charm"
+  },
+  "57": {
+    "descriptionZh": "Increases Special Attack to 1.5× when a friendly Pokémon has Plus or Minus.",
+    "nameEn": "Plus",
+    "nameZh": "正电",
+    "slug": "plus"
+  },
+  "58": {
+    "descriptionZh": "Increases Special Attack to 1.5× when a friendly Pokémon has Plus or Minus.",
+    "nameEn": "Minus",
+    "nameZh": "负电",
+    "slug": "minus"
+  },
+  "59": {
+    "descriptionZh": "Changes Castform's type and form to match the weather.",
+    "nameEn": "Forecast",
+    "nameZh": "阴晴不定",
+    "slug": "forecast"
+  },
+  "6": {
+    "descriptionZh": "Prevents Self-Destruct, Explosion, and Aftermath from working while the Pokémon is in battle.",
+    "nameEn": "Damp",
+    "nameZh": "湿气",
+    "slug": "damp"
+  },
+  "60": {
+    "descriptionZh": "Prevents a held item from being removed by other Pokémon.",
+    "nameEn": "Sticky Hold",
+    "nameZh": "黏着",
+    "slug": "sticky-hold"
+  },
+  "61": {
+    "descriptionZh": "Has a 33% chance of curing any major status ailment after each turn.",
+    "nameEn": "Shed Skin",
+    "nameZh": "蜕皮",
+    "slug": "shed-skin"
+  },
+  "62": {
+    "descriptionZh": "Increases Attack to 1.5× with a major status ailment.",
+    "nameEn": "Guts",
+    "nameZh": "毅力",
+    "slug": "guts"
+  },
+  "63": {
+    "descriptionZh": "Increases Defense to 1.5× with a major status ailment.",
+    "nameEn": "Marvel Scale",
+    "nameZh": "神奇鳞片",
+    "slug": "marvel-scale"
+  },
+  "64": {
+    "descriptionZh": "Damages opponents using leeching moves for as much as they would heal.",
+    "nameEn": "Liquid Ooze",
+    "nameZh": "污泥浆",
+    "slug": "liquid-ooze"
+  },
+  "65": {
+    "descriptionZh": "Strengthens Grass moves to inflict 1.5× damage at 1/3 max HP or less.",
+    "nameEn": "Overgrow",
+    "nameZh": "茂盛",
+    "slug": "overgrow"
+  },
+  "66": {
+    "descriptionZh": "Strengthens Fire moves to inflict 1.5× damage at 1/3 max HP or less.",
+    "nameEn": "Blaze",
+    "nameZh": "猛火",
+    "slug": "blaze"
+  },
+  "67": {
+    "descriptionZh": "Strengthens Water moves to inflict 1.5× damage at 1/3 max HP or less.",
+    "nameEn": "Torrent",
+    "nameZh": "激流",
+    "slug": "torrent"
+  },
+  "68": {
+    "descriptionZh": "Strengthens Bug moves to inflict 1.5× damage at 1/3 max HP or less.",
+    "nameEn": "Swarm",
+    "nameZh": "虫之预感",
+    "slug": "swarm"
+  },
+  "69": {
+    "descriptionZh": "Protects against recoil damage.",
+    "nameEn": "Rock Head",
+    "nameZh": "坚硬脑袋",
+    "slug": "rock-head"
+  },
+  "7": {
+    "descriptionZh": "Prevents paralysis.",
+    "nameEn": "Limber",
+    "nameZh": "柔软",
+    "slug": "limber"
+  },
+  "70": {
+    "descriptionZh": "Summons strong sunlight that lasts indefinitely upon entering battle.",
+    "nameEn": "Drought",
+    "nameZh": "日照",
+    "slug": "drought"
+  },
+  "71": {
+    "descriptionZh": "Prevents opponents from fleeing or switching out.  Eluded by Flying-types and Pokémon in the air.",
+    "nameEn": "Arena Trap",
+    "nameZh": "沙穴",
+    "slug": "arena-trap"
+  },
+  "72": {
+    "descriptionZh": "Prevents sleep.",
+    "nameEn": "Vital Spirit",
+    "nameZh": "干劲",
+    "slug": "vital-spirit"
+  },
+  "73": {
+    "descriptionZh": "Prevents stats from being lowered by other Pokémon.",
+    "nameEn": "White Smoke",
+    "nameZh": "白色烟雾",
+    "slug": "white-smoke"
+  },
+  "74": {
+    "descriptionZh": "Doubles Attack in battle.",
+    "nameEn": "Pure Power",
+    "nameZh": "瑜伽之力",
+    "slug": "pure-power"
+  },
+  "75": {
+    "descriptionZh": "Protects against critical hits.",
+    "nameEn": "Shell Armor",
+    "nameZh": "硬壳盔甲",
+    "slug": "shell-armor"
+  },
+  "76": {
+    "descriptionZh": "Negates all effects of weather, but does not prevent the weather itself.",
+    "nameEn": "Air Lock",
+    "nameZh": "气闸",
+    "slug": "air-lock"
+  },
+  "77": {
+    "descriptionZh": "Doubles evasion when confused.",
+    "nameEn": "Tangled Feet",
+    "nameZh": "蹒跚",
+    "slug": "tangled-feet"
+  },
+  "78": {
+    "descriptionZh": "Absorbs Electric moves, raising Speed one stage.",
+    "nameEn": "Motor Drive",
+    "nameZh": "电气引擎",
+    "slug": "motor-drive"
+  },
+  "79": {
+    "descriptionZh": "Increases damage inflicted to 1.25× against Pokémon of the same gender, but decreases damage to 0.75× against the opposite gender.",
+    "nameEn": "Rivalry",
+    "nameZh": "斗争心",
+    "slug": "rivalry"
+  },
+  "8": {
+    "descriptionZh": "Increases evasion to 1.25× during a sandstorm.  Protects against sandstorm damage.",
+    "nameEn": "Sand Veil",
+    "nameZh": "沙隐",
+    "slug": "sand-veil"
+  },
+  "80": {
+    "descriptionZh": "Raises Speed one stage upon flinching.",
+    "nameEn": "Steadfast",
+    "nameZh": "不屈之心",
+    "slug": "steadfast"
+  },
+  "81": {
+    "descriptionZh": "Increases evasion to 1.25× during hail.  Protects against hail damage.",
+    "nameEn": "Snow Cloak",
+    "nameZh": "雪隐",
+    "slug": "snow-cloak"
+  },
+  "82": {
+    "descriptionZh": "Makes the Pokémon eat any held Berry triggered by low HP below 1/2 its max HP.",
+    "nameEn": "Gluttony",
+    "nameZh": "贪吃鬼",
+    "slug": "gluttony"
+  },
+  "83": {
+    "descriptionZh": "Raises Attack to the maximum of six stages upon receiving a critical hit.",
+    "nameEn": "Anger Point",
+    "nameZh": "愤怒穴位",
+    "slug": "anger-point"
+  },
+  "84": {
+    "descriptionZh": "Doubles Speed upon using or losing a held item.",
+    "nameEn": "Unburden",
+    "nameZh": "轻装",
+    "slug": "unburden"
+  },
+  "85": {
+    "descriptionZh": "Halves damage from Fire moves and burns.",
+    "nameEn": "Heatproof",
+    "nameZh": "耐热",
+    "slug": "heatproof"
+  },
+  "86": {
+    "descriptionZh": "Doubles the Pokémon's stat modifiers.  These doubled modifiers are still capped at -6 or 6 stages.",
+    "nameEn": "Simple",
+    "nameZh": "单纯",
+    "slug": "simple"
+  },
+  "87": {
+    "descriptionZh": "Causes 1/8 max HP in damage each turn during strong sunlight, but heals for 1/8 max HP during rain.  Increases damage from Fire moves to 1.25×, but absorbs Water moves, healing for 1/4 max HP.",
+    "nameEn": "Dry Skin",
+    "nameZh": "干燥皮肤",
+    "slug": "dry-skin"
+  },
+  "88": {
+    "descriptionZh": "Raises the attack stat corresponding to the opponents' weaker defense one stage upon entering battle.",
+    "nameEn": "Download",
+    "nameZh": "下载",
+    "slug": "download"
+  },
+  "89": {
+    "descriptionZh": "Strengthens punch-based moves to 1.2× their power.",
+    "nameEn": "Iron Fist",
+    "nameZh": "铁拳",
+    "slug": "iron-fist"
+  },
+  "9": {
+    "descriptionZh": "Has a 30% chance of paralyzing attacking Pokémon on contact.",
+    "nameEn": "Static",
+    "nameZh": "静电",
+    "slug": "static"
+  },
+  "90": {
+    "descriptionZh": "Heals for 1/8 max HP after each turn when poisoned in place of damage.",
+    "nameEn": "Poison Heal",
+    "nameZh": "毒疗",
+    "slug": "poison-heal"
+  },
+  "91": {
+    "descriptionZh": "Increases the same-type attack bonus from 1.5× to 2×.",
+    "nameEn": "Adaptability",
+    "nameZh": "适应力",
+    "slug": "adaptability"
+  },
+  "92": {
+    "descriptionZh": "Extends two-to-five-hit moves and Triple Kick to their full length every time.",
+    "nameEn": "Skill Link",
+    "nameZh": "连续攻击",
+    "slug": "skill-link"
+  },
+  "93": {
+    "descriptionZh": "Cures any major status ailment after each turn during rain.",
+    "nameEn": "Hydration",
+    "nameZh": "湿润之躯",
+    "slug": "hydration"
+  },
+  "94": {
+    "descriptionZh": "Increases Special Attack to 1.5× but costs 1/8 max HP after each turn during strong sunlight.",
+    "nameEn": "Solar Power",
+    "nameZh": "太阳之力",
+    "slug": "solar-power"
+  },
+  "95": {
+    "descriptionZh": "Increases Speed to 1.5× with a major status ailment.",
+    "nameEn": "Quick Feet",
+    "nameZh": "飞毛腿",
+    "slug": "quick-feet"
+  },
+  "96": {
+    "descriptionZh": "Makes the Pokémon's moves all act Normal-type.",
+    "nameEn": "Normalize",
+    "nameZh": "一般皮肤",
+    "slug": "normalize"
+  },
+  "97": {
+    "descriptionZh": "Strengthens critical hits to inflict 3× damage rather than 2×.",
+    "nameEn": "Sniper",
+    "nameZh": "狙击手",
+    "slug": "sniper"
+  },
+  "98": {
+    "descriptionZh": "Protects against damage not directly caused by a move.",
+    "nameEn": "Magic Guard",
+    "nameZh": "魔法防守",
+    "slug": "magic-guard"
+  },
+  "99": {
+    "descriptionZh": "Ensures all moves used by and against the Pokémon hit.",
+    "nameEn": "No Guard",
+    "nameZh": "无防守",
+    "slug": "no-guard"
+  }
+}

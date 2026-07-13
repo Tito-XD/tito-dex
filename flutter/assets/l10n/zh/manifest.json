@@ -1,0 +1,14 @@
+{
+  "counts": {
+    "abilities": 373,
+    "hgssMapIds": 500,
+    "items": 2221,
+    "locationAreas": 1252,
+    "locationAreasUnresolved": 519,
+    "moves": 937,
+    "species": 1025
+  },
+  "generatedAt": "2026-07-13T04:52:57.850408+00:00",
+  "locale": "zh-Hans",
+  "pokeapiBase": "https://pokeapi.co/api/v2"
+}

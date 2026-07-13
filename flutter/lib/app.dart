@@ -8,6 +8,7 @@ import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
 import 'features/dex/dex_settings_repository.dart';
+import 'l10n/zh_catalog.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
@@ -64,6 +65,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   @override
   void initState() {
     super.initState();
+    ZhCatalog.instance.ensureLoaded();
     _router = GoRouter(
       refreshListenable: gameEditionRepository,
       routes: [

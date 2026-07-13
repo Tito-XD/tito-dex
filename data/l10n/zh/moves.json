@@ -1,0 +1,7498 @@
+{
+  "1": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pound",
+    "nameZh": "拍击",
+    "slug": "pound",
+    "typeZh": "一般"
+  },
+  "10": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Scratch",
+    "nameZh": "抓",
+    "slug": "scratch",
+    "typeZh": "一般"
+  },
+  "100": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Teleport",
+    "nameZh": "瞬间移动",
+    "slug": "teleport",
+    "typeZh": "超能力"
+  },
+  "10001": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Rush",
+    "nameZh": "Shadow Rush",
+    "slug": "shadow-rush",
+    "typeZh": ""
+  },
+  "10002": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Blast",
+    "nameZh": "Shadow Blast",
+    "slug": "shadow-blast",
+    "typeZh": ""
+  },
+  "10003": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Blitz",
+    "nameZh": "Shadow Blitz",
+    "slug": "shadow-blitz",
+    "typeZh": ""
+  },
+  "10004": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Bolt",
+    "nameZh": "Shadow Bolt",
+    "slug": "shadow-bolt",
+    "typeZh": ""
+  },
+  "10005": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Break",
+    "nameZh": "Shadow Break",
+    "slug": "shadow-break",
+    "typeZh": ""
+  },
+  "10006": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Chill",
+    "nameZh": "Shadow Chill",
+    "slug": "shadow-chill",
+    "typeZh": ""
+  },
+  "10007": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow End",
+    "nameZh": "Shadow End",
+    "slug": "shadow-end",
+    "typeZh": ""
+  },
+  "10008": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Fire",
+    "nameZh": "Shadow Fire",
+    "slug": "shadow-fire",
+    "typeZh": ""
+  },
+  "10009": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Rave",
+    "nameZh": "Shadow Rave",
+    "slug": "shadow-rave",
+    "typeZh": ""
+  },
+  "10010": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Storm",
+    "nameZh": "Shadow Storm",
+    "slug": "shadow-storm",
+    "typeZh": ""
+  },
+  "10011": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Wave",
+    "nameZh": "Shadow Wave",
+    "slug": "shadow-wave",
+    "typeZh": ""
+  },
+  "10012": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Down",
+    "nameZh": "Shadow Down",
+    "slug": "shadow-down",
+    "typeZh": ""
+  },
+  "10013": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Half",
+    "nameZh": "Shadow Half",
+    "slug": "shadow-half",
+    "typeZh": ""
+  },
+  "10014": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Hold",
+    "nameZh": "Shadow Hold",
+    "slug": "shadow-hold",
+    "typeZh": ""
+  },
+  "10015": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Mist",
+    "nameZh": "Shadow Mist",
+    "slug": "shadow-mist",
+    "typeZh": ""
+  },
+  "10016": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Panic",
+    "nameZh": "Shadow Panic",
+    "slug": "shadow-panic",
+    "typeZh": ""
+  },
+  "10017": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Shed",
+    "nameZh": "Shadow Shed",
+    "slug": "shadow-shed",
+    "typeZh": ""
+  },
+  "10018": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shadow Sky",
+    "nameZh": "Shadow Sky",
+    "slug": "shadow-sky",
+    "typeZh": ""
+  },
+  "101": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Night Shade",
+    "nameZh": "黑夜魔影",
+    "slug": "night-shade",
+    "typeZh": "幽灵"
+  },
+  "102": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mimic",
+    "nameZh": "模仿",
+    "slug": "mimic",
+    "typeZh": "一般"
+  },
+  "103": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Screech",
+    "nameZh": "刺耳声",
+    "slug": "screech",
+    "typeZh": "一般"
+  },
+  "104": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Double Team",
+    "nameZh": "影子分身",
+    "slug": "double-team",
+    "typeZh": "一般"
+  },
+  "105": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Recover",
+    "nameZh": "自我再生",
+    "slug": "recover",
+    "typeZh": "一般"
+  },
+  "106": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Harden",
+    "nameZh": "变硬",
+    "slug": "harden",
+    "typeZh": "一般"
+  },
+  "107": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Minimize",
+    "nameZh": "变小",
+    "slug": "minimize",
+    "typeZh": "一般"
+  },
+  "108": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Smokescreen",
+    "nameZh": "烟幕",
+    "slug": "smokescreen",
+    "typeZh": "一般"
+  },
+  "109": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Confuse Ray",
+    "nameZh": "奇异之光",
+    "slug": "confuse-ray",
+    "typeZh": "幽灵"
+  },
+  "11": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Vise Grip",
+    "nameZh": "夹住",
+    "slug": "vice-grip",
+    "typeZh": "一般"
+  },
+  "110": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Withdraw",
+    "nameZh": "缩入壳中",
+    "slug": "withdraw",
+    "typeZh": "水"
+  },
+  "111": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Defense Curl",
+    "nameZh": "变圆",
+    "slug": "defense-curl",
+    "typeZh": "一般"
+  },
+  "112": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Barrier",
+    "nameZh": "屏障",
+    "slug": "barrier",
+    "typeZh": "超能力"
+  },
+  "113": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Light Screen",
+    "nameZh": "光墙",
+    "slug": "light-screen",
+    "typeZh": "超能力"
+  },
+  "114": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Haze",
+    "nameZh": "黑雾",
+    "slug": "haze",
+    "typeZh": "冰"
+  },
+  "115": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Reflect",
+    "nameZh": "反射壁",
+    "slug": "reflect",
+    "typeZh": "超能力"
+  },
+  "116": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Focus Energy",
+    "nameZh": "聚气",
+    "slug": "focus-energy",
+    "typeZh": "一般"
+  },
+  "117": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bide",
+    "nameZh": "忍耐",
+    "slug": "bide",
+    "typeZh": "一般"
+  },
+  "118": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Metronome",
+    "nameZh": "挥指",
+    "slug": "metronome",
+    "typeZh": "一般"
+  },
+  "119": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mirror Move",
+    "nameZh": "鹦鹉学舌",
+    "slug": "mirror-move",
+    "typeZh": "飞行"
+  },
+  "12": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Guillotine",
+    "nameZh": "断头钳",
+    "slug": "guillotine",
+    "typeZh": "一般"
+  },
+  "120": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Self-Destruct",
+    "nameZh": "自爆",
+    "slug": "self-destruct",
+    "typeZh": "一般"
+  },
+  "121": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Egg Bomb",
+    "nameZh": "炸蛋",
+    "slug": "egg-bomb",
+    "typeZh": "一般"
+  },
+  "122": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Lick",
+    "nameZh": "舌舔",
+    "slug": "lick",
+    "typeZh": "幽灵"
+  },
+  "123": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Smog",
+    "nameZh": "浊雾",
+    "slug": "smog",
+    "typeZh": "毒"
+  },
+  "124": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sludge",
+    "nameZh": "污泥攻击",
+    "slug": "sludge",
+    "typeZh": "毒"
+  },
+  "125": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bone Club",
+    "nameZh": "骨棒",
+    "slug": "bone-club",
+    "typeZh": "地面"
+  },
+  "126": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fire Blast",
+    "nameZh": "大字爆炎",
+    "slug": "fire-blast",
+    "typeZh": "火"
+  },
+  "127": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Waterfall",
+    "nameZh": "攀瀑",
+    "slug": "waterfall",
+    "typeZh": "水"
+  },
+  "128": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Clamp",
+    "nameZh": "贝壳夹击",
+    "slug": "clamp",
+    "typeZh": "水"
+  },
+  "129": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Swift",
+    "nameZh": "高速星星",
+    "slug": "swift",
+    "typeZh": "一般"
+  },
+  "13": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Razor Wind",
+    "nameZh": "旋风刀",
+    "slug": "razor-wind",
+    "typeZh": "一般"
+  },
+  "130": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Skull Bash",
+    "nameZh": "火箭头锤",
+    "slug": "skull-bash",
+    "typeZh": "一般"
+  },
+  "131": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spike Cannon",
+    "nameZh": "尖刺加农炮",
+    "slug": "spike-cannon",
+    "typeZh": "一般"
+  },
+  "132": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Constrict",
+    "nameZh": "缠绕",
+    "slug": "constrict",
+    "typeZh": "一般"
+  },
+  "133": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Amnesia",
+    "nameZh": "瞬间失忆",
+    "slug": "amnesia",
+    "typeZh": "超能力"
+  },
+  "134": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Kinesis",
+    "nameZh": "折弯汤匙",
+    "slug": "kinesis",
+    "typeZh": "超能力"
+  },
+  "135": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Soft-Boiled",
+    "nameZh": "生蛋",
+    "slug": "soft-boiled",
+    "typeZh": "一般"
+  },
+  "136": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "High Jump Kick",
+    "nameZh": "飞膝踢",
+    "slug": "high-jump-kick",
+    "typeZh": "格斗"
+  },
+  "137": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Glare",
+    "nameZh": "大蛇瞪眼",
+    "slug": "glare",
+    "typeZh": "一般"
+  },
+  "138": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dream Eater",
+    "nameZh": "食梦",
+    "slug": "dream-eater",
+    "typeZh": "超能力"
+  },
+  "139": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Poison Gas",
+    "nameZh": "毒瓦斯",
+    "slug": "poison-gas",
+    "typeZh": "毒"
+  },
+  "14": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Swords Dance",
+    "nameZh": "剑舞",
+    "slug": "swords-dance",
+    "typeZh": "一般"
+  },
+  "140": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Barrage",
+    "nameZh": "投球",
+    "slug": "barrage",
+    "typeZh": "一般"
+  },
+  "141": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Leech Life",
+    "nameZh": "吸血",
+    "slug": "leech-life",
+    "typeZh": "虫"
+  },
+  "142": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Lovely Kiss",
+    "nameZh": "恶魔之吻",
+    "slug": "lovely-kiss",
+    "typeZh": "一般"
+  },
+  "143": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sky Attack",
+    "nameZh": "神鸟猛击",
+    "slug": "sky-attack",
+    "typeZh": "飞行"
+  },
+  "144": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Transform",
+    "nameZh": "变身",
+    "slug": "transform",
+    "typeZh": "一般"
+  },
+  "145": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bubble",
+    "nameZh": "泡沫",
+    "slug": "bubble",
+    "typeZh": "水"
+  },
+  "146": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dizzy Punch",
+    "nameZh": "迷昏拳",
+    "slug": "dizzy-punch",
+    "typeZh": "一般"
+  },
+  "147": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spore",
+    "nameZh": "蘑菇孢子",
+    "slug": "spore",
+    "typeZh": "草"
+  },
+  "148": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Flash",
+    "nameZh": "闪光",
+    "slug": "flash",
+    "typeZh": "一般"
+  },
+  "149": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psywave",
+    "nameZh": "精神波",
+    "slug": "psywave",
+    "typeZh": "超能力"
+  },
+  "15": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Cut",
+    "nameZh": "居合斩",
+    "slug": "cut",
+    "typeZh": "一般"
+  },
+  "150": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Splash",
+    "nameZh": "跃起",
+    "slug": "splash",
+    "typeZh": "一般"
+  },
+  "151": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Acid Armor",
+    "nameZh": "溶化",
+    "slug": "acid-armor",
+    "typeZh": "毒"
+  },
+  "152": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Crabhammer",
+    "nameZh": "蟹钳锤",
+    "slug": "crabhammer",
+    "typeZh": "水"
+  },
+  "153": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Explosion",
+    "nameZh": "大爆炸",
+    "slug": "explosion",
+    "typeZh": "一般"
+  },
+  "154": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fury Swipes",
+    "nameZh": "乱抓",
+    "slug": "fury-swipes",
+    "typeZh": "一般"
+  },
+  "155": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bonemerang",
+    "nameZh": "骨头回力镖",
+    "slug": "bonemerang",
+    "typeZh": "地面"
+  },
+  "156": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Rest",
+    "nameZh": "睡觉",
+    "slug": "rest",
+    "typeZh": "超能力"
+  },
+  "157": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Slide",
+    "nameZh": "岩崩",
+    "slug": "rock-slide",
+    "typeZh": "岩石"
+  },
+  "158": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hyper Fang",
+    "nameZh": "必杀门牙",
+    "slug": "hyper-fang",
+    "typeZh": "一般"
+  },
+  "159": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sharpen",
+    "nameZh": "棱角化",
+    "slug": "sharpen",
+    "typeZh": "一般"
+  },
+  "16": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Gust",
+    "nameZh": "起风",
+    "slug": "gust",
+    "typeZh": "飞行"
+  },
+  "160": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Conversion",
+    "nameZh": "纹理",
+    "slug": "conversion",
+    "typeZh": "一般"
+  },
+  "161": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Tri Attack",
+    "nameZh": "三重攻击",
+    "slug": "tri-attack",
+    "typeZh": "一般"
+  },
+  "162": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Super Fang",
+    "nameZh": "愤怒门牙",
+    "slug": "super-fang",
+    "typeZh": "一般"
+  },
+  "163": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Slash",
+    "nameZh": "劈开",
+    "slug": "slash",
+    "typeZh": "一般"
+  },
+  "164": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Substitute",
+    "nameZh": "替身",
+    "slug": "substitute",
+    "typeZh": "一般"
+  },
+  "165": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Struggle",
+    "nameZh": "挣扎",
+    "slug": "struggle",
+    "typeZh": "一般"
+  },
+  "166": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sketch",
+    "nameZh": "写生",
+    "slug": "sketch",
+    "typeZh": "一般"
+  },
+  "167": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Triple Kick",
+    "nameZh": "三连踢",
+    "slug": "triple-kick",
+    "typeZh": "格斗"
+  },
+  "168": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thief",
+    "nameZh": "小偷",
+    "slug": "thief",
+    "typeZh": "恶"
+  },
+  "169": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spider Web",
+    "nameZh": "蛛网",
+    "slug": "spider-web",
+    "typeZh": "虫"
+  },
+  "17": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wing Attack",
+    "nameZh": "翅膀攻击",
+    "slug": "wing-attack",
+    "typeZh": "飞行"
+  },
+  "170": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mind Reader",
+    "nameZh": "心之眼",
+    "slug": "mind-reader",
+    "typeZh": "一般"
+  },
+  "171": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Nightmare",
+    "nameZh": "恶梦",
+    "slug": "nightmare",
+    "typeZh": "幽灵"
+  },
+  "172": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flame Wheel",
+    "nameZh": "火焰轮",
+    "slug": "flame-wheel",
+    "typeZh": "火"
+  },
+  "173": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Snore",
+    "nameZh": "打鼾",
+    "slug": "snore",
+    "typeZh": "一般"
+  },
+  "174": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Curse",
+    "nameZh": "诅咒",
+    "slug": "curse",
+    "typeZh": "幽灵"
+  },
+  "175": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flail",
+    "nameZh": "抓狂",
+    "slug": "flail",
+    "typeZh": "一般"
+  },
+  "176": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Conversion 2",
+    "nameZh": "纹理２",
+    "slug": "conversion-2",
+    "typeZh": "一般"
+  },
+  "177": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Aeroblast",
+    "nameZh": "气旋攻击",
+    "slug": "aeroblast",
+    "typeZh": "飞行"
+  },
+  "178": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Cotton Spore",
+    "nameZh": "棉孢子",
+    "slug": "cotton-spore",
+    "typeZh": "草"
+  },
+  "179": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Reversal",
+    "nameZh": "起死回生",
+    "slug": "reversal",
+    "typeZh": "格斗"
+  },
+  "18": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Whirlwind",
+    "nameZh": "吹飞",
+    "slug": "whirlwind",
+    "typeZh": "一般"
+  },
+  "180": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spite",
+    "nameZh": "怨恨",
+    "slug": "spite",
+    "typeZh": "幽灵"
+  },
+  "181": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Powder Snow",
+    "nameZh": "细雪",
+    "slug": "powder-snow",
+    "typeZh": "冰"
+  },
+  "182": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Protect",
+    "nameZh": "守住",
+    "slug": "protect",
+    "typeZh": "一般"
+  },
+  "183": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mach Punch",
+    "nameZh": "音速拳",
+    "slug": "mach-punch",
+    "typeZh": "格斗"
+  },
+  "184": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Scary Face",
+    "nameZh": "鬼面",
+    "slug": "scary-face",
+    "typeZh": "一般"
+  },
+  "185": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Feint Attack",
+    "nameZh": "出奇一击",
+    "slug": "feint-attack",
+    "typeZh": "恶"
+  },
+  "186": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sweet Kiss",
+    "nameZh": "天使之吻",
+    "slug": "sweet-kiss",
+    "typeZh": "妖精"
+  },
+  "187": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Belly Drum",
+    "nameZh": "腹鼓",
+    "slug": "belly-drum",
+    "typeZh": "一般"
+  },
+  "188": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sludge Bomb",
+    "nameZh": "污泥炸弹",
+    "slug": "sludge-bomb",
+    "typeZh": "毒"
+  },
+  "189": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mud-Slap",
+    "nameZh": "掷泥",
+    "slug": "mud-slap",
+    "typeZh": "地面"
+  },
+  "19": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fly",
+    "nameZh": "飞翔",
+    "slug": "fly",
+    "typeZh": "飞行"
+  },
+  "190": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Octazooka",
+    "nameZh": "章鱼桶炮",
+    "slug": "octazooka",
+    "typeZh": "水"
+  },
+  "191": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spikes",
+    "nameZh": "撒菱",
+    "slug": "spikes",
+    "typeZh": "地面"
+  },
+  "192": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Zap Cannon",
+    "nameZh": "电磁炮",
+    "slug": "zap-cannon",
+    "typeZh": "电"
+  },
+  "193": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Foresight",
+    "nameZh": "识破",
+    "slug": "foresight",
+    "typeZh": "一般"
+  },
+  "194": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Destiny Bond",
+    "nameZh": "同命",
+    "slug": "destiny-bond",
+    "typeZh": "幽灵"
+  },
+  "195": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Perish Song",
+    "nameZh": "灭亡之歌",
+    "slug": "perish-song",
+    "typeZh": "一般"
+  },
+  "196": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Icy Wind",
+    "nameZh": "冰冻之风",
+    "slug": "icy-wind",
+    "typeZh": "冰"
+  },
+  "197": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Detect",
+    "nameZh": "看穿",
+    "slug": "detect",
+    "typeZh": "格斗"
+  },
+  "198": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bone Rush",
+    "nameZh": "骨棒乱打",
+    "slug": "bone-rush",
+    "typeZh": "地面"
+  },
+  "199": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Lock-On",
+    "nameZh": "锁定",
+    "slug": "lock-on",
+    "typeZh": "一般"
+  },
+  "2": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Karate Chop",
+    "nameZh": "空手劈",
+    "slug": "karate-chop",
+    "typeZh": "格斗"
+  },
+  "20": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bind",
+    "nameZh": "绑紧",
+    "slug": "bind",
+    "typeZh": "一般"
+  },
+  "200": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Outrage",
+    "nameZh": "逆鳞",
+    "slug": "outrage",
+    "typeZh": "龙"
+  },
+  "201": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sandstorm",
+    "nameZh": "沙暴",
+    "slug": "sandstorm",
+    "typeZh": "岩石"
+  },
+  "202": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Giga Drain",
+    "nameZh": "终极吸取",
+    "slug": "giga-drain",
+    "typeZh": "草"
+  },
+  "203": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Endure",
+    "nameZh": "挺住",
+    "slug": "endure",
+    "typeZh": "一般"
+  },
+  "204": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Charm",
+    "nameZh": "撒娇",
+    "slug": "charm",
+    "typeZh": "妖精"
+  },
+  "205": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rollout",
+    "nameZh": "滚动",
+    "slug": "rollout",
+    "typeZh": "岩石"
+  },
+  "206": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "False Swipe",
+    "nameZh": "点到为止",
+    "slug": "false-swipe",
+    "typeZh": "一般"
+  },
+  "207": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Swagger",
+    "nameZh": "虚张声势",
+    "slug": "swagger",
+    "typeZh": "一般"
+  },
+  "208": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Milk Drink",
+    "nameZh": "喝牛奶",
+    "slug": "milk-drink",
+    "typeZh": "一般"
+  },
+  "209": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spark",
+    "nameZh": "电光",
+    "slug": "spark",
+    "typeZh": "电"
+  },
+  "21": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Slam",
+    "nameZh": "摔打",
+    "slug": "slam",
+    "typeZh": "一般"
+  },
+  "210": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fury Cutter",
+    "nameZh": "连斩",
+    "slug": "fury-cutter",
+    "typeZh": "虫"
+  },
+  "211": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Steel Wing",
+    "nameZh": "钢翼",
+    "slug": "steel-wing",
+    "typeZh": "钢"
+  },
+  "212": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mean Look",
+    "nameZh": "黑色目光",
+    "slug": "mean-look",
+    "typeZh": "一般"
+  },
+  "213": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Attract",
+    "nameZh": "迷人",
+    "slug": "attract",
+    "typeZh": "一般"
+  },
+  "214": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sleep Talk",
+    "nameZh": "梦话",
+    "slug": "sleep-talk",
+    "typeZh": "一般"
+  },
+  "215": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Heal Bell",
+    "nameZh": "治愈铃声",
+    "slug": "heal-bell",
+    "typeZh": "一般"
+  },
+  "216": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Return",
+    "nameZh": "报恩",
+    "slug": "return",
+    "typeZh": "一般"
+  },
+  "217": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Present",
+    "nameZh": "礼物",
+    "slug": "present",
+    "typeZh": "一般"
+  },
+  "218": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Frustration",
+    "nameZh": "迁怒",
+    "slug": "frustration",
+    "typeZh": "一般"
+  },
+  "219": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Safeguard",
+    "nameZh": "神秘守护",
+    "slug": "safeguard",
+    "typeZh": "一般"
+  },
+  "22": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Vine Whip",
+    "nameZh": "藤鞭",
+    "slug": "vine-whip",
+    "typeZh": "草"
+  },
+  "220": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Pain Split",
+    "nameZh": "分担痛楚",
+    "slug": "pain-split",
+    "typeZh": "一般"
+  },
+  "221": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sacred Fire",
+    "nameZh": "神圣之火",
+    "slug": "sacred-fire",
+    "typeZh": "火"
+  },
+  "222": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Magnitude",
+    "nameZh": "震级",
+    "slug": "magnitude",
+    "typeZh": "地面"
+  },
+  "223": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dynamic Punch",
+    "nameZh": "爆裂拳",
+    "slug": "dynamic-punch",
+    "typeZh": "格斗"
+  },
+  "224": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Megahorn",
+    "nameZh": "超级角击",
+    "slug": "megahorn",
+    "typeZh": "虫"
+  },
+  "225": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dragon Breath",
+    "nameZh": "龙息",
+    "slug": "dragon-breath",
+    "typeZh": "龙"
+  },
+  "226": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Baton Pass",
+    "nameZh": "接棒",
+    "slug": "baton-pass",
+    "typeZh": "一般"
+  },
+  "227": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Encore",
+    "nameZh": "再来一次",
+    "slug": "encore",
+    "typeZh": "一般"
+  },
+  "228": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pursuit",
+    "nameZh": "追打",
+    "slug": "pursuit",
+    "typeZh": "恶"
+  },
+  "229": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rapid Spin",
+    "nameZh": "高速旋转",
+    "slug": "rapid-spin",
+    "typeZh": "一般"
+  },
+  "23": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Stomp",
+    "nameZh": "踩踏",
+    "slug": "stomp",
+    "typeZh": "一般"
+  },
+  "230": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sweet Scent",
+    "nameZh": "甜甜香气",
+    "slug": "sweet-scent",
+    "typeZh": "一般"
+  },
+  "231": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Iron Tail",
+    "nameZh": "铁尾",
+    "slug": "iron-tail",
+    "typeZh": "钢"
+  },
+  "232": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Metal Claw",
+    "nameZh": "金属爪",
+    "slug": "metal-claw",
+    "typeZh": "钢"
+  },
+  "233": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Vital Throw",
+    "nameZh": "借力摔",
+    "slug": "vital-throw",
+    "typeZh": "格斗"
+  },
+  "234": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Morning Sun",
+    "nameZh": "晨光",
+    "slug": "morning-sun",
+    "typeZh": "一般"
+  },
+  "235": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Synthesis",
+    "nameZh": "光合作用",
+    "slug": "synthesis",
+    "typeZh": "草"
+  },
+  "236": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Moonlight",
+    "nameZh": "月光",
+    "slug": "moonlight",
+    "typeZh": "妖精"
+  },
+  "237": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hidden Power",
+    "nameZh": "觉醒力量",
+    "slug": "hidden-power",
+    "typeZh": "一般"
+  },
+  "238": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Cross Chop",
+    "nameZh": "十字劈",
+    "slug": "cross-chop",
+    "typeZh": "格斗"
+  },
+  "239": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Twister",
+    "nameZh": "龙卷风",
+    "slug": "twister",
+    "typeZh": "龙"
+  },
+  "24": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double Kick",
+    "nameZh": "二连踢",
+    "slug": "double-kick",
+    "typeZh": "格斗"
+  },
+  "240": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Rain Dance",
+    "nameZh": "求雨",
+    "slug": "rain-dance",
+    "typeZh": "水"
+  },
+  "241": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sunny Day",
+    "nameZh": "大晴天",
+    "slug": "sunny-day",
+    "typeZh": "火"
+  },
+  "242": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Crunch",
+    "nameZh": "咬碎",
+    "slug": "crunch",
+    "typeZh": "恶"
+  },
+  "243": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mirror Coat",
+    "nameZh": "镜面反射",
+    "slug": "mirror-coat",
+    "typeZh": "超能力"
+  },
+  "244": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Psych Up",
+    "nameZh": "自我暗示",
+    "slug": "psych-up",
+    "typeZh": "一般"
+  },
+  "245": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Extreme Speed",
+    "nameZh": "神速",
+    "slug": "extreme-speed",
+    "typeZh": "一般"
+  },
+  "246": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ancient Power",
+    "nameZh": "原始之力",
+    "slug": "ancient-power",
+    "typeZh": "岩石"
+  },
+  "247": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shadow Ball",
+    "nameZh": "暗影球",
+    "slug": "shadow-ball",
+    "typeZh": "幽灵"
+  },
+  "248": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Future Sight",
+    "nameZh": "预知未来",
+    "slug": "future-sight",
+    "typeZh": "超能力"
+  },
+  "249": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Smash",
+    "nameZh": "碎岩",
+    "slug": "rock-smash",
+    "typeZh": "格斗"
+  },
+  "25": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mega Kick",
+    "nameZh": "百万吨重踢",
+    "slug": "mega-kick",
+    "typeZh": "一般"
+  },
+  "250": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Whirlpool",
+    "nameZh": "潮旋",
+    "slug": "whirlpool",
+    "typeZh": "水"
+  },
+  "251": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Beat Up",
+    "nameZh": "围攻",
+    "slug": "beat-up",
+    "typeZh": "恶"
+  },
+  "252": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fake Out",
+    "nameZh": "击掌奇袭",
+    "slug": "fake-out",
+    "typeZh": "一般"
+  },
+  "253": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Uproar",
+    "nameZh": "吵闹",
+    "slug": "uproar",
+    "typeZh": "一般"
+  },
+  "254": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Stockpile",
+    "nameZh": "蓄力",
+    "slug": "stockpile",
+    "typeZh": "一般"
+  },
+  "255": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Spit Up",
+    "nameZh": "喷出",
+    "slug": "spit-up",
+    "typeZh": "一般"
+  },
+  "256": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Swallow",
+    "nameZh": "吞下",
+    "slug": "swallow",
+    "typeZh": "一般"
+  },
+  "257": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Heat Wave",
+    "nameZh": "热风",
+    "slug": "heat-wave",
+    "typeZh": "火"
+  },
+  "258": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Hail",
+    "nameZh": "冰雹",
+    "slug": "hail",
+    "typeZh": "冰"
+  },
+  "259": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Torment",
+    "nameZh": "无理取闹",
+    "slug": "torment",
+    "typeZh": "恶"
+  },
+  "26": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Jump Kick",
+    "nameZh": "飞踢",
+    "slug": "jump-kick",
+    "typeZh": "格斗"
+  },
+  "260": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Flatter",
+    "nameZh": "吹捧",
+    "slug": "flatter",
+    "typeZh": "恶"
+  },
+  "261": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Will-O-Wisp",
+    "nameZh": "鬼火",
+    "slug": "will-o-wisp",
+    "typeZh": "火"
+  },
+  "262": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Memento",
+    "nameZh": "临别礼物",
+    "slug": "memento",
+    "typeZh": "恶"
+  },
+  "263": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Facade",
+    "nameZh": "硬撑",
+    "slug": "facade",
+    "typeZh": "一般"
+  },
+  "264": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Focus Punch",
+    "nameZh": "真气拳",
+    "slug": "focus-punch",
+    "typeZh": "格斗"
+  },
+  "265": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Smelling Salts",
+    "nameZh": "清醒",
+    "slug": "smelling-salts",
+    "typeZh": "一般"
+  },
+  "266": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Follow Me",
+    "nameZh": "看我嘛",
+    "slug": "follow-me",
+    "typeZh": "一般"
+  },
+  "267": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Nature Power",
+    "nameZh": "自然之力",
+    "slug": "nature-power",
+    "typeZh": "一般"
+  },
+  "268": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Charge",
+    "nameZh": "充电",
+    "slug": "charge",
+    "typeZh": "电"
+  },
+  "269": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Taunt",
+    "nameZh": "挑衅",
+    "slug": "taunt",
+    "typeZh": "恶"
+  },
+  "27": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rolling Kick",
+    "nameZh": "回旋踢",
+    "slug": "rolling-kick",
+    "typeZh": "格斗"
+  },
+  "270": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Helping Hand",
+    "nameZh": "帮助",
+    "slug": "helping-hand",
+    "typeZh": "一般"
+  },
+  "271": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Trick",
+    "nameZh": "戏法",
+    "slug": "trick",
+    "typeZh": "超能力"
+  },
+  "272": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Role Play",
+    "nameZh": "扮演",
+    "slug": "role-play",
+    "typeZh": "超能力"
+  },
+  "273": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Wish",
+    "nameZh": "祈愿",
+    "slug": "wish",
+    "typeZh": "一般"
+  },
+  "274": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Assist",
+    "nameZh": "借助",
+    "slug": "assist",
+    "typeZh": "一般"
+  },
+  "275": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Ingrain",
+    "nameZh": "扎根",
+    "slug": "ingrain",
+    "typeZh": "草"
+  },
+  "276": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Superpower",
+    "nameZh": "蛮力",
+    "slug": "superpower",
+    "typeZh": "格斗"
+  },
+  "277": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Magic Coat",
+    "nameZh": "魔法反射",
+    "slug": "magic-coat",
+    "typeZh": "超能力"
+  },
+  "278": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Recycle",
+    "nameZh": "回收利用",
+    "slug": "recycle",
+    "typeZh": "一般"
+  },
+  "279": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Revenge",
+    "nameZh": "报复",
+    "slug": "revenge",
+    "typeZh": "格斗"
+  },
+  "28": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sand Attack",
+    "nameZh": "泼沙",
+    "slug": "sand-attack",
+    "typeZh": "地面"
+  },
+  "280": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Brick Break",
+    "nameZh": "劈瓦",
+    "slug": "brick-break",
+    "typeZh": "格斗"
+  },
+  "281": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Yawn",
+    "nameZh": "哈欠",
+    "slug": "yawn",
+    "typeZh": "一般"
+  },
+  "282": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Knock Off",
+    "nameZh": "拍落",
+    "slug": "knock-off",
+    "typeZh": "恶"
+  },
+  "283": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Endeavor",
+    "nameZh": "蛮干",
+    "slug": "endeavor",
+    "typeZh": "一般"
+  },
+  "284": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Eruption",
+    "nameZh": "喷火",
+    "slug": "eruption",
+    "typeZh": "火"
+  },
+  "285": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Skill Swap",
+    "nameZh": "特性互换",
+    "slug": "skill-swap",
+    "typeZh": "超能力"
+  },
+  "286": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Imprison",
+    "nameZh": "封印",
+    "slug": "imprison",
+    "typeZh": "超能力"
+  },
+  "287": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Refresh",
+    "nameZh": "焕然一新",
+    "slug": "refresh",
+    "typeZh": "一般"
+  },
+  "288": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Grudge",
+    "nameZh": "怨念",
+    "slug": "grudge",
+    "typeZh": "幽灵"
+  },
+  "289": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Snatch",
+    "nameZh": "抢夺",
+    "slug": "snatch",
+    "typeZh": "恶"
+  },
+  "29": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Headbutt",
+    "nameZh": "头锤",
+    "slug": "headbutt",
+    "typeZh": "一般"
+  },
+  "290": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Secret Power",
+    "nameZh": "秘密之力",
+    "slug": "secret-power",
+    "typeZh": "一般"
+  },
+  "291": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dive",
+    "nameZh": "潜水",
+    "slug": "dive",
+    "typeZh": "水"
+  },
+  "292": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Arm Thrust",
+    "nameZh": "猛推",
+    "slug": "arm-thrust",
+    "typeZh": "格斗"
+  },
+  "293": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Camouflage",
+    "nameZh": "保护色",
+    "slug": "camouflage",
+    "typeZh": "一般"
+  },
+  "294": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tail Glow",
+    "nameZh": "萤火",
+    "slug": "tail-glow",
+    "typeZh": "虫"
+  },
+  "295": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Luster Purge",
+    "nameZh": "洁净光芒",
+    "slug": "luster-purge",
+    "typeZh": "超能力"
+  },
+  "296": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mist Ball",
+    "nameZh": "薄雾球",
+    "slug": "mist-ball",
+    "typeZh": "超能力"
+  },
+  "297": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Feather Dance",
+    "nameZh": "羽毛舞",
+    "slug": "feather-dance",
+    "typeZh": "飞行"
+  },
+  "298": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Teeter Dance",
+    "nameZh": "摇晃舞",
+    "slug": "teeter-dance",
+    "typeZh": "一般"
+  },
+  "299": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Blaze Kick",
+    "nameZh": "火焰踢",
+    "slug": "blaze-kick",
+    "typeZh": "火"
+  },
+  "3": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double Slap",
+    "nameZh": "连环巴掌",
+    "slug": "double-slap",
+    "typeZh": "一般"
+  },
+  "30": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Horn Attack",
+    "nameZh": "角撞",
+    "slug": "horn-attack",
+    "typeZh": "一般"
+  },
+  "300": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mud Sport",
+    "nameZh": "玩泥巴",
+    "slug": "mud-sport",
+    "typeZh": "地面"
+  },
+  "301": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Ball",
+    "nameZh": "冰球",
+    "slug": "ice-ball",
+    "typeZh": "冰"
+  },
+  "302": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Needle Arm",
+    "nameZh": "尖刺臂",
+    "slug": "needle-arm",
+    "typeZh": "草"
+  },
+  "303": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Slack Off",
+    "nameZh": "偷懒",
+    "slug": "slack-off",
+    "typeZh": "一般"
+  },
+  "304": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hyper Voice",
+    "nameZh": "巨声",
+    "slug": "hyper-voice",
+    "typeZh": "一般"
+  },
+  "305": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Poison Fang",
+    "nameZh": "剧毒牙",
+    "slug": "poison-fang",
+    "typeZh": "毒"
+  },
+  "306": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Crush Claw",
+    "nameZh": "撕裂爪",
+    "slug": "crush-claw",
+    "typeZh": "一般"
+  },
+  "307": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Blast Burn",
+    "nameZh": "爆炸烈焰",
+    "slug": "blast-burn",
+    "typeZh": "火"
+  },
+  "308": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hydro Cannon",
+    "nameZh": "加农水炮",
+    "slug": "hydro-cannon",
+    "typeZh": "水"
+  },
+  "309": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Meteor Mash",
+    "nameZh": "彗星拳",
+    "slug": "meteor-mash",
+    "typeZh": "钢"
+  },
+  "31": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fury Attack",
+    "nameZh": "乱击",
+    "slug": "fury-attack",
+    "typeZh": "一般"
+  },
+  "310": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Astonish",
+    "nameZh": "惊吓",
+    "slug": "astonish",
+    "typeZh": "幽灵"
+  },
+  "311": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Weather Ball",
+    "nameZh": "气象球",
+    "slug": "weather-ball",
+    "typeZh": "一般"
+  },
+  "312": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Aromatherapy",
+    "nameZh": "芳香治疗",
+    "slug": "aromatherapy",
+    "typeZh": "草"
+  },
+  "313": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Fake Tears",
+    "nameZh": "假哭",
+    "slug": "fake-tears",
+    "typeZh": "恶"
+  },
+  "314": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Air Cutter",
+    "nameZh": "空气利刃",
+    "slug": "air-cutter",
+    "typeZh": "飞行"
+  },
+  "315": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Overheat",
+    "nameZh": "过热",
+    "slug": "overheat",
+    "typeZh": "火"
+  },
+  "316": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Odor Sleuth",
+    "nameZh": "气味侦测",
+    "slug": "odor-sleuth",
+    "typeZh": "一般"
+  },
+  "317": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Tomb",
+    "nameZh": "岩石封锁",
+    "slug": "rock-tomb",
+    "typeZh": "岩石"
+  },
+  "318": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Silver Wind",
+    "nameZh": "银色旋风",
+    "slug": "silver-wind",
+    "typeZh": "虫"
+  },
+  "319": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Metal Sound",
+    "nameZh": "金属音",
+    "slug": "metal-sound",
+    "typeZh": "钢"
+  },
+  "32": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Horn Drill",
+    "nameZh": "角钻",
+    "slug": "horn-drill",
+    "typeZh": "一般"
+  },
+  "320": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Grass Whistle",
+    "nameZh": "草笛",
+    "slug": "grass-whistle",
+    "typeZh": "草"
+  },
+  "321": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tickle",
+    "nameZh": "挠痒",
+    "slug": "tickle",
+    "typeZh": "一般"
+  },
+  "322": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Cosmic Power",
+    "nameZh": "宇宙力量",
+    "slug": "cosmic-power",
+    "typeZh": "超能力"
+  },
+  "323": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Water Spout",
+    "nameZh": "喷水",
+    "slug": "water-spout",
+    "typeZh": "水"
+  },
+  "324": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Signal Beam",
+    "nameZh": "信号光束",
+    "slug": "signal-beam",
+    "typeZh": "虫"
+  },
+  "325": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Punch",
+    "nameZh": "暗影拳",
+    "slug": "shadow-punch",
+    "typeZh": "幽灵"
+  },
+  "326": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Extrasensory",
+    "nameZh": "神通力",
+    "slug": "extrasensory",
+    "typeZh": "超能力"
+  },
+  "327": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sky Uppercut",
+    "nameZh": "冲天拳",
+    "slug": "sky-uppercut",
+    "typeZh": "格斗"
+  },
+  "328": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sand Tomb",
+    "nameZh": "流沙地狱",
+    "slug": "sand-tomb",
+    "typeZh": "地面"
+  },
+  "329": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sheer Cold",
+    "nameZh": "绝对零度",
+    "slug": "sheer-cold",
+    "typeZh": "冰"
+  },
+  "33": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Tackle",
+    "nameZh": "撞击",
+    "slug": "tackle",
+    "typeZh": "一般"
+  },
+  "330": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Muddy Water",
+    "nameZh": "浊流",
+    "slug": "muddy-water",
+    "typeZh": "水"
+  },
+  "331": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bullet Seed",
+    "nameZh": "种子机关枪",
+    "slug": "bullet-seed",
+    "typeZh": "草"
+  },
+  "332": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aerial Ace",
+    "nameZh": "燕返",
+    "slug": "aerial-ace",
+    "typeZh": "飞行"
+  },
+  "333": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Icicle Spear",
+    "nameZh": "冰锥",
+    "slug": "icicle-spear",
+    "typeZh": "冰"
+  },
+  "334": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Iron Defense",
+    "nameZh": "铁壁",
+    "slug": "iron-defense",
+    "typeZh": "钢"
+  },
+  "335": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Block",
+    "nameZh": "挡路",
+    "slug": "block",
+    "typeZh": "一般"
+  },
+  "336": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Howl",
+    "nameZh": "长嚎",
+    "slug": "howl",
+    "typeZh": "一般"
+  },
+  "337": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Claw",
+    "nameZh": "龙爪",
+    "slug": "dragon-claw",
+    "typeZh": "龙"
+  },
+  "338": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Frenzy Plant",
+    "nameZh": "疯狂植物",
+    "slug": "frenzy-plant",
+    "typeZh": "草"
+  },
+  "339": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Bulk Up",
+    "nameZh": "健美",
+    "slug": "bulk-up",
+    "typeZh": "格斗"
+  },
+  "34": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Body Slam",
+    "nameZh": "泰山压顶",
+    "slug": "body-slam",
+    "typeZh": "一般"
+  },
+  "340": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bounce",
+    "nameZh": "弹跳",
+    "slug": "bounce",
+    "typeZh": "飞行"
+  },
+  "341": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mud Shot",
+    "nameZh": "泥巴射击",
+    "slug": "mud-shot",
+    "typeZh": "地面"
+  },
+  "342": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Poison Tail",
+    "nameZh": "毒尾",
+    "slug": "poison-tail",
+    "typeZh": "毒"
+  },
+  "343": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Covet",
+    "nameZh": "渴望",
+    "slug": "covet",
+    "typeZh": "一般"
+  },
+  "344": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Volt Tackle",
+    "nameZh": "伏特攻击",
+    "slug": "volt-tackle",
+    "typeZh": "电"
+  },
+  "345": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Magical Leaf",
+    "nameZh": "魔法叶",
+    "slug": "magical-leaf",
+    "typeZh": "草"
+  },
+  "346": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Water Sport",
+    "nameZh": "玩水",
+    "slug": "water-sport",
+    "typeZh": "水"
+  },
+  "347": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Calm Mind",
+    "nameZh": "冥想",
+    "slug": "calm-mind",
+    "typeZh": "超能力"
+  },
+  "348": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Leaf Blade",
+    "nameZh": "叶刃",
+    "slug": "leaf-blade",
+    "typeZh": "草"
+  },
+  "349": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Dragon Dance",
+    "nameZh": "龙之舞",
+    "slug": "dragon-dance",
+    "typeZh": "龙"
+  },
+  "35": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wrap",
+    "nameZh": "紧束",
+    "slug": "wrap",
+    "typeZh": "一般"
+  },
+  "350": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Blast",
+    "nameZh": "岩石爆击",
+    "slug": "rock-blast",
+    "typeZh": "岩石"
+  },
+  "351": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shock Wave",
+    "nameZh": "电击波",
+    "slug": "shock-wave",
+    "typeZh": "电"
+  },
+  "352": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Water Pulse",
+    "nameZh": "水之波动",
+    "slug": "water-pulse",
+    "typeZh": "水"
+  },
+  "353": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Doom Desire",
+    "nameZh": "破灭之愿",
+    "slug": "doom-desire",
+    "typeZh": "钢"
+  },
+  "354": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psycho Boost",
+    "nameZh": "精神突进",
+    "slug": "psycho-boost",
+    "typeZh": "超能力"
+  },
+  "355": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Roost",
+    "nameZh": "羽栖",
+    "slug": "roost",
+    "typeZh": "飞行"
+  },
+  "356": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Gravity",
+    "nameZh": "重力",
+    "slug": "gravity",
+    "typeZh": "超能力"
+  },
+  "357": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Miracle Eye",
+    "nameZh": "奇迹之眼",
+    "slug": "miracle-eye",
+    "typeZh": "超能力"
+  },
+  "358": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wake-Up Slap",
+    "nameZh": "唤醒巴掌",
+    "slug": "wake-up-slap",
+    "typeZh": "格斗"
+  },
+  "359": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hammer Arm",
+    "nameZh": "臂锤",
+    "slug": "hammer-arm",
+    "typeZh": "格斗"
+  },
+  "36": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Take Down",
+    "nameZh": "猛撞",
+    "slug": "take-down",
+    "typeZh": "一般"
+  },
+  "360": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Gyro Ball",
+    "nameZh": "陀螺球",
+    "slug": "gyro-ball",
+    "typeZh": "钢"
+  },
+  "361": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Healing Wish",
+    "nameZh": "治愈之愿",
+    "slug": "healing-wish",
+    "typeZh": "超能力"
+  },
+  "362": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Brine",
+    "nameZh": "盐水",
+    "slug": "brine",
+    "typeZh": "水"
+  },
+  "363": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Natural Gift",
+    "nameZh": "自然之恩",
+    "slug": "natural-gift",
+    "typeZh": "一般"
+  },
+  "364": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Feint",
+    "nameZh": "佯攻",
+    "slug": "feint",
+    "typeZh": "一般"
+  },
+  "365": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pluck",
+    "nameZh": "啄食",
+    "slug": "pluck",
+    "typeZh": "飞行"
+  },
+  "366": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tailwind",
+    "nameZh": "顺风",
+    "slug": "tailwind",
+    "typeZh": "飞行"
+  },
+  "367": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Acupressure",
+    "nameZh": "点穴",
+    "slug": "acupressure",
+    "typeZh": "一般"
+  },
+  "368": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Metal Burst",
+    "nameZh": "金属爆炸",
+    "slug": "metal-burst",
+    "typeZh": "钢"
+  },
+  "369": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "U-turn",
+    "nameZh": "急速折返",
+    "slug": "u-turn",
+    "typeZh": "虫"
+  },
+  "37": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thrash",
+    "nameZh": "大闹一番",
+    "slug": "thrash",
+    "typeZh": "一般"
+  },
+  "370": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Close Combat",
+    "nameZh": "近身战",
+    "slug": "close-combat",
+    "typeZh": "格斗"
+  },
+  "371": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Payback",
+    "nameZh": "以牙还牙",
+    "slug": "payback",
+    "typeZh": "恶"
+  },
+  "372": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Assurance",
+    "nameZh": "恶意追击",
+    "slug": "assurance",
+    "typeZh": "恶"
+  },
+  "373": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Embargo",
+    "nameZh": "查封",
+    "slug": "embargo",
+    "typeZh": "恶"
+  },
+  "374": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fling",
+    "nameZh": "投掷",
+    "slug": "fling",
+    "typeZh": "恶"
+  },
+  "375": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Psycho Shift",
+    "nameZh": "精神转移",
+    "slug": "psycho-shift",
+    "typeZh": "超能力"
+  },
+  "376": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Trump Card",
+    "nameZh": "王牌",
+    "slug": "trump-card",
+    "typeZh": "一般"
+  },
+  "377": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Heal Block",
+    "nameZh": "回复封锁",
+    "slug": "heal-block",
+    "typeZh": "超能力"
+  },
+  "378": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Wring Out",
+    "nameZh": "绞紧",
+    "slug": "wring-out",
+    "typeZh": "一般"
+  },
+  "379": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Power Trick",
+    "nameZh": "力量戏法",
+    "slug": "power-trick",
+    "typeZh": "超能力"
+  },
+  "38": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double-Edge",
+    "nameZh": "舍身冲撞",
+    "slug": "double-edge",
+    "typeZh": "一般"
+  },
+  "380": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Gastro Acid",
+    "nameZh": "胃液",
+    "slug": "gastro-acid",
+    "typeZh": "毒"
+  },
+  "381": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Lucky Chant",
+    "nameZh": "幸运咒语",
+    "slug": "lucky-chant",
+    "typeZh": "一般"
+  },
+  "382": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Me First",
+    "nameZh": "抢先一步",
+    "slug": "me-first",
+    "typeZh": "一般"
+  },
+  "383": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Copycat",
+    "nameZh": "仿效",
+    "slug": "copycat",
+    "typeZh": "一般"
+  },
+  "384": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Power Swap",
+    "nameZh": "力量互换",
+    "slug": "power-swap",
+    "typeZh": "超能力"
+  },
+  "385": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Guard Swap",
+    "nameZh": "防守互换",
+    "slug": "guard-swap",
+    "typeZh": "超能力"
+  },
+  "386": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Punishment",
+    "nameZh": "惩罚",
+    "slug": "punishment",
+    "typeZh": "恶"
+  },
+  "387": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Last Resort",
+    "nameZh": "珍藏",
+    "slug": "last-resort",
+    "typeZh": "一般"
+  },
+  "388": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Worry Seed",
+    "nameZh": "烦恼种子",
+    "slug": "worry-seed",
+    "typeZh": "草"
+  },
+  "389": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sucker Punch",
+    "nameZh": "突袭",
+    "slug": "sucker-punch",
+    "typeZh": "恶"
+  },
+  "39": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tail Whip",
+    "nameZh": "摇尾巴",
+    "slug": "tail-whip",
+    "typeZh": "一般"
+  },
+  "390": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Toxic Spikes",
+    "nameZh": "毒菱",
+    "slug": "toxic-spikes",
+    "typeZh": "毒"
+  },
+  "391": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Heart Swap",
+    "nameZh": "心灵互换",
+    "slug": "heart-swap",
+    "typeZh": "超能力"
+  },
+  "392": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Aqua Ring",
+    "nameZh": "水流环",
+    "slug": "aqua-ring",
+    "typeZh": "水"
+  },
+  "393": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Magnet Rise",
+    "nameZh": "电磁飘浮",
+    "slug": "magnet-rise",
+    "typeZh": "电"
+  },
+  "394": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flare Blitz",
+    "nameZh": "闪焰冲锋",
+    "slug": "flare-blitz",
+    "typeZh": "火"
+  },
+  "395": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Force Palm",
+    "nameZh": "发劲",
+    "slug": "force-palm",
+    "typeZh": "格斗"
+  },
+  "396": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Aura Sphere",
+    "nameZh": "波导弹",
+    "slug": "aura-sphere",
+    "typeZh": "格斗"
+  },
+  "397": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Rock Polish",
+    "nameZh": "岩石打磨",
+    "slug": "rock-polish",
+    "typeZh": "岩石"
+  },
+  "398": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Poison Jab",
+    "nameZh": "毒击",
+    "slug": "poison-jab",
+    "typeZh": "毒"
+  },
+  "399": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dark Pulse",
+    "nameZh": "恶之波动",
+    "slug": "dark-pulse",
+    "typeZh": "恶"
+  },
+  "4": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Comet Punch",
+    "nameZh": "连续拳",
+    "slug": "comet-punch",
+    "typeZh": "一般"
+  },
+  "40": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Poison Sting",
+    "nameZh": "毒针",
+    "slug": "poison-sting",
+    "typeZh": "毒"
+  },
+  "400": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Night Slash",
+    "nameZh": "暗袭要害",
+    "slug": "night-slash",
+    "typeZh": "恶"
+  },
+  "401": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aqua Tail",
+    "nameZh": "水流尾",
+    "slug": "aqua-tail",
+    "typeZh": "水"
+  },
+  "402": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Seed Bomb",
+    "nameZh": "种子炸弹",
+    "slug": "seed-bomb",
+    "typeZh": "草"
+  },
+  "403": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Air Slash",
+    "nameZh": "空气斩",
+    "slug": "air-slash",
+    "typeZh": "飞行"
+  },
+  "404": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "X-Scissor",
+    "nameZh": "十字剪",
+    "slug": "x-scissor",
+    "typeZh": "虫"
+  },
+  "405": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bug Buzz",
+    "nameZh": "虫鸣",
+    "slug": "bug-buzz",
+    "typeZh": "虫"
+  },
+  "406": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dragon Pulse",
+    "nameZh": "龙之波动",
+    "slug": "dragon-pulse",
+    "typeZh": "龙"
+  },
+  "407": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Rush",
+    "nameZh": "龙之俯冲",
+    "slug": "dragon-rush",
+    "typeZh": "龙"
+  },
+  "408": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Power Gem",
+    "nameZh": "力量宝石",
+    "slug": "power-gem",
+    "typeZh": "岩石"
+  },
+  "409": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Drain Punch",
+    "nameZh": "吸取拳",
+    "slug": "drain-punch",
+    "typeZh": "格斗"
+  },
+  "41": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Twineedle",
+    "nameZh": "双针",
+    "slug": "twineedle",
+    "typeZh": "虫"
+  },
+  "410": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Vacuum Wave",
+    "nameZh": "真空波",
+    "slug": "vacuum-wave",
+    "typeZh": "格斗"
+  },
+  "411": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Focus Blast",
+    "nameZh": "真气弹",
+    "slug": "focus-blast",
+    "typeZh": "格斗"
+  },
+  "412": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Energy Ball",
+    "nameZh": "能量球",
+    "slug": "energy-ball",
+    "typeZh": "草"
+  },
+  "413": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Brave Bird",
+    "nameZh": "勇鸟猛攻",
+    "slug": "brave-bird",
+    "typeZh": "飞行"
+  },
+  "414": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Earth Power",
+    "nameZh": "大地之力",
+    "slug": "earth-power",
+    "typeZh": "地面"
+  },
+  "415": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Switcheroo",
+    "nameZh": "掉包",
+    "slug": "switcheroo",
+    "typeZh": "恶"
+  },
+  "416": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Giga Impact",
+    "nameZh": "终极冲击",
+    "slug": "giga-impact",
+    "typeZh": "一般"
+  },
+  "417": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Nasty Plot",
+    "nameZh": "诡计",
+    "slug": "nasty-plot",
+    "typeZh": "恶"
+  },
+  "418": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bullet Punch",
+    "nameZh": "子弹拳",
+    "slug": "bullet-punch",
+    "typeZh": "钢"
+  },
+  "419": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Avalanche",
+    "nameZh": "雪崩",
+    "slug": "avalanche",
+    "typeZh": "冰"
+  },
+  "42": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pin Missile",
+    "nameZh": "飞弹针",
+    "slug": "pin-missile",
+    "typeZh": "虫"
+  },
+  "420": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Shard",
+    "nameZh": "冰砾",
+    "slug": "ice-shard",
+    "typeZh": "冰"
+  },
+  "421": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Claw",
+    "nameZh": "暗影爪",
+    "slug": "shadow-claw",
+    "typeZh": "幽灵"
+  },
+  "422": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thunder Fang",
+    "nameZh": "雷电牙",
+    "slug": "thunder-fang",
+    "typeZh": "电"
+  },
+  "423": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Fang",
+    "nameZh": "冰冻牙",
+    "slug": "ice-fang",
+    "typeZh": "冰"
+  },
+  "424": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fire Fang",
+    "nameZh": "火焰牙",
+    "slug": "fire-fang",
+    "typeZh": "火"
+  },
+  "425": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Sneak",
+    "nameZh": "影子偷袭",
+    "slug": "shadow-sneak",
+    "typeZh": "幽灵"
+  },
+  "426": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mud Bomb",
+    "nameZh": "泥巴炸弹",
+    "slug": "mud-bomb",
+    "typeZh": "地面"
+  },
+  "427": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Psycho Cut",
+    "nameZh": "精神利刃",
+    "slug": "psycho-cut",
+    "typeZh": "超能力"
+  },
+  "428": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Zen Headbutt",
+    "nameZh": "意念头锤",
+    "slug": "zen-headbutt",
+    "typeZh": "超能力"
+  },
+  "429": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mirror Shot",
+    "nameZh": "镜光射击",
+    "slug": "mirror-shot",
+    "typeZh": "钢"
+  },
+  "43": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Leer",
+    "nameZh": "瞪眼",
+    "slug": "leer",
+    "typeZh": "一般"
+  },
+  "430": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Flash Cannon",
+    "nameZh": "加农光炮",
+    "slug": "flash-cannon",
+    "typeZh": "钢"
+  },
+  "431": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Climb",
+    "nameZh": "攀岩",
+    "slug": "rock-climb",
+    "typeZh": "一般"
+  },
+  "432": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Defog",
+    "nameZh": "清除浓雾",
+    "slug": "defog",
+    "typeZh": "飞行"
+  },
+  "433": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Trick Room",
+    "nameZh": "戏法空间",
+    "slug": "trick-room",
+    "typeZh": "超能力"
+  },
+  "434": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Draco Meteor",
+    "nameZh": "流星群",
+    "slug": "draco-meteor",
+    "typeZh": "龙"
+  },
+  "435": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Discharge",
+    "nameZh": "放电",
+    "slug": "discharge",
+    "typeZh": "电"
+  },
+  "436": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Lava Plume",
+    "nameZh": "喷烟",
+    "slug": "lava-plume",
+    "typeZh": "火"
+  },
+  "437": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Leaf Storm",
+    "nameZh": "飞叶风暴",
+    "slug": "leaf-storm",
+    "typeZh": "草"
+  },
+  "438": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Power Whip",
+    "nameZh": "强力鞭打",
+    "slug": "power-whip",
+    "typeZh": "草"
+  },
+  "439": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Wrecker",
+    "nameZh": "岩石炮",
+    "slug": "rock-wrecker",
+    "typeZh": "岩石"
+  },
+  "44": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bite",
+    "nameZh": "咬住",
+    "slug": "bite",
+    "typeZh": "恶"
+  },
+  "440": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Cross Poison",
+    "nameZh": "十字毒刃",
+    "slug": "cross-poison",
+    "typeZh": "毒"
+  },
+  "441": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Gunk Shot",
+    "nameZh": "垃圾射击",
+    "slug": "gunk-shot",
+    "typeZh": "毒"
+  },
+  "442": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Iron Head",
+    "nameZh": "铁头",
+    "slug": "iron-head",
+    "typeZh": "钢"
+  },
+  "443": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Magnet Bomb",
+    "nameZh": "磁铁炸弹",
+    "slug": "magnet-bomb",
+    "typeZh": "钢"
+  },
+  "444": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Stone Edge",
+    "nameZh": "尖石攻击",
+    "slug": "stone-edge",
+    "typeZh": "岩石"
+  },
+  "445": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Captivate",
+    "nameZh": "诱惑",
+    "slug": "captivate",
+    "typeZh": "一般"
+  },
+  "446": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Stealth Rock",
+    "nameZh": "隐形岩",
+    "slug": "stealth-rock",
+    "typeZh": "岩石"
+  },
+  "447": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Grass Knot",
+    "nameZh": "打草结",
+    "slug": "grass-knot",
+    "typeZh": "草"
+  },
+  "448": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Chatter",
+    "nameZh": "喋喋不休",
+    "slug": "chatter",
+    "typeZh": "飞行"
+  },
+  "449": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Judgment",
+    "nameZh": "制裁光砾",
+    "slug": "judgment",
+    "typeZh": "一般"
+  },
+  "45": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Growl",
+    "nameZh": "叫声",
+    "slug": "growl",
+    "typeZh": "一般"
+  },
+  "450": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bug Bite",
+    "nameZh": "虫咬",
+    "slug": "bug-bite",
+    "typeZh": "虫"
+  },
+  "451": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Charge Beam",
+    "nameZh": "充电光束",
+    "slug": "charge-beam",
+    "typeZh": "电"
+  },
+  "452": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wood Hammer",
+    "nameZh": "木槌",
+    "slug": "wood-hammer",
+    "typeZh": "草"
+  },
+  "453": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aqua Jet",
+    "nameZh": "水流喷射",
+    "slug": "aqua-jet",
+    "typeZh": "水"
+  },
+  "454": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Attack Order",
+    "nameZh": "攻击指令",
+    "slug": "attack-order",
+    "typeZh": "虫"
+  },
+  "455": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Defend Order",
+    "nameZh": "防御指令",
+    "slug": "defend-order",
+    "typeZh": "虫"
+  },
+  "456": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Heal Order",
+    "nameZh": "回复指令",
+    "slug": "heal-order",
+    "typeZh": "虫"
+  },
+  "457": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Head Smash",
+    "nameZh": "双刃头锤",
+    "slug": "head-smash",
+    "typeZh": "岩石"
+  },
+  "458": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double Hit",
+    "nameZh": "二连击",
+    "slug": "double-hit",
+    "typeZh": "一般"
+  },
+  "459": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Roar of Time",
+    "nameZh": "时光咆哮",
+    "slug": "roar-of-time",
+    "typeZh": "龙"
+  },
+  "46": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Roar",
+    "nameZh": "吼叫",
+    "slug": "roar",
+    "typeZh": "一般"
+  },
+  "460": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Spacial Rend",
+    "nameZh": "亚空裂斩",
+    "slug": "spacial-rend",
+    "typeZh": "龙"
+  },
+  "461": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Lunar Dance",
+    "nameZh": "新月舞",
+    "slug": "lunar-dance",
+    "typeZh": "超能力"
+  },
+  "462": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Crush Grip",
+    "nameZh": "捏碎",
+    "slug": "crush-grip",
+    "typeZh": "一般"
+  },
+  "463": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Magma Storm",
+    "nameZh": "熔岩风暴",
+    "slug": "magma-storm",
+    "typeZh": "火"
+  },
+  "464": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Dark Void",
+    "nameZh": "暗黑洞",
+    "slug": "dark-void",
+    "typeZh": "恶"
+  },
+  "465": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Seed Flare",
+    "nameZh": "种子闪光",
+    "slug": "seed-flare",
+    "typeZh": "草"
+  },
+  "466": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ominous Wind",
+    "nameZh": "奇异之风",
+    "slug": "ominous-wind",
+    "typeZh": "幽灵"
+  },
+  "467": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Force",
+    "nameZh": "暗影潜袭",
+    "slug": "shadow-force",
+    "typeZh": "幽灵"
+  },
+  "468": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Hone Claws",
+    "nameZh": "磨爪",
+    "slug": "hone-claws",
+    "typeZh": "恶"
+  },
+  "469": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Wide Guard",
+    "nameZh": "广域防守",
+    "slug": "wide-guard",
+    "typeZh": "岩石"
+  },
+  "47": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sing",
+    "nameZh": "唱歌",
+    "slug": "sing",
+    "typeZh": "一般"
+  },
+  "470": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Guard Split",
+    "nameZh": "防守平分",
+    "slug": "guard-split",
+    "typeZh": "超能力"
+  },
+  "471": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Power Split",
+    "nameZh": "力量平分",
+    "slug": "power-split",
+    "typeZh": "超能力"
+  },
+  "472": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Wonder Room",
+    "nameZh": "奇妙空间",
+    "slug": "wonder-room",
+    "typeZh": "超能力"
+  },
+  "473": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psyshock",
+    "nameZh": "精神冲击",
+    "slug": "psyshock",
+    "typeZh": "超能力"
+  },
+  "474": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Venoshock",
+    "nameZh": "毒液冲击",
+    "slug": "venoshock",
+    "typeZh": "毒"
+  },
+  "475": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Autotomize",
+    "nameZh": "身体轻量化",
+    "slug": "autotomize",
+    "typeZh": "钢"
+  },
+  "476": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Rage Powder",
+    "nameZh": "愤怒粉",
+    "slug": "rage-powder",
+    "typeZh": "虫"
+  },
+  "477": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Telekinesis",
+    "nameZh": "意念移物",
+    "slug": "telekinesis",
+    "typeZh": "超能力"
+  },
+  "478": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Magic Room",
+    "nameZh": "魔法空间",
+    "slug": "magic-room",
+    "typeZh": "超能力"
+  },
+  "479": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Smack Down",
+    "nameZh": "击落",
+    "slug": "smack-down",
+    "typeZh": "岩石"
+  },
+  "48": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Supersonic",
+    "nameZh": "超音波",
+    "slug": "supersonic",
+    "typeZh": "一般"
+  },
+  "480": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Storm Throw",
+    "nameZh": "山岚摔",
+    "slug": "storm-throw",
+    "typeZh": "格斗"
+  },
+  "481": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Flame Burst",
+    "nameZh": "烈焰溅射",
+    "slug": "flame-burst",
+    "typeZh": "火"
+  },
+  "482": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sludge Wave",
+    "nameZh": "污泥波",
+    "slug": "sludge-wave",
+    "typeZh": "毒"
+  },
+  "483": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Quiver Dance",
+    "nameZh": "蝶舞",
+    "slug": "quiver-dance",
+    "typeZh": "虫"
+  },
+  "484": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Heavy Slam",
+    "nameZh": "重磅冲撞",
+    "slug": "heavy-slam",
+    "typeZh": "钢"
+  },
+  "485": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Synchronoise",
+    "nameZh": "同步干扰",
+    "slug": "synchronoise",
+    "typeZh": "超能力"
+  },
+  "486": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Electro Ball",
+    "nameZh": "电球",
+    "slug": "electro-ball",
+    "typeZh": "电"
+  },
+  "487": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Soak",
+    "nameZh": "浸水",
+    "slug": "soak",
+    "typeZh": "水"
+  },
+  "488": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flame Charge",
+    "nameZh": "蓄能焰袭",
+    "slug": "flame-charge",
+    "typeZh": "火"
+  },
+  "489": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Coil",
+    "nameZh": "盘蜷",
+    "slug": "coil",
+    "typeZh": "毒"
+  },
+  "49": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sonic Boom",
+    "nameZh": "音爆",
+    "slug": "sonic-boom",
+    "typeZh": "一般"
+  },
+  "490": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Low Sweep",
+    "nameZh": "下盘踢",
+    "slug": "low-sweep",
+    "typeZh": "格斗"
+  },
+  "491": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Acid Spray",
+    "nameZh": "酸液炸弹",
+    "slug": "acid-spray",
+    "typeZh": "毒"
+  },
+  "492": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Foul Play",
+    "nameZh": "欺诈",
+    "slug": "foul-play",
+    "typeZh": "恶"
+  },
+  "493": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Simple Beam",
+    "nameZh": "单纯光束",
+    "slug": "simple-beam",
+    "typeZh": "一般"
+  },
+  "494": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Entrainment",
+    "nameZh": "找伙伴",
+    "slug": "entrainment",
+    "typeZh": "一般"
+  },
+  "495": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "After You",
+    "nameZh": "您先请",
+    "slug": "after-you",
+    "typeZh": "一般"
+  },
+  "496": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Round",
+    "nameZh": "轮唱",
+    "slug": "round",
+    "typeZh": "一般"
+  },
+  "497": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Echoed Voice",
+    "nameZh": "回声",
+    "slug": "echoed-voice",
+    "typeZh": "一般"
+  },
+  "498": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Chip Away",
+    "nameZh": "逐步击破",
+    "slug": "chip-away",
+    "typeZh": "一般"
+  },
+  "499": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Clear Smog",
+    "nameZh": "清除之烟",
+    "slug": "clear-smog",
+    "typeZh": "毒"
+  },
+  "5": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mega Punch",
+    "nameZh": "百万吨重拳",
+    "slug": "mega-punch",
+    "typeZh": "一般"
+  },
+  "50": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Disable",
+    "nameZh": "定身法",
+    "slug": "disable",
+    "typeZh": "一般"
+  },
+  "500": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Stored Power",
+    "nameZh": "辅助力量",
+    "slug": "stored-power",
+    "typeZh": "超能力"
+  },
+  "501": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Quick Guard",
+    "nameZh": "快速防守",
+    "slug": "quick-guard",
+    "typeZh": "格斗"
+  },
+  "502": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Ally Switch",
+    "nameZh": "交换场地",
+    "slug": "ally-switch",
+    "typeZh": "超能力"
+  },
+  "503": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Scald",
+    "nameZh": "热水",
+    "slug": "scald",
+    "typeZh": "水"
+  },
+  "504": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shell Smash",
+    "nameZh": "破壳",
+    "slug": "shell-smash",
+    "typeZh": "一般"
+  },
+  "505": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Heal Pulse",
+    "nameZh": "治愈波动",
+    "slug": "heal-pulse",
+    "typeZh": "超能力"
+  },
+  "506": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hex",
+    "nameZh": "祸不单行",
+    "slug": "hex",
+    "typeZh": "幽灵"
+  },
+  "507": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sky Drop",
+    "nameZh": "自由落体",
+    "slug": "sky-drop",
+    "typeZh": "飞行"
+  },
+  "508": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shift Gear",
+    "nameZh": "换档",
+    "slug": "shift-gear",
+    "typeZh": "钢"
+  },
+  "509": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Circle Throw",
+    "nameZh": "巴投",
+    "slug": "circle-throw",
+    "typeZh": "格斗"
+  },
+  "51": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Acid",
+    "nameZh": "溶解液",
+    "slug": "acid",
+    "typeZh": "毒"
+  },
+  "510": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Incinerate",
+    "nameZh": "烧尽",
+    "slug": "incinerate",
+    "typeZh": "火"
+  },
+  "511": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Quash",
+    "nameZh": "延后",
+    "slug": "quash",
+    "typeZh": "恶"
+  },
+  "512": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Acrobatics",
+    "nameZh": "杂技",
+    "slug": "acrobatics",
+    "typeZh": "飞行"
+  },
+  "513": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Reflect Type",
+    "nameZh": "镜面属性",
+    "slug": "reflect-type",
+    "typeZh": "一般"
+  },
+  "514": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Retaliate",
+    "nameZh": "报仇",
+    "slug": "retaliate",
+    "typeZh": "一般"
+  },
+  "515": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Final Gambit",
+    "nameZh": "搏命",
+    "slug": "final-gambit",
+    "typeZh": "格斗"
+  },
+  "516": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Bestow",
+    "nameZh": "传递礼物",
+    "slug": "bestow",
+    "typeZh": "一般"
+  },
+  "517": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Inferno",
+    "nameZh": "炼狱",
+    "slug": "inferno",
+    "typeZh": "火"
+  },
+  "518": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Water Pledge",
+    "nameZh": "水之誓约",
+    "slug": "water-pledge",
+    "typeZh": "水"
+  },
+  "519": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fire Pledge",
+    "nameZh": "火之誓约",
+    "slug": "fire-pledge",
+    "typeZh": "火"
+  },
+  "52": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ember",
+    "nameZh": "火花",
+    "slug": "ember",
+    "typeZh": "火"
+  },
+  "520": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Grass Pledge",
+    "nameZh": "草之誓约",
+    "slug": "grass-pledge",
+    "typeZh": "草"
+  },
+  "521": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Volt Switch",
+    "nameZh": "伏特替换",
+    "slug": "volt-switch",
+    "typeZh": "电"
+  },
+  "522": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Struggle Bug",
+    "nameZh": "虫之抵抗",
+    "slug": "struggle-bug",
+    "typeZh": "虫"
+  },
+  "523": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bulldoze",
+    "nameZh": "重踏",
+    "slug": "bulldoze",
+    "typeZh": "地面"
+  },
+  "524": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Frost Breath",
+    "nameZh": "冰息",
+    "slug": "frost-breath",
+    "typeZh": "冰"
+  },
+  "525": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Tail",
+    "nameZh": "龙尾",
+    "slug": "dragon-tail",
+    "typeZh": "龙"
+  },
+  "526": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Work Up",
+    "nameZh": "自我激励",
+    "slug": "work-up",
+    "typeZh": "一般"
+  },
+  "527": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Electroweb",
+    "nameZh": "电网",
+    "slug": "electroweb",
+    "typeZh": "电"
+  },
+  "528": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wild Charge",
+    "nameZh": "疯狂伏特",
+    "slug": "wild-charge",
+    "typeZh": "电"
+  },
+  "529": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Drill Run",
+    "nameZh": "直冲钻",
+    "slug": "drill-run",
+    "typeZh": "地面"
+  },
+  "53": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Flamethrower",
+    "nameZh": "喷射火焰",
+    "slug": "flamethrower",
+    "typeZh": "火"
+  },
+  "530": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dual Chop",
+    "nameZh": "二连劈",
+    "slug": "dual-chop",
+    "typeZh": "龙"
+  },
+  "531": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Heart Stamp",
+    "nameZh": "爱心印章",
+    "slug": "heart-stamp",
+    "typeZh": "超能力"
+  },
+  "532": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Horn Leech",
+    "nameZh": "木角",
+    "slug": "horn-leech",
+    "typeZh": "草"
+  },
+  "533": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sacred Sword",
+    "nameZh": "圣剑",
+    "slug": "sacred-sword",
+    "typeZh": "格斗"
+  },
+  "534": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Razor Shell",
+    "nameZh": "贝壳刃",
+    "slug": "razor-shell",
+    "typeZh": "水"
+  },
+  "535": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Heat Crash",
+    "nameZh": "高温重压",
+    "slug": "heat-crash",
+    "typeZh": "火"
+  },
+  "536": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Leaf Tornado",
+    "nameZh": "青草搅拌器",
+    "slug": "leaf-tornado",
+    "typeZh": "草"
+  },
+  "537": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Steamroller",
+    "nameZh": "疯狂滚压",
+    "slug": "steamroller",
+    "typeZh": "虫"
+  },
+  "538": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Cotton Guard",
+    "nameZh": "棉花防守",
+    "slug": "cotton-guard",
+    "typeZh": "草"
+  },
+  "539": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Night Daze",
+    "nameZh": "暗黑爆破",
+    "slug": "night-daze",
+    "typeZh": "恶"
+  },
+  "54": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mist",
+    "nameZh": "白雾",
+    "slug": "mist",
+    "typeZh": "冰"
+  },
+  "540": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psystrike",
+    "nameZh": "精神击破",
+    "slug": "psystrike",
+    "typeZh": "超能力"
+  },
+  "541": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Tail Slap",
+    "nameZh": "扫尾拍打",
+    "slug": "tail-slap",
+    "typeZh": "一般"
+  },
+  "542": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hurricane",
+    "nameZh": "暴风",
+    "slug": "hurricane",
+    "typeZh": "飞行"
+  },
+  "543": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Head Charge",
+    "nameZh": "爆炸头突击",
+    "slug": "head-charge",
+    "typeZh": "一般"
+  },
+  "544": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Gear Grind",
+    "nameZh": "齿轮飞盘",
+    "slug": "gear-grind",
+    "typeZh": "钢"
+  },
+  "545": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Searing Shot",
+    "nameZh": "火焰弹",
+    "slug": "searing-shot",
+    "typeZh": "火"
+  },
+  "546": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Techno Blast",
+    "nameZh": "高科技光炮",
+    "slug": "techno-blast",
+    "typeZh": "一般"
+  },
+  "547": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Relic Song",
+    "nameZh": "古老之歌",
+    "slug": "relic-song",
+    "typeZh": "一般"
+  },
+  "548": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Secret Sword",
+    "nameZh": "神秘之剑",
+    "slug": "secret-sword",
+    "typeZh": "格斗"
+  },
+  "549": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Glaciate",
+    "nameZh": "冰封世界",
+    "slug": "glaciate",
+    "typeZh": "冰"
+  },
+  "55": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Water Gun",
+    "nameZh": "水枪",
+    "slug": "water-gun",
+    "typeZh": "水"
+  },
+  "550": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bolt Strike",
+    "nameZh": "雷击",
+    "slug": "bolt-strike",
+    "typeZh": "电"
+  },
+  "551": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Blue Flare",
+    "nameZh": "青焰",
+    "slug": "blue-flare",
+    "typeZh": "火"
+  },
+  "552": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fiery Dance",
+    "nameZh": "火之舞",
+    "slug": "fiery-dance",
+    "typeZh": "火"
+  },
+  "553": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Freeze Shock",
+    "nameZh": "冰冻伏特",
+    "slug": "freeze-shock",
+    "typeZh": "冰"
+  },
+  "554": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ice Burn",
+    "nameZh": "极寒冷焰",
+    "slug": "ice-burn",
+    "typeZh": "冰"
+  },
+  "555": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Snarl",
+    "nameZh": "大声咆哮",
+    "slug": "snarl",
+    "typeZh": "恶"
+  },
+  "556": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Icicle Crash",
+    "nameZh": "冰柱坠击",
+    "slug": "icicle-crash",
+    "typeZh": "冰"
+  },
+  "557": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "V-create",
+    "nameZh": "Ｖ热焰",
+    "slug": "v-create",
+    "typeZh": "火"
+  },
+  "558": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fusion Flare",
+    "nameZh": "交错火焰",
+    "slug": "fusion-flare",
+    "typeZh": "火"
+  },
+  "559": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fusion Bolt",
+    "nameZh": "交错闪电",
+    "slug": "fusion-bolt",
+    "typeZh": "电"
+  },
+  "56": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hydro Pump",
+    "nameZh": "水炮",
+    "slug": "hydro-pump",
+    "typeZh": "水"
+  },
+  "560": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flying Press",
+    "nameZh": "飞身重压",
+    "slug": "flying-press",
+    "typeZh": "格斗"
+  },
+  "561": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Mat Block",
+    "nameZh": "掀榻榻米",
+    "slug": "mat-block",
+    "typeZh": "格斗"
+  },
+  "562": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Belch",
+    "nameZh": "打嗝",
+    "slug": "belch",
+    "typeZh": "毒"
+  },
+  "563": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Rototiller",
+    "nameZh": "耕地",
+    "slug": "rototiller",
+    "typeZh": "地面"
+  },
+  "564": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sticky Web",
+    "nameZh": "黏黏网",
+    "slug": "sticky-web",
+    "typeZh": "虫"
+  },
+  "565": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fell Stinger",
+    "nameZh": "致命针刺",
+    "slug": "fell-stinger",
+    "typeZh": "虫"
+  },
+  "566": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Phantom Force",
+    "nameZh": "潜灵奇袭",
+    "slug": "phantom-force",
+    "typeZh": "幽灵"
+  },
+  "567": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Trick-or-Treat",
+    "nameZh": "万圣夜",
+    "slug": "trick-or-treat",
+    "typeZh": "幽灵"
+  },
+  "568": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Noble Roar",
+    "nameZh": "战吼",
+    "slug": "noble-roar",
+    "typeZh": "一般"
+  },
+  "569": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Ion Deluge",
+    "nameZh": "等离子浴",
+    "slug": "ion-deluge",
+    "typeZh": "电"
+  },
+  "57": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Surf",
+    "nameZh": "冲浪",
+    "slug": "surf",
+    "typeZh": "水"
+  },
+  "570": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Parabolic Charge",
+    "nameZh": "抛物面充电",
+    "slug": "parabolic-charge",
+    "typeZh": "电"
+  },
+  "571": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Forest’s Curse",
+    "nameZh": "森林诅咒",
+    "slug": "forests-curse",
+    "typeZh": "草"
+  },
+  "572": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Petal Blizzard",
+    "nameZh": "落英缤纷",
+    "slug": "petal-blizzard",
+    "typeZh": "草"
+  },
+  "573": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Freeze-Dry",
+    "nameZh": "冷冻干燥",
+    "slug": "freeze-dry",
+    "typeZh": "冰"
+  },
+  "574": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Disarming Voice",
+    "nameZh": "魅惑之声",
+    "slug": "disarming-voice",
+    "typeZh": "妖精"
+  },
+  "575": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Parting Shot",
+    "nameZh": "抛下狠话",
+    "slug": "parting-shot",
+    "typeZh": "恶"
+  },
+  "576": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Topsy-Turvy",
+    "nameZh": "颠倒",
+    "slug": "topsy-turvy",
+    "typeZh": "恶"
+  },
+  "577": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Draining Kiss",
+    "nameZh": "吸取之吻",
+    "slug": "draining-kiss",
+    "typeZh": "妖精"
+  },
+  "578": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Crafty Shield",
+    "nameZh": "戏法防守",
+    "slug": "crafty-shield",
+    "typeZh": "妖精"
+  },
+  "579": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Flower Shield",
+    "nameZh": "鲜花防守",
+    "slug": "flower-shield",
+    "typeZh": "妖精"
+  },
+  "58": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ice Beam",
+    "nameZh": "冰冻光束",
+    "slug": "ice-beam",
+    "typeZh": "冰"
+  },
+  "580": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Grassy Terrain",
+    "nameZh": "青草场地",
+    "slug": "grassy-terrain",
+    "typeZh": "草"
+  },
+  "581": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Misty Terrain",
+    "nameZh": "薄雾场地",
+    "slug": "misty-terrain",
+    "typeZh": "妖精"
+  },
+  "582": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Electrify",
+    "nameZh": "输电",
+    "slug": "electrify",
+    "typeZh": "电"
+  },
+  "583": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Play Rough",
+    "nameZh": "嬉闹",
+    "slug": "play-rough",
+    "typeZh": "妖精"
+  },
+  "584": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fairy Wind",
+    "nameZh": "妖精之风",
+    "slug": "fairy-wind",
+    "typeZh": "妖精"
+  },
+  "585": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Moonblast",
+    "nameZh": "月亮之力",
+    "slug": "moonblast",
+    "typeZh": "妖精"
+  },
+  "586": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Boomburst",
+    "nameZh": "爆音波",
+    "slug": "boomburst",
+    "typeZh": "一般"
+  },
+  "587": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Fairy Lock",
+    "nameZh": "妖精之锁",
+    "slug": "fairy-lock",
+    "typeZh": "妖精"
+  },
+  "588": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "King’s Shield",
+    "nameZh": "王者盾牌",
+    "slug": "kings-shield",
+    "typeZh": "钢"
+  },
+  "589": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Play Nice",
+    "nameZh": "和睦相处",
+    "slug": "play-nice",
+    "typeZh": "一般"
+  },
+  "59": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Blizzard",
+    "nameZh": "暴风雪",
+    "slug": "blizzard",
+    "typeZh": "冰"
+  },
+  "590": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Confide",
+    "nameZh": "密语",
+    "slug": "confide",
+    "typeZh": "一般"
+  },
+  "591": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Diamond Storm",
+    "nameZh": "钻石风暴",
+    "slug": "diamond-storm",
+    "typeZh": "岩石"
+  },
+  "592": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Steam Eruption",
+    "nameZh": "蒸汽爆炸",
+    "slug": "steam-eruption",
+    "typeZh": "水"
+  },
+  "593": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hyperspace Hole",
+    "nameZh": "异次元洞",
+    "slug": "hyperspace-hole",
+    "typeZh": "超能力"
+  },
+  "594": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Water Shuriken",
+    "nameZh": "飞水手里剑",
+    "slug": "water-shuriken",
+    "typeZh": "水"
+  },
+  "595": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mystical Fire",
+    "nameZh": "魔法火焰",
+    "slug": "mystical-fire",
+    "typeZh": "火"
+  },
+  "596": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spiky Shield",
+    "nameZh": "尖刺防守",
+    "slug": "spiky-shield",
+    "typeZh": "草"
+  },
+  "597": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Aromatic Mist",
+    "nameZh": "芳香薄雾",
+    "slug": "aromatic-mist",
+    "typeZh": "妖精"
+  },
+  "598": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Eerie Impulse",
+    "nameZh": "怪异电波",
+    "slug": "eerie-impulse",
+    "typeZh": "电"
+  },
+  "599": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Venom Drench",
+    "nameZh": "毒液陷阱",
+    "slug": "venom-drench",
+    "typeZh": "毒"
+  },
+  "6": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pay Day",
+    "nameZh": "聚宝功",
+    "slug": "pay-day",
+    "typeZh": "一般"
+  },
+  "60": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psybeam",
+    "nameZh": "幻象光线",
+    "slug": "psybeam",
+    "typeZh": "超能力"
+  },
+  "600": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Powder",
+    "nameZh": "粉尘",
+    "slug": "powder",
+    "typeZh": "虫"
+  },
+  "601": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Geomancy",
+    "nameZh": "大地掌控",
+    "slug": "geomancy",
+    "typeZh": "妖精"
+  },
+  "602": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Magnetic Flux",
+    "nameZh": "磁场操控",
+    "slug": "magnetic-flux",
+    "typeZh": "电"
+  },
+  "603": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Happy Hour",
+    "nameZh": "欢乐时光",
+    "slug": "happy-hour",
+    "typeZh": "一般"
+  },
+  "604": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Electric Terrain",
+    "nameZh": "电气场地",
+    "slug": "electric-terrain",
+    "typeZh": "电"
+  },
+  "605": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dazzling Gleam",
+    "nameZh": "魔法闪耀",
+    "slug": "dazzling-gleam",
+    "typeZh": "妖精"
+  },
+  "606": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Celebrate",
+    "nameZh": "庆祝",
+    "slug": "celebrate",
+    "typeZh": "一般"
+  },
+  "607": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Hold Hands",
+    "nameZh": "牵手",
+    "slug": "hold-hands",
+    "typeZh": "一般"
+  },
+  "608": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Baby-Doll Eyes",
+    "nameZh": "圆瞳",
+    "slug": "baby-doll-eyes",
+    "typeZh": "妖精"
+  },
+  "609": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Nuzzle",
+    "nameZh": "蹭蹭脸颊",
+    "slug": "nuzzle",
+    "typeZh": "电"
+  },
+  "61": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bubble Beam",
+    "nameZh": "泡沫光线",
+    "slug": "bubble-beam",
+    "typeZh": "水"
+  },
+  "610": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hold Back",
+    "nameZh": "手下留情",
+    "slug": "hold-back",
+    "typeZh": "一般"
+  },
+  "611": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Infestation",
+    "nameZh": "死缠烂打",
+    "slug": "infestation",
+    "typeZh": "虫"
+  },
+  "612": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Power-Up Punch",
+    "nameZh": "增强拳",
+    "slug": "power-up-punch",
+    "typeZh": "格斗"
+  },
+  "613": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Oblivion Wing",
+    "nameZh": "死亡之翼",
+    "slug": "oblivion-wing",
+    "typeZh": "飞行"
+  },
+  "614": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thousand Arrows",
+    "nameZh": "千箭齐发",
+    "slug": "thousand-arrows",
+    "typeZh": "地面"
+  },
+  "615": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thousand Waves",
+    "nameZh": "千波激荡",
+    "slug": "thousand-waves",
+    "typeZh": "地面"
+  },
+  "616": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Land’s Wrath",
+    "nameZh": "大地神力",
+    "slug": "lands-wrath",
+    "typeZh": "地面"
+  },
+  "617": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Light of Ruin",
+    "nameZh": "破灭之光",
+    "slug": "light-of-ruin",
+    "typeZh": "妖精"
+  },
+  "618": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Origin Pulse",
+    "nameZh": "根源波动",
+    "slug": "origin-pulse",
+    "typeZh": "水"
+  },
+  "619": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Precipice Blades",
+    "nameZh": "断崖之剑",
+    "slug": "precipice-blades",
+    "typeZh": "地面"
+  },
+  "62": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Aurora Beam",
+    "nameZh": "极光束",
+    "slug": "aurora-beam",
+    "typeZh": "冰"
+  },
+  "620": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Ascent",
+    "nameZh": "画龙点睛",
+    "slug": "dragon-ascent",
+    "typeZh": "飞行"
+  },
+  "621": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hyperspace Fury",
+    "nameZh": "异次元猛攻",
+    "slug": "hyperspace-fury",
+    "typeZh": "恶"
+  },
+  "622": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Breakneck Blitz",
+    "nameZh": "究极无敌大冲撞",
+    "slug": "breakneck-blitz--physical",
+    "typeZh": "一般"
+  },
+  "623": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Breakneck Blitz",
+    "nameZh": "究极无敌大冲撞",
+    "slug": "breakneck-blitz--special",
+    "typeZh": "一般"
+  },
+  "624": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "All-Out Pummeling",
+    "nameZh": "全力无双激烈拳",
+    "slug": "all-out-pummeling--physical",
+    "typeZh": "格斗"
+  },
+  "625": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "All-Out Pummeling",
+    "nameZh": "全力无双激烈拳",
+    "slug": "all-out-pummeling--special",
+    "typeZh": "格斗"
+  },
+  "626": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Supersonic Skystrike",
+    "nameZh": "极速俯冲轰烈撞",
+    "slug": "supersonic-skystrike--physical",
+    "typeZh": "飞行"
+  },
+  "627": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Supersonic Skystrike",
+    "nameZh": "极速俯冲轰烈撞",
+    "slug": "supersonic-skystrike--special",
+    "typeZh": "飞行"
+  },
+  "628": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Acid Downpour",
+    "nameZh": "强酸剧毒灭绝雨",
+    "slug": "acid-downpour--physical",
+    "typeZh": "毒"
+  },
+  "629": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Acid Downpour",
+    "nameZh": "强酸剧毒灭绝雨",
+    "slug": "acid-downpour--special",
+    "typeZh": "毒"
+  },
+  "63": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hyper Beam",
+    "nameZh": "破坏光线",
+    "slug": "hyper-beam",
+    "typeZh": "一般"
+  },
+  "630": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Tectonic Rage",
+    "nameZh": "地隆啸天大终结",
+    "slug": "tectonic-rage--physical",
+    "typeZh": "地面"
+  },
+  "631": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Tectonic Rage",
+    "nameZh": "地隆啸天大终结",
+    "slug": "tectonic-rage--special",
+    "typeZh": "地面"
+  },
+  "632": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Continental Crush",
+    "nameZh": "毁天灭地巨岩坠",
+    "slug": "continental-crush--physical",
+    "typeZh": "岩石"
+  },
+  "633": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Continental Crush",
+    "nameZh": "毁天灭地巨岩坠",
+    "slug": "continental-crush--special",
+    "typeZh": "岩石"
+  },
+  "634": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Savage Spin-Out",
+    "nameZh": "绝对捕食回旋斩",
+    "slug": "savage-spin-out--physical",
+    "typeZh": "虫"
+  },
+  "635": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Savage Spin-Out",
+    "nameZh": "绝对捕食回旋斩",
+    "slug": "savage-spin-out--special",
+    "typeZh": "虫"
+  },
+  "636": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Never-Ending Nightmare",
+    "nameZh": "无尽暗夜之诱惑",
+    "slug": "never-ending-nightmare--physical",
+    "typeZh": "幽灵"
+  },
+  "637": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Never-Ending Nightmare",
+    "nameZh": "无尽暗夜之诱惑",
+    "slug": "never-ending-nightmare--special",
+    "typeZh": "幽灵"
+  },
+  "638": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Corkscrew Crash",
+    "nameZh": "超绝螺旋连击",
+    "slug": "corkscrew-crash--physical",
+    "typeZh": "钢"
+  },
+  "639": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Corkscrew Crash",
+    "nameZh": "超绝螺旋连击",
+    "slug": "corkscrew-crash--special",
+    "typeZh": "钢"
+  },
+  "64": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Peck",
+    "nameZh": "啄",
+    "slug": "peck",
+    "typeZh": "飞行"
+  },
+  "640": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Inferno Overdrive",
+    "nameZh": "超强极限爆焰弹",
+    "slug": "inferno-overdrive--physical",
+    "typeZh": "火"
+  },
+  "641": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Inferno Overdrive",
+    "nameZh": "超强极限爆焰弹",
+    "slug": "inferno-overdrive--special",
+    "typeZh": "火"
+  },
+  "642": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hydro Vortex",
+    "nameZh": "超级水流大漩涡",
+    "slug": "hydro-vortex--physical",
+    "typeZh": "水"
+  },
+  "643": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hydro Vortex",
+    "nameZh": "超级水流大漩涡",
+    "slug": "hydro-vortex--special",
+    "typeZh": "水"
+  },
+  "644": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bloom Doom",
+    "nameZh": "绚烂缤纷花怒放",
+    "slug": "bloom-doom--physical",
+    "typeZh": "草"
+  },
+  "645": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bloom Doom",
+    "nameZh": "绚烂缤纷花怒放",
+    "slug": "bloom-doom--special",
+    "typeZh": "草"
+  },
+  "646": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Gigavolt Havoc",
+    "nameZh": "终极伏特狂雷闪",
+    "slug": "gigavolt-havoc--physical",
+    "typeZh": "电"
+  },
+  "647": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Gigavolt Havoc",
+    "nameZh": "终极伏特狂雷闪",
+    "slug": "gigavolt-havoc--special",
+    "typeZh": "电"
+  },
+  "648": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shattered Psyche",
+    "nameZh": "至高精神破坏波",
+    "slug": "shattered-psyche--physical",
+    "typeZh": "超能力"
+  },
+  "649": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shattered Psyche",
+    "nameZh": "至高精神破坏波",
+    "slug": "shattered-psyche--special",
+    "typeZh": "超能力"
+  },
+  "65": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Drill Peck",
+    "nameZh": "啄钻",
+    "slug": "drill-peck",
+    "typeZh": "飞行"
+  },
+  "650": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Subzero Slammer",
+    "nameZh": "激狂大地万里冰",
+    "slug": "subzero-slammer--physical",
+    "typeZh": "冰"
+  },
+  "651": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Subzero Slammer",
+    "nameZh": "激狂大地万里冰",
+    "slug": "subzero-slammer--special",
+    "typeZh": "冰"
+  },
+  "652": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Devastating Drake",
+    "nameZh": "究极巨龙震天地",
+    "slug": "devastating-drake--physical",
+    "typeZh": "龙"
+  },
+  "653": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Devastating Drake",
+    "nameZh": "究极巨龙震天地",
+    "slug": "devastating-drake--special",
+    "typeZh": "龙"
+  },
+  "654": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Black Hole Eclipse",
+    "nameZh": "黑洞吞噬万物灭",
+    "slug": "black-hole-eclipse--physical",
+    "typeZh": "恶"
+  },
+  "655": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Black Hole Eclipse",
+    "nameZh": "黑洞吞噬万物灭",
+    "slug": "black-hole-eclipse--special",
+    "typeZh": "恶"
+  },
+  "656": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Twinkle Tackle",
+    "nameZh": "可爱星星飞天撞",
+    "slug": "twinkle-tackle--physical",
+    "typeZh": "妖精"
+  },
+  "657": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Twinkle Tackle",
+    "nameZh": "可爱星星飞天撞",
+    "slug": "twinkle-tackle--special",
+    "typeZh": "妖精"
+  },
+  "658": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Catastropika",
+    "nameZh": "皮卡皮卡必杀击",
+    "slug": "catastropika",
+    "typeZh": "电"
+  },
+  "659": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shore Up",
+    "nameZh": "集沙",
+    "slug": "shore-up",
+    "typeZh": "地面"
+  },
+  "66": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Submission",
+    "nameZh": "地狱翻滚",
+    "slug": "submission",
+    "typeZh": "格斗"
+  },
+  "660": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "First Impression",
+    "nameZh": "迎头一击",
+    "slug": "first-impression",
+    "typeZh": "虫"
+  },
+  "661": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Baneful Bunker",
+    "nameZh": "碉堡",
+    "slug": "baneful-bunker",
+    "typeZh": "毒"
+  },
+  "662": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spirit Shackle",
+    "nameZh": "缝影",
+    "slug": "spirit-shackle",
+    "typeZh": "幽灵"
+  },
+  "663": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Darkest Lariat",
+    "nameZh": "ＤＤ金勾臂",
+    "slug": "darkest-lariat",
+    "typeZh": "恶"
+  },
+  "664": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sparkling Aria",
+    "nameZh": "泡影的咏叹调",
+    "slug": "sparkling-aria",
+    "typeZh": "水"
+  },
+  "665": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Hammer",
+    "nameZh": "冰锤",
+    "slug": "ice-hammer",
+    "typeZh": "冰"
+  },
+  "666": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Floral Healing",
+    "nameZh": "花疗",
+    "slug": "floral-healing",
+    "typeZh": "妖精"
+  },
+  "667": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "High Horsepower",
+    "nameZh": "十万马力",
+    "slug": "high-horsepower",
+    "typeZh": "地面"
+  },
+  "668": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Strength Sap",
+    "nameZh": "吸取力量",
+    "slug": "strength-sap",
+    "typeZh": "草"
+  },
+  "669": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Solar Blade",
+    "nameZh": "日光刃",
+    "slug": "solar-blade",
+    "typeZh": "草"
+  },
+  "67": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Low Kick",
+    "nameZh": "踢倒",
+    "slug": "low-kick",
+    "typeZh": "格斗"
+  },
+  "670": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Leafage",
+    "nameZh": "树叶",
+    "slug": "leafage",
+    "typeZh": "草"
+  },
+  "671": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spotlight",
+    "nameZh": "聚光灯",
+    "slug": "spotlight",
+    "typeZh": "一般"
+  },
+  "672": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Toxic Thread",
+    "nameZh": "毒丝",
+    "slug": "toxic-thread",
+    "typeZh": "毒"
+  },
+  "673": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Laser Focus",
+    "nameZh": "磨砺",
+    "slug": "laser-focus",
+    "typeZh": "一般"
+  },
+  "674": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Gear Up",
+    "nameZh": "辅助齿轮",
+    "slug": "gear-up",
+    "typeZh": "钢"
+  },
+  "675": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Throat Chop",
+    "nameZh": "地狱突刺",
+    "slug": "throat-chop",
+    "typeZh": "恶"
+  },
+  "676": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Pollen Puff",
+    "nameZh": "花粉团",
+    "slug": "pollen-puff",
+    "typeZh": "虫"
+  },
+  "677": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Anchor Shot",
+    "nameZh": "掷锚",
+    "slug": "anchor-shot",
+    "typeZh": "钢"
+  },
+  "678": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Psychic Terrain",
+    "nameZh": "精神场地",
+    "slug": "psychic-terrain",
+    "typeZh": "超能力"
+  },
+  "679": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Lunge",
+    "nameZh": "猛扑",
+    "slug": "lunge",
+    "typeZh": "虫"
+  },
+  "68": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Counter",
+    "nameZh": "双倍奉还",
+    "slug": "counter",
+    "typeZh": "格斗"
+  },
+  "680": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fire Lash",
+    "nameZh": "火焰鞭",
+    "slug": "fire-lash",
+    "typeZh": "火"
+  },
+  "681": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Power Trip",
+    "nameZh": "嚣张",
+    "slug": "power-trip",
+    "typeZh": "恶"
+  },
+  "682": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Burn Up",
+    "nameZh": "燃尽",
+    "slug": "burn-up",
+    "typeZh": "火"
+  },
+  "683": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Speed Swap",
+    "nameZh": "速度互换",
+    "slug": "speed-swap",
+    "typeZh": "超能力"
+  },
+  "684": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Smart Strike",
+    "nameZh": "修长之角",
+    "slug": "smart-strike",
+    "typeZh": "钢"
+  },
+  "685": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Purify",
+    "nameZh": "净化",
+    "slug": "purify",
+    "typeZh": "毒"
+  },
+  "686": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Revelation Dance",
+    "nameZh": "觉醒之舞",
+    "slug": "revelation-dance",
+    "typeZh": "一般"
+  },
+  "687": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Core Enforcer",
+    "nameZh": "核心惩罚者",
+    "slug": "core-enforcer",
+    "typeZh": "龙"
+  },
+  "688": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Trop Kick",
+    "nameZh": "热带踢",
+    "slug": "trop-kick",
+    "typeZh": "草"
+  },
+  "689": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Instruct",
+    "nameZh": "号令",
+    "slug": "instruct",
+    "typeZh": "超能力"
+  },
+  "69": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Seismic Toss",
+    "nameZh": "地球上投",
+    "slug": "seismic-toss",
+    "typeZh": "格斗"
+  },
+  "690": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Beak Blast",
+    "nameZh": "鸟嘴加农炮",
+    "slug": "beak-blast",
+    "typeZh": "飞行"
+  },
+  "691": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Clanging Scales",
+    "nameZh": "鳞片噪音",
+    "slug": "clanging-scales",
+    "typeZh": "龙"
+  },
+  "692": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Hammer",
+    "nameZh": "龙锤",
+    "slug": "dragon-hammer",
+    "typeZh": "龙"
+  },
+  "693": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Brutal Swing",
+    "nameZh": "狂舞挥打",
+    "slug": "brutal-swing",
+    "typeZh": "恶"
+  },
+  "694": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Aurora Veil",
+    "nameZh": "极光幕",
+    "slug": "aurora-veil",
+    "typeZh": "冰"
+  },
+  "695": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sinister Arrow Raid",
+    "nameZh": "遮天蔽日暗影箭",
+    "slug": "sinister-arrow-raid",
+    "typeZh": "幽灵"
+  },
+  "696": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Malicious Moonsault",
+    "nameZh": "极恶飞跃粉碎击",
+    "slug": "malicious-moonsault",
+    "typeZh": "恶"
+  },
+  "697": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Oceanic Operetta",
+    "nameZh": "海神庄严交响乐",
+    "slug": "oceanic-operetta",
+    "typeZh": "水"
+  },
+  "698": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Guardian of Alola",
+    "nameZh": "巨人卫士・阿罗拉",
+    "slug": "guardian-of-alola",
+    "typeZh": "妖精"
+  },
+  "699": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Soul-Stealing 7-Star Strike",
+    "nameZh": "七星夺魂腿",
+    "slug": "soul-stealing-7-star-strike",
+    "typeZh": "幽灵"
+  },
+  "7": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fire Punch",
+    "nameZh": "火焰拳",
+    "slug": "fire-punch",
+    "typeZh": "火"
+  },
+  "70": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Strength",
+    "nameZh": "怪力",
+    "slug": "strength",
+    "typeZh": "一般"
+  },
+  "700": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Stoked Sparksurfer",
+    "nameZh": "驾雷驭电戏冲浪",
+    "slug": "stoked-sparksurfer",
+    "typeZh": "电"
+  },
+  "701": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pulverizing Pancake",
+    "nameZh": "认真起来大爆击",
+    "slug": "pulverizing-pancake",
+    "typeZh": "一般"
+  },
+  "702": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Extreme Evoboost",
+    "nameZh": "九彩升华齐聚顶",
+    "slug": "extreme-evoboost",
+    "typeZh": "一般"
+  },
+  "703": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Genesis Supernova",
+    "nameZh": "起源超新星大爆炸",
+    "slug": "genesis-supernova",
+    "typeZh": "超能力"
+  },
+  "704": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shell Trap",
+    "nameZh": "陷阱甲壳",
+    "slug": "shell-trap",
+    "typeZh": "火"
+  },
+  "705": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fleur Cannon",
+    "nameZh": "花朵加农炮",
+    "slug": "fleur-cannon",
+    "typeZh": "妖精"
+  },
+  "706": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Psychic Fangs",
+    "nameZh": "精神之牙",
+    "slug": "psychic-fangs",
+    "typeZh": "超能力"
+  },
+  "707": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Stomping Tantrum",
+    "nameZh": "跺脚",
+    "slug": "stomping-tantrum",
+    "typeZh": "地面"
+  },
+  "708": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Shadow Bone",
+    "nameZh": "暗影之骨",
+    "slug": "shadow-bone",
+    "typeZh": "幽灵"
+  },
+  "709": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Accelerock",
+    "nameZh": "冲岩",
+    "slug": "accelerock",
+    "typeZh": "岩石"
+  },
+  "71": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Absorb",
+    "nameZh": "吸取",
+    "slug": "absorb",
+    "typeZh": "草"
+  },
+  "710": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Liquidation",
+    "nameZh": "水流裂破",
+    "slug": "liquidation",
+    "typeZh": "水"
+  },
+  "711": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Prismatic Laser",
+    "nameZh": "棱镜镭射",
+    "slug": "prismatic-laser",
+    "typeZh": "超能力"
+  },
+  "712": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spectral Thief",
+    "nameZh": "暗影偷盗",
+    "slug": "spectral-thief",
+    "typeZh": "幽灵"
+  },
+  "713": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sunsteel Strike",
+    "nameZh": "流星闪冲",
+    "slug": "sunsteel-strike",
+    "typeZh": "钢"
+  },
+  "714": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Moongeist Beam",
+    "nameZh": "暗影之光",
+    "slug": "moongeist-beam",
+    "typeZh": "幽灵"
+  },
+  "715": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tearful Look",
+    "nameZh": "泪眼汪汪",
+    "slug": "tearful-look",
+    "typeZh": "一般"
+  },
+  "716": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Zing Zap",
+    "nameZh": "麻麻刺刺",
+    "slug": "zing-zap",
+    "typeZh": "电"
+  },
+  "717": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Nature’s Madness",
+    "nameZh": "自然之怒",
+    "slug": "natures-madness",
+    "typeZh": "妖精"
+  },
+  "718": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Multi-Attack",
+    "nameZh": "多属性攻击",
+    "slug": "multi-attack",
+    "typeZh": "一般"
+  },
+  "719": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "10,000,000 Volt Thunderbolt",
+    "nameZh": "千万伏特",
+    "slug": "10-000-000-volt-thunderbolt",
+    "typeZh": "电"
+  },
+  "72": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mega Drain",
+    "nameZh": "超级吸取",
+    "slug": "mega-drain",
+    "typeZh": "草"
+  },
+  "720": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mind Blown",
+    "nameZh": "惊爆大头",
+    "slug": "mind-blown",
+    "typeZh": "火"
+  },
+  "721": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Plasma Fists",
+    "nameZh": "等离子闪电拳",
+    "slug": "plasma-fists",
+    "typeZh": "电"
+  },
+  "722": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Photon Geyser",
+    "nameZh": "光子喷涌",
+    "slug": "photon-geyser",
+    "typeZh": "超能力"
+  },
+  "723": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Light That Burns the Sky",
+    "nameZh": "焚天灭世炽光爆",
+    "slug": "light-that-burns-the-sky",
+    "typeZh": "超能力"
+  },
+  "724": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Searing Sunraze Smash",
+    "nameZh": "日光回旋下苍穹",
+    "slug": "searing-sunraze-smash",
+    "typeZh": "钢"
+  },
+  "725": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Menacing Moonraze Maelstrom",
+    "nameZh": "月华飞溅落灵霄",
+    "slug": "menacing-moonraze-maelstrom",
+    "typeZh": "幽灵"
+  },
+  "726": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Let’s Snuggle Forever",
+    "nameZh": "亲密无间大乱揍",
+    "slug": "lets-snuggle-forever",
+    "typeZh": "妖精"
+  },
+  "727": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Splintered Stormshards",
+    "nameZh": "狼啸石牙飓风暴",
+    "slug": "splintered-stormshards",
+    "typeZh": "岩石"
+  },
+  "728": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Clangorous Soulblaze",
+    "nameZh": "炽魂热舞烈音爆",
+    "slug": "clangorous-soulblaze",
+    "typeZh": "龙"
+  },
+  "729": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Zippy Zap",
+    "nameZh": "电电加速",
+    "slug": "zippy-zap",
+    "typeZh": "电"
+  },
+  "73": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Leech Seed",
+    "nameZh": "寄生种子",
+    "slug": "leech-seed",
+    "typeZh": "草"
+  },
+  "730": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Splishy Splash",
+    "nameZh": "滔滔冲浪",
+    "slug": "splishy-splash",
+    "typeZh": "水"
+  },
+  "731": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Floaty Fall",
+    "nameZh": "飘飘坠落",
+    "slug": "floaty-fall",
+    "typeZh": "飞行"
+  },
+  "732": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Pika Papow",
+    "nameZh": "闪闪雷光",
+    "slug": "pika-papow",
+    "typeZh": "电"
+  },
+  "733": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bouncy Bubble",
+    "nameZh": "活活气泡",
+    "slug": "bouncy-bubble",
+    "typeZh": "水"
+  },
+  "734": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Buzzy Buzz",
+    "nameZh": "麻麻电击",
+    "slug": "buzzy-buzz",
+    "typeZh": "电"
+  },
+  "735": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sizzly Slide",
+    "nameZh": "熊熊火爆",
+    "slug": "sizzly-slide",
+    "typeZh": "火"
+  },
+  "736": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Glitzy Glow",
+    "nameZh": "哗哗气场",
+    "slug": "glitzy-glow",
+    "typeZh": "超能力"
+  },
+  "737": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Baddy Bad",
+    "nameZh": "坏坏领域",
+    "slug": "baddy-bad",
+    "typeZh": "恶"
+  },
+  "738": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Sappy Seed",
+    "nameZh": "茁茁轰炸",
+    "slug": "sappy-seed",
+    "typeZh": "草"
+  },
+  "739": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Freezy Frost",
+    "nameZh": "冰冰霜冻",
+    "slug": "freezy-frost",
+    "typeZh": "冰"
+  },
+  "74": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Growth",
+    "nameZh": "生长",
+    "slug": "growth",
+    "typeZh": "一般"
+  },
+  "740": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sparkly Swirl",
+    "nameZh": "亮亮风暴",
+    "slug": "sparkly-swirl",
+    "typeZh": "妖精"
+  },
+  "741": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Veevee Volley",
+    "nameZh": "砰砰击破",
+    "slug": "veevee-volley",
+    "typeZh": "一般"
+  },
+  "742": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double Iron Bash",
+    "nameZh": "钢拳双击",
+    "slug": "double-iron-bash",
+    "typeZh": "钢"
+  },
+  "743": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Max Guard",
+    "nameZh": "极巨防壁",
+    "slug": "max-guard",
+    "typeZh": "一般"
+  },
+  "744": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dynamax Cannon",
+    "nameZh": "极巨炮",
+    "slug": "dynamax-cannon",
+    "typeZh": "龙"
+  },
+  "745": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Snipe Shot",
+    "nameZh": "狙击",
+    "slug": "snipe-shot",
+    "typeZh": "水"
+  },
+  "746": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Jaw Lock",
+    "nameZh": "紧咬不放",
+    "slug": "jaw-lock",
+    "typeZh": "恶"
+  },
+  "747": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Stuff Cheeks",
+    "nameZh": "大快朵颐",
+    "slug": "stuff-cheeks",
+    "typeZh": "一般"
+  },
+  "748": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "No Retreat",
+    "nameZh": "背水一战",
+    "slug": "no-retreat",
+    "typeZh": "格斗"
+  },
+  "749": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tar Shot",
+    "nameZh": "沥青射击",
+    "slug": "tar-shot",
+    "typeZh": "岩石"
+  },
+  "75": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Razor Leaf",
+    "nameZh": "飞叶快刀",
+    "slug": "razor-leaf",
+    "typeZh": "草"
+  },
+  "750": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Magic Powder",
+    "nameZh": "魔法粉",
+    "slug": "magic-powder",
+    "typeZh": "超能力"
+  },
+  "751": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dragon Darts",
+    "nameZh": "龙箭",
+    "slug": "dragon-darts",
+    "typeZh": "龙"
+  },
+  "752": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Teatime",
+    "nameZh": "茶会",
+    "slug": "teatime",
+    "typeZh": "一般"
+  },
+  "753": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Octolock",
+    "nameZh": "蛸固",
+    "slug": "octolock",
+    "typeZh": "格斗"
+  },
+  "754": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bolt Beak",
+    "nameZh": "电喙",
+    "slug": "bolt-beak",
+    "typeZh": "电"
+  },
+  "755": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fishious Rend",
+    "nameZh": "鳃咬",
+    "slug": "fishious-rend",
+    "typeZh": "水"
+  },
+  "756": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Court Change",
+    "nameZh": "换场",
+    "slug": "court-change",
+    "typeZh": "一般"
+  },
+  "757": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Flare",
+    "nameZh": "极巨火爆",
+    "slug": "max-flare",
+    "typeZh": "火"
+  },
+  "758": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Flutterby",
+    "nameZh": "极巨虫蛊",
+    "slug": "max-flutterby",
+    "typeZh": "虫"
+  },
+  "759": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Lightning",
+    "nameZh": "极巨闪电",
+    "slug": "max-lightning",
+    "typeZh": "电"
+  },
+  "76": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Solar Beam",
+    "nameZh": "日光束",
+    "slug": "solar-beam",
+    "typeZh": "草"
+  },
+  "760": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Strike",
+    "nameZh": "极巨攻击",
+    "slug": "max-strike",
+    "typeZh": "一般"
+  },
+  "761": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Knuckle",
+    "nameZh": "极巨拳斗",
+    "slug": "max-knuckle",
+    "typeZh": "格斗"
+  },
+  "762": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Phantasm",
+    "nameZh": "极巨幽魂",
+    "slug": "max-phantasm",
+    "typeZh": "幽灵"
+  },
+  "763": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Hailstorm",
+    "nameZh": "极巨寒冰",
+    "slug": "max-hailstorm",
+    "typeZh": "冰"
+  },
+  "764": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Ooze",
+    "nameZh": "极巨酸毒",
+    "slug": "max-ooze",
+    "typeZh": "毒"
+  },
+  "765": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Geyser",
+    "nameZh": "极巨水流",
+    "slug": "max-geyser",
+    "typeZh": "水"
+  },
+  "766": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Airstream",
+    "nameZh": "极巨飞冲",
+    "slug": "max-airstream",
+    "typeZh": "飞行"
+  },
+  "767": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Starfall",
+    "nameZh": "极巨妖精",
+    "slug": "max-starfall",
+    "typeZh": "妖精"
+  },
+  "768": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Wyrmwind",
+    "nameZh": "极巨龙骑",
+    "slug": "max-wyrmwind",
+    "typeZh": "龙"
+  },
+  "769": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Mindstorm",
+    "nameZh": "极巨超能",
+    "slug": "max-mindstorm",
+    "typeZh": "超能力"
+  },
+  "77": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Poison Powder",
+    "nameZh": "毒粉",
+    "slug": "poison-powder",
+    "typeZh": "毒"
+  },
+  "770": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Rockfall",
+    "nameZh": "极巨岩石",
+    "slug": "max-rockfall",
+    "typeZh": "岩石"
+  },
+  "771": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Quake",
+    "nameZh": "极巨大地",
+    "slug": "max-quake",
+    "typeZh": "地面"
+  },
+  "772": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Darkness",
+    "nameZh": "极巨恶霸",
+    "slug": "max-darkness",
+    "typeZh": "恶"
+  },
+  "773": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Overgrowth",
+    "nameZh": "极巨草原",
+    "slug": "max-overgrowth",
+    "typeZh": "草"
+  },
+  "774": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Max Steelspike",
+    "nameZh": "极巨钢铁",
+    "slug": "max-steelspike",
+    "typeZh": "钢"
+  },
+  "775": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Clangorous Soul",
+    "nameZh": "魂舞烈音爆",
+    "slug": "clangorous-soul",
+    "typeZh": "龙"
+  },
+  "776": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Body Press",
+    "nameZh": "扑击",
+    "slug": "body-press",
+    "typeZh": "格斗"
+  },
+  "777": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Decorate",
+    "nameZh": "装饰",
+    "slug": "decorate",
+    "typeZh": "妖精"
+  },
+  "778": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Drum Beating",
+    "nameZh": "鼓击",
+    "slug": "drum-beating",
+    "typeZh": "草"
+  },
+  "779": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Snap Trap",
+    "nameZh": "捕兽夹",
+    "slug": "snap-trap",
+    "typeZh": "草"
+  },
+  "78": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Stun Spore",
+    "nameZh": "麻痹粉",
+    "slug": "stun-spore",
+    "typeZh": "草"
+  },
+  "780": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pyro Ball",
+    "nameZh": "火焰球",
+    "slug": "pyro-ball",
+    "typeZh": "火"
+  },
+  "781": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Behemoth Blade",
+    "nameZh": "巨兽斩",
+    "slug": "behemoth-blade",
+    "typeZh": "钢"
+  },
+  "782": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Behemoth Bash",
+    "nameZh": "巨兽弹",
+    "slug": "behemoth-bash",
+    "typeZh": "钢"
+  },
+  "783": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aura Wheel",
+    "nameZh": "气场轮",
+    "slug": "aura-wheel",
+    "typeZh": "电"
+  },
+  "784": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Breaking Swipe",
+    "nameZh": "广域破坏",
+    "slug": "breaking-swipe",
+    "typeZh": "龙"
+  },
+  "785": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Branch Poke",
+    "nameZh": "木枝突刺",
+    "slug": "branch-poke",
+    "typeZh": "草"
+  },
+  "786": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Overdrive",
+    "nameZh": "破音",
+    "slug": "overdrive",
+    "typeZh": "电"
+  },
+  "787": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Apple Acid",
+    "nameZh": "苹果酸",
+    "slug": "apple-acid",
+    "typeZh": "草"
+  },
+  "788": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Grav Apple",
+    "nameZh": "万有引力",
+    "slug": "grav-apple",
+    "typeZh": "草"
+  },
+  "789": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spirit Break",
+    "nameZh": "灵魂冲击",
+    "slug": "spirit-break",
+    "typeZh": "妖精"
+  },
+  "79": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Sleep Powder",
+    "nameZh": "催眠粉",
+    "slug": "sleep-powder",
+    "typeZh": "草"
+  },
+  "790": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Strange Steam",
+    "nameZh": "神奇蒸汽",
+    "slug": "strange-steam",
+    "typeZh": "妖精"
+  },
+  "791": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Life Dew",
+    "nameZh": "生命水滴",
+    "slug": "life-dew",
+    "typeZh": "水"
+  },
+  "792": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Obstruct",
+    "nameZh": "拦堵",
+    "slug": "obstruct",
+    "typeZh": "恶"
+  },
+  "793": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "False Surrender",
+    "nameZh": "假跪真撞",
+    "slug": "false-surrender",
+    "typeZh": "恶"
+  },
+  "794": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Meteor Assault",
+    "nameZh": "流星突击",
+    "slug": "meteor-assault",
+    "typeZh": "格斗"
+  },
+  "795": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Eternabeam",
+    "nameZh": "无极光束",
+    "slug": "eternabeam",
+    "typeZh": "龙"
+  },
+  "796": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Steel Beam",
+    "nameZh": "铁蹄光线",
+    "slug": "steel-beam",
+    "typeZh": "钢"
+  },
+  "797": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Expanding Force",
+    "nameZh": "广域战力",
+    "slug": "expanding-force",
+    "typeZh": "超能力"
+  },
+  "798": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Steel Roller",
+    "nameZh": "铁滚轮",
+    "slug": "steel-roller",
+    "typeZh": "钢"
+  },
+  "799": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Scale Shot",
+    "nameZh": "鳞射",
+    "slug": "scale-shot",
+    "typeZh": "龙"
+  },
+  "8": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Punch",
+    "nameZh": "冰冻拳",
+    "slug": "ice-punch",
+    "typeZh": "冰"
+  },
+  "80": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Petal Dance",
+    "nameZh": "花瓣舞",
+    "slug": "petal-dance",
+    "typeZh": "草"
+  },
+  "800": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Meteor Beam",
+    "nameZh": "流星光束",
+    "slug": "meteor-beam",
+    "typeZh": "岩石"
+  },
+  "801": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Shell Side Arm",
+    "nameZh": "臂贝武器",
+    "slug": "shell-side-arm",
+    "typeZh": "毒"
+  },
+  "802": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Misty Explosion",
+    "nameZh": "薄雾炸裂",
+    "slug": "misty-explosion",
+    "typeZh": "妖精"
+  },
+  "803": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Grassy Glide",
+    "nameZh": "青草滑梯",
+    "slug": "grassy-glide",
+    "typeZh": "草"
+  },
+  "804": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Rising Voltage",
+    "nameZh": "电力上升",
+    "slug": "rising-voltage",
+    "typeZh": "电"
+  },
+  "805": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Terrain Pulse",
+    "nameZh": "大地波动",
+    "slug": "terrain-pulse",
+    "typeZh": "一般"
+  },
+  "806": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Skitter Smack",
+    "nameZh": "爬击",
+    "slug": "skitter-smack",
+    "typeZh": "虫"
+  },
+  "807": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Burning Jealousy",
+    "nameZh": "妒火",
+    "slug": "burning-jealousy",
+    "typeZh": "火"
+  },
+  "808": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Lash Out",
+    "nameZh": "泄愤",
+    "slug": "lash-out",
+    "typeZh": "恶"
+  },
+  "809": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Poltergeist",
+    "nameZh": "灵骚",
+    "slug": "poltergeist",
+    "typeZh": "幽灵"
+  },
+  "81": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "String Shot",
+    "nameZh": "吐丝",
+    "slug": "string-shot",
+    "typeZh": "虫"
+  },
+  "810": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Corrosive Gas",
+    "nameZh": "腐蚀气体",
+    "slug": "corrosive-gas",
+    "typeZh": "毒"
+  },
+  "811": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Coaching",
+    "nameZh": "指导",
+    "slug": "coaching",
+    "typeZh": "格斗"
+  },
+  "812": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flip Turn",
+    "nameZh": "快速折返",
+    "slug": "flip-turn",
+    "typeZh": "水"
+  },
+  "813": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Triple Axel",
+    "nameZh": "三旋击",
+    "slug": "triple-axel",
+    "typeZh": "冰"
+  },
+  "814": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dual Wingbeat",
+    "nameZh": "双翼",
+    "slug": "dual-wingbeat",
+    "typeZh": "飞行"
+  },
+  "815": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Scorching Sands",
+    "nameZh": "热沙大地",
+    "slug": "scorching-sands",
+    "typeZh": "地面"
+  },
+  "816": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Jungle Healing",
+    "nameZh": "丛林治疗",
+    "slug": "jungle-healing",
+    "typeZh": "草"
+  },
+  "817": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wicked Blow",
+    "nameZh": "暗冥强击",
+    "slug": "wicked-blow",
+    "typeZh": "恶"
+  },
+  "818": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Surging Strikes",
+    "nameZh": "水流连打",
+    "slug": "surging-strikes",
+    "typeZh": "水"
+  },
+  "819": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Thunder Cage",
+    "nameZh": "雷电囚笼",
+    "slug": "thunder-cage",
+    "typeZh": "电"
+  },
+  "82": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dragon Rage",
+    "nameZh": "龙之怒",
+    "slug": "dragon-rage",
+    "typeZh": "龙"
+  },
+  "820": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Dragon Energy",
+    "nameZh": "巨龙威能",
+    "slug": "dragon-energy",
+    "typeZh": "龙"
+  },
+  "821": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Freezing Glare",
+    "nameZh": "冰冷视线",
+    "slug": "freezing-glare",
+    "typeZh": "超能力"
+  },
+  "822": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fiery Wrath",
+    "nameZh": "怒火中烧",
+    "slug": "fiery-wrath",
+    "typeZh": "恶"
+  },
+  "823": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thunderous Kick",
+    "nameZh": "雷鸣蹴击",
+    "slug": "thunderous-kick",
+    "typeZh": "格斗"
+  },
+  "824": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Glacial Lance",
+    "nameZh": "雪矛",
+    "slug": "glacial-lance",
+    "typeZh": "冰"
+  },
+  "825": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Astral Barrage",
+    "nameZh": "星碎",
+    "slug": "astral-barrage",
+    "typeZh": "幽灵"
+  },
+  "826": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Eerie Spell",
+    "nameZh": "诡异咒语",
+    "slug": "eerie-spell",
+    "typeZh": "超能力"
+  },
+  "827": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dire Claw",
+    "nameZh": "Dire Claw",
+    "slug": "dire-claw",
+    "typeZh": "毒"
+  },
+  "828": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Psyshield Bash",
+    "nameZh": "Psyshield Bash",
+    "slug": "psyshield-bash",
+    "typeZh": "超能力"
+  },
+  "829": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Power Shift",
+    "nameZh": "Power Shift",
+    "slug": "power-shift",
+    "typeZh": "一般"
+  },
+  "83": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fire Spin",
+    "nameZh": "火焰旋涡",
+    "slug": "fire-spin",
+    "typeZh": "火"
+  },
+  "830": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Stone Axe",
+    "nameZh": "Stone Axe",
+    "slug": "stone-axe",
+    "typeZh": "岩石"
+  },
+  "831": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Springtide Storm",
+    "nameZh": "Springtide Storm",
+    "slug": "springtide-storm",
+    "typeZh": "妖精"
+  },
+  "832": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Mystical Power",
+    "nameZh": "Mystical Power",
+    "slug": "mystical-power",
+    "typeZh": "超能力"
+  },
+  "833": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Raging Fury",
+    "nameZh": "Raging Fury",
+    "slug": "raging-fury",
+    "typeZh": "火"
+  },
+  "834": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wave Crash",
+    "nameZh": "Wave Crash",
+    "slug": "wave-crash",
+    "typeZh": "水"
+  },
+  "835": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Chloroblast",
+    "nameZh": "Chloroblast",
+    "slug": "chloroblast",
+    "typeZh": "草"
+  },
+  "836": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mountain Gale",
+    "nameZh": "Mountain Gale",
+    "slug": "mountain-gale",
+    "typeZh": "冰"
+  },
+  "837": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Victory Dance",
+    "nameZh": "Victory Dance",
+    "slug": "victory-dance",
+    "typeZh": "格斗"
+  },
+  "838": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Headlong Rush",
+    "nameZh": "Headlong Rush",
+    "slug": "headlong-rush",
+    "typeZh": "地面"
+  },
+  "839": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Barb Barrage",
+    "nameZh": "Barb Barrage",
+    "slug": "barb-barrage",
+    "typeZh": "毒"
+  },
+  "84": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Thunder Shock",
+    "nameZh": "电击",
+    "slug": "thunder-shock",
+    "typeZh": "电"
+  },
+  "840": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Esper Wing",
+    "nameZh": "Esper Wing",
+    "slug": "esper-wing",
+    "typeZh": "超能力"
+  },
+  "841": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bitter Malice",
+    "nameZh": "Bitter Malice",
+    "slug": "bitter-malice",
+    "typeZh": "幽灵"
+  },
+  "842": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shelter",
+    "nameZh": "Shelter",
+    "slug": "shelter",
+    "typeZh": "钢"
+  },
+  "843": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Triple Arrows",
+    "nameZh": "Triple Arrows",
+    "slug": "triple-arrows",
+    "typeZh": "格斗"
+  },
+  "844": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Infernal Parade",
+    "nameZh": "Infernal Parade",
+    "slug": "infernal-parade",
+    "typeZh": "幽灵"
+  },
+  "845": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ceaseless Edge",
+    "nameZh": "Ceaseless Edge",
+    "slug": "ceaseless-edge",
+    "typeZh": "恶"
+  },
+  "846": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Bleakwind Storm",
+    "nameZh": "Bleakwind Storm",
+    "slug": "bleakwind-storm",
+    "typeZh": "飞行"
+  },
+  "847": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Wildbolt Storm",
+    "nameZh": "Wildbolt Storm",
+    "slug": "wildbolt-storm",
+    "typeZh": "电"
+  },
+  "848": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Sandsear Storm",
+    "nameZh": "Sandsear Storm",
+    "slug": "sandsear-storm",
+    "typeZh": "地面"
+  },
+  "849": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Lunar Blessing",
+    "nameZh": "Lunar Blessing",
+    "slug": "lunar-blessing",
+    "typeZh": "超能力"
+  },
+  "85": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Thunderbolt",
+    "nameZh": "十万伏特",
+    "slug": "thunderbolt",
+    "typeZh": "电"
+  },
+  "850": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Take Heart",
+    "nameZh": "Take Heart",
+    "slug": "take-heart",
+    "typeZh": "超能力"
+  },
+  "851": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Tera Blast",
+    "nameZh": "Tera Blast",
+    "slug": "tera-blast",
+    "typeZh": "一般"
+  },
+  "852": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Silk Trap",
+    "nameZh": "Silk Trap",
+    "slug": "silk-trap",
+    "typeZh": "虫"
+  },
+  "853": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Axe Kick",
+    "nameZh": "Axe Kick",
+    "slug": "axe-kick",
+    "typeZh": "格斗"
+  },
+  "854": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Last Respects",
+    "nameZh": "Last Respects",
+    "slug": "last-respects",
+    "typeZh": "幽灵"
+  },
+  "855": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Lumina Crash",
+    "nameZh": "Lumina Crash",
+    "slug": "lumina-crash",
+    "typeZh": "超能力"
+  },
+  "856": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Order Up",
+    "nameZh": "Order Up",
+    "slug": "order-up",
+    "typeZh": "龙"
+  },
+  "857": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Jet Punch",
+    "nameZh": "Jet Punch",
+    "slug": "jet-punch",
+    "typeZh": "水"
+  },
+  "858": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Spicy Extract",
+    "nameZh": "Spicy Extract",
+    "slug": "spicy-extract",
+    "typeZh": "草"
+  },
+  "859": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Spin Out",
+    "nameZh": "Spin Out",
+    "slug": "spin-out",
+    "typeZh": "钢"
+  },
+  "86": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Thunder Wave",
+    "nameZh": "电磁波",
+    "slug": "thunder-wave",
+    "typeZh": "电"
+  },
+  "860": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Population Bomb",
+    "nameZh": "Population Bomb",
+    "slug": "population-bomb",
+    "typeZh": "一般"
+  },
+  "861": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ice Spinner",
+    "nameZh": "Ice Spinner",
+    "slug": "ice-spinner",
+    "typeZh": "冰"
+  },
+  "862": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Glaive Rush",
+    "nameZh": "Glaive Rush",
+    "slug": "glaive-rush",
+    "typeZh": "龙"
+  },
+  "863": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Revival Blessing",
+    "nameZh": "Revival Blessing",
+    "slug": "revival-blessing",
+    "typeZh": "一般"
+  },
+  "864": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Salt Cure",
+    "nameZh": "Salt Cure",
+    "slug": "salt-cure",
+    "typeZh": "岩石"
+  },
+  "865": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Triple Dive",
+    "nameZh": "Triple Dive",
+    "slug": "triple-dive",
+    "typeZh": "水"
+  },
+  "866": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mortal Spin",
+    "nameZh": "Mortal Spin",
+    "slug": "mortal-spin",
+    "typeZh": "毒"
+  },
+  "867": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Doodle",
+    "nameZh": "Doodle",
+    "slug": "doodle",
+    "typeZh": "一般"
+  },
+  "868": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Fillet Away",
+    "nameZh": "Fillet Away",
+    "slug": "fillet-away",
+    "typeZh": "一般"
+  },
+  "869": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Kowtow Cleave",
+    "nameZh": "Kowtow Cleave",
+    "slug": "kowtow-cleave",
+    "typeZh": "恶"
+  },
+  "87": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Thunder",
+    "nameZh": "打雷",
+    "slug": "thunder",
+    "typeZh": "电"
+  },
+  "870": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Flower Trick",
+    "nameZh": "Flower Trick",
+    "slug": "flower-trick",
+    "typeZh": "草"
+  },
+  "871": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Torch Song",
+    "nameZh": "Torch Song",
+    "slug": "torch-song",
+    "typeZh": "火"
+  },
+  "872": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aqua Step",
+    "nameZh": "Aqua Step",
+    "slug": "aqua-step",
+    "typeZh": "水"
+  },
+  "873": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Raging Bull",
+    "nameZh": "Raging Bull",
+    "slug": "raging-bull",
+    "typeZh": "一般"
+  },
+  "874": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Make It Rain",
+    "nameZh": "Make It Rain",
+    "slug": "make-it-rain",
+    "typeZh": "钢"
+  },
+  "875": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Psyblade",
+    "nameZh": "精神剑",
+    "slug": "psyblade",
+    "typeZh": "超能力"
+  },
+  "876": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Hydro Steam",
+    "nameZh": "水蒸气",
+    "slug": "hydro-steam",
+    "typeZh": "水"
+  },
+  "877": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Ruination",
+    "nameZh": "Ruination",
+    "slug": "ruination",
+    "typeZh": "恶"
+  },
+  "878": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Collision Course",
+    "nameZh": "Collision Course",
+    "slug": "collision-course",
+    "typeZh": "格斗"
+  },
+  "879": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Electro Drift",
+    "nameZh": "Electro Drift",
+    "slug": "electro-drift",
+    "typeZh": "电"
+  },
+  "88": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rock Throw",
+    "nameZh": "落石",
+    "slug": "rock-throw",
+    "typeZh": "岩石"
+  },
+  "880": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Shed Tail",
+    "nameZh": "Shed Tail",
+    "slug": "shed-tail",
+    "typeZh": "一般"
+  },
+  "881": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Chilly Reception",
+    "nameZh": "Chilly Reception",
+    "slug": "chilly-reception",
+    "typeZh": "冰"
+  },
+  "882": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Tidy Up",
+    "nameZh": "Tidy Up",
+    "slug": "tidy-up",
+    "typeZh": "一般"
+  },
+  "883": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Snowscape",
+    "nameZh": "Snowscape",
+    "slug": "snowscape",
+    "typeZh": "冰"
+  },
+  "884": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Pounce",
+    "nameZh": "Pounce",
+    "slug": "pounce",
+    "typeZh": "虫"
+  },
+  "885": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Trailblaze",
+    "nameZh": "Trailblaze",
+    "slug": "trailblaze",
+    "typeZh": "草"
+  },
+  "886": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Chilling Water",
+    "nameZh": "Chilling Water",
+    "slug": "chilling-water",
+    "typeZh": "水"
+  },
+  "887": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hyper Drill",
+    "nameZh": "Hyper Drill",
+    "slug": "hyper-drill",
+    "typeZh": "一般"
+  },
+  "888": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Twin Beam",
+    "nameZh": "Twin Beam",
+    "slug": "twin-beam",
+    "typeZh": "超能力"
+  },
+  "889": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rage Fist",
+    "nameZh": "Rage Fist",
+    "slug": "rage-fist",
+    "typeZh": "幽灵"
+  },
+  "89": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Earthquake",
+    "nameZh": "地震",
+    "slug": "earthquake",
+    "typeZh": "地面"
+  },
+  "890": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Armor Cannon",
+    "nameZh": "Armor Cannon",
+    "slug": "armor-cannon",
+    "typeZh": "火"
+  },
+  "891": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Bitter Blade",
+    "nameZh": "Bitter Blade",
+    "slug": "bitter-blade",
+    "typeZh": "火"
+  },
+  "892": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Double Shock",
+    "nameZh": "Double Shock",
+    "slug": "double-shock",
+    "typeZh": "电"
+  },
+  "893": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Gigaton Hammer",
+    "nameZh": "Gigaton Hammer",
+    "slug": "gigaton-hammer",
+    "typeZh": "钢"
+  },
+  "894": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Comeuppance",
+    "nameZh": "Comeuppance",
+    "slug": "comeuppance",
+    "typeZh": "恶"
+  },
+  "895": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Aqua Cutter",
+    "nameZh": "Aqua Cutter",
+    "slug": "aqua-cutter",
+    "typeZh": "水"
+  },
+  "896": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Blazing Torque",
+    "nameZh": "Blazing Torque",
+    "slug": "blazing-torque",
+    "typeZh": "火"
+  },
+  "897": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Wicked Torque",
+    "nameZh": "Wicked Torque",
+    "slug": "wicked-torque",
+    "typeZh": "恶"
+  },
+  "898": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Noxious Torque",
+    "nameZh": "Noxious Torque",
+    "slug": "noxious-torque",
+    "typeZh": "毒"
+  },
+  "899": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Combat Torque",
+    "nameZh": "Combat Torque",
+    "slug": "combat-torque",
+    "typeZh": "格斗"
+  },
+  "9": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Thunder Punch",
+    "nameZh": "雷电拳",
+    "slug": "thunder-punch",
+    "typeZh": "电"
+  },
+  "90": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Fissure",
+    "nameZh": "地裂",
+    "slug": "fissure",
+    "typeZh": "地面"
+  },
+  "900": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Magical Torque",
+    "nameZh": "Magical Torque",
+    "slug": "magical-torque",
+    "typeZh": "妖精"
+  },
+  "901": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Blood Moon",
+    "nameZh": "Blood Moon",
+    "slug": "blood-moon",
+    "typeZh": "一般"
+  },
+  "902": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Matcha Gotcha",
+    "nameZh": "Matcha Gotcha",
+    "slug": "matcha-gotcha",
+    "typeZh": "草"
+  },
+  "903": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Syrup Bomb",
+    "nameZh": "Syrup Bomb",
+    "slug": "syrup-bomb",
+    "typeZh": "草"
+  },
+  "904": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Ivy Cudgel",
+    "nameZh": "Ivy Cudgel",
+    "slug": "ivy-cudgel",
+    "typeZh": "草"
+  },
+  "905": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Electro Shot",
+    "nameZh": "电光束",
+    "slug": "electro-shot",
+    "typeZh": "电"
+  },
+  "906": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Tera Starstorm",
+    "nameZh": "晶光星群",
+    "slug": "tera-starstorm",
+    "typeZh": "一般"
+  },
+  "907": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Fickle Beam",
+    "nameZh": "随机光",
+    "slug": "fickle-beam",
+    "typeZh": "龙"
+  },
+  "908": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Burning Bulwark",
+    "nameZh": "火焰守护",
+    "slug": "burning-bulwark",
+    "typeZh": "火"
+  },
+  "909": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Thunderclap",
+    "nameZh": "迅雷",
+    "slug": "thunderclap",
+    "typeZh": "电"
+  },
+  "91": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Dig",
+    "nameZh": "挖洞",
+    "slug": "dig",
+    "typeZh": "地面"
+  },
+  "910": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Mighty Cleave",
+    "nameZh": "强刃攻击",
+    "slug": "mighty-cleave",
+    "typeZh": "岩石"
+  },
+  "911": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Tachyon Cutter",
+    "nameZh": "迅子利刃",
+    "slug": "tachyon-cutter",
+    "typeZh": "钢"
+  },
+  "912": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Hard Press",
+    "nameZh": "硬压",
+    "slug": "hard-press",
+    "typeZh": "钢"
+  },
+  "913": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Dragon Cheer",
+    "nameZh": "龙声鼓舞",
+    "slug": "dragon-cheer",
+    "typeZh": "龙"
+  },
+  "914": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Alluring Voice",
+    "nameZh": "魅诱之声",
+    "slug": "alluring-voice",
+    "typeZh": "妖精"
+  },
+  "915": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Temper Flare",
+    "nameZh": "豁出去",
+    "slug": "temper-flare",
+    "typeZh": "火"
+  },
+  "916": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Supercell Slam",
+    "nameZh": "闪电强袭",
+    "slug": "supercell-slam",
+    "typeZh": "电"
+  },
+  "917": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psychic Noise",
+    "nameZh": "精神噪音",
+    "slug": "psychic-noise",
+    "typeZh": "超能力"
+  },
+  "918": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Upper Hand",
+    "nameZh": "快手还击",
+    "slug": "upper-hand",
+    "typeZh": "格斗"
+  },
+  "919": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Malignant Chain",
+    "nameZh": "邪毒锁链",
+    "slug": "malignant-chain",
+    "typeZh": "毒"
+  },
+  "92": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Toxic",
+    "nameZh": "剧毒",
+    "slug": "toxic",
+    "typeZh": "毒"
+  },
+  "93": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Confusion",
+    "nameZh": "念力",
+    "slug": "confusion",
+    "typeZh": "超能力"
+  },
+  "94": {
+    "categoryEn": "special",
+    "categoryZh": "特殊",
+    "nameEn": "Psychic",
+    "nameZh": "精神强念",
+    "slug": "psychic",
+    "typeZh": "超能力"
+  },
+  "95": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Hypnosis",
+    "nameZh": "催眠术",
+    "slug": "hypnosis",
+    "typeZh": "超能力"
+  },
+  "96": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Meditate",
+    "nameZh": "瑜伽姿势",
+    "slug": "meditate",
+    "typeZh": "超能力"
+  },
+  "97": {
+    "categoryEn": "status",
+    "categoryZh": "变化",
+    "nameEn": "Agility",
+    "nameZh": "高速移动",
+    "slug": "agility",
+    "typeZh": "超能力"
+  },
+  "98": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Quick Attack",
+    "nameZh": "电光一闪",
+    "slug": "quick-attack",
+    "typeZh": "一般"
+  },
+  "99": {
+    "categoryEn": "physical",
+    "categoryZh": "物理",
+    "nameEn": "Rage",
+    "nameZh": "愤怒",
+    "slug": "rage",
+    "typeZh": "一般"
+  }
+}

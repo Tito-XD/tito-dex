@@ -1,0 +1,152 @@
+{
+  "adamant": {
+    "decreasedStatZh": "特攻",
+    "increasedStatZh": "攻击",
+    "nameEn": "Adamant",
+    "nameZh": "固执"
+  },
+  "bashful": {
+    "decreasedStatZh": "",
+    "increasedStatZh": "",
+    "nameEn": "Bashful",
+    "nameZh": "害羞"
+  },
+  "bold": {
+    "decreasedStatZh": "攻击",
+    "increasedStatZh": "防御",
+    "nameEn": "Bold",
+    "nameZh": "大胆"
+  },
+  "brave": {
+    "decreasedStatZh": "速度",
+    "increasedStatZh": "攻击",
+    "nameEn": "Brave",
+    "nameZh": "勇敢"
+  },
+  "calm": {
+    "decreasedStatZh": "攻击",
+    "increasedStatZh": "特防",
+    "nameEn": "Calm",
+    "nameZh": "温和"
+  },
+  "careful": {
+    "decreasedStatZh": "特攻",
+    "increasedStatZh": "特防",
+    "nameEn": "Careful",
+    "nameZh": "慎重"
+  },
+  "docile": {
+    "decreasedStatZh": "",
+    "increasedStatZh": "",
+    "nameEn": "Docile",
+    "nameZh": "坦率"
+  },
+  "gentle": {
+    "decreasedStatZh": "防御",
+    "increasedStatZh": "特防",
+    "nameEn": "Gentle",
+    "nameZh": "温顺"
+  },
+  "hardy": {
+    "decreasedStatZh": "",
+    "increasedStatZh": "",
+    "nameEn": "Hardy",
+    "nameZh": "勤奋"
+  },
+  "hasty": {
+    "decreasedStatZh": "防御",
+    "increasedStatZh": "速度",
+    "nameEn": "Hasty",
+    "nameZh": "急躁"
+  },
+  "impish": {
+    "decreasedStatZh": "特攻",
+    "increasedStatZh": "防御",
+    "nameEn": "Impish",
+    "nameZh": "淘气"
+  },
+  "jolly": {
+    "decreasedStatZh": "特攻",
+    "increasedStatZh": "速度",
+    "nameEn": "Jolly",
+    "nameZh": "爽朗"
+  },
+  "lax": {
+    "decreasedStatZh": "特防",
+    "increasedStatZh": "防御",
+    "nameEn": "Lax",
+    "nameZh": "乐天"
+  },
+  "lonely": {
+    "decreasedStatZh": "防御",
+    "increasedStatZh": "攻击",
+    "nameEn": "Lonely",
+    "nameZh": "怕寂寞"
+  },
+  "mild": {
+    "decreasedStatZh": "防御",
+    "increasedStatZh": "特攻",
+    "nameEn": "Mild",
+    "nameZh": "慢吞吞"
+  },
+  "modest": {
+    "decreasedStatZh": "攻击",
+    "increasedStatZh": "特攻",
+    "nameEn": "Modest",
+    "nameZh": "内敛"
+  },
+  "naive": {
+    "decreasedStatZh": "特防",
+    "increasedStatZh": "速度",
+    "nameEn": "Naive",
+    "nameZh": "天真"
+  },
+  "naughty": {
+    "decreasedStatZh": "特防",
+    "increasedStatZh": "攻击",
+    "nameEn": "Naughty",
+    "nameZh": "顽皮"
+  },
+  "quiet": {
+    "decreasedStatZh": "速度",
+    "increasedStatZh": "特攻",
+    "nameEn": "Quiet",
+    "nameZh": "冷静"
+  },
+  "quirky": {
+    "decreasedStatZh": "",
+    "increasedStatZh": "",
+    "nameEn": "Quirky",
+    "nameZh": "浮躁"
+  },
+  "rash": {
+    "decreasedStatZh": "特防",
+    "increasedStatZh": "特攻",
+    "nameEn": "Rash",
+    "nameZh": "马虎"
+  },
+  "relaxed": {
+    "decreasedStatZh": "速度",
+    "increasedStatZh": "防御",
+    "nameEn": "Relaxed",
+    "nameZh": "悠闲"
+  },
+  "sassy": {
+    "decreasedStatZh": "速度",
+    "increasedStatZh": "特防",
+    "nameEn": "Sassy",
+    "nameZh": "自大"
+  },
+  "serious": {
+    "decreasedStatZh": "",
+    "increasedStatZh": "",
+    "nameEn": "Serious",
+    "nameZh": "认真"
+  },
+  "timid": {
+    "decreasedStatZh": "攻击",
+    "increasedStatZh": "速度",
+    "nameEn": "Timid",
+    "nameZh": "胆小"
+  }
+}

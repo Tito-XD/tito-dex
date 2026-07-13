@@ -25,6 +25,14 @@ import requests
 import zstandard as zstd
 from PIL import Image
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+
+try:
+    from location_zh_resolver import resolve_location_area_zh  # noqa: E402
+except ImportError:
+    resolve_location_area_zh = None  # type: ignore[assignment]
+
 POKEAPI_BASE = "https://pokeapi.co/api/v2"
 TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
@@ -668,9 +676,47 @@ def parse_pokedex_numbers(entries: list[dict[str, Any]]) -> dict[str, int]:
     return result
 
 
+def _load_location_area_catalog() -> dict[str, str]:
+    catalog_path = ROOT / "data" / "l10n" / "zh" / "location_areas.json"
+    if not catalog_path.is_file():
+        return {}
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    labels: dict[str, str] = {}
+    for slug, entry in data.items():
+        if not isinstance(entry, dict):
+            continue
+        label = entry.get("labelZh")
+        if not label:
+            continue
+        labels[slug] = label
+        area_id = entry.get("id")
+        if area_id:
+            labels[str(area_id)] = label
+    return labels
+
+
+_LOCATION_AREA_CATALOG: dict[str, str] | None = None
+_LOCATION_AREA_ID_TO_SLUG: dict[str, str] = {}
+
+
 def encounter_area_label_zh(slug: str) -> str:
+    global _LOCATION_AREA_CATALOG, _LOCATION_AREA_ID_TO_SLUG
+    if _LOCATION_AREA_CATALOG is None:
+        _LOCATION_AREA_CATALOG = _load_location_area_catalog()
+        catalog_path = ROOT / "data" / "l10n" / "zh" / "location_areas.json"
+        if catalog_path.is_file():
+            data = json.loads(catalog_path.read_text(encoding="utf-8"))
+            for entry_slug, entry in data.items():
+                if isinstance(entry, dict) and entry.get("id"):
+                    _LOCATION_AREA_ID_TO_SLUG[str(entry["id"])] = entry_slug
+
+    if slug in _LOCATION_AREA_CATALOG:
+        return _LOCATION_AREA_CATALOG[slug]
     if slug in ENCOUNTER_AREA_LABELS_ZH:
         return ENCOUNTER_AREA_LABELS_ZH[slug]
+    if resolve_location_area_zh is not None:
+        label, _source = resolve_location_area_zh(slug)
+        return label
     route_match = re.match(r"^route-(\d+)-", slug)
     if route_match:
         return f"{route_match.group(1)}号道路"
@@ -716,7 +762,12 @@ def fetch_version_obtain_locations(
         area_url = (encounter.get("location_area") or {}).get("url")
         if not area_url:
             continue
-        slug = area_url.rstrip("/").split("/")[-1]
+        raw_slug = area_url.rstrip("/").split("/")[-1]
+        if _LOCATION_AREA_CATALOG is None:
+            encounter_area_label_zh(raw_slug)
+        slug = raw_slug
+        if slug.isdigit():
+            slug = _LOCATION_AREA_ID_TO_SLUG.get(slug, slug)
         min_level = 100
         max_chance = 0
         in_scope = False

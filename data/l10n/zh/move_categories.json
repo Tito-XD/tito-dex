@@ -1,0 +1,14 @@
+{
+  "physical": {
+    "nameEn": "physical",
+    "nameZh": "物理"
+  },
+  "special": {
+    "nameEn": "special",
+    "nameZh": "特殊"
+  },
+  "status": {
+    "nameEn": "status",
+    "nameZh": "变化"
+  }
+}

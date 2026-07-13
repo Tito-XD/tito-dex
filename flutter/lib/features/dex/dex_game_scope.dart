@@ -3,6 +3,7 @@ library;
 
 import '../parser/hgss_map_lookup.dart';
 import 'dex_models.dart';
+import '../../l10n/zh_catalog.dart';
 
 const hgssVersionGroup = 'heartgold-soulsilver';
 
@@ -67,13 +68,22 @@ String encounterAreaLabelZh(String slug) {
   return cleaned;
 }
 
-/// Resolves obtain-location labels from PokeAPI slugs or HGSS map ids.
+/// Resolves obtain-location labels from bundled catalog, PokeAPI slugs, or HGSS map ids.
 String resolveObtainAreaLabelZh(String areaSlug) {
+  final fromCatalog = zhCatalogLocationAreaLabel(areaSlug);
+  if (fromCatalog != null && fromCatalog.isNotEmpty) {
+    return fromCatalog;
+  }
+
   final fromTable = encounterAreaLabelsZh[areaSlug];
   if (fromTable != null) {
     return fromTable;
   }
   if (RegExp(r'^\d+$').hasMatch(areaSlug)) {
+    final fromHgssCatalog = zhCatalogHgssMapLabel(areaSlug);
+    if (fromHgssCatalog != null && fromHgssCatalog.isNotEmpty) {
+      return fromHgssCatalog;
+    }
     return locationLabelForMapId(int.parse(areaSlug));
   }
   final fallback = encounterAreaLabelZh(areaSlug);
