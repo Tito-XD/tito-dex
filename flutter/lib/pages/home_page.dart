@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/game/game_edition_repository.dart';
+import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
@@ -8,24 +10,22 @@ import '../theme/tito_buttons.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
 import '../widgets/trainer_card.dart';
-import '../widgets/continue_journey_card.dart';
+import '../widgets/journey_card.dart';
 import '../widgets/party_strip.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
     super.key,
     required this.journey,
-    required this.onContinue,
+    required this.onJourneyOpen,
     this.gameBadge = 'HGSS',
     this.onGameBadgeTap,
-    this.onAvatarTap,
   });
 
   final CurrentJourney journey;
-  final VoidCallback onContinue;
+  final VoidCallback onJourneyOpen;
   final String gameBadge;
   final void Function(BuildContext context)? onGameBadgeTap;
-  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +34,7 @@ class HomePage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final padding = DeviceLayout.pagePadding(context);
+    final saveLinked = gameEditionRepository.edition.isSaveLinked;
     final header = AppHeader(
       gameBadge: gameBadge,
       onGameBadgeTap: onGameBadgeTap == null
@@ -50,8 +51,8 @@ class HomePage extends StatelessWidget {
             Expanded(
               child: _SquareHomeLayout(
                 journey: journey,
-                onContinue: onContinue,
-                onAvatarTap: onAvatarTap,
+                saveLinked: saveLinked,
+                onJourneyOpen: onJourneyOpen,
               ),
             ),
           ],
@@ -67,8 +68,8 @@ class HomePage extends StatelessWidget {
           Expanded(
             child: _PortraitHomeLayout(
               journey: journey,
-              onContinue: onContinue,
-              onAvatarTap: onAvatarTap,
+              saveLinked: saveLinked,
+              onJourneyOpen: onJourneyOpen,
             ),
           ),
         ],
@@ -78,23 +79,23 @@ class HomePage extends StatelessWidget {
 }
 
 /// Portrait H4 layout:
-/// trainer card -> continue card -> horizontal party strip -> 2x2 quick grid.
+/// trainer card -> journey card (save-linked) -> party strip -> quick actions row.
 class _PortraitHomeLayout extends StatelessWidget {
   const _PortraitHomeLayout({
     required this.journey,
-    required this.onContinue,
-    this.onAvatarTap,
+    required this.saveLinked,
+    required this.onJourneyOpen,
   });
 
   final CurrentJourney journey;
-  final VoidCallback onContinue;
-  final VoidCallback? onAvatarTap;
+  final bool saveLinked;
+  final VoidCallback onJourneyOpen;
 
   @override
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
     final compact = DeviceLayout.isCompact(context);
-    final continueHeight = compact ? 228.0 : 292.0;
+    final journeyHeight = compact ? 108.0 : 132.0;
     final partyHeight = compact ? 126.0 : 154.0;
     final companionPad = compact ? 72.0 : 84.0;
 
@@ -107,25 +108,25 @@ class _PortraitHomeLayout extends StatelessWidget {
               journey: journey,
               compact: true,
               dense: true,
-              onAvatarTap: onAvatarTap,
             ),
-            SizedBox(height: gap),
-            SizedBox(
-              height: continueHeight,
-              child: ContinueJourneyCard(
-                journey: journey,
-                onContinue: onContinue,
-                compact: compact,
-                mergeContinue: true,
+            if (saveLinked) ...[
+              SizedBox(height: gap),
+              SizedBox(
+                height: journeyHeight,
+                child: JourneyCard(
+                  journey: journey,
+                  onOpenDetail: onJourneyOpen,
+                  compact: compact,
+                ),
               ),
-            ),
+            ],
             SizedBox(height: gap),
             SizedBox(
               height: partyHeight,
               child: PartyStrip(party: journey.party, compact: compact),
             ),
             SizedBox(height: gap),
-            _QuickActionsGrid(dense: compact, polaroid: false),
+            _QuickActionsGrid(dense: compact),
             SizedBox(height: companionPad),
           ],
         );
@@ -140,17 +141,17 @@ class _PortraitHomeLayout extends StatelessWidget {
 }
 
 /// Square / 4:3 / 3:4 handheld layout (H5):
-/// [ Trainer + Continue | Party ] + square quick actions.
+/// [ Trainer (+ Journey) | Party ] + square quick actions.
 class _SquareHomeLayout extends StatelessWidget {
   const _SquareHomeLayout({
     required this.journey,
-    required this.onContinue,
-    this.onAvatarTap,
+    required this.saveLinked,
+    required this.onJourneyOpen,
   });
 
   final CurrentJourney journey;
-  final VoidCallback onContinue;
-  final VoidCallback? onAvatarTap;
+  final bool saveLinked;
+  final VoidCallback onJourneyOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -173,19 +174,18 @@ class _SquareHomeLayout extends StatelessWidget {
                       compact: true,
                       dense: true,
                       micro: true,
-                      onAvatarTap: onAvatarTap,
                     ),
-                    SizedBox(height: gap),
-                    Expanded(
-                      child: ContinueJourneyCard(
-                        journey: journey,
-                        onContinue: onContinue,
-                        compact: true,
-                        dense: true,
-                        mergeContinue: true,
-                        showIllustration: false,
+                    if (saveLinked) ...[
+                      SizedBox(height: gap),
+                      Expanded(
+                        child: JourneyCard(
+                          journey: journey,
+                          onOpenDetail: onJourneyOpen,
+                          compact: true,
+                          dense: true,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -249,47 +249,30 @@ void _openRoute(BuildContext context, String route) {
 }
 
 class _QuickActionsGrid extends StatelessWidget {
-  const _QuickActionsGrid({required this.dense, required this.polaroid});
+  const _QuickActionsGrid({required this.dense});
 
   final bool dense;
-  final bool polaroid;
 
   @override
   Widget build(BuildContext context) {
     final actions = _quickActions();
-    final rotations = const [-2.5, 2.0, 1.5, -1.75];
+    final gap = dense ? 6.0 : 10.0;
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: actions.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: dense ? 6 : 10,
-        mainAxisSpacing: dense ? 6 : 10,
-        childAspectRatio: polaroid ? 1.2 : 1.85,
-      ),
-      itemBuilder: (context, index) {
-        final action = actions[index];
-        if (polaroid) {
-          return TitoPolaroidQuickTile(
-            label: action.label,
-            icon: action.icon,
-            onTap: () => _openRoute(context, action.route),
-            tone: action.tone,
-            compact: dense,
-            tiltDegrees: rotations[index],
-          );
-        }
-
-        return TitoQuickTile(
-          label: action.label,
-          icon: action.icon,
-          onTap: () => _openRoute(context, action.route),
-          compact: true,
-          dense: dense,
-        );
-      },
+    return Row(
+      children: [
+        for (var index = 0; index < actions.length; index++) ...[
+          if (index > 0) SizedBox(width: gap),
+          Expanded(
+            child: TitoQuickTile(
+              label: actions[index].label,
+              icon: actions[index].icon,
+              onTap: () => _openRoute(context, actions[index].route),
+              compact: true,
+              dense: dense,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -301,12 +284,6 @@ List<_QuickAction> _quickActions() {
       icon: Icons.groups_rounded,
       route: '/team',
       tone: TitoPolaroidTone.blue,
-    ),
-    _QuickAction(
-      label: AppZh.navJourney,
-      icon: Icons.map_rounded,
-      route: '/journey',
-      tone: TitoPolaroidTone.yellow,
     ),
     _QuickAction(
       label: AppZh.navDex,

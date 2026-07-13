@@ -4,6 +4,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/journey_timeline.dart';
@@ -11,9 +12,14 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 
 class JourneyPage extends StatelessWidget {
-  const JourneyPage({super.key, required this.journey});
+  const JourneyPage({
+    super.key,
+    required this.journey,
+    this.onLaunchEmulator,
+  });
 
   final CurrentJourney journey;
+  final VoidCallback? onLaunchEmulator;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +28,26 @@ class JourneyPage extends StatelessWidget {
       child: SecondaryPageScaffold(
         title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
         children: [
+        if (onLaunchEmulator != null) ...[
+          StickerCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppZh.emulatorContinueHint,
+                  style: SecondaryTypography.onCard.h15,
+                ),
+                const SizedBox(height: 12),
+                TitoPrimaryButton(
+                  label: AppZh.continueButton,
+                  onPressed: onLaunchEmulator,
+                  expanded: true,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+        ],
         StickerCard(
           variant: StickerVariant.deep,
           child: Column(

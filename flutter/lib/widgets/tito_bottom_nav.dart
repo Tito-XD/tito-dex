@@ -13,7 +13,6 @@ class TitoBottomNav extends StatelessWidget {
 
   static const _routes = [
     _NavSpec('/team', AppZh.navTeam, Icons.groups_rounded),
-    _NavSpec('/journey', AppZh.navJourney, Icons.map_rounded),
     _NavSpec('/', AppZh.navHome, Icons.pets_rounded, center: true),
     _NavSpec('/dex', AppZh.navDex, Icons.grid_view_rounded),
     _NavSpec('/search', AppZh.navSearch, Icons.search_rounded),
