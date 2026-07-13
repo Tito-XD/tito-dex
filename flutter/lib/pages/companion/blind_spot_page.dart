@@ -35,6 +35,10 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
   List<String> _attackerTypes = const ['grass'];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  bool _defenderTerastallized = false;
+  String? _defenderTeraType;
+  bool _attackerTerastallized = false;
+  String? _attackerTeraType;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
@@ -96,6 +100,10 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
       _defenderAbilityOptions = const [];
       _defenderAbilitySlug = null;
       _attackerAbilitySlug = null;
+      _defenderTerastallized = false;
+      _defenderTeraType = defaultTeraTypeFor(summary.types, 9);
+      _attackerTerastallized = false;
+      _attackerTeraType = defaultTeraTypeFor(summary.types, 9);
     });
     _loadAbilities(summary.id);
   }
@@ -133,6 +141,10 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
       defenderAbilitySlug: _defenderAbilitySlug,
       attackerAbilitySlug: _attackerAbilitySlug,
       generation: generation,
+      defenderTerastallized: _defenderTerastallized,
+      defenderTeraType: _defenderTeraType,
+      attackerTerastallized: _attackerTerastallized,
+      attackerTeraType: _attackerTeraType,
     );
   }
 
@@ -215,10 +227,28 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                               _defenderTypes = types;
                               _defenderAbilityOptions = const [];
                               _defenderAbilitySlug = null;
+                              _defenderTeraType =
+                                  defaultTeraTypeFor(types, generation);
                             });
                           }
                         },
                       ),
+                      if (generation >= 9) ...[
+                        const SizedBox(height: 12),
+                        TerastalPicker(
+                          label: AppZh.companionDefenderTerastal,
+                          enabled: true,
+                          terastallized: _defenderTerastallized,
+                          teraType: _defenderTeraType,
+                          fallbackTypes: _defenderTypes,
+                          generation: generation,
+                          onTerastallizedChanged: (value) => setState(
+                            () => _defenderTerastallized = value,
+                          ),
+                          onTeraTypeChanged: (type) =>
+                              setState(() => _defenderTeraType = type),
+                        ),
+                      ],
                       if (_defenderAbilityOptions.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         DefensiveAbilityPicker(
@@ -258,6 +288,22 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                         onChanged: (slug) =>
                             setState(() => _attackerAbilitySlug = slug),
                       ),
+                      if (generation >= 9) ...[
+                        const SizedBox(height: 12),
+                        TerastalPicker(
+                          label: AppZh.companionAttackerTerastal,
+                          enabled: true,
+                          terastallized: _attackerTerastallized,
+                          teraType: _attackerTeraType,
+                          fallbackTypes: _attackerTypes,
+                          generation: generation,
+                          onTerastallizedChanged: (value) => setState(
+                            () => _attackerTerastallized = value,
+                          ),
+                          onTeraTypeChanged: (type) =>
+                              setState(() => _attackerTeraType = type),
+                        ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -269,6 +315,8 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                         relations,
                         generation: generation,
                         attackerAbilitySlug: _attackerAbilitySlug,
+                        attackerTerastallized: _attackerTerastallized,
+                        attackerTeraType: _attackerTeraType,
                       );
                       final defensive =
                           computeDefensiveBlindSpots(input);

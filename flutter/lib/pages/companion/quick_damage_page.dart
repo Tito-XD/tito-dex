@@ -44,6 +44,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   List<String> _defenderTypes = const ['normal'];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  bool _defenderTerastallized = false;
+  String? _defenderTeraType;
+  bool _attackerTerastallized = false;
+  String? _attackerTeraType;
+  BattleHeldItem _heldItem = BattleHeldItem.none;
+  String? _typeBoostItemType;
+  BattleStatusCondition _attackerStatus = BattleStatusCondition.none;
+  bool _isContactMove = false;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   FieldCondition _weather = FieldCondition.none;
   TerrainCondition _terrain = TerrainCondition.none;
@@ -132,11 +140,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     if (!mounted) {
       return;
     }
+    final generation =
+        battleScopeForEdition(gameEditionRepository.edition).generation;
     setState(() {
       _attackerTypes = List<String>.from(summary.types);
       _attackController.text = attackStat.toString();
       _attackerSuggestions = const [];
       _attackerQueryController.text = summary.nameZh;
+      _attackerTeraType = defaultTeraTypeFor(summary.types, generation);
     });
   }
 
@@ -170,6 +181,10 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _defenderAbilityOptions = abilityOptions;
       _defenderAbilitySlug =
           abilityOptions.length == 1 ? abilityOptions.first.slug : null;
+      _defenderTeraType = defaultTeraTypeFor(
+        summary.types,
+        battleScopeForEdition(gameEditionRepository.edition).generation,
+      );
     });
   }
 
@@ -202,6 +217,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             weatherSlug: _weather.slug.isEmpty ? null : _weather.slug,
             terrainSlug: _terrain.slug.isEmpty ? null : _terrain.slug,
             category: _category,
+            defenderTerastallized: _defenderTerastallized,
+            defenderTeraType: _defenderTeraType,
+            attackerTerastallized: _attackerTerastallized,
+            attackerTeraType: _attackerTeraType,
+            attackerHeldItem: _heldItem,
+            typeBoostItemType: _typeBoostItemType,
+            attackerStatus: _attackerStatus,
+            isContactMove: _isContactMove,
           );
         }
 
@@ -334,10 +357,40 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                         _defenderTypes = types;
                         _defenderAbilityOptions = const [];
                         _defenderAbilitySlug = null;
+                        _defenderTeraType =
+                            defaultTeraTypeFor(types, scope.generation);
                       });
                     }
                   },
                 ),
+                if (scope.generation >= 9) ...[
+                  const SizedBox(height: 12),
+                  TerastalPicker(
+                    label: AppZh.companionDefenderTerastal,
+                    enabled: true,
+                    terastallized: _defenderTerastallized,
+                    teraType: _defenderTeraType,
+                    fallbackTypes: _defenderTypes,
+                    generation: scope.generation,
+                    onTerastallizedChanged: (value) =>
+                        setState(() => _defenderTerastallized = value),
+                    onTeraTypeChanged: (type) =>
+                        setState(() => _defenderTeraType = type),
+                  ),
+                  const SizedBox(height: 12),
+                  TerastalPicker(
+                    label: AppZh.companionAttackerTerastal,
+                    enabled: true,
+                    terastallized: _attackerTerastallized,
+                    teraType: _attackerTeraType,
+                    fallbackTypes: _attackerTypes,
+                    generation: scope.generation,
+                    onTerastallizedChanged: (value) =>
+                        setState(() => _attackerTerastallized = value),
+                    onTeraTypeChanged: (type) =>
+                        setState(() => _attackerTeraType = type),
+                  ),
+                ],
                 if (_defenderAbilityOptions.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   DefensiveAbilityPicker(
@@ -375,6 +428,25 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   label: AppZh.companionTerrainPick,
                   selected: _terrain,
                   onChanged: (value) => setState(() => _terrain = value),
+                ),
+                const SizedBox(height: 12),
+                HeldItemPicker(
+                  selected: _heldItem,
+                  onChanged: (value) => setState(() => _heldItem = value),
+                  typeBoostItemType: _typeBoostItemType,
+                  onTypeBoostChanged: (type) =>
+                      setState(() => _typeBoostItemType = type),
+                ),
+                const SizedBox(height: 12),
+                StatusConditionPicker(
+                  selected: _attackerStatus,
+                  onChanged: (value) =>
+                      setState(() => _attackerStatus = value),
+                ),
+                const SizedBox(height: 12),
+                ContactMoveToggle(
+                  value: _isContactMove,
+                  onChanged: (value) => setState(() => _isContactMove = value),
                 ),
                 const SizedBox(height: 12),
                 CompanionNumberField(
@@ -470,7 +542,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                     Text(
                       AppZh.companionDamageModifiers(
                         formatTypeMultiplier(estimate.typeMultiplier),
-                        estimate.stabMultiplier == 1.5 ? '1.5' : '1',
+                        estimate.stabMultiplier == 1.0
+                            ? '1'
+                            : estimate.stabMultiplier.toStringAsFixed(1),
                       ),
                       style: SecondaryTypography.onCard.small12.copyWith(
                         color: TitoColors.mutedInk,
