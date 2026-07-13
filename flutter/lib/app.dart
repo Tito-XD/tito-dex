@@ -574,7 +574,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
 
     return MaterialApp.router(
-      title: AppZh.appTitle,
+      title: AppZh.displayTitleForTrainer(_journey.trainerName),
       theme: buildTitoTheme(),
       builder: (context, child) {
         return SystemUiCoordinator(
