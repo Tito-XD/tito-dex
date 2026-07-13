@@ -7,6 +7,7 @@ class PartyMember {
     this.currentHp,
     this.maxHp,
     this.experience,
+    this.userEdited = false,
   });
 
   final String species;
@@ -16,6 +17,7 @@ class PartyMember {
   final int? currentHp;
   final int? maxHp;
   final int? experience;
+  final bool userEdited;
 
   Map<String, dynamic> toJson() => {
         'species': species,
@@ -25,6 +27,7 @@ class PartyMember {
         if (currentHp != null) 'currentHp': currentHp,
         if (maxHp != null) 'maxHp': maxHp,
         if (experience != null) 'experience': experience,
+        if (userEdited) 'userEdited': true,
       };
 
   factory PartyMember.fromJson(Map<String, dynamic> json) => PartyMember(
@@ -35,7 +38,30 @@ class PartyMember {
         currentHp: json['currentHp'] as int?,
         maxHp: json['maxHp'] as int?,
         experience: json['experience'] as int?,
+        userEdited: json['userEdited'] as bool? ?? false,
       );
+
+  PartyMember copyWith({
+    String? species,
+    int? speciesId,
+    int? level,
+    String? nickname,
+    int? currentHp,
+    int? maxHp,
+    int? experience,
+    bool? userEdited,
+  }) {
+    return PartyMember(
+      species: species ?? this.species,
+      speciesId: speciesId ?? this.speciesId,
+      level: level ?? this.level,
+      nickname: nickname ?? this.nickname,
+      currentHp: currentHp ?? this.currentHp,
+      maxHp: maxHp ?? this.maxHp,
+      experience: experience ?? this.experience,
+      userEdited: userEdited ?? this.userEdited,
+    );
+  }
 }
 
 class JourneyTimelineEntry {
@@ -82,6 +108,10 @@ class CurrentJourney {
     this.saveDexCaughtIds = const [],
     this.saveDexSeenIds = const [],
     this.saveDexHash,
+    this.manualDexSeenIds = const [],
+    this.manualDexCaughtIds = const [],
+    this.saveSyncedParty = const [],
+    this.partyUserOverride = false,
   });
 
   final String game;
@@ -101,6 +131,34 @@ class CurrentJourney {
   final List<int> saveDexCaughtIds;
   final List<int> saveDexSeenIds;
   final String? saveDexHash;
+  final List<int> manualDexSeenIds;
+  final List<int> manualDexCaughtIds;
+  /// Last party parsed from save (for diff banner).
+  final List<PartyMember> saveSyncedParty;
+  final bool partyUserOverride;
+
+  bool get partyDiffersFromSave {
+    if (!partyUserOverride || saveSyncedParty.isEmpty) {
+      return false;
+    }
+    return !_partyListsEqual(party, saveSyncedParty);
+  }
+
+  static bool _partyListsEqual(List<PartyMember> a, List<PartyMember> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      final left = a[i];
+      final right = b[i];
+      if (left.speciesId != right.speciesId ||
+          left.species != right.species ||
+          left.level != right.level) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   CurrentJourney copyWith({
     String? game,
@@ -120,6 +178,10 @@ class CurrentJourney {
     List<int>? saveDexCaughtIds,
     List<int>? saveDexSeenIds,
     String? saveDexHash,
+    List<int>? manualDexSeenIds,
+    List<int>? manualDexCaughtIds,
+    List<PartyMember>? saveSyncedParty,
+    bool? partyUserOverride,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -141,6 +203,10 @@ class CurrentJourney {
       saveDexCaughtIds: saveDexCaughtIds ?? this.saveDexCaughtIds,
       saveDexSeenIds: saveDexSeenIds ?? this.saveDexSeenIds,
       saveDexHash: saveDexHash ?? this.saveDexHash,
+      manualDexSeenIds: manualDexSeenIds ?? this.manualDexSeenIds,
+      manualDexCaughtIds: manualDexCaughtIds ?? this.manualDexCaughtIds,
+      saveSyncedParty: saveSyncedParty ?? this.saveSyncedParty,
+      partyUserOverride: partyUserOverride ?? this.partyUserOverride,
     );
   }
 
@@ -163,6 +229,13 @@ class CurrentJourney {
           'saveDexCaughtIds': saveDexCaughtIds,
         if (saveDexSeenIds.isNotEmpty) 'saveDexSeenIds': saveDexSeenIds,
         if (saveDexHash != null) 'saveDexHash': saveDexHash,
+        if (manualDexSeenIds.isNotEmpty) 'manualDexSeenIds': manualDexSeenIds,
+        if (manualDexCaughtIds.isNotEmpty)
+          'manualDexCaughtIds': manualDexCaughtIds,
+        if (saveSyncedParty.isNotEmpty)
+          'saveSyncedParty':
+              saveSyncedParty.map((m) => m.toJson()).toList(growable: false),
+        if (partyUserOverride) 'partyUserOverride': true,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -195,6 +268,18 @@ class CurrentJourney {
             .map((value) => (value as num).toInt())
             .toList(),
         saveDexHash: json['saveDexHash'] as String?,
+        manualDexSeenIds:
+            (json['manualDexSeenIds'] as List<dynamic>? ?? const [])
+                .map((value) => (value as num).toInt())
+                .toList(),
+        manualDexCaughtIds:
+            (json['manualDexCaughtIds'] as List<dynamic>? ?? const [])
+                .map((value) => (value as num).toInt())
+                .toList(),
+        saveSyncedParty: (json['saveSyncedParty'] as List<dynamic>? ?? const [])
+            .map((item) => PartyMember.fromJson(item as Map<String, dynamic>))
+            .toList(),
+        partyUserOverride: json['partyUserOverride'] as bool? ?? false,
       );
 
   static CurrentJourney mock() => const CurrentJourney(
