@@ -64,6 +64,31 @@ DEFAULT_SLUG_OVERRIDES: dict[str, str] = {
     "cliff-edge-gate-area": "断崖门",
     "battle-frontier-area": "对战开拓区",
     "safari-zone-gate-area": "狩猎地带入口",
+    "pokemon-tower-area": "宝可梦塔",
+    "pokemon-mansion-area": "宝可梦屋",
+    "ss-anne-area": "圣特安努号",
+    "mt-ember-area": "灯火山",
+    "magma-hideout-area": "岩浆团藏身处",
+    "one-island-area": "1岛",
+    "two-island-area": "2岛",
+    "three-island-area": "3岛",
+    "four-island-area": "4岛",
+    "five-island-area": "5岛",
+    "six-island-area": "6岛",
+    "seven-island-area": "7岛",
+    "twinleaf-town-area": "双叶镇",
+    "celestic-town-area": "神和镇",
+    "solaceon-town-area": "随意镇",
+    "canalave-city-area": "水脉市",
+    "pastoria-city-area": "湿原市",
+    "sunyshore-city-area": "滨海市",
+    "snowpoint-city-area": "雪峰市",
+    "veilstone-city-area": "帷幕市",
+    "eterna-city-area": "百代市",
+    "hearthome-city-area": "家缘市",
+    "jubilife-city-area": "祝祝市",
+    "oreburgh-city-area": "黑金市",
+    "floaroma-town-area": "百代镇",
 }
 
 # English place name → 中文 (HGSS / Kanto–Johto + common cross-gen locations).
@@ -397,7 +422,10 @@ def _format_floor(floor: str) -> str:
 
 
 def _route_from_slug(slug: str) -> str | None:
-    match = re.match(r"^route-(\d+)-", slug)
+    sea = re.search(r"sea-route-(\d+)", slug)
+    if sea:
+        return f"{sea.group(1)}号水路"
+    match = re.search(r"route-(\d+)", slug)
     if match:
         return f"{match.group(1)}号道路"
     return None
@@ -491,6 +519,18 @@ def resolve_location_area_zh(
     """Return (label_zh, source) where source explains resolution tier."""
     slug_overrides = slug_overrides or load_slug_overrides()
     names_en_zh = names_en_zh or load_location_names_en_zh()
+
+    if slug.endswith("-underwater"):
+        base_slug = slug[: -len("-underwater")]
+        label, source = resolve_location_area_zh(
+            base_slug,
+            area_name_en=area_name_en,
+            location_name_en=location_name_en,
+            slug_overrides=slug_overrides,
+            names_en_zh=names_en_zh,
+        )
+        if source not in {"english_fallback", "slug_title", "slug_title_name"}:
+            return f"{label}（水下）", f"{source}_underwater"
 
     if slug in slug_overrides:
         return slug_overrides[slug], "slug_override"

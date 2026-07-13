@@ -72,233 +72,233 @@
   "alola-route-1-east": {
     "areaNameEn": "alola-route-1-east",
     "id": "1035",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-1-hauoli-outskirts": {
     "areaNameEn": "alola-route-1-hauoli-outskirts",
     "id": "1036",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-1-south": {
     "areaNameEn": "alola-route-1-south",
     "id": "1037",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-1-trainers-school": {
     "areaNameEn": "alola-route-1-trainers-school",
     "id": "1038",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-1-west": {
     "areaNameEn": "alola-route-1-west",
     "id": "1039",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-10-area": {
     "areaNameEn": "alola-route-10-area",
     "id": "1055",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-11-area": {
     "areaNameEn": "alola-route-11-area",
     "id": "1056",
     "labelZh": "11号道路",
     "locationNameEn": "Route 11",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-12-area": {
     "areaNameEn": "alola-route-12-area",
     "id": "1057",
     "labelZh": "12号道路",
     "locationNameEn": "Route 12",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-13-area": {
     "areaNameEn": "alola-route-13-area",
     "id": "1058",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-14-area": {
     "areaNameEn": "alola-route-14-area",
     "id": "1059",
     "labelZh": "14号道路",
     "locationNameEn": "Route 14",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-15-aether-house": {
     "areaNameEn": "alola-route-15-aether-house",
     "id": "1061",
     "labelZh": "15号道路",
     "locationNameEn": "Route 15",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-15-main": {
     "areaNameEn": "alola-route-15-main",
     "id": "1060",
     "labelZh": "15号道路",
     "locationNameEn": "Route 15",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-16-east": {
     "areaNameEn": "alola-route-16-east",
     "id": "1063",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-16-main": {
     "areaNameEn": "alola-route-16-main",
     "id": "1062",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-16-west": {
     "areaNameEn": "alola-route-16-west",
     "id": "1064",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-17-all-areas": {
     "areaNameEn": "alola-route-17-all-areas",
     "id": "1164",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-17-northeast": {
     "areaNameEn": "alola-route-17-northeast",
     "id": "1065",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-17-west": {
     "areaNameEn": "alola-route-17-west",
     "id": "1066",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-2-main": {
     "areaNameEn": "alola-route-2-main",
     "id": "1040",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-2-north": {
     "areaNameEn": "alola-route-2-north",
     "id": "1041",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-2-south": {
     "areaNameEn": "alola-route-2-south",
     "id": "1042",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-3-main": {
     "areaNameEn": "alola-route-3-main",
     "id": "1043",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-3-north": {
     "areaNameEn": "alola-route-3-north",
     "id": "1044",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-3-south": {
     "areaNameEn": "alola-route-3-south",
     "id": "1045",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-4-area": {
     "areaNameEn": "alola-route-4-area",
     "id": "1046",
-    "labelZh": "Route 4",
+    "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "alola-route-5-area": {
     "areaNameEn": "alola-route-5-area",
     "id": "1047",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-6-north": {
     "areaNameEn": "alola-route-6-north",
     "id": "1048",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-6-south": {
     "areaNameEn": "alola-route-6-south",
     "id": "1049",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-7-area": {
     "areaNameEn": "alola-route-7-area",
     "id": "1050",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-8-fossil-restoration-center": {
     "areaNameEn": "alola-route-8-fossil-restoration-center",
     "id": "1052",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-8-main": {
     "areaNameEn": "alola-route-8-main",
     "id": "1051",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-9-main": {
     "areaNameEn": "alola-route-9-main",
     "id": "1053",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "alola-route-9-police-station": {
     "areaNameEn": "alola-route-9-police-station",
     "id": "1054",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "altar-of-the-moone-area": {
     "areaNameEn": "altar-of-the-moone-area",
@@ -576,9 +576,9 @@
   "bond-bridge-area": {
     "areaNameEn": "Bond Bridge",
     "id": "515",
-    "labelZh": "Bond Bridge",
+    "labelZh": "纽带桥",
     "locationNameEn": "Bond Bridge",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "bonechill-wastes-area": {
     "areaNameEn": "bonechill-wastes-area",
@@ -655,7 +655,7 @@
     "id": "1",
     "labelZh": "水脉市",
     "locationNameEn": "Canalave City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "canyon-entrance-area": {
     "areaNameEn": "Canyon Entrance",
@@ -667,9 +667,9 @@
   "cape-brink-area": {
     "areaNameEn": "Cape Brink",
     "id": "514",
-    "labelZh": "Cape Brink",
+    "labelZh": "布林克角",
     "locationNameEn": "Cape Brink",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "castaway-shore-area": {
     "areaNameEn": "castaway-shore-area",
@@ -802,7 +802,7 @@
     "id": "178",
     "labelZh": "神和镇",
     "locationNameEn": "Celestic Town",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "celestica-ruins-area": {
     "areaNameEn": "celestica-ruins-area",
@@ -863,23 +863,23 @@
   "challengers-cave-1f": {
     "areaNameEn": "Challengers Cave (1F)",
     "id": "640",
-    "labelZh": "Challenger's Cave",
+    "labelZh": "挑战者洞窟",
     "locationNameEn": "Challenger's Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "challengers-cave-b1f": {
     "areaNameEn": "Challengers Cave (B1F)",
     "id": "641",
-    "labelZh": "Challenger's Cave",
+    "labelZh": "挑战者洞窟",
     "locationNameEn": "Challenger's Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "challengers-cave-b2f": {
     "areaNameEn": "Challengers Cave (B2F)",
     "id": "642",
-    "labelZh": "Challenger's Cave",
+    "labelZh": "挑战者洞窟",
     "locationNameEn": "Challenger's Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "chargestone-cave-1f": {
     "areaNameEn": "Chargestone Cave (1F)",
@@ -954,72 +954,72 @@
   "cipher-key-lair-1f": {
     "areaNameEn": "Cipher Key Lair 1F",
     "id": "1277",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-2f": {
     "areaNameEn": "Cipher Key Lair 2F",
     "id": "1278",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-3f": {
     "areaNameEn": "Cipher Key Lair 3F",
     "id": "1279",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-4f": {
     "areaNameEn": "Cipher Key Lair 4F",
     "id": "1280",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-5f": {
     "areaNameEn": "Cipher Key Lair 5F",
     "id": "1282",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-outside": {
     "areaNameEn": "Cipher Key Lair (Outside)",
     "id": "1276",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-key-lair-roof": {
     "areaNameEn": "Cipher Key Lair Roof",
     "id": "1281",
-    "labelZh": "Cipher Key Lair",
+    "labelZh": "密键藏身处",
     "locationNameEn": "Cipher Key Lair",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-lab-bf1": {
     "areaNameEn": "Cipher Lab B1F",
     "id": "1269",
-    "labelZh": "Cipher Lab",
+    "labelZh": "密键研究所",
     "locationNameEn": "Cipher Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-lab-bf2": {
     "areaNameEn": "Cipher Lab B2F",
     "id": "1268",
-    "labelZh": "Cipher Lab",
+    "labelZh": "密键研究所",
     "locationNameEn": "Cipher Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "cipher-lab-outside": {
     "areaNameEn": "Cipher Lab (Outside)",
     "id": "1267",
-    "labelZh": "Cipher Lab",
+    "labelZh": "密键研究所",
     "locationNameEn": "Cipher Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "circhester-area": {
     "areaNameEn": "Circhester",
@@ -1031,72 +1031,72 @@
   "citadark-isle-1f": {
     "areaNameEn": "Citadark Isle 1F",
     "id": "1284",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-2f": {
     "areaNameEn": "Citadark Isle 2F",
     "id": "1286",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-3f": {
     "areaNameEn": "Citadark Isle 3F",
     "id": "1287",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-6f": {
     "areaNameEn": "Citadark Isle 6F",
     "id": "1288",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-bf1": {
     "areaNameEn": "Citadark Isle B1F",
     "id": "1285",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-dome-1f": {
     "areaNameEn": "Citadark Isle Dome 1F",
     "id": "1291",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-dome-2f": {
     "areaNameEn": "Citadark Isle Dome 2F",
     "id": "1292",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-dome-bf1": {
     "areaNameEn": "Citadark Isle Dome B1F",
     "id": "1290",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-dome-exterior": {
     "areaNameEn": "Citadark Isle Dome Exterior",
     "id": "1289",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "citadark-isle-outside": {
     "areaNameEn": "Citadark Isle (Outside)",
     "id": "1283",
-    "labelZh": "Citadark Isle",
+    "labelZh": "暗之岛",
     "locationNameEn": "Citadark Isle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "clamberclaw-cliffs-area": {
     "areaNameEn": "clamberclaw-cliffs-area",
@@ -1241,14 +1241,14 @@
   "desert-resort-area": {
     "areaNameEn": "Desert Resort",
     "id": "584",
-    "labelZh": "沙漠 resort",
+    "labelZh": "沙漠镇",
     "locationNameEn": "Desert Resort",
     "source": "composite_en"
   },
   "desert-resort-entrance": {
     "areaNameEn": "Desert Resort (entrance)",
     "id": "583",
-    "labelZh": "沙漠 resort",
+    "labelZh": "沙漠镇",
     "locationNameEn": "Desert Resort",
     "source": "composite_en"
   },
@@ -1304,9 +1304,9 @@
   "dilford-chamber-area": {
     "areaNameEn": "Dilford Chamber",
     "id": "453",
-    "labelZh": "Dilford Chamber",
+    "labelZh": "迪尔福德之间",
     "locationNameEn": "Dilford Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "dividing-peak-tunnel-area": {
     "areaNameEn": "dividing-peak-tunnel-area",
@@ -1360,16 +1360,16 @@
   "dreamyard-area": {
     "areaNameEn": "Dreamyard",
     "id": "579",
-    "labelZh": "Dreamyard",
+    "labelZh": "梦之遗迹",
     "locationNameEn": "Dreamyard",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "dreamyard-b1f": {
     "areaNameEn": "Dreamyard (B1F)",
     "id": "580",
-    "labelZh": "Dreamyard",
+    "labelZh": "梦之遗迹",
     "locationNameEn": "Dreamyard",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "driftveil-city-area": {
     "areaNameEn": "Driftveil City",
@@ -1453,7 +1453,7 @@
     "id": "2",
     "labelZh": "百代市",
     "locationNameEn": "Eterna City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "eterna-city-west-gate": {
     "areaNameEn": "Eterna City (west gate)",
@@ -1535,16 +1535,16 @@
   "five-island-area": {
     "areaNameEn": "Five Island",
     "id": "563",
-    "labelZh": "Five Island",
+    "labelZh": "5岛",
     "locationNameEn": "Five Island",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "five-isle-meadow-area": {
     "areaNameEn": "Five Isle Meadow",
     "id": "519",
-    "labelZh": "Five Isle Meadow",
+    "labelZh": "5岛原野",
     "locationNameEn": "Five Isle Meadow",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "floaro-gardens-area": {
     "areaNameEn": "floaro-gardens-area",
@@ -1563,23 +1563,23 @@
   "floccesy-ranch-hidden-grotto": {
     "areaNameEn": "Floccesy Ranch (Hidden Grotto)",
     "id": "1353",
-    "labelZh": "Floccesy Ranch",
+    "labelZh": "唐草牧场",
     "locationNameEn": "Floccesy Ranch",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "floccesy-ranch-inner": {
     "areaNameEn": "Floccesy Ranch (inner)",
     "id": "674",
-    "labelZh": "Floccesy Ranch",
+    "labelZh": "唐草牧场",
     "locationNameEn": "Floccesy Ranch",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "floccesy-ranch-outer": {
     "areaNameEn": "Floccesy Ranch (outer)",
     "id": "673",
-    "labelZh": "Floccesy Ranch",
+    "labelZh": "唐草牧场",
     "locationNameEn": "Floccesy Ranch",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "floccesy-town-area": {
     "areaNameEn": "Floccesy Town",
@@ -1612,9 +1612,9 @@
   "four-island-area": {
     "areaNameEn": "Four Island",
     "id": "562",
-    "labelZh": "Four Island",
+    "labelZh": "4岛",
     "locationNameEn": "Four Island",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "freezington-area": {
     "areaNameEn": "Freezington",
@@ -1626,128 +1626,128 @@
   "friend-safari-bug": {
     "areaNameEn": "Friend Safari (Bug)",
     "id": "1334",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-dark": {
     "areaNameEn": "Friend Safari (Dark)",
     "id": "1337",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-dragon": {
     "areaNameEn": "Friend Safari (Dragon)",
     "id": "1335",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-electric": {
     "areaNameEn": "Friend Safari (Electric)",
     "id": "1329",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-fairy": {
     "areaNameEn": "Friend Safari (Fairy)",
     "id": "1339",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-fighting": {
     "areaNameEn": "Friend Safari (Fighting)",
     "id": "1324",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-fire": {
     "areaNameEn": "Friend Safari (Fire)",
     "id": "1323",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-flying": {
     "areaNameEn": "Friend Safari (Flying)",
     "id": "1326",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-ghost": {
     "areaNameEn": "Friend Safari (Ghost)",
     "id": "1336",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-grass": {
     "areaNameEn": "Friend Safari (Grass)",
     "id": "1327",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-ground": {
     "areaNameEn": "Friend Safari (Ground)",
     "id": "1330",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-ice": {
     "areaNameEn": "Friend Safari (Ice)",
     "id": "1333",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-normal": {
     "areaNameEn": "Friend Safari (Normal)",
     "id": "1322",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-poison": {
     "areaNameEn": "Friend Safari (Poison)",
     "id": "1328",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-psychic": {
     "areaNameEn": "Friend Safari (Psychic)",
     "id": "1331",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-rock": {
     "areaNameEn": "Friend Safari (Rock)",
     "id": "1332",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-steel": {
     "areaNameEn": "Friend Safari (Steel)",
     "id": "1338",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "friend-safari-water": {
     "areaNameEn": "Friend Safari (Water)",
     "id": "1325",
-    "labelZh": "Friend Safari",
+    "labelZh": "朋友狩猎区",
     "locationNameEn": "Friend Safari",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "frigid-sea-area": {
     "areaNameEn": "Frigid Sea",
@@ -1859,119 +1859,119 @@
     "id": "843",
     "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-10-main": {
     "areaNameEn": "Route 10 (Main)",
     "id": "856",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-10-near-station": {
     "areaNameEn": "Route 10 (Near Station)",
     "id": "857",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-2-lake": {
     "areaNameEn": "Route 2 (Lake)",
     "id": "1365",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "galar-route-2-lakeside": {
     "areaNameEn": "Route 2 (Lakeside)",
     "id": "1366",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "galar-route-2-main": {
     "areaNameEn": "Route 2",
     "id": "844",
     "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-3-east": {
     "areaNameEn": "Route 3 (East)",
     "id": "845",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "galar-route-3-west": {
     "areaNameEn": "Route 3 (West)",
     "id": "1368",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "galar-route-4-area": {
     "areaNameEn": "Route 4",
     "id": "847",
     "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-5-area": {
     "areaNameEn": "Route 5",
     "id": "848",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-6-area": {
     "areaNameEn": "Route 6",
     "id": "849",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-7-area": {
     "areaNameEn": "Route 7",
     "id": "850",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "route_en"
+    "source": "route_slug"
   },
   "galar-route-8-main": {
     "areaNameEn": "Route 8 (Main)",
     "id": "851",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-8-steamdrift-way": {
     "areaNameEn": "Route 8 (Steamdrift Way)",
     "id": "852",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-9-circhester-bay": {
     "areaNameEn": "Route 9 (Circhester Bay)",
     "id": "854",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-9-main": {
     "areaNameEn": "Route 9 (Main)",
     "id": "853",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "galar-route-9-outer-spikemuth": {
     "areaNameEn": "Route 9 (Outer Spikemuth)",
     "id": "855",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "gapejaw-bog-area": {
     "areaNameEn": "gapejaw-bog-area",
@@ -2046,23 +2046,23 @@
   "giants-cap-area-2": {
     "areaNameEn": "Giant's Cap (Area 2)",
     "id": "886",
-    "labelZh": "Giant's Cap",
+    "labelZh": "巨人帽岩",
     "locationNameEn": "Giant's Cap",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "giants-cap-area-3": {
     "areaNameEn": "Giant's Cap (Area 3)",
     "id": "887",
-    "labelZh": "Giant's Cap",
+    "labelZh": "巨人帽岩",
     "locationNameEn": "Giant's Cap",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "giants-cap-main": {
     "areaNameEn": "Giant's Cap (Main Area)",
     "id": "885",
-    "labelZh": "Giant's Cap",
+    "labelZh": "巨人帽岩",
     "locationNameEn": "Giant's Cap",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "giants-foot-area": {
     "areaNameEn": "Giant's Foot",
@@ -2349,7 +2349,7 @@
     "id": "771",
     "labelZh": "家缘市",
     "locationNameEn": "Hearthome City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "hearthome-city-west-gate": {
     "areaNameEn": "Hearthome City (west gate)",
@@ -2473,275 +2473,275 @@
   "hoenn-route-101-area": {
     "areaNameEn": "Road 101",
     "id": "393",
-    "labelZh": "Route 101",
+    "labelZh": "101号道路",
     "locationNameEn": "Route 101",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-102-area": {
     "areaNameEn": "Road 102",
     "id": "394",
-    "labelZh": "Route 102",
+    "labelZh": "102号道路",
     "locationNameEn": "Route 102",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-103-area": {
     "areaNameEn": "Road 103",
     "id": "395",
-    "labelZh": "Route 103",
+    "labelZh": "103号道路",
     "locationNameEn": "Route 103",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-104-area": {
     "areaNameEn": "Road 104",
     "id": "396",
-    "labelZh": "Route 104",
+    "labelZh": "104号道路",
     "locationNameEn": "Route 104",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-104-north-oras": {
     "areaNameEn": "hoenn-route-104-north-oras",
     "id": "1207",
-    "labelZh": "Route 104",
+    "labelZh": "104号道路",
     "locationNameEn": "Route 104",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-104-south-oras": {
     "areaNameEn": "hoenn-route-104-south-oras",
     "id": "1208",
-    "labelZh": "Route 104",
+    "labelZh": "104号道路",
     "locationNameEn": "Route 104",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-105-area": {
     "areaNameEn": "Road 105",
     "id": "397",
-    "labelZh": "Route 105",
+    "labelZh": "105号道路",
     "locationNameEn": "Route 105",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-106-area": {
     "areaNameEn": "Road 106",
     "id": "398",
-    "labelZh": "Route 106",
+    "labelZh": "106号道路",
     "locationNameEn": "Route 106",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-107-area": {
     "areaNameEn": "Road 107",
     "id": "399",
-    "labelZh": "Route 107",
+    "labelZh": "107号道路",
     "locationNameEn": "Route 107",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-108-area": {
     "areaNameEn": "Road 108",
     "id": "400",
-    "labelZh": "Route 108",
+    "labelZh": "108号道路",
     "locationNameEn": "Route 108",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-109-area": {
     "areaNameEn": "Road 109",
     "id": "401",
-    "labelZh": "Route 109",
+    "labelZh": "109号道路",
     "locationNameEn": "Route 109",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-110-area": {
     "areaNameEn": "Road 110",
     "id": "402",
-    "labelZh": "Route 110",
+    "labelZh": "110号道路",
     "locationNameEn": "Route 110",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-111-area": {
     "areaNameEn": "Road 111",
     "id": "403",
-    "labelZh": "Route 111",
+    "labelZh": "111号道路",
     "locationNameEn": "Route 111",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-112-area": {
     "areaNameEn": "Road 112",
     "id": "404",
-    "labelZh": "Route 112",
+    "labelZh": "112号道路",
     "locationNameEn": "Route 112",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-113-area": {
     "areaNameEn": "Road 113",
     "id": "405",
-    "labelZh": "Route 113",
+    "labelZh": "113号道路",
     "locationNameEn": "Route 113",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-114-area": {
     "areaNameEn": "Road 114",
     "id": "406",
-    "labelZh": "Route 114",
+    "labelZh": "114号道路",
     "locationNameEn": "Route 114",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-115-area": {
     "areaNameEn": "Road 115",
     "id": "407",
-    "labelZh": "Route 115",
+    "labelZh": "115号道路",
     "locationNameEn": "Route 115",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-116-area": {
     "areaNameEn": "Road 116",
     "id": "408",
-    "labelZh": "Route 116",
+    "labelZh": "116号道路",
     "locationNameEn": "Route 116",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-117-area": {
     "areaNameEn": "Road 117",
     "id": "409",
-    "labelZh": "Route 117",
+    "labelZh": "117号道路",
     "locationNameEn": "Route 117",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-118-area": {
     "areaNameEn": "Road 118",
     "id": "410",
-    "labelZh": "Route 118",
+    "labelZh": "118号道路",
     "locationNameEn": "Route 118",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-119-area": {
     "areaNameEn": "Road 119",
     "id": "411",
-    "labelZh": "Route 119",
+    "labelZh": "119号道路",
     "locationNameEn": "Route 119",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-119-weather-institute": {
     "areaNameEn": "Weather Institute (Road 119)",
     "id": "768",
-    "labelZh": "Route 119",
+    "labelZh": "119号道路",
     "locationNameEn": "Route 119",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-120-area": {
     "areaNameEn": "Road 120",
     "id": "412",
-    "labelZh": "Route 120",
+    "labelZh": "120号道路",
     "locationNameEn": "Route 120",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-121-area": {
     "areaNameEn": "Road 121",
     "id": "413",
-    "labelZh": "Route 121",
+    "labelZh": "121号道路",
     "locationNameEn": "Route 121",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-122-area": {
     "areaNameEn": "Road 122",
     "id": "414",
-    "labelZh": "Route 122",
+    "labelZh": "122号道路",
     "locationNameEn": "Route 122",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-123-area": {
     "areaNameEn": "Road 123",
     "id": "415",
-    "labelZh": "Route 123",
+    "labelZh": "123号道路",
     "locationNameEn": "Route 123",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-124-area": {
     "areaNameEn": "Road 124",
     "id": "416",
-    "labelZh": "Route 124",
+    "labelZh": "124号道路",
     "locationNameEn": "Route 124",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-124-underwater": {
     "areaNameEn": "Road 124 (underwater)",
     "id": "417",
-    "labelZh": "Route 124",
+    "labelZh": "124号道路（水下）",
     "locationNameEn": "Route 124",
-    "source": "english_fallback"
+    "source": "route_slug_underwater"
   },
   "hoenn-route-125-area": {
     "areaNameEn": "Road 125",
     "id": "418",
-    "labelZh": "Route 125",
+    "labelZh": "125号道路",
     "locationNameEn": "Route 125",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-126-area": {
     "areaNameEn": "Road 126",
     "id": "419",
-    "labelZh": "Route 126",
+    "labelZh": "126号道路",
     "locationNameEn": "Route 126",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-126-underwater": {
     "areaNameEn": "Road 126 (underwater)",
     "id": "420",
-    "labelZh": "Route 126",
+    "labelZh": "126号道路（水下）",
     "locationNameEn": "Route 126",
-    "source": "english_fallback"
+    "source": "route_slug_underwater"
   },
   "hoenn-route-127-area": {
     "areaNameEn": "Road 127",
     "id": "421",
-    "labelZh": "Route 127",
+    "labelZh": "127号道路",
     "locationNameEn": "Route 127",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-128-area": {
     "areaNameEn": "Road 128",
     "id": "422",
-    "labelZh": "Route 128",
+    "labelZh": "128号道路",
     "locationNameEn": "Route 128",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-129-area": {
     "areaNameEn": "Road 129",
     "id": "423",
-    "labelZh": "Route 129",
+    "labelZh": "129号道路",
     "locationNameEn": "Route 129",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-130-area": {
     "areaNameEn": "Road 130",
     "id": "424",
-    "labelZh": "Route 130",
+    "labelZh": "130号道路",
     "locationNameEn": "Route 130",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-131-area": {
     "areaNameEn": "Road 131",
     "id": "425",
-    "labelZh": "Route 131",
+    "labelZh": "131号道路",
     "locationNameEn": "Route 131",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-132-area": {
     "areaNameEn": "Road 132",
     "id": "426",
-    "labelZh": "Route 132",
+    "labelZh": "132号道路",
     "locationNameEn": "Route 132",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-133-area": {
     "areaNameEn": "Road 133",
     "id": "427",
-    "labelZh": "Route 133",
+    "labelZh": "133号道路",
     "locationNameEn": "Route 133",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-route-134-area": {
     "areaNameEn": "Road 134",
     "id": "428",
-    "labelZh": "Route 134",
+    "labelZh": "134号道路",
     "locationNameEn": "Route 134",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "hoenn-safari-zone-expansion-north": {
     "areaNameEn": "Safari Zone (expansion north)",
@@ -2893,30 +2893,30 @@
   "icefall-cave-1f": {
     "areaNameEn": "Icefall Cave (1F)",
     "id": "497",
-    "labelZh": "Icefall Cave",
+    "labelZh": "冻瀑洞窟",
     "locationNameEn": "Icefall Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "icefall-cave-b1f": {
     "areaNameEn": "Icefall Cave (B1F)",
     "id": "498",
-    "labelZh": "Icefall Cave",
+    "labelZh": "冻瀑洞窟",
     "locationNameEn": "Icefall Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "icefall-cave-entrance": {
     "areaNameEn": "Icefall Cave (entrance)",
     "id": "496",
-    "labelZh": "Icefall Cave",
+    "labelZh": "冻瀑洞窟",
     "locationNameEn": "Icefall Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "icefall-cave-waterfall": {
     "areaNameEn": "Icefall Cave (waterfall)",
     "id": "499",
-    "labelZh": "Icefall Cave",
+    "labelZh": "冻瀑洞窟",
     "locationNameEn": "Icefall Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "icepeak-arena-area": {
     "areaNameEn": "icepeak-arena-area",
@@ -3063,140 +3063,140 @@
     "id": "185",
     "labelZh": "29号道路",
     "locationNameEn": "Route 29",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-30-area": {
     "areaNameEn": "Road 30",
     "id": "187",
     "labelZh": "30号道路",
     "locationNameEn": "Route 30",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-31-area": {
     "areaNameEn": "Road 31",
     "id": "188",
     "labelZh": "31号道路",
     "locationNameEn": "Route 31",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-32-area": {
     "areaNameEn": "Road 32",
     "id": "192",
     "labelZh": "32号道路",
     "locationNameEn": "Route 32",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-33-area": {
     "areaNameEn": "Road 33",
     "id": "201",
     "labelZh": "33号道路",
     "locationNameEn": "Route 33",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-34-area": {
     "areaNameEn": "Road 34",
     "id": "205",
     "labelZh": "34号道路",
     "locationNameEn": "Route 34",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-35-area": {
     "areaNameEn": "Road 35",
     "id": "206",
     "labelZh": "35号道路",
     "locationNameEn": "Route 35",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-36-area": {
     "areaNameEn": "Road 36",
     "id": "209",
     "labelZh": "36号道路",
     "locationNameEn": "Route 36",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-37-area": {
     "areaNameEn": "Road 37",
     "id": "210",
     "labelZh": "37号道路",
     "locationNameEn": "Route 37",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-38-area": {
     "areaNameEn": "Road 38",
     "id": "222",
     "labelZh": "38号道路",
     "locationNameEn": "Route 38",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-39-area": {
     "areaNameEn": "Road 39",
     "id": "223",
     "labelZh": "39号道路",
     "locationNameEn": "Route 39",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-42-area": {
     "areaNameEn": "Road 42",
     "id": "236",
     "labelZh": "42号道路",
     "locationNameEn": "Route 42",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-43-area": {
     "areaNameEn": "Road 43",
     "id": "241",
     "labelZh": "43号道路",
     "locationNameEn": "Route 43",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-44-area": {
     "areaNameEn": "Road 44",
     "id": "243",
     "labelZh": "44号道路",
     "locationNameEn": "Route 44",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-45-area": {
     "areaNameEn": "Road 45",
     "id": "251",
     "labelZh": "45号道路",
     "locationNameEn": "Route 45",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-46-area": {
     "areaNameEn": "Road 46",
     "id": "252",
     "labelZh": "46号道路",
     "locationNameEn": "Route 46",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-47-area": {
     "areaNameEn": "Road 47",
     "id": "255",
     "labelZh": "47号道路",
     "locationNameEn": "Route 47",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-47-cave-gate": {
     "areaNameEn": "Road 47 (cave gate)",
     "id": "266",
     "labelZh": "47号道路",
     "locationNameEn": "Route 47",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-47-inside-cave": {
     "areaNameEn": "Road 47 (inside cave)",
     "id": "267",
     "labelZh": "47号道路",
     "locationNameEn": "Route 47",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-route-48-area": {
     "areaNameEn": "Road 48",
     "id": "286",
     "labelZh": "48号道路",
     "locationNameEn": "Route 48",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "johto-safari-zone-desert": {
     "areaNameEn": "Safari Zone Desert",
@@ -3215,16 +3215,16 @@
   "johto-safari-zone-marshland": {
     "areaNameEn": "Safari Zone Marshland",
     "id": "819",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-meadow": {
     "areaNameEn": "Safari Zone Meadow",
     "id": "816",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-mountain": {
     "areaNameEn": "Safari Zone Mountain",
@@ -3236,65 +3236,65 @@
   "johto-safari-zone-peak": {
     "areaNameEn": "Safari Zone Peak",
     "id": "813",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-plains": {
     "areaNameEn": "Safari Zone Plains",
     "id": "815",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-rocky-beach": {
     "areaNameEn": "Safari Zone Rocky Beach",
     "id": "821",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-savannah": {
     "areaNameEn": "Safari Zone Savannah",
     "id": "823",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-swamp": {
     "areaNameEn": "Safari Zone Swamp",
     "id": "818",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-wasteland": {
     "areaNameEn": "Safari Zone Wasteland",
     "id": "822",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-safari-zone-wetland": {
     "areaNameEn": "Safari Zone Wetland",
     "id": "824",
-    "labelZh": "Johto Safari Zone",
+    "labelZh": "城都狩猎地带",
     "locationNameEn": "Johto Safari Zone",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "johto-sea-route-40-area": {
     "areaNameEn": "Road 40",
     "id": "225",
-    "labelZh": "Sea Route 40",
+    "labelZh": "40号水路",
     "locationNameEn": "Sea Route 40",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "johto-sea-route-41-area": {
     "areaNameEn": "Road 41",
     "id": "226",
-    "labelZh": "Sea Route 41",
+    "labelZh": "41号水路",
     "locationNameEn": "Sea Route 41",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "jubilife-village-area": {
     "areaNameEn": "jubilife-village-area",
@@ -3315,147 +3315,147 @@
     "id": "721",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-11-area": {
     "areaNameEn": "Road 11",
     "id": "722",
     "labelZh": "11号道路",
     "locationNameEn": "Route 11",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-12-area": {
     "areaNameEn": "Road 12",
     "id": "723",
     "labelZh": "12号道路",
     "locationNameEn": "Route 12",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-13-area": {
     "areaNameEn": "Road 13",
     "id": "724",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-14-area": {
     "areaNameEn": "Road 14",
     "id": "725",
     "labelZh": "14号道路",
     "locationNameEn": "Route 14",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-15-area": {
     "areaNameEn": "Road 15",
     "id": "726",
     "labelZh": "15号道路",
     "locationNameEn": "Route 15",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-16-area": {
     "areaNameEn": "Road 16",
     "id": "727",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-17-area": {
     "areaNameEn": "Road 17",
     "id": "728",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-18-area": {
     "areaNameEn": "Road 18",
     "id": "729",
     "labelZh": "18号道路",
     "locationNameEn": "Route 18",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-19-area": {
     "areaNameEn": "Road 19",
     "id": "730",
     "labelZh": "19号道路",
     "locationNameEn": "Route 19",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-2-area": {
     "areaNameEn": "Road 2",
     "id": "713",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kalos-route-20-area": {
     "areaNameEn": "Road 20",
     "id": "731",
     "labelZh": "20号道路",
     "locationNameEn": "Route 20",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-21-area": {
     "areaNameEn": "Road 21",
     "id": "732",
     "labelZh": "21号道路",
     "locationNameEn": "Route 21",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-22-area": {
     "areaNameEn": "Road 22",
     "id": "733",
     "labelZh": "22号道路",
     "locationNameEn": "Route 22",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-3-area": {
     "areaNameEn": "Road 3",
     "id": "714",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kalos-route-4-area": {
     "areaNameEn": "Road 4",
     "id": "715",
-    "labelZh": "Route 4",
+    "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kalos-route-5-area": {
     "areaNameEn": "Road 5",
     "id": "716",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-6-area": {
     "areaNameEn": "Road 6",
     "id": "717",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-7-area": {
     "areaNameEn": "Road 7",
     "id": "718",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-8-area": {
     "areaNameEn": "Road 8",
     "id": "719",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-route-9-area": {
     "areaNameEn": "Road 9",
     "id": "720",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kalos-victory-road-outside": {
     "areaNameEn": "Victory Road (unknown area 327)",
@@ -3579,198 +3579,198 @@
   "kanto-route-1-area": {
     "areaNameEn": "Road 1",
     "id": "295",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-10-area": {
     "areaNameEn": "Road 10",
     "id": "304",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-11-area": {
     "areaNameEn": "Road 11",
     "id": "305",
     "labelZh": "11号道路",
     "locationNameEn": "Route 11",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-12-area": {
     "areaNameEn": "Road 12",
     "id": "276",
     "labelZh": "12号道路",
     "locationNameEn": "Route 12",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-13-area": {
     "areaNameEn": "Road 13",
     "id": "306",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-14-area": {
     "areaNameEn": "Road 14",
     "id": "307",
     "labelZh": "14号道路",
     "locationNameEn": "Route 14",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-15-area": {
     "areaNameEn": "Road 15",
     "id": "308",
     "labelZh": "15号道路",
     "locationNameEn": "Route 15",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-16-area": {
     "areaNameEn": "Road 16",
     "id": "309",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-17-area": {
     "areaNameEn": "Road 17",
     "id": "310",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-18-area": {
     "areaNameEn": "Road 18",
     "id": "311",
     "labelZh": "18号道路",
     "locationNameEn": "Route 18",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-2-north-towards-pewter-city": {
     "areaNameEn": "Road 2 (north, towards Pewter City)",
     "id": "320",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-2-south-towards-viridian-city": {
     "areaNameEn": "Road 2 (south, towards Viridian City)",
     "id": "296",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-22-area": {
     "areaNameEn": "Road 22",
     "id": "313",
     "labelZh": "22号道路",
     "locationNameEn": "Route 22",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-23-area": {
     "areaNameEn": "Road 23",
     "id": "329",
     "labelZh": "23号道路",
     "locationNameEn": "Route 23",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-24-area": {
     "areaNameEn": "Road 24",
     "id": "314",
     "labelZh": "24号道路",
     "locationNameEn": "Route 24",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-25-area": {
     "areaNameEn": "Road 25",
     "id": "315",
     "labelZh": "25号道路",
     "locationNameEn": "Route 25",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-26-area": {
     "areaNameEn": "Road 26",
     "id": "287",
     "labelZh": "26号道路",
     "locationNameEn": "Route 26",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-27-area": {
     "areaNameEn": "Road 27",
     "id": "288",
     "labelZh": "27号道路",
     "locationNameEn": "Route 27",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-28-area": {
     "areaNameEn": "Road 28",
     "id": "289",
     "labelZh": "28号道路",
     "locationNameEn": "Route 28",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-3-area": {
     "areaNameEn": "Road 3",
     "id": "297",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-3-pokemon-center": {
     "areaNameEn": "Pokemon Center (Road 3)",
     "id": "832",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-4-area": {
     "areaNameEn": "Road 4",
     "id": "298",
-    "labelZh": "Route 4",
+    "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-4-pokemon-center": {
     "areaNameEn": "Pokemon Center (Road 4)",
     "id": "761",
-    "labelZh": "Route 4",
+    "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-route-5-area": {
     "areaNameEn": "Road 5",
     "id": "299",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-6-area": {
     "areaNameEn": "Road 6",
     "id": "300",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-7-area": {
     "areaNameEn": "Road 7",
     "id": "301",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-8-area": {
     "areaNameEn": "Road 8",
     "id": "302",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-route-9-area": {
     "areaNameEn": "Road 9",
     "id": "303",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "kanto-safari-zone-area-1-east": {
     "areaNameEn": "Safari Zone (Area 1, east)",
@@ -3803,23 +3803,23 @@
   "kanto-sea-route-19-area": {
     "areaNameEn": "Road 19",
     "id": "277",
-    "labelZh": "Sea Route 19",
+    "labelZh": "19号水路",
     "locationNameEn": "Sea Route 19",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-sea-route-20-area": {
     "areaNameEn": "Road 20",
     "id": "278",
-    "labelZh": "Sea Route 20",
+    "labelZh": "20号水路",
     "locationNameEn": "Sea Route 20",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-sea-route-21-area": {
     "areaNameEn": "Road 21",
     "id": "312",
-    "labelZh": "Sea Route 21",
+    "labelZh": "21号水路",
     "locationNameEn": "Sea Route 21",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "kanto-underground-path-area": {
     "areaNameEn": "Kanto Underground Path",
@@ -4006,9 +4006,9 @@
   "liptoo-chamber-area": {
     "areaNameEn": "Liptoo Chamber",
     "id": "451",
-    "labelZh": "Liptoo Chamber",
+    "labelZh": "利普图之间",
     "locationNameEn": "Liptoo Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "littleroot-town-area": {
     "areaNameEn": "Littleroot Town",
@@ -4034,79 +4034,79 @@
   "lost-cave-item-rooms": {
     "areaNameEn": "Lost Cave (item rooms)",
     "id": "511",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-1": {
     "areaNameEn": "Lost Cave (room 1)",
     "id": "501",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-10": {
     "areaNameEn": "Lost Cave (room 10)",
     "id": "510",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-2": {
     "areaNameEn": "Lost Cave (room 2)",
     "id": "502",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-3": {
     "areaNameEn": "Lost Cave (room 3)",
     "id": "503",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-4": {
     "areaNameEn": "Lost Cave (room 4)",
     "id": "504",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-5": {
     "areaNameEn": "Lost Cave (room 5)",
     "id": "505",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-6": {
     "areaNameEn": "Lost Cave (room 6)",
     "id": "506",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-7": {
     "areaNameEn": "Lost Cave (room 7)",
     "id": "507",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-8": {
     "areaNameEn": "Lost Cave (room 8)",
     "id": "508",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-cave-room-9": {
     "areaNameEn": "Lost Cave (room 9)",
     "id": "509",
-    "labelZh": "Lost Cave",
+    "labelZh": "迷路洞窟",
     "locationNameEn": "Lost Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "lost-hotel-area": {
     "areaNameEn": "Lost Hotel",
@@ -4216,9 +4216,9 @@
   "magma-hideout-area": {
     "areaNameEn": "Magma Hideout",
     "id": "437",
-    "labelZh": "Magma Hideout",
+    "labelZh": "岩浆团藏身处",
     "locationNameEn": "Magma Hideout",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "mahalo-trail-area": {
     "areaNameEn": "mahalo-trail-area",
@@ -4237,16 +4237,16 @@
   "malie-city-main": {
     "areaNameEn": "malie-city-main",
     "id": "1099",
-    "labelZh": "Malie City",
+    "labelZh": "马利埃市",
     "locationNameEn": "Malie City",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "malie-city-outer-cape": {
     "areaNameEn": "malie-city-outer-cape",
     "id": "1100",
-    "labelZh": "Malie City",
+    "labelZh": "马利埃市",
     "locationNameEn": "Malie City",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "malie-garden-area": {
     "areaNameEn": "malie-garden-area",
@@ -4321,9 +4321,9 @@
   "memorial-pillar-area": {
     "areaNameEn": "Memorial Pillar",
     "id": "520",
-    "labelZh": "Memorial Pillar",
+    "labelZh": "纪念柱",
     "locationNameEn": "Memorial Pillar",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "meteor-falls-area": {
     "areaNameEn": "Meteor Falls",
@@ -4356,233 +4356,233 @@
   "mirage-island-area": {
     "areaNameEn": "Mirage Island",
     "id": "1223",
-    "labelZh": "Mirage Island",
+    "labelZh": "幻影岛",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-cave-north-of-fallarbor": {
     "areaNameEn": "Mirage Cave (North of Fallarbor)",
     "id": "1307",
-    "labelZh": "Mirage Cave",
+    "labelZh": "幻影洞窟",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-cave-north-of-fortree": {
     "areaNameEn": "Mirage Cave (North of Fortree)",
     "id": "1308",
-    "labelZh": "Mirage Cave",
+    "labelZh": "幻影洞窟",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-cave-north-of-route-124": {
     "areaNameEn": "Mirage Cave (North of Route 124)",
     "id": "1311",
-    "labelZh": "Mirage Cave",
+    "labelZh": "124号道路",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-cave-north-of-route-132": {
     "areaNameEn": "Mirage Cave (North of Route 132)",
     "id": "1306",
-    "labelZh": "Mirage Cave",
+    "labelZh": "132号道路",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-cave-south-east-of-route-129": {
     "areaNameEn": "Mirage Cave (South East of Route 129)",
     "id": "1309",
-    "labelZh": "Mirage Cave",
+    "labelZh": "129号道路",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-cave-south-of-pacifidlog": {
     "areaNameEn": "Mirage Cave (South of Pacifidlog)",
     "id": "1305",
-    "labelZh": "Mirage Cave",
+    "labelZh": "幻影洞窟",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-cave-south-of-route-107": {
     "areaNameEn": "Mirage Cave (South of Route 107)",
     "id": "1310",
-    "labelZh": "Mirage Cave",
+    "labelZh": "107号道路",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-cave-west-of-rustburo": {
     "areaNameEn": "Mirage Cave (West of Rustboro)",
     "id": "1312",
-    "labelZh": "Mirage Cave",
+    "labelZh": "幻影洞窟",
     "locationNameEn": "Mirage Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-forest-east-of-mossdeep": {
     "areaNameEn": "Mirage Forest (East of Mossdeep)",
     "id": "1226",
-    "labelZh": "Mirage Forest",
+    "labelZh": "幻影森林",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-forest-north-of-lilycove": {
     "areaNameEn": "Mirage Forest (North of Lilycove)",
     "id": "1224",
-    "labelZh": "Mirage Forest",
+    "labelZh": "幻影森林",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-forest-north-of-route-124": {
     "areaNameEn": "Mirage Forest (North of Route 124)",
     "id": "1228",
-    "labelZh": "Mirage Forest",
+    "labelZh": "124号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-forest-south-of-route-109": {
     "areaNameEn": "Mirage Forest (South of Route 109)",
     "id": "1227",
-    "labelZh": "Mirage Forest",
+    "labelZh": "109号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-forest-south-of-route-111": {
     "areaNameEn": "Mirage Forest (South of Route 111)",
     "id": "1231",
-    "labelZh": "Mirage Forest",
+    "labelZh": "111号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-forest-south-of-route-132": {
     "areaNameEn": "Mirage Forest (South of Route 132)",
     "id": "1225",
-    "labelZh": "Mirage Forest",
+    "labelZh": "132号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-forest-west-of-route-105": {
     "areaNameEn": "Mirage Forest (West of Route 105)",
     "id": "1230",
-    "labelZh": "Mirage Forest",
+    "labelZh": "105号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-forest-west-of-route-114": {
     "areaNameEn": "Mirage Forest (West of Route 114)",
     "id": "1229",
-    "labelZh": "Mirage Forest",
+    "labelZh": "114号道路",
     "locationNameEn": "Mirage Forest",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-island-east-of-shoal-cave": {
     "areaNameEn": "Mirage Island (East of Shoal Cave)",
     "id": "1222",
-    "labelZh": "Mirage Island",
+    "labelZh": "幻影岛",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-island-route-114": {
     "areaNameEn": "Mirage Island (Route 114)",
     "id": "1217",
-    "labelZh": "Mirage Island",
+    "labelZh": "114号道路",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-island-route-124": {
     "areaNameEn": "Mirage Island (Route 124)",
     "id": "1218",
-    "labelZh": "Mirage Island",
+    "labelZh": "124号道路",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-island-route-132": {
     "areaNameEn": "Mirage Island (Route 132)",
     "id": "1219",
-    "labelZh": "Mirage Island",
+    "labelZh": "132号道路",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-island-south-of-pacifidlog": {
     "areaNameEn": "Mirage Island (South of Pacofidlog)",
     "id": "1221",
-    "labelZh": "Mirage Island",
+    "labelZh": "幻影岛",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-island-south-of-route-134": {
     "areaNameEn": "Mirage Island (South of Route 134)",
     "id": "1220",
-    "labelZh": "Mirage Island",
+    "labelZh": "134号道路",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-island-west-of-dewford-town": {
     "areaNameEn": "Mirage Island (West Of Dewford Town)",
     "id": "1215",
-    "labelZh": "Mirage Island",
+    "labelZh": "幻影岛",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-island-west-of-route-104": {
     "areaNameEn": "Mirage Island (West Of Route 104)",
     "id": "1216",
-    "labelZh": "Mirage Island",
+    "labelZh": "104号道路",
     "locationNameEn": "Mirage Island",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-mountain-east-of-mossdeep": {
     "areaNameEn": "Mirage Mountain (East of Mossdeep)",
     "id": "1313",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "幻影山",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-mountain-north-east-of-route-125": {
     "areaNameEn": "Mirage Mountain (North East of Route 125)",
     "id": "1320",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "125号道路",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-mountain-north-of-lilycove": {
     "areaNameEn": "Mirage Mountain (North of Lilycove)",
     "id": "1316",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "幻影山",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-mountain-north-of-mossdeep": {
     "areaNameEn": "Mirage Mountain (North of Mossdeep)",
     "id": "1314",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "幻影山",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mirage-spot-mountain-south-east-of-route-129": {
     "areaNameEn": "Mirage Mountain (South East of Route 129)",
     "id": "1315",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "129号道路",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-mountain-south-of-route-129": {
     "areaNameEn": "Mirage Mountain (South of Route 129)",
     "id": "1318",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "129号道路",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-mountain-south-of-route-131": {
     "areaNameEn": "Mirage Mountain (South of Route 131)",
     "id": "1319",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "131号道路",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-spot-mountain-west-of-route-104": {
     "areaNameEn": "Mirage Mountain (West of Route 104)",
     "id": "1317",
-    "labelZh": "Mirage Mountain",
+    "labelZh": "104号道路",
     "locationNameEn": "Mirage Mountain",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "mirage-tower-area": {
     "areaNameEn": "Mirage Tower",
@@ -4608,9 +4608,9 @@
   "monean-chamber-area": {
     "areaNameEn": "Monean Chamber",
     "id": "450",
-    "labelZh": "Monean Chamber",
+    "labelZh": "莫尼安之间",
     "locationNameEn": "Monean Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "moonview-arena-area": {
     "areaNameEn": "moonview-arena-area",
@@ -4734,23 +4734,23 @@
   "mt-battle-100f": {
     "areaNameEn": "Mt. Battle 100F",
     "id": "1261",
-    "labelZh": "Mt. Battle",
+    "labelZh": "战斗山",
     "locationNameEn": "Mt. Battle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-battle-10f": {
     "areaNameEn": "Mt. Battle 10F",
     "id": "1254",
-    "labelZh": "Mt. Battle",
+    "labelZh": "战斗山",
     "locationNameEn": "Mt. Battle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-battle-lobby": {
     "areaNameEn": "Mt. Battle Lobby",
     "id": "1296",
-    "labelZh": "Mt. Battle",
+    "labelZh": "战斗山",
     "locationNameEn": "Mt. Battle",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-coronet-1f-from-exterior": {
     "areaNameEn": "Mount Coronet (1F from exterior)",
@@ -4762,23 +4762,23 @@
   "mt-coronet-1f-route-207": {
     "areaNameEn": "Mount Coronet (1F Road 207)",
     "id": "11",
-    "labelZh": "天冠山",
+    "labelZh": "207号道路",
     "locationNameEn": "Mt. Coronet",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "mt-coronet-1f-route-211": {
     "areaNameEn": "Mount Coronet (1F Road 211)",
     "id": "22",
-    "labelZh": "天冠山",
+    "labelZh": "211号道路",
     "locationNameEn": "Mt. Coronet",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "mt-coronet-1f-route-216": {
     "areaNameEn": "Mount Coronet (1F Road 216)",
     "id": "21",
-    "labelZh": "天冠山",
+    "labelZh": "216号道路",
     "locationNameEn": "Mt. Coronet",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "mt-coronet-2f": {
     "areaNameEn": "Mount Coronet (2F)",
@@ -4846,58 +4846,58 @@
   "mt-ember-1f-cave-behind-team-rocket": {
     "areaNameEn": "Mount Ember (1F, cave behind team rocket)",
     "id": "491",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-area": {
     "areaNameEn": "Mount Ember",
     "id": "488",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "mt-ember-b1f": {
     "areaNameEn": "Mount Ember (B1F)",
     "id": "492",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-b2f": {
     "areaNameEn": "Mount Ember (B2F)",
     "id": "493",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-b3f": {
     "areaNameEn": "Mount Ember (B3F)",
     "id": "494",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-cave": {
     "areaNameEn": "Mount Ember (cave)",
     "id": "489",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-inside": {
     "areaNameEn": "Mount Ember (inside)",
     "id": "490",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-ember-summit": {
     "areaNameEn": "Mount Ember Summit",
     "id": "825",
-    "labelZh": "Mt. Ember",
+    "labelZh": "灯火山",
     "locationNameEn": "Mt. Ember",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "mt-moon-1f": {
     "areaNameEn": "Mount Moon (1F)",
@@ -5261,35 +5261,35 @@
     "id": "1271",
     "labelZh": "ONBS",
     "locationNameEn": "ONBS",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "onbs-3f": {
     "areaNameEn": "ONBS 3F",
     "id": "1272",
     "labelZh": "ONBS",
     "locationNameEn": "ONBS",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "onbs-4f": {
     "areaNameEn": "ONBS 4F",
     "id": "1274",
     "labelZh": "ONBS",
     "locationNameEn": "ONBS",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "onbs-roof": {
     "areaNameEn": "ONBS Roof",
     "id": "1273",
     "labelZh": "ONBS",
     "locationNameEn": "ONBS",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "one-island-area": {
     "areaNameEn": "One Island",
     "id": "561",
-    "labelZh": "One Island",
+    "labelZh": "1岛",
     "locationNameEn": "One Island",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "oreburgh-city-oreburgh-mining-museum": {
     "areaNameEn": "Oreburgh Mining Museum",
@@ -5336,23 +5336,23 @@
   "outcast-island-area": {
     "areaNameEn": "Outcast Island",
     "id": "521",
-    "labelZh": "Outcast Island",
+    "labelZh": "流放岛",
     "locationNameEn": "Outcast Island",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "outskirt-stand-inside": {
     "areaNameEn": "Outskirt Stand (Inside)",
     "id": "1297",
-    "labelZh": "Outskirt Stand",
+    "labelZh": "外围站",
     "locationNameEn": "Outskirt Stand",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "outskirt-stand-outside": {
     "areaNameEn": "Outskirt Stand (Outside)",
     "id": "1232",
-    "labelZh": "Outskirt Stand",
+    "labelZh": "外围站",
     "locationNameEn": "Outskirt Stand",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "p2-laboratory-area": {
     "areaNameEn": "P2 Laboratory",
@@ -5401,7 +5401,7 @@
     "id": "3",
     "labelZh": "湿原市",
     "locationNameEn": "Pastoria City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "path-to-the-peak-area": {
     "areaNameEn": "Path to the Peak",
@@ -5553,114 +5553,114 @@
   "poke-pelago-elite-four-defeated": {
     "areaNameEn": "poke-pelago-elite-four-defeated",
     "id": "1160",
-    "labelZh": "Poké Pelago",
+    "labelZh": "宝可梦度假地",
     "locationNameEn": "Poké Pelago",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "poke-pelago-poni-island-reached": {
     "areaNameEn": "poke-pelago-poni-island-reached",
     "id": "1158",
-    "labelZh": "Poké Pelago",
+    "labelZh": "宝可梦度假地",
     "locationNameEn": "Poké Pelago",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "poke-pelago-ulaula-island-reached": {
     "areaNameEn": "poke-pelago-ulaula-island-reached",
     "id": "1159",
-    "labelZh": "Poké Pelago",
+    "labelZh": "宝可梦度假地",
     "locationNameEn": "Poké Pelago",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-hq-lab-area": {
     "areaNameEn": "Pokemon HQ Lab ",
     "id": "1263",
-    "labelZh": "Pokemon Hq Lab",
+    "labelZh": "宝可梦总部研究所",
     "locationNameEn": "Pokemon Hq Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-hq-lab-outside": {
     "areaNameEn": "Pokemon HQ Lab (Outside)",
     "id": "1264",
-    "labelZh": "Pokemon Hq Lab",
+    "labelZh": "宝可梦总部研究所",
     "locationNameEn": "Pokemon Hq Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-mansion-1f": {
     "areaNameEn": "Pokemon Mansion (1F)",
     "id": "341",
-    "labelZh": "Pokémon Mansion",
+    "labelZh": "宝可梦屋",
     "locationNameEn": "Pokémon Mansion",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-mansion-2f": {
     "areaNameEn": "Pokemon Mansion (2F)",
     "id": "342",
-    "labelZh": "Pokémon Mansion",
+    "labelZh": "宝可梦屋",
     "locationNameEn": "Pokémon Mansion",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-mansion-3f": {
     "areaNameEn": "Pokemon Mansion (3F)",
     "id": "343",
-    "labelZh": "Pokémon Mansion",
+    "labelZh": "宝可梦屋",
     "locationNameEn": "Pokémon Mansion",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-mansion-b1f": {
     "areaNameEn": "Pokemon Mansion (B1F)",
     "id": "344",
-    "labelZh": "Pokémon Mansion",
+    "labelZh": "宝可梦屋",
     "locationNameEn": "Pokémon Mansion",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-1f": {
     "areaNameEn": "Pokemon Tower (1F)",
     "id": "334",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-2f": {
     "areaNameEn": "Pokemon Tower (2F)",
     "id": "335",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-3f": {
     "areaNameEn": "Pokemon Tower (3F)",
     "id": "336",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-4f": {
     "areaNameEn": "Pokemon Tower (4F)",
     "id": "337",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-5f": {
     "areaNameEn": "Pokemon Tower (5F)",
     "id": "338",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-6f": {
     "areaNameEn": "Pokemon Tower (6F)",
     "id": "339",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-tower-7f": {
     "areaNameEn": "Pokemon Tower (7F)",
     "id": "340",
-    "labelZh": "Pokémon Tower",
+    "labelZh": "宝可梦塔",
     "locationNameEn": "Pokémon Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokemon-village-area": {
     "areaNameEn": "Pokemon Village",
@@ -5672,23 +5672,23 @@
   "pokespot-cave": {
     "areaNameEn": "Cave Pokespot ",
     "id": "1270",
-    "labelZh": "Pokespot",
+    "labelZh": "宝可梦Spot",
     "locationNameEn": "Pokespot",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokespot-oasis": {
     "areaNameEn": "Oasis Pokespot ",
     "id": "1295",
-    "labelZh": "Pokespot",
+    "labelZh": "宝可梦Spot",
     "locationNameEn": "Pokespot",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pokespot-rock": {
     "areaNameEn": "Rock Pokespot ",
     "id": "1294",
-    "labelZh": "Pokespot",
+    "labelZh": "宝可梦Spot",
     "locationNameEn": "Pokespot",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "poni-breaker-coast-area": {
     "areaNameEn": "poni-breaker-coast-area",
@@ -5714,7 +5714,7 @@
   "poni-grove-area": {
     "areaNameEn": "poni-grove-area",
     "id": "1116",
-    "labelZh": "波尼 Grove",
+    "labelZh": "波尼树林",
     "locationNameEn": "Poni Grove",
     "source": "composite_en"
   },
@@ -5791,51 +5791,51 @@
   "pyrite-bldg-1f": {
     "areaNameEn": "Pyrite Bldg 1F",
     "id": "1241",
-    "labelZh": "Pyrite Bldg",
+    "labelZh": "黄铁矿大厦",
     "locationNameEn": "Pyrite Bldg",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-bldg-4f": {
     "areaNameEn": "Pyrite Bldg 4F",
     "id": "1243",
-    "labelZh": "Pyrite Bldg",
+    "labelZh": "黄铁矿大厦",
     "locationNameEn": "Pyrite Bldg",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-cave-bf1": {
     "areaNameEn": "Pyrite Cave B1F",
     "id": "1246",
-    "labelZh": "Pyrite Cave",
+    "labelZh": "黄铁矿洞窟",
     "locationNameEn": "Pyrite Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-cave-bf1-post-sewers": {
     "areaNameEn": "Pyrite Cave B1F (Post Sewers)",
     "id": "1247",
-    "labelZh": "Pyrite Cave",
+    "labelZh": "黄铁矿洞窟",
     "locationNameEn": "Pyrite Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-cave-mirors-hideout": {
     "areaNameEn": "Pyrite Cave (Miror's Hideout)",
     "id": "1242",
-    "labelZh": "Pyrite Cave",
+    "labelZh": "黄铁矿洞窟",
     "locationNameEn": "Pyrite Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-cave-outside": {
     "areaNameEn": "Pyrite Cave (Outside)",
     "id": "1244",
-    "labelZh": "Pyrite Cave",
+    "labelZh": "黄铁矿洞窟",
     "locationNameEn": "Pyrite Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-cave-south-sewers": {
     "areaNameEn": "Pyrite Cave (South Sewers)",
     "id": "1245",
-    "labelZh": "Pyrite Cave",
+    "labelZh": "黄铁矿洞窟",
     "locationNameEn": "Pyrite Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "pyrite-town-colosseum": {
     "areaNameEn": "Pyrite Town Colosseum",
@@ -5882,16 +5882,16 @@
   "realgam-tower-area": {
     "areaNameEn": "Realgam Tower",
     "id": "1248",
-    "labelZh": "Realgam Tower",
+    "labelZh": "Realgam塔",
     "locationNameEn": "Realgam Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "realgam-tower-colosseum": {
     "areaNameEn": "Realgam Tower Colosseum",
     "id": "1259",
-    "labelZh": "Realgam Tower",
+    "labelZh": "Realgam塔",
     "locationNameEn": "Realgam Tower",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reflection-cave-unknown-area-305": {
     "areaNameEn": "Reflection Cave (unknown area 305)",
@@ -5952,23 +5952,23 @@
   "relic-passage-castelia-sewers-entrance": {
     "areaNameEn": "Relic Tunnel (Castelia Sewers entrance)",
     "id": "692",
-    "labelZh": "Relic Passage",
+    "labelZh": "遗迹通道",
     "locationNameEn": "Relic Passage",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "relic-passage-pwt-entrance": {
     "areaNameEn": "Relic Tunnel (PWT entrance)",
     "id": "694",
-    "labelZh": "Relic Passage",
+    "labelZh": "遗迹通道",
     "locationNameEn": "Relic Passage",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "relic-passage-relic-castle-entrance": {
     "areaNameEn": "Relic Tunnel (Relic Castle entrance)",
     "id": "693",
-    "labelZh": "Relic Passage",
+    "labelZh": "遗迹通道",
     "locationNameEn": "Relic Passage",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "resolution-cave-area": {
     "areaNameEn": "resolution-cave-area",
@@ -5987,114 +5987,114 @@
   "resort-gorgeous-area": {
     "areaNameEn": "Resort Gorgeous",
     "id": "517",
-    "labelZh": "Resort Gorgeous",
+    "labelZh": "豪华度假地",
     "locationNameEn": "Resort Gorgeous",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-b1f": {
     "areaNameEn": "reversal-mountain-b1f",
     "id": "1172",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-48": {
     "areaNameEn": "Reversal Mountain (unknown area 48)",
     "id": "677",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-49": {
     "areaNameEn": "Reversal Mountain (unknown area 49)",
     "id": "678",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-50": {
     "areaNameEn": "Reversal Mountain (unknown area 50)",
     "id": "679",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-51": {
     "areaNameEn": "Reversal Mountain (unknown area 51)",
     "id": "680",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-52": {
     "areaNameEn": "Reversal Mountain (unknown area 52)",
     "id": "681",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-53": {
     "areaNameEn": "Reversal Mountain (unknown area 53)",
     "id": "682",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-54": {
     "areaNameEn": "Reversal Mountain (unknown area 54)",
     "id": "683",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-55": {
     "areaNameEn": "Reversal Mountain (unknown area 55)",
     "id": "684",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-56": {
     "areaNameEn": "Reversal Mountain (unknown area 56)",
     "id": "685",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-57": {
     "areaNameEn": "Reversal Mountain (unknown area 57)",
     "id": "686",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-58": {
     "areaNameEn": "Reversal Mountain (unknown area 58)",
     "id": "687",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-59": {
     "areaNameEn": "Reversal Mountain (unknown area 59)",
     "id": "688",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "reversal-mountain-unknown-area-60": {
     "areaNameEn": "Reversal Mountain (unknown area 60)",
     "id": "689",
-    "labelZh": "Reversal Mountain",
+    "labelZh": "反转山",
     "locationNameEn": "Reversal Mountain",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "rixy-chamber-area": {
     "areaNameEn": "Rixy Chamber",
     "id": "455",
-    "labelZh": "Rixy Chamber",
+    "labelZh": "里克斯之间",
     "locationNameEn": "Rixy Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "roaming-hoenn-area": {
     "areaNameEn": "Roaming Hoenn",
@@ -6190,9 +6190,9 @@
   "royal-avenue-area": {
     "areaNameEn": "royal-avenue-area",
     "id": "1124",
-    "labelZh": "Royal Avenue",
+    "labelZh": "皇家大道",
     "locationNameEn": "Royal Avenue",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "ruin-maniac-cave-0-9-different-unown-caught": {
     "areaNameEn": "Ruin Maniac Cave (0–9 different Unown caught)",
@@ -6372,58 +6372,58 @@
   "scorched-slab-1f": {
     "areaNameEn": "Scorched Slab (1F)",
     "id": "1185",
-    "labelZh": "Scorched Slab",
+    "labelZh": "灼热石板",
     "locationNameEn": "Scorched Slab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "scorched-slab-b1f": {
     "areaNameEn": "Scorched Slab (B1F)",
     "id": "1186",
-    "labelZh": "Scorched Slab",
+    "labelZh": "灼热石板",
     "locationNameEn": "Scorched Slab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "scorched-slab-b2f": {
     "areaNameEn": "Scorched Slab (B2F)",
     "id": "1187",
-    "labelZh": "Scorched Slab",
+    "labelZh": "灼热石板",
     "locationNameEn": "Scorched Slab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "scorched-slab-b3f": {
     "areaNameEn": "Scorched Slab (B3F)",
     "id": "1188",
-    "labelZh": "Scorched Slab",
+    "labelZh": "灼热石板",
     "locationNameEn": "Scorched Slab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "scufib-chamber-area": {
     "areaNameEn": "Scufib Chamber",
     "id": "454",
-    "labelZh": "Scufib Chamber",
+    "labelZh": "斯库菲布之间",
     "locationNameEn": "Scufib Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "sea-mauville-area": {
     "areaNameEn": "sea-mauville-area",
     "id": "1178",
-    "labelZh": "Sea Mauville",
+    "labelZh": "海上紫堇",
     "locationNameEn": "Sea Mauville",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "sea-mauville-inside": {
     "areaNameEn": "Sea Mauville (Inside)",
     "id": "1180",
-    "labelZh": "Sea Mauville",
+    "labelZh": "海上紫堇",
     "locationNameEn": "Sea Mauville",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "sea-mauville-outside": {
     "areaNameEn": "Sea Mauville (Outside)",
     "id": "1179",
-    "labelZh": "Sea Mauville",
+    "labelZh": "海上紫堇",
     "locationNameEn": "Sea Mauville",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "sea-spirits-den-area": {
     "areaNameEn": "sea-spirits-den-area",
@@ -6498,16 +6498,16 @@
   "seaside-cave-1f": {
     "areaNameEn": "Seaside Cave (1F)",
     "id": "700",
-    "labelZh": "Seaside Cave",
+    "labelZh": "海边洞窟",
     "locationNameEn": "Seaside Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "seaside-cave-b1f": {
     "areaNameEn": "Seaside Cave (B1F)",
     "id": "701",
-    "labelZh": "Seaside Cave",
+    "labelZh": "海边洞窟",
     "locationNameEn": "Seaside Cave",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "seaside-hollow-area": {
     "areaNameEn": "seaside-hollow-area",
@@ -6547,16 +6547,16 @@
   "shadow-pokemon-lab-bf1": {
     "areaNameEn": "Shadow Pokémon Lab B1F",
     "id": "1251",
-    "labelZh": "Shadow Pokémon Lab",
+    "labelZh": "黑暗宝可梦研究所",
     "locationNameEn": "Shadow Pokémon Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "shadow-pokemon-lab-bf2": {
     "areaNameEn": "Shadow Pokémon Lab B2F",
     "id": "1235",
-    "labelZh": "Shadow Pokémon Lab",
+    "labelZh": "黑暗宝可梦研究所",
     "locationNameEn": "Shadow Pokémon Lab",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "shalour-city-area": {
     "areaNameEn": "Shalour City",
@@ -6640,245 +6640,245 @@
     "id": "141",
     "labelZh": "201号道路",
     "locationNameEn": "Route 201",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-202-area": {
     "areaNameEn": "Road 202",
     "id": "142",
     "labelZh": "202号道路",
     "locationNameEn": "Route 202",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-203-area": {
     "areaNameEn": "Road 203",
     "id": "143",
     "labelZh": "203号道路",
     "locationNameEn": "Route 203",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-204-north-towards-floaroma-town": {
     "areaNameEn": "Road 204 (north, towards Floaroma Town)",
     "id": "145",
     "labelZh": "204号道路",
     "locationNameEn": "Route 204",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-204-south-towards-jubilife-city": {
     "areaNameEn": "Road 204 (south, towards Jubilife City)",
     "id": "144",
     "labelZh": "204号道路",
     "locationNameEn": "Route 204",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-205-east-towards-eterna-city": {
     "areaNameEn": "Road 205 (east, towards Eterna City)",
     "id": "147",
     "labelZh": "205号道路",
     "locationNameEn": "Route 205",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-205-south-towards-floaroma-town": {
     "areaNameEn": "Road 205 (south, towards Floaroma Town)",
     "id": "146",
     "labelZh": "205号道路",
     "locationNameEn": "Route 205",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-206-area": {
     "areaNameEn": "Road 206",
     "id": "148",
     "labelZh": "206号道路",
     "locationNameEn": "Route 206",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-207-area": {
     "areaNameEn": "Road 207",
     "id": "149",
     "labelZh": "207号道路",
     "locationNameEn": "Route 207",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-208-area": {
     "areaNameEn": "Road 208",
     "id": "150",
     "labelZh": "208号道路",
     "locationNameEn": "Route 208",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-209-area": {
     "areaNameEn": "Road 209",
     "id": "151",
     "labelZh": "209号道路",
     "locationNameEn": "Route 209",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-210-south-towards-solaceon-town": {
     "areaNameEn": "Road 210 (south, towards Solaceon Town)",
     "id": "157",
     "labelZh": "210号道路",
     "locationNameEn": "Route 210",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-210-west-towards-celestic-town": {
     "areaNameEn": "Road 210 (west, towards Celestic Town)",
     "id": "158",
     "labelZh": "210号道路",
     "locationNameEn": "Route 210",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-211-east-towards-celestic-town": {
     "areaNameEn": "Road 211 (east, towards Celestic Town)",
     "id": "160",
     "labelZh": "211号道路",
     "locationNameEn": "Route 211",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-211-west-towards-eterna-city": {
     "areaNameEn": "Road 211 (west, towards Eterna City)",
     "id": "159",
     "labelZh": "211号道路",
     "locationNameEn": "Route 211",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-212-east-towards-pastoria-city": {
     "areaNameEn": "Road 212 (east, towards Pastoria City)",
     "id": "162",
     "labelZh": "212号道路",
     "locationNameEn": "Route 212",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-212-north-towards-hearthome-city": {
     "areaNameEn": "Road 212 (north, towards Hearthome City)",
     "id": "161",
     "labelZh": "212号道路",
     "locationNameEn": "Route 212",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-213-area": {
     "areaNameEn": "Road 213",
     "id": "163",
     "labelZh": "213号道路",
     "locationNameEn": "Route 213",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-214-area": {
     "areaNameEn": "Road 214",
     "id": "164",
     "labelZh": "214号道路",
     "locationNameEn": "Route 214",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-215-area": {
     "areaNameEn": "Road 215",
     "id": "165",
     "labelZh": "215号道路",
     "locationNameEn": "Route 215",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-216-area": {
     "areaNameEn": "Road 216",
     "id": "166",
     "labelZh": "216号道路",
     "locationNameEn": "Route 216",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-217-area": {
     "areaNameEn": "Road 217",
     "id": "167",
     "labelZh": "217号道路",
     "locationNameEn": "Route 217",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-218-area": {
     "areaNameEn": "Road 218",
     "id": "168",
     "labelZh": "218号道路",
     "locationNameEn": "Route 218",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-219-area": {
     "areaNameEn": "Road 219",
     "id": "169",
     "labelZh": "219号道路",
     "locationNameEn": "Route 219",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-221-area": {
     "areaNameEn": "Road 221",
     "id": "170",
     "labelZh": "221号道路",
     "locationNameEn": "Route 221",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-222-area": {
     "areaNameEn": "Road 222",
     "id": "171",
     "labelZh": "222号道路",
     "locationNameEn": "Route 222",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-224-area": {
     "areaNameEn": "Road 224",
     "id": "172",
     "labelZh": "224号道路",
     "locationNameEn": "Route 224",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-225-area": {
     "areaNameEn": "Road 225",
     "id": "173",
     "labelZh": "225号道路",
     "locationNameEn": "Route 225",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-227-area": {
     "areaNameEn": "Road 227",
     "id": "174",
     "labelZh": "227号道路",
     "locationNameEn": "Route 227",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-228-area": {
     "areaNameEn": "Road 228",
     "id": "175",
     "labelZh": "228号道路",
     "locationNameEn": "Route 228",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-route-229-area": {
     "areaNameEn": "Road 229",
     "id": "176",
     "labelZh": "229号道路",
     "locationNameEn": "Route 229",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "sinnoh-sea-route-220-area": {
     "areaNameEn": "Road 220",
     "id": "180",
-    "labelZh": "Sea Route 220",
+    "labelZh": "220号水路",
     "locationNameEn": "Sea Route 220",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "sinnoh-sea-route-223-area": {
     "areaNameEn": "Road 223",
     "id": "181",
-    "labelZh": "Sea Route 223",
+    "labelZh": "223号水路",
     "locationNameEn": "Sea Route 223",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "sinnoh-sea-route-226-area": {
     "areaNameEn": "Road 226",
     "id": "182",
-    "labelZh": "Sea Route 226",
+    "labelZh": "226号水路",
     "locationNameEn": "Sea Route 226",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "sinnoh-sea-route-230-area": {
     "areaNameEn": "Road 230",
     "id": "183",
-    "labelZh": "Sea Route 230",
+    "labelZh": "230号水路",
     "locationNameEn": "Sea Route 230",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "sinnoh-victory-road-1f": {
     "areaNameEn": "Victory Road (1F)",
@@ -7009,16 +7009,16 @@
   "snagem-hideout-1f": {
     "areaNameEn": "Snagem Hideout 1F",
     "id": "1234",
-    "labelZh": "Snagem Hideout",
+    "labelZh": "Snagem藏身处",
     "locationNameEn": "Snagem Hideout",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "snagem-hideout-2f": {
     "areaNameEn": "Snagem Hideout 2F",
     "id": "1258",
-    "labelZh": "Snagem Hideout",
+    "labelZh": "Snagem藏身处",
     "locationNameEn": "Snagem Hideout",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "snowfall-hot-spring-area": {
     "areaNameEn": "snowfall-hot-spring-area",
@@ -7296,9 +7296,9 @@
   "ss-anne-area": {
     "areaNameEn": "S.S. Anne",
     "id": "461",
-    "labelZh": "S.S. Anne",
+    "labelZh": "圣特安努号",
     "locationNameEn": "S.S. Anne",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "stark-mountain-area": {
     "areaNameEn": "Stark Mountain exterior",
@@ -7331,16 +7331,16 @@
   "stepping-stone-sea-area-2": {
     "areaNameEn": "Stepping-Stone Sea (Area 2)",
     "id": "928",
-    "labelZh": "Stepping-Stone Sea",
+    "labelZh": "垫脚石之海",
     "locationNameEn": "Stepping-Stone Sea",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "stepping-stone-sea-main": {
     "areaNameEn": "Stepping-Stone Sea (Main Area)",
     "id": "927",
-    "labelZh": "Stepping-Stone Sea",
+    "labelZh": "垫脚石之海",
     "locationNameEn": "Stepping-Stone Sea",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "stonetooth-rows-area": {
     "areaNameEn": "stonetooth-rows-area",
@@ -7352,23 +7352,23 @@
   "stony-wilderness-area-2": {
     "areaNameEn": "Stony Wilderness (Area 2)",
     "id": "930",
-    "labelZh": "Stony Wilderness",
+    "labelZh": "巨石原野",
     "locationNameEn": "Stony Wilderness",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "stony-wilderness-area-3": {
     "areaNameEn": "Stony Wilderness (Area 3)",
     "id": "931",
-    "labelZh": "Stony Wilderness",
+    "labelZh": "巨石原野",
     "locationNameEn": "Stony Wilderness",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "stony-wilderness-main": {
     "areaNameEn": "Stony Wilderness (Main Area)",
     "id": "929",
-    "labelZh": "Stony Wilderness",
+    "labelZh": "巨石原野",
     "locationNameEn": "Stony Wilderness",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "stow-on-side-area": {
     "areaNameEn": "Stow-on-Side",
@@ -7380,16 +7380,16 @@
   "strange-house-1f": {
     "areaNameEn": "Strange House (1F)",
     "id": "690",
-    "labelZh": "Strange House",
+    "labelZh": "奇异之屋",
     "locationNameEn": "Strange House",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "strange-house-b1f": {
     "areaNameEn": "Strange House (B1F)",
     "id": "691",
-    "labelZh": "Strange House",
+    "labelZh": "奇异之屋",
     "locationNameEn": "Strange House",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "striaton-city-area": {
     "areaNameEn": "Striaton City",
@@ -7403,7 +7403,7 @@
     "id": "4",
     "labelZh": "滨海市",
     "locationNameEn": "Sunyshore City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "tanoby-ruins-area": {
     "areaNameEn": "Tanoby Ruins",
@@ -7464,16 +7464,16 @@
   "ten-carat-hill-farthest-hollow": {
     "areaNameEn": "ten-carat-hill-farthest-hollow",
     "id": "1135",
-    "labelZh": "Ten Carat Hill",
+    "labelZh": "十克拉山丘",
     "locationNameEn": "Ten Carat Hill",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "ten-carat-hill-inside": {
     "areaNameEn": "ten-carat-hill-inside",
     "id": "1136",
-    "labelZh": "Ten Carat Hill",
+    "labelZh": "十克拉山丘",
     "locationNameEn": "Ten Carat Hill",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "terminus-cave-1f": {
     "areaNameEn": "Terminus Cave (unknown area 343)",
@@ -7562,9 +7562,9 @@
   "three-isle-port-area": {
     "areaNameEn": "Three Isle Port",
     "id": "516",
-    "labelZh": "Three Isle Port",
+    "labelZh": "3岛港口",
     "locationNameEn": "Three Isle Port",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "three-point-pass-area": {
     "areaNameEn": "Three-Point Pass",
@@ -7576,9 +7576,9 @@
   "thrifty-megamart-abandoned-site": {
     "areaNameEn": "thrifty-megamart-abandoned-site",
     "id": "1137",
-    "labelZh": "Royal Avenue",
+    "labelZh": "皇家大道",
     "locationNameEn": "Royal Avenue",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "tidewater-dam-area": {
     "areaNameEn": "tidewater-dam-area",
@@ -7751,9 +7751,9 @@
   "twinleaf-town-area": {
     "areaNameEn": "Twinleaf Town",
     "id": "177",
-    "labelZh": "Twinleaf Town",
+    "labelZh": "双叶镇",
     "locationNameEn": "Twinleaf Town",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "twist-mountain-b1f-3f": {
     "areaNameEn": "Twist Mountain",
@@ -7870,30 +7870,30 @@
   "ultra-space-wilds-cave": {
     "areaNameEn": "ultra-space-wilds-cave",
     "id": "1147",
-    "labelZh": "Ultra Space Wilds",
+    "labelZh": "究极空间",
     "locationNameEn": "Ultra Space Wilds",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "ultra-space-wilds-cliff": {
     "areaNameEn": "ultra-space-wilds-cliff",
     "id": "1148",
-    "labelZh": "Ultra Space Wilds",
+    "labelZh": "究极空间",
     "locationNameEn": "Ultra Space Wilds",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "ultra-space-wilds-crag": {
     "areaNameEn": "ultra-space-wilds-crag",
     "id": "1149",
-    "labelZh": "Ultra Space Wilds",
+    "labelZh": "究极空间",
     "locationNameEn": "Ultra Space Wilds",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "ultra-space-wilds-waterfall": {
     "areaNameEn": "ultra-space-wilds-waterfall",
     "id": "1150",
-    "labelZh": "Ultra Space Wilds",
+    "labelZh": "究极空间",
     "locationNameEn": "Ultra Space Wilds",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "undella-bay-area": {
     "areaNameEn": "Undella Bay",
@@ -7968,268 +7968,268 @@
   "unova-route-1-area": {
     "areaNameEn": "Road 1",
     "id": "623",
-    "labelZh": "Route 1",
+    "labelZh": "1号道路",
     "locationNameEn": "Route 1",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-10-area": {
     "areaNameEn": "Road 10",
     "id": "643",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-10-victory-road-gate": {
     "areaNameEn": "Road 10 (Victory Road gate)",
     "id": "644",
     "labelZh": "10号道路",
     "locationNameEn": "Route 10",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-11-area": {
     "areaNameEn": "Road 11",
     "id": "645",
     "labelZh": "11号道路",
     "locationNameEn": "Route 11",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-12-area": {
     "areaNameEn": "Road 12",
     "id": "646",
     "labelZh": "12号道路",
     "locationNameEn": "Route 12",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-13-area": {
     "areaNameEn": "Road 13",
     "id": "647",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-13-hidden-grotto-giant-chasm": {
     "areaNameEn": "Route 13 (Hidden Grotto – Giant Chasm)",
     "id": "1348",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-13-hidden-grotto-stairs": {
     "areaNameEn": "Route 13 (Hidden Grotto – Stairs)",
     "id": "1349",
     "labelZh": "13号道路",
     "locationNameEn": "Route 13",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-14-area": {
     "areaNameEn": "Road 14",
     "id": "648",
     "labelZh": "14号道路",
     "locationNameEn": "Route 14",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-15-area": {
     "areaNameEn": "Road 15",
     "id": "650",
     "labelZh": "15号道路",
     "locationNameEn": "Route 15",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-16-area": {
     "areaNameEn": "Road 16",
     "id": "651",
     "labelZh": "16号道路",
     "locationNameEn": "Route 16",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-17-area": {
     "areaNameEn": "Road 17",
     "id": "655",
     "labelZh": "17号道路",
     "locationNameEn": "Route 17",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-18-area": {
     "areaNameEn": "Road 18",
     "id": "653",
     "labelZh": "18号道路",
     "locationNameEn": "Route 18",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-18-hidden-grotto": {
     "areaNameEn": "Route 18 (Hidden Grotto)",
     "id": "1350",
     "labelZh": "18号道路",
     "locationNameEn": "Route 18",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-19-area": {
     "areaNameEn": "Road 19",
     "id": "703",
     "labelZh": "19号道路",
     "locationNameEn": "Route 19",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-2-area": {
     "areaNameEn": "Road 2",
     "id": "624",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-2-hidden-grotto": {
     "areaNameEn": "Route 2 (Hidden Grotto)",
     "id": "1340",
-    "labelZh": "Route 2",
+    "labelZh": "2号道路",
     "locationNameEn": "Route 2",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-20-area": {
     "areaNameEn": "Road 20",
     "id": "704",
     "labelZh": "20号道路",
     "locationNameEn": "Route 20",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-21-area": {
     "areaNameEn": "Road 21",
     "id": "707",
     "labelZh": "21号道路",
     "locationNameEn": "Route 21",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-22-area": {
     "areaNameEn": "Road 22",
     "id": "705",
     "labelZh": "22号道路",
     "locationNameEn": "Route 22",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-22-hidden-grotto": {
     "areaNameEn": "Route 22 (Hidden Grotto)",
     "id": "1351",
     "labelZh": "22号道路",
     "locationNameEn": "Route 22",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-23-area": {
     "areaNameEn": "Road 23",
     "id": "706",
     "labelZh": "23号道路",
     "locationNameEn": "Route 23",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-23-hidden-grotto": {
     "areaNameEn": "Route 23 (Hidden Grotto)",
     "id": "1352",
     "labelZh": "23号道路",
     "locationNameEn": "Route 23",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-3-area": {
     "areaNameEn": "Road 3",
     "id": "625",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-3-hidden-grotto-dark-grass": {
     "areaNameEn": "Route 3 (Hidden Grotto – Dark Grass)",
     "id": "1341",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-3-hidden-grotto-pond": {
     "areaNameEn": "Route 3 (Hidden Grotto – Pond)",
     "id": "1342",
-    "labelZh": "Route 3",
+    "labelZh": "3号道路",
     "locationNameEn": "Route 3",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-4-area": {
     "areaNameEn": "Road 4",
     "id": "627",
-    "labelZh": "Route 4",
+    "labelZh": "4号道路",
     "locationNameEn": "Route 4",
-    "source": "english_fallback"
+    "source": "route_slug"
   },
   "unova-route-5-area": {
     "areaNameEn": "Road 5",
     "id": "628",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-5-hidden-grotto": {
     "areaNameEn": "Route 5 (Hidden Grotto)",
     "id": "1343",
     "labelZh": "5号道路",
     "locationNameEn": "Route 5",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-6-area": {
     "areaNameEn": "Road 6",
     "id": "629",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-6-hidden-grotto-mistralton-cave": {
     "areaNameEn": "Route 6 (Hidden Grotto – Mistralton Cave)",
     "id": "1345",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-6-hidden-grotto-near-pokemon-breeder": {
     "areaNameEn": "Route 6 (Hidden Grotto – Near Pokemon Breeder)",
     "id": "1344",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-6-weather-institute": {
     "areaNameEn": "Weather Institute (Road 6)",
     "id": "776",
     "labelZh": "6号道路",
     "locationNameEn": "Route 6",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-7-area": {
     "areaNameEn": "Road 7",
     "id": "632",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-7-hidden-grotto": {
     "areaNameEn": "Route 7 (Hidden Grotto)",
     "id": "1346",
     "labelZh": "7号道路",
     "locationNameEn": "Route 7",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-8-area": {
     "areaNameEn": "Road 8",
     "id": "637",
     "labelZh": "8号道路",
     "locationNameEn": "Route 8",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-9-area": {
     "areaNameEn": "Road 9",
     "id": "639",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-route-9-hidden-grotto": {
     "areaNameEn": "Route 9 (Hidden Grotto)",
     "id": "1347",
     "labelZh": "9号道路",
     "locationNameEn": "Route 9",
-    "source": "composite_en"
+    "source": "route_slug"
   },
   "unova-victory-road-1f-unknown-room": {
     "areaNameEn": "Victory Road (unknown area 58)",
@@ -8467,28 +8467,28 @@
     "id": "772",
     "labelZh": "帷幕市",
     "locationNameEn": "Veilstone City",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "verdant-cavern--trial-site-area": {
     "areaNameEn": "verdant-cavern--trial-site-area",
     "id": "1193",
-    "labelZh": "Verdant Cavern",
+    "labelZh": "翠绿洞窟",
     "locationNameEn": "Verdant Cavern",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "verdant-cavern-totems-den": {
     "areaNameEn": "verdant-cavern-totems-den",
     "id": "1155",
-    "labelZh": "Verdant Cavern",
+    "labelZh": "翠绿洞窟",
     "locationNameEn": "Verdant Cavern",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "verdant-cavern-trial-site": {
     "areaNameEn": "verdant-cavern-trial-site",
     "id": "1154",
-    "labelZh": "Verdant Cavern",
+    "labelZh": "翠绿洞窟",
     "locationNameEn": "Verdant Cavern",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "verdanturf-town-contest-hall": {
     "areaNameEn": "Contest Hall (Verdanturf Town)",
@@ -8514,9 +8514,9 @@
   "viapos-chamber-area": {
     "areaNameEn": "Viapos Chamber",
     "id": "456",
-    "labelZh": "Viapos Chamber",
+    "labelZh": "维亚波斯之间",
     "locationNameEn": "Viapos Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "village-bridge-area": {
     "areaNameEn": "Village Bridge",
@@ -8605,9 +8605,9 @@
   "water-labyrinth-area": {
     "areaNameEn": "Water Labyrinth",
     "id": "518",
-    "labelZh": "Water Labyrinth",
+    "labelZh": "水之迷宫",
     "locationNameEn": "Water Labyrinth",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "water-path-area": {
     "areaNameEn": "Water Path",
@@ -8647,9 +8647,9 @@
   "weepth-chamber-area": {
     "areaNameEn": "Weepth Chamber",
     "id": "452",
-    "labelZh": "Weepth Chamber",
+    "labelZh": "维普夫之间",
     "locationNameEn": "Weepth Chamber",
-    "source": "english_fallback"
+    "source": "composite_en"
   },
   "wela-volcano-park-area": {
     "areaNameEn": "wela-volcano-park-area",
