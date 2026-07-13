@@ -12,7 +12,17 @@ TitoDex CI workflows that upload to Cloudflare R2 require these repository secre
 - `.github/workflows/upload-dex-bundle.yml` — full dex bundle upload
 - `.github/workflows/sync-l10n-catalog.yml` — weekly incremental l10n / maps / config sync
 
-Without these secrets, workflows can still run fetch/generate steps but R2 upload will fail.
+### GitHub repo settings (required for l10n sync commits)
+
+**Settings → Actions → General → Workflow permissions** → select **Read and write permissions**.
+
+The sync workflow sets `permissions: contents: write` and pushes catalog updates when `location_areas.json` changes.
+
+Without write permission, R2 upload can succeed but git push will fail with `403`.
+
+### Wrangler R2 upload
+
+Use **`wrangler r2 object put --remote`** (Wrangler 4 defaults to local storage without this flag).
 
 ## Local upload (alternative)
 

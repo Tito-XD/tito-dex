@@ -14,6 +14,8 @@ jobs:
   sync-l10n:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -50,37 +52,49 @@ jobs:
           cd cloudflare/dex-cdn
           npm ci
 
+          WR="npx wrangler r2 object put --remote"
+
           # l10n/zh/*.json
           L10N=../../dist/l10n-upload/v3/l10n/zh
           for f in "$L10N"/*.json; do
             base=$(basename "$f")
-            npx wrangler r2 object put "titodex-dex/v3/l10n/zh/$base" \
+            $WR "titodex-dex/v3/l10n/zh/$base" \
               --file="$f" \
               --content-type=application/json
           done
 
-          # maps + config (if changed)
-          npx wrangler r2 object put titodex-dex/v3/maps/hgss_map_list.json \
+          # maps + config
+          $WR titodex-dex/v3/maps/hgss_map_list.json \
             --file=../../dist/l10n-upload/v3/maps/hgss_map_list.json \
             --content-type=application/json
 
-          npx wrangler r2 object put titodex-dex/v3/config/app_config.json \
+          $WR titodex-dex/v3/config/app_config.json \
             --file=../../dist/l10n-upload/v3/config/app_config.json \
             --content-type=application/json
 
           # Root bundle-manifest.json — bump l10nVersion + publishedAt
-          npx wrangler r2 object put titodex-dex/bundle-manifest.json \
+          $WR titodex-dex/bundle-manifest.json \
             --file=../../dist/l10n-upload/bundle-manifest.json \
             --content-type=application/json
+
+      - name: Verify CDN l10n upload
+        run: |
+          curl -sfI https://dex.tito.cafe/v3/l10n/zh/manifest.json | head -5
+          curl -sf https://dex.tito.cafe/bundle-manifest.json | python3 - <<'PY'
+          import json, sys
+          m = json.load(sys.stdin)
+          assert m.get("l10nVersion"), f"missing l10nVersion: {m}"
+          print("bundle-manifest l10nVersion:", m["l10nVersion"])
+          PY
 
       - name: Commit catalog changes (if any)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/l10n/zh/ flutter/assets/l10n/zh/
-          if git diff --staged --quiet; then
-            echo "No catalog changes to commit."
-          else
-            git commit -m "chore(l10n): weekly 52poke location sync"
-            git push || echo "Push skipped (no write token or fork)."
+          if git diff --quiet data/l10n/zh/location_areas.json; then
+            echo "No location_areas.json changes — skip git commit."
+            exit 0
           fi
+          git add data/l10n/zh/ flutter/assets/l10n/zh/
+          git commit -m "chore(l10n): 52poke location label updates"
+          git push
