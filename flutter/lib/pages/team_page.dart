@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/parser/hgss_format.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
