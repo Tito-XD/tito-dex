@@ -169,11 +169,13 @@ class FlavorTextCarousel extends StatefulWidget {
   const FlavorTextCarousel({
     super.key,
     required this.entries,
+    this.initialPage = 0,
     this.gameEdition,
     this.onPickEdition,
   });
 
   final List<FlavorTextEntry> entries;
+  final int initialPage;
   final GameEdition? gameEdition;
   final VoidCallback? onPickEdition;
 
@@ -188,7 +190,22 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   @override
   void initState() {
     super.initState();
-    _controller = PageController();
+    final page = widget.initialPage.clamp(0, widget.entries.length - 1);
+    _index = page;
+    _controller = PageController(initialPage: page);
+  }
+
+  @override
+  void didUpdateWidget(covariant FlavorTextCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialPage != widget.initialPage &&
+        widget.entries.isNotEmpty) {
+      final page = widget.initialPage.clamp(0, widget.entries.length - 1);
+      if (_index != page) {
+        _index = page;
+        _controller.jumpToPage(page);
+      }
+    }
   }
 
   @override

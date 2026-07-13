@@ -452,8 +452,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 
   Future<void> _onGameBadgeTap() async {
-    final current = gameEditionFromJourneyGame(_journey.game);
-    final picked = await showGameEditionPicker(context, selected: current);
+    final picked = await showGameEditionPicker(
+      context,
+      selected: gameEditionRepository.edition,
+    );
     if (picked == null || !mounted) {
       return;
     }

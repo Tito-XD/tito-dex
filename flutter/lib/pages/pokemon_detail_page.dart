@@ -6,6 +6,7 @@ import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/type_chart.dart';
 import '../features/game/game_edition.dart';
+import '../features/game/game_edition_repository.dart';
 import '../features/game/game_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
@@ -44,8 +45,27 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   @override
   void initState() {
     super.initState();
+    gameEditionRepository.addListener(_onGlobalEditionChanged);
     _loadDefaultMoveVersion();
     _loadDetail();
+  }
+
+  @override
+  void dispose() {
+    gameEditionRepository.removeListener(_onGlobalEditionChanged);
+    super.dispose();
+  }
+
+  void _onGlobalEditionChanged() {
+    final edition = gameEditionRepository.edition;
+    if (_gameEdition.slug == edition.slug &&
+        _moveGameEdition.slug == edition.slug) {
+      return;
+    }
+    setState(() {
+      _gameEdition = edition;
+      _moveGameEdition = edition;
+    });
   }
 
   Future<void> _loadDefaultMoveVersion() async {
@@ -157,23 +177,52 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<FlavorTextEntry> _flavorEntriesForEdition(PokemonDetail detail) {
-    if (detail.flavorEntries.isEmpty) {
-      return const [];
+    // v0.4.0 §7.3: show all CDN flavor entries; carousel starts on global edition.
+    return detail.flavorEntries;
+  }
+
+  int _flavorInitialIndex(PokemonDetail detail) {
+    final entries = detail.flavorEntries;
+    if (entries.isEmpty) {
+      return 0;
     }
-    final key = _gameEdition.dataVersionGroupKey;
-    final matched = detail.flavorEntries
-        .where(
+    int indexFor(GameEdition edition) => entries.indexWhere(
           (entry) =>
-              entry.versionGroup == key ||
-              entry.gameEdition == _gameEdition.slug,
-        )
-        .toList();
-    return matched.isEmpty ? detail.flavorEntries : matched;
+              entry.versionGroup == edition.dataVersionGroupKey ||
+              entry.gameEdition == edition.slug,
+        );
+    final primary = indexFor(_gameEdition);
+    if (primary >= 0) {
+      return primary;
+    }
+    final fallback = gameEditionFromSlug(_gameEdition.fallbackSlug);
+    if (fallback != null) {
+      final fb = indexFor(fallback);
+      if (fb >= 0) {
+        return fb;
+      }
+    }
+    return 0;
+  }
+
+  List<ObtainLocationEntry> _obtainForEdition(PokemonDetail detail) {
+    var locations =
+        detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
+    if (locations.isNotEmpty) {
+      return locations;
+    }
+    final fallback = gameEditionFromSlug(_gameEdition.fallbackSlug);
+    if (fallback != null && fallback.slug != _gameEdition.slug) {
+      locations =
+          detail.obtainLocationsForKey(fallback.dataVersionGroupKey);
+    }
+    return locations;
   }
 
   List<Widget> _introSections(PokemonDetail detail) => [
         FlavorTextCarousel(
           entries: _flavorEntriesForEdition(detail),
+          initialPage: _flavorInitialIndex(detail),
           gameEdition: _gameEdition,
           onPickEdition: () async {
             final picked = await showGameEditionPicker(
@@ -248,8 +297,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
-    final locations =
-        detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
+    final locations = _obtainForEdition(detail);
     final sections = <Widget>[
       if (locations.isNotEmpty)
         ObtainLocationsCard(
