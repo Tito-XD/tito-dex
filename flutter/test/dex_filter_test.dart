@@ -15,6 +15,15 @@ void main() {
     expect(filter.learnsMoveId, 33);
   });
 
+  test('DexFilter detects egg group filter', () {
+    const filter = DexFilter(
+      eggGroupSlug: 'monster',
+      labelZh: '蛋群：怪兽',
+    );
+    expect(filter.isActive, isTrue);
+    expect(filter.eggGroupSlug, 'monster');
+  });
+
   test('DexFilterController set and clear', () {
     final controller = dexFilterController;
     addTearDown(controller.clearFilter);
