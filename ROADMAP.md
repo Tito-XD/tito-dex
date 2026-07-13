@@ -170,13 +170,10 @@ Full analysis: **[docs/JOURNEY_PROFILE_PLAN.md](./docs/JOURNEY_PROFILE_PLAN.md)*
 
 | Area | Planned change |
 | --- | --- |
-| **Avatar** | Broken (`TrainerAvatarService` silent fail); move pick UI to **Settings** |
-| **Settings** | Editable trainer name + avatar; **remove** manual journey TextFields (location/badges/time → read-only from save) |
-| **Game mode** | `GameEdition` capability: save-linked (HGSS) vs manual (NS/mobile/no parser) |
-| **Home (manual mode)** | Hide Continue card; quick actions **4→3**; portrait grid **2×2 → 1×3 row** |
-| **Nav** | Hide Journey tab when manual mode |
-| **Save sync** | Skip `HgssParser` when global game cannot read saves |
-| **Team** | Manual edit party + member stats (for later games); **team aggregate stats** card (BST/type coverage/etc.) |
+| **Team** | Manual edit **all modes** (default save); **full summary card** (BST, coverage, weaknesses, damage hint) |
+| **Home** | **Journey card** replaces Continue + Journey tab (▶ → detail); no city art; trainer greeting + badges right |
+| **Avatar** | **Settings only** |
+| **Sleep** | No user save API — reference tools or Health Connect sleep widget only (see plan §5) |
 
 ## Phase F — Reference Data (“常用资料”)
 

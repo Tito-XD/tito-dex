@@ -2,247 +2,323 @@
 
 > **Status:** Analysis + requirements only. Batch with other dex/detail UX changes.
 > **Audience:** Tito + Cloud Agents.
+> **Last updated:** 2026-07 (Tito decisions on avatar, team edit, nav, home merge, Sleep)
 
 ---
 
 ## Summary
 
-TitoDex should split into two **journey modes** driven by **Settings → global game version**:
+TitoDex splits into two **journey modes** driven by **Settings → global game version**:
 
 | Mode | When | Home | Save sync | Team |
 | --- | --- | --- | --- | --- |
-| **Save-linked** | Game has readable local save (HGSS today) | Continue card + Journey tab | Auto / manual sync from `.sav` | From save + optional cosmetic overrides |
-| **Manual / dex-only** | NS-era, mobile, or no parser (SV, LZA, Champions, …) | No Continue card, no Journey tab | **Do not attempt** save read | User-built party; full edit |
+| **Save-linked** | Readable local save (HGSS today) | **Journey card** (merged Continue + detail) | From `.sav` | Default from save; **user can override** |
+| **Manual / dex-only** | NS, mobile, no parser (SV, LZA, Champions, …) | No journey card | **Do not read** | Fully user-built |
 
-Settings becomes the place for **trainer display name + avatar**. Journey facts (location, badges, play time) become **read-only** when save-linked.
+**Settings:** trainer display name + avatar (only place to change avatar). Journey facts read-only from save when save-linked.
+
+**Nav:** bottom bar **Team | Home | Dex | Search** (4 items). Quick tiles **Team / Dex / Search** (3). No Journey tab. Hand-drawn icon refresh later.
 
 ---
 
-## 1. Trainer avatar — broken, move to Settings
+## Tito decisions (2026-07)
 
-### Current behavior
-
-| Piece | Location | Notes |
+| # | Topic | Decision |
 | --- | --- | --- |
-| Pick + crop | `TrainerAvatarService` (`image_picker` + `image_cropper`) | Errors swallowed → `null`, no user-facing error |
-| UI entry | Home `TrainerCard` tap only (`app.dart` → `_onTrainerAvatarTap`) | Not in Settings |
-| Confirm UX | Double-tap if already customized | Easy to miss; feels broken |
-| Storage | `CurrentJourney.trainerAvatarPath` → `trainer_avatar.jpg` in app documents | OK |
-| Display | `trainer_card.dart` checks `File.existsSync` | Path loss after reinstall? |
+| 1 | Home avatar tap | **Remove** — avatar changes **Settings only** |
+| 2 | Team edit | **Both modes** — default from save; user can edit/add (non-emulator / other device play) |
+| 3 | NS / mobile list | SM, USUM, SwSh, SV, PLA, LZA, Champions — **sufficient for now** |
+| 4 | Bottom nav slot | **No replacement** — 3 quick tiles + 4-tab nav feels cleaner; custom icons later |
+| 5 | Journey tab | **Merge into home journey card** — see §8 (recommended) |
+| 6 | City illustrations | **Remove** all version-specific drawn maps — solid color block like square layout |
+| 7 | Trainer card | Badges **right column**; **larger avatar**; time-based **greeting + trainer name** |
+| 8 | Team summary | Ship **v1 + defensive/damage estimates** in same card — not deferred |
 
-### Likely failure modes (RG Android)
+---
 
-- `image_cropper` / `UCropActivity` theme or permission edge case on handheld
-- Pick succeeds, crop returns `null`, user sees nothing
-- No Settings entry → user forgets home tap exists
+## 1. Trainer avatar — Settings only
 
-### Planned fix
+### Current (broken)
 
-- **Settings → Trainer** section: display name + **avatar row** (preview +「更换头像」)
-- Remove or keep home tap as shortcut (TBD; Settings is primary)
-- Surface errors (SnackBar) instead of silent `debugPrint`
-- Verify `AndroidManifest.xml` `UCropActivity` + storage permissions on RG builds
+- Entry: home `TrainerCard` tap only (`app.dart`)
+- `TrainerAvatarService` fails silently on RG crop
+- Double-tap confirm if already customized
+
+### Planned
+
+- **Settings → 训练家 → 更换头像** (preview + pick + crop)
+- **Remove** `onAvatarTap` from home `TrainerCard` (display-only avatar)
+- SnackBar on failure; fix `UCropActivity` on RG if needed
 
 ---
 
 ## 2. Settings — trainer vs journey fields
 
-### Tito request
-
-| Field | Settings behavior |
+| Field | Behavior |
 | --- | --- |
-| **Trainer display name** | Editable (keep `trainerNameCustomized` vs `saveTrainerName`) |
-| **Trainer avatar** | Editable (gallery + crop) |
-| **Location, play time, badges, reminder** | **Read-only** — only from save sync, no manual TextFields |
-| **Journey timeline** | Read-only from save / parser (no manual edit in Settings) |
+| Trainer display name | Editable |
+| Trainer avatar | Editable (Settings only) |
+| Global game version | Picker (existing) |
+| Location, play time, badges, timeline | **Read-only** from save (save-linked mode only) |
+| Manual journey fields in Settings | **Remove** TextFields for location/badges/time |
 
-### Current (to remove)
-
-`settings_page.dart` has editable `_locationController`, `_playTimeController`, `_badgesController`, `_reminderController` under「编辑旅程」— conflicts with「只读存档」.
-
-### Planned UI
-
-```
-Settings
-├── 训练家
-│   ├── 显示名称 [TextField]
-│   ├── 头像 [preview + 更换]
-│   └── 全局游戏版本 [picker]  ← already exists (defaultGameEdition)
-├── 旅程信息 (只读)          ← only visible in save-linked mode
-│   ├── 当前地点 / 徽章 / 游戏时间
-│   └── 来源：存档同步于 …
-├── 存档与模拟器             ← only visible in save-linked mode
-│   └── directory, sync, emulator (unchanged)
-└── 图鉴离线包 …
-```
+Save directory + emulator sections: **save-linked mode only**.
 
 ---
 
 ## 3. Game version → journey mode gating
 
-### Rule (Tito confirmed)
-
-If **Settings global `GameEdition`** is **NS generation or mobile / no save**, then:
-
-1. **Do not** run save directory scan / `HgssParser` sync for that profile
-2. **Hide** home `ContinueJourneyCard`
-3. **Hide** Journey tab (bottom nav + quick action)
-4. **Quick actions:** 4 tiles → **3 tiles** (Team, Dex, Search — drop Journey)
-5. **Portrait home:** `_QuickActionsGrid` is 2×2 today → **one row × 3** equal blocks
-6. **Square home:** `_QuickActionsBar` already 4-in-a-row → **3-in-a-row**
-
-### Proposed `GameEdition` capability flag
-
-Add something like:
+### `JourneyCapability` (proposed on `GameEdition`)
 
 ```dart
 enum JourneyCapability {
-  saveLinked,  // HGSS — HgssParser + Continue + Journey tab
-  manual,      // NS / future — manual team, dex tools only
+  saveLinked,  // HGSS today; more when parsers ship
+  manual,      // NS, mobile, retro without parser
 }
 ```
 
-**Initial mapping (Tito intent):**
-
-| Category | Examples | `JourneyCapability` | Save read |
+| Category | Examples | Capability | Save read |
 | --- | --- | --- | --- |
-| HGSS | 心金/魂银 | `saveLinked` | Yes (`HgssParser`) |
-| Legacy handheld (future parsers) | Pt, BW, … | `saveLinked` when parser ships | When implemented |
-| NS | SM, USUM, SwSh, SV, PLA | `manual` | **No** |
-| Mobile / no API | LZA, Champions | `manual` | **No** |
-| Retro without parser yet | RGB, DP, … | `manual` until parser | **No** |
+| HGSS | 心金/魂银 | `saveLinked` | `HgssParser` |
+| Future parsers | Pt, BW, … | `saveLinked` when implemented | When ready |
+| NS | SM, USUM, SwSh, SV, PLA | `manual` | No |
+| Mobile / no API | LZA, Champions | `manual` | No |
+| Retro (no parser) | RGB, DP, … | `manual` | No |
 
-**Important:** Today **only HGSS** has a working parser (`save_sync_service.dart` → `HgssParser`). Selecting Pt/BW in settings still won't read saves until parsers exist — gating should follow **capability**, not `journeyGameKey` alone.
+**Today:** only HGSS parser exists — gating must use capability flag, not `journeyGameKey` alone.
 
-### Touchpoints
+### Manual mode UI
 
-| File | Change |
-| --- | --- |
-| `game_edition.dart` | `journeyCapability` (or `supportsSaveSync`) |
-| `app.dart` | Skip `_syncSave` when manual mode |
-| `home_page.dart` | Conditional Continue card; `_quickActions()` filter |
-| `tito_bottom_nav.dart` | Hide `/journey` route item (4 → 3 nav slots?) |
-| `go_router` | Journey route still reachable via deep link? Or 404 — TBD |
-| `settings_page.dart` | Hide save directory section in manual mode |
-
-### Bottom nav note
-
-Today: Team | Journey | **Home** | Dex | Search (5 items).
-
-If Journey removed: Team | **Home** | Dex | Search (4 items) — layout rebalance needed so center Home still works.
+- Hide home **journey card**
+- Hide save sync in Settings
+- Quick actions: **Team, Dex, Search** (portrait: **1×3 row**; square: **3-in-a-row**)
+- Bottom nav: drop Journey → **Team | Home | Dex | Search**
 
 ---
 
-## 4. Team page — manual edit + richer UI
+## 4. Team page — edit + full summary card
 
-### Current
+### Edit policy (Tito confirmed)
 
-- `team_page.dart`: read-only `PartyTeamList` from `journey.party`
-- `PartyMember`: species, level, nickname, HP, EXP — no IV/EV/nature/moves
-- No edit, no add/remove, no team summary
+- **All modes:** party editable (species, level, nickname, expand to IV/EV/nature/moves)
+- **Save-linked:** load from save on sync; user overrides persist in `CurrentJourney` until next sync (merge policy: user edits win on conflict — TBD detail)
+- **Manual:** empty slots +「添加宝可梦」
 
-### Tito request
-
-1. **Dual source:** party from save **or** user-edited (especially manual journey mode)
-2. **Edit existing members:** species, level, nickname, stats (expand model as needed)
-3. **Team-level aggregate stats** — paired estimate for whole party (BST sum? type coverage? avg level? — see §5)
-
-### Data model extensions (draft)
+### Data model (draft)
 
 ```dart
 class PartyMember {
-  // existing …
+  // existing: species, speciesId, level, nickname, HP, EXP
   int? natureId;
-  Map<String, int>? ivs;   // hp/atk/def/spa/spd/spe
+  Map<String, int>? ivs;
   Map<String, int>? evs;
   List<int>? moveIds;
-  bool manualEntry;        // true if user-created vs save-imported
+  bool userEdited;  // distinguish override vs fresh save import
 }
 ```
 
-Persist via `CurrentJourney` JSON (already import/export in Settings).
+### Team summary card (single StickerCard — **full scope, not phased**)
 
-### UI draft
-
-```
-Team · {game label}
-├── [Team summary card]     ← NEW: aggregate stats
-├── Party slot 1..6         ← tap → edit sheet
-│   └── sprite, name, Lv, HP bar, EXP bar
-├── [+ 添加宝可梦]           ← manual mode or override slot
-└── Note / hint
-```
-
-Save-linked mode: editing might **override** display party while save fields remain source for location/badges — policy TBD (full override vs cosmetic-only).
-
----
-
-## 5. Team aggregate stats — what to estimate
-
-Tito: 「配对的整体队伍数值可以估算」— interface still too simple.
-
-### Minimum viable (v1)
-
-| Metric | Source | Use |
+| Row / block | Metric | Notes |
 | --- | --- | --- |
-| Party size / avg level | `PartyMember.level` | Quick power feel |
-| Total BST | sum of base stats × species from dex CDN | Rough bulk |
-| Type coverage | offensive types represented in party | Companion to battle tools |
-| Physical vs special bias | avg Atk vs SpA BST | Lightweight |
+| Header | 6 槽 · 平均 Lv · 已填 N/6 | Quick scan |
+| Bulk | **BST 合计** / 平均 BST | From dex CDN base stats |
+| Offense | **属性覆盖** (unique attacking types in party) | Reuse type chart |
+| Bias | 物攻向 vs 特攻向 (Atk vs SpA BST 倾向) | Lightweight |
+| Defense | **联防弱点摘要** — top shared weaknesses (e.g. 地面、冰) | Aggregate types × type chart |
+| Damage hint | **对常见属性的估算伤害区间** (optional link → 快速伤害) | Reuse `quick_damage_page` logic at team level |
+| Vitals | HP 总和 / 平均 HP% | From save or manual HP fields |
 
-Reuse existing:
+Reuse: `stat_calc_page.dart`, `type_chart.dart`, `dexRepository.getSummary`, `quick_damage_page.dart`.
 
-- `stat_calc_page.dart` — single-Pokémon calc
-- `type_chart.dart` — type matchup
-- `dexRepository.getSummary(speciesId)` — base stats
-
-### Nice-to-have (v2)
-
-- Estimated damage range vs common types (heavy; links to quick damage tool)
-- Weakness summary (team defensive profile)
-- HP total / status of party
-
-### UX
-
-One **StickerCard** at top of Team page — compact rows, not a full battle calc.
+Not a full Showdown calc — compact companion estimate.
 
 ---
 
-## 6. Dependency graph (implementation order)
+## 5. Pokémon Sleep — can TitoDex connect?
+
+### Short answer
+
+**Not like HGSS `.sav` today.** Pokémon Sleep has **no official public API** for reading a player's sleep sessions, camp, or party from the app account.
+
+### What exists externally
+
+| Source | What it provides | TitoDex fit |
+| --- | --- | --- |
+| **Official game** | Sleep tracked via GO Plus+, phone, Garmin → Health Connect / Apple Health | **Indirect only** — not Pokémon account data |
+| **Neroli's Lab / Sleep API** ([docs](https://docs.nerolislab.com/)) | Game mechanics, species stats, simulators, calculators | **Reference data** (like PokeAPI), not user save |
+| **Health Connect / Apple Health** | Raw sleep duration/stages from Garmin/phone | Could show「昨晚睡了 Xh」on home — **not** Pokémon Sleep progression |
+
+### Realistic integration tiers
+
+| Tier | Effort | Value |
+| --- | --- | --- |
+| **A — Dex companion** | Low | Add `GameEdition` or separate「Sleep」mode: static helpers (Snorlax strength calc links, recipe refs) using public game data |
+| **B — Health sleep line** | Medium | Optional RG permission: read last night sleep from Health Connect → small home widget「睡眠 7h12m」— personal, not game-linked |
+| **C — Full Sleep sync** | **Blocked** | Would need official API or ToS-risky reverse engineering — **not recommended** |
+
+### Recommendation
+
+- Classify **Pokémon Sleep** as `manual` journey mode (same as LZA/Champions) for now.
+- If Tito wants Sleep on the device: **Tier A** (tools + links) or **Tier B** (health sleep stat) — separate from save parser roadmap.
+- Revisit if The Pokémon Company ships account export or companion API.
+
+---
+
+## 6. Home UX — merge Journey tab into journey card (§8)
+
+See **§8** for layout, greeting, badges, illustration removal.
+
+---
+
+## 7. Trainer card redesign (Tito confirmed)
+
+### Current layout
+
+```
+[Avatar]  TRAINER CARD
+          Name
+          Game title
+          Companion
+          Badge grid (2 rows × 4, below text)
+```
+
+### Planned layout
+
+```
+[  Larger   ]   早上好，训练家 Tito
+[  Avatar   ]   (or 下午好 / 傍晚好 / 深夜好 …)
+                [optional companion one-liner]
+[            ]                    [Badge column]
+                                  ●●●●
+                                  ●○○○
+                                  (8 dots vertical
+                                   or compact grid
+                                   on the RIGHT)
+```
+
+### Time-based greeting (local device time)
+
+| Hour (24h) | Greeting |
+| --- | --- |
+| 05–08 | 早上好 |
+| 08–11 | 上午好 |
+| 11–13 | 中午好 |
+| 13–17 | 下午好 |
+| 17–19 | 傍晚好 |
+| 19–23 | 晚上好 |
+| 23–05 | 深夜好 |
+
+Format: `{greeting}，训练家 {trainerName}` — drop standalone「当前游戏」line from card (game context lives in Settings / journey card / dex).
+
+Implementation: `app_zh.dart` helper `greetingForHour(DateTime.now())`.
+
+### Avatar
+
+- Increase `trainerDenseAvatarSize` / micro sizes where card allows
+- **Not tappable** on home
+
+### Badges
+
+- Move `_BadgeGrid` to **trailing** `Column` / `Row` end
+- Frees vertical space for greeting + larger avatar
+
+---
+
+## 8. Journey card — merge Continue + Journey page (recommended)
+
+### Tito proposal
+
+Remove **Journey tab** entirely. Home **journey card** (renamed from Continue):
+
+- Shows: current **location**, play time, maybe one-line game
+- **No** `CityIllustration` / pixel map — **solid deep sticker block** (match square `dense` layout everywhere)
+- **Chevron / ▶** on trailing edge →「可以点进去」
+- Tap → **Journey detail** (today's `JourneyPage` content: location summary, timeline, reminder)
+- **Do not** pretend「继续」launches game — emulator launch moves to Settings or secondary action inside detail (TBD)
+
+### Agent recommendation: **Yes, merge — good fit**
+
+| Pro | Con |
+| --- | --- |
+| Continue button already **doesn't reliably open game** on RG — card as「旅程状态」is honest | Lose one-tap emulator from home (mitigate: keep in Settings / detail footer) |
+| Journey page content is **read-only save info** — natural second level | Need clear ▶ affordance so users discover detail |
+| Drops a nav tab → cleaner **3+4** layout | Route `/journey` becomes push from card, not tab |
+| Matches「旅程信息只读存档」 | Manual mode: whole card hidden — no orphan route |
+
+### Journey card wireframe (save-linked)
+
+```
+┌──────────────────────────────────────▶┐
+│ 旅程 · 满金市                          │
+│ ─────────────────────────────────────  │
+│  (solid deep blue / cream block —      │
+│   no city pixel art)                   │
+│                                        │
+│ 游戏时间 18:42        徽章 3/8         │
+└────────────────────────────────────────┘
+         tap anywhere → JourneyDetailPage
+```
+
+- Remove `_ContinueButton` primary CTA or demote to small link inside detail page
+- `showIllustration: false` globally; deprecate / delete `CityIllustration` usage on home
+
+### Files
+
+| File | Change |
+| --- | --- |
+| `continue_journey_card.dart` | Rename concept; chevron; tap → `/journey`; no illustration |
+| `city_illustration.dart` | Remove from home (file can stay for later art slot) |
+| `home_page.dart` | Trainer card layout; journey card; no avatar tap |
+| `journey_page.dart` | Becomes push destination; optional emulator action at bottom |
+| `tito_bottom_nav.dart` | Remove `/journey` |
+| `app.dart` | Remove `_onTrainerAvatarTap`; adjust `_onContinue` → navigate to journey detail |
+
+---
+
+## 9. Dependency graph
 
 ```mermaid
 flowchart TD
-  A[GameEdition.journeyCapability] --> B[Settings split trainer vs readonly journey]
-  A --> C[Home + nav gating]
-  A --> D[Skip save sync in manual mode]
-  B --> E[Fix avatar in Settings]
-  C --> F[Quick grid 3-column portrait]
-  D --> G[Team manual edit]
-  G --> H[Team aggregate stats card]
+  A[GameEdition.journeyCapability] --> B[Settings trainer + avatar]
+  A --> C[Nav 4-tab + quick 3-tile]
+  A --> D[Skip save sync manual]
+  B --> E[Remove home avatar tap]
+  C --> F[Journey card merge + no illustration]
+  F --> G[Trainer card greeting + badge right]
+  D --> H[Team edit all modes]
+  H --> I[Team full summary card]
 ```
 
-Suggested batch:
+Suggested implementation order:
 
-1. `journeyCapability` + UI gating (home/nav/settings save section)
-2. Settings trainer + avatar fix; journey fields read-only
-3. Team edit model + UI
-4. Team summary card
+1. `journeyCapability` + nav/quick gating
+2. Settings (avatar fix, read-only journey, remove manual fields)
+3. Trainer card + journey card home redesign (merge journey route)
+4. Team edit + summary card
+5. Sleep Tier A/B only if requested
 
 ---
 
-## 7. Open questions (for Tito before coding)
+## 10. Resolved — no longer open
 
-1. **Home avatar tap** — keep as shortcut or Settings-only?
-2. **Save-linked team edit** — allow overriding save party for display, or read-only party with manual mode only?
-3. **Manual mode dex progress** — seen/caught from save flags disabled; use manual markers only?
-4. **Bottom nav** — 4 items after dropping Journey, or replace Journey slot with something else (e.g. Settings shortcut)?
-5. **NS games** — exact list: SM/USUM/SwSh/SV/PLA + LZA/Champions — anything else?
+~~Home avatar shortcut~~ → Settings only  
+~~Team edit save-linked~~ → Always editable, default save  
+~~NS list~~ → Current set OK  
+~~Nav replacement~~ → None; hand-drawn icons later  
+~~Journey tab~~ → Merged into home card (confirmed)
+
+### Still TBD at implementation
+
+1. Party vs save **merge on re-sync** — overwrite user edits or merge by slot?
+2. Emulator launch entry — Settings only vs small button on journey detail?
+3. Manual mode dex seen/caught — disable save flags entirely?
 
 ---
 
 ## Related docs
 
-- [ROADMAP.md](../ROADMAP.md) — Phase B / home dashboard
-- [PRODUCT.md](../PRODUCT.md) — journey companion positioning
-- [AI_READFIRST.md](./AI_READFIRST.md) — agent quick ref
-- Dex/detail UX: [ROADMAP.md](../ROADMAP.md) Phase E (list / obtain / moves)
+- [ROADMAP.md](../ROADMAP.md) — Phase B home dashboard
+- [PRODUCT.md](../PRODUCT.md)
+- [AI_READFIRST.md](./AI_READFIRST.md)
+- Dex/detail: [ROADMAP.md](../ROADMAP.md) Phase E
