@@ -374,32 +374,28 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _movesSections(PokemonDetail detail) {
     final moveSetKey = gameEditionMoveSetKey(_moveGameEdition);
     final moveSet = detail.moveSetForKey(moveSetKey);
-    final availableEditions = [
-      for (final edition in GameEdition.all)
-        if (_moveSetHasData(detail, edition)) edition,
-    ];
 
     return [
-      if (detail.hasMultipleMoveSets || availableEditions.length > 1) ...[
-        _MoveGameEditionBar(
-          selected: _moveGameEdition,
-          available: availableEditions.isEmpty
-              ? const [defaultGameEdition]
-              : availableEditions,
-          onSelected: (edition) {
-            setState(() => _moveGameEdition = edition);
-          },
-        ),
-        const SizedBox(height: 12),
-      ],
       _MoveMethodFilterBar(
         selected: _moveMethodFilter,
         onSelected: (filter) => setState(() => _moveMethodFilter = filter),
       ),
       const SizedBox(height: 12),
-      Text(
-        AppZh.dexMovesScope(gameEditionLabelZh(_moveGameEdition)),
-        style: SecondaryTypography.onGradient.body14,
+      HandheldFocusDecorator(
+        onActivate: () => _pickMoveGameEdition(),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _pickMoveGameEdition,
+            child: Text(
+              AppZh.dexMovesScope(gameEditionLabelZh(_moveGameEdition)),
+              style: SecondaryTypography.onGradient.body14.copyWith(
+                decoration: TextDecoration.underline,
+                decorationColor: TitoColors.skyBlue,
+              ),
+            ),
+          ),
+        ),
       ),
       const SizedBox(height: 12),
       // v0.4.1: AnimatedSize move method panels (experimental)
@@ -443,66 +439,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     };
   }
 
-  bool _moveSetHasData(PokemonDetail detail, GameEdition edition) {
-    final set = detail.moveSetForKey(edition.dataVersionGroupKey);
-    return set.levelUp.isNotEmpty ||
-        set.machine.isNotEmpty ||
-        set.egg.isNotEmpty ||
-        set.tutor.isNotEmpty;
-  }
-}
-
-class _MoveGameEditionBar extends StatelessWidget {
-  const _MoveGameEditionBar({
-    required this.selected,
-    required this.available,
-    required this.onSelected,
-  });
-
-  final GameEdition selected;
-  final List<GameEdition> available;
-  final ValueChanged<GameEdition> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 34,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: available.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 6),
-        itemBuilder: (context, index) {
-          final edition = available[index];
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => onSelected(edition),
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-              child: Ink(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: selected.slug == edition.slug
-                      ? TitoColors.softYellow
-                      : TitoColors.card,
-                  borderRadius: BorderRadius.circular(TitoRadii.sm),
-                  border: Border.all(color: TitoColors.ink, width: 2),
-                ),
-                child: Text(
-                  edition.labelZh,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+  Future<void> _pickMoveGameEdition() async {
+    final picked = await showGameEditionGridPicker(
+      context,
+      selected: _moveGameEdition,
     );
+    if (picked != null && mounted) {
+      setState(() => _moveGameEdition = picked);
+      await dexSettingsRepository.saveDefaultGameEdition(picked);
+    }
   }
 }
 

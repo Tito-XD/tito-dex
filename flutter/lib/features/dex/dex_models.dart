@@ -349,7 +349,7 @@ class ObtainLocationEntry {
       ObtainLocationEntry(
         areaSlug: json['areaSlug'] as String,
         areaLabelZh: json['areaLabelZh'] as String? ??
-            encounterAreaLabelZh(json['areaSlug'] as String),
+            resolveObtainAreaLabelZh(json['areaSlug'] as String),
         minLevel: json['minLevel'] as int?,
         maxChance: json['maxChance'] as int? ?? 0,
       );
