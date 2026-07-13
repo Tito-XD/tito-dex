@@ -4,14 +4,14 @@
 
 It is **not** a full encyclopedia replacement (52Poké, Bulbapedia, etc.). Reference data exists to support the current game, not to catalog everything.
 
-**Current release:** [v0.4.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.6) · App `0.4.6+38` · Offline dex bundle **v5** (1025 species, 23 game editions)
+**Current release:** [v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7) · App `0.4.7+39` · Offline dex bundle **v5** (1025 species, 23 game editions)
 
-## Highlights (v0.4.6)
+## Highlights (v0.4.7)
 
-- **Journey first** — home dashboard, party, timeline, emulator continue, HGSS `.sav` directory sync  
-- **National dex 1–1025** — offline CDN bundle, regional scopes, move/ability encyclopedia with **filter → dex** drill-down  
-- **中文对照** — location/species labels in bundle `l10n/`; weekly sync workflow for 52poke gaps  
-- **对战助手** — type matchup, stat calc, damage estimate (Search hub)  
+- **Sprite 策略** — 列表默认 CDN 小图；详情页点图按 Gen I–IX 切换各代 sprite（按需加载）
+- **图鉴 1025** — 全国图鉴进度分母修正为 1025
+- **首页布局** — 竖屏/Pad 居中；Trainer 卡片加高、头像放大、两行问候、移除右侧徽章
+- **头像裁切** — 修复 UCrop 与状态栏重叠导致无法点确认
 - **RG APK** — arm64-v8a, ~21 MB, [releases/](releases/)
 
 ## Principles
@@ -38,7 +38,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install (RG handheld)
 
-Download **`TitoDex-0.4.6-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Uninstall any locally-built debug APK first (signing key differs).
+Download **`TitoDex-0.4.7-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Uninstall any locally-built debug APK first (signing key differs).
 
 First launch may prompt you to open **Settings → 下载预打包数据包** for the full offline pack.
 

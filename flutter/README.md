@@ -2,7 +2,7 @@
 
 Flutter implementation of the journey companion. Parent repo: [../README.md](../README.md).
 
-**Version:** `0.4.6+38` · [GitHub Release v0.4.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.6)
+**Version:** `0.4.7+39` · [GitHub Release v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7)
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 
@@ -27,7 +27,7 @@ cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-ar
 
 Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local debug builds before sideloading CI APK.
 
-## Features (v0.4.6)
+## Features (v0.4.7)
 
 | Area | Notes |
 | --- | --- |

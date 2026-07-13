@@ -4,8 +4,8 @@
 
 | Field | Value |
 | --- | --- |
-| **Current release** | [v0.4.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.6) |
-| **App version** | `0.4.6+38` (`flutter/pubspec.yaml`) |
+| **Current release** | [v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7) |
+| **App version** | `0.4.7+39` (`flutter/pubspec.yaml`) |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,7 +39,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (v0.4.6)
+## Current feature status (v0.4.7)
 
 ### Journey & save
 - HGSS retail 512 KB `.sav` parser; directory sync (newest by mtime); startup auto-load.
@@ -58,6 +58,13 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **对战资料:** type matchup, stat calc, quick damage (partial).
 - Reference → **structured detail** + drill-down to dex filter (move / ability / egg group).
 - `/search?q=` deep link supported.
+
+### v0.4.7 highlights
+- List/dex uses single default CDN sprite; detail tap opens Gen I–IX picker (Roman numerals + edition labels).
+- National dex progress fixed to 1–1025 (was 493).
+- Home (non-square): centered layout, taller trainer card, two-line greeting, badges removed from card.
+- Avatar crop UCrop toolbar no longer overlaps status bar on Android.
+- Removed bulk PokeAPI sprite mirror CI (on-demand URLs in detail viewer).
 
 ### v0.4.6 highlights
 - Sprite path fixes + loading placeholders; collapsible icon-grid type pickers.
