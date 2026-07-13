@@ -2,7 +2,7 @@
 
 > **Active stack:** Flutter + Dart in `flutter/`. Capacitor + React under `src/` is a frozen design reference. See [Stack Decision](./STACK_DECISION.md) for migration rationale and current feature status.
 
-**Release:** v0.2.25 · Dex CDN bundle v4 at `https://dex.tito.cafe`
+**Release:** v0.2.25 · Dex offline bundle v4 (compile-time CDN config)
 
 **RG APK:** `TitoDex-<ver>-rg-arm64.apk` — arm64-v8a only, SDK 36, ~20 MB. `flutter build apk --release`. Uninstall local builds before sideloading CI APK.
 
@@ -19,7 +19,7 @@
 | Save sync | `SaveSyncService` + `SaveScanner` — directory watch, newest file by mtime |
 | Dex online | `PokeApiClient` + throttle/retry |
 | Dex offline | `DexOfflineService` — PokeAPI batch **or** `DexBundleInstaller` (CDN tar.zst) |
-| Dex CDN | `DexCdnConfig` — compile-time URLs; defaults to `dex.tito.cafe` v4 |
+| Dex CDN | `DexCdnConfig` — compile-time URLs (not shown in app UI) |
 | Artwork | `DexArtworkService` — lazy PNG full-size; local `artwork/` cache on tap |
 | File picking | `file_picker` — directory path |
 | Hashing | `package:crypto` SHA-256 (saves + bundle integrity) |
@@ -167,7 +167,7 @@ See `PARSER_PROPOSAL.md` for full boundary.
 
 ### 4. Dex CDN layer (live)
 
-R2 bucket `titodex-dex` behind Worker `tito-dex` at `dex.tito.cafe`. See `CLOUDFLARE_DEX_CDN.md`.
+R2 bucket `titodex-dex` behind Worker `tito-dex`. See `CLOUDFLARE_DEX_CDN.md` (maintainers).
 
 ### 5. Journey cloud sync
 

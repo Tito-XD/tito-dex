@@ -1,6 +1,8 @@
 # TitoDex 图鉴 — Cloudflare 配置说明
 
-> **受众：** Cloudflare 侧 Agent / 运维。只负责 **R2 + CDN + 离线图鉴包**，不涉及 App UI。
+> **受众：** Cloudflare 侧 Agent / 运维（**内部文档**）。只负责 **R2 + CDN + 离线图鉴包**，不涉及 App UI。
+>
+> **请勿**在 App 文案、GitHub Release 说明、公开 README 中粘贴 CDN 直链，避免被滥用刷流量。
 >
 > **App 对齐：** 离线目录格式与 `flutter/lib/features/dex/dex_cache_store.dart` 一致。
 

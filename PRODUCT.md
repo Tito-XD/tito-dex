@@ -88,7 +88,7 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - Trainer Card feeling.
 - Riolu companion presence.
 - Compact widget dashboard.
-- **National dex 1–493** with offline CDN bundle v4 (`dex.tito.cafe/v2/`) — shipped v0.2.28.
+- **National dex 1–493** with offline bundle v4 — shipped v0.2.28.
 - **National dex 1–1025** + CDN bundle v5 (`/v3/`) + **`DexScope`** multi-game browse — planned v0.3.0.
 - Journey timeline.
 
@@ -122,6 +122,6 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 
 ### Planned (v0.3.0)
 
-- National dex **1–1025**, CDN bundle **v5** at `dex.tito.cafe/v3/`
+- National dex **1–1025**, offline bundle **v5**
 - **`DexScope`** game version switcher (HGSS / SV / SwSh move sets)
 - Radar chart, move/ability encyclopedia browse

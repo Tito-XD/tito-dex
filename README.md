@@ -4,7 +4,7 @@ TitoDex is a personal Pokémon journey companion app: **Tito + Pokédex**, but n
 
 It is designed as a warm companion device for Tito's own Pokémon playthroughs, starting with **Pokémon SoulSilver / HeartGold-SoulSilver context** and expanding only when the journey reaches later games.
 
-**Current release:** [v0.4.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.1) · App `0.4.1+33` · Dex CDN bundle **v5** at `dex.tito.cafe/v3/` (1025 species, 23 game editions)
+**Current release:** [v0.4.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.2) · App `0.4.2+34` · Offline dex bundle **v5** (1025 species, 23 game editions)
 
 **Shipped in v0.4.0:** Global **GameEdition** (23 games), **11 regional dexes**, detail tabs (flavor / obtain / moves per game), search hub (搜索 · 常用资料 · 对战资料)
 
@@ -48,7 +48,7 @@ See [Stack Decision](./docs/STACK_DECISION.md) for migration history and current
 | Persistence | `shared_preferences` — journey JSON + save-directory config |
 | Save parsing | Dart `HgssParser` — retail 512 KB `.sav` |
 | Save sync | Directory watch — newest `.sav` by mtime, startup auto-load |
-| Dex data | PokeAPI + **Cloudflare CDN** offline bundle (`dex.tito.cafe`; v4 `/v2/` today, v5 `/v3/` planned) |
+| Dex data | PokeAPI + **pre-built offline bundle** (downloaded from Settings; v5, 1025 species) |
 | Dex scope | National **1–493** shipped; **1–1025** + `DexScope` (HGSS / Johto / Kanto / SV move sets) in v0.3.0 |
 | Dex sprites | **PNG** thumbnails + lazy-loaded full **artwork** |
 | Localization | Simplified Chinese UI (`lib/l10n/`) |
@@ -72,25 +72,17 @@ cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-ar
 
 **Sideload:** uninstall any locally-built 0.2.x first (CI signing key differs). See [flutter/README.md](flutter/README.md).
 
-## Dex CDN (production)
+## Dex offline bundle
 
-| Item | Value |
+Pre-built dex bundle endpoints are configured at compile time (not shown in the app UI). See `flutter/lib/features/dex/dex_cdn_config.dart` and maintainer docs: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md).
+
+| Item | Notes |
 | --- | --- |
-| Base URL | `https://dex.tito.cafe` |
-| Offline bundle (production) | `https://dex.tito.cafe/v2/bundle.tar.zst` — bundle **v4**, 493 species |
-| Offline bundle (v0.3.0) | `https://dex.tito.cafe/v3/bundle.tar.zst` — bundle **v5**, **1025** species |
-| Bundle versions | **v4** `/v2/` (current APK) · **v5** `/v3/` (planned; adds `abilities`, `obtainLocations`, `pokedexNumbers`) |
+| Bundle **v4** | 493 species (legacy) |
+| Bundle **v5** | **1025** species (current app default) |
 | Worker branch | `deploy/dex-cdn` |
 
-App compile-time defaults (`flutter/lib/features/dex/dex_cdn_config.dart`):
-
-```bash
-TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst   # v0.3.0 → /v3/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4                                     # v0.3.0 → 5
-```
-
-Setup & upload: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md)
+Setup & upload: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md) (maintainers — use your private `--cdn-base`, do not publish URLs in public copy)
 
 ## Documentation
 
@@ -125,7 +117,7 @@ flutter run                # connected Android device / emulator
 
 **Import test save:** Settings → 旅程数据 → 导入内置 PKMSS.sav
 
-**Dex offline pack:** Settings → 图鉴离线包 → 从 CDN 下载（production: `dex.tito.cafe` bundle v4 at `/v2/`; v0.3.0 targets v5 at `/v3/`, 1025 species)
+**Dex offline pack:** Settings → 图鉴离线包 → 下载预打包图鉴包 (bundle v5, 1025 species)
 
 **Auto-sync from emulator folder:** Settings → 存档目录 → pick a folder containing `.sav` files → enable 启动时自动加载. On startup, TitoDex picks the newest 524 288-byte `.sav` and refreshes the home screen.
 
@@ -135,14 +127,11 @@ Probe a save file from the command line:
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
 ```
 
-Build dex CDN bundle:
+Build dex offline bundle (maintainers — set `--cdn-base` via env, do not commit public URLs):
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
-# Production v4 (493, /v2/) — current APK default
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
-# v0.3.0 v5 (1025, /v3/)
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v5 --max-id 1025
+python3 tools/build_dex_bundle.py --cdn-base "$TITODEX_DEX_CDN_BASE" --output dist/dex-v5 --max-id 1025
 ```
 
 ### HGSS save fixtures

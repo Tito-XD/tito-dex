@@ -72,16 +72,10 @@ Requires Android SDK (`flutter doctor --android-licenses`).
 
 Two ways to populate `dex_offline/`:
 
-1. **CDN bundle (recommended on RG)** — Settings → 图鉴离线包 → downloads `bundle.tar.zst` from `dex.tito.cafe` (`/v2/` bundle v4 today; v0.3.0 → `/v3/` bundle v5, 1025 species), verifies SHA256, extracts to app documents.
+1. **Pre-built bundle (recommended on RG)** — Settings → 图鉴离线包 → 下载预打包图鉴包 (bundle v5, 1025 species), verifies SHA256, extracts to app documents.
 2. **PokeAPI batch** — legacy per-species download with throttle/retry (Settings).
 
-Config defaults in `lib/features/dex/dex_cdn_config.dart`:
-
-```dart
-TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst   // v0.3.0 → /v3/
-TITODEX_DEX_BUNDLE_VERSION=4                                     // v0.3.0 → 5
-```
+Config: compile-time env vars `TITODEX_DEX_CDN_BASE`, `TITODEX_DEX_BUNDLE_URL`, `TITODEX_DEX_BUNDLE_VERSION` in `lib/features/dex/dex_cdn_config.dart` (defaults not shown in app UI).
 
 Local layout matches CDN bundle (`lib/features/dex/dex_cache_store.dart`):
 
