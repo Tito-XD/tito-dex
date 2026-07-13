@@ -44,6 +44,20 @@ Tito confirmed: **remove game-edition filter from the dex list**; regional poked
 - **Why:** game tap resets region but region pick does not reset game — confusing dual control.
 - **Track:** [ROADMAP.md](../ROADMAP.md) → Phase E → “Planned UX — Dex list”.
 
+## Detail page UX (planned — batch with dex list changes)
+
+### Obtain tab — location names
+
+Tito confirmed: raw IDs like `301` / `823` in「出现地点」are unusable. Need **encounter location mapping table** (HGSS first).
+
+- Existing partial slug map: `dex_game_scope.dart` → `encounterAreaLabelsZh`
+- Existing HGSS map list (save parser): `hgss_map_list.dart` — not used for obtain display yet
+- Fix at bundle build + app display fallback; see ROADMAP Phase E → “Detail obtain tab”
+
+### Moves tab — inline game picker
+
+Tito confirmed: remove top `_MoveGameEditionBar` chip scroll; make **`以下招式范围：{game}`** tappable to pick game version (bottom sheet). Saves vertical space on RG.
+
 ## Communication Defaults
 
 - Default communication with Tito should be in **Chinese**.

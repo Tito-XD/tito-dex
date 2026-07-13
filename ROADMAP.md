@@ -133,6 +133,37 @@ Cross-filter dex like Pocket Gallery’s **地区图鉴** + per-game move/flavor
 - Init: do not force `_region` from saved game on open — or default list to 全国 unless user last picked a region (TBD with other changes).
 - Global `gameEditionRepository` still updated from home / detail / settings.
 
+### Planned UX — Detail obtain tab (Tito confirmed, not implemented)
+
+**Obtain locations must show human-readable place names**, not raw IDs like `301` / `823`.
+
+| Current | Problem |
+| --- | --- |
+| `ObtainLocationEntry.areaLabelZh` displayed as-is | CDN / PokeAPI slugs with no label fall back to slug or bare number |
+| `encounterAreaLabelsZh` in `dex_game_scope.dart` | ~20 HGSS slug entries only (routes, a few dungeons) |
+| `hgss_map_list.dart` + `locationLabelForMapId()` | Used for **save parser** map @0x1234, **not** wired to obtain tab |
+
+**Planned fix (batch with other detail UX):**
+
+- Add / extend **encounter location mapping** (HGSS first): PokeAPI `location-area` slug → 中文名; numeric IDs → name via lookup table.
+- Reuse or align with Project Pokémon HGSS map list where IDs match in-game map indices.
+- Bundle build (`tools/build_dex_bundle.py` → `encounter_area_label_zh`) should bake `areaLabelZh` at build time so offline bundle is self-contained.
+- Display fallback: never show bare number without 「未知地点 #N」+ optional debug slug.
+
+### Planned UX — Detail moves tab (Tito confirmed, not implemented)
+
+**Remove the top horizontal game-edition chip bar on the Moves tab.** Game selection moves inline to the scope line.
+
+| Current | Planned |
+| --- | --- |
+| `_MoveGameEditionBar` — 23-game horizontal scroll above method filters | **Remove** |
+| Static text `以下招式范围：心金/魂银 (HGSS)` | **Tappable** — opens game picker (bottom sheet or dropdown, same pattern as regional dex picker) |
+| Method chips (等级 / 学习器 / 蛋 / 教学) | Unchanged, stays below scope line |
+
+**Rationale:** Same as dex list — long chip row wastes vertical space on RG; one line with picker is enough. Game filter belongs on the scope label, not a separate row.
+
+**Code touchpoints (when implementing):** `pokemon_detail_page.dart` → `_movesSections`, `_MoveGameEditionBar`; `app_zh.dart` → `dexMovesScope`.
+
 ## Phase F — Reference Data (“常用资料”)
 
 Standalone lists — lower priority than journey loop; can live under Search or Settings.

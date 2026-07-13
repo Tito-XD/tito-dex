@@ -359,12 +359,27 @@ bash tools/upload_dex_bundle.sh dist/dex-v5/upload v3
 
 ### 7.3 详情四 Tab
 
-| Tab | 项 |
-| --- | --- |
-| **简介** | 全版本 flavor 轮播 + game icon；**初始亲密度 / 基础点数(EV) / 捕获率**；特性完整 |
-| **基本** | 种族值 **条形 ↔ 雷达** 小开关 |
-| **获取** | `obtainLocationsByGame` 按当前游戏过滤；无数据 → 空态 + 换版本 |
-| **招式** | 默认当前游戏 `moveSets`；筛选：**等级 / 教学 / 蛋 / 学习器**（单选激活） |
+| Tab | 项 | 状态 |
+| --- | --- | --- |
+| **简介** | 全版本 flavor 轮播 + game icon；**初始亲密度 / 基础点数(EV) / 捕获率**；特性完整 | 🚧 |
+| **基本** | 种族值 **条形 ↔ 雷达** 小开关 | 🚧 |
+| **获取** | `obtainLocationsByGame` 按当前游戏过滤；无数据 → 空态 + 换版本 | ⚠️ 有数据但 **地点名未映射**（截图：301、823 等裸 ID） |
+| **招式** | 默认当前游戏 `moveSets`；筛选：**等级 / 教学 / 蛋 / 学习器**（单选激活） | ⚠️ 顶部 23 游戏 chips 占空间 |
+
+**获取 Tab — 地点映射（Tito 确认待改，2026-07）：**
+
+- 出现地点应显示中文地名（如「28号道路」「互连瀑布」），不能是裸数字 ID。
+- 现状：`encounterAreaLabelsZh` 仅覆盖少量 PokeAPI slug；未命中则直接显示 slug/数字。
+- 已有但未接入：`hgss_map_list.dart`（存档 map ID → 英文名，`game_zh` 本地化）。
+- 待做：扩展 **encounter location 映射表**（bundle 构建时写入 `areaLabelZh` + App 展示兜底）。
+
+**招式 Tab — 游戏筛选位置（Tito 确认待改，2026-07）：**
+
+- **去掉**招式 Tab 顶部横向 23 游戏 chips（`_MoveGameEditionBar`）。
+- 把 **「以下招式范围：心金/魂银 (HGSS)」** 改成可点击，弹出游戏选择列表（同地区图鉴 bottom sheet 模式）。
+- 上方省一行，方法筛选 chips（等级/学习器/蛋/教学）保留。
+
+与其它图鉴 UX 一起批量改 → [ROADMAP.md](../../ROADMAP.md) Phase E。
 
 ### 7.4 资料中心（截图 2 & 3 · 用户确认「全都要」）
 
