@@ -33,13 +33,15 @@ Optional (read-only sanity check): add **Workers R2 Storage → Read** on the sa
 export CLOUDFLARE_API_TOKEN="..."
 export CLOUDFLARE_ACCOUNT_ID="..."
 cd cloudflare/dex-cdn
-npx wrangler r2 bucket list --remote
+npx wrangler r2 bucket list
 # Should list titodex-dex — not 403
 echo test | npx wrangler r2 object put titodex-dex/_healthcheck.txt --file=- --remote
 npx wrangler r2 object delete titodex-dex/_healthcheck.txt --remote
 ```
 
-If `bucket list --remote` returns **403 Authentication error**, the token lacks **Workers R2 Storage Edit** (or wrong account ID).
+`r2 bucket list` always hits the remote API (no `--remote` flag). Only `r2 object put/delete` need `--remote` in Wrangler 4 to avoid local mode.
+
+If `bucket list` returns **403 Authentication error**, the token lacks **Workers R2 Storage Edit** (or wrong account ID).
 
 ### Pre-built template (alternative)
 
