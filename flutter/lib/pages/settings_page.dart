@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
+import '../features/game/game_edition_repository.dart';
+import '../features/game/journey_capability.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
@@ -8,6 +12,7 @@ import '../features/game/game_edition.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
+import '../features/trainer/trainer_avatar_service.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -58,12 +63,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   late final TextEditingController _trainerController;
-  late final TextEditingController _locationController;
-  late final TextEditingController _playTimeController;
-  late final TextEditingController _badgesController;
-  late final TextEditingController _reminderController;
   bool _trainerDirty = false;
-  bool _journeyDirty = false;
+  bool _avatarChanging = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
   GameEdition _defaultGameEdition = defaultGameEdition;
@@ -73,14 +74,6 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _trainerController = TextEditingController(
       text: widget.journey.trainerName,
-    );
-    _locationController = TextEditingController(text: widget.journey.location);
-    _playTimeController = TextEditingController(text: widget.journey.playTime);
-    _badgesController = TextEditingController(
-      text: widget.journey.badges.toString(),
-    );
-    _reminderController = TextEditingController(
-      text: widget.journey.nextReminder ?? '',
     );
     _refreshDexCacheStatus();
     _loadDexSettings();
@@ -255,22 +248,48 @@ class _SettingsPageState extends State<SettingsPage> {
         !_trainerDirty) {
       _trainerController.text = widget.journey.trainerName;
     }
-    if (oldWidget.journey != widget.journey && !_journeyDirty) {
-      _locationController.text = widget.journey.location;
-      _playTimeController.text = widget.journey.playTime;
-      _badgesController.text = widget.journey.badges.toString();
-      _reminderController.text = widget.journey.nextReminder ?? '';
-    }
   }
 
-  @override
   void dispose() {
     _trainerController.dispose();
-    _locationController.dispose();
-    _playTimeController.dispose();
-    _badgesController.dispose();
-    _reminderController.dispose();
     super.dispose();
+  }
+
+  Future<void> _changeAvatar() async {
+    if (_avatarChanging) {
+      return;
+    }
+    setState(() => _avatarChanging = true);
+
+    try {
+      final path = await TrainerAvatarService.pickAndCropSquare();
+      if (!mounted) {
+        return;
+      }
+      if (path == null) {
+        return;
+      }
+      widget.onSaveJourney(
+        widget.journey.copyWith(
+          trainerAvatarPath: path,
+          trainerAvatarCustomized: true,
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackAvatarUpdated)),
+      );
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackAvatarFailed)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _avatarChanging = false);
+      }
+    }
   }
 
   void _saveTrainerName() {
@@ -292,28 +311,6 @@ class _SettingsPageState extends State<SettingsPage> {
     ).showSnackBar(const SnackBar(content: Text(AppZh.snackTrainerSaved)));
   }
 
-  void _saveJourneyEdits() {
-    final badges = int.tryParse(_badgesController.text.trim());
-    if (badges == null || badges < 0) {
-      return;
-    }
-
-    widget.onSaveJourney(
-      widget.journey.copyWith(
-        location: _locationController.text.trim(),
-        playTime: _playTimeController.text.trim(),
-        badges: badges,
-        nextReminder: _reminderController.text.trim().isEmpty
-            ? null
-            : _reminderController.text.trim(),
-      ),
-    );
-    setState(() => _journeyDirty = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneySaved)));
-  }
-
   @override
   Widget build(BuildContext context) {
     final saveName = widget.journey.saveTrainerName;
@@ -324,6 +321,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexCache = _dexCacheStatus;
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
+    final saveLinked = gameEditionRepository.edition.isSaveLinked;
 
     return TitoFontScale(
       multiplier: 1.0,
@@ -336,6 +334,19 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(AppZh.settingsGroupTrainer, style: SecondaryTypography.onCard.h15),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _SettingsAvatarPreview(journey: widget.journey),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _avatarChanging ? null : _changeAvatar,
+                      child: const Text(AppZh.settingsChangeAvatar),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _trainerController,
@@ -365,75 +376,38 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 child: const Text(AppZh.settingsSaveTrainerName),
               ),
-              const SizedBox(height: 16),
-              Text(
-                AppZh.settingsEditJourney,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _locationController,
-                spellCheckConfiguration:
-                    const SpellCheckConfiguration.disabled(),
-                decoration: const InputDecoration(
-                  labelText: AppZh.settingsLocation,
-                  border: OutlineInputBorder(),
+              if (saveLinked) ...[
+                const SizedBox(height: 16),
+                Text(
+                  AppZh.settingsJourneyReadOnly,
+                  style: SecondaryTypography.onCard.h15,
                 ),
-                onChanged: (_) => setState(() => _journeyDirty = true),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _playTimeController,
-                spellCheckConfiguration:
-                    const SpellCheckConfiguration.disabled(),
-                decoration: const InputDecoration(
-                  labelText: AppZh.settingsPlayTime,
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 10),
+                _Row(
+                  label: AppZh.settingsLocation,
+                  value: localizeLocation(widget.journey.location),
                 ),
-                onChanged: (_) => setState(() => _journeyDirty = true),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _badgesController,
-                keyboardType: TextInputType.number,
-                spellCheckConfiguration:
-                    const SpellCheckConfiguration.disabled(),
-                decoration: const InputDecoration(
-                  labelText: AppZh.settingsBadges,
-                  border: OutlineInputBorder(),
+                _Row(
+                  label: AppZh.settingsPlayTime,
+                  value: widget.journey.playTime,
                 ),
-                onChanged: (_) => setState(() => _journeyDirty = true),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _reminderController,
-                spellCheckConfiguration:
-                    const SpellCheckConfiguration.disabled(),
-                decoration: const InputDecoration(
-                  labelText: AppZh.settingsNextReminder,
-                  border: OutlineInputBorder(),
+                _Row(
+                  label: AppZh.settingsBadges,
+                  value:
+                      '${widget.journey.badges}/${widget.journey.maxBadges}',
                 ),
-                onChanged: (_) => setState(() => _journeyDirty = true),
-              ),
-              const SizedBox(height: 8),
-              FilledButton(
-                onPressed: _journeyDirty ? _saveJourneyEdits : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.deepBlue,
-                  foregroundColor: TitoColors.card,
-                ),
-                child: const Text(AppZh.settingsSaveJourneyEdits),
-              ),
+              ],
             ],
           ),
         ),
         const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(AppZh.settingsGroupSaveSync, style: SecondaryTypography.onCard.h15),
+        if (saveLinked)
+          StickerCard(
+            variant: StickerVariant.cream,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(AppZh.settingsGroupSaveSync, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
               Text(
                 AppZh.settingsSaveDirectoryHint,
@@ -758,6 +732,59 @@ class _Row extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SettingsAvatarPreview extends StatelessWidget {
+  const _SettingsAvatarPreview({required this.journey});
+
+  final CurrentJourney journey;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 64.0;
+    final avatarPath = journey.trainerAvatarPath;
+    final hasImage = avatarPath != null &&
+        avatarPath.isNotEmpty &&
+        File(avatarPath).existsSync();
+
+    final child = hasImage
+        ? ClipOval(
+            child: Image.file(
+              File(avatarPath),
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+            ),
+          )
+        : Text(
+            journey.trainerName.isNotEmpty
+                ? journey.trainerName[0].toUpperCase()
+                : 'T',
+            style: SecondaryTypography.onCard.h15.copyWith(
+              fontWeight: FontWeight.w900,
+              color: TitoColors.deepBlue,
+            ),
+          );
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: hasImage
+            ? null
+            : const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [TitoColors.softYellow, TitoColors.coral],
+              ),
+        shape: BoxShape.circle,
+        border: Border.all(color: TitoColors.ink, width: 3),
+      ),
+      alignment: Alignment.center,
+      clipBehavior: Clip.antiAlias,
+      child: child,
     );
   }
 }

@@ -58,7 +58,7 @@ abstract final class TrainerAvatarService {
     } catch (error, stackTrace) {
       debugPrint('TrainerAvatarService: $error');
       debugPrint('$stackTrace');
-      return null;
+      rethrow;
     }
   }
 }
