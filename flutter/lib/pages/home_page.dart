@@ -97,7 +97,6 @@ class _PortraitHomeLayout extends StatelessWidget {
     final compact = DeviceLayout.isCompact(context);
     final journeyHeight = compact ? 108.0 : 132.0;
     final partyHeight = compact ? 126.0 : 154.0;
-    final companionPad = compact ? 72.0 : 84.0;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -128,7 +127,6 @@ class _PortraitHomeLayout extends StatelessWidget {
             ),
             SizedBox(height: gap),
             _QuickActionsGrid(dense: compact),
-            SizedBox(height: companionPad),
           ],
         );
 

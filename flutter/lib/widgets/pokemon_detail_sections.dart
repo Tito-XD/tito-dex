@@ -1443,7 +1443,8 @@ class _InteractiveTypeEffectivenessCardState
       children: [
         if (options.isNotEmpty) ...[
           StickerCard(
-            child: DefensiveAbilityPicker(
+            child: AbilityChipPicker(
+              label: AppZh.companionDefenderAbilityPick,
               selectedSlug: _abilitySlug,
               options: options,
               onChanged: (slug) => setState(() => _abilitySlug = slug),
