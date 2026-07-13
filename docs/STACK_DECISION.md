@@ -12,44 +12,35 @@ TitoDex is built on **Flutter** in the `flutter/` directory. The Phase 2 React m
 
 The decision was driven by real-device feedback (“feels like a webpage”), future target platforms (Linux handhelds, web), and native features (save import, emulator launcher) that are awkward in WebView.
 
-## Current Implementation Status (Jul 2026)
+## Current Implementation Status
+
+**Release:** v0.4.6 · App `0.4.6+38` · Offline bundle **v5** (1025 species, `/v3/`)
 
 | Phase | Goal | Status |
 | --- | --- | --- |
-| **0 — Scaffold** | Flutter project, theme, DeviceShell, home, routing | ✅ Done |
-| **A — Persistence + native feel** | Local journey store, splash/icon/back | ⚠️ Partial — persistence + back; custom icon/splash pending |
-| **B — Useful companion** | Emulator launcher, Settings, JSON I/O | ✅ Done |
-| **C — HGSS parser** | Parse `.sav`, drive home | ✅ Parser + directory sync + timeline merge |
-| **D — Dex + CDN** | Offline dex, Cloudflare bundle, PNG artwork | ✅ v0.2.28 (493, v4 `/v2/`) · 🚧 v0.3.0 (1025, v5 `/v3/`) |
+| **0 — Scaffold** | Flutter project, theme, DeviceShell, routing | ✅ |
+| **A — Persistence** | Local journey store, back handling | ⚠️ Custom icon/splash pending |
+| **B — Companion** | Emulator launcher, Settings, JSON I/O | ✅ |
+| **C — HGSS parser** | Parse `.sav`, drive home | ✅ |
+| **D — Dex + CDN** | 1025 species, offline bundle, artwork | ✅ |
+| **E — Scopes** | Game editions, regional dexes | ✅ |
+| **F — Reference** | Encyclopedia + dex filters | ✅ v0.4.6 |
+| **G — Battle tools** | Matchup, stat/damage calc | ⚠️ Partial |
 
-### Shipped in `flutter/`
+See [AI_CONTEXT.md](./AI_CONTEXT.md) for the full feature matrix and [ROADMAP.md](../ROADMAP.md) for what's next.
 
-- **Home dashboard** — trainer card, continue + map, party, quick actions, companion sticker
-- **DeviceShell + bottom nav** — `/`, `/team`, `/journey`, `/dex`, `/search`, `/settings`
-- **Handheld polish** — RG square layout, D-pad focus, Nunito typography, status icons
-- **Journey persistence** — JSON in `shared_preferences` (`JourneyRepository`)
-- **HGSS parser** — retail 524 288-byte `.sav`; active partition via save counter at `0xF618`
-- **Map → location** — ~500 map IDs → English label → Chinese via `game_zh.dart`
-- **Save directory sync** — pick folder, scan newest `.sav` by mtime, auto-load on startup
-- **Settings** — trainer name, journey edits, emulator picker, save folder, fixture import, JSON export/import
-- **Continue** — first tap picks Android emulator; later taps launch remembered app
-- **Team / Journey pages** — party slots, timeline, journey stats
-- **Dex 1–493** — grid, search, 4-tab detail, type chart, HGSS moves, evolution chain (**shipped v0.2.28**)
-- **Dex 1–1025 + DexScope** — national expansion, Johto/Kanto regional filters, multi-game move sets (**v0.3.0**)
-- **Save dex seen/caught** — from HGSS `.sav` flags + party markers on grid
-- **Abilities + obtain locations** — detail tabs; CDN v5 bundles enriched JSON
-- **Battle companion tools (partial)** — Search page: type matchup, stat calc, quick damage (v0.2.28)
-- **Offline dex** — PokeAPI batch download **or** one-tap CDN bundle from `dex.tito.cafe` (v4 `/v2/`; v5 `/v3/` planned)
-- **PNG sprites + artwork viewer** — transparent thumbnails; tap header for lazy full-size PNG
-- **Tests** — `flutter test` (40+ tests)
+### Shipped highlights (v0.4.x)
 
-### Not yet shipped
+- National dex **1–1025**, CDN bundle v5, zh catalog in `l10n/`
+- 23 game editions, 11 regional dexes, `DexScope`
+- Search hub: encyclopedia + battle tools; reference → dex filter
+- Offline update prompts; incremental l10n download; weekly sync workflow
+- RG APK ~21 MB, `flutter test` ~115 cases
 
-- Custom launcher icon (default Flutter icon remains)
-- HeartGold detection, Kanto badge count, single-file `.sav` picker
-- National dex **1025** browse + CDN v5 app defaults (v0.3.0)
-- Full `DexScope` version switcher, radar chart, move/ability encyclopedia UI
-- Journey cloud sync (dex CDN is live; see `CLOUDFLARE_DEX_CDN.md`)
+### Not yet
+
+- Custom launcher icon; HeartGold detection; single `.sav` picker
+- Blind-spot analysis, IV calc, usage rankings, journey cloud sync
 
 ### Navigation (current)
 
@@ -149,8 +140,9 @@ Phase 0 — Flutter scaffold                    ✅
 Phase A — Native feel + persistence           ⚠️ icon/splash pending
 Phase B — Useful companion                    ✅
 Phase C — HGSS parser + save directory sync   ✅
-Phase D — Dex + Cloudflare CDN v4 (493)        ✅ v0.2.28
-Phase D+ — Dex v5 / 1025 / CDN v3              🚧 v0.3.0
+Phase D — Dex + Cloudflare CDN v5 (1025)        ✅ v0.3.0+
+Phase D+ — l10n/config bundle decoupling       ✅ v0.4.5+
+Phase F/G — Reference filters + battle tools     ✅ partial v0.4.6
 Next    — Ship CDN v5, DexScope UI, radar chart, reference lists, web pokedex
 ```
 
@@ -187,7 +179,7 @@ Phase C — Save parser
 - **Flutter active:** `flutter/lib/`, `flutter/test/`, `flutter/pubspec.yaml`.
 - **Fixtures:** `fixtures/PKMSS.sav`, `flutter/assets/fixtures/PKMSS.sav`.
 - **Tools:** `tools/probe_hgss_save.py`, `tools/hgss_map_list.json`, `tools/generate_hgss_map_list.py`.
-- **Docs:** English for GitHub; chat with Tito in Chinese (`docs/AI_READFIRST.md`).
+- **Docs:** English for GitHub; product owner prefers Chinese in chat. Agent context: [`docs/AI_CONTEXT.md`](./AI_CONTEXT.md).
 
 ### Do not
 
@@ -280,4 +272,4 @@ References: [Project Pokémon HGSS save structure](https://projectpokemon.org/ho
 - [Architecture](./ARCHITECTURE.md) — updated project shape and data layers
 - [Roadmap](../ROADMAP.md) — phased delivery including Flutter migration
 - [Parser proposal](./PARSER_PROPOSAL.md) — HGSS boundary and fixture usage
-- [AI read-first](./AI_READFIRST.md) — contributor guardrails
+- [AI context](./AI_CONTEXT.md) — single source for agents (replaces scattered read-first notes)

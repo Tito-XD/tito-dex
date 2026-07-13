@@ -1,49 +1,35 @@
 # TitoDex Vision
 
-TitoDex is Tito's personal Pokémon companion device.
+TitoDex is a **personal Pokémon companion device** — software that feels like picking up a trusted trainer gadget when you return to a save file.
 
-It exists to make returning to a Pokémon journey feel warm, immediate, and personal. It is not trying to become a complete Pokémon database or a public wiki. It is a small device-like app that understands the current game, remembers the current journey, and helps Tito continue playing.
+## The feeling
 
-## The Feeling
+Opening the app should feel:
 
-Opening TitoDex should feel like picking up a trusted trainer gadget:
+- warm, compact, friendly  
+- slightly retro, sticker-like  
+- useful without noise  
+- personal, not like a generic Android app  
 
-- friendly
-- compact
-- warm
-- slightly retro
-- sticker-like
-- personal
-- useful without being noisy
+Visual north star: modern retro device UI (blue-gray, cream, deep navy) — see [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
 
-The visual identity should evoke a modern retro Pokémon-era device, not a generic Android app.
-
-## The First User
-
-The first user is Tito.
-
-This matters because product decisions should optimize for delight, memory, and play flow instead of broad audience completeness. If a feature helps Tito continue the current game, it is likely important. If a feature only makes TitoDex more encyclopedia-like, it should be questioned.
-
-## Product Promise
-
-TitoDex answers:
+## Product promise
 
 > “Where was I, what was I doing, and what helps me continue this journey now?”
 
-It should eventually understand save files, summarize progress, back up important journey state, and make each generation feel contextual.
+The app should summarize progress from save files, remember journey notes, and surface **game-context** helpers — not compete with full wikis on breadth.
 
-## Expansion Philosophy
+## Design constraints
 
-TitoDex starts with HGSS because Tito is there first.
+- **Personal companion** first — optimize for one player's play flow over audience completeness.  
+- **Not an encyclopedia** — if a feature only adds database breadth without journey utility, defer it.  
+- **Start with HGSS** — expand to Pt, BW, XY, etc. when the playthrough reaches them, as scoped packs rather than one giant import.
 
-Later generations should be added when the journey reaches them:
+## Expansion order (when relevant)
 
-1. HGSS
-2. Platinum
-3. Black / White
-4. Black 2 / White 2
-5. X / Y
-6. Omega Ruby / Alpha Sapphire
-7. Ultra Sun / Ultra Moon
-
-Each generation should be integrated as a journey context, not as a large one-time encyclopedia import.
+1. HeartGold / SoulSilver  
+2. Platinum  
+3. Black / White → B2W2  
+4. X / Y → ORAS  
+5. Ultra Sun / Moon  
+6. Later generations as journey context, not as mandatory day-one scope  

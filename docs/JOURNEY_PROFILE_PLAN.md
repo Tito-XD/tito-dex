@@ -364,5 +364,5 @@ Location / badges / play time from save can still update on sync (read-only jour
 
 - [ROADMAP.md](../ROADMAP.md) — Phase B home dashboard
 - [PRODUCT.md](../PRODUCT.md)
-- [AI_READFIRST.md](./AI_READFIRST.md)
+- [AI context](./AI_CONTEXT.md)
 - Dex/detail: [ROADMAP.md](../ROADMAP.md) Phase E

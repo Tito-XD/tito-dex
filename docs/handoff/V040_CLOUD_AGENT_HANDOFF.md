@@ -1,5 +1,10 @@
 # v0.4.0 Cloud Agent 交接手册
 
+> **Archived.** Current project state is documented in [`docs/AI_CONTEXT.md`](../AI_CONTEXT.md).  
+> This file is kept for historical CDN/schema planning context only.
+
+# v0.4.0 Cloud Agent 交接手册（历史）
+
 > **用途：** 在新 Cloud VM / 新 Agent 对话里 `@docs/handoff/V040_CLOUD_AGENT_HANDOFF.md`，按本文 build → upload → Flutter 开发 → 发版。  
 > **目标版本：** `v0.4.0` · App `0.4.0+32`（暂定）  
 > **仓库：** `github.com/Tito-XD/tito-dex` · 基线分支 **`main`**（含 v0.3.0 + bundle v5 代码，**CDN `/v3/` 尚未上线**）

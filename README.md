@@ -1,160 +1,77 @@
 # TitoDex
 
-TitoDex is a personal Pokémon journey companion app: **Tito + Pokédex**, but not a Pokémon encyclopedia.
+**TitoDex** is a personal Pokémon **journey companion** — a warm, device-like app for picking up where you left off in a playthrough. It combines a trainer dashboard, HGSS save sync, and a lightweight offline Pokédex with Chinese UI.
 
-It is designed as a warm companion device for Tito's own Pokémon playthroughs, starting with **Pokémon SoulSilver / HeartGold-SoulSilver context** and expanding only when the journey reaches later games.
+It is **not** a full encyclopedia replacement (52Poké, Bulbapedia, etc.). Reference data exists to support the current game, not to catalog everything.
 
-**Current release:** [v0.4.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.2) · App `0.4.2+34` · Offline dex bundle **v5** (1025 species, 23 game editions)
+**Current release:** [v0.4.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.6) · App `0.4.6+38` · Offline dex bundle **v5** (1025 species, 23 game editions)
 
-**Shipped in v0.4.0:** Global **GameEdition** (23 games), **11 regional dexes**, detail tabs (flavor / obtain / moves per game), search hub (搜索 · 常用资料 · 对战资料)
+## Highlights (v0.4.6)
 
-## Product North Star
+- **Journey first** — home dashboard, party, timeline, emulator continue, HGSS `.sav` directory sync  
+- **National dex 1–1025** — offline CDN bundle, regional scopes, move/ability encyclopedia with **filter → dex** drill-down  
+- **中文对照** — location/species labels in bundle `l10n/`; weekly sync workflow for 52poke gaps  
+- **对战助手** — type matchup, stat calc, damage estimate (Search hub)  
+- **RG APK** — arm64-v8a, ~21 MB, [releases/](releases/)
 
-**Continue First.**
+## Principles
 
-When Tito opens TitoDex, the first thing should be the current journey:
-
-- current game
-- current location
-- badges
-- play time
-- party snapshot
-- recent journey notes
-- quick access to useful local references
-
-TitoDex should feel less like a wiki and more like a small trainer device that says: “Welcome back. Here is where we were.”
-
-## Core Principles
-
-1. **Continue First** — the home screen prioritizes continuing the current journey.
-2. **Game Context First** — show information relevant to the currently played game.
-3. **Local First** — offline-first and local data first.
-4. **Companion, not Encyclopedia** — focus on play assistance, not replacing 52Poké, Bulbapedia, or Serebii.
-5. **Iterative** — begin with HGSS, then adapt for Pt, BW, B2W2, XY, ORAS, USUM as Tito reaches them.
-6. **Do not over-engineer** — first make a delightful companion, not a universal platform.
+1. **Continue first** — the home screen answers “where was I?”  
+2. **Game context first** — HGSS-default; expand with the journey  
+3. **Local first** — offline bundle, save parsing, no runtime wiki scraping  
+4. **Companion, not encyclopedia** — depth where it helps play  
+5. **Iterate** — ship useful slices; avoid platform over-design  
 
 ## Stack
 
-**Active:** Flutter + Dart (`flutter/`)
-
-**Reference:** Capacitor + React + TypeScript + Vite (`src/`, root `android/`)
-
-See [Stack Decision](./docs/STACK_DECISION.md) for migration history and current feature status.
-
-| Layer | Technology |
+| Layer | Choice |
 | --- | --- |
-| UI | Flutter widgets, `DeviceShell`, sticker cards, bundled **Nunito** |
+| App | **Flutter + Dart** (`flutter/`) |
+| Reference mock | Capacitor + React (`src/` — frozen) |
 | Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
-| Persistence | `shared_preferences` — journey JSON + save-directory config |
-| Save parsing | Dart `HgssParser` — retail 512 KB `.sav` |
-| Save sync | Directory watch — newest `.sav` by mtime, startup auto-load |
-| Dex data | PokeAPI + **pre-built offline bundle** (downloaded from Settings; v5, 1025 species) |
-| Dex scope | National **1–493** shipped; **1–1025** + `DexScope` (HGSS / Johto / Kanto / SV move sets) in v0.3.0 |
-| Dex sprites | **PNG** thumbnails + lazy-loaded full **artwork** |
-| Localization | Simplified Chinese UI (`lib/l10n/`) |
+| Persistence | `shared_preferences` + offline `dex_offline/` |
+| Save | HGSS 512 KB `.sav` parser + directory auto-sync |
+| Dex data | Pre-built CDN bundle v5 (+ APK asset fallbacks) |
+| UI language | Simplified Chinese |
 
-## Releases (RG handheld APK)
+Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
 
-Pre-built Android APKs live under [`releases/`](releases/) and on [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases).
+## Install (RG handheld)
 
-| File | Use |
-| --- | --- |
-| `TitoDex-0.2.28-rg-arm64.apk` | **RG Rotate** — arm64-v8a (~23 MB; SDK 36) |
+Download **`TitoDex-0.4.6-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Uninstall any locally-built debug APK first (signing key differs).
 
-Build locally:
-
-```bash
-cd flutter
-flutter pub get
-flutter build apk --release
-cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
-../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-rg-arm64.apk
-```
-
-**Required APK contents & size checks:** [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md) (~20–23 MB arm64; run `tools/verify_release_apk.sh` before commit).
-
-**Sideload:** uninstall any locally-built 0.2.x first (CI signing key differs). See [flutter/README.md](flutter/README.md).
-
-## Dex offline bundle
-
-Pre-built dex bundle endpoints are configured at compile time (not shown in the app UI). See `flutter/lib/features/dex/dex_cdn_config.dart` and maintainer docs: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md).
-
-| Item | Notes |
-| --- | --- |
-| Bundle **v4** | 493 species (legacy) |
-| Bundle **v5** | **1025** species (current app default) |
-| Worker branch | `deploy/dex-cdn` |
-
-Setup & upload: [Cloudflare Dex CDN](./docs/CLOUDFLARE_DEX_CDN.md) (maintainers — use your private `--cdn-base`, do not publish URLs in public copy)
-
-## Documentation
-
-Start here:
-
-- [Vision](./VISION.md)
-- [Product](./PRODUCT.md)
-- [Roadmap](./ROADMAP.md)
-- [AI read-first guide](./docs/AI_READFIRST.md)
-- [Design system](./docs/DESIGN_SYSTEM.md)
-- [UI reference notes](./docs/UI_REFERENCE.md)
-- [Architecture](./docs/ARCHITECTURE.md)
-- [Stack decision](./docs/STACK_DECISION.md)
-- [Parser proposal](./docs/PARSER_PROPOSAL.md)
-- [Cloud sync proposal](./docs/CLOUD_SYNC_PROPOSAL.md) *(not implemented)*
-- [Cloudflare dex CDN setup](./docs/CLOUDFLARE_DEX_CDN.md)
-- [RG polish plan](./docs/RG_POLISH_PLAN.md)
+First launch may prompt you to open **Settings → 下载预打包数据包** for the full offline pack.
 
 ## Development
-
-### Flutter app (active)
 
 ```bash
 cd flutter
 flutter pub get
 flutter test
-flutter run -d chrome      # web preview
-flutter run                # connected Android device / emulator
+flutter run              # device / emulator
+flutter run -d chrome    # web preview (limited)
 ```
 
-**First launch:** loads mock journey from `CurrentJourney.mock()` unless a saved journey exists in preferences.
+Build release APK: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
 
-**Import test save:** Settings → 旅程数据 → 导入内置 PKMSS.sav
+Maintainers — dex bundle build & R2 upload: [docs/CLOUDFLARE_DEX_CDN.md](docs/CLOUDFLARE_DEX_CDN.md) · secrets: [docs/PERMISSIONS.md](docs/PERMISSIONS.md)
 
-**Dex offline pack:** Settings → 图鉴离线包 → 下载预打包图鉴包 (bundle v5, 1025 species)
+## Documentation
 
-**Auto-sync from emulator folder:** Settings → 存档目录 → pick a folder containing `.sav` files → enable 启动时自动加载. On startup, TitoDex picks the newest 524 288-byte `.sav` and refreshes the home screen.
+| Doc | Contents |
+| --- | --- |
+| [**AI context**](docs/AI_CONTEXT.md) | **Single doc for agents** — status, architecture, guardrails |
+| [Vision](VISION.md) | Product feeling |
+| [Product](PRODUCT.md) | Positioning & priorities |
+| [Roadmap](ROADMAP.md) | Phases & version history |
+| [Flutter app](flutter/README.md) | App-specific dev notes |
+| [Design system](docs/DESIGN_SYSTEM.md) | Visual tokens |
+| [Release build](docs/RELEASE_BUILD.md) | APK checklist |
 
-Probe a save file from the command line:
+## HGSS test save
+
+Bundled fixture `PKMSS.sav` — import via Settings. Expect trainer ETeZ, 3 badges, Goldenrod City, party with Quilava / Togepi.
 
 ```bash
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
 ```
-
-Build dex offline bundle (maintainers — set `--cdn-base` via env, do not commit public URLs):
-
-```bash
-pip install -r tools/dex_bundle_requirements.txt
-python3 tools/build_dex_bundle.py --cdn-base "$TITODEX_DEX_CDN_BASE" --output dist/dex-v5 --max-id 1025
-```
-
-### HGSS save fixtures
-
-| Path | Purpose |
-| --- | --- |
-| `fixtures/PKMSS.sav` | Repo-root copy for scripts |
-| `flutter/assets/fixtures/PKMSS.sav` | Bundled asset for tests + Settings import |
-| `src/PKMSS.sav` | Original upload (legacy path) |
-
-Fixture expectations (active save block): trainer `ETeZ`, TID `22813`, 3 Johto badges, play time `7:03:41`, location 满金市 (map ID 76), party includes Quilava Lv27 and Togepi Lv6.
-
-### React mock (legacy Phase 2 — frozen)
-
-Design reference only. Do not add features here.
-
-```bash
-npm install
-npm run dev                # http://localhost:5173
-npm run cap:sync           # sync into root android/ Capacitor shell
-```
-
-Journey data in React is still mock-only (`journeyStore.ts` always returns `mockJourney`).

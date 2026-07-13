@@ -116,5 +116,5 @@ Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
 ## Related docs
 
 - [flutter/README.md](../flutter/README.md) — app layout & offline data
-- [AI_READFIRST.md](./AI_READFIRST.md) — agent quick reference
+- [AI context](./AI_CONTEXT.md) — agent quick reference
 - [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md) — dex bundle upload (maintainers)

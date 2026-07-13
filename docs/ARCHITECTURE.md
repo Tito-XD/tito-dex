@@ -1,10 +1,10 @@
 # TitoDex Architecture
 
-> **Active stack:** Flutter + Dart in `flutter/`. Capacitor + React under `src/` is a frozen design reference. See [Stack Decision](./STACK_DECISION.md) for migration rationale and current feature status.
+> **Active stack:** Flutter + Dart in `flutter/`. React under `src/` is a frozen design reference.  
+> **Current release:** v0.4.6 · Dex bundle v5 (`/v3/`).  
+> **Full agent context:** [AI_CONTEXT.md](./AI_CONTEXT.md)
 
-**Release:** v0.2.25 · Dex offline bundle v4 (compile-time CDN config)
-
-**RG APK:** `TitoDex-<ver>-rg-arm64.apk` — arm64-v8a only, SDK 36, ~20 MB. `flutter build apk --release`. Uninstall local builds before sideloading CI APK.
+**RG APK:** `TitoDex-<ver>-rg-arm64.apk` — arm64-v8a, SDK 36, ~21 MB. See [RELEASE_BUILD.md](./RELEASE_BUILD.md).
 
 ## Recommended Stack
 
@@ -87,9 +87,10 @@ Repo-level tooling & CDN:
 fixtures/PKMSS.sav
 releases/TitoDex-<ver>-rg-arm64.apk   # arm64-v8a only; see flutter/README.md
 tools/
-  build_dex_bundle.py             # CDN bundle v4 builder
-  upload_dex_via_worker.py
-  cleanup_r2_jpg.py
+  build_dex_bundle.py             # CDN bundle v5 builder (+ l10n/maps/config)
+  fetch_zh_catalog.py             # PokeAPI zh master catalog
+  fetch_52poke_location_zh.py     # Incremental 52poke location labels
+  stage_l10n_upload.py            # Stage l10n-only R2 upload
   probe_hgss_save.py
 cloudflare/dex-cdn/               # Worker tito-dex → R2 titodex-dex
 docs/CLOUDFLARE_DEX_CDN.md
