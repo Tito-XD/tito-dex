@@ -68,7 +68,10 @@ cd flutter
 flutter pub get
 flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
+../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
+
+**Required APK contents & size checks:** [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md) (~20–23 MB arm64; run `tools/verify_release_apk.sh` before commit).
 
 **Sideload:** uninstall any locally-built 0.2.x first (CI signing key differs). See [flutter/README.md](flutter/README.md).
 
