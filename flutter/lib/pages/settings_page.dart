@@ -20,6 +20,7 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_bar.dart';
 
@@ -250,6 +251,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  @override
   void dispose() {
     _trainerController.dispose();
     super.dispose();
@@ -648,6 +650,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        const SleepToolsSection(),
         const SizedBox(height: 16),
         StickerCard(
           child: Column(

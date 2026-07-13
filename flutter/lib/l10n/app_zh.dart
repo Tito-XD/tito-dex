@@ -37,6 +37,7 @@ abstract final class AppZh {
   static const settingsJourneyReadOnly = '旅程信息（来自存档）';
   static const teamSummaryTitle = '队伍概览';
   static const sleepToolsTitle = 'Pokémon Sleep 工具';
+  static const sleepToolsTierAHint = 'Tier A：静态链接，点击复制到剪贴板';
   static const dexManualMarkSeen = '已标记为见过';
   static const dexManualMarkCaught = '已标记为捕获';
   static const dexManualMarkClear = '已清除标记';

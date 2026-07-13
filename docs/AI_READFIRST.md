@@ -29,11 +29,12 @@ When building or publishing RG handheld APKs:
 | **Filename** | `releases/TitoDex-<ver>-rg-arm64.apk` |
 | **SDK** | `compileSdk = 36`, `targetSdk = 36`, `minSdk = 24` (matches working 0.2.11 / local 0.2.23) |
 | **Build** | `flutter build apk --release` (no `--split-per-abi`, no `--target-platform`) |
+| **Verify** | `tools/verify_release_apk.sh releases/TitoDex-<ver>-rg-arm64.apk` — must PASS (~20–23 MB) |
 | **Signing** | `android/key.properties` + `titodex-upload.keystore` (committed; not per-machine debug) |
 | **Native libs** | `.so` must be **Stored** (`useLegacyPackaging = false`, `minSdk 24`) |
 | **Upgrade** | User must **uninstall** locally-built 0.2.x before sideloading CI APK (signature differs) |
 
-Full build notes: [flutter/README.md](../flutter/README.md).
+Full build checklist (required `.so`, bundled assets, common failures): [RELEASE_BUILD.md](./RELEASE_BUILD.md).
 
 ## Communication Defaults
 
