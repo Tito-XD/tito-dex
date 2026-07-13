@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
-import '../../features/dex/battle_effectiveness.dart';
 import '../../features/companion/battle_math.dart';
+import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/game/game_edition_repository.dart';
@@ -35,6 +35,8 @@ class _StatCalcPageState extends State<StatCalcPage> {
   BattleStat _stat = BattleStat.attack;
   NatureModifier _nature = battleNatures.firstWhere((n) => n.key == 'serious');
   String? _attackerAbilitySlug;
+  int? _linkedPokemonId;
+  List<DefensiveAbilityOption> _abilityOptions = const [];
   BattleHeldItem _heldItem = BattleHeldItem.none;
   BattleStatusCondition _status = BattleStatusCondition.none;
   List<PokemonSummary> _suggestions = const [];
@@ -90,7 +92,54 @@ class _StatCalcPageState extends State<StatCalcPage> {
       _baseController.text = base.toString();
       _suggestions = const [];
       _queryController.text = summary.nameZh;
+      _linkedPokemonId = summary.id;
+      _abilityOptions = const [];
+      _attackerAbilitySlug = null;
     });
+    _loadAbilities(summary.id);
+  }
+
+  void _clearLinkedPokemon() {
+    setState(() {
+      _linkedPokemonId = null;
+      _abilityOptions = const [];
+      _attackerAbilitySlug = null;
+    });
+  }
+
+  Future<void> _loadAbilities(int pokemonId) async {
+    try {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedPokemonId != pokemonId) {
+        return;
+      }
+      final options = statAbilityOptionsFromPokemon(abilities);
+      setState(() {
+        _abilityOptions = options;
+        _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _refreshBaseFromLinked() async {
+    final id = _linkedPokemonId;
+    if (id == null) {
+      return;
+    }
+    final detail = await dexRepository.getDetail(id);
+    final stats = detail.baseStats;
+    if (stats == null || !mounted) {
+      return;
+    }
+    final base = switch (_stat) {
+      BattleStat.hp => stats.hp,
+      BattleStat.attack => stats.attack,
+      BattleStat.defense => stats.defense,
+      BattleStat.specialAttack => stats.specialAttack,
+      BattleStat.specialDefense => stats.specialDefense,
+      BattleStat.speed => stats.speed,
+    };
+    setState(() => _baseController.text = base.toString());
   }
 
   int _readBase() => int.tryParse(_baseController.text.trim()) ?? 0;
@@ -136,39 +185,20 @@ class _StatCalcPageState extends State<StatCalcPage> {
             title: AppZh.companionStatInputsTitle,
             subtitle: AppZh.companionStatFacilityNote(scope.facilityLabel),
             children: [
-              TextField(
+              PokemonSearchField(
                 controller: _queryController,
-                onChanged: _searchPokemon,
-                decoration: InputDecoration(
-                  hintText: AppZh.companionPokemonSearchHint,
-                  filled: true,
-                  fillColor: TitoColors.card,
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-                  ),
-                ),
+                hintText: AppZh.companionPokemonSearchHint,
+                suggestions: _suggestions,
+                onQueryChanged: _searchPokemon,
+                onPokemonSelected: _applyPokemon,
               ),
-              if (_suggestions.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _suggestions
-                      .map(
-                        (entry) => ActionChip(
-                          label: Text(entry.nameZh),
-                          onPressed: () => _applyPokemon(entry),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
               const SizedBox(height: 12),
               StatPicker(
                 selected: _stat,
-                onChanged: (value) => setState(() => _stat = value),
+                onChanged: (value) {
+                  setState(() => _stat = value);
+                  _refreshBaseFromLinked();
+                },
               ),
               const SizedBox(height: 12),
               NaturePicker(
@@ -180,7 +210,10 @@ class _StatCalcPageState extends State<StatCalcPage> {
                 label: AppZh.companionStatBase,
                 controller: _baseController,
                 max: 255,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  setState(() {});
+                  _clearLinkedPokemon();
+                },
               ),
               const SizedBox(height: 12),
               CompanionNumberField(
@@ -211,14 +244,19 @@ class _StatCalcPageState extends State<StatCalcPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              ManualAbilityPicker(
-                label: AppZh.companionAttackerAbilityPick,
-                options: kManualAttackerAbilityOptions,
-                selectedSlug: _attackerAbilitySlug,
-                onChanged: (slug) =>
-                    setState(() => _attackerAbilitySlug = slug),
-              ),
+              if (_abilityOptions.isNotEmpty || _linkedPokemonId == null) ...[
+                const SizedBox(height: 12),
+                CompanionAbilitySection(
+                  pokemonLabel: AppZh.companionAttackerAbilityPick,
+                  manualLabel: AppZh.companionAttackerAbilityPick,
+                  manualOptions: kManualAttackerAbilityOptions,
+                  pokemonOptions: _abilityOptions,
+                  linkedPokemonId: _linkedPokemonId,
+                  selectedSlug: _attackerAbilitySlug,
+                  onChanged: (slug) =>
+                      setState(() => _attackerAbilitySlug = slug),
+                ),
+              ],
               const SizedBox(height: 12),
               HeldItemPicker(
                 selected: _heldItem,

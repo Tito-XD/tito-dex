@@ -332,7 +332,8 @@ abstract final class AppZh {
   static String companionToolQuickDamageHint(String facility) =>
       '估算能不能秒 / 能不能扛（$facility 参考）';
   static const companionToolQuickDamage = '伤害速算';
-  static const companionPokemonSearchHint = '搜索宝可梦填入属性或种族值…';
+  static const companionPokemonSearchHint = '搜索宝可梦…';
+  static const companionLinkedTypes = '属性';
   static const companionTypeDefenderTitle = '防守方';
   static const companionTypeManualPick = '手动选择属性（最多 2 个）';
   static const companionTypeSummaryTitle = '克制摘要';
@@ -369,8 +370,8 @@ abstract final class AppZh {
       '此为理论值；对战设施对手的实际数值可能含道具或强化。';
   static const companionDamageInputsTitle = '对战双方';
   static String companionDamageFacility(String facility) => '场景：$facility';
-  static const companionAttackerSearchHint = '搜索攻击方（填入种族值参考）…';
-  static const companionDefenderSearchHint = '搜索防守方（填入种族值参考）…';
+  static const companionAttackerSearchHint = '搜索进攻方宝可梦…';
+  static const companionDefenderSearchHint = '搜索防守方宝可梦…';
   static const companionMoveType = '招式属性';
   static const companionMovePower = '招式威力';
   static const companionAttackStat = '攻击';

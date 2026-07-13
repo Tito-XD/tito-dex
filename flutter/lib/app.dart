@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import 'features/companion/companion_art.dart';
 import 'config/app_config.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
@@ -44,7 +43,6 @@ import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
 import 'widgets/offline_data_prompt.dart';
-import 'widgets/shell_companion_overlay.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
 
@@ -85,24 +83,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 }
                 TitoBackNavigation.navigateBack(context, state.uri.path);
               },
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  HandheldInputShell(
+              child: HandheldInputShell(
                     location: state.uri.path,
                     child: DeviceShell(child: child),
                   ),
-                  Positioned.fill(
-                    child: ShellCompanionOverlay(
-                      onHome: TitoBackNavigation.isHome(state.uri.path),
-                      companionName: _journey.companion,
-                      onTap: () => _onCompanionChanged(
-                        cycleCompanion(_journey.companion),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             );
           },
           routes: [
@@ -506,10 +490,6 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (choice != null) {
       await _rememberEmulator(choice);
     }
-  }
-
-  Future<void> _onCompanionChanged(String companion) async {
-    await _persist(_journey.copyWith(companion: companion));
   }
 
   Future<void> _onGameBadgeTap(BuildContext context) async {

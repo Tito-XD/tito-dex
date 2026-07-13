@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
 import '../../features/companion/battle_tools_service.dart';
-import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
@@ -29,21 +28,25 @@ class BlindSpotPage extends StatefulWidget {
 }
 
 class _BlindSpotPageState extends State<BlindSpotPage> {
-  final _queryController = TextEditingController();
+  final _defenderQueryController = TextEditingController();
+  final _attackerQueryController = TextEditingController();
   List<String> _defenderTypes = const ['water', 'fairy'];
   List<String> _attackerTypes = const ['grass'];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
   int? _linkedDefenderId;
+  int? _linkedAttackerId;
   bool _defenderTerastallized = false;
   String? _defenderTeraType;
   bool _attackerTerastallized = false;
   String? _attackerTeraType;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
+  List<DefensiveAbilityOption> _attackerAbilityOptions = const [];
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
   bool _loading = true;
-  List<PokemonSummary> _suggestions = const [];
+  List<PokemonSummary> _defenderSuggestions = const [];
+  List<PokemonSummary> _attackerSuggestions = const [];
 
   @override
   void initState() {
@@ -53,7 +56,8 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
 
   @override
   void dispose() {
-    _queryController.dispose();
+    _defenderQueryController.dispose();
+    _attackerQueryController.dispose();
     super.dispose();
   }
 
@@ -78,35 +82,58 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
     }
   }
 
-  Future<void> _searchPokemon(String query) async {
+  Future<void> _searchDefender(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      setState(() => _suggestions = const []);
+      setState(() => _defenderSuggestions = const []);
       return;
     }
     final results = await dexRepository.search(trimmed);
-    if (!mounted || _queryController.text.trim() != trimmed) {
+    if (!mounted || _defenderQueryController.text.trim() != trimmed) {
       return;
     }
-    setState(() => _suggestions = results.take(6).toList());
+    setState(() => _defenderSuggestions = results.take(6).toList());
   }
 
-  void _applyPokemon(PokemonSummary summary) {
+  Future<void> _searchAttacker(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      setState(() => _attackerSuggestions = const []);
+      return;
+    }
+    final results = await dexRepository.search(trimmed);
+    if (!mounted || _attackerQueryController.text.trim() != trimmed) {
+      return;
+    }
+    setState(() => _attackerSuggestions = results.take(6).toList());
+  }
+
+  void _applyDefender(PokemonSummary summary) {
     setState(() {
       _defenderTypes = List<String>.from(summary.types);
-      _attackerTypes = List<String>.from(summary.types);
-      _suggestions = const [];
-      _queryController.text = summary.nameZh;
+      _defenderSuggestions = const [];
+      _defenderQueryController.text = summary.nameZh;
       _linkedDefenderId = summary.id;
       _defenderAbilityOptions = const [];
       _defenderAbilitySlug = null;
-      _attackerAbilitySlug = null;
       _defenderTerastallized = false;
       _defenderTeraType = defaultTeraTypeFor(summary.types, 9);
+    });
+    _loadDefenderAbilities(summary.id);
+  }
+
+  void _applyAttacker(PokemonSummary summary) {
+    setState(() {
+      _attackerTypes = List<String>.from(summary.types);
+      _attackerSuggestions = const [];
+      _attackerQueryController.text = summary.nameZh;
+      _linkedAttackerId = summary.id;
+      _attackerAbilityOptions = const [];
+      _attackerAbilitySlug = null;
       _attackerTerastallized = false;
       _attackerTeraType = defaultTeraTypeFor(summary.types, 9);
     });
-    _loadDefenderAbilities(summary.id);
+    _loadAttackerAbilities(summary.id);
   }
 
   void _clearLinkedDefender() {
@@ -114,6 +141,14 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
       _linkedDefenderId = null;
       _defenderAbilityOptions = const [];
       _defenderAbilitySlug = null;
+    });
+  }
+
+  void _clearLinkedAttacker() {
+    setState(() {
+      _linkedAttackerId = null;
+      _attackerAbilityOptions = const [];
+      _attackerAbilitySlug = null;
     });
   }
 
@@ -127,6 +162,20 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
       setState(() {
         _defenderAbilityOptions = options;
         _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _loadAttackerAbilities(int pokemonId) async {
+    try {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedAttackerId != pokemonId) {
+        return;
+      }
+      final options = attackerAbilityOptionsFromPokemon(abilities);
+      setState(() {
+        _attackerAbilityOptions = options;
+        _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
       });
     } catch (_) {}
   }
@@ -182,43 +231,20 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                     title: AppZh.companionTypeDefenderTitle,
                     subtitle: AppZh.companionGenerationTypeNote,
                     children: [
-                      TextField(
-                        controller: _queryController,
-                        onChanged: _searchPokemon,
-                        decoration: InputDecoration(
-                          hintText: AppZh.companionPokemonSearchHint,
-                          filled: true,
-                          fillColor: TitoColors.card,
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: TitoColors.ink,
-                              width: 2,
-                            ),
-                          ),
-                        ),
+                      PokemonSearchField(
+                        controller: _defenderQueryController,
+                        hintText: AppZh.companionDefenderSearchHint,
+                        suggestions: _defenderSuggestions,
+                        onQueryChanged: _searchDefender,
+                        onPokemonSelected: _applyDefender,
+                        prefixIcon: Icons.shield_rounded,
                       ),
-                      if (_suggestions.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _suggestions
-                              .map(
-                                (entry) => ActionChip(
-                                  label: Text(entry.nameZh),
-                                  onPressed: () => _applyPokemon(entry),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ],
                       const SizedBox(height: 12),
-                      CollapsibleTypePicker(
+                      LinkedOrManualTypePicker(
+                        linkedPokemonId: _linkedDefenderId,
                         label: AppZh.companionTypeManualPick,
                         selected: _defenderTypes,
-                        onChanged: (types) {
+                        onManualChanged: (types) {
                           if (types.isNotEmpty) {
                             setState(() {
                               _defenderTypes = types;
@@ -229,24 +255,17 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                           }
                         },
                       ),
-                      if (_defenderAbilityOptions.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        DefensiveAbilityPicker(
-                          selectedSlug: _defenderAbilitySlug,
-                          options: _defenderAbilityOptions,
-                          onChanged: (slug) =>
-                              setState(() => _defenderAbilitySlug = slug),
-                        ),
-                      ] else if (_linkedDefenderId == null) ...[
-                        const SizedBox(height: 12),
-                        ManualAbilityPicker(
-                          label: AppZh.companionManualAbilityPick,
-                          options: kManualDefensiveAbilityOptions,
-                          selectedSlug: _defenderAbilitySlug,
-                          onChanged: (slug) =>
-                              setState(() => _defenderAbilitySlug = slug),
-                        ),
-                      ],
+                      const SizedBox(height: 12),
+                      CompanionAbilitySection(
+                        pokemonLabel: AppZh.companionDefenderAbilityPick,
+                        manualLabel: AppZh.companionManualAbilityPick,
+                        manualOptions: kManualDefensiveAbilityOptions,
+                        pokemonOptions: _defenderAbilityOptions,
+                        linkedPokemonId: _linkedDefenderId,
+                        selectedSlug: _defenderAbilitySlug,
+                        onChanged: (slug) =>
+                            setState(() => _defenderAbilitySlug = slug),
+                      ),
                       if (generation >= 9) ...[
                         const SizedBox(height: 12),
                         TerastalPicker(
@@ -269,17 +288,32 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                   CompanionSectionCard(
                     title: AppZh.companionTypeAttackerTitle,
                     children: [
-                      CollapsibleTypePicker(
+                      PokemonSearchField(
+                        controller: _attackerQueryController,
+                        hintText: AppZh.companionAttackerSearchHint,
+                        suggestions: _attackerSuggestions,
+                        onQueryChanged: _searchAttacker,
+                        onPokemonSelected: _applyAttacker,
+                        prefixIcon: Icons.sports_martial_arts_rounded,
+                      ),
+                      const SizedBox(height: 12),
+                      LinkedOrManualTypePicker(
+                        linkedPokemonId: _linkedAttackerId,
                         label: AppZh.companionTypeAttackerPick,
                         selected: _attackerTypes,
                         maxSelected: 2,
-                        onChanged: (types) =>
-                            setState(() => _attackerTypes = types),
+                        onManualChanged: (types) {
+                          setState(() => _attackerTypes = types);
+                          _clearLinkedAttacker();
+                        },
                       ),
                       const SizedBox(height: 12),
-                      ManualAbilityPicker(
-                        label: AppZh.companionAttackerAbilityPick,
-                        options: kManualAttackerAbilityOptions,
+                      CompanionAbilitySection(
+                        pokemonLabel: AppZh.companionAttackerAbilityPick,
+                        manualLabel: AppZh.companionAttackerAbilityPick,
+                        manualOptions: kManualAttackerAbilityOptions,
+                        pokemonOptions: _attackerAbilityOptions,
+                        linkedPokemonId: _linkedAttackerId,
                         selectedSlug: _attackerAbilitySlug,
                         onChanged: (slug) =>
                             setState(() => _attackerAbilitySlug = slug),
@@ -314,8 +348,7 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                         attackerTerastallized: _attackerTerastallized,
                         attackerTeraType: _attackerTeraType,
                       );
-                      final defensive =
-                          computeDefensiveBlindSpots(input);
+                      final defensive = computeDefensiveBlindSpots(input);
                       final normalized = normalizeTypesForGeneration(
                         _defenderTypes,
                         generation,
