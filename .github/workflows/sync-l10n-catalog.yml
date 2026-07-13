@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python deps
-        run: pip install requests beautifulsoup4
+        run: pip install beautifulsoup4 -r tools/dex_bundle_requirements.txt
 
       - name: Fetch 52poke location labels (incremental)
         run: |
