@@ -2,6 +2,7 @@ import '../companion/companion_art.dart';
 import '../parser/hgss_format.dart';
 import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
+import '../game/game_edition_repository.dart';
 import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
 import 'dex_filter.dart';
@@ -380,7 +381,13 @@ class DexRepository {
       return summary;
     }
 
-    final fallback = summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id);
+    final edition = await gameEditionRepository.loadEdition();
+    final versionGroup = edition.spriteVersionGroup;
+    final editionSprite = summary.spriteUrlForVersionGroup(versionGroup) ??
+        _cdnConfig.spriteUrlForVersionGroup(summary.id, versionGroup);
+    final fallback = editionSprite ??
+        summary.spriteUrl ??
+        _cdnConfig.spriteUrl(summary.id);
     return summary.copyWith(localSpritePath: fallback);
   }
 

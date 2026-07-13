@@ -163,7 +163,8 @@ def localized_genus(genera: list[dict[str, Any]]) -> str:
         if code in ("zh-Hans", "zh-hans"):
             return entry.get("genus") or entry.get("name") or ""
     for entry in genera:
-        if entry.get("language", {}).get("name") == "zh-Hant":
+        code = entry.get("language", {}).get("name", "")
+        if code in ("zh-Hant", "zh-hant"):
             return entry.get("genus") or entry.get("name") or ""
     return ""
 
@@ -174,7 +175,8 @@ def localized_name(names: list[dict[str, Any]], fallback: str) -> str:
         if code in ("zh-Hans", "zh-hans"):
             return entry.get("name") or fallback
     for entry in names:
-        if entry.get("language", {}).get("name") == "zh-Hant":
+        code = entry.get("language", {}).get("name", "")
+        if code in ("zh-Hant", "zh-hant"):
             return entry.get("name") or fallback
     return fallback
 

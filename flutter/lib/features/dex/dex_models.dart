@@ -18,6 +18,8 @@ class PokemonSummary {
     this.artworkUrl,
     this.localSpritePath,
     this.pokedexNumbers,
+    this.spriteUrlsByVersion,
+    this.animatedSpriteUrl,
   });
 
   final int id;
@@ -28,8 +30,14 @@ class PokemonSummary {
   final String? artworkUrl;
   final String? localSpritePath;
   final Map<String, int>? pokedexNumbers;
+  /// CDN URLs keyed by PokeAPI version-group slug (e.g. heartgold-soulsilver).
+  final Map<String, String>? spriteUrlsByVersion;
+  final String? animatedSpriteUrl;
 
   String get typesLabel => types.map(typeNameZh).join('/');
+
+  String? spriteUrlForVersionGroup(String versionGroup) =>
+      spriteUrlsByVersion?[versionGroup] ?? spriteUrl;
 
   String? get displaySpritePath => localSpritePath ?? spriteUrl;
 
@@ -43,12 +51,19 @@ class PokemonSummary {
         if (localSpritePath != null) 'localSpritePath': localSpritePath,
         if (pokedexNumbers != null && pokedexNumbers!.isNotEmpty)
           'pokedexNumbers': pokedexNumbers,
+        if (spriteUrlsByVersion != null && spriteUrlsByVersion!.isNotEmpty)
+          'spriteUrlsByVersion': spriteUrlsByVersion,
+        if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
       };
 
   factory PokemonSummary.fromJson(Map<String, dynamic> json) {
     final pokedexRaw = json['pokedexNumbers'] as Map<String, dynamic>?;
     final pokedexNumbers = pokedexRaw?.map(
       (key, value) => MapEntry(key, (value as num).toInt()),
+    );
+    final spriteMapRaw = json['spriteUrlsByVersion'] as Map<String, dynamic>?;
+    final spriteUrlsByVersion = spriteMapRaw?.map(
+      (key, value) => MapEntry(key, value as String),
     );
 
     return PokemonSummary(
@@ -60,6 +75,8 @@ class PokemonSummary {
       artworkUrl: json['artworkUrl'] as String?,
       localSpritePath: json['localSpritePath'] as String?,
       pokedexNumbers: pokedexNumbers,
+      spriteUrlsByVersion: spriteUrlsByVersion,
+      animatedSpriteUrl: json['animatedSpriteUrl'] as String?,
     );
   }
 
@@ -68,6 +85,8 @@ class PokemonSummary {
     String? artworkUrl,
     String? localSpritePath,
     Map<String, int>? pokedexNumbers,
+    Map<String, String>? spriteUrlsByVersion,
+    String? animatedSpriteUrl,
   }) {
     return PokemonSummary(
       id: id,
@@ -78,6 +97,8 @@ class PokemonSummary {
       artworkUrl: artworkUrl ?? this.artworkUrl,
       localSpritePath: localSpritePath ?? this.localSpritePath,
       pokedexNumbers: pokedexNumbers ?? this.pokedexNumbers,
+      spriteUrlsByVersion: spriteUrlsByVersion ?? this.spriteUrlsByVersion,
+      animatedSpriteUrl: animatedSpriteUrl ?? this.animatedSpriteUrl,
     );
   }
 }
