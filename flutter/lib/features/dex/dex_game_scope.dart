@@ -1,6 +1,7 @@
 /// HGSS / Johto dex scope constants for PokeAPI version groups.
 library;
 
+import '../parser/hgss_map_lookup.dart';
 import 'dex_models.dart';
 
 const hgssVersionGroup = 'heartgold-soulsilver';
@@ -64,6 +65,22 @@ String encounterAreaLabelZh(String slug) {
       .replaceAll(RegExp(r'-area$'), '')
       .replaceAll('-', ' ');
   return cleaned;
+}
+
+/// Resolves obtain-location labels from PokeAPI slugs or HGSS map ids.
+String resolveObtainAreaLabelZh(String areaSlug) {
+  final fromTable = encounterAreaLabelsZh[areaSlug];
+  if (fromTable != null) {
+    return fromTable;
+  }
+  if (RegExp(r'^\d+$').hasMatch(areaSlug)) {
+    return locationLabelForMapId(int.parse(areaSlug));
+  }
+  final fallback = encounterAreaLabelZh(areaSlug);
+  if (RegExp(r'^\d+$').hasMatch(fallback)) {
+    return '地点 $fallback';
+  }
+  return fallback;
 }
 
 const statLabelsZh = <String, String>{
