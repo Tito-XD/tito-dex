@@ -147,6 +147,165 @@ class TypeChipPicker extends StatelessWidget {
   }
 }
 
+class CollapsibleTypePicker extends StatefulWidget {
+  const CollapsibleTypePicker({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onChanged,
+    this.maxSelected = 2,
+  });
+
+  final String label;
+  final List<String> selected;
+  final ValueChanged<List<String>> onChanged;
+  final int maxSelected;
+
+  @override
+  State<CollapsibleTypePicker> createState() => _CollapsibleTypePickerState();
+}
+
+class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
+  bool _expanded = false;
+
+  void _toggleType(String type) {
+    final updated = List<String>.from(widget.selected);
+    if (updated.contains(type)) {
+      updated.remove(type);
+    } else if (widget.maxSelected == 1) {
+      updated
+        ..clear()
+        ..add(type);
+    } else if (updated.length >= widget.maxSelected) {
+      updated
+        ..removeAt(0)
+        ..add(type);
+    } else {
+      updated.add(type);
+    }
+    widget.onChanged(updated);
+  }
+
+  String get _selectionLabel {
+    if (widget.selected.isEmpty) {
+      return '未选择';
+    }
+    return widget.selected.map(typeNameZh).join(' / ');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            borderRadius: BorderRadius.circular(10),
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: TitoColors.card,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: TitoColors.ink, width: 2),
+              ),
+              child: Row(
+                children: [
+                  if (widget.selected.isEmpty)
+                    Icon(
+                      Icons.category_rounded,
+                      size: 20,
+                      color: TitoColors.mutedInk,
+                    )
+                  else
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final type in widget.selected) ...[
+                          Icon(
+                            typeIconData(type),
+                            size: 20,
+                            color: TitoColors.ink,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                      ],
+                    ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectionLabel,
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _expanded
+                        ? Icons.expand_less_rounded
+                        : Icons.expand_more_rounded,
+                    color: TitoColors.ink,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (_expanded) ...[
+          const SizedBox(height: 8),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 6,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
+              childAspectRatio: 1,
+            ),
+            itemCount: typeGridOrder.length,
+            itemBuilder: (context, index) {
+              final type = typeGridOrder[index];
+              final active = widget.selected.contains(type);
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _toggleType(type),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: typeTileColor(type),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: active ? TitoColors.ink : TitoColors.ink.withValues(alpha: 0.35),
+                        width: active ? 3 : 2,
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        typeIconData(type),
+                        size: 22,
+                        color: TitoColors.ink,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 class CompanionSectionCard extends StatelessWidget {
   const CompanionSectionCard({
     super.key,

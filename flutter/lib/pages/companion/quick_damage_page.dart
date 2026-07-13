@@ -279,7 +279,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   onChanged: (value) => setState(() => _category = value),
                 ),
                 const SizedBox(height: 12),
-                TypeChipPicker(
+                CollapsibleTypePicker(
                   label: AppZh.companionMoveType,
                   selected: [_moveType],
                   maxSelected: 1,
@@ -290,13 +290,13 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   },
                 ),
                 const SizedBox(height: 12),
-                TypeChipPicker(
+                CollapsibleTypePicker(
                   label: AppZh.companionTypeAttackerPick,
                   selected: _attackerTypes,
                   onChanged: (types) => setState(() => _attackerTypes = types),
                 ),
                 const SizedBox(height: 12),
-                TypeChipPicker(
+                CollapsibleTypePicker(
                   label: AppZh.companionTypeManualPick,
                   selected: _defenderTypes,
                   onChanged: (types) {

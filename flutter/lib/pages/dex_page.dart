@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/companion/companion_art.dart';
 import '../features/game/journey_capability.dart';
 import '../features/game/game_edition_repository.dart';
+import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_regional_picker.dart';
 import '../features/dex/dex_models.dart';
@@ -19,6 +20,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
+import '../widgets/dex_filter_banner.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
@@ -52,6 +54,8 @@ class _DexPageState extends State<DexPage> {
   DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
   List<PokemonSummary> _journeySummaries = const [];
+  List<PokemonSummary> _referenceFilteredSummaries = const [];
+  bool _loadingReferenceFilter = false;
   final Map<DexRegionalPokedex, List<PokemonSummary>> _regionCache = {};
   bool _loadingRegion = false;
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
@@ -62,12 +66,14 @@ class _DexPageState extends State<DexPage> {
   void initState() {
     super.initState();
     gameEditionRepository.addListener(_onEditionChanged);
+    dexFilterController.addListener(_onReferenceFilterChanged);
     _bootstrap();
   }
 
   @override
   void dispose() {
     gameEditionRepository.removeListener(_onEditionChanged);
+    dexFilterController.removeListener(_onReferenceFilterChanged);
     super.dispose();
   }
 
@@ -96,6 +102,47 @@ class _DexPageState extends State<DexPage> {
     });
   }
 
+  void _onReferenceFilterChanged() {
+    _loadReferenceFilter();
+  }
+
+  Future<void> _loadReferenceFilter() async {
+    if (!dexFilterController.hasActiveFilter) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _referenceFilteredSummaries = const [];
+        _loadingReferenceFilter = false;
+      });
+      return;
+    }
+
+    setState(() => _loadingReferenceFilter = true);
+    try {
+      final entries =
+          await dexRepository.filterSummaries(dexFilterController.currentFilter);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _referenceFilteredSummaries = entries;
+        _loadingReferenceFilter = false;
+        _mode = _DexMode.national;
+        _error = null;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _error = _formatDexError(error);
+        _loadingReferenceFilter = false;
+        _referenceFilteredSummaries = const [];
+      });
+    }
+  }
+
   Future<void> _bootstrap() async {
     try {
       _journeyIds = _resolveJourneyIds();
@@ -107,7 +154,11 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() => _progress = progress);
-      await _loadMore();
+      if (dexFilterController.hasActiveFilter) {
+        await _loadReferenceFilter();
+      } else {
+        await _loadMore();
+      }
     } catch (error) {
       if (!mounted) {
         return;
@@ -314,6 +365,14 @@ class _DexPageState extends State<DexPage> {
   }
 
   List<PokemonSummary> get _visibleEntries {
+    if (dexFilterController.hasActiveFilter) {
+      return dexRepository.filterByEncounter(
+        _referenceFilteredSummaries,
+        _progress,
+        _encounterFilter,
+      );
+    }
+
     final Iterable<PokemonSummary> entries;
     if (_mode == _DexMode.journey) {
       entries = _journeySummaries;
@@ -326,7 +385,7 @@ class _DexPageState extends State<DexPage> {
       );
     }
 
-    return dexRepository.filterSummaries(
+    return dexRepository.filterByEncounter(
       entries,
       _progress,
       _encounterFilter,
@@ -400,9 +459,11 @@ class _DexPageState extends State<DexPage> {
     final visible = _visibleEntries;
     final columns = DeviceLayout.dexGridColumns(context);
     final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
-    final loading = _mode == _DexMode.national
-        ? (_loadingChunk || _loadingRegion)
-        : _loadingJourney;
+    final loading = dexFilterController.hasActiveFilter
+        ? _loadingReferenceFilter
+        : _mode == _DexMode.national
+            ? (_loadingChunk || _loadingRegion)
+            : _loadingJourney;
     final padding = DeviceLayout.pagePadding(context);
 
     return TitoFontScale(
@@ -411,7 +472,8 @@ class _DexPageState extends State<DexPage> {
         onNotification: (notification) {
           if (notification.metrics.pixels >=
                   notification.metrics.maxScrollExtent - 240 &&
-              _mode == _DexMode.national) {
+              _mode == _DexMode.national &&
+              !dexFilterController.hasActiveFilter) {
             _loadMore();
           }
           return false;
@@ -444,6 +506,14 @@ class _DexPageState extends State<DexPage> {
                       style: SecondaryTypography.onGradient.body14,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: squareGap(context)),
+                  ],
+                  if (dexFilterController.hasActiveFilter) ...[
+                    DexFilterBanner(
+                      filter: dexFilterController.currentFilter,
+                      loading: _loadingReferenceFilter,
+                      onClear: dexFilterController.clearFilter,
                     ),
                     SizedBox(height: squareGap(context)),
                   ],
@@ -562,7 +632,8 @@ class _DexPageState extends State<DexPage> {
               ),
             if (_mode == _DexMode.national &&
                 _loadingChunk &&
-                visible.isNotEmpty)
+                visible.isNotEmpty &&
+                !dexFilterController.hasActiveFilter)
               SliverPadding(
                 padding: padding.copyWith(top: 8),
                 sliver: SliverToBoxAdapter(
@@ -575,7 +646,8 @@ class _DexPageState extends State<DexPage> {
               ),
             if (_mode == _DexMode.national &&
                 _region == DexRegionalPokedex.national &&
-                _loadedThrough < titodexMaxNationalDexId)
+                _loadedThrough < titodexMaxNationalDexId &&
+                !dexFilterController.hasActiveFilter)
               SliverPadding(
                 padding: padding.copyWith(top: 8, bottom: 4),
                 sliver: SliverToBoxAdapter(

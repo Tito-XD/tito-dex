@@ -154,7 +154,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                TypeChipPicker(
+                CollapsibleTypePicker(
                   label: AppZh.companionTypeManualPick,
                   selected: _defenderTypes,
                   onChanged: (types) {
@@ -213,7 +213,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
             CompanionSectionCard(
               title: AppZh.companionTypeAttackerTitle,
               children: [
-                TypeChipPicker(
+                CollapsibleTypePicker(
                   label: AppZh.companionTypeAttackerPick,
                   selected: _attackerTypes,
                   maxSelected: 2,

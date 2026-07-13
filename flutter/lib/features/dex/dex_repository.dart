@@ -1,7 +1,10 @@
 import '../companion/companion_art.dart';
 import '../parser/hgss_format.dart';
+import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
+import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
+import 'dex_filter.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
 import 'dex_progress.dart';
@@ -17,14 +20,17 @@ class DexRepository {
     PokeApiClient? client,
     DexOfflineService? offline,
     DexCdnDataSource? cdn,
+    DexCdnConfig? cdnConfig,
     this.summaryBatchSize = 4,
   })  : _client = client ?? PokeApiClient(),
         _offline = offline ?? dexOfflineService,
-        _cdn = cdn ?? DexCdnDataSource();
+        _cdn = cdn ?? DexCdnDataSource(),
+        _cdnConfig = cdnConfig ?? const DexCdnConfig();
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
   final DexCdnDataSource _cdn;
+  final DexCdnConfig _cdnConfig;
   final int summaryBatchSize;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
@@ -36,6 +42,10 @@ class DexRepository {
   Future<Map<int, CachedMove>>? _allMovesFuture;
   Map<int, CachedAbility>? _allAbilitiesCache;
   Future<Map<int, CachedAbility>>? _allAbilitiesFuture;
+  Map<String, List<int>>? _eggGroupIndexCache;
+  Future<Map<String, List<int>>>? _eggGroupIndexFuture;
+  Map<int, List<int>>? _moveLearnersIndexCache;
+  Future<Map<int, List<int>>>? _moveLearnersIndexFuture;
 
   DexProgress progressFor(
     CurrentJourney journey, {
@@ -182,11 +192,14 @@ class DexRepository {
     if (await _offline.shouldPreferOffline()) {
       final cached = await _offline.readAllSummaries();
       if (cached.isNotEmpty) {
-        _allSummaries = cached;
-        for (final summary in cached) {
+        final resolved = await Future.wait(
+          cached.map(_resolveSummarySprite),
+        );
+        _allSummaries = resolved;
+        for (final summary in resolved) {
           _rememberSummary(summary);
         }
-        return cached;
+        return resolved;
       }
     }
 
@@ -264,7 +277,7 @@ class DexRepository {
     final lower = trimmed.toLowerCase();
     final numeric = int.tryParse(trimmed);
 
-    return all.where((entry) {
+    final matches = all.where((entry) {
       if (numeric != null && entry.id == numeric) {
         return true;
       }
@@ -282,6 +295,101 @@ class DexRepository {
       }
       return false;
     }).toList();
+
+    return Future.wait(matches.map(_resolveSummarySprite));
+  }
+
+  Future<List<PokemonSummary>> filterSummaries(DexFilter filter) async {
+    if (!filter.isActive) {
+      return getAllSummaries();
+    }
+
+    if (filter.learnsMoveId != null) {
+      final ids = await findPokemonWithMove(filter.learnsMoveId!);
+      return _resolveSummaries(await getSummariesForIds(ids));
+    }
+
+    if (filter.abilityId != null) {
+      return _resolveSummaries(await findByAbility(filter.abilityId!));
+    }
+
+    if (filter.eggGroupSlug != null) {
+      return _resolveSummaries(await findByEggGroup(filter.eggGroupSlug!));
+    }
+
+    return const [];
+  }
+
+  Future<List<PokemonSummary>> _resolveSummaries(
+    List<PokemonSummary> summaries,
+  ) =>
+      Future.wait(summaries.map(_resolveSummarySprite));
+
+  Future<List<int>> findPokemonWithMove(int moveId) async {
+    final offlineIds = await _offline.findPokemonIdsWithMove(moveId);
+    if (offlineIds.isNotEmpty) {
+      return offlineIds;
+    }
+
+    final cached = <int>[];
+    for (final entry in _detailCache.entries) {
+      if (_detailHasMove(entry.value, moveId)) {
+        cached.add(entry.key);
+      }
+    }
+    if (cached.isNotEmpty) {
+      cached.sort();
+      return cached;
+    }
+
+    final index = await _loadMoveLearnersIndex();
+    final indexed = index[moveId] ?? const [];
+    if (indexed.isNotEmpty) {
+      return indexed;
+    }
+
+    return const [];
+  }
+
+  bool _detailHasMove(PokemonDetail detail, int moveId) {
+    for (final move in detail.moveSet.allMoves) {
+      if (move.id == moveId) {
+        return true;
+      }
+    }
+    for (final moveSet in detail.moveSets.values) {
+      for (final move in moveSet.allMoves) {
+        if (move.id == moveId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  Future<PokemonSummary> _resolveSummarySprite(PokemonSummary summary) async {
+    final path = summary.localSpritePath;
+    if (path != null &&
+        !path.startsWith('http') &&
+        !_isAbsolutePath(path)) {
+      final absolute = await _offline.absolutePathForRelative(path);
+      if (absolute != null) {
+        return summary.copyWith(localSpritePath: absolute);
+      }
+    } else if (path != null) {
+      return summary;
+    }
+
+    final fallback = summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id);
+    return summary.copyWith(localSpritePath: fallback);
+  }
+
+  bool _isAbsolutePath(String path) {
+    if (path.startsWith('/')) {
+      return true;
+    }
+    // Windows drive paths (e.g. C:\sprites\1.png).
+    return RegExp(r'^[a-zA-Z]:[/\\]').hasMatch(path);
   }
 
   /// Party + companion species treated as caught (legacy helper).
@@ -300,7 +408,7 @@ class DexRepository {
   DexEncounterStatus statusFor(int id, DexProgress progress) =>
       progress.statusFor(id);
 
-  List<PokemonSummary> filterSummaries(
+  List<PokemonSummary> filterByEncounter(
     Iterable<PokemonSummary> entries,
     DexProgress progress,
     DexEncounterFilter filter,
@@ -400,6 +508,122 @@ class DexRepository {
     }
   }
 
+  Future<List<PokemonSummary>> findByAbility(int id) async {
+    final abilities = await _loadAllAbilities();
+    final entry = abilities[id];
+    if (entry == null || entry.pokemonIds.isEmpty) {
+      return const [];
+    }
+    return getSummariesForIds(entry.pokemonIds);
+  }
+
+  Future<List<PokemonSummary>> findByEggGroup(String slug) async {
+    final index = await _loadEggGroupIndex();
+    final ids = index[slug] ?? const [];
+    if (ids.isEmpty) {
+      return const [];
+    }
+    return getSummariesForIds(ids);
+  }
+
+  Future<List<PokemonSummary>> findByMove(int moveId) async {
+    final index = await _loadMoveLearnersIndex();
+    final ids = index[moveId] ?? const [];
+    if (ids.isEmpty) {
+      return const [];
+    }
+    return getSummariesForIds(ids);
+  }
+
+  Future<Map<String, List<int>>> _loadEggGroupIndex() {
+    return _eggGroupIndexFuture ??= _buildEggGroupIndex().catchError((Object error) {
+      _eggGroupIndexFuture = null;
+      throw error; // ignore: only_throw_errors
+    });
+  }
+
+  Future<Map<int, List<int>>> _loadMoveLearnersIndex() {
+    return _moveLearnersIndexFuture ??=
+        _buildMoveLearnersIndex().catchError((Object error) {
+      _moveLearnersIndexFuture = null;
+      throw error; // ignore: only_throw_errors
+    });
+  }
+
+  Future<Map<String, List<int>>> _buildEggGroupIndex() async {
+    if (_eggGroupIndexCache != null) {
+      return _eggGroupIndexCache!;
+    }
+    final index = <String, List<int>>{};
+    final summaries = await getAllSummaries();
+    for (var start = 0; start < summaries.length; start += summaryBatchSize) {
+      final end = (start + summaryBatchSize).clamp(0, summaries.length);
+      final batch = summaries.sublist(start, end);
+      final details = await Future.wait(batch.map((entry) => getDetail(entry.id)));
+      for (final detail in details) {
+        for (final groupLabel in detail.eggGroups) {
+          final slug = _eggGroupSlugForLabel(groupLabel);
+          if (slug == null) {
+            continue;
+          }
+          index.putIfAbsent(slug, () => []).add(detail.summary.id);
+        }
+      }
+    }
+    for (final ids in index.values) {
+      ids.sort();
+    }
+    _eggGroupIndexCache = index;
+    return index;
+  }
+
+  Future<Map<int, List<int>>> _buildMoveLearnersIndex() async {
+    if (_moveLearnersIndexCache != null) {
+      return _moveLearnersIndexCache!;
+    }
+    final index = <int, List<int>>{};
+    final summaries = await getAllSummaries();
+    for (var start = 0; start < summaries.length; start += summaryBatchSize) {
+      final end = (start + summaryBatchSize).clamp(0, summaries.length);
+      final batch = summaries.sublist(start, end);
+      final details = await Future.wait(batch.map((entry) => getDetail(entry.id)));
+      for (final detail in details) {
+        final moveIds = <int>{};
+        for (final moveSet in detail.moveSets.values) {
+          moveIds.addAll(_moveIdsFromSet(moveSet));
+        }
+        moveIds.addAll(_moveIdsFromSet(detail.moveSet));
+        for (final moveId in moveIds) {
+          index.putIfAbsent(moveId, () => []).add(detail.summary.id);
+        }
+      }
+    }
+    for (final ids in index.values) {
+      ids.sort();
+    }
+    _moveLearnersIndexCache = index;
+    return index;
+  }
+
+  Set<int> _moveIdsFromSet(PokemonMoveSet moveSet) {
+    final ids = <int>{};
+    for (final entry in moveSet.levelUp) {
+      ids.add(entry.move.id);
+    }
+    for (final entry in moveSet.machine) {
+      ids.add(entry.move.id);
+    }
+    for (final entry in moveSet.egg) {
+      ids.add(entry.move.id);
+    }
+    for (final entry in moveSet.tutor) {
+      ids.add(entry.move.id);
+    }
+    return ids;
+  }
+
+  String? _eggGroupSlugForLabel(String label) => eggGroupSlugForLabelZh(label);
+
   void clearMemoryCache() {
     _summaryCache.clear();
     _detailCache.clear();
@@ -410,6 +634,10 @@ class DexRepository {
     _allMovesFuture = null;
     _allAbilitiesCache = null;
     _allAbilitiesFuture = null;
+    _eggGroupIndexCache = null;
+    _eggGroupIndexFuture = null;
+    _moveLearnersIndexCache = null;
+    _moveLearnersIndexFuture = null;
   }
 
   void _rememberSummary(PokemonSummary summary) {

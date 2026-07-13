@@ -47,12 +47,29 @@ class _SearchPageState extends State<SearchPage> {
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
   int _hubSegment = 0;
+  bool _initialQueryApplied = false;
 
   @override
   void initState() {
     super.initState();
     _loadProgress();
     _loadRecentQueries();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialQueryApplied) {
+      return;
+    }
+    final query = GoRouterState.of(context).uri.queryParameters['q'];
+    if (query == null || query.isEmpty) {
+      return;
+    }
+    _initialQueryApplied = true;
+    _controller.text = query;
+    _controller.selection = TextSelection.collapsed(offset: query.length);
+    _runSearch(query);
   }
 
   Future<void> _loadProgress() async {
