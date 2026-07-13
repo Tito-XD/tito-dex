@@ -14,6 +14,33 @@ abstract final class AppZh {
   static const trainerCard = '训练家卡片';
   static const companion = '同伴';
 
+  static String timeGreeting(DateTime time) {
+    final hour = time.hour;
+    if (hour >= 5 && hour < 8) return '早上好';
+    if (hour >= 8 && hour < 11) return '上午好';
+    if (hour >= 11 && hour < 13) return '中午好';
+    if (hour >= 13 && hour < 17) return '下午好';
+    if (hour >= 17 && hour < 19) return '傍晚好';
+    if (hour >= 19 && hour < 23) return '晚上好';
+    return '深夜好';
+  }
+
+  static String trainerGreeting(String trainerName, [DateTime? time]) =>
+      '${timeGreeting(time ?? DateTime.now())}，训练家 $trainerName';
+
+  static const journeyCardTitle = '旅程';
+  static const journeyOpenDetail = '查看旅程详情';
+  static const emulatorContinueHint = '从模拟器继续';
+  static const partySaveDiffBanner = '与最新存档不同 · 点击同步';
+  static const partySaveSyncConfirm = '用存档队伍覆盖当前编辑？';
+  static const settingsChangeAvatar = '更换头像';
+  static const settingsJourneyReadOnly = '旅程信息（来自存档）';
+  static const teamSummaryTitle = '队伍概览';
+  static const sleepToolsTitle = 'Pokémon Sleep 工具';
+  static const dexManualMarkSeen = '已标记为见过';
+  static const dexManualMarkCaught = '已标记为捕获';
+  static const dexManualMarkClear = '已清除标记';
+
   static const continueJourney = '继续旅程';
   static const cityView = '★  城景  ★';
   static const continueButton = '继续';
