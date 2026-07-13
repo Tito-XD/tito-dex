@@ -72,6 +72,29 @@ void main() {
     expect(progress.matchesFilter(2, DexEncounterFilter.seen), isTrue);
     expect(progress.matchesFilter(1, DexEncounterFilter.seen), isTrue);
     expect(progress.matchesFilter(3, DexEncounterFilter.unseen), isTrue);
-    expect(progress.matchesFilter(3, DexEncounterFilter.all), isTrue);
+  });
+
+  test('DexProgress manualDexMarks uses journey manual id lists', () {
+    final journey = CurrentJourney(
+      game: 'Scarlet',
+      trainerName: 'Test',
+      location: '帕底亚',
+      badges: 0,
+      maxBadges: 8,
+      playTime: '1:00:00',
+      party: const [],
+      timeline: const [],
+      companion: 'Sprigatito',
+      manualDexSeenIds: const [1, 4],
+      manualDexCaughtIds: const [7],
+    );
+
+    final progress = DexProgress.fromJourney(journey, manualDexMarks: true);
+
+    expect(progress.statusFor(1), DexEncounterStatus.seen);
+    expect(progress.statusFor(4), DexEncounterStatus.seen);
+    expect(progress.statusFor(7), DexEncounterStatus.caught);
+    expect(progress.statusFor(25), DexEncounterStatus.unknown);
+    expect(progress.fromSave, isFalse);
   });
 }

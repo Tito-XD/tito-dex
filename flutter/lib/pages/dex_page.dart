@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/game/journey_capability.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_regional_picker.dart';
@@ -25,9 +26,14 @@ import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 
 class DexPage extends StatefulWidget {
-  const DexPage({super.key, required this.journey});
+  const DexPage({
+    super.key,
+    required this.journey,
+    this.onManualDexMarkChanged,
+  });
 
   final CurrentJourney journey;
+  final ValueChanged<CurrentJourney>? onManualDexMarkChanged;
 
   @override
   State<DexPage> createState() => _DexPageState();
@@ -55,13 +61,48 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
+    gameEditionRepository.addListener(_onEditionChanged);
     _bootstrap();
+  }
+
+  @override
+  void dispose() {
+    gameEditionRepository.removeListener(_onEditionChanged);
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(DexPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.journey != widget.journey) {
+      _journeyIds = _resolveJourneyIds();
+      setState(() {
+        _progress = dexRepository.progressFor(
+          widget.journey,
+          manualDexMarks: !_isSaveLinked,
+        );
+      });
+    }
+  }
+
+  bool get _isSaveLinked => gameEditionRepository.edition.isSaveLinked;
+
+  void _onEditionChanged() {
+    setState(() {
+      _progress = dexRepository.progressFor(
+        widget.journey,
+        manualDexMarks: !_isSaveLinked,
+      );
+    });
   }
 
   Future<void> _bootstrap() async {
     try {
       _journeyIds = _resolveJourneyIds();
-      final progress = dexRepository.progressFor(widget.journey);
+      final progress = dexRepository.progressFor(
+        widget.journey,
+        manualDexMarks: !_isSaveLinked,
+      );
       if (!mounted) {
         return;
       }
@@ -93,6 +134,50 @@ class _DexPageState extends State<DexPage> {
       ids.add(companionId);
     }
     return ids;
+  }
+
+  void _cycleManualMark(int id, DexEncounterStatus current) {
+    if (_isSaveLinked || widget.onManualDexMarkChanged == null) {
+      return;
+    }
+
+    var seenIds = widget.journey.manualDexSeenIds.toList();
+    var caughtIds = widget.journey.manualDexCaughtIds.toList();
+
+    switch (current) {
+      case DexEncounterStatus.unknown:
+        if (!seenIds.contains(id)) {
+          seenIds = [...seenIds, id];
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.dexManualMarkSeen)),
+        );
+      case DexEncounterStatus.seen:
+        if (!caughtIds.contains(id)) {
+          caughtIds = [...caughtIds, id];
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.dexManualMarkCaught)),
+        );
+      case DexEncounterStatus.caught:
+        seenIds = seenIds.where((value) => value != id).toList();
+        caughtIds = caughtIds.where((value) => value != id).toList();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppZh.dexManualMarkClear)),
+        );
+    }
+
+    final updated = widget.journey.copyWith(
+      manualDexSeenIds: seenIds,
+      manualDexCaughtIds: caughtIds,
+    );
+    widget.onManualDexMarkChanged!(updated);
+    setState(() {
+      _progress = dexRepository.progressFor(
+        updated,
+        manualDexMarks: true,
+      );
+    });
   }
 
   Future<void> _loadMore() async {
@@ -466,6 +551,9 @@ class _DexPageState extends State<DexPage> {
                         summary: entry,
                         status: status,
                         compact: DeviceLayout.isCompact(context),
+                        onLongPress: _isSaveLinked
+                            ? null
+                            : () => _cycleManualMark(entry.id, status),
                       );
                     },
                     childCount: visible.length,

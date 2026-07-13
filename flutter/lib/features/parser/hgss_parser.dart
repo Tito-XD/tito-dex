@@ -102,34 +102,43 @@ class HgssParser {
       at: _formatParsedAtLocal(summary.parsedAt),
     );
 
+    final parsedParty = summary.party
+        .map(
+          (member) => PartyMember(
+            species: localizeSpecies(member.speciesName),
+            speciesId: member.speciesId,
+            level: member.level,
+            currentHp: member.currentHp,
+            maxHp: member.maxHp,
+            experience: member.experience,
+          ),
+        )
+        .toList(growable: false);
+    final keepUserParty = existing?.partyUserOverride ?? false;
+
     return CurrentJourney(
       game: summary.game,
       trainerName:
           preserveTrainerName ? existing!.trainerName : summary.trainerName,
       saveTrainerName: summary.trainerName,
       trainerNameCustomized: preserveTrainerName,
+      trainerAvatarPath: existing?.trainerAvatarPath,
+      trainerAvatarCustomized: existing?.trainerAvatarCustomized ?? false,
       location: summary.locationLabel,
       badges: summary.badges,
       maxBadges: summary.maxBadges,
       playTime: summary.playTime,
       companion: existing?.companion ?? 'Cyndaquil',
-      party: summary.party
-          .map(
-            (member) => PartyMember(
-              species: localizeSpecies(member.speciesName),
-              speciesId: member.speciesId,
-              level: member.level,
-              currentHp: member.currentHp,
-              maxHp: member.maxHp,
-              experience: member.experience,
-            ),
-          )
-          .toList(),
+      party: keepUserParty ? existing!.party : parsedParty,
+      saveSyncedParty: parsedParty,
+      partyUserOverride: keepUserParty,
       timeline: _mergeTimeline(existing?.timeline ?? const [], syncEntry),
       nextReminder: existing?.nextReminder ?? '继续城都地区的旅程',
       saveDexCaughtIds: summary.dexCaughtIds.toList()..sort(),
       saveDexSeenIds: summary.dexSeenIds.toList()..sort(),
       saveDexHash: summary.saveHash,
+      manualDexSeenIds: existing?.manualDexSeenIds ?? const [],
+      manualDexCaughtIds: existing?.manualDexCaughtIds ?? const [],
     );
   }
 

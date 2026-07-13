@@ -18,10 +18,14 @@ class PartyTeamList extends StatelessWidget {
     super.key,
     required this.party,
     this.showEmptySlots = false,
+    this.onMemberTap,
+    this.onEmptySlotTap,
   });
 
   final List<PartyMember> party;
   final bool showEmptySlots;
+  final ValueChanged<int>? onMemberTap;
+  final VoidCallback? onEmptySlotTap;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +35,13 @@ class PartyTeamList extends StatelessWidget {
         for (var index = 0; index < slots; index++) ...[
           if (index > 0) const SizedBox(height: 10),
           if (index < party.length)
-            _PartyTeamRow(member: party[index], slot: index + 1)
+            _PartyTeamRow(
+              member: party[index],
+              slot: index + 1,
+              onTap: onMemberTap == null ? null : () => onMemberTap!(index),
+            )
           else
-            const _EmptyTeamRow(),
+            _EmptyTeamRow(onTap: onEmptySlotTap),
         ],
       ],
     );
@@ -41,10 +49,15 @@ class PartyTeamList extends StatelessWidget {
 }
 
 class _PartyTeamRow extends StatelessWidget {
-  const _PartyTeamRow({required this.member, required this.slot});
+  const _PartyTeamRow({
+    required this.member,
+    required this.slot,
+    this.onTap,
+  });
 
   final PartyMember member;
   final int slot;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +67,10 @@ class _PartyTeamRow extends StatelessWidget {
 
     return StickerCard(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Row(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (speciesId != null)
@@ -118,6 +134,7 @@ class _PartyTeamRow extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -164,14 +181,19 @@ class _StatBar extends StatelessWidget {
 }
 
 class _EmptyTeamRow extends StatelessWidget {
-  const _EmptyTeamRow();
+  const _EmptyTeamRow({this.onTap});
+
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
       variant: StickerVariant.sky,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      child: Row(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Row(
         children: [
           Container(
             width: 56,
@@ -193,6 +215,7 @@ class _EmptyTeamRow extends StatelessWidget {
           const SizedBox(width: 10),
           Text(AppZh.teamEmptySlot, style: context.tito.cardMuted),
         ],
+        ),
       ),
     );
   }

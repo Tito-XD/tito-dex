@@ -37,8 +37,11 @@ class DexRepository {
   Map<int, CachedAbility>? _allAbilitiesCache;
   Future<Map<int, CachedAbility>>? _allAbilitiesFuture;
 
-  DexProgress progressFor(CurrentJourney journey) =>
-      DexProgress.fromJourney(journey);
+  DexProgress progressFor(
+    CurrentJourney journey, {
+    bool manualDexMarks = false,
+  }) =>
+      DexProgress.fromJourney(journey, manualDexMarks: manualDexMarks);
 
   Future<DexScope> getDefaultScope() => dexSettingsRepository.loadDefaultScope();
 

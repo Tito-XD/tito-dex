@@ -320,6 +320,24 @@ abstract final class AppZh {
   static const teamNote = '队伍数据来自当前存档或演示旅程。后续可在这里编辑同行宝可梦。';
   static const teamEmptySlot = '空位';
   static String teamSubtitle(int count) => '同行 $count 只';
+  static String teamSummaryAvgLevel(double avg) =>
+      '平均 Lv ${avg.toStringAsFixed(1)}';
+  static String teamSummaryBstSum(int sum) => '种族值合计 $sum';
+  static String teamSummaryTypeCoverage(int count) => '属性覆盖 $count/18';
+  static String teamSummaryWeaknesses(String types) => '常见弱点：$types';
+  static const teamEditTitle = '编辑同行';
+  static const teamEditLevel = '等级';
+  static const teamEditNickname = '昵称';
+  static const teamAddTitle = '添加宝可梦';
+  static const teamAddByIdHint = '全国图鉴编号（1–1025）';
+  static const teamAddPick = '从列表选择';
+  static const teamAddInvalidId = '无效编号';
+  static const confirm = '确定';
+  static const cancel = '取消';
+  static const sleepToolsMain = 'Neroli\'s Lab 主页';
+  static const sleepToolsGuides = '攻略指南';
+  static const sleepToolsDocs = '开发文档';
+  static const sleepLinkCopied = '链接已复制到剪贴板';
 
   static const settingsTrainerProfile = '训练家资料';
   static const settingsGroupTrainer = 'Trainer';
@@ -395,6 +413,7 @@ abstract final class AppZh {
 
   static const snackAvatarConfirmAgain = '再次点击修改头像';
   static const snackAvatarUpdated = '头像已更新';
+  static const snackAvatarFailed = '头像更换失败，请重试';
   static const avatarPickGallery = '从相册选择';
   static String snackGameSwitched(String gameTitle) => '已切换至 $gameTitle';
 
