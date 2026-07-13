@@ -17,6 +17,7 @@ import { jsonResponse, methodNotAllowed, textResponse } from './lib/http.js';
 import { buildHealthReport } from './lib/health.js';
 import { handleAdminRequest } from './lib/admin.js';
 import { handleScheduledCron } from './lib/cron.js';
+import { sendAlert, hasAlertConfigured } from './lib/alerts.js';
 import { serveR2Object, serveWithFallbacks } from './lib/r2-serve.js';
 
 function objectKeyFromPath(pathname) {
@@ -79,16 +80,14 @@ export default {
       await handleScheduledCron(env, event.cron);
     } catch (error) {
       console.error('scheduled handler failed', event.cron, error);
-      if (env.ALERT_WEBHOOK_URL) {
-        await fetch(env.ALERT_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content: `TitoDex Worker cron failed (${event.cron}): ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-          }),
-        }).catch(() => {});
+      if (hasAlertConfigured(env)) {
+        await sendAlert(
+          env,
+          `TitoDex Worker cron failed (${event.cron}): ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+          { title: 'Worker cron error' },
+        ).catch(() => {});
       }
     }
   },

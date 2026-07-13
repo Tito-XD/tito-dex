@@ -36,4 +36,6 @@ GITHUB_REPO = "Tito-XD/tito-dex"
 # Secrets (Dashboard → Settings → Variables → Secrets):
 #   GITHUB_DISPATCH_TOKEN — PAT with repo scope (Actions: write) for repository_dispatch
 #   ADMIN_SECRET          — Bearer token for /admin/* routes
-#   ALERT_WEBHOOK_URL     — optional Discord/Slack webhook for probe failures
+#   TELEGRAM_BOT_TOKEN    — optional BotFather token for probe/cron alerts
+#   TELEGRAM_CHAT_ID      — optional Telegram chat id (your user or group)
+#   ALERT_WEBHOOK_URL     — optional Discord/Slack webhook (alternative to Telegram)
