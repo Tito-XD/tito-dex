@@ -1,0 +1,74 @@
+{
+  "bug": {
+    "nameEn": "bug",
+    "nameZh": "虫"
+  },
+  "dark": {
+    "nameEn": "dark",
+    "nameZh": "恶"
+  },
+  "dragon": {
+    "nameEn": "dragon",
+    "nameZh": "龙"
+  },
+  "electric": {
+    "nameEn": "electric",
+    "nameZh": "电"
+  },
+  "fairy": {
+    "nameEn": "fairy",
+    "nameZh": "妖精"
+  },
+  "fighting": {
+    "nameEn": "fighting",
+    "nameZh": "格斗"
+  },
+  "fire": {
+    "nameEn": "fire",
+    "nameZh": "火"
+  },
+  "flying": {
+    "nameEn": "flying",
+    "nameZh": "飞行"
+  },
+  "ghost": {
+    "nameEn": "ghost",
+    "nameZh": "幽灵"
+  },
+  "grass": {
+    "nameEn": "grass",
+    "nameZh": "草"
+  },
+  "ground": {
+    "nameEn": "ground",
+    "nameZh": "地面"
+  },
+  "ice": {
+    "nameEn": "ice",
+    "nameZh": "冰"
+  },
+  "normal": {
+    "nameEn": "normal",
+    "nameZh": "一般"
+  },
+  "poison": {
+    "nameEn": "poison",
+    "nameZh": "毒"
+  },
+  "psychic": {
+    "nameEn": "psychic",
+    "nameZh": "超能力"
+  },
+  "rock": {
+    "nameEn": "rock",
+    "nameZh": "岩石"
+  },
+  "steel": {
+    "nameEn": "steel",
+    "nameZh": "钢"
+  },
+  "water": {
+    "nameEn": "water",
+    "nameZh": "水"
+  }
+}

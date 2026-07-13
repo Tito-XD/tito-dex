@@ -1,0 +1,62 @@
+{
+  "1": {
+    "nameEn": "Monster",
+    "nameZh": "怪兽"
+  },
+  "10": {
+    "nameEn": "Mineral",
+    "nameZh": "矿物"
+  },
+  "11": {
+    "nameEn": "Amorphous",
+    "nameZh": "不定形"
+  },
+  "12": {
+    "nameEn": "Water 2",
+    "nameZh": "水中2"
+  },
+  "13": {
+    "nameEn": "Ditto",
+    "nameZh": "百变怪"
+  },
+  "14": {
+    "nameEn": "Dragon",
+    "nameZh": "龙"
+  },
+  "15": {
+    "nameEn": "Undiscovered",
+    "nameZh": "未发现"
+  },
+  "2": {
+    "nameEn": "Water 1",
+    "nameZh": "水中1"
+  },
+  "3": {
+    "nameEn": "Bug",
+    "nameZh": "虫"
+  },
+  "4": {
+    "nameEn": "Flying",
+    "nameZh": "飞行"
+  },
+  "5": {
+    "nameEn": "Field",
+    "nameZh": "陆上"
+  },
+  "6": {
+    "nameEn": "Fairy",
+    "nameZh": "妖精"
+  },
+  "7": {
+    "nameEn": "Grass",
+    "nameZh": "植物"
+  },
+  "8": {
+    "nameEn": "Human-Like",
+    "nameZh": "人型"
+  },
+  "9": {
+    "nameEn": "Water 3",
+    "nameZh": "水中３"
+  }
+}

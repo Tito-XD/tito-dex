@@ -1,0 +1,6152 @@
+{
+  "1": {
+    "genusZh": "种子宝可梦",
+    "nameEn": "Bulbasaur",
+    "nameZh": "妙蛙种子",
+    "slug": "1"
+  },
+  "10": {
+    "genusZh": "虫宝宝宝可梦",
+    "nameEn": "Caterpie",
+    "nameZh": "绿毛虫",
+    "slug": "10"
+  },
+  "100": {
+    "genusZh": "球宝可梦",
+    "nameEn": "Voltorb",
+    "nameZh": "霹雳电球",
+    "slug": "100"
+  },
+  "1000": {
+    "genusZh": "宝者宝可梦",
+    "nameEn": "Gholdengo",
+    "nameZh": "赛富豪",
+    "slug": "1000"
+  },
+  "1001": {
+    "genusZh": "灾厄宝可梦",
+    "nameEn": "Wo-Chien",
+    "nameZh": "古简蜗",
+    "slug": "1001"
+  },
+  "1002": {
+    "genusZh": "灾厄宝可梦",
+    "nameEn": "Chien-Pao",
+    "nameZh": "古剑豹",
+    "slug": "1002"
+  },
+  "1003": {
+    "genusZh": "灾厄宝可梦",
+    "nameEn": "Ting-Lu",
+    "nameZh": "古鼎鹿",
+    "slug": "1003"
+  },
+  "1004": {
+    "genusZh": "灾厄宝可梦",
+    "nameEn": "Chi-Yu",
+    "nameZh": "古玉鱼",
+    "slug": "1004"
+  },
+  "1005": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Roaring Moon",
+    "nameZh": "轰鸣月",
+    "slug": "1005"
+  },
+  "1006": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Valiant",
+    "nameZh": "铁武者",
+    "slug": "1006"
+  },
+  "1007": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Koraidon",
+    "nameZh": "故勒顿",
+    "slug": "1007"
+  },
+  "1008": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Miraidon",
+    "nameZh": "密勒顿",
+    "slug": "1008"
+  },
+  "1009": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Walking Wake",
+    "nameZh": "波荡水",
+    "slug": "1009"
+  },
+  "101": {
+    "genusZh": "球宝可梦",
+    "nameEn": "Electrode",
+    "nameZh": "顽皮雷弹",
+    "slug": "101"
+  },
+  "1010": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Leaves",
+    "nameZh": "铁斑叶",
+    "slug": "1010"
+  },
+  "1011": {
+    "genusZh": "",
+    "nameEn": "Dipplin",
+    "nameZh": "裹蜜虫",
+    "slug": "1011"
+  },
+  "1012": {
+    "genusZh": "",
+    "nameEn": "Poltchageist",
+    "nameZh": "斯魔茶",
+    "slug": "1012"
+  },
+  "1013": {
+    "genusZh": "",
+    "nameEn": "Sinistcha",
+    "nameZh": "来悲粗茶",
+    "slug": "1013"
+  },
+  "1014": {
+    "genusZh": "",
+    "nameEn": "Okidogi",
+    "nameZh": "够赞狗",
+    "slug": "1014"
+  },
+  "1015": {
+    "genusZh": "",
+    "nameEn": "Munkidori",
+    "nameZh": "愿增猿",
+    "slug": "1015"
+  },
+  "1016": {
+    "genusZh": "",
+    "nameEn": "Fezandipiti",
+    "nameZh": "吉雉鸡",
+    "slug": "1016"
+  },
+  "1017": {
+    "genusZh": "",
+    "nameEn": "Ogerpon",
+    "nameZh": "厄诡椪",
+    "slug": "1017"
+  },
+  "1018": {
+    "genusZh": "",
+    "nameEn": "Archaludon",
+    "nameZh": "铝钢桥龙",
+    "slug": "1018"
+  },
+  "1019": {
+    "genusZh": "",
+    "nameEn": "Hydrapple",
+    "nameZh": "蜜集大蛇",
+    "slug": "1019"
+  },
+  "102": {
+    "genusZh": "蛋宝可梦",
+    "nameEn": "Exeggcute",
+    "nameZh": "蛋蛋",
+    "slug": "102"
+  },
+  "1020": {
+    "genusZh": "",
+    "nameEn": "Gouging Fire",
+    "nameZh": "破空焰",
+    "slug": "1020"
+  },
+  "1021": {
+    "genusZh": "",
+    "nameEn": "Raging Bolt",
+    "nameZh": "猛雷鼓",
+    "slug": "1021"
+  },
+  "1022": {
+    "genusZh": "",
+    "nameEn": "Iron Boulder",
+    "nameZh": "鐵磐岩",
+    "slug": "1022"
+  },
+  "1023": {
+    "genusZh": "",
+    "nameEn": "Iron Crown",
+    "nameZh": "鐵頭殼",
+    "slug": "1023"
+  },
+  "1024": {
+    "genusZh": "",
+    "nameEn": "Terapagos",
+    "nameZh": "太乐巴戈斯",
+    "slug": "1024"
+  },
+  "1025": {
+    "genusZh": "",
+    "nameEn": "Pecharunt",
+    "nameZh": "桃歹郎",
+    "slug": "1025"
+  },
+  "103": {
+    "genusZh": "椰子宝可梦",
+    "nameEn": "Exeggutor",
+    "nameZh": "椰蛋树",
+    "slug": "103"
+  },
+  "104": {
+    "genusZh": "孤独宝可梦",
+    "nameEn": "Cubone",
+    "nameZh": "卡拉卡拉",
+    "slug": "104"
+  },
+  "105": {
+    "genusZh": "爱骨宝可梦",
+    "nameEn": "Marowak",
+    "nameZh": "嘎啦嘎啦",
+    "slug": "105"
+  },
+  "106": {
+    "genusZh": "踢腿宝可梦",
+    "nameEn": "Hitmonlee",
+    "nameZh": "飞腿郎",
+    "slug": "106"
+  },
+  "107": {
+    "genusZh": "拳击宝可梦",
+    "nameEn": "Hitmonchan",
+    "nameZh": "快拳郎",
+    "slug": "107"
+  },
+  "108": {
+    "genusZh": "舔舔宝可梦",
+    "nameEn": "Lickitung",
+    "nameZh": "大舌头",
+    "slug": "108"
+  },
+  "109": {
+    "genusZh": "毒气宝可梦",
+    "nameEn": "Koffing",
+    "nameZh": "瓦斯弹",
+    "slug": "109"
+  },
+  "11": {
+    "genusZh": "蛹宝可梦",
+    "nameEn": "Metapod",
+    "nameZh": "铁甲蛹",
+    "slug": "11"
+  },
+  "110": {
+    "genusZh": "毒气宝可梦",
+    "nameEn": "Weezing",
+    "nameZh": "双弹瓦斯",
+    "slug": "110"
+  },
+  "111": {
+    "genusZh": "尖尖宝可梦",
+    "nameEn": "Rhyhorn",
+    "nameZh": "独角犀牛",
+    "slug": "111"
+  },
+  "112": {
+    "genusZh": "钻锥宝可梦",
+    "nameEn": "Rhydon",
+    "nameZh": "钻角犀兽",
+    "slug": "112"
+  },
+  "113": {
+    "genusZh": "蛋宝可梦",
+    "nameEn": "Chansey",
+    "nameZh": "吉利蛋",
+    "slug": "113"
+  },
+  "114": {
+    "genusZh": "藤蔓状宝可梦",
+    "nameEn": "Tangela",
+    "nameZh": "蔓藤怪",
+    "slug": "114"
+  },
+  "115": {
+    "genusZh": "亲子宝可梦",
+    "nameEn": "Kangaskhan",
+    "nameZh": "袋兽",
+    "slug": "115"
+  },
+  "116": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Horsea",
+    "nameZh": "墨海马",
+    "slug": "116"
+  },
+  "117": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Seadra",
+    "nameZh": "海刺龙",
+    "slug": "117"
+  },
+  "118": {
+    "genusZh": "金鱼宝可梦",
+    "nameEn": "Goldeen",
+    "nameZh": "角金鱼",
+    "slug": "118"
+  },
+  "119": {
+    "genusZh": "金鱼宝可梦",
+    "nameEn": "Seaking",
+    "nameZh": "金鱼王",
+    "slug": "119"
+  },
+  "12": {
+    "genusZh": "蝴蝶宝可梦",
+    "nameEn": "Butterfree",
+    "nameZh": "巴大蝶",
+    "slug": "12"
+  },
+  "120": {
+    "genusZh": "星形宝可梦",
+    "nameEn": "Staryu",
+    "nameZh": "海星星",
+    "slug": "120"
+  },
+  "121": {
+    "genusZh": "谜宝可梦",
+    "nameEn": "Starmie",
+    "nameZh": "宝石海星",
+    "slug": "121"
+  },
+  "122": {
+    "genusZh": "屏障宝可梦",
+    "nameEn": "Mr. Mime",
+    "nameZh": "魔墙人偶",
+    "slug": "122"
+  },
+  "123": {
+    "genusZh": "螳螂宝可梦",
+    "nameEn": "Scyther",
+    "nameZh": "飞天螳螂",
+    "slug": "123"
+  },
+  "124": {
+    "genusZh": "人形宝可梦",
+    "nameEn": "Jynx",
+    "nameZh": "迷唇姐",
+    "slug": "124"
+  },
+  "125": {
+    "genusZh": "电击宝可梦",
+    "nameEn": "Electabuzz",
+    "nameZh": "电击兽",
+    "slug": "125"
+  },
+  "126": {
+    "genusZh": "吐火宝可梦",
+    "nameEn": "Magmar",
+    "nameZh": "鸭嘴火兽",
+    "slug": "126"
+  },
+  "127": {
+    "genusZh": "锹形虫宝可梦",
+    "nameEn": "Pinsir",
+    "nameZh": "凯罗斯",
+    "slug": "127"
+  },
+  "128": {
+    "genusZh": "暴牛宝可梦",
+    "nameEn": "Tauros",
+    "nameZh": "肯泰罗",
+    "slug": "128"
+  },
+  "129": {
+    "genusZh": "鱼宝可梦",
+    "nameEn": "Magikarp",
+    "nameZh": "鲤鱼王",
+    "slug": "129"
+  },
+  "13": {
+    "genusZh": "毛毛虫宝可梦",
+    "nameEn": "Weedle",
+    "nameZh": "独角虫",
+    "slug": "13"
+  },
+  "130": {
+    "genusZh": "凶恶宝可梦",
+    "nameEn": "Gyarados",
+    "nameZh": "暴鲤龙",
+    "slug": "130"
+  },
+  "131": {
+    "genusZh": "乘载宝可梦",
+    "nameEn": "Lapras",
+    "nameZh": "拉普拉斯",
+    "slug": "131"
+  },
+  "132": {
+    "genusZh": "变身宝可梦",
+    "nameEn": "Ditto",
+    "nameZh": "百变怪",
+    "slug": "132"
+  },
+  "133": {
+    "genusZh": "进化宝可梦",
+    "nameEn": "Eevee",
+    "nameZh": "伊布",
+    "slug": "133"
+  },
+  "134": {
+    "genusZh": "吐泡宝可梦",
+    "nameEn": "Vaporeon",
+    "nameZh": "水伊布",
+    "slug": "134"
+  },
+  "135": {
+    "genusZh": "雷宝可梦",
+    "nameEn": "Jolteon",
+    "nameZh": "雷伊布",
+    "slug": "135"
+  },
+  "136": {
+    "genusZh": "火宝可梦",
+    "nameEn": "Flareon",
+    "nameZh": "火伊布",
+    "slug": "136"
+  },
+  "137": {
+    "genusZh": "虚拟宝可梦",
+    "nameEn": "Porygon",
+    "nameZh": "多边兽",
+    "slug": "137"
+  },
+  "138": {
+    "genusZh": "漩涡宝可梦",
+    "nameEn": "Omanyte",
+    "nameZh": "菊石兽",
+    "slug": "138"
+  },
+  "139": {
+    "genusZh": "漩涡宝可梦",
+    "nameEn": "Omastar",
+    "nameZh": "多刺菊石兽",
+    "slug": "139"
+  },
+  "14": {
+    "genusZh": "蛹宝可梦",
+    "nameEn": "Kakuna",
+    "nameZh": "铁壳蛹",
+    "slug": "14"
+  },
+  "140": {
+    "genusZh": "甲壳宝可梦",
+    "nameEn": "Kabuto",
+    "nameZh": "化石盔",
+    "slug": "140"
+  },
+  "141": {
+    "genusZh": "甲壳宝可梦",
+    "nameEn": "Kabutops",
+    "nameZh": "镰刀盔",
+    "slug": "141"
+  },
+  "142": {
+    "genusZh": "化石宝可梦",
+    "nameEn": "Aerodactyl",
+    "nameZh": "化石翼龙",
+    "slug": "142"
+  },
+  "143": {
+    "genusZh": "瞌睡宝可梦",
+    "nameEn": "Snorlax",
+    "nameZh": "卡比兽",
+    "slug": "143"
+  },
+  "144": {
+    "genusZh": "冰冻宝可梦",
+    "nameEn": "Articuno",
+    "nameZh": "急冻鸟",
+    "slug": "144"
+  },
+  "145": {
+    "genusZh": "电击宝可梦",
+    "nameEn": "Zapdos",
+    "nameZh": "闪电鸟",
+    "slug": "145"
+  },
+  "146": {
+    "genusZh": "火焰宝可梦",
+    "nameEn": "Moltres",
+    "nameZh": "火焰鸟",
+    "slug": "146"
+  },
+  "147": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Dratini",
+    "nameZh": "迷你龙",
+    "slug": "147"
+  },
+  "148": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Dragonair",
+    "nameZh": "哈克龙",
+    "slug": "148"
+  },
+  "149": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Dragonite",
+    "nameZh": "快龙",
+    "slug": "149"
+  },
+  "15": {
+    "genusZh": "毒蜂宝可梦",
+    "nameEn": "Beedrill",
+    "nameZh": "大针蜂",
+    "slug": "15"
+  },
+  "150": {
+    "genusZh": "基因宝可梦",
+    "nameEn": "Mewtwo",
+    "nameZh": "超梦",
+    "slug": "150"
+  },
+  "151": {
+    "genusZh": "新种宝可梦",
+    "nameEn": "Mew",
+    "nameZh": "梦幻",
+    "slug": "151"
+  },
+  "152": {
+    "genusZh": "叶子宝可梦",
+    "nameEn": "Chikorita",
+    "nameZh": "菊草叶",
+    "slug": "152"
+  },
+  "153": {
+    "genusZh": "叶子宝可梦",
+    "nameEn": "Bayleef",
+    "nameZh": "月桂叶",
+    "slug": "153"
+  },
+  "154": {
+    "genusZh": "芳草宝可梦",
+    "nameEn": "Meganium",
+    "nameZh": "大竺葵",
+    "slug": "154"
+  },
+  "155": {
+    "genusZh": "火鼠宝可梦",
+    "nameEn": "Cyndaquil",
+    "nameZh": "火球鼠",
+    "slug": "155"
+  },
+  "156": {
+    "genusZh": "火山宝可梦",
+    "nameEn": "Quilava",
+    "nameZh": "火岩鼠",
+    "slug": "156"
+  },
+  "157": {
+    "genusZh": "火山宝可梦",
+    "nameEn": "Typhlosion",
+    "nameZh": "火暴兽",
+    "slug": "157"
+  },
+  "158": {
+    "genusZh": "大颚宝可梦",
+    "nameEn": "Totodile",
+    "nameZh": "小锯鳄",
+    "slug": "158"
+  },
+  "159": {
+    "genusZh": "大颚宝可梦",
+    "nameEn": "Croconaw",
+    "nameZh": "蓝鳄",
+    "slug": "159"
+  },
+  "16": {
+    "genusZh": "小鸟宝可梦",
+    "nameEn": "Pidgey",
+    "nameZh": "波波",
+    "slug": "16"
+  },
+  "160": {
+    "genusZh": "大颚宝可梦",
+    "nameEn": "Feraligatr",
+    "nameZh": "大力鳄",
+    "slug": "160"
+  },
+  "161": {
+    "genusZh": "放哨宝可梦",
+    "nameEn": "Sentret",
+    "nameZh": "尾立",
+    "slug": "161"
+  },
+  "162": {
+    "genusZh": "长躯干宝可梦",
+    "nameEn": "Furret",
+    "nameZh": "大尾立",
+    "slug": "162"
+  },
+  "163": {
+    "genusZh": "猫头鹰宝可梦",
+    "nameEn": "Hoothoot",
+    "nameZh": "咕咕",
+    "slug": "163"
+  },
+  "164": {
+    "genusZh": "猫头鹰宝可梦",
+    "nameEn": "Noctowl",
+    "nameZh": "猫头夜鹰",
+    "slug": "164"
+  },
+  "165": {
+    "genusZh": "五星宝可梦",
+    "nameEn": "Ledyba",
+    "nameZh": "芭瓢虫",
+    "slug": "165"
+  },
+  "166": {
+    "genusZh": "五星宝可梦",
+    "nameEn": "Ledian",
+    "nameZh": "安瓢虫",
+    "slug": "166"
+  },
+  "167": {
+    "genusZh": "吐丝宝可梦",
+    "nameEn": "Spinarak",
+    "nameZh": "圆丝蛛",
+    "slug": "167"
+  },
+  "168": {
+    "genusZh": "长腿宝可梦",
+    "nameEn": "Ariados",
+    "nameZh": "阿利多斯",
+    "slug": "168"
+  },
+  "169": {
+    "genusZh": "蝙蝠宝可梦",
+    "nameEn": "Crobat",
+    "nameZh": "叉字蝠",
+    "slug": "169"
+  },
+  "17": {
+    "genusZh": "鸟宝可梦",
+    "nameEn": "Pidgeotto",
+    "nameZh": "比比鸟",
+    "slug": "17"
+  },
+  "170": {
+    "genusZh": "琵琶鱼宝可梦",
+    "nameEn": "Chinchou",
+    "nameZh": "灯笼鱼",
+    "slug": "170"
+  },
+  "171": {
+    "genusZh": "灯宝可梦",
+    "nameEn": "Lanturn",
+    "nameZh": "电灯怪",
+    "slug": "171"
+  },
+  "172": {
+    "genusZh": "小鼠宝可梦",
+    "nameEn": "Pichu",
+    "nameZh": "皮丘",
+    "slug": "172"
+  },
+  "173": {
+    "genusZh": "星形宝可梦",
+    "nameEn": "Cleffa",
+    "nameZh": "皮宝宝",
+    "slug": "173"
+  },
+  "174": {
+    "genusZh": "气球宝可梦",
+    "nameEn": "Igglybuff",
+    "nameZh": "宝宝丁",
+    "slug": "174"
+  },
+  "175": {
+    "genusZh": "针球宝可梦",
+    "nameEn": "Togepi",
+    "nameZh": "波克比",
+    "slug": "175"
+  },
+  "176": {
+    "genusZh": "幸福宝可梦",
+    "nameEn": "Togetic",
+    "nameZh": "波克基古",
+    "slug": "176"
+  },
+  "177": {
+    "genusZh": "小鸟宝可梦",
+    "nameEn": "Natu",
+    "nameZh": "天然雀",
+    "slug": "177"
+  },
+  "178": {
+    "genusZh": "神秘宝可梦",
+    "nameEn": "Xatu",
+    "nameZh": "天然鸟",
+    "slug": "178"
+  },
+  "179": {
+    "genusZh": "绵毛宝可梦",
+    "nameEn": "Mareep",
+    "nameZh": "咩利羊",
+    "slug": "179"
+  },
+  "18": {
+    "genusZh": "鸟宝可梦",
+    "nameEn": "Pidgeot",
+    "nameZh": "大比鸟",
+    "slug": "18"
+  },
+  "180": {
+    "genusZh": "绵毛宝可梦",
+    "nameEn": "Flaaffy",
+    "nameZh": "茸茸羊",
+    "slug": "180"
+  },
+  "181": {
+    "genusZh": "灯宝可梦",
+    "nameEn": "Ampharos",
+    "nameZh": "电龙",
+    "slug": "181"
+  },
+  "182": {
+    "genusZh": "花宝可梦",
+    "nameEn": "Bellossom",
+    "nameZh": "美丽花",
+    "slug": "182"
+  },
+  "183": {
+    "genusZh": "水鼠宝可梦",
+    "nameEn": "Marill",
+    "nameZh": "玛力露",
+    "slug": "183"
+  },
+  "184": {
+    "genusZh": "水兔宝可梦",
+    "nameEn": "Azumarill",
+    "nameZh": "玛力露丽",
+    "slug": "184"
+  },
+  "185": {
+    "genusZh": "模仿宝可梦",
+    "nameEn": "Sudowoodo",
+    "nameZh": "树才怪",
+    "slug": "185"
+  },
+  "186": {
+    "genusZh": "蛙宝可梦",
+    "nameEn": "Politoed",
+    "nameZh": "蚊香蛙皇",
+    "slug": "186"
+  },
+  "187": {
+    "genusZh": "棉草宝可梦",
+    "nameEn": "Hoppip",
+    "nameZh": "毽子草",
+    "slug": "187"
+  },
+  "188": {
+    "genusZh": "棉草宝可梦",
+    "nameEn": "Skiploom",
+    "nameZh": "毽子花",
+    "slug": "188"
+  },
+  "189": {
+    "genusZh": "棉草宝可梦",
+    "nameEn": "Jumpluff",
+    "nameZh": "毽子棉",
+    "slug": "189"
+  },
+  "19": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Rattata",
+    "nameZh": "小拉达",
+    "slug": "19"
+  },
+  "190": {
+    "genusZh": "长尾宝可梦",
+    "nameEn": "Aipom",
+    "nameZh": "长尾怪手",
+    "slug": "190"
+  },
+  "191": {
+    "genusZh": "种子宝可梦",
+    "nameEn": "Sunkern",
+    "nameZh": "向日种子",
+    "slug": "191"
+  },
+  "192": {
+    "genusZh": "太阳宝可梦",
+    "nameEn": "Sunflora",
+    "nameZh": "向日花怪",
+    "slug": "192"
+  },
+  "193": {
+    "genusZh": "薄翼宝可梦",
+    "nameEn": "Yanma",
+    "nameZh": "蜻蜻蜓",
+    "slug": "193"
+  },
+  "194": {
+    "genusZh": "水鱼宝可梦",
+    "nameEn": "Wooper",
+    "nameZh": "乌波",
+    "slug": "194"
+  },
+  "195": {
+    "genusZh": "水鱼宝可梦",
+    "nameEn": "Quagsire",
+    "nameZh": "沼王",
+    "slug": "195"
+  },
+  "196": {
+    "genusZh": "太阳宝可梦",
+    "nameEn": "Espeon",
+    "nameZh": "太阳伊布",
+    "slug": "196"
+  },
+  "197": {
+    "genusZh": "月光宝可梦",
+    "nameEn": "Umbreon",
+    "nameZh": "月亮伊布",
+    "slug": "197"
+  },
+  "198": {
+    "genusZh": "黑暗宝可梦",
+    "nameEn": "Murkrow",
+    "nameZh": "黑暗鸦",
+    "slug": "198"
+  },
+  "199": {
+    "genusZh": "王者宝可梦",
+    "nameEn": "Slowking",
+    "nameZh": "呆呆王",
+    "slug": "199"
+  },
+  "2": {
+    "genusZh": "种子宝可梦",
+    "nameEn": "Ivysaur",
+    "nameZh": "妙蛙草",
+    "slug": "2"
+  },
+  "20": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Raticate",
+    "nameZh": "拉达",
+    "slug": "20"
+  },
+  "200": {
+    "genusZh": "夜啼宝可梦",
+    "nameEn": "Misdreavus",
+    "nameZh": "梦妖",
+    "slug": "200"
+  },
+  "201": {
+    "genusZh": "象征宝可梦",
+    "nameEn": "Unown",
+    "nameZh": "未知图腾",
+    "slug": "201"
+  },
+  "202": {
+    "genusZh": "忍耐宝可梦",
+    "nameEn": "Wobbuffet",
+    "nameZh": "果然翁",
+    "slug": "202"
+  },
+  "203": {
+    "genusZh": "长颈宝可梦",
+    "nameEn": "Girafarig",
+    "nameZh": "麒麟奇",
+    "slug": "203"
+  },
+  "204": {
+    "genusZh": "蓑衣虫宝可梦",
+    "nameEn": "Pineco",
+    "nameZh": "榛果球",
+    "slug": "204"
+  },
+  "205": {
+    "genusZh": "蓑衣虫宝可梦",
+    "nameEn": "Forretress",
+    "nameZh": "佛烈托斯",
+    "slug": "205"
+  },
+  "206": {
+    "genusZh": "地蛇宝可梦",
+    "nameEn": "Dunsparce",
+    "nameZh": "土龙弟弟",
+    "slug": "206"
+  },
+  "207": {
+    "genusZh": "飞蝎宝可梦",
+    "nameEn": "Gligar",
+    "nameZh": "天蝎",
+    "slug": "207"
+  },
+  "208": {
+    "genusZh": "铁蛇宝可梦",
+    "nameEn": "Steelix",
+    "nameZh": "大钢蛇",
+    "slug": "208"
+  },
+  "209": {
+    "genusZh": "妖精宝可梦",
+    "nameEn": "Snubbull",
+    "nameZh": "布鲁",
+    "slug": "209"
+  },
+  "21": {
+    "genusZh": "小鸟宝可梦",
+    "nameEn": "Spearow",
+    "nameZh": "烈雀",
+    "slug": "21"
+  },
+  "210": {
+    "genusZh": "妖精宝可梦",
+    "nameEn": "Granbull",
+    "nameZh": "布鲁皇",
+    "slug": "210"
+  },
+  "211": {
+    "genusZh": "气球宝可梦",
+    "nameEn": "Qwilfish",
+    "nameZh": "千针鱼",
+    "slug": "211"
+  },
+  "212": {
+    "genusZh": "钳子宝可梦",
+    "nameEn": "Scizor",
+    "nameZh": "巨钳螳螂",
+    "slug": "212"
+  },
+  "213": {
+    "genusZh": "发酵宝可梦",
+    "nameEn": "Shuckle",
+    "nameZh": "壶壶",
+    "slug": "213"
+  },
+  "214": {
+    "genusZh": "独角宝可梦",
+    "nameEn": "Heracross",
+    "nameZh": "赫拉克罗斯",
+    "slug": "214"
+  },
+  "215": {
+    "genusZh": "钩爪宝可梦",
+    "nameEn": "Sneasel",
+    "nameZh": "狃拉",
+    "slug": "215"
+  },
+  "216": {
+    "genusZh": "小熊宝可梦",
+    "nameEn": "Teddiursa",
+    "nameZh": "熊宝宝",
+    "slug": "216"
+  },
+  "217": {
+    "genusZh": "冬眠宝可梦",
+    "nameEn": "Ursaring",
+    "nameZh": "圈圈熊",
+    "slug": "217"
+  },
+  "218": {
+    "genusZh": "熔岩宝可梦",
+    "nameEn": "Slugma",
+    "nameZh": "熔岩虫",
+    "slug": "218"
+  },
+  "219": {
+    "genusZh": "熔岩宝可梦",
+    "nameEn": "Magcargo",
+    "nameZh": "熔岩蜗牛",
+    "slug": "219"
+  },
+  "22": {
+    "genusZh": "鸟嘴宝可梦",
+    "nameEn": "Fearow",
+    "nameZh": "大嘴雀",
+    "slug": "22"
+  },
+  "220": {
+    "genusZh": "小猪宝可梦",
+    "nameEn": "Swinub",
+    "nameZh": "小山猪",
+    "slug": "220"
+  },
+  "221": {
+    "genusZh": "野猪宝可梦",
+    "nameEn": "Piloswine",
+    "nameZh": "长毛猪",
+    "slug": "221"
+  },
+  "222": {
+    "genusZh": "珊瑚宝可梦",
+    "nameEn": "Corsola",
+    "nameZh": "太阳珊瑚",
+    "slug": "222"
+  },
+  "223": {
+    "genusZh": "喷射宝可梦",
+    "nameEn": "Remoraid",
+    "nameZh": "铁炮鱼",
+    "slug": "223"
+  },
+  "224": {
+    "genusZh": "喷射宝可梦",
+    "nameEn": "Octillery",
+    "nameZh": "章鱼桶",
+    "slug": "224"
+  },
+  "225": {
+    "genusZh": "搬运宝可梦",
+    "nameEn": "Delibird",
+    "nameZh": "信使鸟",
+    "slug": "225"
+  },
+  "226": {
+    "genusZh": "风筝宝可梦",
+    "nameEn": "Mantine",
+    "nameZh": "巨翅飞鱼",
+    "slug": "226"
+  },
+  "227": {
+    "genusZh": "钢甲鸟宝可梦",
+    "nameEn": "Skarmory",
+    "nameZh": "盔甲鸟",
+    "slug": "227"
+  },
+  "228": {
+    "genusZh": "阴暗宝可梦",
+    "nameEn": "Houndour",
+    "nameZh": "戴鲁比",
+    "slug": "228"
+  },
+  "229": {
+    "genusZh": "阴暗宝可梦",
+    "nameEn": "Houndoom",
+    "nameZh": "黑鲁加",
+    "slug": "229"
+  },
+  "23": {
+    "genusZh": "蛇宝可梦",
+    "nameEn": "Ekans",
+    "nameZh": "阿柏蛇",
+    "slug": "23"
+  },
+  "230": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Kingdra",
+    "nameZh": "刺龙王",
+    "slug": "230"
+  },
+  "231": {
+    "genusZh": "长鼻宝可梦",
+    "nameEn": "Phanpy",
+    "nameZh": "小小象",
+    "slug": "231"
+  },
+  "232": {
+    "genusZh": "铠甲宝可梦",
+    "nameEn": "Donphan",
+    "nameZh": "顿甲",
+    "slug": "232"
+  },
+  "233": {
+    "genusZh": "虚拟宝可梦",
+    "nameEn": "Porygon2",
+    "nameZh": "多边兽２型",
+    "slug": "233"
+  },
+  "234": {
+    "genusZh": "大角宝可梦",
+    "nameEn": "Stantler",
+    "nameZh": "惊角鹿",
+    "slug": "234"
+  },
+  "235": {
+    "genusZh": "画画宝可梦",
+    "nameEn": "Smeargle",
+    "nameZh": "图图犬",
+    "slug": "235"
+  },
+  "236": {
+    "genusZh": "打斗宝可梦",
+    "nameEn": "Tyrogue",
+    "nameZh": "无畏小子",
+    "slug": "236"
+  },
+  "237": {
+    "genusZh": "倒立宝可梦",
+    "nameEn": "Hitmontop",
+    "nameZh": "战舞郎",
+    "slug": "237"
+  },
+  "238": {
+    "genusZh": "亲吻宝可梦",
+    "nameEn": "Smoochum",
+    "nameZh": "迷唇娃",
+    "slug": "238"
+  },
+  "239": {
+    "genusZh": "电气宝可梦",
+    "nameEn": "Elekid",
+    "nameZh": "电击怪",
+    "slug": "239"
+  },
+  "24": {
+    "genusZh": "眼镜蛇宝可梦",
+    "nameEn": "Arbok",
+    "nameZh": "阿柏怪",
+    "slug": "24"
+  },
+  "240": {
+    "genusZh": "火种宝可梦",
+    "nameEn": "Magby",
+    "nameZh": "鸭嘴宝宝",
+    "slug": "240"
+  },
+  "241": {
+    "genusZh": "奶牛宝可梦",
+    "nameEn": "Miltank",
+    "nameZh": "大奶罐",
+    "slug": "241"
+  },
+  "242": {
+    "genusZh": "幸福宝可梦",
+    "nameEn": "Blissey",
+    "nameZh": "幸福蛋",
+    "slug": "242"
+  },
+  "243": {
+    "genusZh": "天雷宝可梦",
+    "nameEn": "Raikou",
+    "nameZh": "雷公",
+    "slug": "243"
+  },
+  "244": {
+    "genusZh": "火山宝可梦",
+    "nameEn": "Entei",
+    "nameZh": "炎帝",
+    "slug": "244"
+  },
+  "245": {
+    "genusZh": "极光宝可梦",
+    "nameEn": "Suicune",
+    "nameZh": "水君",
+    "slug": "245"
+  },
+  "246": {
+    "genusZh": "岩石肤宝可梦",
+    "nameEn": "Larvitar",
+    "nameZh": "幼基拉斯",
+    "slug": "246"
+  },
+  "247": {
+    "genusZh": "子弹宝可梦",
+    "nameEn": "Pupitar",
+    "nameZh": "沙基拉斯",
+    "slug": "247"
+  },
+  "248": {
+    "genusZh": "铠甲宝可梦",
+    "nameEn": "Tyranitar",
+    "nameZh": "班基拉斯",
+    "slug": "248"
+  },
+  "249": {
+    "genusZh": "潜水宝可梦",
+    "nameEn": "Lugia",
+    "nameZh": "洛奇亚",
+    "slug": "249"
+  },
+  "25": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Pikachu",
+    "nameZh": "皮卡丘",
+    "slug": "25"
+  },
+  "250": {
+    "genusZh": "虹色宝可梦",
+    "nameEn": "Ho-Oh",
+    "nameZh": "凤王",
+    "slug": "250"
+  },
+  "251": {
+    "genusZh": "时空穿越宝可梦",
+    "nameEn": "Celebi",
+    "nameZh": "时拉比",
+    "slug": "251"
+  },
+  "252": {
+    "genusZh": "林蜥宝可梦",
+    "nameEn": "Treecko",
+    "nameZh": "木守宫",
+    "slug": "252"
+  },
+  "253": {
+    "genusZh": "林蜥宝可梦",
+    "nameEn": "Grovyle",
+    "nameZh": "森林蜥蜴",
+    "slug": "253"
+  },
+  "254": {
+    "genusZh": "密林宝可梦",
+    "nameEn": "Sceptile",
+    "nameZh": "蜥蜴王",
+    "slug": "254"
+  },
+  "255": {
+    "genusZh": "雏鸡宝可梦",
+    "nameEn": "Torchic",
+    "nameZh": "火稚鸡",
+    "slug": "255"
+  },
+  "256": {
+    "genusZh": "幼鸡宝可梦",
+    "nameEn": "Combusken",
+    "nameZh": "力壮鸡",
+    "slug": "256"
+  },
+  "257": {
+    "genusZh": "猛火宝可梦",
+    "nameEn": "Blaziken",
+    "nameZh": "火焰鸡",
+    "slug": "257"
+  },
+  "258": {
+    "genusZh": "沼鱼宝可梦",
+    "nameEn": "Mudkip",
+    "nameZh": "水跃鱼",
+    "slug": "258"
+  },
+  "259": {
+    "genusZh": "沼鱼宝可梦",
+    "nameEn": "Marshtomp",
+    "nameZh": "沼跃鱼",
+    "slug": "259"
+  },
+  "26": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Raichu",
+    "nameZh": "雷丘",
+    "slug": "26"
+  },
+  "260": {
+    "genusZh": "沼鱼宝可梦",
+    "nameEn": "Swampert",
+    "nameZh": "巨沼怪",
+    "slug": "260"
+  },
+  "261": {
+    "genusZh": "紧咬宝可梦",
+    "nameEn": "Poochyena",
+    "nameZh": "土狼犬",
+    "slug": "261"
+  },
+  "262": {
+    "genusZh": "紧咬宝可梦",
+    "nameEn": "Mightyena",
+    "nameZh": "大狼犬",
+    "slug": "262"
+  },
+  "263": {
+    "genusZh": "豆狸宝可梦",
+    "nameEn": "Zigzagoon",
+    "nameZh": "蛇纹熊",
+    "slug": "263"
+  },
+  "264": {
+    "genusZh": "猛冲宝可梦",
+    "nameEn": "Linoone",
+    "nameZh": "直冲熊",
+    "slug": "264"
+  },
+  "265": {
+    "genusZh": "虫宝宝宝可梦",
+    "nameEn": "Wurmple",
+    "nameZh": "刺尾虫",
+    "slug": "265"
+  },
+  "266": {
+    "genusZh": "蛹宝可梦",
+    "nameEn": "Silcoon",
+    "nameZh": "甲壳茧",
+    "slug": "266"
+  },
+  "267": {
+    "genusZh": "蝴蝶宝可梦",
+    "nameEn": "Beautifly",
+    "nameZh": "狩猎凤蝶",
+    "slug": "267"
+  },
+  "268": {
+    "genusZh": "蛹宝可梦",
+    "nameEn": "Cascoon",
+    "nameZh": "盾甲茧",
+    "slug": "268"
+  },
+  "269": {
+    "genusZh": "毒蛾宝可梦",
+    "nameEn": "Dustox",
+    "nameZh": "毒粉蛾",
+    "slug": "269"
+  },
+  "27": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Sandshrew",
+    "nameZh": "穿山鼠",
+    "slug": "27"
+  },
+  "270": {
+    "genusZh": "浮萍宝可梦",
+    "nameEn": "Lotad",
+    "nameZh": "莲叶童子",
+    "slug": "270"
+  },
+  "271": {
+    "genusZh": "爽朗宝可梦",
+    "nameEn": "Lombre",
+    "nameZh": "莲帽小童",
+    "slug": "271"
+  },
+  "272": {
+    "genusZh": "乐天宝可梦",
+    "nameEn": "Ludicolo",
+    "nameZh": "乐天河童",
+    "slug": "272"
+  },
+  "273": {
+    "genusZh": "橡实宝可梦",
+    "nameEn": "Seedot",
+    "nameZh": "橡实果",
+    "slug": "273"
+  },
+  "274": {
+    "genusZh": "捉弄宝可梦",
+    "nameEn": "Nuzleaf",
+    "nameZh": "长鼻叶",
+    "slug": "274"
+  },
+  "275": {
+    "genusZh": "邪恶宝可梦",
+    "nameEn": "Shiftry",
+    "nameZh": "狡猾天狗",
+    "slug": "275"
+  },
+  "276": {
+    "genusZh": "幼燕宝可梦",
+    "nameEn": "Taillow",
+    "nameZh": "傲骨燕",
+    "slug": "276"
+  },
+  "277": {
+    "genusZh": "燕子宝可梦",
+    "nameEn": "Swellow",
+    "nameZh": "大王燕",
+    "slug": "277"
+  },
+  "278": {
+    "genusZh": "海鸥宝可梦",
+    "nameEn": "Wingull",
+    "nameZh": "长翅鸥",
+    "slug": "278"
+  },
+  "279": {
+    "genusZh": "水鸟宝可梦",
+    "nameEn": "Pelipper",
+    "nameZh": "大嘴鸥",
+    "slug": "279"
+  },
+  "28": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Sandslash",
+    "nameZh": "穿山王",
+    "slug": "28"
+  },
+  "280": {
+    "genusZh": "心情宝可梦",
+    "nameEn": "Ralts",
+    "nameZh": "拉鲁拉丝",
+    "slug": "280"
+  },
+  "281": {
+    "genusZh": "感情宝可梦",
+    "nameEn": "Kirlia",
+    "nameZh": "奇鲁莉安",
+    "slug": "281"
+  },
+  "282": {
+    "genusZh": "包容宝可梦",
+    "nameEn": "Gardevoir",
+    "nameZh": "沙奈朵",
+    "slug": "282"
+  },
+  "283": {
+    "genusZh": "水黾宝可梦",
+    "nameEn": "Surskit",
+    "nameZh": "溜溜糖球",
+    "slug": "283"
+  },
+  "284": {
+    "genusZh": "眼珠宝可梦",
+    "nameEn": "Masquerain",
+    "nameZh": "雨翅蛾",
+    "slug": "284"
+  },
+  "285": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Shroomish",
+    "nameZh": "蘑蘑菇",
+    "slug": "285"
+  },
+  "286": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Breloom",
+    "nameZh": "斗笠菇",
+    "slug": "286"
+  },
+  "287": {
+    "genusZh": "懒人宝可梦",
+    "nameEn": "Slakoth",
+    "nameZh": "懒人獭",
+    "slug": "287"
+  },
+  "288": {
+    "genusZh": "暴猿宝可梦",
+    "nameEn": "Vigoroth",
+    "nameZh": "过动猿",
+    "slug": "288"
+  },
+  "289": {
+    "genusZh": "怕麻烦宝可梦",
+    "nameEn": "Slaking",
+    "nameZh": "请假王",
+    "slug": "289"
+  },
+  "29": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Nidoran♀",
+    "nameZh": "尼多兰",
+    "slug": "29"
+  },
+  "290": {
+    "genusZh": "入门宝可梦",
+    "nameEn": "Nincada",
+    "nameZh": "土居忍士",
+    "slug": "290"
+  },
+  "291": {
+    "genusZh": "忍者宝可梦",
+    "nameEn": "Ninjask",
+    "nameZh": "铁面忍者",
+    "slug": "291"
+  },
+  "292": {
+    "genusZh": "空壳宝可梦",
+    "nameEn": "Shedinja",
+    "nameZh": "脱壳忍者",
+    "slug": "292"
+  },
+  "293": {
+    "genusZh": "细语宝可梦",
+    "nameEn": "Whismur",
+    "nameZh": "咕妞妞",
+    "slug": "293"
+  },
+  "294": {
+    "genusZh": "大声宝可梦",
+    "nameEn": "Loudred",
+    "nameZh": "吼爆弹",
+    "slug": "294"
+  },
+  "295": {
+    "genusZh": "噪音宝可梦",
+    "nameEn": "Exploud",
+    "nameZh": "爆音怪",
+    "slug": "295"
+  },
+  "296": {
+    "genusZh": "毅力宝可梦",
+    "nameEn": "Makuhita",
+    "nameZh": "幕下力士",
+    "slug": "296"
+  },
+  "297": {
+    "genusZh": "猛推宝可梦",
+    "nameEn": "Hariyama",
+    "nameZh": "铁掌力士",
+    "slug": "297"
+  },
+  "298": {
+    "genusZh": "水珠宝可梦",
+    "nameEn": "Azurill",
+    "nameZh": "露力丽",
+    "slug": "298"
+  },
+  "299": {
+    "genusZh": "罗盘宝可梦",
+    "nameEn": "Nosepass",
+    "nameZh": "朝北鼻",
+    "slug": "299"
+  },
+  "3": {
+    "genusZh": "种子宝可梦",
+    "nameEn": "Venusaur",
+    "nameZh": "妙蛙花",
+    "slug": "3"
+  },
+  "30": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Nidorina",
+    "nameZh": "尼多娜",
+    "slug": "30"
+  },
+  "300": {
+    "genusZh": "小猫宝可梦",
+    "nameEn": "Skitty",
+    "nameZh": "向尾喵",
+    "slug": "300"
+  },
+  "301": {
+    "genusZh": "清高宝可梦",
+    "nameEn": "Delcatty",
+    "nameZh": "优雅猫",
+    "slug": "301"
+  },
+  "302": {
+    "genusZh": "黑暗宝可梦",
+    "nameEn": "Sableye",
+    "nameZh": "勾魂眼",
+    "slug": "302"
+  },
+  "303": {
+    "genusZh": "欺骗宝可梦",
+    "nameEn": "Mawile",
+    "nameZh": "大嘴娃",
+    "slug": "303"
+  },
+  "304": {
+    "genusZh": "铁铠宝可梦",
+    "nameEn": "Aron",
+    "nameZh": "可可多拉",
+    "slug": "304"
+  },
+  "305": {
+    "genusZh": "铁铠宝可梦",
+    "nameEn": "Lairon",
+    "nameZh": "可多拉",
+    "slug": "305"
+  },
+  "306": {
+    "genusZh": "铁铠宝可梦",
+    "nameEn": "Aggron",
+    "nameZh": "波士可多拉",
+    "slug": "306"
+  },
+  "307": {
+    "genusZh": "冥想宝可梦",
+    "nameEn": "Meditite",
+    "nameZh": "玛沙那",
+    "slug": "307"
+  },
+  "308": {
+    "genusZh": "冥想宝可梦",
+    "nameEn": "Medicham",
+    "nameZh": "恰雷姆",
+    "slug": "308"
+  },
+  "309": {
+    "genusZh": "闪电宝可梦",
+    "nameEn": "Electrike",
+    "nameZh": "落雷兽",
+    "slug": "309"
+  },
+  "31": {
+    "genusZh": "钻锥宝可梦",
+    "nameEn": "Nidoqueen",
+    "nameZh": "尼多后",
+    "slug": "31"
+  },
+  "310": {
+    "genusZh": "放电宝可梦",
+    "nameEn": "Manectric",
+    "nameZh": "雷电兽",
+    "slug": "310"
+  },
+  "311": {
+    "genusZh": "加油宝可梦",
+    "nameEn": "Plusle",
+    "nameZh": "正电拍拍",
+    "slug": "311"
+  },
+  "312": {
+    "genusZh": "加油宝可梦",
+    "nameEn": "Minun",
+    "nameZh": "負电拍拍",
+    "slug": "312"
+  },
+  "313": {
+    "genusZh": "萤火虫宝可梦",
+    "nameEn": "Volbeat",
+    "nameZh": "电萤虫",
+    "slug": "313"
+  },
+  "314": {
+    "genusZh": "萤火虫宝可梦",
+    "nameEn": "Illumise",
+    "nameZh": "甜甜萤",
+    "slug": "314"
+  },
+  "315": {
+    "genusZh": "荆棘宝可梦",
+    "nameEn": "Roselia",
+    "nameZh": "毒蔷薇",
+    "slug": "315"
+  },
+  "316": {
+    "genusZh": "胃袋宝可梦",
+    "nameEn": "Gulpin",
+    "nameZh": "溶食兽",
+    "slug": "316"
+  },
+  "317": {
+    "genusZh": "毒袋宝可梦",
+    "nameEn": "Swalot",
+    "nameZh": "吞食兽",
+    "slug": "317"
+  },
+  "318": {
+    "genusZh": "凶猛宝可梦",
+    "nameEn": "Carvanha",
+    "nameZh": "利牙鱼",
+    "slug": "318"
+  },
+  "319": {
+    "genusZh": "凶暴宝可梦",
+    "nameEn": "Sharpedo",
+    "nameZh": "巨牙鲨",
+    "slug": "319"
+  },
+  "32": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Nidoran♂",
+    "nameZh": "尼多朗",
+    "slug": "32"
+  },
+  "320": {
+    "genusZh": "球鲸宝可梦",
+    "nameEn": "Wailmer",
+    "nameZh": "吼吼鲸",
+    "slug": "320"
+  },
+  "321": {
+    "genusZh": "浮鲸宝可梦",
+    "nameEn": "Wailord",
+    "nameZh": "吼鲸王",
+    "slug": "321"
+  },
+  "322": {
+    "genusZh": "迟钝宝可梦",
+    "nameEn": "Numel",
+    "nameZh": "呆火驼",
+    "slug": "322"
+  },
+  "323": {
+    "genusZh": "喷火宝可梦",
+    "nameEn": "Camerupt",
+    "nameZh": "喷火驼",
+    "slug": "323"
+  },
+  "324": {
+    "genusZh": "煤炭宝可梦",
+    "nameEn": "Torkoal",
+    "nameZh": "煤炭龟",
+    "slug": "324"
+  },
+  "325": {
+    "genusZh": "弹跳宝可梦",
+    "nameEn": "Spoink",
+    "nameZh": "跳跳猪",
+    "slug": "325"
+  },
+  "326": {
+    "genusZh": "操纵宝可梦",
+    "nameEn": "Grumpig",
+    "nameZh": "噗噗猪",
+    "slug": "326"
+  },
+  "327": {
+    "genusZh": "斑点熊猫宝可梦",
+    "nameEn": "Spinda",
+    "nameZh": "晃晃斑",
+    "slug": "327"
+  },
+  "328": {
+    "genusZh": "蚁狮宝可梦",
+    "nameEn": "Trapinch",
+    "nameZh": "大颚蚁",
+    "slug": "328"
+  },
+  "329": {
+    "genusZh": "振动宝可梦",
+    "nameEn": "Vibrava",
+    "nameZh": "超音波幼虫",
+    "slug": "329"
+  },
+  "33": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Nidorino",
+    "nameZh": "尼多力诺",
+    "slug": "33"
+  },
+  "330": {
+    "genusZh": "神秘宝可梦",
+    "nameEn": "Flygon",
+    "nameZh": "沙漠蜻蜓",
+    "slug": "330"
+  },
+  "331": {
+    "genusZh": "仙人掌宝可梦",
+    "nameEn": "Cacnea",
+    "nameZh": "刺球仙人掌",
+    "slug": "331"
+  },
+  "332": {
+    "genusZh": "稻草人宝可梦",
+    "nameEn": "Cacturne",
+    "nameZh": "梦歌仙人掌",
+    "slug": "332"
+  },
+  "333": {
+    "genusZh": "绵鸟宝可梦",
+    "nameEn": "Swablu",
+    "nameZh": "青绵鸟",
+    "slug": "333"
+  },
+  "334": {
+    "genusZh": "哼唱宝可梦",
+    "nameEn": "Altaria",
+    "nameZh": "七夕青鸟",
+    "slug": "334"
+  },
+  "335": {
+    "genusZh": "猫鼬宝可梦",
+    "nameEn": "Zangoose",
+    "nameZh": "猫鼬斩",
+    "slug": "335"
+  },
+  "336": {
+    "genusZh": "牙蛇宝可梦",
+    "nameEn": "Seviper",
+    "nameZh": "饭匙蛇",
+    "slug": "336"
+  },
+  "337": {
+    "genusZh": "陨石宝可梦",
+    "nameEn": "Lunatone",
+    "nameZh": "月石",
+    "slug": "337"
+  },
+  "338": {
+    "genusZh": "陨石宝可梦",
+    "nameEn": "Solrock",
+    "nameZh": "太阳岩",
+    "slug": "338"
+  },
+  "339": {
+    "genusZh": "须鱼宝可梦",
+    "nameEn": "Barboach",
+    "nameZh": "泥泥鳅",
+    "slug": "339"
+  },
+  "34": {
+    "genusZh": "钻锥宝可梦",
+    "nameEn": "Nidoking",
+    "nameZh": "尼多王",
+    "slug": "34"
+  },
+  "340": {
+    "genusZh": "须鱼宝可梦",
+    "nameEn": "Whiscash",
+    "nameZh": "鲶鱼王",
+    "slug": "340"
+  },
+  "341": {
+    "genusZh": "无赖宝可梦",
+    "nameEn": "Corphish",
+    "nameZh": "龙虾小兵",
+    "slug": "341"
+  },
+  "342": {
+    "genusZh": "流氓宝可梦",
+    "nameEn": "Crawdaunt",
+    "nameZh": "铁螯龙虾",
+    "slug": "342"
+  },
+  "343": {
+    "genusZh": "泥偶宝可梦",
+    "nameEn": "Baltoy",
+    "nameZh": "天秤偶",
+    "slug": "343"
+  },
+  "344": {
+    "genusZh": "泥偶宝可梦",
+    "nameEn": "Claydol",
+    "nameZh": "念力土偶",
+    "slug": "344"
+  },
+  "345": {
+    "genusZh": "海百合宝可梦",
+    "nameEn": "Lileep",
+    "nameZh": "触手百合",
+    "slug": "345"
+  },
+  "346": {
+    "genusZh": "藤壶宝可梦",
+    "nameEn": "Cradily",
+    "nameZh": "摇篮百合",
+    "slug": "346"
+  },
+  "347": {
+    "genusZh": "古虾宝可梦",
+    "nameEn": "Anorith",
+    "nameZh": "太古羽虫",
+    "slug": "347"
+  },
+  "348": {
+    "genusZh": "甲胄宝可梦",
+    "nameEn": "Armaldo",
+    "nameZh": "太古盔甲",
+    "slug": "348"
+  },
+  "349": {
+    "genusZh": "鱼宝可梦",
+    "nameEn": "Feebas",
+    "nameZh": "丑丑鱼",
+    "slug": "349"
+  },
+  "35": {
+    "genusZh": "妖精宝可梦",
+    "nameEn": "Clefairy",
+    "nameZh": "皮皮",
+    "slug": "35"
+  },
+  "350": {
+    "genusZh": "慈爱宝可梦",
+    "nameEn": "Milotic",
+    "nameZh": "美纳斯",
+    "slug": "350"
+  },
+  "351": {
+    "genusZh": "天气宝可梦",
+    "nameEn": "Castform",
+    "nameZh": "飘浮泡泡",
+    "slug": "351"
+  },
+  "352": {
+    "genusZh": "变色宝可梦",
+    "nameEn": "Kecleon",
+    "nameZh": "变隐龙",
+    "slug": "352"
+  },
+  "353": {
+    "genusZh": "人偶宝可梦",
+    "nameEn": "Shuppet",
+    "nameZh": "怨影娃娃",
+    "slug": "353"
+  },
+  "354": {
+    "genusZh": "布偶宝可梦",
+    "nameEn": "Banette",
+    "nameZh": "诅咒娃娃",
+    "slug": "354"
+  },
+  "355": {
+    "genusZh": "渡魂宝可梦",
+    "nameEn": "Duskull",
+    "nameZh": "夜巡灵",
+    "slug": "355"
+  },
+  "356": {
+    "genusZh": "招手宝可梦",
+    "nameEn": "Dusclops",
+    "nameZh": "彷徨夜灵",
+    "slug": "356"
+  },
+  "357": {
+    "genusZh": "水果宝可梦",
+    "nameEn": "Tropius",
+    "nameZh": "热带龙",
+    "slug": "357"
+  },
+  "358": {
+    "genusZh": "风铃宝可梦",
+    "nameEn": "Chimecho",
+    "nameZh": "风铃铃",
+    "slug": "358"
+  },
+  "359": {
+    "genusZh": "灾祸宝可梦",
+    "nameEn": "Absol",
+    "nameZh": "阿勃梭鲁",
+    "slug": "359"
+  },
+  "36": {
+    "genusZh": "妖精宝可梦",
+    "nameEn": "Clefable",
+    "nameZh": "皮可西",
+    "slug": "36"
+  },
+  "360": {
+    "genusZh": "开朗宝可梦",
+    "nameEn": "Wynaut",
+    "nameZh": "小果然",
+    "slug": "360"
+  },
+  "361": {
+    "genusZh": "雪笠宝可梦",
+    "nameEn": "Snorunt",
+    "nameZh": "雪童子",
+    "slug": "361"
+  },
+  "362": {
+    "genusZh": "脸面宝可梦",
+    "nameEn": "Glalie",
+    "nameZh": "冰鬼护",
+    "slug": "362"
+  },
+  "363": {
+    "genusZh": "拍手宝可梦",
+    "nameEn": "Spheal",
+    "nameZh": "海豹球",
+    "slug": "363"
+  },
+  "364": {
+    "genusZh": "滚球宝可梦",
+    "nameEn": "Sealeo",
+    "nameZh": "海魔狮",
+    "slug": "364"
+  },
+  "365": {
+    "genusZh": "破冰宝可梦",
+    "nameEn": "Walrein",
+    "nameZh": "帝牙海狮",
+    "slug": "365"
+  },
+  "366": {
+    "genusZh": "双壳贝宝可梦",
+    "nameEn": "Clamperl",
+    "nameZh": "珍珠贝",
+    "slug": "366"
+  },
+  "367": {
+    "genusZh": "深海宝可梦",
+    "nameEn": "Huntail",
+    "nameZh": "猎斑鱼",
+    "slug": "367"
+  },
+  "368": {
+    "genusZh": "南海宝可梦",
+    "nameEn": "Gorebyss",
+    "nameZh": "樱花鱼",
+    "slug": "368"
+  },
+  "369": {
+    "genusZh": "长寿宝可梦",
+    "nameEn": "Relicanth",
+    "nameZh": "古空棘鱼",
+    "slug": "369"
+  },
+  "37": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Vulpix",
+    "nameZh": "六尾",
+    "slug": "37"
+  },
+  "370": {
+    "genusZh": "相随宝可梦",
+    "nameEn": "Luvdisc",
+    "nameZh": "爱心鱼",
+    "slug": "370"
+  },
+  "371": {
+    "genusZh": "坚硬脑袋宝可梦",
+    "nameEn": "Bagon",
+    "nameZh": "宝贝龙",
+    "slug": "371"
+  },
+  "372": {
+    "genusZh": "耐力宝可梦",
+    "nameEn": "Shelgon",
+    "nameZh": "甲壳龙",
+    "slug": "372"
+  },
+  "373": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Salamence",
+    "nameZh": "暴飞龙",
+    "slug": "373"
+  },
+  "374": {
+    "genusZh": "铁球宝可梦",
+    "nameEn": "Beldum",
+    "nameZh": "铁哑铃",
+    "slug": "374"
+  },
+  "375": {
+    "genusZh": "铁爪宝可梦",
+    "nameEn": "Metang",
+    "nameZh": "金属怪",
+    "slug": "375"
+  },
+  "376": {
+    "genusZh": "铁足宝可梦",
+    "nameEn": "Metagross",
+    "nameZh": "巨金怪",
+    "slug": "376"
+  },
+  "377": {
+    "genusZh": "岩山宝可梦",
+    "nameEn": "Regirock",
+    "nameZh": "雷吉洛克",
+    "slug": "377"
+  },
+  "378": {
+    "genusZh": "冰山宝可梦",
+    "nameEn": "Regice",
+    "nameZh": "雷吉艾斯",
+    "slug": "378"
+  },
+  "379": {
+    "genusZh": "黑金宝可梦",
+    "nameEn": "Registeel",
+    "nameZh": "雷吉斯奇鲁",
+    "slug": "379"
+  },
+  "38": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Ninetales",
+    "nameZh": "九尾",
+    "slug": "38"
+  },
+  "380": {
+    "genusZh": "无限宝可梦",
+    "nameEn": "Latias",
+    "nameZh": "拉帝亚斯",
+    "slug": "380"
+  },
+  "381": {
+    "genusZh": "无限宝可梦",
+    "nameEn": "Latios",
+    "nameZh": "拉帝欧斯",
+    "slug": "381"
+  },
+  "382": {
+    "genusZh": "海底宝可梦",
+    "nameEn": "Kyogre",
+    "nameZh": "盖欧卡",
+    "slug": "382"
+  },
+  "383": {
+    "genusZh": "大陆宝可梦",
+    "nameEn": "Groudon",
+    "nameZh": "固拉多",
+    "slug": "383"
+  },
+  "384": {
+    "genusZh": "天空宝可梦",
+    "nameEn": "Rayquaza",
+    "nameZh": "烈空坐",
+    "slug": "384"
+  },
+  "385": {
+    "genusZh": "祈愿宝可梦",
+    "nameEn": "Jirachi",
+    "nameZh": "基拉祈",
+    "slug": "385"
+  },
+  "386": {
+    "genusZh": "ＤＮＡ宝可梦",
+    "nameEn": "Deoxys",
+    "nameZh": "代欧奇希斯",
+    "slug": "386"
+  },
+  "387": {
+    "genusZh": "嫩叶宝可梦",
+    "nameEn": "Turtwig",
+    "nameZh": "草苗龟",
+    "slug": "387"
+  },
+  "388": {
+    "genusZh": "树丛宝可梦",
+    "nameEn": "Grotle",
+    "nameZh": "树林龟",
+    "slug": "388"
+  },
+  "389": {
+    "genusZh": "大陆宝可梦",
+    "nameEn": "Torterra",
+    "nameZh": "土台龟",
+    "slug": "389"
+  },
+  "39": {
+    "genusZh": "气球宝可梦",
+    "nameEn": "Jigglypuff",
+    "nameZh": "胖丁",
+    "slug": "39"
+  },
+  "390": {
+    "genusZh": "小猴宝可梦",
+    "nameEn": "Chimchar",
+    "nameZh": "小火焰猴",
+    "slug": "390"
+  },
+  "391": {
+    "genusZh": "顽皮宝可梦",
+    "nameEn": "Monferno",
+    "nameZh": "猛火猴",
+    "slug": "391"
+  },
+  "392": {
+    "genusZh": "火焰宝可梦",
+    "nameEn": "Infernape",
+    "nameZh": "烈焰猴",
+    "slug": "392"
+  },
+  "393": {
+    "genusZh": "企鹅宝可梦",
+    "nameEn": "Piplup",
+    "nameZh": "波加曼",
+    "slug": "393"
+  },
+  "394": {
+    "genusZh": "企鹅宝可梦",
+    "nameEn": "Prinplup",
+    "nameZh": "波皇子",
+    "slug": "394"
+  },
+  "395": {
+    "genusZh": "皇帝宝可梦",
+    "nameEn": "Empoleon",
+    "nameZh": "帝王拿波",
+    "slug": "395"
+  },
+  "396": {
+    "genusZh": "椋鸟宝可梦",
+    "nameEn": "Starly",
+    "nameZh": "姆克儿",
+    "slug": "396"
+  },
+  "397": {
+    "genusZh": "椋鸟宝可梦",
+    "nameEn": "Staravia",
+    "nameZh": "姆克鸟",
+    "slug": "397"
+  },
+  "398": {
+    "genusZh": "猛禽宝可梦",
+    "nameEn": "Staraptor",
+    "nameZh": "姆克鹰",
+    "slug": "398"
+  },
+  "399": {
+    "genusZh": "圆鼠宝可梦",
+    "nameEn": "Bidoof",
+    "nameZh": "大牙狸",
+    "slug": "399"
+  },
+  "4": {
+    "genusZh": "蜥蜴宝可梦",
+    "nameEn": "Charmander",
+    "nameZh": "小火龙",
+    "slug": "4"
+  },
+  "40": {
+    "genusZh": "气球宝可梦",
+    "nameEn": "Wigglytuff",
+    "nameZh": "胖可丁",
+    "slug": "40"
+  },
+  "400": {
+    "genusZh": "河狸宝可梦",
+    "nameEn": "Bibarel",
+    "nameZh": "大尾狸",
+    "slug": "400"
+  },
+  "401": {
+    "genusZh": "蟋蟀宝可梦",
+    "nameEn": "Kricketot",
+    "nameZh": "圆法师",
+    "slug": "401"
+  },
+  "402": {
+    "genusZh": "蟋蟀宝可梦",
+    "nameEn": "Kricketune",
+    "nameZh": "音箱蟀",
+    "slug": "402"
+  },
+  "403": {
+    "genusZh": "闪光宝可梦",
+    "nameEn": "Shinx",
+    "nameZh": "小猫怪",
+    "slug": "403"
+  },
+  "404": {
+    "genusZh": "电光宝可梦",
+    "nameEn": "Luxio",
+    "nameZh": "勒克猫",
+    "slug": "404"
+  },
+  "405": {
+    "genusZh": "目光宝可梦",
+    "nameEn": "Luxray",
+    "nameZh": "伦琴猫",
+    "slug": "405"
+  },
+  "406": {
+    "genusZh": "花苞宝可梦",
+    "nameEn": "Budew",
+    "nameZh": "含羞苞",
+    "slug": "406"
+  },
+  "407": {
+    "genusZh": "花束宝可梦",
+    "nameEn": "Roserade",
+    "nameZh": "罗丝雷朵",
+    "slug": "407"
+  },
+  "408": {
+    "genusZh": "头锤宝可梦",
+    "nameEn": "Cranidos",
+    "nameZh": "头盖龙",
+    "slug": "408"
+  },
+  "409": {
+    "genusZh": "头锤宝可梦",
+    "nameEn": "Rampardos",
+    "nameZh": "战槌龙",
+    "slug": "409"
+  },
+  "41": {
+    "genusZh": "蝙蝠宝可梦",
+    "nameEn": "Zubat",
+    "nameZh": "超音蝠",
+    "slug": "41"
+  },
+  "410": {
+    "genusZh": "护盾宝可梦",
+    "nameEn": "Shieldon",
+    "nameZh": "盾甲龙",
+    "slug": "410"
+  },
+  "411": {
+    "genusZh": "护盾宝可梦",
+    "nameEn": "Bastiodon",
+    "nameZh": "护城龙",
+    "slug": "411"
+  },
+  "412": {
+    "genusZh": "蓑衣虫宝可梦",
+    "nameEn": "Burmy",
+    "nameZh": "结草儿",
+    "slug": "412"
+  },
+  "413": {
+    "genusZh": "蓑衣虫宝可梦",
+    "nameEn": "Wormadam",
+    "nameZh": "结草贵妇",
+    "slug": "413"
+  },
+  "414": {
+    "genusZh": "蓑衣蛾宝可梦",
+    "nameEn": "Mothim",
+    "nameZh": "绅士蛾",
+    "slug": "414"
+  },
+  "415": {
+    "genusZh": "幼蜂宝可梦",
+    "nameEn": "Combee",
+    "nameZh": "三蜜蜂",
+    "slug": "415"
+  },
+  "416": {
+    "genusZh": "蜂巢宝可梦",
+    "nameEn": "Vespiquen",
+    "nameZh": "蜂女王",
+    "slug": "416"
+  },
+  "417": {
+    "genusZh": "电松鼠宝可梦",
+    "nameEn": "Pachirisu",
+    "nameZh": "帕奇利兹",
+    "slug": "417"
+  },
+  "418": {
+    "genusZh": "海鼬宝可梦",
+    "nameEn": "Buizel",
+    "nameZh": "泳圈鼬",
+    "slug": "418"
+  },
+  "419": {
+    "genusZh": "海鼬宝可梦",
+    "nameEn": "Floatzel",
+    "nameZh": "浮潜鼬",
+    "slug": "419"
+  },
+  "42": {
+    "genusZh": "蝙蝠宝可梦",
+    "nameEn": "Golbat",
+    "nameZh": "大嘴蝠",
+    "slug": "42"
+  },
+  "420": {
+    "genusZh": "樱桃宝可梦",
+    "nameEn": "Cherubi",
+    "nameZh": "樱花宝",
+    "slug": "420"
+  },
+  "421": {
+    "genusZh": "樱花宝可梦",
+    "nameEn": "Cherrim",
+    "nameZh": "樱花儿",
+    "slug": "421"
+  },
+  "422": {
+    "genusZh": "海兔宝可梦",
+    "nameEn": "Shellos",
+    "nameZh": "无壳海兔",
+    "slug": "422"
+  },
+  "423": {
+    "genusZh": "海兔宝可梦",
+    "nameEn": "Gastrodon",
+    "nameZh": "海兔兽",
+    "slug": "423"
+  },
+  "424": {
+    "genusZh": "长尾宝可梦",
+    "nameEn": "Ambipom",
+    "nameZh": "双尾怪手",
+    "slug": "424"
+  },
+  "425": {
+    "genusZh": "气球宝可梦",
+    "nameEn": "Drifloon",
+    "nameZh": "飘飘球",
+    "slug": "425"
+  },
+  "426": {
+    "genusZh": "热气球宝可梦",
+    "nameEn": "Drifblim",
+    "nameZh": "随风球",
+    "slug": "426"
+  },
+  "427": {
+    "genusZh": "兔子宝可梦",
+    "nameEn": "Buneary",
+    "nameZh": "卷卷耳",
+    "slug": "427"
+  },
+  "428": {
+    "genusZh": "兔子宝可梦",
+    "nameEn": "Lopunny",
+    "nameZh": "长耳兔",
+    "slug": "428"
+  },
+  "429": {
+    "genusZh": "魔法宝可梦",
+    "nameEn": "Mismagius",
+    "nameZh": "梦妖魔",
+    "slug": "429"
+  },
+  "43": {
+    "genusZh": "杂草宝可梦",
+    "nameEn": "Oddish",
+    "nameZh": "走路草",
+    "slug": "43"
+  },
+  "430": {
+    "genusZh": "大头目宝可梦",
+    "nameEn": "Honchkrow",
+    "nameZh": "乌鸦头头",
+    "slug": "430"
+  },
+  "431": {
+    "genusZh": "装乖宝可梦",
+    "nameEn": "Glameow",
+    "nameZh": "魅力喵",
+    "slug": "431"
+  },
+  "432": {
+    "genusZh": "虎斑猫宝可梦",
+    "nameEn": "Purugly",
+    "nameZh": "东施喵",
+    "slug": "432"
+  },
+  "433": {
+    "genusZh": "铃铛宝可梦",
+    "nameEn": "Chingling",
+    "nameZh": "铃铛响",
+    "slug": "433"
+  },
+  "434": {
+    "genusZh": "臭鼬宝可梦",
+    "nameEn": "Stunky",
+    "nameZh": "臭鼬噗",
+    "slug": "434"
+  },
+  "435": {
+    "genusZh": "臭鼬宝可梦",
+    "nameEn": "Skuntank",
+    "nameZh": "坦克臭鼬",
+    "slug": "435"
+  },
+  "436": {
+    "genusZh": "青铜宝可梦",
+    "nameEn": "Bronzor",
+    "nameZh": "铜镜怪",
+    "slug": "436"
+  },
+  "437": {
+    "genusZh": "铜钟宝可梦",
+    "nameEn": "Bronzong",
+    "nameZh": "青铜钟",
+    "slug": "437"
+  },
+  "438": {
+    "genusZh": "盆栽宝可梦",
+    "nameEn": "Bonsly",
+    "nameZh": "盆才怪",
+    "slug": "438"
+  },
+  "439": {
+    "genusZh": "默剧宝可梦",
+    "nameEn": "Mime Jr.",
+    "nameZh": "魔尼尼",
+    "slug": "439"
+  },
+  "44": {
+    "genusZh": "杂草宝可梦",
+    "nameEn": "Gloom",
+    "nameZh": "臭臭花",
+    "slug": "44"
+  },
+  "440": {
+    "genusZh": "家家酒宝可梦",
+    "nameEn": "Happiny",
+    "nameZh": "小福蛋",
+    "slug": "440"
+  },
+  "441": {
+    "genusZh": "音符宝可梦",
+    "nameEn": "Chatot",
+    "nameZh": "聒噪鸟",
+    "slug": "441"
+  },
+  "442": {
+    "genusZh": "封印宝可梦",
+    "nameEn": "Spiritomb",
+    "nameZh": "花岩怪",
+    "slug": "442"
+  },
+  "443": {
+    "genusZh": "陆鲨宝可梦",
+    "nameEn": "Gible",
+    "nameZh": "圆陆鲨",
+    "slug": "443"
+  },
+  "444": {
+    "genusZh": "洞穴宝可梦",
+    "nameEn": "Gabite",
+    "nameZh": "尖牙陆鲨",
+    "slug": "444"
+  },
+  "445": {
+    "genusZh": "音速宝可梦",
+    "nameEn": "Garchomp",
+    "nameZh": "烈咬陆鲨",
+    "slug": "445"
+  },
+  "446": {
+    "genusZh": "大胃王宝可梦",
+    "nameEn": "Munchlax",
+    "nameZh": "小卡比兽",
+    "slug": "446"
+  },
+  "447": {
+    "genusZh": "波纹宝可梦",
+    "nameEn": "Riolu",
+    "nameZh": "利欧路",
+    "slug": "447"
+  },
+  "448": {
+    "genusZh": "波导宝可梦",
+    "nameEn": "Lucario",
+    "nameZh": "路卡利欧",
+    "slug": "448"
+  },
+  "449": {
+    "genusZh": "河马宝可梦",
+    "nameEn": "Hippopotas",
+    "nameZh": "沙河马",
+    "slug": "449"
+  },
+  "45": {
+    "genusZh": "花宝可梦",
+    "nameEn": "Vileplume",
+    "nameZh": "霸王花",
+    "slug": "45"
+  },
+  "450": {
+    "genusZh": "重量宝可梦",
+    "nameEn": "Hippowdon",
+    "nameZh": "河马兽",
+    "slug": "450"
+  },
+  "451": {
+    "genusZh": "蝎子宝可梦",
+    "nameEn": "Skorupi",
+    "nameZh": "钳尾蝎",
+    "slug": "451"
+  },
+  "452": {
+    "genusZh": "蝎怪宝可梦",
+    "nameEn": "Drapion",
+    "nameZh": "龙王蝎",
+    "slug": "452"
+  },
+  "453": {
+    "genusZh": "毒击宝可梦",
+    "nameEn": "Croagunk",
+    "nameZh": "不良蛙",
+    "slug": "453"
+  },
+  "454": {
+    "genusZh": "毒击宝可梦",
+    "nameEn": "Toxicroak",
+    "nameZh": "毒骷蛙",
+    "slug": "454"
+  },
+  "455": {
+    "genusZh": "捕虫宝可梦",
+    "nameEn": "Carnivine",
+    "nameZh": "尖牙笼",
+    "slug": "455"
+  },
+  "456": {
+    "genusZh": "飞翅鱼宝可梦",
+    "nameEn": "Finneon",
+    "nameZh": "荧光鱼",
+    "slug": "456"
+  },
+  "457": {
+    "genusZh": "霓虹宝可梦",
+    "nameEn": "Lumineon",
+    "nameZh": "霓虹鱼",
+    "slug": "457"
+  },
+  "458": {
+    "genusZh": "风筝宝可梦",
+    "nameEn": "Mantyke",
+    "nameZh": "小球飞鱼",
+    "slug": "458"
+  },
+  "459": {
+    "genusZh": "树冰宝可梦",
+    "nameEn": "Snover",
+    "nameZh": "雪笠怪",
+    "slug": "459"
+  },
+  "46": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Paras",
+    "nameZh": "派拉斯",
+    "slug": "46"
+  },
+  "460": {
+    "genusZh": "树冰宝可梦",
+    "nameEn": "Abomasnow",
+    "nameZh": "暴雪王",
+    "slug": "460"
+  },
+  "461": {
+    "genusZh": "钩爪宝可梦",
+    "nameEn": "Weavile",
+    "nameZh": "玛狃拉",
+    "slug": "461"
+  },
+  "462": {
+    "genusZh": "磁场宝可梦",
+    "nameEn": "Magnezone",
+    "nameZh": "自爆磁怪",
+    "slug": "462"
+  },
+  "463": {
+    "genusZh": "舔舔宝可梦",
+    "nameEn": "Lickilicky",
+    "nameZh": "大舌舔",
+    "slug": "463"
+  },
+  "464": {
+    "genusZh": "钻锥宝可梦",
+    "nameEn": "Rhyperior",
+    "nameZh": "超甲狂犀",
+    "slug": "464"
+  },
+  "465": {
+    "genusZh": "藤蔓状宝可梦",
+    "nameEn": "Tangrowth",
+    "nameZh": "巨蔓藤",
+    "slug": "465"
+  },
+  "466": {
+    "genusZh": "雷电宝可梦",
+    "nameEn": "Electivire",
+    "nameZh": "电击魔兽",
+    "slug": "466"
+  },
+  "467": {
+    "genusZh": "爆炎宝可梦",
+    "nameEn": "Magmortar",
+    "nameZh": "鸭嘴炎兽",
+    "slug": "467"
+  },
+  "468": {
+    "genusZh": "祝福宝可梦",
+    "nameEn": "Togekiss",
+    "nameZh": "波克基斯",
+    "slug": "468"
+  },
+  "469": {
+    "genusZh": "勾蜓宝可梦",
+    "nameEn": "Yanmega",
+    "nameZh": "远古巨蜓",
+    "slug": "469"
+  },
+  "47": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Parasect",
+    "nameZh": "派拉斯特",
+    "slug": "47"
+  },
+  "470": {
+    "genusZh": "新绿宝可梦",
+    "nameEn": "Leafeon",
+    "nameZh": "叶伊布",
+    "slug": "470"
+  },
+  "471": {
+    "genusZh": "新雪宝可梦",
+    "nameEn": "Glaceon",
+    "nameZh": "冰伊布",
+    "slug": "471"
+  },
+  "472": {
+    "genusZh": "牙蝎宝可梦",
+    "nameEn": "Gliscor",
+    "nameZh": "天蝎王",
+    "slug": "472"
+  },
+  "473": {
+    "genusZh": "双牙宝可梦",
+    "nameEn": "Mamoswine",
+    "nameZh": "象牙猪",
+    "slug": "473"
+  },
+  "474": {
+    "genusZh": "虚拟宝可梦",
+    "nameEn": "Porygon-Z",
+    "nameZh": "多边兽乙型",
+    "slug": "474"
+  },
+  "475": {
+    "genusZh": "利刃宝可梦",
+    "nameEn": "Gallade",
+    "nameZh": "艾路雷朵",
+    "slug": "475"
+  },
+  "476": {
+    "genusZh": "罗盘宝可梦",
+    "nameEn": "Probopass",
+    "nameZh": "大朝北鼻",
+    "slug": "476"
+  },
+  "477": {
+    "genusZh": "抓握宝可梦",
+    "nameEn": "Dusknoir",
+    "nameZh": "黑夜魔灵",
+    "slug": "477"
+  },
+  "478": {
+    "genusZh": "雪国宝可梦",
+    "nameEn": "Froslass",
+    "nameZh": "雪妖女",
+    "slug": "478"
+  },
+  "479": {
+    "genusZh": "等离子宝可梦",
+    "nameEn": "Rotom",
+    "nameZh": "洛托姆",
+    "slug": "479"
+  },
+  "48": {
+    "genusZh": "昆虫宝可梦",
+    "nameEn": "Venonat",
+    "nameZh": "毛球",
+    "slug": "48"
+  },
+  "480": {
+    "genusZh": "知识宝可梦",
+    "nameEn": "Uxie",
+    "nameZh": "由克希",
+    "slug": "480"
+  },
+  "481": {
+    "genusZh": "感情宝可梦",
+    "nameEn": "Mesprit",
+    "nameZh": "艾姆利多",
+    "slug": "481"
+  },
+  "482": {
+    "genusZh": "意志宝可梦",
+    "nameEn": "Azelf",
+    "nameZh": "亚克诺姆",
+    "slug": "482"
+  },
+  "483": {
+    "genusZh": "时间宝可梦",
+    "nameEn": "Dialga",
+    "nameZh": "帝牙卢卡",
+    "slug": "483"
+  },
+  "484": {
+    "genusZh": "空间宝可梦",
+    "nameEn": "Palkia",
+    "nameZh": "帕路奇亚",
+    "slug": "484"
+  },
+  "485": {
+    "genusZh": "火山口宝可梦",
+    "nameEn": "Heatran",
+    "nameZh": "席多蓝恩",
+    "slug": "485"
+  },
+  "486": {
+    "genusZh": "巨大宝可梦",
+    "nameEn": "Regigigas",
+    "nameZh": "雷吉奇卡斯",
+    "slug": "486"
+  },
+  "487": {
+    "genusZh": "反抗宝可梦",
+    "nameEn": "Giratina",
+    "nameZh": "骑拉帝纳",
+    "slug": "487"
+  },
+  "488": {
+    "genusZh": "新月宝可梦",
+    "nameEn": "Cresselia",
+    "nameZh": "克雷色利亚",
+    "slug": "488"
+  },
+  "489": {
+    "genusZh": "海洋宝可梦",
+    "nameEn": "Phione",
+    "nameZh": "霏欧纳",
+    "slug": "489"
+  },
+  "49": {
+    "genusZh": "毒蛾宝可梦",
+    "nameEn": "Venomoth",
+    "nameZh": "摩鲁蛾",
+    "slug": "49"
+  },
+  "490": {
+    "genusZh": "回游宝可梦",
+    "nameEn": "Manaphy",
+    "nameZh": "玛纳霏",
+    "slug": "490"
+  },
+  "491": {
+    "genusZh": "暗黑宝可梦",
+    "nameEn": "Darkrai",
+    "nameZh": "达克莱伊",
+    "slug": "491"
+  },
+  "492": {
+    "genusZh": "感谢宝可梦",
+    "nameEn": "Shaymin",
+    "nameZh": "谢米",
+    "slug": "492"
+  },
+  "493": {
+    "genusZh": "创造宝可梦",
+    "nameEn": "Arceus",
+    "nameZh": "阿尔宙斯",
+    "slug": "493"
+  },
+  "494": {
+    "genusZh": "胜利宝可梦",
+    "nameEn": "Victini",
+    "nameZh": "比克提尼",
+    "slug": "494"
+  },
+  "495": {
+    "genusZh": "草蛇宝可梦",
+    "nameEn": "Snivy",
+    "nameZh": "藤藤蛇",
+    "slug": "495"
+  },
+  "496": {
+    "genusZh": "草蛇宝可梦",
+    "nameEn": "Servine",
+    "nameZh": "青藤蛇",
+    "slug": "496"
+  },
+  "497": {
+    "genusZh": "皇家宝可梦",
+    "nameEn": "Serperior",
+    "nameZh": "君主蛇",
+    "slug": "497"
+  },
+  "498": {
+    "genusZh": "火猪宝可梦",
+    "nameEn": "Tepig",
+    "nameZh": "暖暖猪",
+    "slug": "498"
+  },
+  "499": {
+    "genusZh": "火猪宝可梦",
+    "nameEn": "Pignite",
+    "nameZh": "炒炒猪",
+    "slug": "499"
+  },
+  "5": {
+    "genusZh": "火焰宝可梦",
+    "nameEn": "Charmeleon",
+    "nameZh": "火恐龙",
+    "slug": "5"
+  },
+  "50": {
+    "genusZh": "鼹鼠宝可梦",
+    "nameEn": "Diglett",
+    "nameZh": "地鼠",
+    "slug": "50"
+  },
+  "500": {
+    "genusZh": "大火猪宝可梦",
+    "nameEn": "Emboar",
+    "nameZh": "炎武王",
+    "slug": "500"
+  },
+  "501": {
+    "genusZh": "海獭宝可梦",
+    "nameEn": "Oshawott",
+    "nameZh": "水水獭",
+    "slug": "501"
+  },
+  "502": {
+    "genusZh": "修行宝可梦",
+    "nameEn": "Dewott",
+    "nameZh": "双刃丸",
+    "slug": "502"
+  },
+  "503": {
+    "genusZh": "威严宝可梦",
+    "nameEn": "Samurott",
+    "nameZh": "大剑鬼",
+    "slug": "503"
+  },
+  "504": {
+    "genusZh": "放哨宝可梦",
+    "nameEn": "Patrat",
+    "nameZh": "探探鼠",
+    "slug": "504"
+  },
+  "505": {
+    "genusZh": "警戒宝可梦",
+    "nameEn": "Watchog",
+    "nameZh": "步哨鼠",
+    "slug": "505"
+  },
+  "506": {
+    "genusZh": "小狗宝可梦",
+    "nameEn": "Lillipup",
+    "nameZh": "小约克",
+    "slug": "506"
+  },
+  "507": {
+    "genusZh": "忠犬宝可梦",
+    "nameEn": "Herdier",
+    "nameZh": "哈约克",
+    "slug": "507"
+  },
+  "508": {
+    "genusZh": "宽大宝可梦",
+    "nameEn": "Stoutland",
+    "nameZh": "长毛狗",
+    "slug": "508"
+  },
+  "509": {
+    "genusZh": "坏心眼宝可梦",
+    "nameEn": "Purrloin",
+    "nameZh": "扒手猫",
+    "slug": "509"
+  },
+  "51": {
+    "genusZh": "鼹鼠宝可梦",
+    "nameEn": "Dugtrio",
+    "nameZh": "三地鼠",
+    "slug": "51"
+  },
+  "510": {
+    "genusZh": "冷酷宝可梦",
+    "nameEn": "Liepard",
+    "nameZh": "酷豹",
+    "slug": "510"
+  },
+  "511": {
+    "genusZh": "草猴宝可梦",
+    "nameEn": "Pansage",
+    "nameZh": "花椰猴",
+    "slug": "511"
+  },
+  "512": {
+    "genusZh": "刺猴宝可梦",
+    "nameEn": "Simisage",
+    "nameZh": "花椰猿",
+    "slug": "512"
+  },
+  "513": {
+    "genusZh": "高温宝可梦",
+    "nameEn": "Pansear",
+    "nameZh": "爆香猴",
+    "slug": "513"
+  },
+  "514": {
+    "genusZh": "火花宝可梦",
+    "nameEn": "Simisear",
+    "nameZh": "爆香猿",
+    "slug": "514"
+  },
+  "515": {
+    "genusZh": "泼水宝可梦",
+    "nameEn": "Panpour",
+    "nameZh": "冷水猴",
+    "slug": "515"
+  },
+  "516": {
+    "genusZh": "放水宝可梦",
+    "nameEn": "Simipour",
+    "nameZh": "冷水猿",
+    "slug": "516"
+  },
+  "517": {
+    "genusZh": "食梦宝可梦",
+    "nameEn": "Munna",
+    "nameZh": "食梦梦",
+    "slug": "517"
+  },
+  "518": {
+    "genusZh": "半梦半醒宝可梦",
+    "nameEn": "Musharna",
+    "nameZh": "梦梦蚀",
+    "slug": "518"
+  },
+  "519": {
+    "genusZh": "小鸽宝可梦",
+    "nameEn": "Pidove",
+    "nameZh": "豆豆鸽",
+    "slug": "519"
+  },
+  "52": {
+    "genusZh": "妖怪猫宝可梦",
+    "nameEn": "Meowth",
+    "nameZh": "喵喵",
+    "slug": "52"
+  },
+  "520": {
+    "genusZh": "野鸽宝可梦",
+    "nameEn": "Tranquill",
+    "nameZh": "咕咕鸽",
+    "slug": "520"
+  },
+  "521": {
+    "genusZh": "自尊心宝可梦",
+    "nameEn": "Unfezant",
+    "nameZh": "高傲雉鸡",
+    "slug": "521"
+  },
+  "522": {
+    "genusZh": "带电宝可梦",
+    "nameEn": "Blitzle",
+    "nameZh": "斑斑马",
+    "slug": "522"
+  },
+  "523": {
+    "genusZh": "雷电宝可梦",
+    "nameEn": "Zebstrika",
+    "nameZh": "雷电斑马",
+    "slug": "523"
+  },
+  "524": {
+    "genusZh": "地幔宝可梦",
+    "nameEn": "Roggenrola",
+    "nameZh": "石丸子",
+    "slug": "524"
+  },
+  "525": {
+    "genusZh": "矿石宝可梦",
+    "nameEn": "Boldore",
+    "nameZh": "地幔岩",
+    "slug": "525"
+  },
+  "526": {
+    "genusZh": "高压宝可梦",
+    "nameEn": "Gigalith",
+    "nameZh": "庞岩怪",
+    "slug": "526"
+  },
+  "527": {
+    "genusZh": "蝙蝠宝可梦",
+    "nameEn": "Woobat",
+    "nameZh": "滚滚蝙蝠",
+    "slug": "527"
+  },
+  "528": {
+    "genusZh": "求爱宝可梦",
+    "nameEn": "Swoobat",
+    "nameZh": "心蝙蝠",
+    "slug": "528"
+  },
+  "529": {
+    "genusZh": "鼹鼠宝可梦",
+    "nameEn": "Drilbur",
+    "nameZh": "螺钉地鼠",
+    "slug": "529"
+  },
+  "53": {
+    "genusZh": "暹罗猫宝可梦",
+    "nameEn": "Persian",
+    "nameZh": "猫老大",
+    "slug": "53"
+  },
+  "530": {
+    "genusZh": "地底宝可梦",
+    "nameEn": "Excadrill",
+    "nameZh": "龙头地鼠",
+    "slug": "530"
+  },
+  "531": {
+    "genusZh": "听力宝可梦",
+    "nameEn": "Audino",
+    "nameZh": "差不多娃娃",
+    "slug": "531"
+  },
+  "532": {
+    "genusZh": "筋骨宝可梦",
+    "nameEn": "Timburr",
+    "nameZh": "搬运小匠",
+    "slug": "532"
+  },
+  "533": {
+    "genusZh": "筋骨宝可梦",
+    "nameEn": "Gurdurr",
+    "nameZh": "铁骨土人",
+    "slug": "533"
+  },
+  "534": {
+    "genusZh": "筋骨宝可梦",
+    "nameEn": "Conkeldurr",
+    "nameZh": "修建老匠",
+    "slug": "534"
+  },
+  "535": {
+    "genusZh": "蝌蚪宝可梦",
+    "nameEn": "Tympole",
+    "nameZh": "圆蝌蚪",
+    "slug": "535"
+  },
+  "536": {
+    "genusZh": "振动宝可梦",
+    "nameEn": "Palpitoad",
+    "nameZh": "蓝蟾蜍",
+    "slug": "536"
+  },
+  "537": {
+    "genusZh": "振动宝可梦",
+    "nameEn": "Seismitoad",
+    "nameZh": "蟾蜍王",
+    "slug": "537"
+  },
+  "538": {
+    "genusZh": "柔道宝可梦",
+    "nameEn": "Throh",
+    "nameZh": "投摔鬼",
+    "slug": "538"
+  },
+  "539": {
+    "genusZh": "空手道宝可梦",
+    "nameEn": "Sawk",
+    "nameZh": "打击鬼",
+    "slug": "539"
+  },
+  "54": {
+    "genusZh": "鸭宝可梦",
+    "nameEn": "Psyduck",
+    "nameZh": "可达鸭",
+    "slug": "54"
+  },
+  "540": {
+    "genusZh": "裁缝宝可梦",
+    "nameEn": "Sewaddle",
+    "nameZh": "虫宝包",
+    "slug": "540"
+  },
+  "541": {
+    "genusZh": "足不出叶宝可梦",
+    "nameEn": "Swadloon",
+    "nameZh": "宝包茧",
+    "slug": "541"
+  },
+  "542": {
+    "genusZh": "育儿宝可梦",
+    "nameEn": "Leavanny",
+    "nameZh": "保姆虫",
+    "slug": "542"
+  },
+  "543": {
+    "genusZh": "蜈蚣宝可梦",
+    "nameEn": "Venipede",
+    "nameZh": "百足蜈蚣",
+    "slug": "543"
+  },
+  "544": {
+    "genusZh": "茧蜈蚣宝可梦",
+    "nameEn": "Whirlipede",
+    "nameZh": "车轮球",
+    "slug": "544"
+  },
+  "545": {
+    "genusZh": "巨蜈蚣宝可梦",
+    "nameEn": "Scolipede",
+    "nameZh": "蜈蚣王",
+    "slug": "545"
+  },
+  "546": {
+    "genusZh": "棉球宝可梦",
+    "nameEn": "Cottonee",
+    "nameZh": "木棉球",
+    "slug": "546"
+  },
+  "547": {
+    "genusZh": "风隐宝可梦",
+    "nameEn": "Whimsicott",
+    "nameZh": "风妖精",
+    "slug": "547"
+  },
+  "548": {
+    "genusZh": "根茎宝可梦",
+    "nameEn": "Petilil",
+    "nameZh": "百合根娃娃",
+    "slug": "548"
+  },
+  "549": {
+    "genusZh": "花饰宝可梦",
+    "nameEn": "Lilligant",
+    "nameZh": "裙儿小姐",
+    "slug": "549"
+  },
+  "55": {
+    "genusZh": "鸭宝可梦",
+    "nameEn": "Golduck",
+    "nameZh": "哥达鸭",
+    "slug": "55"
+  },
+  "550": {
+    "genusZh": "粗暴宝可梦",
+    "nameEn": "Basculin",
+    "nameZh": "野蛮鲈鱼",
+    "slug": "550"
+  },
+  "551": {
+    "genusZh": "沙漠鳄鱼宝可梦",
+    "nameEn": "Sandile",
+    "nameZh": "黑眼鳄",
+    "slug": "551"
+  },
+  "552": {
+    "genusZh": "沙漠鳄鱼宝可梦",
+    "nameEn": "Krokorok",
+    "nameZh": "混混鳄",
+    "slug": "552"
+  },
+  "553": {
+    "genusZh": "威吓宝可梦",
+    "nameEn": "Krookodile",
+    "nameZh": "流氓鳄",
+    "slug": "553"
+  },
+  "554": {
+    "genusZh": "不倒翁宝可梦",
+    "nameEn": "Darumaka",
+    "nameZh": "火红不倒翁",
+    "slug": "554"
+  },
+  "555": {
+    "genusZh": "爆燃宝可梦",
+    "nameEn": "Darmanitan",
+    "nameZh": "达摩狒狒",
+    "slug": "555"
+  },
+  "556": {
+    "genusZh": "仙人掌宝可梦",
+    "nameEn": "Maractus",
+    "nameZh": "沙铃仙人掌",
+    "slug": "556"
+  },
+  "557": {
+    "genusZh": "石居宝可梦",
+    "nameEn": "Dwebble",
+    "nameZh": "石居蟹",
+    "slug": "557"
+  },
+  "558": {
+    "genusZh": "岩居宝可梦",
+    "nameEn": "Crustle",
+    "nameZh": "岩殿居蟹",
+    "slug": "558"
+  },
+  "559": {
+    "genusZh": "蜕皮宝可梦",
+    "nameEn": "Scraggy",
+    "nameZh": "滑滑小子",
+    "slug": "559"
+  },
+  "56": {
+    "genusZh": "猪猴宝可梦",
+    "nameEn": "Mankey",
+    "nameZh": "猴怪",
+    "slug": "56"
+  },
+  "560": {
+    "genusZh": "恶党宝可梦",
+    "nameEn": "Scrafty",
+    "nameZh": "头巾混混",
+    "slug": "560"
+  },
+  "561": {
+    "genusZh": "似鸟宝可梦",
+    "nameEn": "Sigilyph",
+    "nameZh": "象征鸟",
+    "slug": "561"
+  },
+  "562": {
+    "genusZh": "魂宝可梦",
+    "nameEn": "Yamask",
+    "nameZh": "哭哭面具",
+    "slug": "562"
+  },
+  "563": {
+    "genusZh": "棺木宝可梦",
+    "nameEn": "Cofagrigus",
+    "nameZh": "迭失棺",
+    "slug": "563"
+  },
+  "564": {
+    "genusZh": "古代龟宝可梦",
+    "nameEn": "Tirtouga",
+    "nameZh": "原盖海龟",
+    "slug": "564"
+  },
+  "565": {
+    "genusZh": "古代龟宝可梦",
+    "nameEn": "Carracosta",
+    "nameZh": "肋骨海龟",
+    "slug": "565"
+  },
+  "566": {
+    "genusZh": "远古鸟宝可梦",
+    "nameEn": "Archen",
+    "nameZh": "始祖小鸟",
+    "slug": "566"
+  },
+  "567": {
+    "genusZh": "远古鸟宝可梦",
+    "nameEn": "Archeops",
+    "nameZh": "始祖大鸟",
+    "slug": "567"
+  },
+  "568": {
+    "genusZh": "垃圾袋宝可梦",
+    "nameEn": "Trubbish",
+    "nameZh": "破破袋",
+    "slug": "568"
+  },
+  "569": {
+    "genusZh": "垃圾场宝可梦",
+    "nameEn": "Garbodor",
+    "nameZh": "灰尘山",
+    "slug": "569"
+  },
+  "57": {
+    "genusZh": "猪猴宝可梦",
+    "nameEn": "Primeape",
+    "nameZh": "火暴猴",
+    "slug": "57"
+  },
+  "570": {
+    "genusZh": "恶狐宝可梦",
+    "nameEn": "Zorua",
+    "nameZh": "索罗亚",
+    "slug": "570"
+  },
+  "571": {
+    "genusZh": "妖狐宝可梦",
+    "nameEn": "Zoroark",
+    "nameZh": "索罗亚克",
+    "slug": "571"
+  },
+  "572": {
+    "genusZh": "栗鼠宝可梦",
+    "nameEn": "Minccino",
+    "nameZh": "泡沫栗鼠",
+    "slug": "572"
+  },
+  "573": {
+    "genusZh": "围巾宝可梦",
+    "nameEn": "Cinccino",
+    "nameZh": "奇诺栗鼠",
+    "slug": "573"
+  },
+  "574": {
+    "genusZh": "凝视宝可梦",
+    "nameEn": "Gothita",
+    "nameZh": "哥德宝宝",
+    "slug": "574"
+  },
+  "575": {
+    "genusZh": "操纵宝可梦",
+    "nameEn": "Gothorita",
+    "nameZh": "哥德小童",
+    "slug": "575"
+  },
+  "576": {
+    "genusZh": "天体宝可梦",
+    "nameEn": "Gothitelle",
+    "nameZh": "哥德小姐",
+    "slug": "576"
+  },
+  "577": {
+    "genusZh": "细胞宝可梦",
+    "nameEn": "Solosis",
+    "nameZh": "单卵细胞球",
+    "slug": "577"
+  },
+  "578": {
+    "genusZh": "分割宝可梦",
+    "nameEn": "Duosion",
+    "nameZh": "双卵细胞球",
+    "slug": "578"
+  },
+  "579": {
+    "genusZh": "增幅宝可梦",
+    "nameEn": "Reuniclus",
+    "nameZh": "人造细胞卵",
+    "slug": "579"
+  },
+  "58": {
+    "genusZh": "小狗宝可梦",
+    "nameEn": "Growlithe",
+    "nameZh": "卡蒂狗",
+    "slug": "58"
+  },
+  "580": {
+    "genusZh": "水鸟宝可梦",
+    "nameEn": "Ducklett",
+    "nameZh": "鸭宝宝",
+    "slug": "580"
+  },
+  "581": {
+    "genusZh": "白鸟宝可梦",
+    "nameEn": "Swanna",
+    "nameZh": "舞天鹅",
+    "slug": "581"
+  },
+  "582": {
+    "genusZh": "新雪宝可梦",
+    "nameEn": "Vanillite",
+    "nameZh": "迷你冰",
+    "slug": "582"
+  },
+  "583": {
+    "genusZh": "冰雪宝可梦",
+    "nameEn": "Vanillish",
+    "nameZh": "多多冰",
+    "slug": "583"
+  },
+  "584": {
+    "genusZh": "暴风雪宝可梦",
+    "nameEn": "Vanilluxe",
+    "nameZh": "双倍多多冰",
+    "slug": "584"
+  },
+  "585": {
+    "genusZh": "季节宝可梦",
+    "nameEn": "Deerling",
+    "nameZh": "四季鹿",
+    "slug": "585"
+  },
+  "586": {
+    "genusZh": "季节宝可梦",
+    "nameEn": "Sawsbuck",
+    "nameZh": "萌芽鹿",
+    "slug": "586"
+  },
+  "587": {
+    "genusZh": "飞鼠宝可梦",
+    "nameEn": "Emolga",
+    "nameZh": "电飞鼠",
+    "slug": "587"
+  },
+  "588": {
+    "genusZh": "啃咬宝可梦",
+    "nameEn": "Karrablast",
+    "nameZh": "盖盖虫",
+    "slug": "588"
+  },
+  "589": {
+    "genusZh": "骑兵宝可梦",
+    "nameEn": "Escavalier",
+    "nameZh": "骑士蜗牛",
+    "slug": "589"
+  },
+  "59": {
+    "genusZh": "传说宝可梦",
+    "nameEn": "Arcanine",
+    "nameZh": "风速狗",
+    "slug": "59"
+  },
+  "590": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Foongus",
+    "nameZh": "哎呀球菇",
+    "slug": "590"
+  },
+  "591": {
+    "genusZh": "蘑菇宝可梦",
+    "nameEn": "Amoonguss",
+    "nameZh": "败露球菇",
+    "slug": "591"
+  },
+  "592": {
+    "genusZh": "漂浮宝可梦",
+    "nameEn": "Frillish",
+    "nameZh": "轻飘飘",
+    "slug": "592"
+  },
+  "593": {
+    "genusZh": "漂浮宝可梦",
+    "nameEn": "Jellicent",
+    "nameZh": "胖嘟嘟",
+    "slug": "593"
+  },
+  "594": {
+    "genusZh": "看护宝可梦",
+    "nameEn": "Alomomola",
+    "nameZh": "保姆曼波",
+    "slug": "594"
+  },
+  "595": {
+    "genusZh": "吸附宝可梦",
+    "nameEn": "Joltik",
+    "nameZh": "电电虫",
+    "slug": "595"
+  },
+  "596": {
+    "genusZh": "电蜘蛛宝可梦",
+    "nameEn": "Galvantula",
+    "nameZh": "电蜘蛛",
+    "slug": "596"
+  },
+  "597": {
+    "genusZh": "刺果宝可梦",
+    "nameEn": "Ferroseed",
+    "nameZh": "种子铁球",
+    "slug": "597"
+  },
+  "598": {
+    "genusZh": "刺球宝可梦",
+    "nameEn": "Ferrothorn",
+    "nameZh": "坚果哑铃",
+    "slug": "598"
+  },
+  "599": {
+    "genusZh": "齿轮宝可梦",
+    "nameEn": "Klink",
+    "nameZh": "齿轮儿",
+    "slug": "599"
+  },
+  "6": {
+    "genusZh": "火焰宝可梦",
+    "nameEn": "Charizard",
+    "nameZh": "喷火龙",
+    "slug": "6"
+  },
+  "60": {
+    "genusZh": "蝌蚪宝可梦",
+    "nameEn": "Poliwag",
+    "nameZh": "蚊香蝌蚪",
+    "slug": "60"
+  },
+  "600": {
+    "genusZh": "齿轮宝可梦",
+    "nameEn": "Klang",
+    "nameZh": "齿轮组",
+    "slug": "600"
+  },
+  "601": {
+    "genusZh": "齿轮宝可梦",
+    "nameEn": "Klinklang",
+    "nameZh": "齿轮怪",
+    "slug": "601"
+  },
+  "602": {
+    "genusZh": "电鱼宝可梦",
+    "nameEn": "Tynamo",
+    "nameZh": "麻麻小鱼",
+    "slug": "602"
+  },
+  "603": {
+    "genusZh": "电鱼宝可梦",
+    "nameEn": "Eelektrik",
+    "nameZh": "麻麻鳗",
+    "slug": "603"
+  },
+  "604": {
+    "genusZh": "电鱼宝可梦",
+    "nameEn": "Eelektross",
+    "nameZh": "麻麻鳗鱼王",
+    "slug": "604"
+  },
+  "605": {
+    "genusZh": "脑宝可梦",
+    "nameEn": "Elgyem",
+    "nameZh": "小灰怪",
+    "slug": "605"
+  },
+  "606": {
+    "genusZh": "脑宝可梦",
+    "nameEn": "Beheeyem",
+    "nameZh": "大宇怪",
+    "slug": "606"
+  },
+  "607": {
+    "genusZh": "蜡烛宝可梦",
+    "nameEn": "Litwick",
+    "nameZh": "烛光灵",
+    "slug": "607"
+  },
+  "608": {
+    "genusZh": "油灯宝可梦",
+    "nameEn": "Lampent",
+    "nameZh": "灯火幽灵",
+    "slug": "608"
+  },
+  "609": {
+    "genusZh": "引诱宝可梦",
+    "nameEn": "Chandelure",
+    "nameZh": "水晶灯火灵",
+    "slug": "609"
+  },
+  "61": {
+    "genusZh": "蝌蚪宝可梦",
+    "nameEn": "Poliwhirl",
+    "nameZh": "蚊香君",
+    "slug": "61"
+  },
+  "610": {
+    "genusZh": "牙宝可梦",
+    "nameEn": "Axew",
+    "nameZh": "牙牙",
+    "slug": "610"
+  },
+  "611": {
+    "genusZh": "颚斧宝可梦",
+    "nameEn": "Fraxure",
+    "nameZh": "斧牙龙",
+    "slug": "611"
+  },
+  "612": {
+    "genusZh": "颚斧宝可梦",
+    "nameEn": "Haxorus",
+    "nameZh": "双斧战龙",
+    "slug": "612"
+  },
+  "613": {
+    "genusZh": "结冰宝可梦",
+    "nameEn": "Cubchoo",
+    "nameZh": "喷嚏熊",
+    "slug": "613"
+  },
+  "614": {
+    "genusZh": "冻结宝可梦",
+    "nameEn": "Beartic",
+    "nameZh": "冻原熊",
+    "slug": "614"
+  },
+  "615": {
+    "genusZh": "结晶宝可梦",
+    "nameEn": "Cryogonal",
+    "nameZh": "几何雪花",
+    "slug": "615"
+  },
+  "616": {
+    "genusZh": "蜗牛宝可梦",
+    "nameEn": "Shelmet",
+    "nameZh": "小嘴蜗",
+    "slug": "616"
+  },
+  "617": {
+    "genusZh": "脱壳宝可梦",
+    "nameEn": "Accelgor",
+    "nameZh": "敏捷虫",
+    "slug": "617"
+  },
+  "618": {
+    "genusZh": "陷阱宝可梦",
+    "nameEn": "Stunfisk",
+    "nameZh": "泥巴鱼",
+    "slug": "618"
+  },
+  "619": {
+    "genusZh": "武术宝可梦",
+    "nameEn": "Mienfoo",
+    "nameZh": "功夫鼬",
+    "slug": "619"
+  },
+  "62": {
+    "genusZh": "蝌蚪宝可梦",
+    "nameEn": "Poliwrath",
+    "nameZh": "蚊香泳士",
+    "slug": "62"
+  },
+  "620": {
+    "genusZh": "武术宝可梦",
+    "nameEn": "Mienshao",
+    "nameZh": "师父鼬",
+    "slug": "620"
+  },
+  "621": {
+    "genusZh": "洞穴宝可梦",
+    "nameEn": "Druddigon",
+    "nameZh": "赤面龙",
+    "slug": "621"
+  },
+  "622": {
+    "genusZh": "魔像宝可梦",
+    "nameEn": "Golett",
+    "nameZh": "泥偶小人",
+    "slug": "622"
+  },
+  "623": {
+    "genusZh": "魔像宝可梦",
+    "nameEn": "Golurk",
+    "nameZh": "泥偶巨人",
+    "slug": "623"
+  },
+  "624": {
+    "genusZh": "利器宝可梦",
+    "nameEn": "Pawniard",
+    "nameZh": "驹刀小兵",
+    "slug": "624"
+  },
+  "625": {
+    "genusZh": "刀刃宝可梦",
+    "nameEn": "Bisharp",
+    "nameZh": "劈斩司令",
+    "slug": "625"
+  },
+  "626": {
+    "genusZh": "头锤牛宝可梦",
+    "nameEn": "Bouffalant",
+    "nameZh": "爆炸头水牛",
+    "slug": "626"
+  },
+  "627": {
+    "genusZh": "雏鹰宝可梦",
+    "nameEn": "Rufflet",
+    "nameZh": "毛头小鹰",
+    "slug": "627"
+  },
+  "628": {
+    "genusZh": "勇猛宝可梦",
+    "nameEn": "Braviary",
+    "nameZh": "勇士雄鹰",
+    "slug": "628"
+  },
+  "629": {
+    "genusZh": "尿布宝可梦",
+    "nameEn": "Vullaby",
+    "nameZh": "秃鹰丫头",
+    "slug": "629"
+  },
+  "63": {
+    "genusZh": "念力宝可梦",
+    "nameEn": "Abra",
+    "nameZh": "凯西",
+    "slug": "63"
+  },
+  "630": {
+    "genusZh": "骨鹰宝可梦",
+    "nameEn": "Mandibuzz",
+    "nameZh": "秃鹰娜",
+    "slug": "630"
+  },
+  "631": {
+    "genusZh": "食蚁兽宝可梦",
+    "nameEn": "Heatmor",
+    "nameZh": "熔蚁兽",
+    "slug": "631"
+  },
+  "632": {
+    "genusZh": "铁蚁宝可梦",
+    "nameEn": "Durant",
+    "nameZh": "铁蚁",
+    "slug": "632"
+  },
+  "633": {
+    "genusZh": "粗鲁宝可梦",
+    "nameEn": "Deino",
+    "nameZh": "单首龙",
+    "slug": "633"
+  },
+  "634": {
+    "genusZh": "粗暴宝可梦",
+    "nameEn": "Zweilous",
+    "nameZh": "双首暴龙",
+    "slug": "634"
+  },
+  "635": {
+    "genusZh": "凶暴宝可梦",
+    "nameEn": "Hydreigon",
+    "nameZh": "三首恶龙",
+    "slug": "635"
+  },
+  "636": {
+    "genusZh": "火炬宝可梦",
+    "nameEn": "Larvesta",
+    "nameZh": "燃烧虫",
+    "slug": "636"
+  },
+  "637": {
+    "genusZh": "太阳宝可梦",
+    "nameEn": "Volcarona",
+    "nameZh": "火神蛾",
+    "slug": "637"
+  },
+  "638": {
+    "genusZh": "铁心宝可梦",
+    "nameEn": "Cobalion",
+    "nameZh": "勾帕路翁",
+    "slug": "638"
+  },
+  "639": {
+    "genusZh": "岩窟宝可梦",
+    "nameEn": "Terrakion",
+    "nameZh": "代拉基翁",
+    "slug": "639"
+  },
+  "64": {
+    "genusZh": "念力宝可梦",
+    "nameEn": "Kadabra",
+    "nameZh": "勇基拉",
+    "slug": "64"
+  },
+  "640": {
+    "genusZh": "草原宝可梦",
+    "nameEn": "Virizion",
+    "nameZh": "毕力吉翁",
+    "slug": "640"
+  },
+  "641": {
+    "genusZh": "旋风宝可梦",
+    "nameEn": "Tornadus",
+    "nameZh": "龙卷云",
+    "slug": "641"
+  },
+  "642": {
+    "genusZh": "雷击宝可梦",
+    "nameEn": "Thundurus",
+    "nameZh": "雷电云",
+    "slug": "642"
+  },
+  "643": {
+    "genusZh": "白阳宝可梦",
+    "nameEn": "Reshiram",
+    "nameZh": "莱希拉姆",
+    "slug": "643"
+  },
+  "644": {
+    "genusZh": "黑阴宝可梦",
+    "nameEn": "Zekrom",
+    "nameZh": "捷克罗姆",
+    "slug": "644"
+  },
+  "645": {
+    "genusZh": "丰饶宝可梦",
+    "nameEn": "Landorus",
+    "nameZh": "土地云",
+    "slug": "645"
+  },
+  "646": {
+    "genusZh": "境界宝可梦",
+    "nameEn": "Kyurem",
+    "nameZh": "酋雷姆",
+    "slug": "646"
+  },
+  "647": {
+    "genusZh": "幼马宝可梦",
+    "nameEn": "Keldeo",
+    "nameZh": "凯路迪欧",
+    "slug": "647"
+  },
+  "648": {
+    "genusZh": "旋律宝可梦",
+    "nameEn": "Meloetta",
+    "nameZh": "美洛耶塔",
+    "slug": "648"
+  },
+  "649": {
+    "genusZh": "古生代宝可梦",
+    "nameEn": "Genesect",
+    "nameZh": "盖诺赛克特",
+    "slug": "649"
+  },
+  "65": {
+    "genusZh": "念力宝可梦",
+    "nameEn": "Alakazam",
+    "nameZh": "胡地",
+    "slug": "65"
+  },
+  "650": {
+    "genusZh": "刺栗宝可梦",
+    "nameEn": "Chespin",
+    "nameZh": "哈力栗",
+    "slug": "650"
+  },
+  "651": {
+    "genusZh": "刺铠宝可梦",
+    "nameEn": "Quilladin",
+    "nameZh": "胖胖哈力",
+    "slug": "651"
+  },
+  "652": {
+    "genusZh": "刺铠宝可梦",
+    "nameEn": "Chesnaught",
+    "nameZh": "布里卡隆",
+    "slug": "652"
+  },
+  "653": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Fennekin",
+    "nameZh": "火狐狸",
+    "slug": "653"
+  },
+  "654": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Braixen",
+    "nameZh": "长尾火狐",
+    "slug": "654"
+  },
+  "655": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Delphox",
+    "nameZh": "妖火红狐",
+    "slug": "655"
+  },
+  "656": {
+    "genusZh": "泡蛙宝可梦",
+    "nameEn": "Froakie",
+    "nameZh": "呱呱泡蛙",
+    "slug": "656"
+  },
+  "657": {
+    "genusZh": "泡蛙宝可梦",
+    "nameEn": "Frogadier",
+    "nameZh": "呱头蛙",
+    "slug": "657"
+  },
+  "658": {
+    "genusZh": "忍者宝可梦",
+    "nameEn": "Greninja",
+    "nameZh": "甲贺忍蛙",
+    "slug": "658"
+  },
+  "659": {
+    "genusZh": "挖洞宝可梦",
+    "nameEn": "Bunnelby",
+    "nameZh": "掘掘兔",
+    "slug": "659"
+  },
+  "66": {
+    "genusZh": "怪力宝可梦",
+    "nameEn": "Machop",
+    "nameZh": "腕力",
+    "slug": "66"
+  },
+  "660": {
+    "genusZh": "挖洞宝可梦",
+    "nameEn": "Diggersby",
+    "nameZh": "掘地兔",
+    "slug": "660"
+  },
+  "661": {
+    "genusZh": "知更鸟宝可梦",
+    "nameEn": "Fletchling",
+    "nameZh": "小箭雀",
+    "slug": "661"
+  },
+  "662": {
+    "genusZh": "火花宝可梦",
+    "nameEn": "Fletchinder",
+    "nameZh": "火箭雀",
+    "slug": "662"
+  },
+  "663": {
+    "genusZh": "烈火宝可梦",
+    "nameEn": "Talonflame",
+    "nameZh": "烈箭鹰",
+    "slug": "663"
+  },
+  "664": {
+    "genusZh": "喷粉宝可梦",
+    "nameEn": "Scatterbug",
+    "nameZh": "粉蝶虫",
+    "slug": "664"
+  },
+  "665": {
+    "genusZh": "喷粉宝可梦",
+    "nameEn": "Spewpa",
+    "nameZh": "粉蝶蛹",
+    "slug": "665"
+  },
+  "666": {
+    "genusZh": "鳞粉宝可梦",
+    "nameEn": "Vivillon",
+    "nameZh": "彩粉蝶",
+    "slug": "666"
+  },
+  "667": {
+    "genusZh": "幼狮宝可梦",
+    "nameEn": "Litleo",
+    "nameZh": "小狮狮",
+    "slug": "667"
+  },
+  "668": {
+    "genusZh": "王者宝可梦",
+    "nameEn": "Pyroar",
+    "nameZh": "火炎狮",
+    "slug": "668"
+  },
+  "669": {
+    "genusZh": "单朵宝可梦",
+    "nameEn": "Flabébé",
+    "nameZh": "花蓓蓓",
+    "slug": "669"
+  },
+  "67": {
+    "genusZh": "怪力宝可梦",
+    "nameEn": "Machoke",
+    "nameZh": "豪力",
+    "slug": "67"
+  },
+  "670": {
+    "genusZh": "单朵宝可梦",
+    "nameEn": "Floette",
+    "nameZh": "花叶蒂",
+    "slug": "670"
+  },
+  "671": {
+    "genusZh": "花园宝可梦",
+    "nameEn": "Florges",
+    "nameZh": "花洁夫人",
+    "slug": "671"
+  },
+  "672": {
+    "genusZh": "坐骑宝可梦",
+    "nameEn": "Skiddo",
+    "nameZh": "坐骑小羊",
+    "slug": "672"
+  },
+  "673": {
+    "genusZh": "坐骑宝可梦",
+    "nameEn": "Gogoat",
+    "nameZh": "坐骑山羊",
+    "slug": "673"
+  },
+  "674": {
+    "genusZh": "顽皮宝可梦",
+    "nameEn": "Pancham",
+    "nameZh": "顽皮熊猫",
+    "slug": "674"
+  },
+  "675": {
+    "genusZh": "恶颜宝可梦",
+    "nameEn": "Pangoro",
+    "nameZh": "霸道熊猫",
+    "slug": "675"
+  },
+  "676": {
+    "genusZh": "贵宾犬宝可梦",
+    "nameEn": "Furfrou",
+    "nameZh": "多丽米亚",
+    "slug": "676"
+  },
+  "677": {
+    "genusZh": "自制宝可梦",
+    "nameEn": "Espurr",
+    "nameZh": "妙喵",
+    "slug": "677"
+  },
+  "678": {
+    "genusZh": "抑制宝可梦",
+    "nameEn": "Meowstic",
+    "nameZh": "超能妙喵",
+    "slug": "678"
+  },
+  "679": {
+    "genusZh": "刀剑宝可梦",
+    "nameEn": "Honedge",
+    "nameZh": "独剑鞘",
+    "slug": "679"
+  },
+  "68": {
+    "genusZh": "怪力宝可梦",
+    "nameEn": "Machamp",
+    "nameZh": "怪力",
+    "slug": "68"
+  },
+  "680": {
+    "genusZh": "刀剑宝可梦",
+    "nameEn": "Doublade",
+    "nameZh": "双剑鞘",
+    "slug": "680"
+  },
+  "681": {
+    "genusZh": "王剑宝可梦",
+    "nameEn": "Aegislash",
+    "nameZh": "坚盾剑怪",
+    "slug": "681"
+  },
+  "682": {
+    "genusZh": "香水宝可梦",
+    "nameEn": "Spritzee",
+    "nameZh": "粉香香",
+    "slug": "682"
+  },
+  "683": {
+    "genusZh": "芳香宝可梦",
+    "nameEn": "Aromatisse",
+    "nameZh": "芳香精",
+    "slug": "683"
+  },
+  "684": {
+    "genusZh": "棉花糖宝可梦",
+    "nameEn": "Swirlix",
+    "nameZh": "绵绵泡芙",
+    "slug": "684"
+  },
+  "685": {
+    "genusZh": "泡沫奶油宝可梦",
+    "nameEn": "Slurpuff",
+    "nameZh": "胖甜妮",
+    "slug": "685"
+  },
+  "686": {
+    "genusZh": "回转宝可梦",
+    "nameEn": "Inkay",
+    "nameZh": "好啦鱿",
+    "slug": "686"
+  },
+  "687": {
+    "genusZh": "倒转宝可梦",
+    "nameEn": "Malamar",
+    "nameZh": "乌贼王",
+    "slug": "687"
+  },
+  "688": {
+    "genusZh": "双手宝可梦",
+    "nameEn": "Binacle",
+    "nameZh": "龟脚脚",
+    "slug": "688"
+  },
+  "689": {
+    "genusZh": "集合宝可梦",
+    "nameEn": "Barbaracle",
+    "nameZh": "龟足巨铠",
+    "slug": "689"
+  },
+  "69": {
+    "genusZh": "花宝可梦",
+    "nameEn": "Bellsprout",
+    "nameZh": "喇叭芽",
+    "slug": "69"
+  },
+  "690": {
+    "genusZh": "似草宝可梦",
+    "nameEn": "Skrelp",
+    "nameZh": "垃垃藻",
+    "slug": "690"
+  },
+  "691": {
+    "genusZh": "似草宝可梦",
+    "nameEn": "Dragalge",
+    "nameZh": "毒藻龙",
+    "slug": "691"
+  },
+  "692": {
+    "genusZh": "水枪宝可梦",
+    "nameEn": "Clauncher",
+    "nameZh": "铁臂枪虾",
+    "slug": "692"
+  },
+  "693": {
+    "genusZh": "发射器宝可梦",
+    "nameEn": "Clawitzer",
+    "nameZh": "钢炮臂虾",
+    "slug": "693"
+  },
+  "694": {
+    "genusZh": "发电宝可梦",
+    "nameEn": "Helioptile",
+    "nameZh": "伞电蜥",
+    "slug": "694"
+  },
+  "695": {
+    "genusZh": "发电宝可梦",
+    "nameEn": "Heliolisk",
+    "nameZh": "光电伞蜥",
+    "slug": "695"
+  },
+  "696": {
+    "genusZh": "幼君宝可梦",
+    "nameEn": "Tyrunt",
+    "nameZh": "宝宝暴龙",
+    "slug": "696"
+  },
+  "697": {
+    "genusZh": "暴君宝可梦",
+    "nameEn": "Tyrantrum",
+    "nameZh": "怪颚龙",
+    "slug": "697"
+  },
+  "698": {
+    "genusZh": "冻原宝可梦",
+    "nameEn": "Amaura",
+    "nameZh": "冰雪龙",
+    "slug": "698"
+  },
+  "699": {
+    "genusZh": "冻原宝可梦",
+    "nameEn": "Aurorus",
+    "nameZh": "冰雪巨龙",
+    "slug": "699"
+  },
+  "7": {
+    "genusZh": "小龟宝可梦",
+    "nameEn": "Squirtle",
+    "nameZh": "杰尼龟",
+    "slug": "7"
+  },
+  "70": {
+    "genusZh": "捕蝇宝可梦",
+    "nameEn": "Weepinbell",
+    "nameZh": "口呆花",
+    "slug": "70"
+  },
+  "700": {
+    "genusZh": "连结宝可梦",
+    "nameEn": "Sylveon",
+    "nameZh": "仙子伊布",
+    "slug": "700"
+  },
+  "701": {
+    "genusZh": "摔角宝可梦",
+    "nameEn": "Hawlucha",
+    "nameZh": "摔角鹰人",
+    "slug": "701"
+  },
+  "702": {
+    "genusZh": "天线宝可梦",
+    "nameEn": "Dedenne",
+    "nameZh": "咚咚鼠",
+    "slug": "702"
+  },
+  "703": {
+    "genusZh": "宝石宝可梦",
+    "nameEn": "Carbink",
+    "nameZh": "小碎钻",
+    "slug": "703"
+  },
+  "704": {
+    "genusZh": "软体生物宝可梦",
+    "nameEn": "Goomy",
+    "nameZh": "黏黏宝",
+    "slug": "704"
+  },
+  "705": {
+    "genusZh": "软体生物宝可梦",
+    "nameEn": "Sliggoo",
+    "nameZh": "黏美儿",
+    "slug": "705"
+  },
+  "706": {
+    "genusZh": "龙宝可梦",
+    "nameEn": "Goodra",
+    "nameZh": "黏美龙",
+    "slug": "706"
+  },
+  "707": {
+    "genusZh": "钥匙串宝可梦",
+    "nameEn": "Klefki",
+    "nameZh": "钥圈儿",
+    "slug": "707"
+  },
+  "708": {
+    "genusZh": "树桩宝可梦",
+    "nameEn": "Phantump",
+    "nameZh": "小木灵",
+    "slug": "708"
+  },
+  "709": {
+    "genusZh": "老树宝可梦",
+    "nameEn": "Trevenant",
+    "nameZh": "朽木妖",
+    "slug": "709"
+  },
+  "71": {
+    "genusZh": "捕蝇宝可梦",
+    "nameEn": "Victreebel",
+    "nameZh": "大食花",
+    "slug": "71"
+  },
+  "710": {
+    "genusZh": "南瓜宝可梦",
+    "nameEn": "Pumpkaboo",
+    "nameZh": "南瓜精",
+    "slug": "710"
+  },
+  "711": {
+    "genusZh": "南瓜宝可梦",
+    "nameEn": "Gourgeist",
+    "nameZh": "南瓜怪人",
+    "slug": "711"
+  },
+  "712": {
+    "genusZh": "冰块宝可梦",
+    "nameEn": "Bergmite",
+    "nameZh": "冰宝",
+    "slug": "712"
+  },
+  "713": {
+    "genusZh": "冰山宝可梦",
+    "nameEn": "Avalugg",
+    "nameZh": "冰岩怪",
+    "slug": "713"
+  },
+  "714": {
+    "genusZh": "音波宝可梦",
+    "nameEn": "Noibat",
+    "nameZh": "嗡蝠",
+    "slug": "714"
+  },
+  "715": {
+    "genusZh": "音波宝可梦",
+    "nameEn": "Noivern",
+    "nameZh": "音波龙",
+    "slug": "715"
+  },
+  "716": {
+    "genusZh": "生命宝可梦",
+    "nameEn": "Xerneas",
+    "nameZh": "哲尔尼亚斯",
+    "slug": "716"
+  },
+  "717": {
+    "genusZh": "破坏宝可梦",
+    "nameEn": "Yveltal",
+    "nameZh": "伊裴尔塔尔",
+    "slug": "717"
+  },
+  "718": {
+    "genusZh": "秩序宝可梦",
+    "nameEn": "Zygarde",
+    "nameZh": "基格尔德",
+    "slug": "718"
+  },
+  "719": {
+    "genusZh": "宝石宝可梦",
+    "nameEn": "Diancie",
+    "nameZh": "蒂安希",
+    "slug": "719"
+  },
+  "72": {
+    "genusZh": "水母宝可梦",
+    "nameEn": "Tentacool",
+    "nameZh": "玛瑙水母",
+    "slug": "72"
+  },
+  "720": {
+    "genusZh": "顽童宝可梦",
+    "nameEn": "Hoopa",
+    "nameZh": "胡帕",
+    "slug": "720"
+  },
+  "721": {
+    "genusZh": "蒸汽宝可梦",
+    "nameEn": "Volcanion",
+    "nameZh": "波尔凯尼恩",
+    "slug": "721"
+  },
+  "722": {
+    "genusZh": "草羽宝可梦",
+    "nameEn": "Rowlet",
+    "nameZh": "木木枭",
+    "slug": "722"
+  },
+  "723": {
+    "genusZh": "刃羽宝可梦",
+    "nameEn": "Dartrix",
+    "nameZh": "投羽枭",
+    "slug": "723"
+  },
+  "724": {
+    "genusZh": "箭羽宝可梦",
+    "nameEn": "Decidueye",
+    "nameZh": "狙射树枭",
+    "slug": "724"
+  },
+  "725": {
+    "genusZh": "火猫宝可梦",
+    "nameEn": "Litten",
+    "nameZh": "火斑喵",
+    "slug": "725"
+  },
+  "726": {
+    "genusZh": "火猫宝可梦",
+    "nameEn": "Torracat",
+    "nameZh": "炎热喵",
+    "slug": "726"
+  },
+  "727": {
+    "genusZh": "反派宝可梦",
+    "nameEn": "Incineroar",
+    "nameZh": "炽焰咆哮虎",
+    "slug": "727"
+  },
+  "728": {
+    "genusZh": "海狮宝可梦",
+    "nameEn": "Popplio",
+    "nameZh": "球球海狮",
+    "slug": "728"
+  },
+  "729": {
+    "genusZh": "偶像宝可梦",
+    "nameEn": "Brionne",
+    "nameZh": "花漾海狮",
+    "slug": "729"
+  },
+  "73": {
+    "genusZh": "水母宝可梦",
+    "nameEn": "Tentacruel",
+    "nameZh": "毒刺水母",
+    "slug": "73"
+  },
+  "730": {
+    "genusZh": "独唱者宝可梦",
+    "nameEn": "Primarina",
+    "nameZh": "西狮海壬",
+    "slug": "730"
+  },
+  "731": {
+    "genusZh": "啄木鸟宝可梦",
+    "nameEn": "Pikipek",
+    "nameZh": "小笃儿",
+    "slug": "731"
+  },
+  "732": {
+    "genusZh": "喇叭喙宝可梦",
+    "nameEn": "Trumbeak",
+    "nameZh": "喇叭啄鸟",
+    "slug": "732"
+  },
+  "733": {
+    "genusZh": "铳炮宝可梦",
+    "nameEn": "Toucannon",
+    "nameZh": "铳嘴大鸟",
+    "slug": "733"
+  },
+  "734": {
+    "genusZh": "巡回宝可梦",
+    "nameEn": "Yungoos",
+    "nameZh": "猫鼬少",
+    "slug": "734"
+  },
+  "735": {
+    "genusZh": "蹲守宝可梦",
+    "nameEn": "Gumshoos",
+    "nameZh": "猫鼬探长",
+    "slug": "735"
+  },
+  "736": {
+    "genusZh": "幼虫宝可梦",
+    "nameEn": "Grubbin",
+    "nameZh": "强颚鸡母虫",
+    "slug": "736"
+  },
+  "737": {
+    "genusZh": "蓄电池宝可梦",
+    "nameEn": "Charjabug",
+    "nameZh": "虫电宝",
+    "slug": "737"
+  },
+  "738": {
+    "genusZh": "锹形虫宝可梦",
+    "nameEn": "Vikavolt",
+    "nameZh": "锹农炮虫",
+    "slug": "738"
+  },
+  "739": {
+    "genusZh": "拳斗宝可梦",
+    "nameEn": "Crabrawler",
+    "nameZh": "好胜蟹",
+    "slug": "739"
+  },
+  "74": {
+    "genusZh": "岩石宝可梦",
+    "nameEn": "Geodude",
+    "nameZh": "小拳石",
+    "slug": "74"
+  },
+  "740": {
+    "genusZh": "毛蟹宝可梦",
+    "nameEn": "Crabominable",
+    "nameZh": "好胜毛蟹",
+    "slug": "740"
+  },
+  "741": {
+    "genusZh": "舞蹈宝可梦",
+    "nameEn": "Oricorio",
+    "nameZh": "花舞鸟",
+    "slug": "741"
+  },
+  "742": {
+    "genusZh": "蜂虻宝可梦",
+    "nameEn": "Cutiefly",
+    "nameZh": "萌虻",
+    "slug": "742"
+  },
+  "743": {
+    "genusZh": "蜂虻宝可梦",
+    "nameEn": "Ribombee",
+    "nameZh": "蝶结萌虻",
+    "slug": "743"
+  },
+  "744": {
+    "genusZh": "小狗宝可梦",
+    "nameEn": "Rockruff",
+    "nameZh": "岩狗狗",
+    "slug": "744"
+  },
+  "745": {
+    "genusZh": "狼宝可梦",
+    "nameEn": "Lycanroc",
+    "nameZh": "鬃岩狼人",
+    "slug": "745"
+  },
+  "746": {
+    "genusZh": "小鱼宝可梦",
+    "nameEn": "Wishiwashi",
+    "nameZh": "弱丁鱼",
+    "slug": "746"
+  },
+  "747": {
+    "genusZh": "非星宝可梦",
+    "nameEn": "Mareanie",
+    "nameZh": "好坏星",
+    "slug": "747"
+  },
+  "748": {
+    "genusZh": "非星宝可梦",
+    "nameEn": "Toxapex",
+    "nameZh": "超坏星",
+    "slug": "748"
+  },
+  "749": {
+    "genusZh": "驴宝可梦",
+    "nameEn": "Mudbray",
+    "nameZh": "泥驴仔",
+    "slug": "749"
+  },
+  "75": {
+    "genusZh": "岩石宝可梦",
+    "nameEn": "Graveler",
+    "nameZh": "隆隆石",
+    "slug": "75"
+  },
+  "750": {
+    "genusZh": "挽马宝可梦",
+    "nameEn": "Mudsdale",
+    "nameZh": "重泥挽马",
+    "slug": "750"
+  },
+  "751": {
+    "genusZh": "水泡宝可梦",
+    "nameEn": "Dewpider",
+    "nameZh": "滴蛛",
+    "slug": "751"
+  },
+  "752": {
+    "genusZh": "水泡宝可梦",
+    "nameEn": "Araquanid",
+    "nameZh": "滴蛛霸",
+    "slug": "752"
+  },
+  "753": {
+    "genusZh": "镰草宝可梦",
+    "nameEn": "Fomantis",
+    "nameZh": "伪螳草",
+    "slug": "753"
+  },
+  "754": {
+    "genusZh": "花镰宝可梦",
+    "nameEn": "Lurantis",
+    "nameZh": "兰螳花",
+    "slug": "754"
+  },
+  "755": {
+    "genusZh": "发光宝可梦",
+    "nameEn": "Morelull",
+    "nameZh": "睡睡菇",
+    "slug": "755"
+  },
+  "756": {
+    "genusZh": "发光宝可梦",
+    "nameEn": "Shiinotic",
+    "nameZh": "灯罩夜菇",
+    "slug": "756"
+  },
+  "757": {
+    "genusZh": "毒蜥宝可梦",
+    "nameEn": "Salandit",
+    "nameZh": "夜盗火蜥",
+    "slug": "757"
+  },
+  "758": {
+    "genusZh": "毒蜥宝可梦",
+    "nameEn": "Salazzle",
+    "nameZh": "焰后蜥",
+    "slug": "758"
+  },
+  "759": {
+    "genusZh": "抓狂宝可梦",
+    "nameEn": "Stufful",
+    "nameZh": "童偶熊",
+    "slug": "759"
+  },
+  "76": {
+    "genusZh": "重量级宝可梦",
+    "nameEn": "Golem",
+    "nameZh": "隆隆岩",
+    "slug": "76"
+  },
+  "760": {
+    "genusZh": "强臂宝可梦",
+    "nameEn": "Bewear",
+    "nameZh": "穿着熊",
+    "slug": "760"
+  },
+  "761": {
+    "genusZh": "水果宝可梦",
+    "nameEn": "Bounsweet",
+    "nameZh": "甜竹竹",
+    "slug": "761"
+  },
+  "762": {
+    "genusZh": "水果宝可梦",
+    "nameEn": "Steenee",
+    "nameZh": "甜舞妮",
+    "slug": "762"
+  },
+  "763": {
+    "genusZh": "水果宝可梦",
+    "nameEn": "Tsareena",
+    "nameZh": "甜冷美后",
+    "slug": "763"
+  },
+  "764": {
+    "genusZh": "摘花宝可梦",
+    "nameEn": "Comfey",
+    "nameZh": "花疗环环",
+    "slug": "764"
+  },
+  "765": {
+    "genusZh": "贤者宝可梦",
+    "nameEn": "Oranguru",
+    "nameZh": "智挥猩",
+    "slug": "765"
+  },
+  "766": {
+    "genusZh": "配合宝可梦",
+    "nameEn": "Passimian",
+    "nameZh": "投掷猴",
+    "slug": "766"
+  },
+  "767": {
+    "genusZh": "疾行宝可梦",
+    "nameEn": "Wimpod",
+    "nameZh": "胆小虫",
+    "slug": "767"
+  },
+  "768": {
+    "genusZh": "装甲宝可梦",
+    "nameEn": "Golisopod",
+    "nameZh": "具甲武者",
+    "slug": "768"
+  },
+  "769": {
+    "genusZh": "沙丘宝可梦",
+    "nameEn": "Sandygast",
+    "nameZh": "沙丘娃",
+    "slug": "769"
+  },
+  "77": {
+    "genusZh": "火马宝可梦",
+    "nameEn": "Ponyta",
+    "nameZh": "小火马",
+    "slug": "77"
+  },
+  "770": {
+    "genusZh": "沙堡宝可梦",
+    "nameEn": "Palossand",
+    "nameZh": "噬沙堡爷",
+    "slug": "770"
+  },
+  "771": {
+    "genusZh": "海参宝可梦",
+    "nameEn": "Pyukumuku",
+    "nameZh": "拳海参",
+    "slug": "771"
+  },
+  "772": {
+    "genusZh": "人工宝可梦",
+    "nameEn": "Type: Null",
+    "nameZh": "属性：空",
+    "slug": "772"
+  },
+  "773": {
+    "genusZh": "人工宝可梦",
+    "nameEn": "Silvally",
+    "nameZh": "银伴战兽",
+    "slug": "773"
+  },
+  "774": {
+    "genusZh": "流星宝可梦",
+    "nameEn": "Minior",
+    "nameZh": "小陨星",
+    "slug": "774"
+  },
+  "775": {
+    "genusZh": "半梦半醒宝可梦",
+    "nameEn": "Komala",
+    "nameZh": "树枕尾熊",
+    "slug": "775"
+  },
+  "776": {
+    "genusZh": "爆炸龟宝可梦",
+    "nameEn": "Turtonator",
+    "nameZh": "爆焰龟兽",
+    "slug": "776"
+  },
+  "777": {
+    "genusZh": "蜷缩宝可梦",
+    "nameEn": "Togedemaru",
+    "nameZh": "托戈德玛尔",
+    "slug": "777"
+  },
+  "778": {
+    "genusZh": "画皮宝可梦",
+    "nameEn": "Mimikyu",
+    "nameZh": "谜拟丘",
+    "slug": "778"
+  },
+  "779": {
+    "genusZh": "磨牙宝可梦",
+    "nameEn": "Bruxish",
+    "nameZh": "磨牙彩皮鱼",
+    "slug": "779"
+  },
+  "78": {
+    "genusZh": "火马宝可梦",
+    "nameEn": "Rapidash",
+    "nameZh": "烈焰马",
+    "slug": "78"
+  },
+  "780": {
+    "genusZh": "悠游宝可梦",
+    "nameEn": "Drampa",
+    "nameZh": "老翁龙",
+    "slug": "780"
+  },
+  "781": {
+    "genusZh": "碎藻宝可梦",
+    "nameEn": "Dhelmise",
+    "nameZh": "破破舵轮",
+    "slug": "781"
+  },
+  "782": {
+    "genusZh": "鳞片宝可梦",
+    "nameEn": "Jangmo-o",
+    "nameZh": "心鳞宝",
+    "slug": "782"
+  },
+  "783": {
+    "genusZh": "鳞片宝可梦",
+    "nameEn": "Hakamo-o",
+    "nameZh": "鳞甲龙",
+    "slug": "783"
+  },
+  "784": {
+    "genusZh": "鳞片宝可梦",
+    "nameEn": "Kommo-o",
+    "nameZh": "杖尾鳞甲龙",
+    "slug": "784"
+  },
+  "785": {
+    "genusZh": "土地神宝可梦",
+    "nameEn": "Tapu Koko",
+    "nameZh": "卡璞・鸣鸣",
+    "slug": "785"
+  },
+  "786": {
+    "genusZh": "土地神宝可梦",
+    "nameEn": "Tapu Lele",
+    "nameZh": "卡璞・蝶蝶",
+    "slug": "786"
+  },
+  "787": {
+    "genusZh": "土地神宝可梦",
+    "nameEn": "Tapu Bulu",
+    "nameZh": "卡璞・哞哞",
+    "slug": "787"
+  },
+  "788": {
+    "genusZh": "土地神宝可梦",
+    "nameEn": "Tapu Fini",
+    "nameZh": "卡璞・鳍鳍",
+    "slug": "788"
+  },
+  "789": {
+    "genusZh": "星云宝可梦",
+    "nameEn": "Cosmog",
+    "nameZh": "科斯莫古",
+    "slug": "789"
+  },
+  "79": {
+    "genusZh": "憨憨宝可梦",
+    "nameEn": "Slowpoke",
+    "nameZh": "呆呆兽",
+    "slug": "79"
+  },
+  "790": {
+    "genusZh": "原始星宝可梦",
+    "nameEn": "Cosmoem",
+    "nameZh": "科斯莫姆",
+    "slug": "790"
+  },
+  "791": {
+    "genusZh": "日轮宝可梦",
+    "nameEn": "Solgaleo",
+    "nameZh": "索尔迦雷欧",
+    "slug": "791"
+  },
+  "792": {
+    "genusZh": "月轮宝可梦",
+    "nameEn": "Lunala",
+    "nameZh": "露奈雅拉",
+    "slug": "792"
+  },
+  "793": {
+    "genusZh": "寄生宝可梦",
+    "nameEn": "Nihilego",
+    "nameZh": "虚吾伊德",
+    "slug": "793"
+  },
+  "794": {
+    "genusZh": "膨胀宝可梦",
+    "nameEn": "Buzzwole",
+    "nameZh": "爆肌蚊",
+    "slug": "794"
+  },
+  "795": {
+    "genusZh": "美艳宝可梦",
+    "nameEn": "Pheromosa",
+    "nameZh": "费洛美螂",
+    "slug": "795"
+  },
+  "796": {
+    "genusZh": "灯饰宝可梦",
+    "nameEn": "Xurkitree",
+    "nameZh": "电束木",
+    "slug": "796"
+  },
+  "797": {
+    "genusZh": "发射宝可梦",
+    "nameEn": "Celesteela",
+    "nameZh": "铁火辉夜",
+    "slug": "797"
+  },
+  "798": {
+    "genusZh": "拔刀宝可梦",
+    "nameEn": "Kartana",
+    "nameZh": "纸御剑",
+    "slug": "798"
+  },
+  "799": {
+    "genusZh": "异食宝可梦",
+    "nameEn": "Guzzlord",
+    "nameZh": "恶食大王",
+    "slug": "799"
+  },
+  "8": {
+    "genusZh": "龟宝可梦",
+    "nameEn": "Wartortle",
+    "nameZh": "卡咪龟",
+    "slug": "8"
+  },
+  "80": {
+    "genusZh": "寄居蟹宝可梦",
+    "nameEn": "Slowbro",
+    "nameZh": "呆壳兽",
+    "slug": "80"
+  },
+  "800": {
+    "genusZh": "棱镜宝可梦",
+    "nameEn": "Necrozma",
+    "nameZh": "奈克洛兹玛",
+    "slug": "800"
+  },
+  "801": {
+    "genusZh": "人造宝可梦",
+    "nameEn": "Magearna",
+    "nameZh": "玛机雅娜",
+    "slug": "801"
+  },
+  "802": {
+    "genusZh": "栖影宝可梦",
+    "nameEn": "Marshadow",
+    "nameZh": "玛夏多",
+    "slug": "802"
+  },
+  "803": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Poipole",
+    "nameZh": "毒贝比",
+    "slug": "803"
+  },
+  "804": {
+    "genusZh": "毒针宝可梦",
+    "nameEn": "Naganadel",
+    "nameZh": "四颚针龙",
+    "slug": "804"
+  },
+  "805": {
+    "genusZh": "石墙宝可梦",
+    "nameEn": "Stakataka",
+    "nameZh": "垒磊石",
+    "slug": "805"
+  },
+  "806": {
+    "genusZh": "烟火宝可梦",
+    "nameEn": "Blacephalon",
+    "nameZh": "砰头小丑",
+    "slug": "806"
+  },
+  "807": {
+    "genusZh": "奔雷宝可梦",
+    "nameEn": "Zeraora",
+    "nameZh": "捷拉奥拉",
+    "slug": "807"
+  },
+  "808": {
+    "genusZh": "螺帽宝可梦",
+    "nameEn": "Meltan",
+    "nameZh": "美录坦",
+    "slug": "808"
+  },
+  "809": {
+    "genusZh": "螺帽宝可梦",
+    "nameEn": "Melmetal",
+    "nameZh": "美录梅塔",
+    "slug": "809"
+  },
+  "81": {
+    "genusZh": "磁铁宝可梦",
+    "nameEn": "Magnemite",
+    "nameZh": "小磁怪",
+    "slug": "81"
+  },
+  "810": {
+    "genusZh": "小猴宝可梦",
+    "nameEn": "Grookey",
+    "nameZh": "敲音猴",
+    "slug": "810"
+  },
+  "811": {
+    "genusZh": "节拍宝可梦",
+    "nameEn": "Thwackey",
+    "nameZh": "啪咚猴",
+    "slug": "811"
+  },
+  "812": {
+    "genusZh": "鼓手宝可梦",
+    "nameEn": "Rillaboom",
+    "nameZh": "轰擂金刚猩",
+    "slug": "812"
+  },
+  "813": {
+    "genusZh": "兔子宝可梦",
+    "nameEn": "Scorbunny",
+    "nameZh": "炎兔儿",
+    "slug": "813"
+  },
+  "814": {
+    "genusZh": "兔子宝可梦",
+    "nameEn": "Raboot",
+    "nameZh": "腾蹴小将",
+    "slug": "814"
+  },
+  "815": {
+    "genusZh": "前锋宝可梦",
+    "nameEn": "Cinderace",
+    "nameZh": "闪焰王牌",
+    "slug": "815"
+  },
+  "816": {
+    "genusZh": "水蜥宝可梦",
+    "nameEn": "Sobble",
+    "nameZh": "泪眼蜥",
+    "slug": "816"
+  },
+  "817": {
+    "genusZh": "水蜥宝可梦",
+    "nameEn": "Drizzile",
+    "nameZh": "变涩蜥",
+    "slug": "817"
+  },
+  "818": {
+    "genusZh": "特工宝可梦",
+    "nameEn": "Inteleon",
+    "nameZh": "千面避役",
+    "slug": "818"
+  },
+  "819": {
+    "genusZh": "贪吃宝可梦",
+    "nameEn": "Skwovet",
+    "nameZh": "贪心栗鼠",
+    "slug": "819"
+  },
+  "82": {
+    "genusZh": "磁铁宝可梦",
+    "nameEn": "Magneton",
+    "nameZh": "三合一磁怪",
+    "slug": "82"
+  },
+  "820": {
+    "genusZh": "贪欲宝可梦",
+    "nameEn": "Greedent",
+    "nameZh": "藏饱栗鼠",
+    "slug": "820"
+  },
+  "821": {
+    "genusZh": "小鸟宝可梦",
+    "nameEn": "Rookidee",
+    "nameZh": "稚山雀",
+    "slug": "821"
+  },
+  "822": {
+    "genusZh": "乌鸦宝可梦",
+    "nameEn": "Corvisquire",
+    "nameZh": "蓝鸦",
+    "slug": "822"
+  },
+  "823": {
+    "genusZh": "乌鸦宝可梦",
+    "nameEn": "Corviknight",
+    "nameZh": "钢铠鸦",
+    "slug": "823"
+  },
+  "824": {
+    "genusZh": "幼虫宝可梦",
+    "nameEn": "Blipbug",
+    "nameZh": "索侦虫",
+    "slug": "824"
+  },
+  "825": {
+    "genusZh": "天线罩宝可梦",
+    "nameEn": "Dottler",
+    "nameZh": "天罩虫",
+    "slug": "825"
+  },
+  "826": {
+    "genusZh": "七星宝可梦",
+    "nameEn": "Orbeetle",
+    "nameZh": "以欧路普",
+    "slug": "826"
+  },
+  "827": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Nickit",
+    "nameZh": "狡小狐",
+    "slug": "827"
+  },
+  "828": {
+    "genusZh": "狐狸宝可梦",
+    "nameEn": "Thievul",
+    "nameZh": "猾大狐",
+    "slug": "828"
+  },
+  "829": {
+    "genusZh": "花饰宝可梦",
+    "nameEn": "Gossifleur",
+    "nameZh": "幼棉棉",
+    "slug": "829"
+  },
+  "83": {
+    "genusZh": "黄嘴鸭宝可梦",
+    "nameEn": "Farfetch’d",
+    "nameZh": "大葱鸭",
+    "slug": "83"
+  },
+  "830": {
+    "genusZh": "棉饰宝可梦",
+    "nameEn": "Eldegoss",
+    "nameZh": "白蓬蓬",
+    "slug": "830"
+  },
+  "831": {
+    "genusZh": "绵羊宝可梦",
+    "nameEn": "Wooloo",
+    "nameZh": "毛辫羊",
+    "slug": "831"
+  },
+  "832": {
+    "genusZh": "绵羊宝可梦",
+    "nameEn": "Dubwool",
+    "nameZh": "毛毛角羊",
+    "slug": "832"
+  },
+  "833": {
+    "genusZh": "咬住宝可梦",
+    "nameEn": "Chewtle",
+    "nameZh": "咬咬龟",
+    "slug": "833"
+  },
+  "834": {
+    "genusZh": "紧咬宝可梦",
+    "nameEn": "Drednaw",
+    "nameZh": "暴噬龟",
+    "slug": "834"
+  },
+  "835": {
+    "genusZh": "小狗宝可梦",
+    "nameEn": "Yamper",
+    "nameZh": "来电汪",
+    "slug": "835"
+  },
+  "836": {
+    "genusZh": "狗宝可梦",
+    "nameEn": "Boltund",
+    "nameZh": "逐电犬",
+    "slug": "836"
+  },
+  "837": {
+    "genusZh": "煤炭宝可梦",
+    "nameEn": "Rolycoly",
+    "nameZh": "小炭仔",
+    "slug": "837"
+  },
+  "838": {
+    "genusZh": "煤炭宝可梦",
+    "nameEn": "Carkol",
+    "nameZh": "大炭车",
+    "slug": "838"
+  },
+  "839": {
+    "genusZh": "煤炭宝可梦",
+    "nameEn": "Coalossal",
+    "nameZh": "巨炭山",
+    "slug": "839"
+  },
+  "84": {
+    "genusZh": "两头鸟宝可梦",
+    "nameEn": "Doduo",
+    "nameZh": "嘟嘟",
+    "slug": "84"
+  },
+  "840": {
+    "genusZh": "苹果居宝可梦",
+    "nameEn": "Applin",
+    "nameZh": "啃果虫",
+    "slug": "840"
+  },
+  "841": {
+    "genusZh": "苹果翅宝可梦",
+    "nameEn": "Flapple",
+    "nameZh": "苹裹龙",
+    "slug": "841"
+  },
+  "842": {
+    "genusZh": "苹果汁宝可梦",
+    "nameEn": "Appletun",
+    "nameZh": "丰蜜龙",
+    "slug": "842"
+  },
+  "843": {
+    "genusZh": "沙蛇宝可梦",
+    "nameEn": "Silicobra",
+    "nameZh": "沙包蛇",
+    "slug": "843"
+  },
+  "844": {
+    "genusZh": "沙蛇宝可梦",
+    "nameEn": "Sandaconda",
+    "nameZh": "沙螺蟒",
+    "slug": "844"
+  },
+  "845": {
+    "genusZh": "一口吞宝可梦",
+    "nameEn": "Cramorant",
+    "nameZh": "古月鸟",
+    "slug": "845"
+  },
+  "846": {
+    "genusZh": "突击宝可梦",
+    "nameEn": "Arrokuda",
+    "nameZh": "刺梭鱼",
+    "slug": "846"
+  },
+  "847": {
+    "genusZh": "穿刺宝可梦",
+    "nameEn": "Barraskewda",
+    "nameZh": "戽斗尖梭",
+    "slug": "847"
+  },
+  "848": {
+    "genusZh": "婴儿宝可梦",
+    "nameEn": "Toxel",
+    "nameZh": "电音婴",
+    "slug": "848"
+  },
+  "849": {
+    "genusZh": "庞克宝可梦",
+    "nameEn": "Toxtricity",
+    "nameZh": "颤弦蝾螈",
+    "slug": "849"
+  },
+  "85": {
+    "genusZh": "三头鸟宝可梦",
+    "nameEn": "Dodrio",
+    "nameZh": "嘟嘟利",
+    "slug": "85"
+  },
+  "850": {
+    "genusZh": "发热宝可梦",
+    "nameEn": "Sizzlipede",
+    "nameZh": "烧火蚣",
+    "slug": "850"
+  },
+  "851": {
+    "genusZh": "发热宝可梦",
+    "nameEn": "Centiskorch",
+    "nameZh": "焚焰蚣",
+    "slug": "851"
+  },
+  "852": {
+    "genusZh": "缠人宝可梦",
+    "nameEn": "Clobbopus",
+    "nameZh": "拳拳蛸",
+    "slug": "852"
+  },
+  "853": {
+    "genusZh": "柔术宝可梦",
+    "nameEn": "Grapploct",
+    "nameZh": "八爪武师",
+    "slug": "853"
+  },
+  "854": {
+    "genusZh": "红茶宝可梦",
+    "nameEn": "Sinistea",
+    "nameZh": "来悲茶",
+    "slug": "854"
+  },
+  "855": {
+    "genusZh": "红茶宝可梦",
+    "nameEn": "Polteageist",
+    "nameZh": "怖思壶",
+    "slug": "855"
+  },
+  "856": {
+    "genusZh": "宁静宝可梦",
+    "nameEn": "Hatenna",
+    "nameZh": "迷布莉姆",
+    "slug": "856"
+  },
+  "857": {
+    "genusZh": "肃静宝可梦",
+    "nameEn": "Hattrem",
+    "nameZh": "提布莉姆",
+    "slug": "857"
+  },
+  "858": {
+    "genusZh": "寂静宝可梦",
+    "nameEn": "Hatterene",
+    "nameZh": "布莉姆温",
+    "slug": "858"
+  },
+  "859": {
+    "genusZh": "捉弄宝可梦",
+    "nameEn": "Impidimp",
+    "nameZh": "捣蛋小妖",
+    "slug": "859"
+  },
+  "86": {
+    "genusZh": "海狮宝可梦",
+    "nameEn": "Seel",
+    "nameZh": "小海狮",
+    "slug": "86"
+  },
+  "860": {
+    "genusZh": "坏心眼宝可梦",
+    "nameEn": "Morgrem",
+    "nameZh": "诈唬魔",
+    "slug": "860"
+  },
+  "861": {
+    "genusZh": "健美宝可梦",
+    "nameEn": "Grimmsnarl",
+    "nameZh": "长毛巨魔",
+    "slug": "861"
+  },
+  "862": {
+    "genusZh": "停止宝可梦",
+    "nameEn": "Obstagoon",
+    "nameZh": "堵拦熊",
+    "slug": "862"
+  },
+  "863": {
+    "genusZh": "维京宝可梦",
+    "nameEn": "Perrserker",
+    "nameZh": "喵头目",
+    "slug": "863"
+  },
+  "864": {
+    "genusZh": "珊瑚宝可梦",
+    "nameEn": "Cursola",
+    "nameZh": "魔灵珊瑚",
+    "slug": "864"
+  },
+  "865": {
+    "genusZh": "黄嘴鸭宝可梦",
+    "nameEn": "Sirfetch’d",
+    "nameZh": "葱游兵",
+    "slug": "865"
+  },
+  "866": {
+    "genusZh": "喜剧演员宝可梦",
+    "nameEn": "Mr. Rime",
+    "nameZh": "踏冰人偶",
+    "slug": "866"
+  },
+  "867": {
+    "genusZh": "怨念宝可梦",
+    "nameEn": "Runerigus",
+    "nameZh": "迭失板",
+    "slug": "867"
+  },
+  "868": {
+    "genusZh": "鲜奶油宝可梦",
+    "nameEn": "Milcery",
+    "nameZh": "小仙奶",
+    "slug": "868"
+  },
+  "869": {
+    "genusZh": "鲜奶油宝可梦",
+    "nameEn": "Alcremie",
+    "nameZh": "霜奶仙",
+    "slug": "869"
+  },
+  "87": {
+    "genusZh": "海狮宝可梦",
+    "nameEn": "Dewgong",
+    "nameZh": "白海狮",
+    "slug": "87"
+  },
+  "870": {
+    "genusZh": "阵形宝可梦",
+    "nameEn": "Falinks",
+    "nameZh": "列阵兵",
+    "slug": "870"
+  },
+  "871": {
+    "genusZh": "海胆宝可梦",
+    "nameEn": "Pincurchin",
+    "nameZh": "啪嚓海胆",
+    "slug": "871"
+  },
+  "872": {
+    "genusZh": "虫宝宝宝可梦",
+    "nameEn": "Snom",
+    "nameZh": "雪吞虫",
+    "slug": "872"
+  },
+  "873": {
+    "genusZh": "冰蛾宝可梦",
+    "nameEn": "Frosmoth",
+    "nameZh": "雪绒蛾",
+    "slug": "873"
+  },
+  "874": {
+    "genusZh": "巨石宝可梦",
+    "nameEn": "Stonjourner",
+    "nameZh": "巨石丁",
+    "slug": "874"
+  },
+  "875": {
+    "genusZh": "企鹅宝可梦",
+    "nameEn": "Eiscue",
+    "nameZh": "冰砌鹅",
+    "slug": "875"
+  },
+  "876": {
+    "genusZh": "感情宝可梦",
+    "nameEn": "Indeedee",
+    "nameZh": "爱管侍",
+    "slug": "876"
+  },
+  "877": {
+    "genusZh": "双面宝可梦",
+    "nameEn": "Morpeko",
+    "nameZh": "莫鲁贝可",
+    "slug": "877"
+  },
+  "878": {
+    "genusZh": "像铜宝可梦",
+    "nameEn": "Cufant",
+    "nameZh": "铜象",
+    "slug": "878"
+  },
+  "879": {
+    "genusZh": "像铜宝可梦",
+    "nameEn": "Copperajah",
+    "nameZh": "大王铜象",
+    "slug": "879"
+  },
+  "88": {
+    "genusZh": "污泥宝可梦",
+    "nameEn": "Grimer",
+    "nameZh": "臭泥",
+    "slug": "88"
+  },
+  "880": {
+    "genusZh": "化石宝可梦",
+    "nameEn": "Dracozolt",
+    "nameZh": "雷鸟龙",
+    "slug": "880"
+  },
+  "881": {
+    "genusZh": "化石宝可梦",
+    "nameEn": "Arctozolt",
+    "nameZh": "雷鸟海兽",
+    "slug": "881"
+  },
+  "882": {
+    "genusZh": "化石宝可梦",
+    "nameEn": "Dracovish",
+    "nameZh": "鳃鱼龙",
+    "slug": "882"
+  },
+  "883": {
+    "genusZh": "化石宝可梦",
+    "nameEn": "Arctovish",
+    "nameZh": "鳃鱼海兽",
+    "slug": "883"
+  },
+  "884": {
+    "genusZh": "合金宝可梦",
+    "nameEn": "Duraludon",
+    "nameZh": "铝钢龙",
+    "slug": "884"
+  },
+  "885": {
+    "genusZh": "哀怨宝可梦",
+    "nameEn": "Dreepy",
+    "nameZh": "多龙梅西亚",
+    "slug": "885"
+  },
+  "886": {
+    "genusZh": "保姆宝可梦",
+    "nameEn": "Drakloak",
+    "nameZh": "多龙奇",
+    "slug": "886"
+  },
+  "887": {
+    "genusZh": "隐形宝可梦",
+    "nameEn": "Dragapult",
+    "nameZh": "多龙巴鲁托",
+    "slug": "887"
+  },
+  "888": {
+    "genusZh": "强者宝可梦",
+    "nameEn": "Zacian",
+    "nameZh": "苍响",
+    "slug": "888"
+  },
+  "889": {
+    "genusZh": "强者宝可梦",
+    "nameEn": "Zamazenta",
+    "nameZh": "藏玛然特",
+    "slug": "889"
+  },
+  "89": {
+    "genusZh": "污泥宝可梦",
+    "nameEn": "Muk",
+    "nameZh": "臭臭泥",
+    "slug": "89"
+  },
+  "890": {
+    "genusZh": "超极巨宝可梦",
+    "nameEn": "Eternatus",
+    "nameZh": "无极汰那",
+    "slug": "890"
+  },
+  "891": {
+    "genusZh": "拳法宝可梦",
+    "nameEn": "Kubfu",
+    "nameZh": "熊徒弟",
+    "slug": "891"
+  },
+  "892": {
+    "genusZh": "拳法宝可梦",
+    "nameEn": "Urshifu",
+    "nameZh": "武道熊师",
+    "slug": "892"
+  },
+  "893": {
+    "genusZh": "恶猿宝可梦",
+    "nameEn": "Zarude",
+    "nameZh": "萨戮德",
+    "slug": "893"
+  },
+  "894": {
+    "genusZh": "电子宝可梦",
+    "nameEn": "Regieleki",
+    "nameZh": "雷吉艾勒奇",
+    "slug": "894"
+  },
+  "895": {
+    "genusZh": "龙玉宝可梦",
+    "nameEn": "Regidrago",
+    "nameZh": "雷吉铎拉戈",
+    "slug": "895"
+  },
+  "896": {
+    "genusZh": "烈马宝可梦",
+    "nameEn": "Glastrier",
+    "nameZh": "雪暴马",
+    "slug": "896"
+  },
+  "897": {
+    "genusZh": "骏马宝可梦",
+    "nameEn": "Spectrier",
+    "nameZh": "灵幽马",
+    "slug": "897"
+  },
+  "898": {
+    "genusZh": "国王宝可梦",
+    "nameEn": "Calyrex",
+    "nameZh": "蕾冠王",
+    "slug": "898"
+  },
+  "899": {
+    "genusZh": "大角宝可梦",
+    "nameEn": "Wyrdeer",
+    "nameZh": "诡角鹿",
+    "slug": "899"
+  },
+  "9": {
+    "genusZh": "甲壳宝可梦",
+    "nameEn": "Blastoise",
+    "nameZh": "水箭龟",
+    "slug": "9"
+  },
+  "90": {
+    "genusZh": "双壳贝宝可梦",
+    "nameEn": "Shellder",
+    "nameZh": "大舌贝",
+    "slug": "90"
+  },
+  "900": {
+    "genusZh": "斧钺宝可梦",
+    "nameEn": "Kleavor",
+    "nameZh": "劈斧螳螂",
+    "slug": "900"
+  },
+  "901": {
+    "genusZh": "泥炭宝可梦",
+    "nameEn": "Ursaluna",
+    "nameZh": "月月熊",
+    "slug": "901"
+  },
+  "902": {
+    "genusZh": "大鱼宝可梦",
+    "nameEn": "Basculegion",
+    "nameZh": "幽尾玄鱼",
+    "slug": "902"
+  },
+  "903": {
+    "genusZh": "攀崖宝可梦",
+    "nameEn": "Sneasler",
+    "nameZh": "大狃拉",
+    "slug": "903"
+  },
+  "904": {
+    "genusZh": "剑山宝可梦",
+    "nameEn": "Overqwil",
+    "nameZh": "万针鱼",
+    "slug": "904"
+  },
+  "905": {
+    "genusZh": "爱憎宝可梦",
+    "nameEn": "Enamorus",
+    "nameZh": "眷恋云",
+    "slug": "905"
+  },
+  "906": {
+    "genusZh": "草猫宝可梦",
+    "nameEn": "Sprigatito",
+    "nameZh": "新叶喵",
+    "slug": "906"
+  },
+  "907": {
+    "genusZh": "草猫宝可梦",
+    "nameEn": "Floragato",
+    "nameZh": "蒂蕾喵",
+    "slug": "907"
+  },
+  "908": {
+    "genusZh": "魔术师宝可梦",
+    "nameEn": "Meowscarada",
+    "nameZh": "魔幻假面喵",
+    "slug": "908"
+  },
+  "909": {
+    "genusZh": "火鳄宝可梦",
+    "nameEn": "Fuecoco",
+    "nameZh": "呆火鳄",
+    "slug": "909"
+  },
+  "91": {
+    "genusZh": "双壳贝宝可梦",
+    "nameEn": "Cloyster",
+    "nameZh": "刺甲贝",
+    "slug": "91"
+  },
+  "910": {
+    "genusZh": "火鳄宝可梦",
+    "nameEn": "Crocalor",
+    "nameZh": "炙烫鳄",
+    "slug": "910"
+  },
+  "911": {
+    "genusZh": "歌手宝可梦",
+    "nameEn": "Skeledirge",
+    "nameZh": "骨纹巨声鳄",
+    "slug": "911"
+  },
+  "912": {
+    "genusZh": "小鸭宝可梦",
+    "nameEn": "Quaxly",
+    "nameZh": "润水鸭",
+    "slug": "912"
+  },
+  "913": {
+    "genusZh": "习艺宝可梦",
+    "nameEn": "Quaxwell",
+    "nameZh": "涌跃鸭",
+    "slug": "913"
+  },
+  "914": {
+    "genusZh": "舞者宝可梦",
+    "nameEn": "Quaquaval",
+    "nameZh": "狂欢浪舞鸭",
+    "slug": "914"
+  },
+  "915": {
+    "genusZh": "猪宝可梦",
+    "nameEn": "Lechonk",
+    "nameZh": "爱吃豚",
+    "slug": "915"
+  },
+  "916": {
+    "genusZh": "猪宝可梦",
+    "nameEn": "Oinkologne",
+    "nameZh": "飘香豚",
+    "slug": "916"
+  },
+  "917": {
+    "genusZh": "线球宝可梦",
+    "nameEn": "Tarountula",
+    "nameZh": "团珠蛛",
+    "slug": "917"
+  },
+  "918": {
+    "genusZh": "陷阱宝可梦",
+    "nameEn": "Spidops",
+    "nameZh": "操陷蛛",
+    "slug": "918"
+  },
+  "919": {
+    "genusZh": "蝗虫宝可梦",
+    "nameEn": "Nymble",
+    "nameZh": "豆蟋蟀",
+    "slug": "919"
+  },
+  "92": {
+    "genusZh": "气体状宝可梦",
+    "nameEn": "Gastly",
+    "nameZh": "鬼斯",
+    "slug": "92"
+  },
+  "920": {
+    "genusZh": "蝗虫宝可梦",
+    "nameEn": "Lokix",
+    "nameZh": "烈腿蝗",
+    "slug": "920"
+  },
+  "921": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Pawmi",
+    "nameZh": "布拨",
+    "slug": "921"
+  },
+  "922": {
+    "genusZh": "鼠宝可梦",
+    "nameEn": "Pawmo",
+    "nameZh": "布土拨",
+    "slug": "922"
+  },
+  "923": {
+    "genusZh": "押掌宝可梦",
+    "nameEn": "Pawmot",
+    "nameZh": "巴布土拨",
+    "slug": "923"
+  },
+  "924": {
+    "genusZh": "成对宝可梦",
+    "nameEn": "Tandemaus",
+    "nameZh": "一对鼠",
+    "slug": "924"
+  },
+  "925": {
+    "genusZh": "家族宝可梦",
+    "nameEn": "Maushold",
+    "nameZh": "一家鼠",
+    "slug": "925"
+  },
+  "926": {
+    "genusZh": "小狗宝可梦",
+    "nameEn": "Fidough",
+    "nameZh": "狗仔包",
+    "slug": "926"
+  },
+  "927": {
+    "genusZh": "狗宝可梦",
+    "nameEn": "Dachsbun",
+    "nameZh": "麻花犬",
+    "slug": "927"
+  },
+  "928": {
+    "genusZh": "橄榄宝可梦",
+    "nameEn": "Smoliv",
+    "nameZh": "迷你芙",
+    "slug": "928"
+  },
+  "929": {
+    "genusZh": "橄榄宝可梦",
+    "nameEn": "Dolliv",
+    "nameZh": "奥利纽",
+    "slug": "929"
+  },
+  "93": {
+    "genusZh": "气体状宝可梦",
+    "nameEn": "Haunter",
+    "nameZh": "鬼斯通",
+    "slug": "93"
+  },
+  "930": {
+    "genusZh": "橄榄宝可梦",
+    "nameEn": "Arboliva",
+    "nameZh": "奥利瓦",
+    "slug": "930"
+  },
+  "931": {
+    "genusZh": "鹦鹉宝可梦",
+    "nameEn": "Squawkabilly",
+    "nameZh": "怒鹦哥",
+    "slug": "931"
+  },
+  "932": {
+    "genusZh": "岩盐宝可梦",
+    "nameEn": "Nacli",
+    "nameZh": "盐石宝",
+    "slug": "932"
+  },
+  "933": {
+    "genusZh": "岩盐宝可梦",
+    "nameEn": "Naclstack",
+    "nameZh": "盐石垒",
+    "slug": "933"
+  },
+  "934": {
+    "genusZh": "岩盐宝可梦",
+    "nameEn": "Garganacl",
+    "nameZh": "盐石巨灵",
+    "slug": "934"
+  },
+  "935": {
+    "genusZh": "小火星宝可梦",
+    "nameEn": "Charcadet",
+    "nameZh": "炭小侍",
+    "slug": "935"
+  },
+  "936": {
+    "genusZh": "火战士宝可梦",
+    "nameEn": "Armarouge",
+    "nameZh": "红莲铠骑",
+    "slug": "936"
+  },
+  "937": {
+    "genusZh": "火剑士宝可梦",
+    "nameEn": "Ceruledge",
+    "nameZh": "苍炎刃鬼",
+    "slug": "937"
+  },
+  "938": {
+    "genusZh": "电蝌蚪宝可梦",
+    "nameEn": "Tadbulb",
+    "nameZh": "光蚪仔",
+    "slug": "938"
+  },
+  "939": {
+    "genusZh": "电蛙宝可梦",
+    "nameEn": "Bellibolt",
+    "nameZh": "电肚蛙",
+    "slug": "939"
+  },
+  "94": {
+    "genusZh": "影子宝可梦",
+    "nameEn": "Gengar",
+    "nameZh": "耿鬼",
+    "slug": "94"
+  },
+  "940": {
+    "genusZh": "海燕宝可梦",
+    "nameEn": "Wattrel",
+    "nameZh": "电海燕",
+    "slug": "940"
+  },
+  "941": {
+    "genusZh": "军舰鸟宝可梦",
+    "nameEn": "Kilowattrel",
+    "nameZh": "大电海燕",
+    "slug": "941"
+  },
+  "942": {
+    "genusZh": "小辈宝可梦",
+    "nameEn": "Maschiff",
+    "nameZh": "偶叫獒",
+    "slug": "942"
+  },
+  "943": {
+    "genusZh": "大佬宝可梦",
+    "nameEn": "Mabosstiff",
+    "nameZh": "獒教父",
+    "slug": "943"
+  },
+  "944": {
+    "genusZh": "毒鼠宝可梦",
+    "nameEn": "Shroodle",
+    "nameZh": "滋汁鼹",
+    "slug": "944"
+  },
+  "945": {
+    "genusZh": "毒猴宝可梦",
+    "nameEn": "Grafaiai",
+    "nameZh": "涂标客",
+    "slug": "945"
+  },
+  "946": {
+    "genusZh": "滚草宝可梦",
+    "nameEn": "Bramblin",
+    "nameZh": "纳噬草",
+    "slug": "946"
+  },
+  "947": {
+    "genusZh": "滚草宝可梦",
+    "nameEn": "Brambleghast",
+    "nameZh": "怖纳噬草",
+    "slug": "947"
+  },
+  "948": {
+    "genusZh": "木耳宝可梦",
+    "nameEn": "Toedscool",
+    "nameZh": "原野水母",
+    "slug": "948"
+  },
+  "949": {
+    "genusZh": "木耳宝可梦",
+    "nameEn": "Toedscruel",
+    "nameZh": "陆地水母",
+    "slug": "949"
+  },
+  "95": {
+    "genusZh": "岩蛇宝可梦",
+    "nameEn": "Onix",
+    "nameZh": "大岩蛇",
+    "slug": "95"
+  },
+  "950": {
+    "genusZh": "埋伏宝可梦",
+    "nameEn": "Klawf",
+    "nameZh": "毛崖蟹",
+    "slug": "950"
+  },
+  "951": {
+    "genusZh": "热辣宝可梦",
+    "nameEn": "Capsakid",
+    "nameZh": "热辣娃",
+    "slug": "951"
+  },
+  "952": {
+    "genusZh": "热辣宝可梦",
+    "nameEn": "Scovillain",
+    "nameZh": "狠辣椒",
+    "slug": "952"
+  },
+  "953": {
+    "genusZh": "滚动宝可梦",
+    "nameEn": "Rellor",
+    "nameZh": "虫滚泥",
+    "slug": "953"
+  },
+  "954": {
+    "genusZh": "滚动宝可梦",
+    "nameEn": "Rabsca",
+    "nameZh": "虫甲圣",
+    "slug": "954"
+  },
+  "955": {
+    "genusZh": "褶边宝可梦",
+    "nameEn": "Flittle",
+    "nameZh": "飘飘雏",
+    "slug": "955"
+  },
+  "956": {
+    "genusZh": "鸵鸟宝可梦",
+    "nameEn": "Espathra",
+    "nameZh": "超能艳鸵",
+    "slug": "956"
+  },
+  "957": {
+    "genusZh": "锤炼宝可梦",
+    "nameEn": "Tinkatink",
+    "nameZh": "小锻匠",
+    "slug": "957"
+  },
+  "958": {
+    "genusZh": "锤子宝可梦",
+    "nameEn": "Tinkatuff",
+    "nameZh": "巧锻匠",
+    "slug": "958"
+  },
+  "959": {
+    "genusZh": "锤子宝可梦",
+    "nameEn": "Tinkaton",
+    "nameZh": "巨锻匠",
+    "slug": "959"
+  },
+  "96": {
+    "genusZh": "催眠宝可梦",
+    "nameEn": "Drowzee",
+    "nameZh": "催眠貘",
+    "slug": "96"
+  },
+  "960": {
+    "genusZh": "糯鳗宝可梦",
+    "nameEn": "Wiglett",
+    "nameZh": "海地鼠",
+    "slug": "960"
+  },
+  "961": {
+    "genusZh": "糯鳗宝可梦",
+    "nameEn": "Wugtrio",
+    "nameZh": "三海地鼠",
+    "slug": "961"
+  },
+  "962": {
+    "genusZh": "掉东西宝可梦",
+    "nameEn": "Bombirdier",
+    "nameZh": "下石鸟",
+    "slug": "962"
+  },
+  "963": {
+    "genusZh": "海豚宝可梦",
+    "nameEn": "Finizen",
+    "nameZh": "波普海豚",
+    "slug": "963"
+  },
+  "964": {
+    "genusZh": "海豚宝可梦",
+    "nameEn": "Palafin",
+    "nameZh": "海豚侠",
+    "slug": "964"
+  },
+  "965": {
+    "genusZh": "单汽缸宝可梦",
+    "nameEn": "Varoom",
+    "nameZh": "噗隆隆",
+    "slug": "965"
+  },
+  "966": {
+    "genusZh": "多汽缸宝可梦",
+    "nameEn": "Revavroom",
+    "nameZh": "普隆隆姆",
+    "slug": "966"
+  },
+  "967": {
+    "genusZh": "坐骑宝可梦",
+    "nameEn": "Cyclizar",
+    "nameZh": "摩托蜥",
+    "slug": "967"
+  },
+  "968": {
+    "genusZh": "蚯蚓宝可梦",
+    "nameEn": "Orthworm",
+    "nameZh": "拖拖蚓",
+    "slug": "968"
+  },
+  "969": {
+    "genusZh": "矿石宝可梦",
+    "nameEn": "Glimmet",
+    "nameZh": "晶光芽",
+    "slug": "969"
+  },
+  "97": {
+    "genusZh": "催眠宝可梦",
+    "nameEn": "Hypno",
+    "nameZh": "引梦貘人",
+    "slug": "97"
+  },
+  "970": {
+    "genusZh": "矿石宝可梦",
+    "nameEn": "Glimmora",
+    "nameZh": "晶光花",
+    "slug": "970"
+  },
+  "971": {
+    "genusZh": "鬼犬宝可梦",
+    "nameEn": "Greavard",
+    "nameZh": "墓仔狗",
+    "slug": "971"
+  },
+  "972": {
+    "genusZh": "鬼犬宝可梦",
+    "nameEn": "Houndstone",
+    "nameZh": "墓扬犬",
+    "slug": "972"
+  },
+  "973": {
+    "genusZh": "同步宝可梦",
+    "nameEn": "Flamigo",
+    "nameZh": "纏红鹤",
+    "slug": "973"
+  },
+  "974": {
+    "genusZh": "陆鲸宝可梦",
+    "nameEn": "Cetoddle",
+    "nameZh": "走鲸",
+    "slug": "974"
+  },
+  "975": {
+    "genusZh": "陆鲸宝可梦",
+    "nameEn": "Cetitan",
+    "nameZh": "浩大鲸",
+    "slug": "975"
+  },
+  "976": {
+    "genusZh": "卸除宝可梦",
+    "nameEn": "Veluza",
+    "nameZh": "轻身鳕",
+    "slug": "976"
+  },
+  "977": {
+    "genusZh": "大鲶宝可梦",
+    "nameEn": "Dondozo",
+    "nameZh": "吃吼霸",
+    "slug": "977"
+  },
+  "978": {
+    "genusZh": "拟态宝可梦",
+    "nameEn": "Tatsugiri",
+    "nameZh": "米立龙",
+    "slug": "978"
+  },
+  "979": {
+    "genusZh": "愤怒猴宝可梦",
+    "nameEn": "Annihilape",
+    "nameZh": "弃世猴",
+    "slug": "979"
+  },
+  "98": {
+    "genusZh": "清水蟹宝可梦",
+    "nameEn": "Krabby",
+    "nameZh": "大钳蟹",
+    "slug": "98"
+  },
+  "980": {
+    "genusZh": "刺鱼宝可梦",
+    "nameEn": "Clodsire",
+    "nameZh": "土王",
+    "slug": "980"
+  },
+  "981": {
+    "genusZh": "长颈宝可梦",
+    "nameEn": "Farigiraf",
+    "nameZh": "奇麒麟",
+    "slug": "981"
+  },
+  "982": {
+    "genusZh": "地蛇宝可梦",
+    "nameEn": "Dudunsparce",
+    "nameZh": "土龙节节",
+    "slug": "982"
+  },
+  "983": {
+    "genusZh": "大刀宝可梦",
+    "nameEn": "Kingambit",
+    "nameZh": "仆刀将军",
+    "slug": "983"
+  },
+  "984": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Great Tusk",
+    "nameZh": "雄伟牙",
+    "slug": "984"
+  },
+  "985": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Scream Tail",
+    "nameZh": "吼叫尾",
+    "slug": "985"
+  },
+  "986": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Brute Bonnet",
+    "nameZh": "猛恶菇",
+    "slug": "986"
+  },
+  "987": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Flutter Mane",
+    "nameZh": "振翼发",
+    "slug": "987"
+  },
+  "988": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Slither Wing",
+    "nameZh": "爬地翅",
+    "slug": "988"
+  },
+  "989": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Sandy Shocks",
+    "nameZh": "沙铁皮",
+    "slug": "989"
+  },
+  "99": {
+    "genusZh": "钳子宝可梦",
+    "nameEn": "Kingler",
+    "nameZh": "巨钳蟹",
+    "slug": "99"
+  },
+  "990": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Treads",
+    "nameZh": "铁轍迹",
+    "slug": "990"
+  },
+  "991": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Bundle",
+    "nameZh": "铁包袱",
+    "slug": "991"
+  },
+  "992": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Hands",
+    "nameZh": "铁臂膀",
+    "slug": "992"
+  },
+  "993": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Jugulis",
+    "nameZh": "铁脖颈",
+    "slug": "993"
+  },
+  "994": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Moth",
+    "nameZh": "铁毒蛾",
+    "slug": "994"
+  },
+  "995": {
+    "genusZh": "悖谬宝可梦",
+    "nameEn": "Iron Thorns",
+    "nameZh": "铁荆棘",
+    "slug": "995"
+  },
+  "996": {
+    "genusZh": "冰鳍宝可梦",
+    "nameEn": "Frigibax",
+    "nameZh": "凉脊龙",
+    "slug": "996"
+  },
+  "997": {
+    "genusZh": "冰鳍宝可梦",
+    "nameEn": "Arctibax",
+    "nameZh": "冻脊龙",
+    "slug": "997"
+  },
+  "998": {
+    "genusZh": "冰龙宝可梦",
+    "nameEn": "Baxcalibur",
+    "nameZh": "戟脊龙",
+    "slug": "998"
+  },
+  "999": {
+    "genusZh": "宝箱宝可梦",
+    "nameEn": "Gimmighoul",
+    "nameZh": "索财灵",
+    "slug": "999"
+  }
+}

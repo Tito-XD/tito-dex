@@ -1,0 +1,2502 @@
+{
+  "0": {
+    "code": "EVERYWHERE",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "1": {
+    "code": "NOTHING",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "10": {
+    "code": "R 02: None None-None",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "100": {
+    "code": "T 23: R 01-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "101": {
+    "code": "R 35: R 01-01",
+    "labelZh": "35号道路",
+    "nameEn": "Route 35"
+  },
+  "102": {
+    "code": "R 35: R 02-01",
+    "labelZh": "35号道路",
+    "nameEn": "Route 35"
+  },
+  "103": {
+    "code": "R 36: R 01-01",
+    "labelZh": "36号道路",
+    "nameEn": "Route 36"
+  },
+  "104": {
+    "code": "R 36: R 02-01",
+    "labelZh": "36号道路",
+    "nameEn": "Route 36"
+  },
+  "105": {
+    "code": "T 27: R 06-01",
+    "labelZh": "祝祝市",
+    "nameEn": "Jubilife City"
+  },
+  "106": {
+    "code": "D 01: R 01-01",
+    "labelZh": "地鼠洞",
+    "nameEn": "DIGLETT's Cave"
+  },
+  "107": {
+    "code": "D 02: R 01-01",
+    "labelZh": "月见山",
+    "nameEn": "Mt. Moon"
+  },
+  "108": {
+    "code": "D 05: R 01-01",
+    "labelZh": "岩山隧道",
+    "nameEn": "Rock Tunnel"
+  },
+  "109": {
+    "code": "D 10: R 01-01",
+    "labelZh": "伙伴公园",
+    "nameEn": "Pal Park"
+  },
+  "11": {
+    "code": "R 03: None None-None",
+    "labelZh": "Route 3",
+    "nameEn": "Route 3"
+  },
+  "110": {
+    "code": "D 15: R 01-01",
+    "labelZh": "喇叭芽之塔",
+    "nameEn": "Sprout Tower"
+  },
+  "111": {
+    "code": "D 17: R 01-01",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "112": {
+    "code": "D 23: R 01-01",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "113": {
+    "code": "D 24: R 01-01",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "114": {
+    "code": "D 26: R 01-01",
+    "labelZh": "SLOWPOKE Well",
+    "nameEn": "SLOWPOKE Well"
+  },
+  "115": {
+    "code": "D 27: R 01-01",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "116": {
+    "code": "D 35: R 01-01",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "117": {
+    "code": "D 36: R 01-01",
+    "labelZh": "栎树林",
+    "nameEn": "Ilex Forest"
+  },
+  "118": {
+    "code": "D 37: R 01-01",
+    "labelZh": "满金地下通道",
+    "nameEn": "Goldenrod Tunnel"
+  },
+  "119": {
+    "code": "D 38: R 01-01",
+    "labelZh": "擂钵山",
+    "nameEn": "Mt. Mortar"
+  },
+  "12": {
+    "code": "R 04: None None-None",
+    "labelZh": "Route 4",
+    "nameEn": "Route 4"
+  },
+  "120": {
+    "code": "D 39: R 01-01",
+    "labelZh": "冰雪小径",
+    "nameEn": "Ice Path"
+  },
+  "121": {
+    "code": "D 40: R 01-01",
+    "labelZh": "涡旋岛",
+    "nameEn": "Whirl Islands"
+  },
+  "122": {
+    "code": "D 41: R 01-01",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "123": {
+    "code": "D 42: R 01-01",
+    "labelZh": "黑暗洞窟",
+    "nameEn": "Dark Cave"
+  },
+  "124": {
+    "code": "D 43: R 01-01",
+    "labelZh": "冠军之路",
+    "nameEn": "Victory Road"
+  },
+  "125": {
+    "code": "D 44: R 01-01",
+    "labelZh": "龙穴",
+    "nameEn": "Dragon's Den"
+  },
+  "126": {
+    "code": "D 45: R 01-01",
+    "labelZh": "关都瀑布",
+    "nameEn": "Tohjo Falls"
+  },
+  "127": {
+    "code": "R 30: R 01-01",
+    "labelZh": "30号道路",
+    "nameEn": "Route 30"
+  },
+  "128": {
+    "code": "T 27: PC 01-02",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "129": {
+    "code": "T 27: PC 01-03",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "13": {
+    "code": "R 05: None None-None",
+    "labelZh": "5号道路",
+    "nameEn": "Route 5"
+  },
+  "130": {
+    "code": "T 27: PC 01-04",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "131": {
+    "code": "T 27: PC 01-05",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "132": {
+    "code": "R 42: R 01-01",
+    "labelZh": "42号道路",
+    "nameEn": "Route 42"
+  },
+  "133": {
+    "code": "T 28: R 02-01",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "134": {
+    "code": "R 29: R 01-01",
+    "labelZh": "29号道路",
+    "nameEn": "Route 29"
+  },
+  "135": {
+    "code": "T 22: GYM 01-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "136": {
+    "code": "T 23: GYM 01-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "137": {
+    "code": "T 25: GYM 01-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "138": {
+    "code": "T 26: GYM 01-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "139": {
+    "code": "T 24: GYM 01-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "14": {
+    "code": "R 06: None None-None",
+    "labelZh": "6号道路",
+    "nameEn": "Route 6"
+  },
+  "140": {
+    "code": "T 28: GYM 01-01",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "141": {
+    "code": "T 30: GYM 01-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "142": {
+    "code": "R 43: R 01-01",
+    "labelZh": "43号道路",
+    "nameEn": "Route 43"
+  },
+  "143": {
+    "code": "R 30: R 02-01",
+    "labelZh": "30号道路",
+    "nameEn": "Route 30"
+  },
+  "144": {
+    "code": "T 21: PC 01-02",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "145": {
+    "code": "D 03: R 01-01",
+    "labelZh": "华蓝洞窟",
+    "nameEn": "Cerulean Cave"
+  },
+  "146": {
+    "code": "D 11: R 01-01",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "147": {
+    "code": "D 46: R 01-01",
+    "labelZh": "常磐森林",
+    "nameEn": "Viridian Forest"
+  },
+  "148": {
+    "code": "R 09: R 01-01",
+    "labelZh": "无人发电厂",
+    "nameEn": "Power Plant"
+  },
+  "149": {
+    "code": "T 22: R 07-01",
+    "labelZh": "36号道路",
+    "nameEn": "Route 36"
+  },
+  "15": {
+    "code": "R 07: None None-None",
+    "labelZh": "7号道路",
+    "nameEn": "Route 7"
+  },
+  "150": {
+    "code": "D 22: R 02-01",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "151": {
+    "code": "R 47: None None-None",
+    "labelZh": "47号道路",
+    "nameEn": "Route 47"
+  },
+  "152": {
+    "code": "R 48: None None-None",
+    "labelZh": "48号道路",
+    "nameEn": "Route 48"
+  },
+  "153": {
+    "code": "D 25: R 01-02",
+    "labelZh": "连接洞窟",
+    "nameEn": "Union Cave"
+  },
+  "154": {
+    "code": "D 25: R 01-03",
+    "labelZh": "连接洞窟",
+    "nameEn": "Union Cave"
+  },
+  "155": {
+    "code": "D 15: R 01-02",
+    "labelZh": "喇叭芽之塔",
+    "nameEn": "Sprout Tower"
+  },
+  "156": {
+    "code": "D 15: R 01-03",
+    "labelZh": "喇叭芽之塔",
+    "nameEn": "Sprout Tower"
+  },
+  "157": {
+    "code": "T 22: FS 01-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "158": {
+    "code": "T 22: PC 01-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "159": {
+    "code": "T 22: R 03-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "16": {
+    "code": "R 08: None None-None",
+    "labelZh": "8号道路",
+    "nameEn": "Route 8"
+  },
+  "160": {
+    "code": "T 22: R 04-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "161": {
+    "code": "T 22: R 05-01",
+    "labelZh": "祝祝市",
+    "nameEn": "Jubilife City"
+  },
+  "162": {
+    "code": "T 22: R 06-01",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "163": {
+    "code": "T 23: R 02-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "164": {
+    "code": "T 23: R 05-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "165": {
+    "code": "T 23: FS 01-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "166": {
+    "code": "T 23: PC 01-01",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "167": {
+    "code": "T 22: PC 01-02",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "168": {
+    "code": "T 23: PC 01-02",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "169": {
+    "code": "R 32: PC 01-01",
+    "labelZh": "32号道路",
+    "nameEn": "Route 32"
+  },
+  "17": {
+    "code": "R 09: None None-None",
+    "labelZh": "9号道路",
+    "nameEn": "Route 9"
+  },
+  "170": {
+    "code": "R 32: PC 01-02",
+    "labelZh": "32号道路",
+    "nameEn": "Route 32"
+  },
+  "171": {
+    "code": "R 34: R 02-01",
+    "labelZh": "34号道路",
+    "nameEn": "Route 34"
+  },
+  "172": {
+    "code": "R 38: R 01-01",
+    "labelZh": "38号道路",
+    "nameEn": "Route 38"
+  },
+  "173": {
+    "code": "D 47: R 01-01",
+    "labelZh": "狩猎地带入口",
+    "nameEn": "Safari Zone Gate"
+  },
+  "174": {
+    "code": "D 47: None None-None",
+    "labelZh": "狩猎地带入口",
+    "nameEn": "Safari Zone Gate"
+  },
+  "175": {
+    "code": "T 27: R 03-01",
+    "labelZh": "祝祝市",
+    "nameEn": "Jubilife City"
+  },
+  "176": {
+    "code": "D 42: R 01-02",
+    "labelZh": "黑暗洞窟",
+    "nameEn": "Dark Cave"
+  },
+  "177": {
+    "code": "D 26: R 01-02",
+    "labelZh": "SLOWPOKE Well",
+    "nameEn": "SLOWPOKE Well"
+  },
+  "178": {
+    "code": "D 43: R 01-02",
+    "labelZh": "冠军之路",
+    "nameEn": "Victory Road"
+  },
+  "179": {
+    "code": "D 43: R 01-03",
+    "labelZh": "冠军之路",
+    "nameEn": "Victory Road"
+  },
+  "18": {
+    "code": "R 10: None None-None",
+    "labelZh": "10号道路",
+    "nameEn": "Route 10"
+  },
+  "180": {
+    "code": "T 23: GYM 01-02",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "181": {
+    "code": "D 26: R 01-03",
+    "labelZh": "SLOWPOKE Well",
+    "nameEn": "SLOWPOKE Well"
+  },
+  "182": {
+    "code": "T 25: R 02-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "183": {
+    "code": "T 25: R 11-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "184": {
+    "code": "T 25: R 06-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "185": {
+    "code": "T 25: PC 01-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "186": {
+    "code": "D 23: R 01-02",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "187": {
+    "code": "D 23: R 01-03",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "188": {
+    "code": "D 23: R 01-04",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "189": {
+    "code": "D 23: R 01-05",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "19": {
+    "code": "R 11: None None-None",
+    "labelZh": "11号道路",
+    "nameEn": "Route 11"
+  },
+  "190": {
+    "code": "D 23: R 01-06",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "191": {
+    "code": "T 25: R 10-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "192": {
+    "code": "T 25: R 10-02",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "193": {
+    "code": "T 25: R 10-03",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "194": {
+    "code": "T 25: R 10-04",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "195": {
+    "code": "T 25: R 10-05",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "196": {
+    "code": "T 25: R 10-06",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "197": {
+    "code": "T 25: R 05-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "198": {
+    "code": "T 25: R 05-02",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "199": {
+    "code": "D 37: R 01-02",
+    "labelZh": "满金地下通道",
+    "nameEn": "Goldenrod Tunnel"
+  },
+  "2": {
+    "code": "UNION",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "20": {
+    "code": "R 12: None None-None",
+    "labelZh": "12号道路",
+    "nameEn": "Route 12"
+  },
+  "200": {
+    "code": "D 37: R 01-03",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "201": {
+    "code": "D 37: R 01-04",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "202": {
+    "code": "D 37: R 01-05",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "203": {
+    "code": "T 25: R 04-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "204": {
+    "code": "T 25: R 03-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "205": {
+    "code": "T 25: R 08-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "206": {
+    "code": "T 25: R 09-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "207": {
+    "code": "T 25: R 12-01",
+    "labelZh": "全球终端",
+    "nameEn": "Global Terminal"
+  },
+  "208": {
+    "code": "T 25: R 13-01",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "209": {
+    "code": "T 25: R 13-02",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "21": {
+    "code": "R 13: None None-None",
+    "labelZh": "13号道路",
+    "nameEn": "Route 13"
+  },
+  "210": {
+    "code": "T 25: R 13-03",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "211": {
+    "code": "T 25: R 13-04",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "212": {
+    "code": "T 25: R 13-05",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "213": {
+    "code": "T 25: R 13-06",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "214": {
+    "code": "R 39: R 01-01",
+    "labelZh": "39号道路",
+    "nameEn": "Route 39"
+  },
+  "215": {
+    "code": "R 39: R 02-01",
+    "labelZh": "39号道路",
+    "nameEn": "Route 39"
+  },
+  "216": {
+    "code": "T 27: R 02-02",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "217": {
+    "code": "D 18: R 01-02",
+    "labelZh": "烧焦塔",
+    "nameEn": "Burned Tower"
+  },
+  "218": {
+    "code": "D 24: R 02-01",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "219": {
+    "code": "T 25: PC 01-02",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "22": {
+    "code": "R 14: None None-None",
+    "labelZh": "14号道路",
+    "nameEn": "Route 14"
+  },
+  "220": {
+    "code": "D 27: R 01-02",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "221": {
+    "code": "D 27: R 01-03",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "222": {
+    "code": "D 27: R 01-04",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "223": {
+    "code": "D 27: R 01-05",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "224": {
+    "code": "D 27: R 01-06",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "225": {
+    "code": "D 27: R 01-07",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "226": {
+    "code": "T 26: PC 01-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "227": {
+    "code": "T 26: FS 01-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "228": {
+    "code": "T 26: R 03-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "229": {
+    "code": "T 26: R 05-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "23": {
+    "code": "R 15: None None-None",
+    "labelZh": "15号道路",
+    "nameEn": "Route 15"
+  },
+  "230": {
+    "code": "T 26: R 06-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "231": {
+    "code": "T 26: R 07-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "232": {
+    "code": "T 24: R 02-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "233": {
+    "code": "T 24: R 05-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "234": {
+    "code": "T 24: R 06-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "235": {
+    "code": "T 24: R 07-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "236": {
+    "code": "T 24: PC 01-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "237": {
+    "code": "D 39: R 01-02",
+    "labelZh": "冰雪小径",
+    "nameEn": "Ice Path"
+  },
+  "238": {
+    "code": "D 39: R 01-03",
+    "labelZh": "冰雪小径",
+    "nameEn": "Ice Path"
+  },
+  "239": {
+    "code": "D 39: R 01-04",
+    "labelZh": "冰雪小径",
+    "nameEn": "Ice Path"
+  },
+  "24": {
+    "code": "R 16: None None-None",
+    "labelZh": "16号道路",
+    "nameEn": "Route 16"
+  },
+  "240": {
+    "code": "P 01: R 01-01",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "241": {
+    "code": "T 24: PC 01-02",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "242": {
+    "code": "D 40: R 01-02",
+    "labelZh": "涡旋岛",
+    "nameEn": "Whirl Islands"
+  },
+  "243": {
+    "code": "D 40: R 01-04",
+    "labelZh": "涡旋岛",
+    "nameEn": "Whirl Islands"
+  },
+  "244": {
+    "code": "D 40: R 01-07",
+    "labelZh": "涡旋岛",
+    "nameEn": "Whirl Islands"
+  },
+  "245": {
+    "code": "R 43: R 02-01",
+    "labelZh": "43号道路",
+    "nameEn": "Route 43"
+  },
+  "246": {
+    "code": "T 28: PC 01-01",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "247": {
+    "code": "D 35: R 01-02",
+    "labelZh": "火箭队基地",
+    "nameEn": "Team Rocket HQ"
+  },
+  "248": {
+    "code": "D 35: R 01-03",
+    "labelZh": "火箭队基地",
+    "nameEn": "Team Rocket HQ"
+  },
+  "249": {
+    "code": "D 35: R 01-04",
+    "labelZh": "火箭队基地",
+    "nameEn": "Team Rocket HQ"
+  },
+  "25": {
+    "code": "R 17: None None-None",
+    "labelZh": "17号道路",
+    "nameEn": "Route 17"
+  },
+  "250": {
+    "code": "D 38: R 01-02",
+    "labelZh": "擂钵山",
+    "nameEn": "Mt. Mortar"
+  },
+  "251": {
+    "code": "D 38: R 01-03",
+    "labelZh": "擂钵山",
+    "nameEn": "Mt. Mortar"
+  },
+  "252": {
+    "code": "D 38: R 01-04",
+    "labelZh": "擂钵山",
+    "nameEn": "Mt. Mortar"
+  },
+  "253": {
+    "code": "D 44: R 01-02",
+    "labelZh": "龙穴",
+    "nameEn": "Dragon's Den"
+  },
+  "254": {
+    "code": "C 11: None None-None",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "255": {
+    "code": "C 11: PC 01-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "256": {
+    "code": "C 11: PC 01-02",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "257": {
+    "code": "C 11: FS 01-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "258": {
+    "code": "C 11: R 01-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "259": {
+    "code": "C 11: R 02-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "26": {
+    "code": "R 18: None None-None",
+    "labelZh": "18号道路",
+    "nameEn": "Route 18"
+  },
+  "260": {
+    "code": "C 11: R 03-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "261": {
+    "code": "C 11: R 04-01",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "262": {
+    "code": "C 11: PC 01-03",
+    "labelZh": "战斗区",
+    "nameEn": "Fight Area"
+  },
+  "263": {
+    "code": "D 31: None None-None",
+    "labelZh": "对战公园",
+    "nameEn": "Battle Park"
+  },
+  "264": {
+    "code": "D 31: R 01-01",
+    "labelZh": "对战公园",
+    "nameEn": "Battle Park"
+  },
+  "265": {
+    "code": "D 31: R 02-01",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "266": {
+    "code": "D 31: R 02-02",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "267": {
+    "code": "D 31: R 02-03",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "268": {
+    "code": "D 31: R 02-04",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "269": {
+    "code": "D 31: R 02-05",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "27": {
+    "code": "R 22: None None-None",
+    "labelZh": "22号道路",
+    "nameEn": "Route 22"
+  },
+  "270": {
+    "code": "D 31: R 02-06",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "271": {
+    "code": "D 31: R 02-07",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "272": {
+    "code": "D 32: None None-None",
+    "labelZh": "对战开拓区",
+    "nameEn": "Battle Frontier"
+  },
+  "273": {
+    "code": "D 32: R 01-01",
+    "labelZh": "对战开拓区",
+    "nameEn": "Battle Frontier"
+  },
+  "274": {
+    "code": "D 32: R 02-01",
+    "labelZh": "对战塔",
+    "nameEn": "Battle Tower"
+  },
+  "275": {
+    "code": "D 32: R 03-01",
+    "labelZh": "对战工厂",
+    "nameEn": "Battle Factory"
+  },
+  "276": {
+    "code": "D 32: R 04-01",
+    "labelZh": "对战大厅",
+    "nameEn": "Battle Hall"
+  },
+  "277": {
+    "code": "D 32: R 05-01",
+    "labelZh": "对战城堡",
+    "nameEn": "Battle Castle"
+  },
+  "278": {
+    "code": "D 32: R 06-01",
+    "labelZh": "对战轮盘",
+    "nameEn": "Battle Arcade"
+  },
+  "279": {
+    "code": "D 48: R 01-01",
+    "labelZh": "断崖门",
+    "nameEn": "Cliff Edge Gate"
+  },
+  "28": {
+    "code": "R 24: None None-None",
+    "labelZh": "24号道路",
+    "nameEn": "Route 24"
+  },
+  "280": {
+    "code": "D 49: None None-None",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "281": {
+    "code": "D 49: R 01-01",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "282": {
+    "code": "D 49: R 01-02",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "283": {
+    "code": "D 49: R 01-03",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "284": {
+    "code": "D 49: R 01-04",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "285": {
+    "code": "D 49: R 01-05",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "286": {
+    "code": "D 49: R 01-06",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "287": {
+    "code": "D 49: R 01-07",
+    "labelZh": "Pok\\xe9athlon Dome",
+    "nameEn": "Pok\\xe9athlon Dome"
+  },
+  "288": {
+    "code": "D 44: R 01-03",
+    "labelZh": "龙穴",
+    "nameEn": "Dragon's Den"
+  },
+  "289": {
+    "code": "T 30: R 02-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "29": {
+    "code": "R 25: None None-None",
+    "labelZh": "25号道路",
+    "nameEn": "Route 25"
+  },
+  "290": {
+    "code": "T 30: R 03-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "291": {
+    "code": "T 30: R 06-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "292": {
+    "code": "T 30: FS 01-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "293": {
+    "code": "T 30: PC 01-01",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "294": {
+    "code": "T 29: R 01-01",
+    "labelZh": "愤怒之湖",
+    "nameEn": "Lake of Rage"
+  },
+  "295": {
+    "code": "T 29: R 02-01",
+    "labelZh": "愤怒之湖",
+    "nameEn": "Lake of Rage"
+  },
+  "296": {
+    "code": "R 26: R 01-01",
+    "labelZh": "26号道路",
+    "nameEn": "Route 26"
+  },
+  "297": {
+    "code": "R 26: R 02-01",
+    "labelZh": "26号道路",
+    "nameEn": "Route 26"
+  },
+  "298": {
+    "code": "D 45: R 01-02",
+    "labelZh": "关都瀑布",
+    "nameEn": "Tohjo Falls"
+  },
+  "299": {
+    "code": "R 22: R 01-01",
+    "labelZh": "26号道路",
+    "nameEn": "Route 26"
+  },
+  "3": {
+    "code": "UG",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "30": {
+    "code": "R 26: None None-None",
+    "labelZh": "26号道路",
+    "nameEn": "Route 26"
+  },
+  "300": {
+    "code": "T 10: R 01-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "301": {
+    "code": "T 10: R 02-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "302": {
+    "code": "T 10: R 03-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "303": {
+    "code": "T 10: R 04-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "304": {
+    "code": "T 10: R 05-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "305": {
+    "code": "T 10: R 06-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "306": {
+    "code": "T 10: R 07-01",
+    "labelZh": "Pok\\xe9mon League",
+    "nameEn": "Pok\\xe9mon League"
+  },
+  "307": {
+    "code": "P 01: R 03-01",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "308": {
+    "code": "P 01: R 03-02",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "309": {
+    "code": "P 01: R 03-03",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "31": {
+    "code": "R 27: None None-None",
+    "labelZh": "27号道路",
+    "nameEn": "Route 27"
+  },
+  "310": {
+    "code": "P 01: R 03-04",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "311": {
+    "code": "P 01: R 03-05",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "312": {
+    "code": "D 24: R 02-02",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "313": {
+    "code": "D 24: R 02-03",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "314": {
+    "code": "D 24: R 02-04",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "315": {
+    "code": "D 24: R 02-05",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "316": {
+    "code": "D 24: R 02-06",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "317": {
+    "code": "D 24: R 02-07",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "318": {
+    "code": "D 24: R 02-08",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "319": {
+    "code": "D 24: R 02-09",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "32": {
+    "code": "R 28: None None-None",
+    "labelZh": "28号道路",
+    "nameEn": "Route 28"
+  },
+  "320": {
+    "code": "D 24: R 02-10",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "321": {
+    "code": "D 24: R 01-02",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "322": {
+    "code": "R 27: R 01-01",
+    "labelZh": "27号道路",
+    "nameEn": "Route 27"
+  },
+  "323": {
+    "code": "D 24: R 02-11",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "324": {
+    "code": "D 24: R 02-12",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "325": {
+    "code": "D 24: R 02-13",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "326": {
+    "code": "D 24: R 02-14",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "327": {
+    "code": "D 24: R 02-15",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "328": {
+    "code": "P 01: R 03-06",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "329": {
+    "code": "P 01: R 03-07",
+    "labelZh": "S.S. Aqua",
+    "nameEn": "S.S. Aqua"
+  },
+  "33": {
+    "code": "R 29: None None-None",
+    "labelZh": "29号道路",
+    "nameEn": "Route 29"
+  },
+  "330": {
+    "code": "P 01: R 01-02",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "331": {
+    "code": "R 34: R 01-01",
+    "labelZh": "34号道路",
+    "nameEn": "Route 34"
+  },
+  "332": {
+    "code": "D 17: R 01-02",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "333": {
+    "code": "D 17: R 01-03",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "334": {
+    "code": "D 17: R 01-04",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "335": {
+    "code": "D 17: R 01-05",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "336": {
+    "code": "D 17: R 01-06",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "337": {
+    "code": "D 17: R 01-07",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "338": {
+    "code": "D 17: R 01-08",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "339": {
+    "code": "D 17: R 01-09",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "34": {
+    "code": "R 30: None None-None",
+    "labelZh": "30号道路",
+    "nameEn": "Route 30"
+  },
+  "340": {
+    "code": "D 17: R 01-10",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "341": {
+    "code": "D 17: R 01-12",
+    "labelZh": "铃铛塔",
+    "nameEn": "Bell Tower"
+  },
+  "342": {
+    "code": "D 50: R 01-01",
+    "labelZh": "断崖洞窟",
+    "nameEn": "Cliff Cave"
+  },
+  "343": {
+    "code": "SAF01",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "344": {
+    "code": "SAF02",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "345": {
+    "code": "SAF03",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "346": {
+    "code": "SAF04",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "347": {
+    "code": "SAF05",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "348": {
+    "code": "SAF06",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "349": {
+    "code": "SAF07",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "35": {
+    "code": "R 31: None None-None",
+    "labelZh": "31号道路",
+    "nameEn": "Route 31"
+  },
+  "350": {
+    "code": "SAF08",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "351": {
+    "code": "SAF09",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "352": {
+    "code": "SAF10",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "353": {
+    "code": "SAF11",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "354": {
+    "code": "SAF12",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "355": {
+    "code": "SAF13",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "356": {
+    "code": "SAF14",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "357": {
+    "code": "D 47: R 01-02",
+    "labelZh": "狩猎地带",
+    "nameEn": "Safari Zone"
+  },
+  "358": {
+    "code": "T 06: PC 01-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "359": {
+    "code": "T 06: PC 01-02",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "36": {
+    "code": "R 32: None None-None",
+    "labelZh": "32号道路",
+    "nameEn": "Route 32"
+  },
+  "360": {
+    "code": "T 06: FS 01-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "361": {
+    "code": "T 06: R 01-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "362": {
+    "code": "T 06: R 03-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "363": {
+    "code": "T 06: R 04-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "364": {
+    "code": "T 06: R 06-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "365": {
+    "code": "T 06: GYM 01-01",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "366": {
+    "code": "W 40: R 01-01",
+    "labelZh": "40号道路",
+    "nameEn": "Route 40"
+  },
+  "367": {
+    "code": "T 26: PC 01-02",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "368": {
+    "code": "T 28: PC 01-02",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "369": {
+    "code": "T 30: PC 01-02",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "37": {
+    "code": "R 33: None None-None",
+    "labelZh": "33号道路",
+    "nameEn": "Route 33"
+  },
+  "370": {
+    "code": "T 07: R 01-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "371": {
+    "code": "T 07: R 01-02",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "372": {
+    "code": "T 07: R 01-03",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "373": {
+    "code": "T 07: R 01-04",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "374": {
+    "code": "T 07: R 01-05",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "375": {
+    "code": "T 07: R 01-06",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "376": {
+    "code": "T 07: R 02-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "377": {
+    "code": "T 07: R 02-02",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "378": {
+    "code": "T 07: R 02-03",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "379": {
+    "code": "T 07: R 02-04",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "38": {
+    "code": "R 34: None None-None",
+    "labelZh": "34号道路",
+    "nameEn": "Route 34"
+  },
+  "380": {
+    "code": "T 07: R 02-05",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "381": {
+    "code": "T 07: R 04-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "382": {
+    "code": "T 07: R 05-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "383": {
+    "code": "T 07: R 07-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "384": {
+    "code": "T 20: R 04-02",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "385": {
+    "code": "T 24: R 08-01",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "386": {
+    "code": "P 01: R 01-03",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "387": {
+    "code": "P 01: R 01-04",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "388": {
+    "code": "R 10: R 01-01",
+    "labelZh": "10号道路",
+    "nameEn": "Route 10"
+  },
+  "389": {
+    "code": "R 06: R 02-01",
+    "labelZh": "6号道路",
+    "nameEn": "Route 6"
+  },
+  "39": {
+    "code": "R 35: None None-None",
+    "labelZh": "35号道路",
+    "nameEn": "Route 35"
+  },
+  "390": {
+    "code": "R 08: R 02-01",
+    "labelZh": "8号道路",
+    "nameEn": "Route 8"
+  },
+  "391": {
+    "code": "R 05: R 03-01",
+    "labelZh": "5号道路",
+    "nameEn": "Route 5"
+  },
+  "392": {
+    "code": "R 15: R 01-01",
+    "labelZh": "15号道路",
+    "nameEn": "Route 15"
+  },
+  "393": {
+    "code": "T 07: PC 01-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "394": {
+    "code": "T 07: PC 01-02",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "395": {
+    "code": "T 07: GYM 01-01",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "396": {
+    "code": "T 28: GYM 01-02",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "397": {
+    "code": "T 28: GYM 01-03",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "398": {
+    "code": "T 11: R 01-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "399": {
+    "code": "T 11: R 05-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "4": {
+    "code": "DIRECT2",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "40": {
+    "code": "R 36: None None-None",
+    "labelZh": "36号道路",
+    "nameEn": "Route 36"
+  },
+  "400": {
+    "code": "T 11: R 06-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "401": {
+    "code": "T 11: R 06-02",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "402": {
+    "code": "T 11: R 07-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "403": {
+    "code": "T 11: R 07-02",
+    "labelZh": "ROTOM's Room",
+    "nameEn": "ROTOM's Room"
+  },
+  "404": {
+    "code": "T 11: R 08-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "405": {
+    "code": "T 11: R 08-02",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "406": {
+    "code": "T 11: R 09-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "407": {
+    "code": "T 11: PC 01-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "408": {
+    "code": "T 11: PC 01-02",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "409": {
+    "code": "T 11: FS 01-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "41": {
+    "code": "R 37: None None-None",
+    "labelZh": "37号道路",
+    "nameEn": "Route 37"
+  },
+  "410": {
+    "code": "T 11: GYM 01-01",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "411": {
+    "code": "D 32: R 01-02",
+    "labelZh": "开拓区入口",
+    "nameEn": "Frontier Access"
+  },
+  "412": {
+    "code": "T 25: R 12-02",
+    "labelZh": "全球终端",
+    "nameEn": "Global Terminal"
+  },
+  "413": {
+    "code": "T 25: R 12-03",
+    "labelZh": "全球终端",
+    "nameEn": "Global Terminal"
+  },
+  "414": {
+    "code": "R 02: R 01-01",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "415": {
+    "code": "R 16: R 01-01",
+    "labelZh": "16号道路",
+    "nameEn": "Route 16"
+  },
+  "416": {
+    "code": "W 20: R 01-01",
+    "labelZh": "20号道路",
+    "nameEn": "Route 20"
+  },
+  "417": {
+    "code": "R 02: R 02-01",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "418": {
+    "code": "R 02: R 03-01",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "419": {
+    "code": "R 02: R 04-01",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "42": {
+    "code": "R 38: None None-None",
+    "labelZh": "38号道路",
+    "nameEn": "Route 38"
+  },
+  "420": {
+    "code": "R 02: R 05-01",
+    "labelZh": "Route 2",
+    "nameEn": "Route 2"
+  },
+  "421": {
+    "code": "R 16: R 02-01",
+    "labelZh": "16号道路",
+    "nameEn": "Route 16"
+  },
+  "422": {
+    "code": "R 16: R 03-01",
+    "labelZh": "16号道路",
+    "nameEn": "Route 16"
+  },
+  "423": {
+    "code": "R 18: R 01-01",
+    "labelZh": "18号道路",
+    "nameEn": "Route 18"
+  },
+  "424": {
+    "code": "W 19: R 01-01",
+    "labelZh": "19号道路",
+    "nameEn": "Route 19"
+  },
+  "425": {
+    "code": "R 11: R 01-01",
+    "labelZh": "11号道路",
+    "nameEn": "Route 11"
+  },
+  "426": {
+    "code": "T 04: FS 01-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "427": {
+    "code": "T 04: GYM 01-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "428": {
+    "code": "T 04: PC 01-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "429": {
+    "code": "T 04: R 01-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "43": {
+    "code": "R 39: None None-None",
+    "labelZh": "39号道路",
+    "nameEn": "Route 39"
+  },
+  "430": {
+    "code": "T 04: R 02-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "431": {
+    "code": "T 04: R 03-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "432": {
+    "code": "T 04: R 04-01",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "433": {
+    "code": "T 05: FS 01-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "434": {
+    "code": "T 05: PC 01-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "435": {
+    "code": "T 05: R 02-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "436": {
+    "code": "T 05: R 03-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "437": {
+    "code": "T 05: R 04-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "438": {
+    "code": "T 05: R 06-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "439": {
+    "code": "T 05: R 07-01",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "44": {
+    "code": "R 42: None None-None",
+    "labelZh": "42号道路",
+    "nameEn": "Route 42"
+  },
+  "440": {
+    "code": "R 25: R 01-01",
+    "labelZh": "25号道路",
+    "nameEn": "Route 25"
+  },
+  "441": {
+    "code": "T 25: R 10-07",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "442": {
+    "code": "T 07: R 01-07",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "443": {
+    "code": "T 07: R 02-06",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "444": {
+    "code": "T 07: R 02-07",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "445": {
+    "code": "T 11: R 07-03",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "446": {
+    "code": "D 27: R 01-08",
+    "labelZh": "灯塔",
+    "nameEn": "Lighthouse"
+  },
+  "447": {
+    "code": "D 23: R 01-07",
+    "labelZh": "广播塔",
+    "nameEn": "Radio Tower"
+  },
+  "448": {
+    "code": "D 02: R 01-02",
+    "labelZh": "月见山",
+    "nameEn": "Mt. Moon"
+  },
+  "449": {
+    "code": "D 02: R 01-03",
+    "labelZh": "月见山",
+    "nameEn": "Mt. Moon"
+  },
+  "45": {
+    "code": "R 43: None None-None",
+    "labelZh": "43号道路",
+    "nameEn": "Route 43"
+  },
+  "450": {
+    "code": "D 03: R 01-02",
+    "labelZh": "华蓝洞窟",
+    "nameEn": "Cerulean Cave"
+  },
+  "451": {
+    "code": "D 03: R 01-03",
+    "labelZh": "华蓝洞窟",
+    "nameEn": "Cerulean Cave"
+  },
+  "452": {
+    "code": "D 05: R 01-02",
+    "labelZh": "岩山隧道",
+    "nameEn": "Rock Tunnel"
+  },
+  "453": {
+    "code": "D 11: R 01-02",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "454": {
+    "code": "D 11: R 01-03",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "455": {
+    "code": "D 11: R 01-04",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "456": {
+    "code": "D 11: R 01-05",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "457": {
+    "code": "D 11: R 01-06",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "458": {
+    "code": "D 11: R 01-07",
+    "labelZh": "双子岛",
+    "nameEn": "Seafoam Islands"
+  },
+  "459": {
+    "code": "D 41: R 01-02",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "46": {
+    "code": "R 44: None None-None",
+    "labelZh": "44号道路",
+    "nameEn": "Route 44"
+  },
+  "460": {
+    "code": "D 41: R 01-03",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "461": {
+    "code": "D 41: R 01-04",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "462": {
+    "code": "D 41: R 01-05",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "463": {
+    "code": "D 41: R 01-06",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "464": {
+    "code": "D 41: R 01-07",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "465": {
+    "code": "D 41: R 01-08",
+    "labelZh": "Mt. Silver Cave",
+    "nameEn": "Mt. Silver Cave"
+  },
+  "466": {
+    "code": "R 10: PC 01-01",
+    "labelZh": "10号道路",
+    "nameEn": "Route 10"
+  },
+  "467": {
+    "code": "R 10: R 02-01",
+    "labelZh": "无人发电厂",
+    "nameEn": "Power Plant"
+  },
+  "468": {
+    "code": "R 05: R 01-01",
+    "labelZh": "5号道路",
+    "nameEn": "Route 5"
+  },
+  "469": {
+    "code": "R 05: R 02-01",
+    "labelZh": "5号道路",
+    "nameEn": "Route 5"
+  },
+  "47": {
+    "code": "R 45: None None-None",
+    "labelZh": "45号道路",
+    "nameEn": "Route 45"
+  },
+  "470": {
+    "code": "R 06: R 01-01",
+    "labelZh": "6号道路",
+    "nameEn": "Route 6"
+  },
+  "471": {
+    "code": "T 03: R 01-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "472": {
+    "code": "T 03: R 02-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "473": {
+    "code": "T 03: GYM 01-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "474": {
+    "code": "T 03: FS 01-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "475": {
+    "code": "T 03: PC 01-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "476": {
+    "code": "T 03: PC 01-02",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "477": {
+    "code": "T 03: R 06-01",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "478": {
+    "code": "T 08: FS 01-01",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "479": {
+    "code": "T 08: R 02-01",
+    "labelZh": "伙伴公园",
+    "nameEn": "Pal Park"
+  },
+  "48": {
+    "code": "R 46: None None-None",
+    "labelZh": "46号道路",
+    "nameEn": "Route 46"
+  },
+  "480": {
+    "code": "T 08: GYM 01-01",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "481": {
+    "code": "T 08: R 04-01",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "482": {
+    "code": "T 08: PC 01-01",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "483": {
+    "code": "T 08: R 06-01",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "484": {
+    "code": "R 10: PC 01-02",
+    "labelZh": "10号道路",
+    "nameEn": "Route 10"
+  },
+  "485": {
+    "code": "T 08: PC 01-02",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "486": {
+    "code": "D 40: R 01-06",
+    "labelZh": "涡旋岛",
+    "nameEn": "Whirl Islands"
+  },
+  "487": {
+    "code": "D 22: R 01-02",
+    "labelZh": "自然公园",
+    "nameEn": "National Park"
+  },
+  "488": {
+    "code": "D 22: R 01-03",
+    "labelZh": "自然公园",
+    "nameEn": "National Park"
+  },
+  "489": {
+    "code": "R 10: R 02-02",
+    "labelZh": "无人发电厂",
+    "nameEn": "Power Plant"
+  },
+  "49": {
+    "code": "T 01: None None-None",
+    "labelZh": "真新镇",
+    "nameEn": "Pallet Town"
+  },
+  "490": {
+    "code": "D 24: R 02-16",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "491": {
+    "code": "D 24: R 02-17",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "492": {
+    "code": "D 24: R 02-18",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "493": {
+    "code": "R 07: R 01-01",
+    "labelZh": "7号道路",
+    "nameEn": "Route 7"
+  },
+  "494": {
+    "code": "T 05: PC 01-02",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "495": {
+    "code": "T 04: PC 01-02",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "496": {
+    "code": "T 02: GYM 01-01",
+    "labelZh": "常磐市",
+    "nameEn": "Viridian City"
+  },
+  "497": {
+    "code": "T 02: R 02-01",
+    "labelZh": "常磐市",
+    "nameEn": "Viridian City"
+  },
+  "498": {
+    "code": "T 02: R 03-01",
+    "labelZh": "常磐市",
+    "nameEn": "Viridian City"
+  },
+  "499": {
+    "code": "T 02: R 03-02",
+    "labelZh": "常磐市",
+    "nameEn": "Viridian City"
+  },
+  "5": {
+    "code": "DIRECT4",
+    "labelZh": "神秘区域",
+    "nameEn": "Mystery Zone"
+  },
+  "50": {
+    "code": "T 02: None None-None",
+    "labelZh": "常磐市",
+    "nameEn": "Viridian City"
+  },
+  "51": {
+    "code": "T 03: None None-None",
+    "labelZh": "尼比市",
+    "nameEn": "Pewter City"
+  },
+  "52": {
+    "code": "T 04: None None-None",
+    "labelZh": "华蓝市",
+    "nameEn": "Cerulean City"
+  },
+  "53": {
+    "code": "T 05: None None-None",
+    "labelZh": "紫苑镇",
+    "nameEn": "Lavender Town"
+  },
+  "54": {
+    "code": "T 06: None None-None",
+    "labelZh": "枯叶市",
+    "nameEn": "Vermilion City"
+  },
+  "55": {
+    "code": "T 07: None None-None",
+    "labelZh": "彩虹市",
+    "nameEn": "Celadon City"
+  },
+  "56": {
+    "code": "T 08: None None-None",
+    "labelZh": "浅红市",
+    "nameEn": "Fuchsia City"
+  },
+  "57": {
+    "code": "T 09: None None-None",
+    "labelZh": "红莲镇",
+    "nameEn": "Cinnabar Island"
+  },
+  "58": {
+    "code": "T 10: None None-None",
+    "labelZh": "石英联盟",
+    "nameEn": "Indigo Plateau"
+  },
+  "59": {
+    "code": "T 11: None None-None",
+    "labelZh": "金黄市",
+    "nameEn": "Saffron City"
+  },
+  "6": {
+    "code": "D 17: R 11-01",
+    "labelZh": "铃铛小径",
+    "nameEn": "Bellchime Trail"
+  },
+  "60": {
+    "code": "T 20: None None-None",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "61": {
+    "code": "T 20: R 01-01",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "62": {
+    "code": "T 20: R 01-02",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "63": {
+    "code": "T 20: R 02-01",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "64": {
+    "code": "T 20: R 02-02",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "65": {
+    "code": "T 20: R 03-01",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "66": {
+    "code": "T 20: R 04-01",
+    "labelZh": "若叶镇",
+    "nameEn": "New Bark Town"
+  },
+  "67": {
+    "code": "T 21: None None-None",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "68": {
+    "code": "T 21: FS 01-01",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "69": {
+    "code": "T 21: PC 01-01",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "7": {
+    "code": "D 18: R 01-01",
+    "labelZh": "烧焦塔",
+    "nameEn": "Burned Tower"
+  },
+  "70": {
+    "code": "T 21: R 03-01",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "71": {
+    "code": "T 21: R 04-01",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "72": {
+    "code": "T 21: R 05-01",
+    "labelZh": "吉花市",
+    "nameEn": "Cherrygrove City"
+  },
+  "73": {
+    "code": "T 22: None None-None",
+    "labelZh": "桔梗市",
+    "nameEn": "Violet City"
+  },
+  "74": {
+    "code": "T 23: None None-None",
+    "labelZh": "桧皮镇",
+    "nameEn": "Azalea Town"
+  },
+  "75": {
+    "code": "T 24: None None-None",
+    "labelZh": "湛蓝市",
+    "nameEn": "Cianwood City"
+  },
+  "76": {
+    "code": "T 25: None None-None",
+    "labelZh": "满金市",
+    "nameEn": "Goldenrod City"
+  },
+  "77": {
+    "code": "T 26: None None-None",
+    "labelZh": "浅葱市",
+    "nameEn": "Olivine City"
+  },
+  "78": {
+    "code": "T 27: None None-None",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "79": {
+    "code": "T 27: FS 01-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "8": {
+    "code": "D 24: None None-None",
+    "labelZh": "阿露福遗迹",
+    "nameEn": "Ruins of Alph"
+  },
+  "80": {
+    "code": "T 27: GYM 01-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "81": {
+    "code": "T 27: PC 01-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "82": {
+    "code": "T 27: R 01-01",
+    "labelZh": "祝祝市",
+    "nameEn": "Jubilife City"
+  },
+  "83": {
+    "code": "T 27: R 02-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "84": {
+    "code": "T 27: R 08-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "85": {
+    "code": "T 27: R 04-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "86": {
+    "code": "T 27: R 05-01",
+    "labelZh": "圆朱市",
+    "nameEn": "Ecruteak City"
+  },
+  "87": {
+    "code": "T 28: None None-None",
+    "labelZh": "卡吉镇",
+    "nameEn": "Mahogany Town"
+  },
+  "88": {
+    "code": "T 29: None None-None",
+    "labelZh": "愤怒之湖",
+    "nameEn": "Lake of Rage"
+  },
+  "89": {
+    "code": "T 30: None None-None",
+    "labelZh": "烟墨市",
+    "nameEn": "Blackthorn City"
+  },
+  "9": {
+    "code": "R 01: None None-None",
+    "labelZh": "Route 1",
+    "nameEn": "Route 1"
+  },
+  "90": {
+    "code": "T 31: None None-None",
+    "labelZh": "白银山",
+    "nameEn": "Mt. Silver"
+  },
+  "91": {
+    "code": "W 19: None None-None",
+    "labelZh": "19号道路",
+    "nameEn": "Route 19"
+  },
+  "92": {
+    "code": "W 20: None None-None",
+    "labelZh": "20号道路",
+    "nameEn": "Route 20"
+  },
+  "93": {
+    "code": "W 21: None None-None",
+    "labelZh": "21号道路",
+    "nameEn": "Route 21"
+  },
+  "94": {
+    "code": "W 40: None None-None",
+    "labelZh": "40号道路",
+    "nameEn": "Route 40"
+  },
+  "95": {
+    "code": "W 41: None None-None",
+    "labelZh": "41号道路",
+    "nameEn": "Route 41"
+  },
+  "96": {
+    "code": "D 22: R 01-01",
+    "labelZh": "自然公园",
+    "nameEn": "National Park"
+  },
+  "97": {
+    "code": "R 31: R 01-01",
+    "labelZh": "31号道路",
+    "nameEn": "Route 31"
+  },
+  "98": {
+    "code": "R 32: R 01-01",
+    "labelZh": "32号道路",
+    "nameEn": "Route 32"
+  },
+  "99": {
+    "code": "D 25: R 01-01",
+    "labelZh": "连接洞窟",
+    "nameEn": "Union Cave"
+  }
+}

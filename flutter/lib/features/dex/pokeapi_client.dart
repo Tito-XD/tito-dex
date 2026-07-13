@@ -395,7 +395,7 @@ class PokeApiClient {
 
         merged[slug] = ObtainLocationEntry(
           areaSlug: slug,
-          areaLabelZh: encounterAreaLabelZh(slug),
+          areaLabelZh: resolveObtainAreaLabelZh(slug),
           minLevel: minLevel == 100 ? null : minLevel,
           maxChance: maxChance,
         );

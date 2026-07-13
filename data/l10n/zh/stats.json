@@ -1,0 +1,26 @@
+{
+  "attack": {
+    "nameEn": "attack",
+    "nameZh": "攻击"
+  },
+  "defense": {
+    "nameEn": "defense",
+    "nameZh": "防御"
+  },
+  "hp": {
+    "nameEn": "hp",
+    "nameZh": "HP"
+  },
+  "special-attack": {
+    "nameEn": "special-attack",
+    "nameZh": "特攻"
+  },
+  "special-defense": {
+    "nameEn": "special-defense",
+    "nameZh": "特防"
+  },
+  "speed": {
+    "nameEn": "speed",
+    "nameZh": "速度"
+  }
+}
