@@ -21,6 +21,7 @@ import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
+import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'type_badge.dart';
 
@@ -1398,8 +1399,9 @@ class _InteractiveTypeEffectivenessCardState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const StickerCard(
-        child: Center(child: CircularProgressIndicator()),
+      return const TitoLoadingPanel(
+        message: AppZh.companionLoading,
+        compact: true,
       );
     }
     final relations = _relations;
