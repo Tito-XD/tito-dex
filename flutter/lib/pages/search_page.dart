@@ -24,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_animated_size_switcher.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key, required this.journey});
@@ -165,13 +166,39 @@ class _SearchPageState extends State<SearchPage> {
               onSelected: (index) => setState(() => _hubSegment = index),
             ),
             const SizedBox(height: 12),
-            if (_hubSegment == 0) ..._searchSegment(context),
-            if (_hubSegment == 1) ..._referenceSegment(context),
-            if (_hubSegment == 2) ..._battleSegment(context),
+            // v0.4.1: AnimatedSize hub segments (experimental)
+            TitoAnimatedSizeSwitcher(
+              switchKey: ValueKey<int>(_hubSegment),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: switch (_hubSegment) {
+                  0 => _searchSegment(context),
+                  1 => _referenceSegment(context),
+                  _ => _battleSegment(context),
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Key get _searchResultsSwitchKey {
+    final query = _controller.text.trim();
+    if (query.isEmpty) {
+      return const ValueKey<String>('search-idle');
+    }
+    if (_searching) {
+      return const ValueKey<String>('search-loading');
+    }
+    if (_error != null) {
+      return ValueKey<String>('search-error-${_error.hashCode}');
+    }
+    if (_results.isEmpty) {
+      return const ValueKey<String>('search-empty');
+    }
+    return ValueKey<String>('search-results-${_results.length}');
   }
 
   List<Widget> _searchSegment(BuildContext context) {
@@ -262,58 +289,71 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ],
         const SizedBox(height: 16),
-        if (query.isEmpty)
-          const _SearchIdlePlaceholder()
-        else if (_searching)
-          const Center(child: CircularProgressIndicator())
-        else if (_error != null)
-          StickerCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppZh.dexLoadFailed,
-                  style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _error!,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                    height: 1.45,
-                  ),
-                ),
-              ],
-            ),
-          )
-        else if (_results.isEmpty)
-          StickerCard(
-            child: Text(
-              AppZh.searchNoResults,
+        TitoAnimatedSizeSwitcher(
+          switchKey: _searchResultsSwitchKey,
+          child: _searchResultsBody(context, query),
+        ),
+    ];
+  }
+
+  Widget _searchResultsBody(BuildContext context, String query) {
+    if (query.isEmpty) {
+      return const _SearchIdlePlaceholder();
+    }
+    if (_searching) {
+      return const SizedBox(
+        height: 48,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_error != null) {
+      return StickerCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppZh.dexLoadFailed,
               style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
-          )
-        else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemCount: _results.length,
-            itemBuilder: (context, index) {
-              final entry = _results[index];
-              final status = dexRepository.statusFor(entry.id, _progress);
-              return _SearchResultRow(
-                entry: entry,
-                status: status,
-                onTap: () => context.push('/dex/${entry.id}'),
-              );
-            },
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_results.isEmpty) {
+      return StickerCard(
+        child: Text(
+          AppZh.searchNoResults,
+          style: SecondaryTypography.onCard.body14.copyWith(
+            fontWeight: FontWeight.w700,
           ),
-    ];
+        ),
+      );
+    }
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemCount: _results.length,
+      itemBuilder: (context, index) {
+        final entry = _results[index];
+        final status = dexRepository.statusFor(entry.id, _progress);
+        return _SearchResultRow(
+          entry: entry,
+          status: status,
+          onTap: () => context.push('/dex/${entry.id}'),
+        );
+      },
+    );
   }
 
   List<Widget> _referenceSegment(BuildContext context) {

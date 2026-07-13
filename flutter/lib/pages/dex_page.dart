@@ -5,6 +5,7 @@ import '../features/companion/companion_art.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_game_scope.dart';
+import '../features/dex/dex_regional_picker.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
@@ -23,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_skeleton.dart';
+import '../widgets/tito_animated_size_switcher.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({super.key, required this.journey});
@@ -154,11 +156,6 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _setMode(_DexMode mode) async {
     if (_mode == mode && mode == _DexMode.national) {
-      // Re-activating the selected national tab cycles the regional scope —
-      // reachable with a plain A-press on the D-pad (no tiny dropdown needed).
-      final scopes = DexRegionalPokedex.values;
-      final next = scopes[(scopes.indexOf(_region) + 1) % scopes.length];
-      _setRegion(next);
       return;
     }
 
@@ -194,6 +191,24 @@ class _DexPageState extends State<DexPage> {
         _loadingJourney = false;
         _journeySummaries = const [];
       });
+    }
+  }
+
+  Future<void> _onNationalTabTap() async {
+    if (_mode != _DexMode.national) {
+      await _setMode(_DexMode.national);
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    final picked = await showRegionalPokedexPicker(
+      context,
+      selected: _region,
+      gameEdition: _gameEdition,
+    );
+    if (picked != null && picked != _region) {
+      _setRegion(picked);
     }
   }
 
@@ -396,17 +411,26 @@ class _DexPageState extends State<DexPage> {
                     scopeStats: _scopeStats,
                     journeyCount: _journeyIds.length,
                     onModeSelected: _setMode,
-                    onRegionSelected: _setRegion,
+                    onNationalRegionPicker: _onNationalTabTap,
                   ),
-                  if (_mode == _DexMode.national) ...[
-                    SizedBox(height: squareGap(context)),
-                    _DexEncounterFilterBar(
-                      filter: _encounterFilter,
-                      onSelected: (filter) {
-                        setState(() => _encounterFilter = filter);
-                      },
-                    ),
-                  ],
+                  // v0.4.1: AnimatedSize encounter filter (experimental)
+                  TitoAnimatedSizeSwitcher(
+                    switchKey: ValueKey<bool>(_mode == _DexMode.national),
+                    child: _mode == _DexMode.national
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(height: squareGap(context)),
+                              _DexEncounterFilterBar(
+                                filter: _encounterFilter,
+                                onSelected: (filter) {
+                                  setState(() => _encounterFilter = filter);
+                                },
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                   SizedBox(height: squareGap(context)),
                   if (_error != null)
                     StickerCard(
@@ -724,7 +748,7 @@ class _DexScopeBar extends StatelessWidget {
     required this.scopeStats,
     required this.journeyCount,
     required this.onModeSelected,
-    required this.onRegionSelected,
+    required this.onNationalRegionPicker,
   });
 
   final _DexMode mode;
@@ -733,7 +757,7 @@ class _DexScopeBar extends StatelessWidget {
   final DexScopeStats scopeStats;
   final int journeyCount;
   final ValueChanged<_DexMode> onModeSelected;
-  final ValueChanged<DexRegionalPokedex> onRegionSelected;
+  final VoidCallback onNationalRegionPicker;
 
   @override
   Widget build(BuildContext context) {
@@ -742,18 +766,17 @@ class _DexScopeBar extends StatelessWidget {
         Expanded(
           child: _DexModeTab(
             selected: mode == _DexMode.national,
-            title: AppZh.dexTabNational,
+            title: AppZh.dexRegionalDexTitle(regionalPokedexLabelZh(region)),
             subtitle: AppZh.dexScopeProgress(
               scopeStats.caught,
               scopeStats.seen,
               scopeStats.total,
             ),
             count: scopeStats.total,
-            showRegionMenu: true,
-            region: region,
-            gameEdition: gameEdition,
+            showRegionPicker: true,
+            regionPickerActive: mode == _DexMode.national,
             onTap: () => onModeSelected(_DexMode.national),
-            onRegionSelected: onRegionSelected,
+            onRegionPickerTap: onNationalRegionPicker,
           ),
         ),
         const SizedBox(width: 6),
@@ -820,10 +843,9 @@ class _DexModeTab extends StatelessWidget {
     required this.subtitle,
     required this.count,
     required this.onTap,
-    this.showRegionMenu = false,
-    this.region = DexRegionalPokedex.national,
-    this.gameEdition = defaultGameEdition,
-    this.onRegionSelected,
+    this.showRegionPicker = false,
+    this.regionPickerActive = false,
+    this.onRegionPickerTap,
   });
 
   final bool selected;
@@ -831,23 +853,23 @@ class _DexModeTab extends StatelessWidget {
   final String subtitle;
   final int count;
   final VoidCallback onTap;
-  final bool showRegionMenu;
-  final DexRegionalPokedex region;
-  final GameEdition gameEdition;
-  final ValueChanged<DexRegionalPokedex>? onRegionSelected;
+  final bool showRegionPicker;
+  final bool regionPickerActive;
+  final VoidCallback? onRegionPickerTap;
 
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
     final square = DeviceLayout.useSquareDashboard(context);
+    final openPicker = showRegionPicker && regionPickerActive && selected;
 
     return HandheldFocusDecorator(
-      onActivate: onTap,
+      onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
       borderRadius: BorderRadius.circular(radius),
       child: Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: openPicker ? onRegionPickerTap : onTap,
         canRequestFocus: false,
         borderRadius: BorderRadius.circular(radius),
         child: Ink(
@@ -875,6 +897,15 @@ class _DexModeTab extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (openPicker)
+                    const Padding(
+                      padding: EdgeInsets.only(right: 2),
+                      child: Icon(
+                        Icons.arrow_drop_down_rounded,
+                        size: 18,
+                        color: TitoColors.ink,
+                      ),
+                    ),
                   Text(
                     '$count',
                     style: SecondaryTypography.onCard.meta14.copyWith(
@@ -884,72 +915,20 @@ class _DexModeTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              if (showRegionMenu && selected)
-                // Whole subtitle line opens the region menu — big tap target.
-                PopupMenuButton<DexRegionalPokedex>(
-                  padding: EdgeInsets.zero,
-                  tooltip: '切换地区图鉴',
-                  onSelected: onRegionSelected,
-                  itemBuilder: (context) {
-                    final highlights = {
-                      gameEdition.defaultRegionalPokedex,
-                      DexRegionalPokedex.national,
-                    };
-                    return DexRegionalPokedex.values
-                        .map(
-                          (scope) => PopupMenuItem(
-                            value: scope,
-                            child: Row(
-                              children: [
-                                if (highlights.contains(scope))
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 6),
-                                    child: Icon(
-                                      Icons.star_rounded,
-                                      size: 16,
-                                      color: TitoColors.coral,
-                                    ),
-                                  ),
-                                Text(regionalPokedexLabelZh(scope)),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList();
-                  },
-                  child: _subtitleRow(context, withMenuArrow: true),
-                )
-              else
-                _subtitleRow(context),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: SecondaryTypography.onCard.meta14.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: TitoColors.mutedInk,
+                ),
+              ),
             ],
           ),
         ),
       ),
       ),
-    );
-  }
-
-  Widget _subtitleRow(BuildContext context, {bool withMenuArrow = false}) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            subtitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: SecondaryTypography.onCard.meta14.copyWith(
-              fontWeight: FontWeight.w600,
-              color: TitoColors.mutedInk,
-            ),
-          ),
-        ),
-        if (withMenuArrow)
-          const Icon(
-            Icons.arrow_drop_down_rounded,
-            size: 18,
-            color: TitoColors.ink,
-          ),
-      ],
     );
   }
 }

@@ -43,6 +43,8 @@ abstract final class AppZh {
   static String dexScopeProgress(int caught, int seen, int total) =>
       '捕获 $caught · 见过 $seen / $total';
   static const dexTabNational = '全国图鉴';
+  static String dexRegionalDexTitle(String regionLabel) => '$regionLabel图鉴';
+  static const dexPickRegionalPokedex = '选择地区图鉴';
   static const dexTabJourney = '旅程同行';
   static const dexFilterEmpty = '当前筛选条件下暂无图鉴条目。';
   static String dexRegionProgress(
