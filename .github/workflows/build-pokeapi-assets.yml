@@ -12,9 +12,15 @@ on:
         type: number
         default: 1
       upload:
-        description: Upload to R2 after build
+        description: Upload each asset to R2 as it is built
         type: boolean
         default: true
+      skip_existing_cdn:
+        description: Skip assets already on dex.tito.cafe (resume-friendly)
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [build-pokeapi-assets]
 
 jobs:
   build-assets:
@@ -34,16 +40,35 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Cache partial build output
+        uses: actions/cache@v4
+        with:
+          path: dist/pokeapi-assets
+          key: pokeapi-assets-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-${{ hashFiles('tools/build_pokeapi_assets.py', 'tools/pokeapi_assets.py', 'tools/build_dex_bundle.py') }}
+          restore-keys: |
+            pokeapi-assets-${{ inputs.min_id || github.event.client_payload.min_id || 1 }}-${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}-
+
       - name: Build PokeAPI sprite / artwork / animated assets
-        run: |
-          UPLOAD=""
-          if [ "${{ inputs.upload }}" = "true" ]; then
-            UPLOAD="--upload"
-          fi
-          python3 tools/build_pokeapi_assets.py \
-            --min-id ${{ inputs.min_id }} \
-            --max-id ${{ inputs.max_id }} \
-            $UPLOAD
         env:
+          MIN_ID: ${{ inputs.min_id || github.event.client_payload.min_id || 1 }}
+          MAX_ID: ${{ inputs.max_id || github.event.client_payload.max_id || 1025 }}
+          UPLOAD_FLAG: ${{ inputs.upload || github.event.client_payload.upload || true }}
+          SKIP_CDN_FLAG: ${{ inputs.skip_existing_cdn || github.event.client_payload.skip_existing_cdn || true }}
+          DISPATCH_SOURCE: ${{ github.event.client_payload.source || 'manual' }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Trigger source: ${DISPATCH_SOURCE}"
+          UPLOAD=""
+          if [ "$UPLOAD_FLAG" = "true" ]; then
+            UPLOAD="--upload"
+          fi
+          SKIP_CDN="--skip-existing-cdn"
+          if [ "$SKIP_CDN_FLAG" = "false" ]; then
+            SKIP_CDN="--no-skip-existing-cdn"
+          fi
+          python3 tools/build_pokeapi_assets.py \
+            --min-id "$MIN_ID" \
+            --max-id "$MAX_ID" \
+            $SKIP_CDN \
+            $UPLOAD
