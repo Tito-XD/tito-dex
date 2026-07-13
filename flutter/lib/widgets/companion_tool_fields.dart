@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../l10n/app_zh.dart';
 import '../features/companion/battle_math.dart';
+import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/battle_effectiveness.dart';
+import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -478,6 +480,36 @@ class DefensiveAbilityOption {
   final String slug;
   final String labelZh;
   final bool isHidden;
+}
+
+List<DefensiveAbilityOption> defensiveAbilityOptionsFrom(
+  List<PokemonAbility> abilities,
+) {
+  return abilities
+      .map(
+        (ability) => DefensiveAbilityOption(
+          slug: abilitySlugFromNameEn(ability.nameEn),
+          labelZh: ability.nameZh,
+          isHidden: ability.isHidden,
+        ),
+      )
+      .toList(growable: false);
+}
+
+/// Auto-select when the Pokémon has exactly one ability (e.g. Cresselia → Levitate).
+String? defaultAbilitySlugForOptions(List<DefensiveAbilityOption> options) {
+  if (options.length == 1) {
+    return options.first.slug;
+  }
+  return null;
+}
+
+List<DefensiveAbilityOption> attackerAbilityOptionsFromPokemon(
+  List<PokemonAbility> abilities,
+) {
+  return defensiveAbilityOptionsFrom(abilities)
+      .where((option) => kManualAttackerAbilityOptions.containsKey(option.slug))
+      .toList(growable: false);
 }
 
 class DefensiveAbilityPicker extends StatelessWidget {

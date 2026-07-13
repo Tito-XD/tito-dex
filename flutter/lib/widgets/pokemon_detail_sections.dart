@@ -1368,6 +1368,7 @@ class _InteractiveTypeEffectivenessCardState
   @override
   void initState() {
     super.initState();
+    _syncDefaultAbility();
     _load();
   }
 
@@ -1375,11 +1376,21 @@ class _InteractiveTypeEffectivenessCardState
   void didUpdateWidget(covariant InteractiveTypeEffectivenessCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.generation != widget.generation ||
-        oldWidget.types != widget.types) {
+        oldWidget.types != widget.types ||
+        oldWidget.abilities != widget.abilities) {
       setState(() {
         _defenderTeraType =
             defaultTeraTypeFor(widget.types, widget.generation);
+        _syncDefaultAbility(force: oldWidget.abilities != widget.abilities);
       });
+    }
+  }
+
+  void _syncDefaultAbility({bool force = false}) {
+    final options = defensiveAbilityOptionsFrom(widget.abilities);
+    final defaultSlug = defaultAbilitySlugForOptions(options);
+    if (defaultSlug != null && (_abilitySlug == null || force)) {
+      _abilitySlug = defaultSlug;
     }
   }
 
@@ -1412,15 +1423,7 @@ class _InteractiveTypeEffectivenessCardState
       return const SizedBox.shrink();
     }
 
-    final options = widget.abilities
-        .map(
-          (ability) => DefensiveAbilityOption(
-            slug: abilitySlugFromNameEn(ability.nameEn),
-            labelZh: ability.nameZh,
-            isHidden: ability.isHidden,
-          ),
-        )
-        .toList(growable: false);
+    final options = defensiveAbilityOptionsFrom(widget.abilities);
 
     final input = BattleEffectivenessInput(
       defenderTypes: widget.types,

@@ -43,6 +43,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   List<String> _defenderTypes = const ['normal'];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  int? _linkedDefenderId;
   bool _defenderTerastallized = false;
   String? _defenderTeraType;
   bool _attackerTerastallized = false;
@@ -159,15 +160,6 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     final defenseStat = _category == MoveCategory.physical
         ? stats.defense
         : stats.specialDefense;
-    final abilityOptions = detail.abilities
-        .map(
-          (ability) => DefensiveAbilityOption(
-            slug: abilitySlugFromNameEn(ability.nameEn),
-            labelZh: ability.nameZh,
-            isHidden: ability.isHidden,
-          ),
-        )
-        .toList(growable: false);
     if (!mounted) {
       return;
     }
@@ -177,14 +169,37 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _hpController.text = stats.hp.toString();
       _defenderSuggestions = const [];
       _defenderQueryController.text = summary.nameZh;
-      _defenderAbilityOptions = abilityOptions;
-      _defenderAbilitySlug =
-          abilityOptions.length == 1 ? abilityOptions.first.slug : null;
+      _linkedDefenderId = summary.id;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
       _defenderTeraType = defaultTeraTypeFor(
         summary.types,
         battleScopeForEdition(gameEditionRepository.edition).generation,
       );
     });
+    _loadDefenderAbilities(summary.id);
+  }
+
+  void _clearLinkedDefender() {
+    setState(() {
+      _linkedDefenderId = null;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
+    });
+  }
+
+  Future<void> _loadDefenderAbilities(int pokemonId) async {
+    try {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedDefenderId != pokemonId) {
+        return;
+      }
+      final options = defensiveAbilityOptionsFrom(abilities);
+      setState(() {
+        _defenderAbilityOptions = options;
+        _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
+      });
+    } catch (_) {}
   }
 
   int _readInt(TextEditingController controller, int fallback) =>
@@ -351,11 +366,10 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                     if (types.isNotEmpty) {
                       setState(() {
                         _defenderTypes = types;
-                        _defenderAbilityOptions = const [];
-                        _defenderAbilitySlug = null;
                         _defenderTeraType =
                             defaultTeraTypeFor(types, scope.generation);
                       });
+                      _clearLinkedDefender();
                     }
                   },
                 ),
@@ -395,7 +409,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                     onChanged: (slug) =>
                         setState(() => _defenderAbilitySlug = slug),
                   ),
-                ] else ...[
+                ] else if (_linkedDefenderId == null) ...[
                   const SizedBox(height: 12),
                   ManualAbilityPicker(
                     label: AppZh.companionManualAbilityPick,

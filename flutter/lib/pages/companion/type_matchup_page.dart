@@ -35,6 +35,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
   List<String> _attackerTypes = const [];
   String? _defenderAbilitySlug;
   String? _attackerAbilitySlug;
+  int? _linkedDefenderId;
   bool _defenderTerastallized = false;
   String? _defenderTeraType;
   bool _attackerTerastallized = false;
@@ -96,6 +97,7 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
       _defenderTypes = List<String>.from(summary.types);
       _suggestions = const [];
       _queryController.text = summary.nameZh;
+      _linkedDefenderId = summary.id;
       _defenderAbilityOptions = const [];
       _defenderAbilitySlug = null;
       _defenderTerastallized = false;
@@ -104,25 +106,24 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
     _loadDefenderAbilities(summary.id);
   }
 
+  void _clearLinkedDefender() {
+    setState(() {
+      _linkedDefenderId = null;
+      _defenderAbilityOptions = const [];
+      _defenderAbilitySlug = null;
+    });
+  }
+
   Future<void> _loadDefenderAbilities(int pokemonId) async {
     try {
-      final detail = await dexRepository.getDetail(pokemonId);
-      if (!mounted) {
+      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
+      if (!mounted || _linkedDefenderId != pokemonId) {
         return;
       }
-      final options = detail.abilities
-          .map(
-            (ability) => DefensiveAbilityOption(
-              slug: abilitySlugFromNameEn(ability.nameEn),
-              labelZh: ability.nameZh,
-              isHidden: ability.isHidden,
-            ),
-          )
-          .toList(growable: false);
+      final options = defensiveAbilityOptionsFrom(abilities);
       setState(() {
         _defenderAbilityOptions = options;
-        _defenderAbilitySlug =
-            options.length == 1 ? options.first.slug : null;
+        _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
       });
     } catch (_) {}
   }
@@ -220,14 +221,31 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                           if (types.isNotEmpty) {
                             setState(() {
                               _defenderTypes = types;
-                              _defenderAbilityOptions = const [];
-                              _defenderAbilitySlug = null;
                               _defenderTeraType =
                                   defaultTeraTypeFor(types, generation);
                             });
+                            _clearLinkedDefender();
                           }
                         },
                       ),
+                      if (_defenderAbilityOptions.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        DefensiveAbilityPicker(
+                          selectedSlug: _defenderAbilitySlug,
+                          options: _defenderAbilityOptions,
+                          onChanged: (slug) =>
+                              setState(() => _defenderAbilitySlug = slug),
+                        ),
+                      ] else if (_linkedDefenderId == null) ...[
+                        const SizedBox(height: 12),
+                        ManualAbilityPicker(
+                          label: AppZh.companionManualAbilityPick,
+                          options: kManualDefensiveAbilityOptions,
+                          selectedSlug: _defenderAbilitySlug,
+                          onChanged: (slug) =>
+                              setState(() => _defenderAbilitySlug = slug),
+                        ),
+                      ],
                       if (generation >= 9) ...[
                         const SizedBox(height: 12),
                         TerastalPicker(
@@ -242,24 +260,6 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                           ),
                           onTeraTypeChanged: (type) =>
                               setState(() => _defenderTeraType = type),
-                        ),
-                      ],
-                      if (_defenderAbilityOptions.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        DefensiveAbilityPicker(
-                          selectedSlug: _defenderAbilitySlug,
-                          options: _defenderAbilityOptions,
-                          onChanged: (slug) =>
-                              setState(() => _defenderAbilitySlug = slug),
-                        ),
-                      ] else ...[
-                        const SizedBox(height: 12),
-                        ManualAbilityPicker(
-                          label: AppZh.companionManualAbilityPick,
-                          options: kManualDefensiveAbilityOptions,
-                          selectedSlug: _defenderAbilitySlug,
-                          onChanged: (slug) =>
-                              setState(() => _defenderAbilitySlug = slug),
                         ),
                       ],
                     ],
