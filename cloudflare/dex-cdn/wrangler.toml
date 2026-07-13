@@ -13,12 +13,27 @@ compatibility_date = "2024-09-23"
 binding = "DEX_BUCKET"
 bucket_name = "titodex-dex"
 
+# Optional: create KV namespace "titodex-dex-kv" in Dashboard, paste id below.
+# Worker degrades gracefully when MANIFEST_KV is not bound.
+# [[kv_namespaces]]
+# binding = "MANIFEST_KV"
+# id = "YOUR_KV_NAMESPACE_ID"
+
 # Custom domain — zone tito.cafe must be on this Cloudflare account.
 [[routes]]
 pattern = "dex.tito.cafe/*"
 zone_name = "tito.cafe"
 
+[triggers]
+crons = ["0 4 * * 0", "0 */6 * * *"]
+
 [vars]
-CDN_VERSION = "2"
+CDN_VERSION = "3"
 CDN_BASE_URL = "https://dex.tito.cafe"
-DEPLOY_REV = "2026-07-09a"
+DEPLOY_REV = "2026-07-13a"
+GITHUB_REPO = "Tito-XD/tito-dex"
+
+# Secrets (Dashboard → Settings → Variables → Secrets):
+#   GITHUB_DISPATCH_TOKEN — PAT with repo scope (Actions: write) for repository_dispatch
+#   ADMIN_SECRET          — Bearer token for /admin/* routes
+#   ALERT_WEBHOOK_URL     — optional Discord/Slack webhook for probe failures
