@@ -58,6 +58,15 @@ Tito confirmed: raw IDs like `301` / `823` in「出现地点」are unusable. Nee
 
 Tito confirmed: remove top `_MoveGameEditionBar` chip scroll; make **`以下招式范围：{game}`** tappable to pick game version (bottom sheet). Saves vertical space on RG.
 
+## Journey / trainer / team (planned — batch separately)
+
+See **[JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md)**.
+
+- Fix **avatar** in **Settings** (broken; home-only tap today)
+- Settings: trainer name + avatar editable; journey fields **read-only from save**
+- NS/mobile global game → no save sync; hide **Continue** + **Journey**; home quick tiles **4→3**
+- Team: manual party edit + **aggregate team stats** card
+
 ## Communication Defaults
 
 - Default communication with Tito should be in **Chinese**.

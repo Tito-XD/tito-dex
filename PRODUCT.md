@@ -118,6 +118,13 @@ Mock data is acceptable because the immediate goal is product shape and feeling,
 - **Abilities + obtain locations** on detail tabs
 - **Regional browse** — Johto 251 / Kanto 151 filters
 - **Battle companion tools (partial)** — Search: type matchup, stat calc, quick damage
+
+### Planned (v0.5+ — see [JOURNEY_PROFILE_PLAN.md](./docs/JOURNEY_PROFILE_PLAN.md))
+
+- **Settings:** trainer name + avatar; journey info read-only from save (remove manual location/badges/time edit)
+- **Journey modes:** HGSS save-linked vs NS/mobile manual — hide Continue + Journey when no save
+- **Home layout:** 3 quick tiles (Team / Dex / Search) in one row on portrait when manual mode
+- **Team:** manual party builder + aggregate team stats estimate
 - RG release APK: `TitoDex-0.2.28-rg-arm64.apk` (arm64-v8a; see `flutter/README.md`)
 
 ### Planned (v0.3.0)
