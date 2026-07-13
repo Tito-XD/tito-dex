@@ -90,12 +90,18 @@ jobs:
       - name: Verify CDN l10n upload
         run: |
           curl -sfI https://dex.tito.cafe/v3/l10n/zh/manifest.json | head -5
-          curl -sf https://dex.tito.cafe/bundle-manifest.json | python3 - <<'PY'
+          curl -sf https://dex.tito.cafe/v3/l10n/zh/manifest.json | python3 -c "
           import json, sys
           m = json.load(sys.stdin)
-          assert m.get("l10nVersion"), f"missing l10nVersion: {m}"
-          print("bundle-manifest l10nVersion:", m["l10nVersion"])
-          PY
+          assert m.get('generatedAt'), f'unexpected l10n manifest: {m}'
+          print('l10n manifest generatedAt:', m['generatedAt'])
+          "
+          curl -sf https://dex.tito.cafe/bundle-manifest.json | python3 -c "
+          import json, sys
+          m = json.load(sys.stdin)
+          assert m.get('l10nVersion'), f'missing l10nVersion: {m}'
+          print('bundle-manifest l10nVersion:', m['l10nVersion'])
+          "
 
       - name: Commit catalog changes (if any)
         run: |
