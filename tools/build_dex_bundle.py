@@ -38,6 +38,10 @@ TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
     "sprites/types/generation-iii/colosseum"
 )
+POKESPRITE_TYPE_ICON_DIR = ROOT / "data" / "assets" / "type_icons"
+POKESPRITE_RAW_BASE = (
+    "https://raw.githubusercontent.com/msikma/pokesprite/master/misc"
+)
 BUNDLE_VERSION = 5
 BUNDLE_CDN_PREFIX = "v3"
 TITODEX_MAX_NATIONAL_ID = 1025
@@ -453,6 +457,28 @@ class PokeApiBuilder:
             lookup_id = 10001 if type_name == "fairy" else type_id
             return f"{TYPE_ICON_BASE}/{lookup_id}.png"
         return None
+
+    def pokesprite_type_icon_url(self, type_name: str) -> str | None:
+        """Resolve Gen 8 type icon URL from pokesprite misc.json."""
+        if not hasattr(self, "_pokesprite_type_paths"):
+            request = requests.Request(
+                "GET",
+                "https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json",
+                headers={"User-Agent": "TitoDex-maintainer/1.0"},
+            )
+            prepared = self.session.prepare_request(request)
+            response = self.session.send(prepared, timeout=60)
+            response.raise_for_status()
+            misc = response.json()
+            mapping: dict[str, str] = {}
+            for entry in misc.get("types") or []:
+                eng = (entry.get("name") or {}).get("eng")
+                files = entry.get("files") or {}
+                rel = files.get("gen-8") or (next(iter(files.values()), None) if files else None)
+                if eng and rel:
+                    mapping[eng] = f"{POKESPRITE_RAW_BASE}/{rel}"
+            self._pokesprite_type_paths = mapping
+        return self._pokesprite_type_paths.get(type_name)
 
     def fetch_move(self, move_id: int) -> dict[str, Any]:
         if move_id in self.move_cache:
@@ -1464,16 +1490,25 @@ def build_bundle(
         write_json(staging / "items.json", fetch_items_index(builder))
 
     if not any((staging / "type_icons").glob("*.png")):
-        print("Downloading type icons…")
+        print("Downloading type icons (pokesprite Gen 8)…")
         for type_name in TYPE_NAMES:
+            dest = staging / "type_icons" / f"{type_name}.png"
+            vendored = POKESPRITE_TYPE_ICON_DIR / f"{type_name}.png"
+            if vendored.is_file():
+                dest.write_bytes(vendored.read_bytes())
+                continue
             try:
-                icon_url = builder.type_icon_url(type_name)
+                icon_url = builder.pokesprite_type_icon_url(type_name)
                 if not icon_url:
-                    print(f"  warn: no colosseum icon for {type_name}", file=sys.stderr)
+                    icon_url = builder.type_icon_url(type_name)
+                if not icon_url:
+                    print(f"  warn: no type icon for {type_name}", file=sys.stderr)
                     continue
                 png = download_bytes(session, icon_url)
                 optimized = optimize_png(png, max_width=64)
-                (staging / "type_icons" / f"{type_name}.png").write_bytes(optimized)
+                dest.write_bytes(optimized)
+                POKESPRITE_TYPE_ICON_DIR.mkdir(parents=True, exist_ok=True)
+                (POKESPRITE_TYPE_ICON_DIR / f"{type_name}.png").write_bytes(optimized)
             except requests.RequestException as exc:
                 print(f"  warn: type icon {type_name}: {exc}", file=sys.stderr)
 
