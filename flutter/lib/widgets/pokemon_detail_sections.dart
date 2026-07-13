@@ -893,13 +893,9 @@ class AbilitiesCard extends StatelessWidget {
   const AbilitiesCard({
     super.key,
     required this.abilities,
-    this.gameEdition,
-    this.onPickEdition,
   });
 
   final List<PokemonAbility> abilities;
-  final GameEdition? gameEdition;
-  final VoidCallback? onPickEdition;
 
   @override
   Widget build(BuildContext context) {
@@ -919,13 +915,6 @@ class AbilitiesCard extends StatelessWidget {
                 color: TitoColors.mutedInk,
               ),
             ),
-            if (onPickEdition != null) ...[
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: onPickEdition,
-                child: const Text(AppZh.dexFlavorPickEdition),
-              ),
-            ],
           ],
         ),
       );
@@ -950,7 +939,7 @@ class AbilitiesCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          ability.nameZh,
+                          ability.displayNameZh,
                           style: SecondaryTypography.onCard.body14.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -1403,11 +1392,13 @@ class InteractiveTypeEffectivenessCard extends StatefulWidget {
     required this.types,
     required this.abilities,
     required this.generation,
+    this.abilityPickerLabel = AppZh.companionDefenderAbilityPick,
   });
 
   final List<String> types;
   final List<PokemonAbility> abilities;
   final int generation;
+  final String abilityPickerLabel;
 
   @override
   State<InteractiveTypeEffectivenessCard> createState() =>
@@ -1501,7 +1492,7 @@ class _InteractiveTypeEffectivenessCardState
         if (options.isNotEmpty) ...[
           StickerCard(
             child: AbilityChipPicker(
-              label: AppZh.companionDefenderAbilityPick,
+              label: widget.abilityPickerLabel,
               selectedSlug: _abilitySlug,
               options: options,
               onChanged: (slug) => setState(() => _abilitySlug = slug),

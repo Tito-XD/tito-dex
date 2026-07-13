@@ -288,4 +288,14 @@ GameEdition gameEditionFromJourneyGame(String? journeyGame) {
 
 String gameEditionLabelZh(GameEdition edition) => edition.labelZh;
 
+String gameEditionLabelForVersionGroup(String versionGroupKey) {
+  for (final edition in GameEdition.all) {
+    if (edition.dataVersionGroupKey == versionGroupKey ||
+        edition.versionGroup == versionGroupKey) {
+      return edition.labelZh;
+    }
+  }
+  return versionGroupKey;
+}
+
 String gameEditionMoveSetKey(GameEdition edition) => edition.dataVersionGroupKey;

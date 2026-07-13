@@ -133,15 +133,16 @@ abstract final class AppZh {
   static const dexFlavorEmpty = '暂无可用图鉴描述（PokeAPI 未提供该版本中文文案时会显示英文）。';
   static const dexAbilities = '特性';
   static const dexAbilityHidden = '隐藏特性';
+  static const dexAbilityAllVersions = '全版本';
+  static const dexAbilitySinceGen5 = '第五世代起';
+  static const dexAbilityFilter = '特性筛选';
   static const dexAbilityUnknownName = '待收录';
   static const dexAbilityPlaceholder = '特性资料整理中，将随后续图鉴数据包更新。';
-  static const dexAbilityEmptyPending =
-      '当前版本暂无特性数据，请切换其他游戏版本查看。';
+  static const dexAbilityEmptyPending = '暂无特性数据。';
   static const dexBaseHappiness = '初始亲密度';
   static const dexCaptureRate = '捕获率';
   static const dexEvYield = '基础点数 (EV)';
-  static const dexObtainEmptyVersion =
-      '当前游戏版本暂无出现地点，请切换其他版本查看。';
+  static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
   static const dexFlavorNoEdition =
       '当前版本暂无图鉴描述';

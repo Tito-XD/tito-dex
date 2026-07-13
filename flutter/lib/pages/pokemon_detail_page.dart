@@ -36,6 +36,7 @@ class PokemonDetailPage extends StatefulWidget {
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> {
   PokemonDetail? _detail;
+  List<PokemonAbility> _abilities = const [];
   (String, String)? _errorCopy;
   bool _loading = true;
   int _currentTabIndex = 0;
@@ -87,11 +88,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     });
     try {
       final detail = await dexRepository.getDetail(widget.pokemonId);
+      final abilities = await dexRepository.abilitiesForPokemon(widget.pokemonId);
       if (!mounted) {
         return;
       }
       setState(() {
         _detail = detail;
+        _abilities = abilities;
         _loading = false;
       });
     } catch (error) {
@@ -213,24 +216,33 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     return 0;
   }
 
-  List<ObtainLocationEntry> _obtainForEdition(PokemonDetail detail) {
-    return detail.obtainLocationsForKey(_gameEdition.dataVersionGroupKey);
-  }
-
-  String? _obtainSourceLabel(PokemonDetail detail) {
-    final key = _gameEdition.dataVersionGroupKey;
-    final direct = detail.obtainLocationsByGame[key];
-    if (direct != null && direct.isNotEmpty) {
-      return _gameEdition.labelZh;
+  List<(String, List<ObtainLocationEntry>)> _allObtainGroups(
+    PokemonDetail detail,
+  ) {
+    final seen = <String>{};
+    final groups = <(String, List<ObtainLocationEntry>)>[];
+    for (final edition in GameEdition.all) {
+      final key = edition.dataVersionGroupKey;
+      if (seen.contains(key)) {
+        continue;
+      }
+      final locations = detail.obtainLocationsByGame[key];
+      if (locations != null && locations.isNotEmpty) {
+        seen.add(key);
+        groups.add((key, locations));
+      }
     }
-    final (fallbackKey, _) = detail.firstAvailableObtain;
-    if (fallbackKey == null) {
-      return null;
+    for (final entry in detail.obtainLocationsByGame.entries) {
+      if (entry.value.isEmpty || seen.contains(entry.key)) {
+        continue;
+      }
+      seen.add(entry.key);
+      groups.add((entry.key, entry.value));
     }
-    if (fallbackKey == key) {
-      return _gameEdition.labelZh;
+    if (groups.isEmpty && detail.obtainLocations.isNotEmpty) {
+      groups.add(('heartgold-soulsilver', detail.obtainLocations));
     }
-    return fallbackKey;
+    return groups;
   }
 
   List<Widget> _introSections(PokemonDetail detail) => [
@@ -252,20 +264,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         const SizedBox(height: 12),
         IntroMetaCard(detail: detail),
         const SizedBox(height: 12),
-        AbilitiesCard(
-          abilities: detail.abilities,
-          gameEdition: _gameEdition,
-          onPickEdition: () async {
-            final picked = await showGameEditionPicker(
-              context,
-              selected: _gameEdition,
-            );
-            if (picked != null && mounted) {
-              setState(() => _gameEdition = picked);
-              await dexSettingsRepository.saveDefaultGameEdition(picked);
-            }
-          },
-        ),
+        AbilitiesCard(abilities: _abilities),
         const SizedBox(height: 12),
         StickerCard(
           child: Text(
@@ -286,8 +285,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       ],
       InteractiveTypeEffectivenessCard(
         types: detail.summary.types,
-        abilities: detail.abilities,
+        abilities: _abilities,
         generation: _gameEdition.generation,
+        abilityPickerLabel: AppZh.dexAbilityFilter,
       ),
       const SizedBox(height: 12),
       StickerCard(
@@ -313,37 +313,25 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
-    final locations = _obtainForEdition(detail);
+    final obtainGroups = _allObtainGroups(detail);
     final sections = <Widget>[
-      if (locations.isNotEmpty)
-        ObtainLocationsCard(
-          locations: locations,
-          gameLabel: _obtainSourceLabel(detail) ?? _gameEdition.labelZh,
-        )
+      if (obtainGroups.isNotEmpty)
+        ...[
+          for (var i = 0; i < obtainGroups.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            ObtainLocationsCard(
+              locations: obtainGroups[i].$2,
+              gameLabel: gameEditionLabelForVersionGroup(obtainGroups[i].$1),
+            ),
+          ],
+        ]
       else
         StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.dexObtainEmptyVersion,
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () async {
-                  final picked = await showGameEditionPicker(
-                    context,
-                    selected: _gameEdition,
-                  );
-                  if (picked != null && mounted) {
-                    setState(() => _gameEdition = picked);
-                    await dexSettingsRepository.saveDefaultGameEdition(picked);
-                  }
-                },
-                child: const Text(AppZh.dexFlavorPickEdition),
-              ),
-            ],
+          child: Text(
+            AppZh.dexObtainEmptyVersion,
+            style: SecondaryTypography.onCard.body14.copyWith(
+              color: TitoColors.mutedInk,
+            ),
           ),
         ),
     ];
