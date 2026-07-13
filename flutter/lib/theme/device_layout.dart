@@ -261,6 +261,10 @@ abstract final class DeviceLayout {
   static double trainerDenseCardHeight(BuildContext context) =>
       dim(context, 200.0);
 
+  /// Square-dashboard trainer card — same 5-row grid + height as portrait dense.
+  static double trainerSquareCardHeight(BuildContext context) =>
+      trainerDenseCardHeight(context);
+
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);
 

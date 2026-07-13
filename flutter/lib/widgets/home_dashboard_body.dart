@@ -182,7 +182,7 @@ class _SquareHomeLayout extends StatelessWidget {
                     _TrainerCardSlot(
                       journey: journey,
                       bootstrapping: bootstrapping,
-                      micro: true,
+                      dense: true,
                     ),
                     if (bootstrapping) ...[
                       SizedBox(height: gap),

@@ -99,15 +99,17 @@ class _TrainerCardMetrics {
     return switch (density) {
       TrainerCardDensity.micro => _TrainerCardMetrics(
           cardHeight: DeviceLayout.trainerMicroCardHeight(context),
-          rowCount: 3,
-          avatarSpanRows: 2,
+          rowCount: 5,
+          avatarSpanRows: 3,
           gutter: DeviceLayout.dim(context, 8),
           textGap: DeviceLayout.dim(context, 4),
           greetingFontSize: DeviceLayout.dim(context, 15),
           nameFontSize: DeviceLayout.dim(context, 14),
         ),
       TrainerCardDensity.dense => _TrainerCardMetrics(
-          cardHeight: DeviceLayout.trainerDenseCardHeight(context),
+          cardHeight: DeviceLayout.useSquareDashboard(context)
+              ? DeviceLayout.trainerSquareCardHeight(context)
+              : DeviceLayout.trainerDenseCardHeight(context),
           rowCount: 5,
           avatarSpanRows: 3,
           gutter: DeviceLayout.dim(context, 12),
