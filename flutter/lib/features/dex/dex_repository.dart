@@ -2,7 +2,9 @@ import '../companion/companion_art.dart';
 import '../parser/hgss_format.dart';
 import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
+import '../game/game_edition.dart';
 import '../game/game_edition_repository.dart';
+import '../../l10n/app_zh.dart';
 import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
 import 'dex_filter.dart';
@@ -192,25 +194,65 @@ class DexRepository {
   /// Abilities for a species — detail JSON first, then reverse lookup in abilities index.
   Future<List<PokemonAbility>> abilitiesForPokemon(int pokemonId) async {
     final detail = await getDetail(pokemonId);
-    if (detail.abilities.isNotEmpty) {
-      return detail.abilities;
+    var abilities = detail.abilities;
+    if (abilities.isEmpty) {
+      final index = await _loadAllAbilities();
+      final fromIndex = <PokemonAbility>[];
+      for (final entry in index.values) {
+        if (entry.pokemonIds.contains(pokemonId)) {
+          fromIndex.add(
+            PokemonAbility(
+              nameEn: entry.nameEn,
+              nameZh: entry.nameZh,
+              descriptionZh: entry.descriptionZh,
+            ),
+          );
+        }
+      }
+      fromIndex.sort((a, b) => a.nameZh.compareTo(b.nameZh));
+      abilities = fromIndex;
+    }
+    return _enrichAbilityGameLabels(abilities, detail);
+  }
+
+  List<PokemonAbility> _enrichAbilityGameLabels(
+    List<PokemonAbility> abilities,
+    PokemonDetail detail,
+  ) {
+    if (abilities.isEmpty) {
+      return abilities;
     }
 
-    final index = await _loadAllAbilities();
-    final fromIndex = <PokemonAbility>[];
-    for (final entry in index.values) {
-      if (entry.pokemonIds.contains(pokemonId)) {
-        fromIndex.add(
-          PokemonAbility(
-            nameEn: entry.nameEn,
-            nameZh: entry.nameZh,
-            descriptionZh: entry.descriptionZh,
-          ),
-        );
+    final labelsByNameEn = <String, List<String>>{};
+    if (detail.abilitiesByGame.isNotEmpty) {
+      for (final entry in detail.abilitiesByGame.entries) {
+        final label = gameEditionLabelForVersionGroup(entry.key);
+        for (final ability in entry.value) {
+          labelsByNameEn
+              .putIfAbsent(ability.nameEn, () => [])
+              .add(label);
+        }
       }
     }
-    fromIndex.sort((a, b) => a.nameZh.compareTo(b.nameZh));
-    return fromIndex;
+
+    return abilities.map((ability) {
+      if (ability.gameLabelsZh.isNotEmpty) {
+        return ability;
+      }
+      final labels = labelsByNameEn[ability.nameEn];
+      if (labels != null && labels.isNotEmpty) {
+        return ability.copyWith(
+          gameLabelsZh: labels.toSet().toList()..sort(),
+        );
+      }
+      return ability.copyWith(
+        gameLabelsZh: [
+          ability.isHidden
+              ? AppZh.dexAbilitySinceGen5
+              : AppZh.dexAbilityAllVersions,
+        ],
+      );
+    }).toList(growable: false);
   }
 
   Future<List<PokemonSummary>> getAllSummaries() async {

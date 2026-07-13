@@ -243,40 +243,23 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('AbilitiesCard shown without AbilityPlaceholderCard when data present',
+  testWidgets('AbilitiesCard shows ability with game version label',
       (tester) async {
-    const detail = PokemonDetail(
-      summary: PokemonSummary(
-        id: 1,
-        nameEn: 'bulbasaur',
-        nameZh: '妙蛙种子',
-        types: ['grass', 'poison'],
+    const abilities = [
+      PokemonAbility(
+        nameEn: 'overgrow',
+        nameZh: '茂盛',
+        descriptionZh: 'HP减少时，草属性招式的威力会提高。',
+        gameLabelsZh: ['全版本'],
       ),
-      genusZh: '种子宝可梦',
-      heightDm: 70,
-      weightHg: 69,
-      weaknesses: const [],
-      resistances: const [],
-      immunities: const [],
-      stabSuperEffective: const [],
-      evolutionChain: null,
-      abilities: [
-        PokemonAbility(
-          nameEn: 'overgrow',
-          nameZh: '茂盛',
-          descriptionZh: 'HP减少时，草属性招式的威力会提高。',
-        ),
-      ],
-    );
+    ];
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: ListView(
             children: [
-              AbilitiesCard(abilities: detail.abilities),
-              if (detail.abilities.isEmpty)
-                const AbilityPlaceholderCard(),
+              AbilitiesCard(abilities: abilities),
             ],
           ),
         ),
@@ -284,8 +267,7 @@ void main() {
     );
 
     expect(find.byType(AbilitiesCard), findsOneWidget);
-    expect(find.byType(AbilityPlaceholderCard), findsNothing);
-    expect(find.text('茂盛'), findsOneWidget);
+    expect(find.text('茂盛（全版本）'), findsOneWidget);
     expect(find.text('待收录'), findsNothing);
   });
 }
