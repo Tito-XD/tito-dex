@@ -114,7 +114,7 @@ Future<GameEdition?> showGameEditionGridPicker(
                       crossAxisCount: columns,
                       mainAxisSpacing: 8,
                       crossAxisSpacing: 8,
-                      childAspectRatio: 0.92,
+                      childAspectRatio: 0.82,
                     ),
                     itemCount: GameEdition.all.length,
                     itemBuilder: (context, index) {
@@ -145,6 +145,8 @@ Future<GameEdition?> showGameEditionGridPicker(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                _GameEditionGridIcon(edition: edition),
+                                const SizedBox(height: 6),
                                 Text(
                                   edition.labelZh,
                                   textAlign: TextAlign.center,
@@ -173,6 +175,39 @@ Future<GameEdition?> showGameEditionGridPicker(
       );
     },
   );
+}
+
+class _GameEditionGridIcon extends StatelessWidget {
+  const _GameEditionGridIcon({required this.edition});
+
+  final GameEdition edition;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = edition.iconUrl;
+    if (url == null) {
+      return Icon(
+        edition.hasPokeApiData
+            ? Icons.videogame_asset_rounded
+            : Icons.info_outline_rounded,
+        size: 36,
+        color: const Color(0x9918283B),
+      );
+    }
+    return Image.network(
+      url,
+      width: 40,
+      height: 40,
+      fit: BoxFit.contain,
+      errorBuilder: (_, __, ___) => Icon(
+        edition.hasPokeApiData
+            ? Icons.videogame_asset_rounded
+            : Icons.info_outline_rounded,
+        size: 36,
+        color: const Color(0x9918283B),
+      ),
+    );
+  }
 }
 
 /// List bottom sheet (legacy — prefer [showGameEditionGridPicker] on home).

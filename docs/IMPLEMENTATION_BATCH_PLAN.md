@@ -22,7 +22,7 @@
 | K1 | Sleep Tier A links (search page) |
 | L1–L3 | Handheld vs phone display rules |
 
-**Still pending:** G6 hand-drawn nav icons; L4 game grid **icon assets** (Tito to supply).
+**Still pending:** G6 hand-drawn nav icons.
 
 ---
 
@@ -30,8 +30,8 @@
 
 | ID | Item | Status |
 | --- | --- | --- |
-| A1 | `RELEASE_BUILD.md` + `verify_release_apk.sh` | On doc branch |
-| A2 | Fix v0.4.1 truncated APK | On doc branch |
+| A1 | `RELEASE_BUILD.md` + `verify_release_apk.sh` | ✅ |
+| A2 | Fix v0.4.1 truncated APK | ✅ |
 
 ---
 
@@ -118,7 +118,7 @@
 
 ## K. Pokémon Sleep (Tier A only) ✅
 
-| K1 | **Tier A only** — static tools / links (search page) | ✅ |
+| K1 | **Tier A only** — static tools / links (settings page) | ✅ |
 | K2 | No account sync this batch | ✅ |
 
 ---
@@ -128,15 +128,15 @@
 | L1 | Handheld panel (1:1, 3:4, 4:3): keep current RG layout | ✅ |
 | L2 | Other devices: normal status + nav bars, not fullscreen | ✅ |
 | L3 | No custom Wi‑Fi/battery except handheld panel | ✅ |
-| L4 | Game grid picker with icon slots when assets ready | partial |
+| L4 | Game grid picker with CDN icon slots | ✅ |
 
 ---
 
 ## Doc index
 
-- [JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md) — journey/trainer/team (on doc branch; merge to main)
+- [JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md) — journey/trainer/team product spec
 - [DISPLAY_LAYOUT.md](./DISPLAY_LAYOUT.md)
-- [RELEASE_BUILD.md](./RELEASE_BUILD.md) (doc branch)
+- [RELEASE_BUILD.md](./RELEASE_BUILD.md)
 
 ---
 

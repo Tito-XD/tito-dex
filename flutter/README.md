@@ -24,9 +24,12 @@ Same as working 0.2.11 / local 0.2.23: **arm64-v8a only**, ~20 MB, `TitoDex-<ver
 ```bash
 flutter build apk --release
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
+../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
 
 `android/app/build.gradle.kts`: `compileSdk/targetSdk 36`, `minSdk 24`, `abiFilters arm64-v8a`, release keystore in `android/key.properties`. No `--split-per-abi`.
+
+**Full checklist** (native libs, bundled assets, size ~20–23 MB): [docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md).
 
 **Upgrade:** uninstall any locally-built 0.2.x before sideloading (CI keystore ≠ your machine debug key).
 
