@@ -55,10 +55,20 @@ class DexCdnConfig {
   String spriteUrl(int id, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/sprites/$id.png';
 
+  String spriteUrlForVersionGroup(
+    int id,
+    String versionGroup, {
+    String prefix = bundleVersionPrefix,
+  }) =>
+      '$cdnBase/$prefix/sprites/by-version/$versionGroup/$id.png';
+
+  String animatedSpriteUrl(int id, {String prefix = bundleVersionPrefix}) =>
+      '$cdnBase/$prefix/sprites/animated/$id.gif';
+
   String artworkUrl(int id, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/artwork/$id.png';
 
-  String typeIconUrl(String type, {String prefix = legacyBundleVersionPrefix}) =>
+  String typeIconUrl(String type, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/type_icons/$type.png';
 
   String l10nFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>

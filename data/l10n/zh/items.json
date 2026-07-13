@@ -5134,7 +5134,7 @@
     "categoryEn": "gameplay",
     "categoryZh": "游戏",
     "nameEn": "Adamant Crystal",
-    "nameZh": "Adamant Crystal",
+    "nameZh": "大金刚宝玉",
     "slug": "adamant-crystal"
   },
   "166": {
@@ -5148,70 +5148,70 @@
     "categoryEn": "gameplay",
     "categoryZh": "游戏",
     "nameEn": "Lustrous Globe",
-    "nameZh": "Lustrous Globe",
+    "nameZh": "大白宝玉",
     "slug": "lustrous-globe"
   },
   "1661": {
     "categoryEn": "gameplay",
     "categoryZh": "游戏",
     "nameEn": "Griseous Core",
-    "nameZh": "Griseous Core",
+    "nameZh": "大白金宝玉",
     "slug": "griseous-core"
   },
   "1662": {
     "categoryEn": "plates",
     "categoryZh": "石板",
     "nameEn": "Blank Plate",
-    "nameZh": "Blank Plate",
+    "nameZh": "净空石板",
     "slug": "blank-plate"
   },
   "1663": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Strange Ball",
-    "nameZh": "Strange Ball",
+    "nameZh": "奇异球",
     "slug": "strange-ball"
   },
   "1664": {
     "categoryEn": "plates",
     "categoryZh": "石板",
     "nameEn": "Legend Plate",
-    "nameZh": "Legend Plate",
+    "nameZh": "传说石板",
     "slug": "legend-plate"
   },
   "1665": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Rotom Phone",
-    "nameZh": "Rotom Phone",
+    "nameZh": "手机洛托姆",
     "slug": "rotom-phone"
   },
   "1666": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Sandwich",
-    "nameZh": "Sandwich",
+    "nameZh": "三明治",
     "slug": "sandwich"
   },
   "1667": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Koraidon’s Poké Ball",
-    "nameZh": "Koraidon’s Poké Ball",
+    "nameZh": "故勒顿的球",
     "slug": "koraidons-poke-ball"
   },
   "1668": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Miraidon’s Poké Ball",
-    "nameZh": "Miraidon’s Poké Ball",
+    "nameZh": "密勒顿的球",
     "slug": "miraidons-poke-ball"
   },
   "1669": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Tera Orb",
-    "nameZh": "Tera Orb",
+    "nameZh": "太晶珠",
     "slug": "tera-orb"
   },
   "167": {
@@ -5225,70 +5225,70 @@
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Scarlet Book",
-    "nameZh": "Scarlet Book",
+    "nameZh": "朱之书",
     "slug": "scarlet-book"
   },
   "1671": {
     "categoryEn": "event-items",
     "categoryZh": "活动道具",
     "nameEn": "Violet Book",
-    "nameZh": "Violet Book",
+    "nameZh": "紫之书",
     "slug": "violet-book"
   },
   "1672": {
     "categoryEn": "plot-advancement",
     "categoryZh": "剧情",
     "nameEn": "Kofu’s Wallet",
-    "nameZh": "Kofu’s Wallet",
+    "nameZh": "海岱的钱包",
     "slug": "kofus-wallet"
   },
   "1673": {
     "categoryEn": "loot",
     "categoryZh": "loot",
     "nameEn": "Tiny Bamboo Shoot",
-    "nameZh": "Tiny Bamboo Shoot",
+    "nameZh": "小竹笋",
     "slug": "tiny-bamboo-shoot"
   },
   "1674": {
     "categoryEn": "loot",
     "categoryZh": "loot",
     "nameEn": "Big Bamboo Shoot",
-    "nameZh": "Big Bamboo Shoot",
+    "nameZh": "大竹笋",
     "slug": "big-bamboo-shoot"
   },
   "1675": {
     "categoryEn": "gameplay",
     "categoryZh": "游戏",
     "nameEn": "Scroll of Darkness",
-    "nameZh": "Scroll of Darkness",
+    "nameZh": "恶之挂轴",
     "slug": "scroll-of-darkness"
   },
   "1676": {
     "categoryEn": "gameplay",
     "categoryZh": "游戏",
     "nameEn": "Scroll of Waters",
-    "nameZh": "Scroll of Waters",
+    "nameZh": "水之挂轴",
     "slug": "scroll-of-waters"
   },
   "1677": {
     "categoryEn": "evolution",
     "categoryZh": "进化",
     "nameEn": "Malicious Armor",
-    "nameZh": "Malicious Armor",
+    "nameZh": "咒术之铠",
     "slug": "malicious-armor"
   },
   "1678": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Normal Tera Shard",
-    "nameZh": "Normal Tera Shard",
+    "nameZh": "一般太晶碎块",
     "slug": "normal-tera-shard"
   },
   "1679": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Fire Tera Shard",
-    "nameZh": "Fire Tera Shard",
+    "nameZh": "火太晶碎块",
     "slug": "fire-tera-shard"
   },
   "168": {
@@ -5302,70 +5302,70 @@
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Water Tera Shard",
-    "nameZh": "Water Tera Shard",
+    "nameZh": "水太晶碎块",
     "slug": "water-tera-shard"
   },
   "1681": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Electric Tera Shard",
-    "nameZh": "Electric Tera Shard",
+    "nameZh": "电太晶碎块",
     "slug": "electric-tera-shard"
   },
   "1682": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Grass Tera Shard",
-    "nameZh": "Grass Tera Shard",
+    "nameZh": "草太晶碎块",
     "slug": "grass-tera-shard"
   },
   "1683": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Ice Tera Shard",
-    "nameZh": "Ice Tera Shard",
+    "nameZh": "冰太晶碎块",
     "slug": "ice-tera-shard"
   },
   "1684": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Fighting Tera Shard",
-    "nameZh": "Fighting Tera Shard",
+    "nameZh": "格斗太晶碎块",
     "slug": "fighting-tera-shard"
   },
   "1685": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Poison Tera Shard",
-    "nameZh": "Poison Tera Shard",
+    "nameZh": "毒太晶碎块",
     "slug": "poison-tera-shard"
   },
   "1686": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Ground Tera Shard",
-    "nameZh": "Ground Tera Shard",
+    "nameZh": "地面太晶碎块",
     "slug": "ground-tera-shard"
   },
   "1687": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Flying Tera Shard",
-    "nameZh": "Flying Tera Shard",
+    "nameZh": "飞行太晶碎块",
     "slug": "flying-tera-shard"
   },
   "1688": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Psychic Tera Shard",
-    "nameZh": "Psychic Tera Shard",
+    "nameZh": "超能力太晶碎块",
     "slug": "psychic-tera-shard"
   },
   "1689": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Bug Tera Shard",
-    "nameZh": "Bug Tera Shard",
+    "nameZh": "虫太晶碎块",
     "slug": "bug-tera-shard"
   },
   "169": {
@@ -5379,70 +5379,70 @@
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Rock Tera Shard",
-    "nameZh": "Rock Tera Shard",
+    "nameZh": "岩石太晶碎块",
     "slug": "rock-tera-shard"
   },
   "1691": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Ghost Tera Shard",
-    "nameZh": "Ghost Tera Shard",
+    "nameZh": "幽灵太晶碎块",
     "slug": "ghost-tera-shard"
   },
   "1692": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Dragon Tera Shard",
-    "nameZh": "Dragon Tera Shard",
+    "nameZh": "龙太晶碎块",
     "slug": "dragon-tera-shard"
   },
   "1693": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Dark Tera Shard",
-    "nameZh": "Dark Tera Shard",
+    "nameZh": "恶太晶碎块",
     "slug": "dark-tera-shard"
   },
   "1694": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Steel Tera Shard",
-    "nameZh": "Steel Tera Shard",
+    "nameZh": "钢太晶碎块",
     "slug": "steel-tera-shard"
   },
   "1695": {
     "categoryEn": "tera-shard",
     "categoryZh": "tera-shard",
     "nameEn": "Fairy Tera Shard",
-    "nameZh": "Fairy Tera Shard",
+    "nameZh": "妖精太晶碎块",
     "slug": "fairy-tera-shard"
   },
   "1696": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Booster Energy",
-    "nameZh": "Booster Energy",
+    "nameZh": "驱劲能量",
     "slug": "booster-energy"
   },
   "1697": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Ability Shield",
-    "nameZh": "Ability Shield",
+    "nameZh": "特性护具",
     "slug": "ability-shield"
   },
   "1698": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Clear Amulet",
-    "nameZh": "Clear Amulet",
+    "nameZh": "清净坠饰",
     "slug": "clear-amulet"
   },
   "1699": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Mirror Herb",
-    "nameZh": "Mirror Herb",
+    "nameZh": "模仿香草",
     "slug": "mirror-herb"
   },
   "17": {
@@ -5463,70 +5463,70 @@
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Punching Glove",
-    "nameZh": "Punching Glove",
+    "nameZh": "拳击手套",
     "slug": "punching-glove"
   },
   "1701": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Covert Cloak",
-    "nameZh": "Covert Cloak",
+    "nameZh": "密探斗篷",
     "slug": "covert-cloak"
   },
   "1702": {
     "categoryEn": "held-items",
     "categoryZh": "携带道具",
     "nameEn": "Loaded Dice",
-    "nameZh": "Loaded Dice",
+    "nameZh": "机变骰子",
     "slug": "loaded-dice"
   },
   "1703": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Baguette",
-    "nameZh": "Baguette",
+    "nameZh": "长棍面包",
     "slug": "baguette"
   },
   "1704": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Mayonnaise",
-    "nameZh": "Mayonnaise",
+    "nameZh": "蛋黄酱",
     "slug": "mayonnaise"
   },
   "1705": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Ketchup",
-    "nameZh": "Ketchup",
+    "nameZh": "番茄酱",
     "slug": "ketchup"
   },
   "1706": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Mustard",
-    "nameZh": "Mustard",
+    "nameZh": "黄芥末酱",
     "slug": "mustard"
   },
   "1707": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Butter",
-    "nameZh": "Butter",
+    "nameZh": "黄油",
     "slug": "butter"
   },
   "1708": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Peanut Butter",
-    "nameZh": "Peanut Butter",
+    "nameZh": "花生酱",
     "slug": "peanut-butter"
   },
   "1709": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Chili Sauce",
-    "nameZh": "Chili Sauce",
+    "nameZh": "辣酱",
     "slug": "chili-sauce"
   },
   "171": {
@@ -5540,70 +5540,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Salt",
-    "nameZh": "Salt",
+    "nameZh": "盐",
     "slug": "salt"
   },
   "1711": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Pepper",
-    "nameZh": "Pepper",
+    "nameZh": "胡椒",
     "slug": "pepper"
   },
   "1712": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Yogurt",
-    "nameZh": "Yogurt",
+    "nameZh": "酸奶",
     "slug": "yogurt"
   },
   "1713": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Whipped Cream",
-    "nameZh": "Whipped Cream",
+    "nameZh": "鲜奶油",
     "slug": "whipped-cream"
   },
   "1714": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Cream Cheese",
-    "nameZh": "Cream Cheese",
+    "nameZh": "奶油芝士",
     "slug": "cream-cheese"
   },
   "1715": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Jam",
-    "nameZh": "Jam",
+    "nameZh": "莓果酱",
     "slug": "jam"
   },
   "1716": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Marmalade",
-    "nameZh": "Marmalade",
+    "nameZh": "橘子酱",
     "slug": "marmalade"
   },
   "1717": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Olive Oil",
-    "nameZh": "Olive Oil",
+    "nameZh": "橄榄油",
     "slug": "olive-oil"
   },
   "1718": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Vinegar",
-    "nameZh": "Vinegar",
+    "nameZh": "醋",
     "slug": "vinegar"
   },
   "1719": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Sweet Herba Mystica",
-    "nameZh": "Sweet Herba Mystica",
+    "nameZh": "秘传：甜味料",
     "slug": "sweet-herba-mystica"
   },
   "172": {
@@ -5617,70 +5617,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Salty Herba Mystica",
-    "nameZh": "Salty Herba Mystica",
+    "nameZh": "秘传：咸味料",
     "slug": "salty-herba-mystica"
   },
   "1721": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Sour Herba Mystica",
-    "nameZh": "Sour Herba Mystica",
+    "nameZh": "秘传：酸味料",
     "slug": "sour-herba-mystica"
   },
   "1722": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Bitter Herba Mystica",
-    "nameZh": "Bitter Herba Mystica",
+    "nameZh": "秘传：苦味料",
     "slug": "bitter-herba-mystica"
   },
   "1723": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Spicy Herba Mystica",
-    "nameZh": "Spicy Herba Mystica",
+    "nameZh": "秘传：辣味料",
     "slug": "spicy-herba-mystica"
   },
   "1724": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Lettuce",
-    "nameZh": "Lettuce",
+    "nameZh": "生菜",
     "slug": "lettuce"
   },
   "1725": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Tomato",
-    "nameZh": "Tomato",
+    "nameZh": "西红柿片",
     "slug": "tomato"
   },
   "1726": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Cherry Tomatoes",
-    "nameZh": "Cherry Tomatoes",
+    "nameZh": "小西红柿块",
     "slug": "cherry-tomatoes"
   },
   "1727": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Cucumber",
-    "nameZh": "Cucumber",
+    "nameZh": "小黄瓜片",
     "slug": "cucumber"
   },
   "1728": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Pickle",
-    "nameZh": "Pickle",
+    "nameZh": "酸黄瓜片",
     "slug": "pickle"
   },
   "1729": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Onion",
-    "nameZh": "Onion",
+    "nameZh": "洋葱片",
     "slug": "onion"
   },
   "173": {
@@ -5694,70 +5694,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Red Onion",
-    "nameZh": "Red Onion",
+    "nameZh": "红洋葱",
     "slug": "red-onion"
   },
   "1731": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Green Bell Pepper",
-    "nameZh": "Green Bell Pepper",
+    "nameZh": "青椒片",
     "slug": "green-bell-pepper"
   },
   "1732": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Red Bell Pepper",
-    "nameZh": "Red Bell Pepper",
+    "nameZh": "红椒片",
     "slug": "red-bell-pepper"
   },
   "1733": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Yellow Bell Pepper",
-    "nameZh": "Yellow Bell Pepper",
+    "nameZh": "黄椒片",
     "slug": "yellow-bell-pepper"
   },
   "1734": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Avocado",
-    "nameZh": "Avocado",
+    "nameZh": "牛油果",
     "slug": "avocado"
   },
   "1735": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Bacon",
-    "nameZh": "Bacon",
+    "nameZh": "煎培根",
     "slug": "bacon"
   },
   "1736": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Ham",
-    "nameZh": "Ham",
+    "nameZh": "火腿片",
     "slug": "ham"
   },
   "1737": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Prosciutto",
-    "nameZh": "Prosciutto",
+    "nameZh": "生火腿",
     "slug": "prosciutto"
   },
   "1738": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Chorizo",
-    "nameZh": "Chorizo",
+    "nameZh": "煎辣香肠",
     "slug": "chorizo"
   },
   "1739": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Herbed Sausage",
-    "nameZh": "Herbed Sausage",
+    "nameZh": "香草香肠",
     "slug": "herbed-sausage"
   },
   "174": {
@@ -5771,70 +5771,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Hamburger",
-    "nameZh": "Hamburger",
+    "nameZh": "汉堡排",
     "slug": "hamburger"
   },
   "1741": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Klawf Stick",
-    "nameZh": "Klawf Stick",
+    "nameZh": "毛崖蟹棒",
     "slug": "klawf-stick"
   },
   "1742": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Smoked Fillet",
-    "nameZh": "Smoked Fillet",
+    "nameZh": "烟熏鱼片",
     "slug": "smoked-fillet"
   },
   "1743": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Fried Fillet",
-    "nameZh": "Fried Fillet",
+    "nameZh": "炸鱼片",
     "slug": "fried-fillet"
   },
   "1744": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Egg",
-    "nameZh": "Egg",
+    "nameZh": "水煮蛋片",
     "slug": "egg"
   },
   "1745": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Potato Tortilla",
-    "nameZh": "Potato Tortilla",
+    "nameZh": "烘蛋",
     "slug": "potato-tortilla"
   },
   "1746": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Tofu",
-    "nameZh": "Tofu",
+    "nameZh": "豆腐",
     "slug": "tofu"
   },
   "1747": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Rice",
-    "nameZh": "Rice",
+    "nameZh": "米饭",
     "slug": "rice"
   },
   "1748": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Noodles",
-    "nameZh": "Noodles",
+    "nameZh": "面条",
     "slug": "noodles"
   },
   "1749": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Potato Salad",
-    "nameZh": "Potato Salad",
+    "nameZh": "土豆色拉",
     "slug": "potato-salad"
   },
   "175": {
@@ -5848,70 +5848,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Cheese",
-    "nameZh": "Cheese",
+    "nameZh": "芝士片",
     "slug": "cheese"
   },
   "1751": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Banana",
-    "nameZh": "Banana",
+    "nameZh": "香蕉片",
     "slug": "banana"
   },
   "1752": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Strawberry",
-    "nameZh": "Strawberry",
+    "nameZh": "草莓片",
     "slug": "strawberry"
   },
   "1753": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Apple",
-    "nameZh": "Apple",
+    "nameZh": "苹果片",
     "slug": "apple"
   },
   "1754": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Kiwi",
-    "nameZh": "Kiwi",
+    "nameZh": "奇异果片",
     "slug": "kiwi"
   },
   "1755": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Pineapple",
-    "nameZh": "Pineapple",
+    "nameZh": "凤梨片",
     "slug": "pineapple"
   },
   "1756": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Jalapeño",
-    "nameZh": "Jalapeño",
+    "nameZh": "小辣椒",
     "slug": "jalapeno"
   },
   "1757": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Horseradish",
-    "nameZh": "Horseradish",
+    "nameZh": "辣根",
     "slug": "horseradish"
   },
   "1758": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Curry Powder",
-    "nameZh": "Curry Powder",
+    "nameZh": "咖喱粉",
     "slug": "curry-powder"
   },
   "1759": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Wasabi",
-    "nameZh": "Wasabi",
+    "nameZh": "芥末酱",
     "slug": "wasabi"
   },
   "176": {
@@ -5925,70 +5925,70 @@
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Watercress",
-    "nameZh": "Watercress",
+    "nameZh": "豆瓣菜",
     "slug": "watercress"
   },
   "1761": {
     "categoryEn": "sandwich-ingredients",
     "categoryZh": "sandwich-ingredients",
     "nameEn": "Basil",
-    "nameZh": "Basil",
+    "nameZh": "罗勒",
     "slug": "basil"
   },
   "1762": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Venonat Fang",
-    "nameZh": "Venonat Fang",
+    "nameZh": "毛球的牙",
     "slug": "venonat-fang"
   },
   "1763": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Diglett Dirt",
-    "nameZh": "Diglett Dirt",
+    "nameZh": "地鼠的土",
     "slug": "diglett-dirt"
   },
   "1764": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Meowth Fur",
-    "nameZh": "Meowth Fur",
+    "nameZh": "喵喵的毛",
     "slug": "meowth-fur"
   },
   "1765": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Psyduck Down",
-    "nameZh": "Psyduck Down",
+    "nameZh": "可达鸭的羽绒",
     "slug": "psyduck-down"
   },
   "1766": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Mankey Fur",
-    "nameZh": "Mankey Fur",
+    "nameZh": "猴怪的毛",
     "slug": "mankey-fur"
   },
   "1767": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Growlithe Fur",
-    "nameZh": "Growlithe Fur",
+    "nameZh": "卡蒂狗的毛",
     "slug": "growlithe-fur"
   },
   "1768": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Slowpoke Claw",
-    "nameZh": "Slowpoke Claw",
+    "nameZh": "呆呆兽的爪子",
     "slug": "slowpoke-claw"
   },
   "1769": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Magnemite Screw",
-    "nameZh": "Magnemite Screw",
+    "nameZh": "小磁怪的螺丝",
     "slug": "magnemite-screw"
   },
   "177": {
@@ -6002,70 +6002,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Grimer Toxin",
-    "nameZh": "Grimer Toxin",
+    "nameZh": "臭泥的毒素",
     "slug": "grimer-toxin"
   },
   "1771": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shellder Pearl",
-    "nameZh": "Shellder Pearl",
+    "nameZh": "大舌贝的珍珠",
     "slug": "shellder-pearl"
   },
   "1772": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Gastly Gas",
-    "nameZh": "Gastly Gas",
+    "nameZh": "鬼斯的气体",
     "slug": "gastly-gas"
   },
   "1773": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Drowzee Fur",
-    "nameZh": "Drowzee Fur",
+    "nameZh": "催眠貘的毛",
     "slug": "drowzee-fur"
   },
   "1774": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Voltorb Sparks",
-    "nameZh": "Voltorb Sparks",
+    "nameZh": "霹雳电球的电力",
     "slug": "voltorb-sparks"
   },
   "1775": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Scyther Claw",
-    "nameZh": "Scyther Claw",
+    "nameZh": "飞天螳螂的爪子",
     "slug": "scyther-claw"
   },
   "1776": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tauros Hair",
-    "nameZh": "Tauros Hair",
+    "nameZh": "肯泰罗的毛",
     "slug": "tauros-hair"
   },
   "1777": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Magikarp Scales",
-    "nameZh": "Magikarp Scales",
+    "nameZh": "鲤鱼王的鳞片",
     "slug": "magikarp-scales"
   },
   "1778": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Ditto Goo",
-    "nameZh": "Ditto Goo",
+    "nameZh": "百变怪的黏糊",
     "slug": "ditto-goo"
   },
   "1779": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Eevee Fur",
-    "nameZh": "Eevee Fur",
+    "nameZh": "伊布的毛",
     "slug": "eevee-fur"
   },
   "178": {
@@ -6079,70 +6079,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Dratini Scales",
-    "nameZh": "Dratini Scales",
+    "nameZh": "迷你龙的鳞片",
     "slug": "dratini-scales"
   },
   "1781": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pichu Fur",
-    "nameZh": "Pichu Fur",
+    "nameZh": "皮丘的毛",
     "slug": "pichu-fur"
   },
   "1782": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Igglybuff Fluff",
-    "nameZh": "Igglybuff Fluff",
+    "nameZh": "宝宝丁的毛",
     "slug": "igglybuff-fluff"
   },
   "1783": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Mareep Wool",
-    "nameZh": "Mareep Wool",
+    "nameZh": "咩利羊的毛球",
     "slug": "mareep-wool"
   },
   "1784": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Hoppip Leaf",
-    "nameZh": "Hoppip Leaf",
+    "nameZh": "毽子草的叶片",
     "slug": "hoppip-leaf"
   },
   "1785": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sunkern Leaf",
-    "nameZh": "Sunkern Leaf",
+    "nameZh": "向日种子的叶片",
     "slug": "sunkern-leaf"
   },
   "1786": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Murkrow Bauble",
-    "nameZh": "Murkrow Bauble",
+    "nameZh": "黑暗鸦的宝物",
     "slug": "murkrow-bauble"
   },
   "1787": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Misdreavus Tears",
-    "nameZh": "Misdreavus Tears",
+    "nameZh": "梦妖的眼泪",
     "slug": "misdreavus-tears"
   },
   "1788": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Girafarig Fur",
-    "nameZh": "Girafarig Fur",
+    "nameZh": "麒麟奇的毛",
     "slug": "girafarig-fur"
   },
   "1789": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pineco Husk",
-    "nameZh": "Pineco Husk",
+    "nameZh": "榛果球的壳",
     "slug": "pineco-husk"
   },
   "179": {
@@ -6156,70 +6156,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Dunsparce Scales",
-    "nameZh": "Dunsparce Scales",
+    "nameZh": "土龙弟弟的鳞片",
     "slug": "dunsparce-scales"
   },
   "1791": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Qwilfish Spines",
-    "nameZh": "Qwilfish Spines",
+    "nameZh": "千针鱼的刺",
     "slug": "qwilfish-spines"
   },
   "1792": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Heracross Claw",
-    "nameZh": "Heracross Claw",
+    "nameZh": "赫拉克罗斯的爪子",
     "slug": "heracross-claw"
   },
   "1793": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sneasel Claw",
-    "nameZh": "Sneasel Claw",
+    "nameZh": "狃拉的爪子",
     "slug": "sneasel-claw"
   },
   "1794": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Teddiursa Claw",
-    "nameZh": "Teddiursa Claw",
+    "nameZh": "熊宝宝的爪子",
     "slug": "teddiursa-claw"
   },
   "1795": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Delibird Parcel",
-    "nameZh": "Delibird Parcel",
+    "nameZh": "信使鸟的行李",
     "slug": "delibird-parcel"
   },
   "1796": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Houndour Fang",
-    "nameZh": "Houndour Fang",
+    "nameZh": "戴鲁比的牙",
     "slug": "houndour-fang"
   },
   "1797": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Phanpy Nail",
-    "nameZh": "Phanpy Nail",
+    "nameZh": "小小象的爪子",
     "slug": "phanpy-nail"
   },
   "1798": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Stantler Hair",
-    "nameZh": "Stantler Hair",
+    "nameZh": "惊角鹿的毛",
     "slug": "stantler-hair"
   },
   "1799": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Larvitar Claw",
-    "nameZh": "Larvitar Claw",
+    "nameZh": "幼基拉斯的爪子",
     "slug": "larvitar-claw"
   },
   "18": {
@@ -6240,70 +6240,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Wingull Feather",
-    "nameZh": "Wingull Feather",
+    "nameZh": "长翅鸥的羽毛",
     "slug": "wingull-feather"
   },
   "1801": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Ralts Dust",
-    "nameZh": "Ralts Dust",
+    "nameZh": "拉鲁拉丝的掉落物",
     "slug": "ralts-dust"
   },
   "1802": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Surskit Syrup",
-    "nameZh": "Surskit Syrup",
+    "nameZh": "溜溜糖球的蜜",
     "slug": "surskit-syrup"
   },
   "1803": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shroomish Spores",
-    "nameZh": "Shroomish Spores",
+    "nameZh": "蘑蘑菇的孢子",
     "slug": "shroomish-spores"
   },
   "1804": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Slakoth Fur",
-    "nameZh": "Slakoth Fur",
+    "nameZh": "懒人獭的毛",
     "slug": "slakoth-fur"
   },
   "1805": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Makuhita Sweat",
-    "nameZh": "Makuhita Sweat",
+    "nameZh": "幕下力士的汗",
     "slug": "makuhita-sweat"
   },
   "1806": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Azurill Fur",
-    "nameZh": "Azurill Fur",
+    "nameZh": "露力丽的毛",
     "slug": "azurill-fur"
   },
   "1807": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sableye Gem",
-    "nameZh": "Sableye Gem",
+    "nameZh": "勾魂眼的宝石",
     "slug": "sableye-gem"
   },
   "1808": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Meditite Sweat",
-    "nameZh": "Meditite Sweat",
+    "nameZh": "玛沙那的汗",
     "slug": "meditite-sweat"
   },
   "1809": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Gulpin Mucus",
-    "nameZh": "Gulpin Mucus",
+    "nameZh": "溶食兽的黏液",
     "slug": "gulpin-mucus"
   },
   "181": {
@@ -6317,70 +6317,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Numel Lava",
-    "nameZh": "Numel Lava",
+    "nameZh": "呆火驼的熔岩",
     "slug": "numel-lava"
   },
   "1811": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Torkoal Coal",
-    "nameZh": "Torkoal Coal",
+    "nameZh": "煤炭龟的煤炭",
     "slug": "torkoal-coal"
   },
   "1812": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Spoink Pearl",
-    "nameZh": "Spoink Pearl",
+    "nameZh": "跳跳猪的珍珠",
     "slug": "spoink-pearl"
   },
   "1813": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cacnea Needle",
-    "nameZh": "Cacnea Needle",
+    "nameZh": "刺球仙人掌的刺",
     "slug": "cacnea-needle"
   },
   "1814": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Swablu Fluff",
-    "nameZh": "Swablu Fluff",
+    "nameZh": "青绵鸟的羽毛",
     "slug": "swablu-fluff"
   },
   "1815": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Zangoose Claw",
-    "nameZh": "Zangoose Claw",
+    "nameZh": "猫鼬斩的爪子",
     "slug": "zangoose-claw"
   },
   "1816": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Seviper Fang",
-    "nameZh": "Seviper Fang",
+    "nameZh": "饭匙蛇的牙",
     "slug": "seviper-fang"
   },
   "1817": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Barboach Slime",
-    "nameZh": "Barboach Slime",
+    "nameZh": "泥泥鳅的黏液",
     "slug": "barboach-slime"
   },
   "1818": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shuppet Scrap",
-    "nameZh": "Shuppet Scrap",
+    "nameZh": "怨影娃娃的残片",
     "slug": "shuppet-scrap"
   },
   "1819": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tropius Leaf",
-    "nameZh": "Tropius Leaf",
+    "nameZh": "热带龙的叶片",
     "slug": "tropius-leaf"
   },
   "182": {
@@ -6394,70 +6394,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Snorunt Fur",
-    "nameZh": "Snorunt Fur",
+    "nameZh": "雪童子的毛",
     "slug": "snorunt-fur"
   },
   "1821": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Luvdisc Scales",
-    "nameZh": "Luvdisc Scales",
+    "nameZh": "爱心鱼的鳞片",
     "slug": "luvdisc-scales"
   },
   "1822": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bagon Scales",
-    "nameZh": "Bagon Scales",
+    "nameZh": "宝贝龙的鳞片",
     "slug": "bagon-scales"
   },
   "1823": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Starly Feather",
-    "nameZh": "Starly Feather",
+    "nameZh": "姆克儿的羽毛",
     "slug": "starly-feather"
   },
   "1824": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Kricketot Shell",
-    "nameZh": "Kricketot Shell",
+    "nameZh": "圆法师的蜕壳",
     "slug": "kricketot-shell"
   },
   "1825": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shinx Fang",
-    "nameZh": "Shinx Fang",
+    "nameZh": "小猫怪的牙",
     "slug": "shinx-fang"
   },
   "1826": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Combee Honey",
-    "nameZh": "Combee Honey",
+    "nameZh": "三蜜蜂的蜜",
     "slug": "combee-honey"
   },
   "1827": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pachirisu Fur",
-    "nameZh": "Pachirisu Fur",
+    "nameZh": "帕奇利兹的毛",
     "slug": "pachirisu-fur"
   },
   "1828": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Buizel Fur",
-    "nameZh": "Buizel Fur",
+    "nameZh": "泳圈鼬的毛",
     "slug": "buizel-fur"
   },
   "1829": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shellos Mucus",
-    "nameZh": "Shellos Mucus",
+    "nameZh": "无壳海兔的黏液",
     "slug": "shellos-mucus"
   },
   "183": {
@@ -6471,70 +6471,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Drifloon Gas",
-    "nameZh": "Drifloon Gas",
+    "nameZh": "飘飘球的气体",
     "slug": "drifloon-gas"
   },
   "1831": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Stunky Fur",
-    "nameZh": "Stunky Fur",
+    "nameZh": "臭鼬噗的毛",
     "slug": "stunky-fur"
   },
   "1832": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bronzor Fragment",
-    "nameZh": "Bronzor Fragment",
+    "nameZh": "铜镜怪的碎片",
     "slug": "bronzor-fragment"
   },
   "1833": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bonsly Tears",
-    "nameZh": "Bonsly Tears",
+    "nameZh": "盆才怪的眼泪",
     "slug": "bonsly-tears"
   },
   "1834": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Happiny Dust",
-    "nameZh": "Happiny Dust",
+    "nameZh": "小福蛋的掉落物",
     "slug": "happiny-dust"
   },
   "1835": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Spiritomb Fragment",
-    "nameZh": "Spiritomb Fragment",
+    "nameZh": "花岩怪的碎片",
     "slug": "spiritomb-fragment"
   },
   "1836": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Gible Scales",
-    "nameZh": "Gible Scales",
+    "nameZh": "圆陆鲨的鳞片",
     "slug": "gible-scales"
   },
   "1837": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Riolu Fur",
-    "nameZh": "Riolu Fur",
+    "nameZh": "利欧路的毛",
     "slug": "riolu-fur"
   },
   "1838": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Hippopotas Sand",
-    "nameZh": "Hippopotas Sand",
+    "nameZh": "沙河马的沙",
     "slug": "hippopotas-sand"
   },
   "1839": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Croagunk Poison",
-    "nameZh": "Croagunk Poison",
+    "nameZh": "不良蛙的毒素",
     "slug": "croagunk-poison"
   },
   "184": {
@@ -6548,70 +6548,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Finneon Scales",
-    "nameZh": "Finneon Scales",
+    "nameZh": "荧光鱼的鳞片",
     "slug": "finneon-scales"
   },
   "1841": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Snover Berries",
-    "nameZh": "Snover Berries",
+    "nameZh": "雪笠怪的果实",
     "slug": "snover-berries"
   },
   "1842": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rotom Sparks",
-    "nameZh": "Rotom Sparks",
+    "nameZh": "洛托姆的电力",
     "slug": "rotom-sparks"
   },
   "1843": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Petilil Leaf",
-    "nameZh": "Petilil Leaf",
+    "nameZh": "百合根娃娃的叶片",
     "slug": "petilil-leaf"
   },
   "1844": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Basculin Fang",
-    "nameZh": "Basculin Fang",
+    "nameZh": "野蛮鲈鱼的牙",
     "slug": "basculin-fang"
   },
   "1845": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sandile Claw",
-    "nameZh": "Sandile Claw",
+    "nameZh": "黑眼鳄的爪子",
     "slug": "sandile-claw"
   },
   "1846": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Zorua Fur",
-    "nameZh": "Zorua Fur",
+    "nameZh": "索罗亚的毛",
     "slug": "zorua-fur"
   },
   "1847": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Gothita Eyelash",
-    "nameZh": "Gothita Eyelash",
+    "nameZh": "哥德宝宝的睫毛",
     "slug": "gothita-eyelash"
   },
   "1848": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Deerling Hair",
-    "nameZh": "Deerling Hair",
+    "nameZh": "四季鹿的毛",
     "slug": "deerling-hair"
   },
   "1849": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Foongus Spores",
-    "nameZh": "Foongus Spores",
+    "nameZh": "哎呀球菇的孢子",
     "slug": "foongus-spores"
   },
   "185": {
@@ -6625,70 +6625,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Alomomola Mucus",
-    "nameZh": "Alomomola Mucus",
+    "nameZh": "保姆曼波的黏液",
     "slug": "alomomola-mucus"
   },
   "1851": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tynamo Slime",
-    "nameZh": "Tynamo Slime",
+    "nameZh": "麻麻小鱼的黏液",
     "slug": "tynamo-slime"
   },
   "1852": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Axew Scales",
-    "nameZh": "Axew Scales",
+    "nameZh": "牙牙的鳞片",
     "slug": "axew-scales"
   },
   "1853": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cubchoo Fur",
-    "nameZh": "Cubchoo Fur",
+    "nameZh": "喷嚏熊的毛",
     "slug": "cubchoo-fur"
   },
   "1854": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cryogonal Ice",
-    "nameZh": "Cryogonal Ice",
+    "nameZh": "几何雪花的冰",
     "slug": "cryogonal-ice"
   },
   "1855": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pawniard Blade",
-    "nameZh": "Pawniard Blade",
+    "nameZh": "驹刀小兵的刀",
     "slug": "pawniard-blade"
   },
   "1856": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rufflet Feather",
-    "nameZh": "Rufflet Feather",
+    "nameZh": "毛头小鹰的羽毛",
     "slug": "rufflet-feather"
   },
   "1857": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Deino Scales",
-    "nameZh": "Deino Scales",
+    "nameZh": "单首龙的鳞片",
     "slug": "deino-scales"
   },
   "1858": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Larvesta Fuzz",
-    "nameZh": "Larvesta Fuzz",
+    "nameZh": "燃烧虫的毛",
     "slug": "larvesta-fuzz"
   },
   "1859": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Fletchling Feather",
-    "nameZh": "Fletchling Feather",
+    "nameZh": "小箭雀的羽毛",
     "slug": "fletchling-feather"
   },
   "186": {
@@ -6702,70 +6702,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Scatterbug Powder",
-    "nameZh": "Scatterbug Powder",
+    "nameZh": "粉蝶虫的粉",
     "slug": "scatterbug-powder"
   },
   "1861": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Litleo Tuft",
-    "nameZh": "Litleo Tuft",
+    "nameZh": "小狮狮的鬃毛",
     "slug": "litleo-tuft"
   },
   "1862": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Flabébé Pollen",
-    "nameZh": "Flabébé Pollen",
+    "nameZh": "花蓓蓓的花粉",
     "slug": "flabebe-pollen"
   },
   "1863": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Skiddo Leaf",
-    "nameZh": "Skiddo Leaf",
+    "nameZh": "坐骑小羊的叶片",
     "slug": "skiddo-leaf"
   },
   "1864": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Skrelp Kelp",
-    "nameZh": "Skrelp Kelp",
+    "nameZh": "垃垃藻的碎藻",
     "slug": "skrelp-kelp"
   },
   "1865": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Clauncher Claw",
-    "nameZh": "Clauncher Claw",
+    "nameZh": "铁臂枪虾的钳子",
     "slug": "clauncher-claw"
   },
   "1866": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Hawlucha Down",
-    "nameZh": "Hawlucha Down",
+    "nameZh": "摔角鹰人的羽绒",
     "slug": "hawlucha-down"
   },
   "1867": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Dedenne Fur",
-    "nameZh": "Dedenne Fur",
+    "nameZh": "咚咚鼠的毛",
     "slug": "dedenne-fur"
   },
   "1868": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Goomy Goo",
-    "nameZh": "Goomy Goo",
+    "nameZh": "黏黏宝的黏液",
     "slug": "goomy-goo"
   },
   "1869": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Klefki Key",
-    "nameZh": "Klefki Key",
+    "nameZh": "钥圈儿的钥匙",
     "slug": "klefki-key"
   },
   "187": {
@@ -6779,70 +6779,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bergmite Ice",
-    "nameZh": "Bergmite Ice",
+    "nameZh": "冰宝的冰",
     "slug": "bergmite-ice"
   },
   "1871": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Noibat Fur",
-    "nameZh": "Noibat Fur",
+    "nameZh": "嗡蝠的毛",
     "slug": "noibat-fur"
   },
   "1872": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Yungoos Fur",
-    "nameZh": "Yungoos Fur",
+    "nameZh": "猫鼬少的毛",
     "slug": "yungoos-fur"
   },
   "1873": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Crabrawler Shell",
-    "nameZh": "Crabrawler Shell",
+    "nameZh": "好胜蟹的壳",
     "slug": "crabrawler-shell"
   },
   "1874": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Oricorio Feather",
-    "nameZh": "Oricorio Feather",
+    "nameZh": "花舞鸟的羽毛",
     "slug": "oricorio-feather"
   },
   "1875": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rockruff Rock",
-    "nameZh": "Rockruff Rock",
+    "nameZh": "岩狗狗的岩石",
     "slug": "rockruff-rock"
   },
   "1876": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Mareanie Spike",
-    "nameZh": "Mareanie Spike",
+    "nameZh": "好坏星的刺",
     "slug": "mareanie-spike"
   },
   "1877": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Mudbray Mud",
-    "nameZh": "Mudbray Mud",
+    "nameZh": "泥驴仔的泥巴",
     "slug": "mudbray-mud"
   },
   "1878": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Fomantis Leaf",
-    "nameZh": "Fomantis Leaf",
+    "nameZh": "伪螳草的叶片",
     "slug": "fomantis-leaf"
   },
   "1879": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Salandit Gas",
-    "nameZh": "Salandit Gas",
+    "nameZh": "夜盗火蜥的气体",
     "slug": "salandit-gas"
   },
   "188": {
@@ -6856,70 +6856,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bounsweet Sweat",
-    "nameZh": "Bounsweet Sweat",
+    "nameZh": "甜竹竹的汗",
     "slug": "bounsweet-sweat"
   },
   "1881": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Oranguru Fur",
-    "nameZh": "Oranguru Fur",
+    "nameZh": "智挥猩的毛",
     "slug": "oranguru-fur"
   },
   "1882": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Passimian Fur",
-    "nameZh": "Passimian Fur",
+    "nameZh": "投掷猴的毛",
     "slug": "passimian-fur"
   },
   "1883": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sandygast Sand",
-    "nameZh": "Sandygast Sand",
+    "nameZh": "沙丘娃的沙",
     "slug": "sandygast-sand"
   },
   "1884": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Komala Claw",
-    "nameZh": "Komala Claw",
+    "nameZh": "树枕尾熊的爪子",
     "slug": "komala-claw"
   },
   "1885": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Mimikyu Scrap",
-    "nameZh": "Mimikyu Scrap",
+    "nameZh": "谜拟丘的残片",
     "slug": "mimikyu-scrap"
   },
   "1886": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bruxish Tooth",
-    "nameZh": "Bruxish Tooth",
+    "nameZh": "磨牙彩皮鱼的牙齿",
     "slug": "bruxish-tooth"
   },
   "1887": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Chewtle Claw",
-    "nameZh": "Chewtle Claw",
+    "nameZh": "咬咬龟的爪子",
     "slug": "chewtle-claw"
   },
   "1888": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Skwovet Fur",
-    "nameZh": "Skwovet Fur",
+    "nameZh": "贪心栗鼠的毛",
     "slug": "skwovet-fur"
   },
   "1889": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Arrokuda Scales",
-    "nameZh": "Arrokuda Scales",
+    "nameZh": "刺梭鱼的鳞片",
     "slug": "arrokuda-scales"
   },
   "189": {
@@ -6933,70 +6933,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rookidee Feather",
-    "nameZh": "Rookidee Feather",
+    "nameZh": "稚山雀的羽毛",
     "slug": "rookidee-feather"
   },
   "1891": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Toxel Sparks",
-    "nameZh": "Toxel Sparks",
+    "nameZh": "电音婴的电力",
     "slug": "toxel-sparks"
   },
   "1892": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Falinks Sweat",
-    "nameZh": "Falinks Sweat",
+    "nameZh": "列阵兵的汗",
     "slug": "falinks-sweat"
   },
   "1893": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cufant Tarnish",
-    "nameZh": "Cufant Tarnish",
+    "nameZh": "铜象的锈",
     "slug": "cufant-tarnish"
   },
   "1894": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rolycoly Coal",
-    "nameZh": "Rolycoly Coal",
+    "nameZh": "小炭仔的煤炭",
     "slug": "rolycoly-coal"
   },
   "1895": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Silicobra Sand",
-    "nameZh": "Silicobra Sand",
+    "nameZh": "沙包蛇的沙",
     "slug": "silicobra-sand"
   },
   "1896": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Indeedee Fur",
-    "nameZh": "Indeedee Fur",
+    "nameZh": "爱管侍的毛",
     "slug": "indeedee-fur"
   },
   "1897": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pincurchin Spines",
-    "nameZh": "Pincurchin Spines",
+    "nameZh": "啪嚓海胆的针",
     "slug": "pincurchin-spines"
   },
   "1898": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Snom Thread",
-    "nameZh": "Snom Thread",
+    "nameZh": "雪吞虫的丝",
     "slug": "snom-thread"
   },
   "1899": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Impidimp Hair",
-    "nameZh": "Impidimp Hair",
+    "nameZh": "捣蛋小妖的毛",
     "slug": "impidimp-hair"
   },
   "19": {
@@ -7017,70 +7017,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Applin Juice",
-    "nameZh": "Applin Juice",
+    "nameZh": "啃果虫的果汁",
     "slug": "applin-juice"
   },
   "1901": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Sinistea Chip",
-    "nameZh": "Sinistea Chip",
+    "nameZh": "来悲茶的碎片",
     "slug": "sinistea-chip"
   },
   "1902": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Hatenna Dust",
-    "nameZh": "Hatenna Dust",
+    "nameZh": "迷布莉姆的掉落物",
     "slug": "hatenna-dust"
   },
   "1903": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Stonjourner Stone",
-    "nameZh": "Stonjourner Stone",
+    "nameZh": "巨石丁的岩石",
     "slug": "stonjourner-stone"
   },
   "1904": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Eiscue Down",
-    "nameZh": "Eiscue Down",
+    "nameZh": "冰砌鹅的羽绒",
     "slug": "eiscue-down"
   },
   "1905": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Dreepy Powder",
-    "nameZh": "Dreepy Powder",
+    "nameZh": "多龙梅西亚的粉",
     "slug": "dreepy-powder"
   },
   "1906": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Lechonk Hair",
-    "nameZh": "Lechonk Hair",
+    "nameZh": "爱吃豚的毛",
     "slug": "lechonk-hair"
   },
   "1907": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tarountula Thread",
-    "nameZh": "Tarountula Thread",
+    "nameZh": "团珠蛛的丝",
     "slug": "tarountula-thread"
   },
   "1908": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Nymble Claw",
-    "nameZh": "Nymble Claw",
+    "nameZh": "豆蟋蟀的爪子",
     "slug": "nymble-claw"
   },
   "1909": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Rellor Mud",
-    "nameZh": "Rellor Mud",
+    "nameZh": "虫滚泥的泥巴",
     "slug": "rellor-mud"
   },
   "191": {
@@ -7094,70 +7094,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Greavard Wax",
-    "nameZh": "Greavard Wax",
+    "nameZh": "墓仔狗的蜡",
     "slug": "greavard-wax"
   },
   "1911": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Flittle Down",
-    "nameZh": "Flittle Down",
+    "nameZh": "飘飘雏的羽绒",
     "slug": "flittle-down"
   },
   "1912": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Wiglett Sand",
-    "nameZh": "Wiglett Sand",
+    "nameZh": "海地鼠的沙",
     "slug": "wiglett-sand"
   },
   "1913": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Dondozo Whisker",
-    "nameZh": "Dondozo Whisker",
+    "nameZh": "吃吼霸的胡须",
     "slug": "dondozo-whisker"
   },
   "1914": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Veluza Fillet",
-    "nameZh": "Veluza Fillet",
+    "nameZh": "轻身鳕的鱼片",
     "slug": "veluza-fillet"
   },
   "1915": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Finizen Mucus",
-    "nameZh": "Finizen Mucus",
+    "nameZh": "波普海豚的黏液",
     "slug": "finizen-mucus"
   },
   "1916": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Smoliv Oil",
-    "nameZh": "Smoliv Oil",
+    "nameZh": "迷你芙的油",
     "slug": "smoliv-oil"
   },
   "1917": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Capsakid Seed",
-    "nameZh": "Capsakid Seed",
+    "nameZh": "热辣娃的种子",
     "slug": "capsakid-seed"
   },
   "1918": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tadbulb Mucus",
-    "nameZh": "Tadbulb Mucus",
+    "nameZh": "光蚪仔的黏液",
     "slug": "tadbulb-mucus"
   },
   "1919": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Varoom Fume",
-    "nameZh": "Varoom Fume",
+    "nameZh": "噗隆隆的气体",
     "slug": "varoom-fume"
   },
   "192": {
@@ -7171,70 +7171,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Orthworm Tarnish",
-    "nameZh": "Orthworm Tarnish",
+    "nameZh": "拖拖蚓的锈",
     "slug": "orthworm-tarnish"
   },
   "1921": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tandemaus Fur",
-    "nameZh": "Tandemaus Fur",
+    "nameZh": "一对鼠的毛",
     "slug": "tandemaus-fur"
   },
   "1922": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cetoddle Grease",
-    "nameZh": "Cetoddle Grease",
+    "nameZh": "走鲸的油脂",
     "slug": "cetoddle-grease"
   },
   "1923": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Frigibax Scales",
-    "nameZh": "Frigibax Scales",
+    "nameZh": "凉脊龙的鳞片",
     "slug": "frigibax-scales"
   },
   "1924": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tatsugiri Scales",
-    "nameZh": "Tatsugiri Scales",
+    "nameZh": "米立龙的鳞片",
     "slug": "tatsugiri-scales"
   },
   "1925": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Cyclizar Scales",
-    "nameZh": "Cyclizar Scales",
+    "nameZh": "摩托蜥的鳞片",
     "slug": "cyclizar-scales"
   },
   "1926": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Pawmi Fur",
-    "nameZh": "Pawmi Fur",
+    "nameZh": "布拨的毛",
     "slug": "pawmi-fur"
   },
   "1927": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Wattrel Feather",
-    "nameZh": "Wattrel Feather",
+    "nameZh": "电海燕的羽毛",
     "slug": "wattrel-feather"
   },
   "1928": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bombirdier Feather",
-    "nameZh": "Bombirdier Feather",
+    "nameZh": "下石鸟的羽毛",
     "slug": "bombirdier-feather"
   },
   "1929": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Squawkabilly Feather",
-    "nameZh": "Squawkabilly Feather",
+    "nameZh": "怒鹦哥的羽毛",
     "slug": "squawkabilly-feather"
   },
   "193": {
@@ -7248,70 +7248,70 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Flamigo Down",
-    "nameZh": "Flamigo Down",
+    "nameZh": "缠红鹤的羽绒",
     "slug": "flamigo-down"
   },
   "1931": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Klawf Claw",
-    "nameZh": "Klawf Claw",
+    "nameZh": "毛崖蟹的钳子",
     "slug": "klawf-claw"
   },
   "1932": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Nacli Salt",
-    "nameZh": "Nacli Salt",
+    "nameZh": "盐石宝的盐",
     "slug": "nacli-salt"
   },
   "1933": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Glimmet Crystal",
-    "nameZh": "Glimmet Crystal",
+    "nameZh": "晶光芽的结晶",
     "slug": "glimmet-crystal"
   },
   "1934": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Shroodle Ink",
-    "nameZh": "Shroodle Ink",
+    "nameZh": "滋汁鼹的墨汁",
     "slug": "shroodle-ink"
   },
   "1935": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Fidough Fur",
-    "nameZh": "Fidough Fur",
+    "nameZh": "狗仔包的毛",
     "slug": "fidough-fur"
   },
   "1936": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Maschiff Fang",
-    "nameZh": "Maschiff Fang",
+    "nameZh": "偶叫獒的牙",
     "slug": "maschiff-fang"
   },
   "1937": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Bramblin Twig",
-    "nameZh": "Bramblin Twig",
+    "nameZh": "纳噬草的枝条",
     "slug": "bramblin-twig"
   },
   "1938": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Gimmighoul Coin",
-    "nameZh": "Gimmighoul Coin",
+    "nameZh": "索财灵的硬币",
     "slug": "gimmighoul-coin"
   },
   "1939": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Tinkatink Hair",
-    "nameZh": "Tinkatink Hair",
+    "nameZh": "小锻匠的毛",
     "slug": "tinkatink-hair"
   },
   "194": {
@@ -7325,63 +7325,63 @@
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Charcadet Soot",
-    "nameZh": "Charcadet Soot",
+    "nameZh": "炭小侍的煤灰",
     "slug": "charcadet-soot"
   },
   "1941": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Toedscool Flaps",
-    "nameZh": "Toedscool Flaps",
+    "nameZh": "原野水母的薄片",
     "slug": "toedscool-flaps"
   },
   "1942": {
     "categoryEn": "tm-materials",
     "categoryZh": "tm-materials",
     "nameEn": "Wooper Slime",
-    "nameZh": "Wooper Slime",
+    "nameZh": "乌波的黏液",
     "slug": "wooper-slime"
   },
   "1944": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM101",
-    "nameZh": "TM101",
+    "nameZh": "招式学习器１０１",
     "slug": "tm101"
   },
   "1945": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM102",
-    "nameZh": "TM102",
+    "nameZh": "招式学习器１０２",
     "slug": "tm102"
   },
   "1946": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM103",
-    "nameZh": "TM103",
+    "nameZh": "招式学习器１０３",
     "slug": "tm103"
   },
   "1947": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM104",
-    "nameZh": "TM104",
+    "nameZh": "招式学习器１０４",
     "slug": "tm104"
   },
   "1948": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM105",
-    "nameZh": "TM105",
+    "nameZh": "招式学习器１０５",
     "slug": "tm105"
   },
   "1949": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM106",
-    "nameZh": "TM106",
+    "nameZh": "招式学习器１０６",
     "slug": "tm106"
   },
   "195": {
@@ -7395,70 +7395,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM107",
-    "nameZh": "TM107",
+    "nameZh": "招式学习器１０７",
     "slug": "tm107"
   },
   "1951": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM108",
-    "nameZh": "TM108",
+    "nameZh": "招式学习器１０８",
     "slug": "tm108"
   },
   "1952": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM109",
-    "nameZh": "TM109",
+    "nameZh": "招式学习器１０９",
     "slug": "tm109"
   },
   "1953": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM110",
-    "nameZh": "TM110",
+    "nameZh": "招式学习器１１０",
     "slug": "tm110"
   },
   "1954": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM111",
-    "nameZh": "TM111",
+    "nameZh": "招式学习器１１１",
     "slug": "tm111"
   },
   "1955": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM112",
-    "nameZh": "TM112",
+    "nameZh": "招式学习器１１２",
     "slug": "tm112"
   },
   "1956": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM113",
-    "nameZh": "TM113",
+    "nameZh": "招式学习器１１３",
     "slug": "tm113"
   },
   "1957": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM114",
-    "nameZh": "TM114",
+    "nameZh": "招式学习器１１４",
     "slug": "tm114"
   },
   "1958": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM115",
-    "nameZh": "TM115",
+    "nameZh": "招式学习器１１５",
     "slug": "tm115"
   },
   "1959": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM116",
-    "nameZh": "TM116",
+    "nameZh": "招式学习器１１６",
     "slug": "tm116"
   },
   "196": {
@@ -7472,70 +7472,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM117",
-    "nameZh": "TM117",
+    "nameZh": "招式学习器１１７",
     "slug": "tm117"
   },
   "1961": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM118",
-    "nameZh": "TM118",
+    "nameZh": "招式学习器１１８",
     "slug": "tm118"
   },
   "1962": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM119",
-    "nameZh": "TM119",
+    "nameZh": "招式学习器１１９",
     "slug": "tm119"
   },
   "1963": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM120",
-    "nameZh": "TM120",
+    "nameZh": "招式学习器１２０",
     "slug": "tm120"
   },
   "1964": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM121",
-    "nameZh": "TM121",
+    "nameZh": "招式学习器１２１",
     "slug": "tm121"
   },
   "1965": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM122",
-    "nameZh": "TM122",
+    "nameZh": "招式学习器１２２",
     "slug": "tm122"
   },
   "1966": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM123",
-    "nameZh": "TM123",
+    "nameZh": "招式学习器１２３",
     "slug": "tm123"
   },
   "1967": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM124",
-    "nameZh": "TM124",
+    "nameZh": "招式学习器１２４",
     "slug": "tm124"
   },
   "1968": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM125",
-    "nameZh": "TM125",
+    "nameZh": "招式学习器１２５",
     "slug": "tm125"
   },
   "1969": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM126",
-    "nameZh": "TM126",
+    "nameZh": "招式学习器１２６",
     "slug": "tm126"
   },
   "197": {
@@ -7549,70 +7549,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM127",
-    "nameZh": "TM127",
+    "nameZh": "招式学习器１２７",
     "slug": "tm127"
   },
   "1971": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM128",
-    "nameZh": "TM128",
+    "nameZh": "招式学习器１２８",
     "slug": "tm128"
   },
   "1972": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM129",
-    "nameZh": "TM129",
+    "nameZh": "招式学习器１２９",
     "slug": "tm129"
   },
   "1973": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM130",
-    "nameZh": "TM130",
+    "nameZh": "招式学习器１３０",
     "slug": "tm130"
   },
   "1974": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM131",
-    "nameZh": "TM131",
+    "nameZh": "招式学习器１３１",
     "slug": "tm131"
   },
   "1975": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM132",
-    "nameZh": "TM132",
+    "nameZh": "招式学习器１３２",
     "slug": "tm132"
   },
   "1976": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM133",
-    "nameZh": "TM133",
+    "nameZh": "招式学习器１３３",
     "slug": "tm133"
   },
   "1977": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM134",
-    "nameZh": "TM134",
+    "nameZh": "招式学习器１３４",
     "slug": "tm134"
   },
   "1978": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM135",
-    "nameZh": "TM135",
+    "nameZh": "招式学习器１３５",
     "slug": "tm135"
   },
   "1979": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM136",
-    "nameZh": "TM136",
+    "nameZh": "招式学习器１３６",
     "slug": "tm136"
   },
   "198": {
@@ -7626,70 +7626,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM137",
-    "nameZh": "TM137",
+    "nameZh": "招式学习器１３７",
     "slug": "tm137"
   },
   "1981": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM138",
-    "nameZh": "TM138",
+    "nameZh": "招式学习器１３８",
     "slug": "tm138"
   },
   "1982": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM139",
-    "nameZh": "TM139",
+    "nameZh": "招式学习器１３９",
     "slug": "tm139"
   },
   "1983": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM140",
-    "nameZh": "TM140",
+    "nameZh": "招式学习器１４０",
     "slug": "tm140"
   },
   "1984": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM141",
-    "nameZh": "TM141",
+    "nameZh": "招式学习器１４１",
     "slug": "tm141"
   },
   "1985": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM142",
-    "nameZh": "TM142",
+    "nameZh": "招式学习器１４２",
     "slug": "tm142"
   },
   "1986": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM143",
-    "nameZh": "TM143",
+    "nameZh": "招式学习器１４３",
     "slug": "tm143"
   },
   "1987": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM144",
-    "nameZh": "TM144",
+    "nameZh": "招式学习器１４４",
     "slug": "tm144"
   },
   "1988": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM145",
-    "nameZh": "TM145",
+    "nameZh": "招式学习器１４５",
     "slug": "tm145"
   },
   "1989": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM146",
-    "nameZh": "TM146",
+    "nameZh": "招式学习器１４６",
     "slug": "tm146"
   },
   "199": {
@@ -7703,70 +7703,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM147",
-    "nameZh": "TM147",
+    "nameZh": "招式学习器１４７",
     "slug": "tm147"
   },
   "1991": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM148",
-    "nameZh": "TM148",
+    "nameZh": "招式学习器１４８",
     "slug": "tm148"
   },
   "1992": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM149",
-    "nameZh": "TM149",
+    "nameZh": "招式学习器１４９",
     "slug": "tm149"
   },
   "1993": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM150",
-    "nameZh": "TM150",
+    "nameZh": "招式学习器１５０",
     "slug": "tm150"
   },
   "1994": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM151",
-    "nameZh": "TM151",
+    "nameZh": "招式学习器１５１",
     "slug": "tm151"
   },
   "1995": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM152",
-    "nameZh": "TM152",
+    "nameZh": "招式学习器１５２",
     "slug": "tm152"
   },
   "1996": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM153",
-    "nameZh": "TM153",
+    "nameZh": "招式学习器１５３",
     "slug": "tm153"
   },
   "1997": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM154",
-    "nameZh": "TM154",
+    "nameZh": "招式学习器１５４",
     "slug": "tm154"
   },
   "1998": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM155",
-    "nameZh": "TM155",
+    "nameZh": "招式学习器１５５",
     "slug": "tm155"
   },
   "1999": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM156",
-    "nameZh": "TM156",
+    "nameZh": "招式学习器１５６",
     "slug": "tm156"
   },
   "2": {
@@ -7794,70 +7794,70 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM157",
-    "nameZh": "TM157",
+    "nameZh": "招式学习器１５７",
     "slug": "tm157"
   },
   "2001": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM158",
-    "nameZh": "TM158",
+    "nameZh": "招式学习器１５８",
     "slug": "tm158"
   },
   "2002": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM159",
-    "nameZh": "TM159",
+    "nameZh": "招式学习器１５９",
     "slug": "tm159"
   },
   "2003": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM160",
-    "nameZh": "TM160",
+    "nameZh": "招式学习器１６０",
     "slug": "tm160"
   },
   "2004": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM161",
-    "nameZh": "TM161",
+    "nameZh": "招式学习器１６１",
     "slug": "tm161"
   },
   "2005": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM162",
-    "nameZh": "TM162",
+    "nameZh": "招式学习器１６２",
     "slug": "tm162"
   },
   "2006": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM163",
-    "nameZh": "TM163",
+    "nameZh": "招式学习器１６３",
     "slug": "tm163"
   },
   "2007": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM164",
-    "nameZh": "TM164",
+    "nameZh": "招式学习器１６４",
     "slug": "tm164"
   },
   "2008": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM165",
-    "nameZh": "TM165",
+    "nameZh": "招式学习器１６５",
     "slug": "tm165"
   },
   "2009": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM166",
-    "nameZh": "TM166",
+    "nameZh": "招式学习器１６６",
     "slug": "tm166"
   },
   "201": {
@@ -7871,63 +7871,63 @@
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM167",
-    "nameZh": "TM167",
+    "nameZh": "招式学习器１６７",
     "slug": "tm167"
   },
   "2011": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM168",
-    "nameZh": "TM168",
+    "nameZh": "招式学习器１６８",
     "slug": "tm168"
   },
   "2012": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM169",
-    "nameZh": "TM169",
+    "nameZh": "招式学习器１６９",
     "slug": "tm169"
   },
   "2013": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM170",
-    "nameZh": "TM170",
+    "nameZh": "招式学习器１７０",
     "slug": "tm170"
   },
   "2014": {
     "categoryEn": "all-machines",
     "categoryZh": "all-machines",
     "nameEn": "TM171",
-    "nameZh": "TM171",
+    "nameZh": "招式学习器１７１",
     "slug": "tm171"
   },
   "2015": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Picnic Set",
-    "nameZh": "Picnic Set",
+    "nameZh": "野餐组合",
     "slug": "picnic-set"
   },
   "2016": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Academy Bottle",
-    "nameZh": "Academy Bottle",
+    "nameZh": "校园水壶",
     "slug": "academy-bottle"
   },
   "2018": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Polka-Dot Bottle",
-    "nameZh": "Polka-Dot Bottle",
+    "nameZh": "圆点水壶",
     "slug": "polka-dot-bottle"
   },
   "2019": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Striped Bottle",
-    "nameZh": "Striped Bottle",
+    "nameZh": "条纹水壶",
     "slug": "striped-bottle"
   },
   "202": {
@@ -7941,56 +7941,56 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Diamond Bottle",
-    "nameZh": "Diamond Bottle",
+    "nameZh": "菱纹水壶",
     "slug": "diamond-bottle"
   },
   "2021": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Academy Cup",
-    "nameZh": "Academy Cup",
+    "nameZh": "校园水杯",
     "slug": "academy-cup"
   },
   "2023": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Striped Cup",
-    "nameZh": "Striped Cup",
+    "nameZh": "直条纹水杯",
     "slug": "striped-cup"
   },
   "2024": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Polka-Dot Cup",
-    "nameZh": "Polka-Dot Cup",
+    "nameZh": "圆点水杯",
     "slug": "polka-dot-cup"
   },
   "2025": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Flower Pattern Cup",
-    "nameZh": "Flower Pattern Cup",
+    "nameZh": "花朵水杯",
     "slug": "flower-pattern-cup"
   },
   "2026": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Academy Tablecloth",
-    "nameZh": "Academy Tablecloth",
+    "nameZh": "校园桌巾",
     "slug": "academy-tablecloth"
   },
   "2028": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Whimsical Tablecloth",
-    "nameZh": "Whimsical Tablecloth",
+    "nameZh": "幻彩桌巾",
     "slug": "whimsical-tablecloth"
   },
   "2029": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Leafy Tablecloth",
-    "nameZh": "Leafy Tablecloth",
+    "nameZh": "大自然桌巾",
     "slug": "leafy-tablecloth"
   },
   "203": {
@@ -8004,63 +8004,63 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Spooky Tablecloth",
-    "nameZh": "Spooky Tablecloth",
+    "nameZh": "鬼祟桌巾",
     "slug": "spooky-tablecloth"
   },
   "2031": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Academy Ball",
-    "nameZh": "Academy Ball",
+    "nameZh": "校园球",
     "slug": "academy-ball"
   },
   "2033": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Marill Ball",
-    "nameZh": "Marill Ball",
+    "nameZh": "玛力露球",
     "slug": "marill-ball"
   },
   "2034": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Yarn Ball",
-    "nameZh": "Yarn Ball",
+    "nameZh": "毛线球",
     "slug": "yarn-ball"
   },
   "2035": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Cyber Ball",
-    "nameZh": "Cyber Ball",
+    "nameZh": "电竞球",
     "slug": "cyber-ball"
   },
   "2036": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Gold Pick",
-    "nameZh": "Gold Pick",
+    "nameZh": "金色三明治签",
     "slug": "gold-pick"
   },
   "2037": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Silver Pick",
-    "nameZh": "Silver Pick",
+    "nameZh": "银色三明治签",
     "slug": "silver-pick"
   },
   "2038": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Red-Flag Pick",
-    "nameZh": "Red-Flag Pick",
+    "nameZh": "红旗子三明治签",
     "slug": "red-flag-pick"
   },
   "2039": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue-Flag Pick",
-    "nameZh": "Blue-Flag Pick",
+    "nameZh": "蓝旗子三明治签",
     "slug": "blue-flag-pick"
   },
   "204": {
@@ -8074,70 +8074,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Pika-Pika Pick",
-    "nameZh": "Pika-Pika Pick",
+    "nameZh": "皮卡丘三明治签",
     "slug": "pika-pika-pick"
   },
   "2041": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Winking Pika Pick",
-    "nameZh": "Winking Pika Pick",
+    "nameZh": "眨眼皮卡丘三明治签",
     "slug": "winking-pika-pick"
   },
   "2042": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Vee-Vee Pick",
-    "nameZh": "Vee-Vee Pick",
+    "nameZh": "伊布三明治签",
     "slug": "vee-vee-pick"
   },
   "2043": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Smiling Vee Pick",
-    "nameZh": "Smiling Vee Pick",
+    "nameZh": "笑脸伊布三明治签",
     "slug": "smiling-vee-pick"
   },
   "2044": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue Poké Ball Pick",
-    "nameZh": "Blue Poké Ball Pick",
+    "nameZh": "蓝珠珠三明治签",
     "slug": "blue-poke-ball-pick"
   },
   "2045": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Auspicious Armor",
-    "nameZh": "Auspicious Armor",
+    "nameZh": "庆祝之铠",
     "slug": "auspicious-armor"
   },
   "2046": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Leader’s Crest",
-    "nameZh": "Leader’s Crest",
+    "nameZh": "头领凭证",
     "slug": "leaders-crest"
   },
   "2047": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Pink Bottle",
-    "nameZh": "Pink Bottle",
+    "nameZh": "粉红水壶",
     "slug": "pink-bottle"
   },
   "2048": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue Bottle",
-    "nameZh": "Blue Bottle",
+    "nameZh": "蓝色水壶",
     "slug": "blue-bottle"
   },
   "2049": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Yellow Bottle",
-    "nameZh": "Yellow Bottle",
+    "nameZh": "黄色水壶",
     "slug": "yellow-bottle"
   },
   "205": {
@@ -8151,70 +8151,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Steel Bottle (R)",
-    "nameZh": "Steel Bottle (R)",
+    "nameZh": "红纹不锈钢水壶",
     "slug": "steel-bottle-r"
   },
   "2051": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Steel Bottle (Y)",
-    "nameZh": "Steel Bottle (Y)",
+    "nameZh": "黄纹不锈钢水壶",
     "slug": "steel-bottle-y"
   },
   "2052": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Steel Bottle (B)",
-    "nameZh": "Steel Bottle (B)",
+    "nameZh": "蓝纹不锈钢水壶",
     "slug": "steel-bottle-b"
   },
   "2053": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Silver Bottle",
-    "nameZh": "Silver Bottle",
+    "nameZh": "银钛水壶",
     "slug": "silver-bottle"
   },
   "2054": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Barred Cup",
-    "nameZh": "Barred Cup",
+    "nameZh": "横条纹水杯",
     "slug": "barred-cup"
   },
   "2055": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Diamond Pattern Cup",
-    "nameZh": "Diamond Pattern Cup",
+    "nameZh": "菱纹水杯",
     "slug": "diamond-pattern-cup"
   },
   "2056": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Fire Pattern Cup",
-    "nameZh": "Fire Pattern Cup",
+    "nameZh": "火焰水杯",
     "slug": "fire-pattern-cup"
   },
   "2057": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Pink Cup",
-    "nameZh": "Pink Cup",
+    "nameZh": "粉红水杯",
     "slug": "pink-cup"
   },
   "2058": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue Cup",
-    "nameZh": "Blue Cup",
+    "nameZh": "蓝色水杯",
     "slug": "blue-cup"
   },
   "2059": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Yellow Cup",
-    "nameZh": "Yellow Cup",
+    "nameZh": "黄色水杯",
     "slug": "yellow-cup"
   },
   "206": {
@@ -8228,70 +8228,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Pikachu Cup",
-    "nameZh": "Pikachu Cup",
+    "nameZh": "皮卡丘水杯",
     "slug": "pikachu-cup"
   },
   "2061": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Eevee Cup",
-    "nameZh": "Eevee Cup",
+    "nameZh": "伊布水杯",
     "slug": "eevee-cup"
   },
   "2062": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Slowpoke Cup",
-    "nameZh": "Slowpoke Cup",
+    "nameZh": "呆呆兽水杯",
     "slug": "slowpoke-cup"
   },
   "2063": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Silver Cup",
-    "nameZh": "Silver Cup",
+    "nameZh": "银钛水杯",
     "slug": "silver-cup"
   },
   "2064": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Exercise Ball",
-    "nameZh": "Exercise Ball",
+    "nameZh": "瑜珈球",
     "slug": "exercise-ball"
   },
   "2065": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Plaid Tablecloth (Y)",
-    "nameZh": "Plaid Tablecloth (Y)",
+    "nameZh": "黄色格子桌巾",
     "slug": "plaid-tablecloth-y"
   },
   "2066": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Plaid Tablecloth (B)",
-    "nameZh": "Plaid Tablecloth (B)",
+    "nameZh": "蓝色格子桌巾",
     "slug": "plaid-tablecloth-b"
   },
   "2067": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Plaid Tablecloth (R)",
-    "nameZh": "Plaid Tablecloth (R)",
+    "nameZh": "红色格子桌巾",
     "slug": "plaid-tablecloth-r"
   },
   "2068": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "B&W Grass Tablecloth",
-    "nameZh": "B&W Grass Tablecloth",
+    "nameZh": "黑白草丛桌巾",
     "slug": "bw-grass-tablecloth"
   },
   "2069": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Battle Tablecloth",
-    "nameZh": "Battle Tablecloth",
+    "nameZh": "对决桌巾",
     "slug": "battle-tablecloth"
   },
   "207": {
@@ -8305,70 +8305,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Monstrous Tablecloth",
-    "nameZh": "Monstrous Tablecloth",
+    "nameZh": "怪兽桌巾",
     "slug": "monstrous-tablecloth"
   },
   "2071": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Striped Tablecloth",
-    "nameZh": "Striped Tablecloth",
+    "nameZh": "条纹桌巾",
     "slug": "striped-tablecloth"
   },
   "2072": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Diamond Tablecloth",
-    "nameZh": "Diamond Tablecloth",
+    "nameZh": "菱纹桌巾",
     "slug": "diamond-tablecloth"
   },
   "2073": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Polka-Dot Tablecloth",
-    "nameZh": "Polka-Dot Tablecloth",
+    "nameZh": "圆点桌巾",
     "slug": "polka-dot-tablecloth"
   },
   "2074": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Lilac Tablecloth",
-    "nameZh": "Lilac Tablecloth",
+    "nameZh": "紫色桌巾",
     "slug": "lilac-tablecloth"
   },
   "2075": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Mint Tablecloth",
-    "nameZh": "Mint Tablecloth",
+    "nameZh": "浅绿桌巾",
     "slug": "mint-tablecloth"
   },
   "2076": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Peach Tablecloth",
-    "nameZh": "Peach Tablecloth",
+    "nameZh": "米色桌巾",
     "slug": "peach-tablecloth"
   },
   "2077": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Yellow Tablecloth",
-    "nameZh": "Yellow Tablecloth",
+    "nameZh": "黄色桌巾",
     "slug": "yellow-tablecloth"
   },
   "2078": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue Tablecloth",
-    "nameZh": "Blue Tablecloth",
+    "nameZh": "蓝色桌巾",
     "slug": "blue-tablecloth"
   },
   "2079": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Pink Tablecloth",
-    "nameZh": "Pink Tablecloth",
+    "nameZh": "粉红桌巾",
     "slug": "pink-tablecloth"
   },
   "208": {
@@ -8382,70 +8382,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Gold Bottle",
-    "nameZh": "Gold Bottle",
+    "nameZh": "金钛水壶",
     "slug": "gold-bottle"
   },
   "2081": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Bronze Bottle",
-    "nameZh": "Bronze Bottle",
+    "nameZh": "铜钛水壶",
     "slug": "bronze-bottle"
   },
   "2082": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Gold Cup",
-    "nameZh": "Gold Cup",
+    "nameZh": "金钛水杯",
     "slug": "gold-cup"
   },
   "2083": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Bronze Cup",
-    "nameZh": "Bronze Cup",
+    "nameZh": "铜钛水杯",
     "slug": "bronze-cup"
   },
   "2084": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Green Poké Ball Pick",
-    "nameZh": "Green Poké Ball Pick",
+    "nameZh": "绿珠珠三明治签",
     "slug": "green-poke-ball-pick"
   },
   "2085": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Red Poké Ball Pick",
-    "nameZh": "Red Poké Ball Pick",
+    "nameZh": "红珠珠三明治签",
     "slug": "red-poke-ball-pick"
   },
   "2086": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Party Sparkler Pick",
-    "nameZh": "Party Sparkler Pick",
+    "nameZh": "烟花祝庆三明治签",
     "slug": "party-sparkler-pick"
   },
   "2087": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Heroic Sword Pick",
-    "nameZh": "Heroic Sword Pick",
+    "nameZh": "勇者之剑三明治签",
     "slug": "heroic-sword-pick"
   },
   "2088": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Magical Star Pick",
-    "nameZh": "Magical Star Pick",
+    "nameZh": "魔法星星三明治签",
     "slug": "magical-star-pick"
   },
   "2089": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Magical Heart Pick",
-    "nameZh": "Magical Heart Pick",
+    "nameZh": "魔法甜心三明治签",
     "slug": "magical-heart-pick"
   },
   "209": {
@@ -8459,70 +8459,70 @@
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Parasol Pick",
-    "nameZh": "Parasol Pick",
+    "nameZh": "阳伞三明治签",
     "slug": "parasol-pick"
   },
   "2091": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue-Sky Flower Pick",
-    "nameZh": "Blue-Sky Flower Pick",
+    "nameZh": "晴空花三明治签",
     "slug": "blue-sky-flower-pick"
   },
   "2092": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Sunset Flower Pick",
-    "nameZh": "Sunset Flower Pick",
+    "nameZh": "夕阳花三明治签",
     "slug": "sunset-flower-pick"
   },
   "2093": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Sunrise Flower Pick",
-    "nameZh": "Sunrise Flower Pick",
+    "nameZh": "朝霞花三明治签",
     "slug": "sunrise-flower-pick"
   },
   "2094": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Blue Dish",
-    "nameZh": "Blue Dish",
+    "nameZh": "蓝色盘子",
     "slug": "blue-dish"
   },
   "2095": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Green Dish",
-    "nameZh": "Green Dish",
+    "nameZh": "绿色盘子",
     "slug": "green-dish"
   },
   "2096": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Orange Dish",
-    "nameZh": "Orange Dish",
+    "nameZh": "橘色盘子",
     "slug": "orange-dish"
   },
   "2097": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Red Dish",
-    "nameZh": "Red Dish",
+    "nameZh": "红色盘子",
     "slug": "red-dish"
   },
   "2098": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "White Dish",
-    "nameZh": "White Dish",
+    "nameZh": "白色盘子",
     "slug": "white-dish"
   },
   "2099": {
     "categoryEn": "picnic",
     "categoryZh": "野餐",
     "nameEn": "Yellow Dish",
-    "nameZh": "Yellow Dish",
+    "nameZh": "黄色盘子",
     "slug": "yellow-dish"
   },
   "21": {

@@ -33,6 +33,28 @@ class GameEdition {
     return fallback?.versionGroup ?? fallbackSlug;
   }
 
+  /// National dex generation (1–9) for default sprite / battle scope display.
+  int get generation => switch (dataVersionGroupKey) {
+        'red-blue' || 'yellow' => 1,
+        'gold-silver' || 'crystal' => 2,
+        'ruby-sapphire' || 'emerald' || 'firered-leafgreen' => 3,
+        'diamond-pearl' || 'platinum' || 'heartgold-soulsilver' => 4,
+        'black-white' || 'black-2-white-2' => 5,
+        'x-y' || 'omega-ruby-alpha-sapphire' => 6,
+        'sun-moon' ||
+        'ultra-sun-ultra-moon' ||
+        'lets-go-pikachu-lets-go-eevee' =>
+          7,
+        'sword-shield' ||
+        'brilliant-diamond-shining-pearl' ||
+        'legends-arceus' =>
+          8,
+        _ => 9,
+      };
+
+  /// PokeAPI version-group key used for in-game dex sprites.
+  String get spriteVersionGroup => dataVersionGroupKey;
+
   String? get iconUrl {
     final key = versionGroup ?? fallbackSlug;
     return 'https://dex.tito.cafe/v3/game_icons/$key.png';

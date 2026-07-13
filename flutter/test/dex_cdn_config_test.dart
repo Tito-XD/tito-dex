@@ -80,8 +80,16 @@ void main() {
       expect(config.spriteUrl(25), '${DexCdnConfig.cdnBase}/v3/sprites/25.png');
       expect(config.artworkUrl(25), '${DexCdnConfig.cdnBase}/v3/artwork/25.png');
       expect(
+        config.spriteUrlForVersionGroup(25, 'heartgold-soulsilver'),
+        '${DexCdnConfig.cdnBase}/v3/sprites/by-version/heartgold-soulsilver/25.png',
+      );
+      expect(
+        config.animatedSpriteUrl(25),
+        '${DexCdnConfig.cdnBase}/v3/sprites/animated/25.gif',
+      );
+      expect(
         config.typeIconUrl('fire'),
-        '${DexCdnConfig.cdnBase}/v2/type_icons/fire.png',
+        '${DexCdnConfig.cdnBase}/v3/type_icons/fire.png',
       );
     });
 

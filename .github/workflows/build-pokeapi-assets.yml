@@ -1,0 +1,49 @@
+name: Build PokeAPI assets to R2
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_id:
+        description: Max national dex id (1025 = full)
+        type: number
+        default: 1025
+      min_id:
+        description: Min national dex id
+        type: number
+        default: 1
+      upload:
+        description: Upload to R2 after build
+        type: boolean
+        default: true
+
+jobs:
+  build-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 720
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps
+        run: pip install -r tools/dex_bundle_requirements.txt
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Build PokeAPI sprite / artwork / animated assets
+        run: |
+          UPLOAD=""
+          if [ "${{ inputs.upload }}" = "true" ]; then
+            UPLOAD="--upload"
+          fi
+          python3 tools/build_pokeapi_assets.py \
+            --min-id ${{ inputs.min_id }} \
+            --max-id ${{ inputs.max_id }} \
+            $UPLOAD
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

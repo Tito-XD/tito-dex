@@ -551,9 +551,21 @@ class PokeApiBuilder:
         cdn_prefix = BUNDLE_CDN_PREFIX
 
         types = extract_types(pokemon["types"])
-        sprite_remote = sprite_url(pokemon["sprites"])
+        sprites_payload = pokemon.get("sprites") or {}
+        sprite_remote = sprite_url(sprites_payload)
         sprite_cdn = f"{cdn_base}/{cdn_prefix}/sprites/{pokemon_id}.png"
         artwork_cdn = f"{cdn_base}/{cdn_prefix}/artwork/{pokemon_id}.png"
+        from pokeapi_assets import animated_sprite_url, build_sprite_url_map
+
+        sprite_urls_by_version = {
+            vg: f"{cdn_base}/{cdn_prefix}/sprites/by-version/{vg}/{pokemon_id}.png"
+            for vg in build_sprite_url_map(sprites_payload)
+        }
+        animated_cdn = (
+            f"{cdn_base}/{cdn_prefix}/sprites/animated/{pokemon_id}.gif"
+            if animated_sprite_url(sprites_payload)
+            else None
+        )
 
         summary = {
             "id": pokemon_id,
@@ -564,7 +576,10 @@ class PokeApiBuilder:
             "artworkUrl": artwork_cdn,
             "localSpritePath": f"sprites/{pokemon_id}.png",
             "pokedexNumbers": parse_pokedex_numbers(species.get("pokedex_numbers", [])),
+            "spriteUrlsByVersion": sprite_urls_by_version,
         }
+        if animated_cdn:
+            summary["animatedSpriteUrl"] = animated_cdn
 
         profile = compute_defensive_profile(types, relations)
         multipliers = compute_defensive_multipliers(types, relations)
@@ -658,7 +673,8 @@ def localized_name(names: list[dict[str, Any]], fallback: str) -> str:
         if code in ("zh-Hans", "zh-hans"):
             return entry["name"]
     for entry in names:
-        if entry.get("language", {}).get("name") == "zh-Hant":
+        code = entry.get("language", {}).get("name", "")
+        if code in ("zh-Hant", "zh-hant"):
             return entry["name"]
     return capitalize(fallback)
 
@@ -677,9 +693,14 @@ def extract_types(types: list[dict[str, Any]]) -> list[str]:
 
 
 def sprite_url(sprites: dict[str, Any]) -> str | None:
-    other = sprites.get("other") or {}
-    artwork = other.get("official-artwork") or {}
-    return artwork.get("front_default") or sprites.get("front_default")
+    """Legacy default: HGSS in-game sprite, then home/official artwork."""
+    from pokeapi_assets import official_artwork_url, sprite_url_for_version_group
+
+    return (
+        sprite_url_for_version_group(sprites, "heartgold-soulsilver")
+        or official_artwork_url(sprites)
+        or sprites.get("front_default")
+    )
 
 
 def id_from_url(url: str) -> int:
@@ -860,7 +881,7 @@ def pick_flavor_text(lang_map: dict[str, str]) -> str | None:
     return (
         lang_map.get("zh-Hans")
         or lang_map.get("zh-hans")
-        or lang_map.get("zh-Hant")
+        or lang_map.get("zh-hant")
         or lang_map.get("en")
     )
 
@@ -1498,7 +1519,16 @@ def build_bundle(
                 dest.write_bytes(vendored.read_bytes())
                 continue
             try:
-                icon_url = builder.pokesprite_type_icon_url(type_name)
+                icon_url = None
+                try:
+                    detail = builder._get_json(f"/type/{type_name}")
+                    from pokeapi_assets import type_icon_url_pokeapi
+
+                    icon_url = type_icon_url_pokeapi(detail)
+                except requests.RequestException:
+                    pass
+                if not icon_url:
+                    icon_url = builder.pokesprite_type_icon_url(type_name)
                 if not icon_url:
                     icon_url = builder.type_icon_url(type_name)
                 if not icon_url:

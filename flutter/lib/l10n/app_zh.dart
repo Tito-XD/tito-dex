@@ -209,7 +209,25 @@ abstract final class AppZh {
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
-      '下载后离线可用：全国图鉴 1–1025、招式/特性/性格/天气/道具索引、中文对照表、HGSS 地图名、游戏版本图标与应用配置（Sleep 工具链接等）。手绘导航图标仍随 APK 内置。';
+      '离线图鉴缓存包含以下内容（可在下方勾选要下载/保留的部分）。推荐先下载 CDN 预打包数据包；手绘导航图标仍随 APK 内置。';
+  static const settingsDexCacheContentsTitle = '缓存内容说明';
+  static const settingsDexCacheOptionJson =
+      '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
+  static const settingsDexCacheOptionSprites =
+      '列表小图（按当前游戏版本世代，约 1025 张 × 单版本 ~25MB）';
+  static const settingsDexCacheOptionSpritesAllVersions =
+      '全版本小图（21 个版本组各一套，体积大，仅 Wi‑Fi 推荐）';
+  static const settingsDexCacheOptionArtwork =
+      '官方立绘大图（详情页查看，约 1025 张 ~80–120MB）';
+  static const settingsDexCacheOptionAnimated =
+      'Showdown 动图（PokeAPI GIF，约 1025 张 ~40–60MB）';
+  static const settingsDexCacheOptionL10n =
+      '中文对照表（物种/招式/特性/道具名、地点、HGSS 地图）';
+  static const settingsDexCacheOptionTypeIcons = '属性图标（18 个，内置仓库资源）';
+  static const settingsDexCacheOptionConfig =
+      '应用配置（Sleep 工具链接、游戏版本图标索引等）';
+  static String settingsDexCacheEstimate(String items) =>
+      '预计体积（勾选合计）：$items';
   static const settingsDexOfflineUnset = '尚未下载离线数据包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
@@ -250,7 +268,7 @@ abstract final class AppZh {
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
-      '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组';
+      '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组；列表小图默认展示该版本对应世代的游戏内像素图。';
   static const snackDexCdnDone = '预打包数据包已安装完成';
   static const snackDexCdnFailed = '预打包数据包下载失败';
 

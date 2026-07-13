@@ -6611,7 +6611,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Dire Claw",
-    "nameZh": "Dire Claw",
+    "nameZh": "克命爪",
     "slug": "dire-claw",
     "typeZh": "毒"
   },
@@ -6619,7 +6619,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Psyshield Bash",
-    "nameZh": "Psyshield Bash",
+    "nameZh": "屏障猛攻",
     "slug": "psyshield-bash",
     "typeZh": "超能力"
   },
@@ -6627,7 +6627,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Power Shift",
-    "nameZh": "Power Shift",
+    "nameZh": "力量转换",
     "slug": "power-shift",
     "typeZh": "一般"
   },
@@ -6643,7 +6643,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Stone Axe",
-    "nameZh": "Stone Axe",
+    "nameZh": "岩斧",
     "slug": "stone-axe",
     "typeZh": "岩石"
   },
@@ -6651,7 +6651,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Springtide Storm",
-    "nameZh": "Springtide Storm",
+    "nameZh": "阳春风暴",
     "slug": "springtide-storm",
     "typeZh": "妖精"
   },
@@ -6659,7 +6659,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Mystical Power",
-    "nameZh": "Mystical Power",
+    "nameZh": "神秘之力",
     "slug": "mystical-power",
     "typeZh": "超能力"
   },
@@ -6667,7 +6667,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Raging Fury",
-    "nameZh": "Raging Fury",
+    "nameZh": "大愤慨",
     "slug": "raging-fury",
     "typeZh": "火"
   },
@@ -6675,7 +6675,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Wave Crash",
-    "nameZh": "Wave Crash",
+    "nameZh": "波动冲",
     "slug": "wave-crash",
     "typeZh": "水"
   },
@@ -6683,7 +6683,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Chloroblast",
-    "nameZh": "Chloroblast",
+    "nameZh": "叶绿爆震",
     "slug": "chloroblast",
     "typeZh": "草"
   },
@@ -6691,7 +6691,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Mountain Gale",
-    "nameZh": "Mountain Gale",
+    "nameZh": "冰山风",
     "slug": "mountain-gale",
     "typeZh": "冰"
   },
@@ -6699,7 +6699,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Victory Dance",
-    "nameZh": "Victory Dance",
+    "nameZh": "胜利之舞",
     "slug": "victory-dance",
     "typeZh": "格斗"
   },
@@ -6707,7 +6707,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Headlong Rush",
-    "nameZh": "Headlong Rush",
+    "nameZh": "突飞猛扑",
     "slug": "headlong-rush",
     "typeZh": "地面"
   },
@@ -6715,7 +6715,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Barb Barrage",
-    "nameZh": "Barb Barrage",
+    "nameZh": "毒千针",
     "slug": "barb-barrage",
     "typeZh": "毒"
   },
@@ -6731,7 +6731,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Esper Wing",
-    "nameZh": "Esper Wing",
+    "nameZh": "气场之翼",
     "slug": "esper-wing",
     "typeZh": "超能力"
   },
@@ -6739,7 +6739,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Bitter Malice",
-    "nameZh": "Bitter Malice",
+    "nameZh": "冤冤相报",
     "slug": "bitter-malice",
     "typeZh": "幽灵"
   },
@@ -6747,7 +6747,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Shelter",
-    "nameZh": "Shelter",
+    "nameZh": "闭关",
     "slug": "shelter",
     "typeZh": "钢"
   },
@@ -6755,7 +6755,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Triple Arrows",
-    "nameZh": "Triple Arrows",
+    "nameZh": "三连箭",
     "slug": "triple-arrows",
     "typeZh": "格斗"
   },
@@ -6763,7 +6763,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Infernal Parade",
-    "nameZh": "Infernal Parade",
+    "nameZh": "群魔乱舞",
     "slug": "infernal-parade",
     "typeZh": "幽灵"
   },
@@ -6771,7 +6771,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Ceaseless Edge",
-    "nameZh": "Ceaseless Edge",
+    "nameZh": "秘剑・千重涛",
     "slug": "ceaseless-edge",
     "typeZh": "恶"
   },
@@ -6779,7 +6779,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Bleakwind Storm",
-    "nameZh": "Bleakwind Storm",
+    "nameZh": "枯叶风暴",
     "slug": "bleakwind-storm",
     "typeZh": "飞行"
   },
@@ -6787,7 +6787,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Wildbolt Storm",
-    "nameZh": "Wildbolt Storm",
+    "nameZh": "鸣雷风暴",
     "slug": "wildbolt-storm",
     "typeZh": "电"
   },
@@ -6795,7 +6795,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Sandsear Storm",
-    "nameZh": "Sandsear Storm",
+    "nameZh": "热沙风暴",
     "slug": "sandsear-storm",
     "typeZh": "地面"
   },
@@ -6803,7 +6803,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Lunar Blessing",
-    "nameZh": "Lunar Blessing",
+    "nameZh": "新月祈祷",
     "slug": "lunar-blessing",
     "typeZh": "超能力"
   },
@@ -6819,7 +6819,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Take Heart",
-    "nameZh": "Take Heart",
+    "nameZh": "勇气填充",
     "slug": "take-heart",
     "typeZh": "超能力"
   },
@@ -6827,7 +6827,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Tera Blast",
-    "nameZh": "Tera Blast",
+    "nameZh": "太晶爆发",
     "slug": "tera-blast",
     "typeZh": "一般"
   },
@@ -6835,7 +6835,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Silk Trap",
-    "nameZh": "Silk Trap",
+    "nameZh": "线阱",
     "slug": "silk-trap",
     "typeZh": "虫"
   },
@@ -6843,7 +6843,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Axe Kick",
-    "nameZh": "Axe Kick",
+    "nameZh": "下压踢",
     "slug": "axe-kick",
     "typeZh": "格斗"
   },
@@ -6851,7 +6851,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Last Respects",
-    "nameZh": "Last Respects",
+    "nameZh": "扫墓",
     "slug": "last-respects",
     "typeZh": "幽灵"
   },
@@ -6859,7 +6859,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Lumina Crash",
-    "nameZh": "Lumina Crash",
+    "nameZh": "琉光冲激",
     "slug": "lumina-crash",
     "typeZh": "超能力"
   },
@@ -6867,7 +6867,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Order Up",
-    "nameZh": "Order Up",
+    "nameZh": "上菜",
     "slug": "order-up",
     "typeZh": "龙"
   },
@@ -6875,7 +6875,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Jet Punch",
-    "nameZh": "Jet Punch",
+    "nameZh": "喷射拳",
     "slug": "jet-punch",
     "typeZh": "水"
   },
@@ -6883,7 +6883,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Spicy Extract",
-    "nameZh": "Spicy Extract",
+    "nameZh": "辣椒精华",
     "slug": "spicy-extract",
     "typeZh": "草"
   },
@@ -6891,7 +6891,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Spin Out",
-    "nameZh": "Spin Out",
+    "nameZh": "疾速转轮",
     "slug": "spin-out",
     "typeZh": "钢"
   },
@@ -6907,7 +6907,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Population Bomb",
-    "nameZh": "Population Bomb",
+    "nameZh": "鼠数儿",
     "slug": "population-bomb",
     "typeZh": "一般"
   },
@@ -6915,7 +6915,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Ice Spinner",
-    "nameZh": "Ice Spinner",
+    "nameZh": "冰旋",
     "slug": "ice-spinner",
     "typeZh": "冰"
   },
@@ -6923,7 +6923,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Glaive Rush",
-    "nameZh": "Glaive Rush",
+    "nameZh": "巨剑突击",
     "slug": "glaive-rush",
     "typeZh": "龙"
   },
@@ -6931,7 +6931,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Revival Blessing",
-    "nameZh": "Revival Blessing",
+    "nameZh": "复生祈祷",
     "slug": "revival-blessing",
     "typeZh": "一般"
   },
@@ -6939,7 +6939,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Salt Cure",
-    "nameZh": "Salt Cure",
+    "nameZh": "盐腌",
     "slug": "salt-cure",
     "typeZh": "岩石"
   },
@@ -6947,7 +6947,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Triple Dive",
-    "nameZh": "Triple Dive",
+    "nameZh": "三连钻",
     "slug": "triple-dive",
     "typeZh": "水"
   },
@@ -6955,7 +6955,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Mortal Spin",
-    "nameZh": "Mortal Spin",
+    "nameZh": "晶光转转",
     "slug": "mortal-spin",
     "typeZh": "毒"
   },
@@ -6963,7 +6963,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Doodle",
-    "nameZh": "Doodle",
+    "nameZh": "描绘",
     "slug": "doodle",
     "typeZh": "一般"
   },
@@ -6971,7 +6971,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Fillet Away",
-    "nameZh": "Fillet Away",
+    "nameZh": "甩肉",
     "slug": "fillet-away",
     "typeZh": "一般"
   },
@@ -6979,7 +6979,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Kowtow Cleave",
-    "nameZh": "Kowtow Cleave",
+    "nameZh": "仆刀",
     "slug": "kowtow-cleave",
     "typeZh": "恶"
   },
@@ -6995,7 +6995,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Flower Trick",
-    "nameZh": "Flower Trick",
+    "nameZh": "千变万花",
     "slug": "flower-trick",
     "typeZh": "草"
   },
@@ -7003,7 +7003,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Torch Song",
-    "nameZh": "Torch Song",
+    "nameZh": "闪焰高歌",
     "slug": "torch-song",
     "typeZh": "火"
   },
@@ -7011,7 +7011,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Aqua Step",
-    "nameZh": "Aqua Step",
+    "nameZh": "流水旋舞",
     "slug": "aqua-step",
     "typeZh": "水"
   },
@@ -7019,7 +7019,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Raging Bull",
-    "nameZh": "Raging Bull",
+    "nameZh": "怒牛",
     "slug": "raging-bull",
     "typeZh": "一般"
   },
@@ -7027,7 +7027,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Make It Rain",
-    "nameZh": "Make It Rain",
+    "nameZh": "淘金潮",
     "slug": "make-it-rain",
     "typeZh": "钢"
   },
@@ -7051,7 +7051,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Ruination",
-    "nameZh": "Ruination",
+    "nameZh": "大灾难",
     "slug": "ruination",
     "typeZh": "恶"
   },
@@ -7059,7 +7059,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Collision Course",
-    "nameZh": "Collision Course",
+    "nameZh": "全开猛撞",
     "slug": "collision-course",
     "typeZh": "格斗"
   },
@@ -7067,7 +7067,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Electro Drift",
-    "nameZh": "Electro Drift",
+    "nameZh": "闪电猛冲",
     "slug": "electro-drift",
     "typeZh": "电"
   },
@@ -7083,7 +7083,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Shed Tail",
-    "nameZh": "Shed Tail",
+    "nameZh": "断尾",
     "slug": "shed-tail",
     "typeZh": "一般"
   },
@@ -7091,7 +7091,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Chilly Reception",
-    "nameZh": "Chilly Reception",
+    "nameZh": "冷笑话",
     "slug": "chilly-reception",
     "typeZh": "冰"
   },
@@ -7099,7 +7099,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Tidy Up",
-    "nameZh": "Tidy Up",
+    "nameZh": "大扫除",
     "slug": "tidy-up",
     "typeZh": "一般"
   },
@@ -7107,7 +7107,7 @@
     "categoryEn": "status",
     "categoryZh": "变化",
     "nameEn": "Snowscape",
-    "nameZh": "Snowscape",
+    "nameZh": "雪景",
     "slug": "snowscape",
     "typeZh": "冰"
   },
@@ -7115,7 +7115,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Pounce",
-    "nameZh": "Pounce",
+    "nameZh": "虫扑",
     "slug": "pounce",
     "typeZh": "虫"
   },
@@ -7123,7 +7123,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Trailblaze",
-    "nameZh": "Trailblaze",
+    "nameZh": "起草",
     "slug": "trailblaze",
     "typeZh": "草"
   },
@@ -7131,7 +7131,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Chilling Water",
-    "nameZh": "Chilling Water",
+    "nameZh": "泼冷水",
     "slug": "chilling-water",
     "typeZh": "水"
   },
@@ -7139,7 +7139,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Hyper Drill",
-    "nameZh": "Hyper Drill",
+    "nameZh": "强力钻",
     "slug": "hyper-drill",
     "typeZh": "一般"
   },
@@ -7147,7 +7147,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Twin Beam",
-    "nameZh": "Twin Beam",
+    "nameZh": "双光束",
     "slug": "twin-beam",
     "typeZh": "超能力"
   },
@@ -7155,7 +7155,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Rage Fist",
-    "nameZh": "Rage Fist",
+    "nameZh": "愤怒之拳",
     "slug": "rage-fist",
     "typeZh": "幽灵"
   },
@@ -7171,7 +7171,7 @@
     "categoryEn": "special",
     "categoryZh": "特殊",
     "nameEn": "Armor Cannon",
-    "nameZh": "Armor Cannon",
+    "nameZh": "铠农炮",
     "slug": "armor-cannon",
     "typeZh": "火"
   },
@@ -7179,7 +7179,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Bitter Blade",
-    "nameZh": "Bitter Blade",
+    "nameZh": "悔念剑",
     "slug": "bitter-blade",
     "typeZh": "火"
   },
@@ -7187,7 +7187,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Double Shock",
-    "nameZh": "Double Shock",
+    "nameZh": "电光双击",
     "slug": "double-shock",
     "typeZh": "电"
   },
@@ -7195,7 +7195,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Gigaton Hammer",
-    "nameZh": "Gigaton Hammer",
+    "nameZh": "巨力锤",
     "slug": "gigaton-hammer",
     "typeZh": "钢"
   },
@@ -7203,7 +7203,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Comeuppance",
-    "nameZh": "Comeuppance",
+    "nameZh": "复仇",
     "slug": "comeuppance",
     "typeZh": "恶"
   },
@@ -7211,7 +7211,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Aqua Cutter",
-    "nameZh": "Aqua Cutter",
+    "nameZh": "水波刀",
     "slug": "aqua-cutter",
     "typeZh": "水"
   },
@@ -7219,7 +7219,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Blazing Torque",
-    "nameZh": "Blazing Torque",
+    "nameZh": "灼热暴冲",
     "slug": "blazing-torque",
     "typeZh": "火"
   },
@@ -7227,7 +7227,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Wicked Torque",
-    "nameZh": "Wicked Torque",
+    "nameZh": "黑暗暴冲",
     "slug": "wicked-torque",
     "typeZh": "恶"
   },
@@ -7235,7 +7235,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Noxious Torque",
-    "nameZh": "Noxious Torque",
+    "nameZh": "剧毒暴冲",
     "slug": "noxious-torque",
     "typeZh": "毒"
   },
@@ -7243,7 +7243,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Combat Torque",
-    "nameZh": "Combat Torque",
+    "nameZh": "格斗暴冲",
     "slug": "combat-torque",
     "typeZh": "格斗"
   },
@@ -7267,7 +7267,7 @@
     "categoryEn": "physical",
     "categoryZh": "物理",
     "nameEn": "Magical Torque",
-    "nameZh": "Magical Torque",
+    "nameZh": "魔法暴冲",
     "slug": "magical-torque",
     "typeZh": "妖精"
   },
