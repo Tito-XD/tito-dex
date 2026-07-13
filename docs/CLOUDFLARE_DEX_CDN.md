@@ -299,6 +299,53 @@ export WRANGLER_R2_BUCKET=titodex-dex
 
 ---
 
+Or run `python3 tools/stage_l10n_upload.py` then upload `dist/l10n-upload/` manually with Wrangler.
+
+---
+
+## 自动化：每周 l10n 同步（52poke → R2）
+
+GitHub Actions workflow [`.github/workflows/sync-l10n-catalog.yml`](../.github/workflows/sync-l10n-catalog.yml) 每周日 04:00 UTC 运行（也可 `workflow_dispatch` 手动触发）。
+
+### 流程
+
+1. `tools/fetch_52poke_location_zh.py` — 从 `location_areas_unresolved.json` 读取 slug，尝试从 52poke wiki 抓取中文名（礼貌限速，User-Agent: `TitoDex-maintainer`），合并到 `data/l10n/zh/location_areas.json`
+2. `tools/generate_zh_catalog_assets.py` — 生成紧凑 APK / CDN 用 `flutter/assets/l10n/zh/*.json`
+3. `tools/stage_l10n_upload.py` — 复制 l10n + maps + config 到 `dist/l10n-upload/v3/`
+4. Wrangler 上传到 R2：
+   - `v3/l10n/zh/*`
+   - `v3/maps/hgss_map_list.json`（如有变更）
+   - `v3/config/app_config.json`
+   - 根目录 `bundle-manifest.json`（更新 `l10nVersion` + `publishedAt`）
+
+### workflow_dispatch 输入
+
+| 输入 | 说明 |
+| --- | --- |
+| `force_full` | `true` 时重新解析所有仍缺中文的 slug（不限 unresolved 列表） |
+
+### 所需 GitHub Secrets
+
+| Secret | 说明 |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | R2 Object Write |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 账户 ID |
+
+详见 [`docs/PERMISSIONS.md`](PERMISSIONS.md)。
+
+### 52poke 抓取限制
+
+52poke wiki 可能启用 Cloudflare 人机验证，导致 CI 无法自动抓取。脚本会记录失败并将 slug 保留在 `location_areas_unresolved.json`；可在本地网络环境手动运行：
+
+```bash
+pip install requests beautifulsoup4
+python3 tools/fetch_52poke_location_zh.py --limit 20
+python3 tools/generate_zh_catalog_assets.py
+python3 tools/stage_l10n_upload.py
+```
+
+---
+
 ## 相关仓库文件
 
 | 路径 | 说明 |

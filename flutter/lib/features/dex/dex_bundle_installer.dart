@@ -121,6 +121,8 @@ class DexBundleInstaller {
         pokemonCount: pokemonTotal,
         moveCount: moves.length,
         sizeBytes: sizeBytes,
+        l10nVersion: bundleManifest.l10nVersion,
+        configVersion: bundleManifest.configVersion,
       ),
     );
 
