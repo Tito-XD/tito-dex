@@ -56,8 +56,23 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
+    gameEditionRepository.addListener(_onGlobalEditionChanged);
     _loadDefaultGameVersion();
     _bootstrap();
+  }
+
+  @override
+  void dispose() {
+    gameEditionRepository.removeListener(_onGlobalEditionChanged);
+    super.dispose();
+  }
+
+  void _onGlobalEditionChanged() {
+    final edition = gameEditionRepository.edition;
+    if (_gameEdition.slug == edition.slug) {
+      return;
+    }
+    setState(() => _gameEdition = edition);
   }
 
   Future<void> _loadDefaultGameVersion() async {
@@ -377,6 +392,7 @@ class _DexPageState extends State<DexPage> {
                   _DexScopeBar(
                     mode: _mode,
                     region: _region,
+                    gameEdition: _gameEdition,
                     scopeStats: _scopeStats,
                     journeyCount: _journeyIds.length,
                     onModeSelected: _setMode,
@@ -704,6 +720,7 @@ class _DexScopeBar extends StatelessWidget {
   const _DexScopeBar({
     required this.mode,
     required this.region,
+    required this.gameEdition,
     required this.scopeStats,
     required this.journeyCount,
     required this.onModeSelected,
@@ -712,6 +729,7 @@ class _DexScopeBar extends StatelessWidget {
 
   final _DexMode mode;
   final DexRegionalPokedex region;
+  final GameEdition gameEdition;
   final DexScopeStats scopeStats;
   final int journeyCount;
   final ValueChanged<_DexMode> onModeSelected;
@@ -733,6 +751,7 @@ class _DexScopeBar extends StatelessWidget {
             count: scopeStats.total,
             showRegionMenu: true,
             region: region,
+            gameEdition: gameEdition,
             onTap: () => onModeSelected(_DexMode.national),
             onRegionSelected: onRegionSelected,
           ),
@@ -803,6 +822,7 @@ class _DexModeTab extends StatelessWidget {
     required this.onTap,
     this.showRegionMenu = false,
     this.region = DexRegionalPokedex.national,
+    this.gameEdition = defaultGameEdition,
     this.onRegionSelected,
   });
 
@@ -813,6 +833,7 @@ class _DexModeTab extends StatelessWidget {
   final VoidCallback onTap;
   final bool showRegionMenu;
   final DexRegionalPokedex region;
+  final GameEdition gameEdition;
   final ValueChanged<DexRegionalPokedex>? onRegionSelected;
 
   @override
@@ -870,11 +891,28 @@ class _DexModeTab extends StatelessWidget {
                   tooltip: '切换地区图鉴',
                   onSelected: onRegionSelected,
                   itemBuilder: (context) {
+                    final highlights = {
+                      gameEdition.defaultRegionalPokedex,
+                      DexRegionalPokedex.national,
+                    };
                     return DexRegionalPokedex.values
                         .map(
                           (scope) => PopupMenuItem(
                             value: scope,
-                            child: Text(regionalPokedexLabelZh(scope)),
+                            child: Row(
+                              children: [
+                                if (highlights.contains(scope))
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 6),
+                                    child: Icon(
+                                      Icons.star_rounded,
+                                      size: 16,
+                                      color: TitoColors.coral,
+                                    ),
+                                  ),
+                                Text(regionalPokedexLabelZh(scope)),
+                              ],
+                            ),
                           ),
                         )
                         .toList();
