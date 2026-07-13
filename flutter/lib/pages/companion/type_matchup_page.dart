@@ -309,43 +309,12 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                                     .copyWith(color: TitoColors.mutedInk),
                               ),
                             ),
-                          StickerCard(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppZh.companionTypeSummaryTitle,
-                                  style: SecondaryTypography.onCard.h15,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  profileLine(
-                                    AppZh.dexWeaknesses,
-                                    profile.weaknesses,
-                                  ),
-                                  style: SecondaryTypography.onCard.body14,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  profileLine(
-                                    AppZh.dexResistances,
-                                    profile.resistances,
-                                  ),
-                                  style: SecondaryTypography.onCard.body14,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  profileLine(
-                                    AppZh.dexImmunities,
-                                    profile.immunities,
-                                  ),
-                                  style: SecondaryTypography.onCard.body14,
-                                ),
-                              ],
-                            ),
+                          TypeEffectivenessGrid(
+                            multipliers: multipliers,
+                            weaknesses: profile.weaknesses,
+                            resistances: profile.resistances,
+                            immunities: profile.immunities,
                           ),
-                          const SizedBox(height: 12),
-                          TypeEffectivenessGrid(multipliers: multipliers),
                         ],
                       );
                     },

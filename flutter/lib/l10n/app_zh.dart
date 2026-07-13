@@ -4,6 +4,15 @@ import '../features/dex/dex_models.dart';
 abstract final class AppZh {
   static const appTitle = 'TitoDex';
 
+  /// Home header title — default TitoDex; custom trainer → «Name»Dex.
+  static String displayTitleForTrainer(String trainerName) {
+    final trimmed = trainerName.trim();
+    if (trimmed.isEmpty || trimmed == 'Tito' || trimmed == 'Trainer') {
+      return appTitle;
+    }
+    return '${trimmed}Dex';
+  }
+
   static const navHome = '首页';
   static const navTeam = '队伍';
   static const navJourney = '旅程';

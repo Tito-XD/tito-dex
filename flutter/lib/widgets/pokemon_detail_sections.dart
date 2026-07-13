@@ -750,68 +750,125 @@ class _StatsViewChip extends StatelessWidget {
 }
 
 class TypeEffectivenessGrid extends StatelessWidget {
-  const TypeEffectivenessGrid({super.key, required this.multipliers});
+  const TypeEffectivenessGrid({
+    super.key,
+    required this.multipliers,
+    this.weaknesses,
+    this.resistances,
+    this.immunities,
+  });
 
   final Map<String, double> multipliers;
+  final List<String>? weaknesses;
+  final List<String>? resistances;
+  final List<String>? immunities;
+
+  bool get _hasSummary =>
+      weaknesses != null && resistances != null && immunities != null;
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            AppZh.dexTypeGridTitle,
-            style: SecondaryTypography.onCard.h15,
-          ),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 6,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 6,
-            childAspectRatio: 0.68,
-            children: typeGridOrder.map((type) {
-              final multiplier = multipliers[type] ?? 1;
-              final label = formatTypeMultiplier(multiplier);
-              return Column(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: typeTileColor(type),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      typeIconData(type),
-                      size: 24,
-                      color: TitoColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    typeNameZh(type),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  Text(
-                    label,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: _multiplierColor(multiplier),
-                    ),
-                  ),
-                ],
+          if (_hasSummary) ...[
+            Text(
+              AppZh.companionTypeSummaryTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              profileLine(AppZh.dexWeaknesses, weaknesses!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              profileLine(AppZh.dexResistances, resistances!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              profileLine(AppZh.dexImmunities, immunities!),
+              style: SecondaryTypography.onCard.body14,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppZh.dexTypeGridTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 12),
+          ] else ...[
+            Text(
+              AppZh.dexTypeGridTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
+            const SizedBox(height: 12),
+          ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const crossAxisCount = 6;
+              const crossAxisSpacing = 6.0;
+              const mainAxisSpacing = 8.0;
+              const tileHeight = 68.0;
+              final tileWidth = (constraints.maxWidth -
+                      crossAxisSpacing * (crossAxisCount - 1)) /
+                  crossAxisCount;
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: crossAxisSpacing,
+                  mainAxisSpacing: mainAxisSpacing,
+                  childAspectRatio: tileWidth / tileHeight,
+                ),
+                itemCount: typeGridOrder.length,
+                itemBuilder: (context, index) {
+                  final type = typeGridOrder[index];
+                  final multiplier = multipliers[type] ?? 1;
+                  final label = formatTypeMultiplier(multiplier);
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: tileWidth.clamp(32, 56),
+                        height: tileWidth.clamp(32, 56),
+                        decoration: BoxDecoration(
+                          color: typeTileColor(type),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: TitoColors.ink, width: 2),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          typeIconData(type),
+                          size: (tileWidth * 0.55).clamp(18, 28),
+                          color: TitoColors.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        typeNameZh(type),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        label,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: _multiplierColor(multiplier),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               );
-            }).toList(),
+            },
           ),
         ],
       ),
@@ -1482,34 +1539,12 @@ class _InteractiveTypeEffectivenessCardState
               ),
             ),
           ),
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.companionTypeSummaryTitle,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                profileLine(AppZh.dexWeaknesses, profile.weaknesses),
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                profileLine(AppZh.dexResistances, profile.resistances),
-                style: SecondaryTypography.onCard.body14,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                profileLine(AppZh.dexImmunities, profile.immunities),
-                style: SecondaryTypography.onCard.body14,
-              ),
-            ],
-          ),
+        TypeEffectivenessGrid(
+          multipliers: multipliers,
+          weaknesses: profile.weaknesses,
+          resistances: profile.resistances,
+          immunities: profile.immunities,
         ),
-        const SizedBox(height: 12),
-        TypeEffectivenessGrid(multipliers: multipliers),
       ],
     );
   }
