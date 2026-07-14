@@ -1,6 +1,6 @@
 # RG Polish Plan (0.2.10 → 0.2.25)
 
-Implementation plan from discussion — items 1–9, plus follow-up CDN work.
+Historical implementation plan for the v0.2.x handheld polish series. Use [`AI_CONTEXT.md`](./AI_CONTEXT.md) and [`ROADMAP.md`](../ROADMAP.md) for current work.
 
 ## Status
 

@@ -4,7 +4,7 @@
 **Previous stack:** Capacitor + React + TypeScript + Vite  
 **New stack:** Flutter + Dart
 
-This document records why TitoDex is moving to Flutter, what stays the same, and what contributors should watch for during migration.
+This document records why TitoDex moved to Flutter, what remains from the previous stack, and what contributors should watch for.
 
 ## Summary
 
@@ -14,7 +14,7 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 
 ## Current Implementation Status
 
-**Release:** v0.4.6 · App `0.4.6+38` · Offline bundle **v5** (1025 species, `/v3/`)
+**Latest standard release:** v0.4.98 · App `0.4.98+51`; **`main` baseline:** `0.4.94+47` · Offline bundle **v5** (1025 species, `/v3/`)
 
 | Phase | Goal | Status |
 | --- | --- | --- |
@@ -25,7 +25,7 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 | **D — Dex + CDN** | 1025 species, offline bundle, artwork | ✅ |
 | **E — Scopes** | Game editions, regional dexes | ✅ |
 | **F — Reference** | Encyclopedia + dex filters | ✅ v0.4.6 |
-| **G — Battle tools** | Matchup, stat/damage calc | ⚠️ Partial |
+| **G — Battle tools** | Matchup, stat/damage estimates, blind spots, modifiers | ⚠️ Shipped, formula depth partial |
 
 See [AI_CONTEXT.md](./AI_CONTEXT.md) for the full feature matrix and [ROADMAP.md](../ROADMAP.md) for what's next.
 
@@ -40,7 +40,7 @@ See [AI_CONTEXT.md](./AI_CONTEXT.md) for the full feature matrix and [ROADMAP.md
 ### Not yet
 
 - Custom launcher icon; HeartGold detection; single `.sav` picker
-- Blind-spot analysis, IV calc, usage rankings, journey cloud sync
+- Full competitive damage/IV workflows, usage rankings, journey cloud sync
 
 ### Navigation (current)
 
@@ -179,7 +179,7 @@ Phase C — Save parser
 - **Flutter active:** `flutter/lib/`, `flutter/test/`, `flutter/pubspec.yaml`.
 - **Fixtures:** `fixtures/PKMSS.sav`, `flutter/assets/fixtures/PKMSS.sav`.
 - **Tools:** `tools/probe_hgss_save.py`, `tools/hgss_map_list.json`, `tools/generate_hgss_map_list.py`.
-- **Docs:** English for GitHub; product owner prefers Chinese in chat. Agent context: [`docs/AI_CONTEXT.md`](./AI_CONTEXT.md).
+- **Docs:** English for repository artifacts; Chinese for product discussions unless requested otherwise. Agent context: [`docs/AI_CONTEXT.md`](./AI_CONTEXT.md).
 
 ### Do not
 
@@ -187,7 +187,7 @@ Phase C — Save parser
 - Delete Capacitor sources before Flutter home is demo-ready on Android.
 - Build a multi-generation parser framework before HGSS works end-to-end.
 - Overwrite manual journey timeline notes when applying parser results.
-- Commit personal save files with identifiable trainer data to public repos without Tito’s OK — use fixtures intentionally.
+- Commit user save files containing identifiable trainer data to public repositories — use reviewed fixtures only.
 
 ### Do
 

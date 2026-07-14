@@ -54,7 +54,7 @@ Possible key format:
 users/{userId}/saves/{gameId}/{saveHash}.sav
 ```
 
-For an early personal app, `userId` can remain simple or private. Avoid building a complex account system too early.
+For an early optional-sync implementation, `userId` can remain an opaque private identifier. Avoid introducing a complex account system before product and privacy requirements are defined.
 
 ## D1 Tables
 
@@ -79,7 +79,7 @@ CREATE TABLE journey_metadata (
 
 Manual-first flow:
 
-1. Tito chooses backup.
+1. The user chooses backup.
 2. App computes save hash.
 3. App uploads metadata to Worker.
 4. App uploads `.sav` to R2 through Worker or signed upload flow.
@@ -88,10 +88,10 @@ Manual-first flow:
 Restore flow:
 
 1. App lists synced metadata.
-2. Tito chooses a backup.
+2. The user chooses a backup.
 3. App downloads `.sav` if needed.
 4. App shows metadata before restore.
-5. Tito confirms local save/export action.
+5. The user confirms the local save/export action.
 
 ## Conflict Strategy
 
@@ -100,7 +100,7 @@ Keep the first version simple:
 - compare `saveHash`
 - compare `updatedAt`
 - show both versions if different
-- ask Tito before replacing local state
+- require explicit confirmation before replacing local state
 
 Do not build automatic complex merge behavior in the first sync prototype.
 

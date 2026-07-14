@@ -1,6 +1,6 @@
 # Display & system UI layout
 
-## Rule (Tito confirmed)
+## Current layout rule
 
 | Device aspect | Examples | System UI | Custom Wi‑Fi/battery | Home layout |
 | --- | --- | --- | --- | --- |
@@ -22,5 +22,5 @@ Web preview keeps mock phone frame + decorative status strip (dev only).
 ## Home game version picker
 
 - Tap header game pill → **`showGameEditionGridPicker`** (3–4 column grid, name labels)
-- Game **icons** — placeholder until Tito supplies assets; grid cells ready for icon slot
+- Game **icons** — use bundled assets when available; grid cells retain a text fallback
 - Fix: use **route `BuildContext`** for bottom sheet (not `TitoDexApp` state context above `MaterialApp`)

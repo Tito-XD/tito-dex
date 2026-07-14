@@ -1,71 +1,55 @@
 # TitoDex Roadmap
 
-> **Active code:** `flutter/`. **Current release:** v0.4.6. **Agent context:** [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md).
+> **Latest standard release:** [v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98) (`0.4.98+51`).
+>
+> **Current `main` source baseline:** `0.4.94+47`. See [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md) for the branch and release distinction.
 
-## Version history (recent)
+## Recent release history
 
 | Version | Summary |
 | --- | --- |
-| **v0.4.6** | Dex filter drill-down, reference detail UI, sprite fixes, collapsible type pickers, l10n sync workflow, offline update prompts |
-| **v0.4.5** | CDN bundle decoupling — `l10n/`, `maps/`, `config/` in offline pack |
-| **v0.4.4** | Master zh catalog; obtain location Chinese labels |
-| **v0.4.3** | Batch UX — journey, dex, team, nav, manual mode |
-| **v0.4.0** | 23 game editions, 11 regional dexes, search hub segments |
-| **v0.3.0** | National 1025 + CDN bundle v5 foundation |
-| **v0.2.28** | Dex detail UI, battle companion tools (partial) |
+| **v0.4.98** | Correct per-game titles in the Pokédex flavor-text carousel |
+| **v0.4.97** | Trainer-card name-line copy adjustment |
+| **v0.4.96** | Dense trainer-card layout fix for square screens |
+| **v0.4.95** | Trainer-card bootstrap, loading panels, team editor, settings cleanup, and download progress controls |
+| **v0.4.94** | Compact settings sections and paginated Pokédex filter results |
+| **v0.4.93** | Ability fallback, game labels, location coverage, and ability filtering |
+| **v0.4.92** | Combined matchup summary card and dynamic dashboard title |
+| **v0.4.91** | Attacker selection and ability-aware battle filters |
+| **v0.4.85** | Terastal, held items, status effects, defensive abilities, and team shared weaknesses |
+| **v0.4.8** | Generation-aware abilities, matchup modifiers, and blind-spot tools |
+| **v0.4.7** | Sprite picker, 1–1025 progress, home layout, and avatar crop fix |
+| **v0.4.6** | Reference drill-down, sprite fixes, and offline update prompts |
+| **v0.4.0** | 23 game editions, 11 regional Pokédex scopes, and segmented search hub |
+| **v0.3.0** | National Pokédex 1–1025 and bundle v5 foundation |
 
-APK naming: `TitoDex-<ver>-rg-arm64.apk` under `releases/`.
+Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 
-## Phase status (condensed)
+## Current capability status
 
-| Phase | Focus | Status |
-| --- | --- | --- |
-| 0–B | Flutter scaffold, persistence, settings, emulator | ✅ |
-| C | HGSS parser + save directory sync | ✅ core |
-| D | Dex 1–1025, CDN v5, offline bundle, artwork | ✅ |
-| E | Regional & game edition scopes | ✅ (ongoing polish) |
-| F | Reference encyclopedia + dex filters | ✅ v0.4.6 |
-| G | Battle tools | ⚠️ partial |
-| H | CDN l10n automation (52poke incremental) | ✅ workflow; content fills over time |
-| — | Journey cloud sync | ❌ proposal only |
-
-## Phase G — Battle tools (remaining)
-
-| Item | Status |
+| Area | Status |
 | --- | --- |
-| Type matchup, stat calc, quick damage | ✅ |
-| Collapsible icon-grid type pickers | ✅ v0.4.6 |
-| Offensive / defensive blind spots | ❌ |
-| Full damage calculator | ❌ |
-| IV calculator, usage rankings | ❌ |
+| Flutter application, persistence, routing, and emulator launch | Shipped |
+| HGSS save parsing and directory sync | Shipped, game-specific limitations documented |
+| Pokédex 1–1025 and regional/game scopes | Shipped |
+| Offline bundle, Chinese catalog, maps, config, and update prompts | Shipped |
+| Structured reference hub and Pokédex drill-down | Shipped |
+| Matchup, stat/damage estimates, blind spots, modifiers, and team weaknesses | Shipped; calculation depth remains partial |
+| APK-bundled offline variant | Available as an optional distribution |
+| Journey cloud sync | Proposal only |
+| Additional save parsers | Not started |
 
-## Phase — Infrastructure (v0.4.x)
+## Next priorities
 
-| Item | Status |
-| --- | --- |
-| Bundle `l10n/` + `config/` on CDN | ✅ |
-| Incremental l10n download in app | ✅ |
-| First-run + update-available dialogs | ✅ |
-| Weekly `sync-l10n-catalog` GitHub Action | ✅ |
-| Hand-drawn nav icons in APK only | ✅ policy |
+1. **Source alignment** — integrate the `v0.4.95`–`v0.4.98` release line into `main` and preserve release tests.
+2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
+3. **Save workflow polish** — add HeartGold detection and single-file `.sav` selection.
+4. **Distribution polish** — finalize launcher icon, splash, install guidance, and release consistency.
+5. **Offline maintenance** — keep bundle v5 manifests and Chinese labels current without exposing private service URLs in public copy.
 
-## Recommended next
+## Future work
 
-1. **Blind-spot tools** — team coverage gaps (offense / defense)  
-2. **Battle hub layout** — list-style entry like reference apps  
-3. **Nav icon art** — replace bundled tab icons in APK assets  
-4. **Full v3 CDN refresh** — rebuild bundle with latest l10n after 52poke sync fills gaps  
-5. **Launcher icon / splash**  
-6. **HeartGold detection**, single `.sav` file picker  
-
-## Later generation packs
-
-Add when the journey reaches each era — scoped dex/move data, not day-one encyclopedia imports. See [STACK_DECISION.md](docs/STACK_DECISION.md) for per-generation notes.
-
-## Platform
-
-| Platform | When |
-| --- | --- |
-| Android RG / phone | **Now** |
-| Linux handheld | After Android loop solid |
-| Web companion | After save sync without `dart:io` |
+- additional generation-specific save adapters
+- Linux handheld packaging
+- optional hosted sync after privacy, conflict, and account requirements are defined
+- broader accessibility and controller-navigation validation

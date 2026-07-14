@@ -1,35 +1,35 @@
 # TitoDex Vision
 
-TitoDex is a **personal Pokémon companion device** — software that feels like picking up a trusted trainer gadget when you return to a save file.
+TitoDex is a warm, offline-first companion for Pokémon playthroughs. It should feel like picking up a familiar trainer device: compact, recognizable, and ready to continue from the last save.
 
-## The feeling
+## Product outcome
 
-Opening the app should feel:
+When TitoDex opens, a user should be able to answer three questions quickly:
 
-- warm, compact, friendly  
-- slightly retro, sticker-like  
-- useful without noise  
-- personal, not like a generic Android app  
+1. Which game and save are active?
+2. What is the current location, party, and progress?
+3. Which reference or battle tool is useful next?
 
-Visual north star: modern retro device UI (blue-gray, cream, deep navy) — see [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+The app combines save-aware progress, manual team management, Pokédex data, and battle utilities. It does not aim to reproduce every page of a community wiki or the full scope of a competitive simulator.
 
-## Product promise
+## Experience goals
 
-> “Where was I, what was I doing, and what helps me continue this journey now?”
+- fast to scan on small and square screens
+- useful with or without a supported save file
+- reliable when offline after data installation
+- consistent across the dashboard, Pokédex, reference pages, and tools
+- visually distinctive, playful, and recognizably TitoDex without reducing readability
 
-The app should summarize progress from save files, remember journey notes, and surface **game-context** helpers — not compete with full wikis on breadth.
+Visual direction: a modern-retro trainer device using blue-gray, cream, deep navy, sticker-like cards, friendly typography, and small moments of personality. See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
 
-## Design constraints
+## Product constraints
 
-- **Personal companion** first — optimize for one player's play flow over audience completeness.  
-- **Not an encyclopedia** — if a feature only adds database breadth without journey utility, defer it.  
-- **Start with HGSS** — expand to Pt, BW, XY, etc. when the playthrough reaches them, as scoped packs rather than one giant import.
+- **Playthrough utility first** — prioritize features that help users resume, plan, or understand the selected game.
+- **Game-scoped behavior** — respect generation mechanics, edition availability, and regional Pokédex rules.
+- **Offline-first delivery** — keep core flows functional from local saves, downloaded data, and APK fallbacks.
+- **Incremental save support** — HGSS is the first parser; add other games only with tested, explicit boundaries.
+- **Focused reference scope** — link related data and provide useful filters without becoming a general-purpose wiki.
 
-## Expansion order (when relevant)
+## Expansion order
 
-1. HeartGold / SoulSilver  
-2. Platinum  
-3. Black / White → B2W2  
-4. X / Y → ORAS  
-5. Ultra Sun / Moon  
-6. Later generations as journey context, not as mandatory day-one scope  
+Save parsing and game-specific features should expand according to demand, test fixtures, and implementation confidence. New game support must define its save format, edition rules, data coverage, and fallback behavior before release.

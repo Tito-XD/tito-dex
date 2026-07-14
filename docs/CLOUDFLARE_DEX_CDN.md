@@ -12,14 +12,14 @@
 
 为 TitoDex（Flutter 掌机 App）提供：
 
-1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（当前 App v0.4.6 默认 bundle v5）
+1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（当前 v0.4.x 发布线默认 bundle v5）
 2. **CDN 加速** — 精灵图、属性图标、单条详情 JSON
 3. **一次下载完整包** — 掌机不必逐条请求 PokeAPI
 
 App 侧环境变量（由 CDN 部署交付）：
 
 ```bash
-# Current production (v0.4.6 APK)
+# Current production (v0.4.x release line)
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=5

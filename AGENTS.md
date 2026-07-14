@@ -6,7 +6,8 @@
 
 - **Active code:** `flutter/` (Flutter + Dart, Chinese UI)
 - **Frozen:** `src/` (React mock — do not extend)
-- **Current release:** v0.4.94 · App `0.4.94+47` · Dex bundle v5 (1025 species, `/v3/`)
+- **Latest standard release:** v0.4.98 · App `0.4.98+51`; **`main` baseline:** `0.4.94+47`
+- **Optional distribution:** v0.4.97-offline · Dex bundle v5 (1025 species, `/v3/`)
 - **Tests:** `cd flutter && flutter test` (~115 passing)
 
 ## Cloud VM

@@ -4,8 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Current release** | [v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7) |
-| **App version** | `0.4.7+39` (`flutter/pubspec.yaml`) |
+| **Latest standard release** | [v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98) · App `0.4.98+51` |
+| **`main` source baseline** | `0.4.94+47` (`flutter/pubspec.yaml`) |
+| **Optional distribution** | `v0.4.97-offline` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -14,12 +15,12 @@
 
 ## What this project is
 
-**TitoDex** is a personal Pokémon **journey companion** — a warm, device-like app for continuing a playthrough, not a full wiki replacement.
+**TitoDex** is a warm, offline-first Pokémon journey companion for Android handhelds and phones. It combines save-aware progress, manual team and journey management, structured Pokédex data, and lightweight battle utilities in a distinctive device-like UI.
 
-- **Continue first:** home shows current game, location, party, badges, timeline.
+- **Resume quickly:** home shows current game, location, party, badges, play time, and actions.
 - **Local first:** HGSS save parsing, offline dex bundle, no runtime 52poke/PokeAPI scraping in the app.
-- **Companion, not encyclopedia:** reference data supports play; avoid bulging into Bulbapedia / 52Poké scope.
-- **Iterative:** HGSS-first; later generations when the journey reaches them.
+- **Game context first:** edition, generation, and regional scope affect data and calculations.
+- **Focused reference:** provide practical depth without reproducing a full community wiki or simulator.
 
 Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bundled Nunito — see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), [UI_REFERENCE.md](./UI_REFERENCE.md).
 
@@ -39,7 +40,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (v0.4.7)
+## Current feature status (latest release line: v0.4.98)
+
+> `main` currently ends at `v0.4.94`. Changes described for `v0.4.95`–`v0.4.98` are present on the release tag line and should be merged back before new work branches from `main`.
 
 ### Journey & save
 - HGSS retail 512 KB `.sav` parser; directory sync (newest by mtime); startup auto-load.
@@ -59,21 +62,17 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Reference → **structured detail** + drill-down to dex filter (move / ability / egg group).
 - `/search?q=` deep link supported.
 
-### v0.4.7 highlights
-- List/dex uses single default CDN sprite; detail tap opens Gen I–IX picker (Roman numerals + edition labels).
-- National dex progress fixed to 1–1025 (was 493).
-- Home (non-square): centered layout, taller trainer card, two-line greeting, badges removed from card.
-- Avatar crop UCrop toolbar no longer overlaps status bar on Android.
-- Removed bulk PokeAPI sprite mirror CI (on-demand URLs in detail viewer).
-
-### v0.4.6 highlights
-- Sprite path fixes + loading placeholders; collapsible icon-grid type pickers.
-- CDN update check + first-run offline prompt; incremental l10n download.
-- Weekly GH Action: 52poke location zh sync → R2 (`sync-l10n-catalog.yml`).
+### Latest release-line highlights
+- v0.4.98: per-game titles in the flavor-text carousel for paired editions.
+- v0.4.95–v0.4.97: trainer-card bootstrap and square layout, loading panels, team editor improvements, download progress/cancel, and copy cleanup.
+- v0.4.94: compact Settings sections and paginated dex filter results.
+- v0.4.93: ability fallback, game labels, obtain-location coverage, and ability filters.
+- v0.4.85: Terastal, held items, status, defensive abilities, and team shared weaknesses.
+- v0.4.8: generation-aware matchup modifiers and offensive/defensive blind-spot tools.
 
 ### Not shipped / partial
-- Offensive/defensive blind-spot analysis, IV calc, usage rankings, Showdown link.
-- Full damage calculator; journey cloud sync ([CLOUD_SYNC_PROPOSAL.md](./CLOUD_SYNC_PROPOSAL.md)).
+- Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
+- Journey cloud sync ([CLOUD_SYNC_PROPOSAL.md](./CLOUD_SYNC_PROPOSAL.md)).
 - Custom launcher icon; HeartGold title detection; single-file `.sav` picker.
 - Nav hand-drawn icons: **APK assets only**, not on CDN.
 
@@ -91,7 +90,7 @@ flutter/lib/
     save/                     # SaveSyncService, SaveScanner
     companion/                # Battle math, type relations
     game/                     # GameEdition, regional dex
-  config/app_config.dart      # Sleep tools etc.; offline-first
+  config/app_config.dart      # Offline-first app configuration
   l10n/                       # app_zh.dart, game_zh.dart, zh_catalog.dart
   pages/                      # home, dex, search, settings, companion tools
   widgets/                    # DeviceShell, dex_reference_detail, …
@@ -124,7 +123,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # expect ~115 tests pass
+flutter test                    # regression gate; baseline is approximately 115 tests
 flutter build apk --release     # arm64 only, ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
@@ -172,7 +171,7 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 - Add features to `src/` (React mock).
 - Runtime-fetch 52poke/PokeAPI for zh catalog in the app.
 - Put hand-drawn nav icons on CDN (APK assets only).
-- Turn TitoDex into a full encyclopedia or competitive platform.
+- Expand TitoDex into a full wiki mirror or competitive simulator without an explicit product decision.
 - Overwrite manual journey timeline on save import without merge rules ([PARSER_PROPOSAL.md](./PARSER_PROPOSAL.md)).
 - Publish private CDN base URLs in user-facing copy.
 
@@ -194,7 +193,8 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 | [README.md](../README.md) | Project intro, quick start |
 | [VISION.md](../VISION.md) | Product feeling & philosophy |
 | [PRODUCT.md](../PRODUCT.md) | Feature positioning |
-| [ROADMAP.md](../ROADMAP.md) | Phase history & what's next |
+| [ROADMAP.md](../ROADMAP.md) | Release history & what's next |
+| [RELEASES.md](./RELEASES.md) | Standardized GitHub Release copy archive |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical structure |
 | [STACK_DECISION.md](./STACK_DECISION.md) | Why Flutter; migration notes |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
@@ -210,5 +210,5 @@ Legacy handoff docs under `docs/handoff/` are historical — prefer this file fo
 
 ## Communication
 
-- Product owner prefers **Chinese** in chat; repo artifacts **English** by default.
-- When unsure between encyclopedia breadth vs journey utility, choose **journey utility**.
+- Product discussions use **Chinese** by default; repository artifacts use **English** unless a task requests otherwise.
+- When unsure between reference breadth and playthrough utility, choose **playthrough utility**.
