@@ -2,7 +2,7 @@
 
 > **Status:** Planning / side-branch experiment  
 > **Branch:** `cursor/apk-bundled-offline-dex-feef`  
-> **App version:** `0.4.94-offline+48` (mainline remains `0.4.94+47`)  
+> **App version:** `0.4.97-offline+50` (mainline remains `0.4.94+47`)  
 > **Audience:** Tito + Cloud Agents  
 > **Product ask (confirmed):** Ship **exactly** what Settings “下载离线图鉴” installs today (`bundle.tar.zst` → `dex_offline/`) inside the APK, so install → open → use needs **no network** for that offline dataset.
 
@@ -63,7 +63,7 @@ dex_offline/                         # = unpacked bundle.tar.zst
 | `sprites/by-version/…` | Cancelled plan — not part of offline tar (summaries may still carry URLs; files not shipped in pack) |
 | `sprites/animated/…` | Same — not in offline tar |
 
-**Size signal:** live fixture in tests uses `archiveSizeBytes: 3749451` (~**3.7 MB** compressed). Unpacked staging is larger (many small files) but still “one pack”, not hundred-MB artwork dumps.
+**Size signal:** live fixture in tests uses `archiveSizeBytes: 41154067` (~**3.7 MB** compressed). Unpacked staging is larger (many small files) but still “one pack”, not hundred-MB artwork dumps.
 
 **APK forecast:** ~21 MB → ~**25–28 MB** if we embed that one `bundle.tar.zst`.
 
@@ -100,7 +100,7 @@ Still allowed to need network (unchanged product edges):
 4. Skip download prompt when seed OK  
 5. Settings keep optional CDN re-download / update for newer bundle or l10n slice  
 
-Why A: identical bytes to today’s offline install; one ~3.7 MB asset; no thousand-file AssetManifest; reuses extractor.
+Why A: identical bytes to today’s offline install; one ~41 MB asset; no thousand-file AssetManifest; reuses extractor.
 
 **Rejected for this experiment**
 
@@ -115,7 +115,7 @@ Why A: identical bytes to today’s offline install; one ~3.7 MB asset; no thous
 ### Phase 0 — Version + docs
 
 - [x] Branch `cursor/apk-bundled-offline-dex-feef`  
-- [x] Version `0.4.94-offline+48`  
+- [x] Version `0.4.97-offline+50`  
 - [x] This plan (scope = current offline tar, single sprite)  
 - [x] Links from `AI_CONTEXT.md` / `ARCHITECTURE.md` / `AGENTS.md`
 
@@ -154,7 +154,7 @@ Why A: identical bytes to today’s offline install; one ~3.7 MB asset; no thous
 | Metric | Pass idea |
 | --- | --- |
 | Airplane-mode dex grid + detail (no artwork) | Works on first open after seed |
-| APK size | ~25–28 MB acceptable on RG |
+| APK size | ~60–75 MB acceptable on RG |
 | Seed time once | Progress shown; no re-seed next launch |
 | Parity | File tree matches a CDN-installed `dex_offline/` for same bundleVersion |
 
@@ -210,7 +210,7 @@ Why A: identical bytes to today’s offline install; one ~3.7 MB asset; no thous
 
 ## 10. Open questions (narrowed)
 
-1. Asset delivery: **CI/R2 fetch at APK build** vs commit the ~3.7 MB archive in git?  
+1. Asset delivery: **CI/R2 fetch at APK build** vs commit the ~41 MB archive in git?  
 2. Mainline later: merge this as default, or keep `*-offline` as RG travel flavor only?  
 3. Artwork: leave as CDN-on-tap (matches today’s offline pack), or expand the **CDN offline archive** in a separate change?
 
