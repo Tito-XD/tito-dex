@@ -1,8 +1,8 @@
 # APK-bundled offline dex — experiment plan (`*-offline`)
 
-> **Status:** Planning / side-branch experiment  
+> **Status:** Implemented — `0.4.97-offline+50` APK built  
 > **Branch:** `cursor/apk-bundled-offline-dex-feef`  
-> **App version:** `0.4.97-offline+50` (mainline remains `0.4.94+47`)  
+> **App version:** `0.4.97-offline+50` (mainline remains on main)  
 > **Audience:** Tito + Cloud Agents  
 > **Product ask (confirmed):** Ship **exactly** what Settings “下载离线图鉴” installs today (`bundle.tar.zst` → `dex_offline/`) inside the APK, so install → open → use needs **no network** for that offline dataset.
 
