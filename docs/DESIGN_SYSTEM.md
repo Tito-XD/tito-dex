@@ -1,6 +1,6 @@
 # TitoDex Design System
 
-TitoDex should feel like a warm Pokémon companion device, not a generic Android application. The current UI north star is captured in [UI Reference Notes](./UI_REFERENCE.md).
+TitoDex uses a warm, compact, modern-retro trainer-device language that remains readable on Android phones and handheld displays. Its personality should be recognizable without depending on private user information. The original visual reference is documented in [UI Reference Notes](./UI_REFERENCE.md).
 
 **Implementation:** Design tokens live in `src/styles/tokens.css` (React reference) and `flutter/lib/theme/tito_colors.dart` (active). Keep both in sync when changing colors or radii. See [Stack Decision](./STACK_DECISION.md).
 
@@ -11,10 +11,10 @@ Keywords:
 - warm device UI
 - modern retro
 - sticker UI
-- trainer journey
+- playthrough progress
 - compact
 - friendly
-- companion
+- companion-like
 - soft but sturdy
 
 ## Color Direction
@@ -161,13 +161,13 @@ Square screens may show these as a dashboard with multiple panels visible at onc
 
 ### Trainer Card
 
-Feels like the reference card: cream surface, deep-blue text, companion portrait/sticker, trainer identity, and badge emblem. It should feel personal rather than like an account profile.
+Use a cream surface, deep-blue text, avatar or companion illustration, trainer identity, and concise progress metadata. It should feel specific to the current journey rather than like a generic account profile.
 
 Core content:
 
-- Tito name
+- trainer display name
 - current game
-- companion Riolu
+- avatar or companion illustration
 - badge strip
 - soft yellow or blue-gray panel
 

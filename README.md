@@ -1,26 +1,34 @@
 # TitoDex
 
-**TitoDex** is a personal Pokémon **journey companion** — a warm, device-like app for picking up where you left off in a playthrough. It combines a trainer dashboard, HGSS save sync, and a lightweight offline Pokédex with Chinese UI.
+**TitoDex** is a warm, offline-first Pokémon **journey companion** for Android handhelds and phones. It brings save progress, team and journey management, a 1–1025 Pokédex, Chinese reference data, and lightweight battle utilities into one compact, device-like interface.
 
-It is **not** a full encyclopedia replacement (52Poké, Bulbapedia, etc.). Reference data exists to support the current game, not to catalog everything.
+It is built to make returning to a playthrough feel immediate and familiar: see where the journey paused, check the current team, and open the right reference tool without losing the character of a dedicated trainer device. It does not aim to replace a full community wiki or competitive simulator.
 
-**Current release:** [v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7) · App `0.4.7+39` · Offline dex bundle **v5** (1025 species, 23 game editions)
+| Channel | Version | Notes |
+| --- | --- | --- |
+| Latest standard APK | [v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98) · App `0.4.98+51` | arm64-v8a, about 23 MB |
+| Optional offline APK | [v0.4.97-offline](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.97-offline) | Bundles the current dex pack, about 61 MB |
+| `main` source baseline | App `0.4.94+47` | Latest release fixes are on the `v0.4.95`–`v0.4.98` tag line |
 
-## Highlights (v0.4.7)
+Offline dex bundle: **v5** · 1025 species · 23 game editions.
 
-- **Sprite 策略** — 列表默认 CDN 小图；详情页点图按 Gen I–IX 切换各代 sprite（按需加载）
-- **图鉴 1025** — 全国图鉴进度分母修正为 1025
-- **首页布局** — 竖屏/Pad 居中；Trainer 卡片加高、头像放大、两行问候、移除右侧徽章
-- **头像裁切** — 修复 UCrop 与状态栏重叠导致无法点确认
-- **RG APK** — arm64-v8a, ~21 MB, [releases/](releases/)
+## Highlights
 
-## Principles
+- **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions
+- **HGSS save support** — 512 KB `.sav` parsing, directory sync, and seen/caught progress
+- **Pokédex 1–1025** — search, regional scopes, per-game flavor text, obtain data, moves, abilities, and sprites
+- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status
+- **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers
+- **Offline-first data** — downloadable dex bundle with Chinese labels, maps, config, icons, and list sprites
+- **Handheld layouts** — phone, tablet, and square-screen dashboard support with controller focus navigation
 
-1. **Continue first** — the home screen answers “where was I?”  
-2. **Game context first** — HGSS-default; expand with the journey  
-3. **Local first** — offline bundle, save parsing, no runtime wiki scraping  
-4. **Companion, not encyclopedia** — depth where it helps play  
-5. **Iterate** — ship useful slices; avoid platform over-design  
+## Product principles
+
+1. **Resume quickly** — show the information needed to continue a playthrough.
+2. **Respect game context** — filter data and tools by the selected title and generation.
+3. **Work offline** — prefer local saves, cached reference data, and bundled fallbacks.
+4. **Stay focused** — provide practical reference depth without duplicating a full wiki.
+5. **Scale across devices** — support Android phones and compact handheld displays.
 
 ## Stack
 
@@ -31,16 +39,16 @@ It is **not** a full encyclopedia replacement (52Poké, Bulbapedia, etc.). Refer
 | Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
 | Persistence | `shared_preferences` + offline `dex_offline/` |
 | Save | HGSS 512 KB `.sav` parser + directory auto-sync |
-| Dex data | Pre-built CDN bundle v5 (+ APK asset fallbacks) |
+| Dex data | Pre-built bundle v5 with APK asset fallbacks |
 | UI language | Simplified Chinese |
 
 Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
 
-## Install (RG handheld)
+## Install
 
-Download **`TitoDex-0.4.7-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Uninstall any locally-built debug APK first (signing key differs).
+Download **`TitoDex-0.4.98-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). It targets arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
-First launch may prompt you to open **Settings → 下载预打包数据包** for the full offline pack.
+The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 
 ## Development
 
@@ -49,28 +57,29 @@ cd flutter
 flutter pub get
 flutter test
 flutter run              # device / emulator
-flutter run -d chrome    # web preview (limited)
+flutter run -d chrome    # limited web preview
 ```
 
-Build release APK: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
+Build and release instructions: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
 
-Maintainers — dex bundle build & R2 upload: [docs/CLOUDFLARE_DEX_CDN.md](docs/CLOUDFLARE_DEX_CDN.md) · secrets: [docs/PERMISSIONS.md](docs/PERMISSIONS.md)
+Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repository permissions](docs/PERMISSIONS.md)
 
 ## Documentation
 
-| Doc | Contents |
+| Document | Contents |
 | --- | --- |
-| [**AI context**](docs/AI_CONTEXT.md) | **Single doc for agents** — status, architecture, guardrails |
-| [Vision](VISION.md) | Product feeling |
-| [Product](PRODUCT.md) | Positioning & priorities |
-| [Roadmap](ROADMAP.md) | Phases & version history |
-| [Flutter app](flutter/README.md) | App-specific dev notes |
-| [Design system](docs/DESIGN_SYSTEM.md) | Visual tokens |
+| [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
+| [Vision](VISION.md) | Product goals and boundaries |
+| [Product](PRODUCT.md) | Audience, feature set, and priorities |
+| [Roadmap](ROADMAP.md) | Release history and next work |
+| [Flutter app](flutter/README.md) | App development notes |
+| [Design system](docs/DESIGN_SYSTEM.md) | Visual and interaction tokens |
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |
+| [Release history](docs/RELEASES.md) | Standardized GitHub Release notes |
 
 ## HGSS test save
 
-Bundled fixture `PKMSS.sav` — import via Settings. Expect trainer ETeZ, 3 badges, Goldenrod City, party with Quilava / Togepi.
+The bundled fixture `PKMSS.sav` is available for parser and import testing. Expected fields include three badges, Goldenrod City, and a party containing Quilava and Togepi.
 
 ```bash
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav

@@ -1,7 +1,8 @@
 # TitoDex Architecture
 
 > **Active stack:** Flutter + Dart in `flutter/`. React under `src/` is a frozen design reference.  
-> **Current release:** v0.4.6 · Dex bundle v5 (`/v3/`).  
+> **Latest standard release:** v0.4.98; **`main` baseline:** `0.4.94+47` · Dex bundle v5 (`/v3/`).
+>
 > **Full agent context:** [AI_CONTEXT.md](./AI_CONTEXT.md)
 
 **RG APK:** `TitoDex-<ver>-rg-arm64.apk` — arm64-v8a, SDK 36, ~21 MB. See [RELEASE_BUILD.md](./RELEASE_BUILD.md).
@@ -51,7 +52,7 @@ Constraints:
 - responsive phone + square layouts
 - simple data model
 - game-scoped parser (HGSS only for now)
-- dex CDN as shared asset layer (App + future `tito.cafe/pokedex` web)
+- dex CDN as a shared asset layer for the app and future clients
 
 ## Project Shape
 
@@ -145,9 +146,9 @@ Sprites are **PNG** thumbnails in bundle; full **artwork** fetched lazily on tap
 
 ## Data Layers
 
-### 1. Mock seed
+### 1. Default seed
 
-`CurrentJourney.mock()` — Chinese SoulSilver template on first launch.
+`CurrentJourney.mock()` — Chinese SoulSilver sample data used when no saved state exists.
 
 ### 2. Local journey store
 

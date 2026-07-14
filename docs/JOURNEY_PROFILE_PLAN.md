@@ -1,8 +1,8 @@
-# Journey / Trainer / Team — Product plan (Tito confirmed)
+# Journey / Trainer / Team — Product specification archive
 
-> **Status:** Implemented on branch `cursor/batch-ux-journey-dex-947b` (2026-07). This doc remains the product spec reference.
-> **Audience:** Tito + Cloud Agents.
-> **Last updated:** 2026-07 (Tito decisions on avatar, team edit, nav, home merge, Sleep)
+> **Status:** Historical specification implemented on branch `cursor/batch-ux-journey-dex-947b` (2026-07). Use [`AI_CONTEXT.md`](./AI_CONTEXT.md) for current state.
+> **Audience:** Maintainers and contributors.
+> **Last reviewed:** 2026-07-14. Decision records below preserve implementation context and are not current marketing copy.
 
 ---
 
@@ -21,7 +21,7 @@ TitoDex splits into two **journey modes** driven by **Settings → global game v
 
 ---
 
-## Tito decisions (2026-07)
+## Product decisions (2026-07)
 
 | # | Topic | Decision |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ enum JourneyCapability {
 
 ## 4. Team page — edit + full summary card
 
-### Edit policy (Tito confirmed)
+### Edit policy (product decision)
 
 - **All modes:** party editable (species, level, nickname, expand to IV/EV/nature/moves)
 - **Save-linked:** load from save on sync; user overrides persist in `CurrentJourney` until next sync (merge policy: user edits win on conflict — TBD detail)
@@ -154,13 +154,13 @@ Not a full Showdown calc — compact companion estimate.
 | Tier | Effort | Value |
 | --- | --- | --- |
 | **A — Dex companion** | Low | Add `GameEdition` or separate「Sleep」mode: static helpers (Snorlax strength calc links, recipe refs) using public game data |
-| **B — Health sleep line** | Medium | Optional RG permission: read last night sleep from Health Connect → small home widget「睡眠 7h12m」— personal, not game-linked |
+| **B — Health sleep line** | Medium | Historical option: read a Health Connect sleep summary. This is not game-linked and is no longer part of the primary Settings flow. |
 | **C — Full Sleep sync** | **Blocked** | Would need official API or ToS-risky reverse engineering — **not recommended** |
 
 ### Recommendation
 
 - Classify **Pokémon Sleep** as `manual` journey mode (same as LZA/Champions) for now.
-- If Tito wants Sleep on the device: **Tier A** (tools + links) or **Tier B** (health sleep stat) — separate from save parser roadmap.
+- If health integrations are reconsidered: treat **Tier A** (tools + links) or **Tier B** (health sleep stat) as separate from the save-parser roadmap.
 - Revisit if The Pokémon Company ships account export or companion API.
 
 ---
@@ -171,7 +171,7 @@ See **§8** for layout, greeting, badges, illustration removal.
 
 ---
 
-## 7. Trainer card redesign (Tito confirmed)
+## 7. Trainer card redesign (product decision)
 
 ### Current layout
 
@@ -186,7 +186,7 @@ See **§8** for layout, greeting, badges, illustration removal.
 ### Planned layout
 
 ```
-[  Larger   ]   早上好，训练家 Tito
+[  Larger   ]   早上好，训练家 小明
 [  Avatar   ]   (or 下午好 / 傍晚好 / 深夜好 …)
                 [optional companion one-liner]
 [            ]                    [Badge column]
@@ -227,7 +227,7 @@ Implementation: `app_zh.dart` helper `greetingForHour(DateTime.now())`.
 
 ## 8. Journey card — merge Continue + Journey page (recommended)
 
-### Tito proposal
+### Historical proposal
 
 Remove **Journey tab** entirely. Home **journey card** (renamed from Continue):
 
@@ -320,7 +320,7 @@ Suggested implementation order:
 
 ---
 
-## 11. Manual mode — dex encounter markers (Tito confirmed)
+## 11. Manual mode — dex encounter markers (product decision)
 
 When `JourneyCapability.manual` (NS / mobile / no save):
 
@@ -339,7 +339,7 @@ UI: optional haptic + small toast on state change; filter chips (已见/已捕) 
 
 ---
 
-## 12. Save re-sync vs user-edited party (Tito confirmed)
+## 12. Save re-sync vs user-edited party (product decision)
 
 On save sync when user has edited party slots (`userEdited` / differs from parsed save):
 
@@ -352,7 +352,7 @@ Location / badges / play time from save can still update on sync (read-only jour
 
 ---
 
-## 13. Emulator entry (Tito confirmed)
+## 13. Emulator entry (product decision)
 
 - **Not** on home journey card primary tap
 - **Journey detail page** (`/journey` push from home card): **top prompt** — e.g.「从模拟器继续」+ pick/launch emulator (existing `EmulatorLauncher` flow)

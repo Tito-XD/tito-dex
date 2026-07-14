@@ -1,7 +1,8 @@
-# TitoDex — Master implementation checklist (Tito review)
+# TitoDex — Historical implementation checklist
 
-> **Status:** Batch UX implemented on branch `cursor/batch-ux-journey-dex-947b` (2026-07).  
-> **88 tests pass** · `flutter analyze` clean (warnings only).
+> **Status:** Archived batch plan implemented on branch `cursor/batch-ux-journey-dex-947b` (2026-07).
+>
+> Test counts below describe that historical branch. Use [`AI_CONTEXT.md`](./AI_CONTEXT.md) for the current baseline.
 
 ---
 

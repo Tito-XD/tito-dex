@@ -1,10 +1,10 @@
 # UI Reference Notes
 
-These notes capture Tito's supplied visual reference for TitoDex. Treat the image as the current north-star art direction for the first mock UI pass.
+These notes preserve the original visual reference for TitoDex and document the design anchors that remain relevant to the Flutter implementation.
 
 ## Overall Impression
 
-TitoDex should look like a personal Pokémon companion device, with a warm blue handheld shell and sticker-like interface panels. The UI should feel custom, playful, and compact rather than like a standard Material Design app.
+TitoDex should feel like a warm Pokémon trainer device, with a blue handheld shell and sticker-like panels. The UI should be personal in character, playful, readable, and efficient on phones and square handheld screens rather than relying on default Material presentation.
 
 The reference combines three product forms:
 
@@ -16,7 +16,7 @@ The reference combines three product forms:
 
 Use these as design anchors:
 
-- TitoDex wordmark with paw icon.
+- TitoDex wordmark with its small paw/device motif.
 - Deep blue header and navigation surfaces.
 - Cream cards with thick navy outlines.
 - Slate-blue device shell / panel background.
@@ -24,7 +24,7 @@ Use these as design anchors:
 - Coral-orange Dex/action accent.
 - Sticker tape, star stickers, badge stickers, and soft drop shadows.
 - City illustration panel for Continue Journey, initially Goldenrod City.
-- Riolu companion sticker with a short encouraging speech bubble.
+- Optional companion sticker or lightweight status illustration.
 
 ## Reference Palette
 
@@ -73,7 +73,7 @@ Use a dashboard layout instead of simply scaling phone portrait:
 - Continue Journey card on the left or dominant area.
 - Current Party panel on the right.
 - Quick action tiles along the lower row.
-- Riolu sticker can sit outside or overlap the device panel edge.
+- A companion sticker may sit outside or overlap the device panel edge when space allows.
 
 ### Launcher Widgets
 
@@ -102,7 +102,7 @@ Potential later motion:
 
 - page transition between Dex / Journey with small card-slide motion
 - device sound feedback for scan/tap moments
-- Riolu micro-animation for encouragement
+- lightweight companion or status animation
 - badge sparkle / unlock animation
 
 Motion should be light and delightful, not heavy or distracting.

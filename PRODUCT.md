@@ -1,59 +1,65 @@
-# TitoDex Product Notes
+# TitoDex Product Overview
 
 ## Positioning
 
-TitoDex is a **journey companion** for Pokémon playthroughs on a handheld (primarily RG / Android).
+TitoDex is an offline-first Pokémon journey companion for Android handhelds and phones. Its warm device-like interface is part of the product, while save, Pokédex, and battle features remain clear enough for general use.
 
-| It is | It is not |
+| TitoDex provides | Current boundary |
 | --- | --- |
-| Journey dashboard & trainer card | Full Pokédex / wiki |
-| Local save helper (HGSS) | Universal save manager |
-| Lightweight reference (moves, types, items) | Competitive battle platform |
-| Warm device UI | Material-default Android app |
+| Save-aware progress dashboard | HGSS is the supported save parser |
+| Manual trainer, team, and journey data | Not a universal save editor |
+| Pokédex and structured reference data | Not a full community wiki mirror |
+| Battle matchup and estimate tools | Not a competitive simulator replacement |
+| Phone and square-screen layouts | Android arm64 is the primary distribution target |
 
-## Primary user story
+## Primary user flow
 
-When I open TitoDex, I see my **current journey** — game, location, badges, party, recent notes — so I can continue without re-orienting.
+1. Select a game edition and optionally connect a supported save directory.
+2. Review location, badges, play time, party, and Pokédex progress on the dashboard.
+3. Open the team editor, Pokédex, reference hub, or battle utilities as needed.
+4. Continue the game through the configured emulator or return later with local state preserved.
 
-## Home screen (north star)
+The app also supports manual mode for games without a save parser.
 
-1. Trainer card (name, game, companion sprite)  
-2. Continue journey card (location, badges, play time, party snapshot)  
-3. Quick access — Team, Journey, Dex, Search  
-4. Recent timeline / reminders  
+## Current capabilities
 
-Reference: [docs/UI_REFERENCE.md](docs/UI_REFERENCE.md)
+- HGSS 512 KB save parser, directory sync, and startup auto-load
+- Home, Team, Journey, Dex, Search, and Settings flows
+- Manual team editing and journey JSON import/export
+- National Pokédex 1–1025 with 23 game editions and 11 regional scopes
+- Per-game flavor text, obtain locations, moves, abilities, sprites, and Chinese labels
+- Structured reference pages for moves, abilities, natures, egg groups, items, weather, terrain, and status
+- Type matchup, stat and damage estimates, blind-spot analysis, team shared weaknesses, and common battle modifiers
+- Downloadable offline data pack plus an optional APK-bundled offline build
+- Responsive phone, tablet, and square handheld layouts
 
-## Shipped (v0.4.6)
+## Product priorities
 
-- HGSS save parser + directory sync + seen/caught on dex grid  
-- National dex **1–1025**, CDN offline bundle v5, 23 game editions, regional filters  
-- Detail tabs: flavor, stats, obtain locations, moves per game  
-- Search hub: encyclopedia (moves, abilities, natures, items, weather, …) with **dex drill-down filters**  
-- Battle tools (partial): type matchup, stat calc, quick damage  
-- Chinese catalog in bundle `l10n/`; update prompts + incremental l10n sync  
-- RG release APK pipeline (~21 MB arm64)
+### Maintain
 
-## Priorities
+- clear resume and progress information on the home screen
+- correct game and generation context across data and calculations
+- offline behavior with explicit download and update states
+- readable interaction patterns for touch and handheld controls
+- transparent parser and data limitations
 
-### Must have
-- Continue journey as dominant home action  
-- Current game context on important surfaces  
-- Offline-first dex & reference where possible  
-- Distinct visual language (DeviceShell, sticker cards)
+### Improve next
 
-### Should have next
-- Blind-spot / coverage analysis for teams  
-- Richer damage calc; IV tools (lower priority)  
-- Launcher icon & splash polish  
-- HeartGold detection, single-file save pick  
+- merge the `v0.4.95`–`v0.4.98` release line back into `main`
+- expand automated coverage for trainer-card, team-editor, and flavor-title behavior
+- refine damage calculation and validation coverage
+- add HeartGold title detection and single-file save selection
+- improve launcher icon, splash, and distribution polish
 
-### Out of scope (for now)
-- Account system, OCR, journey cloud sync ([proposal](docs/CLOUD_SYNC_PROPOSAL.md))  
-- Usage rankings, full Showdown parity  
-- Runtime scraping of fan wikis in the app  
+### Out of scope for now
+
+- account system and hosted journey sync ([proposal](docs/CLOUD_SYNC_PROPOSAL.md))
+- runtime scraping of fan wikis in the app
+- full competitive usage rankings or complete simulator parity
+- untested multi-generation save editing
 
 ## Platform
 
-- **Now:** Android (phone + RG Rotate), arm64 APK  
-- **Later:** Linux handheld, optional web companion (save sync needs `dart:io` strategy)
+- **Primary:** Android arm64 phones and RG-class handhelds
+- **Secondary:** Flutter web preview for UI smoke testing
+- **Future:** Linux handheld support after Android workflows are stable

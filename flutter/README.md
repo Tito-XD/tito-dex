@@ -1,8 +1,10 @@
 # TitoDex Flutter App
 
-Flutter implementation of the journey companion. Parent repo: [../README.md](../README.md).
+Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Version:** `0.4.7+39` · [GitHub Release v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7)
+**Latest standard release:** `0.4.98+51` · [GitHub Release v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98)
+
+**Current `main` package version:** `0.4.94+47`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 
@@ -17,7 +19,7 @@ flutter run -d chrome # web preview (limited)
 
 ## Release APK (RG handheld)
 
-arm64-v8a only, ~21 MB, SDK 36.
+arm64-v8a only, approximately 23 MB for the standard APK, SDK 36.
 
 ```bash
 flutter build apk --release
@@ -27,7 +29,7 @@ cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-ar
 
 Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local debug builds before sideloading CI APK.
 
-## Features (v0.4.7)
+## Features
 
 | Area | Notes |
 | --- | --- |
@@ -35,7 +37,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | HGSS save | 512 KB `.sav`, directory sync, seen/caught on dex |
 | Dex 1–1025 | Grid, search, 4-tab detail, 23 editions, regional scope |
 | Offline pack | Settings → CDN bundle; l10n/maps/config; update prompts |
-| Search hub | Encyclopedia + battle tools; reference → dex filters |
+| Search hub | Structured reference + battle tools; reference → dex filters |
 | UI | Chinese (`lib/l10n/`), DeviceShell, Nunito, RG layout |
 
 ## Navigation
@@ -88,11 +90,11 @@ assets/
 
 `go_router`, `shared_preferences`, `file_picker`, `http`, `zstandard`, `image`, `crypto`
 
-## Not yet
+## Not yet / partial
 
 - Custom launcher icon / splash  
 - HeartGold detection; single-file `.sav` picker  
-- Blind-spot analysis, IV calc, usage rankings  
+- Full competitive damage/IV workflows and usage rankings
 - Journey cloud sync  
 
 Parser details: [../docs/PARSER_PROPOSAL.md](../docs/PARSER_PROPOSAL.md)
