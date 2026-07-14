@@ -134,6 +134,8 @@ Settings → download CDN bundle
   → manifest.complete=true, preferOffline=true
 ```
 
+**Experiment (`*-offline` builds):** same extract into `dex_offline/`, but seed from APK `assets/dex/bundle.tar.zst` on first launch instead of requiring CDN. See [APK_BUNDLED_OFFLINE_PLAN.md](./APK_BUNDLED_OFFLINE_PLAN.md).
+
 Sprites are **PNG** thumbnails in bundle; full **artwork** fetched lazily on tap (`v2/artwork/{id}.png` or PokeAPI fallback) into `dex_offline/artwork/`.
 
 ### Journey model highlights
