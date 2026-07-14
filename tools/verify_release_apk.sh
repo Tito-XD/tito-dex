@@ -11,19 +11,35 @@ fi
 
 size_bytes=$(stat -c%s "$APK" 2>/dev/null || stat -f%z "$APK")
 size_mb=$((size_bytes / 1024 / 1024))
+base="$(basename "$APK")"
+is_offline=0
+if [[ "$base" == *"-offline-"* ]] || [[ "$base" == *offline* ]]; then
+  is_offline=1
+fi
 
 echo "==> $APK"
 echo "    size: ${size_mb} MB (${size_bytes} bytes)"
+if (( is_offline )); then
+  echo "    flavor: offline (bundled dex pack)"
+fi
 
-# RG arm64 release builds are ~19–23 MB. Anything under 15 MB is almost certainly truncated.
+# Standard RG arm64 ~19–23 MB. Offline flavor embeds ~40 MB bundle.tar.zst → ~60–75 MB.
 if (( size_bytes < 15000000 )); then
-  echo "ERROR: APK too small — expected ~20–23 MB for arm64-v8a release." >&2
+  echo "ERROR: APK too small — expected ~20–23 MB (or ~60–75 MB for offline)." >&2
   echo "       Likely truncated copy or build still in progress." >&2
   exit 1
 fi
 
-if (( size_bytes > 35000000 )); then
-  echo "WARN: APK larger than usual (>35 MB) — check for debug build or universal ABI." >&2
+if (( is_offline )); then
+  if (( size_bytes < 45000000 )); then
+    echo "ERROR: offline APK too small (<45 MB) — bundled dex archive likely missing." >&2
+    exit 1
+  fi
+  if (( size_bytes > 120000000 )); then
+    echo "WARN: offline APK larger than expected (>120 MB)." >&2
+  fi
+elif (( size_bytes > 35000000 )); then
+  echo "WARN: APK larger than usual (>35 MB) — check for debug build, universal ABI, or offline assets." >&2
 fi
 
 echo "==> zip integrity"
@@ -63,5 +79,18 @@ for asset in \
   fi
   echo "    OK $asset"
 done
+
+if (( is_offline )); then
+  echo "==> offline dex assets"
+  for asset in \
+    assets/flutter_assets/assets/dex/bundle.tar.zst \
+    assets/flutter_assets/assets/dex/bundle-manifest.json; do
+    if ! echo "$listing" | awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}'; then
+      echo "ERROR: missing $asset" >&2
+      exit 1
+    fi
+    echo "    OK $asset"
+  done
+fi
 
 echo "PASS: release APK looks complete."

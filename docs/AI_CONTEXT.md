@@ -5,7 +5,8 @@
 | Field | Value |
 | --- | --- |
 | **Current release** | [v0.4.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.7) |
-| **App version** | `0.4.7+39` (`flutter/pubspec.yaml`) |
+| **App version** | `0.4.94+47` (`flutter/pubspec.yaml` on main) |
+| **Offline experiment** | `0.4.97-offline+50` — APK-bundled dex seed; see [APK_BUNDLED_OFFLINE_PLAN.md](./APK_BUNDLED_OFFLINE_PLAN.md) |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -203,6 +204,7 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Colors, typography |
 | [PARSER_PROPOSAL.md](./PARSER_PROPOSAL.md) | Save parser design |
 | [JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md) | Journey UX plans |
+| [APK_BUNDLED_OFFLINE_PLAN.md](./APK_BUNDLED_OFFLINE_PLAN.md) | Side-branch: ship CDN bundle inside APK |
 
 Legacy handoff docs under `docs/handoff/` are historical — prefer this file for current state.
 

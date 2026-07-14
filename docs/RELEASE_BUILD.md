@@ -30,7 +30,9 @@ These ship **inside** the APK via `pubspec.yaml`:
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
 
-**Not bundled in APK:** the 1025-species dex offline pack — users download via **Settings → 下载预打包图鉴包** into app documents (`dex_offline/`).
+**Mainline:** dex offline pack is downloaded via Settings into `dex_offline/`.
+
+**`*-offline` flavor:** ships `assets/dex/bundle.tar.zst` (~41 MB) and seeds `dex_offline/` on first launch — see [APK_BUNDLED_OFFLINE_PLAN.md](./APK_BUNDLED_OFFLINE_PLAN.md)..
 
 ### Compile-time dex CDN config
 

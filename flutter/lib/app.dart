@@ -290,6 +290,15 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
     final saveConfig = await _saveSync.loadConfig();
     final emulatorChoice = await _emulatorLauncher.loadChoice();
+
+    // Offline APK: seed dex_offline/ from bundled bundle.tar.zst before UI.
+    try {
+      await for (final _ in dexOfflineService.seedFromApkAssetIfNeeded()) {}
+    } catch (error, stackTrace) {
+      debugPrint('APK dex seed failed: $error');
+      debugPrint('$stackTrace');
+    }
+
     if (!mounted) {
       return;
     }
@@ -311,7 +320,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
     final offlineReady = await dexOfflineService.isReady();
     if (!offlineReady) {
-      if (mounted) {
+      // Bundled offline builds should already be seeded; only prompt when the
+      // APK does not ship the archive (or seed failed).
+      final hasBundled = await dexOfflineService.hasApkBundledOfflinePack();
+      if (!hasBundled && mounted) {
         await showOfflineDataPrompt(context);
       }
       return;
