@@ -125,7 +125,7 @@ flutter/lib/
 cd flutter
 flutter pub get
 flutter test                    # regression gate; baseline is approximately 115 tests
-flutter build apk --release     # arm64 only, ~21 MB
+flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
