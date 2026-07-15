@@ -1,0 +1,94 @@
+name: Android Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: APK filename, for example TitoDex-0.4.99-lite-rg-arm64.apk
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Test, build, and verify signed APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: flutter
+
+    steps:
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.6"
+          cache: true
+          pub-cache: true
+
+      - name: Restore Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_STORE_PASSWORD"
+          test -n "$ANDROID_KEY_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/titodex-upload.keystore
+          {
+            printf 'storePassword=%s\n' "$ANDROID_STORE_PASSWORD"
+            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
+            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
+            printf 'storeFile=../titodex-upload.keystore\n'
+          } > android/key.properties
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-pub --no-fatal-warnings --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --no-pub
+
+      - name: Build signed arm64 APK
+        run: flutter build apk --release --no-pub
+
+      - name: Name and verify APK
+        env:
+          ARTIFACT_NAME: ${{ inputs.artifact_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ARTIFACT_NAME" =~ ^TitoDex-[0-9A-Za-z.+-]+-rg-arm64\.apk$ ]]; then
+            echo "Invalid artifact_name: $ARTIFACT_NAME" >&2
+            exit 2
+          fi
+          mkdir -p ../dist
+          cp build/app/outputs/flutter-apk/app-release.apk "../dist/$ARTIFACT_NAME"
+          ../tools/verify_release_apk.sh "../dist/$ARTIFACT_NAME"
+          sha256sum "../dist/$ARTIFACT_NAME"
+
+      - name: Upload verified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: dist/${{ inputs.artifact_name }}
+          if-no-files-found: error
+          retention-days: 14

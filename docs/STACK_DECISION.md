@@ -14,7 +14,7 @@ The decision was driven by real-device feedback (“feels like a webpage”), fu
 
 ## Current Implementation Status
 
-**Latest standard release:** v0.4.98 · App `0.4.98+51`; **`main` baseline:** `0.4.94+47` · Offline bundle **v5** (1025 species, `/v3/`)
+**Latest release:** v0.4.99 · Lite `0.4.99+52` · Offline `0.4.99-offline+53` · Offline bundle **v5** (1025 species, `/v3/`)
 
 | Phase | Goal | Status |
 | --- | --- | --- |
