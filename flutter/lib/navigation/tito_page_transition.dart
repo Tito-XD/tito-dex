@@ -25,10 +25,10 @@ abstract final class TitoHomeActionHero {
 /// A Material page lets Android provide the standard route transition.
 ///
 /// [heroTag] is used only when one of the three home quick-action cards opens
-/// its matching first-level page. The Hero animates a lightweight page surface,
-/// rather than moving the destination page itself into the Hero overlay. This
-/// keeps stateful Team and Search content mounted while the card expands and
-/// contracts during Android Back.
+/// its matching first-level page. The fixed-size open and closed children use
+/// the same fade-through layout strategy as Flutter's official OpenContainer,
+/// while the route itself remains owned by GoRouter for deep links and Android
+/// predictive back.
 Page<T> titoMaterialPage<T>({
   required LocalKey key,
   required Widget child,
@@ -38,22 +38,11 @@ Page<T> titoMaterialPage<T>({
     key: key,
     child: heroTag == null
         ? child
-        : Stack(
-            fit: StackFit.expand,
-            children: [
-              child,
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Hero(
-                    tag: heroTag,
-                    flightShuttleBuilder: _homeActionFlightShuttle,
-                    // The destination anchor is transparent at rest. Its
-                    // visual surface exists only while Hero owns the flight.
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-              ),
-            ],
+        : Hero(
+            tag: heroTag,
+            transitionOnUserGestures: true,
+            flightShuttleBuilder: _homeActionFlightShuttle,
+            child: child,
           ),
   );
 }
@@ -65,15 +54,94 @@ Widget _homeActionFlightShuttle(
   BuildContext fromHeroContext,
   BuildContext toHeroContext,
 ) {
-  return const DecoratedBox(
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [TitoColors.skyBlue, TitoColors.slateBlue],
-      ),
-    ),
-    child: SizedBox.expand(),
+  final cardContext = flightDirection == HeroFlightDirection.push
+      ? fromHeroContext
+      : toHeroContext;
+  final pageContext = flightDirection == HeroFlightDirection.push
+      ? toHeroContext
+      : fromHeroContext;
+  final cardHero = cardContext.widget as Hero;
+  final pageHero = pageContext.widget as Hero;
+  final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
+  final pageSize = (pageContext.findRenderObject()! as RenderBox).size;
+
+  final Animation<double> cardOpacity;
+  final Animation<double> pageOpacity;
+  if (flightDirection == HeroFlightDirection.push) {
+    cardOpacity = animation.drive(
+      TweenSequence<double>([
+        TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 1),
+        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 4),
+      ]),
+    );
+    pageOpacity = animation.drive(
+      TweenSequence<double>([
+        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 1),
+        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 4),
+      ]),
+    );
+  } else {
+    // The route animation runs from 1 to 0 while popping. Fade the page out
+    // first, then reveal the card during the remaining contraction.
+    cardOpacity = animation.drive(
+      TweenSequence<double>([
+        TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 4),
+        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 1),
+      ]),
+    );
+    pageOpacity = animation.drive(
+      TweenSequence<double>([
+        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 4),
+        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 1),
+      ]),
+    );
+  }
+
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (context, _) {
+      final progress = animation.value;
+      final radius = 14 * (1 - progress);
+      final borderWidth = 3 * (1 - progress);
+
+      return Material(
+        animationDuration: Duration.zero,
+        clipBehavior: Clip.antiAlias,
+        color: Color.lerp(TitoColors.card, TitoColors.slateBlue, progress),
+        elevation: 2 * (1 - progress),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+          side: BorderSide(color: TitoColors.ink, width: borderWidth),
+        ),
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            FittedBox(
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topLeft,
+              child: SizedBox.fromSize(
+                size: cardSize,
+                child: FadeTransition(
+                  opacity: cardOpacity,
+                  child: cardHero.child,
+                ),
+              ),
+            ),
+            FittedBox(
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topLeft,
+              child: SizedBox.fromSize(
+                size: pageSize,
+                child: FadeTransition(
+                  opacity: pageOpacity,
+                  child: pageHero.child,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
   );
 }
 

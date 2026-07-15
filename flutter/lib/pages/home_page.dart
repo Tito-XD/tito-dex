@@ -85,6 +85,7 @@ class _QuickActionsBar extends StatelessWidget {
               Expanded(
                 child: Hero(
                   tag: actions[index].heroTag,
+                  transitionOnUserGestures: true,
                   child: TitoQuickTile(
                     label: actions[index].label,
                     icon: actions[index].icon,
@@ -124,6 +125,7 @@ class _QuickActionsGrid extends StatelessWidget {
           Expanded(
             child: Hero(
               tag: actions[index].heroTag,
+              transitionOnUserGestures: true,
               child: TitoQuickTile(
                 label: actions[index].label,
                 icon: actions[index].icon,
