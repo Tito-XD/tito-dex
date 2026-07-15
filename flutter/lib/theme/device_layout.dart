@@ -259,9 +259,9 @@ abstract final class DeviceLayout {
       dim(context, 116.0);
 
   static double trainerDenseCardHeight(BuildContext context) =>
-      dim(context, 200.0);
+      dim(context, 124.0);
 
-  /// Square-dashboard trainer card — same 5-row grid + height as portrait dense.
+  /// Square-dashboard trainer card — same compact height as portrait dense.
   static double trainerSquareCardHeight(BuildContext context) =>
       trainerDenseCardHeight(context);
 
@@ -285,9 +285,9 @@ abstract final class DeviceLayout {
   static int dexGridColumns(BuildContext context) {
     final width = sizeOf(context).width;
     if (width >= 1440) {
-      return 8;
+      return 6;
     }
-    return 4;
+    return 3;
   }
 
   static double dexCardAspectRatio(BuildContext context) {

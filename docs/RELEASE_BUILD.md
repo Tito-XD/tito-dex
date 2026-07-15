@@ -30,7 +30,7 @@ These ship **inside** the APK via `pubspec.yaml`:
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
 
-**Not bundled in APK:** the 1025-species dex offline pack — users download via **Settings → 下载预打包图鉴包** into app documents (`dex_offline/`).
+**Lite APK:** users download the 1025-species dex pack through **Settings → 下载预打包图鉴包** into app documents (`dex_offline/`). The optional Offline APK adds `assets/dex/bundle.tar.zst` and its manifest, then seeds the same pack on first launch.
 
 ### Compile-time dex CDN config
 
@@ -80,16 +80,30 @@ cp build/app/outputs/flutter-apk/app-release.apk \
 
 Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
 
+### Offline variant
+
+Temporarily use the `x.y.z-offline+build` version and include `assets/dex/` in `pubspec.yaml`; build with the same arm64 command. Its archive must contain `dex_catalog.json` so the seeded package can serve list, search, and reference filters without building indices after a tap.
+
+```bash
+flutter build apk --release --target-platform android-arm64
+../tools/verify_release_apk.sh --offline build/app/outputs/flutter-apk/app-release.apk
+cp build/app/outputs/flutter-apk/app-release.apk \
+   ../releases/TitoDex-<ver>-offline-rg-arm64.apk
+```
+
+Restore the Lite `version:` and remove the `assets/dex/` entry before committing the normal source configuration; retain the offline archive only through the release asset.
+
 ---
 
 ## Post-build checklist
 
 - [ ] `unzip -t releases/TitoDex-*-rg-arm64.apk` → **No errors**
-- [ ] File size **≥ 15 MB** (expect **19–23 MB**)
+- [ ] Lite file size **≥ 15 MB** (expect **19–23 MB**); Offline can be about **64 MB**
 - [ ] `lib/arm64-v8a/libflutter.so` present (~11 MB)
 - [ ] `lib/arm64-v8a/libapp.so` present (~7–8 MB)
 - [ ] `lib/arm64-v8a/libzstandard_android.so` present
 - [ ] `assets/flutter_assets/assets/fixtures/PKMSS.sav` present
+- [ ] Offline only: archive and manifest present under `assets/flutter_assets/assets/dex/`
 - [ ] Nunito fonts present under `assets/flutter_assets/assets/fonts/`
 - [ ] GitHub Release asset uploaded **after** local verify (same bytes as `releases/` copy)
 - [ ] Do **not** paste CDN URLs in release notes (see `CLOUDFLARE_DEX_CDN.md`)

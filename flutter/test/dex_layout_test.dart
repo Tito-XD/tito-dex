@@ -13,25 +13,19 @@ import 'package:titodex/widgets/tito_progress_bar.dart';
 import 'package:titodex/widgets/type_badge.dart';
 
 PokemonSummary _summary(int id, String nameZh, List<String> types) =>
-    PokemonSummary(
-      id: id,
-      nameEn: 'pokemon-$id',
-      nameZh: nameZh,
-      types: types,
-    );
+    PokemonSummary(id: id, nameEn: 'pokemon-$id', nameZh: nameZh, types: types);
 
 Widget _wrap(Widget child, {Size size = const Size(360, 360)}) {
   return MediaQuery(
     data: MediaQueryData(size: size),
-    child: MaterialApp(
-      home: Scaffold(body: child),
-    ),
+    child: MaterialApp(home: Scaffold(body: child)),
   );
 }
 
 void main() {
-  testWidgets('TitoTypeBadge shows symbol icon + Chinese label',
-      (tester) async {
+  testWidgets('TitoTypeBadge shows symbol icon + Chinese label', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(const Center(child: TitoTypeBadge(typeEn: 'grass'))),
     );
@@ -40,9 +34,9 @@ void main() {
     expect(find.byIcon(Icons.grass), findsOneWidget);
   });
 
-  testWidgets(
-      'dex grid of mini cards fits RG square (360x360 logical) without overflow',
-      (tester) async {
+  testWidgets('dex grid uses three mini cards on RG square (360x360 logical)', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(720, 720);
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.reset);
@@ -63,7 +57,7 @@ void main() {
             builder: (context) {
               final columns = DeviceLayout.dexGridColumns(context);
               final ratio = DeviceLayout.dexCardAspectRatio(context);
-              expect(columns, 4);
+              expect(columns, 3);
               return GridView.count(
                 crossAxisCount: columns,
                 mainAxisSpacing: 6,
@@ -95,8 +89,25 @@ void main() {
     expect(find.byIcon(Icons.local_fire_department), findsWidgets);
   });
 
-  testWidgets('TitoProgressBar fill width matches value fraction',
-      (tester) async {
+  testWidgets('dex grid doubles to six columns on extra-wide layouts', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        Builder(
+          builder: (context) {
+            expect(DeviceLayout.dexGridColumns(context), 6);
+            return const SizedBox();
+          },
+        ),
+        size: const Size(1440, 720),
+      ),
+    );
+  });
+
+  testWidgets('TitoProgressBar fill width matches value fraction', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _wrap(
         const Padding(
@@ -116,8 +127,9 @@ void main() {
     expect(fillWidth, moreOrLessEquals(trackWidth * 0.5, epsilon: 1));
   });
 
-  testWidgets('mini card shows yellow focus ring on D-pad focus',
-      (tester) async {
+  testWidgets('mini card shows yellow focus ring on D-pad focus', (
+    tester,
+  ) async {
     FocusManager.instance.highlightStrategy =
         FocusHighlightStrategy.alwaysTraditional;
     addTearDown(() {
@@ -203,9 +215,7 @@ void main() {
 
     await tester.pumpWidget(
       _wrap(
-        SingleChildScrollView(
-          child: const BaseStatsRadarChart(stats: stats),
-        ),
+        SingleChildScrollView(child: const BaseStatsRadarChart(stats: stats)),
         size: const Size(360, 360),
       ),
     );
@@ -214,7 +224,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('BaseStatsSection toggles between bars and radar', (tester) async {
+  testWidgets('BaseStatsSection toggles between bars and radar', (
+    tester,
+  ) async {
     const stats = PokemonBaseStats(
       hp: 80,
       attack: 80,
@@ -226,9 +238,7 @@ void main() {
 
     await tester.pumpWidget(
       _wrap(
-        SingleChildScrollView(
-          child: const BaseStatsSection(stats: stats),
-        ),
+        SingleChildScrollView(child: const BaseStatsSection(stats: stats)),
         size: const Size(800, 400),
       ),
     );
@@ -243,8 +253,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('AbilitiesCard shows ability with game version label',
-      (tester) async {
+  testWidgets('AbilitiesCard shows ability with game version label', (
+    tester,
+  ) async {
     const abilities = [
       PokemonAbility(
         nameEn: 'overgrow',
@@ -257,11 +268,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ListView(
-            children: [
-              AbilitiesCard(abilities: abilities),
-            ],
-          ),
+          body: ListView(children: [AbilitiesCard(abilities: abilities)]),
         ),
       ),
     );

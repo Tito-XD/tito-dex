@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'dex_catalog.dart';
 import 'dex_models.dart';
 import 'type_chart.dart';
 
@@ -16,6 +17,7 @@ class DexCachePaths {
   File get typesFile => File('${root.path}/types.json');
   File get movesFile => File('${root.path}/moves.json');
   File get abilitiesFile => File('${root.path}/abilities.json');
+  File get catalogFile => File('${root.path}/${DexCatalog.filename}');
   File jsonFile(String name) => File('${root.path}/$name');
   Directory get detailsDir => Directory('${root.path}/details');
   Directory get spritesDir => Directory('${root.path}/sprites');
@@ -50,9 +52,10 @@ class DexCachePaths {
 }
 
 class DexCacheStore {
-  DexCacheStore({DexCachePaths? paths}) : _pathsFuture = paths != null
-      ? Future.value(paths)
-      : DexCachePaths.resolve();
+  DexCacheStore({DexCachePaths? paths})
+    : _pathsFuture = paths != null
+          ? Future.value(paths)
+          : DexCachePaths.resolve();
 
   final Future<DexCachePaths> _pathsFuture;
 
@@ -66,8 +69,7 @@ class DexCacheStore {
         preferOffline: true,
       );
     }
-    final json =
-        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
     return DexCacheManifest.fromJson(json);
   }
 
@@ -98,6 +100,67 @@ class DexCacheStore {
         .toList();
   }
 
+  Future<DexCatalog?> readCatalog() async {
+    final paths = await _pathsFuture;
+    final file = paths.catalogFile;
+    if (!await file.exists()) {
+      return null;
+    }
+    return DexCatalog.decode(await file.readAsString());
+  }
+
+  Future<bool> hasCatalog() async =>
+      await (await _pathsFuture).catalogFile.exists();
+
+  Future<void> writeCatalog(DexCatalog catalog) async {
+    final paths = await _pathsFuture;
+    await paths.ensureLayout();
+    await paths.catalogFile.writeAsString(jsonEncode(catalog.toJson()));
+  }
+
+  /// Converts a legacy bundle once during installation.  Do not call this
+  /// from UI data reads: the resulting catalog is specifically what prevents
+  /// those reads from scanning every detail file.
+  Future<DexCatalog?> rebuildCatalogFromLegacyBundle() async {
+    final paths = await _pathsFuture;
+    final summariesFile = paths.summariesFile;
+    final movesFile = paths.movesFile;
+    final abilitiesFile = paths.abilitiesFile;
+    if (!await summariesFile.exists() ||
+        !await movesFile.exists() ||
+        !await abilitiesFile.exists()) {
+      return null;
+    }
+    final detailSources = <String>[];
+    if (await paths.detailsDir.exists()) {
+      await for (final entity in paths.detailsDir.list()) {
+        if (entity is File && entity.path.endsWith('.json')) {
+          detailSources.add(await entity.readAsString());
+        }
+      }
+    }
+    if (detailSources.isEmpty) {
+      return null;
+    }
+    final catalog = await DexCatalog.buildFromLegacyBundle(
+      summariesSource: await summariesFile.readAsString(),
+      movesSource: await movesFile.readAsString(),
+      abilitiesSource: await abilitiesFile.readAsString(),
+      detailSources: detailSources,
+    );
+    await writeCatalog(catalog);
+    return catalog;
+  }
+
+  /// Resolves a bundle-relative sprite without an expensive per-file stat.
+  /// Catalog entries are only trusted after the bundle manifest is complete.
+  Future<String> absolutePathForKnownRelative(String relativePath) async {
+    final paths = await _pathsFuture;
+    return '${paths.root.path}/$relativePath';
+  }
+
+  Future<String> rootPath() async => (await _pathsFuture).root.path;
+
   Future<void> writeTypeRelations(
     Map<String, TypeDamageRelations> relations,
   ) async {
@@ -125,12 +188,13 @@ class DexCacheStore {
     for (final entry in json.entries) {
       final map = entry.value as Map<String, dynamic>;
       relations[entry.key] = TypeDamageRelations(
-        doubleDamageTo:
-            (map['doubleDamageTo'] as List<dynamic>).cast<String>().toSet(),
-        halfDamageTo:
-            (map['halfDamageTo'] as List<dynamic>).cast<String>().toSet(),
-        noDamageTo:
-            (map['noDamageTo'] as List<dynamic>).cast<String>().toSet(),
+        doubleDamageTo: (map['doubleDamageTo'] as List<dynamic>)
+            .cast<String>()
+            .toSet(),
+        halfDamageTo: (map['halfDamageTo'] as List<dynamic>)
+            .cast<String>()
+            .toSet(),
+        noDamageTo: (map['noDamageTo'] as List<dynamic>).cast<String>().toSet(),
       );
     }
     return relations;
@@ -216,7 +280,9 @@ class DexCacheStore {
   Future<void> writeDetail(int id, PokemonDetail detail) async {
     final paths = await _pathsFuture;
     await paths.ensureLayout();
-    await paths.detailFile(id).writeAsString(
+    await paths
+        .detailFile(id)
+        .writeAsString(
           const JsonEncoder.withIndent('  ').convert(detail.toJson()),
         );
   }
@@ -228,8 +294,7 @@ class DexCacheStore {
       return null;
     }
     final moves = await readMoves();
-    final json =
-        jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
     return PokemonDetail.fromJson(json, moveLookup: moves);
   }
 
@@ -319,10 +384,7 @@ class DexCacheStore {
     return matches;
   }
 
-  static bool _detailJsonContainsMove(
-    Map<String, dynamic> json,
-    int moveId,
-  ) {
+  static bool _detailJsonContainsMove(Map<String, dynamic> json, int moveId) {
     bool listHasMove(List<dynamic>? refs) {
       if (refs == null) {
         return false;

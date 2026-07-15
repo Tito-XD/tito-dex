@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/theme/device_layout.dart';
 import 'package:titodex/widgets/home_dashboard_body.dart';
+import 'package:titodex/widgets/journey_card.dart';
 import 'package:titodex/widgets/trainer_card.dart';
 
 Widget _wrapSquare(Widget child) {
@@ -14,8 +15,9 @@ Widget _wrapSquare(Widget child) {
 }
 
 void main() {
-  testWidgets('square home uses dense trainer card height matching portrait',
-      (tester) async {
+  testWidgets('square home fits compact trainer and journey cards', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(720, 720);
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.reset);
@@ -39,9 +41,11 @@ void main() {
             );
             return HomeDashboardBody(
               journey: journey,
-              saveLinked: false,
+              saveLinked: true,
               onJourneyOpen: () {},
-              quickActions: const SizedBox(height: 48),
+              quickActions: SizedBox(
+                height: DeviceLayout.squareQuickTileHeight(context),
+              ),
             );
           },
         ),
@@ -52,7 +56,35 @@ void main() {
     // StickerCard padding on square dashboard is 8px per side.
     expect(trainerCard.height, squareDenseHeight + 16);
 
-    // Old micro layout was ~65px interior — dense should be substantially taller.
-    expect(trainerCard.height, greaterThan(130));
+    expect(trainerCard.height, lessThanOrEqualTo(110));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('portrait home journey card has no bottom overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1080, 2340);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(360, 780)),
+        child: MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              height: 140,
+              child: JourneyCard(
+                journey: CurrentJourney.mock(),
+                onOpenDetail: () {},
+                compact: true,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
   });
 }

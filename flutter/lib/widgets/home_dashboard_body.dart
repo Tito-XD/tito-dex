@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
-import 'app_header.dart';
 import 'journey_card.dart';
 import 'party_strip.dart';
-import 'tito_loading_panel.dart';
 import 'tito_skeleton.dart';
 import 'trainer_card.dart';
 
@@ -69,7 +66,7 @@ class _PortraitHomeLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
     final compact = DeviceLayout.isCompact(context);
-    final journeyHeight = compact ? 108.0 : 132.0;
+    final journeyHeight = compact ? 140.0 : 132.0;
     final partyHeight = compact ? 126.0 : 154.0;
     final companionPad = compact ? 72.0 : 84.0;
 
@@ -117,14 +114,7 @@ class _PortraitHomeLayout extends StatelessWidget {
         final column = Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            trainerSlot,
-            if (bootstrapping) ...[
-              SizedBox(height: gap),
-              const TitoBootstrapProgress(),
-            ],
-            belowTrainer,
-          ],
+          children: [trainerSlot, belowTrainer],
         );
 
         return Center(
@@ -137,10 +127,7 @@ class _PortraitHomeLayout extends StatelessWidget {
                 maxWidth: 520,
                 minHeight: constraints.maxHeight,
               ),
-              child: Align(
-                alignment: Alignment.center,
-                child: column,
-              ),
+              child: Align(alignment: Alignment.center, child: column),
             ),
           ),
         );
@@ -184,10 +171,6 @@ class _SquareHomeLayout extends StatelessWidget {
                       bootstrapping: bootstrapping,
                       dense: true,
                     ),
-                    if (bootstrapping) ...[
-                      SizedBox(height: gap),
-                      const TitoBootstrapProgress(),
-                    ],
                     if (saveLinked) ...[
                       SizedBox(height: gap),
                       Expanded(
@@ -233,10 +216,7 @@ class _SquareHomeLayout extends StatelessWidget {
         AnimatedOpacity(
           duration: TitoMotion.routeForwardDuration,
           opacity: bootstrapping ? 0.0 : 1.0,
-          child: IgnorePointer(
-            ignoring: bootstrapping,
-            child: quickActions,
-          ),
+          child: IgnorePointer(ignoring: bootstrapping, child: quickActions),
         ),
       ],
     );
@@ -248,13 +228,11 @@ class _TrainerCardSlot extends StatelessWidget {
     required this.journey,
     required this.bootstrapping,
     this.dense = false,
-    this.micro = false,
   });
 
   final CurrentJourney journey;
   final bool bootstrapping;
   final bool dense;
-  final bool micro;
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +240,6 @@ class _TrainerCardSlot extends StatelessWidget {
       journey: journey,
       compact: true,
       dense: dense,
-      micro: micro,
       useHero: true,
       avatarPlaceholder: bootstrapping,
     );

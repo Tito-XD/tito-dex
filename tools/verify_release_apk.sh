@@ -2,7 +2,13 @@
 # Verify a TitoDex RG arm64 release APK before commit / GitHub upload.
 set -euo pipefail
 
-APK="${1:?Usage: verify_release_apk.sh path/to/TitoDex-x.y.z-rg-arm64.apk}"
+offline=false
+if [[ "${1:-}" == "--offline" ]]; then
+  offline=true
+  shift
+fi
+
+APK="${1:?Usage: verify_release_apk.sh [--offline] path/to/TitoDex-x.y.z-rg-arm64.apk}"
 
 if [[ ! -f "$APK" ]]; then
   echo "ERROR: file not found: $APK" >&2
@@ -22,8 +28,13 @@ if (( size_bytes < 15000000 )); then
   exit 1
 fi
 
-if (( size_bytes > 35000000 )); then
+if ! "$offline" && (( size_bytes > 35000000 )); then
   echo "ERROR: standard APK larger than expected (>35 MB) — likely debug or universal ABI." >&2
+  exit 1
+fi
+
+if "$offline" && (( size_bytes > 100000000 )); then
+  echo "ERROR: offline APK larger than expected (>100 MB)." >&2
   exit 1
 fi
 
@@ -73,5 +84,18 @@ for asset in \
   fi
   echo "    OK $asset"
 done
+
+if "$offline"; then
+  echo "==> bundled offline Dex data"
+  for asset in \
+    assets/flutter_assets/assets/dex/bundle-manifest.json \
+    assets/flutter_assets/assets/dex/bundle.tar.zst; do
+    if ! echo "$listing" | awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}'; then
+      echo "ERROR: missing $asset" >&2
+      exit 1
+    fi
+    echo "    OK $asset"
+  done
+fi
 
 echo "PASS: release APK looks complete."

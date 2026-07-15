@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'dex_asset_seed_installer.dart';
 import 'dex_bundle_installer.dart';
+import 'dex_catalog.dart';
 import 'dex_l10n_installer.dart';
 import 'dex_cache_store.dart';
 import 'dex_cdn_config.dart';
@@ -24,20 +24,24 @@ class DexOfflineService {
     DexSpriteCodec? codec,
     DexCdnConfig? cdnConfig,
     DexBundleInstaller? bundleInstaller,
+    DexAssetSeedInstaller? assetSeedInstaller,
     this.pokemonRetryAttempts = 5,
     this.checkpointEvery = 5,
-  })  : _client = client ?? PokeApiClient(),
-        _store = store ?? DexCacheStore(),
-        _codec = codec ?? const DexSpriteCodec(),
-        _cdnConfig = cdnConfig ?? const DexCdnConfig(),
-        _explicitBundleInstaller = bundleInstaller;
+  }) : _client = client ?? PokeApiClient(),
+       _store = store ?? DexCacheStore(),
+       _codec = codec ?? const DexSpriteCodec(),
+       _cdnConfig = cdnConfig ?? const DexCdnConfig(),
+       _explicitBundleInstaller = bundleInstaller,
+       _explicitAssetSeedInstaller = assetSeedInstaller;
 
   final PokeApiClient _client;
   final DexCacheStore _store;
   final DexSpriteCodec _codec;
   final DexCdnConfig _cdnConfig;
   final DexBundleInstaller? _explicitBundleInstaller;
+  final DexAssetSeedInstaller? _explicitAssetSeedInstaller;
   DexBundleInstaller? _resolvedBundleInstaller;
+  DexAssetSeedInstaller? _resolvedAssetSeedInstaller;
   final http.Client _http = http.Client();
   final int pokemonRetryAttempts;
   final int checkpointEvery;
@@ -48,6 +52,16 @@ class DexOfflineService {
         store: _store,
         config: _cdnConfig,
       ));
+
+  DexAssetSeedInstaller get _assetSeedInstaller =>
+      _explicitAssetSeedInstaller ??
+      (_resolvedAssetSeedInstaller ??= DexAssetSeedInstaller(
+        store: _store,
+        bundleInstaller: _bundleInstaller,
+      ));
+
+  Future<bool> hasApkBundledOfflinePack() =>
+      _assetSeedInstaller.hasBundledArchive();
 
   bool _downloading = false;
   bool _cancelRequested = false;
@@ -111,6 +125,19 @@ class DexOfflineService {
   Future<List<PokemonSummary>> readAllSummaries() =>
       kIsWeb ? Future.value(const <PokemonSummary>[]) : _store.readSummaries();
 
+  Future<DexCatalog?> readCatalog() =>
+      kIsWeb ? Future.value(null) : _store.readCatalog();
+
+  Future<bool> hasCatalog() =>
+      kIsWeb ? Future.value(false) : _store.hasCatalog();
+
+  Future<bool> ensureCatalog() async {
+    if (kIsWeb || await _store.hasCatalog()) {
+      return !kIsWeb;
+    }
+    return await _store.rebuildCatalogFromLegacyBundle() != null;
+  }
+
   Future<PokemonSummary?> readSummary(int id) async {
     if (kIsWeb) {
       return null;
@@ -168,6 +195,11 @@ class DexOfflineService {
   Future<String?> absolutePathForRelative(String relativePath) =>
       _store.absolutePathForRelative(relativePath);
 
+  Future<String> absolutePathForKnownRelative(String relativePath) =>
+      _store.absolutePathForKnownRelative(relativePath);
+
+  Future<String> cacheRootPath() => _store.rootPath();
+
   String spriteUrlFor(int id) => _cdnConfig.spriteUrl(id);
 
   Future<List<int>> findPokemonIdsWithMove(int moveId) async {
@@ -185,19 +217,20 @@ class DexOfflineService {
     return _cdnConfig.typeIconUrl(type);
   }
 
-  Stream<DexCacheProgress> downloadL10nFromCdn({DexBundleManifest? manifest}) async* {
+  Stream<DexCacheProgress> downloadL10nFromCdn({
+    DexBundleManifest? manifest,
+  }) async* {
     if (_downloading) {
       return;
     }
     _downloading = true;
 
-    final installer = DexL10nInstaller(
-      store: _store,
-      config: _cdnConfig,
-    );
+    final installer = DexL10nInstaller(store: _store, config: _cdnConfig);
 
     try {
-      await for (final progress in installer.install(remoteManifest: manifest)) {
+      await for (final progress in installer.install(
+        remoteManifest: manifest,
+      )) {
         yield _setProgress(
           phase: progress.phase,
           current: progress.current,
@@ -239,6 +272,33 @@ class DexOfflineService {
     } finally {
       _downloading = false;
       _cancelRequested = false;
+      _progress = null;
+    }
+  }
+
+  /// Installs the APK seed before UI prewarming when this is an offline build.
+  Stream<DexCacheProgress> seedFromApkAssetIfNeeded({
+    bool force = false,
+  }) async* {
+    if (kIsWeb ||
+        _downloading ||
+        !await _assetSeedInstaller.needsSeed(force: force)) {
+      return;
+    }
+    _downloading = true;
+    try {
+      await for (final progress in _assetSeedInstaller.seedIfNeeded(
+        force: force,
+      )) {
+        yield _setProgress(
+          phase: progress.phase,
+          current: progress.current,
+          total: progress.total,
+          label: progress.label,
+        );
+      }
+    } finally {
+      _downloading = false;
       _progress = null;
     }
   }
@@ -320,8 +380,10 @@ class DexOfflineService {
 
         mergeMoves(moves, detail.moveSet.allMoves);
 
-        final spritePath =
-            await _cachePokemonSprite(id, detail.summary.spriteUrl);
+        final spritePath = await _cachePokemonSprite(
+          id,
+          detail.summary.spriteUrl,
+        );
         final summary = detail.summary.copyWith(localSpritePath: spritePath);
         final localizedEvolution = await _localizeEvolutionSprites(
           detail.evolutionChain,
@@ -366,6 +428,9 @@ class DexOfflineService {
       await _store.writeSummaries(summaries);
 
       if (failedIds.isEmpty && summaries.length == hgssMaxNationalDexId) {
+        yield _setProgress(phase: 'index', current: 0, total: 1);
+        await _store.rebuildCatalogFromLegacyBundle();
+        yield _setProgress(phase: 'index', current: 1, total: 1);
         final sizeBytes = await _store.directorySizeBytes();
         await _store.writeManifest(
           DexCacheManifest(
@@ -462,6 +527,9 @@ class DexOfflineService {
     await _store.clearAll();
     await ZhCatalog.instance.reload();
     await AppConfig.instance.reload();
+    if (!kIsWeb && await hasApkBundledOfflinePack()) {
+      await for (final _ in seedFromApkAssetIfNeeded(force: true)) {}
+    }
   }
 
   DexCacheProgress _setProgress({
@@ -511,14 +579,13 @@ class DexOfflineService {
     return _codec.compressPngBytes(bytes);
   }
 
-  Future<EvolutionNode?> _localizeEvolutionSprites(
-    EvolutionNode? node,
-  ) async {
+  Future<EvolutionNode?> _localizeEvolutionSprites(EvolutionNode? node) async {
     if (node == null) {
       return null;
     }
 
-    final spritePath = await _store.spriteRelativePath(node.id) ??
+    final spritePath =
+        await _store.spriteRelativePath(node.id) ??
         await _cachePokemonSprite(node.id, node.spriteUrl);
     final localizedChildren = <EvolutionNode>[];
     for (final child in node.children) {

@@ -1482,6 +1482,53 @@ def summaries_from_details(staging: Path, max_id: int) -> list[dict[str, Any]]:
     return summaries
 
 
+def build_runtime_catalog(
+    staging: Path,
+    summaries: list[dict[str, Any]],
+    moves_payload: dict[str, dict[str, Any]],
+    abilities_payload: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Create the UI-hot subset of a dex bundle.
+
+    The app must never discover filter memberships by walking 1025 detail
+    files after a user has tapped a reference.  Keep those reverse lookups in
+    one small JSON document next to the summary list instead.
+    """
+    move_learners: dict[str, set[int]] = {}
+    egg_groups: dict[str, set[int]] = {}
+    egg_group_slugs = {label: slug for slug, label in EGG_GROUP_ZH.items()}
+
+    for summary in summaries:
+        pokemon_id = int(summary["id"])
+        detail_path = staging / "details" / f"{pokemon_id}.json"
+        if not detail_path.exists():
+            continue
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        for move_id in collect_move_ids_from_detail(detail):
+            move_learners.setdefault(str(move_id), set()).add(pokemon_id)
+        for label in detail.get("eggGroups") or []:
+            slug = egg_group_slugs.get(label)
+            if slug:
+                egg_groups.setdefault(slug, set()).add(pokemon_id)
+
+    return {
+        "version": 1,
+        "summaries": summaries,
+        "moveLearners": {
+            move_id: sorted(ids) for move_id, ids in sorted(move_learners.items(), key=lambda item: int(item[0]))
+        },
+        "eggGroups": {
+            slug: sorted(ids) for slug, ids in sorted(egg_groups.items())
+        },
+        "abilityPokemonIds": {
+            ability_id: sorted({int(pid) for pid in entry.get("pokemonIds", [])})
+            for ability_id, entry in sorted(abilities_payload.items(), key=lambda item: int(item[0]))
+        },
+        "moves": moves_payload,
+        "abilities": abilities_payload,
+    }
+
+
 def build_bundle(
     *,
     cdn_base: str,
@@ -1611,6 +1658,10 @@ def build_bundle(
         for ability_id, data in sorted(builder.ability_index.items())
     }
     write_json(staging / "abilities.json", abilities_payload)
+    write_json(
+        staging / "dex_catalog.json",
+        build_runtime_catalog(staging, summaries, moves_payload, abilities_payload),
+    )
 
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     reference_meta = stage_bundle_reference_data(staging, published_at=published_at)
@@ -1659,6 +1710,7 @@ def build_bundle(
         "types.json",
         "moves.json",
         "abilities.json",
+        "dex_catalog.json",
         "games.json",
         "natures.json",
         "egg_groups.json",
