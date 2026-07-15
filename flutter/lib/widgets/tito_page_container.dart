@@ -11,17 +11,14 @@ class TitoPageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
+    return Material(
       color: TitoColors.slateBlue,
       child: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              TitoColors.skyBlue,
-              TitoColors.slateBlue,
-            ],
+            colors: [TitoColors.skyBlue, TitoColors.slateBlue],
           ),
         ),
         child: child,
