@@ -24,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 
 class SearchPage extends StatefulWidget {
@@ -318,9 +319,10 @@ class _SearchPageState extends State<SearchPage> {
       return const _SearchIdlePlaceholder();
     }
     if (_searching) {
-      return const SizedBox(
-        height: 48,
-        child: Center(child: CircularProgressIndicator()),
+      return const TitoLoadingPanel(
+        message: AppZh.searchLoading,
+        compact: true,
+        showSkeleton: false,
       );
     }
     if (_error != null) {

@@ -12,6 +12,7 @@ import '../../widgets/dex_reference_detail.dart';
 import '../../widgets/handheld_input.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
+import '../../widgets/tito_loading_panel.dart';
 import '../../widgets/type_badge.dart';
 
 typedef DexReferenceFilter<T> = bool Function(T entry, String query);
@@ -115,7 +116,10 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         ),
         const SizedBox(height: 12),
         if (_loading)
-          const Center(child: CircularProgressIndicator())
+          const TitoLoadingPanel(
+            message: AppZh.referenceLoading,
+            compact: true,
+          )
         else if (_error != null)
           StickerCard(
             child: Column(

@@ -3,6 +3,12 @@ import '../features/dex/dex_models.dart';
 
 abstract final class AppZh {
   static const appTitle = 'TitoDex';
+  static const bootstrapLoading = '正在准备你的旅程…';
+  static const companionLoading = '正在加载对战数据…';
+  static const progressDialogTitle = '正在处理…';
+  static const snackDownloadCancelled = '下载已取消';
+  static const searchLoading = '正在搜索…';
+  static const referenceLoading = '正在加载资料…';
 
   /// Home header title — default TitoDex; custom trainer → «Name»Dex.
   static String displayTitleForTrainer(String trainerName) {
@@ -36,6 +42,11 @@ abstract final class AppZh {
 
   static String trainerGreeting(String trainerName, [DateTime? time]) =>
       '${timeGreeting(time ?? DateTime.now())}，训练家 $trainerName';
+
+  static String trainerNameLine(String trainerName) {
+    final name = trainerName.isNotEmpty ? trainerName : 'Tito';
+    return '训练家 $name';
+  }
 
   static const journeyCardTitle = '旅程';
   static const journeyOpenDetail = '查看旅程详情';
@@ -416,6 +427,11 @@ abstract final class AppZh {
   static const teamEditTitle = '编辑同行';
   static const teamEditLevel = '等级';
   static const teamEditNickname = '昵称';
+  static const teamEditTypes = '属性';
+  static const teamEditAbility = '特性';
+  static const teamEditDelete = '移出队伍';
+  static const teamEditSwapPrev = '与前一位交换';
+  static const teamEditSwapNext = '与后一位交换';
   static const teamAddTitle = '添加宝可梦';
   static const teamAddByIdHint = '全国图鉴编号（1–1025）';
   static const teamAddPick = '从列表选择';

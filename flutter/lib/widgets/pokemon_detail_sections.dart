@@ -21,6 +21,7 @@ import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
+import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'type_badge.dart';
 
@@ -1462,8 +1463,9 @@ class _InteractiveTypeEffectivenessCardState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const StickerCard(
-        child: Center(child: CircularProgressIndicator()),
+      return const TitoLoadingPanel(
+        message: AppZh.companionLoading,
+        compact: true,
       );
     }
     final relations = _relations;
@@ -1487,22 +1489,21 @@ class _InteractiveTypeEffectivenessCardState
     final normalized =
         normalizeTypesForGeneration(widget.types, widget.generation);
 
-    return Column(
-      children: [
-        if (options.isNotEmpty) ...[
-          StickerCard(
-            child: AbilityChipPicker(
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (options.isNotEmpty) ...[
+            AbilityChipPicker(
               label: widget.abilityPickerLabel,
               selectedSlug: _abilitySlug,
               options: options,
               onChanged: (slug) => setState(() => _abilitySlug = slug),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (widget.generation >= 9) ...[
-          StickerCard(
-            child: TerastalPicker(
+            const SizedBox(height: 12),
+          ],
+          if (widget.generation >= 9) ...[
+            TerastalPicker(
               label: AppZh.companionDefenderTerastal,
               enabled: true,
               terastallized: _defenderTerastallized,
@@ -1514,29 +1515,29 @@ class _InteractiveTypeEffectivenessCardState
               onTeraTypeChanged: (type) =>
                   setState(() => _defenderTeraType = type),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (widget.generation < 6)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '世代修正：${normalized.map(typeNameZh).join('/')}',
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+            const SizedBox(height: 12),
+          ],
+          if (widget.generation < 6)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '世代修正：${normalized.map(typeNameZh).join('/')}',
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
                 ),
               ),
             ),
+          TypeEffectivenessGrid(
+            multipliers: multipliers,
+            weaknesses: profile.weaknesses,
+            resistances: profile.resistances,
+            immunities: profile.immunities,
           ),
-        TypeEffectivenessGrid(
-          multipliers: multipliers,
-          weaknesses: profile.weaknesses,
-          resistances: profile.resistances,
-          immunities: profile.immunities,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
