@@ -37,10 +37,13 @@ required=(
   lib/arm64-v8a/libzstandard_android.so
 )
 listing=$(unzip -l "$APK")
-abis=$(echo "$listing" | awk '$4 ~ /^lib\/[^/]+\// {split($4, parts, "/"); print parts[2]}' | sort -u)
-if [[ "$abis" != "arm64-v8a" ]]; then
-  echo "ERROR: expected only arm64-v8a native libraries; found:" >&2
-  echo "$abis" >&2
+unexpected_runtime_libs=$(
+  echo "$listing" |
+    awk '$4 ~ /^lib\/[^/]+\/(libapp|libflutter)\.so$/ && $4 !~ /^lib\/arm64-v8a\// {print $4}'
+)
+if [[ -n "$unexpected_runtime_libs" ]]; then
+  echo "ERROR: Flutter runtime was built for non-arm64 ABIs:" >&2
+  echo "$unexpected_runtime_libs" >&2
   exit 1
 fi
 for lib in "${required[@]}"; do
