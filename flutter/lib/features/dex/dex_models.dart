@@ -297,8 +297,14 @@ class FlavorTextEntry {
   final String? labelZh;
   final String? iconUrl;
 
-  String get displayLabel =>
-      labelZh ?? flavorVersionLabelZh(version);
+  /// Carousel title — per-game version when known (e.g. 晶灿钻石 vs 明亮珍珠).
+  /// Edition picker still uses combined [labelZh] / [GameEdition.labelZh].
+  String get displayLabel {
+    if (flavorVersionHasLabel(version)) {
+      return flavorVersionLabelZh(version);
+    }
+    return labelZh ?? flavorVersionLabelZh(version);
+  }
 
   Map<String, dynamic> toJson() => {
         'version': version,

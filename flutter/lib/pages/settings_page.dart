@@ -6,7 +6,6 @@ import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
-import '../features/dex/dex_cache_preferences.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/game/game_edition.dart';
@@ -21,9 +20,8 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/settings_expandable_section.dart';
-import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -71,7 +69,6 @@ class _SettingsPageState extends State<SettingsPage> {
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
   GameEdition _defaultGameEdition = defaultGameEdition;
-  DexCachePreferences _cachePreferences = const DexCachePreferences();
 
   @override
   void initState() {
@@ -81,26 +78,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     _refreshDexCacheStatus();
     _loadDexSettings();
-    _loadCachePreferences();
-  }
-
-  Future<void> _loadCachePreferences() async {
-    final prefs = await DexCachePreferences.load();
-    if (!mounted) {
-      return;
-    }
-    setState(() => _cachePreferences = prefs);
-  }
-
-  Future<void> _updateCachePreference(
-    DexCachePreferences Function(DexCachePreferences current) update,
-  ) async {
-    final next = update(_cachePreferences);
-    await next.save();
-    if (!mounted) {
-      return;
-    }
-    setState(() => _cachePreferences = next);
   }
 
   Future<void> _loadDexSettings() async {
@@ -137,41 +114,21 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _dexDownloading = true);
 
     try {
-      DexCacheProgress? lastProgress;
-      await for (final progress in dexOfflineService.downloadFromCdnBundle()) {
-        lastProgress = progress;
-        if (!mounted) {
-          return;
-        }
-        setState(() {
-          _dexCacheStatus = DexCacheStatus(
-            manifest:
-                _dexCacheStatus?.manifest ??
-                const DexCacheManifest(
-                  version: DexCacheManifest.currentVersion,
-                  complete: false,
-                  preferOffline: true,
-                ),
-            sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
-            isDownloading: progress.phase != 'done',
-            progress: progress,
-          );
-        });
-      }
+      final lastProgress = await trackWhileDownloading(
+        context: context,
+        title: AppZh.settingsDexCdnDownload,
+        onCancel: dexOfflineService.requestCancelDownload,
+        download: (onProgress) => _consumeDexDownload(
+          dexOfflineService.downloadFromCdnBundle(),
+          onProgress,
+        ),
+      );
       dexRepository.clearMemoryCache();
       await _refreshDexCacheStatus();
       if (!mounted) {
         return;
       }
-      if (lastProgress?.phase == 'done') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.snackDexCdnDone)),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
-        );
-      }
+      _showDexDownloadResult(lastProgress);
     } catch (_) {
       if (!mounted) {
         return;
@@ -193,47 +150,21 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _dexDownloading = true);
 
     try {
-      DexCacheProgress? lastProgress;
-      await for (final progress in dexOfflineService.downloadAll()) {
-        lastProgress = progress;
-        if (!mounted) {
-          return;
-        }
-        setState(() {
-          _dexCacheStatus = DexCacheStatus(
-            manifest:
-                _dexCacheStatus?.manifest ??
-                const DexCacheManifest(
-                  version: DexCacheManifest.currentVersion,
-                  complete: false,
-                  preferOffline: true,
-                ),
-            sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
-            isDownloading:
-                progress.phase != 'done' && progress.phase != 'partial',
-            progress: progress,
-          );
-        });
-      }
+      final lastProgress = await trackWhileDownloading(
+        context: context,
+        title: AppZh.settingsDexOfflineDownloadPokeApi,
+        onCancel: dexOfflineService.requestCancelDownload,
+        download: (onProgress) => _consumeDexDownload(
+          dexOfflineService.downloadAll(),
+          onProgress,
+        ),
+      );
       dexRepository.clearMemoryCache();
       await _refreshDexCacheStatus();
       if (!mounted) {
         return;
       }
-      final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
-      if (lastProgress?.phase == 'done') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
-        );
-      } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
-        );
-      }
+      _showDexOfflineDownloadResult(lastProgress);
     } catch (_) {
       if (!mounted) {
         return;
@@ -245,6 +176,81 @@ class _SettingsPageState extends State<SettingsPage> {
       if (mounted) {
         setState(() => _dexDownloading = false);
       }
+    }
+  }
+
+  Future<DexCacheProgress?> _consumeDexDownload(
+    Stream<DexCacheProgress> stream,
+    void Function(DexCacheProgress progress) onProgress,
+  ) async {
+    DexCacheProgress? lastProgress;
+    await for (final progress in stream) {
+      lastProgress = progress;
+      if (!mounted) {
+        return lastProgress;
+      }
+      onProgress(progress);
+      setState(() {
+        _dexCacheStatus = DexCacheStatus(
+          manifest:
+              _dexCacheStatus?.manifest ??
+              const DexCacheManifest(
+                version: DexCacheManifest.currentVersion,
+                complete: false,
+                preferOffline: true,
+              ),
+          sizeBytes: _dexCacheStatus?.sizeBytes ?? 0,
+          isDownloading: progress.phase != 'done' &&
+              progress.phase != 'partial' &&
+              progress.phase != 'cancelled',
+          progress: progress,
+        );
+      });
+      if (progress.phase == 'cancelled') {
+        return lastProgress;
+      }
+    }
+    return lastProgress;
+  }
+
+  void _showDexDownloadResult(DexCacheProgress? lastProgress) {
+    if (lastProgress?.phase == 'cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDownloadCancelled)),
+      );
+      return;
+    }
+    if (lastProgress?.phase == 'done') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexCdnDone)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexCdnFailed)),
+      );
+    }
+  }
+
+  void _showDexOfflineDownloadResult(DexCacheProgress? lastProgress) {
+    if (lastProgress?.phase == 'cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDownloadCancelled)),
+      );
+      return;
+    }
+    final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
+    if (lastProgress?.phase == 'done') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexOfflineDone)),
+      );
+    } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+      );
     }
   }
 
@@ -578,144 +584,25 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         const SizedBox(height: 12),
-        SettingsExpandableSection(
-          title: AppZh.settingsDexCacheContentsTitle,
-          subtitle: _cachePreferences.estimateLabelZh(),
+        StickerCard(
           variant: StickerVariant.mint,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                AppZh.settingsDexCacheExpandHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                AppZh.settingsDexAdvancedOptions,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
-                AppZh.settingsDexCacheEstimate(
-                  _cachePreferences.estimateLabelZh(),
-                ),
+                _defaultGameEdition.labelZh,
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
                 ),
               ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionJson,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheJsonData,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheJsonData: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionSprites,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheSprites,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheSprites: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionSpritesAllVersions,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheSpritesAllVersions,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) =>
-                              p.copyWith(cacheSpritesAllVersions: value ?? false),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionArtwork,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheArtwork,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheArtwork: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionAnimated,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheAnimatedSprites,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheAnimatedSprites: value ?? false),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionL10n,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheL10n,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheL10n: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionTypeIcons,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheTypeIcons,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheTypeIcons: value ?? true),
-                        ),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(
-                  AppZh.settingsDexCacheOptionConfig,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-                value: _cachePreferences.cacheConfig,
-                onChanged: _dexDownloading
-                    ? null
-                    : (value) => _updateCachePreference(
-                          (p) => p.copyWith(cacheConfig: value ?? true),
-                        ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        SettingsExpandableSection(
-          title: AppZh.settingsDexAdvancedOptions,
-          subtitle: _defaultGameEdition.labelZh,
-          variant: StickerVariant.mint,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+              const SizedBox(height: 12),
               Text(
                 AppZh.settingsDexDefaultGameVersion,
                 style: SecondaryTypography.onCard.body14.copyWith(
@@ -820,12 +707,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ],
           ),
-        ),
-        const SizedBox(height: 16),
-        SettingsExpandableSection(
-          title: AppZh.sleepToolsTitle,
-          subtitle: AppZh.sleepToolsTierAHint,
-          child: const SleepToolsSection(),
         ),
         const SizedBox(height: 16),
         StickerCard(
