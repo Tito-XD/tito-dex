@@ -37,13 +37,13 @@ void main() {
     }
   });
 
-  test('home action hero tags only match their corresponding route', () {
+  test('only the Dex home action uses a Hero tag', () {
     expect(
-      TitoHomeActionHero.forRoute('/team', TitoHomeActionHero.team),
-      TitoHomeActionHero.team,
+      TitoHomeActionHero.forRoute('/dex', TitoHomeActionHero.dex),
+      TitoHomeActionHero.dex,
     );
     expect(
-      TitoHomeActionHero.forRoute('/dex', TitoHomeActionHero.search),
+      TitoHomeActionHero.forRoute('/team', TitoHomeActionHero.dex),
       isNull,
     );
   });

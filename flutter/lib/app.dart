@@ -101,7 +101,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
           routes: [
             GoRoute(
               path: '/',
-              pageBuilder: (context, state) => titoMaterialPage(
+              pageBuilder: (context, state) => titoHomePage(
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: ListenableBuilder(
@@ -123,9 +123,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/team',
-              pageBuilder: (context, state) => titoMaterialPage(
+              pageBuilder: (context, state) => titoSideSlidePage(
                 key: state.pageKey,
-                heroTag: TitoHomeActionHero.forRoute('/team', state.extra),
+                direction: TitoSideSlideDirection.fromLeft,
                 child: TitoPageContainer(
                   child: TeamPage(journey: _journey, onSaveJourney: _persist),
                 ),
@@ -145,7 +145,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/dex',
-              pageBuilder: (context, state) => titoMaterialPage(
+              pageBuilder: (context, state) => titoDexPage(
                 key: state.pageKey,
                 heroTag: TitoHomeActionHero.forRoute('/dex', state.extra),
                 child: TitoPageContainer(
@@ -190,9 +190,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/search',
-              pageBuilder: (context, state) => titoMaterialPage(
+              pageBuilder: (context, state) => titoSideSlidePage(
                 key: state.pageKey,
-                heroTag: TitoHomeActionHero.forRoute('/search', state.extra),
+                direction: TitoSideSlideDirection.fromRight,
                 child: TitoPageContainer(child: SearchPage(journey: _journey)),
               ),
               routes: [
