@@ -17,7 +17,7 @@ A valid **arm64-v8a release** APK is about **20–23 MB** on disk. If you see **
 | `libzstandard_android.so` | ~0.5 MB | Offline bundle zstd decompress (`zstandard` package) |
 | `libdatastore_shared_counter.so` | tiny | AndroidX DataStore |
 
-**Do not use** `--split-per-abi` or `--target-platform` flags that drop libs. RG sideload needs **Stored** native libs (`minSdk 24`, `useLegacyPackaging = false`) — see `flutter/android/app/build.gradle.kts`.
+Use `--target-platform android-arm64` and **do not use** `--split-per-abi`. Flutter 3.44 may otherwise package arm64, armv7, and x86_64 despite the Gradle `abiFilters`. RG sideload also needs **Stored** native libs (`minSdk 24`, `useLegacyPackaging = false`) — see `flutter/android/app/build.gradle.kts`.
 
 ### Bundled Flutter assets (not the CDN dex bundle)
 
@@ -62,7 +62,7 @@ flutter pub get
 flutter test
 
 # Standard RG arm64 release — NO --split-per-abi
-flutter build apk --release
+flutter build apk --release --target-platform android-arm64
 
 # Sanity: output should be ~20–23 MB
 ls -lh build/app/outputs/flutter-apk/app-release.apk

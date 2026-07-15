@@ -23,7 +23,8 @@ if (( size_bytes < 15000000 )); then
 fi
 
 if (( size_bytes > 35000000 )); then
-  echo "WARN: APK larger than usual (>35 MB) — check for debug build or universal ABI." >&2
+  echo "ERROR: standard APK larger than expected (>35 MB) — likely debug or universal ABI." >&2
+  exit 1
 fi
 
 echo "==> zip integrity"
@@ -36,6 +37,12 @@ required=(
   lib/arm64-v8a/libzstandard_android.so
 )
 listing=$(unzip -l "$APK")
+abis=$(echo "$listing" | awk '$4 ~ /^lib\/[^/]+\// {split($4, parts, "/"); print parts[2]}' | sort -u)
+if [[ "$abis" != "arm64-v8a" ]]; then
+  echo "ERROR: expected only arm64-v8a native libraries; found:" >&2
+  echo "$abis" >&2
+  exit 1
+fi
 for lib in "${required[@]}"; do
   lib_size=$(echo "$listing" | awk -v n="$lib" '$4==n {print $1; exit}')
   if [[ -z "$lib_size" ]]; then
