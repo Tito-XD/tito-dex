@@ -23,7 +23,8 @@ if (( size_bytes < 15000000 )); then
 fi
 
 if (( size_bytes > 35000000 )); then
-  echo "WARN: APK larger than usual (>35 MB) — check for debug build or universal ABI." >&2
+  echo "ERROR: standard APK larger than expected (>35 MB) — likely debug or universal ABI." >&2
+  exit 1
 fi
 
 echo "==> zip integrity"
@@ -36,6 +37,15 @@ required=(
   lib/arm64-v8a/libzstandard_android.so
 )
 listing=$(unzip -l "$APK")
+unexpected_runtime_libs=$(
+  echo "$listing" |
+    awk '$4 ~ /^lib\/[^/]+\/(libapp|libflutter)\.so$/ && $4 !~ /^lib\/arm64-v8a\// {print $4}'
+)
+if [[ -n "$unexpected_runtime_libs" ]]; then
+  echo "ERROR: Flutter runtime was built for non-arm64 ABIs:" >&2
+  echo "$unexpected_runtime_libs" >&2
+  exit 1
+fi
 for lib in "${required[@]}"; do
   lib_size=$(echo "$listing" | awk -v n="$lib" '$4==n {print $1; exit}')
   if [[ -z "$lib_size" ]]; then

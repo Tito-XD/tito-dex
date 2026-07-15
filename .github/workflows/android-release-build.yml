@@ -69,7 +69,7 @@ jobs:
         run: flutter test --no-pub
 
       - name: Build signed arm64 APK
-        run: flutter build apk --release --no-pub
+        run: flutter build apk --release --no-pub --target-platform android-arm64
 
       - name: Name and verify APK
         env:
