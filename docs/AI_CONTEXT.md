@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest standard release** | [v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98) · App `0.4.98+51` |
-| **`main` source baseline** | `0.4.94+47` (`flutter/pubspec.yaml`) |
-| **Optional distribution** | `v0.4.97-offline` — APK-bundled dex data |
+| **Latest release** | [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) |
+| **`main` / lite** | `0.4.99+52` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.4.99-offline+53` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -40,9 +40,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.4.98)
+## Current feature status (latest release line: v0.4.99)
 
-> `main` currently ends at `v0.4.94`. Changes described for `v0.4.95`–`v0.4.98` are present on the release tag line and should be merged back before new work branches from `main`.
+> `main` includes the complete v0.4.95–v0.4.99 release line. The offline packaging branch adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - HGSS retail 512 KB `.sav` parser; directory sync (newest by mtime); startup auto-load.
@@ -63,6 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.4.99: source-line consolidation and aligned lite/offline packages.
 - v0.4.98: per-game titles in the flavor-text carousel for paired editions.
 - v0.4.95–v0.4.97: trainer-card bootstrap and square layout, loading panels, team editor improvements, download progress/cancel, and copy cleanup.
 - v0.4.94: compact Settings sections and paginated dex filter results.

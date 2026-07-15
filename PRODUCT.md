@@ -45,7 +45,7 @@ The app also supports manual mode for games without a save parser.
 
 ### Improve next
 
-- merge the `v0.4.95`–`v0.4.98` release line back into `main`
+- keep lite and offline packages aligned to the same release source
 - expand automated coverage for trainer-card, team-editor, and flavor-title behavior
 - refine damage calculation and validation coverage
 - add HeartGold title detection and single-file save selection
