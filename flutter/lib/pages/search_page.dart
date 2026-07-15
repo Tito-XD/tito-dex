@@ -184,7 +184,7 @@ class _SearchPageState extends State<SearchPage> {
               onSelected: (index) => setState(() => _hubSegment = index),
             ),
             const SizedBox(height: 12),
-            // v0.4.1: AnimatedSize hub segments (experimental)
+            // Keyed content swap without a custom transition.
             TitoAnimatedSizeSwitcher(
               switchKey: ValueKey<int>(_hubSegment),
               child: Column(
@@ -223,94 +223,84 @@ class _SearchPageState extends State<SearchPage> {
     final query = _controller.text.trim();
 
     return [
+      StickerCard(
+        variant: StickerVariant.deep,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppZh.searchPrompt, style: SecondaryTypography.onGradient.h15),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _controller,
+              onChanged: _onQueryChanged,
+              spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+              style: SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+              decoration: InputDecoration(
+                hintText: AppZh.searchPlaceholder,
+                hintStyle: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: TitoColors.deepBlue,
+                ),
+                filled: true,
+                fillColor: TitoColors.card,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  borderSide: const BorderSide(color: TitoColors.ink, width: 3),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  borderSide: const BorderSide(color: TitoColors.ink, width: 3),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  borderSide: const BorderSide(
+                    color: TitoColors.softYellow,
+                    width: 3,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      if (_recentQueries.isNotEmpty) ...[
+        const SizedBox(height: 12),
         StickerCard(
-          variant: StickerVariant.deep,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppZh.searchPrompt,
-                style: SecondaryTypography.onGradient.h15,
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _controller,
-                onChanged: _onQueryChanged,
-                spellCheckConfiguration:
-                    const SpellCheckConfiguration.disabled(),
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-                decoration: InputDecoration(
-                  hintText: AppZh.searchPlaceholder,
-                  hintStyle: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search_rounded,
-                    color: TitoColors.deepBlue,
-                  ),
-                  filled: true,
-                  fillColor: TitoColors.card,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(TitoRadii.md),
-                    borderSide: const BorderSide(
-                      color: TitoColors.ink,
-                      width: 3,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(TitoRadii.md),
-                    borderSide: const BorderSide(
-                      color: TitoColors.ink,
-                      width: 3,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(TitoRadii.md),
-                    borderSide: const BorderSide(
-                      color: TitoColors.softYellow,
-                      width: 3,
-                    ),
-                  ),
-                ),
+              Text(AppZh.searchRecent, style: SecondaryTypography.onCard.h15),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _recentQueries
+                    .map(
+                      (recent) => _SearchQueryChip(
+                        label: recent,
+                        onTap: () => _applyQuery(recent),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
         ),
-        if (_recentQueries.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          StickerCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(AppZh.searchRecent, style: SecondaryTypography.onCard.h15),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _recentQueries
-                      .map(
-                        (recent) => _SearchQueryChip(
-                          label: recent,
-                          onTap: () => _applyQuery(recent),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        ],
-        const SizedBox(height: 16),
-        TitoAnimatedSizeSwitcher(
-          switchKey: _searchResultsSwitchKey,
-          child: _searchResultsBody(context, query),
-        ),
+      ],
+      const SizedBox(height: 16),
+      TitoAnimatedSizeSwitcher(
+        switchKey: _searchResultsSwitchKey,
+        child: _searchResultsBody(context, query),
+      ),
     ];
   }
 
@@ -381,7 +371,10 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppZh.searchHubDataTitle, style: SecondaryTypography.onCard.h15),
+            Text(
+              AppZh.searchHubDataTitle,
+              style: SecondaryTypography.onCard.h15,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,

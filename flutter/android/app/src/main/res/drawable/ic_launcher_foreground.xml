@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- The complete Pokédex mark stays inside Android's 66dp safe zone. -->
+    <path
+        android:fillColor="#FF121417"
+        android:pathData="M54,20 A34,34 0,1 1,54 88 A34,34 0,1 1,54 20 Z" />
+    <path
+        android:fillColor="#FF4A90E2"
+        android:pathData="M54,23 A31,31 0,0 1,85 54 L23,54 A31,31 0,0 1,54 23 Z" />
+    <path
+        android:fillColor="#FF2C313A"
+        android:pathData="M23,54 L85,54 A31,31 0,0 1,23 54 Z" />
+    <path
+        android:fillColor="#FF121417"
+        android:pathData="M23,48 L85,48 L85,60 L23,60 Z" />
+    <path
+        android:fillColor="#FFF5F7FA"
+        android:pathData="M29,51 L79,51 A3,3 0,0 1,79 57 L29,57 A3,3 0,0 1,29 51 Z" />
+    <path
+        android:fillColor="#FF121417"
+        android:pathData="M54,43 A11,11 0,1 1,54 65 A11,11 0,1 1,54 43 Z" />
+    <path
+        android:fillColor="#FFF5F7FA"
+        android:pathData="M54,46 A8,8 0,1 1,54 62 A8,8 0,1 1,54 46 Z" />
+    <path
+        android:fillColor="#FF4A90E2"
+        android:pathData="M54,49 A5,5 0,1 1,54 59 A5,5 0,1 1,54 49 Z" />
+</vector>

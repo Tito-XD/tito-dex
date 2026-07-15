@@ -88,7 +88,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     });
     try {
       final detail = await dexRepository.getDetail(widget.pokemonId);
-      final abilities = await dexRepository.abilitiesForPokemon(widget.pokemonId);
+      final abilities = await dexRepository.abilitiesForPokemon(
+        widget.pokemonId,
+      );
       if (!mounted) {
         return;
       }
@@ -119,60 +121,57 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       child: Column(
         children: [
           Expanded(
-          child: TitoSkeletonGate(
-            loading: _loading,
-            skeleton: ListView(
-              padding: padding,
-              children: const [
-                TitoDetailHeaderSkeleton(),
-                SizedBox(height: 12),
-                TitoCardSkeleton(height: 140),
-                SizedBox(height: 12),
-                TitoCardSkeleton(height: 88),
-              ],
+            child: TitoSkeletonGate(
+              loading: _loading,
+              skeleton: ListView(
+                padding: padding,
+                children: const [
+                  TitoDetailHeaderSkeleton(),
+                  SizedBox(height: 12),
+                  TitoCardSkeleton(height: 140),
+                  SizedBox(height: 12),
+                  TitoCardSkeleton(height: 88),
+                ],
+              ),
+              child: errorCopy != null
+                  ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                  : detail == null
+                  ? const SizedBox.shrink()
+                  : ListView(
+                      padding: padding.copyWith(bottom: 12),
+                      children: [
+                        const SecondaryPageAppBar(
+                          title: AppZh.navDex,
+                          showSettings: false,
+                        ),
+                        const SizedBox(height: 8),
+                        PokemonDetailHeader(
+                          detail: detail,
+                          compact: true,
+                          showSettingsAction: false,
+                        ),
+                        const SizedBox(height: 12),
+                        // Keyed tab-body swap without a custom transition.
+                        TitoAnimatedSizeSwitcher(
+                          switchKey: ValueKey<int>(_currentTabIndex),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: _tabSections(detail, _currentTabIndex),
+                          ),
+                        ),
+                        const SizedBox(height: 72),
+                      ],
+                    ),
             ),
-            child: errorCopy != null
-                ? _ErrorBody(
-                    copy: errorCopy,
-                    onRetry: _loadDetail,
-                  )
-                : detail == null
-                    ? const SizedBox.shrink()
-                    : ListView(
-                        padding: padding.copyWith(bottom: 12),
-                        children: [
-                          const SecondaryPageAppBar(
-                            title: AppZh.navDex,
-                            showSettings: false,
-                          ),
-                          const SizedBox(height: 8),
-                          PokemonDetailHeader(
-                            detail: detail,
-                            compact: true,
-                            showSettingsAction: false,
-                          ),
-                          const SizedBox(height: 12),
-                          // v0.4.1: AnimatedSize tab body (experimental)
-                          TitoAnimatedSizeSwitcher(
-                            switchKey: ValueKey<int>(_currentTabIndex),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: _tabSections(detail, _currentTabIndex),
-                            ),
-                          ),
-                          const SizedBox(height: 72),
-                        ],
-                      ),
           ),
-        ),
-        _DetailBottomTabs(
-          currentIndex: _currentTabIndex,
-          onSelected: (index) {
-            if (_currentTabIndex != index) {
-              setState(() => _currentTabIndex = index);
-            }
-          },
-        ),
+          _DetailBottomTabs(
+            currentIndex: _currentTabIndex,
+            onSelected: (index) {
+              if (_currentTabIndex != index) {
+                setState(() => _currentTabIndex = index);
+              }
+            },
+          ),
         ],
       ),
     );
@@ -198,10 +197,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       return 0;
     }
     int indexFor(GameEdition edition) => entries.indexWhere(
-          (entry) =>
-              entry.versionGroup == edition.dataVersionGroupKey ||
-              entry.gameEdition == edition.slug,
-        );
+      (entry) =>
+          entry.versionGroup == edition.dataVersionGroupKey ||
+          entry.gameEdition == edition.slug,
+    );
     final primary = indexFor(_gameEdition);
     if (primary >= 0) {
       return primary;
@@ -246,36 +245,36 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _introSections(PokemonDetail detail) => [
-        FlavorTextCarousel(
-          entries: _flavorEntriesForEdition(detail),
-          initialPage: _flavorInitialIndex(detail),
-          gameEdition: _gameEdition,
-          onPickEdition: () async {
-            final picked = await showGameEditionPicker(
-              context,
-              selected: _gameEdition,
-            );
-            if (picked != null && mounted) {
-              setState(() => _gameEdition = picked);
-              await dexSettingsRepository.saveDefaultGameEdition(picked);
-            }
-          },
+    FlavorTextCarousel(
+      entries: _flavorEntriesForEdition(detail),
+      initialPage: _flavorInitialIndex(detail),
+      gameEdition: _gameEdition,
+      onPickEdition: () async {
+        final picked = await showGameEditionPicker(
+          context,
+          selected: _gameEdition,
+        );
+        if (picked != null && mounted) {
+          setState(() => _gameEdition = picked);
+          await dexSettingsRepository.saveDefaultGameEdition(picked);
+        }
+      },
+    ),
+    const SizedBox(height: 12),
+    IntroMetaCard(detail: detail),
+    const SizedBox(height: 12),
+    AbilitiesCard(abilities: _abilities),
+    const SizedBox(height: 12),
+    StickerCard(
+      child: Text(
+        AppZh.dexApiNote,
+        style: SecondaryTypography.onCard.small12.copyWith(
+          color: TitoColors.mutedInk,
+          height: 1.4,
         ),
-        const SizedBox(height: 12),
-        IntroMetaCard(detail: detail),
-        const SizedBox(height: 12),
-        AbilitiesCard(abilities: _abilities),
-        const SizedBox(height: 12),
-        StickerCard(
-          child: Text(
-            AppZh.dexApiNote,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ];
+      ),
+    ),
+  ];
 
   List<Widget> _basicSections(PokemonDetail detail) {
     return [
@@ -294,10 +293,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppZh.dexStabEffective,
-              style: SecondaryTypography.onCard.h15,
-            ),
+            Text(AppZh.dexStabEffective, style: SecondaryTypography.onCard.h15),
             const SizedBox(height: 8),
             TypeChipRow(
               types: detail.stabSuperEffective,
@@ -315,17 +311,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _obtainSections(PokemonDetail detail) {
     final obtainGroups = _allObtainGroups(detail);
     final sections = <Widget>[
-      if (obtainGroups.isNotEmpty)
-        ...[
-          for (var i = 0; i < obtainGroups.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            ObtainLocationsCard(
-              locations: obtainGroups[i].$2,
-              gameLabel: gameEditionLabelForVersionGroup(obtainGroups[i].$1),
-            ),
-          ],
-        ]
-      else
+      if (obtainGroups.isNotEmpty) ...[
+        for (var i = 0; i < obtainGroups.length; i++) ...[
+          if (i > 0) const SizedBox(height: 12),
+          ObtainLocationsCard(
+            locations: obtainGroups[i].$2,
+            gameLabel: gameEditionLabelForVersionGroup(obtainGroups[i].$1),
+          ),
+        ],
+      ] else
         StickerCard(
           child: Text(
             AppZh.dexObtainEmptyVersion,
@@ -343,10 +337,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                AppZh.dexEvolution,
-                style: SecondaryTypography.onCard.h15,
-              ),
+              Text(AppZh.dexEvolution, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 12),
               EvolutionChainVerticalView(
                 root: detail.evolutionChain!,
@@ -388,7 +379,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
       ),
       const SizedBox(height: 12),
-      // v0.4.1: AnimatedSize move method panels (experimental)
+      // Keyed move-method panel swap without a custom transition.
       TitoAnimatedSizeSwitcher(
         switchKey: ValueKey<_MoveMethodFilter>(_moveMethodFilter),
         child: Column(
@@ -402,30 +393,27 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _movePanelsForFilter(PokemonMoveSet moveSet) {
     return switch (_moveMethodFilter) {
       _MoveMethodFilter.level => [
-          MoveCategoryPanel(
-            title: moveMethodLabelZh('level-up'),
-            moves: moveSet.levelUp,
-            showLevel: true,
-          ),
-        ],
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('level-up'),
+          moves: moveSet.levelUp,
+          showLevel: true,
+        ),
+      ],
       _MoveMethodFilter.machine => [
-          MoveCategoryPanel(
-            title: moveMethodLabelZh('machine'),
-            moves: moveSet.machine,
-          ),
-        ],
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('machine'),
+          moves: moveSet.machine,
+        ),
+      ],
       _MoveMethodFilter.egg => [
-          MoveCategoryPanel(
-            title: moveMethodLabelZh('egg'),
-            moves: moveSet.egg,
-          ),
-        ],
+        MoveCategoryPanel(title: moveMethodLabelZh('egg'), moves: moveSet.egg),
+      ],
       _MoveMethodFilter.tutor => [
-          MoveCategoryPanel(
-            title: moveMethodLabelZh('tutor'),
-            moves: moveSet.tutor,
-          ),
-        ],
+        MoveCategoryPanel(
+          title: moveMethodLabelZh('tutor'),
+          moves: moveSet.tutor,
+        ),
+      ],
     };
   }
 
@@ -566,9 +554,7 @@ class _DetailBottomTabs extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: TitoColors.card,
-        border: Border(
-          top: BorderSide(color: TitoColors.ink, width: 2),
-        ),
+        border: Border(top: BorderSide(color: TitoColors.ink, width: 2)),
       ),
       child: SafeArea(
         top: false,
@@ -579,9 +565,7 @@ class _DetailBottomTabs extends StatelessWidget {
               child: HandheldFocusDecorator(
                 onActivate: () => onSelected(index),
                 child: Material(
-                  color: selected
-                      ? TitoColors.softYellow
-                      : Colors.transparent,
+                  color: selected ? TitoColors.softYellow : Colors.transparent,
                   child: InkWell(
                     onTap: () => onSelected(index),
                     child: Padding(

@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.5.0` (`0.5.0+54`) | Recommended arm64-v8a download |
-| Offline APK | `v0.5.0` (`0.5.0-offline+55`) | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.5.0+54` | Current default branch baseline |
+| Lite APK | `v0.5.1` (`0.5.1+56`) | Recommended arm64-v8a download |
+| Offline APK | `v0.5.1` (`0.5.1-offline+57`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.5.1+56` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.5.1` | TitoDex v0.5.1 · Android 返回与转场 | Uses Android-standard navigation motion and predictive back, with Home quick-action cards expanding into Team, Dex, and Search. |
 | `v0.5.0` | TitoDex v0.5.0 · 图鉴无感知加载 | Precomputed catalog keeps Dex lists, search, and reference filters responsive in both lite and offline packages. |
 | `v0.4.99` | TitoDex v0.4.99 · Lite 与离线版本同步 | Aligns the full release source and provides matching lite and offline arm64 packages. |
 | `v0.4.98` | TitoDex v0.4.98 · 图鉴版本标题修正 | Flavor-text cards now identify each game edition separately. |

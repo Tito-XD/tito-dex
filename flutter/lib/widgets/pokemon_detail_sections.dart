@@ -94,10 +94,7 @@ class PokemonDetailHeader extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () => showPokemonArtworkViewer(
-                context,
-                summary: summary,
-              ),
+              onTap: () => showPokemonArtworkViewer(context, summary: summary),
               child: DexSpriteImage(
                 source: summary.displaySpritePath,
                 width: square ? 56 : 64,
@@ -147,10 +144,8 @@ class PokemonDetailHeader extends StatelessWidget {
                   tooltip: AppZh.navSettings,
                 ),
               GestureDetector(
-                onTap: () => showPokemonArtworkViewer(
-                  context,
-                  summary: summary,
-                ),
+                onTap: () =>
+                    showPokemonArtworkViewer(context, summary: summary),
                 child: DexSpriteImage(
                   source: summary.displaySpritePath,
                   width: square ? 72 : (compactLayout ? 84 : 108),
@@ -239,7 +234,10 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
         );
       }
       return StickerCard(
-        child: Text(AppZh.dexFlavorEmpty, style: SecondaryTypography.onCard.body14),
+        child: Text(
+          AppZh.dexFlavorEmpty,
+          style: SecondaryTypography.onCard.body14,
+        ),
       );
     }
 
@@ -247,10 +245,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexFlavorTitle,
-            style: SecondaryTypography.onCard.h15,
-          ),
+          Text(AppZh.dexFlavorTitle, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
           SizedBox(
             height: 132,
@@ -320,9 +315,9 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 onPressed: _index > 0
                     ? () => _controller.previousPage(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOut,
-                        )
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOut,
+                      )
                     : null,
                 icon: const Icon(Icons.chevron_left_rounded),
                 color: TitoColors.coral,
@@ -340,9 +335,9 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                 onPressed: _index < widget.entries.length - 1
                     ? () => _controller.nextPage(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOut,
-                        )
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOut,
+                      )
                     : null,
                 icon: const Icon(Icons.chevron_right_rounded),
                 color: TitoColors.coral,
@@ -370,10 +365,7 @@ class BaseStatsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexBaseStats,
-            style: SecondaryTypography.onCard.h15,
-          ),
+          Text(AppZh.dexBaseStats, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 12),
           ...stats.entries.map((entry) {
             final label = statLabelsZh[entry.key] ?? entry.key;
@@ -419,10 +411,7 @@ class BaseStatsCard extends StatelessWidget {
                 AppZh.dexBaseStatTotal,
                 style: SecondaryTypography.onCard.team12,
               ),
-              Text(
-                '${stats.total}',
-                style: SecondaryTypography.onCard.h15,
-              ),
+              Text('${stats.total}', style: SecondaryTypography.onCard.h15),
             ],
           ),
         ],
@@ -495,7 +484,8 @@ class BaseStatsRadarChart extends StatelessWidget {
                             for (var i = 0; i < labels.length; i++)
                               _RadarStatLabel(
                                 label:
-                                    statLabelsZh[labels[i].key] ?? labels[i].key,
+                                    statLabelsZh[labels[i].key] ??
+                                    labels[i].key,
                                 value: labels[i].value,
                                 center: center,
                                 radius: radius + 16,
@@ -687,26 +677,12 @@ class _BaseStatsSectionState extends State<BaseStatsSection> {
           ],
         ),
         const SizedBox(height: 8),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeInOut,
-          alignment: Alignment.topCenter,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            layoutBuilder: (current, previous) =>
-                current ?? const SizedBox.shrink(),
-            child: _showRadar
-                ? SizedBox(
-                    key: const ValueKey('radar'),
-                    height: 280,
-                    child: BaseStatsRadarChart(stats: widget.stats),
-                  )
-                : BaseStatsCard(
-                    key: const ValueKey('bars'),
-                    stats: widget.stats,
-                  ),
-          ),
-        ),
+        _showRadar
+            ? SizedBox(
+                height: 280,
+                child: BaseStatsRadarChart(stats: widget.stats),
+              )
+            : BaseStatsCard(stats: widget.stats),
       ],
     );
   }
@@ -794,16 +770,10 @@ class TypeEffectivenessGrid extends StatelessWidget {
               style: SecondaryTypography.onCard.body14,
             ),
             const SizedBox(height: 16),
-            Text(
-              AppZh.dexTypeGridTitle,
-              style: SecondaryTypography.onCard.h15,
-            ),
+            Text(AppZh.dexTypeGridTitle, style: SecondaryTypography.onCard.h15),
             const SizedBox(height: 12),
           ] else ...[
-            Text(
-              AppZh.dexTypeGridTitle,
-              style: SecondaryTypography.onCard.h15,
-            ),
+            Text(AppZh.dexTypeGridTitle, style: SecondaryTypography.onCard.h15),
             const SizedBox(height: 12),
           ],
           LayoutBuilder(
@@ -812,7 +782,8 @@ class TypeEffectivenessGrid extends StatelessWidget {
               const crossAxisSpacing = 6.0;
               const mainAxisSpacing = 8.0;
               const tileHeight = 68.0;
-              final tileWidth = (constraints.maxWidth -
+              final tileWidth =
+                  (constraints.maxWidth -
                       crossAxisSpacing * (crossAxisCount - 1)) /
                   crossAxisCount;
 
@@ -891,10 +862,7 @@ class TypeEffectivenessGrid extends StatelessWidget {
 }
 
 class AbilitiesCard extends StatelessWidget {
-  const AbilitiesCard({
-    super.key,
-    required this.abilities,
-  });
+  const AbilitiesCard({super.key, required this.abilities});
 
   final List<PokemonAbility> abilities;
 
@@ -905,10 +873,7 @@ class AbilitiesCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppZh.dexAbilities,
-              style: SecondaryTypography.onCard.h15,
-            ),
+            Text(AppZh.dexAbilities, style: SecondaryTypography.onCard.h15),
             const SizedBox(height: 8),
             Text(
               AppZh.dexAbilityEmptyPending,
@@ -925,10 +890,7 @@ class AbilitiesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexAbilities,
-            style: SecondaryTypography.onCard.h15,
-          ),
+          Text(AppZh.dexAbilities, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 10),
           ...abilities.map(
             (ability) => Padding(
@@ -1071,10 +1033,7 @@ class MoveCategoryPanel extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  title,
-                  style: SecondaryTypography.onCard.h15,
-                ),
+                child: Text(title, style: SecondaryTypography.onCard.h15),
               ),
               Text(
                 '${moves.length}',
@@ -1185,16 +1144,15 @@ class AbilityPlaceholderCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppZh.dexAbilities,
-            style: SecondaryTypography.onCard.h15,
-          ),
+          Text(AppZh.dexAbilities, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 3,
+                ),
                 decoration: BoxDecoration(
                   color: TitoColors.skyBlue,
                   borderRadius: BorderRadius.circular(999),
@@ -1324,10 +1282,7 @@ class IntroMetaCard extends StatelessWidget {
           ],
           if (detail.evYieldLabel != null) ...[
             const Divider(height: 20),
-            _MetaRow(
-              label: AppZh.dexEvYield,
-              value: detail.evYieldLabel!,
-            ),
+            _MetaRow(label: AppZh.dexEvYield, value: detail.evYieldLabel!),
           ],
         ],
       ),
@@ -1428,8 +1383,7 @@ class _InteractiveTypeEffectivenessCardState
         oldWidget.types != widget.types ||
         oldWidget.abilities != widget.abilities) {
       setState(() {
-        _defenderTeraType =
-            defaultTeraTypeFor(widget.types, widget.generation);
+        _defenderTeraType = defaultTeraTypeFor(widget.types, widget.generation);
         _syncDefaultAbility(force: oldWidget.abilities != widget.abilities);
       });
     }
@@ -1481,13 +1435,16 @@ class _InteractiveTypeEffectivenessCardState
       defenderAbilitySlug: _abilitySlug,
       generation: widget.generation,
       defenderTerastallized: _defenderTerastallized,
-      defenderTeraType: _defenderTeraType ??
+      defenderTeraType:
+          _defenderTeraType ??
           defaultTeraTypeFor(widget.types, widget.generation),
     );
     final profile = computeBattleDefensiveProfile(input);
     final multipliers = computeBattleTypeMultipliers(input);
-    final normalized =
-        normalizeTypesForGeneration(widget.types, widget.generation);
+    final normalized = normalizeTypesForGeneration(
+      widget.types,
+      widget.generation,
+    );
 
     return StickerCard(
       child: Column(

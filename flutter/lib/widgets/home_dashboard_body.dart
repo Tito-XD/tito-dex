@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../models/journey.dart';
-import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
 import 'journey_card.dart';
 import 'party_strip.dart';
 import 'tito_skeleton.dart';
 import 'trainer_card.dart';
 
-/// Home dashboard body with optional bootstrap reveal animation.
+/// Home dashboard body with optional static bootstrap placeholder state.
 class HomeDashboardBody extends StatelessWidget {
   const HomeDashboardBody({
     super.key,
@@ -78,12 +77,10 @@ class _PortraitHomeLayout extends StatelessWidget {
           dense: true,
         );
 
-        final belowTrainer = AnimatedOpacity(
-          duration: TitoMotion.routeForwardDuration,
-          curve: TitoMotion.standardCurve,
-          opacity: bootstrapping ? 0.0 : 1.0,
-          child: IgnorePointer(
-            ignoring: bootstrapping,
+        final belowTrainer = IgnorePointer(
+          ignoring: bootstrapping,
+          child: Opacity(
+            opacity: bootstrapping ? 0.0 : 1.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -174,11 +171,10 @@ class _SquareHomeLayout extends StatelessWidget {
                     if (saveLinked) ...[
                       SizedBox(height: gap),
                       Expanded(
-                        child: AnimatedOpacity(
-                          duration: TitoMotion.routeForwardDuration,
-                          opacity: bootstrapping ? 0.0 : 1.0,
-                          child: IgnorePointer(
-                            ignoring: bootstrapping,
+                        child: IgnorePointer(
+                          ignoring: bootstrapping,
+                          child: Opacity(
+                            opacity: bootstrapping ? 0.0 : 1.0,
                             child: JourneyCard(
                               journey: journey,
                               onOpenDetail: onJourneyOpen,
@@ -195,11 +191,10 @@ class _SquareHomeLayout extends StatelessWidget {
               SizedBox(width: gap),
               Expanded(
                 flex: 1,
-                child: AnimatedOpacity(
-                  duration: TitoMotion.routeForwardDuration,
-                  opacity: bootstrapping ? 0.0 : 1.0,
-                  child: IgnorePointer(
-                    ignoring: bootstrapping,
+                child: IgnorePointer(
+                  ignoring: bootstrapping,
+                  child: Opacity(
+                    opacity: bootstrapping ? 0.0 : 1.0,
                     child: PartyStrip(
                       party: journey.party,
                       compact: true,
@@ -213,10 +208,12 @@ class _SquareHomeLayout extends StatelessWidget {
           ),
         ),
         SizedBox(height: gap),
-        AnimatedOpacity(
-          duration: TitoMotion.routeForwardDuration,
-          opacity: bootstrapping ? 0.0 : 1.0,
-          child: IgnorePointer(ignoring: bootstrapping, child: quickActions),
+        IgnorePointer(
+          ignoring: bootstrapping,
+          child: Opacity(
+            opacity: bootstrapping ? 0.0 : 1.0,
+            child: quickActions,
+          ),
         ),
       ],
     );
@@ -240,7 +237,6 @@ class _TrainerCardSlot extends StatelessWidget {
       journey: journey,
       compact: true,
       dense: dense,
-      useHero: true,
       avatarPlaceholder: bootstrapping,
     );
   }

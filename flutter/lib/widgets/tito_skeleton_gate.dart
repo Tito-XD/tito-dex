@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../navigation/tito_page_transition.dart';
-
-/// M4 loading gate: delay skeleton 120ms, keep at least 200ms before swap.
+/// Loading gate: delay skeleton 120ms, keep it visible for at least 200ms.
+///
+/// This controls when static placeholders appear; it does not animate them.
 class TitoSkeletonGate extends StatefulWidget {
   const TitoSkeletonGate({
     super.key,
@@ -24,6 +24,9 @@ class TitoSkeletonGate extends StatefulWidget {
 }
 
 class _TitoSkeletonGateState extends State<TitoSkeletonGate> {
+  static const _skeletonDelay = Duration(milliseconds: 120);
+  static const _skeletonMinVisible = Duration(milliseconds: 200);
+
   bool _showSkeleton = false;
   Timer? _delayTimer;
   DateTime? _skeletonShownAt;
@@ -51,7 +54,7 @@ class _TitoSkeletonGateState extends State<TitoSkeletonGate> {
   void _sync(bool loading) {
     _delayTimer?.cancel();
     if (loading) {
-      _delayTimer = Timer(TitoMotion.skeletonDelay, () {
+      _delayTimer = Timer(_skeletonDelay, () {
         if (!mounted || !widget.loading) {
           return;
         }
@@ -69,8 +72,7 @@ class _TitoSkeletonGateState extends State<TitoSkeletonGate> {
     }
 
     final shownAt = _skeletonShownAt ?? DateTime.now();
-    final remaining =
-        TitoMotion.skeletonMinVisible - DateTime.now().difference(shownAt);
+    final remaining = _skeletonMinVisible - DateTime.now().difference(shownAt);
     if (remaining <= Duration.zero) {
       setState(() {
         _showSkeleton = false;
