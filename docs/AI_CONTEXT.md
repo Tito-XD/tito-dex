@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) |
-| **`main` / lite** | `0.4.99+52` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.4.99-offline+53` — APK-bundled dex data |
+| **Latest release** | [v0.5.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.0) |
+| **`main` / lite** | `0.5.0+54` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.5.0-offline+55` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -40,9 +40,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.4.99)
+## Current feature status (latest release line: v0.5.0)
 
-> `main` includes the complete v0.4.95–v0.4.99 release line. The offline packaging branch adds only the bundled dex seed and offline package version.
+> `main` includes the v0.5.0 release line. The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - HGSS retail 512 KB `.sav` parser; directory sync (newest by mtime); startup auto-load.
@@ -53,7 +53,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Grid + search; 4-tab detail (简介 / 基本信息 / 获取 / 招式).
 - **23 game editions**, **11 regional dexes**, `DexScope` filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
-- Bundle includes: summaries, details, sprites, moves, abilities, **l10n/zh**, **maps**, **config**, game icons.
+- Bundle includes: summaries, precomputed filter catalog, details, sprites, moves, abilities, **l10n/zh**, **maps**, **config**, game icons.
 - Chinese location labels via zh catalog; HGSS map id lookup.
 
 ### Search hub
@@ -63,6 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.5.0: precomputed Dex catalog keeps list, search, and reference filters in memory; home no longer blocks on a looping bootstrap bar.
 - v0.4.99: source-line consolidation and aligned lite/offline packages.
 - v0.4.98: per-game titles in the flavor-text carousel for paired editions.
 - v0.4.95–v0.4.97: trainer-card bootstrap and square layout, loading panels, team editor improvements, download progress/cancel, and copy cleanup.

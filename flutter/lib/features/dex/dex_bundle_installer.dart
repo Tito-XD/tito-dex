@@ -18,10 +18,10 @@ class DexBundleInstaller {
     DexCdnConfig? config,
     http.Client? httpClient,
     Zstandard? zstandard,
-  })  : _store = store ?? DexCacheStore(),
-        _config = config ?? const DexCdnConfig(),
-        _http = httpClient ?? http.Client(),
-        _zstandard = zstandard ?? Zstandard();
+  }) : _store = store ?? DexCacheStore(),
+       _config = config ?? const DexCdnConfig(),
+       _http = httpClient ?? http.Client(),
+       _zstandard = zstandard ?? Zstandard();
 
   final DexCacheStore _store;
   final DexCdnConfig _config;
@@ -36,7 +36,8 @@ class DexBundleInstaller {
       label: 'bundle-manifest.json',
     );
 
-    final bundleManifest = manifest ?? await _config.fetchManifest(client: _http);
+    final bundleManifest =
+        manifest ?? await _config.fetchManifest(client: _http);
 
     final totalBytes = bundleManifest.archiveSizeBytes > 0
         ? bundleManifest.archiveSizeBytes
@@ -64,25 +65,56 @@ class DexBundleInstaller {
     }
     final archiveBytes = Uint8List.fromList(chunks);
 
-    yield _progress(phase: 'cdn_verify', current: 1, total: 1, label: 'SHA-256');
+    yield* installFromArchiveBytes(
+      archiveBytes: archiveBytes,
+      bundleManifest: bundleManifest,
+    );
+  }
 
-    if (bundleManifest.hasIntegrityCheck) {
-      final digest = sha256.convert(archiveBytes).toString();
-      if (digest != bundleManifest.archiveSha256) {
-        throw DexCdnException(
-          'Bundle SHA-256 mismatch: expected ${bundleManifest.archiveSha256}, got $digest',
-        );
+  /// Installs an already available archive.  The APK seed and CDN download
+  /// intentionally share this path so both receive the same catalog index.
+  Stream<DexCacheProgress> installFromArchiveBytes({
+    required Uint8List archiveBytes,
+    required DexBundleManifest bundleManifest,
+    bool verifySha256 = true,
+    String progressPrefix = 'cdn',
+  }) async* {
+    if (verifySha256) {
+      yield _progress(
+        phase: '${progressPrefix}_verify',
+        current: 1,
+        total: 1,
+        label: 'SHA-256',
+      );
+
+      if (bundleManifest.hasIntegrityCheck) {
+        final digest = sha256.convert(archiveBytes).toString();
+        if (digest != bundleManifest.archiveSha256) {
+          throw DexCdnException(
+            'Bundle SHA-256 mismatch: expected ${bundleManifest.archiveSha256}, got $digest',
+          );
+        }
       }
     }
 
-    yield _progress(phase: 'cdn_decompress', current: 0, total: 1, label: 'zstd');
+    yield _progress(
+      phase: '${progressPrefix}_decompress',
+      current: 0,
+      total: 1,
+      label: 'zstd',
+    );
 
     final tarBytes = await _decompress(archiveBytes);
     if (tarBytes == null || tarBytes.isEmpty) {
       throw DexCdnException('Failed to decompress bundle archive');
     }
 
-    yield _progress(phase: 'cdn_decompress', current: 1, total: 1, label: 'zstd');
+    yield _progress(
+      phase: '${progressPrefix}_decompress',
+      current: 1,
+      total: 1,
+      label: 'zstd',
+    );
 
     await _store.clearAll();
     final paths = await _resolvePaths();
@@ -96,16 +128,34 @@ class DexBundleInstaller {
       final outFile = File('${paths.root.path}/${entry.name}');
       await outFile.parent.create(recursive: true);
       await outFile.writeAsBytes(entry.content as List<int>);
-      final shouldReport =
-          i == 0 || i + 1 == fileCount || (i + 1) % 50 == 0;
+      final shouldReport = i == 0 || i + 1 == fileCount || (i + 1) % 50 == 0;
       if (shouldReport) {
         yield _progress(
-          phase: 'cdn_extract',
+          phase: '${progressPrefix}_extract',
           current: i + 1,
           total: fileCount,
           label: null,
         );
       }
+    }
+
+    // Old CDN bundles predate dex_catalog.json.  Build it here, while the
+    // Settings download panel is already active, so first Dex/filter use is
+    // still a memory-only operation.
+    if (!await _store.hasCatalog()) {
+      yield _progress(
+        phase: '${progressPrefix}_index',
+        current: 0,
+        total: 1,
+        label: null,
+      );
+      await _store.rebuildCatalogFromLegacyBundle();
+      yield _progress(
+        phase: '${progressPrefix}_index',
+        current: 1,
+        total: 1,
+        label: null,
+      );
     }
 
     final cacheManifest = await _store.readManifest();
@@ -117,16 +167,16 @@ class DexBundleInstaller {
         : (bundleManifest.pokemonCount ?? titodexMaxNationalDexId);
     await _store.writeManifest(
       DexCacheManifest(
-        version: DexCdnConfig.bundleVersion,
+        version: bundleManifest.bundleVersion,
         complete: true,
         preferOffline: true,
-        downloadedAt:
-            cacheManifest.downloadedAt ?? DateTime.now().toIso8601String(),
+        downloadedAt: DateTime.now().toIso8601String(),
         pokemonCount: pokemonTotal,
         moveCount: moves.length,
         sizeBytes: sizeBytes,
-        l10nVersion: bundleManifest.l10nVersion,
-        configVersion: bundleManifest.configVersion,
+        l10nVersion: bundleManifest.l10nVersion ?? cacheManifest.l10nVersion,
+        configVersion:
+            bundleManifest.configVersion ?? cacheManifest.configVersion,
       ),
     );
 

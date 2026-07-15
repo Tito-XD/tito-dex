@@ -24,7 +24,7 @@ void main() {
 
     final found = await scanner.findNewestSave(tempDir.path);
     expect(found, isNotNull);
-    expect(found!.path, newer.path);
+    expect(found!.absolute.uri.toFilePath(), newer.absolute.uri.toFilePath());
   });
 
   test('findNewestSave ignores non-retail sizes and non-sav files', () async {

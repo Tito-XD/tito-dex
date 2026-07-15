@@ -6,9 +6,9 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) · App `0.4.99+52` | arm64-v8a, about 23 MB |
-| Offline APK | [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) · App `0.4.99-offline+53` | Bundles the current dex pack, about 64 MB |
-| `main` source baseline | App `0.4.99+52` | Includes the complete v0.4.95–v0.4.99 release line |
+| Lite APK | [v0.5.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.0) · App `0.5.0+54` | arm64-v8a, about 23 MB |
+| Offline APK | [v0.5.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.0) · App `0.5.0-offline+55` | Bundles the current dex pack, about 64 MB |
+| `main` source baseline | App `0.5.0+54` | Instant catalog-backed dex browsing and current dashboard layout |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
@@ -48,7 +48,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.4.99-lite-rg-arm64.apk`** or **`TitoDex-0.4.99-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.5.0-lite-rg-arm64.apk`** or **`TitoDex-0.5.0-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

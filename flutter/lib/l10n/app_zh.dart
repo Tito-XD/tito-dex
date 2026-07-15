@@ -79,8 +79,7 @@ abstract final class AppZh {
   static const widgetContinue = '继续';
   static String companionMessage(String location) => '$location 今天也很热闹！';
 
-  static const dexScopeNote =
-      '全国图鉴 1–1025，中文名与属性来自在线图鉴；已捕获/已见过状态来自存档与同行队伍。';
+  static const dexScopeNote = '全国图鉴 1–1025，中文名与属性来自在线图鉴；已捕获/已见过状态来自存档与同行队伍。';
   static const dexCaught = '已捕获';
   static const dexSeen = '已见过';
   static const dexUnknown = '未见过';
@@ -101,8 +100,7 @@ abstract final class AppZh {
     int seen,
     int caught,
     int total,
-  ) =>
-      '#$startId–$endId · 已见 $seen / 已捕 $caught / 共 $total';
+  ) => '#$startId–$endId · 已见 $seen / 已捕 $caught / 共 $total';
   static const dexRegionNational = '全国';
   static const dexRegionJohto = '城都';
   static const dexRegionKanto = '关东';
@@ -129,8 +127,7 @@ abstract final class AppZh {
   static const dexObtainEmpty =
       'PokeAPI 未收录该宝可梦在心金/魂银的野外遭遇数据（可能为进化、赠送或不可野生捕获）。';
   static const dexFlavorEnglishNote = '该世代暂无官方中文描述，以下为英文原文。';
-  static const dexFlavorZhFallbackNote =
-      '心金/魂银世代无中文图鉴文案，以下为近世代中文译名供参考。';
+  static const dexFlavorZhFallbackNote = '心金/魂银世代无中文图鉴文案，以下为近世代中文译名供参考。';
   static const dexNone = '无';
   static const dexApiNote =
       '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
@@ -155,8 +152,7 @@ abstract final class AppZh {
   static const dexEvYield = '基础点数 (EV)';
   static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
-  static const dexFlavorNoEdition =
-      '当前版本暂无图鉴描述';
+  static const dexFlavorNoEdition = '当前版本暂无图鉴描述';
   static const dexFlavorPickEdition = '选择其他版本查看';
   static const dexMoveFilterAll = '全部';
   static const dexMoveFilterLevel = '等级';
@@ -201,6 +197,7 @@ abstract final class AppZh {
     }
     return parts.join(' · ');
   }
+
   static const dexReferenceNatureStats = '能力变化';
   static const dexReferenceNatureFlavors = '口味偏好';
   static const dexReferenceNatureNeutral = '无能力变化（中性性格）';
@@ -234,8 +231,7 @@ abstract final class AppZh {
   static const settingsDexCacheContentsTitle = '缓存内容筛选';
   static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
   static const settingsDexAdvancedOptions = '高级选项';
-  static const settingsDexCacheOptionJson =
-      '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
+  static const settingsDexCacheOptionJson = '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
   static const settingsDexCacheOptionSprites =
       '列表小图（按当前游戏版本世代，约 1025 张 × 单版本 ~25MB）';
   static const settingsDexCacheOptionSpritesAllVersions =
@@ -244,13 +240,10 @@ abstract final class AppZh {
       '官方立绘大图（详情页查看，约 1025 张 ~80–120MB）';
   static const settingsDexCacheOptionAnimated =
       'Showdown 动图（PokeAPI GIF，约 1025 张 ~40–60MB）';
-  static const settingsDexCacheOptionL10n =
-      '中文对照表（物种/招式/特性/道具名、地点、HGSS 地图）';
+  static const settingsDexCacheOptionL10n = '中文对照表（物种/招式/特性/道具名、地点、HGSS 地图）';
   static const settingsDexCacheOptionTypeIcons = '属性图标（18 个，内置仓库资源）';
-  static const settingsDexCacheOptionConfig =
-      '应用配置（Sleep 工具链接、游戏版本图标索引等）';
-  static String settingsDexCacheEstimate(String items) =>
-      '预计体积（勾选合计）：$items';
+  static const settingsDexCacheOptionConfig = '应用配置（Sleep 工具链接、游戏版本图标索引等）';
+  static String settingsDexCacheEstimate(String items) => '预计体积（勾选合计）：$items';
   static const settingsDexOfflineUnset = '尚未下载离线数据包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
@@ -277,6 +270,8 @@ abstract final class AppZh {
       'cdn_verify' => '校验',
       'cdn_decompress' => '解压',
       'cdn_extract' => '写入',
+      'cdn_index' => '准备筛选索引',
+      'index' => '准备筛选索引',
       'l10n_download' => '中文对照',
       'done' => '完成',
       'partial' => '部分完成',
@@ -302,8 +297,7 @@ abstract final class AppZh {
   static const offlinePromptGoSettings = '去设置';
 
   static const updateAvailableTitle = '图鉴数据有更新';
-  static const updateAvailableBody =
-      'CDN 上有较新的图鉴包或中文对照表，可在设置中下载更新。';
+  static const updateAvailableBody = 'CDN 上有较新的图鉴包或中文对照表，可在设置中下载更新。';
   static const updateAvailableLater = '稍后';
   static const updateAvailableGoSettings = '去设置';
 
@@ -342,10 +336,8 @@ abstract final class AppZh {
   static const searchOnlineUsage = '使用率排行';
 
   static const companionToolsTitle = '对战助手';
-  static String companionToolsSubtitle(String gameTitle) =>
-      '跟随当前游戏：$gameTitle';
-  static String companionToolsFacility(String facility) =>
-      '参考场景：$facility';
+  static String companionToolsSubtitle(String gameTitle) => '跟随当前游戏：$gameTitle';
+  static String companionToolsFacility(String facility) => '参考场景：$facility';
   static const companionToolDex = '打开图鉴';
   static const companionToolDexHint = '查种族值、属性、招式与克制关系';
   static const companionToolTypeMatchup = '属性克制速查';
@@ -389,8 +381,7 @@ abstract final class AppZh {
   static const companionStatIv = '个体值';
   static const companionStatEv = '努力值';
   static const companionStatResultTitle = '计算结果';
-  static const companionStatResultHint =
-      '此为理论值；对战设施对手的实际数值可能含道具或强化。';
+  static const companionStatResultHint = '此为理论值；对战设施对手的实际数值可能含道具或强化。';
   static const companionDamageInputsTitle = '对战双方';
   static String companionDamageFacility(String facility) => '场景：$facility';
   static const companionAttackerSearchHint = '搜索进攻方宝可梦…';
@@ -423,7 +414,8 @@ abstract final class AppZh {
   static String teamSummaryBstSum(int sum) => '种族值合计 $sum';
   static String teamSummaryTypeCoverage(int count) => '属性覆盖 $count/18';
   static String teamSummaryWeaknesses(String types) => '常见弱点：$types';
-  static String teamSummarySharedWeaknesses(String types) => '共同弱点（≥2 只）：$types';
+  static String teamSummarySharedWeaknesses(String types) =>
+      '共同弱点（≥2 只）：$types';
   static const teamEditTitle = '编辑同行';
   static const teamEditLevel = '等级';
   static const teamEditNickname = '昵称';

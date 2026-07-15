@@ -29,6 +29,8 @@ class JourneyCard extends StatelessWidget {
         ? DeviceLayout.cardPadding(context)
         : null;
     final location = localizeLocation(journey.location);
+    TextStyle denseStyle(TextStyle style) =>
+        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85, height: 1);
 
     return HandheldFocusDecorator(
       onActivate: onOpenDetail,
@@ -53,13 +55,17 @@ class JourneyCard extends StatelessWidget {
                         children: [
                           Text(
                             AppZh.journeyCardTitle.toUpperCase(),
-                            style: context.tito.onDeepOverline,
+                            style: dense
+                                ? denseStyle(context.tito.onDeepOverline)
+                                : context.tito.onDeepOverline,
                           ),
-                          SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
+                          SizedBox(height: dense ? 1 : (compact ? 6 : 8)),
                           Text(
                             location,
-                            style: context.tito.onDeepHeading,
-                            maxLines: dense ? 3 : 2,
+                            style: dense
+                                ? denseStyle(context.tito.onDeepHeading)
+                                : context.tito.onDeepHeading,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -74,7 +80,7 @@ class JourneyCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
+                SizedBox(height: dense ? 2 : (compact ? 8 : 10)),
                 Row(
                   children: [
                     _Meta(
@@ -99,11 +105,7 @@ class JourneyCard extends StatelessWidget {
 }
 
 class _Meta extends StatelessWidget {
-  const _Meta({
-    required this.label,
-    required this.value,
-    required this.dense,
-  });
+  const _Meta({required this.label, required this.value, required this.dense});
 
   final String label;
   final String value;
@@ -111,19 +113,26 @@ class _Meta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle denseStyle(TextStyle style) =>
+        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85, height: 1);
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: context.tito.onDeepMetaLabel,
+            style: dense
+                ? denseStyle(context.tito.onDeepMetaLabel)
+                : context.tito.onDeepMetaLabel,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             value,
-            style: context.tito.onDeepMetaValue,
+            style: dense
+                ? denseStyle(context.tito.onDeepMetaValue)
+                : context.tito.onDeepMetaValue,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

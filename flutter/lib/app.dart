@@ -8,6 +8,7 @@ import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
 import 'features/dex/dex_offline_service.dart';
+import 'features/dex/dex_repository.dart';
 import 'features/dex/dex_settings_repository.dart';
 import 'features/dex/dex_update_service.dart';
 import 'l10n/zh_catalog.dart';
@@ -92,9 +93,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 TitoBackNavigation.navigateBack(context, state.uri.path);
               },
               child: HandheldInputShell(
-                    location: state.uri.path,
-                    child: DeviceShell(child: child),
-                  ),
+                location: state.uri.path,
+                child: DeviceShell(child: child),
+              ),
             );
           },
           routes: [
@@ -125,10 +126,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
                 child: TitoPageContainer(
-                  child: TeamPage(
-                    journey: _journey,
-                    onSaveJourney: _persist,
-                  ),
+                  child: TeamPage(journey: _journey, onSaveJourney: _persist),
                 ),
               ),
             ),
@@ -181,8 +179,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: PokemonDetailPage(
                         pokemonId:
-                            int.tryParse(state.pathParameters['id'] ?? '') ??
-                                1,
+                            int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
                       ),
                     ),
                   ),
@@ -193,9 +190,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
               path: '/search',
               pageBuilder: (context, state) => titoSlidePage(
                 key: state.pageKey,
-                child: TitoPageContainer(
-                  child: SearchPage(journey: _journey),
-                ),
+                child: TitoPageContainer(child: SearchPage(journey: _journey)),
               ),
               routes: [
                 GoRoute(
@@ -321,8 +316,31 @@ class _TitoDexAppState extends State<TitoDexApp> {
     });
     _BootstrapGate.instance.markReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkOfflineDataPrompts();
+      _prepareDexAfterHomeIsReady();
     });
+  }
+
+  /// Data preparation intentionally happens outside the home bootstrap UI.
+  /// A legacy bundle may need one catalog migration; it must never make the
+  /// home progress animation loop or block the rest of the app from opening.
+  Future<void> _prepareDexAfterHomeIsReady() async {
+    try {
+      await for (final _ in dexOfflineService.seedFromApkAssetIfNeeded()) {}
+      if (await dexOfflineService.isReady()) {
+        if (!await dexOfflineService.hasCatalog()) {
+          await dexOfflineService.ensureCatalog();
+          dexRepository.clearMemoryCache();
+        }
+        await dexRepository.warmUp();
+      }
+    } catch (error, stackTrace) {
+      debugPrint('Dex background preparation failed: $error');
+      debugPrint('$stackTrace');
+    } finally {
+      if (mounted) {
+        await _checkOfflineDataPrompts();
+      }
+    }
   }
 
   Future<void> _checkOfflineDataPrompts() async {
@@ -365,9 +383,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     setState(() => _saveConfig = config);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackSaveDirectorySet)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackSaveDirectorySet)));
     await _syncSaveDirectory(force: true);
   }
 
@@ -405,9 +423,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
     final message = _syncMessage(result);
     if (message != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -440,10 +458,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
       SnackBar(
         content: Text(
           warnings.isEmpty
-              ? AppZh.snackSaveLoaded(
-                  summary.trainerName,
-                  summary.party.length,
-                )
+              ? AppZh.snackSaveLoaded(summary.trainerName, summary.party.length)
               : AppZh.snackSaveLoadedWarnings(warnings.length),
         ),
       ),
@@ -455,9 +470,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackMockRestored)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackMockRestored)));
   }
 
   Future<void> _exportJourney() async {
@@ -465,9 +480,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackJourneyExported)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneyExported)));
   }
 
   Future<void> _importJourneyJson() async {
@@ -479,9 +494,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackJourneyImported)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneyImported)));
   }
 
   Future<void> _rememberEmulator(EmulatorAppChoice choice) async {
@@ -490,9 +505,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     setState(() => _emulatorChoice = choice);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackEmulatorSaved)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorSaved)));
   }
 
   Future<void> _clearEmulator() async {
@@ -501,9 +516,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     setState(() => _emulatorChoice = null);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackEmulatorCleared)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorCleared)));
   }
 
   Future<void> _pickEmulatorFromSettings() async {

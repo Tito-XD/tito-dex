@@ -72,8 +72,7 @@ class TrainerCard extends StatelessWidget {
 class _TrainerCardMetrics {
   const _TrainerCardMetrics({
     required this.cardHeight,
-    required this.rowCount,
-    required this.avatarSpanRows,
+    required this.avatarSize,
     required this.gutter,
     required this.textGap,
     required this.greetingFontSize,
@@ -81,16 +80,11 @@ class _TrainerCardMetrics {
   });
 
   final double cardHeight;
-  final int rowCount;
-  final int avatarSpanRows;
+  final double avatarSize;
   final double gutter;
   final double textGap;
   final double greetingFontSize;
   final double nameFontSize;
-
-  double get rowUnit => cardHeight / rowCount;
-
-  double get avatarSize => rowUnit * avatarSpanRows;
 
   static _TrainerCardMetrics forDensity(
     BuildContext context,
@@ -98,35 +92,33 @@ class _TrainerCardMetrics {
   ) {
     return switch (density) {
       TrainerCardDensity.micro => _TrainerCardMetrics(
-          cardHeight: DeviceLayout.trainerMicroCardHeight(context),
-          rowCount: 5,
-          avatarSpanRows: 3,
-          gutter: DeviceLayout.dim(context, 8),
-          textGap: DeviceLayout.dim(context, 4),
-          greetingFontSize: DeviceLayout.dim(context, 15),
-          nameFontSize: DeviceLayout.dim(context, 14),
-        ),
+        cardHeight: DeviceLayout.trainerMicroCardHeight(context),
+        avatarSize: DeviceLayout.trainerMicroAvatarSize(context),
+        gutter: DeviceLayout.dim(context, 8),
+        textGap: DeviceLayout.dim(context, 4),
+        greetingFontSize: DeviceLayout.dim(context, 15),
+        nameFontSize: DeviceLayout.dim(context, 14),
+      ),
       TrainerCardDensity.dense => _TrainerCardMetrics(
-          cardHeight: DeviceLayout.useSquareDashboard(context)
-              ? DeviceLayout.trainerSquareCardHeight(context)
-              : DeviceLayout.trainerDenseCardHeight(context),
-          rowCount: 5,
-          avatarSpanRows: 3,
-          gutter: DeviceLayout.dim(context, 12),
-          textGap: DeviceLayout.dim(context, 8),
-          greetingFontSize: DeviceLayout.dim(context, 22),
-          nameFontSize: DeviceLayout.dim(context, 18),
-        ),
+        cardHeight: DeviceLayout.useSquareDashboard(context)
+            ? DeviceLayout.trainerSquareCardHeight(context)
+            : DeviceLayout.trainerDenseCardHeight(context),
+        avatarSize: DeviceLayout.trainerDenseAvatarSize(context),
+        gutter: DeviceLayout.dim(context, 12),
+        textGap: DeviceLayout.dim(context, 8),
+        greetingFontSize: DeviceLayout.dim(context, 33),
+        nameFontSize: DeviceLayout.dim(context, 27),
+      ),
       TrainerCardDensity.standard => _TrainerCardMetrics(
-          cardHeight: DeviceLayout.trainerDenseCardHeight(context) +
-              DeviceLayout.dim(context, 16),
-          rowCount: 5,
-          avatarSpanRows: 3,
-          gutter: DeviceLayout.dim(context, 14),
-          textGap: DeviceLayout.dim(context, 10),
-          greetingFontSize: DeviceLayout.dim(context, 24),
-          nameFontSize: DeviceLayout.dim(context, 20),
-        ),
+        cardHeight:
+            DeviceLayout.trainerDenseCardHeight(context) +
+            DeviceLayout.dim(context, 16),
+        avatarSize: DeviceLayout.trainerDenseAvatarSize(context),
+        gutter: DeviceLayout.dim(context, 14),
+        textGap: DeviceLayout.dim(context, 10),
+        greetingFontSize: DeviceLayout.dim(context, 24),
+        nameFontSize: DeviceLayout.dim(context, 20),
+      ),
     };
   }
 }
@@ -148,12 +140,6 @@ class _TrainerCardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rowUnit = metrics.rowUnit;
-    final topPad = rowUnit;
-    final contentHeight = metrics.avatarSize;
-    final bottomPad =
-        rowUnit * (metrics.rowCount - metrics.avatarSpanRows - 1);
-
     final greetingStyle = TitoTypography.style(
       fontSize: metrics.greetingFontSize,
       fontWeight: FontWeight.w800,
@@ -165,8 +151,9 @@ class _TrainerCardBody extends StatelessWidget {
       height: 1.05,
     );
 
-    final trainerName =
-        journey.trainerName.isNotEmpty ? journey.trainerName : 'Tito';
+    final trainerName = journey.trainerName.isNotEmpty
+        ? journey.trainerName
+        : 'Tito';
 
     Widget avatar = _TrainerAvatar(
       journey: journey,
@@ -216,17 +203,11 @@ class _TrainerCardBody extends StatelessWidget {
       ],
     );
 
-    final content = SizedBox(
-      height: contentHeight,
-      child: row,
-    );
+    final content = SizedBox(height: metrics.avatarSize, child: row);
 
-    final body = Column(
-      children: [
-        SizedBox(height: topPad),
-        content,
-        if (bottomPad > 0) SizedBox(height: bottomPad),
-      ],
+    final body = SizedBox(
+      height: metrics.cardHeight,
+      child: Center(child: content),
     );
 
     if (onAvatarTap != null) {
@@ -266,7 +247,8 @@ class _TrainerAvatar extends StatelessWidget {
     }
 
     final avatarPath = journey.trainerAvatarPath;
-    final hasImage = avatarPath != null &&
+    final hasImage =
+        avatarPath != null &&
         avatarPath.isNotEmpty &&
         File(avatarPath).existsSync();
 

@@ -1,12 +1,10 @@
-import '../companion/companion_art.dart';
-import '../parser/hgss_format.dart';
 import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
 import '../game/game_edition.dart';
-import '../game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import 'dex_cdn_config.dart';
 import 'dex_cdn_data_source.dart';
+import 'dex_catalog.dart';
 import 'dex_filter.dart';
 import 'dex_models.dart';
 import 'dex_offline_service.dart';
@@ -25,10 +23,10 @@ class DexRepository {
     DexCdnDataSource? cdn,
     DexCdnConfig? cdnConfig,
     this.summaryBatchSize = 4,
-  })  : _client = client ?? PokeApiClient(),
-        _offline = offline ?? dexOfflineService,
-        _cdn = cdn ?? DexCdnDataSource(),
-        _cdnConfig = cdnConfig ?? const DexCdnConfig();
+  }) : _client = client ?? PokeApiClient(),
+       _offline = offline ?? dexOfflineService,
+       _cdn = cdn ?? DexCdnDataSource(),
+       _cdnConfig = cdnConfig ?? const DexCdnConfig();
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
@@ -40,6 +38,8 @@ class DexRepository {
   final Map<String, int> _nameToIdCache = {};
   List<PokemonSummary>? _allSummaries;
   Future<List<PokemonSummary>>? _allSummariesFuture;
+  DexCatalog? _catalog;
+  Future<DexCatalog?>? _catalogFuture;
   bool _cdnSummariesUnavailable = false;
   Map<int, CachedMove>? _allMovesCache;
   Future<Map<int, CachedMove>>? _allMovesFuture;
@@ -53,15 +53,14 @@ class DexRepository {
   DexProgress progressFor(
     CurrentJourney journey, {
     bool manualDexMarks = false,
-  }) =>
-      DexProgress.fromJourney(journey, manualDexMarks: manualDexMarks);
+  }) => DexProgress.fromJourney(journey, manualDexMarks: manualDexMarks);
 
-  Future<DexScope> getDefaultScope() => dexSettingsRepository.loadDefaultScope();
+  Future<DexScope> getDefaultScope() =>
+      dexSettingsRepository.loadDefaultScope();
 
   Future<List<PokemonSummary>> getScopeSummaries(DexScope scope) async {
     final all = await getAllSummaries();
-    final filtered =
-        all.where(scope.speciesInScope).toList(growable: false);
+    final filtered = all.where(scope.speciesInScope).toList(growable: false);
     filtered.sort((a, b) {
       final aNumber = scope.regionalNumberFor(a) ?? a.id;
       final bNumber = scope.regionalNumberFor(b) ?? b.id;
@@ -77,6 +76,15 @@ class DexRepository {
   Future<PokemonSummary> getSummary(int id) async {
     if (_summaryCache.containsKey(id)) {
       return _summaryCache[id]!;
+    }
+
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      await _activateCatalog(catalog);
+      final summary = _summaryCache[id];
+      if (summary != null) {
+        return summary;
+      }
     }
 
     if (await _offline.shouldPreferOffline()) {
@@ -228,50 +236,46 @@ class DexRepository {
       for (final entry in detail.abilitiesByGame.entries) {
         final label = gameEditionLabelForVersionGroup(entry.key);
         for (final ability in entry.value) {
-          labelsByNameEn
-              .putIfAbsent(ability.nameEn, () => [])
-              .add(label);
+          labelsByNameEn.putIfAbsent(ability.nameEn, () => []).add(label);
         }
       }
     }
 
-    return abilities.map((ability) {
-      if (ability.gameLabelsZh.isNotEmpty) {
-        return ability;
-      }
-      final labels = labelsByNameEn[ability.nameEn];
-      if (labels != null && labels.isNotEmpty) {
-        return ability.copyWith(
-          gameLabelsZh: labels.toSet().toList()..sort(),
-        );
-      }
-      return ability.copyWith(
-        gameLabelsZh: [
-          ability.isHidden
-              ? AppZh.dexAbilitySinceGen5
-              : AppZh.dexAbilityAllVersions,
-        ],
-      );
-    }).toList(growable: false);
+    return abilities
+        .map((ability) {
+          if (ability.gameLabelsZh.isNotEmpty) {
+            return ability;
+          }
+          final labels = labelsByNameEn[ability.nameEn];
+          if (labels != null && labels.isNotEmpty) {
+            return ability.copyWith(
+              gameLabelsZh: labels.toSet().toList()..sort(),
+            );
+          }
+          return ability.copyWith(
+            gameLabelsZh: [
+              ability.isHidden
+                  ? AppZh.dexAbilitySinceGen5
+                  : AppZh.dexAbilityAllVersions,
+            ],
+          );
+        })
+        .toList(growable: false);
   }
 
   Future<List<PokemonSummary>> getAllSummaries() async {
-    if (await _offline.shouldPreferOffline()) {
-      final cached = await _offline.readAllSummaries();
-      if (cached.isNotEmpty) {
-        final resolved = await Future.wait(
-          cached.map(_resolveSummarySprite),
-        );
-        _allSummaries = resolved;
-        for (final summary in resolved) {
-          _rememberSummary(summary);
-        }
-        return resolved;
-      }
+    if (_allSummaries != null) {
+      return _allSummaries!;
     }
-
     _allSummariesFuture ??= _loadAllSummaries();
     return _allSummariesFuture!;
+  }
+
+  /// Starts the complete list/filter directory before a user opens the Dex.
+  /// Once this resolves, list, search and all supported reference filters are
+  /// pure memory operations.
+  Future<void> warmUp() async {
+    await getAllSummaries();
   }
 
   Future<List<PokemonSummary>> _loadAllSummaries() async {
@@ -279,14 +283,23 @@ class DexRepository {
       return _allSummaries!;
     }
 
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      return _activateCatalog(catalog);
+    }
+
+    if (await _offline.shouldPreferOffline()) {
+      final cached = await _offline.readAllSummaries();
+      if (cached.isNotEmpty) {
+        final resolved = await Future.wait(cached.map(_resolveSummarySprite));
+        return _rememberAllSummaries(resolved);
+      }
+    }
+
     if (!_cdnSummariesUnavailable) {
       try {
         final all = await _cdn.fetchAllSummaries();
-        for (final summary in all) {
-          _rememberSummary(summary);
-        }
-        _allSummaries = all;
-        return all;
+        return _rememberAllSummaries(all);
       } catch (_) {
         _cdnSummariesUnavailable = true;
       }
@@ -294,44 +307,30 @@ class DexRepository {
 
     final summaries = <PokemonSummary>[];
 
-    for (var start = 1; start <= titodexMaxNationalDexId; start += summaryBatchSize) {
-      final end = (start + summaryBatchSize - 1).clamp(1, titodexMaxNationalDexId);
+    for (
+      var start = 1;
+      start <= titodexMaxNationalDexId;
+      start += summaryBatchSize
+    ) {
+      final end = (start + summaryBatchSize - 1).clamp(
+        1,
+        titodexMaxNationalDexId,
+      );
       summaries.addAll(await getSummaryRange(start, end));
     }
 
-    _allSummaries = summaries;
-    return summaries;
+    return _rememberAllSummaries(summaries);
   }
 
   Future<List<PokemonSummary>> getSummaryRange(int start, int end) async {
     final safeStart = start.clamp(1, titodexMaxNationalDexId);
     final safeEnd = end.clamp(safeStart, titodexMaxNationalDexId);
 
-    // Fast path: the CDN summary list covers the whole range at once.
-    if (!_cdnSummariesUnavailable) {
-      final fromCdn = await _summaryFromCdn(safeStart);
-      if (fromCdn != null) {
-        return [
-          for (var id = safeStart; id <= safeEnd; id++)
-            if (_summaryCache.containsKey(id)) _summaryCache[id]!,
-        ];
-      }
-    }
-
-    final summaries = <PokemonSummary>[];
-
-    for (var id = safeStart; id <= safeEnd; id += summaryBatchSize) {
-      final batchEnd = (id + summaryBatchSize - 1).clamp(safeStart, safeEnd);
-      final batch = await Future.wait(
-        [
-          for (var batchId = id; batchId <= batchEnd; batchId++)
-            getSummary(batchId),
-        ],
-      );
-      summaries.addAll(batch);
-    }
-
-    return summaries;
+    final all = await getAllSummaries();
+    return [
+      for (final summary in all)
+        if (summary.id >= safeStart && summary.id <= safeEnd) summary,
+    ];
   }
 
   Future<List<PokemonSummary>> search(String query) async {
@@ -363,7 +362,7 @@ class DexRepository {
       return false;
     }).toList();
 
-    return Future.wait(matches.map(_resolveSummarySprite));
+    return matches;
   }
 
   Future<List<PokemonSummary>> filterSummaries(DexFilter filter) async {
@@ -373,26 +372,26 @@ class DexRepository {
 
     if (filter.learnsMoveId != null) {
       final ids = await findPokemonWithMove(filter.learnsMoveId!);
-      return _resolveSummaries(await getSummariesForIds(ids));
+      return getSummariesForIds(ids);
     }
 
     if (filter.abilityId != null) {
-      return _resolveSummaries(await findByAbility(filter.abilityId!));
+      return findByAbility(filter.abilityId!);
     }
 
     if (filter.eggGroupSlug != null) {
-      return _resolveSummaries(await findByEggGroup(filter.eggGroupSlug!));
+      return findByEggGroup(filter.eggGroupSlug!);
     }
 
     return const [];
   }
 
-  Future<List<PokemonSummary>> _resolveSummaries(
-    List<PokemonSummary> summaries,
-  ) =>
-      Future.wait(summaries.map(_resolveSummarySprite));
-
   Future<List<int>> findPokemonWithMove(int moveId) async {
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      return catalog.moveLearners[moveId] ?? const [];
+    }
+
     final offlineIds = await _offline.findPokemonIdsWithMove(moveId);
     if (offlineIds.isNotEmpty) {
       return offlineIds;
@@ -436,9 +435,7 @@ class DexRepository {
 
   Future<PokemonSummary> _resolveSummarySprite(PokemonSummary summary) async {
     final path = summary.localSpritePath;
-    if (path != null &&
-        !path.startsWith('http') &&
-        !_isAbsolutePath(path)) {
+    if (path != null && !path.startsWith('http') && !_isAbsolutePath(path)) {
       final absolute = await _offline.absolutePathForRelative(path);
       if (absolute != null) {
         return summary.copyWith(localSpritePath: absolute);
@@ -447,8 +444,7 @@ class DexRepository {
       return summary;
     }
 
-    final fallback =
-        summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id);
+    final fallback = summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id);
     return summary.copyWith(localSpritePath: fallback);
   }
 
@@ -469,6 +465,12 @@ class DexRepository {
     final unique = ids.toSet().toList()..sort();
     if (unique.isEmpty) {
       return const [];
+    }
+    if (_allSummaries != null) {
+      return [
+        for (final id in unique)
+          if (_summaryCache[id] != null) _summaryCache[id]!,
+      ];
     }
     return Future.wait(unique.map(getSummary));
   }
@@ -500,6 +502,11 @@ class DexRepository {
   Future<Map<int, CachedMove>> _loadAllMoves() async {
     if (_allMovesCache != null) {
       return _allMovesCache!;
+    }
+    final catalog = await _loadCatalog();
+    if (catalog != null && catalog.moves.isNotEmpty) {
+      _allMovesCache = catalog.moves;
+      return catalog.moves;
     }
     final offline = await _offline.readMovesIndex();
     if (offline.isNotEmpty) {
@@ -544,6 +551,11 @@ class DexRepository {
     if (_allAbilitiesCache != null) {
       return _allAbilitiesCache!;
     }
+    final catalog = await _loadCatalog();
+    if (catalog != null && catalog.abilities.isNotEmpty) {
+      _allAbilitiesCache = catalog.abilities;
+      return catalog.abilities;
+    }
     final offline = await _offline.readAbilitiesIndex();
     if (offline.isNotEmpty) {
       _allAbilitiesCache = offline;
@@ -564,7 +576,9 @@ class DexRepository {
   }
 
   /// Reference hub entries (natures, weather, …) — local bundle first, then CDN.
-  Future<List<Map<String, dynamic>>> getReferenceEntries(String filename) async {
+  Future<List<Map<String, dynamic>>> getReferenceEntries(
+    String filename,
+  ) async {
     final offline = await _offline.readReferenceArray(filename);
     if (offline.isNotEmpty) {
       return offline;
@@ -577,6 +591,10 @@ class DexRepository {
   }
 
   Future<List<PokemonSummary>> findByAbility(int id) async {
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      return getSummariesForIds(catalog.abilityPokemonIds[id] ?? const []);
+    }
     final abilities = await _loadAllAbilities();
     final entry = abilities[id];
     if (entry == null || entry.pokemonIds.isEmpty) {
@@ -586,6 +604,10 @@ class DexRepository {
   }
 
   Future<List<PokemonSummary>> findByEggGroup(String slug) async {
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      return getSummariesForIds(catalog.eggGroups[slug] ?? const []);
+    }
     final index = await _loadEggGroupIndex();
     final ids = index[slug] ?? const [];
     if (ids.isEmpty) {
@@ -595,6 +617,10 @@ class DexRepository {
   }
 
   Future<List<PokemonSummary>> findByMove(int moveId) async {
+    final catalog = await _loadCatalog();
+    if (catalog != null) {
+      return getSummariesForIds(catalog.moveLearners[moveId] ?? const []);
+    }
     final index = await _loadMoveLearnersIndex();
     final ids = index[moveId] ?? const [];
     if (ids.isEmpty) {
@@ -604,15 +630,18 @@ class DexRepository {
   }
 
   Future<Map<String, List<int>>> _loadEggGroupIndex() {
-    return _eggGroupIndexFuture ??= _buildEggGroupIndex().catchError((Object error) {
+    return _eggGroupIndexFuture ??= _buildEggGroupIndex().catchError((
+      Object error,
+    ) {
       _eggGroupIndexFuture = null;
       throw error; // ignore: only_throw_errors
     });
   }
 
   Future<Map<int, List<int>>> _loadMoveLearnersIndex() {
-    return _moveLearnersIndexFuture ??=
-        _buildMoveLearnersIndex().catchError((Object error) {
+    return _moveLearnersIndexFuture ??= _buildMoveLearnersIndex().catchError((
+      Object error,
+    ) {
       _moveLearnersIndexFuture = null;
       throw error; // ignore: only_throw_errors
     });
@@ -627,7 +656,9 @@ class DexRepository {
     for (var start = 0; start < summaries.length; start += summaryBatchSize) {
       final end = (start + summaryBatchSize).clamp(0, summaries.length);
       final batch = summaries.sublist(start, end);
-      final details = await Future.wait(batch.map((entry) => getDetail(entry.id)));
+      final details = await Future.wait(
+        batch.map((entry) => getDetail(entry.id)),
+      );
       for (final detail in details) {
         for (final groupLabel in detail.eggGroups) {
           final slug = _eggGroupSlugForLabel(groupLabel);
@@ -654,7 +685,9 @@ class DexRepository {
     for (var start = 0; start < summaries.length; start += summaryBatchSize) {
       final end = (start + summaryBatchSize).clamp(0, summaries.length);
       final batch = summaries.sublist(start, end);
-      final details = await Future.wait(batch.map((entry) => getDetail(entry.id)));
+      final details = await Future.wait(
+        batch.map((entry) => getDetail(entry.id)),
+      );
       for (final detail in details) {
         final moveIds = <int>{};
         for (final moveSet in detail.moveSets.values) {
@@ -698,6 +731,8 @@ class DexRepository {
     _nameToIdCache.clear();
     _allSummaries = null;
     _allSummariesFuture = null;
+    _catalog = null;
+    _catalogFuture = null;
     _allMovesCache = null;
     _allMovesFuture = null;
     _allAbilitiesCache = null;
@@ -712,6 +747,57 @@ class DexRepository {
     _summaryCache[summary.id] = summary;
     _nameToIdCache[summary.nameEn.toLowerCase()] = summary.id;
     _nameToIdCache[summary.nameZh] = summary.id;
+  }
+
+  Future<DexCatalog?> _loadCatalog() {
+    if (_catalog != null) {
+      return Future.value(_catalog);
+    }
+    return _catalogFuture ??= _offline
+        .readCatalog()
+        .then((catalog) {
+          _catalog = catalog;
+          return catalog;
+        })
+        .catchError((_) {
+          // A legacy or interrupted bundle can still use the existing fallback.
+          return null;
+        });
+  }
+
+  Future<List<PokemonSummary>> _activateCatalog(DexCatalog catalog) async {
+    if (_allSummaries != null) {
+      return _allSummaries!;
+    }
+    final rootPath = await _offline.cacheRootPath();
+    final resolved = catalog.summaries
+        .map((summary) => _resolveCatalogSummarySprite(summary, rootPath))
+        .toList(growable: false);
+    return _rememberAllSummaries(resolved);
+  }
+
+  PokemonSummary _resolveCatalogSummarySprite(
+    PokemonSummary summary,
+    String rootPath,
+  ) {
+    final path = summary.localSpritePath;
+    if (path != null && !path.startsWith('http') && !_isAbsolutePath(path)) {
+      return summary.copyWith(localSpritePath: '$rootPath/$path');
+    }
+    if (path != null) {
+      return summary;
+    }
+    return summary.copyWith(
+      localSpritePath: summary.spriteUrl ?? _cdnConfig.spriteUrl(summary.id),
+    );
+  }
+
+  List<PokemonSummary> _rememberAllSummaries(List<PokemonSummary> summaries) {
+    _allSummaries = summaries;
+    for (final summary in summaries) {
+      _rememberSummary(summary);
+    }
+    return summaries;
   }
 }
 
