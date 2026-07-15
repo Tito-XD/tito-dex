@@ -45,6 +45,7 @@ class _HandheldNativeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final padding = MediaQuery.paddingOf(context);
+    final size = MediaQuery.sizeOf(context);
 
     return ColoredBox(
       color: TitoColors.deepBlue,
@@ -64,7 +65,14 @@ class _HandheldNativeShell extends StatelessWidget {
             left: padding.left,
             right: padding.right,
           ),
-          child: child,
+          // RG immersive shell strips top/bottom safe padding — without an
+          // explicit height, route ListViews see unbounded max height and
+          // behave like an infinitely growing scroll surface.
+          child: SizedBox(
+            height: size.height,
+            width: size.width - padding.left - padding.right,
+            child: child,
+          ),
         ),
       ),
     );

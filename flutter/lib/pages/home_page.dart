@@ -9,9 +9,7 @@ import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
-import '../widgets/trainer_card.dart';
-import '../widgets/journey_card.dart';
-import '../widgets/party_strip.dart';
+import '../widgets/home_dashboard_body.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -20,19 +18,17 @@ class HomePage extends StatelessWidget {
     required this.onJourneyOpen,
     this.gameBadge = 'HGSS',
     this.onGameBadgeTap,
+    this.bootstrapping = false,
   });
 
   final CurrentJourney journey;
   final VoidCallback onJourneyOpen;
   final String gameBadge;
   final void Function(BuildContext context)? onGameBadgeTap;
+  final bool bootstrapping;
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody(context);
-  }
-
-  Widget _buildBody(BuildContext context) {
     final padding = DeviceLayout.pagePadding(context);
     final saveLinked = gameEditionRepository.edition.isSaveLinked;
     final header = AppHeader(
@@ -43,23 +39,9 @@ class HomePage extends StatelessWidget {
           : () => onGameBadgeTap!(context),
     );
 
-    if (DeviceLayout.useSquareDashboard(context)) {
-      return Padding(
-        padding: padding,
-        child: Column(
-          children: [
-            header,
-            Expanded(
-              child: _SquareHomeLayout(
-                journey: journey,
-                saveLinked: saveLinked,
-                onJourneyOpen: onJourneyOpen,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    final quickActions = DeviceLayout.useSquareDashboard(context)
+        ? const _QuickActionsBar()
+        : _QuickActionsGrid(dense: DeviceLayout.isCompact(context));
 
     return Padding(
       padding: padding,
@@ -67,158 +49,16 @@ class HomePage extends StatelessWidget {
         children: [
           header,
           Expanded(
-            child: _PortraitHomeLayout(
+            child: HomeDashboardBody(
               journey: journey,
               saveLinked: saveLinked,
               onJourneyOpen: onJourneyOpen,
+              quickActions: quickActions,
+              bootstrapping: bootstrapping,
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Portrait H4 layout:
-/// trainer card -> journey card (save-linked) -> party strip -> quick actions row.
-class _PortraitHomeLayout extends StatelessWidget {
-  const _PortraitHomeLayout({
-    required this.journey,
-    required this.saveLinked,
-    required this.onJourneyOpen,
-  });
-
-  final CurrentJourney journey;
-  final bool saveLinked;
-  final VoidCallback onJourneyOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final gap = DeviceLayout.sectionSpacing(context);
-    final compact = DeviceLayout.isCompact(context);
-    final journeyHeight = compact ? 108.0 : 132.0;
-    final partyHeight = compact ? 126.0 : 154.0;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final column = Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TrainerCard(
-              journey: journey,
-              compact: true,
-              dense: true,
-            ),
-            if (saveLinked) ...[
-              SizedBox(height: gap),
-              SizedBox(
-                height: journeyHeight,
-                child: JourneyCard(
-                  journey: journey,
-                  onOpenDetail: onJourneyOpen,
-                  compact: compact,
-                ),
-              ),
-            ],
-            SizedBox(height: gap),
-            SizedBox(
-              height: partyHeight,
-              child: PartyStrip(party: journey.party, compact: compact),
-            ),
-            SizedBox(height: gap),
-            _QuickActionsGrid(dense: compact),
-          ],
-        );
-
-        return Center(
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: 520,
-                minHeight: constraints.maxHeight,
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: column,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Square / 4:3 / 3:4 handheld layout (H5):
-/// [ Trainer (+ Journey) | Party ] + square quick actions.
-class _SquareHomeLayout extends StatelessWidget {
-  const _SquareHomeLayout({
-    required this.journey,
-    required this.saveLinked,
-    required this.onJourneyOpen,
-  });
-
-  final CurrentJourney journey;
-  final bool saveLinked;
-  final VoidCallback onJourneyOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final gap = DeviceLayout.sectionSpacing(context);
-    final quickSize = DeviceLayout.squareQuickTileHeight(context);
-
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TrainerCard(
-                      journey: journey,
-                      compact: true,
-                      dense: true,
-                      micro: true,
-                    ),
-                    if (saveLinked) ...[
-                      SizedBox(height: gap),
-                      Expanded(
-                        child: JourneyCard(
-                          journey: journey,
-                          onOpenDetail: onJourneyOpen,
-                          compact: true,
-                          dense: true,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(width: gap),
-              Expanded(
-                flex: 1,
-                child: PartyStrip(
-                  party: journey.party,
-                  compact: true,
-                  square: true,
-                  listMode: true,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: gap),
-        SizedBox(
-          height: quickSize,
-          child: const _QuickActionsBar(),
-        ),
-      ],
     );
   }
 }
@@ -231,25 +71,29 @@ class _QuickActionsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = _quickActions();
     final gap = DeviceLayout.sectionSpacing(context);
+    final quickSize = DeviceLayout.squareQuickTileHeight(context);
 
-    return TitoFontScale(
-      multiplier: 2.0,
-      child: Row(
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) SizedBox(width: gap),
-            Expanded(
-              child: TitoQuickTile(
-                label: actions[index].label,
-                icon: actions[index].icon,
-                onTap: () => _openRoute(context, actions[index].route),
-                compact: true,
-                dense: true,
-                square: true,
+    return SizedBox(
+      height: quickSize,
+      child: TitoFontScale(
+        multiplier: 2.0,
+        child: Row(
+          children: [
+            for (var index = 0; index < actions.length; index++) ...[
+              if (index > 0) SizedBox(width: gap),
+              Expanded(
+                child: TitoQuickTile(
+                  label: actions[index].label,
+                  icon: actions[index].icon,
+                  onTap: () => _openRoute(context, actions[index].route),
+                  compact: true,
+                  dense: true,
+                  square: true,
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
