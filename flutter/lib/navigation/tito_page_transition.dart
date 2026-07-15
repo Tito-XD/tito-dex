@@ -25,8 +25,10 @@ abstract final class TitoHomeActionHero {
 /// A Material page lets Android provide the standard route transition.
 ///
 /// [heroTag] is used only when one of the three home quick-action cards opens
-/// its matching first-level page. The destination page then expands from that
-/// card; nested routes and all other navigation remain platform-standard.
+/// its matching first-level page. The Hero animates a lightweight page surface,
+/// rather than moving the destination page itself into the Hero overlay. This
+/// keeps stateful Team and Search content mounted while the card expands and
+/// contracts during Android Back.
 Page<T> titoMaterialPage<T>({
   required LocalKey key,
   required Widget child,
@@ -34,7 +36,44 @@ Page<T> titoMaterialPage<T>({
 }) {
   return MaterialPage<T>(
     key: key,
-    child: heroTag == null ? child : Hero(tag: heroTag, child: child),
+    child: heroTag == null
+        ? child
+        : Stack(
+            fit: StackFit.expand,
+            children: [
+              child,
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Hero(
+                    tag: heroTag,
+                    flightShuttleBuilder: _homeActionFlightShuttle,
+                    // The destination anchor is transparent at rest. Its
+                    // visual surface exists only while Hero owns the flight.
+                    child: const SizedBox.expand(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+  );
+}
+
+Widget _homeActionFlightShuttle(
+  BuildContext flightContext,
+  Animation<double> animation,
+  HeroFlightDirection flightDirection,
+  BuildContext fromHeroContext,
+  BuildContext toHeroContext,
+) {
+  return const DecoratedBox(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [TitoColors.skyBlue, TitoColors.slateBlue],
+      ),
+    ),
+    child: SizedBox.expand(),
   );
 }
 
