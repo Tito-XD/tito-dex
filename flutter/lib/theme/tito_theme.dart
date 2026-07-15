@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../navigation/tito_page_transition.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 
@@ -34,10 +33,7 @@ ThemeData buildTitoTheme() {
     titleSmall: baseStyle(fontSize: 16, fontWeight: FontWeight.w700),
     bodyLarge: baseStyle(fontSize: 16),
     bodyMedium: baseStyle(fontSize: 14),
-    bodySmall: baseStyle(
-      fontSize: 12,
-      color: TitoColors.mutedInk,
-    ),
+    bodySmall: baseStyle(fontSize: 12, color: TitoColors.mutedInk),
     labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w800),
     labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w700),
     labelSmall: baseStyle(
@@ -57,19 +53,14 @@ ThemeData buildTitoTheme() {
     textTheme: textTheme,
   );
 
-  const slideTransitions = PageTransitionsTheme(
-    builders: {
-      TargetPlatform.android: _TitoSlidePageTransitionsBuilder(),
-      TargetPlatform.iOS: _TitoSlidePageTransitionsBuilder(),
-      TargetPlatform.linux: _TitoSlidePageTransitionsBuilder(),
-      TargetPlatform.macOS: _TitoSlidePageTransitionsBuilder(),
-      TargetPlatform.windows: _TitoSlidePageTransitionsBuilder(),
-      TargetPlatform.fuchsia: _TitoSlidePageTransitionsBuilder(),
-    },
+  const androidTransitions = PageTransitionsTheme(
+    builders: {TargetPlatform.android: PredictiveBackPageTransitionsBuilder()},
   );
 
   return base.copyWith(
-    pageTransitionsTheme: slideTransitions,
+    // Android's Material route transition, including predictive-back progress.
+    // Other platforms keep Flutter's own platform defaults.
+    pageTransitionsTheme: androidTransitions,
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: TitoColors.card,
       modalBarrierColor: Color(0x73221F26),
@@ -91,7 +82,9 @@ ThemeData buildTitoTheme() {
       titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
     ),
     listTileTheme: ListTileThemeData(
-      titleTextStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+      titleTextStyle: textTheme.bodyMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
       subtitleTextStyle: textTheme.bodySmall,
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
@@ -167,24 +160,4 @@ ThemeData buildTitoTheme() {
       ),
     ),
   );
-}
-
-class _TitoSlidePageTransitionsBuilder extends PageTransitionsBuilder {
-  const _TitoSlidePageTransitionsBuilder();
-
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    return titoSlideTransitionBuilder(
-      context,
-      animation,
-      secondaryAnimation,
-      child,
-    );
-  }
 }

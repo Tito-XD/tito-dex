@@ -122,8 +122,9 @@ class _DexPageState extends State<DexPage> {
 
     setState(() => _loadingReferenceFilter = true);
     try {
-      final entries =
-          await dexRepository.filterSummaries(dexFilterController.currentFilter);
+      final entries = await dexRepository.filterSummaries(
+        dexFilterController.currentFilter,
+      );
       if (!mounted) {
         return;
       }
@@ -175,14 +176,16 @@ class _DexPageState extends State<DexPage> {
   Set<int> _resolveJourneyIds() {
     final ids = <int>{};
     for (final member in widget.journey.party) {
-      final id = member.speciesId ??
+      final id =
+          member.speciesId ??
           speciesIdForName(member.species) ??
           knownSpeciesIdForLabel(member.species);
       if (id != null) {
         ids.add(id);
       }
     }
-    final companionId = speciesIdForName(widget.journey.companion) ??
+    final companionId =
+        speciesIdForName(widget.journey.companion) ??
         knownSpeciesIdForLabel(widget.journey.companion);
     if (companionId != null) {
       ids.add(companionId);
@@ -203,9 +206,9 @@ class _DexPageState extends State<DexPage> {
         if (!seenIds.contains(id)) {
           seenIds = [...seenIds, id];
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.dexManualMarkSeen)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(AppZh.dexManualMarkSeen)));
       case DexEncounterStatus.seen:
         if (!caughtIds.contains(id)) {
           caughtIds = [...caughtIds, id];
@@ -216,9 +219,9 @@ class _DexPageState extends State<DexPage> {
       case DexEncounterStatus.caught:
         seenIds = seenIds.where((value) => value != id).toList();
         caughtIds = caughtIds.where((value) => value != id).toList();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.dexManualMarkClear)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text(AppZh.dexManualMarkClear)));
     }
 
     final updated = widget.journey.copyWith(
@@ -227,10 +230,7 @@ class _DexPageState extends State<DexPage> {
     );
     widget.onManualDexMarkChanged!(updated);
     setState(() {
-      _progress = dexRepository.progressFor(
-        updated,
-        manualDexMarks: true,
-      );
+      _progress = dexRepository.progressFor(updated, manualDexMarks: true);
     });
   }
 
@@ -240,8 +240,10 @@ class _DexPageState extends State<DexPage> {
         return;
       }
       setState(() {
-        _filterVisibleCount = (_filterVisibleCount + _chunkSize)
-            .clamp(0, _referenceFilteredSummaries.length);
+        _filterVisibleCount = (_filterVisibleCount + _chunkSize).clamp(
+          0,
+          _referenceFilteredSummaries.length,
+        );
       });
       return;
     }
@@ -256,7 +258,10 @@ class _DexPageState extends State<DexPage> {
     setState(() => _loadingChunk = true);
     try {
       final start = _loadedThrough + 1;
-      final end = (_loadedThrough + _chunkSize).clamp(1, titodexMaxNationalDexId);
+      final end = (_loadedThrough + _chunkSize).clamp(
+        1,
+        titodexMaxNationalDexId,
+      );
       final chunk = await dexRepository.getSummaryRange(start, end);
       if (!mounted) {
         return;
@@ -420,8 +425,9 @@ class _DexPageState extends State<DexPage> {
         _region == DexRegionalPokedex.kanto) {
       return _progress.statsFor(legacyScope);
     }
-    final visible = _summaries
-        .where((entry) => summaryMatchesRegionalPokedex(entry, _region));
+    final visible = _summaries.where(
+      (entry) => summaryMatchesRegionalPokedex(entry, _region),
+    );
     var caught = 0;
     var seenOnly = 0;
     for (final entry in visible) {
@@ -460,11 +466,13 @@ class _DexPageState extends State<DexPage> {
     if (!dexFilterController.hasActiveFilter) {
       return 0;
     }
-    return dexRepository.filterByEncounter(
-      _referenceFilteredSummaries,
-      _progress,
-      _encounterFilter,
-    ).length;
+    return dexRepository
+        .filterByEncounter(
+          _referenceFilteredSummaries,
+          _progress,
+          _encounterFilter,
+        )
+        .length;
   }
 
   /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
@@ -494,8 +502,8 @@ class _DexPageState extends State<DexPage> {
     final loading = dexFilterController.hasActiveFilter
         ? _loadingReferenceFilter
         : _mode == _DexMode.national
-            ? (_loadingChunk || _loadingRegion)
-            : _loadingJourney;
+        ? (_loadingChunk || _loadingRegion)
+        : _loadingJourney;
     final padding = DeviceLayout.pagePadding(context);
 
     return TitoFontScale(
@@ -503,7 +511,7 @@ class _DexPageState extends State<DexPage> {
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification.metrics.pixels >=
-                  notification.metrics.maxScrollExtent - 240) {
+              notification.metrics.maxScrollExtent - 240) {
             _loadMoreVisible();
           }
           return false;
@@ -555,7 +563,7 @@ class _DexPageState extends State<DexPage> {
                     onModeSelected: _setMode,
                     onNationalRegionPicker: _onNationalTabTap,
                   ),
-                  // v0.4.1: AnimatedSize encounter filter (experimental)
+                  // Keyed encounter-filter swap without a custom transition.
                   TitoAnimatedSizeSwitcher(
                     switchKey: ValueKey<bool>(_mode == _DexMode.national),
                     child: _mode == _DexMode.national
@@ -627,12 +635,7 @@ class _DexPageState extends State<DexPage> {
             ),
             if (visible.isNotEmpty && _error == null)
               SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  padding.left,
-                  0,
-                  padding.right,
-                  0,
-                ),
+                padding: EdgeInsets.fromLTRB(padding.left, 0, padding.right, 0),
                 sliver: SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: columns,
@@ -640,24 +643,18 @@ class _DexPageState extends State<DexPage> {
                     crossAxisSpacing: 6,
                     childAspectRatio: aspectRatio,
                   ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final entry = visible[index];
-                      final status = dexRepository.statusFor(
-                        entry.id,
-                        _progress,
-                      );
-                      return PokemonMiniCard(
-                        summary: entry,
-                        status: status,
-                        compact: DeviceLayout.isCompact(context),
-                        onLongPress: _isSaveLinked
-                            ? null
-                            : () => _cycleManualMark(entry.id, status),
-                      );
-                    },
-                    childCount: visible.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final entry = visible[index];
+                    final status = dexRepository.statusFor(entry.id, _progress);
+                    return PokemonMiniCard(
+                      summary: entry,
+                      status: status,
+                      compact: DeviceLayout.isCompact(context),
+                      onLongPress: _isSaveLinked
+                          ? null
+                          : () => _cycleManualMark(entry.id, status),
+                    );
+                  }, childCount: visible.length),
                 ),
               ),
             if (_mode == _DexMode.national &&
@@ -793,10 +790,7 @@ class _DexTopBar extends StatelessWidget {
                 style: SecondaryTypography.onGradient.title.copyWith(
                   letterSpacing: -0.5,
                   shadows: const [
-                    Shadow(
-                      color: Color(0x4018283B),
-                      offset: Offset(0, 2),
-                    ),
+                    Shadow(color: Color(0x4018283B), offset: Offset(0, 2)),
                   ],
                 ),
               ),
@@ -812,9 +806,14 @@ class _DexTopBar extends StatelessWidget {
               onTap: onSearch,
               borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+                  borderRadius: BorderRadius.circular(
+                    DeviceLayout.rMd(context),
+                  ),
                   border: Border.all(color: TitoColors.card, width: 2),
                 ),
                 child: Row(
@@ -851,7 +850,9 @@ class _DexTopBar extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+                  borderRadius: BorderRadius.circular(
+                    DeviceLayout.rMd(context),
+                  ),
                   border: Border.all(color: TitoColors.card, width: 2),
                 ),
                 child: Text(
@@ -995,67 +996,67 @@ class _DexModeTab extends StatelessWidget {
       onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
       borderRadius: BorderRadius.circular(radius),
       child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: openPicker ? onRegionPickerTap : onTap,
-        canRequestFocus: false,
-        borderRadius: BorderRadius.circular(radius),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: selected ? TitoColors.softYellow : TitoColors.card,
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: TitoColors.ink, width: 2),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: square ? 5 : 8,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: openPicker ? onRegionPickerTap : onTap,
+          canRequestFocus: false,
+          borderRadius: BorderRadius.circular(radius),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: selected ? TitoColors.softYellow : TitoColors.card,
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(color: TitoColors.ink, width: 2),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: square ? 5 : 8,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                  ),
-                  if (openPicker)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 2),
-                      child: Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: 18,
-                        color: TitoColors.ink,
+                    if (openPicker)
+                      const Padding(
+                        padding: EdgeInsets.only(right: 2),
+                        child: Icon(
+                          Icons.arrow_drop_down_rounded,
+                          size: 18,
+                          color: TitoColors.ink,
+                        ),
+                      ),
+                    Text(
+                      '$count',
+                      style: SecondaryTypography.onCard.meta14.copyWith(
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                  Text(
-                    '$count',
-                    style: SecondaryTypography.onCard.meta14.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SecondaryTypography.onCard.meta14.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: TitoColors.mutedInk,
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: SecondaryTypography.onCard.meta14.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

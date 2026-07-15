@@ -5,6 +5,7 @@ import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
+import '../navigation/tito_page_transition.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_font_scale.dart';
@@ -82,13 +83,16 @@ class _QuickActionsBar extends StatelessWidget {
             for (var index = 0; index < actions.length; index++) ...[
               if (index > 0) SizedBox(width: gap),
               Expanded(
-                child: TitoQuickTile(
-                  label: actions[index].label,
-                  icon: actions[index].icon,
-                  onTap: () => _openRoute(context, actions[index].route),
-                  compact: true,
-                  dense: true,
-                  square: true,
+                child: Hero(
+                  tag: actions[index].heroTag,
+                  child: TitoQuickTile(
+                    label: actions[index].label,
+                    icon: actions[index].icon,
+                    onTap: () => _openRoute(context, actions[index]),
+                    compact: true,
+                    dense: true,
+                    square: true,
+                  ),
                 ),
               ),
             ],
@@ -99,8 +103,8 @@ class _QuickActionsBar extends StatelessWidget {
   }
 }
 
-void _openRoute(BuildContext context, String route) {
-  context.push(route);
+void _openRoute(BuildContext context, _QuickAction action) {
+  context.push(action.route, extra: action.heroTag);
 }
 
 class _QuickActionsGrid extends StatelessWidget {
@@ -118,12 +122,15 @@ class _QuickActionsGrid extends StatelessWidget {
         for (var index = 0; index < actions.length; index++) ...[
           if (index > 0) SizedBox(width: gap),
           Expanded(
-            child: TitoQuickTile(
-              label: actions[index].label,
-              icon: actions[index].icon,
-              onTap: () => _openRoute(context, actions[index].route),
-              compact: true,
-              dense: dense,
+            child: Hero(
+              tag: actions[index].heroTag,
+              child: TitoQuickTile(
+                label: actions[index].label,
+                icon: actions[index].icon,
+                onTap: () => _openRoute(context, actions[index]),
+                compact: true,
+                dense: dense,
+              ),
             ),
           ),
         ],
@@ -138,18 +145,21 @@ List<_QuickAction> _quickActions() {
       label: AppZh.navTeam,
       icon: Icons.groups_rounded,
       route: '/team',
+      heroTag: TitoHomeActionHero.team,
       tone: TitoPolaroidTone.blue,
     ),
     _QuickAction(
       label: AppZh.navDex,
       icon: Icons.grid_view_rounded,
       route: '/dex',
+      heroTag: TitoHomeActionHero.dex,
       tone: TitoPolaroidTone.coral,
     ),
     _QuickAction(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       route: '/search',
+      heroTag: TitoHomeActionHero.search,
       tone: TitoPolaroidTone.mint,
     ),
   ];
@@ -160,11 +170,13 @@ class _QuickAction {
     required this.label,
     required this.icon,
     required this.route,
+    required this.heroTag,
     required this.tone,
   });
 
   final String label;
   final IconData icon;
   final String route;
+  final String heroTag;
   final TitoPolaroidTone tone;
 }

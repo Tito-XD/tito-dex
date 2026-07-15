@@ -50,7 +50,13 @@ required=(
 listing=$(unzip -l "$APK")
 unexpected_runtime_libs=$(
   echo "$listing" |
-    awk '$4 ~ /^lib\/[^/]+\/(libapp|libflutter)\.so$/ && $4 !~ /^lib\/arm64-v8a\// {print $4}'
+    awk '{
+      split($4, path, "/")
+      if (path[1] == "lib" && path[2] != "arm64-v8a" &&
+          (path[3] == "libapp.so" || path[3] == "libflutter.so")) {
+        print $4
+      }
+    }'
 )
 if [[ -n "$unexpected_runtime_libs" ]]; then
   echo "ERROR: Flutter runtime was built for non-arm64 ABIs:" >&2

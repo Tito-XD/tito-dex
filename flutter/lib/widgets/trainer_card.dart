@@ -9,13 +9,6 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
 
-/// Shared [Hero] tags for bootstrap → home trainer card continuity.
-abstract final class TrainerCardHero {
-  static const avatar = 'trainer-card-avatar';
-  static const greeting = 'trainer-card-greeting';
-  static const name = 'trainer-card-name';
-}
-
 enum TrainerCardDensity { standard, dense, micro }
 
 class TrainerCard extends StatelessWidget {
@@ -26,7 +19,6 @@ class TrainerCard extends StatelessWidget {
     this.dense = false,
     this.micro = false,
     this.onAvatarTap,
-    this.useHero = false,
     this.avatarPlaceholder = false,
   });
 
@@ -35,7 +27,6 @@ class TrainerCard extends StatelessWidget {
   final bool dense;
   final bool micro;
   final VoidCallback? onAvatarTap;
-  final bool useHero;
   final bool avatarPlaceholder;
 
   TrainerCardDensity get _density {
@@ -59,7 +50,6 @@ class TrainerCard extends StatelessWidget {
         child: _TrainerCardBody(
           journey: journey,
           metrics: metrics,
-          useHero: useHero,
           avatarPlaceholder: avatarPlaceholder,
           onAvatarTap: onAvatarTap,
         ),
@@ -127,14 +117,12 @@ class _TrainerCardBody extends StatelessWidget {
   const _TrainerCardBody({
     required this.journey,
     required this.metrics,
-    required this.useHero,
     required this.avatarPlaceholder,
     this.onAvatarTap,
   });
 
   final CurrentJourney journey;
   final _TrainerCardMetrics metrics;
-  final bool useHero;
   final bool avatarPlaceholder;
   final VoidCallback? onAvatarTap;
 
@@ -155,35 +143,23 @@ class _TrainerCardBody extends StatelessWidget {
         ? journey.trainerName
         : 'Tito';
 
-    Widget avatar = _TrainerAvatar(
+    final avatar = _TrainerAvatar(
       journey: journey,
       size: metrics.avatarSize,
       placeholder: avatarPlaceholder,
     );
-    if (useHero) {
-      avatar = Hero(tag: TrainerCardHero.avatar, child: avatar);
-    }
-
-    Widget greeting = Text(
+    final greeting = Text(
       AppZh.timeGreeting(DateTime.now()),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: greetingStyle,
     );
-    if (useHero) {
-      greeting = Hero(tag: TrainerCardHero.greeting, child: greeting);
-    }
-
-    Widget nameLine = Text(
+    final nameLine = Text(
       AppZh.trainerNameLine(trainerName),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: nameStyle,
     );
-    if (useHero) {
-      nameLine = Hero(tag: TrainerCardHero.name, child: nameLine);
-    }
-
     final textColumn = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,

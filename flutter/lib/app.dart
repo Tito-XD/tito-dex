@@ -101,7 +101,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
           routes: [
             GoRoute(
               path: '/',
-              pageBuilder: (context, state) => titoHomePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: ListenableBuilder(
@@ -123,8 +123,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/team',
-              pageBuilder: (context, state) => titoSlidePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
+                heroTag: TitoHomeActionHero.forRoute('/team', state.extra),
                 child: TitoPageContainer(
                   child: TeamPage(journey: _journey, onSaveJourney: _persist),
                 ),
@@ -132,7 +133,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/journey',
-              pageBuilder: (context, state) => titoSlidePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: JourneyPage(
@@ -144,8 +145,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/dex',
-              pageBuilder: (context, state) => titoSlidePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
+                heroTag: TitoHomeActionHero.forRoute('/dex', state.extra),
                 child: TitoPageContainer(
                   child: DexPage(
                     journey: _journey,
@@ -156,7 +158,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
               routes: [
                 GoRoute(
                   path: 'moves',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: const TitoPageContainer(
                       child: MoveEncyclopediaPage(),
@@ -165,7 +167,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: 'abilities',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: const TitoPageContainer(
                       child: AbilityEncyclopediaPage(),
@@ -174,7 +176,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: ':id',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: PokemonDetailPage(
@@ -188,14 +190,15 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/search',
-              pageBuilder: (context, state) => titoSlidePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
+                heroTag: TitoHomeActionHero.forRoute('/search', state.extra),
                 child: TitoPageContainer(child: SearchPage(journey: _journey)),
               ),
               routes: [
                 GoRoute(
                   path: 'companion/type-matchup',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: TypeMatchupPage(journey: _journey),
@@ -204,7 +207,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: 'companion/stat-calc',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: StatCalcPage(journey: _journey),
@@ -213,7 +216,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: 'companion/blind-spot',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: BlindSpotPage(journey: _journey),
@@ -222,7 +225,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: 'companion/quick-damage',
-                  pageBuilder: (context, state) => titoSlidePage(
+                  pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
                       child: QuickDamagePage(journey: _journey),
@@ -234,7 +237,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   pageBuilder: (context, state) {
                     final extra = state.extra;
                     final map = extra is Map<String, String> ? extra : const {};
-                    return titoSlidePage(
+                    return titoMaterialPage(
                       key: state.pageKey,
                       child: TitoPageContainer(
                         child: DexJsonReferencePage(
@@ -249,7 +252,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
             ),
             GoRoute(
               path: '/settings',
-              pageBuilder: (context, state) => titoSlidePage(
+              pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: SettingsPage(

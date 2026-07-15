@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_zh.dart';
-import '../navigation/tito_page_transition.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'sticker_card.dart';
@@ -44,19 +43,13 @@ class TitoLoadingPanel extends StatelessWidget {
           if (showSkeleton) ...[
             const TitoSkeletonBox(height: 14, width: 120),
             const SizedBox(height: 10),
-            TitoSkeletonBox(
-              height: compact ? 72 : 96,
-              width: double.infinity,
-            ),
+            TitoSkeletonBox(height: compact ? 72 : 96, width: double.infinity),
             const SizedBox(height: 10),
             const TitoSkeletonBox(height: 12, width: 180),
             SizedBox(height: compact ? 14 : 18),
           ],
           if (progress != null)
-            TitoProgressBar(
-              value: progress!.clamp(0.0, 1.0),
-              height: 6,
-            )
+            TitoProgressBar(value: progress!.clamp(0.0, 1.0), height: 6)
           else
             const Center(
               child: SizedBox(
@@ -74,7 +67,7 @@ class TitoLoadingPanel extends StatelessWidget {
   }
 }
 
-/// Dims [child] and shows a slim top progress bar while [loading].
+/// Replaces [child] with loading content without an app-defined transition.
 class TitoLoadingScope extends StatelessWidget {
   const TitoLoadingScope({
     super.key,
@@ -91,62 +84,22 @@ class TitoLoadingScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: TitoMotion.tabFadeDuration,
-      switchInCurve: TitoMotion.standardCurve,
-      switchOutCurve: TitoMotion.standardCurve,
-      child: loading
-          ? (loadingChild ??
-              KeyedSubtree(
-                key: const ValueKey('loading'),
-                child: TitoLoadingPanel(progress: progress),
-              ))
-          : KeyedSubtree(
-              key: const ValueKey('content'),
-              child: child,
-            ),
-    );
+    return loading
+        ? (loadingChild ?? TitoLoadingPanel(progress: progress))
+        : child;
   }
 }
 
-/// Indeterminate bootstrap progress under the home trainer card.
-class TitoBootstrapProgress extends StatefulWidget {
+/// Static bootstrap progress under the home trainer card.
+class TitoBootstrapProgress extends StatelessWidget {
   const TitoBootstrapProgress({super.key});
 
   @override
-  State<TitoBootstrapProgress> createState() => _TitoBootstrapProgressState();
-}
-
-class _TitoBootstrapProgressState extends State<TitoBootstrapProgress>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pulse.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _pulse,
-      builder: (context, child) {
-        return TitoProgressBar(
-          value: 0.35 + _pulse.value * 0.45,
-          label: AppZh.bootstrapLoading,
-          height: 6,
-        );
-      },
+    return const TitoProgressBar(
+      value: 0.5,
+      label: AppZh.bootstrapLoading,
+      height: 6,
     );
   }
 }
