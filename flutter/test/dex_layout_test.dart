@@ -63,7 +63,7 @@ void main() {
             builder: (context) {
               final columns = DeviceLayout.dexGridColumns(context);
               final ratio = DeviceLayout.dexCardAspectRatio(context);
-              expect(columns, 3);
+              expect(columns, 4);
               return GridView.count(
                 crossAxisCount: columns,
                 mainAxisSpacing: 6,

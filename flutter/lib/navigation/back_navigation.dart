@@ -10,7 +10,7 @@ abstract final class TitoBackNavigation {
   /// Whether the platform back gesture/button may pop without custom handling.
   static bool canPopRoute(BuildContext context, String path) {
     if (isHome(path)) {
-      return true;
+      return false;
     }
     return GoRouter.of(context).canPop();
   }

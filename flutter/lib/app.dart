@@ -36,7 +36,6 @@ import 'pages/dex/dex_json_reference_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
-import 'theme/tito_colors.dart';
 import 'theme/tito_theme.dart';
 import 'theme/tito_typography.dart';
 import 'widgets/continue_emulator_sheet.dart';
@@ -63,7 +62,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   CurrentJourney _journey = CurrentJourney.mock();
   SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
   EmulatorAppChoice? _emulatorChoice;
-  bool _ready = false;
+  bool _bootstrapComplete = false;
 
   @override
   void initState() {
@@ -71,7 +70,16 @@ class _TitoDexAppState extends State<TitoDexApp> {
     ZhCatalog.instance.ensureLoaded();
     AppConfig.instance.ensureLoaded();
     _router = GoRouter(
-      refreshListenable: gameEditionRepository,
+      refreshListenable: Listenable.merge([
+        gameEditionRepository,
+        _BootstrapGate.instance,
+      ]),
+      redirect: (context, state) {
+        if (!_bootstrapComplete && state.uri.path != '/') {
+          return '/';
+        }
+        return null;
+      },
       routes: [
         ShellRoute(
           builder: (context, state, child) {
@@ -105,6 +113,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                           gameEditionRepository.edition,
                         ),
                         onGameBadgeTap: _onGameBadgeTap,
+                        bootstrapping: !_bootstrapComplete,
                       );
                     },
                   ),
@@ -277,15 +286,26 @@ class _TitoDexAppState extends State<TitoDexApp> {
   Future<void> _bootstrap() async {
     await gameEditionRepository.load();
     var journey = await _repository.load();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _journey = journey);
+
     if (journey.game == 'SoulSilver' && journey.companion == 'Riolu') {
       journey = journey.copyWith(companion: 'Cyndaquil');
       await _repository.save(journey);
+      if (mounted) {
+        setState(() => _journey = journey);
+      }
     }
     if (gameEditionRepository.edition.isSaveLinked) {
       final syncResult = await _saveSync.syncOnStartup(existing: journey);
       if (syncResult.updated) {
         journey = syncResult.journey;
         await _repository.save(journey);
+        if (mounted) {
+          setState(() => _journey = journey);
+        }
       }
     }
     final saveConfig = await _saveSync.loadConfig();
@@ -297,8 +317,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
       _journey = journey;
       _saveConfig = saveConfig;
       _emulatorChoice = emulatorChoice;
-      _ready = true;
+      _bootstrapComplete = true;
     });
+    _BootstrapGate.instance.markReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkOfflineDataPrompts();
     });
@@ -560,19 +581,6 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_ready) {
-      return MaterialApp(
-        theme: buildTitoTheme(),
-        home: const TitoPageContainer(
-          child: DeviceShell(
-            child: Center(
-              child: _BootstrapLoading(),
-            ),
-          ),
-        ),
-      );
-    }
-
     return MaterialApp.router(
       title: AppZh.displayTitleForTrainer(_journey.trainerName),
       theme: buildTitoTheme(),
@@ -591,25 +599,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 }
 
-class _BootstrapLoading extends StatelessWidget {
-  const _BootstrapLoading();
+/// Notifies [GoRouter] when bootstrap completes so redirects unlock.
+final class _BootstrapGate extends ChangeNotifier {
+  _BootstrapGate._();
+  static final instance = _BootstrapGate._();
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          AppZh.appTitle,
-          style: TitoTypography.style(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: TitoColors.card,
-          ),
-        ),
-        const SizedBox(height: 16),
-        const CircularProgressIndicator(color: TitoColors.card),
-      ],
-    );
-  }
+  void markReady() => notifyListeners();
 }

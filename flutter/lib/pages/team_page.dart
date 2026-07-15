@@ -10,6 +10,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
+import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -92,70 +93,176 @@ class _TeamPageState extends State<TeamPage> {
     final nicknameController = TextEditingController(
       text: member.nickname ?? '',
     );
+    var selectedTypes = List<String>.from(
+      member.types.isNotEmpty ? member.types : const <String>[],
+    );
+    String? selectedAbility = member.abilitySlug;
+    List<PokemonAbility> abilities = const [];
+    if (member.speciesId != null) {
+      try {
+        final summary = await dexRepository.getSummary(member.speciesId!);
+        if (selectedTypes.isEmpty) {
+          selectedTypes = List<String>.from(summary.types);
+        }
+        abilities = await dexRepository.abilitiesForPokemon(member.speciesId!);
+        selectedAbility ??= defaultAbilitySlugForOptions(
+          defensiveAbilityOptionsFrom(abilities),
+        );
+      } catch (_) {
+        // Keep manual edits when dex data is unavailable.
+      }
+    }
+    if (!mounted) {
+      return;
+    }
 
-    final saved = await showModalBottomSheet<bool>(
+    final abilityOptions = defensiveAbilityOptionsFrom(abilities);
+    final editResult = await showModalBottomSheet<_TeamEditResult>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 8,
-            bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.teamEditTitle,
-                style: SecondaryTypography.onCard.h15,
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 8,
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: levelController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: AppZh.teamEditLevel,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      AppZh.teamEditTitle,
+                      style: SecondaryTypography.onCard.h15,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: levelController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: const InputDecoration(
+                        labelText: AppZh.teamEditLevel,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: nicknameController,
+                      decoration: const InputDecoration(
+                        labelText: AppZh.teamEditNickname,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TypeChipPicker(
+                      label: AppZh.teamEditTypes,
+                      selected: selectedTypes,
+                      onChanged: (types) =>
+                          setSheetState(() => selectedTypes = types),
+                    ),
+                    if (abilityOptions.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      AbilityChipPicker(
+                        label: AppZh.teamEditAbility,
+                        selectedSlug: selectedAbility,
+                        options: abilityOptions,
+                        onChanged: (slug) =>
+                            setSheetState(() => selectedAbility = slug),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        if (index > 0)
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(
+                                context,
+                                _TeamEditResult.swapPrev,
+                              ),
+                              child: const Text(AppZh.teamEditSwapPrev),
+                            ),
+                          ),
+                        if (index > 0 && index < _party.length - 1)
+                          const SizedBox(width: 8),
+                        if (index < _party.length - 1)
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(
+                                context,
+                                _TeamEditResult.swapNext,
+                              ),
+                              child: const Text(AppZh.teamEditSwapNext),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: () =>
+                          Navigator.pop(context, _TeamEditResult.delete),
+                      child: const Text(AppZh.teamEditDelete),
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      onPressed: () =>
+                          Navigator.pop(context, _TeamEditResult.save),
+                      child: const Text(AppZh.confirm),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: nicknameController,
-                decoration: const InputDecoration(
-                  labelText: AppZh.teamEditNickname,
-                ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(AppZh.confirm),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
-
-    if (saved != true) {
-      levelController.dispose();
-      nicknameController.dispose();
-      return;
-    }
 
     final level = int.tryParse(levelController.text.trim());
     final nickname = nicknameController.text.trim();
     levelController.dispose();
     nicknameController.dispose();
 
+    if (!mounted || editResult == null) {
+      return;
+    }
+
+    if (editResult == _TeamEditResult.delete) {
+      final updated = List<PartyMember>.from(_party)..removeAt(index);
+      _saveParty(updated);
+      return;
+    }
+
+    if (editResult == _TeamEditResult.swapPrev && index > 0) {
+      final updated = List<PartyMember>.from(_party);
+      final temp = updated[index - 1];
+      updated[index - 1] = updated[index];
+      updated[index] = temp;
+      _saveParty(updated);
+      return;
+    }
+
+    if (editResult == _TeamEditResult.swapNext && index < _party.length - 1) {
+      final updated = List<PartyMember>.from(_party);
+      final temp = updated[index + 1];
+      updated[index + 1] = updated[index];
+      updated[index] = temp;
+      _saveParty(updated);
+      return;
+    }
+
     final updated = List<PartyMember>.from(_party);
     updated[index] = member.copyWith(
       level: level,
       nickname: nickname.isEmpty ? null : nickname,
+      types: selectedTypes,
+      abilitySlug: selectedAbility,
       userEdited: true,
+      clearNickname: nickname.isEmpty,
+      clearAbilitySlug: selectedAbility == null,
     );
     _saveParty(updated);
   }
@@ -226,6 +333,12 @@ class _TeamPageState extends State<TeamPage> {
         speciesId: summary.id,
         level: 5,
         nickname: summary.nameZh,
+        types: summary.types,
+        abilitySlug: defaultAbilitySlugForOptions(
+          defensiveAbilityOptionsFrom(
+            await dexRepository.abilitiesForPokemon(summary.id),
+          ),
+        ),
         userEdited: true,
       );
       _saveParty([..._party, member]);
@@ -357,3 +470,5 @@ class _TeamPageState extends State<TeamPage> {
     );
   }
 }
+
+enum _TeamEditResult { save, delete, swapPrev, swapNext }

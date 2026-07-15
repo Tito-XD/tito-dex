@@ -248,28 +248,22 @@ abstract final class DeviceLayout {
     return dim(context, raw);
   }
 
-  static double dexBackControlSize(BuildContext context) {
-    final raw = useSquareDashboard(context)
-        ? 56.0
-        : (isCompact(context) ? 48.0 : 40.0);
-    return dim(context, raw);
-  }
+  static double dexBackControlSize(BuildContext context) => dim(context, 40.0);
 
-  static double dexBackIconSize(BuildContext context) {
-    final raw = useSquareDashboard(context)
-        ? 72.0
-        : (isCompact(context) ? 64.0 : 56.0);
-    return dim(context, raw);
-  }
+  static double dexBackIconSize(BuildContext context) => dim(context, 40.0);
 
-  /// Back arrow — larger touch target, independent of title font size.
+  /// Back arrow — unified size across secondary/detail pages.
   static double backIconSize(BuildContext context) => dexBackIconSize(context);
 
   static double trainerMicroCardHeight(BuildContext context) =>
       dim(context, 116.0);
 
   static double trainerDenseCardHeight(BuildContext context) =>
-      dim(context, 168.0);
+      dim(context, 200.0);
+
+  /// Square-dashboard trainer card — same 5-row grid + height as portrait dense.
+  static double trainerSquareCardHeight(BuildContext context) =>
+      trainerDenseCardHeight(context);
 
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);
@@ -289,17 +283,11 @@ abstract final class DeviceLayout {
       dim(context, compact ? 18.0 : 16.0);
 
   static int dexGridColumns(BuildContext context) {
-    final size = sizeOf(context);
-    if (useSquareDashboard(context)) {
-      return size.width >= 560 ? 4 : 3;
+    final width = sizeOf(context).width;
+    if (width >= 1440) {
+      return 8;
     }
-    if (size.width >= 680 || (size.width > size.height && size.width >= 520)) {
-      return 4;
-    }
-    if (size.width >= 390) {
-      return 3;
-    }
-    return 2;
+    return 4;
   }
 
   static double dexCardAspectRatio(BuildContext context) {

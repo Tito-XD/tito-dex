@@ -7,6 +7,8 @@ class PartyMember {
     this.currentHp,
     this.maxHp,
     this.experience,
+    this.types = const [],
+    this.abilitySlug,
     this.userEdited = false,
   });
 
@@ -17,6 +19,8 @@ class PartyMember {
   final int? currentHp;
   final int? maxHp;
   final int? experience;
+  final List<String> types;
+  final String? abilitySlug;
   final bool userEdited;
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +31,8 @@ class PartyMember {
         if (currentHp != null) 'currentHp': currentHp,
         if (maxHp != null) 'maxHp': maxHp,
         if (experience != null) 'experience': experience,
+        if (types.isNotEmpty) 'types': types,
+        if (abilitySlug != null) 'abilitySlug': abilitySlug,
         if (userEdited) 'userEdited': true,
       };
 
@@ -38,6 +44,11 @@ class PartyMember {
         currentHp: json['currentHp'] as int?,
         maxHp: json['maxHp'] as int?,
         experience: json['experience'] as int?,
+        types: (json['types'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            const [],
+        abilitySlug: json['abilitySlug'] as String?,
         userEdited: json['userEdited'] as bool? ?? false,
       );
 
@@ -49,16 +60,23 @@ class PartyMember {
     int? currentHp,
     int? maxHp,
     int? experience,
+    List<String>? types,
+    String? abilitySlug,
     bool? userEdited,
+    bool clearNickname = false,
+    bool clearAbilitySlug = false,
   }) {
     return PartyMember(
       species: species ?? this.species,
       speciesId: speciesId ?? this.speciesId,
       level: level ?? this.level,
-      nickname: nickname ?? this.nickname,
+      nickname: clearNickname ? null : (nickname ?? this.nickname),
       currentHp: currentHp ?? this.currentHp,
       maxHp: maxHp ?? this.maxHp,
       experience: experience ?? this.experience,
+      types: types ?? this.types,
+      abilitySlug:
+          clearAbilitySlug ? null : (abilitySlug ?? this.abilitySlug),
       userEdited: userEdited ?? this.userEdited,
     );
   }
