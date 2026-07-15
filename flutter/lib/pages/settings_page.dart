@@ -68,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _avatarChanging = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
+  bool _hasApkBundledPack = false;
   GameEdition _defaultGameEdition = defaultGameEdition;
 
   @override
@@ -78,6 +79,15 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     _refreshDexCacheStatus();
     _loadDexSettings();
+    _loadApkBundledFlag();
+  }
+
+  Future<void> _loadApkBundledFlag() async {
+    final bundled = await dexOfflineService.hasApkBundledOfflinePack();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _hasApkBundledPack = bundled);
   }
 
   Future<void> _loadDexSettings() async {
@@ -261,9 +271,15 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _hasApkBundledPack
+              ? AppZh.snackDexOfflineClearedReseeded
+              : AppZh.snackDexOfflineCleared,
+        ),
+      ),
+    );
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -512,11 +528,23 @@ class _SettingsPageState extends State<SettingsPage> {
               Text(AppZh.settingsDexOffline, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 8),
               Text(
-                AppZh.settingsDexOfflineHint,
+                _hasApkBundledPack
+                    ? AppZh.settingsDexOfflineBundledHint
+                    : AppZh.settingsDexOfflineHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
                 ),
               ),
+              if (_hasApkBundledPack) ...[
+                const SizedBox(height: 8),
+                Text(
+                  AppZh.settingsDexOfflineBundledBadge,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.deepBlue,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               Text(
                 dexManifest != null && dexManifest.complete
@@ -552,7 +580,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 if (dexProgress.label != null &&
                     (dexProgress.phase == 'cdn_download' ||
-                        dexProgress.phase == 'cdn_manifest')) ...[
+                        dexProgress.phase == 'cdn_manifest' ||
+                        dexProgress.phase == 'apk_seed_load' ||
+                        dexProgress.phase == 'apk_seed_manifest')) ...[
                   const SizedBox(height: 4),
                   Text(
                     dexProgress.label!,
@@ -566,7 +596,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               const SizedBox(height: 12),
               Text(
-                AppZh.settingsDexCdnDownloadHint,
+                _hasApkBundledPack
+                    ? AppZh.settingsDexCdnUpdateHint
+                    : AppZh.settingsDexCdnDownloadHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
                 ),
@@ -578,7 +610,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   backgroundColor: TitoColors.coral,
                   foregroundColor: TitoColors.ink,
                 ),
-                child: const Text(AppZh.settingsDexCdnDownload),
+                child: Text(
+                  _hasApkBundledPack
+                      ? AppZh.settingsDexCdnUpdate
+                      : AppZh.settingsDexCdnDownload,
+                ),
               ),
             ],
           ),

@@ -231,6 +231,9 @@ abstract final class AppZh {
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
       '离线图鉴缓存包含以下内容（可在下方勾选要下载/保留的部分）。推荐先下载 CDN 预打包数据包；手绘导航图标仍随 APK 内置。';
+  static const settingsDexOfflineBundledHint =
+      '本安装包已内置当前 CDN 离线图鉴包（图鉴数据、中文对照、列表精灵图等）。首次启动会自动解压到本机，无需联网即可使用。';
+  static const settingsDexOfflineBundledBadge = '已随 APK 内置 · 打开即用';
   static const settingsDexCacheContentsTitle = '缓存内容筛选';
   static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
   static const settingsDexAdvancedOptions = '高级选项';
@@ -277,6 +280,11 @@ abstract final class AppZh {
       'cdn_verify' => '校验',
       'cdn_decompress' => '解压',
       'cdn_extract' => '写入',
+      'apk_seed_manifest' => '内置包清单',
+      'apk_seed_load' => '读取内置包',
+      'apk_seed_verify' => '校验内置包',
+      'apk_seed_decompress' => '解压内置包',
+      'apk_seed_extract' => '写入内置包',
       'l10n_download' => '中文对照',
       'done' => '完成',
       'partial' => '部分完成',
@@ -286,8 +294,11 @@ abstract final class AppZh {
   }
 
   static const settingsDexCdnDownload = '下载预打包数据包';
+  static const settingsDexCdnUpdate = '检查并更新预打包数据';
   static const settingsDexCdnDownloadHint =
       '推荐：一次性下载预打包数据包（图鉴 + 中文对照 + HGSS 地图 + 游戏图标 + 应用配置），安装后完全离线可用；无需逐条请求 PokeAPI。';
+  static const settingsDexCdnUpdateHint =
+      '内置包已可用。若日后有新版本，可联网检查并覆盖更新。';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
@@ -311,6 +322,7 @@ abstract final class AppZh {
   static String snackDexOfflinePartial(int count) =>
       '已缓存 $count / $titodexMaxNationalDexId 只宝可梦，可再次点击继续下载补全';
   static const snackDexOfflineCleared = '已清除离线图鉴缓存';
+  static const snackDexOfflineClearedReseeded = '已清除并重新从安装包恢复离线图鉴';
   static const snackDexOfflineFailed = '离线图鉴下载失败';
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';

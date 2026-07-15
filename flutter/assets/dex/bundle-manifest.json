@@ -1,0 +1,10 @@
+{
+  "bundleVersion": 5,
+  "pokemonCount": 1025,
+  "archiveSha256": "c2eb245d1a8a74bb2ab163894d9516ad93429669919b7bd8722c531ce3ec5e32",
+  "archiveSizeBytes": 41154067,
+  "publishedAt": "2026-07-13T07:36:26.637975+00:00",
+  "l10nVersion": "2026-07-13T04:52:57.850408+00:00",
+  "configVersion": 1,
+  "assetPath": "assets/dex/bundle.tar.zst"
+}

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'dex_asset_seed_installer.dart';
 import 'dex_bundle_installer.dart';
 import 'dex_l10n_installer.dart';
 import 'dex_cache_store.dart';
@@ -24,20 +25,24 @@ class DexOfflineService {
     DexSpriteCodec? codec,
     DexCdnConfig? cdnConfig,
     DexBundleInstaller? bundleInstaller,
+    DexAssetSeedInstaller? assetSeedInstaller,
     this.pokemonRetryAttempts = 5,
     this.checkpointEvery = 5,
   })  : _client = client ?? PokeApiClient(),
         _store = store ?? DexCacheStore(),
         _codec = codec ?? const DexSpriteCodec(),
         _cdnConfig = cdnConfig ?? const DexCdnConfig(),
-        _explicitBundleInstaller = bundleInstaller;
+        _explicitBundleInstaller = bundleInstaller,
+        _explicitAssetSeedInstaller = assetSeedInstaller;
 
   final PokeApiClient _client;
   final DexCacheStore _store;
   final DexSpriteCodec _codec;
   final DexCdnConfig _cdnConfig;
   final DexBundleInstaller? _explicitBundleInstaller;
+  final DexAssetSeedInstaller? _explicitAssetSeedInstaller;
   DexBundleInstaller? _resolvedBundleInstaller;
+  DexAssetSeedInstaller? _resolvedAssetSeedInstaller;
   final http.Client _http = http.Client();
   final int pokemonRetryAttempts;
   final int checkpointEvery;
@@ -48,6 +53,17 @@ class DexOfflineService {
         store: _store,
         config: _cdnConfig,
       ));
+
+  DexAssetSeedInstaller get _assetSeedInstaller =>
+      _explicitAssetSeedInstaller ??
+      (_resolvedAssetSeedInstaller ??= DexAssetSeedInstaller(
+        store: _store,
+        bundleInstaller: _bundleInstaller,
+      ));
+
+  /// True when this build ships `assets/dex/bundle.tar.zst`.
+  Future<bool> hasApkBundledOfflinePack() =>
+      _assetSeedInstaller.hasBundledArchive();
 
   bool _downloading = false;
   bool _cancelRequested = false;
@@ -239,6 +255,35 @@ class DexOfflineService {
     } finally {
       _downloading = false;
       _cancelRequested = false;
+      _progress = null;
+    }
+  }
+
+  /// First-launch / post-clear seed from the APK-bundled offline archive.
+  Stream<DexCacheProgress> seedFromApkAssetIfNeeded({bool force = false}) async* {
+    if (kIsWeb) {
+      return;
+    }
+    if (_downloading) {
+      return;
+    }
+    if (!await _assetSeedInstaller.needsSeed(force: force)) {
+      return;
+    }
+
+    _downloading = true;
+    try {
+      await for (final progress
+          in _assetSeedInstaller.seedIfNeeded(force: force)) {
+        yield _setProgress(
+          phase: progress.phase,
+          current: progress.current,
+          total: progress.total,
+          label: progress.label,
+        );
+      }
+    } finally {
+      _downloading = false;
       _progress = null;
     }
   }
@@ -462,6 +507,12 @@ class DexOfflineService {
     await _store.clearAll();
     await ZhCatalog.instance.reload();
     await AppConfig.instance.reload();
+
+    // Offline APK flavor: clear must not strand the user without a network
+    // re-download — re-seed from the bundled archive when present.
+    if (!kIsWeb && await hasApkBundledOfflinePack()) {
+      await for (final _ in seedFromApkAssetIfNeeded(force: true)) {}
+    }
   }
 
   DexCacheProgress _setProgress({
