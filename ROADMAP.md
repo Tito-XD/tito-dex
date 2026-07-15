@@ -1,13 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest standard release:** [v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98) (`0.4.98+51`).
+> **Latest release:** [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) · Lite `0.4.99+52` · Offline `0.4.99-offline+53`.
 >
-> **Current `main` source baseline:** `0.4.94+47`. See [docs/AI_CONTEXT.md](docs/AI_CONTEXT.md) for the branch and release distinction.
+> **Current `main` source baseline:** `0.4.99+52`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.4.99** | Align the complete release source and publish matching lite/offline packages |
 | **v0.4.98** | Correct per-game titles in the Pokédex flavor-text carousel |
 | **v0.4.97** | Trainer-card name-line copy adjustment |
 | **v0.4.96** | Dense trainer-card layout fix for square screens |
@@ -41,7 +42,7 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 
 ## Next priorities
 
-1. **Source alignment** — integrate the `v0.4.95`–`v0.4.98` release line into `main` and preserve release tests.
+1. **Regression coverage** — expand automated coverage for the aligned trainer-card, team-editor, offline, and flavor-title behavior.
 2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
 3. **Save workflow polish** — add HeartGold detection and single-file `.sav` selection.
 4. **Distribution polish** — finalize launcher icon, splash, install guidance, and release consistency.

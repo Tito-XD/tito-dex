@@ -6,14 +6,17 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Standard APK | `v0.4.98` (`0.4.98+51`) | Recommended arm64-v8a download |
-| Offline APK | `v0.4.97-offline` | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.4.94+47` | Current default branch baseline |
+| Lite APK | `v0.4.99` (`0.4.99+52`) | Recommended arm64-v8a download |
+| Offline APK | `v0.4.99` (`0.4.99-offline+53`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.4.99+52` | Current default branch baseline |
+
+Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
 ## Release notes
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.4.99` | TitoDex v0.4.99 · Lite 与离线版本同步 | Aligns the full release source and provides matching lite and offline arm64 packages. |
 | `v0.4.98` | TitoDex v0.4.98 · 图鉴版本标题修正 | Flavor-text cards now identify each game edition separately. |
 | `v0.4.97-offline` | TitoDex v0.4.97-offline · 内置离线数据包 | Optional 61 MB build that seeds the core dex data without a first-run download. |
 | `v0.4.97` | TitoDex v0.4.97 · 训练家卡文案调整 | Keeps the default “训练家 Tito” identity while simplifying punctuation. |

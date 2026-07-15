@@ -1,6 +1,6 @@
 # TitoDex RG APK — Release build checklist
 
-**Audience:** maintainers / Cloud Agents packaging `releases/TitoDex-<ver>-rg-arm64.apk`.
+**Audience:** maintainers / Cloud Agents packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
 
 A valid **arm64-v8a release** APK is about **20–23 MB** on disk. If you see **~7 MB**, the file is **truncated or corrupt** (missing `libflutter.so` tail / broken ZIP central directory) — **do not ship it**.
 
@@ -72,10 +72,10 @@ ls -lh build/app/outputs/flutter-apk/app-release.apk
 
 # Rename & copy
 cp build/app/outputs/flutter-apk/app-release.apk \
-   ../releases/TitoDex-<ver>-rg-arm64.apk
+   ../releases/TitoDex-<ver>-lite-rg-arm64.apk
 
 # Verify again after copy
-../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-rg-arm64.apk
+../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-lite-rg-arm64.apk
 ```
 
 Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
