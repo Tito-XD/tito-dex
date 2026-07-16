@@ -4,10 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest stable** | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) |
-| **Latest preview** | [v0.5.51](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.51) |
-| **`main` / lite** | `0.5.51+65` (`flutter/pubspec.yaml`) |
-| **Offline preview** | `0.5.51-offline+66` — APK-bundled dex data |
+| **Latest release** | [v0.6.2.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.2.1) |
+| **`main` / lite source** | `0.6.2+73` (`flutter/pubspec.yaml`); release versionName `0.6.2.1` |
+| **Offline package** | `0.6.2.1-offline+74` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -41,9 +40,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest preview line: v0.5.51)
+## Current feature status (latest release line: v0.6.2.1)
 
-> `main` includes the v0.5.5 stable feature line plus the v0.5.51 navigation preview fix. The offline package adds only the bundled dex seed and offline package version.
+> `main` includes the v0.6.2 feature line plus the v0.6.2.1 adaptive launcher icon patch. The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -64,6 +63,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.6.2.1: full-bleed launcher artwork lets Android adaptive-icon masks define the circle, squircle, rounded-square, or square silhouette.
+- v0.6.2: companion size control, bundled starter GIF/cry media, and cancellable preload for other companions.
+- v0.6.1: companion 2.0, landscape Home, bundled modern game icons, header polish, and Settings cleanup.
 - v0.5.51 preview: Home Team and Search routes keep their designed entry/exit edge, while Team, Dex, and Search opt out of predictive-back progress.
 - v0.5.5: single-file save import, native Android app picker, experimental Gen 1–7 save metadata, polished route/list motion, six-slot party layout, standby companion, shiny surprises, and silhouette quiz.
 - v0.5.1: Android-standard route motion and predictive back; Home Team / Dex / Search cards expand into their matching first-level page, while all other routes use Material transitions.
@@ -79,7 +81,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Not shipped / partial
 - Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
 - Journey cloud sync ([CLOUD_SYNC_PROPOSAL.md](./CLOUD_SYNC_PROPOSAL.md)).
-- Custom launcher icon; broader real-save fixtures and validation beyond HGSS.
+- Broader real-save fixtures and validation beyond HGSS.
 - Nav hand-drawn icons: **APK assets only**, not on CDN.
 
 ---
@@ -129,7 +131,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; baseline is approximately 115 tests
+flutter test                    # regression gate; 187 tests
 flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
