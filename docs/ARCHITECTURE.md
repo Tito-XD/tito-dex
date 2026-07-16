@@ -1,7 +1,7 @@
 # TitoDex Architecture
 
 > **Active stack:** Flutter + Dart in `flutter/`. React under `src/` is a frozen design reference.  
-> **Latest release:** v0.5.1; **`main` / lite:** `0.5.1+56`; **offline:** `0.5.1-offline+57` · Dex bundle v5 (`/v3/`).
+> **Latest release:** v0.5.5; **`main` / lite:** `0.5.5+63`; **offline:** `0.5.5-offline+64` · Dex bundle v5 (`/v3/`).
 >
 > **Full agent context:** [AI_CONTEXT.md](./AI_CONTEXT.md)
 
@@ -15,9 +15,9 @@
 | --- | --- |
 | UI | Custom widgets — `DeviceShell`, sticker cards, bundled Nunito |
 | Routing | `go_router` — shell route + bottom nav + dex detail |
-| Persistence | `shared_preferences` — journey JSON + save-directory config |
-| Save parsing | `HgssParser` — retail 512 KB NDS `.sav` |
-| Save sync | `SaveSyncService` + `SaveScanner` — directory watch, newest file by mtime |
+| Persistence | `shared_preferences` — journey JSON + selected save URI/config |
+| Save parsing | `PokemonSaveParser` — experimental Gen 1–7 metadata adapters; fixture-verified HGSS party/map/dex parsing |
+| Save sync | `SaveSyncService` + `SaveFileRepository` — one persisted document URI, no directory scan |
 | Dex online | `PokeApiClient` + throttle/retry |
 | Dex offline | `DexOfflineService` — PokeAPI batch **or** `DexBundleInstaller` (CDN tar.zst) |
 | Dex CDN | `DexCdnConfig` — compile-time URLs (not shown in app UI) |
@@ -66,7 +66,7 @@ flutter/
       dex/                        # PokeAPI, offline cache, CDN installer, artwork
       journey/journey_repository.dart
       parser/                     # HgssParser, map list, Gen IV text/crypto
-      save/                       # SaveSyncService, SaveScanner
+      save/                       # Single-file SaveSyncService + persisted document URI
       trainer/                    # Avatar service
     l10n/                         # app_zh.dart, game_zh.dart
     models/                       # journey.dart, parsed_save.dart
@@ -110,18 +110,19 @@ package.json
 ### App bootstrap (`lib/app.dart`)
 
 1. `JourneyRepository.load()` — prefs or `CurrentJourney.mock()`.
-2. `SaveSyncService.syncOnStartup()` — if auto-load enabled and directory set, parse newest `.sav`.
+2. `SaveSyncService.syncOnStartup()` — if auto-load is enabled and a file is selected, re-read that exact `.sav` URI.
 3. If sync updated journey → persist.
 4. Render `HomePage` with current journey.
 
-### Save directory sync
+### Single-file save sync
 
 ```txt
-User picks directory (Settings)
-  → SaveDirectoryRepository persists path + auto-load flag
-  → SaveScanner.findNewestSave() — recursive, 524288-byte .sav only
-  → skip if same path+mtime (unless force)
-  → HgssParser.parseSummary() → toJourney(existing: …)
+User picks one .sav document (Settings)
+  → Android persists read permission for that document URI
+  → SaveFileRepository persists URI, display name, and auto-load flag
+  → SaveSyncService re-reads only that URI
+  → skip if the parsed hash is unchanged (unless force)
+  → PokemonSaveParser.parseSummary() → toJourney(existing: …)
   → JourneyRepository.save()
 ```
 
@@ -202,7 +203,7 @@ Not implemented. See `CLOUD_SYNC_PROPOSAL.md`.
 | Adapter | Location | Notes |
 | --- | --- | --- |
 | Journey prefs | `journey_repository.dart` | |
-| Save directory prefs | `save_directory_repository.dart` | |
+| Selected save file prefs | `save_file_repository.dart` | |
 | Directory pick | `file_picker` in `app.dart` | |
 | Save file read | `save_sync_service.dart` | `dart:io` — not on web |
 | Parser | `hgss_parser.dart` | pure Dart |
@@ -219,10 +220,10 @@ cd flutter && flutter test
 | `hgss_parser_test.dart` | Full PKMSS fixture |
 | `dex_cdn_config_test.dart` | CDN URLs, manifest parsing |
 | `device_layout_test.dart` | RG square / compact |
-| `save_scanner_test.dart` | Newest-by-mtime, size filter |
+| `save_sync_test.dart` | Persisted URI, startup reload, clear permission, legacy-directory cleanup |
 | `widget_test.dart` | App boot loading shell |
 
-Manual: Settings import, directory sync on Android device with emulator save folder; CDN bundle download on RG; sideload `TitoDex-*-rg-arm64.apk` (verify `.so` are Stored with `unzip -lv`).
+Manual: Settings single-file save selection on Android; CDN bundle download on RG; sideload `TitoDex-*-rg-arm64.apk` (verify `.so` are Stored with `unzip -lv`).
 
 ## Related Documents
 

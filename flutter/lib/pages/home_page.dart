@@ -4,12 +4,13 @@ import 'package:go_router/go_router.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
-import '../models/journey.dart';
 import '../navigation/tito_page_transition.dart';
+import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
+import '../widgets/companion_standby.dart';
 import '../widgets/home_dashboard_body.dart';
 
 class HomePage extends StatelessWidget {
@@ -46,18 +47,23 @@ class HomePage extends StatelessWidget {
 
     return Padding(
       padding: padding,
-      child: Column(
+      child: Stack(
         children: [
-          header,
-          Expanded(
-            child: HomeDashboardBody(
-              journey: journey,
-              saveLinked: saveLinked,
-              onJourneyOpen: onJourneyOpen,
-              quickActions: quickActions,
-              bootstrapping: bootstrapping,
-            ),
+          Column(
+            children: [
+              header,
+              Expanded(
+                child: HomeDashboardBody(
+                  journey: journey,
+                  saveLinked: saveLinked,
+                  onJourneyOpen: onJourneyOpen,
+                  quickActions: quickActions,
+                  bootstrapping: bootstrapping,
+                ),
+              ),
+            ],
           ),
+          if (!bootstrapping) CompanionStandbyOverlay(journey: journey),
         ],
       ),
     );
@@ -104,12 +110,7 @@ class _QuickActionsBar extends StatelessWidget {
 }
 
 void _openRoute(BuildContext context, _QuickAction action) {
-  final heroTag = action.heroTag;
-  if (heroTag == null) {
-    context.push(action.route);
-    return;
-  }
-  context.push(action.route, extra: heroTag);
+  context.push(action.route, extra: action.heroTag);
 }
 
 Widget _withDexHero(_QuickAction action, Widget child) {

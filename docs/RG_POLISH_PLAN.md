@@ -10,7 +10,7 @@ Historical implementation plan for the v0.2.x handheld polish series. Use [`AI_C
 | 2 | Double underlines | N/A (not reproduced) |
 | 3 | Companion tap-to-cycle, local sprites, no name | Done |
 | 4 | Party sprites, evolution chain scroll, compress secondary content | Done |
-| 5 | Portrait save sync when directory set | Done |
+| 5 | Portrait save sync when one file is selected | Done |
 | 6 | Dex offline via Cloudflare | **Done** — `dex.tito.cafe`, bundle v4 PNG |
 | 7 | Per-game emulator launcher | Deferred (new games incoming) |
 | 8 | RG D-pad / A·B focus navigation | Done |

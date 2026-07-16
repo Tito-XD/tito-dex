@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../features/companion/companion_art.dart';
+import '../features/companion/companion_repository.dart';
+import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
@@ -9,6 +12,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_offline_service.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/game/game_edition.dart';
+import '../features/game/game_catalog.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
@@ -19,6 +23,8 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
+import '../widgets/companion_picker_sheet.dart';
+import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_dialog.dart';
@@ -33,8 +39,8 @@ class SettingsPage extends StatefulWidget {
     required this.onImportFixture,
     required this.onResetMock,
     required this.onSaveJourney,
-    required this.onPickSaveDirectory,
-    required this.onClearSaveDirectory,
+    required this.onPickSaveFile,
+    required this.onClearSaveFile,
     required this.onToggleAutoLoad,
     required this.onSyncNow,
     required this.onExportJourney,
@@ -44,13 +50,13 @@ class SettingsPage extends StatefulWidget {
   });
 
   final CurrentJourney journey;
-  final SaveDirectoryConfig saveConfig;
+  final SaveFileConfig saveConfig;
   final EmulatorAppChoice? emulatorChoice;
   final VoidCallback onImportFixture;
   final VoidCallback onResetMock;
   final ValueChanged<CurrentJourney> onSaveJourney;
-  final VoidCallback onPickSaveDirectory;
-  final VoidCallback onClearSaveDirectory;
+  final VoidCallback onPickSaveFile;
+  final VoidCallback onClearSaveFile;
   final ValueChanged<bool> onToggleAutoLoad;
   final VoidCallback onSyncNow;
   final VoidCallback onExportJourney;
@@ -97,6 +103,16 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     setState(() => _defaultGameEdition = edition);
+  }
+
+  Future<void> _pickDefaultGameEdition() async {
+    final edition = await showGameEditionGridPicker(
+      context,
+      selected: _defaultGameEdition,
+    );
+    if (edition != null && mounted) {
+      await _setDefaultGameEdition(edition);
+    }
   }
 
   Future<void> _refreshDexCacheStatus() async {
@@ -347,7 +363,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final saveName = widget.journey.saveTrainerName;
     final config = widget.saveConfig;
-    final directoryPath = config.directoryPath;
+    final selectedFileUri = config.selectedFileUri;
+    final selectedFileName = config.selectedFileName;
+    final hasSaveFile = selectedFileUri != null;
     final lastSynced = config.lastLoadedFileName;
     final emulator = widget.emulatorChoice;
     final dexCache = _dexCacheStatus;
@@ -436,6 +454,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const SizedBox(height: 16),
+          _CompanionSection(journey: widget.journey),
+          const SizedBox(height: 16),
           if (saveLinked)
             StickerCard(
               variant: StickerVariant.cream,
@@ -448,34 +468,38 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    AppZh.settingsSaveDirectoryHint,
+                    AppZh.settingsSaveFileHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.mutedInk,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    directoryPath ?? AppZh.settingsSaveDirectoryUnset,
+                    selectedFileUri != null
+                        ? AppZh.settingsSelectedSaveFile(
+                            selectedFileName ?? selectedFileUri,
+                          )
+                        : AppZh.settingsSaveFileUnset,
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      color: directoryPath == null
+                      color: !hasSaveFile
                           ? TitoColors.mutedInk
                           : TitoColors.ink,
                     ),
                   ),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed: widget.onPickSaveDirectory,
+                    onPressed: widget.onPickSaveFile,
                     style: FilledButton.styleFrom(
                       backgroundColor: TitoColors.deepBlue,
                       foregroundColor: TitoColors.card,
                     ),
-                    child: const Text(AppZh.settingsPickSaveDirectory),
+                    child: const Text(AppZh.settingsPickSaveFile),
                   ),
-                  if (directoryPath != null) ...[
+                  if (hasSaveFile) ...[
                     const SizedBox(height: 8),
                     OutlinedButton(
-                      onPressed: widget.onClearSaveDirectory,
-                      child: const Text(AppZh.settingsClearSaveDirectory),
+                      onPressed: widget.onClearSaveFile,
+                      child: const Text(AppZh.settingsClearSaveFile),
                     ),
                   ],
                   const SizedBox(height: 10),
@@ -503,7 +527,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton(
-                    onPressed: directoryPath != null ? widget.onSyncNow : null,
+                    onPressed: hasSaveFile ? widget.onSyncNow : null,
                     child: const Text(AppZh.settingsSyncNow),
                   ),
                 ],
@@ -629,19 +653,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                DropdownButtonFormField<GameEdition>(
-                  value: _defaultGameEdition,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                OutlinedButton(
+                  onPressed: _dexDownloading ? null : _pickDefaultGameEdition,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(58),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    alignment: Alignment.centerLeft,
                   ),
-                  items: [
-                    for (final edition in GameEdition.all)
-                      DropdownMenuItem(
-                        value: edition,
-                        child: Text(edition.labelZh),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _defaultGameEdition.labelZh,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ),
-                  ],
-                  onChanged: _dexDownloading ? null : _setDefaultGameEdition,
+                      const SizedBox(width: 8),
+                      const Icon(Icons.expand_more_rounded),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
@@ -812,6 +846,102 @@ class _Row extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Settings → 同行宝可梦: current standby preview (animated, fetched on
+/// demand) plus picker and reset-to-starter actions.
+class _CompanionSection extends StatelessWidget {
+  const _CompanionSection({required this.journey});
+
+  final CurrentJourney journey;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: companionRepository,
+      builder: (context, _) {
+        final choice = companionRepository.choice;
+        final speciesId =
+            choice?.pokemonId ??
+            speciesIdForName(journey.companion) ??
+            companionSpeciesIds[hgssDefaultCompanion]!;
+        final nameZh = choice?.nameZh ?? localizeSpecies(journey.companion);
+
+        return StickerCard(
+          variant: StickerVariant.sky,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.companionSettingsTitle,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppZh.companionSettingsHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: TitoColors.card,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: TitoColors.ink, width: 3),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    padding: const EdgeInsets.all(4),
+                    child: FallbackSpriteImage(
+                      sources: animatedSpriteCandidatesFor(speciesId),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      nameZh,
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () async {
+                  final picked = await showCompanionPickerSheet(context);
+                  if (picked != null && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(AppZh.companionPicked(picked.nameZh)),
+                      ),
+                    );
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: TitoColors.coral,
+                  foregroundColor: TitoColors.ink,
+                ),
+                child: const Text(AppZh.companionSettingsPick),
+              ),
+              if (choice != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: companionRepository.clear,
+                  child: const Text(AppZh.companionSettingsReset),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:installed_apps/installed_apps.dart';
+import 'package:flutter/services.dart';
 
 import 'emulator_launcher_repository.dart';
 
@@ -42,68 +42,43 @@ const _emulatorKeywords = [
 
 class EmulatorLauncher {
   EmulatorLauncher({EmulatorLauncherRepository? repository})
-      : _repository = repository ?? EmulatorLauncherRepository();
+    : _repository = repository ?? EmulatorLauncherRepository();
 
   final EmulatorLauncherRepository _repository;
+  static const _channel = MethodChannel('com.tito.titodex/app_launcher');
 
   Future<EmulatorAppChoice?> loadChoice() => _repository.load();
 
-  Future<void> saveChoice(EmulatorAppChoice choice) =>
-      _repository.save(choice);
+  Future<void> saveChoice(EmulatorAppChoice choice) => _repository.save(choice);
 
   Future<void> clearChoice() => _repository.clear();
 
   bool get isLaunchSupported => !kIsWeb && Platform.isAndroid;
 
-  /// Installed known emulators plus keyword-matched launcher apps.
+  /// All launcher-visible Android apps. Recommended emulators are ranked in UI.
   Future<List<EmulatorAppChoice>> listCandidateApps() async {
     if (!Platform.isAndroid) {
       return knownEmulatorPackages.entries
           .map(
-            (entry) => EmulatorAppChoice(
-              packageName: entry.key,
-              appName: entry.value,
-            ),
+            (entry) =>
+                EmulatorAppChoice(packageName: entry.key, appName: entry.value),
           )
           .toList();
     }
 
-    final results = <String, EmulatorAppChoice>{};
-
-    for (final entry in knownEmulatorPackages.entries) {
-      if (!await _canLaunch(entry.key)) {
-        continue;
-      }
-      final app = await InstalledApps.getAppInfo(entry.key, null);
-      results[entry.key] = EmulatorAppChoice(
-        packageName: entry.key,
-        appName: app?.name ?? entry.value,
-      );
-    }
-
-    try {
-      final installed = await InstalledApps.getInstalledApps(false, false);
-      for (final app in installed) {
-        final haystack = '${app.name} ${app.packageName}'.toLowerCase();
-        if (!_emulatorKeywords.any(haystack.contains)) {
-          continue;
-        }
-        if (!await _canLaunch(app.packageName)) {
-          continue;
-        }
-        results[app.packageName] = EmulatorAppChoice(
-          packageName: app.packageName,
-          appName: app.name,
-        );
-      }
-    } catch (error, stackTrace) {
-      debugPrint('EmulatorLauncher: installed app scan failed: $error');
-      debugPrint('$stackTrace');
-    }
-
-    final list = results.values.toList()
-      ..sort((a, b) => a.appName.compareTo(b.appName));
-    return list;
+    final rawApps = await _channel.invokeListMethod<Object?>(
+      'listLaunchableApps',
+    );
+    return (rawApps ?? const <Object?>[])
+        .whereType<Map<Object?, Object?>>()
+        .map((app) {
+          return EmulatorAppChoice(
+            packageName: app['packageName']! as String,
+            activityName: app['activityName']! as String,
+            appName: app['appName']! as String,
+          );
+        })
+        .toList(growable: false);
   }
 
   Future<bool> launch(EmulatorAppChoice choice) async {
@@ -111,12 +86,18 @@ class EmulatorLauncher {
       return false;
     }
 
-    final started = await InstalledApps.startApp(choice.packageName);
-    return started == true;
+    return await _channel.invokeMethod<bool>('launchApp', {
+          'packageName': choice.packageName,
+          'activityName': choice.activityName,
+        }) ??
+        false;
   }
+}
 
-  Future<bool> _canLaunch(String packageName) async {
-    final installed = await InstalledApps.isAppInstalled(packageName);
-    return installed == true;
+bool isRecommendedEmulator(EmulatorAppChoice choice) {
+  if (knownEmulatorPackages.containsKey(choice.packageName)) {
+    return true;
   }
+  final haystack = '${choice.appName} ${choice.packageName}'.toLowerCase();
+  return _emulatorKeywords.any(haystack.contains);
 }
