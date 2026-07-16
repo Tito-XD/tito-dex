@@ -80,6 +80,17 @@ cp build/app/outputs/flutter-apk/app-release.apk \
 
 Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
 
+### Fast cloud build (Lite + Offline)
+
+Run the **Android Release APKs** workflow manually with:
+
+- `version` — product version without `v`
+- `lite_build_number` — Lite Android versionCode
+- `offline_build_number` — a larger Offline versionCode
+- `offline_seed_apk` — a previous verified Offline APK whose unchanged dex v5 seed should be reused
+
+The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload.
+
 ### Offline variant
 
 Temporarily use the `x.y.z-offline+build` version and include `assets/dex/` in `pubspec.yaml`; build with the same arm64 command. Its archive must contain `dex_catalog.json` so the seeded package can serve list, search, and reference filters without building indices after a tap.

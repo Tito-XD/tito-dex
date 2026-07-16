@@ -1,7 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../features/companion/companion_art.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/shiny_odds.dart';
+import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -9,6 +14,7 @@ import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
+import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
 
 class PartyStrip extends StatelessWidget {
@@ -31,17 +37,9 @@ class PartyStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final useHorizontal = square || !vertical;
     final titleStyle = square
         ? context.tito.cardSectionTitle
         : context.tito.cardTitle;
-
-    if (party.isEmpty && !gridMode && !listMode) {
-      return StickerCard(
-        padding: DeviceLayout.cardPadding(context),
-        child: Text(AppZh.currentParty, style: titleStyle),
-      );
-    }
 
     final padding = (compact || square)
         ? DeviceLayout.cardPadding(context)
@@ -62,23 +60,7 @@ class PartyStrip extends StatelessWidget {
             Expanded(
               child: _PartyGrid(party: party, compact: compact || square),
             )
-          else if (useHorizontal)
-            Expanded(
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: party.length,
-                separatorBuilder: (_, __) =>
-                    SizedBox(width: square ? 4 : (compact ? 8 : 10)),
-                itemBuilder: (context, index) {
-                  return _PartyOrb(
-                    member: party[index],
-                    compact: compact || square,
-                    mini: square,
-                  );
-                },
-              ),
-            )
-          else
+          else if (vertical)
             Expanded(
               child: ListView.separated(
                 itemCount: party.length,
@@ -91,9 +73,168 @@ class PartyStrip extends StatelessWidget {
                   );
                 },
               ),
+            )
+          else
+            Expanded(
+              child: _PartyHomeGrid(party: party, compact: compact),
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Compact dashboard presentation: six equal slots, with a bare sprite and
+/// two aligned text lines. Empty slots stay visible as muted Poké Balls.
+class _PartyHomeGrid extends StatelessWidget {
+  const _PartyHomeGrid({required this.party, required this.compact});
+
+  final List<PartyMember> party;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    const slotCount = 6;
+    final visibleParty = party.take(slotCount).toList(growable: false);
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: slotCount,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: compact ? 4 : 8,
+        mainAxisSpacing: compact ? 3 : 6,
+        childAspectRatio: compact ? 2.35 : 2.5,
+      ),
+      itemBuilder: (context, index) {
+        if (index >= visibleParty.length) {
+          return _EmptyPartyGridSlot(compact: compact);
+        }
+        return _PartyGridMember(member: visibleParty[index], compact: compact);
+      },
+    );
+  }
+}
+
+class _PartyGridMember extends StatelessWidget {
+  const _PartyGridMember({required this.member, required this.compact});
+
+  final PartyMember member;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = member.nickname ?? localizeSpecies(member.species);
+    final levelLabel = member.level == null
+        ? '${AppZh.level}—'
+        : '${AppZh.level}${member.level}';
+
+    // Slots pass through the home container expansion animation, so width can
+    // transiently be a few px — shrink the avatar instead of overflowing.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gap = compact ? 3.0 : 5.0;
+        final spriteSize = math.min(
+          compact ? 38.0 : 48.0,
+          math.max(0.0, constraints.maxWidth - gap - 4),
+        );
+        return Row(
+          children: [
+            _PartyMemberAvatar(
+              member: member,
+              size: spriteSize,
+              label: label,
+              framed: false,
+            ),
+            SizedBox(width: gap),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.tito.captionStrong,
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    levelLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.tito.caption.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _EmptyPartyGridSlot extends StatelessWidget {
+  const _EmptyPartyGridSlot({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final spriteSize = compact ? 38.0 : 48.0;
+    return Row(
+      children: [
+        SizedBox(
+          width: spriteSize,
+          height: spriteSize,
+          child: Icon(
+            Icons.catching_pokemon_rounded,
+            size: compact ? 27 : 34,
+            color: TitoColors.mutedInk.withValues(alpha: 0.38),
+          ),
+        ),
+        SizedBox(width: compact ? 3 : 5),
+        const Expanded(child: _PartyTextPlaceholder()),
+      ],
+    );
+  }
+}
+
+class _PartyTextPlaceholder extends StatelessWidget {
+  const _PartyTextPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    final lineColor = TitoColors.mutedInk.withValues(alpha: 0.2);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FractionallySizedBox(
+          widthFactor: 0.88,
+          child: Container(
+            height: 6,
+            decoration: BoxDecoration(
+              color: lineColor,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+        ),
+        const SizedBox(height: 7),
+        FractionallySizedBox(
+          widthFactor: 0.5,
+          child: Container(
+            height: 5,
+            decoration: BoxDecoration(
+              color: lineColor,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -241,10 +382,7 @@ class _PartyOrb extends StatelessWidget {
     );
 
     final level = member.level != null
-        ? Text(
-            '${AppZh.level}${member.level}',
-            style: context.tito.caption,
-          )
+        ? Text('${AppZh.level}${member.level}', style: context.tito.caption)
         : null;
 
     if (horizontal) {
@@ -256,10 +394,7 @@ class _PartyOrb extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(child: name),
-                if (level != null) ...[
-                  const SizedBox(width: 4),
-                  level,
-                ],
+                if (level != null) ...[const SizedBox(width: 4), level],
               ],
             ),
           ),
@@ -277,10 +412,7 @@ class _PartyOrb extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Flexible(child: name),
-              if (level != null) ...[
-                const SizedBox(width: 2),
-                level,
-              ],
+              if (level != null) ...[const SizedBox(width: 2), level],
             ],
           ),
         ],
@@ -294,15 +426,68 @@ class _PartyMemberAvatar extends StatelessWidget {
     required this.member,
     required this.size,
     required this.label,
+    this.framed = true,
   });
+
+  /// One roll table per app launch — opening the app is the slot machine.
+  static final int _sessionSeed = DateTime.now().millisecondsSinceEpoch;
 
   final PartyMember member;
   final double size;
   final String label;
+  final bool framed;
 
   @override
   Widget build(BuildContext context) {
     final speciesId = member.speciesId ?? _guessSpeciesId(member.species);
+    final isShiny = speciesId != null && shinyRoll(_sessionSeed, speciesId);
+
+    Widget sprite = speciesId != null
+        ? FutureBuilder(
+            future: dexRepository.getSummary(speciesId),
+            builder: (context, snapshot) {
+              final sprite = snapshot.data?.displaySpritePath;
+              if (sprite != null && sprite.isNotEmpty) {
+                if (isShiny) {
+                  return FallbackSpriteImage(
+                    sources: [shinySpriteUrlFor(speciesId), sprite],
+                    width: size,
+                    height: size,
+                  );
+                }
+                return DexSpriteImage(
+                  source: sprite,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                );
+              }
+              return _letterFallback(label, size);
+            },
+          )
+        : _letterFallback(label, size);
+
+    if (isShiny) {
+      sprite = GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppZh.shinyPartyFound(label))),
+          );
+        },
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            sprite,
+            const Positioned(top: -2, right: -2, child: _SparklePulse()),
+          ],
+        ),
+      );
+    }
+
+    if (!framed) {
+      return SizedBox(width: size, height: size, child: sprite);
+    }
 
     return Container(
       width: size,
@@ -317,23 +502,7 @@ class _PartyMemberAvatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      child: speciesId != null
-          ? FutureBuilder(
-              future: dexRepository.getSummary(speciesId),
-              builder: (context, snapshot) {
-                final sprite = snapshot.data?.displaySpritePath;
-                if (sprite != null && sprite.isNotEmpty) {
-                  return DexSpriteImage(
-                    source: sprite,
-                    width: size,
-                    height: size,
-                    fit: BoxFit.contain,
-                  );
-                }
-                return _letterFallback(label, size);
-              },
-            )
-          : _letterFallback(label, size),
+      child: sprite,
     );
   }
 
@@ -358,5 +527,47 @@ class _PartyMemberAvatar extends StatelessWidget {
       }
     }
     return null;
+  }
+}
+
+/// Gentle twinkle over a shiny party sprite.
+class _SparklePulse extends StatefulWidget {
+  const _SparklePulse();
+
+  @override
+  State<_SparklePulse> createState() => _SparklePulseState();
+}
+
+class _SparklePulseState extends State<_SparklePulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.35, end: 1.0).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      ),
+      child: const Icon(
+        Icons.auto_awesome_rounded,
+        size: 13,
+        color: TitoColors.softYellow,
+      ),
+    );
   }
 }

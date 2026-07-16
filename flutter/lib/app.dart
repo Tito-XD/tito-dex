@@ -1,9 +1,9 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'config/app_config.dart';
+import 'features/companion/companion_repository.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
@@ -16,7 +16,7 @@ import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
 import 'features/launcher/emulator_launcher.dart';
 import 'features/launcher/emulator_launcher_repository.dart';
-import 'features/parser/hgss_parser.dart';
+import 'features/parser/pokemon_save_parser.dart';
 import 'features/save/save_sync_service.dart';
 import 'features/save/save_types.dart';
 import 'l10n/app_zh.dart';
@@ -34,6 +34,7 @@ import 'pages/companion/quick_damage_page.dart';
 import 'pages/companion/stat_calc_page.dart';
 import 'pages/companion/type_matchup_page.dart';
 import 'pages/dex/dex_json_reference_page.dart';
+import 'pages/dex/silhouette_quiz_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/team_page.dart';
@@ -55,13 +56,15 @@ class TitoDexApp extends StatefulWidget {
 
 class _TitoDexAppState extends State<TitoDexApp> {
   final _repository = JourneyRepository();
-  final _parser = const HgssParser();
+  final _parser = const PokemonSaveParser();
   final _saveSync = SaveSyncService();
   final _emulatorLauncher = EmulatorLauncher();
   final _journeyIo = const JourneyIo();
+  final _emulatorChoiceRefresh = ValueNotifier<EmulatorAppChoice?>(null);
+  final _settingsRefresh = ValueNotifier<int>(0);
   late final GoRouter _router;
   CurrentJourney _journey = CurrentJourney.mock();
-  SaveDirectoryConfig _saveConfig = const SaveDirectoryConfig();
+  SaveFileConfig _saveConfig = const SaveFileConfig();
   EmulatorAppChoice? _emulatorChoice;
   bool _bootstrapComplete = false;
 
@@ -74,6 +77,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
       refreshListenable: Listenable.merge([
         gameEditionRepository,
         _BootstrapGate.instance,
+        _emulatorChoiceRefresh,
+        _settingsRefresh,
       ]),
       redirect: (context, state) {
         if (!_bootstrapComplete && state.uri.path != '/') {
@@ -105,7 +110,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: ListenableBuilder(
-                    listenable: gameEditionRepository,
+                    listenable: Listenable.merge([
+                      gameEditionRepository,
+                      _settingsRefresh,
+                    ]),
                     builder: (context, _) {
                       return HomePage(
                         journey: _journey,
@@ -138,7 +146,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 child: TitoPageContainer(
                   child: JourneyPage(
                     journey: _journey,
-                    onLaunchEmulator: _onContinue,
+                    onLaunchEmulator: () => _onContinue(context),
                   ),
                 ),
               ),
@@ -148,11 +156,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoDexPage(
                 key: state.pageKey,
                 heroTag: TitoHomeActionHero.forRoute('/dex', state.extra),
-                child: TitoPageContainer(
-                  child: DexPage(
-                    journey: _journey,
-                    onManualDexMarkChanged: _persist,
-                  ),
+                child: const TitoPageContainer(child: SizedBox.expand()),
+                content: DexPage(
+                  journey: _journey,
+                  onManualDexMarkChanged: _persist,
                 ),
               ),
               routes: [
@@ -172,6 +179,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: const TitoPageContainer(
                       child: AbilityEncyclopediaPage(),
                     ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'quiz',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: const TitoPageContainer(child: SilhouetteQuizPage()),
                   ),
                 ),
                 GoRoute(
@@ -262,14 +276,14 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     onImportFixture: _importBundledSave,
                     onResetMock: _resetMock,
                     onSaveJourney: _persist,
-                    onPickSaveDirectory: _pickSaveDirectory,
-                    onClearSaveDirectory: _clearSaveDirectory,
+                    onPickSaveFile: () => _pickSaveFile(context),
+                    onClearSaveFile: () => _clearSaveFile(context),
                     onToggleAutoLoad: _setAutoLoadOnStartup,
-                    onSyncNow: () => _syncSaveDirectory(force: true),
+                    onSyncNow: () => _syncSaveFile(context, force: true),
                     onExportJourney: _exportJourney,
                     onImportJourney: _importJourneyJson,
-                    onPickEmulator: _pickEmulatorFromSettings,
-                    onClearEmulator: _clearEmulator,
+                    onPickEmulator: () => _pickEmulatorFromSettings(context),
+                    onClearEmulator: () => _clearEmulator(context),
                   ),
                 ),
               ),
@@ -283,7 +297,9 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   Future<void> _bootstrap() async {
     await gameEditionRepository.load();
+    await companionRepository.load();
     var journey = await _repository.load();
+    journey = await _migrateLegacyBundledTrainerName(journey);
     if (!mounted) {
       return;
     }
@@ -297,13 +313,18 @@ class _TitoDexAppState extends State<TitoDexApp> {
       }
     }
     if (gameEditionRepository.edition.isSaveLinked) {
-      final syncResult = await _saveSync.syncOnStartup(existing: journey);
-      if (syncResult.updated) {
-        journey = syncResult.journey;
-        await _repository.save(journey);
-        if (mounted) {
-          setState(() => _journey = journey);
+      try {
+        final syncResult = await _saveSync.syncOnStartup(existing: journey);
+        if (syncResult.updated) {
+          journey = syncResult.journey;
+          await _repository.save(journey);
+          if (mounted) {
+            setState(() => _journey = journey);
+          }
         }
+      } catch (error, stackTrace) {
+        debugPrint('Save startup sync skipped: $error');
+        debugPrint('$stackTrace');
       }
     }
     final saveConfig = await _saveSync.loadConfig();
@@ -317,10 +338,33 @@ class _TitoDexAppState extends State<TitoDexApp> {
       _emulatorChoice = emulatorChoice;
       _bootstrapComplete = true;
     });
+    _emulatorChoiceRefresh.value = emulatorChoice;
+    _settingsRefresh.value += 1;
     _BootstrapGate.instance.markReady();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prepareDexAfterHomeIsReady();
     });
+  }
+
+  Future<CurrentJourney> _migrateLegacyBundledTrainerName(
+    CurrentJourney journey,
+  ) async {
+    final legacyHash = journey.saveDexHash;
+    if (legacyHash == null || legacyHash.startsWith('v2:')) {
+      return journey;
+    }
+    final bytes = await rootBundle.load('assets/fixtures/PKMSS.sav');
+    final summary = _parser.parseSummary(bytes.buffer.asUint8List());
+    if (!summary.saveHash.endsWith(legacyHash) ||
+        journey.trainerNameCustomized) {
+      return journey;
+    }
+    final migrated = journey.copyWith(
+      trainerName: summary.trainerName,
+      saveTrainerName: summary.trainerName,
+    );
+    await _repository.save(migrated);
+    return migrated;
   }
 
   /// Data preparation intentionally happens outside the home bootstrap UI.
@@ -334,8 +378,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
           await dexOfflineService.ensureCatalog();
           dexRepository.clearMemoryCache();
         }
-        await dexRepository.warmUp();
       }
+      // Lite uses the CDN rather than an APK bundle. Warm both variants in
+      // the background so opening Dex does not begin the first list fetch.
+      await dexRepository.warmUp();
     } catch (error, stackTrace) {
       debugPrint('Dex background preparation failed: $error');
       debugPrint('$stackTrace');
@@ -372,35 +418,49 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   Future<void> _persist(CurrentJourney journey) async {
     setState(() => _journey = journey);
+    _settingsRefresh.value += 1;
     await _repository.save(journey);
   }
 
-  Future<void> _pickSaveDirectory() async {
-    final path = await FilePicker.platform.getDirectoryPath();
-    if (path == null) {
+  Future<void> _pickSaveFile(BuildContext feedbackContext) async {
+    final document = await _saveSync.pickSaveDocument();
+    if (document == null) {
       return;
     }
-
-    final config = await _saveSync.updateDirectory(path);
-    if (!mounted) {
+    final result = await _saveSync.selectSaveDocument(
+      document: document,
+      existing: _journey,
+    );
+    final config = await _saveSync.loadConfig();
+    if (!mounted || !feedbackContext.mounted) {
       return;
     }
-    setState(() => _saveConfig = config);
+    if (result.updated) {
+      setState(() => _saveConfig = config);
+      await _persist(result.journey);
+      if (!feedbackContext.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        feedbackContext,
+      ).showSnackBar(const SnackBar(content: Text(AppZh.snackSaveFileSet)));
+      return;
+    }
     ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackSaveDirectorySet)));
-    await _syncSaveDirectory(force: true);
+      feedbackContext,
+    ).showSnackBar(SnackBar(content: Text(_syncMessage(result) ?? '')));
   }
 
-  Future<void> _clearSaveDirectory() async {
-    final config = await _saveSync.updateDirectory(null);
-    if (!mounted) {
+  Future<void> _clearSaveFile(BuildContext feedbackContext) async {
+    final config = await _saveSync.clearFile();
+    if (!mounted || !feedbackContext.mounted) {
       return;
     }
     setState(() => _saveConfig = config);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppZh.snackSaveDirectoryCleared)),
-    );
+    _settingsRefresh.value += 1;
+    ScaffoldMessenger.of(
+      feedbackContext,
+    ).showSnackBar(const SnackBar(content: Text(AppZh.snackSaveFileCleared)));
   }
 
   Future<void> _setAutoLoadOnStartup(bool enabled) async {
@@ -409,12 +469,19 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     setState(() => _saveConfig = config);
+    _settingsRefresh.value += 1;
   }
 
-  Future<void> _syncSaveDirectory({bool force = false}) async {
-    final result = await _saveSync.syncLatest(existing: _journey, force: force);
+  Future<void> _syncSaveFile(
+    BuildContext feedbackContext, {
+    bool force = false,
+  }) async {
+    final result = await _saveSync.syncSelected(
+      existing: _journey,
+      force: force,
+    );
     final config = await _saveSync.loadConfig();
-    if (!mounted) {
+    if (!mounted || !feedbackContext.mounted) {
       return;
     }
 
@@ -422,12 +489,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
       await _persist(result.journey);
     } else {
       setState(() => _saveConfig = config);
+      _settingsRefresh.value += 1;
     }
 
     final message = _syncMessage(result);
-    if (message != null && mounted) {
+    if (message != null && mounted && feedbackContext.mounted) {
       ScaffoldMessenger.of(
-        context,
+        feedbackContext,
       ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
@@ -438,12 +506,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
         return AppZh.snackSaveSyncLoaded(result.fileName ?? '');
       case 'unchanged':
         return AppZh.snackSaveSyncUnchanged;
-      case 'no_directory':
-        return AppZh.snackSaveSyncNoDirectory;
-      case 'no_save_found':
-        return AppZh.snackSaveSyncNoSave;
+      case 'no_file':
+        return AppZh.snackSaveSyncNoFile;
       case 'unsupported_save':
         return AppZh.snackSaveSyncUnsupported;
+      case 'selected_file_unavailable':
+        return AppZh.snackSaveFileUnavailable;
       default:
         return null;
     }
@@ -502,32 +570,44 @@ class _TitoDexAppState extends State<TitoDexApp> {
     ).showSnackBar(const SnackBar(content: Text(AppZh.snackJourneyImported)));
   }
 
-  Future<void> _rememberEmulator(EmulatorAppChoice choice) async {
+  Future<void> _rememberEmulator(
+    EmulatorAppChoice choice,
+    BuildContext feedbackContext,
+  ) async {
     await _emulatorLauncher.saveChoice(choice);
     if (!mounted) {
       return;
     }
     setState(() => _emulatorChoice = choice);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorSaved)));
+    _emulatorChoiceRefresh.value = choice;
+    if (feedbackContext.mounted) {
+      ScaffoldMessenger.of(
+        feedbackContext,
+      ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorSaved)));
+    }
   }
 
-  Future<void> _clearEmulator() async {
+  Future<void> _clearEmulator(BuildContext feedbackContext) async {
     await _emulatorLauncher.clearChoice();
     if (!mounted) {
       return;
     }
     setState(() => _emulatorChoice = null);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorCleared)));
+    _emulatorChoiceRefresh.value = null;
+    if (feedbackContext.mounted) {
+      ScaffoldMessenger.of(
+        feedbackContext,
+      ).showSnackBar(const SnackBar(content: Text(AppZh.snackEmulatorCleared)));
+    }
   }
 
-  Future<void> _pickEmulatorFromSettings() async {
-    final choice = await showEmulatorPickerSheet(context, _emulatorLauncher);
-    if (choice != null) {
-      await _rememberEmulator(choice);
+  Future<void> _pickEmulatorFromSettings(BuildContext pickerContext) async {
+    final choice = await showEmulatorPickerSheet(
+      pickerContext,
+      _emulatorLauncher,
+    );
+    if (choice != null && pickerContext.mounted) {
+      await _rememberEmulator(choice, pickerContext);
     }
   }
 
@@ -545,7 +625,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (picked.journeyGameKey != null && _journey.game != journeyKey) {
       await _persist(_journey.copyWith(game: journeyKey));
     }
-    if (!mounted) {
+    if (!mounted || !context.mounted) {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
@@ -553,48 +633,74 @@ class _TitoDexAppState extends State<TitoDexApp> {
     );
   }
 
-  Future<void> _onContinue() async {
+  Future<void> _onContinue(BuildContext pickerContext) async {
     final saved = _emulatorChoice;
     if (saved != null && _emulatorLauncher.isLaunchSupported) {
       try {
-        await _emulatorLauncher.launch(saved);
-        if (!mounted) {
+        final started = await _emulatorLauncher.launch(saved);
+        if (!started) {
+          throw StateError('Saved launcher activity is unavailable');
+        }
+        if (!mounted || !pickerContext.mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(pickerContext).showSnackBar(
           SnackBar(content: Text(AppZh.continueSheetLaunching(saved.appName))),
         );
         return;
       } catch (_) {
-        if (!mounted) {
+        await _emulatorLauncher.clearChoice();
+        if (!mounted || !pickerContext.mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
+        setState(() => _emulatorChoice = null);
+        _emulatorChoiceRefresh.value = null;
+        ScaffoldMessenger.of(pickerContext).showSnackBar(
           const SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
         );
       }
     }
 
-    if (!mounted) {
+    if (!mounted || !pickerContext.mounted) {
       return;
     }
-    final choice = await showEmulatorPickerSheet(context, _emulatorLauncher);
-    if (choice == null || !mounted) {
+    final choice = await showEmulatorPickerSheet(
+      pickerContext,
+      _emulatorLauncher,
+    );
+    if (choice == null || !mounted || !pickerContext.mounted) {
       return;
     }
 
-    await _rememberEmulator(choice);
+    await _rememberEmulator(choice, pickerContext);
     if (_emulatorLauncher.isLaunchSupported) {
       try {
-        await _emulatorLauncher.launch(choice);
+        final started = await _emulatorLauncher.launch(choice);
+        if (!started) {
+          throw StateError('Selected launcher activity is unavailable');
+        }
       } catch (_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+        if (mounted && pickerContext.mounted) {
+          await _emulatorLauncher.clearChoice();
+          if (!mounted || !pickerContext.mounted) {
+            return;
+          }
+          setState(() => _emulatorChoice = null);
+          _emulatorChoiceRefresh.value = null;
+          ScaffoldMessenger.of(pickerContext).showSnackBar(
             const SnackBar(content: Text(AppZh.snackEmulatorLaunchFailed)),
           );
         }
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    _emulatorChoiceRefresh.dispose();
+    _settingsRefresh.dispose();
+    super.dispose();
   }
 
   @override

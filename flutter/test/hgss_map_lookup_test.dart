@@ -63,7 +63,7 @@ void main() {
     final existing = CurrentJourney.mock();
     final journey = parser.toJourney(summary, existing: existing);
 
-    expect(journey.timeline.first.text, '已从本地魂银存档同步');
+    expect(journey.timeline.first.text, contains('心金/魂银'));
     expect(
       journey.timeline.any((entry) => entry.text == '抵达满金市'),
       isTrue,

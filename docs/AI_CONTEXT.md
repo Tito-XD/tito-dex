@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.5.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.1) |
-| **`main` / lite** | `0.5.1+56` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.5.1-offline+57` — APK-bundled dex data |
+| **Latest release** | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) |
+| **`main` / lite** | `0.5.5+63` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.5.5-offline+64` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -18,7 +18,7 @@
 **TitoDex** is a warm, offline-first Pokémon journey companion for Android handhelds and phones. It combines save-aware progress, manual team and journey management, structured Pokédex data, and lightweight battle utilities in a distinctive device-like UI.
 
 - **Resume quickly:** home shows current game, location, party, badges, play time, and actions.
-- **Local first:** HGSS save parsing, offline dex bundle, no runtime 52poke/PokeAPI scraping in the app.
+- **Local first:** single-file save import, richer HGSS parsing, offline dex bundle, no runtime 52poke/PokeAPI scraping in the app.
 - **Game context first:** edition, generation, and regional scope affect data and calculations.
 - **Focused reference:** provide practical depth without reproducing a full community wiki or simulator.
 
@@ -40,13 +40,13 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.5.1)
+## Current feature status (latest release line: v0.5.5)
 
-> `main` includes the v0.5.1 release line. The offline package adds only the bundled dex seed and offline package version.
+> `main` includes the v0.5.5 release line. The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
-- HGSS retail 512 KB `.sav` parser; directory sync (newest by mtime); startup auto-load.
-- Home / Team / Journey / Settings; emulator launcher; journey JSON import/export.
+- Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
+- Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
 
 ### Dex (national 1–1025)
@@ -63,6 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.5.5: single-file save import, native Android app picker, experimental Gen 1–7 save metadata, polished route/list motion, six-slot party layout, standby companion, shiny surprises, and silhouette quiz.
 - v0.5.1: Android-standard route motion and predictive back; Home Team / Dex / Search cards expand into their matching first-level page, while all other routes use Material transitions.
 - v0.5.0: precomputed Dex catalog keeps list, search, and reference filters in memory; home no longer blocks on a looping bootstrap bar.
 - v0.4.99: source-line consolidation and aligned lite/offline packages.
@@ -76,7 +77,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Not shipped / partial
 - Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
 - Journey cloud sync ([CLOUD_SYNC_PROPOSAL.md](./CLOUD_SYNC_PROPOSAL.md)).
-- Custom launcher icon; HeartGold title detection; single-file `.sav` picker.
+- Custom launcher icon; broader real-save fixtures and validation beyond HGSS.
 - Nav hand-drawn icons: **APK assets only**, not on CDN.
 
 ---
@@ -89,8 +90,8 @@ flutter/lib/
   features/
     dex/                      # PokeAPI, offline cache, CDN installer, l10n update
     journey/                  # JourneyRepository
-    parser/                   # HgssParser, hgss_map_list
-    save/                     # SaveSyncService, SaveScanner
+    parser/                   # PokemonSaveParser, HgssParser, hgss_map_list
+    save/                     # SaveSyncService, SaveFileRepository, document URI source
     companion/                # Battle math, type relations
     game/                     # GameEdition, regional dex
   config/app_config.dart      # Offline-first app configuration

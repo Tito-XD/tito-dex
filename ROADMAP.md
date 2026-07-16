@@ -1,13 +1,16 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.4.99](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.99) · Lite `0.4.99+52` · Offline `0.4.99-offline+53`.
+> **Latest release:** [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · Lite `0.5.5+63` · Offline `0.5.5-offline+64`.
 >
-> **Current `main` source baseline:** `0.4.99+52`.
+> **Current `main` source baseline:** `0.5.5+63`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.5.5** | Single-file saves, native app picker, polished motion, companion interactions, six-slot party card, and silhouette quiz |
+| **v0.5.1** | Android-standard route motion and predictive back |
+| **v0.5.0** | Precomputed in-memory Dex catalog and responsive filtering |
 | **v0.4.99** | Align the complete release source and publish matching lite/offline packages |
 | **v0.4.98** | Correct per-game titles in the Pokédex flavor-text carousel |
 | **v0.4.97** | Trainer-card name-line copy adjustment |
@@ -31,26 +34,27 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 | Area | Status |
 | --- | --- |
 | Flutter application, persistence, routing, and emulator launch | Shipped |
-| HGSS save parsing and directory sync | Shipped, game-specific limitations documented |
+| Single-file save import | Shipped; HGSS has fixture-verified party/map/dex parsing |
+| Other pre-Switch save metadata | Experimental; real-save fixture coverage remains incomplete |
 | Pokédex 1–1025 and regional/game scopes | Shipped |
 | Offline bundle, Chinese catalog, maps, config, and update prompts | Shipped |
 | Structured reference hub and Pokédex drill-down | Shipped |
 | Matchup, stat/damage estimates, blind spots, modifiers, and team weaknesses | Shipped; calculation depth remains partial |
 | APK-bundled offline variant | Available as an optional distribution |
 | Journey cloud sync | Proposal only |
-| Additional save parsers | Not started |
+| Standby companion, shiny party surprise, silhouette quiz | Shipped in v0.5.5 |
 
 ## Next priorities
 
 1. **Regression coverage** — expand automated coverage for the aligned trainer-card, team-editor, offline, and flavor-title behavior.
 2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
-3. **Save workflow polish** — add HeartGold detection and single-file `.sav` selection.
+3. **Save workflow validation** — add real fixtures for supported pre-Switch games and expand format-specific imports.
 4. **Distribution polish** — finalize launcher icon, splash, install guidance, and release consistency.
 5. **Offline maintenance** — keep bundle v5 manifests and Chinese labels current without exposing private service URLs in public copy.
 
 ## Future work
 
-- additional generation-specific save adapters
+- deeper generation-specific save adapters beyond trainer metadata
 - Linux handheld packaging
 - optional hosted sync after privacy, conflict, and account requirements are defined
 - broader accessibility and controller-navigation validation

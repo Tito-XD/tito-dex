@@ -45,6 +45,7 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
     with WidgetsBindingObserver {
   late Future<List<EmulatorAppChoice>> _appsFuture;
   Object? _error;
+  String _query = '';
 
   @override
   void initState() {
@@ -108,7 +109,11 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
               );
             }
 
-            return _EmulatorPickerList(apps: apps);
+            return _EmulatorPickerList(
+              apps: apps,
+              query: _query,
+              onQueryChanged: (value) => setState(() => _query = value),
+            );
           },
         ),
       ),
@@ -117,10 +122,7 @@ class _EmulatorPickerSheetState extends State<_EmulatorPickerSheet>
 }
 
 class _EmulatorPickerMessage extends StatelessWidget {
-  const _EmulatorPickerMessage({
-    required this.message,
-    required this.onRetry,
-  });
+  const _EmulatorPickerMessage({required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -133,75 +135,149 @@ class _EmulatorPickerMessage extends StatelessWidget {
       children: [
         Text(message, style: context.tito.cardBody),
         const SizedBox(height: 12),
-        FilledButton(
-          onPressed: onRetry,
-          child: const Text(AppZh.dexRetry),
-        ),
+        FilledButton(onPressed: onRetry, child: const Text(AppZh.dexRetry)),
       ],
     );
   }
 }
 
 class _EmulatorPickerList extends StatelessWidget {
-  const _EmulatorPickerList({required this.apps});
+  const _EmulatorPickerList({
+    required this.apps,
+    required this.query,
+    required this.onQueryChanged,
+  });
 
   final List<EmulatorAppChoice> apps;
+  final String query;
+  final ValueChanged<String> onQueryChanged;
 
   @override
   Widget build(BuildContext context) {
     final maxHeight = MediaQuery.sizeOf(context).height * 0.55;
+    final normalizedQuery = query.trim().toLowerCase();
+    final filtered = apps
+        .where((app) {
+          if (normalizedQuery.isEmpty) {
+            return true;
+          }
+          return '${app.appName} ${app.packageName}'.toLowerCase().contains(
+            normalizedQuery,
+          );
+        })
+        .toList(growable: false);
+    final recommended = filtered
+        .where(isRecommendedEmulator)
+        .toList(growable: false);
+    final other = filtered
+        .where((app) => !isRecommendedEmulator(app))
+        .toList(growable: false);
+    final listChildren = <Widget>[];
+
+    void addSection(String title, List<EmulatorAppChoice> sectionApps) {
+      if (sectionApps.isEmpty) {
+        return;
+      }
+      if (listChildren.isNotEmpty) {
+        listChildren.add(const SizedBox(height: 12));
+      }
+      listChildren.add(_AppSectionHeader(title: title));
+      listChildren.add(const SizedBox(height: 6));
+      for (final app in sectionApps) {
+        listChildren.add(_AppChoiceTile(app: app));
+        listChildren.add(const SizedBox(height: 8));
+      }
+    }
+
+    if (normalizedQuery.isNotEmpty) {
+      addSection(AppZh.continueSheetSearchResults, filtered);
+    } else {
+      addSection(AppZh.continueSheetRecommended, recommended);
+      addSection(AppZh.continueSheetOtherApps, other);
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          AppZh.continueSheetPickEmulator,
-          style: context.tito.cardTitle,
+        Text(AppZh.continueSheetPickEmulator, style: context.tito.cardTitle),
+        const SizedBox(height: 12),
+        TextField(
+          onChanged: onQueryChanged,
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            hintText: AppZh.continueSheetSearchHint,
+            prefixIcon: const Icon(Icons.search_rounded),
+            isDense: true,
+          ),
         ),
         const SizedBox(height: 12),
         ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: apps.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final app = apps[index];
-              return Material(
-                color: TitoColors.card,
-                borderRadius: BorderRadius.circular(TitoRadii.md),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  onTap: () => Navigator.pop(context, app),
+          child: listChildren.isEmpty
+              ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            app.appName,
-                            style: context.tito.cardBodyEmphasis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            app.packageName,
-                            style: context.tito.caption,
-                            textAlign: TextAlign.end,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Text(
+                      AppZh.continueSheetNoSearchResults,
+                      style: context.tito.cardBody,
                     ),
                   ),
-                ),
-              );
-            },
-          ),
+                )
+              : ListView(shrinkWrap: true, children: listChildren),
         ),
       ],
+    );
+  }
+}
+
+class _AppSectionHeader extends StatelessWidget {
+  const _AppSectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: context.tito.captionStrong.copyWith(color: TitoColors.mutedInk),
+    );
+  }
+}
+
+class _AppChoiceTile extends StatelessWidget {
+  const _AppChoiceTile({required this.app});
+
+  final EmulatorAppChoice app;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: TitoColors.card,
+      borderRadius: BorderRadius.circular(TitoRadii.md),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        onTap: () => Navigator.pop(context, app),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(app.appName, style: context.tito.cardBodyEmphasis),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  app.packageName,
+                  style: context.tito.caption,
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

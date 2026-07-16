@@ -1,3 +1,7 @@
+/// Increment when parsing semantics change so unchanged files are re-imported
+/// once after an app upgrade.
+const saveParserRevision = 2;
+
 class ParsedPartyMember {
   const ParsedPartyMember({
     required this.speciesId,
@@ -29,6 +33,7 @@ class ParsedSaveSummary {
     required this.party,
     required this.saveHash,
     required this.parsedAt,
+    this.savedAt,
     this.warnings = const [],
     this.tid,
     this.mapHeaderId,
@@ -45,6 +50,11 @@ class ParsedSaveSummary {
   final List<ParsedPartyMember> party;
   final String saveHash;
   final DateTime parsedAt;
+
+  /// Best available save timestamp: embedded game timestamp when present,
+  /// otherwise the source file's modified time. This is intentionally
+  /// separate from [parsedAt], which only records when TitoDex imported it.
+  final DateTime? savedAt;
   final List<String> warnings;
   final int? tid;
   final int? mapHeaderId;
