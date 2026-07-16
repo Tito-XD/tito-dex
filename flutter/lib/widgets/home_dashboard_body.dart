@@ -26,8 +26,12 @@ class HomeDashboardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (DeviceLayout.useSquareDashboard(context)) {
-      return _SquareHomeLayout(
+    // Square handhelds AND regular landscape screens (tablets, rotated
+    // phones) share the horizontal composition: portrait's fixed-height
+    // stack would clip the party card and force scrolling there.
+    if (DeviceLayout.useSquareDashboard(context) ||
+        DeviceLayout.isLandscape(context)) {
+      return _HorizontalHomeLayout(
         journey: journey,
         saveLinked: saveLinked,
         onJourneyOpen: onJourneyOpen,
@@ -133,8 +137,8 @@ class _PortraitHomeLayout extends StatelessWidget {
   }
 }
 
-class _SquareHomeLayout extends StatelessWidget {
-  const _SquareHomeLayout({
+class _HorizontalHomeLayout extends StatelessWidget {
+  const _HorizontalHomeLayout({
     required this.journey,
     required this.saveLinked,
     required this.onJourneyOpen,
@@ -162,6 +166,11 @@ class _SquareHomeLayout extends StatelessWidget {
                 flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                  // Without a linked save there is no journey card below the
+                  // trainer card — center it so the column has no dead gap.
+                  mainAxisAlignment: saveLinked
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
                   children: [
                     _TrainerCardSlot(
                       journey: journey,

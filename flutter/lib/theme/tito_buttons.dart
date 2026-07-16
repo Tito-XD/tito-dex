@@ -42,7 +42,7 @@ class TitoPrimaryButton extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 3),
+            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
             boxShadow: const [
               BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
             ],
@@ -112,7 +112,7 @@ class TitoSecondaryButton extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 3),
+            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
             boxShadow: const [
               BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
             ],
@@ -162,7 +162,7 @@ class TitoCoralButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 3),
+            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
             boxShadow: const [
               BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
             ],
@@ -208,15 +208,6 @@ class TitoQuickTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = square
-        ? null
-        : (dense
-            ? DeviceLayout.squareQuickTileHeight(context)
-            : (compact ? 56.0 : 88.0));
-    final iconSize = square
-        ? DeviceLayout.quickTileIconSize(context, square: true)
-        : (dense ? 18.0 : (compact ? 22.0 : 28.0));
-
     final tile = HandheldFocusDecorator(
       onActivate: onTap,
       child: Material(
@@ -229,49 +220,44 @@ class TitoQuickTile extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink, width: 3),
+              border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
               boxShadow: const [
                 BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
               ],
             ),
-            child: square
-                ? LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            icon,
-                            color: TitoColors.deepBlue,
-                            size: iconSize,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.tito.quickTileLabel,
-                          ),
-                        ],
-                      );
-                    },
-                  )
-                : SizedBox(
-                    height: height,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-                        SizedBox(height: dense ? 2 : (compact ? 4 : 8)),
-                        Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: context.tito.quickTileLabel,
-                        ),
-                      ],
+            // Icon and label scale off the tile's own height, never off
+            // inherited scale scopes: the portrait grid and the square bar
+            // stay visually identical, and the Hero flight to the Dex page
+            // re-inflates this subtree in the overlay without the icon or
+            // label snapping to a different size mid-transition.
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final side = constraints.maxHeight.isFinite
+                    ? (constraints.maxWidth.isFinite
+                          ? math.min(constraints.maxWidth, constraints.maxHeight)
+                          : constraints.maxHeight)
+                    : 88.0;
+                final iconSize = side * 0.38;
+                final fontSize = (side * 0.18).clamp(10.0, 24.0).toDouble();
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: TitoColors.deepBlue, size: iconSize),
+                    SizedBox(height: side * 0.04),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TitoTypography.style(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w800,
+                        color: TitoColors.deepBlue,
+                      ),
                     ),
-                  ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -326,7 +312,7 @@ class TitoPolaroidQuickTile extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: radius,
-              border: Border.all(color: TitoColors.ink, width: 3),
+              border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
               boxShadow: const [
                 BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
               ],
@@ -415,7 +401,7 @@ class TitoBadgePill extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 3),
+        border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
         boxShadow: const [
           BoxShadow(color: Color(0x3818283B), offset: Offset(0, 3)),
         ],

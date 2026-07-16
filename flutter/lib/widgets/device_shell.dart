@@ -128,7 +128,10 @@ class _PreviewShell extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: TitoColors.slateBlue,
                   borderRadius: BorderRadius.circular(TitoRadii.xl),
-                  border: Border.all(color: TitoColors.ink, width: 3),
+                  border: Border.all(
+                    color: TitoColors.ink,
+                    width: TitoBorders.card,
+                  ),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x4D18283B),

@@ -264,7 +264,7 @@ class _TrainerAvatar extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 3),
+        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

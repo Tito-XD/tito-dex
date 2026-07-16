@@ -6,10 +6,9 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · App `0.5.5+63` | arm64-v8a, about 23 MB |
-| Offline APK | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · App `0.5.5-offline+64` | Bundles the current dex pack, about 64 MB |
-| Preview APKs | [v0.5.51](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.51) · Apps `0.5.51+65` / `0.5.51-offline+66` | Pre-release with corrected Home quick-action return motion |
-| `main` source baseline | App `0.5.51+65` | Stable feature set plus the preview navigation fix |
+| Lite APK | [v0.6.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.0) · App `0.6.0+67` | arm64-v8a, about 23 MB |
+| Offline APK | [v0.6.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.0) · App `0.6.0-offline+68` | Bundles the current dex pack, about 64 MB |
+| `main` source baseline | App `0.6.0+67` | Standby companion 2.0, landscape dashboard, bundled game icons |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
@@ -20,7 +19,7 @@ Offline dex bundle: **v5** · 1025 species · 23 game editions.
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata import and richer HGSS party/map/dex parsing
 - **Native Android handoff** — choose an installed emulator or game app and resume from TitoDex
-- **Companion touches** — configurable standby Pokémon, a six-slot party card, rare shiny surprises, and a silhouette quiz
+- **Companion touches** — a height-scaled animated standby Pokémon with quotes and cries, a six-slot party card, rare shiny surprises, and a silhouette quiz
 - **Pokédex 1–1025** — search, regional scopes, per-game flavor text, obtain data, moves, abilities, and sprites
 - **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status
 - **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers
@@ -51,7 +50,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.5.5-lite-rg-arm64.apk`** or **`TitoDex-0.5.5-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.6.0-lite-rg-arm64.apk`** or **`TitoDex-0.6.0-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

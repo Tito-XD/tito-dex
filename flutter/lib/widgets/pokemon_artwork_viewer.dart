@@ -252,7 +252,30 @@ class _ArtworkImage extends StatelessWidget {
 
     final uri = Uri.tryParse(source);
     if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
-      return Image.network(source, fit: BoxFit.contain, errorBuilder: missing);
+      return Image.network(
+        source,
+        fit: BoxFit.contain,
+        errorBuilder: missing,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) {
+            return child;
+          }
+          final total = progress.expectedTotalBytes;
+          return Center(
+            child: SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                value: total == null || total == 0
+                    ? null
+                    : progress.cumulativeBytesLoaded / total,
+                strokeWidth: 3,
+                color: TitoColors.card,
+              ),
+            ),
+          );
+        },
+      );
     }
     return Image.file(File(source), fit: BoxFit.contain, errorBuilder: missing);
   }

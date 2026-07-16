@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import '../dex/dex_game_scope.dart';
 
 /// Canonical game edition for home / dex / detail / battle tools (23 games).
@@ -53,10 +55,41 @@ class GameEdition {
   /// PokeAPI version-group key used for in-game dex sprites.
   String get spriteVersionGroup => dataVersionGroupKey;
 
-  String? get iconUrl {
-    final key = versionGroup ?? fallbackSlug;
-    return 'https://dex.tito.cafe/v3/game_icons/$key.png';
-  }
+  /// Bundled official Pokémon HOME game icon — only Gen VI+ titles have
+  /// square per-game icons (Nintendo never drew them for older games), so
+  /// earlier editions fall back to a version-tinted letter badge. Bundled in
+  /// the APK on purpose: 11 files ≈ 88 KB, no CDN round trip.
+  String? get iconAsset => switch (slug) {
+    'xy' ||
+    'oras' ||
+    'sm' ||
+    'usum' ||
+    'lgpe' ||
+    'swsh' ||
+    'bdsp' ||
+    'pla' ||
+    'sv' ||
+    'lza' ||
+    'champions' => 'assets/game_icons/$slug.png',
+    _ => null,
+  };
+
+  /// Representative version color for the letter-badge fallback.
+  Color get accentColor => switch (slug) {
+    'rgb' => const Color(0xFFE3350D),
+    'yellow' => const Color(0xFFF2C63A),
+    'gs' => const Color(0xFFC9A548),
+    'crystal' => const Color(0xFF6FC7D8),
+    'rs' => const Color(0xFFB63A2F),
+    'emerald' => const Color(0xFF2FA05C),
+    'frlg' => const Color(0xFFE8703A),
+    'dp' => const Color(0xFF6C93C4),
+    'pt' => const Color(0xFF8E8E9E),
+    'hgss' => const Color(0xFFD1A62C),
+    'bw' => const Color(0xFF4A4A55),
+    'bw2' => const Color(0xFF3D7A99),
+    _ => const Color(0xFF7B91A6),
+  };
 
   static const GameEdition hgss = GameEdition(
     slug: 'hgss',

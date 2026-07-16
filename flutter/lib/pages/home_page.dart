@@ -8,7 +8,6 @@ import '../navigation/tito_page_transition.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_standby.dart';
 import '../widgets/home_dashboard_body.dart';
@@ -41,9 +40,7 @@ class HomePage extends StatelessWidget {
           : () => onGameBadgeTap!(context),
     );
 
-    final quickActions = DeviceLayout.useSquareDashboard(context)
-        ? const _QuickActionsBar()
-        : _QuickActionsGrid(dense: DeviceLayout.isCompact(context));
+    const quickActions = _QuickActionsRow();
 
     return Padding(
       padding: padding,
@@ -70,9 +67,10 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// Bottom quick bar — square tiles in one row on handheld dashboard.
-class _QuickActionsBar extends StatelessWidget {
-  const _QuickActionsBar();
+/// Bottom quick bar — the same square tiles on both the portrait phone
+/// layout and the handheld square dashboard, sized by one shared formula.
+class _QuickActionsRow extends StatelessWidget {
+  const _QuickActionsRow();
 
   @override
   Widget build(BuildContext context) {
@@ -82,28 +80,25 @@ class _QuickActionsBar extends StatelessWidget {
 
     return SizedBox(
       height: quickSize,
-      child: TitoFontScale(
-        multiplier: 2.0,
-        child: Row(
-          children: [
-            for (var index = 0; index < actions.length; index++) ...[
-              if (index > 0) SizedBox(width: gap),
-              Expanded(
-                child: _withDexHero(
-                  actions[index],
-                  TitoQuickTile(
-                    label: actions[index].label,
-                    icon: actions[index].icon,
-                    onTap: () => _openRoute(context, actions[index]),
-                    compact: true,
-                    dense: true,
-                    square: true,
-                  ),
+      child: Row(
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) SizedBox(width: gap),
+            Expanded(
+              child: _withDexHero(
+                actions[index],
+                TitoQuickTile(
+                  label: actions[index].label,
+                  icon: actions[index].icon,
+                  onTap: () => _openRoute(context, actions[index]),
+                  compact: true,
+                  dense: true,
+                  square: true,
                 ),
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -119,38 +114,6 @@ Widget _withDexHero(_QuickAction action, Widget child) {
     return child;
   }
   return Hero(tag: heroTag, transitionOnUserGestures: false, child: child);
-}
-
-class _QuickActionsGrid extends StatelessWidget {
-  const _QuickActionsGrid({required this.dense});
-
-  final bool dense;
-
-  @override
-  Widget build(BuildContext context) {
-    final actions = _quickActions();
-    final gap = dense ? 6.0 : 10.0;
-
-    return Row(
-      children: [
-        for (var index = 0; index < actions.length; index++) ...[
-          if (index > 0) SizedBox(width: gap),
-          Expanded(
-            child: _withDexHero(
-              actions[index],
-              TitoQuickTile(
-                label: actions[index].label,
-                icon: actions[index].icon,
-                onTap: () => _openRoute(context, actions[index]),
-                compact: true,
-                dense: dense,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
 }
 
 List<_QuickAction> _quickActions() {

@@ -14,12 +14,17 @@ class FallbackSpriteImage extends StatefulWidget {
     this.width,
     this.height,
     this.fit = BoxFit.contain,
+    this.showLoadingProgress = false,
   });
 
   final List<String> sources;
   final double? width;
   final double? height;
   final BoxFit fit;
+
+  /// Show a small progress ring while a network source downloads
+  /// (with real byte progress when the server reports content length).
+  final bool showLoadingProgress;
 
   @override
   State<FallbackSpriteImage> createState() => _FallbackSpriteImageState();
@@ -81,6 +86,19 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
         fit: widget.fit,
         gaplessPlayback: true,
         errorBuilder: onError,
+        loadingBuilder: widget.showLoadingProgress
+            ? (context, child, progress) {
+                if (progress == null) {
+                  return child;
+                }
+                final total = progress.expectedTotalBytes;
+                return _loadingRing(
+                  total == null || total == 0
+                      ? null
+                      : progress.cumulativeBytesLoaded / total,
+                );
+              }
+            : null,
       );
     }
 
@@ -100,6 +118,27 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
       decoration: BoxDecoration(
         color: TitoColors.card.withValues(alpha: 0.45),
         borderRadius: BorderRadius.circular(TitoRadii.sm),
+      ),
+    );
+  }
+
+  Widget _loadingRing(double? value) {
+    final side = widget.width ?? widget.height ?? 40.0;
+    final ring = (side * 0.42).clamp(14.0, 26.0);
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: Center(
+        child: SizedBox(
+          width: ring,
+          height: ring,
+          child: CircularProgressIndicator(
+            value: value,
+            strokeWidth: 2.5,
+            color: TitoColors.deepBlue,
+            backgroundColor: TitoColors.deepBlue.withValues(alpha: 0.15),
+          ),
+        ),
       ),
     );
   }

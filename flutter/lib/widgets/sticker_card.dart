@@ -32,7 +32,7 @@ class StickerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.$1,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: TitoColors.ink, width: 3),
+        border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
         boxShadow: const [
           BoxShadow(
             color: Color(0x3818283B),

@@ -15,11 +15,16 @@ class CompanionChoice {
 class CompanionRepository extends ChangeNotifier {
   static const _idKey = 'companion.pokemonId';
   static const _nameKey = 'companion.nameZh';
+  static const _enabledKey = 'companion.enabled';
 
   CompanionChoice? _choice;
+  bool _enabled = true;
   bool _loaded = false;
 
   CompanionChoice? get choice => _choice;
+
+  /// Whether the standby companion shows on the home dashboard (default on).
+  bool get enabled => _enabled;
 
   Future<void> load() async {
     if (_loaded) {
@@ -28,11 +33,22 @@ class CompanionRepository extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt(_idKey);
     final name = prefs.getString(_nameKey);
+    final enabled = prefs.getBool(_enabledKey) ?? true;
     _loaded = true;
+    _enabled = enabled;
     if (id != null && id > 0) {
       _choice = CompanionChoice(pokemonId: id, nameZh: name ?? '#$id');
+    }
+    if (!enabled || _choice != null) {
       notifyListeners();
     }
+  }
+
+  Future<void> setEnabled(bool enabled) async {
+    _enabled = enabled;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_enabledKey, enabled);
   }
 
   Future<void> save(CompanionChoice choice) async {

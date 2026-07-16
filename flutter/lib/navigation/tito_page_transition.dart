@@ -320,7 +320,7 @@ Widget _homeActionFlightShuttle(
     builder: (context, _) {
       final progress = animation.value;
       final radius = 14 * (1 - progress);
-      final borderWidth = 3 * (1 - progress);
+      final borderWidth = TitoBorders.card * (1 - progress);
 
       return Material(
         animationDuration: Duration.zero,

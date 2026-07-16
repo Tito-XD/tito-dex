@@ -62,5 +62,17 @@ void main() {
         expect(companionPatQuotes, contains(pickCompanionQuote(random)));
       }
     });
+
+    test('formatCompanionQuote substitutes the companion name', () {
+      expect(
+        formatCompanionQuote('{name}使用了撒娇！', '火球鼠'),
+        '火球鼠使用了撒娇！',
+      );
+      expect(formatCompanionQuote('效果拔群！', '火球鼠'), '效果拔群！');
+      expect(
+        formatCompanionQuote(companionFriendshipQuote, '波克比'),
+        '波克比最喜欢你了！❤',
+      );
+    });
   });
 }

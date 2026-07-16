@@ -47,7 +47,7 @@ class TitoBottomNav extends StatelessWidget {
         decoration: BoxDecoration(
           color: TitoColors.deepBlue,
           borderRadius: BorderRadius.circular(TitoRadii.lg),
-          border: Border.all(color: TitoColors.ink, width: 3),
+          border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
           boxShadow: const [
             BoxShadow(
               color: Color(0x3818283B),
@@ -168,7 +168,7 @@ class _CenterNavItem extends StatelessWidget {
       child: Material(
         color: selected ? TitoColors.softYellow : TitoColors.cream,
         shape: const CircleBorder(
-          side: BorderSide(color: TitoColors.ink, width: 3),
+          side: BorderSide(color: TitoColors.ink, width: TitoBorders.element),
         ),
         elevation: 0,
         child: InkWell(

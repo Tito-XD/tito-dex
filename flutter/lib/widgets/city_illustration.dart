@@ -64,7 +64,7 @@ class CityIllustration extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        border: Border.all(color: TitoColors.ink, width: 3),
+        border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,

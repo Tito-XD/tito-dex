@@ -38,7 +38,10 @@ class CompanionSticker extends StatelessWidget {
             decoration: BoxDecoration(
               color: TitoColors.card,
               shape: BoxShape.circle,
-              border: Border.all(color: TitoColors.ink, width: 3),
+              border: Border.all(
+                color: TitoColors.ink,
+                width: TitoBorders.element,
+              ),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x2818283B),
