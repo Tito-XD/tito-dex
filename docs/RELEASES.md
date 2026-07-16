@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.6.2` (`0.6.2+71`) | Recommended arm64-v8a download |
-| Offline APK | `v0.6.2` (`0.6.2-offline+72`) | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.6.2+71` | Current default branch baseline |
+| Lite APK | `v0.6.2.1` (`0.6.2.1+73`) | Recommended arm64-v8a download |
+| Offline APK | `v0.6.2.1` (`0.6.2.1-offline+74`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.6.2+73` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.6.2.1` | TitoDex v0.6.2.1 · 自适应应用图标 | Replaces the inset circular launcher mark with full-bleed artwork so Android can apply each device's circle, squircle, rounded-square, or square adaptive mask naturally. |
 | `v0.6.2` | TitoDex v0.6.2 · 同行大小与即时媒体 | Adds the companion size slider with raised height ceilings and pixel-crisp upscaling, bundles all starter GIFs and cries into the APK, and introduces a cancellable preload dialog when choosing any other companion. |
 | `v0.6.1` | TitoDex v0.6.1 · 同行宝可梦与横屏布局 | Upgrades the standby companion to a frameless height-scaled animation with quotes, cries, and a toggle; bundles official Gen VI+ game icons into the header and pickers; adds a one-screen landscape home layout; and unifies secondary-page header sizing. (v0.6.0 was built but superseded before publication.) |
 | `v0.5.51` | TitoDex v0.5.51 · Home 返回动画修正预发布 | Keeps Team and Search exit motion aligned with their entry edge and removes predictive-back progress from the three Home quick actions. |

@@ -4,28 +4,28 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- The complete Pokédex mark stays inside Android's 66dp safe zone. -->
-    <path
-        android:fillColor="#FF121417"
-        android:pathData="M54,20 A34,34 0,1 1,54 88 A34,34 0,1 1,54 20 Z" />
+    <!-- Full-bleed adaptive artwork: the launcher mask supplies the silhouette. -->
     <path
         android:fillColor="#FF4A90E2"
-        android:pathData="M54,23 A31,31 0,0 1,85 54 L23,54 A31,31 0,0 1,54 23 Z" />
+        android:pathData="M0,0 H108 V54 H0 Z" />
     <path
         android:fillColor="#FF2C313A"
-        android:pathData="M23,54 L85,54 A31,31 0,0 1,23 54 Z" />
+        android:pathData="M0,54 H108 V108 H0 Z" />
     <path
         android:fillColor="#FF121417"
-        android:pathData="M23,48 L85,48 L85,60 L23,60 Z" />
+        android:pathData="M0,47 H108 V61 H0 Z" />
     <path
         android:fillColor="#FFF5F7FA"
-        android:pathData="M29,51 L79,51 A3,3 0,0 1,79 57 L29,57 A3,3 0,0 1,29 51 Z" />
+        android:pathData="M15,50 H43 A4,4 0,0 1,43 58 H15 A4,4 0,0 1,15 50 Z" />
+    <path
+        android:fillColor="#FFF5F7FA"
+        android:pathData="M65,50 H93 A4,4 0,0 1,93 58 H65 A4,4 0,0 1,65 50 Z" />
     <path
         android:fillColor="#FF121417"
-        android:pathData="M54,43 A11,11 0,1 1,54 65 A11,11 0,1 1,54 43 Z" />
+        android:pathData="M54,41 A13,13 0,1 1,54 67 A13,13 0,1 1,54 41 Z" />
     <path
         android:fillColor="#FFF5F7FA"
-        android:pathData="M54,46 A8,8 0,1 1,54 62 A8,8 0,1 1,54 46 Z" />
+        android:pathData="M54,45 A9,9 0,1 1,54 63 A9,9 0,1 1,54 45 Z" />
     <path
         android:fillColor="#FF4A90E2"
         android:pathData="M54,49 A5,5 0,1 1,54 59 A5,5 0,1 1,54 49 Z" />
