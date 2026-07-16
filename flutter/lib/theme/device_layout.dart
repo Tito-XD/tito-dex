@@ -255,10 +255,12 @@ abstract final class DeviceLayout {
 
   static double dexBackControlSize(BuildContext context) => dim(context, 40.0);
 
-  static double dexBackIconSize(BuildContext context) => dim(context, 40.0);
+  /// Secondary-page titles are a fixed 22.5px (SecondaryTypography spec), so
+  /// the back arrow is fixed too — icon and text read as one unit on every
+  /// page depth and device instead of the arrow scaling independently.
+  static double backIconSize(BuildContext context) => 26.0;
 
-  /// Back arrow — unified size across secondary/detail pages.
-  static double backIconSize(BuildContext context) => dexBackIconSize(context);
+  static double dexBackIconSize(BuildContext context) => backIconSize(context);
 
   static double trainerMicroCardHeight(BuildContext context) =>
       dim(context, 116.0);

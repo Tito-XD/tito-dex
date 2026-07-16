@@ -26,6 +26,7 @@ import '../theme/tito_font_scale.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/settings_expandable_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
@@ -763,54 +764,46 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const SizedBox(height: 16),
-          StickerCard(
+          SettingsExpandableSection(
+            title: AppZh.settingsGroupAdvanced,
+            subtitle: AppZh.settingsGroupAdvancedHint,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppZh.settingsGroupAdvanced,
-                  style: SecondaryTypography.onCard.h15,
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onImportFixture,
+                        child: const Text(AppZh.settingsImportSave),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onExportJourney,
+                        child: const Text(AppZh.settingsExportJourney),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
-                _Row(
-                  label: AppZh.settingsCurrentGame,
-                  value: localizeGame(widget.journey.game),
-                ),
-                _Row(
-                  label: AppZh.settingsLocation,
-                  value: localizeLocation(widget.journey.location),
-                ),
-                _Row(
-                  label: AppZh.settingsPlayTime,
-                  value: widget.journey.playTime,
-                ),
-                _Row(
-                  label: AppZh.settingsBadges,
-                  value: '${widget.journey.badges}/${widget.journey.maxBadges}',
-                ),
-                const SizedBox(height: 6),
-                FilledButton(
-                  onPressed: widget.onImportFixture,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: TitoColors.deepBlue,
-                    foregroundColor: TitoColors.card,
-                  ),
-                  child: const Text(AppZh.settingsImportSave),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: widget.onExportJourney,
-                  child: const Text(AppZh.settingsExportJourney),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: widget.onImportJourney,
-                  child: const Text(AppZh.settingsImportJourney),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: widget.onResetMock,
-                  child: const Text(AppZh.settingsResetMock),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onImportJourney,
+                        child: const Text(AppZh.settingsImportJourney),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onResetMock,
+                        child: const Text(AppZh.settingsResetMock),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
