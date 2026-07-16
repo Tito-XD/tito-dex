@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/companion/companion_media.dart';
 import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_repository.dart';
@@ -67,9 +68,11 @@ class _CompanionStandbyState extends State<CompanionStandby>
   final _hearts = <_HeartParticle>[];
   final _cryPlayer = AudioPlayer();
   late Future<int?> _heightFuture;
+  List<String>? _spriteSources;
   Timer? _quoteTimer;
   String? _quoteTemplate;
   var _cryUrlIndex = 0;
+  var _cryBusy = false;
   var _nextHeartId = 0;
   var _pats = 0;
 
@@ -79,6 +82,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
   void initState() {
     super.initState();
     _heightFuture = _loadHeight(widget.speciesId);
+    _resolveSpriteSources();
     _bounce = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 420),
@@ -100,7 +104,29 @@ class _CompanionStandbyState extends State<CompanionStandby>
       _cryUrlIndex = 0;
       _quoteTimer?.cancel();
       _heightFuture = _loadHeight(widget.speciesId);
+      _spriteSources = null;
+      _resolveSpriteSources();
     }
+  }
+
+  /// Sprite source order: bundled asset (starters) → disk cache (chosen via
+  /// the picker's preload dialog) → network candidates.
+  Future<void> _resolveSpriteSources() async {
+    final id = widget.speciesId;
+    final bundled = bundledCompanionGifAsset(id);
+    final cached = bundled == null
+        ? await companionMediaCache.cachedGifPath(id)
+        : null;
+    if (!mounted || id != widget.speciesId) {
+      return;
+    }
+    setState(() {
+      _spriteSources = [
+        if (bundled != null) bundled,
+        if (cached != null) cached,
+        ...animatedSpriteCandidatesFor(id),
+      ];
+    });
   }
 
   @override
@@ -111,20 +137,47 @@ class _CompanionStandbyState extends State<CompanionStandby>
     super.dispose();
   }
 
-  /// Play the species cry, walking the CDN→GitHub candidate list once and
-  /// then sticking with whichever source worked. Silent on total failure —
-  /// the pat animation carries the interaction offline.
+  /// Play the species cry: bundled asset (starters) → disk cache → network
+  /// stream (which also backfills the cache). Guarded so rapid taps don't
+  /// stack downloads; silent on total failure — the pat animation carries
+  /// the interaction offline.
   Future<void> _playCry() async {
-    final candidates = cryCandidatesFor(widget.speciesId);
-    for (var i = _cryUrlIndex; i < candidates.length; i++) {
-      try {
+    if (_cryBusy) {
+      return;
+    }
+    _cryBusy = true;
+    final id = widget.speciesId;
+    try {
+      final bundled = bundledCompanionCryAsset(id);
+      if (bundled != null) {
         await _cryPlayer.stop();
-        await _cryPlayer.play(UrlSource(candidates[i]), volume: 0.55);
-        _cryUrlIndex = i;
+        await _cryPlayer.play(
+          AssetSource(bundled.substring('assets/'.length)),
+          volume: 0.55,
+        );
         return;
-      } catch (_) {
-        // Try the next source.
       }
+      final cached = await companionMediaCache.cachedCryPath(id);
+      if (cached != null) {
+        await _cryPlayer.stop();
+        await _cryPlayer.play(DeviceFileSource(cached), volume: 0.55);
+        return;
+      }
+      final candidates = cryCandidatesFor(id);
+      for (var i = _cryUrlIndex; i < candidates.length; i++) {
+        try {
+          await _cryPlayer.stop();
+          await _cryPlayer.play(UrlSource(candidates[i]), volume: 0.55);
+          _cryUrlIndex = i;
+          // Backfill the disk cache so the next pat is instant.
+          unawaited(companionMediaCache.ensureCry(id));
+          return;
+        } catch (_) {
+          // Try the next source.
+        }
+      }
+    } finally {
+      _cryBusy = false;
     }
   }
 
@@ -222,7 +275,13 @@ class _CompanionStandbyState extends State<CompanionStandby>
       height: spriteSize,
       alignment: Alignment.bottomCenter,
       child: FallbackSpriteImage(
-        sources: animatedSpriteCandidatesFor(widget.speciesId),
+        sources:
+            _spriteSources ??
+            [
+              if (bundledCompanionGifAsset(widget.speciesId) != null)
+                bundledCompanionGifAsset(widget.speciesId)!,
+              ...animatedSpriteCandidatesFor(widget.speciesId),
+            ],
         width: spriteSize,
         height: spriteSize,
         showLoadingProgress: true,

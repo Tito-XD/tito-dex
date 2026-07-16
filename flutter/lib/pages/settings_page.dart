@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
@@ -940,7 +941,11 @@ class _CompanionSection extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     padding: const EdgeInsets.all(4),
                     child: FallbackSpriteImage(
-                      sources: animatedSpriteCandidatesFor(speciesId),
+                      sources: [
+                        if (bundledCompanionGifAsset(speciesId) != null)
+                          bundledCompanionGifAsset(speciesId)!,
+                        ...animatedSpriteCandidatesFor(speciesId),
+                      ],
                       showLoadingProgress: true,
                     ),
                   ),

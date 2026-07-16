@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
@@ -55,6 +58,18 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
   }
 
   Future<void> _select(PokemonSummary summary) async {
+    // Starters ship inside the APK — no download, keep instantly.
+    if (!bundledCompanionIds.contains(summary.id)) {
+      final ready = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) =>
+            _CompanionMediaLoadingDialog(summary: summary),
+      );
+      if (ready != true || !mounted) {
+        return; // Cancelled — keep the previous companion.
+      }
+    }
     final choice = CompanionChoice(
       pokemonId: summary.id,
       nameZh: summary.nameZh,
@@ -143,6 +158,155 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
           ],
         ),
       ),
+    );
+  }
+}
+
+enum _MediaLoadState { loading, done, failed }
+
+/// Cancellable preload dialog — downloads the animated GIF and cry to the
+/// disk cache before the choice is committed, so the home standby and the
+/// first pat are instant. Failures still proceed (static fallback works).
+class _CompanionMediaLoadingDialog extends StatefulWidget {
+  const _CompanionMediaLoadingDialog({required this.summary});
+
+  final PokemonSummary summary;
+
+  @override
+  State<_CompanionMediaLoadingDialog> createState() =>
+      _CompanionMediaLoadingDialogState();
+}
+
+class _CompanionMediaLoadingDialogState
+    extends State<_CompanionMediaLoadingDialog> {
+  var _gif = _MediaLoadState.loading;
+  var _cry = _MediaLoadState.loading;
+  var _cancelled = false;
+
+  bool get _settled =>
+      _gif != _MediaLoadState.loading && _cry != _MediaLoadState.loading;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final id = widget.summary.id;
+    await Future.wait([
+      companionMediaCache.ensureGif(id).then((path) {
+        _update(() {
+          _gif = path != null
+              ? _MediaLoadState.done
+              : _MediaLoadState.failed;
+        });
+      }),
+      companionMediaCache.ensureCry(id).then((path) {
+        _update(() {
+          _cry = path != null
+              ? _MediaLoadState.done
+              : _MediaLoadState.failed;
+        });
+      }),
+    ]);
+    if (_cancelled || !mounted) {
+      return;
+    }
+    // Let the checkmarks land before the dialog closes itself.
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    if (mounted && !_cancelled) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  void _update(VoidCallback change) {
+    if (mounted && !_cancelled) {
+      setState(change);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final anyFailed =
+        _gif == _MediaLoadState.failed || _cry == _MediaLoadState.failed;
+
+    return AlertDialog(
+      backgroundColor: TitoColors.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        side: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      title: Text(
+        AppZh.companionMediaTitle(widget.summary.nameZh),
+        style: SecondaryTypography.onCard.h15,
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _MediaLoadRow(label: AppZh.companionMediaGif, state: _gif),
+          const SizedBox(height: 10),
+          _MediaLoadRow(label: AppZh.companionMediaCry, state: _cry),
+          if (_settled && anyFailed) ...[
+            const SizedBox(height: 10),
+            Text(
+              AppZh.companionMediaFailedHint,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            _cancelled = true;
+            Navigator.of(context).pop(false);
+          },
+          child: const Text(AppZh.cancel),
+        ),
+      ],
+    );
+  }
+}
+
+class _MediaLoadRow extends StatelessWidget {
+  const _MediaLoadRow({required this.label, required this.state});
+
+  final String label;
+  final _MediaLoadState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final indicator = switch (state) {
+      _MediaLoadState.loading => const SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          color: TitoColors.deepBlue,
+        ),
+      ),
+      _MediaLoadState.done => const Icon(
+        Icons.check_circle_rounded,
+        size: 18,
+        color: TitoColors.mint,
+      ),
+      _MediaLoadState.failed => const Icon(
+        Icons.error_outline_rounded,
+        size: 18,
+        color: TitoColors.coral,
+      ),
+    };
+
+    return Row(
+      children: [
+        indicator,
+        const SizedBox(width: 10),
+        Text(label, style: SecondaryTypography.onCard.body14),
+      ],
     );
   }
 }

@@ -345,6 +345,10 @@ abstract final class AppZh {
   static const companionSettingsHint = '它会以动图形式待在主页右下角，点它有惊喜。';
   static const companionSettingsToggle = '在主页显示同行宝可梦';
   static const companionSettingsSize = '同行大小';
+  static String companionMediaTitle(String name) => '准备 $name 中…';
+  static const companionMediaGif = '载入动图';
+  static const companionMediaCry = '载入叫声';
+  static const companionMediaFailedHint = '部分资源载入失败，将使用静态图或稍后重试。';
   static const settingsGroupAdvancedHint = '内置存档导入、旅程 JSON 导入/导出与重置';
   static const companionSettingsPick = '更换同伴';
   static const companionSettingsReset = '恢复默认（随存档御三家）';
