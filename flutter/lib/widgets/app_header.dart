@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/game/game_catalog.dart';
+import '../features/game/game_edition.dart';
+import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
@@ -53,10 +55,9 @@ class AppHeader extends StatelessWidget {
                 ),
               ),
             ),
-            TitoBadgePill(
-              label: gameBadge,
-              tone: TitoBadgeTone.yellow,
-              compact: compact,
+            _GameBadgeButton(
+              edition: gameEditionRepository.edition,
+              semanticLabel: gameBadge,
               onTap: onGameBadgeTap,
             ),
             if (DeviceLayout.useHandheldChrome(context)) ...[
@@ -73,6 +74,82 @@ class AppHeader extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Home game switcher — the current edition's icon in the same circular
+/// frame and size as the settings button. Square HOME icons are clipped to
+/// the circle (BoxFit.cover crops the corners); pre-Gen-VI editions show
+/// the version-tinted letter code instead.
+class _GameBadgeButton extends StatelessWidget {
+  const _GameBadgeButton({
+    required this.edition,
+    required this.semanticLabel,
+    this.onTap,
+  });
+
+  final GameEdition edition;
+  final String semanticLabel;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = DeviceLayout.headerIconSize(context);
+    final asset = edition.iconAsset;
+    final accent = edition.accentColor;
+    final darkAccent = accent.computeLuminance() < 0.4;
+
+    final content = asset != null
+        ? Image.asset(
+            asset,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) =>
+                _letterContent(size, accent, darkAccent),
+          )
+        : _letterContent(size, accent, darkAccent);
+
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(size / 2),
+      child: Semantics(
+        button: onTap != null,
+        label: '$semanticLabel · ${edition.labelZh}',
+        child: Material(
+          color: asset != null ? TitoColors.card : accent,
+          shape: const CircleBorder(
+            side: BorderSide(color: TitoColors.ink, width: 2),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            customBorder: const CircleBorder(),
+            child: SizedBox(width: size, height: size, child: content),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _letterContent(double size, Color accent, bool darkAccent) {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: size * 0.12),
+          child: Text(
+            gameEditionShortCode(edition),
+            style: TitoTypography.style(
+              fontSize: size * 0.30,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+              color: darkAccent ? TitoColors.card : TitoColors.ink,
+            ),
+          ),
         ),
       ),
     );

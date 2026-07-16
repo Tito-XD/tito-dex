@@ -344,6 +344,7 @@ abstract final class AppZh {
   static const companionSettingsTitle = '同行宝可梦';
   static const companionSettingsHint = '它会以动图形式待在主页右下角，点它有惊喜。';
   static const companionSettingsToggle = '在主页显示同行宝可梦';
+  static const settingsGroupAdvancedHint = '内置存档导入、旅程 JSON 导入/导出与重置';
   static const companionSettingsPick = '更换同伴';
   static const companionSettingsReset = '恢复默认（随存档御三家）';
   static String shinyPartyFound(String name) => '✨ 你的 $name 今天在闪光！';
