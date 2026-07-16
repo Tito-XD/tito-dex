@@ -45,21 +45,55 @@ void main() {
     });
   });
 
+  group('companionQuotePoolFor', () {
+    test('HGSS pool has follower narration plus Gen II flavor', () {
+      final pool = companionQuotePoolFor(generation: 4, editionSlug: 'hgss');
+      expect(pool, containsAll(companionSharedQuotes));
+      expect(pool, containsAll(companionFollowerQuotes));
+      expect(pool, containsAll(companionGenerationQuotes[4]!));
+      expect(pool.contains(companionPartnerQuote), isFalse);
+    });
+
+    test('non-follower games skip follower narration', () {
+      final pool = companionQuotePoolFor(generation: 5, editionSlug: 'bw');
+      expect(pool.contains(companionFollowerQuotes.first), isFalse);
+      expect(pool, containsAll(companionGenerationQuotes[5]!));
+    });
+
+    test('partner games add the hug line', () {
+      final lgpe = companionQuotePoolFor(generation: 7, editionSlug: 'lgpe');
+      expect(lgpe, contains(companionPartnerQuote));
+      expect(lgpe, containsAll(companionFollowerQuotes));
+    });
+
+    test('every generation in the catalog has flavor lines', () {
+      for (var generation = 1; generation <= 9; generation++) {
+        expect(
+          companionGenerationQuotes[generation],
+          isNotNull,
+          reason: 'gen $generation missing',
+        );
+      }
+    });
+  });
+
   group('pickCompanionQuote', () {
+    final pool = companionQuotePoolFor(generation: 4, editionSlug: 'hgss');
+
     test('never repeats the previous quote back-to-back', () {
       final random = Random(3);
-      var previous = pickCompanionQuote(random);
+      var previous = pickCompanionQuote(pool, random);
       for (var i = 0; i < 200; i++) {
-        final next = pickCompanionQuote(random, previous: previous);
+        final next = pickCompanionQuote(pool, random, previous: previous);
         expect(next, isNot(previous));
         previous = next;
       }
     });
 
-    test('only emits known quotes', () {
+    test('only emits quotes from the given pool', () {
       final random = Random(9);
       for (var i = 0; i < 50; i++) {
-        expect(companionPatQuotes, contains(pickCompanionQuote(random)));
+        expect(pool, contains(pickCompanionQuote(pool, random)));
       }
     });
 

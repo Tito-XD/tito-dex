@@ -10,6 +10,7 @@ import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
+import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -144,12 +145,20 @@ class _CompanionStandbyState extends State<CompanionStandby>
         setState(() => _quoteTemplate = null);
       }
     });
+    final edition = gameEditionRepository.edition;
     setState(() {
       _pats += 1;
       _hearts.add(_HeartParticle(_nextHeartId++, _random));
       _quoteTemplate = becameFriend
           ? companionFriendshipQuote
-          : pickCompanionQuote(_random, previous: _quoteTemplate);
+          : pickCompanionQuote(
+              companionQuotePoolFor(
+                generation: edition.generation,
+                editionSlug: edition.slug,
+              ),
+              _random,
+              previous: _quoteTemplate,
+            );
     });
   }
 
