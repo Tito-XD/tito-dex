@@ -29,3 +29,6 @@ android/local.properties
 *.njsproj
 *.sln
 *.sw?
+
+# Kotlin compiler session artifacts
+flutter/android/.kotlin/
