@@ -896,6 +896,33 @@ class _CompanionSection extends StatelessWidget {
                   ),
                 ],
               ),
+              Row(
+                children: [
+                  Text(
+                    AppZh.companionSettingsSize,
+                    style: SecondaryTypography.onCard.body14,
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: companionRepository.sizeScale,
+                      min: CompanionRepository.minSizeScale,
+                      max: CompanionRepository.maxSizeScale,
+                      divisions: 10,
+                      label:
+                          '×${companionRepository.sizeScale.toStringAsFixed(2)}',
+                      onChanged: companionRepository.enabled
+                          ? companionRepository.setSizeScale
+                          : null,
+                    ),
+                  ),
+                  Text(
+                    '×${companionRepository.sizeScale.toStringAsFixed(2)}',
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [

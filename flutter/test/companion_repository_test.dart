@@ -30,6 +30,26 @@ void main() {
     expect(restored.choice?.nameZh, '仙子伊布');
   });
 
+  test('sizeScale defaults to 1.0, persists, and clamps to 1.0–1.5', () async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = CompanionRepository();
+    await repository.load();
+    expect(repository.sizeScale, 1.0);
+
+    await repository.setSizeScale(1.25);
+    expect(repository.sizeScale, 1.25);
+
+    await repository.setSizeScale(9.0);
+    expect(repository.sizeScale, CompanionRepository.maxSizeScale);
+    await repository.setSizeScale(0.2);
+    expect(repository.sizeScale, CompanionRepository.minSizeScale);
+
+    await repository.setSizeScale(1.4);
+    final restored = CompanionRepository();
+    await restored.load();
+    expect(restored.sizeScale, 1.4);
+  });
+
   test('clear removes the stored choice', () async {
     SharedPreferences.setMockInitialValues({
       'companion.pokemonId': 25,

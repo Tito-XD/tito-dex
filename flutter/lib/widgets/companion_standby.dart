@@ -30,11 +30,15 @@ class CompanionStandby extends StatefulWidget {
     required this.speciesId,
     required this.nameZh,
     this.compact = false,
+    this.sizeScale = 1.0,
   });
 
   final int speciesId;
   final String nameZh;
   final bool compact;
+
+  /// User multiplier from Settings (1.0–1.5) on top of height-based sizing.
+  final double sizeScale;
 
   @override
   State<CompanionStandby> createState() => _CompanionStandbyState();
@@ -182,20 +186,24 @@ class _CompanionStandbyState extends State<CompanionStandby>
   @override
   Widget build(BuildContext context) {
     final square = DeviceLayout.useSquareDashboard(context);
-    final scaled = square || widget.compact;
-    // Frameless GIF gets more room than the old bordered circle did.
-    final minSize = scaled ? DeviceLayout.dim(context, 48.0) : 52.0;
-    final maxSize = scaled ? DeviceLayout.dim(context, 104.0) : 116.0;
+    // Floors stay at the previous defaults (can't shrink below); the phone
+    // ceiling rises to the Showdown source resolution (~140px), tablets keep
+    // the same phone:tablet ratio, square handhelds stay a bit tighter.
+    final minSize = square || widget.compact ? 36.0 : 52.0;
+    final maxSize = square ? 120.0 : (widget.compact ? 140.0 : 208.0);
+    final scale = widget.sizeScale.clamp(1.0, 1.5);
 
     return FutureBuilder<int?>(
       future: _heightFuture,
       builder: (context, snapshot) {
-        final spriteSize = companionSpriteSizeFor(
-          snapshot.data,
-          minSize: minSize,
-          maxSize: maxSize,
-        );
-        return _buildSticker(context, spriteSize, maxSize);
+        final spriteSize =
+            companionSpriteSizeFor(
+              snapshot.data,
+              minSize: minSize,
+              maxSize: maxSize,
+            ) *
+            scale;
+        return _buildSticker(context, spriteSize, maxSize * scale);
       },
     );
   }
@@ -218,6 +226,11 @@ class _CompanionStandbyState extends State<CompanionStandby>
         width: spriteSize,
         height: spriteSize,
         showLoadingProgress: true,
+        // Beyond ~1.3× the Showdown source starts to blur when smoothed —
+        // nearest-neighbor keeps the pixel-art edges crisp instead.
+        filterQuality: widget.sizeScale > 1.3
+            ? FilterQuality.none
+            : FilterQuality.low,
       ),
     );
 
@@ -430,6 +443,7 @@ class CompanionStandbyOverlay extends StatelessWidget {
                 speciesId: speciesId,
                 nameZh: nameZh,
                 compact: compact,
+                sizeScale: companionRepository.sizeScale,
               ),
             ),
           ),
