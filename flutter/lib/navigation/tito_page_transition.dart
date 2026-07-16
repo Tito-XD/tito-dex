@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show PredictiveBackEvent, SwipeEdge;
 
 import '../theme/tito_colors.dart';
 
@@ -57,7 +56,7 @@ Page<T> titoDexPage<T>({
     kind: _TitoMaterialPageKind.dex,
     child: Hero(
       tag: heroTag,
-      transitionOnUserGestures: true,
+      transitionOnUserGestures: false,
       flightShuttleBuilder: _homeActionFlightShuttle,
       child: child,
     ),
@@ -67,8 +66,8 @@ Page<T> titoDexPage<T>({
 
 /// Team and Search deliberately use simple full-screen slides. Their pages do
 /// not enter the Hero overlay, so stateful content is never laid out at card
-/// size. Taps retain the designed slide curve; Android predictive back uses a
-/// linear, edge-aware slide which follows the user's finger exactly.
+/// size. These two routes deliberately opt out of predictive-back progress:
+/// Team always enters and exits on the left, while Search does so on the right.
 Page<T> titoSideSlidePage<T>({
   required LocalKey key,
   required Widget child,
@@ -114,6 +113,10 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
 
   @override
   bool get fullscreenDialog => false;
+
+  @override
+  bool get popGestureEnabled =>
+      _page.kind == _TitoMaterialPageKind.dex ? false : super.popGestureEnabled;
 
   @override
   Duration get transitionDuration => _page.kind == _TitoMaterialPageKind.dex
@@ -193,40 +196,6 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
 
   _TitoSideSlidePage<T> get _page => settings as _TitoSideSlidePage<T>;
 
-  final ValueNotifier<SwipeEdge?> _predictiveBackEdge = ValueNotifier(null);
-
-  void beginPredictiveBack(SwipeEdge edge) {
-    _predictiveBackEdge.value = edge;
-  }
-
-  void clearPredictiveBackWhenSettled() {
-    final routeAnimation = animation;
-    if (routeAnimation == null) {
-      _predictiveBackEdge.value = null;
-      return;
-    }
-    if (routeAnimation.isCompleted || routeAnimation.isDismissed) {
-      _predictiveBackEdge.value = null;
-      return;
-    }
-
-    late final AnimationStatusListener listener;
-    listener = (status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
-        _predictiveBackEdge.value = null;
-        routeAnimation.removeStatusListener(listener);
-      }
-    };
-    routeAnimation.addStatusListener(listener);
-  }
-
-  @override
-  void dispose() {
-    _predictiveBackEdge.dispose();
-    super.dispose();
-  }
-
   @override
   Duration get transitionDuration => titoSideSlideTransitionDuration;
 
@@ -239,6 +208,9 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
 
   @override
   bool get fullscreenDialog => false;
+
+  @override
+  bool get popGestureEnabled => false;
 
   @override
   Color? get barrierColor => null;
@@ -273,22 +245,10 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
       TitoSideSlideDirection.fromLeft => const Offset(-1, 0),
       TitoSideSlideDirection.fromRight => const Offset(1, 0),
     };
-    return _TitoPredictiveBackController(
-      route: this,
-      child: ValueListenableBuilder<SwipeEdge?>(
-        valueListenable: _predictiveBackEdge,
-        child: child,
-        builder: (context, edge, page) {
-          final position = edge == null
-              ? _buttonSlidePosition(animation, begin)
-              : _predictiveBackSlidePosition(animation, edge);
-          return SlideTransition(
-            key: const ValueKey<String>('tito-side-slide-transition'),
-            position: position,
-            child: page,
-          );
-        },
-      ),
+    return SlideTransition(
+      key: const ValueKey<String>('tito-side-slide-transition'),
+      position: _buttonSlidePosition(animation, begin),
+      child: child,
     );
   }
 
@@ -303,83 +263,6 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
     );
     return Tween<Offset>(begin: begin, end: Offset.zero).animate(curve);
   }
-
-  Animation<Offset> _predictiveBackSlidePosition(
-    Animation<double> animation,
-    SwipeEdge edge,
-  ) {
-    final exitOffset = edge == SwipeEdge.left
-        ? const Offset(1, 0)
-        : const Offset(-1, 0);
-    return Tween<Offset>(
-      begin: exitOffset,
-      end: Offset.zero,
-    ).animate(animation);
-  }
-}
-
-class _TitoPredictiveBackController extends StatefulWidget {
-  const _TitoPredictiveBackController({
-    required this.route,
-    required this.child,
-  });
-
-  final _TitoSideSlidePageRoute<dynamic> route;
-  final Widget child;
-
-  @override
-  State<_TitoPredictiveBackController> createState() =>
-      _TitoPredictiveBackControllerState();
-}
-
-class _TitoPredictiveBackControllerState
-    extends State<_TitoPredictiveBackController>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
-    if (backEvent.isButtonEvent ||
-        !widget.route.isCurrent ||
-        !widget.route.popGestureEnabled) {
-      return false;
-    }
-    widget.route.beginPredictiveBack(backEvent.swipeEdge);
-    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
-    return true;
-  }
-
-  @override
-  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
-    widget.route.handleUpdateBackGestureProgress(
-      progress: 1 - backEvent.progress,
-    );
-  }
-
-  @override
-  void handleCancelBackGesture() {
-    widget.route.handleCancelBackGesture();
-    widget.route.clearPredictiveBackWhenSettled();
-  }
-
-  @override
-  void handleCommitBackGesture() {
-    widget.route.handleCommitBackGesture();
-    widget.route.clearPredictiveBackWhenSettled();
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }
 
 Widget _homeActionFlightShuttle(

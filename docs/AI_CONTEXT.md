@@ -4,9 +4,10 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) |
-| **`main` / lite** | `0.5.5+63` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.5.5-offline+64` — APK-bundled dex data |
+| **Latest stable** | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) |
+| **Latest preview** | [v0.5.51](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.51) |
+| **`main` / lite** | `0.5.51+65` (`flutter/pubspec.yaml`) |
+| **Offline preview** | `0.5.51-offline+66` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -40,9 +41,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.5.5)
+## Current feature status (latest preview line: v0.5.51)
 
-> `main` includes the v0.5.5 release line. The offline package adds only the bundled dex seed and offline package version.
+> `main` includes the v0.5.5 stable feature line plus the v0.5.51 navigation preview fix. The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -63,6 +64,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.5.51 preview: Home Team and Search routes keep their designed entry/exit edge, while Team, Dex, and Search opt out of predictive-back progress.
 - v0.5.5: single-file save import, native Android app picker, experimental Gen 1–7 save metadata, polished route/list motion, six-slot party layout, standby companion, shiny surprises, and silhouette quiz.
 - v0.5.1: Android-standard route motion and predictive back; Home Team / Dex / Search cards expand into their matching first-level page, while all other routes use Material transitions.
 - v0.5.0: precomputed Dex catalog keeps list, search, and reference filters in memory; home no longer blocks on a looping bootstrap bar.

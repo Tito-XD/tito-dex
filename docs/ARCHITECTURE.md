@@ -1,7 +1,7 @@
 # TitoDex Architecture
 
 > **Active stack:** Flutter + Dart in `flutter/`. React under `src/` is a frozen design reference.  
-> **Latest release:** v0.5.5; **`main` / lite:** `0.5.5+63`; **offline:** `0.5.5-offline+64` · Dex bundle v5 (`/v3/`).
+> **Latest stable:** v0.5.5; **latest preview:** v0.5.51; **`main` / lite:** `0.5.51+65`; **offline preview:** `0.5.51-offline+66` · Dex bundle v5 (`/v3/`).
 >
 > **Full agent context:** [AI_CONTEXT.md](./AI_CONTEXT.md)
 

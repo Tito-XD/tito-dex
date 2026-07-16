@@ -2,12 +2,15 @@
 
 > **Latest release:** [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · Lite `0.5.5+63` · Offline `0.5.5-offline+64`.
 >
-> **Current `main` source baseline:** `0.5.5+63`.
+> **Latest preview:** [v0.5.51](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.51) · Lite `0.5.51+65` · Offline `0.5.51-offline+66`.
+>
+> **Current `main` source baseline:** `0.5.51+65`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.5.51** | Preview fix for deterministic Team, Dex, and Search return motion |
 | **v0.5.5** | Single-file saves, native app picker, polished motion, companion interactions, six-slot party card, and silhouette quiz |
 | **v0.5.1** | Android-standard route motion and predictive back |
 | **v0.5.0** | Precomputed in-memory Dex catalog and responsive filtering |
