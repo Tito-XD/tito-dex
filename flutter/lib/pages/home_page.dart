@@ -118,7 +118,7 @@ Widget _withDexHero(_QuickAction action, Widget child) {
   if (heroTag == null) {
     return child;
   }
-  return Hero(tag: heroTag, transitionOnUserGestures: true, child: child);
+  return Hero(tag: heroTag, transitionOnUserGestures: false, child: child);
 }
 
 class _QuickActionsGrid extends StatelessWidget {
