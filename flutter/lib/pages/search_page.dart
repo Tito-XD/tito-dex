@@ -440,6 +440,11 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => context.push('/dex'),
                   label: Text(AppZh.searchHubRegionalDex),
                 ),
+                ActionChip(
+                  onPressed: () => context.push('/dex/quiz'),
+                  avatar: const Icon(Icons.help_center_rounded, size: 16),
+                  label: Text(AppZh.quizTitle),
+                ),
               ],
             ),
           ],

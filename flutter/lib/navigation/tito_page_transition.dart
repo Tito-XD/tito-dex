@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show PredictiveBackEvent;
+import 'package:flutter/services.dart' show PredictiveBackEvent, SwipeEdge;
 
 import '../theme/tito_colors.dart';
 
-/// Tag for the one intentional home-to-page shared-element transition.
+/// Tag for the single home action that expands into its first-level page.
 abstract final class TitoHomeActionHero {
   static const dex = 'home-action-dex';
 
@@ -14,10 +14,11 @@ abstract final class TitoHomeActionHero {
 
 enum TitoSideSlideDirection { fromLeft, fromRight }
 
-/// Android's current forward transition is 450 ms. The Dex shared-element
-/// transition intentionally runs at half speed in both directions.
-const titoDexTransitionDuration = Duration(milliseconds: 900);
+/// Android's current forward transition is 450 ms. Dex keeps its slightly
+/// slower card expansion, while its actual contents reveal afterwards.
+const titoDexTransitionDuration = Duration(milliseconds: 600);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
+const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
 /// A Material page lets Android provide the standard route transition.
 ///
@@ -36,15 +37,19 @@ Page<T> titoHomePage<T>({required LocalKey key, required Widget child}) {
   );
 }
 
-/// The Dex route retains the existing Hero/container animation and Android's
-/// predictive-back integration, with a doubled push and pop duration.
+/// Dex expands the home card into its page shell. [content] is an independent
+/// layer which fades in only after that shell is almost fully expanded.
 Page<T> titoDexPage<T>({
   required LocalKey key,
   required Widget child,
   String? heroTag,
+  Widget? content,
 }) {
+  final page = content == null
+      ? child
+      : Stack(fit: StackFit.expand, children: [child, content]);
   if (heroTag == null) {
-    return titoMaterialPage<T>(key: key, child: child);
+    return titoMaterialPage<T>(key: key, child: page);
   }
 
   return _TitoControlledMaterialPage<T>(
@@ -56,13 +61,14 @@ Page<T> titoDexPage<T>({
       flightShuttleBuilder: _homeActionFlightShuttle,
       child: child,
     ),
+    overlay: content,
   );
 }
 
 /// Team and Search deliberately use simple full-screen slides. Their pages do
 /// not enter the Hero overlay, so stateful content is never laid out at card
-/// size. The route observer keeps the slide driven by Android predictive-back
-/// gesture progress.
+/// size. Taps retain the designed slide curve; Android predictive back uses a
+/// linear, edge-aware slide which follows the user's finger exactly.
 Page<T> titoSideSlidePage<T>({
   required LocalKey key,
   required Widget child,
@@ -77,11 +83,13 @@ class _TitoControlledMaterialPage<T> extends Page<T> {
   const _TitoControlledMaterialPage({
     required this.kind,
     required this.child,
+    this.overlay,
     super.key,
   });
 
   final _TitoMaterialPageKind kind;
   final Widget child;
+  final Widget? overlay;
 
   @override
   Route<T> createRoute(BuildContext context) {
@@ -119,6 +127,39 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
       : super.reverseTransitionDuration;
 
   @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final transitioned = super.buildTransitions(
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
+    if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
+      return transitioned;
+    }
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        transitioned,
+        FadeTransition(
+          key: const ValueKey<String>('tito-dex-content-reveal'),
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.7, 1, curve: Curves.easeOutCubic),
+            reverseCurve: const Interval(0.7, 1, curve: Curves.easeInCubic),
+          ),
+          child: _page.overlay!,
+        ),
+      ],
+    );
+  }
+
+  @override
   bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
     if (_page.kind == _TitoMaterialPageKind.home &&
         (nextRoute is _TitoSideSlidePageRoute ||
@@ -152,11 +193,46 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
 
   _TitoSideSlidePage<T> get _page => settings as _TitoSideSlidePage<T>;
 
+  final ValueNotifier<SwipeEdge?> _predictiveBackEdge = ValueNotifier(null);
+
+  void beginPredictiveBack(SwipeEdge edge) {
+    _predictiveBackEdge.value = edge;
+  }
+
+  void clearPredictiveBackWhenSettled() {
+    final routeAnimation = animation;
+    if (routeAnimation == null) {
+      _predictiveBackEdge.value = null;
+      return;
+    }
+    if (routeAnimation.isCompleted || routeAnimation.isDismissed) {
+      _predictiveBackEdge.value = null;
+      return;
+    }
+
+    late final AnimationStatusListener listener;
+    listener = (status) {
+      if (status == AnimationStatus.completed ||
+          status == AnimationStatus.dismissed) {
+        _predictiveBackEdge.value = null;
+        routeAnimation.removeStatusListener(listener);
+      }
+    };
+    routeAnimation.addStatusListener(listener);
+  }
+
+  @override
+  void dispose() {
+    _predictiveBackEdge.dispose();
+    super.dispose();
+  }
+
   @override
   Duration get transitionDuration => titoSideSlideTransitionDuration;
 
   @override
-  Duration get reverseTransitionDuration => titoSideSlideTransitionDuration;
+  Duration get reverseTransitionDuration =>
+      titoSideSlideReverseTransitionDuration;
 
   @override
   bool get maintainState => true;
@@ -197,18 +273,48 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
       TitoSideSlideDirection.fromLeft => const Offset(-1, 0),
       TitoSideSlideDirection.fromRight => const Offset(1, 0),
     };
-    final position = Tween<Offset>(begin: begin, end: Offset.zero)
-        .chain(CurveTween(curve: Curves.easeInOutCubicEmphasized))
-        .animate(animation);
-
     return _TitoPredictiveBackController(
       route: this,
-      child: SlideTransition(
-        key: const ValueKey<String>('tito-side-slide-transition'),
-        position: position,
+      child: ValueListenableBuilder<SwipeEdge?>(
+        valueListenable: _predictiveBackEdge,
         child: child,
+        builder: (context, edge, page) {
+          final position = edge == null
+              ? _buttonSlidePosition(animation, begin)
+              : _predictiveBackSlidePosition(animation, edge);
+          return SlideTransition(
+            key: const ValueKey<String>('tito-side-slide-transition'),
+            position: position,
+            child: page,
+          );
+        },
       ),
     );
+  }
+
+  Animation<Offset> _buttonSlidePosition(
+    Animation<double> animation,
+    Offset begin,
+  ) {
+    final curve = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeInOutCubicEmphasized,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return Tween<Offset>(begin: begin, end: Offset.zero).animate(curve);
+  }
+
+  Animation<Offset> _predictiveBackSlidePosition(
+    Animation<double> animation,
+    SwipeEdge edge,
+  ) {
+    final exitOffset = edge == SwipeEdge.left
+        ? const Offset(1, 0)
+        : const Offset(-1, 0);
+    return Tween<Offset>(
+      begin: exitOffset,
+      end: Offset.zero,
+    ).animate(animation);
   }
 }
 
@@ -218,7 +324,7 @@ class _TitoPredictiveBackController extends StatefulWidget {
     required this.child,
   });
 
-  final PageRoute<dynamic> route;
+  final _TitoSideSlidePageRoute<dynamic> route;
   final Widget child;
 
   @override
@@ -248,6 +354,7 @@ class _TitoPredictiveBackControllerState
         !widget.route.popGestureEnabled) {
       return false;
     }
+    widget.route.beginPredictiveBack(backEvent.swipeEdge);
     widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
     return true;
   }
@@ -262,11 +369,13 @@ class _TitoPredictiveBackControllerState
   @override
   void handleCancelBackGesture() {
     widget.route.handleCancelBackGesture();
+    widget.route.clearPredictiveBackWhenSettled();
   }
 
   @override
   void handleCommitBackGesture() {
     widget.route.handleCommitBackGesture();
+    widget.route.clearPredictiveBackWhenSettled();
   }
 
   @override
@@ -294,21 +403,21 @@ Widget _homeActionFlightShuttle(
   final Animation<double> cardOpacity;
   final Animation<double> pageOpacity;
   if (flightDirection == HeroFlightDirection.push) {
+    // Swap to the already-empty destination shell in the first moments of
+    // the flight. The home card therefore never paints across a full screen.
     cardOpacity = animation.drive(
       TweenSequence<double>([
         TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 1),
-        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 4),
+        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 11),
       ]),
     );
     pageOpacity = animation.drive(
       TweenSequence<double>([
-        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 1),
-        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 4),
+        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 1),
+        TweenSequenceItem(tween: ConstantTween<double>(1), weight: 11),
       ]),
     );
   } else {
-    // The route animation runs from 1 to 0 while popping. Fade the page out
-    // first, then reveal the card during the remaining contraction.
     cardOpacity = animation.drive(
       TweenSequence<double>([
         TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 4),
@@ -333,7 +442,9 @@ Widget _homeActionFlightShuttle(
       return Material(
         animationDuration: Duration.zero,
         clipBehavior: Clip.antiAlias,
-        color: Color.lerp(TitoColors.card, TitoColors.slateBlue, progress),
+        // Both Hero children paint their own backgrounds. A transparent
+        // flight Material prevents a fallback white or blue compositing frame.
+        color: Colors.transparent,
         elevation: 2 * (1 - progress),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),

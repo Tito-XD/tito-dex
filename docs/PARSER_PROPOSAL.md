@@ -100,7 +100,7 @@ When fixing timeline merge: update structured fields (location, badges, party, t
 | Path | Entry | Status |
 | --- | --- | --- |
 | Settings → import bundled fixture | `rootBundle` → parse → persist | ✅ |
-| Settings → pick save directory | `file_picker` directory | ✅ |
+| Settings → pick one save file | Persisted document URI | ✅ |
 | Startup auto-load | `SaveSyncService.syncOnStartup` | ✅ |
 | Single `.sav` file pick | SAF file mode | ❌ planned |
 | User drops file into app | — | ❌ |

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/app.dart';
@@ -18,7 +20,7 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
   });
 
-  testWidgets('Dex uses a reversible 900ms container Hero', (tester) async {
+  testWidgets('Dex uses a reversible 600ms container Hero', (tester) async {
     final page = titoDexPage<void>(
       key: const ValueKey<String>('dex-page'),
       heroTag: TitoHomeActionHero.dex,
@@ -33,46 +35,44 @@ void main() {
 
     expect(find.byType(Placeholder), findsOneWidget);
     expect(find.byType(Hero), findsOneWidget);
-    final hero = tester.widget<Hero>(find.byType(Hero));
-    expect(hero.child, isA<Placeholder>());
-    expect(hero.flightShuttleBuilder, isNotNull);
-    expect(hero.transitionOnUserGestures, isTrue);
     final route = ModalRoute.of(tester.element(find.byType(Placeholder)))!;
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexTransitionDuration);
+    expect(route.opaque, isTrue);
   });
 
-  testWidgets('Container Hero keeps a stateful full page stable both ways', (
+  testWidgets('Dex shell expands before its list cards fade in', (
     tester,
   ) async {
-    await tester.pumpWidget(const _HomeActionFlightHarness());
-
-    await tester.tap(find.byKey(const ValueKey<String>('open-card')));
-    for (var index = 0; index < 6; index++) {
-      await tester.pump(const Duration(milliseconds: 60));
-      expect(tester.takeException(), isNull);
-    }
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.byKey(const ValueKey<String>('close-page')).last);
-    for (var index = 0; index < 6; index++) {
-      await tester.pump(const Duration(milliseconds: 60));
-      expect(tester.takeException(), isNull);
-    }
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey<String>('open-card')), findsOneWidget);
-  });
-
-  testWidgets('Home stays fixed while the Dex container opens', (tester) async {
-    await tester.pumpWidget(const _HomeActionFlightHarness());
+    await tester.pumpWidget(const _DexFadeHarness());
     final home = find.byKey(const ValueKey<String>('home-surface'));
     final initialPosition = tester.getTopLeft(home);
 
     await tester.tap(find.byKey(const ValueKey<String>('open-card')));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 450));
-
+    var fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, lessThan(0.1));
     expect(tester.getTopLeft(home), initialPosition);
+
+    await tester.pump(const Duration(milliseconds: 300));
+    fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, lessThan(0.1));
+    await tester.pump(const Duration(milliseconds: 150));
+    fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, greaterThan(0));
+    expect(fade.opacity.value, lessThan(1));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey<String>('close-page')));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey<String>('open-card')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -83,6 +83,15 @@ void main() {
       await tester.pumpWidget(_SideSlideHarness(direction: direction));
       await tester.tap(find.byKey(const ValueKey<String>('open-side-page')));
       await tester.pump();
+
+      final route = ModalRoute.of(
+        tester.element(find.byKey(const ValueKey<String>('close-side-page'))),
+      )!;
+      expect(route.transitionDuration, titoSideSlideTransitionDuration);
+      expect(
+        route.reverseTransitionDuration,
+        titoSideSlideReverseTransitionDuration,
+      );
 
       expect(find.byType(Hero), findsNothing);
       final slideFinder = find.byKey(
@@ -117,17 +126,81 @@ void main() {
       await tester.pumpAndSettle();
     }
   });
+
+  testWidgets('side slides track Android predictive back linearly by edge', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    try {
+      for (final (swipeEdge, expectedOffset) in <(int, double)>[
+        (0, 0.35),
+        (1, -0.35),
+      ]) {
+        await tester.pumpWidget(
+          const _SideSlideHarness(direction: TitoSideSlideDirection.fromLeft),
+        );
+        await tester.tap(find.byKey(const ValueKey<String>('open-side-page')));
+        await tester.pumpAndSettle();
+
+        await _sendBackGesture(tester, 'startBackGesture', <String, dynamic>{
+          'touchOffset': const <double>[5, 300],
+          'progress': 0.0,
+          'swipeEdge': swipeEdge,
+        });
+        await _sendBackGesture(
+          tester,
+          'updateBackGestureProgress',
+          <String, dynamic>{
+            'touchOffset': const <double>[100, 300],
+            'progress': 0.35,
+            'swipeEdge': swipeEdge,
+          },
+        );
+        await tester.pump();
+
+        final slide = tester.widget<SlideTransition>(
+          find.byKey(const ValueKey<String>('tito-side-slide-transition')),
+        );
+        expect(slide.position.value.dx, closeTo(expectedOffset, 0.001));
+
+        await _sendBackGesture(tester, 'cancelBackGesture', null);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey<String>('close-side-page')),
+          findsOneWidget,
+        );
+        await tester.tap(find.byKey(const ValueKey<String>('close-side-page')));
+        await tester.pumpAndSettle();
+      }
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
 }
 
-class _HomeActionFlightHarness extends StatefulWidget {
-  const _HomeActionFlightHarness();
+Future<void> _sendBackGesture(
+  WidgetTester tester,
+  String method,
+  Map<String, dynamic>? arguments,
+) async {
+  final message = const StandardMethodCodec().encodeMethodCall(
+    MethodCall(method, arguments),
+  );
+  await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+    'flutter/backgesture',
+    message,
+    (_) {},
+  );
+}
+
+class _DexFadeHarness extends StatefulWidget {
+  const _DexFadeHarness();
 
   @override
-  State<_HomeActionFlightHarness> createState() =>
-      _HomeActionFlightHarnessState();
+  State<_DexFadeHarness> createState() => _DexFadeHarnessState();
 }
 
-class _HomeActionFlightHarnessState extends State<_HomeActionFlightHarness> {
+class _DexFadeHarnessState extends State<_DexFadeHarness> {
   bool _open = false;
 
   @override
@@ -165,8 +238,13 @@ class _HomeActionFlightHarnessState extends State<_HomeActionFlightHarness> {
             titoDexPage<void>(
               key: const ValueKey<String>('dex'),
               heroTag: TitoHomeActionHero.dex,
-              child: _StatefulFlightDestination(
-                onClose: () => setState(() => _open = false),
+              child: const ColoredBox(color: Colors.blueGrey),
+              content: Center(
+                child: TextButton(
+                  key: const ValueKey<String>('close-page'),
+                  onPressed: () => setState(() => _open = false),
+                  child: const Text('Back'),
+                ),
               ),
             ),
         ],
@@ -222,52 +300,6 @@ class _SideSlideHarnessState extends State<_SideSlideHarness> {
             ),
         ],
         onDidRemovePage: (_) {},
-      ),
-    );
-  }
-}
-
-class _StatefulFlightDestination extends StatefulWidget {
-  const _StatefulFlightDestination({required this.onClose});
-
-  final VoidCallback onClose;
-
-  @override
-  State<_StatefulFlightDestination> createState() =>
-      _StatefulFlightDestinationState();
-}
-
-class _StatefulFlightDestinationState
-    extends State<_StatefulFlightDestination> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.blueGrey,
-      child: SafeArea(
-        child: Column(
-          children: [
-            TextField(controller: _controller),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 20,
-                itemBuilder: (context, index) => Text('Item $index'),
-              ),
-            ),
-            TextButton(
-              key: const ValueKey<String>('close-page'),
-              onPressed: widget.onClose,
-              child: const Text('Back'),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -1,123 +1,171 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import '../../models/journey.dart';
-import '../parser/hgss_parser.dart';
-import 'save_directory_repository.dart';
-import 'save_scanner.dart';
+import '../parser/pokemon_save_parser.dart';
+import 'save_document_source.dart';
+import 'save_file_repository.dart';
 import 'save_types.dart';
 
+/// Reads exactly one user-selected save document. Android keeps persisted URI
+/// permission for this file, so startup sync never scans a directory.
 class SaveSyncService {
   SaveSyncService({
-    SaveDirectoryRepository? directoryRepository,
-    SaveScanner? scanner,
-    HgssParser? parser,
-  })  : _directoryRepository =
-            directoryRepository ?? SaveDirectoryRepository(),
-        _scanner = scanner ?? const SaveScanner(),
-        _parser = parser ?? const HgssParser();
+    SaveFileRepository? fileRepository,
+    PokemonSaveParser? parser,
+    SaveDocumentSource? documentSource,
+  }) : _fileRepository = fileRepository ?? SaveFileRepository(),
+       _parser = parser ?? const PokemonSaveParser(),
+       _documentSource = documentSource ?? PlatformSaveDocumentSource();
 
-  final SaveDirectoryRepository _directoryRepository;
-  final SaveScanner _scanner;
-  final HgssParser _parser;
+  final SaveFileRepository _fileRepository;
+  final PokemonSaveParser _parser;
+  final SaveDocumentSource _documentSource;
 
-  Future<SaveDirectoryConfig> loadConfig() => _directoryRepository.load();
+  Future<SaveFileConfig> loadConfig() => _fileRepository.load();
 
-  Future<SaveDirectoryConfig> updateDirectory(String? directoryPath) async {
-    final current = await _directoryRepository.load();
-    final next = current.copyWith(
-      directoryPath: directoryPath,
-      autoLoadOnStartup:
-          directoryPath != null ? true : current.autoLoadOnStartup,
-      clearLastLoaded: directoryPath != current.directoryPath,
+  Future<SaveDocument?> pickSaveDocument() => _documentSource.pick();
+
+  Future<SaveSyncResult> selectSaveDocument({
+    required SaveDocument document,
+    required CurrentJourney existing,
+  }) async {
+    final current = await _fileRepository.load();
+    if (!_parser.canParse(document.bytes)) {
+      if (document.uri != current.selectedFileUri) {
+        await _documentSource.release(document.uri);
+      }
+      return SaveSyncResult(
+        journey: existing,
+        updated: false,
+        fileName: document.fileName,
+        filePath: document.uri,
+        message: 'unsupported_save',
+      );
+    }
+    if (current.selectedFileUri != null &&
+        current.selectedFileUri != document.uri) {
+      await _documentSource.release(current.selectedFileUri!);
+    }
+    final selectedConfig = current.copyWith(
+      selectedFileUri: document.uri,
+      selectedFileName: document.fileName,
+      clearLastLoaded: true,
+      autoLoadOnStartup: true,
     );
-    await _directoryRepository.save(next);
+    return _syncDocument(
+      config: selectedConfig,
+      document: document,
+      existing: existing,
+      force: true,
+    );
+  }
+
+  Future<SaveFileConfig> clearFile() async {
+    final current = await _fileRepository.load();
+    if (current.selectedFileUri != null) {
+      await _documentSource.release(current.selectedFileUri!);
+    }
+    final next = current.copyWith(
+      clearSelectedFile: true,
+      clearLastLoaded: true,
+    );
+    await _fileRepository.save(next);
     return next;
   }
 
-  Future<SaveDirectoryConfig> setAutoLoadOnStartup(bool enabled) async {
-    final current = await _directoryRepository.load();
+  Future<SaveFileConfig> setAutoLoadOnStartup(bool enabled) async {
+    final current = await _fileRepository.load();
     final next = current.copyWith(autoLoadOnStartup: enabled);
-    await _directoryRepository.save(next);
+    await _fileRepository.save(next);
     return next;
   }
 
-  Future<SaveSyncResult> syncLatest({
+  Future<SaveSyncResult> syncSelected({
     required CurrentJourney existing,
     bool force = false,
   }) async {
-    final config = await _directoryRepository.load();
-    final directoryPath = config.directoryPath;
-    if (directoryPath == null || directoryPath.isEmpty) {
+    final config = await _fileRepository.load();
+    final uri = config.selectedFileUri;
+    if (uri == null || uri.isEmpty) {
       return SaveSyncResult(
         journey: existing,
         updated: false,
-        message: 'no_directory',
+        message: 'no_file',
       );
     }
-
-    final file = await _scanner.findNewestSave(directoryPath);
-    if (file == null) {
+    final document = await _documentSource.read(uri);
+    if (document == null) {
       return SaveSyncResult(
         journey: existing,
         updated: false,
-        message: 'no_save_found',
+        fileName: config.selectedFileName,
+        filePath: uri,
+        message: 'selected_file_unavailable',
       );
     }
+    return _syncDocument(
+      config: config,
+      document: document,
+      existing: existing,
+      force: force,
+    );
+  }
 
-    final stat = await file.stat();
-    final modifiedMs = stat.modified.millisecondsSinceEpoch;
-    final path = file.path;
-    final fileName = path.split(Platform.pathSeparator).last;
-
-    if (!force &&
-        config.lastLoadedPath == path &&
-        config.lastLoadedModifiedMs == modifiedMs) {
+  Future<SaveSyncResult> _syncDocument({
+    required SaveFileConfig config,
+    required SaveDocument document,
+    required CurrentJourney existing,
+    required bool force,
+  }) async {
+    if (!_parser.canParse(document.bytes)) {
       return SaveSyncResult(
         journey: existing,
         updated: false,
-        fileName: fileName,
-        filePath: path,
-        message: 'unchanged',
-      );
-    }
-
-    final bytes = Uint8List.fromList(await file.readAsBytes());
-    if (!_parser.canParse(bytes)) {
-      return SaveSyncResult(
-        journey: existing,
-        updated: false,
-        fileName: fileName,
-        filePath: path,
+        fileName: document.fileName,
+        filePath: document.uri,
         message: 'unsupported_save',
       );
     }
 
-    final summary = _parser.parseSummary(bytes);
+    final summary = _parser.parseSummary(
+      document.bytes,
+      sourceModifiedAt: document.modifiedMs == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(document.modifiedMs!),
+    );
+    if (!force && config.lastLoadedHash == summary.saveHash) {
+      return SaveSyncResult(
+        journey: existing,
+        updated: false,
+        fileName: document.fileName,
+        filePath: document.uri,
+        message: 'unchanged',
+      );
+    }
+
     final journey = _parser.toJourney(summary, existing: existing);
     final nextConfig = config.copyWith(
-      lastLoadedPath: path,
-      lastLoadedModifiedMs: modifiedMs,
+      selectedFileUri: document.uri,
+      selectedFileName: document.fileName,
+      lastLoadedModifiedMs: document.modifiedMs ?? 0,
       lastLoadedHash: summary.saveHash,
-      lastLoadedFileName: fileName,
+      lastLoadedFileName: document.fileName,
     );
-    await _directoryRepository.save(nextConfig);
-
+    await _fileRepository.save(nextConfig);
     return SaveSyncResult(
       journey: journey,
       updated: true,
-      fileName: fileName,
-      filePath: path,
+      fileName: document.fileName,
+      filePath: document.uri,
       message: 'loaded',
     );
   }
 
-  Future<SaveSyncResult> syncOnStartup({required CurrentJourney existing}) async {
-    final config = await _directoryRepository.load();
-    final directoryPath = config.directoryPath;
-    if (directoryPath == null || directoryPath.isEmpty) {
+  Future<SaveSyncResult> syncOnStartup({
+    required CurrentJourney existing,
+  }) async {
+    final config = await _fileRepository.load();
+    if (!config.autoLoadOnStartup || config.selectedFileUri == null) {
       return SaveSyncResult(journey: existing, updated: false);
     }
-    return syncLatest(existing: existing);
+    return syncSelected(existing: existing);
   }
 }

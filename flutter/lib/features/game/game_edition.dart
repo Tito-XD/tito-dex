@@ -35,22 +35,20 @@ class GameEdition {
 
   /// National dex generation (1–9) for default sprite / battle scope display.
   int get generation => switch (dataVersionGroupKey) {
-        'red-blue' || 'yellow' => 1,
-        'gold-silver' || 'crystal' => 2,
-        'ruby-sapphire' || 'emerald' || 'firered-leafgreen' => 3,
-        'diamond-pearl' || 'platinum' || 'heartgold-soulsilver' => 4,
-        'black-white' || 'black-2-white-2' => 5,
-        'x-y' || 'omega-ruby-alpha-sapphire' => 6,
-        'sun-moon' ||
-        'ultra-sun-ultra-moon' ||
-        'lets-go-pikachu-lets-go-eevee' =>
-          7,
-        'sword-shield' ||
-        'brilliant-diamond-shining-pearl' ||
-        'legends-arceus' =>
-          8,
-        _ => 9,
-      };
+    'red-blue' || 'yellow' => 1,
+    'gold-silver' || 'crystal' => 2,
+    'ruby-sapphire' || 'emerald' || 'firered-leafgreen' => 3,
+    'diamond-pearl' || 'platinum' || 'heartgold-soulsilver' => 4,
+    'black-white' || 'black-2-white-2' => 5,
+    'x-y' || 'omega-ruby-alpha-sapphire' => 6,
+    'sun-moon' ||
+    'ultra-sun-ultra-moon' ||
+    'lets-go-pikachu-lets-go-eevee' => 7,
+    'sword-shield' ||
+    'brilliant-diamond-shining-pearl' ||
+    'legends-arceus' => 8,
+    _ => 9,
+  };
 
   /// PokeAPI version-group key used for in-game dex sprites.
   String get spriteVersionGroup => dataVersionGroupKey;
@@ -280,9 +278,26 @@ GameEdition gameEditionFromJourneyGame(String? journeyGame) {
       return edition;
     }
   }
-  if (journeyGame == 'HeartGold') {
-    return GameEdition.hgss;
-  }
+  final legacySlug = switch (journeyGame) {
+    'RedBlueYellow' => 'rgb',
+    'GoldSilver' => 'gs',
+    'Crystal' => 'crystal',
+    'RubySapphire' => 'rs',
+    'Emerald' => 'emerald',
+    'FireRedLeafGreen' => 'frlg',
+    'Diamond' || 'Pearl' || 'DiamondPearl' => 'dp',
+    'Platinum' => 'pt',
+    'HeartGold' => 'hgss',
+    'White' || 'Black' || 'BlackWhite' => 'bw',
+    'White2' || 'Black2' => 'bw2',
+    'X' || 'Y' => 'xy',
+    'AlphaSapphire' || 'OmegaRuby' => 'oras',
+    'Sun' || 'Moon' || 'SunMoon' => 'sm',
+    'UltraSun' || 'UltraMoon' => 'usum',
+    _ => null,
+  };
+  final legacyEdition = gameEditionFromSlug(legacySlug);
+  if (legacyEdition != null) return legacyEdition;
   return defaultGameEdition;
 }
 
@@ -298,4 +313,5 @@ String gameEditionLabelForVersionGroup(String versionGroupKey) {
   return versionGroupKey;
 }
 
-String gameEditionMoveSetKey(GameEdition edition) => edition.dataVersionGroupKey;
+String gameEditionMoveSetKey(GameEdition edition) =>
+    edition.dataVersionGroupKey;

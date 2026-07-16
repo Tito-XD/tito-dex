@@ -66,7 +66,7 @@ class _PortraitHomeLayout extends StatelessWidget {
     final gap = DeviceLayout.sectionSpacing(context);
     final compact = DeviceLayout.isCompact(context);
     final journeyHeight = compact ? 140.0 : 132.0;
-    final partyHeight = compact ? 126.0 : 154.0;
+    final partyHeight = compact ? 164.0 : 174.0;
     final companionPad = compact ? 72.0 : 84.0;
 
     return LayoutBuilder(

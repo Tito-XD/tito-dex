@@ -8,7 +8,7 @@ This document records why TitoDex moved to Flutter, what remains from the previo
 
 ## Summary
 
-TitoDex is built on **Flutter** in the `flutter/` directory. The Phase 2 React mock under `src/` remains a **design reference** for layout and tokens. Flutter already drives the home screen from real HGSS save data when a save directory or bundled fixture is configured.
+TitoDex is built on **Flutter** in the `flutter/` directory. The Phase 2 React mock under `src/` remains a **design reference** for layout and tokens. Flutter drives the home screen from real save data when one `.sav` file or the bundled fixture is configured.
 
 The decision was driven by real-device feedback (“feels like a webpage”), future target platforms (Linux handhelds, web), and native features (save import, emulator launcher) that are awkward in WebView.
 
@@ -139,7 +139,7 @@ The root `android/` Capacitor project and `npm` scripts remain as legacy referen
 Phase 0 — Flutter scaffold                    ✅
 Phase A — Native feel + persistence           ⚠️ icon/splash pending
 Phase B — Useful companion                    ✅
-Phase C — HGSS parser + save directory sync   ✅
+Phase C — Save parser + single-file sync       ✅
 Phase D — Dex + Cloudflare CDN v5 (1025)        ✅ v0.3.0+
 Phase D+ — l10n/config bundle decoupling       ✅ v0.4.5+
 Phase F/G — Reference filters + battle tools     ✅ partial v0.4.6

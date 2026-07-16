@@ -1,10 +1,134 @@
 import '../../l10n/game_zh.dart';
 
 const _blockPosition = <int>[
-  0, 1, 2, 3, 0, 1, 3, 2, 0, 2, 1, 3, 0, 3, 1, 2, 0, 2, 3, 1, 0, 3, 2, 1, 1, 0, 2, 3, 1, 0, 3, 2,
-  2, 0, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 3, 0, 2, 1, 1, 2, 0, 3, 1, 3, 0, 2, 2, 1, 0, 3, 3, 1, 0, 2,
-  2, 3, 0, 1, 3, 2, 0, 1, 1, 2, 3, 0, 1, 3, 2, 0, 2, 1, 3, 0, 3, 1, 2, 0, 2, 3, 1, 0, 3, 2, 1, 0,
-  0, 1, 2, 3, 0, 1, 3, 2, 0, 2, 1, 3, 0, 3, 1, 2, 0, 2, 3, 1, 0, 3, 2, 1, 1, 0, 2, 3, 1, 0, 3, 2,
+  0,
+  1,
+  2,
+  3,
+  0,
+  1,
+  3,
+  2,
+  0,
+  2,
+  1,
+  3,
+  0,
+  3,
+  1,
+  2,
+  0,
+  2,
+  3,
+  1,
+  0,
+  3,
+  2,
+  1,
+  1,
+  0,
+  2,
+  3,
+  1,
+  0,
+  3,
+  2,
+  2,
+  0,
+  1,
+  3,
+  3,
+  0,
+  1,
+  2,
+  2,
+  0,
+  3,
+  1,
+  3,
+  0,
+  2,
+  1,
+  1,
+  2,
+  0,
+  3,
+  1,
+  3,
+  0,
+  2,
+  2,
+  1,
+  0,
+  3,
+  3,
+  1,
+  0,
+  2,
+  2,
+  3,
+  0,
+  1,
+  3,
+  2,
+  0,
+  1,
+  1,
+  2,
+  3,
+  0,
+  1,
+  3,
+  2,
+  0,
+  2,
+  1,
+  3,
+  0,
+  3,
+  1,
+  2,
+  0,
+  2,
+  3,
+  1,
+  0,
+  3,
+  2,
+  1,
+  0,
+  0,
+  1,
+  2,
+  3,
+  0,
+  1,
+  3,
+  2,
+  0,
+  2,
+  1,
+  3,
+  0,
+  3,
+  1,
+  2,
+  0,
+  2,
+  3,
+  1,
+  0,
+  3,
+  2,
+  1,
+  1,
+  0,
+  2,
+  3,
+  1,
+  0,
+  3,
+  2,
 ];
 
 const _speciesNames = <int, String>{
@@ -50,12 +174,22 @@ String decodeGen4Text(List<int> buffer) {
     if (code == 0xFFFF) {
       break;
     }
-    if (code >= 0xBB && code <= 0xD4) {
-      chars.add(String.fromCharCode('A'.codeUnitAt(0) + code - 0xBB));
-    } else if (code >= 0xD5 && code <= 0xEE) {
-      chars.add(String.fromCharCode('a'.codeUnitAt(0) + code - 0xD5));
-    } else if (code >= 0xEF && code <= 0xF8) {
-      chars.add(String.fromCharCode('0'.codeUnitAt(0) + code - 0xEF));
+    if (code >= 0x00A2 && code <= 0x00AB) {
+      chars.add(String.fromCharCode('0'.codeUnitAt(0) + code - 0x00A2));
+    } else if (code >= 0x00AC && code <= 0x00C5) {
+      chars.add(String.fromCharCode('A'.codeUnitAt(0) + code - 0x00AC));
+    } else if (code >= 0x00C6 && code <= 0x00DF) {
+      chars.add(String.fromCharCode('a'.codeUnitAt(0) + code - 0x00C6));
+    } else if (code >= 0x0121 && code <= 0x012A) {
+      chars.add(String.fromCharCode('0'.codeUnitAt(0) + code - 0x0121));
+    } else if (code >= 0x012B && code <= 0x0144) {
+      chars.add(String.fromCharCode('A'.codeUnitAt(0) + code - 0x012B));
+    } else if (code >= 0x0145 && code <= 0x015E) {
+      chars.add(String.fromCharCode('a'.codeUnitAt(0) + code - 0x0145));
+    } else if (code == 0x01DE) {
+      chars.add(' ');
+    } else if (code >= 0x20 && code <= 0x7E) {
+      chars.add(String.fromCharCode(code));
     } else {
       chars.add('[$code]');
     }

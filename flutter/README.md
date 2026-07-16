@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest standard release:** `0.4.98+51` · [GitHub Release v0.4.98](https://github.com/Tito-XD/tito-dex/releases/tag/v0.4.98)
+**Latest standard release:** `0.5.5+63` · [GitHub Release v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5)
 
-**Current `main` package version:** `0.4.94+47`
+**Current `main` package version:** `0.5.5+63`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 
@@ -12,7 +12,7 @@ Flutter implementation of the TitoDex journey companion. Parent repo: [../README
 
 ```bash
 flutter pub get
-flutter test          # ~115 tests
+flutter test          # ~175 tests
 flutter run           # Android device / emulator
 flutter run -d chrome # web preview (limited)
 ```
@@ -34,7 +34,9 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | Area | Notes |
 | --- | --- |
 | Home / Team / Journey | Trainer card, party, timeline, emulator continue |
-| HGSS save | 512 KB `.sav`, directory sync, seen/caught on dex |
+| Save import | One selected `.sav`; experimental Gen 1–7 metadata; richer fixture-verified HGSS party/map/dex parsing |
+| Android handoff | Native installed-app picker and emulator/game launcher |
+| Companion | Configurable standby Pokémon, six-slot party card, shiny surprise, silhouette quiz |
 | Dex 1–1025 | Grid, search, 4-tab detail, 23 editions, regional scope |
 | Offline pack | Settings → CDN bundle; l10n/maps/config; update prompts |
 | Search hub | Structured reference + battle tools; reference → dex filters |

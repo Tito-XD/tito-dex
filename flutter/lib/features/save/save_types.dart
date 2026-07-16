@@ -1,42 +1,47 @@
 import '../../models/journey.dart';
 
-/// User configuration for automatic save directory syncing.
-class SaveDirectoryConfig {
-  const SaveDirectoryConfig({
-    this.directoryPath,
+/// User configuration for a single persisted `.sav` document.
+class SaveFileConfig {
+  const SaveFileConfig({
+    this.selectedFileUri,
+    this.selectedFileName,
     this.autoLoadOnStartup = true,
-    this.lastLoadedPath,
     this.lastLoadedModifiedMs,
     this.lastLoadedHash,
     this.lastLoadedFileName,
   });
 
-  final String? directoryPath;
+  final String? selectedFileUri;
+  final String? selectedFileName;
   final bool autoLoadOnStartup;
-  final String? lastLoadedPath;
   final int? lastLoadedModifiedMs;
   final String? lastLoadedHash;
   final String? lastLoadedFileName;
 
-  SaveDirectoryConfig copyWith({
-    String? directoryPath,
+  SaveFileConfig copyWith({
+    String? selectedFileUri,
+    String? selectedFileName,
     bool? autoLoadOnStartup,
-    String? lastLoadedPath,
     int? lastLoadedModifiedMs,
     String? lastLoadedHash,
     String? lastLoadedFileName,
     bool clearLastLoaded = false,
+    bool clearSelectedFile = false,
   }) {
-    return SaveDirectoryConfig(
-      directoryPath: directoryPath ?? this.directoryPath,
+    return SaveFileConfig(
+      selectedFileUri: clearSelectedFile
+          ? null
+          : (selectedFileUri ?? this.selectedFileUri),
+      selectedFileName: clearSelectedFile
+          ? null
+          : (selectedFileName ?? this.selectedFileName),
       autoLoadOnStartup: autoLoadOnStartup ?? this.autoLoadOnStartup,
-      lastLoadedPath:
-          clearLastLoaded ? null : (lastLoadedPath ?? this.lastLoadedPath),
       lastLoadedModifiedMs: clearLastLoaded
           ? null
           : (lastLoadedModifiedMs ?? this.lastLoadedModifiedMs),
-      lastLoadedHash:
-          clearLastLoaded ? null : (lastLoadedHash ?? this.lastLoadedHash),
+      lastLoadedHash: clearLastLoaded
+          ? null
+          : (lastLoadedHash ?? this.lastLoadedHash),
       lastLoadedFileName: clearLastLoaded
           ? null
           : (lastLoadedFileName ?? this.lastLoadedFileName),
@@ -44,7 +49,7 @@ class SaveDirectoryConfig {
   }
 }
 
-/// Result of scanning/parsing the newest save in a folder.
+/// Result of reading and parsing the selected save file.
 class SaveSyncResult {
   const SaveSyncResult({
     required this.journey,

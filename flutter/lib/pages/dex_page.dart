@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,6 +48,8 @@ enum _DexMode { national, journey }
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
 
+  late final DateTime _openedAt;
+
   int _loadedThrough = 0;
   bool _loadingChunk = false;
   bool _loadingJourney = false;
@@ -66,6 +70,7 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
+    _openedAt = DateTime.now();
     gameEditionRepository.addListener(_onEditionChanged);
     dexFilterController.addListener(_onReferenceFilterChanged);
     _bootstrap();
@@ -280,6 +285,16 @@ class _DexPageState extends State<DexPage> {
         _loadingChunk = false;
       });
     }
+  }
+
+  Duration _cardRevealDelay(int index, int columns) {
+    // Let the page shell finish first. If data arrives later than the shell,
+    // cards start immediately while preserving their row-by-row cadence.
+    final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
+    final shellWaitMs = math.max(0, 620 - elapsedMs);
+    final row = index ~/ columns;
+    final staggerMs = math.min(row, 7) * 42;
+    return Duration(milliseconds: shellWaitMs + staggerMs);
   }
 
   Future<void> _setMode(_DexMode mode) async {
@@ -646,13 +661,17 @@ class _DexPageState extends State<DexPage> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final entry = visible[index];
                     final status = dexRepository.statusFor(entry.id, _progress);
-                    return PokemonMiniCard(
-                      summary: entry,
-                      status: status,
-                      compact: DeviceLayout.isCompact(context),
-                      onLongPress: _isSaveLinked
-                          ? null
-                          : () => _cycleManualMark(entry.id, status),
+                    return _DexGridCardReveal(
+                      key: ValueKey<String>('dex-grid-entry-${entry.id}'),
+                      delay: _cardRevealDelay(index, columns),
+                      child: PokemonMiniCard(
+                        summary: entry,
+                        status: status,
+                        compact: DeviceLayout.isCompact(context),
+                        onLongPress: _isSaveLinked
+                            ? null
+                            : () => _cycleManualMark(entry.id, status),
+                      ),
                     );
                   }, childCount: visible.length),
                 ),
@@ -680,25 +699,6 @@ class _DexPageState extends State<DexPage> {
                     AppZh.dexLoadingProgress(
                       _filterVisibleCount,
                       _filteredTotalCount,
-                    ),
-                    textAlign: TextAlign.center,
-                    style: SecondaryTypography.onGradient.body14.copyWith(
-                      color: TitoColors.skyBlue,
-                    ),
-                  ),
-                ),
-              ),
-            if (_mode == _DexMode.national &&
-                _region == DexRegionalPokedex.national &&
-                _loadedThrough < titodexMaxNationalDexId &&
-                !dexFilterController.hasActiveFilter)
-              SliverPadding(
-                padding: padding.copyWith(top: 8, bottom: 4),
-                sliver: SliverToBoxAdapter(
-                  child: Text(
-                    AppZh.dexLoadingProgress(
-                      _loadedThrough,
-                      titodexMaxNationalDexId,
                     ),
                     textAlign: TextAlign.center,
                     style: SecondaryTypography.onGradient.body14.copyWith(
@@ -745,6 +745,60 @@ class _DexPageState extends State<DexPage> {
           ),
         );
       },
+    );
+  }
+}
+
+class _DexGridCardReveal extends StatefulWidget {
+  const _DexGridCardReveal({
+    super.key,
+    required this.delay,
+    required this.child,
+  });
+
+  final Duration delay;
+  final Widget child;
+
+  @override
+  State<_DexGridCardReveal> createState() => _DexGridCardRevealState();
+}
+
+class _DexGridCardRevealState extends State<_DexGridCardReveal>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  late final Animation<Offset> _position;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _position = Tween<Offset>(
+      begin: const Offset(0, 0.12),
+      end: Offset.zero,
+    ).animate(_opacity);
+    Future<void>.delayed(widget.delay, () {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacity,
+      child: SlideTransition(position: _position, child: widget.child),
     );
   }
 }

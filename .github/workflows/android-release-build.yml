@@ -1,21 +1,80 @@
-name: Android Release APK
+name: Android Release APKs
 
 on:
   workflow_dispatch:
     inputs:
-      artifact_name:
-        description: APK filename, for example TitoDex-0.4.99-lite-rg-arm64.apk
+      version:
+        description: Product version without the leading v, for example 0.5.5
         required: true
+        type: string
+      lite_build_number:
+        description: Monotonically increasing Android versionCode for Lite
+        required: true
+        type: string
+      offline_build_number:
+        description: Monotonically increasing Android versionCode for Offline
+        required: true
+        type: string
+      offline_seed_apk:
+        description: Previous verified Offline APK used to reuse the unchanged dex v5 seed
+        required: true
+        default: releases/TitoDex-0.5.12-offline-rg-arm64.apk
         type: string
 
 permissions:
   contents: read
 
 jobs:
+  validate:
+    name: Analyze and test release source
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: flutter
+
+    steps:
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.6"
+          cache: true
+          pub-cache: true
+
+      - name: Validate release inputs
+        env:
+          VERSION: ${{ inputs.version }}
+          LITE_BUILD_NUMBER: ${{ inputs.lite_build_number }}
+          OFFLINE_BUILD_NUMBER: ${{ inputs.offline_build_number }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          [[ "$LITE_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]
+          [[ "$OFFLINE_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]
+          (( OFFLINE_BUILD_NUMBER > LITE_BUILD_NUMBER ))
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-pub --no-fatal-warnings --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --no-pub
+
   build:
-    name: Test, build, and verify signed APK
+    name: Build signed ${{ matrix.variant }} APK
+    needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [lite, offline]
     defaults:
       run:
         working-directory: flutter
@@ -59,36 +118,64 @@ jobs:
             printf 'storeFile=../titodex-upload.keystore\n'
           } > android/key.properties
 
+      - name: Reuse verified offline dex seed
+        if: matrix.variant == 'offline'
+        env:
+          OFFLINE_SEED_APK: ${{ inputs.offline_seed_apk }}
+        run: |
+          set -euo pipefail
+          seed="../$OFFLINE_SEED_APK"
+          test -f "$seed"
+          mkdir -p assets/dex
+          unzip -p "$seed" assets/flutter_assets/assets/dex/bundle.tar.zst > assets/dex/bundle.tar.zst
+          unzip -p "$seed" assets/flutter_assets/assets/dex/bundle-manifest.json > assets/dex/bundle-manifest.json
+          test -s assets/dex/bundle.tar.zst
+          test -s assets/dex/bundle-manifest.json
+          sed -i '\|    - assets/config/|a\    - assets/dex/' pubspec.yaml
+
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Analyze
-        run: flutter analyze --no-pub --no-fatal-warnings --no-fatal-infos
-
-      - name: Run tests
-        run: flutter test --no-pub
+      - name: Configure package version
+        env:
+          VERSION: ${{ inputs.version }}
+          VARIANT: ${{ matrix.variant }}
+          LITE_BUILD_NUMBER: ${{ inputs.lite_build_number }}
+          OFFLINE_BUILD_NUMBER: ${{ inputs.offline_build_number }}
+        run: |
+          set -euo pipefail
+          if [[ "$VARIANT" == "offline" ]]; then
+            echo "BUILD_NAME=$VERSION-offline" >> "$GITHUB_ENV"
+            echo "BUILD_NUMBER=$OFFLINE_BUILD_NUMBER" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_NAME=$VERSION" >> "$GITHUB_ENV"
+            echo "BUILD_NUMBER=$LITE_BUILD_NUMBER" >> "$GITHUB_ENV"
+          fi
+          echo "ARTIFACT_NAME=TitoDex-$VERSION-$VARIANT-rg-arm64.apk" >> "$GITHUB_ENV"
 
       - name: Build signed arm64 APK
-        run: flutter build apk --release --no-pub --target-platform android-arm64
+        run: >-
+          flutter build apk --release --no-pub --target-platform android-arm64
+          --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
 
       - name: Name and verify APK
         env:
-          ARTIFACT_NAME: ${{ inputs.artifact_name }}
+          VARIANT: ${{ matrix.variant }}
         run: |
           set -euo pipefail
-          if [[ ! "$ARTIFACT_NAME" =~ ^TitoDex-[0-9A-Za-z.+-]+-rg-arm64\.apk$ ]]; then
-            echo "Invalid artifact_name: $ARTIFACT_NAME" >&2
-            exit 2
-          fi
           mkdir -p ../dist
           cp build/app/outputs/flutter-apk/app-release.apk "../dist/$ARTIFACT_NAME"
-          ../tools/verify_release_apk.sh "../dist/$ARTIFACT_NAME"
+          if [[ "$VARIANT" == "offline" ]]; then
+            ../tools/verify_release_apk.sh --offline "../dist/$ARTIFACT_NAME"
+          else
+            ../tools/verify_release_apk.sh "../dist/$ARTIFACT_NAME"
+          fi
           sha256sum "../dist/$ARTIFACT_NAME"
 
       - name: Upload verified APK
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifact_name }}
-          path: dist/${{ inputs.artifact_name }}
+          name: TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
+          path: dist/TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
           if-no-files-found: error
           retention-days: 14

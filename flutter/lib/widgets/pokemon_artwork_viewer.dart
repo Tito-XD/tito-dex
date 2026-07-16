@@ -36,17 +36,15 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   @override
   void initState() {
     super.initState();
-    _options = spriteEditionOptions(
-      spriteUrlsByVersion: widget.summary.spriteUrlsByVersion,
+    _options = spriteEditionOptionsForPokemon(
+      widget.summary.id,
+      cdnUrlsByVersion: widget.summary.spriteUrlsByVersion,
       fallbackSpriteUrl:
           widget.summary.displaySpritePath ?? widget.summary.spriteUrl,
-      animatedSpriteUrl: widget.summary.animatedSpriteUrl,
     );
     _grouped = groupSpriteOptionsByGeneration(_options);
     _mainSource = widget.summary.artworkUrl ??
-        widget.summary.displaySpritePath ??
-        widget.summary.spriteUrl ??
-        (_options.isNotEmpty ? _options.last.spriteUrl : null);
+        officialArtworkUrlFor(widget.summary.id);
     _showAnimated = false;
   }
 
@@ -231,7 +229,7 @@ class _SpritePickerTile extends StatelessWidget {
                     ? TitoColors.softYellow
                     : TitoColors.skyBlue,
               ),
-              child: const Text('GIF', style: TextStyle(fontSize: 9)),
+              child: const Text('动图', style: TextStyle(fontSize: 9)),
             ),
         ],
       ),
@@ -246,10 +244,16 @@ class _ArtworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget missing(BuildContext _, Object __, StackTrace? ___) => const Icon(
+      Icons.image_not_supported_outlined,
+      color: TitoColors.card,
+      size: 48,
+    );
+
     final uri = Uri.tryParse(source);
     if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
-      return Image.network(source, fit: BoxFit.contain);
+      return Image.network(source, fit: BoxFit.contain, errorBuilder: missing);
     }
-    return Image.file(File(source), fit: BoxFit.contain);
+    return Image.file(File(source), fit: BoxFit.contain, errorBuilder: missing);
   }
 }

@@ -335,6 +335,26 @@ abstract final class AppZh {
   static const searchOnlineShowdown = 'Showdown 网页版';
   static const searchOnlineUsage = '使用率排行';
 
+  static const companionStandbyLabel = '同行宝可梦';
+  static const companionPickerTitle = '选择同行宝可梦';
+  static const companionPickerHint = '选中后会按需下载它的动图，不占安装包体积。';
+  static const companionPickerSearchHint = '搜索中文名、英文名或编号…';
+  static String companionPicked(String name) => '$name 加入同行！';
+  static String companionFriendship(String name) => '$name 的好感度爆棚了！❤';
+  static const companionSettingsTitle = '同行宝可梦';
+  static const companionSettingsHint = '它会以动图形式待在主页右下角，点它有惊喜。';
+  static const companionSettingsPick = '更换同伴';
+  static const companionSettingsReset = '恢复默认（随存档御三家）';
+  static String shinyPartyFound(String name) => '✨ 你的 $name 今天在闪光！';
+  static const quizTitle = '猜猜我是谁';
+  static const quizEntryHint = '剪影问答';
+  static const quizPrompt = '这只宝可梦是谁？';
+  static const quizNext = '下一题';
+  static const quizCorrect = '答对了！';
+  static String quizWrong(String name) => '是 $name 才对！';
+  static String quizScore(int correct, int total) => '战绩 $correct / $total';
+  static String quizStreak(int streak) => '连对 $streak';
+
   static const companionToolsTitle = '对战助手';
   static String companionToolsSubtitle(String gameTitle) => '跟随当前游戏：$gameTitle';
   static String companionToolsFacility(String facility) => '参考场景：$facility';
@@ -467,22 +487,22 @@ abstract final class AppZh {
   static const settingsClearEmulator = '清除选择';
   static String settingsEmulatorSelected(String name) => '已选择：$name';
 
-  static const settingsSaveDirectory = '存档目录';
-  static const settingsSaveDirectoryHint =
-      '选择 melonDS / Delta 等模拟器的存档文件夹，启动时自动读取最新的 .sav。';
-  static const settingsSaveDirectoryUnset = '未设置';
-  static const settingsPickSaveDirectory = '选择存档文件夹';
-  static const settingsClearSaveDirectory = '清除目录';
-  static const settingsAutoLoadOnStartup = '启动时自动加载最新存档';
+  static const settingsSaveFileHint =
+      '选择一个具体的 .sav 存档文件。TitoDex 只会保存并重读这个文件，不会扫描任何文件夹。';
+  static const settingsSaveFileUnset = '尚未选择存档文件';
+  static const settingsPickSaveFile = '选择 .sav 存档文件';
+  static String settingsSelectedSaveFile(String name) => '已选择文件：$name';
+  static const settingsClearSaveFile = '清除所选存档文件';
+  static const settingsAutoLoadOnStartup = '启动时自动重读所选存档';
   static const settingsSyncNow = '立即同步';
   static String settingsLastSynced(String fileName) => '上次同步：$fileName';
-  static const settingsLastSyncedNone = '尚未从目录同步过存档';
+  static const settingsLastSyncedNone = '尚未读取所选存档';
 
-  static const snackSaveDirectorySet = '存档目录已设置';
-  static const snackSaveDirectoryCleared = '已清除存档目录';
+  static const snackSaveFileSet = '存档文件已选择并解析';
+  static const snackSaveFileCleared = '已清除所选存档文件';
   static const snackSaveSyncUnchanged = '存档未变化，无需更新';
-  static const snackSaveSyncNoDirectory = '请先在设置中选择存档目录';
-  static const snackSaveSyncNoSave = '目录中未找到 512 KB 的 .sav 文件';
+  static const snackSaveSyncNoFile = '请先在设置中选择一个 .sav 存档文件';
+  static const snackSaveFileUnavailable = '无法再次读取所选存档，请重新选择文件';
   static const snackSaveSyncUnsupported = '找到的存档格式不受支持';
   static String snackSaveSyncLoaded(String fileName) => '已从 $fileName 同步存档';
 
@@ -496,10 +516,15 @@ abstract final class AppZh {
   static const snackMockRestored = '已恢复演示旅程';
 
   static const continueSheetTitle = '继续旅程';
-  static const continueSheetPickEmulator = '选择要启动的模拟器';
+  static const continueSheetPickEmulator = '选择要启动的应用';
   static const continueSheetLaunch = '启动';
   static const continueSheetChange = '换一个';
-  static const continueSheetNoEmulators = '未找到已安装的模拟器应用';
+  static const continueSheetNoEmulators = '未找到可启动的应用';
+  static const continueSheetSearchHint = '搜索应用名称或包名';
+  static const continueSheetRecommended = '推荐模拟器';
+  static const continueSheetOtherApps = '其他应用';
+  static const continueSheetSearchResults = '搜索结果';
+  static const continueSheetNoSearchResults = '没有匹配的应用';
   static const continueSheetEmulatorLoadFailed = '读取已安装应用失败，请稍后重试';
   static const continueSheetDesktopHint = '模拟器启动目前仅支持 Android';
   static String continueSheetLaunching(String name) => '正在打开 $name…';
