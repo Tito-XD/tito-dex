@@ -243,7 +243,10 @@ class _QuizBody extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(TitoRadii.md),
-                side: const BorderSide(color: TitoColors.ink, width: 3),
+                side: const BorderSide(
+                  color: TitoColors.ink,
+                  width: TitoBorders.card,
+                ),
               ),
             ),
             child: const Text(AppZh.quizNext),

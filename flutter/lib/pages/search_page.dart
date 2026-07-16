@@ -254,17 +254,23 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(color: TitoColors.ink, width: 3),
+                  borderSide: const BorderSide(
+                    color: TitoColors.ink,
+                    width: TitoBorders.card,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(color: TitoColors.ink, width: 3),
+                  borderSide: const BorderSide(
+                    color: TitoColors.ink,
+                    width: TitoBorders.card,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(TitoRadii.md),
                   borderSide: const BorderSide(
                     color: TitoColors.softYellow,
-                    width: 3,
+                    width: TitoBorders.card,
                   ),
                 ),
               ),

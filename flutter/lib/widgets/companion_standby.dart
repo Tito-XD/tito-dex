@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -59,9 +60,11 @@ class _CompanionStandbyState extends State<CompanionStandby>
   late final Animation<double> _bounceScale;
   final _random = math.Random();
   final _hearts = <_HeartParticle>[];
+  final _cryPlayer = AudioPlayer();
   late Future<int?> _heightFuture;
   Timer? _quoteTimer;
-  String? _quote;
+  String? _quoteTemplate;
+  var _cryUrlIndex = 0;
   var _nextHeartId = 0;
   var _pats = 0;
 
@@ -88,7 +91,8 @@ class _CompanionStandbyState extends State<CompanionStandby>
     if (oldWidget.speciesId != widget.speciesId) {
       _pats = 0;
       _hearts.clear();
-      _quote = null;
+      _quoteTemplate = null;
+      _cryUrlIndex = 0;
       _quoteTimer?.cancel();
       _heightFuture = _loadHeight(widget.speciesId);
     }
@@ -97,8 +101,26 @@ class _CompanionStandbyState extends State<CompanionStandby>
   @override
   void dispose() {
     _quoteTimer?.cancel();
+    _cryPlayer.dispose();
     _bounce.dispose();
     super.dispose();
+  }
+
+  /// Play the species cry, walking the CDN→GitHub candidate list once and
+  /// then sticking with whichever source worked. Silent on total failure —
+  /// the pat animation carries the interaction offline.
+  Future<void> _playCry() async {
+    final candidates = cryCandidatesFor(widget.speciesId);
+    for (var i = _cryUrlIndex; i < candidates.length; i++) {
+      try {
+        await _cryPlayer.stop();
+        await _cryPlayer.play(UrlSource(candidates[i]), volume: 0.55);
+        _cryUrlIndex = i;
+        return;
+      } catch (_) {
+        // Try the next source.
+      }
+    }
   }
 
   static Future<int?> _loadHeight(int speciesId) async {
@@ -114,19 +136,20 @@ class _CompanionStandbyState extends State<CompanionStandby>
   void _onPat() {
     HapticFeedback.lightImpact();
     _bounce.forward(from: 0);
+    unawaited(_playCry());
     final becameFriend = _pats + 1 == _friendshipPats;
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDuration, () {
       if (mounted) {
-        setState(() => _quote = null);
+        setState(() => _quoteTemplate = null);
       }
     });
     setState(() {
       _pats += 1;
       _hearts.add(_HeartParticle(_nextHeartId++, _random));
-      _quote = becameFriend
+      _quoteTemplate = becameFriend
           ? companionFriendshipQuote
-          : pickCompanionQuote(_random, previous: _quote);
+          : pickCompanionQuote(_random, previous: _quoteTemplate);
     });
   }
 
@@ -151,8 +174,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
   Widget build(BuildContext context) {
     final square = DeviceLayout.useSquareDashboard(context);
     final scaled = square || widget.compact;
-    final minSize = scaled ? DeviceLayout.dim(context, 40.0) : 44.0;
-    final maxSize = scaled ? DeviceLayout.dim(context, 88.0) : 96.0;
+    // Frameless GIF gets more room than the old bordered circle did.
+    final minSize = scaled ? DeviceLayout.dim(context, 48.0) : 52.0;
+    final maxSize = scaled ? DeviceLayout.dim(context, 104.0) : 116.0;
 
     return FutureBuilder<int?>(
       future: _heightFuture,
@@ -172,32 +196,27 @@ class _CompanionStandbyState extends State<CompanionStandby>
     double spriteSize,
     double maxSize,
   ) {
+    // Frameless — the animated sprite stands on the dashboard directly,
+    // like a follower Pokémon rather than a badge.
     final sticker = AnimatedContainer(
       duration: const Duration(milliseconds: 360),
       curve: Curves.easeOutBack,
       width: spriteSize,
       height: spriteSize,
-      decoration: BoxDecoration(
-        color: TitoColors.card,
-        shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 3),
-        boxShadow: const [
-          BoxShadow(color: Color(0x2818283B), offset: Offset(0, 4)),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      padding: const EdgeInsets.all(4),
+      alignment: Alignment.bottomCenter,
       child: FallbackSpriteImage(
         sources: animatedSpriteCandidatesFor(widget.speciesId),
         width: spriteSize,
         height: spriteSize,
+        showLoadingProgress: true,
       ),
     );
 
-    // Reserve the max footprint so height-based resizing never shifts the
-    // dashboard around; the bubble floats in the extra headroom.
-    final stackWidth = math.max(maxSize + 36, 148.0);
-    final stackHeight = maxSize + 76;
+    // The sticker itself hugs the bottom-right corner; the reserved headroom
+    // to the left/top only hosts the bubble and hearts, so height-based
+    // resizing never shifts the anchor.
+    final stackWidth = math.max(maxSize + 60, 168.0);
+    final stackHeight = maxSize + 72;
 
     return Semantics(
       button: true,
@@ -206,25 +225,33 @@ class _CompanionStandbyState extends State<CompanionStandby>
         width: stackWidth,
         height: stackHeight,
         child: Stack(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.bottomRight,
           clipBehavior: Clip.none,
           children: [
             for (final heart in _hearts)
-              _RisingHeart(
-                key: ValueKey(heart.id),
-                particle: heart,
-                riseHeight: spriteSize + 26,
-                onDone: () => _removeHeart(heart.id),
+              Positioned(
+                right: spriteSize / 2 - heart.size / 2,
+                bottom: 0,
+                child: _RisingHeart(
+                  key: ValueKey(heart.id),
+                  particle: heart,
+                  riseHeight: spriteSize + 22,
+                  onDone: () => _removeHeart(heart.id),
+                ),
               ),
             GestureDetector(
               onTap: _onPat,
               onLongPress: _openPicker,
-              child: ScaleTransition(scale: _bounceScale, child: sticker),
+              child: ScaleTransition(
+                scale: _bounceScale,
+                alignment: Alignment.bottomCenter,
+                child: sticker,
+              ),
             ),
             if (_friend)
               Positioned(
-                right: (stackWidth - spriteSize) / 2 - 4,
-                bottom: spriteSize - 10,
+                right: -2,
+                bottom: spriteSize - 12,
                 child: TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0, end: 1),
                   duration: const Duration(milliseconds: 360),
@@ -236,7 +263,10 @@ class _CompanionStandbyState extends State<CompanionStandby>
                     decoration: BoxDecoration(
                       color: TitoColors.softYellow,
                       shape: BoxShape.circle,
-                      border: Border.all(color: TitoColors.ink, width: 2),
+                      border: Border.all(
+                        color: TitoColors.ink,
+                        width: TitoBorders.element,
+                      ),
                     ),
                     child: const Icon(
                       Icons.favorite_rounded,
@@ -247,8 +277,14 @@ class _CompanionStandbyState extends State<CompanionStandby>
                 ),
               ),
             Positioned(
-              bottom: spriteSize + 10,
-              child: _QuoteBubble(quote: _quote, maxWidth: stackWidth),
+              right: 0,
+              bottom: spriteSize + 8,
+              child: _QuoteBubble(
+                quote: _quoteTemplate == null
+                    ? null
+                    : formatCompanionQuote(_quoteTemplate!, widget.nameZh),
+                maxWidth: stackWidth,
+              ),
             ),
           ],
         ),
@@ -270,6 +306,9 @@ class _QuoteBubble extends StatelessWidget {
     return IgnorePointer(
       child: AnimatedScale(
         scale: visible ? 1.0 : 0.6,
+        // Anchored bottom-right so the bubble pops toward the upper-left,
+        // away from the corner-pinned sticker.
+        alignment: Alignment.bottomRight,
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutBack,
         child: AnimatedOpacity(
@@ -324,19 +363,16 @@ class _RisingHeart extends StatelessWidget {
       curve: Curves.easeOut,
       onEnd: onDone,
       builder: (context, t, child) {
-        return Positioned(
-          bottom: 12 + riseHeight * t,
-          child: Transform.translate(
-            offset: Offset(particle.dx * t, 0),
-            child: Transform.rotate(
-              angle: particle.angle * t,
-              child: Opacity(
-                opacity: (1 - t).clamp(0.0, 1.0),
-                child: Icon(
-                  Icons.favorite_rounded,
-                  size: particle.size,
-                  color: TitoColors.coral,
-                ),
+        return Transform.translate(
+          offset: Offset(particle.dx * t, -(12 + riseHeight * t)),
+          child: Transform.rotate(
+            angle: particle.angle * t,
+            child: Opacity(
+              opacity: (1 - t).clamp(0.0, 1.0),
+              child: Icon(
+                Icons.favorite_rounded,
+                size: particle.size,
+                color: TitoColors.coral,
               ),
             ),
           ),
@@ -361,6 +397,9 @@ class CompanionStandbyOverlay extends StatelessWidget {
     return ListenableBuilder(
       listenable: companionRepository,
       builder: (context, _) {
+        if (!companionRepository.enabled) {
+          return const SizedBox.shrink();
+        }
         final choice = companionRepository.choice;
         final speciesId =
             choice?.pokemonId ??

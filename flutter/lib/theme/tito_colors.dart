@@ -22,3 +22,11 @@ abstract final class TitoRadii {
   static const lg = 24.0;
   static const xl = 32.0;
 }
+
+/// Ink outline widths for the sticker look. The original 3.0 read slightly
+/// chunky on phone density — cards/buttons use [card], small circular
+/// elements (avatars, companion sticker) use [element].
+abstract final class TitoBorders {
+  static const card = 2.5;
+  static const element = 2.0;
+}

@@ -171,7 +171,12 @@ abstract final class DeviceLayout {
   static double squareQuickTileHeight(BuildContext context) {
     final width = sizeOf(context).width;
     final gap = sectionSpacing(context);
-    return useSquareDashboard(context) ? (width - gap * 3) / 4 : 56;
+    if (useSquareDashboard(context)) {
+      return (width - gap * 3) / 4;
+    }
+    // Portrait phones share the square-dashboard tile formula (clamped for
+    // tablets) so the home quick actions look identical across devices.
+    return ((width - gap * 3) / 4).clamp(64.0, 116.0);
   }
 
   /// Native handheld UI ignores system font/display scaling — fixed logical layout.
@@ -306,7 +311,9 @@ abstract final class DeviceLayout {
   }
 
   static double companionOverlayBottom(BuildContext context) {
-    if (useSquareDashboard(context)) {
+    // Horizontal home layouts (square handheld + landscape) pin the quick
+    // bar to the bottom edge — float the companion just above it.
+    if (useSquareDashboard(context) || isLandscape(context)) {
       return squareQuickTileHeight(context) + sectionSpacing(context) + 4;
     }
     if (isCompact(context)) {

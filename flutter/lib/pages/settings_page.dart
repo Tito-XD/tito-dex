@@ -424,7 +424,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     foregroundColor: TitoColors.ink,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(TitoRadii.md),
-                      side: const BorderSide(color: TitoColors.ink, width: 3),
+                      side: const BorderSide(
+                        color: TitoColors.ink,
+                        width: TitoBorders.card,
+                      ),
                     ),
                   ),
                   child: const Text(AppZh.settingsSaveTrainerName),
@@ -885,7 +888,22 @@ class _CompanionSection extends StatelessWidget {
                   color: TitoColors.mutedInk,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.companionSettingsToggle,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                  ),
+                  Switch(
+                    value: companionRepository.enabled,
+                    onChanged: companionRepository.setEnabled,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Container(
@@ -894,12 +912,16 @@ class _CompanionSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: TitoColors.card,
                       shape: BoxShape.circle,
-                      border: Border.all(color: TitoColors.ink, width: 3),
+                      border: Border.all(
+                        color: TitoColors.ink,
+                        width: TitoBorders.element,
+                      ),
                     ),
                     clipBehavior: Clip.antiAlias,
                     padding: const EdgeInsets.all(4),
                     child: FallbackSpriteImage(
                       sources: animatedSpriteCandidatesFor(speciesId),
+                      showLoadingProgress: true,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -991,7 +1013,7 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 3),
+        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

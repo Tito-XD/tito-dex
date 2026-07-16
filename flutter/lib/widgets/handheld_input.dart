@@ -113,7 +113,7 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
         decoration: BoxDecoration(
           borderRadius: widget.borderRadius,
           border: _focused
-              ? Border.all(color: TitoColors.softYellow, width: 3)
+              ? Border.all(color: TitoColors.softYellow, width: TitoBorders.card)
               : null,
           boxShadow: _focused
               ? const [

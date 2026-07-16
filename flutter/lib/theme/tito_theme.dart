@@ -110,7 +110,10 @@ ThemeData buildTitoTheme() {
         textStyle: textTheme.labelLarge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
-          side: const BorderSide(color: TitoColors.ink, width: 3),
+          side: const BorderSide(
+            color: TitoColors.ink,
+            width: TitoBorders.card,
+          ),
         ),
       ),
     ),

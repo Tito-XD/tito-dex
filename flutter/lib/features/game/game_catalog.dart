@@ -177,6 +177,89 @@ Future<GameEdition?> showGameEditionGridPicker(
   );
 }
 
+/// Short code for the letter-badge fallback — the ASCII tag inside the
+/// label's parentheses ('心金/魂银 (HGSS)' → 'HGSS').
+String gameEditionShortCode(GameEdition edition) {
+  final label = edition.labelZh;
+  final open = label.lastIndexOf('(');
+  final close = label.lastIndexOf(')');
+  if (open >= 0 && close > open + 1) {
+    return label.substring(open + 1, close);
+  }
+  return edition.slug.length > 4
+      ? edition.slug.substring(0, 4).toUpperCase()
+      : edition.slug.toUpperCase();
+}
+
+/// Game icon: bundled official HOME icon for Gen VI+, version-tinted letter
+/// badge for older titles.
+class GameEditionIcon extends StatelessWidget {
+  const GameEditionIcon({super.key, required this.edition, this.size = 40});
+
+  final GameEdition edition;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = edition.iconAsset;
+    if (asset != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        child: Image.asset(
+          asset,
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _LetterBadge(
+            edition: edition,
+            size: size,
+          ),
+        ),
+      );
+    }
+    return _LetterBadge(edition: edition, size: size);
+  }
+}
+
+class _LetterBadge extends StatelessWidget {
+  const _LetterBadge({required this.edition, required this.size});
+
+  final GameEdition edition;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final code = gameEditionShortCode(edition);
+    final accent = edition.accentColor;
+    final dark = accent.computeLuminance() < 0.4;
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: accent,
+        borderRadius: BorderRadius.circular(size * 0.22),
+        border: Border.all(color: const Color(0x3318283B), width: 1),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: size * 0.08),
+          child: Text(
+            code,
+            style: TextStyle(
+              fontSize: size * 0.34,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+              color: dark ? Colors.white : const Color(0xFF221F26),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _GameEditionGridIcon extends StatelessWidget {
   const _GameEditionGridIcon({required this.edition});
 
@@ -184,29 +267,7 @@ class _GameEditionGridIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = edition.iconUrl;
-    if (url == null) {
-      return Icon(
-        edition.hasPokeApiData
-            ? Icons.videogame_asset_rounded
-            : Icons.info_outline_rounded,
-        size: 36,
-        color: const Color(0x9918283B),
-      );
-    }
-    return Image.network(
-      url,
-      width: 40,
-      height: 40,
-      fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => Icon(
-        edition.hasPokeApiData
-            ? Icons.videogame_asset_rounded
-            : Icons.info_outline_rounded,
-        size: 36,
-        color: const Color(0x9918283B),
-      ),
-    );
+    return GameEditionIcon(edition: edition, size: 40);
   }
 }
 
@@ -248,9 +309,7 @@ Future<GameEdition?> showGameEditionPicker(
                       final edition = GameEdition.all[index];
                       final isSelected = edition.slug == current.slug;
                       return ListTile(
-                        leading: edition.hasPokeApiData
-                            ? const Icon(Icons.videogame_asset_rounded)
-                            : const Icon(Icons.info_outline_rounded),
+                        leading: GameEditionIcon(edition: edition, size: 32),
                         title: Text(edition.labelZh),
                         subtitle: edition.hasPokeApiData
                             ? null
