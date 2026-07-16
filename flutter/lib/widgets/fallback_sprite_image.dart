@@ -15,12 +15,16 @@ class FallbackSpriteImage extends StatefulWidget {
     this.height,
     this.fit = BoxFit.contain,
     this.showLoadingProgress = false,
+    this.filterQuality = FilterQuality.low,
   });
 
   final List<String> sources;
   final double? width;
   final double? height;
   final BoxFit fit;
+
+  /// Upscale filtering — pass [FilterQuality.none] for crisp pixel art.
+  final FilterQuality filterQuality;
 
   /// Show a small progress ring while a network source downloads
   /// (with real byte progress when the server reports content length).
@@ -73,6 +77,7 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
         width: widget.width,
         height: widget.height,
         fit: widget.fit,
+        filterQuality: widget.filterQuality,
         errorBuilder: onError,
       );
     }
@@ -85,6 +90,7 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
         height: widget.height,
         fit: widget.fit,
         gaplessPlayback: true,
+        filterQuality: widget.filterQuality,
         errorBuilder: onError,
         loadingBuilder: widget.showLoadingProgress
             ? (context, child, progress) {
@@ -107,6 +113,7 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
       width: widget.width,
       height: widget.height,
       fit: widget.fit,
+      filterQuality: widget.filterQuality,
       errorBuilder: onError,
     );
   }
