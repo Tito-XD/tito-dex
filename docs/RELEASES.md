@@ -19,7 +19,10 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 | `v0.6.2` | TitoDex v0.6.2 · 同行大小与即时媒体 | Adds the companion size slider with raised height ceilings and pixel-crisp upscaling, bundles all starter GIFs and cries into the APK, and introduces a cancellable preload dialog when choosing any other companion. |
 | `v0.6.1` | TitoDex v0.6.1 · 同行宝可梦与横屏布局 | Upgrades the standby companion to a frameless height-scaled animation with quotes, cries, and a toggle; bundles official Gen VI+ game icons into the header and pickers; adds a one-screen landscape home layout; and unifies secondary-page header sizing. (v0.6.0 was built but superseded before publication.) |
 | `v0.5.51` | TitoDex v0.5.51 · Home 返回动画修正预发布 | Keeps Team and Search exit motion aligned with their entry edge and removes predictive-back progress from the three Home quick actions. |
+| `v0.5.12` | TitoDex v0.5.12 预发布 · 首页动效拆分预览 | Splits the three Home actions into independent transitions: Dex keeps card expansion while Team and Search slide from their own screen edges. |
+| `v0.5.11` | TitoDex v0.5.11 预发布 · 容器转场预览 | Fixes the solid-color overlay and Team/Search crashes during Home card expansion with a fade-through container transition. |
 | `v0.5.5` | TitoDex v0.5.5 · 存档与同行体验更新 | Moves save sync to one explicitly selected file, adds native Android app selection, refines motion and the six-slot party card, and introduces standby companion interactions and the silhouette quiz. |
+| `v0.5.2-rc.1` | TitoDex v0.5.2-rc.1 预发布 · 首页卡片展开修正 | Isolates the Hero surface from destination pages so Team, Dex, and Search stay interactive through the expansion. |
 | `v0.5.1` | TitoDex v0.5.1 · Android 返回与转场 | Uses Android-standard navigation motion and predictive back, with Home quick-action cards expanding into Team, Dex, and Search. |
 | `v0.5.0` | TitoDex v0.5.0 · 图鉴无感知加载 | Precomputed catalog keeps Dex lists, search, and reference filters responsive in both lite and offline packages. |
 | `v0.4.99` | TitoDex v0.4.99 · Lite 与离线版本同步 | Aligns the full release source and provides matching lite and offline arm64 packages. |
@@ -74,6 +77,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 ## Copy rules
 
+- Write every GitHub Release title and body in Simplified Chinese, titled `TitoDex vX.Y.Z · 主题` (pre-releases: `TitoDex vX.Y.Z 预发布 · 主题`). If an English channel is ever added, append a bilingual section under the Chinese copy instead of replacing it.
 - Use the version and one clear outcome in the title.
 - Describe user-visible changes before implementation details.
 - Name the attached package and supported ABI when applicable.
