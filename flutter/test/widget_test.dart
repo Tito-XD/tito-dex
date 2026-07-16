@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/app.dart';
@@ -39,6 +37,11 @@ void main() {
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexTransitionDuration);
     expect(route.opaque, isTrue);
+    expect(route.popGestureEnabled, isFalse);
+    expect(
+      tester.widget<Hero>(find.byType(Hero)).transitionOnUserGestures,
+      isFalse,
+    );
   });
 
   testWidgets('Dex shell expands before its list cards fade in', (
@@ -92,6 +95,7 @@ void main() {
         route.reverseTransitionDuration,
         titoSideSlideReverseTransitionDuration,
       );
+      expect(route.popGestureEnabled, isFalse);
 
       expect(find.byType(Hero), findsNothing);
       final slideFinder = find.byKey(
@@ -126,71 +130,6 @@ void main() {
       await tester.pumpAndSettle();
     }
   });
-
-  testWidgets('side slides track Android predictive back linearly by edge', (
-    tester,
-  ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    try {
-      for (final (swipeEdge, expectedOffset) in <(int, double)>[
-        (0, 0.35),
-        (1, -0.35),
-      ]) {
-        await tester.pumpWidget(
-          const _SideSlideHarness(direction: TitoSideSlideDirection.fromLeft),
-        );
-        await tester.tap(find.byKey(const ValueKey<String>('open-side-page')));
-        await tester.pumpAndSettle();
-
-        await _sendBackGesture(tester, 'startBackGesture', <String, dynamic>{
-          'touchOffset': const <double>[5, 300],
-          'progress': 0.0,
-          'swipeEdge': swipeEdge,
-        });
-        await _sendBackGesture(
-          tester,
-          'updateBackGestureProgress',
-          <String, dynamic>{
-            'touchOffset': const <double>[100, 300],
-            'progress': 0.35,
-            'swipeEdge': swipeEdge,
-          },
-        );
-        await tester.pump();
-
-        final slide = tester.widget<SlideTransition>(
-          find.byKey(const ValueKey<String>('tito-side-slide-transition')),
-        );
-        expect(slide.position.value.dx, closeTo(expectedOffset, 0.001));
-
-        await _sendBackGesture(tester, 'cancelBackGesture', null);
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const ValueKey<String>('close-side-page')),
-          findsOneWidget,
-        );
-        await tester.tap(find.byKey(const ValueKey<String>('close-side-page')));
-        await tester.pumpAndSettle();
-      }
-    } finally {
-      debugDefaultTargetPlatformOverride = null;
-    }
-  });
-}
-
-Future<void> _sendBackGesture(
-  WidgetTester tester,
-  String method,
-  Map<String, dynamic>? arguments,
-) async {
-  final message = const StandardMethodCodec().encodeMethodCall(
-    MethodCall(method, arguments),
-  );
-  await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
-    'flutter/backgesture',
-    message,
-    (_) {},
-  );
 }
 
 class _DexFadeHarness extends StatefulWidget {
@@ -217,7 +156,7 @@ class _DexFadeHarnessState extends State<_DexFadeHarness> {
                 child: Center(
                   child: Hero(
                     tag: TitoHomeActionHero.dex,
-                    transitionOnUserGestures: true,
+                    transitionOnUserGestures: false,
                     child: SizedBox(
                       key: const ValueKey<String>('open-card'),
                       width: 120,

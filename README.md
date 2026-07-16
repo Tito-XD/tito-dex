@@ -8,7 +8,8 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 | --- | --- | --- |
 | Lite APK | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · App `0.5.5+63` | arm64-v8a, about 23 MB |
 | Offline APK | [v0.5.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.5) · App `0.5.5-offline+64` | Bundles the current dex pack, about 64 MB |
-| `main` source baseline | App `0.5.5+63` | Single-file saves, native app launching, polished motion, and companion features |
+| Preview APKs | [v0.5.51](https://github.com/Tito-XD/tito-dex/releases/tag/v0.5.51) · Apps `0.5.51+65` / `0.5.51-offline+66` | Pre-release with corrected Home quick-action return motion |
+| `main` source baseline | App `0.5.51+65` | Stable feature set plus the preview navigation fix |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 

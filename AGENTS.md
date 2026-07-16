@@ -6,7 +6,7 @@
 
 - **Active code:** `flutter/` (Flutter + Dart, Chinese UI)
 - **Frozen:** `src/` (React mock — do not extend)
-- **Latest release:** v0.5.5 · Lite `0.5.5+63`; Offline `0.5.5-offline+64`
+- **Latest stable:** v0.5.5 · **Latest preview:** v0.5.51 · Lite `0.5.51+65`; Offline `0.5.51-offline+66`
 - **Offline data:** Dex bundle v5 (1025 species, `/v3/`)
 - **Tests:** `cd flutter && flutter test` (177 passing)
 
