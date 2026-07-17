@@ -855,10 +855,9 @@ class TypeEffectivenessGrid extends StatelessWidget {
                           border: Border.all(color: TitoColors.ink, width: 2),
                         ),
                         alignment: Alignment.center,
-                        child: Icon(
-                          typeIconData(type),
-                          size: (tileWidth * 0.55).clamp(18, 28),
-                          color: TitoColors.ink,
+                        child: TypeIconImage(
+                          typeEn: type,
+                          size: (tileWidth * 0.62).clamp(18.0, 30.0).toDouble(),
                         ),
                       ),
                       const SizedBox(height: 2),

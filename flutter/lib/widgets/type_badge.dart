@@ -6,6 +6,34 @@ import '../theme/tito_typography.dart';
 
 enum TypeBadgeSize { small, medium }
 
+/// Official Gen VIII-style type icon (pokesprite set, bundled in the APK at
+/// assets/type_icons/{type}.png). Falls back to the legacy Material symbol
+/// if the asset is missing so unknown type keys never break a row.
+class TypeIconImage extends StatelessWidget {
+  const TypeIconImage({
+    super.key,
+    required this.typeEn,
+    required this.size,
+    this.fallbackColor = TitoColors.ink,
+  });
+
+  final String typeEn;
+  final double size;
+  final Color fallbackColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/type_icons/${typeEn.toLowerCase()}.png',
+      width: size,
+      height: size,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (_, __, ___) =>
+          Icon(typeIconData(typeEn), size: size, color: fallbackColor),
+    );
+  }
+}
+
 /// Sticker-style type badge: colored pill with symbol icon + Chinese label.
 ///
 /// Replaces the old CDN English name-badge images (PokeAPI only provides
@@ -39,11 +67,7 @@ class TitoTypeBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            typeIconData(typeEn),
-            size: iconSize,
-            color: TitoColors.ink,
-          ),
+          TypeIconImage(typeEn: typeEn, size: iconSize),
           SizedBox(width: small ? 2 : 4),
           Text(
             typeNameZh(typeEn),

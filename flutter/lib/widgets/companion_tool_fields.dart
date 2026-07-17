@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'type_badge.dart';
+
 import '../l10n/app_zh.dart';
 import '../features/companion/battle_math.dart';
 import '../features/dex/ability_type_modifiers.dart';
@@ -115,11 +117,7 @@ class TypeChipPicker extends StatelessWidget {
               selected: active,
               showCheckmark: false,
               label: Text(typeNameZh(type)),
-              avatar: Icon(
-                typeIconData(type),
-                size: 16,
-                color: TitoColors.ink,
-              ),
+              avatar: TypeIconImage(typeEn: type, size: 16),
               selectedColor: typeTileColor(type),
               backgroundColor: TitoColors.card,
               side: const BorderSide(color: TitoColors.ink, width: 2),
@@ -234,11 +232,7 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         for (final type in widget.selected) ...[
-                          Icon(
-                            typeIconData(type),
-                            size: 20,
-                            color: TitoColors.ink,
-                          ),
+                          TypeIconImage(typeEn: type, size: 20),
                           const SizedBox(width: 4),
                         ],
                       ],
@@ -293,11 +287,7 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                       ),
                     ),
                     child: Center(
-                      child: Icon(
-                        typeIconData(type),
-                        size: 22,
-                        color: TitoColors.ink,
-                      ),
+                      child: TypeIconImage(typeEn: type, size: 22),
                     ),
                   ),
                 ),
