@@ -68,4 +68,49 @@ void main() {
 
     expect(estimate.tankVerdictZh, isNot('完全免疫或无伤'));
   });
+
+  group('critical hits and screens', () {
+    DamageEstimate run({
+      bool crit = false,
+      bool screened = false,
+      int generation = 9,
+    }) => estimateDamage(
+      level: 50,
+      power: 90,
+      attack: 120,
+      defense: 80,
+      defenderHp: 150,
+      moveType: 'fighting',
+      attackerTypes: const ['fighting'],
+      defenderTypes: const ['normal'],
+      relationsByType: relations,
+      generation: generation,
+      isCriticalHit: crit,
+      defenderScreened: screened,
+    );
+
+    test('crit multiplies ×1.5 from Gen 6 and ×2 before', () {
+      final base = run();
+      expect(
+        run(crit: true).extraMultiplier,
+        closeTo(base.extraMultiplier * 1.5, 1e-9),
+      );
+      expect(
+        run(crit: true, generation: 5).extraMultiplier,
+        closeTo(run(generation: 5).extraMultiplier * 2.0, 1e-9),
+      );
+    });
+
+    test('screens halve damage but are bypassed by crits', () {
+      final base = run();
+      expect(
+        run(screened: true).extraMultiplier,
+        closeTo(base.extraMultiplier * 0.5, 1e-9),
+      );
+      expect(
+        run(crit: true, screened: true).extraMultiplier,
+        closeTo(run(crit: true).extraMultiplier, 1e-9),
+      );
+    });
+  });
 }

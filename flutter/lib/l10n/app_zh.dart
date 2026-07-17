@@ -365,6 +365,9 @@ abstract final class AppZh {
   static String quizWrong(String name) => '是 $name 才对！';
   static String quizScore(int correct, int total) => '战绩 $correct / $total';
   static String quizStreak(int streak) => '连对 $streak';
+  static String quizBestStreak(int streak) => '最佳连对 $streak';
+  static const quizAdoptCompanion = '设为同行';
+  static String quizAdopted(String name) => '$name 现在陪你同行啦！';
 
   static const companionToolsTitle = '对战助手';
   static String companionToolsSubtitle(String gameTitle) => '跟随当前游戏：$gameTitle';
@@ -404,6 +407,12 @@ abstract final class AppZh {
   static const companionDefensiveBlindSpots = '联防盲点';
   static const companionGenerationTypeNote = '属性按当前游戏世代修正（Gen 4/5 无妖精）';
   static String companionDamageExtra(String extra) => '环境/特性修正 ×$extra';
+  static const companionCriticalHit = '击中要害';
+  static const companionDefenderScreen = '对方有光墙/反射壁';
+  static const companionDamageAssumptions =
+      '计算假设：单打对战，伤害含 85%–100% 随机浮动；'
+      '击中要害按世代倍率（第六世代起 ×1.5，此前 ×2）并无视光墙/反射壁；'
+      '未收录的特性、道具与场地细节不计入，结果仅供旅途参考。';
   static const companionStatInputsTitle = '输入';
   static String companionStatFacilityNote(String facility) =>
       '默认等级按 $facility 常见配置（Lv.50）';

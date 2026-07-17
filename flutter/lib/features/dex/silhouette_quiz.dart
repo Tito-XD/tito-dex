@@ -10,6 +10,20 @@ class SilhouetteQuestion {
   final List<PokemonSummary> choices;
 }
 
+/// National dex ceiling per generation — quiz pools stay within the species
+/// the player can actually meet in the selected game's era.
+int maxNationalDexIdForGeneration(int generation) => switch (generation) {
+  1 => 151,
+  2 => 251,
+  3 => 386,
+  4 => 493,
+  5 => 649,
+  6 => 721,
+  7 => 809,
+  8 => 905,
+  _ => 1025,
+};
+
 /// Draw a question from [pool]; [excludeIds] avoids repeating recent answers.
 /// Returns null when the pool cannot fill four distinct choices.
 SilhouetteQuestion? buildSilhouetteQuestion(

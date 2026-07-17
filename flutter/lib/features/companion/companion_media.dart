@@ -102,6 +102,14 @@ class CompanionMediaCache {
   Future<String?> ensureGif(int id) =>
       _download(id, 'gif', companionGifDownloadCandidates(id));
 
+  Future<String?> cachedShinyGifPath(int id) =>
+      _existingPath(id, 'shiny.gif');
+
+  /// Download-and-cache the shiny GIF (fetched lazily on a shiny session,
+  /// never part of the picker preload).
+  Future<String?> ensureShinyGif(int id) =>
+      _download(id, 'shiny.gif', animatedShinySpriteCandidatesFor(id));
+
   /// Download-and-cache the cry; returns the local path or null.
   Future<String?> ensureCry(int id) =>
       _download(id, 'ogg', cryCandidatesFor(id));

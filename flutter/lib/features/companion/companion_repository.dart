@@ -78,6 +78,22 @@ class CompanionRepository extends ChangeNotifier {
     await prefs.setString(_nameKey, choice.nameZh);
   }
 
+  static String _patsKey(int pokemonId) => 'companion.pats.$pokemonId';
+
+  /// Lifetime pat count for a species — drives the friendship badge and the
+  /// intimacy quote tiers across restarts.
+  Future<int> patCountFor(int pokemonId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_patsKey(pokemonId)) ?? 0;
+  }
+
+  Future<int> incrementPats(int pokemonId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final next = (prefs.getInt(_patsKey(pokemonId)) ?? 0) + 1;
+    await prefs.setInt(_patsKey(pokemonId), next);
+    return next;
+  }
+
   Future<void> clear() async {
     _choice = null;
     _loaded = true;

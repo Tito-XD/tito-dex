@@ -1073,10 +1073,33 @@ class ContactMoveToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BattleToggleChip(
+      label: AppZh.companionContactMove,
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+}
+
+/// Shared battle-condition toggle chip (contact move, critical hit, screens…).
+class BattleToggleChip extends StatelessWidget {
+  const BattleToggleChip({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
     return FilterChip(
       selected: value,
       showCheckmark: false,
-      label: Text(AppZh.companionContactMove),
+      label: Text(label),
       selectedColor: TitoColors.mint,
       backgroundColor: TitoColors.card,
       side: const BorderSide(color: TitoColors.ink, width: 2),

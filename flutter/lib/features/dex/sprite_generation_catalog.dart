@@ -221,6 +221,17 @@ String showdownGifUrlFor(int id, {bool shiny = false}) => shiny
 String bwAnimatedGifUrlFor(int id) =>
     '$pokeApiSpritesBase/versions/generation-v/black-white/animated/$id.gif';
 
+String bwAnimatedShinyGifUrlFor(int id) =>
+    '$pokeApiSpritesBase/versions/generation-v/black-white/animated/shiny'
+    '/$id.gif';
+
+/// Shiny animated candidates. Callers append the normal chain afterwards so
+/// a missing shiny asset degrades to the regular look instead of a blank.
+List<String> animatedShinySpriteCandidatesFor(int id) => [
+  showdownGifUrlFor(id, shiny: true),
+  if (id <= bwAnimatedMaxId) bwAnimatedShinyGifUrlFor(id),
+];
+
 /// Own-CDN animated GIF (seeded per release for the starters; a fast 404
 /// falls through for everyone else).
 String cdnAnimatedGifUrlFor(int id) =>

@@ -29,4 +29,18 @@ void main() {
       showdownGifUrlFor(1000),
     ]);
   });
+
+  test('shiny animated candidates use the shiny folders with BW ceiling', () {
+    expect(animatedShinySpriteCandidatesFor(175), [
+      showdownGifUrlFor(175, shiny: true),
+      bwAnimatedShinyGifUrlFor(175),
+    ]);
+    expect(animatedShinySpriteCandidatesFor(1000), [
+      showdownGifUrlFor(1000, shiny: true),
+    ]);
+    expect(
+      showdownGifUrlFor(175, shiny: true),
+      contains('/showdown/shiny/175.gif'),
+    );
+  });
 }

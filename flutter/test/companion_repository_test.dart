@@ -66,4 +66,19 @@ void main() {
     await reloaded.load();
     expect(reloaded.choice, isNull);
   });
+
+  test('pat counts persist per species and survive a new instance', () async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = CompanionRepository();
+    expect(await repository.patCountFor(155), 0);
+
+    expect(await repository.incrementPats(155), 1);
+    expect(await repository.incrementPats(155), 2);
+    expect(await repository.incrementPats(700), 1);
+    expect(await repository.patCountFor(155), 2);
+    expect(await repository.patCountFor(700), 1);
+
+    final restored = CompanionRepository();
+    expect(await restored.patCountFor(155), 2);
+  });
 }

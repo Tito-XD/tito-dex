@@ -24,6 +24,31 @@ Future<CompanionChoice?> showCompanionPickerSheet(BuildContext context) {
   );
 }
 
+/// Adopt [summary] as the standby companion. Non-bundled species go through
+/// the cancellable media preload dialog first, matching the picker sheet.
+/// Returns the saved choice, or null when the user cancelled.
+Future<CompanionChoice?> adoptCompanion(
+  BuildContext context,
+  PokemonSummary summary,
+) async {
+  if (!bundledCompanionIds.contains(summary.id)) {
+    final ready = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _CompanionMediaLoadingDialog(summary: summary),
+    );
+    if (ready != true || !context.mounted) {
+      return null; // Cancelled — keep the previous companion.
+    }
+  }
+  final choice = CompanionChoice(
+    pokemonId: summary.id,
+    nameZh: summary.nameZh,
+  );
+  await companionRepository.save(choice);
+  return choice;
+}
+
 class _CompanionPickerSheet extends StatefulWidget {
   const _CompanionPickerSheet();
 
@@ -58,24 +83,8 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
   }
 
   Future<void> _select(PokemonSummary summary) async {
-    // Starters ship inside the APK — no download, keep instantly.
-    if (!bundledCompanionIds.contains(summary.id)) {
-      final ready = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) =>
-            _CompanionMediaLoadingDialog(summary: summary),
-      );
-      if (ready != true || !mounted) {
-        return; // Cancelled — keep the previous companion.
-      }
-    }
-    final choice = CompanionChoice(
-      pokemonId: summary.id,
-      nameZh: summary.nameZh,
-    );
-    await companionRepository.save(choice);
-    if (mounted) {
+    final choice = await adoptCompanion(context, summary);
+    if (choice != null && mounted) {
       Navigator.of(context).pop(choice);
     }
   }

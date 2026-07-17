@@ -2,16 +2,19 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/silhouette_quiz.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/tito_font_scale.dart';
+import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -28,6 +31,7 @@ class SilhouetteQuizPage extends StatefulWidget {
 
 class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
   static const _recentAnswerMemory = 12;
+  static const _bestStreakKey = 'quiz.bestStreak';
 
   final _random = Random();
   final _recentAnswers = <int>{};
@@ -39,19 +43,47 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
   var _correct = 0;
   var _total = 0;
   var _streak = 0;
+  var _bestStreak = 0;
 
   bool get _answered => _selectedId != null;
 
   @override
   void initState() {
     super.initState();
+    _loadBestStreak();
     _loadPool();
+  }
+
+  Future<void> _loadBestStreak() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() => _bestStreak = prefs.getInt(_bestStreakKey) ?? 0);
+    }
+  }
+
+  Future<void> _saveBestStreak(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_bestStreakKey, value);
   }
 
   Future<void> _loadPool() async {
     try {
+      // Questions stay within the generation of the selected game — no
+      // spoiler species from eras the player has not reached.
+      final ceiling = maxNationalDexIdForGeneration(
+        gameEditionRepository.edition.generation,
+      );
       final scope = await dexRepository.getDefaultScope();
-      var pool = await dexRepository.getScopeSummaries(scope);
+      var pool = [
+        for (final entry in await dexRepository.getScopeSummaries(scope))
+          if (entry.id <= ceiling) entry,
+      ];
+      if (pool.length < 4) {
+        pool = [
+          for (final entry in await dexRepository.getAllSummaries())
+            if (entry.id <= ceiling) entry,
+        ];
+      }
       if (pool.length < 4) {
         pool = await dexRepository.getAllSummaries();
       }
@@ -100,6 +132,10 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
       if (isCorrect) {
         _correct += 1;
         _streak += 1;
+        if (_streak > _bestStreak) {
+          _bestStreak = _streak;
+          _saveBestStreak(_streak);
+        }
       } else {
         _streak = 0;
       }
@@ -107,6 +143,19 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
     _recentAnswers.add(question.answer.id);
     if (_recentAnswers.length > _recentAnswerMemory) {
       _recentAnswers.remove(_recentAnswers.first);
+    }
+  }
+
+  Future<void> _adoptAnswer() async {
+    final question = _question;
+    if (question == null) {
+      return;
+    }
+    final choice = await adoptCompanion(context, question.answer);
+    if (choice != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppZh.quizAdopted(choice.nameZh))),
+      );
     }
   }
 
@@ -118,6 +167,7 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
         type: MaterialType.transparency,
         child: SecondaryPageScaffold(
           title: AppZh.quizTitle,
+          subtitle: gameEditionRepository.edition.labelZh,
           children: [_body(context)],
         ),
       ),
@@ -146,8 +196,10 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
       correct: _correct,
       total: _total,
       streak: _streak,
+      bestStreak: _bestStreak,
       onChoice: _onChoice,
       onNext: _nextQuestion,
+      onAdopt: _adoptAnswer,
     );
   }
 }
@@ -160,8 +212,10 @@ class _QuizBody extends StatelessWidget {
     required this.correct,
     required this.total,
     required this.streak,
+    required this.bestStreak,
     required this.onChoice,
     required this.onNext,
+    required this.onAdopt,
   });
 
   final SilhouetteQuestion question;
@@ -170,8 +224,10 @@ class _QuizBody extends StatelessWidget {
   final int correct;
   final int total;
   final int streak;
+  final int bestStreak;
   final ValueChanged<PokemonSummary> onChoice;
   final VoidCallback onNext;
+  final VoidCallback onAdopt;
 
   @override
   Widget build(BuildContext context) {
@@ -182,11 +238,14 @@ class _QuizBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
           children: [
             _ScoreChip(label: AppZh.quizScore(correct, total)),
-            const SizedBox(width: 8),
             if (streak > 1) _ScoreChip(label: AppZh.quizStreak(streak)),
+            if (bestStreak > 1)
+              _ScoreChip(label: AppZh.quizBestStreak(bestStreak)),
           ],
         ),
         const SizedBox(height: 12),
@@ -235,6 +294,26 @@ class _QuizBody extends StatelessWidget {
         ),
         if (answered) ...[
           const SizedBox(height: 14),
+          if (answerIsCorrect) ...[
+            OutlinedButton.icon(
+              onPressed: onAdopt,
+              icon: const Icon(Icons.pets_rounded, size: 18),
+              label: const Text(AppZh.quizAdoptCompanion),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: TitoColors.ink,
+                backgroundColor: TitoColors.card,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  side: const BorderSide(
+                    color: TitoColors.ink,
+                    width: TitoBorders.element,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           FilledButton(
             onPressed: onNext,
             style: FilledButton.styleFrom(
