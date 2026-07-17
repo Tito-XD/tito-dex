@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.6.5` (`0.6.5+75`) | Recommended arm64-v8a download |
-| Offline APK | `v0.6.5` (`0.6.5-offline+76`) | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.6.5+75` | Current default branch baseline |
+| Lite APK | `v0.6.6` (`0.6.6+77`) | Recommended arm64-v8a download |
+| Offline APK | `v0.6.6` (`0.6.6-offline+78`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.6.6+77` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.6.6` | TitoDex v0.6.6 · 互动升级与官方图标 | Scopes the silhouette quiz to the selected game's generation with a persisted best streak and an adopt-as-companion action, adds shiny companion sessions with lifetime intimacy quote tiers and time-of-day greetings, brings critical-hit and screen toggles plus an assumptions note to quick damage, reuses species-linked types in team editing, bundles official-style type icons across the UI, and matches the route transition backdrop to the page palette. |
 | `v0.6.5` | TitoDex v0.6.5 · 体验修补与中文参考 | Save-diff banner scoped to save-linked editions with dismissal, symmetric dex expansion backdrop at 480/380ms, submit-only recent searches, a prominent current-game card in Settings, overflow-free matchup grid, unified dex top-bar pills, a 0.75× companion size floor, and modern official Chinese attached as a reference to untranslated flavor text. |
 | `v0.6.2.1` | TitoDex v0.6.2.1 · 自适应应用图标 | Replaces the inset circular launcher mark with full-bleed artwork so Android can apply each device's circle, squircle, rounded-square, or square adaptive mask naturally. |
 | `v0.6.2` | TitoDex v0.6.2 · 同行大小与即时媒体 | Adds the companion size slider with raised height ceilings and pixel-crisp upscaling, bundles all starter GIFs and cries into the APK, and introduces a cancellable preload dialog when choosing any other companion. |

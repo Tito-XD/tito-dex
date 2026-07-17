@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) |
-| **`main` / lite source** | `0.6.5+75` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.6.5-offline+76` — APK-bundled dex data |
+| **Latest release** | [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) |
+| **`main` / lite source** | `0.6.6+77` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.6.6-offline+78` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.6.5)
+## Current feature status (latest release line: v0.6.6)
 
-> `main` includes the v0.6.5 polish batch plus unreleased work (bundled type icons, transition backdrop fix, repository cleanup). The offline package adds only the bundled dex seed and offline package version.
+> `main` matches the v0.6.6 release line. The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -62,6 +62,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.6.6: generation-scoped silhouette quiz with persisted best streak + adopt-as-companion, shiny companion sessions (Showdown shiny GIFs, disk-cached) with intimacy quote tiers / time-of-day greetings / pat-count persistence, crit + screen toggles and an assumptions note in quick damage, species-linked team editing, bundled official-style type icons, matched transition backdrop, repository cleanup.
 - v0.6.5: save-diff banner scoping + dismissal, unified dex transition backdrop and timing (480/380 ms), submit-only recent searches (max 10), prominent current-game card in Settings, matchup grid overflow fix, companion size floor ×0.75, Chinese reference note for untranslated flavor text.
 - v0.6.2.1: full-bleed launcher artwork lets Android adaptive-icon masks define the circle, squircle, rounded-square, or square silhouette.
 - v0.6.2: companion size control, bundled starter GIF/cry media, and cancellable preload for other companions.
@@ -133,7 +134,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; 184 tests
+flutter test                    # regression gate; 193 tests
 flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
