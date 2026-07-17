@@ -11,6 +11,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
@@ -489,16 +490,21 @@ class _PartyMemberAvatar extends StatelessWidget {
       return SizedBox(width: size, height: size, child: sprite);
     }
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: TitoColors.cream,
-        shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: 2),
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, child) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: TitoColors.cream,
+          shape: BoxShape.circle,
+          border: Border.all(color: TitoColors.ink, width: 2),
+          boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
+        ),
+        clipBehavior: Clip.antiAlias,
+        alignment: Alignment.center,
+        child: child,
       ),
-      clipBehavior: Clip.antiAlias,
-      alignment: Alignment.center,
       child: sprite,
     );
   }

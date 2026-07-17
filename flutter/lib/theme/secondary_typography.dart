@@ -62,6 +62,7 @@ final class _SecondaryOnGradient {
         fontSize: 15,
         fontWeight: FontWeight.w800,
         color: TitoColors.card,
+        letterSpacing: 15 * -0.02,
       );
 
   TextStyle get body14 => TitoTypography.style(
@@ -97,6 +98,7 @@ final class _SecondaryOnCard {
   TextStyle get h15 => TitoTypography.style(
         fontSize: 15,
         fontWeight: FontWeight.w800,
+        letterSpacing: 15 * -0.02,
       );
 
   TextStyle get body14 => TitoTypography.style(

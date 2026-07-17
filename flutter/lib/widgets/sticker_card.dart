@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 
 enum StickerVariant { cream, deep, sky, mint, softYellow }
@@ -28,13 +29,18 @@ class StickerCard extends StatelessWidget {
       StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
     };
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.$1,
-        borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-        // 0.6.6 experiment: drop the hard offset shadow — the bold ink
-        // border carries the sticker look on its own, flatter and cleaner.
+    // Retro style: the signature solid drop shadow on every card; flat mode
+    // lets the bold ink border carry the sticker look on its own.
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, inner) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.$1,
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
+          boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
+        ),
+        child: inner,
       ),
       child: Padding(padding: padding, child: child),
     );
