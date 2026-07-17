@@ -851,76 +851,72 @@ class _DexTopBar extends StatelessWidget {
             ),
           ),
         ),
-        HandheldFocusDecorator(
-          onActivate: onSearch,
-          borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onSearch,
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rMd(context),
-                  ),
-                  border: Border.all(color: TitoColors.card, width: 2),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.search_rounded,
-                      color: TitoColors.card,
-                      size: backIcon * 0.72,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppZh.navSearch,
-                      style: SecondaryTypography.onGradient.small12.copyWith(
-                        color: TitoColors.card,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        _DexTopBarAction(
+          icon: Icons.search_rounded,
+          label: AppZh.navSearch,
+          onTap: onSearch,
         ),
         const SizedBox(width: 6),
-        HandheldFocusDecorator(
-          onActivate: onReference,
-          borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onReference,
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rMd(context),
-                  ),
-                  border: Border.all(color: TitoColors.card, width: 2),
-                ),
-                child: Text(
-                  AppZh.dexReferenceTitle,
+        _DexTopBarAction(
+          icon: Icons.menu_book_rounded,
+          label: AppZh.dexReferenceTitle,
+          onTap: onReference,
+        ),
+      ],
+    );
+  }
+}
+
+/// Shared pill for the dex top bar — one height, padding, and icon size so
+/// 搜索 and 常用资料 read as siblings.
+class _DexTopBarAction extends StatelessWidget {
+  const _DexTopBarAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  static const _height = 34.0;
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(DeviceLayout.rMd(context));
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: radius,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Container(
+            height: _height,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: TitoColors.card, width: 2),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: TitoColors.card, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  label,
                   style: SecondaryTypography.onGradient.small12.copyWith(
                     color: TitoColors.card,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

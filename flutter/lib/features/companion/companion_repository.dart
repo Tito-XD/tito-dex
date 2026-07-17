@@ -18,14 +18,15 @@ class CompanionRepository extends ChangeNotifier {
   static const _enabledKey = 'companion.enabled';
   static const _sizeScaleKey = 'companion.sizeScale';
 
-  /// Slider bounds — 1.0 is the smallest allowed (the default sizes),
-  /// 1.5 is a hard ceiling per product decision.
-  static const double minSizeScale = 1.0;
+  /// Slider bounds — 0.75 lets the companion shrink below the default,
+  /// 1.5 is a hard ceiling per product decision. Default stays 1.0.
+  static const double minSizeScale = 0.75;
   static const double maxSizeScale = 1.5;
+  static const double defaultSizeScale = 1.0;
 
   CompanionChoice? _choice;
   bool _enabled = true;
-  double _sizeScale = minSizeScale;
+  double _sizeScale = defaultSizeScale;
   bool _loaded = false;
 
   CompanionChoice? get choice => _choice;
@@ -44,7 +45,7 @@ class CompanionRepository extends ChangeNotifier {
     final id = prefs.getInt(_idKey);
     final name = prefs.getString(_nameKey);
     final enabled = prefs.getBool(_enabledKey) ?? true;
-    final sizeScale = prefs.getDouble(_sizeScaleKey) ?? minSizeScale;
+    final sizeScale = prefs.getDouble(_sizeScaleKey) ?? defaultSizeScale;
     _loaded = true;
     _enabled = enabled;
     _sizeScale = sizeScale.clamp(minSizeScale, maxSizeScale);

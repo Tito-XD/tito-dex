@@ -778,14 +778,19 @@ class TypeEffectivenessGrid extends StatelessWidget {
           ],
           LayoutBuilder(
             builder: (context, constraints) {
-              const crossAxisCount = 6;
               const crossAxisSpacing = 6.0;
               const mainAxisSpacing = 8.0;
-              const tileHeight = 68.0;
+              // Narrow screens drop to 5 columns instead of squeezing tiles
+              // below their minimum, which used to overflow the cells by a
+              // few pixels ("折叠" stripes).
+              final crossAxisCount = constraints.maxWidth < 300 ? 5 : 6;
               final tileWidth =
                   (constraints.maxWidth -
                       crossAxisSpacing * (crossAxisCount - 1)) /
                   crossAxisCount;
+              // Icon tile never exceeds the cell it lives in.
+              final tileSide = tileWidth.clamp(28.0, 56.0).toDouble();
+              final cellHeight = tileSide + 22.0;
 
               return GridView.builder(
                 shrinkWrap: true,
@@ -794,7 +799,7 @@ class TypeEffectivenessGrid extends StatelessWidget {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: crossAxisSpacing,
                   mainAxisSpacing: mainAxisSpacing,
-                  childAspectRatio: tileWidth / tileHeight,
+                  childAspectRatio: tileWidth / cellHeight,
                 ),
                 itemCount: typeGridOrder.length,
                 itemBuilder: (context, index) {
@@ -805,8 +810,8 @@ class TypeEffectivenessGrid extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: tileWidth.clamp(32, 56),
-                        height: tileWidth.clamp(32, 56),
+                        width: math.min(tileSide, tileWidth),
+                        height: math.min(tileSide, tileWidth),
                         decoration: BoxDecoration(
                           color: typeTileColor(type),
                           borderRadius: BorderRadius.circular(10),

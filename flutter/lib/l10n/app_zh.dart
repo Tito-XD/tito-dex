@@ -52,6 +52,7 @@ abstract final class AppZh {
   static const journeyOpenDetail = '查看旅程详情';
   static const emulatorContinueHint = '从模拟器继续';
   static const partySaveDiffBanner = '与最新存档不同 · 点击同步';
+  static const partySaveDiffDismiss = '不再提示本次差异';
   static const partySaveSyncConfirm = '用存档队伍覆盖当前编辑？';
   static const settingsChangeAvatar = '更换头像';
   static const settingsJourneyReadOnly = '旅程信息（来自存档）';
@@ -311,6 +312,8 @@ abstract final class AppZh {
   static const searchPrompt = '搜索宝可梦';
   static const searchEmptyHint = '可搜索 1–1025 号宝可梦的中文名、英文名、编号或属性。';
   static const searchRecent = '最近搜索';
+  static const searchRecentClear = '清空';
+  static const settingsSwitchGame = '更换';
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
   static const searchHubSearch = '搜索';

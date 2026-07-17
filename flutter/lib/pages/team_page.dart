@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/game/game_edition_repository.dart';
+import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -31,12 +34,46 @@ class TeamPage extends StatefulWidget {
 }
 
 class _TeamPageState extends State<TeamPage> {
+  static const _diffBannerDismissedKey = 'team.saveDiffBannerDismissedSig';
+
   late List<PartyMember> _party;
+  String? _dismissedDiffSig;
+
+  /// Fingerprint of the current manual-party vs save-party divergence — the
+  /// dismissal only holds while the divergence stays the same.
+  String get _diffSig {
+    String encode(List<PartyMember> members) => members
+        .map((m) => '${m.speciesId ?? m.species}:${m.level}')
+        .join(',');
+    return '${encode(widget.journey.party)}|'
+        '${encode(widget.journey.saveSyncedParty)}';
+  }
+
+  bool get _showSaveDiffBanner =>
+      gameEditionRepository.edition.isSaveLinked &&
+      widget.journey.partyDiffersFromSave &&
+      _dismissedDiffSig != _diffSig;
 
   @override
   void initState() {
     super.initState();
     _party = List<PartyMember>.from(widget.journey.party);
+    _loadDiffBannerDismissal();
+  }
+
+  Future<void> _loadDiffBannerDismissal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final sig = prefs.getString(_diffBannerDismissedKey);
+    if (mounted && sig != null) {
+      setState(() => _dismissedDiffSig = sig);
+    }
+  }
+
+  Future<void> _dismissDiffBanner() async {
+    final sig = _diffSig;
+    setState(() => _dismissedDiffSig = sig);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_diffBannerDismissedKey, sig);
   }
 
   @override
@@ -395,7 +432,7 @@ class _TeamPageState extends State<TeamPage> {
         title: AppZh.navTeam,
         padding: DeviceLayout.pagePadding(context),
         children: [
-          if (journey.partyDiffersFromSave)
+          if (_showSaveDiffBanner)
             Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Material(
@@ -405,10 +442,7 @@ class _TeamPageState extends State<TeamPage> {
                   onTap: _confirmSyncFromSave,
                   borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
                     child: Row(
                       children: [
                         const Icon(Icons.sync_rounded, size: 18),
@@ -420,6 +454,12 @@ class _TeamPageState extends State<TeamPage> {
                               fontWeight: FontWeight.w800,
                             ),
                           ),
+                        ),
+                        IconButton(
+                          onPressed: _dismissDiffBanner,
+                          tooltip: AppZh.partySaveDiffDismiss,
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.close_rounded, size: 18),
                         ),
                       ],
                     ),

@@ -38,7 +38,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   static const _recentQueriesKey = 'search_page_recent_queries_v1';
-  static const _maxRecentQueries = 5;
+  static const _maxRecentQueries = 10;
 
   final _controller = TextEditingController();
   Timer? _debounce;
@@ -123,6 +123,12 @@ class _SearchPageState extends State<SearchPage> {
     await prefs.setStringList(_recentQueriesKey, updated);
   }
 
+  Future<void> _clearRecentQueries() async {
+    setState(() => _recentQueries = const []);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_recentQueriesKey);
+  }
+
   void _applyQuery(String query) {
     _controller
       ..text = query
@@ -152,7 +158,8 @@ class _SearchPageState extends State<SearchPage> {
       if (!mounted || _controller.text.trim() != trimmed) {
         return;
       }
-      await _rememberRecentQuery(trimmed);
+      // Recent queries are recorded on submit / result tap only — live
+      // debounced searches would otherwise store half-typed pinyin.
       setState(() {
         _results = results;
         _searching = false;
@@ -233,6 +240,8 @@ class _SearchPageState extends State<SearchPage> {
             TextField(
               controller: _controller,
               onChanged: _onQueryChanged,
+              onSubmitted: _rememberRecentQuery,
+              textInputAction: TextInputAction.search,
               spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
@@ -284,7 +293,34 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppZh.searchRecent, style: SecondaryTypography.onCard.h15),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.searchRecent,
+                      style: SecondaryTypography.onCard.h15,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _clearRecentQueries,
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      AppZh.searchRecentClear,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -365,7 +401,10 @@ class _SearchPageState extends State<SearchPage> {
         return _SearchResultRow(
           entry: entry,
           status: status,
-          onTap: () => context.push('/dex/${entry.id}'),
+          onTap: () {
+            _rememberRecentQuery(_controller.text);
+            context.push('/dex/${entry.id}');
+          },
         );
       },
     );
