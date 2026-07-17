@@ -53,7 +53,7 @@ The app also supports manual mode for games without a save parser.
 
 ### Out of scope for now
 
-- account system and hosted journey sync ([proposal](docs/CLOUD_SYNC_PROPOSAL.md))
+- account system and hosted journey sync — TitoDex stays local-first; journey JSON import/export is the portability path
 - runtime scraping of fan wikis in the app
 - full competitive usage rankings or complete simulator parity
 - untested multi-generation save editing

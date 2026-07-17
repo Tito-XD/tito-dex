@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.6.2.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.2.1) |
-| **`main` / lite source** | `0.6.2+73` (`flutter/pubspec.yaml`); release versionName `0.6.2.1` |
-| **Offline package** | `0.6.2.1-offline+74` — APK-bundled dex data |
+| **Latest release** | [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) |
+| **`main` / lite source** | `0.6.5+75` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.6.5-offline+76` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -31,7 +31,6 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 | Path | Role |
 | --- | --- |
 | **`flutter/`** | **Active app** — Flutter + Dart |
-| `src/` | **Frozen** React/Vite design reference — do not add features |
 | `tools/` | Python: dex bundle build, zh catalog fetch, HGSS save probe |
 | `cloudflare/dex-cdn/` | R2 proxy Worker (deploy branch `deploy/dex-cdn`) |
 | `data/l10n/zh/` | Master zh catalog (git); copied to bundle + APK assets |
@@ -40,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.6.2.1)
+## Current feature status (latest release line: v0.6.5)
 
-> `main` includes the v0.6.2 feature line plus the v0.6.2.1 adaptive launcher icon patch. The offline package adds only the bundled dex seed and offline package version.
+> `main` includes the v0.6.5 polish batch plus unreleased work (bundled type icons, transition backdrop fix, repository cleanup). The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -63,6 +62,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.6.5: save-diff banner scoping + dismissal, unified dex transition backdrop and timing (480/380 ms), submit-only recent searches (max 10), prominent current-game card in Settings, matchup grid overflow fix, companion size floor ×0.75, Chinese reference note for untranslated flavor text.
 - v0.6.2.1: full-bleed launcher artwork lets Android adaptive-icon masks define the circle, squircle, rounded-square, or square silhouette.
 - v0.6.2: companion size control, bundled starter GIF/cry media, and cancellable preload for other companions.
 - v0.6.1: companion 2.0, landscape Home, bundled modern game icons, header polish, and Settings cleanup.
@@ -80,9 +80,11 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ### Not shipped / partial
 - Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
-- Journey cloud sync ([CLOUD_SYNC_PROPOSAL.md](./CLOUD_SYNC_PROPOSAL.md)).
-- Broader real-save fixtures and validation beyond HGSS.
-- Nav hand-drawn icons: **APK assets only**, not on CDN.
+- Broader real-save fixtures and validation beyond HGSS (more real saves incoming from the maintainer).
+- Community (52poke) Chinese flavor-text import for older generations — planned as dex bundle v6; attribution (CC BY-NC-SA) is mandatory when it lands.
+- Hand-drawn icons for the home quick tiles / entry cards (artwork in progress; the old bottom nav was removed). APK assets only, not on CDN.
+
+> Cloud sync was dropped as a direction (2026-07): TitoDex stays local-first. Journey JSON import/export remains the portability path.
 
 ---
 
@@ -131,7 +133,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; 187 tests
+flutter test                    # regression gate; 184 tests
 flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
@@ -156,7 +158,7 @@ Bump `flutter/pubspec.yaml` **before** building. Tag `v<x.y.z>` + GitHub Release
 - **Flutter 3.44+** at `~/flutter/bin` (on PATH in login shells).
 - **Web** is the default dev target when no Android SDK; `flutter run -d chrome`.
 - **APK builds** require Android SDK + release keystore (may be unavailable in some cloud VMs).
-- Root `npm install` + `flutter pub get` on startup.
+- `flutter pub get` on startup (the old root npm mock was removed in the 0.6.5 cleanup).
 
 **Web caveat:** Settings / Search / Dex sub-pages may hit `No Material widget found` on web (missing Scaffold in some scaffolds). Real target is Android RG. Home / Team / Journey work on web for smoke tests.
 
@@ -176,7 +178,6 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 - Run `flutter test` before pushing.
 
 ### Do not
-- Add features to `src/` (React mock).
 - Runtime-fetch 52poke/PokeAPI for zh catalog in the app.
 - Put hand-drawn nav icons on CDN (APK assets only).
 - Expand TitoDex into a full wiki mirror or competitive simulator without an explicit product decision.
