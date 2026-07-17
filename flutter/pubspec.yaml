@@ -66,6 +66,7 @@ flutter:
     - assets/fixtures/PKMSS.sav
     - assets/companion_media/
     - assets/game_icons/
+    - assets/type_icons/
     - assets/l10n/zh/
     - assets/config/
 

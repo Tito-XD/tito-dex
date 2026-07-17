@@ -9,6 +9,7 @@ import '../l10n/game_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/sticker_card.dart';
+import 'type_badge.dart';
 
 enum DexReferenceKind {
   nature,
@@ -558,7 +559,7 @@ class _TypeModifierChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(typeIconData(type), size: 12, color: TitoColors.ink),
+          TypeIconImage(typeEn: type, size: 12),
           const SizedBox(width: 3),
           Text(
             typeNameZh(type),

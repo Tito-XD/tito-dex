@@ -23,7 +23,7 @@ Widget _wrap(Widget child, {Size size = const Size(360, 360)}) {
 }
 
 void main() {
-  testWidgets('TitoTypeBadge shows symbol icon + Chinese label', (
+  testWidgets('TitoTypeBadge shows the bundled type icon + Chinese label', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -31,7 +31,8 @@ void main() {
     );
 
     expect(find.text('草'), findsOneWidget);
-    expect(find.byIcon(Icons.grass), findsOneWidget);
+    final icon = tester.widget<TypeIconImage>(find.byType(TypeIconImage));
+    expect(icon.typeEn, 'grass');
   });
 
   testWidgets('dex grid uses three mini cards on RG square (360x360 logical)', (
@@ -86,7 +87,12 @@ void main() {
     expect(find.text('#493'), findsOneWidget);
     // Type badges render icon + Chinese text combos inside the cards.
     expect(find.text('草'), findsWidgets);
-    expect(find.byIcon(Icons.local_fire_department), findsWidgets);
+    expect(
+      tester
+          .widgetList<TypeIconImage>(find.byType(TypeIconImage))
+          .where((icon) => icon.typeEn == 'fire'),
+      isNotEmpty,
+    );
   });
 
   testWidgets('dex grid doubles to six columns on extra-wide layouts', (
