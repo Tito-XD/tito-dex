@@ -314,6 +314,7 @@ abstract final class AppZh {
   static const searchRecent = '最近搜索';
   static const searchRecentClear = '清空';
   static const settingsSwitchGame = '更换';
+  static String dexFlavorZhReference(String source) => '中文参考 · 来自$source：';
   static const searchTrending = '热门搜索';
   static const searchNoResults = '没有找到匹配的宝可梦。';
   static const searchHubSearch = '搜索';
