@@ -33,12 +33,8 @@ class StickerCard extends StatelessWidget {
         color: colors.$1,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3818283B),
-            offset: Offset(0, 5),
-          ),
-        ],
+        // 0.6.6 experiment: drop the hard offset shadow — the bold ink
+        // border carries the sticker look on its own, flatter and cleaner.
       ),
       child: Padding(padding: padding, child: child),
     );

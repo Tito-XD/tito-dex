@@ -24,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 
@@ -398,13 +399,17 @@ class _SearchPageState extends State<SearchPage> {
       itemBuilder: (context, index) {
         final entry = _results[index];
         final status = dexRepository.statusFor(entry.id, _progress);
-        return _SearchResultRow(
-          entry: entry,
-          status: status,
-          onTap: () {
-            _rememberRecentQuery(_controller.text);
-            context.push('/dex/${entry.id}');
-          },
+        return TitoListReveal(
+          key: ValueKey<int>(entry.id),
+          delay: TitoListReveal.staggerDelay(index),
+          child: _SearchResultRow(
+            entry: entry,
+            status: status,
+            onTap: () {
+              _rememberRecentQuery(_controller.text);
+              context.push('/dex/${entry.id}');
+            },
+          ),
         );
       },
     );

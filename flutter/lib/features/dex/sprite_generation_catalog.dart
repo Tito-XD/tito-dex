@@ -125,7 +125,9 @@ List<SpriteEditionOption> spriteEditionOptions({
     addOption(entry.key, entry.value);
   }
 
-  if (options.isEmpty && fallbackSpriteUrl != null && fallbackSpriteUrl.isNotEmpty) {
+  if (options.isEmpty &&
+      fallbackSpriteUrl != null &&
+      fallbackSpriteUrl.isNotEmpty) {
     options.add(
       SpriteEditionOption(
         versionGroup: 'default',
@@ -225,6 +227,27 @@ String bwAnimatedShinyGifUrlFor(int id) =>
     '$pokeApiSpritesBase/versions/generation-v/black-white/animated/shiny'
     '/$id.gif';
 
+/// Shiny variant of a PokeAPI sprite URL — inserts the `shiny/` folder
+/// before the filename. Returns null when the source has no shiny
+/// counterpart: own-CDN copies, non-PokeAPI URLs, and Gen I games (shiny
+/// colors only exist from Gen II on).
+String? shinySpriteVariantUrl(String url) {
+  if (!url.startsWith(pokeApiSpritesBase)) {
+    return null;
+  }
+  if (url.contains('/red-blue/') || url.contains('/yellow/')) {
+    return null;
+  }
+  if (url.contains('/shiny/')) {
+    return url;
+  }
+  final slash = url.lastIndexOf('/');
+  if (slash < 0) {
+    return null;
+  }
+  return '${url.substring(0, slash)}/shiny${url.substring(slash)}';
+}
+
 /// Shiny animated candidates. Callers append the normal chain afterwards so
 /// a missing shiny asset degrades to the regular look instead of a blank.
 List<String> animatedShinySpriteCandidatesFor(int id) => [
@@ -314,8 +337,7 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
       editionShortLabelForVersionGroup(source.versionGroup),
       kSpriteVersionGroupGeneration[source.versionGroup] ?? 9,
       url,
-      animatedUrl:
-          source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
+      animatedUrl: source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
           ? bwAnimatedGifUrlFor(id)
           : null,
     );

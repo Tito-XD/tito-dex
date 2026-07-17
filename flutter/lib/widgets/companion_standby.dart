@@ -386,9 +386,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
                       Icons.auto_awesome_rounded,
                       size: 16,
                       color: TitoColors.softYellow,
-                      shadows: [
-                        Shadow(color: TitoColors.ink, blurRadius: 2),
-                      ],
+                      shadows: [Shadow(color: TitoColors.ink, blurRadius: 2)],
                     ),
                   ),
                 ),
@@ -466,9 +464,6 @@ class _QuoteBubble extends StatelessWidget {
               color: TitoColors.card,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: TitoColors.ink, width: 2),
-              boxShadow: const [
-                BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
-              ],
             ),
             child: Text(
               quote ?? '',
@@ -550,8 +545,7 @@ class CompanionStandbyOverlay extends StatelessWidget {
             choice?.pokemonId ??
             speciesIdForName(journey.companion) ??
             companionSpeciesIds[hgssDefaultCompanion]!;
-        final nameZh =
-            choice?.nameZh ?? localizeSpecies(journey.companion);
+        final nameZh = choice?.nameZh ?? localizeSpecies(journey.companion);
 
         return SafeArea(
           top: false,

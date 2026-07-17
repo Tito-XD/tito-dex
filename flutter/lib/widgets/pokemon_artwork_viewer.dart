@@ -30,8 +30,19 @@ class _PokemonArtworkViewer extends StatefulWidget {
 class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   late String? _mainSource;
   late bool _showAnimated;
+  var _shiny = false;
   late final List<SpriteEditionOption> _options;
   late final Map<int, List<SpriteEditionOption>> _grouped;
+
+  /// Source actually rendered: the shiny variant when toggled and available
+  /// (Gen I sources and CDN copies fall back to the normal look).
+  String? get _displaySource {
+    final source = _mainSource;
+    if (source == null || !_shiny) {
+      return source;
+    }
+    return shinySpriteVariantUrl(source) ?? source;
+  }
 
   @override
   void initState() {
@@ -43,15 +54,17 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
           widget.summary.displaySpritePath ?? widget.summary.spriteUrl,
     );
     _grouped = groupSpriteOptionsByGeneration(_options);
-    _mainSource = widget.summary.artworkUrl ??
-        officialArtworkUrlFor(widget.summary.id);
+    _mainSource =
+        widget.summary.artworkUrl ?? officialArtworkUrlFor(widget.summary.id);
     _showAnimated = false;
   }
 
   void _selectOption(SpriteEditionOption option, {bool animated = false}) {
     setState(() {
       _showAnimated = animated;
-      _mainSource = animated ? (option.animatedUrl ?? option.spriteUrl) : option.spriteUrl;
+      _mainSource = animated
+          ? (option.animatedUrl ?? option.spriteUrl)
+          : option.spriteUrl;
     });
   }
 
@@ -79,9 +92,25 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                       ),
                     ),
                   ),
+                  TextButton.icon(
+                    onPressed: () => setState(() => _shiny = !_shiny),
+                    style: TextButton.styleFrom(
+                      foregroundColor: _shiny
+                          ? TitoColors.softYellow
+                          : TitoColors.card.withValues(alpha: 0.8),
+                    ),
+                    icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                    label: const Text(
+                      '闪光',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, color: TitoColors.card),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: TitoColors.card,
+                    ),
                     tooltip: '关闭',
                   ),
                 ],
@@ -89,7 +118,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
             ),
             Expanded(
               child: Center(
-                child: _mainSource == null
+                child: _displaySource == null
                     ? const Icon(
                         Icons.image_not_supported_outlined,
                         color: TitoColors.card,
@@ -100,7 +129,10 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                         maxScale: 4,
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: _ArtworkImage(source: _mainSource!),
+                          child: _ArtworkImage(
+                            key: ValueKey('$_displaySource'),
+                            source: _displaySource!,
+                          ),
                         ),
                       ),
               ),
@@ -131,13 +163,15 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                           separatorBuilder: (_, __) => const SizedBox(width: 8),
                           itemBuilder: (context, index) {
                             final option = entry.value[index];
-                            final selected = !_showAnimated &&
+                            final selected =
+                                !_showAnimated &&
                                 _mainSource == option.spriteUrl;
                             return _SpritePickerTile(
                               option: option,
                               selected: selected,
                               animatedSelected:
-                                  _showAnimated && _mainSource == option.animatedUrl,
+                                  _showAnimated &&
+                                  _mainSource == option.animatedUrl,
                               onSelectStatic: () =>
                                   _selectOption(option, animated: false),
                               onSelectAnimated: option.animatedUrl == null
@@ -238,7 +272,7 @@ class _SpritePickerTile extends StatelessWidget {
 }
 
 class _ArtworkImage extends StatelessWidget {
-  const _ArtworkImage({required this.source});
+  const _ArtworkImage({super.key, required this.source});
 
   final String source;
 

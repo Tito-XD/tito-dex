@@ -42,9 +42,6 @@ class TitoPrimaryButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.md),
             border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-            boxShadow: const [
-              BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
-            ],
           ),
           child: Row(
             mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
@@ -112,10 +109,10 @@ class TitoQuickTile extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-              boxShadow: const [
-                BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
-              ],
+              border: Border.all(
+                color: TitoColors.ink,
+                width: TitoBorders.card,
+              ),
             ),
             // Icon and label scale off the tile's own height, never off
             // inherited scale scopes: the portrait grid and the square bar
@@ -126,7 +123,10 @@ class TitoQuickTile extends StatelessWidget {
               builder: (context, constraints) {
                 final side = constraints.maxHeight.isFinite
                     ? (constraints.maxWidth.isFinite
-                          ? math.min(constraints.maxWidth, constraints.maxHeight)
+                          ? math.min(
+                              constraints.maxWidth,
+                              constraints.maxHeight,
+                            )
                           : constraints.maxHeight)
                     : 88.0;
                 final iconSize = side * 0.38;
@@ -204,10 +204,10 @@ class TitoPolaroidQuickTile extends StatelessWidget {
           child: Ink(
             decoration: BoxDecoration(
               borderRadius: radius,
-              border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-              boxShadow: const [
-                BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
-              ],
+              border: Border.all(
+                color: TitoColors.ink,
+                width: TitoBorders.card,
+              ),
             ),
             child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -256,4 +256,3 @@ class TitoPolaroidQuickTile extends StatelessWidget {
 }
 
 enum TitoPolaroidTone { blue, yellow, coral, mint }
-
