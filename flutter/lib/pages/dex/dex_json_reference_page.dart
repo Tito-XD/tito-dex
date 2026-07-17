@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dex/dex_repository.dart';
-import '../../l10n/app_zh.dart';
-import '../../l10n/game_zh.dart';
 import '../../widgets/dex_reference_detail.dart';
 import 'dex_reference_list.dart';
 

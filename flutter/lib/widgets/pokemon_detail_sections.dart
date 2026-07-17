@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/companion/battle_tools_service.dart';
-import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/generation_type_chart.dart';
 import '../features/dex/type_chart.dart';

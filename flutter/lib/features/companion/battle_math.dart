@@ -1,5 +1,4 @@
 import '../dex/battle_effectiveness.dart';
-import '../dex/generation_type_chart.dart';
 import '../dex/type_chart.dart';
 
 enum BattleStat { hp, attack, defense, specialAttack, specialDefense, speed }

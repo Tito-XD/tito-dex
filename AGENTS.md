@@ -5,7 +5,7 @@
 ## Quick facts
 
 - **Active code:** `flutter/` (Flutter + Dart, Chinese UI)
-- **Frozen:** `src/` (React mock — do not extend)
+- **Removed:** the pre-Flutter React mock (`src/`) was deleted in the 0.6.5 cleanup; its releases stay on GitHub as historical artifacts
 - **Latest release:** v0.6.2.1 · Lite `0.6.2.1+73`; Offline `0.6.2.1-offline+74`
 - **Offline data:** Dex bundle v5 (1025 species, `/v3/`)
 - **Tests:** `cd flutter && flutter test` (187 passing)

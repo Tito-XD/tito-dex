@@ -18,7 +18,7 @@ on:
       offline_seed_apk:
         description: Previous verified Offline APK used to reuse the unchanged dex v5 seed
         required: true
-        default: releases/TitoDex-0.5.12-offline-rg-arm64.apk
+        default: releases/TitoDex-0.6.2.1-offline-rg-arm64.apk
         type: string
 
 permissions:

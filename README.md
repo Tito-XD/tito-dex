@@ -39,7 +39,6 @@ Offline dex bundle: **v5** · 1025 species · 23 game editions.
 | Layer | Choice |
 | --- | --- |
 | App | **Flutter + Dart** (`flutter/`) |
-| Reference mock | Capacitor + React (`src/` — frozen) |
 | Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
 | Persistence | `shared_preferences` + offline `dex_offline/` |
 | Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |

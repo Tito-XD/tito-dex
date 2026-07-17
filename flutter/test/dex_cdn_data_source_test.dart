@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-import 'package:titodex/features/dex/dex_cdn_config.dart';
 import 'package:titodex/features/dex/dex_cdn_data_source.dart';
 
 MockClient _mockCdn() {

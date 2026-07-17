@@ -1117,13 +1117,11 @@ class _DexFilterChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-    this.compact = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -1137,10 +1135,7 @@ class _DexFilterChip extends StatelessWidget {
           canRequestFocus: false,
           borderRadius: BorderRadius.circular(999),
           child: Ink(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 8 : 4,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
             decoration: BoxDecoration(
               color: selected ? TitoColors.softYellow : TitoColors.card,
               borderRadius: BorderRadius.circular(999),
@@ -1154,7 +1149,7 @@ class _DexFilterChip extends StatelessWidget {
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
                 height: 1.2,
-                fontSize: compact ? 10 : 12,
+                fontSize: 12,
               ),
             ),
           ),

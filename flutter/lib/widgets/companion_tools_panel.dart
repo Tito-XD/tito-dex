@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/companion/battle_game_scope.dart';
-import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';

@@ -26,7 +26,8 @@ These ship **inside** the APK via `pubspec.yaml`:
 | Asset | Purpose |
 | --- | --- |
 | `assets/fixtures/PKMSS.sav` | Settings → 导入内置存档 |
-| `assets/companion/*.png` | Home companion sprites (HGSS starters) |
+| `assets/companion_media/*` | Starter companion GIFs + cries (29 species) |
+| `assets/game_icons/*.png` | Official HOME game icons (Gen VI+) |
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
 

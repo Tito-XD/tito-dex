@@ -9,7 +9,6 @@ import '../l10n/game_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/sticker_card.dart';
-import '../widgets/type_badge.dart';
 
 enum DexReferenceKind {
   nature,
