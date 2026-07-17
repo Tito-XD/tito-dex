@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'dex_catalog.dart';
@@ -376,8 +377,9 @@ class DexCacheStore {
         if (_detailJsonContainsMove(json, moveId)) {
           matches.add(id);
         }
-      } catch (_) {
-        // Skip corrupt detail files.
+      } catch (error) {
+        // Skip corrupt detail files, but leave a trace for diagnosis.
+        debugPrint('DexCacheStore: corrupt detail #$id skipped: $error');
       }
     }
     matches.sort();
