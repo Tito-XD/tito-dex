@@ -172,9 +172,9 @@ See `PARSER_PROPOSAL.md` for full boundary.
 
 R2 bucket `titodex-dex` behind Worker `tito-dex`. See `CLOUDFLARE_DEX_CDN.md` (maintainers).
 
-### 5. Journey cloud sync
+### 5. Journey portability
 
-Not implemented. See `CLOUD_SYNC_PROPOSAL.md`.
+Local-first by design — no hosted sync. Journey JSON import/export (Settings) is the portability path.
 
 ## UI Routing
 

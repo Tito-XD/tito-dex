@@ -94,9 +94,10 @@ assets/
 
 ## Not yet / partial
 
-- Custom launcher icon / splash  
-- HeartGold detection; single-file `.sav` picker  
 - Full competitive damage/IV workflows and usage rankings
-- Journey cloud sync  
+- Community Chinese flavor text for older generations (dex bundle v6, attribution required)
+- Real-save fixtures beyond HGSS
+
+Cloud sync is intentionally out: TitoDex stays local-first (journey JSON import/export covers portability).
 
 Parser details: [../docs/PARSER_PROPOSAL.md](../docs/PARSER_PROPOSAL.md)

@@ -1,13 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.2.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.2.1) · Lite `0.6.2.1+73` · Offline `0.6.2.1-offline+74`.
+> **Latest release:** [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) · Lite `0.6.5+75` · Offline `0.6.5-offline+76`.
 >
-> **Current `main` source baseline:** `0.6.2+73`.
+> **Current `main` source baseline:** `0.6.5+75`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.6.5** | Polish batch: save banner scoping, unified dex transitions, search history, settings game card, and Chinese flavor reference |
 | **v0.6.2.1** | Full-bleed adaptive launcher icon for system-defined icon shapes |
 | **v0.6.2** | Companion sizing and bundled starter animation/cry media |
 | **v0.6.1** | Companion 2.0, landscape home, game icons, and header polish |
@@ -45,8 +46,8 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 | Structured reference hub and Pokédex drill-down | Shipped |
 | Matchup, stat/damage estimates, blind spots, modifiers, and team weaknesses | Shipped; calculation depth remains partial |
 | APK-bundled offline variant | Available as an optional distribution |
-| Journey cloud sync | Proposal only |
-| Standby companion, shiny party surprise, silhouette quiz | Shipped in v0.5.5 |
+| Standby companion, shiny party surprise, silhouette quiz | Shipped in v0.5.5; companion sizing/media in v0.6.1–v0.6.2 |
+| Community Chinese flavor text for older generations | Planned as dex bundle v6 (attribution required) |
 
 ## Next priorities
 
@@ -58,7 +59,9 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 
 ## Future work
 
-- deeper generation-specific save adapters beyond trainer metadata
+- deeper generation-specific save adapters beyond trainer metadata (more real save fixtures incoming)
 - Linux handheld packaging
-- optional hosted sync after privacy, conflict, and account requirements are defined
+- hand-drawn artwork for the home quick tiles / entry cards (in progress)
 - broader accessibility and controller-navigation validation
+
+> Cloud sync is intentionally **not** planned: TitoDex stays local-first, with journey JSON import/export as the portability path.

@@ -23,7 +23,7 @@
 | K1 | Sleep Tier A links (search page) |
 | L1–L3 | Handheld vs phone display rules |
 
-**Still pending:** G6 hand-drawn nav icons.
+**Still pending:** G6 hand-drawn icons — scope updated 2026-07: the bottom nav was removed, so the artwork (in progress) now targets the home quick tiles / entry cards.
 
 ---
 
