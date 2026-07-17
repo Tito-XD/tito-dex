@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../l10n/game_zh.dart';
 import '../../models/journey.dart';
 import '../game/game_edition.dart';
@@ -125,8 +127,9 @@ class DexRepository {
         _rememberSummary(summary);
       }
       return _summaryCache[id];
-    } catch (_) {
+    } catch (error) {
       // CDN unreachable — remember and fall back to PokeAPI for this session.
+      debugPrint('DexRepository: CDN summaries unavailable: $error');
       _cdnSummariesUnavailable = true;
       return null;
     }
@@ -146,8 +149,9 @@ class DexRepository {
           _summaryCache[id] = cached.summary;
           return cached;
         }
-      } catch (_) {
+      } catch (error) {
         // Corrupt entry — fall through to live sources.
+        debugPrint('DexRepository: offline detail #$id unreadable: $error');
       }
     }
 
@@ -159,8 +163,9 @@ class DexRepository {
           _summaryCache[id] = cached.summary;
           return cached;
         }
-      } catch (_) {
+      } catch (error) {
         // Corrupt partial offline cache — fall through to live sources.
+        debugPrint('DexRepository: partial offline #$id unreadable: $error');
       }
     }
 
