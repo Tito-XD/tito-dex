@@ -566,21 +566,27 @@ class PokemonDetail {
       : '城都 #${johtoDexNumber!.toString().padLeft(3, '0')}';
 
   /// Move set for a game version group key (falls back through legacy moveSet).
-  PokemonMoveSet moveSetForKey(String versionGroupKey) {
+  PokemonMoveSet moveSetForKey(String versionGroupKey) =>
+      resolvedMoveSetForKey(versionGroupKey).$2;
+
+  /// Like [moveSetForKey] but also reports which version-group key actually
+  /// backs the data — the UI labels fallbacks so borrowed data from another
+  /// game is never presented silently. `$1` is null when nothing matched.
+  (String?, PokemonMoveSet) resolvedMoveSetForKey(String versionGroupKey) {
     final direct = moveSets[versionGroupKey];
     if (direct != null && !_moveSetIsEmpty(direct)) {
-      return direct;
+      return (versionGroupKey, direct);
     }
     if (versionGroupKey == 'heartgold-soulsilver' &&
         !_moveSetIsEmpty(moveSet)) {
-      return moveSet;
+      return (versionGroupKey, moveSet);
     }
     for (final entry in moveSets.entries) {
       if (!_moveSetIsEmpty(entry.value)) {
-        return entry.value;
+        return (entry.key, entry.value);
       }
     }
-    return moveSet;
+    return (null, moveSet);
   }
 
   static bool _moveSetIsEmpty(PokemonMoveSet set) =>
@@ -592,22 +598,30 @@ class PokemonDetail {
   bool get hasMultipleMoveSets => moveSets.length > 1;
 
   /// Obtain locations for a game version group key (empty CDN lists fall through).
-  List<ObtainLocationEntry> obtainLocationsForKey(String versionGroupKey) {
+  List<ObtainLocationEntry> obtainLocationsForKey(String versionGroupKey) =>
+      resolvedObtainLocationsForKey(versionGroupKey).$2;
+
+  /// Like [obtainLocationsForKey] but also reports the backing key so the UI
+  /// can label data borrowed from another game. `$1` is null when empty.
+  (String?, List<ObtainLocationEntry>) resolvedObtainLocationsForKey(
+    String versionGroupKey,
+  ) {
     final byGame = obtainLocationsByGame[versionGroupKey];
     if (byGame != null && byGame.isNotEmpty) {
-      return byGame;
+      return (versionGroupKey, byGame);
     }
     if (versionGroupKey == 'heartgold-soulsilver' &&
         obtainLocations.isNotEmpty) {
-      return obtainLocations;
+      return (versionGroupKey, obtainLocations);
     }
     // Any non-empty obtain data beats showing nothing (offline-first UX).
     for (final entry in obtainLocationsByGame.entries) {
       if (entry.value.isNotEmpty) {
-        return entry.value;
+        return (entry.key, entry.value);
       }
     }
-    return obtainLocations;
+    return (obtainLocations.isEmpty ? null : 'heartgold-soulsilver',
+        obtainLocations);
   }
 
   /// First non-empty obtain key + locations (for UI labels).

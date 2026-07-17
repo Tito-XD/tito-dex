@@ -1,4 +1,6 @@
 /// Simplified Chinese UI copy for TitoDex.
+library;
+
 import '../features/dex/dex_models.dart';
 
 abstract final class AppZh {
@@ -171,6 +173,8 @@ abstract final class AppZh {
   static const dexNoEvolution = '没有进化链记录。';
   static const dexMovesHgssScope = '以下招式范围：心金 / 魂银';
   static String dexMovesScope(String gameLabel) => '以下招式范围：$gameLabel';
+  static String dexDataFallbackNote(String gameLabel) =>
+      '当前游戏暂无此数据，以下来自：$gameLabel';
   static const dexBaseStatsRadar = '能力雷达';
   static const dexBaseStatsBars = '种族值条';
   static const dexReferenceTitle = '常用资料';
@@ -228,23 +232,8 @@ abstract final class AppZh {
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
-      '离线图鉴缓存包含以下内容，可在下方勾选要下载或保留的部分。推荐优先下载预打包数据包，一次安装即可完全离线使用。';
-  static const settingsDexCacheContentsTitle = '缓存内容筛选';
-  static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
+      '离线图鉴数据用于完全离线浏览。推荐优先下载预打包数据包，一次安装即可离线使用全部图鉴与中文对照。';
   static const settingsDexAdvancedOptions = '高级选项';
-  static const settingsDexCacheOptionJson = '图鉴 JSON（摘要、详情、招式/特性/性格/天气/道具索引）';
-  static const settingsDexCacheOptionSprites =
-      '列表小图（按当前游戏版本世代，约 1025 张 × 单版本 ~25MB）';
-  static const settingsDexCacheOptionSpritesAllVersions =
-      '全版本小图（21 个版本组各一套，体积大，仅 Wi‑Fi 推荐）';
-  static const settingsDexCacheOptionArtwork =
-      '官方立绘大图（详情页查看，约 1025 张 ~80–120MB）';
-  static const settingsDexCacheOptionAnimated =
-      'Showdown 动图（PokeAPI GIF，约 1025 张 ~40–60MB）';
-  static const settingsDexCacheOptionL10n = '中文对照表（物种/招式/特性/道具名、地点、HGSS 地图）';
-  static const settingsDexCacheOptionTypeIcons = '属性图标（18 个，内置仓库资源）';
-  static const settingsDexCacheOptionConfig = '应用配置（Sleep 工具链接、游戏版本图标索引等）';
-  static String settingsDexCacheEstimate(String items) => '预计体积（勾选合计）：$items';
   static const settingsDexOfflineUnset = '尚未下载离线数据包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
@@ -468,8 +457,6 @@ abstract final class AppZh {
   static const teamEditSwapPrev = '与前一位交换';
   static const teamEditSwapNext = '与后一位交换';
   static const teamAddTitle = '添加宝可梦';
-  static const teamAddByIdHint = '全国图鉴编号（1–1025）';
-  static const teamAddPick = '从列表选择';
   static const teamAddInvalidId = '无效编号';
   static const confirm = '确定';
   static const cancel = '取消';
