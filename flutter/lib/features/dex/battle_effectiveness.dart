@@ -438,7 +438,7 @@ double bestStabMultiplierAgainstDefender({
 }) {
   final candidates = <String>{
     ...normalizeTypesForGeneration(attackerTypes, generation),
-    if (attackerTerastallized && attackerTeraType != null) attackerTeraType!,
+    if (attackerTerastallized && attackerTeraType != null) attackerTeraType,
   };
 
   var best = 0.0;

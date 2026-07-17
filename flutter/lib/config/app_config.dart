@@ -13,7 +13,6 @@ class AppConfig {
   static final AppConfig instance = AppConfig._();
 
   static const _assetPath = 'assets/config/app_config.json';
-  static const _offlineRelative = 'config/app_config.json';
 
   int configVersion = 0;
   String sleepToolsTierAHint = AppZh.sleepToolsTierAHint;

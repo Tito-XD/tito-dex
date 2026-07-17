@@ -4,7 +4,6 @@ import '../features/companion/battle_game_scope.dart';
 import '../features/companion/battle_tools_service.dart';
 import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/type_chart.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';

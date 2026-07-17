@@ -8,7 +8,6 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
-import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/tito_font_scale.dart';
