@@ -1,13 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) · Lite `0.6.5+75` · Offline `0.6.5-offline+76`.
+> **Latest release:** [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · Lite `0.6.6+77` · Offline `0.6.6-offline+78`.
 >
-> **Current `main` source baseline:** `0.6.5+75`.
+> **Current `main` source baseline:** `0.6.6+77`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.6.6** | Interactive batch: generation-scoped quiz, shiny companion with intimacy quotes, crit/screen damage toggles, linked team editing, and bundled type icons |
 | **v0.6.5** | Polish batch: save banner scoping, unified dex transitions, search history, settings game card, and Chinese flavor reference |
 | **v0.6.2.1** | Full-bleed adaptive launcher icon for system-defined icon shapes |
 | **v0.6.2** | Companion sizing and bundled starter animation/cry media |
