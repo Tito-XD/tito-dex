@@ -241,6 +241,16 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
       );
     }
 
+    // Older games were never localized in Chinese, so their entries stay
+    // English. When a modern game's official Chinese text exists for the
+    // same species, keep it at hand as a reference block below the original.
+    final zhReference = widget.entries
+        .where((entry) => _looksChinese(entry.text))
+        .toList();
+    final needsZhReference =
+        zhReference.isNotEmpty &&
+        widget.entries.any((entry) => !_looksChinese(entry.text));
+
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,7 +258,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
           Text(AppZh.dexFlavorTitle, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
           SizedBox(
-            height: 132,
+            height: needsZhReference ? 184 : 132,
             child: PageView.builder(
               controller: _controller,
               itemCount: widget.entries.length,
@@ -256,9 +266,14 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
               itemBuilder: (context, index) {
                 final entry = widget.entries[index];
                 final isChinese = _looksChinese(entry.text);
+                final reference = !isChinese && zhReference.isNotEmpty
+                    ? zhReference.first
+                    : null;
                 final note = entry.version == 'zh-reference'
                     ? AppZh.dexFlavorZhFallbackNote
-                    : (!isChinese ? AppZh.dexFlavorEnglishNote : null);
+                    : (!isChinese && reference == null
+                          ? AppZh.dexFlavorEnglishNote
+                          : null);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -295,9 +310,32 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                     ],
                     const SizedBox(height: 6),
                     Expanded(
-                      child: Text(
-                        entry.text,
-                        style: SecondaryTypography.onCard.body14,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.text,
+                              style: SecondaryTypography.onCard.body14,
+                            ),
+                            if (reference != null) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                AppZh.dexFlavorZhReference(
+                                  reference.displayLabel,
+                                ),
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(color: TitoColors.mutedInk),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                reference.text,
+                                style: SecondaryTypography.onCard.body14
+                                    .copyWith(fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
