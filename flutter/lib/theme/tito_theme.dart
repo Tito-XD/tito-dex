@@ -11,6 +11,7 @@ ThemeData buildTitoTheme() {
     FontWeight fontWeight = FontWeight.w600,
     Color color = TitoColors.ink,
     double? height,
+    double? letterSpacing,
   }) {
     return TextStyle(
       fontFamily: fontFamily,
@@ -18,19 +19,31 @@ ThemeData buildTitoTheme() {
       fontWeight: fontWeight,
       color: color,
       height: height,
+      letterSpacing: letterSpacing,
     );
   }
 
+  // Headings tighten by -0.02em so titles hold together on square screens;
+  // pairs Nunito's roundness with the thick ink borders.
+  TextStyle headingStyle({
+    required double fontSize,
+    FontWeight fontWeight = FontWeight.w800,
+  }) => baseStyle(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: fontSize * -0.02,
+  );
+
   final textTheme = TextTheme(
-    displayLarge: baseStyle(fontSize: 32, fontWeight: FontWeight.w800),
-    displayMedium: baseStyle(fontSize: 28, fontWeight: FontWeight.w800),
-    displaySmall: baseStyle(fontSize: 24, fontWeight: FontWeight.w800),
-    headlineLarge: baseStyle(fontSize: 24, fontWeight: FontWeight.w800),
-    headlineMedium: baseStyle(fontSize: 22, fontWeight: FontWeight.w800),
-    headlineSmall: baseStyle(fontSize: 20, fontWeight: FontWeight.w800),
-    titleLarge: baseStyle(fontSize: 20, fontWeight: FontWeight.w800),
-    titleMedium: baseStyle(fontSize: 18, fontWeight: FontWeight.w800),
-    titleSmall: baseStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    displayLarge: headingStyle(fontSize: 32),
+    displayMedium: headingStyle(fontSize: 28),
+    displaySmall: headingStyle(fontSize: 24),
+    headlineLarge: headingStyle(fontSize: 24),
+    headlineMedium: headingStyle(fontSize: 22),
+    headlineSmall: headingStyle(fontSize: 20),
+    titleLarge: headingStyle(fontSize: 20),
+    titleMedium: headingStyle(fontSize: 18),
+    titleSmall: headingStyle(fontSize: 16, fontWeight: FontWeight.w700),
     bodyLarge: baseStyle(fontSize: 16),
     bodyMedium: baseStyle(fontSize: 14),
     bodySmall: baseStyle(fontSize: 12, color: TitoColors.mutedInk),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 import '../widgets/handheld_input.dart';
+import '../widgets/sticker_pressable.dart';
 
 /// Sticker-style primary action — deep blue pill per design reference.
 class TitoPrimaryButton extends StatelessWidget {
@@ -26,7 +27,9 @@ class TitoPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = Material(
+    final button = StickerPressable(
+      borderRadius: BorderRadius.circular(TitoRadii.md),
+      child: Material(
       color: TitoColors.deepBlue,
       borderRadius: BorderRadius.circular(TitoRadii.md),
       child: InkWell(
@@ -67,6 +70,7 @@ class TitoPrimaryButton extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
 
     if (expanded) {
@@ -99,7 +103,9 @@ class TitoQuickTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final tile = HandheldFocusDecorator(
       onActivate: onTap,
-      child: Material(
+      child: StickerPressable(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        child: Material(
         color: TitoColors.card,
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: InkWell(
@@ -153,6 +159,7 @@ class TitoQuickTile extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
 
     if (square) {
@@ -194,7 +201,9 @@ class TitoPolaroidQuickTile extends StatelessWidget {
 
     final tile = HandheldFocusDecorator(
       onActivate: onTap,
-      child: Material(
+      child: StickerPressable(
+        borderRadius: radius,
+        child: Material(
         color: TitoColors.card,
         borderRadius: radius,
         child: InkWell(
@@ -245,6 +254,7 @@ class TitoPolaroidQuickTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
 

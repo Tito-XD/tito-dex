@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 
@@ -28,7 +29,9 @@ class TitoSpriteSticker extends StatelessWidget {
     final borderRadius =
         radius ?? (shape == BoxShape.circle ? size / 2 : TitoRadii.sm);
 
-    return Container(
+    return ListenableBuilder(
+      listenable: retroStyle,
+      builder: (context, child) => Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
@@ -38,9 +41,12 @@ class TitoSpriteSticker extends StatelessWidget {
             ? BorderRadius.circular(borderRadius)
             : null,
         border: Border.all(color: TitoColors.ink, width: 2),
+        boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
+      child: child,
+      ),
       child: Padding(
         padding: EdgeInsets.all(padding),
         child: DexSpriteImage(

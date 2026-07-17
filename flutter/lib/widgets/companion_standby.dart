@@ -17,6 +17,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'companion_picker_sheet.dart';
@@ -464,6 +465,9 @@ class _QuoteBubble extends StatelessWidget {
               color: TitoColors.card,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: TitoColors.ink, width: 2),
+              boxShadow: retroStyle.enabled
+                  ? TitoShadows.stickerSmall
+                  : null,
             ),
             child: Text(
               quote ?? '',

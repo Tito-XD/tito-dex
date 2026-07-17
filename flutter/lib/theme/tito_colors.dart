@@ -1,5 +1,23 @@
 import 'package:flutter/material.dart';
 
+/// Signature sticker shadows — solid offset drops with no blur, the
+/// "physical key" look. Applied globally when Retro style is on.
+abstract final class TitoShadows {
+  static const List<BoxShadow> sticker = [
+    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
+  ];
+
+  /// Squashed variant while a pressable sticker is held down.
+  static const List<BoxShadow> stickerPressed = [
+    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 1)),
+  ];
+
+  /// Smaller drop for chips, sprites, and bubbles.
+  static const List<BoxShadow> stickerSmall = [
+    BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
+  ];
+}
+
 abstract final class TitoColors {
   static const deepBlue = Color(0xFF2F4361);
   static const slateBlue = Color(0xFF7B91A6);

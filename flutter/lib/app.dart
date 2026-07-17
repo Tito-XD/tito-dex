@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'config/app_config.dart';
 import 'features/companion/companion_repository.dart';
 import 'theme/motion_preferences.dart';
+import 'theme/retro_style.dart';
 import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
@@ -301,6 +302,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await gameEditionRepository.load();
     await companionRepository.load();
     await motionPreferences.load();
+    await retroStyle.load();
     var journey = await _repository.load();
     journey = await _migrateLegacyBundledTrainerName(journey);
     if (!mounted) {

@@ -22,6 +22,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/motion_preferences.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
@@ -923,14 +924,14 @@ class _CurrentGameSection extends StatelessWidget {
   }
 }
 
-/// Settings → 界面动画: global toggle for the list reveal micro-animations.
+/// Settings → 界面风格: Retro sticker feel plus the list reveal animations.
 class _InterfaceSection extends StatelessWidget {
   const _InterfaceSection();
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: motionPreferences,
+      listenable: Listenable.merge([motionPreferences, retroStyle]),
       builder: (context, _) {
         return StickerCard(
           child: Column(
@@ -941,13 +942,27 @@ class _InterfaceSection extends StatelessWidget {
                 style: SecondaryTypography.onCard.h15,
               ),
               const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.settingsRetroStyle,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                  ),
+                  Switch(
+                    value: retroStyle.enabled,
+                    onChanged: retroStyle.setEnabled,
+                  ),
+                ],
+              ),
               Text(
-                AppZh.settingsListAnimationsHint,
+                AppZh.settingsRetroStyleHint,
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
@@ -961,6 +976,12 @@ class _InterfaceSection extends StatelessWidget {
                     onChanged: motionPreferences.setListAnimationsEnabled,
                   ),
                 ],
+              ),
+              Text(
+                AppZh.settingsListAnimationsHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
               ),
             ],
           ),
