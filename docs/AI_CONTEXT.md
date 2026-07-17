@@ -158,6 +158,34 @@ Bump `flutter/pubspec.yaml` **before** building. Tag `v<x.y.z>` + GitHub Release
 
 ---
 
+## iOS platform (in progress, 2026-07)
+
+Same codebase, no diverging fork — `ios/` generated via
+`flutter create --platforms=ios --org com.tito .` (bundle id
+`com.tito.titodex`). Dart-side platform guards (`Platform.isAndroid` /
+`kIsWeb`) keep iOS off the Android-only paths.
+
+- **Save import (iOS)**: `file_picker` grants a short-lived temporary URL, so
+  `PlatformSaveDocumentSource` persists a copy under app documents
+  (`save_import/`) and re-reads from there; `release()` deletes only that
+  copy. No security-scoped bookmark channel yet.
+- **Emulator launcher**: iOS cannot enumerate/launch other apps; the entry
+  falls through to the existing "模拟器启动目前仅支持 Android" hint.
+- **Icons / launch**: `tools/render_ios_icons.py` (Pillow) renders the AppIcon
+  set from the Android adaptive-icon vector; launch screen is solid deep blue
+  `#2F4361` matching Android.
+- **Info.plist**: display name `TitoDex`,
+  `NSPhotoLibraryUsageDescription` for trainer-avatar picking (gallery only).
+- **Verified**: `flutter analyze` clean, `flutter test` 198 passing (incl.
+  zstandard FFI via `zstandard_ios`).
+- **Still needed (blocked on host setup)**: accept the Xcode license
+  (`sudo xcodebuild -license accept`), `brew install cocoapods`, then
+  `cd ios && pod install` and `flutter build ios`. Distribution needs an
+  Apple Developer account; prefer TestFlight/sideload — App Store review is a
+  Pokémon-IP risk.
+
+---
+
 ## Cloud agent / VM environment
 
 - **Flutter 3.44+** at `~/flutter/bin` (on PATH in login shells).
