@@ -66,6 +66,45 @@ void main() {
       expect(lgpe, containsAll(companionFollowerQuotes));
     });
 
+    test('intimacy tiers unlock by lifetime pat count', () {
+      List<String> pool(int pats) =>
+          companionQuotePoolFor(generation: 4, patCount: pats);
+
+      expect(
+        pool(0).any(companionIntimacyTier1Quotes.contains),
+        isFalse,
+      );
+      final tier1 = pool(companionIntimacyTier1Pats);
+      expect(tier1, containsAll(companionIntimacyTier1Quotes));
+      expect(
+        tier1.any(companionIntimacyTier2Quotes.contains),
+        isFalse,
+      );
+      expect(
+        pool(companionIntimacyTier2Pats),
+        containsAll(companionIntimacyTier2Quotes),
+      );
+    });
+
+    test('time-of-day greetings follow the local hour', () {
+      List<String> pool(int hour) =>
+          companionQuotePoolFor(generation: 4, hour: hour);
+
+      expect(pool(8), containsAll(companionMorningQuotes));
+      expect(pool(8).any(companionNightQuotes.contains), isFalse);
+      expect(pool(22), containsAll(companionNightQuotes));
+      expect(pool(2), containsAll(companionNightQuotes));
+      expect(pool(14).any(companionMorningQuotes.contains), isFalse);
+      expect(pool(14).any(companionNightQuotes.contains), isFalse);
+    });
+
+    test('shiny sessions add sparkle lines', () {
+      final normal = companionQuotePoolFor(generation: 4);
+      final shiny = companionQuotePoolFor(generation: 4, shiny: true);
+      expect(normal.any(companionShinyQuotes.contains), isFalse);
+      expect(shiny, containsAll(companionShinyQuotes));
+    });
+
     test('every generation in the catalog has flavor lines', () {
       for (var generation = 1; generation <= 9; generation++) {
         expect(

@@ -53,6 +53,8 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   String? _typeBoostItemType;
   BattleStatusCondition _attackerStatus = BattleStatusCondition.none;
   bool _isContactMove = false;
+  bool _isCriticalHit = false;
+  bool _defenderScreened = false;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   List<DefensiveAbilityOption> _attackerAbilityOptions = const [];
   FieldCondition _weather = FieldCondition.none;
@@ -268,6 +270,8 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             typeBoostItemType: _typeBoostItemType,
             attackerStatus: _attackerStatus,
             isContactMove: _isContactMove,
+            isCriticalHit: _isCriticalHit,
+            defenderScreened: _defenderScreened,
           );
         }
 
@@ -449,9 +453,28 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                       setState(() => _attackerStatus = value),
                 ),
                 const SizedBox(height: 12),
-                ContactMoveToggle(
-                  value: _isContactMove,
-                  onChanged: (value) => setState(() => _isContactMove = value),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ContactMoveToggle(
+                      value: _isContactMove,
+                      onChanged: (value) =>
+                          setState(() => _isContactMove = value),
+                    ),
+                    BattleToggleChip(
+                      label: AppZh.companionCriticalHit,
+                      value: _isCriticalHit,
+                      onChanged: (value) =>
+                          setState(() => _isCriticalHit = value),
+                    ),
+                    BattleToggleChip(
+                      label: AppZh.companionDefenderScreen,
+                      value: _defenderScreened,
+                      onChanged: (value) =>
+                          setState(() => _defenderScreened = value),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 CompanionNumberField(
@@ -568,6 +591,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 8),
+                    Text(
+                      AppZh.companionDamageAssumptions,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        height: 1.45,
+                      ),
+                    ),
                   ],
                 ),
               ),

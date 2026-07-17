@@ -60,6 +60,26 @@ void main() {
     });
   });
 
+  group('maxNationalDexIdForGeneration', () {
+    test('matches the era ceilings the quiz pool relies on', () {
+      expect(maxNationalDexIdForGeneration(1), 151);
+      expect(maxNationalDexIdForGeneration(2), 251);
+      expect(maxNationalDexIdForGeneration(4), 493);
+      expect(maxNationalDexIdForGeneration(8), 905);
+      expect(maxNationalDexIdForGeneration(9), 1025);
+    });
+
+    test('is monotonic and never exceeds the national ceiling', () {
+      var previous = 0;
+      for (var generation = 1; generation <= 9; generation++) {
+        final ceiling = maxNationalDexIdForGeneration(generation);
+        expect(ceiling, greaterThan(previous));
+        expect(ceiling, lessThanOrEqualTo(1025));
+        previous = ceiling;
+      }
+    });
+  });
+
   group('shinyRoll', () {
     test('is deterministic per (seed, species)', () {
       expect(shinyRoll(123, 25), shinyRoll(123, 25));

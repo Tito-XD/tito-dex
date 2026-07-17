@@ -199,6 +199,8 @@ DamageEstimate estimateDamage({
   String? typeBoostItemType,
   BattleStatusCondition attackerStatus = BattleStatusCondition.none,
   bool isContactMove = false,
+  bool isCriticalHit = false,
+  bool defenderScreened = false,
   double otherMultiplier = 1,
 }) {
   final isPhysical = category == MoveCategory.physical;
@@ -267,7 +269,17 @@ DamageEstimate estimateDamage({
     moveType: moveType,
     typeBoostItemType: typeBoostItemType,
   );
-  final extra = fieldMod * abilityMod * defenderMod * itemMod * otherMultiplier;
+  // Critical hits: ×2 before Gen 6, ×1.5 since — and they bypass screens.
+  final critMod = isCriticalHit ? (generation >= 6 ? 1.5 : 2.0) : 1.0;
+  final screenMod = defenderScreened && !isCriticalHit ? 0.5 : 1.0;
+  final extra =
+      fieldMod *
+      abilityMod *
+      defenderMod *
+      itemMod *
+      critMod *
+      screenMod *
+      otherMultiplier;
   final modifier = stab * type * extra;
   final minDamage = (base * modifier * 0.85).floor();
   final maxDamage = (base * modifier).floor();

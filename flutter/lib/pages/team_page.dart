@@ -135,12 +135,14 @@ class _TeamPageState extends State<TeamPage> {
     );
     String? selectedAbility = member.abilitySlug;
     List<PokemonAbility> abilities = const [];
+    var speciesLinked = false;
     if (member.speciesId != null) {
       try {
         final summary = await dexRepository.getSummary(member.speciesId!);
         if (selectedTypes.isEmpty) {
           selectedTypes = List<String>.from(summary.types);
         }
+        speciesLinked = true;
         abilities = await dexRepository.abilitiesForPokemon(member.speciesId!);
         selectedAbility ??= defaultAbilitySlugForOptions(
           defensiveAbilityOptionsFrom(abilities),
@@ -194,12 +196,18 @@ class _TeamPageState extends State<TeamPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TypeChipPicker(
-                      label: AppZh.teamEditTypes,
-                      selected: selectedTypes,
-                      onChanged: (types) =>
-                          setSheetState(() => selectedTypes = types),
-                    ),
+                    // Same rule as the battle tools: a species-linked member
+                    // keeps its own types; only fully manual members pick
+                    // from the full grid.
+                    if (speciesLinked)
+                      LinkedPokemonTypesRow(types: selectedTypes)
+                    else
+                      TypeChipPicker(
+                        label: AppZh.teamEditTypes,
+                        selected: selectedTypes,
+                        onChanged: (types) =>
+                            setSheetState(() => selectedTypes = types),
+                      ),
                     if (abilityOptions.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       AbilityChipPicker(

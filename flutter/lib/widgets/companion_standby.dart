@@ -10,6 +10,7 @@ import '../features/companion/companion_media.dart';
 import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/shiny_odds.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
@@ -61,6 +62,11 @@ class _CompanionStandbyState extends State<CompanionStandby>
     with SingleTickerProviderStateMixin {
   static const _friendshipPats = 10;
   static const _quoteDuration = Duration(milliseconds: 1900);
+  static const _easterEggOdds = 50;
+
+  /// One roll per app session per species — same scheme as the party strip,
+  /// so remounts don't reroll the sparkle.
+  static final int _sessionSeed = DateTime.now().millisecondsSinceEpoch;
 
   late final AnimationController _bounce;
   late final Animation<double> _bounceScale;
@@ -75,14 +81,14 @@ class _CompanionStandbyState extends State<CompanionStandby>
   var _cryBusy = false;
   var _nextHeartId = 0;
   var _pats = 0;
+  var _shiny = false;
 
   bool get _friend => _pats >= _friendshipPats;
 
   @override
   void initState() {
     super.initState();
-    _heightFuture = _loadHeight(widget.speciesId);
-    _resolveSpriteSources();
+    _initForSpecies();
     _bounce = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 420),
@@ -103,25 +109,51 @@ class _CompanionStandbyState extends State<CompanionStandby>
       _quoteTemplate = null;
       _cryUrlIndex = 0;
       _quoteTimer?.cancel();
-      _heightFuture = _loadHeight(widget.speciesId);
       _spriteSources = null;
-      _resolveSpriteSources();
+      _initForSpecies();
     }
   }
 
-  /// Sprite source order: bundled asset (starters) → disk cache (chosen via
-  /// the picker's preload dialog) → network candidates.
+  void _initForSpecies() {
+    final id = widget.speciesId;
+    _shiny = shinyRoll(_sessionSeed, id);
+    _heightFuture = _loadHeight(id);
+    _resolveSpriteSources();
+    _loadPats(id);
+  }
+
+  Future<void> _loadPats(int id) async {
+    final count = await companionRepository.patCountFor(id);
+    if (mounted && id == widget.speciesId) {
+      setState(() => _pats = count);
+    }
+  }
+
+  /// Sprite source order: (shiny session: cached/network shiny first) →
+  /// bundled asset (starters) → disk cache (chosen via the picker's preload
+  /// dialog) → network candidates. Every miss falls through to the normal
+  /// look, so a shiny roll can never blank the companion.
   Future<void> _resolveSpriteSources() async {
     final id = widget.speciesId;
+    final shiny = _shiny;
     final bundled = bundledCompanionGifAsset(id);
     final cached = bundled == null
         ? await companionMediaCache.cachedGifPath(id)
         : null;
+    final cachedShiny = shiny
+        ? await companionMediaCache.cachedShinyGifPath(id)
+        : null;
+    if (shiny && cachedShiny == null) {
+      // Prime the disk cache so the sparkle survives going offline later.
+      unawaited(companionMediaCache.ensureShinyGif(id));
+    }
     if (!mounted || id != widget.speciesId) {
       return;
     }
     setState(() {
       _spriteSources = [
+        if (cachedShiny != null) cachedShiny,
+        if (shiny) ...animatedShinySpriteCandidatesFor(id),
         if (bundled != null) bundled,
         if (cached != null) cached,
         ...animatedSpriteCandidatesFor(id),
@@ -195,7 +227,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
     HapticFeedback.lightImpact();
     _bounce.forward(from: 0);
     unawaited(_playCry());
+    unawaited(companionRepository.incrementPats(widget.speciesId));
     final becameFriend = _pats + 1 == _friendshipPats;
+    final easterEgg = _random.nextInt(_easterEggOdds) == 0;
     _quoteTimer?.cancel();
     _quoteTimer = Timer(_quoteDuration, () {
       if (mounted) {
@@ -205,13 +239,21 @@ class _CompanionStandbyState extends State<CompanionStandby>
     final edition = gameEditionRepository.edition;
     setState(() {
       _pats += 1;
-      _hearts.add(_HeartParticle(_nextHeartId++, _random));
+      final heartCount = easterEgg ? 6 : 1;
+      for (var i = 0; i < heartCount; i++) {
+        _hearts.add(_HeartParticle(_nextHeartId++, _random));
+      }
       _quoteTemplate = becameFriend
           ? companionFriendshipQuote
+          : easterEgg
+          ? companionEasterEggQuote
           : pickCompanionQuote(
               companionQuotePoolFor(
                 generation: edition.generation,
                 editionSlug: edition.slug,
+                patCount: _pats,
+                hour: DateTime.now().hour,
+                shiny: _shiny,
               ),
               _random,
               previous: _quoteTemplate,
@@ -329,6 +371,28 @@ class _CompanionStandbyState extends State<CompanionStandby>
                 child: sticker,
               ),
             ),
+            if (_shiny)
+              Positioned(
+                right: spriteSize - 10,
+                bottom: spriteSize - 10,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) =>
+                      Transform.scale(scale: value, child: child),
+                  child: const IgnorePointer(
+                    child: Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 16,
+                      color: TitoColors.softYellow,
+                      shadows: [
+                        Shadow(color: TitoColors.ink, blurRadius: 2),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             if (_friend)
               Positioned(
                 right: -2,

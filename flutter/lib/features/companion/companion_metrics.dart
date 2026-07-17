@@ -83,10 +83,67 @@ const Map<int, List<String>> companionGenerationQuotes = {
 /// Partner-game hug line (皮卡丘版 / LGPE).
 const String companionPartnerQuote = '搭档想要抱抱！';
 
+/// Intimacy tiers — unlocked by the lifetime pat count (persisted per
+/// species), so a long-time companion talks more affectionately.
+const int companionIntimacyTier1Pats = 30;
+const int companionIntimacyTier2Pats = 100;
+
+const List<String> companionIntimacyTier1Quotes = [
+  '{name}已经完全信赖你了。',
+  '{name}轻轻靠在你身边。',
+  '{name}把最喜欢的树果分给你一半。',
+];
+
+const List<String> companionIntimacyTier2Quotes = [
+  '无论去哪里，{name}都想和你一起。',
+  '{name}的眼睛里闪着光——那是羁绊的颜色。',
+  '就算说再见，{name}也一定会找到你。',
+];
+
+List<String> companionIntimacyQuotesFor(int patCount) => [
+  if (patCount >= companionIntimacyTier1Pats)
+    ...companionIntimacyTier1Quotes,
+  if (patCount >= companionIntimacyTier2Pats)
+    ...companionIntimacyTier2Quotes,
+];
+
+/// Time-of-day greetings mixed into the pool by the local hour.
+const List<String> companionMorningQuotes = [
+  '早上好！今天也精神满满！',
+  '{name}揉了揉眼睛，向你道早安。',
+];
+
+const List<String> companionNightQuotes = [
+  '夜深了，{name}打起了小呼噜。',
+  '月亮出来了，{name}望着星星发呆。',
+];
+
+List<String> companionTimeQuotesFor(int hour) {
+  if (hour >= 5 && hour < 11) {
+    return companionMorningQuotes;
+  }
+  if (hour >= 19 || hour < 5) {
+    return companionNightQuotes;
+  }
+  return const [];
+}
+
+/// Extra lines when the standby companion rolled shiny this session.
+const List<String> companionShinyQuotes = [
+  '✨{name}今天闪闪发光！',
+  '罕见的颜色…{name}好像有点得意。',
+];
+
+/// 1/50 pat surprise — heart burst plus this line.
+const String companionEasterEggQuote = '{name}突然给了你一个大大的拥抱！';
+
 /// Assemble the pat-quote pool for the selected game edition.
 List<String> companionQuotePoolFor({
   required int generation,
   String? editionSlug,
+  int patCount = 0,
+  int? hour,
+  bool shiny = false,
 }) {
   return [
     ...companionSharedQuotes,
@@ -96,6 +153,9 @@ List<String> companionQuotePoolFor({
     ...?companionGenerationQuotes[generation],
     if (editionSlug == 'yellow' || editionSlug == 'lgpe')
       companionPartnerQuote,
+    ...companionIntimacyQuotesFor(patCount),
+    if (hour != null) ...companionTimeQuotesFor(hour),
+    if (shiny) ...companionShinyQuotes,
   ];
 }
 
