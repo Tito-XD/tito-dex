@@ -54,7 +54,15 @@ ThemeData buildTitoTheme() {
   );
 
   const androidTransitions = PageTransitionsTheme(
-    builders: {TargetPlatform.android: PredictiveBackPageTransitionsBuilder()},
+    builders: {
+      // fallbackColor drives the transition backdrop (enter scrim + the
+      // ColoredBox behind predictive-back). It defaults to
+      // colorScheme.surface — cream, which flashed behind the blue-gradient
+      // pages. Slate blue matches scaffoldBackgroundColor/TitoPageContainer.
+      TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
+        fallbackColor: TitoColors.slateBlue,
+      ),
+    },
   );
 
   return base.copyWith(
