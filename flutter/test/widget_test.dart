@@ -18,7 +18,7 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
   });
 
-  testWidgets('Dex uses a reversible 600ms container Hero', (tester) async {
+  testWidgets('Dex expands in 480ms and collapses in 380ms', (tester) async {
     final page = titoDexPage<void>(
       key: const ValueKey<String>('dex-page'),
       heroTag: TitoHomeActionHero.dex,
@@ -35,7 +35,12 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
     final route = ModalRoute.of(tester.element(find.byType(Placeholder)))!;
     expect(route.transitionDuration, titoDexTransitionDuration);
-    expect(route.reverseTransitionDuration, titoDexTransitionDuration);
+    expect(route.reverseTransitionDuration, titoDexReverseTransitionDuration);
+    expect(titoDexTransitionDuration, const Duration(milliseconds: 480));
+    expect(
+      titoDexReverseTransitionDuration,
+      const Duration(milliseconds: 380),
+    );
     expect(route.opaque, isTrue);
     expect(route.popGestureEnabled, isFalse);
     expect(

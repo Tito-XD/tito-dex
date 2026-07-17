@@ -13,9 +13,10 @@ abstract final class TitoHomeActionHero {
 
 enum TitoSideSlideDirection { fromLeft, fromRight }
 
-/// Android's current forward transition is 450 ms. Dex keeps its slightly
-/// slower card expansion, while its actual contents reveal afterwards.
-const titoDexTransitionDuration = Duration(milliseconds: 600);
+/// Android's current forward transition is 450 ms. Dex keeps a slightly
+/// slower expansion going in, and a snappier collapse coming back.
+const titoDexTransitionDuration = Duration(milliseconds: 480);
+const titoDexReverseTransitionDuration = Duration(milliseconds: 380);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
@@ -126,7 +127,7 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   @override
   Duration get reverseTransitionDuration =>
       _page.kind == _TitoMaterialPageKind.dex
-      ? titoDexTransitionDuration
+      ? titoDexReverseTransitionDuration
       : super.reverseTransitionDuration;
 
   @override
@@ -325,9 +326,11 @@ Widget _homeActionFlightShuttle(
       return Material(
         animationDuration: Duration.zero,
         clipBehavior: Clip.antiAlias,
-        // Both Hero children paint their own backgrounds. A transparent
-        // flight Material prevents a fallback white or blue compositing frame.
-        color: Colors.transparent,
+        // Paint the flight surface itself: card cream at rest, dex deep blue
+        // when expanded. The pop flight previously left both Hero layers
+        // near-invisible for most of the collapse, exposing a transparent
+        // frame — a solid lerped backdrop keeps enter and exit symmetric.
+        color: Color.lerp(TitoColors.card, TitoColors.deepBlue, progress),
         elevation: 2 * (1 - progress),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),

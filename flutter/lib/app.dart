@@ -284,6 +284,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     onImportJourney: _importJourneyJson,
                     onPickEmulator: () => _pickEmulatorFromSettings(context),
                     onClearEmulator: () => _clearEmulator(context),
+                    onChangeGameEdition: _onGameBadgeTap,
                   ),
                 ),
               ),

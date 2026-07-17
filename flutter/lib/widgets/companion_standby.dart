@@ -244,7 +244,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
     // the same phone:tablet ratio, square handhelds stay a bit tighter.
     final minSize = square || widget.compact ? 36.0 : 52.0;
     final maxSize = square ? 120.0 : (widget.compact ? 140.0 : 208.0);
-    final scale = widget.sizeScale.clamp(1.0, 1.5);
+    final scale = widget.sizeScale.clamp(0.75, 1.5);
 
     return FutureBuilder<int?>(
       future: _heightFuture,

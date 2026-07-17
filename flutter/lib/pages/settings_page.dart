@@ -49,6 +49,7 @@ class SettingsPage extends StatefulWidget {
     required this.onImportJourney,
     required this.onPickEmulator,
     required this.onClearEmulator,
+    this.onChangeGameEdition,
   });
 
   final CurrentJourney journey;
@@ -65,6 +66,9 @@ class SettingsPage extends StatefulWidget {
   final VoidCallback onImportJourney;
   final VoidCallback onPickEmulator;
   final VoidCallback onClearEmulator;
+
+  /// Opens the game edition picker (same flow as the home header badge).
+  final Future<void> Function(BuildContext context)? onChangeGameEdition;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -381,6 +385,16 @@ class _SettingsPageState extends State<SettingsPage> {
         title: AppZh.navSettings,
         subtitle: localizeGame(widget.journey.game),
         children: [
+          _CurrentGameSection(
+            onChangeGameEdition: widget.onChangeGameEdition == null
+                ? null
+                : () => widget.onChangeGameEdition!(context).then((_) {
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  }),
+          ),
+          const SizedBox(height: 16),
           StickerCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -847,6 +861,66 @@ class _Row extends StatelessWidget {
   }
 }
 
+/// Settings → 当前游戏: prominent edition card with the official icon and a
+/// direct switch entry — previously the edition only appeared as the page
+/// subtitle and the switcher sat three levels deep in dex advanced options.
+class _CurrentGameSection extends StatelessWidget {
+  const _CurrentGameSection({this.onChangeGameEdition});
+
+  final VoidCallback? onChangeGameEdition;
+
+  @override
+  Widget build(BuildContext context) {
+    final edition = gameEditionRepository.edition;
+
+    return StickerCard(
+      variant: StickerVariant.softYellow,
+      child: Row(
+        children: [
+          GameEditionIcon(edition: edition, size: 48),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppZh.settingsCurrentGame,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  edition.labelZh,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: SecondaryTypography.onCard.h15,
+                ),
+              ],
+            ),
+          ),
+          if (onChangeGameEdition != null) ...[
+            const SizedBox(width: 8),
+            FilledButton(
+              onPressed: onChangeGameEdition,
+              style: FilledButton.styleFrom(
+                backgroundColor: TitoColors.deepBlue,
+                foregroundColor: TitoColors.card,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+              ),
+              child: const Text(AppZh.settingsSwitchGame),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 /// Settings → 同行宝可梦: current standby preview (animated, fetched on
 /// demand) plus picker and reset-to-starter actions.
 class _CompanionSection extends StatelessWidget {
@@ -908,7 +982,7 @@ class _CompanionSection extends StatelessWidget {
                       value: companionRepository.sizeScale,
                       min: CompanionRepository.minSizeScale,
                       max: CompanionRepository.maxSizeScale,
-                      divisions: 10,
+                      divisions: 15,
                       label:
                           '×${companionRepository.sizeScale.toStringAsFixed(2)}',
                       onChanged: companionRepository.enabled
