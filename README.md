@@ -8,7 +8,7 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 | --- | --- | --- |
 | Lite APK | [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) · App `0.6.5+75` | arm64-v8a, about 24 MB |
 | Offline APK | [v0.6.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.5) · App `0.6.5-offline+76` | Bundles the current dex pack, about 65 MB |
-| `main` source baseline | App `0.6.5+75` | v0.6.2 feature line with the full-bleed adaptive launcher icon |
+| `main` source baseline | App `0.6.5+75` | Polish batch: save banner scoping, transition backdrop, search history, Chinese flavor reference |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
