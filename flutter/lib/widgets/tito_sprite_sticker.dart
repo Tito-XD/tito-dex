@@ -25,7 +25,8 @@ class TitoSpriteSticker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inner = size - padding * 2 - 4;
-    final borderRadius = radius ?? (shape == BoxShape.circle ? size / 2 : TitoRadii.sm);
+    final borderRadius =
+        radius ?? (shape == BoxShape.circle ? size / 2 : TitoRadii.sm);
 
     return Container(
       width: size,
@@ -37,9 +38,6 @@ class TitoSpriteSticker extends StatelessWidget {
             ? BorderRadius.circular(borderRadius)
             : null,
         border: Border.all(color: TitoColors.ink, width: 2),
-        boxShadow: const [
-          BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,

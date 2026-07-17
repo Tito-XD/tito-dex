@@ -21,6 +21,7 @@ import '../features/trainer/trainer_avatar_service.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/motion_preferences.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
@@ -383,7 +384,6 @@ class _SettingsPageState extends State<SettingsPage> {
       multiplier: 1.0,
       child: SecondaryPageScaffold(
         title: AppZh.navSettings,
-        subtitle: localizeGame(widget.journey.game),
         children: [
           _CurrentGameSection(
             onChangeGameEdition: widget.onChangeGameEdition == null
@@ -474,6 +474,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 16),
           _CompanionSection(journey: widget.journey),
+          const SizedBox(height: 16),
+          const _InterfaceSection(),
           const SizedBox(height: 16),
           if (saveLinked)
             StickerCard(
@@ -917,6 +919,53 @@ class _CurrentGameSection extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Settings → 界面动画: global toggle for the list reveal micro-animations.
+class _InterfaceSection extends StatelessWidget {
+  const _InterfaceSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: motionPreferences,
+      builder: (context, _) {
+        return StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.settingsGroupInterface,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                AppZh.settingsListAnimationsHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppZh.settingsListAnimations,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                  ),
+                  Switch(
+                    value: motionPreferences.listAnimationsEnabled,
+                    onChanged: motionPreferences.setListAnimationsEnabled,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

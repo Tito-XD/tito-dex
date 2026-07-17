@@ -45,6 +45,9 @@ class JourneyCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              // The square layout stretches this card to fill the column —
+              // keep the text block vertically centered instead of top-stuck.
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,

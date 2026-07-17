@@ -352,13 +352,39 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     return sections;
   }
 
+  static List<PokemonMove> _movesForMethod(
+    _MoveMethodFilter filter,
+    PokemonMoveSet moveSet,
+  ) => switch (filter) {
+    _MoveMethodFilter.level => moveSet.levelUp,
+    _MoveMethodFilter.machine => moveSet.machine,
+    _MoveMethodFilter.egg => moveSet.egg,
+    _MoveMethodFilter.tutor => moveSet.tutor,
+  };
+
   List<Widget> _movesSections(PokemonDetail detail) {
     final moveSetKey = gameEditionMoveSetKey(_moveGameEdition);
     final moveSet = detail.moveSetForKey(moveSetKey);
 
+    // Species without level-up moves (or without the currently selected
+    // method) land on their first non-empty method instead of a blank panel.
+    var effectiveFilter = _moveMethodFilter;
+    if (_movesForMethod(effectiveFilter, moveSet).isEmpty) {
+      for (final candidate in _MoveMethodFilterBar._order) {
+        if (_movesForMethod(candidate, moveSet).isNotEmpty) {
+          effectiveFilter = candidate;
+          break;
+        }
+      }
+    }
+
     return [
       _MoveMethodFilterBar(
-        selected: _moveMethodFilter,
+        selected: effectiveFilter,
+        emptyMethods: {
+          for (final entry in _MoveMethodFilterBar._order)
+            if (_movesForMethod(entry, moveSet).isEmpty) entry,
+        },
         onSelected: (filter) => setState(() => _moveMethodFilter = filter),
       ),
       const SizedBox(height: 12),
@@ -381,17 +407,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       const SizedBox(height: 12),
       // Keyed move-method panel swap without a custom transition.
       TitoAnimatedSizeSwitcher(
-        switchKey: ValueKey<_MoveMethodFilter>(_moveMethodFilter),
+        switchKey: ValueKey<_MoveMethodFilter>(effectiveFilter),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: _movePanelsForFilter(moveSet),
+          children: _movePanelsForFilter(effectiveFilter, moveSet),
         ),
       ),
     ];
   }
 
-  List<Widget> _movePanelsForFilter(PokemonMoveSet moveSet) {
-    return switch (_moveMethodFilter) {
+  List<Widget> _movePanelsForFilter(
+    _MoveMethodFilter filter,
+    PokemonMoveSet moveSet,
+  ) {
+    return switch (filter) {
       _MoveMethodFilter.level => [
         MoveCategoryPanel(
           title: moveMethodLabelZh('level-up'),
@@ -433,10 +462,14 @@ class _MoveMethodFilterBar extends StatelessWidget {
   const _MoveMethodFilterBar({
     required this.selected,
     required this.onSelected,
+    this.emptyMethods = const {},
   });
 
   final _MoveMethodFilter selected;
   final ValueChanged<_MoveMethodFilter> onSelected;
+
+  /// Methods with no moves for the current game — rendered muted.
+  final Set<_MoveMethodFilter> emptyMethods;
 
   static const _order = [
     _MoveMethodFilter.level,
@@ -469,15 +502,25 @@ class _MoveMethodFilterBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: selected == entry
                         ? TitoColors.softYellow
+                        : emptyMethods.contains(entry)
+                        ? TitoColors.card.withValues(alpha: 0.55)
                         : TitoColors.card,
                     borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(color: TitoColors.ink, width: 2),
+                    border: Border.all(
+                      color: emptyMethods.contains(entry)
+                          ? TitoColors.ink.withValues(alpha: 0.4)
+                          : TitoColors.ink,
+                      width: 2,
+                    ),
                   ),
                   child: Text(
                     _labels[entry]!,
                     textAlign: TextAlign.center,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       fontWeight: FontWeight.w800,
+                      color: emptyMethods.contains(entry)
+                          ? TitoColors.mutedInk
+                          : null,
                     ),
                   ),
                 ),

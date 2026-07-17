@@ -471,9 +471,9 @@ class _PartyMemberAvatar extends StatelessWidget {
       sprite = GestureDetector(
         onTap: () {
           HapticFeedback.mediumImpact();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppZh.shinyPartyFound(label))),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(AppZh.shinyPartyFound(label))));
         },
         child: Stack(
           clipBehavior: Clip.none,
@@ -496,9 +496,6 @@ class _PartyMemberAvatar extends StatelessWidget {
         color: TitoColors.cream,
         shape: BoxShape.circle,
         border: Border.all(color: TitoColors.ink, width: 2),
-        boxShadow: const [
-          BoxShadow(color: Color(0x3818283B), offset: Offset(0, 3)),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
@@ -560,9 +557,10 @@ class _SparklePulseState extends State<_SparklePulse>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: Tween<double>(begin: 0.35, end: 1.0).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-      ),
+      opacity: Tween<double>(
+        begin: 0.35,
+        end: 1.0,
+      ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut)),
       child: const Icon(
         Icons.auto_awesome_rounded,
         size: 13,

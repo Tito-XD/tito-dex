@@ -228,7 +228,7 @@ abstract final class AppZh {
 
   static const settingsDexOffline = '离线图鉴缓存';
   static const settingsDexOfflineHint =
-      '离线图鉴缓存包含以下内容（可在下方勾选要下载/保留的部分）。推荐先下载 CDN 预打包数据包；手绘导航图标仍随 APK 内置。';
+      '离线图鉴缓存包含以下内容，可在下方勾选要下载或保留的部分。推荐优先下载预打包数据包，一次安装即可完全离线使用。';
   static const settingsDexCacheContentsTitle = '缓存内容筛选';
   static const settingsDexCacheExpandHint = 'PokeAPI 备用下载时可勾选缓存项';
   static const settingsDexAdvancedOptions = '高级选项';
@@ -354,6 +354,9 @@ abstract final class AppZh {
   static const companionMediaCry = '载入叫声';
   static const companionMediaFailedHint = '部分资源载入失败，将使用静态图或稍后重试。';
   static const settingsGroupAdvancedHint = '内置存档导入、旅程 JSON 导入/导出与重置';
+  static const settingsGroupInterface = '界面动画';
+  static const settingsListAnimations = '列表渐入动画';
+  static const settingsListAnimationsHint = '图鉴、搜索、常用资料等列表的渐入小动画；关闭后内容会立即显示。';
   static const companionSettingsPick = '更换同伴';
   static const companionSettingsReset = '恢复默认（随存档御三家）';
   static String shinyPartyFound(String name) => '✨ 你的 $name 今天在闪光！';
@@ -475,10 +478,9 @@ abstract final class AppZh {
   static const sleepToolsDocs = '开发文档';
   static const sleepLinkCopied = '链接已复制到剪贴板';
 
-  static const settingsTrainerProfile = '训练家资料';
-  static const settingsGroupTrainer = 'Trainer';
-  static const settingsGroupSaveSync = 'Save sync';
-  static const settingsGroupAdvanced = 'Advanced';
+  static const settingsGroupTrainer = '训练家';
+  static const settingsGroupSaveSync = '存档同步';
+  static const settingsGroupAdvanced = '高级';
   static const settingsDisplayName = '显示名称';
   static const settingsDisplayNameHint = 'Tito';
   static const settingsSaveTrainerName = '保存名称';
@@ -490,9 +492,6 @@ abstract final class AppZh {
   static const settingsLocation = '当前地点';
   static const settingsPlayTime = '游戏时间';
   static const settingsBadges = '徽章';
-  static const settingsNextReminder = '下一步提醒';
-  static const settingsEditJourney = '编辑旅程信息';
-  static const settingsSaveJourneyEdits = '保存旅程信息';
 
   static const settingsJourneyData = '旅程数据';
   static const settingsImportSave = '导入内置 PKMSS.sav';

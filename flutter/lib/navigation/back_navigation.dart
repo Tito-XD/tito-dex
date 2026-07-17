@@ -8,7 +8,10 @@ abstract final class TitoBackNavigation {
   static bool isDexDetail(String path) => RegExp(r'^/dex/\d+$').hasMatch(path);
 
   static String parentPath(String path) {
-    if (isDexDetail(path) || path == '/dex/moves' || path == '/dex/abilities') {
+    if (isDexDetail(path) ||
+        path == '/dex/moves' ||
+        path == '/dex/abilities' ||
+        path == '/dex/quiz') {
       return '/dex';
     }
     if (path.startsWith('/search/companion/') ||

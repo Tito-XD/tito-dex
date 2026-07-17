@@ -240,8 +240,10 @@ class DexReferenceDetailBody extends StatelessWidget {
           DexReferenceKind.item => ItemReferenceDetail(entry: entry),
           DexReferenceKind.weather ||
           DexReferenceKind.terrain ||
-          DexReferenceKind.status =>
-            ConditionReferenceDetail(entry: entry, kind: kind),
+          DexReferenceKind.status => ConditionReferenceDetail(
+            entry: entry,
+            kind: kind,
+          ),
           DexReferenceKind.generic => GenericReferenceDetail(entry: entry),
         },
       ],
@@ -371,7 +373,7 @@ class EggGroupReferenceDetail extends StatelessWidget {
                   labelZh: AppZh.dexFilterByEggGroup(label),
                 ),
               );
-              context.go('/dex');
+              context.push('/dex');
             },
       child: Text(AppZh.dexReferenceViewEggGroupPokemon),
     );
@@ -385,10 +387,12 @@ class ItemReferenceDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final category = entry['category'] as String? ?? entry['categoryEn'] as String?;
+    final category =
+        entry['category'] as String? ?? entry['categoryEn'] as String?;
     final categoryLabel = itemCategoryLabelZh(category);
     final costLabel = itemCostLabel(entry['cost']);
-    final effect = referenceDescriptionZh(entry) ??
+    final effect =
+        referenceDescriptionZh(entry) ??
         entry['effectZh'] as String? ??
         entry['shortEffectZh'] as String?;
 
@@ -529,7 +533,10 @@ class ReferenceTypeModifierChips extends StatelessWidget {
             spacing: 6,
             runSpacing: 6,
             children: entries.map((entry) {
-              return _TypeModifierChip(type: entry.key, multiplier: entry.value);
+              return _TypeModifierChip(
+                type: entry.key,
+                multiplier: entry.value,
+              );
             }).toList(),
           ),
         ],
@@ -637,11 +644,11 @@ class _CategoryBadge extends StatelessWidget {
 }
 
 IconData moveCategoryIcon(String category) => switch (category) {
-      'physical' => Icons.sports_martial_arts_rounded,
-      'special' => Icons.auto_awesome_rounded,
-      'status' => Icons.tips_and_updates_outlined,
-      _ => Icons.help_outline_rounded,
-    };
+  'physical' => Icons.sports_martial_arts_rounded,
+  'special' => Icons.auto_awesome_rounded,
+  'status' => Icons.tips_and_updates_outlined,
+  _ => Icons.help_outline_rounded,
+};
 
 String moveCategoryLabelZh(String category) {
   return moveCategoryLabelsZh[category] ?? category;
@@ -653,9 +660,7 @@ String formatMoveStatLine({
   int? accuracy,
   int? pp,
 }) {
-  final parts = <String>[
-    moveCategoryLabelZh(category),
-  ];
+  final parts = <String>[moveCategoryLabelZh(category)];
   if (power != null) {
     parts.add('${AppZh.dexReferenceMovePowerSymbol} $power');
   }
