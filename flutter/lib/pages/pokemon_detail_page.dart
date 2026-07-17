@@ -364,7 +364,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   List<Widget> _movesSections(PokemonDetail detail) {
     final moveSetKey = gameEditionMoveSetKey(_moveGameEdition);
-    final moveSet = detail.moveSetForKey(moveSetKey);
+    final (moveSetSourceKey, moveSet) = detail.resolvedMoveSetForKey(
+      moveSetKey,
+    );
+    final moveSetBorrowed =
+        moveSetSourceKey != null && moveSetSourceKey != moveSetKey;
 
     // Species without level-up moves (or without the currently selected
     // method) land on their first non-empty method instead of a blank panel.
@@ -404,6 +408,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           ),
         ),
       ),
+      if (moveSetBorrowed) ...[
+        const SizedBox(height: 6),
+        Text(
+          AppZh.dexDataFallbackNote(
+            gameEditionLabelForVersionGroup(moveSetSourceKey),
+          ),
+          style: SecondaryTypography.onGradient.small12.copyWith(
+            color: TitoColors.softYellow,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
       const SizedBox(height: 12),
       // Keyed move-method panel swap without a custom transition.
       TitoAnimatedSizeSwitcher(

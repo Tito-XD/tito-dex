@@ -36,7 +36,9 @@ abstract final class TrainerAvatarService {
             toolbarColor: TitoColors.deepBlue,
             toolbarWidgetColor: TitoColors.card,
             activeControlsWidgetColor: TitoColors.softYellow,
-            statusBarColor: TitoColors.deepBlue,
+            // Deep-blue chrome → light status-bar icons (statusBarColor is
+            // deprecated; the bar color itself comes from UCropTheme).
+            statusBarLight: false,
             backgroundColor: TitoColors.deepBlue,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,

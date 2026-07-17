@@ -13,6 +13,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
+import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -313,66 +314,17 @@ class _TeamPageState extends State<TeamPage> {
   }
 
   Future<void> _addMember() async {
-    final idController = TextEditingController();
-    final picked = await showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(AppZh.teamAddTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: idController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: AppZh.teamAddByIdHint,
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () async {
-                final id = await _pickSpeciesFromList(context);
-                if (context.mounted && id != null) {
-                  Navigator.pop(context, id);
-                }
-              },
-              child: const Text(AppZh.teamAddPick),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(AppZh.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final id = int.tryParse(idController.text.trim());
-              if (id == null || id < 1 || id > titodexMaxNationalDexId) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text(AppZh.teamAddInvalidId)),
-                );
-                return;
-              }
-              Navigator.pop(context, id);
-            },
-            child: const Text(AppZh.confirm),
-          ),
-        ],
-      ),
+    // Full-dex grid with search (id / 中文名 / 英文名) — same picker UX as
+    // the companion sheet, instead of the old 1–30 starter-only dialog.
+    final summary = await showSpeciesPickerSheet(
+      context,
+      title: AppZh.teamAddTitle,
     );
-    idController.dispose();
-
-    if (picked == null || _party.length >= 6) {
+    if (summary == null || !mounted || _party.length >= 6) {
       return;
     }
 
     try {
-      final summary = await dexRepository.getSummary(picked);
-      if (!mounted) {
-        return;
-      }
       final member = PartyMember(
         species: summary.nameZh,
         speciesId: summary.id,
@@ -386,6 +338,9 @@ class _TeamPageState extends State<TeamPage> {
         ),
         userEdited: true,
       );
+      if (!mounted) {
+        return;
+      }
       _saveParty([..._party, member]);
     } catch (_) {
       if (!mounted) {
@@ -395,39 +350,6 @@ class _TeamPageState extends State<TeamPage> {
         const SnackBar(content: Text(AppZh.teamAddInvalidId)),
       );
     }
-  }
-
-  Future<int?> _pickSpeciesFromList(BuildContext context) async {
-    List<PokemonSummary> starters;
-    try {
-      starters = await dexRepository.getSummaryRange(1, 30);
-    } catch (_) {
-      return null;
-    }
-    if (!context.mounted) {
-      return null;
-    }
-
-    return showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(AppZh.teamAddPick),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: starters.length,
-            itemBuilder: (context, index) {
-              final entry = starters[index];
-              return ListTile(
-                title: Text('#${entry.id} ${entry.nameZh}'),
-                onTap: () => Navigator.pop(context, entry.id),
-              );
-            },
-          ),
-        ),
-      ),
-    );
   }
 
   @override

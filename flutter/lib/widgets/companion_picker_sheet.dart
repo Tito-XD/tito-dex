@@ -24,6 +24,22 @@ Future<CompanionChoice?> showCompanionPickerSheet(BuildContext context) {
   );
 }
 
+/// Generic full-dex species picker (same grid + search as the companion
+/// picker) — returns the chosen summary without any side effects.
+Future<PokemonSummary?> showSpeciesPickerSheet(
+  BuildContext context, {
+  String? title,
+}) {
+  return showTitoModalBottomSheet<PokemonSummary>(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) => _CompanionPickerSheet(
+      title: title,
+      returnSummaryOnly: true,
+    ),
+  );
+}
+
 /// Adopt [summary] as the standby companion. Non-bundled species go through
 /// the cancellable media preload dialog first, matching the picker sheet.
 /// Returns the saved choice, or null when the user cancelled.
@@ -50,7 +66,17 @@ Future<CompanionChoice?> adoptCompanion(
 }
 
 class _CompanionPickerSheet extends StatefulWidget {
-  const _CompanionPickerSheet();
+  const _CompanionPickerSheet({
+    this.title,
+    this.returnSummaryOnly = false,
+  });
+
+  /// Optional title override (defaults to the companion picker copy).
+  final String? title;
+
+  /// When true the sheet just pops the tapped summary — no companion save,
+  /// no media preload dialog.
+  final bool returnSummaryOnly;
 
   @override
   State<_CompanionPickerSheet> createState() => _CompanionPickerSheetState();
@@ -83,6 +109,10 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
   }
 
   Future<void> _select(PokemonSummary summary) async {
+    if (widget.returnSummaryOnly) {
+      Navigator.of(context).pop(summary);
+      return;
+    }
     final choice = await adoptCompanion(context, summary);
     if (choice != null && mounted) {
       Navigator.of(context).pop(choice);
@@ -101,16 +131,18 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              AppZh.companionPickerTitle,
+              widget.title ?? AppZh.companionPickerTitle,
               style: SecondaryTypography.onCard.h15,
             ),
-            const SizedBox(height: 4),
-            Text(
-              AppZh.companionPickerHint,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+            if (!widget.returnSummaryOnly) ...[
+              const SizedBox(height: 4),
+              Text(
+                AppZh.companionPickerHint,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 10),
             TextField(
               controller: _controller,
