@@ -8,7 +8,7 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 | --- | --- | --- |
 | Lite APK | [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · App `0.6.6+77` | arm64-v8a, about 24 MB |
 | Offline APK | [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · App `0.6.6-offline+78` | Bundles the current dex pack, about 65 MB |
-| `main` source baseline | App `0.6.6+77` | Interactive batch: quiz scoping, shiny companion, intimacy quotes, crit/screen toggles, type icons |
+| `main` source baseline | App `0.6.6+77` | Retro sticker-feel toggle, quiz scoping, shiny companion, intimacy quotes, crit/screen toggles, type icons |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 

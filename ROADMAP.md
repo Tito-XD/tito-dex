@@ -8,7 +8,7 @@
 
 | Version | Summary |
 | --- | --- |
-| **v0.6.6** | Interactive batch: generation-scoped quiz, shiny companion with intimacy quotes, crit/screen damage toggles, linked team editing, and bundled type icons |
+| **v0.6.6** | Retro sticker-feel toggle, generation-scoped quiz, shiny companion with intimacy quotes, crit/screen damage toggles, linked team editing, and bundled type icons |
 | **v0.6.5** | Polish batch: save banner scoping, unified dex transitions, search history, settings game card, and Chinese flavor reference |
 | **v0.6.2.1** | Full-bleed adaptive launcher icon for system-defined icon shapes |
 | **v0.6.2** | Companion sizing and bundled starter animation/cry media |

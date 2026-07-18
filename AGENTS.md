@@ -8,7 +8,7 @@
 - **Removed:** the pre-Flutter React mock (`src/`) was deleted in the 0.6.5 cleanup; its releases stay on GitHub as historical artifacts
 - **Latest release:** v0.6.6 · Lite `0.6.6+77`; Offline `0.6.6-offline+78`
 - **Offline data:** Dex bundle v5 (1025 species, `/v3/`)
-- **Tests:** `cd flutter && flutter test` (193 passing)
+- **Tests:** `cd flutter && flutter test` (198 passing)
 
 ## Cloud VM
 
