@@ -12,6 +12,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
+import 'sticker_pressable.dart';
 
 /// Pick the standby companion from the full national dex. The selection is
 /// saved to [companionRepository]; only its animated sprite is fetched later,
@@ -33,10 +34,8 @@ Future<PokemonSummary?> showSpeciesPickerSheet(
   return showTitoModalBottomSheet<PokemonSummary>(
     context: context,
     isScrollControlled: true,
-    builder: (context) => _CompanionPickerSheet(
-      title: title,
-      returnSummaryOnly: true,
-    ),
+    builder: (context) =>
+        _CompanionPickerSheet(title: title, returnSummaryOnly: true),
   );
 }
 
@@ -57,19 +56,13 @@ Future<CompanionChoice?> adoptCompanion(
       return null; // Cancelled — keep the previous companion.
     }
   }
-  final choice = CompanionChoice(
-    pokemonId: summary.id,
-    nameZh: summary.nameZh,
-  );
+  final choice = CompanionChoice(pokemonId: summary.id, nameZh: summary.nameZh);
   await companionRepository.save(choice);
   return choice;
 }
 
 class _CompanionPickerSheet extends StatefulWidget {
-  const _CompanionPickerSheet({
-    this.title,
-    this.returnSummaryOnly = false,
-  });
+  const _CompanionPickerSheet({this.title, this.returnSummaryOnly = false});
 
   /// Optional title override (defaults to the companion picker copy).
   final String? title;
@@ -238,16 +231,12 @@ class _CompanionMediaLoadingDialogState
     await Future.wait([
       companionMediaCache.ensureGif(id).then((path) {
         _update(() {
-          _gif = path != null
-              ? _MediaLoadState.done
-              : _MediaLoadState.failed;
+          _gif = path != null ? _MediaLoadState.done : _MediaLoadState.failed;
         });
       }),
       companionMediaCache.ensureCry(id).then((path) {
         _update(() {
-          _cry = path != null
-              ? _MediaLoadState.done
-              : _MediaLoadState.failed;
+          _cry = path != null ? _MediaLoadState.done : _MediaLoadState.failed;
         });
       }),
     ]);
@@ -360,42 +349,46 @@ class _CompanionPickTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: TitoColors.cream,
+    return StickerPressable(
       borderRadius: BorderRadius.circular(TitoRadii.md),
-      child: InkWell(
-        onTap: onTap,
+      ownShadow: false,
+      child: Material(
+        color: TitoColors.cream,
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(
-              color: TitoColors.ink.withValues(alpha: 0.35),
-              width: 2,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              border: Border.all(
+                color: TitoColors.ink.withValues(alpha: 0.35),
+                width: 2,
+              ),
             ),
-          ),
-          padding: const EdgeInsets.all(6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: DexSpriteImage(
-                  source: summary.displaySpritePath,
-                  height: null,
-                  width: null,
+            padding: const EdgeInsets.all(6),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: DexSpriteImage(
+                    source: summary.displaySpritePath,
+                    height: null,
+                    width: null,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                summary.nameZh,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
+                const SizedBox(height: 4),
+                Text(
+                  summary.nameZh,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

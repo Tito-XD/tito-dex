@@ -24,6 +24,7 @@ import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
@@ -649,54 +650,61 @@ class _SearchResultRow extends StatelessWidget {
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            StickerCard(
-              variant: variant,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  DexSpriteImage(
-                    source: entry.displaySpritePath,
-                    height: 48,
-                    width: 48,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        TypeChipRow(
-                          types: entry.types.map(typeNameZh).toList(),
-                          typeKeys: entry.types,
-                        ),
-                      ],
+      child: StickerPressable(
+        borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+        ownShadow: false,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              StickerCard(
+                variant: variant,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: [
+                    DexSpriteImage(
+                      source: entry.displaySpritePath,
+                      height: 48,
+                      width: 48,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            if (status == DexEncounterStatus.caught)
-              const Positioned(
-                top: 6,
-                right: 6,
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: TitoColors.mint,
-                  size: 18,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
+                            style: SecondaryTypography.onCard.body14.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TypeChipRow(
+                            types: entry.types.map(typeNameZh).toList(),
+                            typeKeys: entry.types,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-          ],
+              if (status == DexEncounterStatus.caught)
+                const Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: TitoColors.mint,
+                    size: 18,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

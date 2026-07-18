@@ -9,6 +9,7 @@ import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
+import 'sticker_pressable.dart';
 import 'type_badge.dart';
 
 class PokemonMiniCard extends StatelessWidget {
@@ -42,70 +43,80 @@ class PokemonMiniCard extends StatelessWidget {
     return HandheldFocusDecorator(
       onActivate: activate,
       borderRadius: BorderRadius.circular(radius),
-      child: GestureDetector(
-        onTap: activate,
-        onLongPress: onLongPress,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            StickerCard(
-              variant: variant,
-              padding: EdgeInsets.fromLTRB(padding, padding, padding, padding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Flexible sprite area — absorbs any extra tile height so the
-                  // card always fills its grid cell without overflowing.
-                  Expanded(
-                    child: DexSpriteImage(
-                      source: summary.displaySpritePath,
-                      height: null,
-                      fit: BoxFit.contain,
+      child: StickerPressable(
+        borderRadius: BorderRadius.circular(radius),
+        // StickerCard below paints the retro shadow — sink physics only.
+        ownShadow: false,
+        child: GestureDetector(
+          onTap: activate,
+          onLongPress: onLongPress,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              StickerCard(
+                variant: variant,
+                padding: EdgeInsets.fromLTRB(
+                  padding,
+                  padding,
+                  padding,
+                  padding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Flexible sprite area — absorbs any extra tile height so the
+                    // card always fills its grid cell without overflowing.
+                    Expanded(
+                      child: DexSpriteImage(
+                        source: summary.displaySpritePath,
+                        height: null,
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: compact ? 2 : 4),
-                  Text(
-                    '#${summary.id.toString().padLeft(3, '0')}',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    style: TitoTypography.style(
-                      fontSize: compact ? 10 : 12,
-                      fontWeight: FontWeight.w700,
-                      color: TitoColors.mutedInk,
-                      height: 1.1,
+                    SizedBox(height: compact ? 2 : 4),
+                    Text(
+                      '#${summary.id.toString().padLeft(3, '0')}',
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      style: TitoTypography.style(
+                        fontSize: compact ? 10 : 12,
+                        fontWeight: FontWeight.w700,
+                        color: TitoColors.mutedInk,
+                        height: 1.1,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    summary.nameZh,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TitoTypography.style(
-                      fontSize: compact ? 12 : 14,
-                      fontWeight: FontWeight.w800,
-                      height: 1.2,
+                    const SizedBox(height: 1),
+                    Text(
+                      summary.nameZh,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TitoTypography.style(
+                        fontSize: compact ? 12 : 14,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: compact ? 3 : 4),
-                  TitoTypeBadgeRow(
-                    typesEn: summary.types,
-                    size: TypeBadgeSize.small,
-                  ),
-                ],
-              ),
-            ),
-            if (status == DexEncounterStatus.caught)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: TitoColors.mint,
-                  size: checkSize,
+                    SizedBox(height: compact ? 3 : 4),
+                    TitoTypeBadgeRow(
+                      typesEn: summary.types,
+                      size: TypeBadgeSize.small,
+                    ),
+                  ],
                 ),
               ),
-          ],
+              if (status == DexEncounterStatus.caught)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: TitoColors.mint,
+                    size: checkSize,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -127,10 +138,7 @@ class TypeChipRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (types.isEmpty) {
-      return Text(
-        AppZh.dexNone,
-        style: context.tito.cardMuted,
-      );
+      return Text(AppZh.dexNone, style: context.tito.cardMuted);
     }
 
     return Wrap(
@@ -155,10 +163,7 @@ class TypeChipRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: TitoColors.ink, width: 2),
           ),
-          child: Text(
-            types[index],
-            style: context.tito.chip,
-          ),
+          child: Text(types[index], style: context.tito.chip),
         );
       }),
     );
@@ -198,10 +203,7 @@ class EvolutionChainView extends StatelessWidget {
 
   List<Widget> _buildNodes(BuildContext context, EvolutionNode node) {
     final widgets = <Widget>[
-      _EvolutionCard(
-        node: node,
-        highlighted: node.id == highlightId,
-      ),
+      _EvolutionCard(node: node, highlighted: node.id == highlightId),
     ];
 
     for (final child in node.children) {
@@ -219,10 +221,7 @@ class EvolutionChainView extends StatelessWidget {
 }
 
 class _EvolutionCard extends StatelessWidget {
-  const _EvolutionCard({
-    required this.node,
-    required this.highlighted,
-  });
+  const _EvolutionCard({required this.node, required this.highlighted});
 
   final EvolutionNode node;
   final bool highlighted;
@@ -317,7 +316,10 @@ class EvolutionChainVerticalView extends StatelessWidget {
               if (i > 0) ...[
                 const Padding(
                   padding: EdgeInsets.only(top: 40),
-                  child: Icon(Icons.arrow_forward_rounded, color: TitoColors.ink),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: TitoColors.ink,
+                  ),
                 ),
                 const SizedBox(width: 6),
               ],

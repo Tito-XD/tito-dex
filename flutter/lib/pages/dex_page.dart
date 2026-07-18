@@ -26,6 +26,7 @@ import '../widgets/dex_filter_banner.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_animated_size_switcher.dart';
@@ -860,31 +861,36 @@ class _DexTopBarAction extends StatelessWidget {
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          child: Container(
-            height: _height,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(color: TitoColors.card, width: 2),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: TitoColors.card, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  label,
-                  style: SecondaryTypography.onGradient.small12.copyWith(
-                    color: TitoColors.card,
-                    fontWeight: FontWeight.w800,
+      child: StickerPressable(
+        borderRadius: radius,
+        // Outline pill on the gradient header — sink physics only.
+        ownShadow: false,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Container(
+              height: _height,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(color: TitoColors.card, width: 2),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, color: TitoColors.card, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    label,
+                    style: SecondaryTypography.onGradient.small12.copyWith(
+                      color: TitoColors.card,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

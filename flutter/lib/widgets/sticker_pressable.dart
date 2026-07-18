@@ -16,6 +16,7 @@ class StickerPressable extends StatefulWidget {
     required this.borderRadius,
     required this.child,
     this.interactive = true,
+    this.ownShadow = true,
   });
 
   final BorderRadius borderRadius;
@@ -23,6 +24,11 @@ class StickerPressable extends StatefulWidget {
 
   /// When false only the static shadow applies (display-only stickers).
   final bool interactive;
+
+  /// When false the wrapper draws no shadow of its own and only provides
+  /// the press-sink physics — for children (e.g. [StickerCard]) that already
+  /// paint the retro shadow themselves, so it isn't doubled.
+  final bool ownShadow;
 
   @override
   State<StickerPressable> createState() => _StickerPressableState();
@@ -50,7 +56,7 @@ class _StickerPressableState extends State<StickerPressable> {
           transform: Matrix4.translationValues(0, sunk ? 3 : 0, 0),
           decoration: BoxDecoration(
             borderRadius: widget.borderRadius,
-            boxShadow: !retro
+            boxShadow: !retro || !widget.ownShadow
                 ? null
                 : sunk
                 ? TitoShadows.stickerPressed
