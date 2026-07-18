@@ -19,6 +19,7 @@ import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
 import '../widgets/tito_animated_size_switcher.dart';
@@ -610,7 +611,10 @@ class _DetailBottomTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // v0.6.7 sticker tabs (detail template): four mini sticker cards,
+    // active one goes coral; the press sinks like every other sticker.
     return Container(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       decoration: const BoxDecoration(
         color: TitoColors.card,
         border: Border(top: BorderSide(color: TitoColors.ink, width: 2)),
@@ -620,20 +624,41 @@ class _DetailBottomTabs extends StatelessWidget {
         child: Row(
           children: List.generate(_labels.length, (index) {
             final selected = index == currentIndex;
+            final radius = BorderRadius.circular(TitoRadii.sm);
             return Expanded(
-              child: HandheldFocusDecorator(
-                onActivate: () => onSelected(index),
-                child: Material(
-                  color: selected ? TitoColors.softYellow : Colors.transparent,
-                  child: InkWell(
-                    onTap: () => onSelected(index),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        _labels[index],
-                        textAlign: TextAlign.center,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          fontWeight: FontWeight.w800,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: index == _labels.length - 1 ? 0 : 8,
+                ),
+                child: HandheldFocusDecorator(
+                  onActivate: () => onSelected(index),
+                  child: StickerPressable(
+                    borderRadius: radius,
+                    child: Material(
+                      color: selected ? TitoColors.coral : TitoColors.card,
+                      borderRadius: radius,
+                      child: InkWell(
+                        borderRadius: radius,
+                        onTap: () => onSelected(index),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: radius,
+                            border: Border.all(
+                              color: TitoColors.ink,
+                              width: TitoBorders.element,
+                            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
+                          child: Text(
+                            _labels[index],
+                            textAlign: TextAlign.center,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: selected
+                                  ? const Color(0xFF4A1B0C)
+                                  : TitoColors.mutedInk,
+                            ),
+                          ),
                         ),
                       ),
                     ),

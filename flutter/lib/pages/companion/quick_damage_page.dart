@@ -484,11 +484,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   onChanged: (_) => setState(() {}),
                 ),
                 const SizedBox(height: 12),
-                CompanionNumberField(
-                  label: AppZh.companionMovePower,
+                _PowerSliderRow(
                   controller: _powerController,
-                  max: 250,
-                  onChanged: (_) => setState(() {}),
+                  onChanged: () => setState(() {}),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -527,81 +525,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             ),
             if (estimate != null) ...[
               const SizedBox(height: 12),
-              StickerCard(
-                variant: StickerVariant.mint,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppZh.companionDamageResultTitle,
-                      style: SecondaryTypography.onCard.h15,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppZh.companionDamageRange(
-                        estimate.minDamage,
-                        estimate.maxDamage,
-                      ),
-                      style: SecondaryTypography.onCard.h15.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppZh.companionDamagePercent(
-                        estimate.minPercent,
-                        estimate.maxPercent,
-                      ),
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${AppZh.companionDamageOffense}：${estimate.verdictZh}',
-                      style: SecondaryTypography.onCard.body14,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
-                      style: SecondaryTypography.onCard.body14,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppZh.companionDamageModifiers(
-                        formatTypeMultiplier(estimate.typeMultiplier),
-                        estimate.stabMultiplier == 1.0
-                            ? '1'
-                            : estimate.stabMultiplier.toStringAsFixed(1),
-                      ),
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    if (estimate.extraMultiplier != 1) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        AppZh.companionDamageExtra(
-                          estimate.extraMultiplier.toStringAsFixed(2),
-                        ),
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 8),
-                    Text(
-                      AppZh.companionDamageAssumptions,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _DamageResultCard(estimate: estimate),
             ],
           ],
               ],
@@ -609,6 +533,205 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Move-power slider row (battle template): label + live value over a
+/// coral-filled rail. The text controller stays the source of truth so the
+/// estimate pipeline is unchanged.
+class _PowerSliderRow extends StatelessWidget {
+  const _PowerSliderRow({required this.controller, required this.onChanged});
+
+  final TextEditingController controller;
+  final VoidCallback onChanged;
+
+  static const _min = 10.0;
+  static const _max = 250.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = (int.tryParse(controller.text.trim()) ?? 80)
+        .clamp(_min.toInt(), _max.toInt())
+        .toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              AppZh.companionMovePower,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              current.round().toString(),
+              style: SecondaryTypography.onCard.meta14.copyWith(
+                color: TitoColors.deepBlue,
+              ),
+            ),
+          ],
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: TitoColors.coral,
+            inactiveTrackColor: TitoColors.cardWarm,
+            thumbColor: TitoColors.card,
+            overlayColor: TitoColors.coral.withValues(alpha: 0.15),
+            trackHeight: 8,
+            thumbShape: const RoundSliderThumbShape(
+              enabledThumbRadius: 11,
+              elevation: 0,
+              pressedElevation: 0,
+            ),
+          ),
+          child: Slider(
+            value: current,
+            min: _min,
+            max: _max,
+            divisions: (_max - _min).toInt(),
+            onChanged: (value) {
+              controller.text = value.round().toString();
+              onChanged();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Result card (battle template): the single accent focus of the page —
+/// deep-blue card, oversized soft-yellow percentage, and an HP bar split
+/// into mint-safe / coral-damage segments.
+class _DamageResultCard extends StatelessWidget {
+  const _DamageResultCard({required this.estimate});
+
+  final DamageEstimate estimate;
+
+  @override
+  Widget build(BuildContext context) {
+    final minPct = estimate.minPercent;
+    final maxPct = estimate.maxPercent;
+    final bigPercent = (maxPct - minPct) < 0.5
+        ? '${maxPct.round()}%'
+        : '${minPct.round()}–${maxPct.round()}%';
+    final damageFraction = (maxPct / 100).clamp(0.0, 1.0);
+
+    return StickerCard(
+      variant: StickerVariant.deep,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.companionDamageResultTitle,
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              fontWeight: FontWeight.w800,
+              color: TitoColors.skyBlue,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                bigPercent,
+                style: SecondaryTypography.onGradient.h15.copyWith(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 34 * -0.03,
+                  color: TitoColors.softYellow,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '${estimate.minDamage} – ${estimate.maxDamage} · '
+                  '${estimate.verdictZh}',
+                  style: SecondaryTypography.onGradient.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: TitoColors.skyBlue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              return Container(
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: TitoColors.ink, width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: width * (1 - damageFraction),
+                      child: const ColoredBox(color: TitoColors.mint),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: width * damageFraction,
+                      child: const ColoredBox(color: TitoColors.coral),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
+            style: SecondaryTypography.onGradient.body14,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            AppZh.companionDamageModifiers(
+              formatTypeMultiplier(estimate.typeMultiplier),
+              estimate.stabMultiplier == 1.0
+                  ? '1'
+                  : estimate.stabMultiplier.toStringAsFixed(1),
+            ),
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              color: TitoColors.skyBlue,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (estimate.extraMultiplier != 1) ...[
+            const SizedBox(height: 4),
+            Text(
+              AppZh.companionDamageExtra(
+                estimate.extraMultiplier.toStringAsFixed(2),
+              ),
+              style: SecondaryTypography.onGradient.small12.copyWith(
+                color: TitoColors.skyBlue,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(
+            AppZh.companionDamageAssumptions,
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              color: TitoColors.skyBlue,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
