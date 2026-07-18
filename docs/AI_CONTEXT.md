@@ -62,7 +62,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
-- v0.6.6: generation-scoped silhouette quiz with persisted best streak + adopt-as-companion, shiny companion sessions (Showdown shiny GIFs, disk-cached) with intimacy quote tiers / time-of-day greetings / pat-count persistence, crit + screen toggles and an assumptions note in quick damage, species-linked team editing, bundled official-style type icons, matched transition backdrop, repository cleanup.
+- v0.6.6: Retro sticker-feel toggle (Settings → 界面风格, default on — TitoShadows solid drops, StickerPressable press physics, -0.02em headings), generation-scoped silhouette quiz with persisted best streak + adopt-as-companion, shiny companion sessions (Showdown shiny GIFs, disk-cached) with intimacy quote tiers / time-of-day greetings / pat-count persistence, crit + screen toggles and an assumptions note in quick damage, full-dex team picker with species-linked editing, bundled official-style type icons, drill-down back-hierarchy fixes, toggleable list reveal animations, shiny artwork preview, branded Android 12+ splash, matched transition backdrop, repository cleanup.
 - v0.6.5: save-diff banner scoping + dismissal, unified dex transition backdrop and timing (480/380 ms), submit-only recent searches (max 10), prominent current-game card in Settings, matchup grid overflow fix, companion size floor ×0.75, Chinese reference note for untranslated flavor text.
 - v0.6.2.1: full-bleed launcher artwork lets Android adaptive-icon masks define the circle, squircle, rounded-square, or square silhouette.
 - v0.6.2: companion size control, bundled starter GIF/cry media, and cancellable preload for other companions.
@@ -134,7 +134,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; 193 tests
+flutter test                    # regression gate; 198 tests
 flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
