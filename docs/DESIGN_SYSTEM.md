@@ -53,7 +53,9 @@ Color usage:
 - sticker-like offsets
 - badge pills
 - panel seams like a small handheld device
-- soft shadows, not heavy Material elevation
+- **solid offset sticker shadows are the signature** — a hard `0 5px 0` drop
+  with no blur (never Material's soft elevation). Paired with press-down
+  physics it reads as a physical handheld key.
 
 Suggested tokens:
 
@@ -69,6 +71,21 @@ Suggested tokens:
   --shadow-soft: 0 12px 32px rgba(24, 40, 59, 0.14);
 }
 ```
+
+### Retro sticker feel (Flutter implementation)
+
+Settings → 界面风格 → **Retro 贴纸手感** (default on) drives the whole
+package through `retroStyle`:
+
+- `TitoShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
+  (0/3px) on chips/sprites/bubbles, `.stickerPressed` (0/1px) while held.
+- `StickerPressable` wraps interactive stickers: touch-down sinks the
+  sticker 3px in ~80ms and squashes the shadow; release springs back.
+  `ownShadow: false` gives sink-only physics when the inner `StickerCard`
+  already paints the drop, so shadows never double.
+- Headings tighten to `letter-spacing: -0.02em` (applies in both modes).
+- Toggle off = pure flat stickers; every shadow and press effect gates on
+  `retroStyle.enabled` and switches live.
 
 ## Typography
 
