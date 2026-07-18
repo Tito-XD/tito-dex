@@ -18,6 +18,7 @@ import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
+import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_loading_panel.dart';
 
 /// "Who's that Pokémon" — silhouette quiz over the current dex scope,
@@ -153,9 +154,9 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
     }
     final choice = await adoptCompanion(context, question.answer);
     if (choice != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.quizAdopted(choice.nameZh))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppZh.quizAdopted(choice.nameZh))));
     }
   }
 
@@ -371,25 +372,29 @@ class _ChoiceButton extends StatelessWidget {
       _ChoiceState.idle => TitoColors.card,
     };
 
-    return Material(
-      color: background,
+    return StickerPressable(
       borderRadius: BorderRadius.circular(TitoRadii.md),
-      child: InkWell(
-        onTap: onTap,
+      interactive: onTap != null,
+      child: Material(
+        color: background,
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        child: Container(
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: 2),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w800,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              border: Border.all(color: TitoColors.ink, width: 2),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: SecondaryTypography.onCard.body14.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ),

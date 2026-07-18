@@ -10,6 +10,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
 
 class CompanionToolsPanel extends StatelessWidget {
   const CompanionToolsPanel({super.key, required this.journey});
@@ -68,7 +69,9 @@ class CompanionToolsPanel extends StatelessWidget {
               _CompanionToolTile(
                 icon: Icons.flash_on_rounded,
                 title: AppZh.companionToolQuickDamage,
-                subtitle: AppZh.companionToolQuickDamageHint(scope.facilityLabel),
+                subtitle: AppZh.companionToolQuickDamageHint(
+                  scope.facilityLabel,
+                ),
                 onTap: () => context.push('/search/companion/quick-damage'),
               ),
             ],
@@ -97,47 +100,50 @@ class _CompanionToolTile extends StatelessWidget {
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(12),
-      child: Material(
-        color: TitoColors.card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: TitoColors.ink, width: 2),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Icon(icon, color: TitoColors.deepBlue, size: 22),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
+      child: StickerPressable(
+        borderRadius: BorderRadius.circular(12),
+        child: Material(
+          color: TitoColors.card,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: TitoColors.ink, width: 2),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(icon, color: TitoColors.deepBlue, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            color: TitoColors.mutedInk,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  color: TitoColors.mutedInk,
-                ),
-              ],
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: TitoColors.mutedInk,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

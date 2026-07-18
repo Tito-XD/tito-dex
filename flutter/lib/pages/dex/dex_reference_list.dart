@@ -12,6 +12,7 @@ import '../../widgets/dex_reference_detail.dart';
 import '../../widgets/handheld_input.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
+import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_list_reveal.dart';
 import '../../widgets/tito_loading_panel.dart';
 import '../../widgets/type_badge.dart';
@@ -161,43 +162,51 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   borderRadius: BorderRadius.circular(
                     DeviceLayout.rMd(context),
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => widget.detailSheet(context, entry),
-                      borderRadius: BorderRadius.circular(
-                        DeviceLayout.rMd(context),
-                      ),
-                      child: StickerCard(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
+                  child: StickerPressable(
+                    borderRadius: BorderRadius.circular(
+                      DeviceLayout.rMd(context),
+                    ),
+                    ownShadow: false,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => widget.detailSheet(context, entry),
+                        borderRadius: BorderRadius.circular(
+                          DeviceLayout.rMd(context),
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.primaryLabel(entry),
-                                    style: SecondaryTypography.onCard.body14
-                                        .copyWith(fontWeight: FontWeight.w800),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    widget.secondaryLabel(entry),
-                                    style: SecondaryTypography.onCard.small12
-                                        .copyWith(color: TitoColors.mutedInk),
-                                  ),
-                                ],
+                        child: StickerCard(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.primaryLabel(entry),
+                                      style: SecondaryTypography.onCard.body14
+                                          .copyWith(
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      widget.secondaryLabel(entry),
+                                      style: SecondaryTypography.onCard.small12
+                                          .copyWith(color: TitoColors.mutedInk),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const Icon(
-                              Icons.chevron_right_rounded,
-                              color: TitoColors.mutedInk,
-                            ),
-                          ],
+                              const Icon(
+                                Icons.chevron_right_rounded,
+                                color: TitoColors.mutedInk,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
