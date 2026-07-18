@@ -63,8 +63,11 @@ if [[ -n "$unexpected_runtime_libs" ]]; then
   echo "$unexpected_runtime_libs" >&2
   exit 1
 fi
+# Note: feed $listing to awk via herestrings, never `echo | awk` — awk's
+# early exit closes the pipe mid-write and pipefail turns the resulting
+# EPIPE on echo into a spurious "missing" failure.
 for lib in "${required[@]}"; do
-  lib_size=$(echo "$listing" | awk -v n="$lib" '$4==n {print $1; exit}')
+  lib_size=$(awk -v n="$lib" '$4==n {print $1; exit}' <<<"$listing")
   if [[ -z "$lib_size" ]]; then
     echo "ERROR: missing $lib" >&2
     exit 1
@@ -73,7 +76,7 @@ for lib in "${required[@]}"; do
 done
 
 # libflutter.so should be ~11 MB; libapp.so ~7–8 MB
-flutter_size=$(echo "$listing" | awk '$4=="lib/arm64-v8a/libflutter.so" {print $1; exit}')
+flutter_size=$(awk '$4=="lib/arm64-v8a/libflutter.so" {print $1; exit}' <<<"$listing")
 if (( flutter_size < 10000000 )); then
   echo "ERROR: libflutter.so too small ($flutter_size) — incomplete engine." >&2
   exit 1
@@ -84,7 +87,7 @@ for asset in \
   assets/flutter_assets/assets/fixtures/PKMSS.sav \
   assets/flutter_assets/assets/fonts/Nunito-Regular.ttf \
   assets/flutter_assets/AssetManifest.bin; do
-  if ! echo "$listing" | awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}'; then
+  if ! awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}' <<<"$listing"; then
     echo "ERROR: missing $asset" >&2
     exit 1
   fi
@@ -96,7 +99,7 @@ if "$offline"; then
   for asset in \
     assets/flutter_assets/assets/dex/bundle-manifest.json \
     assets/flutter_assets/assets/dex/bundle.tar.zst; do
-    if ! echo "$listing" | awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}'; then
+    if ! awk -v n="$asset" '$4==n {found=1; exit} END{exit !found}' <<<"$listing"; then
       echo "ERROR: missing $asset" >&2
       exit 1
     fi
