@@ -47,58 +47,104 @@ class PokemonDetailHeader extends StatelessWidget {
     ].join(' · ');
 
     if (compact) {
+      // v0.6.7 hero: type-tinted sprite plate on the left, oversized tight
+      // name, EN · genus subtitle, type pills (detail template).
+      final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
+      final accent = typeTileColor(primaryType);
+      final plateSize = square ? 84.0 : 92.0;
       return StickerCard(
         variant: StickerVariant.deep,
         padding: EdgeInsets.symmetric(
           horizontal: square ? 10 : 12,
           vertical: square ? 8 : 10,
         ),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dexLabel,
-                    style: SecondaryTypography.onGradient.small12.copyWith(
-                      color: TitoColors.skyBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    summary.nameZh,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onGradient.h15.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  if (detail.genusZh.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      detail.genusZh,
-                      style: SecondaryTypography.onGradient.small12,
-                    ),
-                  ],
-                  const SizedBox(height: 6),
-                  TypeChipRow(
-                    types: summary.types.map(typeNameZh).toList(),
-                    typeKeys: summary.types,
-                    tone: TypeChipTone.neutral,
-                  ),
-                ],
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                dexLabel,
+                style: SecondaryTypography.onGradient.small12.copyWith(
+                  color: TitoColors.skyBlue,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () => showPokemonArtworkViewer(context, summary: summary),
-              child: DexSpriteImage(
-                source: summary.displaySpritePath,
-                width: square ? 56 : 64,
-                height: square ? 56 : 64,
-              ),
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () =>
+                      showPokemonArtworkViewer(context, summary: summary),
+                  child: Container(
+                    width: plateSize,
+                    height: plateSize,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: const Alignment(-0.6, -0.8),
+                        end: const Alignment(0.6, 0.8),
+                        colors: [
+                          Color.lerp(accent, Colors.white, 0.35)!,
+                          accent,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(TitoRadii.sm),
+                      border: Border.all(
+                        color: TitoColors.ink,
+                        width: TitoBorders.element,
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Center(
+                      child: DexSpriteImage(
+                        source: summary.displaySpritePath,
+                        width: plateSize - 14,
+                        height: plateSize - 14,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        summary.nameZh,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onGradient.h15.copyWith(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 26 * -0.03,
+                          height: 1.05,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        [
+                          summary.nameEn,
+                          if (detail.genusZh.isNotEmpty) detail.genusZh,
+                        ].join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onGradient.small12.copyWith(
+                          color: TitoColors.skyBlue,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TypeChipRow(
+                        types: summary.types.map(typeNameZh).toList(),
+                        typeKeys: summary.types,
+                        tone: TypeChipTone.neutral,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

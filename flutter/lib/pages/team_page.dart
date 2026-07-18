@@ -16,6 +16,7 @@ import '../theme/tito_font_scale.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
+import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/team_summary_card.dart';
@@ -185,14 +186,14 @@ class _TeamPageState extends State<TeamPage> {
                       controller: levelController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: const InputDecoration(
+                      decoration: retroInsetDecoration(
                         labelText: AppZh.teamEditLevel,
                       ),
                     ),
                     const SizedBox(height: 8),
                     TextField(
                       controller: nicknameController,
-                      decoration: const InputDecoration(
+                      decoration: retroInsetDecoration(
                         labelText: AppZh.teamEditNickname,
                       ),
                     ),

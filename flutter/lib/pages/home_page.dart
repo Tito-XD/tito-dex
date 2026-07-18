@@ -8,6 +8,7 @@ import '../navigation/tito_page_transition.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
+import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_standby.dart';
 import '../widgets/home_dashboard_body.dart';
@@ -94,6 +95,7 @@ class _QuickActionsRow extends StatelessWidget {
                   compact: true,
                   dense: true,
                   square: true,
+                  iconPlateColor: actions[index].plateColor,
                 ),
               ),
             ),
@@ -154,4 +156,11 @@ class _QuickAction {
   final String route;
   final String? heroTag;
   final TitoPolaroidTone tone;
+
+  /// Accent plate behind the quick-tile icon (v0.6.7 sticker language).
+  Color get plateColor => switch (tone) {
+    TitoPolaroidTone.coral => TitoColors.coral,
+    TitoPolaroidTone.mint => TitoColors.mint,
+    _ => TitoColors.skyBlue,
+  };
 }
