@@ -41,7 +41,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.6.6)
 
-> `main` matches the v0.6.6 release line. The offline package adds only the bundled dex seed and offline package version.
+> `main` = v0.6.6 plus unreleased work: Retro press physics extended across interactive stickers (dex grid cards, search/reference/team rows, journey card, quiz choices, top-bar pills, picker tiles, battle tool rows — `StickerPressable.ownShadow` avoids doubled shadows). The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
