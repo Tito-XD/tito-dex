@@ -6,9 +6,9 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · App `0.6.6+77` | arm64-v8a, about 24 MB |
-| Offline APK | [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · App `0.6.6-offline+78` | Bundles the current dex pack, about 65 MB |
-| `main` source baseline | App `0.6.6+77` | Retro sticker-feel toggle, quiz scoping, shiny companion, intimacy quotes, crit/screen toggles, type icons |
+| Lite APK | [v0.6.6.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6.1) · App `0.6.6.1+79` | arm64-v8a, about 24 MB |
+| Offline APK | [v0.6.6.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6.1) · App `0.6.6.1-offline+80` | Bundles the current dex pack, about 65 MB |
+| `main` source baseline | App `0.6.6+77` | Retro sticker feel with app-wide press physics, quiz scoping, shiny companion, intimacy quotes, type icons |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
@@ -49,7 +49,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.6.6-lite-rg-arm64.apk`** or **`TitoDex-0.6.6-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.6.6.1-lite-rg-arm64.apk`** or **`TitoDex-0.6.6.1-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

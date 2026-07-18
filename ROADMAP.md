@@ -1,6 +1,6 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6) · Lite `0.6.6+77` · Offline `0.6.6-offline+78`.
+> **Latest release:** [v0.6.6.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.6.1) · Lite `0.6.6.1+79` · Offline `0.6.6.1-offline+80`.
 >
 > **Current `main` source baseline:** `0.6.6+77`.
 
@@ -8,6 +8,7 @@
 
 | Version | Summary |
 | --- | --- |
+| **v0.6.6.1** | Retro press physics extended to every interactive sticker across the app |
 | **v0.6.6** | Retro sticker-feel toggle, generation-scoped quiz, shiny companion with intimacy quotes, crit/screen damage toggles, linked team editing, and bundled type icons |
 | **v0.6.5** | Polish batch: save banner scoping, unified dex transitions, search history, settings game card, and Chinese flavor reference |
 | **v0.6.2.1** | Full-bleed adaptive launcher icon for system-defined icon shapes |
