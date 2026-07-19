@@ -19,6 +19,8 @@ import '../widgets/party_team_list.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/sticker_pressable.dart';
+import '../widgets/tito_sprite_sticker.dart';
 import '../widgets/team_summary_card.dart';
 
 class TeamPage extends StatefulWidget {
@@ -124,193 +126,53 @@ class _TeamPageState extends State<TeamPage> {
     );
   }
 
-  Future<void> _editMember(int index) async {
+  /// v0.6.7: the member editor expands inline at the tapped slot (team
+  /// template) instead of a modal bottom sheet — context stays visible.
+  int? _editingIndex;
+
+  void _toggleEditor(int index) {
+    setState(() => _editingIndex = _editingIndex == index ? null : index);
+  }
+
+  void _handleEditorSave(
+    int index, {
+    required int? level,
+    required String nickname,
+    required List<String> types,
+    required String? abilitySlug,
+  }) {
     final member = _party[index];
-    final levelController = TextEditingController(
-      text: member.level?.toString() ?? '',
-    );
-    final nicknameController = TextEditingController(
-      text: member.nickname ?? '',
-    );
-    var selectedTypes = List<String>.from(
-      member.types.isNotEmpty ? member.types : const <String>[],
-    );
-    String? selectedAbility = member.abilitySlug;
-    List<PokemonAbility> abilities = const [];
-    var speciesLinked = false;
-    if (member.speciesId != null) {
-      try {
-        final summary = await dexRepository.getSummary(member.speciesId!);
-        if (selectedTypes.isEmpty) {
-          selectedTypes = List<String>.from(summary.types);
-        }
-        speciesLinked = true;
-        abilities = await dexRepository.abilitiesForPokemon(member.speciesId!);
-        selectedAbility ??= defaultAbilitySlugForOptions(
-          defensiveAbilityOptionsFrom(abilities),
-        );
-      } catch (_) {
-        // Keep manual edits when dex data is unavailable.
-      }
-    }
-    if (!mounted) {
-      return;
-    }
-
-    final abilityOptions = defensiveAbilityOptionsFrom(abilities);
-    final editResult = await showModalBottomSheet<_TeamEditResult>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 8,
-                bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      AppZh.teamEditTitle,
-                      style: SecondaryTypography.onCard.h15,
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: levelController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: retroInsetDecoration(
-                        labelText: AppZh.teamEditLevel,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: nicknameController,
-                      decoration: retroInsetDecoration(
-                        labelText: AppZh.teamEditNickname,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Same rule as the battle tools: a species-linked member
-                    // keeps its own types; only fully manual members pick
-                    // from the full grid.
-                    if (speciesLinked)
-                      LinkedPokemonTypesRow(types: selectedTypes)
-                    else
-                      TypeChipPicker(
-                        label: AppZh.teamEditTypes,
-                        selected: selectedTypes,
-                        onChanged: (types) =>
-                            setSheetState(() => selectedTypes = types),
-                      ),
-                    if (abilityOptions.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      AbilityChipPicker(
-                        label: AppZh.teamEditAbility,
-                        selectedSlug: selectedAbility,
-                        options: abilityOptions,
-                        onChanged: (slug) =>
-                            setSheetState(() => selectedAbility = slug),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        if (index > 0)
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(
-                                context,
-                                _TeamEditResult.swapPrev,
-                              ),
-                              child: const Text(AppZh.teamEditSwapPrev),
-                            ),
-                          ),
-                        if (index > 0 && index < _party.length - 1)
-                          const SizedBox(width: 8),
-                        if (index < _party.length - 1)
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(
-                                context,
-                                _TeamEditResult.swapNext,
-                              ),
-                              child: const Text(AppZh.teamEditSwapNext),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, _TeamEditResult.delete),
-                      child: const Text(AppZh.teamEditDelete),
-                    ),
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      onPressed: () =>
-                          Navigator.pop(context, _TeamEditResult.save),
-                      child: const Text(AppZh.confirm),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-
-    final level = int.tryParse(levelController.text.trim());
-    final nickname = nicknameController.text.trim();
-    levelController.dispose();
-    nicknameController.dispose();
-
-    if (!mounted || editResult == null) {
-      return;
-    }
-
-    if (editResult == _TeamEditResult.delete) {
-      final updated = List<PartyMember>.from(_party)..removeAt(index);
-      _saveParty(updated);
-      return;
-    }
-
-    if (editResult == _TeamEditResult.swapPrev && index > 0) {
-      final updated = List<PartyMember>.from(_party);
-      final temp = updated[index - 1];
-      updated[index - 1] = updated[index];
-      updated[index] = temp;
-      _saveParty(updated);
-      return;
-    }
-
-    if (editResult == _TeamEditResult.swapNext && index < _party.length - 1) {
-      final updated = List<PartyMember>.from(_party);
-      final temp = updated[index + 1];
-      updated[index + 1] = updated[index];
-      updated[index] = temp;
-      _saveParty(updated);
-      return;
-    }
-
     final updated = List<PartyMember>.from(_party);
     updated[index] = member.copyWith(
       level: level,
       nickname: nickname.isEmpty ? null : nickname,
-      types: selectedTypes,
-      abilitySlug: selectedAbility,
+      types: types,
+      abilitySlug: abilitySlug,
       userEdited: true,
       clearNickname: nickname.isEmpty,
-      clearAbilitySlug: selectedAbility == null,
+      clearAbilitySlug: abilitySlug == null,
     );
+    _editingIndex = null;
+    _saveParty(updated);
+  }
+
+  void _handleEditorDelete(int index) {
+    final updated = List<PartyMember>.from(_party)..removeAt(index);
+    _editingIndex = null;
+    _saveParty(updated);
+  }
+
+  void _handleEditorSwap(int index, int delta) {
+    final target = index + delta;
+    if (target < 0 || target >= _party.length) {
+      return;
+    }
+    final updated = List<PartyMember>.from(_party);
+    final temp = updated[target];
+    updated[target] = updated[index];
+    updated[index] = temp;
+    // Keep the editor open on the moved member so repeat swaps are easy.
+    _editingIndex = target;
     _saveParty(updated);
   }
 
@@ -423,8 +285,20 @@ class _TeamPageState extends State<TeamPage> {
           PartyTeamList(
             party: _party,
             showEmptySlots: true,
-            onMemberTap: _editMember,
+            onMemberTap: _toggleEditor,
             onEmptySlotTap: _party.length < 6 ? _addMember : null,
+            expandedIndex: _editingIndex,
+            editorBuilder: (context, index) => _InlineTeamEditor(
+              key: ValueKey('team-editor-$index'),
+              member: _party[index],
+              index: index,
+              canSwapPrev: index > 0,
+              canSwapNext: index < _party.length - 1,
+              onSave: _handleEditorSave,
+              onDelete: _handleEditorDelete,
+              onSwap: _handleEditorSwap,
+              onClose: () => setState(() => _editingIndex = null),
+            ),
           ),
           const SizedBox(height: 14),
           StickerCard(
@@ -442,4 +316,285 @@ class _TeamPageState extends State<TeamPage> {
   }
 }
 
-enum _TeamEditResult { save, delete, swapPrev, swapNext }
+/// Inline member editor (team template): expands in place of the tapped
+/// slot. Two-column name/level fields, linked-or-manual types, ability
+/// chips, and sticker action buttons (swap warm / delete warn / save coral).
+class _InlineTeamEditor extends StatefulWidget {
+  const _InlineTeamEditor({
+    super.key,
+    required this.member,
+    required this.index,
+    required this.canSwapPrev,
+    required this.canSwapNext,
+    required this.onSave,
+    required this.onDelete,
+    required this.onSwap,
+    required this.onClose,
+  });
+
+  final PartyMember member;
+  final int index;
+  final bool canSwapPrev;
+  final bool canSwapNext;
+  final void Function(
+    int index, {
+    required int? level,
+    required String nickname,
+    required List<String> types,
+    required String? abilitySlug,
+  })
+  onSave;
+  final ValueChanged<int> onDelete;
+  final void Function(int index, int delta) onSwap;
+  final VoidCallback onClose;
+
+  @override
+  State<_InlineTeamEditor> createState() => _InlineTeamEditorState();
+}
+
+class _InlineTeamEditorState extends State<_InlineTeamEditor> {
+  late final TextEditingController _levelController;
+  late final TextEditingController _nicknameController;
+  late List<String> _selectedTypes;
+  String? _selectedAbility;
+  List<PokemonAbility> _abilities = const [];
+  var _speciesLinked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _levelController = TextEditingController(
+      text: widget.member.level?.toString() ?? '',
+    );
+    _nicknameController = TextEditingController(
+      text: widget.member.nickname ?? '',
+    );
+    _selectedTypes = List<String>.from(widget.member.types);
+    _selectedAbility = widget.member.abilitySlug;
+    _loadDexData();
+  }
+
+  Future<void> _loadDexData() async {
+    final speciesId = widget.member.speciesId;
+    if (speciesId == null) {
+      return;
+    }
+    try {
+      final summary = await dexRepository.getSummary(speciesId);
+      final abilities = await dexRepository.abilitiesForPokemon(speciesId);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        if (_selectedTypes.isEmpty) {
+          _selectedTypes = List<String>.from(summary.types);
+        }
+        _speciesLinked = true;
+        _abilities = abilities;
+        _selectedAbility ??= defaultAbilitySlugForOptions(
+          defensiveAbilityOptionsFrom(abilities),
+        );
+      });
+    } catch (_) {
+      // Keep manual edits when dex data is unavailable.
+    }
+  }
+
+  @override
+  void dispose() {
+    _levelController.dispose();
+    _nicknameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final abilityOptions = defensiveAbilityOptionsFrom(_abilities);
+    final radius = BorderRadius.circular(TitoRadii.sm);
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              if (widget.member.speciesId != null)
+                FutureBuilder(
+                  future: dexRepository.getSummary(widget.member.speciesId!),
+                  builder: (context, snapshot) => TitoSpriteSticker(
+                    source: snapshot.data?.displaySpritePath,
+                    size: 40,
+                    radius: 12,
+                  ),
+                )
+              else
+                const TitoSpriteSticker(source: null, size: 40, radius: 12),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '${AppZh.teamEditTitle} · 槽位 ${widget.index + 1}',
+                  style: SecondaryTypography.onCard.h15.copyWith(
+                    color: TitoColors.deepBlue,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: widget.onClose,
+                icon: const Icon(Icons.close_rounded, size: 18),
+                tooltip: AppZh.cancel,
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _nicknameController,
+                  decoration: retroInsetDecoration(
+                    labelText: AppZh.teamEditNickname,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: TextField(
+                  controller: _levelController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: retroInsetDecoration(
+                    labelText: AppZh.teamEditLevel,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (_speciesLinked)
+            LinkedPokemonTypesRow(types: _selectedTypes)
+          else
+            TypeChipPicker(
+              label: AppZh.teamEditTypes,
+              selected: _selectedTypes,
+              onChanged: (types) => setState(() => _selectedTypes = types),
+            ),
+          if (abilityOptions.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            AbilityChipPicker(
+              label: AppZh.teamEditAbility,
+              selectedSlug: _selectedAbility,
+              options: abilityOptions,
+              onChanged: (slug) => setState(() => _selectedAbility = slug),
+            ),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              if (widget.canSwapPrev) ...[
+                Expanded(
+                  child: _EditorActionButton(
+                    label: AppZh.teamEditSwapPrev,
+                    background: TitoColors.cardWarm,
+                    foreground: TitoColors.deepBlue,
+                    radius: radius,
+                    onTap: () => widget.onSwap(widget.index, -1),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              if (widget.canSwapNext) ...[
+                Expanded(
+                  child: _EditorActionButton(
+                    label: AppZh.teamEditSwapNext,
+                    background: TitoColors.cardWarm,
+                    foreground: TitoColors.deepBlue,
+                    radius: radius,
+                    onTap: () => widget.onSwap(widget.index, 1),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: _EditorActionButton(
+                  label: AppZh.teamEditDelete,
+                  background: const Color(0xFFFDE0D6),
+                  foreground: const Color(0xFF7A2A12),
+                  radius: radius,
+                  onTap: () => widget.onDelete(widget.index),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _EditorActionButton(
+            label: AppZh.confirm,
+            background: TitoColors.coral,
+            foreground: const Color(0xFF4A1B0C),
+            radius: radius,
+            onTap: () => widget.onSave(
+              widget.index,
+              level: int.tryParse(_levelController.text.trim()),
+              nickname: _nicknameController.text.trim(),
+              types: _selectedTypes,
+              abilitySlug: _selectedAbility,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Sticker action button for the inline editor (small solid drop shadow,
+/// sinks on press like every other sticker).
+class _EditorActionButton extends StatelessWidget {
+  const _EditorActionButton({
+    required this.label,
+    required this.background,
+    required this.foreground,
+    required this.radius,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color background;
+  final Color foreground;
+  final BorderRadius radius;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerPressable(
+      borderRadius: radius,
+      child: Material(
+        color: background,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(
+                color: TitoColors.ink,
+                width: TitoBorders.element,
+              ),
+            ),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: foreground,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
