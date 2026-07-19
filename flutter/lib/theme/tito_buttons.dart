@@ -92,6 +92,8 @@ class TitoQuickTile extends StatelessWidget {
     this.dense = false,
     this.square = false,
     this.iconPlateColor,
+    this.iconAsset,
+    this.backgroundColor,
   });
 
   final String label;
@@ -105,6 +107,14 @@ class TitoQuickTile extends StatelessWidget {
   /// bare deep-blue ink (home quick tiles pass one accent color each).
   final Color? iconPlateColor;
 
+  /// v0.6.7 official: hand-drawn transparent PNG used directly as the tile
+  /// icon — no plate, no frame. Overrides [icon]/[iconPlateColor] when set.
+  final String? iconAsset;
+
+  /// Pastel tint for the tile card itself (pairs with [iconAsset]'s main
+  /// color); defaults to the standard cream card.
+  final Color? backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     final tile = HandheldFocusDecorator(
@@ -112,7 +122,7 @@ class TitoQuickTile extends StatelessWidget {
       child: StickerPressable(
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: Material(
-        color: TitoColors.card,
+        color: backgroundColor ?? TitoColors.card,
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: InkWell(
           onTap: onTap,
@@ -143,11 +153,19 @@ class TitoQuickTile extends StatelessWidget {
                     : 88.0;
                 final iconSize = side * 0.38;
                 final plateColor = iconPlateColor;
+                final asset = iconAsset;
                 final fontSize = (side * 0.18).clamp(10.0, 24.0).toDouble();
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (plateColor != null)
+                    if (asset != null)
+                      Image.asset(
+                        asset,
+                        width: side * 0.52,
+                        height: side * 0.52,
+                        fit: BoxFit.contain,
+                      )
+                    else if (plateColor != null)
                       StickerIconPlate(
                         icon: icon,
                         color: plateColor,
