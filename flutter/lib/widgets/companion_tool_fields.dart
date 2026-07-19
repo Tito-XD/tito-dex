@@ -11,6 +11,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
 
 class CompanionNumberField extends StatelessWidget {
@@ -50,21 +51,10 @@ class CompanionNumberField extends StatelessWidget {
           style: SecondaryTypography.onCard.body14.copyWith(
             fontWeight: FontWeight.w800,
           ),
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: TitoColors.card,
+          decoration: retroInsetDecoration(hintText: hint).copyWith(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
             ),
           ),
           onChanged: onChanged,
@@ -1082,6 +1072,7 @@ class ContactMoveToggle extends StatelessWidget {
 }
 
 /// Shared battle-condition toggle chip (contact move, critical hit, screens…).
+/// Renders as the retro pill toggle with a state dot (see battle template).
 class BattleToggleChip extends StatelessWidget {
   const BattleToggleChip({
     super.key,
@@ -1096,14 +1087,6 @@ class BattleToggleChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilterChip(
-      selected: value,
-      showCheckmark: false,
-      label: Text(label),
-      selectedColor: TitoColors.mint,
-      backgroundColor: TitoColors.card,
-      side: const BorderSide(color: TitoColors.ink, width: 2),
-      onSelected: onChanged,
-    );
+    return StickerPillToggle(label: label, value: value, onChanged: onChanged);
   }
 }

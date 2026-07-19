@@ -155,6 +155,7 @@ abstract final class AppZh {
   static const dexEvYield = '基础点数 (EV)';
   static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
+  static String dexObtainScope(String gameLabel) => '以下出现地点：$gameLabel';
   static const dexFlavorNoEdition = '当前版本暂无图鉴描述';
   static const dexFlavorPickEdition = '选择其他版本查看';
   static const dexMoveFilterAll = '全部';

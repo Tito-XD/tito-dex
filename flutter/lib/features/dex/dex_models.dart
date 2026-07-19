@@ -406,14 +406,24 @@ class ObtainLocationEntry {
         'maxChance': maxChance,
       };
 
-  factory ObtainLocationEntry.fromJson(Map<String, dynamic> json) =>
-      ObtainLocationEntry(
-        areaSlug: json['areaSlug'] as String,
-        areaLabelZh: json['areaLabelZh'] as String? ??
-            resolveObtainAreaLabelZh(json['areaSlug'] as String),
-        minLevel: json['minLevel'] as int?,
-        maxChance: json['maxChance'] as int? ?? 0,
-      );
+  factory ObtainLocationEntry.fromJson(Map<String, dynamic> json) {
+    final slug = json['areaSlug'] as String;
+    final baked = json['areaLabelZh'] as String?;
+    // v0.6.7: bundles baked raw location-area ids as labels for areas the
+    // build-time catalog missed (e.g. "290"); treat numeric or slug-echo
+    // labels as unresolved and re-resolve against the fuller zh catalogs.
+    final unresolved =
+        baked == null ||
+        baked == slug ||
+        RegExp(r'^\d+$').hasMatch(baked) ||
+        RegExp(r'^地点 \d+$').hasMatch(baked);
+    return ObtainLocationEntry(
+      areaSlug: slug,
+      areaLabelZh: unresolved ? resolveObtainAreaLabelZh(slug) : baked,
+      minLevel: json['minLevel'] as int?,
+      maxChance: json['maxChance'] as int? ?? 0,
+    );
+  }
 }
 
 class PokemonMoveSet {
