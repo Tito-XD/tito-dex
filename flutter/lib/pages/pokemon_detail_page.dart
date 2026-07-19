@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
@@ -43,6 +44,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   int _currentTabIndex = 0;
   GameEdition _gameEdition = defaultGameEdition;
   GameEdition _moveGameEdition = defaultGameEdition;
+  GameEdition _obtainGameEdition = defaultGameEdition;
   _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
 
   @override
@@ -62,12 +64,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   void _onGlobalEditionChanged() {
     final edition = gameEditionRepository.edition;
     if (_gameEdition.slug == edition.slug &&
-        _moveGameEdition.slug == edition.slug) {
+        _moveGameEdition.slug == edition.slug &&
+        _obtainGameEdition.slug == edition.slug) {
       return;
     }
     setState(() {
       _gameEdition = edition;
       _moveGameEdition = edition;
+      _obtainGameEdition = edition;
     });
   }
 
@@ -79,6 +83,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     setState(() {
       _gameEdition = edition;
       _moveGameEdition = edition;
+      _obtainGameEdition = edition;
     });
   }
 
@@ -119,7 +124,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
     return TitoFontScale(
       multiplier: 1.0,
-      child: Column(
+      // This page owns the only warm-white bottom bar in the app — match
+      // the system nav bar to it instead of the global deep blue (v0.6.7).
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          systemNavigationBarColor: TitoColors.card,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+        child: Column(
         children: [
           Expanded(
             child: TitoSkeletonGate(
@@ -174,6 +186,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             },
           ),
         ],
+        ),
       ),
     );
   }
@@ -310,17 +323,40 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
+    // v0.6.7 fix: the obtain tab used to dump every version group and
+    // ignored the edition pickers entirely — now it follows its own
+    // selected edition, same pattern as the moves tab.
     final obtainGroups = _allObtainGroups(detail);
+    final editionKey = _obtainGameEdition.dataVersionGroupKey;
+    final matchIndex = obtainGroups.indexWhere(
+      (group) => group.$1 == editionKey,
+    );
+    final locations = matchIndex >= 0 ? obtainGroups[matchIndex].$2 : null;
+
     final sections = <Widget>[
-      if (obtainGroups.isNotEmpty) ...[
-        for (var i = 0; i < obtainGroups.length; i++) ...[
-          if (i > 0) const SizedBox(height: 12),
-          ObtainLocationsCard(
-            locations: obtainGroups[i].$2,
-            gameLabel: gameEditionLabelForVersionGroup(obtainGroups[i].$1),
+      HandheldFocusDecorator(
+        onActivate: () => _pickObtainGameEdition(),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _pickObtainGameEdition,
+            child: Text(
+              AppZh.dexObtainScope(gameEditionLabelZh(_obtainGameEdition)),
+              style: SecondaryTypography.onGradient.body14.copyWith(
+                decoration: TextDecoration.underline,
+                decorationColor: TitoColors.skyBlue,
+              ),
+            ),
           ),
-        ],
-      ] else
+        ),
+      ),
+      const SizedBox(height: 12),
+      if (locations != null && locations.isNotEmpty)
+        ObtainLocationsCard(
+          locations: locations,
+          gameLabel: gameEditionLabelForVersionGroup(editionKey),
+        )
+      else
         StickerCard(
           child: Text(
             AppZh.dexObtainEmptyVersion,
@@ -351,6 +387,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     }
 
     return sections;
+  }
+
+  Future<void> _pickObtainGameEdition() async {
+    final picked = await showGameEditionGridPicker(
+      context,
+      selected: _obtainGameEdition,
+    );
+    if (picked != null && mounted) {
+      setState(() => _obtainGameEdition = picked);
+      await dexSettingsRepository.saveDefaultGameEdition(picked);
+    }
   }
 
   static List<PokemonMove> _movesForMethod(
@@ -504,45 +551,62 @@ class _MoveMethodFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // v0.6.7: these were flat ink-bordered boxes that read as labels, not
+    // buttons — restyle as pressable sticker chips (same language as the
+    // bottom tabs): solid drop shadow, coral when active, muted when the
+    // method has no moves for the current game.
     return Row(
       children: [
         for (final entry in _order) ...[
-          if (entry != _order.first) const SizedBox(width: 5),
+          if (entry != _order.first) const SizedBox(width: 6),
           Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => onSelected(entry),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                child: Ink(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: selected == entry
-                        ? TitoColors.softYellow
-                        : emptyMethods.contains(entry)
+            child: () {
+              final isEmpty = emptyMethods.contains(entry);
+              final isSelected = selected == entry;
+              final radius = BorderRadius.circular(TitoRadii.sm);
+              return HandheldFocusDecorator(
+                onActivate: () => onSelected(entry),
+                child: StickerPressable(
+                  borderRadius: radius,
+                  child: Material(
+                    color: isSelected
+                        ? TitoColors.coral
+                        : isEmpty
                         ? TitoColors.card.withValues(alpha: 0.55)
                         : TitoColors.card,
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(
-                      color: emptyMethods.contains(entry)
-                          ? TitoColors.ink.withValues(alpha: 0.4)
-                          : TitoColors.ink,
-                      width: 2,
-                    ),
-                  ),
-                  child: Text(
-                    _labels[entry]!,
-                    textAlign: TextAlign.center,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: emptyMethods.contains(entry)
-                          ? TitoColors.mutedInk
-                          : null,
+                    borderRadius: radius,
+                    child: InkWell(
+                      onTap: () => onSelected(entry),
+                      borderRadius: radius,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                        decoration: BoxDecoration(
+                          borderRadius: radius,
+                          border: Border.all(
+                            color: isEmpty
+                                ? TitoColors.ink.withValues(alpha: 0.4)
+                                : TitoColors.ink,
+                            width: TitoBorders.element,
+                          ),
+                        ),
+                        child: Text(
+                          _labels[entry]!,
+                          textAlign: TextAlign.center,
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: isSelected
+                                ? const Color(0xFF4A1B0C)
+                                : isEmpty
+                                ? TitoColors.mutedInk
+                                : null,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            }(),
           ),
         ],
       ],
