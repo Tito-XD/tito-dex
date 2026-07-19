@@ -8,7 +8,6 @@ import '../navigation/tito_page_transition.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_buttons.dart';
-import '../theme/tito_colors.dart';
 import '../widgets/app_header.dart';
 import '../widgets/companion_standby.dart';
 import '../widgets/home_dashboard_body.dart';
@@ -95,7 +94,8 @@ class _QuickActionsRow extends StatelessWidget {
                   compact: true,
                   dense: true,
                   square: true,
-                  iconPlateColor: actions[index].plateColor,
+                  iconAsset: actions[index].iconAsset,
+                  backgroundColor: actions[index].tileColor,
                 ),
               ),
             ),
@@ -125,6 +125,8 @@ List<_QuickAction> _quickActions() {
       icon: Icons.groups_rounded,
       route: '/team',
       tone: TitoPolaroidTone.blue,
+      iconAsset: 'assets/icons/Team.png',
+      tileColor: const Color(0xFFFBEFC3),
     ),
     _QuickAction(
       label: AppZh.navDex,
@@ -132,12 +134,16 @@ List<_QuickAction> _quickActions() {
       route: '/dex',
       heroTag: TitoHomeActionHero.dex,
       tone: TitoPolaroidTone.coral,
+      iconAsset: 'assets/icons/Dex.png',
+      tileColor: const Color(0xFFF9DEDC),
     ),
     _QuickAction(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       route: '/search',
       tone: TitoPolaroidTone.mint,
+      iconAsset: 'assets/icons/Search.png',
+      tileColor: const Color(0xFFDFF1F9),
     ),
   ];
 }
@@ -149,6 +155,8 @@ class _QuickAction {
     required this.route,
     this.heroTag,
     required this.tone,
+    required this.iconAsset,
+    required this.tileColor,
   });
 
   final String label;
@@ -157,10 +165,9 @@ class _QuickAction {
   final String? heroTag;
   final TitoPolaroidTone tone;
 
-  /// Accent plate behind the quick-tile icon (v0.6.7 sticker language).
-  Color get plateColor => switch (tone) {
-    TitoPolaroidTone.coral => TitoColors.coral,
-    TitoPolaroidTone.mint => TitoColors.mint,
-    _ => TitoColors.skyBlue,
-  };
+  /// Hand-drawn transparent icon, shown directly on the tile (no frame).
+  final String iconAsset;
+
+  /// Pastel card tint close to the icon's main color.
+  final Color tileColor;
 }
