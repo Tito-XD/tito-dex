@@ -94,6 +94,8 @@ class _QuickActionsRow extends StatelessWidget {
                   compact: true,
                   dense: true,
                   square: true,
+                  iconAsset: actions[index].iconAsset,
+                  backgroundColor: actions[index].tileColor,
                 ),
               ),
             ),
@@ -123,6 +125,8 @@ List<_QuickAction> _quickActions() {
       icon: Icons.groups_rounded,
       route: '/team',
       tone: TitoPolaroidTone.blue,
+      iconAsset: 'assets/icons/Team.png',
+      tileColor: const Color(0xFFFBEFC3),
     ),
     _QuickAction(
       label: AppZh.navDex,
@@ -130,12 +134,16 @@ List<_QuickAction> _quickActions() {
       route: '/dex',
       heroTag: TitoHomeActionHero.dex,
       tone: TitoPolaroidTone.coral,
+      iconAsset: 'assets/icons/Dex.png',
+      tileColor: const Color(0xFFF9DEDC),
     ),
     _QuickAction(
       label: AppZh.navSearch,
       icon: Icons.search_rounded,
       route: '/search',
       tone: TitoPolaroidTone.mint,
+      iconAsset: 'assets/icons/Search.png',
+      tileColor: const Color(0xFFDFF1F9),
     ),
   ];
 }
@@ -147,6 +155,8 @@ class _QuickAction {
     required this.route,
     this.heroTag,
     required this.tone,
+    required this.iconAsset,
+    required this.tileColor,
   });
 
   final String label;
@@ -154,4 +164,10 @@ class _QuickAction {
   final String route;
   final String? heroTag;
   final TitoPolaroidTone tone;
+
+  /// Hand-drawn transparent icon, shown directly on the tile (no frame).
+  final String iconAsset;
+
+  /// Pastel card tint close to the icon's main color.
+  final Color tileColor;
 }

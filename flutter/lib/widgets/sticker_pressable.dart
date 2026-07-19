@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import 'handheld_input.dart';
 
 /// Retro press physics for interactive stickers: the signature solid drop
 /// shadow, and on touch-down the sticker sinks ~3px while the shadow
@@ -9,7 +10,10 @@ import '../theme/tito_colors.dart';
 /// Retro style toggle is off, leaving the flat look untouched.
 ///
 /// Uses a [Listener] so the child's own InkWell/GestureDetector keeps
-/// receiving its taps unchanged.
+/// receiving its taps unchanged. v0.6.7: quick taps hold the sunk pose for
+/// at least [_minHold] so the feedback actually registers, and a held
+/// gamepad/keyboard activate key (via [HandheldPressed]) keeps the sticker
+/// sunk until release.
 class StickerPressable extends StatefulWidget {
   const StickerPressable({
     super.key,
@@ -35,12 +39,37 @@ class StickerPressable extends StatefulWidget {
 }
 
 class _StickerPressableState extends State<StickerPressable> {
+  static const _minHold = Duration(milliseconds: 120);
+
   var _pressed = false;
+  DateTime? _pressedAt;
 
   void _setPressed(bool pressed) {
-    if (_pressed != pressed && mounted) {
-      setState(() => _pressed = pressed);
+    if (!mounted) {
+      return;
     }
+    if (pressed) {
+      if (!_pressed) {
+        _pressedAt = DateTime.now();
+        setState(() => _pressed = true);
+      }
+      return;
+    }
+    if (!_pressed) {
+      return;
+    }
+    final elapsed = DateTime.now().difference(_pressedAt ?? DateTime.now());
+    if (elapsed < _minHold) {
+      // The tap was faster than the 80ms animation — hold the sunk pose a
+      // beat so the "physical key" reads instead of flickering.
+      Future.delayed(_minHold - elapsed, () {
+        if (mounted && _pressed) {
+          setState(() => _pressed = false);
+        }
+      });
+      return;
+    }
+    setState(() => _pressed = false);
   }
 
   @override
@@ -49,7 +78,8 @@ class _StickerPressableState extends State<StickerPressable> {
       listenable: retroStyle,
       builder: (context, child) {
         final retro = retroStyle.enabled;
-        final sunk = retro && widget.interactive && _pressed;
+        final keyHeld = widget.interactive && HandheldPressed.of(context);
+        final sunk = retro && widget.interactive && (_pressed || keyHeld);
         Widget result = AnimatedContainer(
           duration: const Duration(milliseconds: 80),
           curve: Curves.easeOut,

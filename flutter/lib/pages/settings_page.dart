@@ -22,6 +22,7 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/motion_preferences.dart';
+import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -396,15 +397,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   }),
           ),
           const SizedBox(height: 16),
-          StickerCard(
+          _SettingsGroup(
+            title: AppZh.settingsGroupTrainer,
+            child: StickerCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppZh.settingsGroupTrainer,
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 12),
                 Row(
                   children: [
                     _SettingsAvatarPreview(journey: widget.journey),
@@ -472,6 +470,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ],
             ),
+            ),
           ),
           const SizedBox(height: 16),
           _CompanionSection(journey: widget.journey),
@@ -479,16 +478,13 @@ class _SettingsPageState extends State<SettingsPage> {
           const _InterfaceSection(),
           const SizedBox(height: 16),
           if (saveLinked)
-            StickerCard(
+            _SettingsGroup(
+              title: AppZh.settingsGroupSaveSync,
+              child: StickerCard(
               variant: StickerVariant.cream,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    AppZh.settingsGroupSaveSync,
-                    style: SecondaryTypography.onCard.h15,
-                  ),
-                  const SizedBox(height: 8),
                   Text(
                     AppZh.settingsSaveFileHint,
                     style: SecondaryTypography.onCard.small12.copyWith(
@@ -527,18 +523,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
+                      const StickerIconPlate(
+                        icon: Icons.refresh_rounded,
+                        color: TitoColors.skyBlue,
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           AppZh.settingsAutoLoadOnStartup,
                           style: SecondaryTypography.onCard.body14,
                         ),
                       ),
-                      Switch(
+                      StickerSwitch(
                         value: config.autoLoadOnStartup,
                         onChanged: widget.onToggleAutoLoad,
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
                   Text(
                     lastSynced != null
                         ? AppZh.settingsLastSynced(lastSynced)
@@ -554,19 +556,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
+              ),
             ),
           const SizedBox(height: 16),
-          StickerCard(
+          _SettingsGroup(
+            title: AppZh.settingsDexOffline,
+            child: StickerCard(
             variant: StickerVariant.mint,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppZh.settingsDexOffline,
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 8),
                 Text(
                   AppZh.settingsDexOfflineHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
@@ -639,6 +639,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Text(AppZh.settingsDexCdnDownload),
                 ),
               ],
+            ),
             ),
           ),
           const SizedBox(height: 12),
@@ -720,7 +721,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: SecondaryTypography.onCard.body14,
                         ),
                       ),
-                      Switch(
+                      StickerSwitch(
                         value: dexManifest.preferOffline,
                         onChanged: _dexDownloading
                             ? null
@@ -737,16 +738,13 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           const SizedBox(height: 16),
-          StickerCard(
+          _SettingsGroup(
+            title: AppZh.settingsEmulator,
+            child: StickerCard(
             variant: StickerVariant.sky,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppZh.settingsEmulator,
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 8),
                 Text(
                   AppZh.settingsEmulatorHint,
                   style: SecondaryTypography.onCard.small12.copyWith(
@@ -779,6 +777,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ],
+            ),
             ),
           ),
           const SizedBox(height: 16),
@@ -832,8 +831,79 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-class _Row extends StatelessWidget {
-  const _Row({required this.label, required this.value});
+/// v0.6.7 preview grouping: a soft-yellow pill label floats above each
+/// settings card instead of a heading inside it.
+class _SettingsGroup extends StatelessWidget {
+  const _SettingsGroup({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        StickerGroupLabel(text: title),
+        const SizedBox(height: 8),
+        child,
+      ],
+    );
+  }
+}
+
+/// Template-style settings row: colored icon plate + label/hint column +
+/// a [StickerSwitch]. Matches the mock's `.row` pattern.
+class _SettingsToggleRow extends StatelessWidget {
+  const _SettingsToggleRow({
+    required this.icon,
+    required this.plateColor,
+    required this.label,
+    required this.hint,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final Color plateColor;
+  final String label;
+  final String hint;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          StickerIconPlate(icon: icon, color: plateColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: SecondaryTypography.onCard.body14),
+                const SizedBox(height: 2),
+                Text(
+                  hint,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          StickerSwitch(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {  const _Row({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -933,57 +1003,32 @@ class _InterfaceSection extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([motionPreferences, retroStyle]),
       builder: (context, _) {
-        return StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsGroupInterface,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppZh.settingsRetroStyle,
-                      style: SecondaryTypography.onCard.body14,
-                    ),
-                  ),
-                  Switch(
-                    value: retroStyle.enabled,
-                    onChanged: retroStyle.setEnabled,
-                  ),
-                ],
-              ),
-              Text(
-                AppZh.settingsRetroStyleHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+        return _SettingsGroup(
+          title: AppZh.settingsGroupInterface,
+          child: StickerCard(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SettingsToggleRow(
+                  icon: Icons.auto_awesome_rounded,
+                  plateColor: TitoColors.mint,
+                  label: AppZh.settingsRetroStyle,
+                  hint: AppZh.settingsRetroStyleHint,
+                  value: retroStyle.enabled,
+                  onChanged: retroStyle.setEnabled,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppZh.settingsListAnimations,
-                      style: SecondaryTypography.onCard.body14,
-                    ),
-                  ),
-                  Switch(
-                    value: motionPreferences.listAnimationsEnabled,
-                    onChanged: motionPreferences.setListAnimationsEnabled,
-                  ),
-                ],
-              ),
-              Text(
-                AppZh.settingsListAnimationsHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+                const StickerRowDivider(),
+                _SettingsToggleRow(
+                  icon: Icons.view_carousel_rounded,
+                  plateColor: TitoColors.skyBlue,
+                  label: AppZh.settingsListAnimations,
+                  hint: AppZh.settingsListAnimationsHint,
+                  value: motionPreferences.listAnimationsEnabled,
+                  onChanged: motionPreferences.setListAnimationsEnabled,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -1010,38 +1055,26 @@ class _CompanionSection extends StatelessWidget {
             companionSpeciesIds[hgssDefaultCompanion]!;
         final nameZh = choice?.nameZh ?? localizeSpecies(journey.companion);
 
-        return StickerCard(
-          variant: StickerVariant.sky,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.companionSettingsTitle,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppZh.companionSettingsHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
+        return _SettingsGroup(
+          title: AppZh.companionSettingsTitle,
+          child: StickerCard(
+            variant: StickerVariant.sky,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SettingsToggleRow(
+                  icon: Icons.cruelty_free_rounded,
+                  plateColor: TitoColors.softYellow,
+                  label: AppZh.companionSettingsToggle,
+                  hint: AppZh.companionSettingsHint,
+                  value: companionRepository.enabled,
+                  onChanged: companionRepository.setEnabled,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppZh.companionSettingsToggle,
-                      style: SecondaryTypography.onCard.body14,
-                    ),
-                  ),
-                  Switch(
-                    value: companionRepository.enabled,
-                    onChanged: companionRepository.setEnabled,
-                  ),
-                ],
-              ),
-              Row(
+                const StickerRowDivider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
                 children: [
                   Text(
                     AppZh.companionSettingsSize,
@@ -1068,8 +1101,11 @@ class _CompanionSection extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
+              ),
+              const StickerRowDivider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
                 children: [
                   Container(
                     width: 64,
@@ -1104,7 +1140,12 @@ class _CompanionSection extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
               FilledButton(
                 onPressed: () async {
                   final picked = await showCompanionPickerSheet(context);
@@ -1129,7 +1170,11 @@ class _CompanionSection extends StatelessWidget {
                   child: const Text(AppZh.companionSettingsReset),
                 ),
               ],
+                  ],
+                ),
+              ),
             ],
+          ),
           ),
         );
       },

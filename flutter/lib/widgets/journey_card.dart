@@ -26,12 +26,15 @@ class JourneyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final padding = (compact || dense)
-        ? DeviceLayout.cardPadding(context)
-        : null;
+    // Always share the layout's cardPadding so this card's edges line up
+    // with the trainer card above it in every density (v0.6.7 fix for the
+    // mismatched gutters / squeezed look on square dashboards).
+    final padding = DeviceLayout.cardPadding(context);
     final location = localizeLocation(journey.location);
+    // Dense shrinks the glyph size only — keep Nunito's natural line height
+    // or the stacked meta rows read as squeezed against the card's center.
     TextStyle denseStyle(TextStyle style) =>
-        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85, height: 1);
+        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85);
 
     return HandheldFocusDecorator(
       onActivate: onOpenDetail,
@@ -41,7 +44,7 @@ class JourneyCard extends StatelessWidget {
         ownShadow: false,
         child: StickerCard(
           variant: StickerVariant.deep,
-          padding: padding ?? const EdgeInsets.all(16),
+          padding: padding,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -66,7 +69,7 @@ class JourneyCard extends StatelessWidget {
                                   ? denseStyle(context.tito.onDeepOverline)
                                   : context.tito.onDeepOverline,
                             ),
-                            SizedBox(height: dense ? 1 : (compact ? 6 : 8)),
+                            SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
                             Text(
                               location,
                               style: dense
@@ -87,7 +90,7 @@ class JourneyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: dense ? 2 : (compact ? 8 : 10)),
+                  SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
                   Row(
                     children: [
                       _Meta(
@@ -122,7 +125,7 @@ class _Meta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextStyle denseStyle(TextStyle style) =>
-        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85, height: 1);
+        style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85);
 
     return Expanded(
       child: Column(

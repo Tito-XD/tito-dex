@@ -291,10 +291,10 @@ abstract final class DeviceLayout {
 
   static int dexGridColumns(BuildContext context) {
     final width = sizeOf(context).width;
-    if (width >= 1440) {
-      return 6;
-    }
-    return 3;
+    // v0.6.7: responsive fill like the species picker — ~132px tiles,
+    // 3 columns on the square handheld, up to 6 on wide screens (was a
+    // hard 3/6 breakpoint, so tablets looked identical to phones).
+    return (width / 132).floor().clamp(3, 6);
   }
 
   static double dexCardAspectRatio(BuildContext context) {
