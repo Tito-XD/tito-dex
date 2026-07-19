@@ -11,6 +11,7 @@ import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/error_text.dart';
+import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/tito_font_scale.dart';
@@ -275,14 +276,51 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
           );
         }
 
+        // v0.6.7: the estimate pins under the app bar (compact card) while
+        // the long form scrolls below — result-first layout.
+        final pagePadding = DeviceLayout.pagePadding(context);
         return TitoFontScale(
           multiplier: 1.0,
           child: Material(
             type: MaterialType.transparency,
-            child: SecondaryPageScaffold(
-              title: AppZh.companionToolQuickDamage,
-              subtitle: edition.labelZh,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Padding(
+                  padding: pagePadding.copyWith(bottom: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SecondaryPageAppBar(
+                        title: AppZh.companionToolQuickDamage,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        edition.labelZh,
+                        style: SecondaryTypography.onGradient.body14.copyWith(
+                          color: TitoColors.skyBlue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (estimate != null)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      pagePadding.left,
+                      12,
+                      pagePadding.right,
+                      0,
+                    ),
+                    child: _DamageResultCard(
+                      estimate: estimate,
+                      compact: true,
+                    ),
+                  ),
+                Expanded(
+                  child: ListView(
+                    padding: pagePadding.copyWith(top: 12, bottom: 96),
+                    children: [
           if (_loading)
             const TitoLoadingPanel(
               message: AppZh.companionLoading,
@@ -525,9 +563,18 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             ),
             if (estimate != null) ...[
               const SizedBox(height: 12),
-              _DamageResultCard(estimate: estimate),
+              Text(
+                AppZh.companionDamageAssumptions,
+                style: SecondaryTypography.onGradient.small12.copyWith(
+                  color: TitoColors.skyBlue,
+                  height: 1.45,
+                ),
+              ),
             ],
           ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -605,11 +652,13 @@ class _PowerSliderRow extends StatelessWidget {
 
 /// Result card (battle template): the single accent focus of the page —
 /// deep-blue card, oversized soft-yellow percentage, and an HP bar split
-/// into mint-safe / coral-damage segments.
+/// into mint-safe / coral-damage segments. [compact] (pinned under the app
+/// bar) drops the verdict and assumptions so the summary stays glanceable.
 class _DamageResultCard extends StatelessWidget {
-  const _DamageResultCard({required this.estimate});
+  const _DamageResultCard({required this.estimate, this.compact = false});
 
   final DamageEstimate estimate;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -693,11 +742,13 @@ class _DamageResultCard extends StatelessWidget {
             },
           ),
           const SizedBox(height: 10),
-          Text(
-            '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
-            style: SecondaryTypography.onGradient.body14,
-          ),
-          const SizedBox(height: 8),
+          if (!compact) ...[
+            Text(
+              '${AppZh.companionDamageDefense}：${estimate.tankVerdictZh}',
+              style: SecondaryTypography.onGradient.body14,
+            ),
+            const SizedBox(height: 8),
+          ],
           Text(
             AppZh.companionDamageModifiers(
               formatTypeMultiplier(estimate.typeMultiplier),
@@ -722,14 +773,16 @@ class _DamageResultCard extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 8),
-          Text(
-            AppZh.companionDamageAssumptions,
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              color: TitoColors.skyBlue,
-              height: 1.45,
+          if (!compact) ...[
+            const SizedBox(height: 8),
+            Text(
+              AppZh.companionDamageAssumptions,
+              style: SecondaryTypography.onGradient.small12.copyWith(
+                color: TitoColors.skyBlue,
+                height: 1.45,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
