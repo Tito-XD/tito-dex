@@ -86,7 +86,9 @@ void main() {
     expect(decoration().boxShadow, TitoShadows.stickerPressed);
 
     await gesture.up();
-    await tester.pump();
+    // Release is deferred by the 120ms minimum-hold so quick taps still
+    // read as a physical press — settle past it before asserting rebound.
+    await tester.pump(const Duration(milliseconds: 200));
     expect(sunkY(), 0);
     expect(decoration().boxShadow, TitoShadows.sticker);
   });
@@ -119,6 +121,8 @@ void main() {
     expect((container().transform as Matrix4).getTranslation().y, 0);
     expect((container().decoration as BoxDecoration).boxShadow, isNull);
     await gesture.up();
+    // Let the deferred min-hold release fire so no timer leaks past teardown.
+    await tester.pump(const Duration(milliseconds: 200));
   });
 
   testWidgets('display-only pressable keeps the static shadow without sinking',

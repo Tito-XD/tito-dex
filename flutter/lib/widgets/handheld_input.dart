@@ -77,9 +77,32 @@ class _HandheldBackIntent extends Intent {
   const _HandheldBackIntent();
 }
 
+/// Exposes "the activate key (A / Enter / Space / Select) is currently held"
+/// to descendants — [StickerPressable] reads this to keep a sticker sunk
+/// for as long as a gamepad button is held, matching touch press physics.
+class HandheldPressed extends InheritedWidget {
+  const HandheldPressed({
+    super.key,
+    required this.pressed,
+    required super.child,
+  });
+
+  final bool pressed;
+
+  static bool of(BuildContext context) {
+    return context
+            .dependOnInheritedWidgetOfExactType<HandheldPressed>()
+            ?.pressed ??
+        false;
+  }
+
+  @override
+  bool updateShouldNotify(HandheldPressed oldWidget) =>
+      pressed != oldWidget.pressed;
+}
+
 /// Visible focus ring for D-pad navigation on cream tiles.
-class HandheldFocusDecorator extends StatefulWidget {
-  const HandheldFocusDecorator({
+class HandheldFocusDecorator extends StatefulWidget {  const HandheldFocusDecorator({
     super.key,
     required this.child,
     required this.onActivate,
@@ -95,37 +118,68 @@ class HandheldFocusDecorator extends StatefulWidget {
 }
 
 class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
+  static final _activateKeys = {
+    LogicalKeyboardKey.enter,
+    LogicalKeyboardKey.select,
+    LogicalKeyboardKey.space,
+    LogicalKeyboardKey.gameButtonA,
+  };
+
   bool _focused = false;
+  bool _keyHeld = false;
+
+  KeyEventResult _trackActivateKey(FocusNode node, KeyEvent event) {
+    if (_activateKeys.contains(event.logicalKey)) {
+      final held = event is! KeyUpEvent;
+      if (held != _keyHeld) {
+        setState(() => _keyHeld = held);
+      }
+    }
+    // Never consume — ActivateIntent and traversal still need the key.
+    return KeyEventResult.ignored;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FocusableActionDetector(
-      onShowFocusHighlight: (value) => setState(() => _focused = value),
-      actions: {
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (_) {
-            widget.onActivate?.call();
-            return null;
-          },
+    return Focus(
+      onKeyEvent: _trackActivateKey,
+      // Skip in traversal (this is a passive listener, not a target) or it
+      // steals the D-pad hop from the real focusable child.
+      canRequestFocus: false,
+      child: FocusableActionDetector(
+        onShowFocusHighlight: (value) => setState(() => _focused = value),
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              widget.onActivate?.call();
+              return null;
+            },
+          ),
+        },
+        child: HandheldPressed(
+          pressed: _keyHeld,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: widget.borderRadius,
+              border: _focused
+                  ? Border.all(
+                      color: TitoColors.softYellow,
+                      width: TitoBorders.card,
+                    )
+                  : null,
+              boxShadow: _focused
+                  ? const [
+                      BoxShadow(
+                        color: Color(0x66FFE08A),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: widget.child,
+          ),
         ),
-      },
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: widget.borderRadius,
-          border: _focused
-              ? Border.all(color: TitoColors.softYellow, width: TitoBorders.card)
-              : null,
-          boxShadow: _focused
-              ? const [
-                  BoxShadow(
-                    color: Color(0x66FFE08A),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
-        ),
-        child: widget.child,
       ),
     );
   }
