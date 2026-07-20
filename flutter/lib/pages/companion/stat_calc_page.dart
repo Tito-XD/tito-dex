@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
 import '../../features/companion/battle_game_scope.dart';
+import '../../features/companion/battle_handoff.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
@@ -141,6 +144,32 @@ class _StatCalcPageState extends State<StatCalcPage> {
     setState(() => _baseController.text = base.toString());
   }
 
+  /// Which quick-damage slot this stat maps into.
+  String get _applyToDamageLabel => switch (_stat) {
+    BattleStat.attack ||
+    BattleStat.specialAttack => AppZh.companionStatApplyAttack,
+    BattleStat.defense ||
+    BattleStat.specialDefense => AppZh.companionStatApplyDefense,
+    _ => AppZh.companionStatApplyHp,
+  };
+
+  void _applyToDamage(int result) {
+    battleStatHandoff.clear();
+    switch (_stat) {
+      case BattleStat.attack:
+      case BattleStat.specialAttack:
+        battleStatHandoff.attack = result;
+      case BattleStat.defense:
+      case BattleStat.specialDefense:
+        battleStatHandoff.defense = result;
+      case BattleStat.hp:
+        battleStatHandoff.hp = result;
+      case BattleStat.speed:
+        return;
+    }
+    context.push('/search/companion/quick-damage');
+  }
+
   int _readBase() => int.tryParse(_baseController.text.trim()) ?? 0;
 
   int _readLevel() {
@@ -180,123 +209,135 @@ class _StatCalcPageState extends State<StatCalcPage> {
               title: AppZh.companionToolStatCalc,
               subtitle: edition.labelZh,
               children: [
-          CompanionSectionCard(
-            title: AppZh.companionStatInputsTitle,
-            subtitle: AppZh.companionStatFacilityNote(scope.facilityLabel),
-            children: [
-              PokemonSearchField(
-                controller: _queryController,
-                hintText: AppZh.companionPokemonSearchHint,
-                suggestions: _suggestions,
-                onQueryChanged: _searchPokemon,
-                onPokemonSelected: _applyPokemon,
-              ),
-              const SizedBox(height: 12),
-              StatPicker(
-                selected: _stat,
-                onChanged: (value) {
-                  setState(() => _stat = value);
-                  _refreshBaseFromLinked();
-                },
-              ),
-              const SizedBox(height: 12),
-              NaturePicker(
-                selected: _nature,
-                onChanged: (value) => setState(() => _nature = value),
-              ),
-              const SizedBox(height: 12),
-              CompanionNumberField(
-                label: AppZh.companionStatBase,
-                controller: _baseController,
-                max: 255,
-                onChanged: (_) {
-                  setState(() {});
-                  _clearLinkedPokemon();
-                },
-              ),
-              const SizedBox(height: 12),
-              CompanionNumberField(
-                label: AppZh.companionStatLevel,
-                controller: _levelController,
-                max: 100,
-                onChanged: (_) => setState(() {}),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: CompanionNumberField(
-                      label: AppZh.companionStatIv,
-                      controller: _ivController,
-                      max: 31,
+                CompanionSectionCard(
+                  title: AppZh.companionStatInputsTitle,
+                  subtitle: AppZh.companionStatFacilityNote(
+                    scope.facilityLabel,
+                  ),
+                  children: [
+                    PokemonSearchField(
+                      controller: _queryController,
+                      hintText: AppZh.companionPokemonSearchHint,
+                      suggestions: _suggestions,
+                      onQueryChanged: _searchPokemon,
+                      onPokemonSelected: _applyPokemon,
+                    ),
+                    const SizedBox(height: 12),
+                    StatPicker(
+                      selected: _stat,
+                      onChanged: (value) {
+                        setState(() => _stat = value);
+                        _refreshBaseFromLinked();
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    NaturePicker(
+                      selected: _nature,
+                      onChanged: (value) => setState(() => _nature = value),
+                    ),
+                    const SizedBox(height: 12),
+                    CompanionNumberField(
+                      label: AppZh.companionStatBase,
+                      controller: _baseController,
+                      max: 255,
+                      onChanged: (_) {
+                        setState(() {});
+                        _clearLinkedPokemon();
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    CompanionNumberField(
+                      label: AppZh.companionStatLevel,
+                      controller: _levelController,
+                      max: 100,
                       onChanged: (_) => setState(() {}),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: CompanionNumberField(
-                      label: AppZh.companionStatEv,
-                      controller: _evController,
-                      max: 252,
-                      onChanged: (_) => setState(() {}),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CompanionNumberField(
+                            label: AppZh.companionStatIv,
+                            controller: _ivController,
+                            max: 31,
+                            onChanged: (_) => setState(() {}),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CompanionNumberField(
+                            label: AppZh.companionStatEv,
+                            controller: _evController,
+                            max: 252,
+                            onChanged: (_) => setState(() {}),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              if (_abilityOptions.isNotEmpty || _linkedPokemonId == null) ...[
+                    if (_abilityOptions.isNotEmpty ||
+                        _linkedPokemonId == null) ...[
+                      const SizedBox(height: 12),
+                      CompanionAbilitySection(
+                        pokemonLabel: AppZh.companionAttackerAbilityPick,
+                        manualLabel: AppZh.companionAttackerAbilityPick,
+                        manualOptions: kManualAttackerAbilityOptions,
+                        pokemonOptions: _abilityOptions,
+                        linkedPokemonId: _linkedPokemonId,
+                        selectedSlug: _attackerAbilitySlug,
+                        onChanged: (slug) =>
+                            setState(() => _attackerAbilitySlug = slug),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    HeldItemPicker(
+                      selected: _heldItem,
+                      onChanged: (value) => setState(() => _heldItem = value),
+                    ),
+                    const SizedBox(height: 12),
+                    StatusConditionPicker(
+                      selected: _status,
+                      onChanged: (value) => setState(() => _status = value),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 12),
-                CompanionAbilitySection(
-                  pokemonLabel: AppZh.companionAttackerAbilityPick,
-                  manualLabel: AppZh.companionAttackerAbilityPick,
-                  manualOptions: kManualAttackerAbilityOptions,
-                  pokemonOptions: _abilityOptions,
-                  linkedPokemonId: _linkedPokemonId,
-                  selectedSlug: _attackerAbilitySlug,
-                  onChanged: (slug) =>
-                      setState(() => _attackerAbilitySlug = slug),
-                ),
-              ],
-              const SizedBox(height: 12),
-              HeldItemPicker(
-                selected: _heldItem,
-                onChanged: (value) => setState(() => _heldItem = value),
-              ),
-              const SizedBox(height: 12),
-              StatusConditionPicker(
-                selected: _status,
-                onChanged: (value) => setState(() => _status = value),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          StickerCard(
-            variant: StickerVariant.mint,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppZh.companionStatResultTitle,
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${_stat.labelZh}：$result',
-                  style: SecondaryTypography.onCard.h15.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  AppZh.companionStatResultHint,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w700,
+                StickerCard(
+                  variant: StickerVariant.mint,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        AppZh.companionStatResultTitle,
+                        style: SecondaryTypography.onCard.h15,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${_stat.labelZh}：$result',
+                        style: SecondaryTypography.onCard.h15.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        AppZh.companionStatResultHint,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      // Speed has no slot in the damage formula — no carry-over.
+                      if (_stat != BattleStat.speed) ...[
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => _applyToDamage(result),
+                          icon: const Icon(Icons.calculate_rounded, size: 18),
+                          label: Text(_applyToDamageLabel),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
             ),
           ),
         );

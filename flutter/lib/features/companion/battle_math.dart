@@ -5,31 +5,31 @@ enum BattleStat { hp, attack, defense, specialAttack, specialDefense, speed }
 
 extension BattleStatLabel on BattleStat {
   String get labelZh => switch (this) {
-        BattleStat.hp => 'HP',
-        BattleStat.attack => '攻击',
-        BattleStat.defense => '防御',
-        BattleStat.specialAttack => '特攻',
-        BattleStat.specialDefense => '特防',
-        BattleStat.speed => '速度',
-      };
+    BattleStat.hp => 'HP',
+    BattleStat.attack => '攻击',
+    BattleStat.defense => '防御',
+    BattleStat.specialAttack => '特攻',
+    BattleStat.specialDefense => '特防',
+    BattleStat.speed => '速度',
+  };
 
   String get apiKey => switch (this) {
-        BattleStat.hp => 'hp',
-        BattleStat.attack => 'attack',
-        BattleStat.defense => 'defense',
-        BattleStat.specialAttack => 'special-attack',
-        BattleStat.specialDefense => 'special-defense',
-        BattleStat.speed => 'speed',
-      };
+    BattleStat.hp => 'hp',
+    BattleStat.attack => 'attack',
+    BattleStat.defense => 'defense',
+    BattleStat.specialAttack => 'special-attack',
+    BattleStat.specialDefense => 'special-defense',
+    BattleStat.speed => 'speed',
+  };
 }
 
 enum MoveCategory { physical, special }
 
 extension MoveCategoryLabel on MoveCategory {
   String get labelZh => switch (this) {
-        MoveCategory.physical => '物理',
-        MoveCategory.special => '特殊',
-      };
+    MoveCategory.physical => '物理',
+    MoveCategory.special => '特殊',
+  };
 }
 
 class NatureModifier {
@@ -48,29 +48,129 @@ class NatureModifier {
 
 const battleNatures = <NatureModifier>[
   NatureModifier(key: 'hardy', labelZh: '勤奋', boost: null, drop: null),
-  NatureModifier(key: 'lonely', labelZh: '怕寂寞', boost: BattleStat.attack, drop: BattleStat.defense),
-  NatureModifier(key: 'brave', labelZh: '勇敢', boost: BattleStat.attack, drop: BattleStat.speed),
-  NatureModifier(key: 'adamant', labelZh: '固执', boost: BattleStat.attack, drop: BattleStat.specialAttack),
-  NatureModifier(key: 'naughty', labelZh: '顽皮', boost: BattleStat.attack, drop: BattleStat.specialDefense),
-  NatureModifier(key: 'bold', labelZh: '大胆', boost: BattleStat.defense, drop: BattleStat.attack),
+  NatureModifier(
+    key: 'lonely',
+    labelZh: '怕寂寞',
+    boost: BattleStat.attack,
+    drop: BattleStat.defense,
+  ),
+  NatureModifier(
+    key: 'brave',
+    labelZh: '勇敢',
+    boost: BattleStat.attack,
+    drop: BattleStat.speed,
+  ),
+  NatureModifier(
+    key: 'adamant',
+    labelZh: '固执',
+    boost: BattleStat.attack,
+    drop: BattleStat.specialAttack,
+  ),
+  NatureModifier(
+    key: 'naughty',
+    labelZh: '顽皮',
+    boost: BattleStat.attack,
+    drop: BattleStat.specialDefense,
+  ),
+  NatureModifier(
+    key: 'bold',
+    labelZh: '大胆',
+    boost: BattleStat.defense,
+    drop: BattleStat.attack,
+  ),
   NatureModifier(key: 'docile', labelZh: '坦率', boost: null, drop: null),
-  NatureModifier(key: 'relaxed', labelZh: '悠闲', boost: BattleStat.defense, drop: BattleStat.speed),
-  NatureModifier(key: 'impish', labelZh: '淘气', boost: BattleStat.defense, drop: BattleStat.specialAttack),
-  NatureModifier(key: 'lax', labelZh: '乐天', boost: BattleStat.defense, drop: BattleStat.specialDefense),
-  NatureModifier(key: 'timid', labelZh: '胆小', boost: BattleStat.speed, drop: BattleStat.attack),
-  NatureModifier(key: 'hasty', labelZh: '急躁', boost: BattleStat.speed, drop: BattleStat.defense),
+  NatureModifier(
+    key: 'relaxed',
+    labelZh: '悠闲',
+    boost: BattleStat.defense,
+    drop: BattleStat.speed,
+  ),
+  NatureModifier(
+    key: 'impish',
+    labelZh: '淘气',
+    boost: BattleStat.defense,
+    drop: BattleStat.specialAttack,
+  ),
+  NatureModifier(
+    key: 'lax',
+    labelZh: '乐天',
+    boost: BattleStat.defense,
+    drop: BattleStat.specialDefense,
+  ),
+  NatureModifier(
+    key: 'timid',
+    labelZh: '胆小',
+    boost: BattleStat.speed,
+    drop: BattleStat.attack,
+  ),
+  NatureModifier(
+    key: 'hasty',
+    labelZh: '急躁',
+    boost: BattleStat.speed,
+    drop: BattleStat.defense,
+  ),
   NatureModifier(key: 'serious', labelZh: '认真', boost: null, drop: null),
-  NatureModifier(key: 'jolly', labelZh: '爽朗', boost: BattleStat.speed, drop: BattleStat.specialAttack),
-  NatureModifier(key: 'naive', labelZh: '天真', boost: BattleStat.speed, drop: BattleStat.specialDefense),
-  NatureModifier(key: 'modest', labelZh: '内敛', boost: BattleStat.specialAttack, drop: BattleStat.attack),
-  NatureModifier(key: 'mild', labelZh: '慢吞吞', boost: BattleStat.specialAttack, drop: BattleStat.defense),
-  NatureModifier(key: 'quiet', labelZh: '冷静', boost: BattleStat.specialAttack, drop: BattleStat.speed),
+  NatureModifier(
+    key: 'jolly',
+    labelZh: '爽朗',
+    boost: BattleStat.speed,
+    drop: BattleStat.specialAttack,
+  ),
+  NatureModifier(
+    key: 'naive',
+    labelZh: '天真',
+    boost: BattleStat.speed,
+    drop: BattleStat.specialDefense,
+  ),
+  NatureModifier(
+    key: 'modest',
+    labelZh: '内敛',
+    boost: BattleStat.specialAttack,
+    drop: BattleStat.attack,
+  ),
+  NatureModifier(
+    key: 'mild',
+    labelZh: '慢吞吞',
+    boost: BattleStat.specialAttack,
+    drop: BattleStat.defense,
+  ),
+  NatureModifier(
+    key: 'quiet',
+    labelZh: '冷静',
+    boost: BattleStat.specialAttack,
+    drop: BattleStat.speed,
+  ),
   NatureModifier(key: 'bashful', labelZh: '害羞', boost: null, drop: null),
-  NatureModifier(key: 'rash', labelZh: '马虎', boost: BattleStat.specialAttack, drop: BattleStat.specialDefense),
-  NatureModifier(key: 'calm', labelZh: '温和', boost: BattleStat.specialDefense, drop: BattleStat.attack),
-  NatureModifier(key: 'gentle', labelZh: '温顺', boost: BattleStat.specialDefense, drop: BattleStat.defense),
-  NatureModifier(key: 'sassy', labelZh: '自大', boost: BattleStat.specialDefense, drop: BattleStat.speed),
-  NatureModifier(key: 'careful', labelZh: '慎重', boost: BattleStat.specialDefense, drop: BattleStat.specialAttack),
+  NatureModifier(
+    key: 'rash',
+    labelZh: '马虎',
+    boost: BattleStat.specialAttack,
+    drop: BattleStat.specialDefense,
+  ),
+  NatureModifier(
+    key: 'calm',
+    labelZh: '温和',
+    boost: BattleStat.specialDefense,
+    drop: BattleStat.attack,
+  ),
+  NatureModifier(
+    key: 'gentle',
+    labelZh: '温顺',
+    boost: BattleStat.specialDefense,
+    drop: BattleStat.defense,
+  ),
+  NatureModifier(
+    key: 'sassy',
+    labelZh: '自大',
+    boost: BattleStat.specialDefense,
+    drop: BattleStat.speed,
+  ),
+  NatureModifier(
+    key: 'careful',
+    labelZh: '慎重',
+    boost: BattleStat.specialDefense,
+    drop: BattleStat.specialAttack,
+  ),
   NatureModifier(key: 'quirky', labelZh: '浮躁', boost: null, drop: null),
 ];
 
@@ -201,6 +301,7 @@ DamageEstimate estimateDamage({
   bool isContactMove = false,
   bool isCriticalHit = false,
   bool defenderScreened = false,
+  bool isSpreadMove = false,
   double otherMultiplier = 1,
 }) {
   final isPhysical = category == MoveCategory.physical;
@@ -272,6 +373,9 @@ DamageEstimate estimateDamage({
   // Critical hits: ×2 before Gen 6, ×1.5 since — and they bypass screens.
   final critMod = isCriticalHit ? (generation >= 6 ? 1.5 : 2.0) : 1.0;
   final screenMod = defenderScreened && !isCriticalHit ? 0.5 : 1.0;
+  // Doubles: a move hitting multiple targets takes the ×0.75 spread
+  // modifier (Gen 3+). Crits do not bypass it.
+  final spreadMod = isSpreadMove ? 0.75 : 1.0;
   final extra =
       fieldMod *
       abilityMod *
@@ -279,6 +383,7 @@ DamageEstimate estimateDamage({
       itemMod *
       critMod *
       screenMod *
+      spreadMod *
       otherMultiplier;
   final modifier = stab * type * extra;
   final minDamage = (base * modifier * 0.85).floor();

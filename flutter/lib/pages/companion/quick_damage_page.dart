@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
+import '../../features/companion/battle_handoff.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/battle_effectiveness.dart';
@@ -56,6 +57,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   bool _isContactMove = false;
   bool _isCriticalHit = false;
   bool _defenderScreened = false;
+  bool _isSpreadMove = false;
   List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
   List<DefensiveAbilityOption> _attackerAbilityOptions = const [];
   FieldCondition _weather = FieldCondition.none;
@@ -71,6 +73,20 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     super.initState();
     final scope = battleScopeForEdition(gameEditionRepository.edition);
     _levelController.text = scope.defaultLevel.toString();
+    // Values carried over from the stat calculator (one-shot).
+    if (!battleStatHandoff.isEmpty) {
+      final handoff = battleStatHandoff;
+      if (handoff.attack != null) {
+        _attackController.text = '${handoff.attack}';
+      }
+      if (handoff.defense != null) {
+        _defenseController.text = '${handoff.defense}';
+      }
+      if (handoff.hp != null) {
+        _hpController.text = '${handoff.hp}';
+      }
+      battleStatHandoff.clear();
+    }
     _loadRelations();
   }
 
@@ -145,8 +161,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     if (!mounted) {
       return;
     }
-    final generation =
-        battleScopeForEdition(gameEditionRepository.edition).generation;
+    final generation = battleScopeForEdition(
+      gameEditionRepository.edition,
+    ).generation;
     setState(() {
       _attackerTypes = List<String>.from(summary.types);
       _attackController.text = attackStat.toString();
@@ -273,6 +290,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
             isContactMove: _isContactMove,
             isCriticalHit: _isCriticalHit,
             defenderScreened: _defenderScreened,
+            isSpreadMove: _isSpreadMove,
           );
         }
 
@@ -312,266 +330,283 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                       pagePadding.right,
                       0,
                     ),
-                    child: _DamageResultCard(
-                      estimate: estimate,
-                      compact: true,
-                    ),
+                    child: _DamageResultCard(estimate: estimate, compact: true),
                   ),
                 Expanded(
                   child: ListView(
                     padding: pagePadding.copyWith(top: 12, bottom: 96),
                     children: [
-          if (_loading)
-            const TitoLoadingPanel(
-              message: AppZh.companionLoading,
-              compact: true,
-            )
-          else if (_error != null)
-            StickerCard(
-              child: Text(
-                _error!,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                  height: 1.45,
-                ),
-              ),
-            )
-          else ...[
-            CompanionSectionCard(
-              title: AppZh.companionDamageInputsTitle,
-              subtitle: scope.damageNote,
-              children: [
-                Text(
-                  AppZh.companionDamageFacility(scope.facilityLabel),
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: TitoColors.deepBlue,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                PokemonSearchField(
-                  controller: _attackerQueryController,
-                  hintText: AppZh.companionAttackerSearchHint,
-                  suggestions: _attackerSuggestions,
-                  onQueryChanged: _searchAttacker,
-                  onPokemonSelected: _applyAttacker,
-                  prefixIcon: Icons.sports_martial_arts_rounded,
-                ),
-                const SizedBox(height: 12),
-                PokemonSearchField(
-                  controller: _defenderQueryController,
-                  hintText: AppZh.companionDefenderSearchHint,
-                  suggestions: _defenderSuggestions,
-                  onQueryChanged: _searchDefender,
-                  onPokemonSelected: _applyDefender,
-                  prefixIcon: Icons.shield_rounded,
-                ),
-                const SizedBox(height: 12),
-                MoveCategoryPicker(
-                  selected: _category,
-                  onChanged: (value) => setState(() => _category = value),
-                ),
-                const SizedBox(height: 12),
-                CollapsibleTypePicker(
-                  label: AppZh.companionMoveType,
-                  selected: [_moveType],
-                  maxSelected: 1,
-                  onChanged: (types) {
-                    if (types.isNotEmpty) {
-                      setState(() => _moveType = types.first);
-                    }
-                  },
-                ),
-                const SizedBox(height: 12),
-                LinkedOrManualTypePicker(
-                  linkedPokemonId: _linkedAttackerId,
-                  label: AppZh.companionTypeAttackerPick,
-                  selected: _attackerTypes,
-                  onManualChanged: (types) {
-                    setState(() => _attackerTypes = types);
-                    _clearLinkedAttacker();
-                  },
-                ),
-                const SizedBox(height: 12),
-                LinkedOrManualTypePicker(
-                  linkedPokemonId: _linkedDefenderId,
-                  label: AppZh.companionTypeManualPick,
-                  selected: _defenderTypes,
-                  onManualChanged: (types) {
-                    if (types.isNotEmpty) {
-                      setState(() {
-                        _defenderTypes = types;
-                        _defenderTeraType =
-                            defaultTeraTypeFor(types, scope.generation);
-                      });
-                      _clearLinkedDefender();
-                    }
-                  },
-                ),
-                if (scope.generation >= 9) ...[
-                  const SizedBox(height: 12),
-                  TerastalPicker(
-                    label: AppZh.companionDefenderTerastal,
-                    enabled: true,
-                    terastallized: _defenderTerastallized,
-                    teraType: _defenderTeraType,
-                    fallbackTypes: _defenderTypes,
-                    generation: scope.generation,
-                    onTerastallizedChanged: (value) =>
-                        setState(() => _defenderTerastallized = value),
-                    onTeraTypeChanged: (type) =>
-                        setState(() => _defenderTeraType = type),
-                  ),
-                  const SizedBox(height: 12),
-                  TerastalPicker(
-                    label: AppZh.companionAttackerTerastal,
-                    enabled: true,
-                    terastallized: _attackerTerastallized,
-                    teraType: _attackerTeraType,
-                    fallbackTypes: _attackerTypes,
-                    generation: scope.generation,
-                    onTerastallizedChanged: (value) =>
-                        setState(() => _attackerTerastallized = value),
-                    onTeraTypeChanged: (type) =>
-                        setState(() => _attackerTeraType = type),
-                  ),
-                ],
-                if (_defenderAbilityOptions.isNotEmpty ||
-                    _linkedDefenderId == null) ...[
-                  const SizedBox(height: 12),
-                  CompanionAbilitySection(
-                    pokemonLabel: AppZh.companionDefenderAbilityPick,
-                    manualLabel: AppZh.companionManualAbilityPick,
-                    manualOptions: kManualDefensiveAbilityOptions,
-                    pokemonOptions: _defenderAbilityOptions,
-                    linkedPokemonId: _linkedDefenderId,
-                    selectedSlug: _defenderAbilitySlug,
-                    onChanged: (slug) =>
-                        setState(() => _defenderAbilitySlug = slug),
-                  ),
-                ],
-                if (_attackerAbilityOptions.isNotEmpty ||
-                    _linkedAttackerId == null) ...[
-                  const SizedBox(height: 12),
-                  CompanionAbilitySection(
-                    pokemonLabel: AppZh.companionAttackerAbilityPick,
-                    manualLabel: AppZh.companionAttackerAbilityPick,
-                    manualOptions: kManualAttackerAbilityOptions,
-                    pokemonOptions: _attackerAbilityOptions,
-                    linkedPokemonId: _linkedAttackerId,
-                    selectedSlug: _attackerAbilitySlug,
-                    onChanged: (slug) =>
-                        setState(() => _attackerAbilitySlug = slug),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                FieldConditionPicker(
-                  label: AppZh.companionWeatherPick,
-                  selected: _weather,
-                  onChanged: (value) => setState(() => _weather = value),
-                ),
-                const SizedBox(height: 12),
-                TerrainConditionPicker(
-                  label: AppZh.companionTerrainPick,
-                  selected: _terrain,
-                  onChanged: (value) => setState(() => _terrain = value),
-                ),
-                const SizedBox(height: 12),
-                HeldItemPicker(
-                  selected: _heldItem,
-                  onChanged: (value) => setState(() => _heldItem = value),
-                  typeBoostItemType: _typeBoostItemType,
-                  onTypeBoostChanged: (type) =>
-                      setState(() => _typeBoostItemType = type),
-                ),
-                const SizedBox(height: 12),
-                StatusConditionPicker(
-                  selected: _attackerStatus,
-                  onChanged: (value) =>
-                      setState(() => _attackerStatus = value),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ContactMoveToggle(
-                      value: _isContactMove,
-                      onChanged: (value) =>
-                          setState(() => _isContactMove = value),
-                    ),
-                    BattleToggleChip(
-                      label: AppZh.companionCriticalHit,
-                      value: _isCriticalHit,
-                      onChanged: (value) =>
-                          setState(() => _isCriticalHit = value),
-                    ),
-                    BattleToggleChip(
-                      label: AppZh.companionDefenderScreen,
-                      value: _defenderScreened,
-                      onChanged: (value) =>
-                          setState(() => _defenderScreened = value),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                CompanionNumberField(
-                  label: AppZh.companionStatLevel,
-                  controller: _levelController,
-                  max: 100,
-                  onChanged: (_) => setState(() {}),
-                ),
-                const SizedBox(height: 12),
-                _PowerSliderRow(
-                  controller: _powerController,
-                  onChanged: () => setState(() {}),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: CompanionNumberField(
-                        label: _category == MoveCategory.physical
-                            ? AppZh.companionAttackStat
-                            : AppZh.companionSpAttackStat,
-                        controller: _attackController,
-                        max: 999,
-                        onChanged: (_) => setState(() {}),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: CompanionNumberField(
-                        label: _category == MoveCategory.physical
-                            ? AppZh.companionDefenseStat
-                            : AppZh.companionSpDefenseStat,
-                        controller: _defenseController,
-                        max: 999,
-                        onChanged: (_) => setState(() {}),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                CompanionNumberField(
-                  label: AppZh.companionDefenderHp,
-                  controller: _hpController,
-                  max: 999,
-                  onChanged: (_) => setState(() {}),
-                ),
-              ],
-            ),
-            if (estimate != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                AppZh.companionDamageAssumptions,
-                style: SecondaryTypography.onGradient.small12.copyWith(
-                  color: TitoColors.skyBlue,
-                  height: 1.45,
-                ),
-              ),
-            ],
-          ],
+                      if (_loading)
+                        const TitoLoadingPanel(
+                          message: AppZh.companionLoading,
+                          compact: true,
+                        )
+                      else if (_error != null)
+                        StickerCard(
+                          child: Text(
+                            _error!,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              color: TitoColors.mutedInk,
+                              height: 1.45,
+                            ),
+                          ),
+                        )
+                      else ...[
+                        CompanionSectionCard(
+                          title: AppZh.companionDamageInputsTitle,
+                          subtitle: scope.damageNote,
+                          children: [
+                            Text(
+                              AppZh.companionDamageFacility(
+                                scope.facilityLabel,
+                              ),
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: TitoColors.deepBlue,
+                                  ),
+                            ),
+                            const SizedBox(height: 12),
+                            PokemonSearchField(
+                              controller: _attackerQueryController,
+                              hintText: AppZh.companionAttackerSearchHint,
+                              suggestions: _attackerSuggestions,
+                              onQueryChanged: _searchAttacker,
+                              onPokemonSelected: _applyAttacker,
+                              prefixIcon: Icons.sports_martial_arts_rounded,
+                            ),
+                            const SizedBox(height: 12),
+                            PokemonSearchField(
+                              controller: _defenderQueryController,
+                              hintText: AppZh.companionDefenderSearchHint,
+                              suggestions: _defenderSuggestions,
+                              onQueryChanged: _searchDefender,
+                              onPokemonSelected: _applyDefender,
+                              prefixIcon: Icons.shield_rounded,
+                            ),
+                            const SizedBox(height: 12),
+                            MoveCategoryPicker(
+                              selected: _category,
+                              onChanged: (value) =>
+                                  setState(() => _category = value),
+                            ),
+                            const SizedBox(height: 12),
+                            CollapsibleTypePicker(
+                              label: AppZh.companionMoveType,
+                              selected: [_moveType],
+                              maxSelected: 1,
+                              onChanged: (types) {
+                                if (types.isNotEmpty) {
+                                  setState(() => _moveType = types.first);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            LinkedOrManualTypePicker(
+                              linkedPokemonId: _linkedAttackerId,
+                              label: AppZh.companionTypeAttackerPick,
+                              selected: _attackerTypes,
+                              onManualChanged: (types) {
+                                setState(() => _attackerTypes = types);
+                                _clearLinkedAttacker();
+                              },
+                            ),
+                            const SizedBox(height: 12),
+                            LinkedOrManualTypePicker(
+                              linkedPokemonId: _linkedDefenderId,
+                              label: AppZh.companionTypeManualPick,
+                              selected: _defenderTypes,
+                              onManualChanged: (types) {
+                                if (types.isNotEmpty) {
+                                  setState(() {
+                                    _defenderTypes = types;
+                                    _defenderTeraType = defaultTeraTypeFor(
+                                      types,
+                                      scope.generation,
+                                    );
+                                  });
+                                  _clearLinkedDefender();
+                                }
+                              },
+                            ),
+                            if (scope.generation >= 9) ...[
+                              const SizedBox(height: 12),
+                              TerastalPicker(
+                                label: AppZh.companionDefenderTerastal,
+                                enabled: true,
+                                terastallized: _defenderTerastallized,
+                                teraType: _defenderTeraType,
+                                fallbackTypes: _defenderTypes,
+                                generation: scope.generation,
+                                onTerastallizedChanged: (value) => setState(
+                                  () => _defenderTerastallized = value,
+                                ),
+                                onTeraTypeChanged: (type) =>
+                                    setState(() => _defenderTeraType = type),
+                              ),
+                              const SizedBox(height: 12),
+                              TerastalPicker(
+                                label: AppZh.companionAttackerTerastal,
+                                enabled: true,
+                                terastallized: _attackerTerastallized,
+                                teraType: _attackerTeraType,
+                                fallbackTypes: _attackerTypes,
+                                generation: scope.generation,
+                                onTerastallizedChanged: (value) => setState(
+                                  () => _attackerTerastallized = value,
+                                ),
+                                onTeraTypeChanged: (type) =>
+                                    setState(() => _attackerTeraType = type),
+                              ),
+                            ],
+                            if (_defenderAbilityOptions.isNotEmpty ||
+                                _linkedDefenderId == null) ...[
+                              const SizedBox(height: 12),
+                              CompanionAbilitySection(
+                                pokemonLabel:
+                                    AppZh.companionDefenderAbilityPick,
+                                manualLabel: AppZh.companionManualAbilityPick,
+                                manualOptions: kManualDefensiveAbilityOptions,
+                                pokemonOptions: _defenderAbilityOptions,
+                                linkedPokemonId: _linkedDefenderId,
+                                selectedSlug: _defenderAbilitySlug,
+                                onChanged: (slug) =>
+                                    setState(() => _defenderAbilitySlug = slug),
+                              ),
+                            ],
+                            if (_attackerAbilityOptions.isNotEmpty ||
+                                _linkedAttackerId == null) ...[
+                              const SizedBox(height: 12),
+                              CompanionAbilitySection(
+                                pokemonLabel:
+                                    AppZh.companionAttackerAbilityPick,
+                                manualLabel: AppZh.companionAttackerAbilityPick,
+                                manualOptions: kManualAttackerAbilityOptions,
+                                pokemonOptions: _attackerAbilityOptions,
+                                linkedPokemonId: _linkedAttackerId,
+                                selectedSlug: _attackerAbilitySlug,
+                                onChanged: (slug) =>
+                                    setState(() => _attackerAbilitySlug = slug),
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            FieldConditionPicker(
+                              label: AppZh.companionWeatherPick,
+                              selected: _weather,
+                              onChanged: (value) =>
+                                  setState(() => _weather = value),
+                            ),
+                            const SizedBox(height: 12),
+                            TerrainConditionPicker(
+                              label: AppZh.companionTerrainPick,
+                              selected: _terrain,
+                              onChanged: (value) =>
+                                  setState(() => _terrain = value),
+                            ),
+                            const SizedBox(height: 12),
+                            HeldItemPicker(
+                              selected: _heldItem,
+                              onChanged: (value) =>
+                                  setState(() => _heldItem = value),
+                              typeBoostItemType: _typeBoostItemType,
+                              onTypeBoostChanged: (type) =>
+                                  setState(() => _typeBoostItemType = type),
+                            ),
+                            const SizedBox(height: 12),
+                            StatusConditionPicker(
+                              selected: _attackerStatus,
+                              onChanged: (value) =>
+                                  setState(() => _attackerStatus = value),
+                            ),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                ContactMoveToggle(
+                                  value: _isContactMove,
+                                  onChanged: (value) =>
+                                      setState(() => _isContactMove = value),
+                                ),
+                                BattleToggleChip(
+                                  label: AppZh.companionCriticalHit,
+                                  value: _isCriticalHit,
+                                  onChanged: (value) =>
+                                      setState(() => _isCriticalHit = value),
+                                ),
+                                BattleToggleChip(
+                                  label: AppZh.companionDefenderScreen,
+                                  value: _defenderScreened,
+                                  onChanged: (value) =>
+                                      setState(() => _defenderScreened = value),
+                                ),
+                                BattleToggleChip(
+                                  label: AppZh.companionSpreadMove,
+                                  value: _isSpreadMove,
+                                  onChanged: (value) =>
+                                      setState(() => _isSpreadMove = value),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            CompanionNumberField(
+                              label: AppZh.companionStatLevel,
+                              controller: _levelController,
+                              max: 100,
+                              onChanged: (_) => setState(() {}),
+                            ),
+                            const SizedBox(height: 12),
+                            _PowerSliderRow(
+                              controller: _powerController,
+                              onChanged: () => setState(() {}),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CompanionNumberField(
+                                    label: _category == MoveCategory.physical
+                                        ? AppZh.companionAttackStat
+                                        : AppZh.companionSpAttackStat,
+                                    controller: _attackController,
+                                    max: 999,
+                                    onChanged: (_) => setState(() {}),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: CompanionNumberField(
+                                    label: _category == MoveCategory.physical
+                                        ? AppZh.companionDefenseStat
+                                        : AppZh.companionSpDefenseStat,
+                                    controller: _defenseController,
+                                    max: 999,
+                                    onChanged: (_) => setState(() {}),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            CompanionNumberField(
+                              label: AppZh.companionDefenderHp,
+                              controller: _hpController,
+                              max: 999,
+                              onChanged: (_) => setState(() {}),
+                            ),
+                          ],
+                        ),
+                        if (estimate != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            AppZh.companionDamageAssumptions,
+                            style: SecondaryTypography.onGradient.small12
+                                .copyWith(
+                                  color: TitoColors.skyBlue,
+                                  height: 1.45,
+                                ),
+                          ),
+                        ],
+                      ],
                     ],
                   ),
                 ),
