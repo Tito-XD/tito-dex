@@ -20,6 +20,7 @@ class TrainerCard extends StatelessWidget {
     this.micro = false,
     this.onAvatarTap,
     this.avatarPlaceholder = false,
+    this.stacked = false,
   });
 
   final CurrentJourney journey;
@@ -29,6 +30,11 @@ class TrainerCard extends StatelessWidget {
   final VoidCallback? onAvatarTap;
   final bool avatarPlaceholder;
 
+  /// Square-dashboard solo layout: avatar / greeting / name stack in three
+  /// centered rows instead of the side-by-side row — visually balances the
+  /// left column when there is no journey card below (no linked save).
+  final bool stacked;
+
   TrainerCardDensity get _density {
     if (micro) return TrainerCardDensity.micro;
     if (dense || compact) return TrainerCardDensity.dense;
@@ -37,7 +43,12 @@ class TrainerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final density = _density;
+    // Square dashboards need the whole micro treatment (height AND font
+    // sizes) — dense height with dense 33/27pt type still overflows the
+    // 720px column's journey card below.
+    final density = DeviceLayout.useSquareDashboard(context)
+        ? TrainerCardDensity.micro
+        : _density;
     final metrics = _TrainerCardMetrics.forDensity(context, density);
     final padding = density == TrainerCardDensity.standard
         ? const EdgeInsets.all(16)
@@ -170,16 +181,17 @@ class _TrainerCardBody extends StatelessWidget {
       ],
     );
 
-    final row = Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        avatar,
-        SizedBox(width: metrics.gutter),
-        Expanded(child: textColumn),
-      ],
+    final content = SizedBox(
+      height: metrics.avatarSize,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          avatar,
+          SizedBox(width: metrics.gutter),
+          Expanded(child: textColumn),
+        ],
+      ),
     );
-
-    final content = SizedBox(height: metrics.avatarSize, child: row);
 
     final body = SizedBox(
       height: metrics.cardHeight,

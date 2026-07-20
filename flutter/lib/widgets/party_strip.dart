@@ -299,35 +299,50 @@ class _PartyGrid extends StatelessWidget {
     const slotCount = 6;
     final visibleParty = party.take(slotCount).toList(growable: false);
 
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: slotCount,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-        childAspectRatio: 2.25,
-      ),
-      itemBuilder: (context, index) {
-        if (index < visibleParty.length) {
-          return DecoratedBox(
-            decoration: BoxDecoration(
-              color: TitoColors.card.withValues(alpha: 0.52),
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: _PartyOrb(
-                member: visibleParty[index],
-                compact: compact,
-                horizontal: true,
-                mini: true,
-              ),
-            ),
-          );
-        }
-        return const _EmptyPartySlot();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Three columns × two rows (mirrors the portrait home grid) — each
+        // cell gets enough height for the sprite + name-over-level stack.
+        const cols = 3;
+        const rows = 2;
+        const gap = 4.0;
+        final cellW = (constraints.maxWidth - gap * (cols - 1)) / cols;
+        final cellH = (constraints.maxHeight - gap * (rows - 1)) / rows;
+        final ratio = cellH > 0 && cellW > 0 ? cellW / cellH : 1.0;
+        return GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: slotCount,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: cols,
+            crossAxisSpacing: gap,
+            mainAxisSpacing: gap,
+            childAspectRatio: ratio,
+          ),
+          itemBuilder: (context, index) {
+            if (index < visibleParty.length) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: TitoColors.card.withValues(alpha: 0.52),
+                  borderRadius: BorderRadius.circular(TitoRadii.sm),
+                  border: Border.all(color: TitoColors.ink, width: 2),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  child: _PartyOrb(
+                    member: visibleParty[index],
+                    compact: compact,
+                    horizontal: true,
+                    mini: true,
+                  ),
+                ),
+              );
+            }
+            return const _EmptyPartySlot();
+          },
+        );
       },
     );
   }
@@ -387,6 +402,26 @@ class _PartyOrb extends StatelessWidget {
         : null;
 
     if (horizontal) {
+      if (mini) {
+        // Square-grid member cell: sprite on the left, name top-right,
+        // level bottom-right — same stack as the portrait home grid.
+        return Row(
+          children: [
+            avatar,
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  name,
+                  if (level != null) level,
+                ],
+              ),
+            ),
+          ],
+        );
+      }
       return Row(
         children: [
           avatar,

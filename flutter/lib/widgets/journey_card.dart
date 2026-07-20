@@ -90,21 +90,40 @@ class JourneyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
-                  Row(
-                    children: [
-                      _Meta(
-                        label: AppZh.labelBadges,
-                        value: '${journey.badges}/${journey.maxBadges}',
-                        dense: dense,
-                      ),
-                      _Meta(
-                        label: AppZh.labelPlayTime,
-                        value: journey.playTime,
-                        dense: dense,
-                      ),
-                    ],
-                  ),
+                  SizedBox(height: dense ? 4 : (compact ? 8 : 10)),
+                  // Square dashboards only get ~78px for this card — the two
+                  // meta columns merge into one row in dense mode so the
+                  // badge count and play time survive instead of overflowing.
+                  if (dense)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${AppZh.labelBadges} ${journey.badges}/${journey.maxBadges}'
+                            ' · ${AppZh.labelPlayTime} ${journey.playTime}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: denseStyle(context.tito.onDeepMetaLabel)
+                                .copyWith(fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Row(
+                      children: [
+                        _Meta(
+                          label: AppZh.labelBadges,
+                          value: '${journey.badges}/${journey.maxBadges}',
+                          dense: dense,
+                        ),
+                        _Meta(
+                          label: AppZh.labelPlayTime,
+                          value: journey.playTime,
+                          dense: dense,
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

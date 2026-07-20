@@ -166,62 +166,86 @@ class _HorizontalHomeLayout extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Column(
+              // Without a linked save the two-column split leaves the left
+              // column mostly empty (trainer card only). Fall back to the
+              // portrait treatment instead: two full-width bars stacked —
+              // trainer card on top, party card below — which fills the
+              // square screen evenly.
+              child: saveLinked
+                  ? Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      // Without a linked save there is no journey card below the
-                      // trainer card — center it so the column has no dead gap.
-                      mainAxisAlignment: saveLinked
-                          ? MainAxisAlignment.start
-                          : MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _TrainerCardSlot(
+                                journey: journey,
+                                bootstrapping: bootstrapping,
+                                dense: true,
+                              ),
+                              SizedBox(height: gap),
+                              Expanded(
+                                child: IgnorePointer(
+                                  ignoring: bootstrapping,
+                                  child: Opacity(
+                                    opacity: bootstrapping ? 0.0 : 1.0,
+                                    child: JourneyCard(
+                                      journey: journey,
+                                      onOpenDetail: onJourneyOpen,
+                                      compact: true,
+                                      dense: true,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: gap),
+                        Expanded(
+                          flex: 1,
+                          child: IgnorePointer(
+                            ignoring: bootstrapping,
+                            child: Opacity(
+                              opacity: bootstrapping ? 0.0 : 1.0,
+                              child: PartyStrip(
+                                party: journey.party,
+                                compact: true,
+                                square: true,
+                                gridMode: true,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _TrainerCardSlot(
                           journey: journey,
                           bootstrapping: bootstrapping,
                           dense: true,
                         ),
-                        if (saveLinked) ...[
-                          SizedBox(height: gap),
-                          Expanded(
-                            child: IgnorePointer(
-                              ignoring: bootstrapping,
-                              child: Opacity(
-                                opacity: bootstrapping ? 0.0 : 1.0,
-                                child: JourneyCard(
-                                  journey: journey,
-                                  onOpenDetail: onJourneyOpen,
-                                  compact: true,
-                                  dense: true,
-                                ),
+                        SizedBox(height: gap),
+                        Expanded(
+                          child: IgnorePointer(
+                            ignoring: bootstrapping,
+                            child: Opacity(
+                              opacity: bootstrapping ? 0.0 : 1.0,
+                              child: PartyStrip(
+                                party: journey.party,
+                                compact: true,
+                                square: true,
+                                gridMode: true,
                               ),
                             ),
                           ),
-                        ],
+                        ),
                       ],
                     ),
-                  ),
-                  SizedBox(width: gap),
-                  Expanded(
-                    flex: 1,
-                    child: IgnorePointer(
-                      ignoring: bootstrapping,
-                      child: Opacity(
-                        opacity: bootstrapping ? 0.0 : 1.0,
-                        child: PartyStrip(
-                          party: journey.party,
-                          compact: true,
-                          square: true,
-                          listMode: true,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
             SizedBox(height: gap),
             IgnorePointer(
