@@ -268,9 +268,11 @@ abstract final class DeviceLayout {
   static double trainerDenseCardHeight(BuildContext context) =>
       dim(context, 124.0);
 
-  /// Square-dashboard trainer card — same compact height as portrait dense.
+  /// Square-dashboard trainer card — tighter than portrait dense so the
+  /// journey card below it gets the room it needs (720px square: the
+  /// journey meta row was overflowing by 21px at dense height).
   static double trainerSquareCardHeight(BuildContext context) =>
-      trainerDenseCardHeight(context);
+      dim(context, 116.0);
 
   static double trainerMicroAvatarSize(BuildContext context) =>
       dim(context, 56.0);

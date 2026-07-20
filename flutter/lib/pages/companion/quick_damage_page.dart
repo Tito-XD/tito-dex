@@ -316,7 +316,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                       Text(
                         edition.labelZh,
                         style: SecondaryTypography.onGradient.body14.copyWith(
-                          color: TitoColors.skyBlue,
+                          color: TitoColors.card.withValues(alpha: 0.92),
                         ),
                       ),
                     ],
@@ -601,7 +601,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                             AppZh.companionDamageAssumptions,
                             style: SecondaryTypography.onGradient.small12
                                 .copyWith(
-                                  color: TitoColors.skyBlue,
+                                  color: TitoColors.card.withValues(alpha: 0.92),
                                   height: 1.45,
                                 ),
                           ),

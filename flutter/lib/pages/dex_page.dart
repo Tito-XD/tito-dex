@@ -25,6 +25,7 @@ import '../theme/tito_font_scale.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
+import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
@@ -563,9 +564,12 @@ class _DexPageState extends State<DexPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _DexTopBar(
-                        gameTitle: gameEditionRepository.edition.labelZh,
                         onSearch: () => context.push('/search'),
                         onReference: () => _showReferenceMenu(context),
+                      ),
+                      const SizedBox(height: 6),
+                      SecondaryPageSubtitle(
+                        text: gameEditionRepository.edition.labelZh,
                       ),
                       SizedBox(height: squareGap(context)),
                       // Square handheld: keep the top area short — at most one
@@ -729,7 +733,7 @@ class _DexPageState extends State<DexPage> {
                     ),
                     textAlign: TextAlign.center,
                     style: SecondaryTypography.onGradient.body14.copyWith(
-                      color: TitoColors.skyBlue,
+                      color: TitoColors.card.withValues(alpha: 0.92),
                     ),
                   ),
                 ),
@@ -777,13 +781,8 @@ class _DexPageState extends State<DexPage> {
 }
 
 class _DexTopBar extends StatelessWidget {
-  const _DexTopBar({
-    required this.gameTitle,
-    required this.onSearch,
-    required this.onReference,
-  });
+  const _DexTopBar({required this.onSearch, required this.onReference});
 
-  final String gameTitle;
   final VoidCallback onSearch;
   final VoidCallback onReference;
 
@@ -810,8 +809,10 @@ class _DexTopBar extends StatelessWidget {
                 size: backIcon,
                 color: TitoColors.card,
               ),
+              // Title is just 「图鉴」 — the game name moved to the shared
+              // subtitle line so the two action buttons stop squeezing it.
               label: Text(
-                '${AppZh.navDex} · $gameTitle',
+                AppZh.navDex,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: SecondaryTypography.onGradient.title.copyWith(

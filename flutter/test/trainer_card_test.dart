@@ -24,20 +24,18 @@ void main() {
 
     final journey = CurrentJourney.mock();
 
-    double denseCardHeight(BuildContext context) {
-      return DeviceLayout.trainerDenseCardHeight(context);
-    }
-
-    late double squareDenseHeight;
+    late double squareHeight;
     await tester.pumpWidget(
       _wrapSquare(
         Builder(
           builder: (context) {
-            squareDenseHeight = denseCardHeight(context);
+            // v0.6.7: square dashboards drop the trainer card to the micro
+            // height (116×dim) so the journey card below stops overflowing.
+            squareHeight = DeviceLayout.trainerSquareCardHeight(context);
             expect(DeviceLayout.useSquareDashboard(context), isTrue);
             expect(
-              DeviceLayout.trainerSquareCardHeight(context),
-              squareDenseHeight,
+              squareHeight,
+              DeviceLayout.trainerMicroCardHeight(context),
             );
             return HomeDashboardBody(
               journey: journey,
@@ -54,9 +52,10 @@ void main() {
 
     final trainerCard = tester.getSize(find.byType(TrainerCard));
     // StickerCard padding on square dashboard is 8px per side.
-    expect(trainerCard.height, squareDenseHeight + 16);
+    expect(trainerCard.height, squareHeight + 16);
 
-    expect(trainerCard.height, lessThanOrEqualTo(110));
+    // micro 116 + 16 padding at dim 1.0 (360px square test surface).
+    expect(trainerCard.height, lessThanOrEqualTo(132));
     expect(tester.takeException(), isNull);
   });
 

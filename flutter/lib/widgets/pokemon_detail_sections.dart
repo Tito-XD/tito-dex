@@ -66,7 +66,7 @@ class PokemonDetailHeader extends StatelessWidget {
               child: Text(
                 dexLabel,
                 style: SecondaryTypography.onGradient.small12.copyWith(
-                  color: TitoColors.skyBlue,
+                  color: TitoColors.card.withValues(alpha: 0.92),
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -131,7 +131,7 @@ class PokemonDetailHeader extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.small12.copyWith(
-                          color: TitoColors.skyBlue,
+                          color: TitoColors.card.withValues(alpha: 0.92),
                           fontWeight: FontWeight.w700,
                         ),
                       ),

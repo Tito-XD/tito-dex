@@ -35,16 +35,31 @@ class SecondaryPageScaffold extends StatelessWidget {
         SecondaryPageAppBar(title: title, showSettings: showSettings),
         if (subtitle != null) ...[
           const SizedBox(height: 6),
-          Text(
-            subtitle!,
-            style: SecondaryTypography.onGradient.body14.copyWith(
-              color: TitoColors.skyBlue,
-            ),
-          ),
+          SecondaryPageSubtitle(text: subtitle!),
         ],
         const SizedBox(height: 12),
         ...children,
       ],
+    );
+  }
+}
+
+/// On-gradient subtitle line shared by secondary pages (settings, dex,
+/// quick damage, …). Cream at 92% reads clearly against the v0.6.7
+/// deep-blue gradient top (was skyBlue on skyBlue, ~1:1 contrast).
+/// Extracted so a future color tweak lands in exactly one place.
+class SecondaryPageSubtitle extends StatelessWidget {
+  const SecondaryPageSubtitle({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: SecondaryTypography.onGradient.body14.copyWith(
+        color: TitoColors.card.withValues(alpha: 0.92),
+      ),
     );
   }
 }

@@ -18,7 +18,11 @@ class TitoPageContainer extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [TitoColors.skyBlue, TitoColors.slateBlue],
+            // v0.6.7 header refresh (picked in the gradient template v3):
+            // #5D728A → slateBlue, a 60% melt from deepBlue into slate. The
+            // cream title now sits on the dark end instead of the palest
+            // end (was skyBlue→slate, 1.64:1 contrast).
+            colors: [Color(0xFF5D728A), Color(0xFF7B91A6)],
           ),
         ),
         child: child,
