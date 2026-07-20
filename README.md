@@ -6,9 +6,9 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.6.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.7) · App `0.6.7+85` | arm64-v8a, about 24 MB |
-| Offline APK | [v0.6.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.7) · App `0.6.7-offline+86` | Bundles the current dex pack, about 65 MB |
-| `main` source baseline | App `0.6.7+85` | Retro phase 2: settings groups, damage hero card, dex hero tabs, template-aligned team page, hand-drawn tile icons |
+| Lite APK | [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) · App `0.6.8+87` | arm64-v8a, about 24 MB |
+| Offline APK | [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) · App `0.6.8-offline+88` | Bundles the current dex pack, about 65 MB |
+| `main` source baseline | App `0.6.8+87` | Header gradient refresh (readable dark-top `#5D728A→slateBlue`), cream on-gradient subtitles, slim dex title, square-dashboard polish |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
@@ -49,7 +49,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.6.7-lite-rg-arm64.apk`** or **`TitoDex-0.6.7-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.6.8-lite-rg-arm64.apk`** or **`TitoDex-0.6.8-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

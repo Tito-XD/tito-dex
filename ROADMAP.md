@@ -1,13 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.7) · Lite `0.6.7+85` · Offline `0.6.7-offline+86`.
+> **Latest release:** [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) · Lite `0.6.8+87` · Offline `0.6.8-offline+88`.
 >
-> **Current `main` source baseline:** `0.6.7+85`.
+> **Current `main` source baseline:** `0.6.8+87`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.6.8** | Header gradient recolor to a readable dark-top `#5D728A→slateBlue`, cream on-gradient subtitles, slim dex title, square-dashboard polish, doubles spread modifier and stat→damage handoff |
 | **v0.6.7** | Retro phase 2 (settings groups, damage hero, dex hero tabs, template-aligned team page) plus hand-drawn tile icons, validated via two previews |
 | **v0.6.6.1** | Retro press physics extended to every interactive sticker across the app |
 | **v0.6.6** | Retro sticker-feel toggle, generation-scoped quiz, shiny companion with intimacy quotes, crit/screen damage toggles, linked team editing, and bundled type icons |
