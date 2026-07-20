@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.6.6.1` (`0.6.6.1+79`) | Recommended arm64-v8a download |
-| Offline APK | `v0.6.6.1` (`0.6.6.1-offline+80`) | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.6.6+77` | Current default branch baseline |
+| Lite APK | `v0.6.7` (`0.6.7+85`) | Recommended arm64-v8a download |
+| Offline APK | `v0.6.7` (`0.6.7-offline+86`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.6.7+85` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,9 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.6.7` | TitoDex v0.6.7 · Retro 第二批与手绘图标 | Lands the second Retro batch after two preview rounds: settings group-label pills with sticker switches and icon plates, the deep-blue damage hero card with a visual HP bar and power slider, dex detail hero header with type-tinted plate and sticker tabs, the team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons, plus fixes — obtain tab follows the selected edition, responsive dex grid, hold-press physics, pinned damage result. |
+| `v0.6.7-pre.2` | TitoDex v0.6.7-pre.2 · 修复与 Team 对齐（预览） | Preview build on the pre.1 base: feedback fixes, team template alignment, responsive dex grid, and hold-press physics — superseded by v0.6.7. |
+| `v0.6.7-pre.1` | TitoDex v0.6.7-pre.1 · Retro 第二批（预览） | First preview of the Retro phase-2 batch (settings groups, sticker switches, damage hero, dex hero tabs, engraved forms) — superseded by v0.6.7. |
 | `v0.6.6.1` | TitoDex v0.6.6.1 · Retro 按压反馈扩展 | Extends the Retro press-down physics to every interactive sticker — dex grid cards, search results, moves/abilities reference rows, team rows, the journey card, quiz choices, dex top-bar pills, picker tiles, and battle tool rows — via a shared StickerPressable wrapper that avoids doubled shadows and fully gates on the Retro toggle. |
 | `v0.6.6` | TitoDex v0.6.6 · Retro 贴纸质感 | Adds the Retro sticker-feel toggle (signature solid drop shadows, press-down physics, tightened headings — default on), a generation-scoped silhouette quiz with persisted best streak and adopt-as-companion, shiny companion sessions with intimacy quote tiers and time-of-day greetings, critical-hit and screen toggles in quick damage, a full-dex team picker with species-linked editing, official-style type icons, drill-down back-hierarchy fixes, toggleable list reveal animations, a shiny artwork preview, a branded Android 12+ splash, and matched transition backdrops. |
 | `v0.6.5` | TitoDex v0.6.5 · 体验修补与中文参考 | Save-diff banner scoped to save-linked editions with dismissal, symmetric dex expansion backdrop at 480/380ms, submit-only recent searches, a prominent current-game card in Settings, overflow-free matchup grid, unified dex top-bar pills, a 0.75× companion size floor, and modern official Chinese attached as a reference to untranslated flavor text. |
