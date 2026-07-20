@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.6.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.7) |
-| **`main` / lite source** | `0.6.7+85` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.6.7-offline+86` — APK-bundled dex data |
+| **Latest release** | [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) |
+| **`main` / lite source** | `0.6.8+87` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.6.8-offline+88` — APK-bundled dex data |
 | **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.6.7)
+## Current feature status (latest release line: v0.6.8)
 
-> `main` matches the v0.6.7 release line (Retro phase 2, validated via the v0.6.7-pre.1/pre.2 previews on the merged `preview/retro-phase2` branch). The offline package adds only the bundled dex seed and offline package version.
+> `main` matches the v0.6.8 release line (header gradient refresh + square-dashboard polish on top of the Retro phase-2 base). The offline package adds only the bundled dex seed and offline package version.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -62,6 +62,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.6.8: header gradient recolored from light-top skyBlue→slateBlue (1.64:1 title contrast) to dark-top `#5D728A`→slateBlue picked via `docs/mockups/titodex_header_gradient_template.html`; on-gradient subtitles switch from invisible skyBlue to cream through the shared `SecondaryPageSubtitle` (deep-blue-card skyBlue text untouched — it was already readable); dex top bar slims to 「图鉴」 with the game name as subtitle; square dashboard gets a 3×2 party grid, tighter trainer card, journey-card overflow fix, and a stacked layout when no save is linked; quick damage gains the doubles spread ×0.75 toggle and the stat-calc → quick-damage one-shot handoff (`battle_handoff.dart`).
 - v0.6.7: Retro phase 2 from the five mock templates — settings group-label pills + StickerSwitch + icon plates, deep-blue damage hero card (oversized percentage, mint/coral HP bar, power slider, engraved fields, pill toggles), dex detail hero header with type-tinted plate + sticker tabs, team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons (`assets/icons/`), responsive dex grid, hold-press physics, pinned damage result, obtain tab follows the selected edition. Cream screen base and weak/resist tinted cells remain intentionally excluded.
 - v0.6.6.1: Retro press physics extended to every interactive sticker (dex grid cards, search/reference/team rows, journey card, quiz choices, dex top-bar pills, picker tiles, battle tool rows) via `StickerPressable` with `ownShadow` to avoid doubled shadows; DESIGN_SYSTEM canonizes the solid sticker-shadow signature.
 - v0.6.6: Retro sticker-feel toggle (Settings → 界面风格, default on — TitoShadows solid drops, StickerPressable press physics, -0.02em headings), generation-scoped silhouette quiz with persisted best streak + adopt-as-companion, shiny companion sessions (Showdown shiny GIFs, disk-cached) with intimacy quote tiers / time-of-day greetings / pat-count persistence, crit + screen toggles and an assumptions note in quick damage, full-dex team picker with species-linked editing, bundled official-style type icons, drill-down back-hierarchy fixes, toggleable list reveal animations, shiny artwork preview, branded Android 12+ splash, matched transition backdrop, repository cleanup.
