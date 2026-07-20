@@ -156,6 +156,15 @@ class _HorizontalHomeLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final gap = DeviceLayout.sectionSpacing(context);
 
+    // Tablets and other tall landscape screens: the two full-height columns
+    // balloon their cards (journey card oversized, party cells adrift in a
+    // stretched grid). Compose with fixed-height rows instead — trainer +
+    // journey side by side, party as one 6-across strip. Square handhelds
+    // and short landscape phones keep the packed two-column treatment.
+    final wideRows =
+        !DeviceLayout.useSquareDashboard(context) &&
+        DeviceLayout.sizeOf(context).height >= 560;
+
     // Tablets share this layout with square handhelds; without a width cap
     // the two columns stretch across the whole screen. Match the portrait
     // treatment: centered content with breathing room on the sides. Square
@@ -171,7 +180,15 @@ class _HorizontalHomeLayout extends StatelessWidget {
               // portrait treatment instead: two full-width bars stacked —
               // trainer card on top, party card below — which fills the
               // square screen evenly.
-              child: saveLinked
+              child: wideRows
+                  ? _WideRowsContent(
+                      journey: journey,
+                      saveLinked: saveLinked,
+                      onJourneyOpen: onJourneyOpen,
+                      bootstrapping: bootstrapping,
+                      gap: gap,
+                    )
+                  : saveLinked
                   ? Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -261,6 +278,82 @@ class _HorizontalHomeLayout extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Tablet-landscape composition: intrinsic-height trainer + journey row,
+/// then the party as a single 6-across strip, vertically centered above
+/// the quick actions instead of stretching to fill the screen.
+class _WideRowsContent extends StatelessWidget {
+  const _WideRowsContent({
+    required this.journey,
+    required this.saveLinked,
+    required this.onJourneyOpen,
+    required this.bootstrapping,
+    required this.gap,
+  });
+
+  final CurrentJourney journey;
+  final bool saveLinked;
+  final VoidCallback onJourneyOpen;
+  final bool bootstrapping;
+  final double gap;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget hideWhileBootstrapping(Widget child) => IgnorePointer(
+      ignoring: bootstrapping,
+      child: Opacity(opacity: bootstrapping ? 0.0 : 1.0, child: child),
+    );
+
+    final trainerSlot = _TrainerCardSlot(
+      journey: journey,
+      bootstrapping: bootstrapping,
+      dense: true,
+    );
+
+    final headerRow = saveLinked
+        ? IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: trainerSlot),
+                SizedBox(width: gap),
+                Expanded(
+                  child: hideWhileBootstrapping(
+                    JourneyCard(
+                      journey: journey,
+                      onOpenDetail: onJourneyOpen,
+                      compact: true,
+                      dense: true,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : trainerSlot;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        headerRow,
+        SizedBox(height: gap),
+        SizedBox(
+          height: 200,
+          child: hideWhileBootstrapping(
+            PartyStrip(
+              party: journey.party,
+              compact: true,
+              square: true,
+              gridMode: true,
+              stripMode: true,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
