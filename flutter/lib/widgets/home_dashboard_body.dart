@@ -221,7 +221,9 @@ class _HorizontalHomeLayout extends StatelessWidget {
                         ),
                       ],
                     )
-                  : Column(
+                  : // Full-width stacked bars: the party card renders as a
+                    // single 6-across strip so its cells don't stretch.
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _TrainerCardSlot(
@@ -240,6 +242,7 @@ class _HorizontalHomeLayout extends StatelessWidget {
                                 compact: true,
                                 square: true,
                                 gridMode: true,
+                                stripMode: true,
                               ),
                             ),
                           ),
