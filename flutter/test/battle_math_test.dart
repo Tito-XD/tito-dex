@@ -34,24 +34,27 @@ void main() {
     expect(attack, greaterThan(200));
   });
 
-  test('estimateDamage reports guaranteed ohko on super effective ice vs ground', () {
-    final estimate = estimateDamage(
-      level: 50,
-      power: 120,
-      attack: 238,
-      defense: 150,
-      defenderHp: 207,
-      moveType: 'ice',
-      attackerTypes: const ['psychic', 'ice'],
-      defenderTypes: const ['ground'],
-      relationsByType: relations,
-    );
+  test(
+    'estimateDamage reports guaranteed ohko on super effective ice vs ground',
+    () {
+      final estimate = estimateDamage(
+        level: 50,
+        power: 120,
+        attack: 238,
+        defense: 150,
+        defenderHp: 207,
+        moveType: 'ice',
+        attackerTypes: const ['psychic', 'ice'],
+        defenderTypes: const ['ground'],
+        relationsByType: relations,
+      );
 
-    expect(estimate.stabMultiplier, 1.5);
-    expect(estimate.typeMultiplier, 2);
-    expect(estimate.minDamage, greaterThan(207));
-    expect(estimate.verdictZh, '稳秒杀');
-  });
+      expect(estimate.stabMultiplier, 1.5);
+      expect(estimate.typeMultiplier, 2);
+      expect(estimate.minDamage, greaterThan(207));
+      expect(estimate.verdictZh, '稳秒杀');
+    },
+  );
 
   test('estimateDamage reports tank risk when max exceeds hp', () {
     final estimate = estimateDamage(
@@ -98,6 +101,44 @@ void main() {
       expect(
         run(crit: true, generation: 5).extraMultiplier,
         closeTo(run(generation: 5).extraMultiplier * 2.0, 1e-9),
+      );
+    });
+
+    test('spread moves take x0.75 in doubles and stack with crits', () {
+      final base = run();
+      final spread = estimateDamage(
+        level: 50,
+        power: 90,
+        attack: 120,
+        defense: 80,
+        defenderHp: 150,
+        moveType: 'fighting',
+        attackerTypes: const ['fighting'],
+        defenderTypes: const ['normal'],
+        relationsByType: relations,
+        isSpreadMove: true,
+      );
+      expect(
+        spread.extraMultiplier,
+        closeTo(base.extraMultiplier * 0.75, 1e-9),
+      );
+      final spreadCrit = estimateDamage(
+        level: 50,
+        power: 90,
+        attack: 120,
+        defense: 80,
+        defenderHp: 150,
+        moveType: 'fighting',
+        attackerTypes: const ['fighting'],
+        defenderTypes: const ['normal'],
+        relationsByType: relations,
+        isSpreadMove: true,
+        isCriticalHit: true,
+      );
+      // Crits bypass screens but NOT the spread modifier.
+      expect(
+        spreadCrit.extraMultiplier,
+        closeTo(base.extraMultiplier * 0.75 * 1.5, 1e-9),
       );
     });
 

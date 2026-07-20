@@ -404,8 +404,13 @@ abstract final class AppZh {
   static String companionDamageExtra(String extra) => '环境/特性修正 ×$extra';
   static const companionCriticalHit = '击中要害';
   static const companionDefenderScreen = '对方有光墙/反射壁';
+  static const companionSpreadMove = '双打·多目标招式';
+  static const companionStatApplyAttack = '带入伤害计算（攻击侧）';
+  static const companionStatApplyDefense = '带入伤害计算（防御侧）';
+  static const companionStatApplyHp = '带入伤害计算（对方 HP）';
   static const companionDamageAssumptions =
-      '计算假设：单打对战，伤害含 85%–100% 随机浮动；'
+      '计算假设：默认单打；勾选「双打·多目标招式」后按命中多个目标 ×0.75 计算；'
+      '伤害含 85%–100% 随机浮动；'
       '击中要害按世代倍率（第六世代起 ×1.5，此前 ×2）并无视光墙/反射壁；'
       '未收录的特性、道具与场地细节不计入，结果仅供旅途参考。';
   static const companionStatInputsTitle = '输入';
