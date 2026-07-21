@@ -7,8 +7,9 @@
 - **Active code:** `flutter/` (Flutter + Dart, Chinese UI)
 - **Removed:** the pre-Flutter React mock (`src/`) was deleted in the 0.6.5 cleanup; its releases stay on GitHub as historical artifacts
 - **Latest release:** v0.6.8 · Lite `0.6.8+87`; Offline `0.6.8-offline+88`
+- **Preview line:** v0.6.9-pre.1 (`+89` / `-offline+90`) — party grid and tablet layout, awaiting device feedback
 - **Offline data:** Dex bundle v5 (1025 species, `/v3/`)
-- **Tests:** `cd flutter && flutter test` (201 passing)
+- **Tests:** `cd flutter && flutter test` (205 passing)
 
 ## Cloud VM
 

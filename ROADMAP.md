@@ -3,6 +3,8 @@
 > **Latest release:** [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) · Lite `0.6.8+87` · Offline `0.6.8-offline+88`.
 >
 > **Current `main` source baseline:** `0.6.8+87`.
+>
+> **In preview:** [v0.6.9-pre.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.9-pre.1) · party grid and tablet layout, awaiting device feedback before the version bump.
 
 ## Recent release history
 
