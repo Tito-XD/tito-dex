@@ -37,37 +37,37 @@ class TitoProgressBar extends StatelessWidget {
           ),
           const SizedBox(height: 6),
         ],
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final trackWidth = constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : 120.0;
-            final fillWidth = trackWidth * clamped;
-            return Container(
-              width: trackWidth,
-              height: height,
-              decoration: BoxDecoration(
-                color: trackColor ?? TitoColors.ink.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(
-                  color: TitoColors.ink.withValues(alpha: 0.35),
-                  width: 1,
-                ),
+        // No LayoutBuilder here: AlertDialog sizes its content via
+        // IntrinsicWidth, and LayoutBuilder cannot answer intrinsic queries —
+        // in debug builds that assertion kills the whole dialog layout.
+        // LimitedBox keeps the 120px fallback for unbounded-width parents.
+        LimitedBox(
+          maxWidth: 120,
+          child: Container(
+            width: double.infinity,
+            height: height,
+            decoration: BoxDecoration(
+              color: trackColor ?? TitoColors.ink.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: TitoColors.ink.withValues(alpha: 0.35),
+                width: 1,
               ),
-              clipBehavior: Clip.antiAlias,
-              alignment: Alignment.centerLeft,
-              child: fillWidth <= 0
-                  ? const SizedBox.shrink()
-                  : Container(
-                      width: fillWidth,
-                      height: height,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: clamped <= 0
+                ? null
+                : FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: clamped,
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: fillColor ?? TitoColors.deepBlue,
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-            );
-          },
+                  ),
+          ),
         ),
       ],
     );
