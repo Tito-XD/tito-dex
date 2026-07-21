@@ -23,19 +23,15 @@ class PartyStrip extends StatelessWidget {
     super.key,
     required this.party,
     this.compact = false,
-    this.vertical = false,
     this.square = false,
     this.gridMode = false,
-    this.listMode = false,
     this.stripMode = false,
   });
 
   final List<PartyMember> party;
   final bool compact;
-  final bool vertical;
   final bool square;
   final bool gridMode;
-  final bool listMode;
 
   /// Full-width bar variant of [gridMode]: one row of six upright slots
   /// instead of the 2×3 column grid. Layout intent can't be inferred from
@@ -60,27 +56,9 @@ class PartyStrip extends StatelessWidget {
         children: [
           Text(AppZh.currentParty, style: titleStyle),
           SizedBox(height: square ? 4 : (compact ? 8 : 10)),
-          if (listMode)
-            Expanded(
-              child: _PartySlotList(party: party, compact: compact || square),
-            )
-          else if (gridMode)
+          if (gridMode)
             Expanded(
               child: _PartyGrid(party: party, strip: stripMode),
-            )
-          else if (vertical)
-            Expanded(
-              child: ListView.separated(
-                itemCount: party.length,
-                separatorBuilder: (_, __) => SizedBox(height: compact ? 6 : 8),
-                itemBuilder: (context, index) {
-                  return _PartyOrb(
-                    member: party[index],
-                    compact: compact,
-                    horizontal: true,
-                  );
-                },
-              ),
             )
           else
             Expanded(
@@ -234,54 +212,6 @@ class _PartyTextPlaceholder extends StatelessWidget {
             ),
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _PartySlotList extends StatelessWidget {
-  const _PartySlotList({required this.party, required this.compact});
-
-  final List<PartyMember> party;
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    const slotCount = 6;
-    final visibleParty = party.take(slotCount).toList(growable: false);
-
-    return Column(
-      children: [
-        for (var index = 0; index < slotCount; index++) ...[
-          if (index > 0) const SizedBox(height: 3),
-          Expanded(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: index < visibleParty.length
-                    ? TitoColors.card.withValues(alpha: 0.52)
-                    : TitoColors.card.withValues(alpha: 0.28),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                border: Border.all(
-                  color: index < visibleParty.length
-                      ? TitoColors.ink
-                      : TitoColors.ink.withValues(alpha: 0.45),
-                  width: 2,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: index < visibleParty.length
-                    ? _PartyOrb(
-                        member: visibleParty[index],
-                        compact: compact,
-                        horizontal: true,
-                        mini: true,
-                      )
-                    : const Center(child: _EmptyPartySlot()),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -496,102 +426,6 @@ class _EmptyPartySlot extends StatelessWidget {
       Icons.add_circle_outline_rounded,
       color: TitoColors.mutedInk.withValues(alpha: 0.65),
       size: 16,
-    );
-  }
-}
-
-class _PartyOrb extends StatelessWidget {
-  const _PartyOrb({
-    required this.member,
-    this.compact = false,
-    this.horizontal = false,
-    this.mini = false,
-  });
-
-  final PartyMember member;
-  final bool compact;
-  final bool horizontal;
-  final bool mini;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = member.nickname ?? localizeSpecies(member.species);
-    final orbSize = mini
-        ? DeviceLayout.dim(context, 28.0)
-        : (compact ? DeviceLayout.dim(context, 40.0) : 48.0);
-    final slotWidth = mini
-        ? DeviceLayout.dim(context, 52.0)
-        : (compact ? DeviceLayout.dim(context, 58.0) : 64.0);
-
-    final avatar = _PartyMemberAvatar(
-      member: member,
-      size: orbSize,
-      label: label,
-    );
-
-    final name = Text(
-      label,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: context.tito.captionStrong,
-    );
-
-    final level = member.level != null
-        ? Text('${AppZh.level}${member.level}', style: context.tito.caption)
-        : null;
-
-    if (horizontal) {
-      if (mini) {
-        // Square-grid member cell: sprite on the left, name top-right,
-        // level bottom-right — same stack as the portrait home grid.
-        return Row(
-          children: [
-            avatar,
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  name,
-                  if (level != null) level,
-                ],
-              ),
-            ),
-          ],
-        );
-      }
-      return Row(
-        children: [
-          avatar,
-          const SizedBox(width: 6),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(child: name),
-                if (level != null) ...[const SizedBox(width: 4), level],
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    return SizedBox(
-      width: slotWidth,
-      child: Column(
-        children: [
-          avatar,
-          SizedBox(height: mini ? 2 : 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(child: name),
-              if (level != null) ...[const SizedBox(width: 2), level],
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
