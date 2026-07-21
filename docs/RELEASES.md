@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.6.8` (`0.6.8+87`) | Recommended arm64-v8a download |
-| Offline APK | `v0.6.8` (`0.6.8-offline+88`) | Larger package with the core dex bundle embedded |
-| Source on `main` | `0.6.8+87` | Current default branch baseline |
+| Lite APK | `v0.6.9` (`0.6.9+91`) | Recommended arm64-v8a download |
+| Offline APK | `v0.6.9` (`0.6.9-offline+92`) | Larger package with the core dex bundle embedded |
+| Source on `main` | `0.6.9+91` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,7 +16,8 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
-| `v0.6.9-pre.1` | TitoDex v0.6.9-pre.1 · 队伍宫格与平板布局（预览） | Preview build for device feedback: party cells go upright with the level as a corner badge so names stop truncating and sprites scale with the cell; the square dashboard lays 2×3 when a save is linked and six-across when it is not; tablet landscape puts the trainer and journey cards in one equal-height row above a single party strip. Latest still points at v0.6.8. |
+| `v0.6.9` | TitoDex v0.6.9 · 队伍宫格与平板布局 | Reworks the party card: cells go upright with the level as a sprite-corner badge so names stop truncating and sprites scale with the cell; the square dashboard lays 2×3 when a save is linked and six-across when it is not; tablet landscape puts the trainer and journey cards in one equal-height row above a single party strip. Also drops the dead `vertical` / `listMode` party layouts. |
+| `v0.6.9-pre.1` | TitoDex v0.6.9-pre.1 · 队伍宫格与平板布局（预览） | Preview build of the party grid and tablet layout rework — superseded by v0.6.9. |
 | `v0.6.8` | TitoDex v0.6.8 · 头部渐变与方屏布局 | Recolors the global page gradient from light-top skyBlue→slateBlue (title contrast 1.64:1) to a readable dark-top `#5D728A`→slateBlue chosen via the interactive gradient template; fixes on-gradient subtitles from invisible skyBlue to cream through a shared SecondaryPageSubtitle component (settings, dex, quick damage, detail hero); slims the dex top bar to 「图鉴」 with the game name as subtitle; and polishes the square dashboard — 3×2 party grid with name-over-level cells, tighter trainer card, journey card overflow fix, and a stacked two-bar layout when no save is linked. Also ships the doubles spread ×0.75 modifier and the stat-calc→quick-damage handoff. |
 | `v0.6.7` | TitoDex v0.6.7 · Retro 第二批与手绘图标 | Lands the second Retro batch after two preview rounds: settings group-label pills with sticker switches and icon plates, the deep-blue damage hero card with a visual HP bar and power slider, dex detail hero header with type-tinted plate and sticker tabs, the team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons, plus fixes — obtain tab follows the selected edition, responsive dex grid, hold-press physics, pinned damage result. |
 | `v0.6.7-pre.2` | TitoDex v0.6.7-pre.2 · 修复与 Team 对齐（预览） | Preview build on the pre.1 base: feedback fixes, team template alignment, responsive dex grid, and hold-press physics — superseded by v0.6.7. |

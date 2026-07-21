@@ -1,15 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.8) · Lite `0.6.8+87` · Offline `0.6.8-offline+88`.
+> **Latest release:** [v0.6.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.9) · Lite `0.6.9+91` · Offline `0.6.9-offline+92`.
 >
-> **Current `main` source baseline:** `0.6.8+87`.
->
-> **In preview:** [v0.6.9-pre.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.9-pre.1) · party grid and tablet layout, awaiting device feedback before the version bump.
+> **Current `main` source baseline:** `0.6.9+91`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.6.9** | Party grid rework (upright cells, sprite-corner level badges, 2×3 / 6×1 by context) and a fixed-row tablet home, validated via the 0.6.9-pre.1 preview |
 | **v0.6.8** | Header gradient recolor to a readable dark-top `#5D728A→slateBlue`, cream on-gradient subtitles, slim dex title, square-dashboard polish, doubles spread modifier and stat→damage handoff |
 | **v0.6.7** | Retro phase 2 (settings groups, damage hero, dex hero tabs, template-aligned team page) plus hand-drawn tile icons, validated via two previews |
 | **v0.6.6.1** | Retro press physics extended to every interactive sticker across the app |
