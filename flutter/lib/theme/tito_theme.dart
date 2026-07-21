@@ -75,6 +75,14 @@ ThemeData buildTitoTheme() {
       TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
         fallbackColor: TitoColors.slateBlue,
       ),
+      // iOS matches Android's non-gesture look (zoom + slateBlue backdrop)
+      // instead of the Cupertino slide — the default cream surface flashed
+      // behind the gradient pages and clashed with the rewritten Android
+      // transitions. Trades away edge-swipe-back; the app has its own back
+      // hierarchy.
+      TargetPlatform.iOS: ZoomPageTransitionsBuilder(
+        backgroundColor: TitoColors.slateBlue,
+      ),
     },
   );
 
