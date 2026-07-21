@@ -44,7 +44,8 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
       return;
     }
 
-    if (DeviceLayout.isHandheldPanelSize(size)) {
+    if (DeviceLayout.isHandheldPlatform &&
+        DeviceLayout.isHandheldPanelSize(size)) {
       SystemChrome.setEnabledSystemUIMode(
         SystemUiMode.immersiveSticky,
         overlays: const [],
@@ -60,6 +61,9 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
+        // iOS reads statusBarBrightness (background brightness): dark
+        // background → white status bar text over the deepBlue shell.
+        statusBarBrightness: Brightness.dark,
         systemNavigationBarColor: TitoColors.deepBlue,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
