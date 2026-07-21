@@ -4,9 +4,17 @@ import 'package:flutter/material.dart';
 import 'tito_colors.dart';
 import 'tito_font_scale.dart';
 
-/// Layout helpers for real Android/Linux handhelds vs web preview frame.
+/// Layout helpers for real Android/iOS/Linux devices vs web preview frame.
 abstract final class DeviceLayout {
   static bool get isNativeTarget =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.linux);
+
+  /// RG handhelds run Android or Linux; iPads are ~4:3 panels but must never
+  /// get the immersive handheld chrome (they keep system bars + safe areas).
+  static bool get isHandheldPlatform =>
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.linux);
@@ -46,7 +54,7 @@ abstract final class DeviceLayout {
 
   /// Handheld chrome: immersive UI, custom Wi‑Fi/battery, square dashboard.
   static bool useHandheldChrome(BuildContext context) {
-    return isNativeTarget && isHandheldPanelSize(sizeOf(context));
+    return isHandheldPlatform && isHandheldPanelSize(sizeOf(context));
   }
 
   static bool _nearAspect(double ratio, double target, double tolerance) {

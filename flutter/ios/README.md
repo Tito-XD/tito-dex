@@ -2,27 +2,62 @@
 
 **Audience:** maintainers / agents working on the `feature/ios-platform` branch.
 
-Last updated: 2026-07-20.
+Last updated: 2026-07-21.
 
 ## Current status
 
-iOS support lives on the **`feature/ios-platform`** branch (3 commits ahead of `main` at `f15c095`):
+iOS support lives on the **`feature/ios-platform`** branch, rebased onto `main` at **v0.6.9 (`0dad858`, build 91)**. Branch commits:
 
 | Commit | What it does |
 |---|---|
-| `18420e6` | Initial iOS platform scaffolding (`flutter/ios/`) |
-| `e488df8` | CocoaPods integration (`Podfile`, `Podfile.lock`, `Runner.xcworkspace`) |
-| `f8cebb8` | Fixes to make the build work under **Xcode 27 beta** |
+| scaffolding | Initial iOS platform scaffolding (`flutter/ios/`) |
+| pods | CocoaPods integration (`Podfile`, `Podfile.lock`, `Runner.xcworkspace`) |
+| Xcode 27 fixes | Fixes to make the build work under **Xcode 27 beta** |
+| shell adaptation | iOS renders the real native shell instead of the web preview frame (see below) |
 
-**The app builds successfully under Xcode 27 beta.** No signing, App Store / TestFlight, or device-run work has been done yet.
+**Verified on 2026-07-21 against v0.6.9:** `flutter analyze` clean, `flutter test` 205 passing, `flutter build ios --no-codesign` succeeds under Xcode 27 beta (27.5 MB Runner.app). Signing / TestFlight / device runs still pending.
 
-## Upstream sync — deliberately paused
+## iOS shell & layout adaptation (v0.6.9 rebase)
 
-`origin/main` has moved ahead to **v0.6.7 / build 85** (`b1c1877`, "Retro phase 2": team page rework, responsive dex grid, quick-tile icons, `retro_forms.dart`, etc.). This branch has **not** been rebased onto it on purpose:
+`DeviceLayout.isNativeTarget` previously meant Android/Linux only, so iOS fell
+through to `_PreviewShell` — the web preview frame (520 px card, fake status
+strip). Fixed:
 
-> Android Flutter builds are the primary release target. New `main` changes are validated and shipped on Android **first**; only after that do we rebase this branch and re-verify the iOS build.
+- **`isNativeTarget` now includes iOS** — iPhone/iPad get `_RegularNativeShell`
+  (deepBlue backdrop + real `SafeArea`) and the same handheld typography/UI
+  scale as Android phones.
+- **New `DeviceLayout.isHandheldPlatform` (Android/Linux only)** gates
+  `useHandheldChrome` and `SystemUiCoordinator`'s immersive-sticky mode.
+  Rationale: iPads are ~4:3 panels and would otherwise be misdetected as RG
+  handhelds and lose their status bar / safe areas. iPads still get the square
+  dashboard *layout* (aspect-based), just not the immersive *chrome*.
+- **`statusBarBrightness: Brightness.dark`** added to the two
+  `SystemUiOverlayStyle` constructions that lacked it (`main.dart`,
+  `system_ui_coordinator.dart`) — iOS ignores `statusBarIconBrightness`
+  (Android-only) and reads background brightness instead.
 
-When the time comes, the rebase is expected to be clean — the v0.6.7 diff touches zero files that this branch touches (verified with `git diff --name-only`). After rebasing, rebuild under Xcode 27 and push with `--force-with-lease`.
+The v0.6.7–v0.6.9 feature work itself (retro forms, party grid, tablet rows,
+battle handoff, …) is pure widget/layout code — no platform channels, no new
+plugins — and needed no per-platform changes. `battery_plus` /
+`connectivity_plus` (header Wi-Fi/battery icons) support iOS and the service
+already falls back on errors.
+
+## Things to check at first device run
+
+- Status bar: white text over the deepBlue strip on notched iPhones.
+- iPad: square dashboard layout **with** visible status bar (not immersive).
+- Pokémon detail page: Android tints the system nav bar warm-white to match
+  the page's bottom bar; on iPhone the home-indicator area stays deepBlue —
+  acceptable, but note the seam if it looks off.
+- Save import via `file_picker` (copies into `save_import/` under app
+  documents), photo-library avatar picking (`NSPhotoLibraryUsageDescription`).
+
+## Upstream sync policy
+
+Android Flutter builds are the primary release target. New `main` changes are
+validated and shipped on Android **first**; only after that do we rebase this
+branch and re-verify the iOS build. After rebasing, rebuild under Xcode 27 and
+push with `--force-with-lease`.
 
 ## Xcode 27 beta workarounds — do not remove
 
@@ -50,8 +85,7 @@ Always open **`Runner.xcworkspace`**, not `Runner.xcodeproj`.
 
 ## Next steps (rough order)
 
-1. Ship v0.6.7 on Android; rebase this branch onto the new `main` and re-verify the build.
-2. Run on simulator / physical device.
-3. Bundle ID, signing, and team configuration.
-4. App icons and launch screen assets.
-5. TestFlight pipeline.
+1. Run on simulator / physical device (see "Things to check" above).
+2. Bundle ID, signing, and team configuration.
+3. App icons and launch screen assets (icon set already rendered via `tools/render_ios_icons.py`).
+4. TestFlight pipeline.
