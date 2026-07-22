@@ -843,7 +843,7 @@ def parse_obtain_locations_by_version(
     *,
     pokemon_id: int | None = None,
     species_id: int | None = None,
-    form_slug: str | None = None,
+    form_key: str | None = None,
     is_default_form: bool | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Preserve every PokeAPI version and form identity from one response."""
@@ -901,10 +901,11 @@ def parse_obtain_locations_by_version(
                 entry["pokemonId"] = pokemon_id
             if species_id is not None:
                 entry["speciesId"] = species_id
-            if form_slug:
-                entry["formSlug"] = form_slug
+            if form_key:
+                entry["formKey"] = form_key
             if is_default_form is not None:
                 entry["isDefaultForm"] = is_default_form
+            entry["formAmbiguous"] = False
             if min_levels:
                 entry["minLevel"] = min(min_levels)
             if max_levels:
@@ -934,7 +935,7 @@ def merge_obtain_location_versions(
     for version in sorted(versions):
         for source in by_version.get(version, []):
             slug = source["areaSlug"]
-            identity = f"{source.get('pokemonId', '')}:{source.get('formSlug', '')}:{slug}"
+            identity = f"{source.get('pokemonId', '')}:{source.get('formKey', source.get('formSlug', ''))}:{slug}"
             current = merged.get(identity)
             if current is None:
                 current = dict(source)
@@ -987,21 +988,30 @@ def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
                 "source name/url/license"
             )
         species_entries: dict[str, list[dict[str, Any]]] = {}
-        for pokemon_id, entries in (payload.get("encounters") or {}).items():
+        for encounter_key, entries in (payload.get("encounters") or {}).items():
             normalized: list[dict[str, Any]] = []
             for raw in entries:
                 entry = dict(raw)
                 slug = str(entry.get("areaSlug") or "")
                 if not slug:
-                    raise ValueError(f"{path}: Pokémon {pokemon_id} has blank areaSlug")
+                    raise ValueError(f"{path}: encounter {encounter_key} has blank areaSlug")
                 entry.setdefault("areaLabelZh", encounter_area_label_zh(slug))
                 entry.setdefault("maxChance", 0)
                 entry.setdefault("rateKind", "percentage")
                 entry.setdefault("rateValue", entry.get("maxChance", 0))
-                entry.setdefault("pokemonId", int(pokemon_id))
+                ambiguous = bool(entry.get("formAmbiguous"))
+                if not ambiguous and not str(encounter_key).startswith("species:"):
+                    raw_id = str(encounter_key).removeprefix("pokemon:")
+                    entry.setdefault("pokemonId", int(raw_id))
+                if "formKey" not in entry and "formSlug" in entry:
+                    entry["formKey"] = entry.pop("formSlug")
+                entry.setdefault(
+                    "formAmbiguous",
+                    entry.get("pokemonId") is None and entry.get("formKey") is None,
+                )
                 entry["versions"] = [version]
                 normalized.append(entry)
-            species_entries[str(pokemon_id)] = normalized
+            species_entries[str(encounter_key)] = normalized
         overlays[version] = species_entries
     _ENCOUNTER_OVERLAYS = overlays
     return overlays
@@ -1012,7 +1022,7 @@ def apply_encounter_overlays(
     pokemon_id: int,
     *,
     species_id: int | None = None,
-    form_slug: str | None = None,
+    form_key: str | None = None,
     is_default_form: bool | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Overlay attributed modern-game rows, replacing duplicate version/area rows."""
@@ -1024,12 +1034,55 @@ def apply_encounter_overlays(
         for entry in overlay_entries:
             if species_id is not None:
                 entry.setdefault("speciesId", species_id)
-            if form_slug:
-                entry.setdefault("formSlug", form_slug)
+            if form_key:
+                entry.setdefault("formKey", form_key)
             if is_default_form is not None:
                 entry.setdefault("isDefaultForm", is_default_form)
+            entry.setdefault("formAmbiguous", False)
         merged = {entry["areaSlug"]: entry for entry in result.get(version, [])}
         merged.update({entry["areaSlug"]: entry for entry in overlay_entries})
+        result[version] = sorted(
+            merged.values(), key=lambda item: item["areaLabelZh"]
+        )
+    return result
+
+
+def apply_species_ambiguous_overlays(
+    by_version: dict[str, list[dict[str, Any]]], species_id: int
+) -> dict[str, list[dict[str, Any]]]:
+    """Attach species-only rows once without pretending they are the default form."""
+    result = {version: list(entries) for version, entries in by_version.items()}
+    lookup_keys = (f"species:{species_id}",)
+    for version, overlay_entries in load_encounter_overlays().items():
+        species_entries = next(
+            (
+                overlay_entries[key]
+                for key in lookup_keys
+                if key in overlay_entries
+            ),
+            None,
+        )
+        if not species_entries:
+            continue
+        normalized: list[dict[str, Any]] = []
+        for source in species_entries:
+            entry = dict(source)
+            entry["speciesId"] = species_id
+            entry.pop("pokemonId", None)
+            entry.pop("formKey", None)
+            entry.pop("formSlug", None)
+            entry["formAmbiguous"] = True
+            normalized.append(entry)
+        merged = {
+            (
+                entry["areaSlug"],
+                entry.get("pokemonId"),
+                entry.get("formKey", entry.get("formSlug")),
+            ): entry
+            for entry in result.get(version, [])
+        }
+        for entry in normalized:
+            merged[(entry["areaSlug"], None, None)] = entry
         result[version] = sorted(
             merged.values(), key=lambda item: item["areaLabelZh"]
         )
@@ -1041,7 +1094,7 @@ def fetch_obtain_locations(
     pokemon_id: int,
     *,
     species_id: int | None = None,
-    form_slug: str | None = None,
+    form_key: str | None = None,
     is_default_form: bool | None = None,
 ) -> tuple[
     dict[str, list[dict[str, Any]]],
@@ -1057,12 +1110,12 @@ def fetch_obtain_locations(
             encounters,
             pokemon_id=pokemon_id,
             species_id=species_id,
-            form_slug=form_slug,
+            form_key=form_key,
             is_default_form=is_default_form,
         ),
         pokemon_id,
         species_id=species_id,
-        form_slug=form_slug,
+        form_key=form_key,
         is_default_form=is_default_form,
     )
     by_game = {
@@ -1106,17 +1159,21 @@ def fetch_species_obtain_locations(
         if pokemon_id in seen_pokemon_ids:
             continue
         seen_pokemon_ids.add(pokemon_id)
-        form_slug = str(pokemon_ref.get("name") or pokemon_id)
+        form_key = str(pokemon_ref.get("name") or pokemon_id)
         is_default = bool(variety.get("is_default"))
         _by_game, by_version = fetch_obtain_locations(
             builder,
             pokemon_id,
             species_id=species_id,
-            form_slug=form_slug,
+            form_key=form_key,
             is_default_form=is_default,
         )
         for version, entries in by_version.items():
             combined_by_version.setdefault(version, []).extend(entries)
+
+    combined_by_version = apply_species_ambiguous_overlays(
+        combined_by_version, species_id
+    )
 
     by_game = {
         edition.version_group: merge_obtain_location_versions(

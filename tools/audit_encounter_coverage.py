@@ -62,6 +62,11 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
             "locationEntries": 0,
             "distinctAreaSlugs": set(),
             "unresolvedAreaSlugs": set(),
+            "formLinkedEntries": 0,
+            "formAmbiguousEntries": 0,
+            "formIdentityMismatchEntries": 0,
+            "teraEntries": 0,
+            "specialStateEntries": 0,
         }
         for group in group_order
     }
@@ -82,6 +87,30 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
                 stats[group]["speciesWithLocations"] += 1
             stats[group]["locationEntries"] += len(locations)
             for entry in locations:
+                form_key = entry.get("formKey") or entry.get("formSlug")
+                pokemon_id = entry.get("pokemonId")
+                form_ambiguous = bool(entry.get("formAmbiguous")) or (
+                    pokemon_id is None and not form_key
+                )
+                if pokemon_id is not None and form_key:
+                    stats[group]["formLinkedEntries"] += 1
+                if form_ambiguous:
+                    stats[group]["formAmbiguousEntries"] += 1
+                elif (pokemon_id is None) != (not form_key):
+                    stats[group]["formIdentityMismatchEntries"] += 1
+                if entry.get("teraType"):
+                    stats[group]["teraEntries"] += 1
+                if any(
+                    entry.get(key)
+                    for key in (
+                        "isAlpha",
+                        "isTitan",
+                        "isTotem",
+                        "isRaid",
+                        "isFixedEncounter",
+                    )
+                ):
+                    stats[group]["specialStateEntries"] += 1
                 slug = str(entry.get("areaSlug") or "")
                 label = str(entry.get("areaLabelZh") or "")
                 if not slug:
@@ -109,6 +138,11 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
                 "distinctAreaCount": len(row["distinctAreaSlugs"]),
                 "unresolvedAreaCount": len(row["unresolvedAreaSlugs"]),
                 "unresolvedAreaSlugs": sorted(row["unresolvedAreaSlugs"]),
+                "formLinkedEntries": row["formLinkedEntries"],
+                "formAmbiguousEntries": row["formAmbiguousEntries"],
+                "formIdentityMismatchEntries": row["formIdentityMismatchEntries"],
+                "teraEntries": row["teraEntries"],
+                "specialStateEntries": row["specialStateEntries"],
             }
         )
 
@@ -147,9 +181,9 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
 
 def print_table(report: dict[str, Any]) -> None:
     print(
-        "version group                            species  entries  areas  unresolved"
+        "version group                            species  entries  areas  unresolved  linked  ambiguous"
     )
-    print("-" * 79)
+    print("-" * 99)
     for row in report["gameGroups"]:
         print(
             f"{row['versionGroup']:<40}"
@@ -157,6 +191,8 @@ def print_table(report: dict[str, Any]) -> None:
             f"{row['locationEntries']:>9}"
             f"{row['distinctAreaCount']:>7}"
             f"{row['unresolvedAreaCount']:>12}"
+            f"{row['formLinkedEntries']:>8}"
+            f"{row['formAmbiguousEntries']:>11}"
         )
     print()
     print(

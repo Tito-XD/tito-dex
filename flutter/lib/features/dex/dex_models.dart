@@ -385,8 +385,16 @@ class ObtainLocationEntry {
     required this.areaLabelZh,
     this.pokemonId,
     this.speciesId,
-    this.formSlug,
+    String? formKey,
+    String? formSlug,
     this.isDefaultForm,
+    this.teraType,
+    this.isAlpha = false,
+    this.isTitan = false,
+    this.isTotem = false,
+    this.isRaid = false,
+    this.isFixedEncounter = false,
+    this.formAmbiguous = false,
     this.minLevel,
     this.maxLevel,
     this.maxChance = 0,
@@ -395,14 +403,23 @@ class ObtainLocationEntry {
     this.versions = const [],
     this.methods = const [],
     this.conditions = const [],
-  });
+  }) : formKey = formKey ?? formSlug;
 
   final String areaSlug;
   final String areaLabelZh;
   final int? pokemonId;
   final int? speciesId;
-  final String? formSlug;
+  final String? formKey;
+  @Deprecated('Use formKey')
+  String? get formSlug => formKey;
   final bool? isDefaultForm;
+  final String? teraType;
+  final bool isAlpha;
+  final bool isTitan;
+  final bool isTotem;
+  final bool isRaid;
+  final bool isFixedEncounter;
+  final bool formAmbiguous;
   final int? minLevel;
   final int? maxLevel;
   final int maxChance;
@@ -417,8 +434,15 @@ class ObtainLocationEntry {
     'areaLabelZh': areaLabelZh,
     if (pokemonId != null) 'pokemonId': pokemonId,
     if (speciesId != null) 'speciesId': speciesId,
-    if (formSlug != null) 'formSlug': formSlug,
+    if (formKey != null) 'formKey': formKey,
     if (isDefaultForm != null) 'isDefaultForm': isDefaultForm,
+    if (teraType != null) 'teraType': teraType,
+    if (isAlpha) 'isAlpha': true,
+    if (isTitan) 'isTitan': true,
+    if (isTotem) 'isTotem': true,
+    if (isRaid) 'isRaid': true,
+    if (isFixedEncounter) 'isFixedEncounter': true,
+    if (formAmbiguous) 'formAmbiguous': true,
     if (minLevel != null) 'minLevel': minLevel,
     if (maxLevel != null) 'maxLevel': maxLevel,
     'maxChance': maxChance,
@@ -445,8 +469,19 @@ class ObtainLocationEntry {
       areaLabelZh: unresolved ? resolveObtainAreaLabelZh(slug) : baked,
       pokemonId: (json['pokemonId'] as num?)?.toInt(),
       speciesId: (json['speciesId'] as num?)?.toInt(),
-      formSlug: json['formSlug'] as String?,
+      formKey: (json['formKey'] ?? json['formSlug']) as String?,
       isDefaultForm: json['isDefaultForm'] as bool?,
+      teraType: json['teraType'] as String?,
+      isAlpha: json['isAlpha'] as bool? ?? false,
+      isTitan: json['isTitan'] as bool? ?? false,
+      isTotem: json['isTotem'] as bool? ?? false,
+      isRaid: json['isRaid'] as bool? ?? false,
+      isFixedEncounter: json['isFixedEncounter'] as bool? ?? false,
+      formAmbiguous:
+          json['formAmbiguous'] as bool? ??
+          (json['formKey'] == null &&
+              json['formSlug'] == null &&
+              json['pokemonId'] == null),
       minLevel: (json['minLevel'] as num?)?.toInt(),
       maxLevel: (json['maxLevel'] as num?)?.toInt(),
       maxChance: (json['maxChance'] as num?)?.toInt() ?? 0,

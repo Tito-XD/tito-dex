@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "version": "y",
   "versionGroup": "x-y",
   "source": {
@@ -8,11 +8,11 @@
     "license": "BSD-3-Clause"
   },
   "encounters": {
-    "165": [{"speciesId": 165, "formSlug": "ledyba", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-red"]}],
-    "313": [{"speciesId": 313, "formSlug": "volbeat", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-blue"]}],
-    "314": [{"speciesId": 314, "formSlug": "illumise", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-purple"]}],
-    "412": [{"speciesId": 412, "formSlug": "burmy", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-green"]}],
-    "415": [{"speciesId": 415, "formSlug": "combee", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-yellow"]}],
-    "665": [{"speciesId": 665, "formSlug": "spewpa", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-pink"]}]
+    "165": [{"speciesId": 165, "formKey": "ledyba", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-red"]}],
+    "313": [{"speciesId": 313, "formKey": "volbeat", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-blue"]}],
+    "314": [{"speciesId": 314, "formKey": "illumise", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-purple"]}],
+    "412": [{"speciesId": 412, "formKey": "burmy", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-green"]}],
+    "415": [{"speciesId": 415, "formKey": "combee", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-yellow"]}],
+    "665": [{"speciesId": 665, "formKey": "spewpa", "isDefaultForm": true, "areaSlug": "kalos-berry-fields-area", "areaLabelZh": "树果园（卡洛斯）", "minLevel": 14, "maxLevel": 15, "maxChance": 100, "rateKind": "percentage", "rateValue": 100, "methods": ["berry-trees"], "conditions": ["berry-tree-type-pink"]}]
   }
 }
