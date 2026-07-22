@@ -22,6 +22,9 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from opencc import OpenCC
+
+from location_zh_resolver import load_slug_overrides
 
 ROOT = Path(__file__).resolve().parents[1]
 L10N_DIR = ROOT / "data" / "l10n" / "zh"
@@ -30,8 +33,10 @@ UNRESOLVED_PATH = L10N_DIR / "location_areas_unresolved.json"
 MANIFEST_PATH = L10N_DIR / "manifest.json"
 
 WIKI_BASE = "https://wiki.52poke.com"
+BULBAPEDIA_BASE = "https://bulbapedia.bulbagarden.net"
 USER_AGENT = "TitoDex-maintainer/1.0 (+https://github.com/Tito-XD/tito-dex)"
 DEFAULT_DELAY = 1.5
+ZH_HANS_CONVERTER = OpenCC("t2s")
 
 # English labels that indicate we still need a Chinese name.
 UNRESOLVED_SOURCES = frozenset(
@@ -121,6 +126,73 @@ def _fetch_page_title_zh(session: requests.Session, title: str) -> str | None:
     return None
 
 
+def _resolve_redirect_title_zh(
+    session: requests.Session, title: str
+) -> tuple[str | None, bool]:
+    """Resolve an English redirect via MediaWiki API.
+
+    Returns ``(label, blocked)``. Using the API avoids relying on the HTML
+    redirect page, whose heading can remain English even when its canonical
+    target is a Chinese article.
+    """
+    params = {
+        "action": "query",
+        "redirects": 1,
+        "titles": title,
+        "prop": "info",
+        "format": "json",
+        "formatversion": 2,
+    }
+    url = f"{WIKI_BASE}/api.php?{urllib.parse.urlencode(params)}"
+    response = session.get(url, timeout=30)
+    if _is_cloudflare_block(response.text, response.status_code):
+        return None, True
+    if response.status_code != 200:
+        return None, False
+    try:
+        payload = response.json()
+    except json.JSONDecodeError:
+        return None, False
+    pages = (payload.get("query") or {}).get("pages") or []
+    for page in pages:
+        canonical = str(page.get("title") or "")
+        if canonical and _looks_chinese(canonical):
+            return _normalize_label(canonical), False
+    return None, False
+
+
+def _fetch_bulbapedia_zh_langlink(
+    session: requests.Session, title: str
+) -> tuple[str | None, bool]:
+    """Use Bulbapedia's zh interwiki target when 52poke has no English redirect."""
+    params = {
+        "action": "query",
+        "redirects": 1,
+        "prop": "langlinks",
+        "lllang": "zh",
+        "titles": title,
+        "format": "json",
+        "formatversion": 2,
+    }
+    url = f"{BULBAPEDIA_BASE}/w/api.php?{urllib.parse.urlencode(params)}"
+    response = session.get(url, timeout=30)
+    if _is_cloudflare_block(response.text, response.status_code):
+        return None, True
+    if response.status_code != 200:
+        return None, False
+    try:
+        payload = response.json()
+    except json.JSONDecodeError:
+        return None, False
+    pages = (payload.get("query") or {}).get("pages") or []
+    for page in pages:
+        for langlink in page.get("langlinks") or []:
+            title_zh = str(langlink.get("title") or "")
+            if title_zh and _looks_chinese(title_zh):
+                return _normalize_label(title_zh), False
+    return None, False
+
+
 def _looks_chinese(text: str) -> bool:
     return bool(re.search(r"[\u4e00-\u9fff]", text))
 
@@ -128,7 +200,7 @@ def _looks_chinese(text: str) -> bool:
 def _normalize_label(text: str) -> str:
     text = text.strip()
     text = re.sub(r"\s+", " ", text)
-    return text
+    return ZH_HANS_CONVERTER.convert(text)
 
 
 def _search_queries(slug: str, entry: dict[str, object]) -> list[str]:
@@ -177,24 +249,42 @@ def fetch_label_for_slug(
     entry: dict[str, object],
     *,
     delay: float,
-) -> tuple[str | None, str]:
-    """Return (label_zh, status) where status is resolved|not_found|blocked."""
+    bulbapedia_only: bool = False,
+) -> tuple[str | None, str, str | None]:
+    """Return (label_zh, status, source)."""
+    if not bulbapedia_only:
+        for query in _search_queries(slug, entry):
+            time.sleep(delay)
+            titles = _search_wiki(session, query)
+            if not titles and query == _search_queries(slug, entry)[0]:
+                # First query got empty — might be Cloudflare; probe once more.
+                probe = session.get(
+                    f"{WIKI_BASE}/api.php?action=query&meta=siteinfo", timeout=30
+                )
+                if _is_cloudflare_block(probe.text, probe.status_code):
+                    return None, "blocked", None
+
+            for title in titles:
+                time.sleep(delay)
+                label, blocked = _resolve_redirect_title_zh(session, title)
+                if blocked:
+                    return None, "blocked", None
+                if label:
+                    return label, "resolved", "52poke_wiki"
+                time.sleep(delay)
+                label = _fetch_page_title_zh(session, title)
+                if label:
+                    return label, "resolved", "52poke_wiki"
+
     for query in _search_queries(slug, entry):
         time.sleep(delay)
-        titles = _search_wiki(session, query)
-        if not titles and query == _search_queries(slug, entry)[0]:
-            # First query got empty — might be Cloudflare; probe once more.
-            probe = session.get(f"{WIKI_BASE}/api.php?action=query&meta=siteinfo", timeout=30)
-            if _is_cloudflare_block(probe.text, probe.status_code):
-                return None, "blocked"
+        label, blocked = _fetch_bulbapedia_zh_langlink(session, query)
+        if blocked:
+            return None, "blocked", None
+        if label:
+            return label, "resolved", "bulbapedia_langlink"
 
-        for title in titles:
-            time.sleep(delay)
-            label = _fetch_page_title_zh(session, title)
-            if label:
-                return label, "resolved"
-
-    return None, "not_found"
+    return None, "not_found", None
 
 
 def load_json(path: Path) -> dict | list:
@@ -220,6 +310,26 @@ def update_manifest(*, resolved_count: int, unresolved_count: int) -> str:
     manifest["counts"] = counts
     manifest.setdefault("locale", "zh-Hans")
     manifest.setdefault("pokeapiBase", "https://pokeapi.co/api/v2")
+    sources = dict(manifest.get("sources") or {})
+    sources.setdefault(
+        "52poke_wiki",
+        {
+            "name": "神奇宝贝百科",
+            "url": WIKI_BASE,
+            "license": "CC BY-NC-SA 3.0",
+            "scope": "location-area Chinese labels",
+        },
+    )
+    sources.setdefault(
+        "bulbapedia_langlink",
+        {
+            "name": "Bulbapedia",
+            "url": BULBAPEDIA_BASE,
+            "license": "CC BY-NC-SA 2.5",
+            "scope": "zh interwiki titles for location-area labels",
+        },
+    )
+    manifest["sources"] = sources
     write_json(MANIFEST_PATH, manifest)
     return generated_at
 
@@ -243,6 +353,11 @@ def main() -> int:
         action="store_true",
         help="Re-fetch all slugs that still lack proper Chinese labels",
     )
+    parser.add_argument(
+        "--bulbapedia-only",
+        action="store_true",
+        help="Skip 52poke lookup and retry the queue through zh interwiki titles",
+    )
     args = parser.parse_args()
 
     if not AREAS_PATH.is_file():
@@ -250,24 +365,52 @@ def main() -> int:
         return 1
 
     areas: dict[str, dict[str, object]] = load_json(AREAS_PATH)  # type: ignore[assignment]
+    seed_resolved: list[str] = []
+    for slug, label in load_slug_overrides().items():
+        entry = areas.get(slug)
+        if entry is None or not _needs_resolution(entry):
+            continue
+        entry["labelZh"] = label
+        entry["source"] = "slug_override"
+        seed_resolved.append(slug)
+    if seed_resolved:
+        write_json(AREAS_PATH, areas)
 
     if args.force_full:
         slugs = [s for s, e in areas.items() if _needs_resolution(e)]
     elif UNRESOLVED_PATH.is_file():
         unresolved_data = load_json(UNRESOLVED_PATH)
-        slugs = list(unresolved_data.get("slugs") or [])
+        slugs = [
+            slug
+            for slug in dict.fromkeys(unresolved_data.get("slugs") or [])
+            if slug in areas and _needs_resolution(areas[slug])
+        ]
     else:
         slugs = [s for s, e in areas.items() if _needs_resolution(e)]
 
+    queued_slugs = list(slugs)
     if args.limit > 0:
         slugs = slugs[: args.limit]
 
     if not slugs:
-        print("No slugs to process.", flush=True)
+        unresolved = sorted(
+            slug for slug, entry in areas.items() if _needs_resolution(entry)
+        )
+        write_json(UNRESOLVED_PATH, {"slugs": unresolved})
+        if seed_resolved:
+            update_manifest(
+                resolved_count=len(seed_resolved),
+                unresolved_count=len(unresolved),
+            )
+        print(
+            f"No remote slugs to process; seed-resolved={len(seed_resolved)}, "
+            f"unresolved={len(unresolved)}.",
+            flush=True,
+        )
         return 0
 
     session = _wiki_session()
-    resolved: list[str] = []
+    resolved: list[str] = list(seed_resolved)
     still_unresolved: list[str] = []
     blocked = False
 
@@ -280,8 +423,12 @@ def main() -> int:
             still_unresolved.append(slug)
             continue
 
-        label, status = fetch_label_for_slug(
-            session, slug, entry, delay=args.delay
+        label, status, source = fetch_label_for_slug(
+            session,
+            slug,
+            entry,
+            delay=args.delay,
+            bulbapedia_only=args.bulbapedia_only,
         )
 
         if status == "blocked":
@@ -296,7 +443,7 @@ def main() -> int:
 
         if label:
             entry["labelZh"] = label
-            entry["source"] = "52poke_wiki"
+            entry["source"] = source or "52poke_wiki"
             resolved.append(slug)
             print(f"  [{index}/{len(slugs)}] ✓ {slug} → {label}", flush=True)
         else:
@@ -306,13 +453,46 @@ def main() -> int:
     if resolved:
         write_json(AREAS_PATH, areas)
 
-    # Merge remaining unresolved from catalog entries still lacking Chinese.
-    if args.force_full or not blocked:
-        for slug, entry in areas.items():
-            if _needs_resolution(entry) and slug not in still_unresolved:
-                still_unresolved.append(slug)
-
-    still_unresolved = sorted(set(still_unresolved))
+    catalog_unresolved = {
+        slug for slug, entry in areas.items() if _needs_resolution(entry)
+    }
+    if not args.force_full and not blocked:
+        attempted = set(slugs)
+        remaining_queue = [
+            slug
+            for slug in queued_slugs
+            if slug not in attempted and slug in catalog_unresolved
+        ]
+        newly_discovered = [
+            slug
+            for slug in areas
+            if slug in catalog_unresolved
+            and slug not in queued_slugs
+            and slug not in still_unresolved
+        ]
+        # Rotate unsuccessful attempts behind untouched entries so the weekly
+        # 50-item job eventually visits the entire catalog instead of retrying
+        # the same alphabetic prefix forever.
+        still_unresolved = list(
+            dict.fromkeys(
+                remaining_queue
+                + newly_discovered
+                + [
+                    slug
+                    for slug in still_unresolved
+                    if slug in catalog_unresolved
+                ]
+            )
+        )
+    elif blocked:
+        still_unresolved = list(
+            dict.fromkeys(
+                [slug for slug in queued_slugs if slug in catalog_unresolved]
+                + sorted(catalog_unresolved - set(queued_slugs))
+            )
+        )
+    else:
+        still_unresolved = sorted(catalog_unresolved)
     write_json(UNRESOLVED_PATH, {"slugs": still_unresolved})
 
     generated_at = ""

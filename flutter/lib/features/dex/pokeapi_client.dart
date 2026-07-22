@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:http/http.dart' as http;
 
@@ -13,8 +14,8 @@ class PokeApiClient {
     http.Client? client,
     PokeApiThrottle? throttle,
     this.maxRetries = 4,
-  })  : _client = client ?? http.Client(),
-        _throttle = throttle ?? PokeApiThrottle();
+  }) : _client = client ?? http.Client(),
+       _throttle = throttle ?? PokeApiThrottle();
 
   final http.Client _client;
   final PokeApiThrottle _throttle;
@@ -95,7 +96,8 @@ class PokeApiClient {
       ),
       types: _extractTypes(pokemon['types'] as List<dynamic>),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
-      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+      artworkUrl:
+          _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
           pokeApiOfficialArtworkUrl(pokemon['id'] as int),
     );
   }
@@ -116,14 +118,14 @@ class PokeApiClient {
       ),
       types: _extractTypes(pokemon['types'] as List<dynamic>),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
-      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+      artworkUrl:
+          _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
           pokeApiOfficialArtworkUrl(pokemon['id'] as int),
     );
 
     final profile = computeDefensiveProfile(summary.types, relations);
     final stab = computeStabSuperEffective(summary.types, relations);
-    final multipliers =
-        computeDefensiveMultipliers(summary.types, relations);
+    final multipliers = computeDefensiveMultipliers(summary.types, relations);
     final baseStats = _parseBaseStats(pokemon['stats'] as List<dynamic>);
     final johtoDex = _johtoDexNumber(
       species['pokedex_numbers'] as List<dynamic>,
@@ -131,8 +133,10 @@ class PokeApiClient {
     final flavorEntries = _parseFlavorEntries(
       species['flavor_text_entries'] as List<dynamic>,
     );
-    final obtainLocations = await _fetchHgssObtainLocations(id);
-    final abilities = await _fetchAbilities(pokemon['abilities'] as List<dynamic>);
+    final obtainLocations = await _fetchObtainLocations(id, species);
+    final abilities = await _fetchAbilities(
+      pokemon['abilities'] as List<dynamic>,
+    );
     final moveSet = await _fetchHgssMoveSet(pokemon['moves'] as List<dynamic>);
     final genderFemalePercent = _genderFemalePercent(
       species['gender_rate'] as int?,
@@ -160,7 +164,9 @@ class PokeApiClient {
       baseStats: baseStats,
       typeMultipliers: multipliers,
       flavorEntries: flavorEntries,
-      obtainLocations: obtainLocations,
+      obtainLocations: obtainLocations.byGame[hgssVersionGroup] ?? const [],
+      obtainLocationsByGame: obtainLocations.byGame,
+      obtainLocationsByVersion: obtainLocations.byVersion,
       abilities: abilities,
       moveSet: moveSet,
       genderFemalePercent: genderFemalePercent,
@@ -313,7 +319,8 @@ class PokeApiClient {
   }
 
   String _abilityDescriptionZh(Map<String, dynamic> detail) {
-    for (final entry in detail['effect_entries'] as List<dynamic>? ?? const []) {
+    for (final entry
+        in detail['effect_entries'] as List<dynamic>? ?? const []) {
       final map = entry as Map<String, dynamic>;
       final language = (map['language'] as Map<String, dynamic>)['name'];
       if (language == 'zh-Hans' || language == 'zh-hans') {
@@ -327,8 +334,8 @@ class PokeApiClient {
         }
       }
     }
-    for (final entry in detail['flavor_text_entries'] as List<dynamic>? ??
-        const []) {
+    for (final entry
+        in detail['flavor_text_entries'] as List<dynamic>? ?? const []) {
       final map = entry as Map<String, dynamic>;
       final language = (map['language'] as Map<String, dynamic>)['name'];
       if (language == 'zh-Hans' || language == 'zh-hans') {
@@ -338,7 +345,8 @@ class PokeApiClient {
         }
       }
     }
-    for (final entry in detail['effect_entries'] as List<dynamic>? ?? const []) {
+    for (final entry
+        in detail['effect_entries'] as List<dynamic>? ?? const []) {
       final map = entry as Map<String, dynamic>;
       if ((map['language'] as Map<String, dynamic>)['name'] == 'en') {
         final short = (map['short_effect'] as String?)?.trim();
@@ -350,63 +358,180 @@ class PokeApiClient {
     return '';
   }
 
-  Future<List<ObtainLocationEntry>> _fetchHgssObtainLocations(int id) async {
+  Future<
+    ({
+      Map<String, List<ObtainLocationEntry>> byGame,
+      Map<String, List<ObtainLocationEntry>> byVersion,
+    })
+  >
+  _fetchObtainLocations(int id, Map<String, dynamic> species) async {
     try {
-      final list = await _getJsonList('/pokemon/$id/encounters');
-      final merged = <String, ObtainLocationEntry>{};
+      final versionEntries = <String, Map<String, ObtainLocationEntry>>{};
+      final varieties = (species['varieties'] as List<dynamic>? ?? const []);
+      final varietyRows = varieties.isEmpty
+          ? <Map<String, dynamic>>[
+              {
+                'is_default': true,
+                'pokemon': {'name': '$id', 'url': '$baseUrl/pokemon/$id/'},
+              },
+            ]
+          : varieties.cast<Map<String, dynamic>>();
 
-      for (final encounter in list) {
-        final map = encounter as Map<String, dynamic>;
-        final areaUrl = map['location_area']?['url'] as String?;
-        if (areaUrl == null) {
+      for (final variety in varietyRows) {
+        final pokemonRef =
+            variety['pokemon'] as Map<String, dynamic>? ?? const {};
+        final pokemonUrl = pokemonRef['url'] as String?;
+        final pokemonId = pokemonUrl == null ? id : _idFromUrl(pokemonUrl);
+        final formSlug = pokemonRef['name'] as String? ?? '$pokemonId';
+        final isDefaultForm = variety['is_default'] as bool? ?? pokemonId == id;
+        List<dynamic> list;
+        try {
+          list = await _getJsonList('/pokemon/$pokemonId/encounters');
+        } on PokeApiException {
           continue;
         }
-        final slug = areaUrl.split('/').where((part) => part.isNotEmpty).last;
-        var minLevel = 100;
-        var maxChance = 0;
-        var inHgss = false;
-
-        for (final detail in map['version_details'] as List<dynamic>) {
-          final detailMap = detail as Map<String, dynamic>;
-          final version =
-              (detailMap['version'] as Map<String, dynamic>)['name'] as String;
-          if (version != 'heartgold' && version != 'soulsilver') {
+        for (final encounter in list) {
+          final map = encounter as Map<String, dynamic>;
+          final area = map['location_area'] as Map<String, dynamic>?;
+          final areaUrl = area?['url'] as String?;
+          if (areaUrl == null) {
             continue;
           }
-          inHgss = true;
-          final chance = detailMap['max_chance'] as int? ?? 0;
-          if (chance > maxChance) {
-            maxChance = chance;
-          }
-          for (final encounterDetail
-              in detailMap['encounter_details'] as List<dynamic>? ?? const []) {
-            final level = (encounterDetail
-                    as Map<String, dynamic>)['min_level'] as int? ??
-                100;
-            if (level < minLevel) {
-              minLevel = level;
+          final rawSlug =
+              area?['name'] as String? ??
+              areaUrl.split('/').where((part) => part.isNotEmpty).last;
+          for (final detail in map['version_details'] as List<dynamic>) {
+            final detailMap = detail as Map<String, dynamic>;
+            final version =
+                (detailMap['version'] as Map<String, dynamic>)['name']
+                    as String;
+            if (rawSlug == 'new-mauville-area' &&
+                (version == 'sun' || version == 'moon') &&
+                (pokemonId == 100 || pokemonId == 101)) {
+              continue;
             }
+            final slug =
+                rawSlug == 'team-flare-secret-hq-area' &&
+                    ((version == 'black' && pokemonId == 641) ||
+                        (version == 'white' && pokemonId == 642))
+                ? 'unova-roaming-area'
+                : rawSlug;
+            var minLevel = 100;
+            var maxLevel = 0;
+            final methods = <String>{};
+            final conditions = <String>{};
+            if (slug == 'unova-roaming-area') {
+              conditions.add('roaming');
+            }
+            for (final encounterDetail
+                in detailMap['encounter_details'] as List<dynamic>? ??
+                    const []) {
+              final encounterMap = encounterDetail as Map<String, dynamic>;
+              final min = encounterMap['min_level'] as int? ?? 100;
+              final max = encounterMap['max_level'] as int? ?? 0;
+              if (min > 0 && min < minLevel) {
+                minLevel = min;
+              }
+              if (max > maxLevel) {
+                maxLevel = max;
+              }
+              final method = encounterMap['method']?['name'] as String?;
+              if (method != null) {
+                methods.add(method);
+              }
+              for (final condition
+                  in encounterMap['condition_values'] as List<dynamic>? ??
+                      const []) {
+                final name =
+                    (condition as Map<String, dynamic>)['name'] as String?;
+                if (name != null) {
+                  conditions.add(name);
+                }
+              }
+            }
+            final identity = '$pokemonId:$slug';
+            versionEntries.putIfAbsent(
+              version,
+              () => {},
+            )[identity] = ObtainLocationEntry(
+              areaSlug: slug,
+              areaLabelZh: resolveObtainAreaLabelZh(slug),
+              pokemonId: pokemonId,
+              speciesId: id,
+              formSlug: formSlug,
+              isDefaultForm: isDefaultForm,
+              minLevel: minLevel == 100 ? null : minLevel,
+              maxLevel: maxLevel == 0 ? null : maxLevel,
+              maxChance: detailMap['max_chance'] as int? ?? 0,
+              rateKind: 'percentage',
+              rateValue: detailMap['max_chance'] as int? ?? 0,
+              versions: [version],
+              methods: methods.toList()..sort(),
+              conditions: conditions.toList()..sort(),
+            );
           }
         }
-
-        if (!inHgss) {
-          continue;
-        }
-
-        merged[slug] = ObtainLocationEntry(
-          areaSlug: slug,
-          areaLabelZh: resolveObtainAreaLabelZh(slug),
-          minLevel: minLevel == 100 ? null : minLevel,
-          maxChance: maxChance,
-        );
       }
 
-      final results = merged.values.toList()
-        ..sort((a, b) => a.areaLabelZh.compareTo(b.areaLabelZh));
-      return results;
+      final byVersion = versionEntries.map(
+        (version, entries) => MapEntry(
+          version,
+          entries.values.toList()
+            ..sort((a, b) => a.areaLabelZh.compareTo(b.areaLabelZh)),
+        ),
+      );
+      final byGame = <String, List<ObtainLocationEntry>>{};
+      for (final group in encounterVersionsByVersionGroup.entries) {
+        byGame[group.key] = _mergeObtainVersions(byVersion, group.value);
+      }
+      return (byGame: byGame, byVersion: byVersion);
     } catch (_) {
-      return const [];
+      return (
+        byGame: <String, List<ObtainLocationEntry>>{},
+        byVersion: <String, List<ObtainLocationEntry>>{},
+      );
     }
+  }
+
+  List<ObtainLocationEntry> _mergeObtainVersions(
+    Map<String, List<ObtainLocationEntry>> byVersion,
+    List<String> versions,
+  ) {
+    final grouped = <String, List<ObtainLocationEntry>>{};
+    for (final version in versions) {
+      for (final entry in byVersion[version] ?? const []) {
+        final identity =
+            '${entry.pokemonId ?? ''}:${entry.formSlug ?? ''}:${entry.areaSlug}';
+        grouped.putIfAbsent(identity, () => []).add(entry);
+      }
+    }
+    final merged = grouped.values.map((entries) {
+      final first = entries.first;
+      final minLevels = entries.map((entry) => entry.minLevel).nonNulls;
+      final maxLevels = entries.map((entry) => entry.maxLevel).nonNulls;
+      return ObtainLocationEntry(
+        areaSlug: first.areaSlug,
+        areaLabelZh: first.areaLabelZh,
+        pokemonId: first.pokemonId,
+        speciesId: first.speciesId,
+        formSlug: first.formSlug,
+        isDefaultForm: first.isDefaultForm,
+        minLevel: minLevels.isEmpty ? null : minLevels.reduce(math.min),
+        maxLevel: maxLevels.isEmpty ? null : maxLevels.reduce(math.max),
+        maxChance: entries.map((entry) => entry.maxChance).reduce(math.max),
+        rateKind: first.rateKind,
+        rateValue: entries.map((entry) => entry.rateValue).nonNulls.isEmpty
+            ? null
+            : entries.map((entry) => entry.rateValue).nonNulls.reduce(math.max),
+        versions: entries.expand((entry) => entry.versions).toSet().toList()
+          ..sort(),
+        methods: entries.expand((entry) => entry.methods).toSet().toList()
+          ..sort(),
+        conditions: entries.expand((entry) => entry.conditions).toSet().toList()
+          ..sort(),
+      );
+    }).toList()..sort((a, b) => a.areaLabelZh.compareTo(b.areaLabelZh));
+    return merged;
   }
 
   Future<PokemonMoveSet> _fetchHgssMoveSet(List<dynamic> moveEntries) async {
@@ -430,9 +555,7 @@ class PokeApiClient {
         final method =
             (detailMap['move_learn_method'] as Map<String, dynamic>)['name']
                 as String;
-        if (method != 'level-up' &&
-            method != 'machine' &&
-            method != 'egg') {
+        if (method != 'level-up' && method != 'machine' && method != 'egg') {
           continue;
         }
 
@@ -505,12 +628,10 @@ class PokeApiClient {
       'dragon': '龙',
       'no-eggs': '未发现',
     };
-    return groups
-        .map((entry) {
-          final name = (entry as Map<String, dynamic>)['name'] as String;
-          return labels[name] ?? name;
-        })
-        .toList();
+    return groups.map((entry) {
+      final name = (entry as Map<String, dynamic>)['name'] as String;
+      return labels[name] ?? name;
+    }).toList();
   }
 
   final Map<int, CachedMove> _moveCache = {};
@@ -597,7 +718,8 @@ class PokeApiClient {
         fallback: species['name'] as String,
       ),
       spriteUrl: _spriteUrl(pokemon['sprites'] as Map<String, dynamic>),
-      artworkUrl: _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
+      artworkUrl:
+          _artworkUrl(pokemon['sprites'] as Map<String, dynamic>) ??
           pokeApiOfficialArtworkUrl(speciesId),
       evolvesFrom: triggerZh,
       triggerZh: triggerZh,
@@ -607,13 +729,10 @@ class PokeApiClient {
 
   List<String> _extractTypes(List<dynamic> types) {
     final sorted = List<Map<String, dynamic>>.from(types)
-      ..sort(
-        (a, b) => ((a['slot'] as int)).compareTo(b['slot'] as int),
-      );
+      ..sort((a, b) => ((a['slot'] as int)).compareTo(b['slot'] as int));
     return sorted
         .map(
-          (entry) =>
-              (entry['type'] as Map<String, dynamic>)['name'] as String,
+          (entry) => (entry['type'] as Map<String, dynamic>)['name'] as String,
         )
         .toList();
   }

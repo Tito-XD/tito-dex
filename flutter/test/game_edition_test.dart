@@ -13,7 +13,7 @@ void main() {
 
   test('gameEditionFromSlug resolves known slugs', () {
     expect(gameEditionFromSlug('sv')?.labelZh, contains('朱'));
-    expect(gameEditionFromSlug('lza')?.hasPokeApiData, isFalse);
+    expect(gameEditionFromSlug('lza')?.hasPokeApiData, isTrue);
     expect(gameEditionFromSlug('missing'), isNull);
   });
 
@@ -23,9 +23,11 @@ void main() {
     expect(edition.journeyGameKey, 'SoulSilver');
   });
 
-  test('lza falls back to sv data key', () {
+  test('lza uses its current PokeAPI data key', () {
     final lza = gameEditionFromSlug('lza')!;
-    expect(lza.dataVersionGroupKey, 'scarlet-violet');
+    expect(lza.dataVersionGroupKey, 'legends-za');
+    expect(lza.fallbackSlug, 'sv');
+    expect(lza.defaultRegionalPokedex.name, 'kalos');
   });
 
   test('bdsp falls back to dp for sparse data', () {

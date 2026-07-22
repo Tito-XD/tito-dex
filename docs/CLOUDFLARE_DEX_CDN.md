@@ -334,7 +334,7 @@ GitHub Actions workflow [`.github/workflows/sync-l10n-catalog.yml`](../.github/w
 52poke wiki 可能启用 Cloudflare 人机验证，导致 CI 无法自动抓取。脚本会记录失败并将 slug 保留在 `location_areas_unresolved.json`；可在本地网络环境手动运行：
 
 ```bash
-pip install requests beautifulsoup4
+pip install beautifulsoup4 -r tools/dex_bundle_requirements.txt
 python3 tools/fetch_52poke_location_zh.py --limit 20
 python3 tools/generate_zh_catalog_assets.py
 python3 tools/stage_l10n_upload.py

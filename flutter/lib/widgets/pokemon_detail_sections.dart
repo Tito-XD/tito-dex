@@ -1063,18 +1063,35 @@ class ObtainLocationsCard extends StatelessWidget {
             (entry) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(
-                      entry.areaLabelZh,
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.areaLabelZh,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        if (entry.versions.isNotEmpty)
+                          Text(
+                            entry.versions
+                                .map(flavorVersionLabelZh)
+                                .join(' / '),
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              color: TitoColors.mutedInk,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   if (entry.minLevel != null)
                     Text(
-                      'Lv.${entry.minLevel}+',
+                      entry.maxLevel != null && entry.maxLevel != entry.minLevel
+                          ? 'Lv.${entry.minLevel}–${entry.maxLevel}'
+                          : 'Lv.${entry.minLevel}',
                       style: SecondaryTypography.onCard.small12.copyWith(
                         color: TitoColors.mutedInk,
                       ),

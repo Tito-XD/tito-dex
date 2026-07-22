@@ -305,9 +305,18 @@ def fetch_egg_groups(client: PokeApiClient) -> dict[str, dict[str, str]]:
     return catalog
 
 
-def fetch_location_areas(client: PokeApiClient) -> dict[str, dict[str, str]]:
+def fetch_location_areas(
+    client: PokeApiClient,
+) -> tuple[dict[str, dict[str, str]], list[str]]:
     slug_overrides = load_slug_overrides()
     names_en_zh = load_location_names_en_zh()
+    existing_path = OUT_DIR / "location_areas.json"
+    existing: dict[str, dict[str, str]] = (
+        json.loads(existing_path.read_text(encoding="utf-8"))
+        if existing_path.is_file()
+        else {}
+    )
+    preserved_sources = {"52poke_wiki", "bulbapedia_langlink", "slug_override"}
     catalog: dict[str, dict[str, str]] = {}
     unresolved: list[str] = []
 
@@ -329,6 +338,10 @@ def fetch_location_areas(client: PokeApiClient) -> dict[str, dict[str, str]]:
             slug_overrides=slug_overrides,
             names_en_zh=names_en_zh,
         )
+        previous = existing.get(slug) or {}
+        if previous.get("source") in preserved_sources and previous.get("labelZh"):
+            label_zh = previous["labelZh"]
+            source = previous["source"]
         if source in {"english_fallback", "slug_title"}:
             unresolved.append(slug)
 

@@ -2,6 +2,8 @@
 
 PokeAPI 的 **`zh-Hans`** 字段覆盖宝可梦、招式、特性、道具、性格等名称，但 **地点（location-area）没有官方中文**。TitoDex 在此维护一份可版本化的对照表，供 App 运行时与 CDN bundle 构建共用。
 
+地点条目中的 `source` 会记录解析来源。`source: 52poke_wiki` 的中文地点名来自[神奇宝贝百科](https://wiki.52poke.com/)（CC BY-NC-SA 3.0）；`source: bulbapedia_langlink` 来自 [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Bulbapedia:Copyrights) 的中文跨语言标题（CC BY-NC-SA 2.5）。两者均通过 OpenCC 转为项目统一的简体中文；复用或发布这些条目时须保留署名、非商业与相同方式共享条件。
+
 ## 目录结构
 
 ```
@@ -38,6 +40,9 @@ flutter/assets/l10n/zh/
 # 从 PokeAPI 拉全量对照（地点约需数分钟）
 python3 tools/fetch_zh_catalog.py
 
+# 尝试用 52PokéWiki 补全仍为英文的地点名
+python3 tools/fetch_52poke_location_zh.py --limit 50
+
 # 生成 Flutter assets
 python3 tools/generate_zh_catalog_assets.py
 
@@ -51,7 +56,9 @@ python3 tools/build_dex_bundle.py ...
 2. `route-N-*` → `N号道路`  
 3. `seeds/location_names_en_zh.json` + 内置英文地名表（按 PokeAPI 英文地名匹配）  
 4. 子区域后缀（`-1f` / `-b1f`）拼到父地点中文后  
-5. 仍无中文 → 使用 PokeAPI **英文地名**（不再显示裸 slug 或数字）
+5. 52PokéWiki 英文重定向页对应的中文标题（OpenCC 转为 `zh-Hans`）
+6. Bulbapedia 对应页面的中文跨语言标题（同样转为 `zh-Hans`）
+7. 仍无中文 → 使用 PokeAPI **英文地名**（不再显示裸 slug 或数字）
 
 HGSS 存档 **map id**（纯数字 slug）走 `hgss_map_ids.json`。
 

@@ -62,6 +62,17 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 4. **Distribution polish** — refine splash, install guidance, and release consistency.
 5. **Offline maintenance** — keep bundle v5 manifests and Chinese labels current without exposing private service URLs in public copy.
 
+## Active TODO
+
+- [ ] Restore the deep CDN health check: upload the missing Scarlet/Violet Pikachu version sprite or make the probe accept the intentional shared-sprite fallback, so the six-hour cron does not emit false alarms.
+- [ ] Restore the production Worker Cron Triggers (currently none are attached): deploy the weekly l10n dispatch and six-hour deep-health schedules declared on `deploy/dex-cdn`, then verify both handlers from Cloudflare's trigger inventory.
+- [ ] Create and bind a dedicated TitoDex KV namespace for hot-object caching plus last-probe / last-dispatch state; do not reuse the unrelated `FODI_CACHE` namespace.
+- [ ] Reconcile the two Worker-only commits on `deploy/dex-cdn` with `main`, while keeping `deploy/dex-cdn` as the production deployment branch.
+- [ ] Refresh the Worker compatibility date and locked Wrangler release, then run a dry-run validation before the next production deployment.
+- [ ] Verify whether the legacy `autumn-shape-2b65` Worker still has traffic or an owner; retire it only after that read-only check confirms it is unused.
+- [ ] Rebuild and publish the dex bundle with the new exact-version encounter schema; before claiming full modern-game coverage, audit and add attributed redistributable overlays for modern version groups whose upstream encounter tables are empty or not yet verified (BDSP, Legends: Arceus, Scarlet/Violet, Z-A, and Champions).
+- [ ] Add persistent caching or bounded concurrency to the full PokeAPI location-area refresh; the current first-run catalog sync is correct but serial and slow.
+
 ## Future work
 
 - deeper generation-specific save adapters beyond trainer metadata (more real save fixtures incoming)

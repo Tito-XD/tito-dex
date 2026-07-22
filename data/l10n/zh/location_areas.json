@@ -58,16 +58,16 @@
   "aipom-hill-area": {
     "areaNameEn": "aipom-hill-area",
     "id": "946",
-    "labelZh": "Aipom Hill",
+    "labelZh": "长尾怪手山",
     "locationNameEn": "Aipom Hill",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "akala-outskirts-area": {
     "areaNameEn": "akala-outskirts-area",
     "id": "1068",
-    "labelZh": "Akala Outskirts",
+    "labelZh": "阿卡拉岛郊外",
     "locationNameEn": "Akala Outskirts",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "alola-route-1-east": {
     "areaNameEn": "alola-route-1-east",
@@ -331,9 +331,9 @@
   "ancient-quarry-area": {
     "areaNameEn": "ancient-quarry-area",
     "id": "947",
-    "labelZh": "Ancient Quarry",
+    "labelZh": "古代采石场",
     "locationNameEn": "Ancient Quarry",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "ancient-tomb-area": {
     "areaNameEn": "Ancient Tomb",
@@ -345,16 +345,16 @@
   "aquacorde-town-area": {
     "areaNameEn": "Aquacorde Town",
     "id": "778",
-    "labelZh": "Aquacorde Town",
+    "labelZh": "名水镇",
     "locationNameEn": "Aquacorde Town",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "arenas-approach-area": {
     "areaNameEn": "arenas-approach-area",
     "id": "948",
-    "labelZh": "Arena's Approach",
+    "labelZh": "往战场的路",
     "locationNameEn": "Arena's Approach",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "artisan-cave-area": {
     "areaNameEn": "Artisan Cave",
@@ -373,27 +373,34 @@
   "aspiration-hill-area": {
     "areaNameEn": "aspiration-hill-area",
     "id": "949",
-    "labelZh": "Aspiration Hill",
+    "labelZh": "大志坡",
     "locationNameEn": "Aspiration Hill",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "avalanche-slopes-area": {
     "areaNameEn": "avalanche-slopes-area",
     "id": "950",
-    "labelZh": "Avalanche Slopes",
+    "labelZh": "雪崩坡",
     "locationNameEn": "Avalanche Slopes",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "avaluggs-legacy-area": {
     "areaNameEn": "avaluggs-legacy-area",
     "id": "951",
-    "labelZh": "Avalugg's Legacy",
+    "labelZh": "冰岩块",
     "locationNameEn": "Avalugg's Legacy",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "axews-eye-area": {
     "areaNameEn": "Axew's Eye",
     "id": "858",
+    "labelZh": "牙牙之眼",
+    "locationNameEn": "Axew's Eye",
+    "source": "composite_en"
+  },
+  "axews-eye-max-den-a": {
+    "areaNameEn": "Axew's Eye (Max Den A)",
+    "id": "1411",
     "labelZh": "牙牙之眼",
     "locationNameEn": "Axew's Eye",
     "source": "composite_en"
@@ -436,16 +443,16 @@
   "bathers-lagoon-area": {
     "areaNameEn": "bathers-lagoon-area",
     "id": "952",
-    "labelZh": "Bathers' Lagoon",
+    "labelZh": "戏水潟湖",
     "locationNameEn": "Bathers' Lagoon",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "battle-resort-area": {
     "areaNameEn": "Battle Resort",
     "id": "786",
-    "labelZh": "Battle Resort",
+    "labelZh": "对战度假地",
     "locationNameEn": "Battle Resort",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "bell-tower-10f": {
     "areaNameEn": "Bell Tower (10F)",
@@ -527,16 +534,16 @@
   "berry-fields-area": {
     "areaNameEn": "berry-fields-area",
     "id": "1072",
-    "labelZh": "Berry Fields",
+    "labelZh": "树果园（阿罗拉）",
     "locationNameEn": "Berry Fields",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "berry-forest-area": {
     "areaNameEn": "Berry Forest",
     "id": "495",
-    "labelZh": "Berry Forest",
+    "labelZh": "树果森林",
     "locationNameEn": "Berry Forest",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "birth-island-area": {
     "areaNameEn": "Birth Island",
@@ -555,23 +562,23 @@
   "blush-mountain-area": {
     "areaNameEn": "blush-mountain-area",
     "id": "1073",
-    "labelZh": "Blush Mountain",
+    "labelZh": "火特力山",
     "locationNameEn": "Blush Mountain",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "bolderoll-ravine-area": {
     "areaNameEn": "bolderoll-ravine-area",
     "id": "953",
-    "labelZh": "Bolderoll Ravine",
+    "labelZh": "隆隆山地",
     "locationNameEn": "Bolderoll Ravine",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "bolderoll-slope-area": {
     "areaNameEn": "bolderoll-slope-area",
     "id": "954",
-    "labelZh": "Bolderoll Slope",
+    "labelZh": "隆隆坡",
     "locationNameEn": "Bolderoll Slope",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "bond-bridge-area": {
     "areaNameEn": "Bond Bridge",
@@ -583,16 +590,16 @@
   "bonechill-wastes-area": {
     "areaNameEn": "bonechill-wastes-area",
     "id": "955",
-    "labelZh": "Bonechill Wastes",
+    "labelZh": "酷寒荒地",
     "locationNameEn": "Bonechill Wastes",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "brava-arena-area": {
     "areaNameEn": "brava-arena-area",
     "id": "956",
-    "labelZh": "Brava Arena",
+    "labelZh": "舞台战场",
     "locationNameEn": "Brava Arena",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "brawlers-cave-area": {
     "areaNameEn": "Brawler's Cave",
@@ -604,6 +611,69 @@
   "bridge-field-area": {
     "areaNameEn": "Bridge Field",
     "id": "863",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-a": {
+    "areaNameEn": "Bridge Field (Max Den A)",
+    "id": "1432",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-b": {
+    "areaNameEn": "Bridge Field (Max Den B)",
+    "id": "1433",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-c": {
+    "areaNameEn": "Bridge Field (Max Den C)",
+    "id": "1434",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-d": {
+    "areaNameEn": "Bridge Field (Max Den D)",
+    "id": "1435",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-e": {
+    "areaNameEn": "Bridge Field (Max Den E)",
+    "id": "1436",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-f": {
+    "areaNameEn": "Bridge Field (Max Den F)",
+    "id": "1437",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-g": {
+    "areaNameEn": "Bridge Field (Max Den G)",
+    "id": "1438",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-h": {
+    "areaNameEn": "Bridge Field (Max Den H)",
+    "id": "1439",
+    "labelZh": "桥间空地",
+    "locationNameEn": "Bridge Field",
+    "source": "composite_en"
+  },
+  "bridge-field-max-den-i": {
+    "areaNameEn": "Bridge Field (Max Den I)",
+    "id": "1440",
     "labelZh": "桥间空地",
     "locationNameEn": "Bridge Field",
     "source": "composite_en"
@@ -660,9 +730,9 @@
   "canyon-entrance-area": {
     "areaNameEn": "Canyon Entrance",
     "id": "526",
-    "labelZh": "Canyon Entrance",
+    "labelZh": "溪谷入口",
     "locationNameEn": "Canyon Entrance",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "cape-brink-area": {
     "areaNameEn": "Cape Brink",
@@ -674,9 +744,9 @@
   "castaway-shore-area": {
     "areaNameEn": "castaway-shore-area",
     "id": "957",
-    "labelZh": "Castaway Shore",
+    "labelZh": "离散石滩",
     "locationNameEn": "Castaway Shore",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "castelia-city-area": {
     "areaNameEn": "Castelia City",
@@ -807,16 +877,16 @@
   "celestica-ruins-area": {
     "areaNameEn": "celestica-ruins-area",
     "id": "958",
-    "labelZh": "Celestica Ruins",
+    "labelZh": "神阖寺院遗址",
     "locationNameEn": "Celestica Ruins",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "celestica-trail-area": {
     "areaNameEn": "celestica-trail-area",
     "id": "959",
-    "labelZh": "Celestica Trail",
+    "labelZh": "神阖山道",
     "locationNameEn": "Celestica Trail",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "cerulean-cave-1f": {
     "areaNameEn": "Cerulean Cave (1F)",
@@ -849,16 +919,16 @@
   "challenge-beach-area": {
     "areaNameEn": "Challenge Beach",
     "id": "864",
-    "labelZh": "Challenge Beach",
+    "labelZh": "挑战海滩",
     "locationNameEn": "Challenge Beach",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "challenge-road-area": {
     "areaNameEn": "Challenge Road",
     "id": "868",
-    "labelZh": "Challenge Road",
+    "labelZh": "挑战之路",
     "locationNameEn": "Challenge Road",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "challengers-cave-1f": {
     "areaNameEn": "Challengers Cave (1F)",
@@ -1101,65 +1171,65 @@
   "clamberclaw-cliffs-area": {
     "areaNameEn": "clamberclaw-cliffs-area",
     "id": "960",
-    "labelZh": "Clamberclaw Cliffs",
+    "labelZh": "攀崖崖",
     "locationNameEn": "Clamberclaw Cliffs",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "clay-tunnel-area": {
     "areaNameEn": "Clay Tunnel",
     "id": "695",
-    "labelZh": "Clay Tunnel",
+    "labelZh": "菊老大之路",
     "locationNameEn": "Clay Tunnel",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "cloudcap-pass-area": {
     "areaNameEn": "cloudcap-pass-area",
     "id": "961",
-    "labelZh": "Cloudcap Pass",
+    "labelZh": "笠云锥道",
     "locationNameEn": "Cloudcap Pass",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "cloudpool-ridge-area": {
     "areaNameEn": "cloudpool-ridge-area",
     "id": "962",
-    "labelZh": "Cloudpool Ridge",
+    "labelZh": "云海山道",
     "locationNameEn": "Cloudpool Ridge",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "coastlands-camp-area": {
     "areaNameEn": "coastlands-camp-area",
     "id": "963",
-    "labelZh": "Coastlands Base Camp",
+    "labelZh": "基地营",
     "locationNameEn": "Coastlands Base Camp",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "cold-storage-area": {
     "areaNameEn": "Cold Storage",
     "id": "589",
-    "labelZh": "Cold Storage",
+    "labelZh": "冷冻仓库",
     "locationNameEn": "Cold Storage",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "connecting-cave-area": {
     "areaNameEn": "Connecting Cave",
     "id": "753",
-    "labelZh": "Connecting Cave",
+    "labelZh": "串连地洞",
     "locationNameEn": "Connecting Cave",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "cottonsedge-prairie-area": {
     "areaNameEn": "cottonsedge-prairie-area",
     "id": "964",
-    "labelZh": "Cottonsedge Prairie",
+    "labelZh": "羊胡草原",
     "locationNameEn": "Cottonsedge Prairie",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "courageous-cavern-area": {
     "areaNameEn": "Courageous Cavern",
     "id": "870",
-    "labelZh": "Courageous Cavern",
+    "labelZh": "斗志洞窟",
     "locationNameEn": "Courageous Cavern",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "couriway-town-area": {
     "areaNameEn": "Couriway Town",
@@ -1171,16 +1241,16 @@
   "crescent-isle-area": {
     "areaNameEn": "Crescent Isle",
     "id": "1189",
-    "labelZh": "Crescent Isle",
+    "labelZh": "弓形岛",
     "locationNameEn": "Crescent Isle",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "crossing-slope-area": {
     "areaNameEn": "crossing-slope-area",
     "id": "965",
-    "labelZh": "Crossing Slope",
+    "labelZh": "通海坡",
     "locationNameEn": "Crossing Slope",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "crown-shrine-area": {
     "areaNameEn": "Crown Shrine",
@@ -1203,6 +1273,41 @@
     "locationNameEn": "Dappled Grove",
     "source": "composite_en"
   },
+  "dappled-grove-max-den-a": {
+    "areaNameEn": "Dappled Grove (Max Den A)",
+    "id": "1393",
+    "labelZh": "花之草原",
+    "locationNameEn": "Dappled Grove",
+    "source": "composite_en"
+  },
+  "dappled-grove-max-den-b": {
+    "areaNameEn": "Dappled Grove (Max Den B)",
+    "id": "1394",
+    "labelZh": "花之草原",
+    "locationNameEn": "Dappled Grove",
+    "source": "composite_en"
+  },
+  "dappled-grove-max-den-c": {
+    "areaNameEn": "Dappled Grove (Max Den C)",
+    "id": "1395",
+    "labelZh": "花之草原",
+    "locationNameEn": "Dappled Grove",
+    "source": "composite_en"
+  },
+  "dappled-grove-max-den-d": {
+    "areaNameEn": "Dappled Grove (Max Den D)",
+    "id": "1396",
+    "labelZh": "花之草原",
+    "locationNameEn": "Dappled Grove",
+    "source": "composite_en"
+  },
+  "dappled-grove-max-den-e": {
+    "areaNameEn": "Dappled Grove (Max Den E)",
+    "id": "1397",
+    "labelZh": "花之草原",
+    "locationNameEn": "Dappled Grove",
+    "source": "composite_en"
+  },
   "dark-cave-blackthorn-city-entrance": {
     "areaNameEn": "Dark Cave (Blackthorn City entrance)",
     "id": "254",
@@ -1220,23 +1325,23 @@
   "deadwood-haunt-area": {
     "areaNameEn": "deadwood-haunt-area",
     "id": "966",
-    "labelZh": "Deadwood Haunt",
+    "labelZh": "鬼枯原",
     "locationNameEn": "Deadwood Haunt",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "deertrack-heights-area": {
     "areaNameEn": "deertrack-heights-area",
     "id": "967",
-    "labelZh": "Deertrack Heights",
+    "labelZh": "角鹿高岗",
     "locationNameEn": "Deertrack Heights",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "deertrack-path-area": {
     "areaNameEn": "deertrack-path-area",
     "id": "968",
-    "labelZh": "Deertrack Path",
+    "labelZh": "角鹿山道",
     "locationNameEn": "Deertrack Path",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "desert-resort-area": {
     "areaNameEn": "Desert Resort",
@@ -1255,9 +1360,9 @@
   "desert-ruins-area": {
     "areaNameEn": "Desert Ruins",
     "id": "810",
-    "labelZh": "Desert Ruins",
+    "labelZh": "沙漠遗迹",
     "locationNameEn": "Desert Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "desert-underpass-area": {
     "areaNameEn": "Desert Underpass",
@@ -1276,16 +1381,16 @@
   "diamond-heath-area": {
     "areaNameEn": "diamond-heath-area",
     "id": "969",
-    "labelZh": "Diamond Heath",
+    "labelZh": "金刚后山",
     "locationNameEn": "Diamond Heath",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "diamond-settlement-area": {
     "areaNameEn": "diamond-settlement-area",
     "id": "970",
-    "labelZh": "Diamond Settlement",
+    "labelZh": "金刚聚落",
     "locationNameEn": "Diamond Settlement",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "digletts-cave-area": {
     "areaNameEn": "Digletts Cave",
@@ -1297,9 +1402,9 @@
   "digletts-tunnel-area": {
     "areaNameEn": "digletts-tunnel-area",
     "id": "1078",
-    "labelZh": "Diglett’s Tunnel",
+    "labelZh": "地鼠隧道",
     "locationNameEn": "Diglett’s Tunnel",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "dilford-chamber-area": {
     "areaNameEn": "Dilford Chamber",
@@ -1308,12 +1413,19 @@
     "locationNameEn": "Dilford Chamber",
     "source": "composite_en"
   },
+  "distortion-world-area": {
+    "areaNameEn": "Distortion World",
+    "id": "1379",
+    "labelZh": "毁坏的世界",
+    "locationNameEn": "Distortion World",
+    "source": "composite_en"
+  },
   "dividing-peak-tunnel-area": {
     "areaNameEn": "dividing-peak-tunnel-area",
     "id": "1079",
-    "labelZh": "Dividing Peak Tunnel",
+    "labelZh": "分隔岭隧道",
     "locationNameEn": "Dividing Peak Tunnel",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "dragons-den-area": {
     "areaNameEn": "Dragon's Den",
@@ -1381,16 +1493,16 @@
   "driftveil-drawbridge-area": {
     "areaNameEn": "Driftveil Drawbridge",
     "id": "620",
-    "labelZh": "Driftveil Drawbridge",
+    "labelZh": "帆巴吊桥",
     "locationNameEn": "Driftveil Drawbridge",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "droning-meadow-area": {
     "areaNameEn": "droning-meadow-area",
     "id": "971",
-    "labelZh": "Droning Meadow",
+    "labelZh": "羽音原野",
     "locationNameEn": "Droning Meadow",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "dusty-bowl-area": {
     "areaNameEn": "Dusty Bowl",
@@ -1399,16 +1511,114 @@
     "locationNameEn": "Dusty Bowl",
     "source": "composite_en"
   },
+  "dusty-bowl-max-den-a": {
+    "areaNameEn": "Dusty Bowl (Max Den A)",
+    "id": "1458",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-b": {
+    "areaNameEn": "Dusty Bowl (Max Den B)",
+    "id": "1459",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-c": {
+    "areaNameEn": "Dusty Bowl (Max Den C)",
+    "id": "1460",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-d": {
+    "areaNameEn": "Dusty Bowl (Max Den D)",
+    "id": "1461",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-e": {
+    "areaNameEn": "Dusty Bowl (Max Den E)",
+    "id": "1462",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-f": {
+    "areaNameEn": "Dusty Bowl (Max Den F)",
+    "id": "1463",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-g": {
+    "areaNameEn": "Dusty Bowl (Max Den G)",
+    "id": "1464",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-h": {
+    "areaNameEn": "Dusty Bowl (Max Den H)",
+    "id": "1465",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
+  "dusty-bowl-max-den-i": {
+    "areaNameEn": "Dusty Bowl (Max Den I)",
+    "id": "1466",
+    "labelZh": "沙尘盆地",
+    "locationNameEn": "Dusty Bowl",
+    "source": "composite_en"
+  },
   "dyna-tree-hill-area": {
     "areaNameEn": "Dyna Tree Hill",
     "id": "874",
-    "labelZh": "Dyna Tree Hill",
+    "labelZh": "巨树丘陵",
     "locationNameEn": "Dyna Tree Hill",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "east-lake-axewell-area": {
     "areaNameEn": "East Lake Axewell",
     "id": "875",
+    "labelZh": "牙牙湖东",
+    "locationNameEn": "East Lake Axewell",
+    "source": "composite_en"
+  },
+  "east-lake-axewell-max-den-a": {
+    "areaNameEn": "East Lake Axewell (Max Den A)",
+    "id": "1406",
+    "labelZh": "牙牙湖东",
+    "locationNameEn": "East Lake Axewell",
+    "source": "composite_en"
+  },
+  "east-lake-axewell-max-den-b": {
+    "areaNameEn": "East Lake Axewell (Max Den B)",
+    "id": "1407",
+    "labelZh": "牙牙湖东",
+    "locationNameEn": "East Lake Axewell",
+    "source": "composite_en"
+  },
+  "east-lake-axewell-max-den-c": {
+    "areaNameEn": "East Lake Axewell (Max Den C)",
+    "id": "1408",
+    "labelZh": "牙牙湖东",
+    "locationNameEn": "East Lake Axewell",
+    "source": "composite_en"
+  },
+  "east-lake-axewell-max-den-d": {
+    "areaNameEn": "East Lake Axewell (Max Den D)",
+    "id": "1409",
+    "labelZh": "牙牙湖东",
+    "locationNameEn": "East Lake Axewell",
+    "source": "composite_en"
+  },
+  "east-lake-axewell-max-den-e": {
+    "areaNameEn": "East Lake Axewell (Max Den E)",
+    "id": "1410",
     "labelZh": "牙牙湖东",
     "locationNameEn": "East Lake Axewell",
     "source": "composite_en"
@@ -1444,9 +1654,9 @@
   "energy-plant-tower-summit": {
     "areaNameEn": "Energy Plant Tower Summit",
     "id": "1370",
-    "labelZh": "Energy Plant",
+    "labelZh": "能源工厂",
     "locationNameEn": "Energy Plant",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "eterna-city-area": {
     "areaNameEn": "Eterna City",
@@ -1479,23 +1689,23 @@
   "exeggutor-island-area": {
     "areaNameEn": "exeggutor-island-area",
     "id": "1080",
-    "labelZh": "Exeggutor Island",
+    "labelZh": "椰蛋树岛",
     "locationNameEn": "Exeggutor Island",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "fabled-cave-area": {
     "areaNameEn": "Fabled Cave",
     "id": "1191",
-    "labelZh": "Fabled Cave",
+    "labelZh": "朦胧洞窟",
     "locationNameEn": "Fabled Cave",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "fabled-spring-area": {
     "areaNameEn": "fabled-spring-area",
     "id": "972",
-    "labelZh": "Fabled Spring",
+    "labelZh": "妖精之泉",
     "locationNameEn": "Fabled Spring",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "fallarbor-town-contest-hall": {
     "areaNameEn": "Contest Hall (Fallarbor Town)",
@@ -1514,9 +1724,9 @@
   "fields-of-honor-area": {
     "areaNameEn": "Fields of Honor",
     "id": "876",
-    "labelZh": "Fields of Honor",
+    "labelZh": "揖礼原野",
     "locationNameEn": "Fields of Honor",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "fiery-path-area": {
     "areaNameEn": "Fiery Path",
@@ -1528,9 +1738,9 @@
   "firespit-island-area": {
     "areaNameEn": "firespit-island-area",
     "id": "973",
-    "labelZh": "Firespit Island",
+    "labelZh": "吹火岛",
     "locationNameEn": "Firespit Island",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "five-island-area": {
     "areaNameEn": "Five Island",
@@ -1549,16 +1759,16 @@
   "floaro-gardens-area": {
     "areaNameEn": "floaro-gardens-area",
     "id": "974",
-    "labelZh": "Floaro Gardens",
+    "labelZh": "荒园开垦地",
     "locationNameEn": "Floaro Gardens",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "floaroma-meadow-area": {
     "areaNameEn": "Floaroma Meadow",
     "id": "1362",
-    "labelZh": "Floaroma Meadow",
+    "labelZh": "花苑花田",
     "locationNameEn": "Floaroma Meadow",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "floccesy-ranch-hidden-grotto": {
     "areaNameEn": "Floccesy Ranch (Hidden Grotto)",
@@ -1598,9 +1808,9 @@
   "forest-of-focus-area": {
     "areaNameEn": "Forest of Focus",
     "id": "878",
-    "labelZh": "Forest of Focus",
+    "labelZh": "专注森林",
     "locationNameEn": "Forest of Focus",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "fortree-city-area": {
     "areaNameEn": "Fortree City",
@@ -1794,9 +2004,9 @@
   "frostpoint-field-area": {
     "areaNameEn": "Frostpoint Field",
     "id": "881",
-    "labelZh": "Frostpoint Field",
+    "labelZh": "冰点雪原",
     "locationNameEn": "Frostpoint Field",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "fuchsia-city-area": {
     "areaNameEn": "Fuchsia City",
@@ -1822,16 +2032,16 @@
   "galar-iceberg-ruins-area": {
     "areaNameEn": "Iceberg Ruins",
     "id": "897",
-    "labelZh": "Iceberg Ruins",
+    "labelZh": "冰山遗迹",
     "locationNameEn": "Iceberg Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "galar-iron-ruins-area": {
     "areaNameEn": "Iron Ruins",
     "id": "899",
-    "labelZh": "Iron Ruins",
+    "labelZh": "黑金遗迹",
     "locationNameEn": "Iron Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "galar-mine-area": {
     "areaNameEn": "Galar Mine",
@@ -1850,9 +2060,9 @@
   "galar-rock-peak-ruins-area": {
     "areaNameEn": "Rock Peak Ruins",
     "id": "915",
-    "labelZh": "Rock Peak Ruins",
+    "labelZh": "岩山遗迹",
     "locationNameEn": "Rock Peak Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "galar-route-1-area": {
     "areaNameEn": "Route 1",
@@ -1973,12 +2183,19 @@
     "locationNameEn": "Route 9",
     "source": "route_slug"
   },
+  "galar-wild-area-max-dens-area": {
+    "areaNameEn": "All Max Dens in the Galar Wild Area",
+    "id": "1383",
+    "labelZh": "旷野地带（极巨巢穴）",
+    "locationNameEn": "All Max Dens in the Galar Wild Area",
+    "source": "slug_override"
+  },
   "gapejaw-bog-area": {
     "areaNameEn": "gapejaw-bog-area",
     "id": "975",
-    "labelZh": "Gapejaw Bog",
+    "labelZh": "大嘴沼泽",
     "locationNameEn": "Gapejaw Bog",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "gateon-port-across-bridge": {
     "areaNameEn": "Gateon Port (Across Bridge)",
@@ -2064,6 +2281,41 @@
     "locationNameEn": "Giant's Cap",
     "source": "composite_en"
   },
+  "giants-cap-max-den-a": {
+    "areaNameEn": "Giant's Cap (Max Den A)",
+    "id": "1453",
+    "labelZh": "巨人帽岩",
+    "locationNameEn": "Giant's Cap",
+    "source": "composite_en"
+  },
+  "giants-cap-max-den-b": {
+    "areaNameEn": "Giant's Cap (Max Den B)",
+    "id": "1454",
+    "labelZh": "巨人帽岩",
+    "locationNameEn": "Giant's Cap",
+    "source": "composite_en"
+  },
+  "giants-cap-max-den-c": {
+    "areaNameEn": "Giant's Cap (Max Den C)",
+    "id": "1455",
+    "labelZh": "巨人帽岩",
+    "locationNameEn": "Giant's Cap",
+    "source": "composite_en"
+  },
+  "giants-cap-max-den-d": {
+    "areaNameEn": "Giant's Cap (Max Den D)",
+    "id": "1456",
+    "labelZh": "巨人帽岩",
+    "locationNameEn": "Giant's Cap",
+    "source": "composite_en"
+  },
+  "giants-cap-max-den-e": {
+    "areaNameEn": "Giant's Cap (Max Den E)",
+    "id": "1457",
+    "labelZh": "巨人帽岩",
+    "locationNameEn": "Giant's Cap",
+    "source": "composite_en"
+  },
   "giants-foot-area": {
     "areaNameEn": "Giant's Foot",
     "id": "888",
@@ -2085,33 +2337,103 @@
     "locationNameEn": "Giant's Mirror",
     "source": "composite_en"
   },
+  "giants-mirror-max-den-a": {
+    "areaNameEn": "Giant's Mirror (Max Den A)",
+    "id": "1467",
+    "labelZh": "巨人镜面",
+    "locationNameEn": "Giant's Mirror",
+    "source": "composite_en"
+  },
+  "giants-mirror-max-den-b": {
+    "areaNameEn": "Giant's Mirror (Max Den B)",
+    "id": "1468",
+    "labelZh": "巨人镜面",
+    "locationNameEn": "Giant's Mirror",
+    "source": "composite_en"
+  },
+  "giants-mirror-max-den-c": {
+    "areaNameEn": "Giant's Mirror (Max Den C)",
+    "id": "1469",
+    "labelZh": "巨人镜面",
+    "locationNameEn": "Giant's Mirror",
+    "source": "composite_en"
+  },
+  "giants-mirror-max-den-d": {
+    "areaNameEn": "Giant's Mirror (Max Den D)",
+    "id": "1470",
+    "labelZh": "巨人镜面",
+    "locationNameEn": "Giant's Mirror",
+    "source": "composite_en"
+  },
+  "giants-mirror-max-den-e": {
+    "areaNameEn": "Giant's Mirror (Max Den E)",
+    "id": "1471",
+    "labelZh": "巨人镜面",
+    "locationNameEn": "Giant's Mirror",
+    "source": "composite_en"
+  },
   "giants-seat-area": {
     "areaNameEn": "Giant's Seat",
     "id": "890",
-    "labelZh": "Giant's Seat",
+    "labelZh": "巨人凳岩",
     "locationNameEn": "Giant's Seat",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
+  },
+  "giants-seat-max-den-a": {
+    "areaNameEn": "Giant's Seat (Max Den A)",
+    "id": "1418",
+    "labelZh": "巨人凳岩",
+    "locationNameEn": "Giant's Seat",
+    "source": "52poke_wiki"
+  },
+  "giants-seat-max-den-b": {
+    "areaNameEn": "Giant's Seat (Max Den B)",
+    "id": "1419",
+    "labelZh": "巨人凳岩",
+    "locationNameEn": "Giant's Seat",
+    "source": "52poke_wiki"
+  },
+  "giants-seat-max-den-c": {
+    "areaNameEn": "Giant's Seat (Max Den C)",
+    "id": "1420",
+    "labelZh": "巨人凳岩",
+    "locationNameEn": "Giant's Seat",
+    "source": "52poke_wiki"
+  },
+  "giants-seat-max-den-d": {
+    "areaNameEn": "Giant's Seat (Max Den D)",
+    "id": "1421",
+    "labelZh": "巨人凳岩",
+    "locationNameEn": "Giant's Seat",
+    "source": "52poke_wiki"
+  },
+  "giants-seat-max-den-e": {
+    "areaNameEn": "Giant's Seat (Max Den E)",
+    "id": "1422",
+    "labelZh": "巨人凳岩",
+    "locationNameEn": "Giant's Seat",
+    "source": "52poke_wiki"
   },
   "ginkgo-landing-area": {
     "areaNameEn": "ginkgo-landing-area",
     "id": "976",
-    "labelZh": "Ginkgo Landing",
+    "labelZh": "银杏沙滩",
     "locationNameEn": "Ginkgo Landing",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "glacier-room-area": {
     "areaNameEn": "Glacier Room",
     "id": "698",
-    "labelZh": "Glacier Room",
+    "labelZh": "冰川房间",
     "locationNameEn": "Glacier Room",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "glacier-terrace-area": {
     "areaNameEn": "glacier-terrace-area",
     "id": "977",
-    "labelZh": "Glacier Terrace",
+    "labelZh": "冰河阶坡",
     "locationNameEn": "Glacier Terrace",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "glimwood-tangle-area": {
     "areaNameEn": "Glimwood Tangle",
@@ -2137,16 +2459,16 @@
   "gnarled-den-area": {
     "areaNameEn": "Gnarled Den",
     "id": "1192",
-    "labelZh": "Gnarled Den",
+    "labelZh": "歪曲洞穴",
     "locationNameEn": "Gnarled Den",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "golden-lowlands-area": {
     "areaNameEn": "golden-lowlands-area",
     "id": "978",
-    "labelZh": "Golden Lowlands",
+    "labelZh": "金色平野",
     "locationNameEn": "Golden Lowlands",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "goldenrod-city-bills-house": {
     "areaNameEn": "Goldenrod City (Bill's house)",
@@ -2179,9 +2501,9 @@
   "grandtree-arena-area": {
     "areaNameEn": "grandtree-arena-area",
     "id": "979",
-    "labelZh": "Grandtree Arena",
+    "labelZh": "巨木战场",
     "locationNameEn": "Grandtree Arena",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "granite-cave-1f": {
     "areaNameEn": "Granite Cave (1F)",
@@ -2256,30 +2578,30 @@
   "green-path-area": {
     "areaNameEn": "Green Path",
     "id": "522",
-    "labelZh": "Green Path",
+    "labelZh": "绿之步道",
     "locationNameEn": "Green Path",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "grueling-grove-area": {
     "areaNameEn": "grueling-grove-area",
     "id": "980",
-    "labelZh": "Grueling Grove",
+    "labelZh": "险林",
     "locationNameEn": "Grueling Grove",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "guidance-chamber-area": {
     "areaNameEn": "Guidance Chamber",
     "id": "631",
-    "labelZh": "Guidance Chamber",
+    "labelZh": "吹寄洞穴",
     "locationNameEn": "Guidance Chamber",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "haina-desert-area": {
     "areaNameEn": "haina-desert-area",
     "id": "1081",
-    "labelZh": "Haina Desert",
+    "labelZh": "哈伊纳沙漠",
     "locationNameEn": "Haina Desert",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "hammerlocke-area": {
     "areaNameEn": "Hammerlocke",
@@ -2295,19 +2617,68 @@
     "locationNameEn": "Hammerlocke Hills",
     "source": "composite_en"
   },
+  "hammerlocke-hills-max-den-a": {
+    "areaNameEn": "Hammerlocke Hills (Max Den A)",
+    "id": "1476",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-b": {
+    "areaNameEn": "Hammerlocke Hills (Max Den B)",
+    "id": "1477",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-c": {
+    "areaNameEn": "Hammerlocke Hills (Max Den C)",
+    "id": "1478",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-d": {
+    "areaNameEn": "Hammerlocke Hills (Max Den D)",
+    "id": "1479",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-e": {
+    "areaNameEn": "Hammerlocke Hills (Max Den E)",
+    "id": "1480",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-f": {
+    "areaNameEn": "Hammerlocke Hills (Max Den F)",
+    "id": "1481",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
+  "hammerlocke-hills-max-den-g": {
+    "areaNameEn": "Hammerlocke Hills (Max Den G)",
+    "id": "1482",
+    "labelZh": "拳关丘陵",
+    "locationNameEn": "Hammerlocke Hills",
+    "source": "composite_en"
+  },
   "hano-beach-area": {
     "areaNameEn": "hano-beach-area",
     "id": "1082",
-    "labelZh": "Hano Beach",
+    "labelZh": "豪诺豪诺海滩",
     "locationNameEn": "Hano Beach",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "hauoli-cemetery-area": {
     "areaNameEn": "hauoli-cemetery-area",
     "id": "1083",
-    "labelZh": "Hau’oli Cemetery",
+    "labelZh": "好奥乐墓园",
     "locationNameEn": "Hau’oli Cemetery",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "hauoli-city-beachfront": {
     "areaNameEn": "hauoli-city-beachfront",
@@ -2333,9 +2704,9 @@
   "heahea-beach-area": {
     "areaNameEn": "heahea-beach-area",
     "id": "1087",
-    "labelZh": "Heahea Beach",
+    "labelZh": "慷待海滩",
     "locationNameEn": "Heahea Beach",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "heahea-city-surf-association": {
     "areaNameEn": "heahea-city-surf-association",
@@ -2361,30 +2732,30 @@
   "hearts-crag-area": {
     "areaNameEn": "hearts-crag-area",
     "id": "981",
-    "labelZh": "Heart's Crag",
+    "labelZh": "心形岩山",
     "locationNameEn": "Heart's Crag",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "heavenward-lookout-area": {
     "areaNameEn": "heavenward-lookout-area",
     "id": "982",
-    "labelZh": "Heavenward Lookout",
+    "labelZh": "神前高岗",
     "locationNameEn": "Heavenward Lookout",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "heights-camp-area": {
     "areaNameEn": "heights-camp-area",
     "id": "983",
-    "labelZh": "Heights Base Camp",
+    "labelZh": "基地营",
     "locationNameEn": "Heights Base Camp",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "hideaway-bay-area": {
     "areaNameEn": "hideaway-bay-area",
     "id": "984",
-    "labelZh": "Hideaway Bay",
+    "labelZh": "后浦",
     "locationNameEn": "Hideaway Bay",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "hisui-lake-acuity-area": {
     "areaNameEn": "hisui-lake-acuity-area",
@@ -2424,9 +2795,9 @@
   "hisui-spring-path-area": {
     "areaNameEn": "hisui-spring-path-area",
     "id": "1019",
-    "labelZh": "Spring Path",
+    "labelZh": "隐泉之路",
     "locationNameEn": "Spring Path",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "hisui-turnback-cave-area": {
     "areaNameEn": "hisui-turnback-cave-area",
@@ -2452,23 +2823,23 @@
   "hoenn-battle-frontier-area": {
     "areaNameEn": "Hoenn Battle Frontier",
     "id": "809",
-    "labelZh": "Hoenn Battle Frontier",
+    "labelZh": "对战开拓区（第三世代）",
     "locationNameEn": "Hoenn Battle Frontier",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "hoenn-pokecenter-area": {
     "areaNameEn": "hoenn-pokecenter-area",
     "id": "1210",
-    "labelZh": "hoenn-pokecenter-area",
+    "labelZh": "丰缘地区宝可梦中心",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "hoenn-pokemart-area": {
     "areaNameEn": "hoenn-pokemart-area",
     "id": "1209",
-    "labelZh": "hoenn-pokemart-area",
+    "labelZh": "丰缘地区友好商店",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "hoenn-route-101-area": {
     "areaNameEn": "Road 101",
@@ -2809,30 +3180,30 @@
   "holm-of-trials-area": {
     "areaNameEn": "holm-of-trials-area",
     "id": "985",
-    "labelZh": "Holm of Trials",
+    "labelZh": "试炼沙洲",
     "locationNameEn": "Holm of Trials",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "honeycalm-island-area": {
     "areaNameEn": "Honeycalm Island",
     "id": "894",
-    "labelZh": "Honeycalm Island",
+    "labelZh": "蜂巢岛",
     "locationNameEn": "Honeycalm Island",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "honeycalm-sea-area": {
     "areaNameEn": "Honeycalm Sea",
     "id": "895",
-    "labelZh": "Honeycalm Sea",
+    "labelZh": "蜂巢海",
     "locationNameEn": "Honeycalm Sea",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "horseshoe-plains-area": {
     "areaNameEn": "horseshoe-plains-area",
     "id": "986",
-    "labelZh": "Horseshoe Plains",
+    "labelZh": "蹄铁草原",
     "locationNameEn": "Horseshoe Plains",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "hulbury-area": {
     "areaNameEn": "Hulbury",
@@ -2844,16 +3215,16 @@
   "humilau-city-area": {
     "areaNameEn": "Humilau City",
     "id": "659",
-    "labelZh": "Humilau City",
+    "labelZh": "青海波市",
     "locationNameEn": "Humilau City",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ice-column-chamber-area": {
     "areaNameEn": "ice-column-chamber-area",
     "id": "987",
-    "labelZh": "Ice Column Chamber",
+    "labelZh": "冰柱窟",
     "locationNameEn": "Ice Column Chamber",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "ice-path-1f": {
     "areaNameEn": "Ice Path (1F)",
@@ -2886,9 +3257,9 @@
   "icebound-falls-area": {
     "areaNameEn": "icebound-falls-area",
     "id": "988",
-    "labelZh": "Icebound Falls",
+    "labelZh": "冰鬼瀑",
     "locationNameEn": "Icebound Falls",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "icefall-cave-1f": {
     "areaNameEn": "Icefall Cave (1F)",
@@ -2921,16 +3292,16 @@
   "icepeak-arena-area": {
     "areaNameEn": "icepeak-arena-area",
     "id": "989",
-    "labelZh": "Icepeak Arena",
+    "labelZh": "冰山战场",
     "locationNameEn": "Icepeak Arena",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "icepeak-cavern-area": {
     "areaNameEn": "icepeak-cavern-area",
     "id": "990",
-    "labelZh": "Icepeak Cavern",
+    "labelZh": "冰山地道",
     "locationNameEn": "Icepeak Cavern",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "icirrus-city-area": {
     "areaNameEn": "Icirrus City",
@@ -2963,9 +3334,9 @@
   "insular-sea-area": {
     "areaNameEn": "Insular Sea",
     "id": "898",
-    "labelZh": "Insular Sea",
+    "labelZh": "离岛海域",
     "locationNameEn": "Insular Sea",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "iron-island-1f": {
     "areaNameEn": "Iron Island (1F)",
@@ -3019,9 +3390,9 @@
   "iron-room-area": {
     "areaNameEn": "Iron Room",
     "id": "699",
-    "labelZh": "Iron Room",
+    "labelZh": "钢铁房间",
     "locationNameEn": "Iron Room",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "island-cave-area": {
     "areaNameEn": "Island Cave",
@@ -3033,16 +3404,16 @@
   "isle-of-armor-caves-area": {
     "areaNameEn": "Random caves across the Isle of Armor",
     "id": "1376",
-    "labelZh": "Random caves across the Isle of Armor",
+    "labelZh": "铠岛洞窟",
     "locationNameEn": "Random caves across the Isle of Armor",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "islespy-shore-area": {
     "areaNameEn": "islespy-shore-area",
     "id": "991",
-    "labelZh": "Islespy Shore",
+    "labelZh": "望岛滩",
     "locationNameEn": "Islespy Shore",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "jagged-pass-area": {
     "areaNameEn": "Jagged Pass",
@@ -3054,9 +3425,9 @@
   "johto-pokemart-area": {
     "areaNameEn": "johto-pokemart-area",
     "id": "1214",
-    "labelZh": "johto-pokemart-area",
+    "labelZh": "城都地区友好商店",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "johto-route-29-area": {
     "areaNameEn": "Road 29",
@@ -3299,16 +3670,16 @@
   "jubilife-village-area": {
     "areaNameEn": "jubilife-village-area",
     "id": "992",
-    "labelZh": "Jubilife Village",
+    "labelZh": "祝庆村",
     "locationNameEn": "Jubilife Village",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "kalae-bay-area": {
     "areaNameEn": "kalae-bay-area",
     "id": "1090",
-    "labelZh": "Kala’e Bay",
+    "labelZh": "卡拉蔚湾",
     "locationNameEn": "Kala’e Bay",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "kalos-route-10-area": {
     "areaNameEn": "Road 10",
@@ -3558,16 +3929,16 @@
   "kanto-pokecenter-area": {
     "areaNameEn": "kanto-pokecenter-area",
     "id": "1212",
-    "labelZh": "kanto-pokecenter-area",
+    "labelZh": "关都地区宝可梦中心",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "kanto-pokemart-area": {
     "areaNameEn": "kanto-pokemart-area",
     "id": "1211",
-    "labelZh": "kanto-pokemart-area",
+    "labelZh": "关都地区友好商店",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "kanto-power-plant-area": {
     "areaNameEn": "Power Plant",
@@ -3824,9 +4195,9 @@
   "kanto-underground-path-area": {
     "areaNameEn": "Kanto Underground Path",
     "id": "1302",
-    "labelZh": "Kanto Underground Path",
+    "labelZh": "关都地下通道",
     "locationNameEn": "Kanto Underground Path",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "kanto-victory-road-1-1f": {
     "areaNameEn": "Victory Road 1 (1F)",
@@ -3873,9 +4244,9 @@
   "kindle-road-area": {
     "areaNameEn": "Kindle Road",
     "id": "512",
-    "labelZh": "Kindle Road",
+    "labelZh": "热气之路",
     "locationNameEn": "Kindle Road",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "konikoni-city-area": {
     "areaNameEn": "konikoni-city-area",
@@ -3905,6 +4276,34 @@
     "locationNameEn": "Lake of Outrage",
     "source": "composite_en"
   },
+  "lake-of-outrage-max-den-a": {
+    "areaNameEn": "Lake of Outrage (Max Den A)",
+    "id": "1472",
+    "labelZh": "愤怒之湖",
+    "locationNameEn": "Lake of Outrage",
+    "source": "composite_en"
+  },
+  "lake-of-outrage-max-den-b": {
+    "areaNameEn": "Lake of Outrage (Max Den B)",
+    "id": "1473",
+    "labelZh": "愤怒之湖",
+    "locationNameEn": "Lake of Outrage",
+    "source": "composite_en"
+  },
+  "lake-of-outrage-max-den-c": {
+    "areaNameEn": "Lake of Outrage (Max Den C)",
+    "id": "1474",
+    "labelZh": "愤怒之湖",
+    "locationNameEn": "Lake of Outrage",
+    "source": "composite_en"
+  },
+  "lake-of-outrage-max-den-d": {
+    "areaNameEn": "Lake of Outrage (Max Den D)",
+    "id": "1475",
+    "labelZh": "愤怒之湖",
+    "locationNameEn": "Lake of Outrage",
+    "source": "composite_en"
+  },
   "lake-of-rage-area": {
     "areaNameEn": "Lake of Rage",
     "id": "242",
@@ -3915,16 +4314,16 @@
   "lake-of-the-moone-area": {
     "areaNameEn": "lake-of-the-moone-area",
     "id": "1092",
-    "labelZh": "Lake of the Moone",
+    "labelZh": "月轮湖",
     "locationNameEn": "Lake of the Moone",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "lake-of-the-sunne-area": {
     "areaNameEn": "lake-of-the-sunne-area",
     "id": "1093",
-    "labelZh": "Lake of the Sunne",
+    "labelZh": "日轮湖",
     "locationNameEn": "Lake of the Sunne",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "lake-valor-area": {
     "areaNameEn": "Lake Valor",
@@ -3957,9 +4356,9 @@
   "lakeside-cave-area": {
     "areaNameEn": "Lakeside Cave",
     "id": "901",
-    "labelZh": "Lakeside Cave",
+    "labelZh": "湖畔洞窟",
     "locationNameEn": "Lakeside Cave",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "lavaridge-town-area": {
     "areaNameEn": "Lavaridge Town",
@@ -4020,16 +4419,16 @@
   "lonely-spring-area": {
     "areaNameEn": "lonely-spring-area",
     "id": "996",
-    "labelZh": "Lonely Spring",
+    "labelZh": "离泉",
     "locationNameEn": "Lonely Spring",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "loop-lagoon-area": {
     "areaNameEn": "Loop Lagoon",
     "id": "902",
-    "labelZh": "Loop Lagoon",
+    "labelZh": "圆环海湾",
     "locationNameEn": "Loop Lagoon",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "lost-cave-item-rooms": {
     "areaNameEn": "Lost Cave (item rooms)",
@@ -4174,9 +4573,9 @@
   "lunkers-lair-area": {
     "areaNameEn": "lunkers-lair-area",
     "id": "997",
-    "labelZh": "Lunker's Lair",
+    "labelZh": "大鱼隐岩",
     "locationNameEn": "Lunker's Lair",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "lush-jungle-all-areas": {
     "areaNameEn": "lush-jungle-all-areas",
@@ -4223,9 +4622,9 @@
   "mahalo-trail-area": {
     "areaNameEn": "mahalo-trail-area",
     "id": "1098",
-    "labelZh": "Mahalo Trail",
+    "labelZh": "马哈罗山路",
     "locationNameEn": "Mahalo Trail",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "mahogany-town-area": {
     "areaNameEn": "Mahogany City",
@@ -4251,9 +4650,9 @@
   "malie-garden-area": {
     "areaNameEn": "malie-garden-area",
     "id": "1101",
-    "labelZh": "Malie Garden",
+    "labelZh": "马利埃庭园",
     "locationNameEn": "Malie Garden",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "maniac-tunnel-26-plus-different-unown-caught": {
     "areaNameEn": "Maniac Tunnel (26+ different Unown caught)",
@@ -4265,58 +4664,58 @@
   "marine-cave-area": {
     "areaNameEn": "Marine Cave",
     "id": "803",
-    "labelZh": "Marine Cave",
+    "labelZh": "海之窟",
     "locationNameEn": "Marine Cave",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "marvelous-bridge-area": {
     "areaNameEn": "Marvelous Bridge",
     "id": "622",
-    "labelZh": "Marvelous Bridge",
+    "labelZh": "奇幻桥",
     "locationNameEn": "Marvelous Bridge",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "master-dojo-area": {
     "areaNameEn": "Master Dojo",
     "id": "904",
-    "labelZh": "Master Dojo",
+    "labelZh": "马师傅武馆",
     "locationNameEn": "Master Dojo",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "max-lair-area": {
     "areaNameEn": "Max Lair",
     "id": "905",
-    "labelZh": "Max Lair",
+    "labelZh": "极巨巢穴",
     "locationNameEn": "Max Lair",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "meetup-spot-area": {
     "areaNameEn": "Meetup Spot",
     "id": "1371",
-    "labelZh": "Meetup Spot",
+    "labelZh": "集汇空地",
     "locationNameEn": "Meetup Spot",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "melemele-meadow-area": {
     "areaNameEn": "melemele-meadow-area",
     "id": "1102",
-    "labelZh": "Melemele Meadow",
+    "labelZh": "美乐美乐花园",
     "locationNameEn": "Melemele Meadow",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "melemele-sea-area": {
     "areaNameEn": "melemele-sea-area",
     "id": "1103",
-    "labelZh": "Melemele Sea",
+    "labelZh": "美乐美乐海",
     "locationNameEn": "Melemele Sea",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "memorial-hill-area": {
     "areaNameEn": "memorial-hill-area",
     "id": "1104",
-    "labelZh": "Memorial Hill",
+    "labelZh": "回忆之丘",
     "locationNameEn": "Memorial Hill",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "memorial-pillar-area": {
     "areaNameEn": "Memorial Pillar",
@@ -4601,9 +5000,9 @@
   "molten-arena-area": {
     "areaNameEn": "molten-arena-area",
     "id": "998",
-    "labelZh": "Molten Arena",
+    "labelZh": "熔岩战场",
     "locationNameEn": "Molten Arena",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "monean-chamber-area": {
     "areaNameEn": "Monean Chamber",
@@ -4615,9 +5014,9 @@
   "moonview-arena-area": {
     "areaNameEn": "moonview-arena-area",
     "id": "999",
-    "labelZh": "Moonview Arena",
+    "labelZh": "迎月战场",
     "locationNameEn": "Moonview Arena",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "moor-of-icirrus-area": {
     "areaNameEn": "Moor of Icirrus",
@@ -4643,9 +5042,9 @@
   "mossdeep-space-center-area": {
     "areaNameEn": "Mossdeep Space Center",
     "id": "1181",
-    "labelZh": "Mossdeep Space Center",
+    "labelZh": "绿岭宇宙中心",
     "locationNameEn": "Mossdeep Space Center",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "motostoke-gym": {
     "areaNameEn": "Motostoke (Gym)",
@@ -4664,9 +5063,9 @@
   "motostoke-outskirts-area": {
     "areaNameEn": "Motostoke Outskirts",
     "id": "907",
-    "labelZh": "Motostoke Outskirts",
+    "labelZh": "机擎市郊外",
     "locationNameEn": "Motostoke Outskirts",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "motostoke-pokemon-center": {
     "areaNameEn": "Motostoke Pokémon Center",
@@ -4678,9 +5077,37 @@
   "motostoke-riverbank-area": {
     "areaNameEn": "Motostoke Riverbank",
     "id": "908",
-    "labelZh": "Motostoke Riverbank",
+    "labelZh": "机擎河岸",
     "locationNameEn": "Motostoke Riverbank",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
+  },
+  "motostoke-riverbank-max-den-a": {
+    "areaNameEn": "Motostoke Riverbank (Max Den A)",
+    "id": "1428",
+    "labelZh": "机擎河岸",
+    "locationNameEn": "Motostoke Riverbank",
+    "source": "52poke_wiki"
+  },
+  "motostoke-riverbank-max-den-b": {
+    "areaNameEn": "Motostoke Riverbank (Max Den B)",
+    "id": "1429",
+    "labelZh": "机擎河岸",
+    "locationNameEn": "Motostoke Riverbank",
+    "source": "52poke_wiki"
+  },
+  "motostoke-riverbank-max-den-c": {
+    "areaNameEn": "Motostoke Riverbank (Max Den C)",
+    "id": "1430",
+    "labelZh": "机擎河岸",
+    "locationNameEn": "Motostoke Riverbank",
+    "source": "52poke_wiki"
+  },
+  "motostoke-riverbank-max-den-d": {
+    "areaNameEn": "Motostoke Riverbank (Max Den D)",
+    "id": "1431",
+    "labelZh": "机擎河岸",
+    "locationNameEn": "Motostoke Riverbank",
+    "source": "52poke_wiki"
   },
   "mount-hokulani-east": {
     "areaNameEn": "mount-hokulani-east",
@@ -5091,9 +5518,9 @@
   "nameless-cavern-area": {
     "areaNameEn": "Nameless Cavern",
     "id": "1183",
-    "labelZh": "Nameless Cavern",
+    "labelZh": "未知洞窟",
     "locationNameEn": "Nameless Cavern",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "national-park-area": {
     "areaNameEn": "National Park",
@@ -5105,23 +5532,23 @@
   "nature-sanctuary-area": {
     "areaNameEn": "Nature Sanctuary",
     "id": "702",
-    "labelZh": "Nature Sanctuary",
+    "labelZh": "自然保护区",
     "locationNameEn": "Nature Sanctuary",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "natures-pantry-area": {
     "areaNameEn": "natures-pantry-area",
     "id": "1000",
-    "labelZh": "Nature's Pantry",
+    "labelZh": "森林膳房",
     "locationNameEn": "Nature's Pantry",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "navel-rock-area": {
     "areaNameEn": "Navel Rock",
     "id": "807",
-    "labelZh": "Navel Rock",
+    "labelZh": "肚脐岩",
     "locationNameEn": "Navel Rock",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "new-bark-town-area": {
     "areaNameEn": "New Bark Town",
@@ -5158,12 +5585,54 @@
     "locationNameEn": "North Lake Miloch",
     "source": "composite_en"
   },
+  "north-lake-miloch-max-den-a": {
+    "areaNameEn": "North Lake Miloch (Max Den A)",
+    "id": "1412",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
+  "north-lake-miloch-max-den-b": {
+    "areaNameEn": "North Lake Miloch (Max Den B)",
+    "id": "1413",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
+  "north-lake-miloch-max-den-c": {
+    "areaNameEn": "North Lake Miloch (Max Den C)",
+    "id": "1414",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
+  "north-lake-miloch-max-den-d": {
+    "areaNameEn": "North Lake Miloch (Max Den D)",
+    "id": "1415",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
+  "north-lake-miloch-max-den-e": {
+    "areaNameEn": "North Lake Miloch (Max Den E)",
+    "id": "1416",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
+  "north-lake-miloch-max-den-f": {
+    "areaNameEn": "North Lake Miloch (Max Den F)",
+    "id": "1417",
+    "labelZh": "美录湖 north",
+    "locationNameEn": "North Lake Miloch",
+    "source": "composite_en"
+  },
   "ns-castle-throne-room": {
     "areaNameEn": "ns-castle-throne-room",
     "id": "1170",
-    "labelZh": "N's Castle",
+    "labelZh": "Ｎ的城堡",
     "locationNameEn": "N's Castle",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "nuvema-town-area": {
     "areaNameEn": "Nuvema Town",
@@ -5175,9 +5644,9 @@
   "obsidian-falls-area": {
     "areaNameEn": "obsidian-falls-area",
     "id": "1001",
-    "labelZh": "Obsidian Falls",
+    "labelZh": "黑曜瀑布",
     "locationNameEn": "Obsidian Falls",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "old-cemetery-area": {
     "areaNameEn": "Old Cemetery",
@@ -5259,30 +5728,30 @@
   "onbs-2f": {
     "areaNameEn": "ONBS 2F",
     "id": "1271",
-    "labelZh": "ONBS",
+    "labelZh": "ONBS 2楼",
     "locationNameEn": "ONBS",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "onbs-3f": {
     "areaNameEn": "ONBS 3F",
     "id": "1272",
-    "labelZh": "ONBS",
+    "labelZh": "ONBS 3楼",
     "locationNameEn": "ONBS",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "onbs-4f": {
     "areaNameEn": "ONBS 4F",
     "id": "1274",
-    "labelZh": "ONBS",
+    "labelZh": "ONBS 4楼",
     "locationNameEn": "ONBS",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "onbs-roof": {
     "areaNameEn": "ONBS Roof",
     "id": "1273",
-    "labelZh": "ONBS",
+    "labelZh": "ONBS 屋顶",
     "locationNameEn": "ONBS",
-    "source": "composite_en"
+    "source": "slug_override"
   },
   "one-island-area": {
     "areaNameEn": "One Island",
@@ -5329,9 +5798,9 @@
   "oreburrow-tunnel-area": {
     "areaNameEn": "oreburrow-tunnel-area",
     "id": "1002",
-    "labelZh": "Oreburrow Tunnel",
+    "labelZh": "黑金隧道",
     "locationNameEn": "Oreburrow Tunnel",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "outcast-island-area": {
     "areaNameEn": "Outcast Island",
@@ -5378,9 +5847,9 @@
   "paniola-ranch-area": {
     "areaNameEn": "paniola-ranch-area",
     "id": "1111",
-    "labelZh": "Paniola Ranch",
+    "labelZh": "欧哈纳牧场",
     "locationNameEn": "Paniola Ranch",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "paniola-town-area": {
     "areaNameEn": "paniola-town-area",
@@ -5406,30 +5875,30 @@
   "path-to-the-peak-area": {
     "areaNameEn": "Path to the Peak",
     "id": "911",
-    "labelZh": "Path to the Peak",
+    "labelZh": "通顶雪道",
     "locationNameEn": "Path to the Peak",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "pathless-plain-area": {
     "areaNameEn": "Pathless Plain",
     "id": "1190",
-    "labelZh": "Pathless Plain",
+    "labelZh": "无名平原",
     "locationNameEn": "Pathless Plain",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "pattern-bush-area": {
     "areaNameEn": "Pattern Bush",
     "id": "500",
-    "labelZh": "Pattern Bush",
+    "labelZh": "标志之林",
     "locationNameEn": "Pattern Bush",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "pearl-settlement-area": {
     "areaNameEn": "pearl-settlement-area",
     "id": "1003",
-    "labelZh": "Pearl Settlement",
+    "labelZh": "珍珠聚落",
     "locationNameEn": "Pearl Settlement",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "petalburg-city-area": {
     "areaNameEn": "Petalburg City",
@@ -5693,9 +6162,9 @@
   "poni-breaker-coast-area": {
     "areaNameEn": "poni-breaker-coast-area",
     "id": "1113",
-    "labelZh": "Poni Breaker Coast",
+    "labelZh": "波尼鼓浪岩岸",
     "locationNameEn": "Poni Breaker Coast",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "poni-coast-area": {
     "areaNameEn": "poni-coast-area",
@@ -5707,9 +6176,9 @@
   "poni-gauntlet-area": {
     "areaNameEn": "poni-gauntlet-area",
     "id": "1115",
-    "labelZh": "Poni Gauntlet",
+    "labelZh": "波尼险路",
     "locationNameEn": "Poni Gauntlet",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "poni-grove-area": {
     "areaNameEn": "poni-grove-area",
@@ -5721,9 +6190,9 @@
   "poni-meadow-area": {
     "areaNameEn": "poni-meadow-area",
     "id": "1117",
-    "labelZh": "Poni Meadow",
+    "labelZh": "波尼花园",
     "locationNameEn": "Poni Meadow",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "poni-plains-center": {
     "areaNameEn": "poni-plains-center",
@@ -5777,16 +6246,16 @@
   "potbottom-desert-area": {
     "areaNameEn": "Potbottom Desert",
     "id": "913",
-    "labelZh": "Potbottom Desert",
+    "labelZh": "锅底沙漠",
     "locationNameEn": "Potbottom Desert",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "primeval-grotto-area": {
     "areaNameEn": "primeval-grotto-area",
     "id": "1004",
-    "labelZh": "Primeval Grotto",
+    "labelZh": "太古洞穴",
     "locationNameEn": "Primeval Grotto",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "pyrite-bldg-1f": {
     "areaNameEn": "Pyrite Bldg 1F",
@@ -5868,9 +6337,9 @@
   "ramanas-island-area": {
     "areaNameEn": "ramanas-island-area",
     "id": "1005",
-    "labelZh": "Ramanas Island",
+    "labelZh": "玫瑰岛",
     "locationNameEn": "Ramanas Island",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ravaged-path-area": {
     "areaNameEn": "Ravaged Path",
@@ -6096,54 +6565,75 @@
     "locationNameEn": "Rixy Chamber",
     "source": "composite_en"
   },
+  "roaming-crown-tundra-area": {
+    "areaNameEn": "The Crown Tundra",
+    "id": "1382",
+    "labelZh": "冠之雪原",
+    "locationNameEn": "Roaming the Crown Tundra",
+    "source": "bulbapedia_langlink"
+  },
+  "roaming-galar-wild-area-area": {
+    "areaNameEn": "Galar Wild Areas",
+    "id": "1380",
+    "labelZh": "旷野地带（游走）",
+    "locationNameEn": "Roaming Galar Wild Areas",
+    "source": "slug_override"
+  },
   "roaming-hoenn-area": {
     "areaNameEn": "Roaming Hoenn",
     "id": "796",
-    "labelZh": "Roaming Hoenn",
+    "labelZh": "丰缘地区（游走）",
     "locationNameEn": "Roaming Hoenn",
-    "source": "english_fallback"
+    "source": "slug_override"
+  },
+  "roaming-isle-of-armor-area": {
+    "areaNameEn": "The Isle of Armor",
+    "id": "1381",
+    "labelZh": "铠之孤岛",
+    "locationNameEn": "Roaming the Isle of Armor",
+    "source": "bulbapedia_langlink"
   },
   "roaming-johto-area": {
     "areaNameEn": "Wandert durch Johto",
     "id": "795",
-    "labelZh": "Roaming Johto",
+    "labelZh": "城都地区（游走）",
     "locationNameEn": "Roaming Johto",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "roaming-kalos-area": {
     "areaNameEn": "Roaming Kalos",
     "id": "1182",
-    "labelZh": "Kalos (Roaming)",
+    "labelZh": "卡洛斯地区（游走）",
     "locationNameEn": "Kalos (Roaming)",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "roaming-kanto-area": {
     "areaNameEn": "Roaming Kanto",
     "id": "794",
-    "labelZh": "Roaming Kanto",
+    "labelZh": "关都地区（游走）",
     "locationNameEn": "Roaming Kanto",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "roaming-sinnoh-area": {
     "areaNameEn": "Roaming Sinnoh",
     "id": "797",
-    "labelZh": "Roaming Sinnoh",
+    "labelZh": "神奥地区（游走）",
     "locationNameEn": "Roaming Sinnoh",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "roaming-unova-area": {
     "areaNameEn": "Rumination Field",
     "id": "1169",
-    "labelZh": "Unova (Roaming)",
+    "labelZh": "矢车森林",
     "locationNameEn": "Unova (Roaming)",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "roaring-sea-caves-area": {
     "areaNameEn": "Roaring-Sea Caves",
     "id": "914",
-    "labelZh": "Roaring-Sea Caves",
+    "labelZh": "海鸣洞窟",
     "locationNameEn": "Roaring-Sea Caves",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "rock-tunnel-1f": {
     "areaNameEn": "Rock Tunnel (1F)",
@@ -6169,9 +6659,9 @@
   "rocky-mountain-room-area": {
     "areaNameEn": "Rocky Mountain Room",
     "id": "697",
-    "labelZh": "Rocky Mountain Room",
+    "labelZh": "岩山房间",
     "locationNameEn": "Rocky Mountain Room",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "rolling-fields-area-2": {
     "areaNameEn": "Rolling Fields (Area 2)",
@@ -6183,6 +6673,69 @@
   "rolling-fields-main": {
     "areaNameEn": "Rolling Fields (Main Area)",
     "id": "916",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-a": {
+    "areaNameEn": "Rolling Fields (Max Den A)",
+    "id": "1384",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-b": {
+    "areaNameEn": "Rolling Fields (Max Den B)",
+    "id": "1385",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-c": {
+    "areaNameEn": "Rolling Fields (Max Den C)",
+    "id": "1386",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-d": {
+    "areaNameEn": "Rolling Fields (Max Den D)",
+    "id": "1387",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-e": {
+    "areaNameEn": "Rolling Fields (Max Den E)",
+    "id": "1388",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-f": {
+    "areaNameEn": "Rolling Fields (Max Den F)",
+    "id": "1389",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-g": {
+    "areaNameEn": "Rolling Fields (Max Den G)",
+    "id": "1390",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-h": {
+    "areaNameEn": "Rolling Fields (Max Den H)",
+    "id": "1391",
+    "labelZh": "滚轮 fields",
+    "locationNameEn": "Rolling Fields",
+    "source": "composite_en"
+  },
+  "rolling-fields-max-den-i": {
+    "areaNameEn": "Rolling Fields (Max Den I)",
+    "id": "1392",
     "labelZh": "滚轮 fields",
     "locationNameEn": "Rolling Fields",
     "source": "composite_en"
@@ -6211,16 +6764,16 @@
   "ruin-valley-area": {
     "areaNameEn": "Ruin Valley",
     "id": "524",
-    "labelZh": "Ruin Valley",
+    "labelZh": "遗迹山谷",
     "locationNameEn": "Ruin Valley",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ruins-of-abundance-area": {
     "areaNameEn": "ruins-of-abundance-area",
     "id": "1125",
-    "labelZh": "Ruins of Abundance",
+    "labelZh": "丰收遗迹",
     "locationNameEn": "Ruins of Abundance",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "ruins-of-alph-interior-a": {
     "areaNameEn": "Ruins of Alph (interior A)",
@@ -6260,23 +6813,23 @@
   "ruins-of-conflict-area": {
     "areaNameEn": "ruins-of-conflict-area",
     "id": "1126",
-    "labelZh": "Ruins of Conflict",
+    "labelZh": "战争遗迹",
     "locationNameEn": "Ruins of Conflict",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ruins-of-hope-area": {
     "areaNameEn": "ruins-of-hope-area",
     "id": "1127",
-    "labelZh": "Ruins of Hope",
+    "labelZh": "彼岸遗迹",
     "locationNameEn": "Ruins of Hope",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ruins-of-life-area": {
     "areaNameEn": "ruins-of-life-area",
     "id": "1128",
-    "labelZh": "Ruins of Life",
+    "labelZh": "生命遗迹",
     "locationNameEn": "Ruins of Life",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "rustboro-city-area": {
     "areaNameEn": "Rustboro City",
@@ -6295,9 +6848,9 @@
   "sacred-plaza-area": {
     "areaNameEn": "sacred-plaza-area",
     "id": "1006",
-    "labelZh": "Sacred Plaza",
+    "labelZh": "祈祷广场",
     "locationNameEn": "Sacred Plaza",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "safari-zone-gate-area": {
     "areaNameEn": "Safari Zone Gate",
@@ -6337,23 +6890,23 @@
   "sandgem-flats-area": {
     "areaNameEn": "sandgem-flats-area",
     "id": "1008",
-    "labelZh": "Sandgem Flats",
+    "labelZh": "真砂平原",
     "locationNameEn": "Sandgem Flats",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "sands-reach-area": {
     "areaNameEn": "sands-reach-area",
     "id": "1007",
-    "labelZh": "Sand's Reach",
+    "labelZh": "沙手",
     "locationNameEn": "Sand's Reach",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "sandy-cave-area": {
     "areaNameEn": "sandy-cave-area",
     "id": "1129",
-    "labelZh": "Sandy Cave",
+    "labelZh": "海滩洞穴",
     "locationNameEn": "Sandy Cave",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "santalune-forest-area": {
     "areaNameEn": "Santalune Forest",
@@ -6365,9 +6918,9 @@
   "scarlet-bog-area": {
     "areaNameEn": "scarlet-bog-area",
     "id": "1009",
-    "labelZh": "Scarlet Bog",
+    "labelZh": "绯红沼",
     "locationNameEn": "Scarlet Bog",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "scorched-slab-1f": {
     "areaNameEn": "Scorched Slab (1F)",
@@ -6428,9 +6981,9 @@
   "sea-spirits-den-area": {
     "areaNameEn": "sea-spirits-den-area",
     "id": "1174",
-    "labelZh": "Sea Spirit’s Den",
+    "labelZh": "海神之穴",
     "locationNameEn": "Sea Spirit’s Den",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "seafloor-cavern-area": {
     "areaNameEn": "Seafloor Cavern",
@@ -6491,9 +7044,9 @@
   "seagrass-haven-area": {
     "areaNameEn": "seagrass-haven-area",
     "id": "1010",
-    "labelZh": "Seagrass Haven",
+    "labelZh": "海草乐园",
     "locationNameEn": "Seagrass Haven",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "seaside-cave-1f": {
     "areaNameEn": "Seaside Cave (1F)",
@@ -6512,23 +7065,23 @@
   "seaside-hollow-area": {
     "areaNameEn": "seaside-hollow-area",
     "id": "1011",
-    "labelZh": "Seaside Hollow",
+    "labelZh": "海边小洞",
     "locationNameEn": "Seaside Hollow",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "seaward-cave-area": {
     "areaNameEn": "seaward-cave-area",
     "id": "1132",
-    "labelZh": "Seaward Cave",
+    "labelZh": "通海洞穴",
     "locationNameEn": "Seaward Cave",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "secluded-shore-area": {
     "areaNameEn": "secluded-shore-area",
     "id": "1133",
-    "labelZh": "Secluded Shore",
+    "labelZh": "乌拉乌拉海滩",
     "locationNameEn": "Secluded Shore",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "sendoff-spring-area": {
     "areaNameEn": "Sendoff Spring",
@@ -6540,9 +7093,9 @@
   "sevault-canyon-area": {
     "areaNameEn": "Sevault Canyon",
     "id": "527",
-    "labelZh": "Sevault Canyon",
+    "labelZh": "七宝溪谷",
     "locationNameEn": "Sevault Canyon",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "shadow-pokemon-lab-bf1": {
     "areaNameEn": "Shadow Pokémon Lab B1F",
@@ -6603,16 +7156,16 @@
   "shrouded-ruins-area": {
     "areaNameEn": "shrouded-ruins-area",
     "id": "1012",
-    "labelZh": "Shrouded Ruins",
+    "labelZh": "云雾遗迹",
     "locationNameEn": "Shrouded Ruins",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "sinjoh-ruins-area": {
     "areaNameEn": "Sinjoy Ruins",
     "id": "842",
-    "labelZh": "Sinjoh Ruins",
+    "labelZh": "神都遗迹",
     "locationNameEn": "Sinjoh Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "sinnoh-hall-of-origin-1-area": {
     "areaNameEn": "Hall of Origin",
@@ -6624,9 +7177,9 @@
   "sinnoh-pokemart-area": {
     "areaNameEn": "sinnoh-pokemart-area",
     "id": "1213",
-    "labelZh": "sinnoh-pokemart-area",
+    "labelZh": "神奥地区友好商店",
     "locationNameEn": "",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "sinnoh-pokemon-league-area": {
     "areaNameEn": "Sinnoh League",
@@ -6967,9 +7520,9 @@
   "slippery-slope-area": {
     "areaNameEn": "Slippery Slope",
     "id": "918",
-    "labelZh": "Slippery Slope",
+    "labelZh": "起橇雪原",
     "locationNameEn": "Slippery Slope",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "slowpoke-well-1f": {
     "areaNameEn": "Slowpoke Well (1F)",
@@ -6988,9 +7541,9 @@
   "sludge-mound-area": {
     "areaNameEn": "sludge-mound-area",
     "id": "1013",
-    "labelZh": "Sludge Mound",
+    "labelZh": "泥炭台地",
     "locationNameEn": "Sludge Mound",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "slumbering-weald-deep": {
     "areaNameEn": "Slumbering Weald (Deep)",
@@ -7023,9 +7576,9 @@
   "snowfall-hot-spring-area": {
     "areaNameEn": "snowfall-hot-spring-area",
     "id": "1014",
-    "labelZh": "Snowfall Hot Spring",
+    "labelZh": "观雪温泉",
     "locationNameEn": "Snowfall Hot Spring",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "snowpoint-temple-1f": {
     "areaNameEn": "Snowpoint Temple (1F)",
@@ -7079,9 +7632,9 @@
   "soaring-in-the-sky-area": {
     "areaNameEn": "Soaring in the Sky",
     "id": "1184",
-    "labelZh": "Soaring in the sky",
+    "labelZh": "翱翔高空",
     "locationNameEn": "Soaring in the sky",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "solaceon-ruins-1f": {
     "areaNameEn": "Solaceon Ruins (1F)",
@@ -7212,16 +7765,16 @@
   "sonorous-path-area": {
     "areaNameEn": "sonorous-path-area",
     "id": "1017",
-    "labelZh": "Sonorous Path",
+    "labelZh": "巡礼者之路",
     "locationNameEn": "Sonorous Path",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "soothing-wetlands-area": {
     "areaNameEn": "Soothing Wetlands",
     "id": "921",
-    "labelZh": "Soothing Wetlands",
+    "labelZh": "清凉湿原",
     "locationNameEn": "Soothing Wetlands",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "sootopolis-city-area": {
     "areaNameEn": "Sootopolis City",
@@ -7244,6 +7797,41 @@
     "locationNameEn": "South Lake Miloch",
     "source": "composite_en"
   },
+  "south-lake-miloch-max-den-a": {
+    "areaNameEn": "South Lake Miloch (Max Den A)",
+    "id": "1423",
+    "labelZh": "美录湖 south",
+    "locationNameEn": "South Lake Miloch",
+    "source": "composite_en"
+  },
+  "south-lake-miloch-max-den-b": {
+    "areaNameEn": "South Lake Miloch (Max Den B)",
+    "id": "1424",
+    "labelZh": "美录湖 south",
+    "locationNameEn": "South Lake Miloch",
+    "source": "composite_en"
+  },
+  "south-lake-miloch-max-den-c": {
+    "areaNameEn": "South Lake Miloch (Max Den C)",
+    "id": "1425",
+    "labelZh": "美录湖 south",
+    "locationNameEn": "South Lake Miloch",
+    "source": "composite_en"
+  },
+  "south-lake-miloch-max-den-d": {
+    "areaNameEn": "South Lake Miloch (Max Den D)",
+    "id": "1426",
+    "labelZh": "美录湖 south",
+    "locationNameEn": "South Lake Miloch",
+    "source": "composite_en"
+  },
+  "south-lake-miloch-max-den-e": {
+    "areaNameEn": "South Lake Miloch (Max Den E)",
+    "id": "1427",
+    "labelZh": "美录湖 south",
+    "locationNameEn": "South Lake Miloch",
+    "source": "composite_en"
+  },
   "southern-island-area": {
     "areaNameEn": "Southern Island",
     "id": "785",
@@ -7254,9 +7842,9 @@
   "space-time-distortion-area": {
     "areaNameEn": "space-time-distortion-area",
     "id": "1018",
-    "labelZh": "Space-time distortion",
+    "labelZh": "时空歪曲",
     "locationNameEn": "Space-time distortion",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "spear-pillar-area": {
     "areaNameEn": "Spear Pillar",
@@ -7345,9 +7933,9 @@
   "stonetooth-rows-area": {
     "areaNameEn": "stonetooth-rows-area",
     "id": "1020",
-    "labelZh": "Stonetooth Rows",
+    "labelZh": "列石山道",
     "locationNameEn": "Stonetooth Rows",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "stony-wilderness-area-2": {
     "areaNameEn": "Stony Wilderness (Area 2)",
@@ -7366,6 +7954,90 @@
   "stony-wilderness-main": {
     "areaNameEn": "Stony Wilderness (Main Area)",
     "id": "929",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-a": {
+    "areaNameEn": "Stony Wilderness (Max Den A)",
+    "id": "1441",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-b": {
+    "areaNameEn": "Stony Wilderness (Max Den B)",
+    "id": "1442",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-c": {
+    "areaNameEn": "Stony Wilderness (Max Den C)",
+    "id": "1443",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-d": {
+    "areaNameEn": "Stony Wilderness (Max Den D)",
+    "id": "1444",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-e": {
+    "areaNameEn": "Stony Wilderness (Max Den E)",
+    "id": "1445",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-f": {
+    "areaNameEn": "Stony Wilderness (Max Den F)",
+    "id": "1446",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-g": {
+    "areaNameEn": "Stony Wilderness (Max Den G)",
+    "id": "1447",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-h": {
+    "areaNameEn": "Stony Wilderness (Max Den H)",
+    "id": "1448",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-i": {
+    "areaNameEn": "Stony Wilderness (Max Den I)",
+    "id": "1449",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-j": {
+    "areaNameEn": "Stony Wilderness (Max Den J)",
+    "id": "1450",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-k": {
+    "areaNameEn": "Stony Wilderness (Max Den K)",
+    "id": "1451",
+    "labelZh": "巨石原野",
+    "locationNameEn": "Stony Wilderness",
+    "source": "composite_en"
+  },
+  "stony-wilderness-max-den-l": {
+    "areaNameEn": "Stony Wilderness (Max Den L)",
+    "id": "1452",
     "labelZh": "巨石原野",
     "locationNameEn": "Stony Wilderness",
     "source": "composite_en"
@@ -7408,9 +8080,9 @@
   "tanoby-ruins-area": {
     "areaNameEn": "Tanoby Ruins",
     "id": "528",
-    "labelZh": "Tanoby Ruins",
+    "labelZh": "阿斯卡纳遗迹",
     "locationNameEn": "Tanoby Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "tapu-village-area": {
     "areaNameEn": "tapu-village-area",
@@ -7422,23 +8094,23 @@
   "team-aqua-hideout-area": {
     "areaNameEn": "team-aqua-hideout-area",
     "id": "1165",
-    "labelZh": "Team Aqua Hideout",
+    "labelZh": "海洋队基地",
     "locationNameEn": "Team Aqua Hideout",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "team-flare-secret-hq-area": {
     "areaNameEn": "team-flare-secret-hq-area",
     "id": "1176",
-    "labelZh": "Team Flare Secret HQ",
+    "labelZh": "闪焰队秘密基地",
     "locationNameEn": "Team Flare Secret HQ",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "team-magma-hideout-area": {
     "areaNameEn": "team-magma-hideout-area",
     "id": "1166",
-    "labelZh": "Team Magma Hideout",
+    "labelZh": "熔岩队本部",
     "locationNameEn": "Team Magma Hideout",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "team-rocket-hq-area": {
     "areaNameEn": "Team Rocket HQ",
@@ -7450,16 +8122,16 @@
   "team-rockets-castle-area": {
     "areaNameEn": "team-rockets-castle-area",
     "id": "1161",
-    "labelZh": "Team Rocket's Castle",
+    "labelZh": "火箭队城堡",
     "locationNameEn": "Team Rocket's Castle",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "temple-of-sinnoh-area": {
     "areaNameEn": "temple-of-sinnoh-area",
     "id": "1021",
-    "labelZh": "Temple of Sinnoh",
+    "labelZh": "神奥神殿",
     "locationNameEn": "Temple of Sinnoh",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ten-carat-hill-farthest-hollow": {
     "areaNameEn": "ten-carat-hill-farthest-hollow",
@@ -7513,16 +8185,16 @@
   "terra-cave-area": {
     "areaNameEn": "Terra Cave",
     "id": "802",
-    "labelZh": "Terra Cave",
+    "labelZh": "陆之窟",
     "locationNameEn": "Terra Cave",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "the-heartwood-area": {
     "areaNameEn": "the-heartwood-area",
     "id": "1022",
-    "labelZh": "The Heartwood",
+    "labelZh": "深幽森林",
     "locationNameEn": "The Heartwood",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "the-under-area": {
     "areaNameEn": "The Under",
@@ -7583,9 +8255,9 @@
   "tidewater-dam-area": {
     "areaNameEn": "tidewater-dam-area",
     "id": "1023",
-    "labelZh": "Tidewater Dam",
+    "labelZh": "河口堤堰",
     "locationNameEn": "Tidewater Dam",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "tohjo-falls-area": {
     "areaNameEn": "Tohjo Falls",
@@ -7597,16 +8269,16 @@
   "tombolo-walk-area": {
     "areaNameEn": "tombolo-walk-area",
     "id": "1024",
-    "labelZh": "Tombolo Walk",
+    "labelZh": "沙洲道",
     "locationNameEn": "Tombolo Walk",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "tower-of-darkness-area": {
     "areaNameEn": "Tower of Darkness",
     "id": "934",
-    "labelZh": "Tower of Darkness",
+    "labelZh": "恶之塔",
     "locationNameEn": "Tower of Darkness",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "tower-of-mastery-area": {
     "areaNameEn": "Tower of Mastery",
@@ -7618,58 +8290,58 @@
   "tower-of-waters-area": {
     "areaNameEn": "Tower of Waters",
     "id": "935",
-    "labelZh": "Tower of Waters",
+    "labelZh": "水之塔",
     "locationNameEn": "Tower of Waters",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "trackless-forest-area": {
     "areaNameEn": "trackless-forest-area",
     "id": "1177",
-    "labelZh": "Trackless Forest",
+    "labelZh": "原始森林",
     "locationNameEn": "Trackless Forest",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "trainer-tower-area": {
     "areaNameEn": "Trainer Tower",
     "id": "525",
-    "labelZh": "Trainer Tower",
+    "labelZh": "训练家塔",
     "locationNameEn": "Trainer Tower",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "trainers-school-area": {
     "areaNameEn": "Trainers' School",
     "id": "1194",
-    "labelZh": "Trainers’ School",
+    "labelZh": "训练家学校",
     "locationNameEn": "Trainers’ School",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "training-lowlands-area": {
     "areaNameEn": "Training Lowlands",
     "id": "936",
-    "labelZh": "Training Lowlands",
+    "labelZh": "锻炼平原",
     "locationNameEn": "Training Lowlands",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "tranquility-cove-area": {
     "areaNameEn": "tranquility-cove-area",
     "id": "1025",
-    "labelZh": "Tranquility Cove",
+    "labelZh": "宁静湾",
     "locationNameEn": "Tranquility Cove",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "treasure-beach-area": {
     "areaNameEn": "Treasure Beach",
     "id": "513",
-    "labelZh": "Treasure Beach",
+    "labelZh": "宝物海滩",
     "locationNameEn": "Treasure Beach",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "trial-chamber-area": {
     "areaNameEn": "Trial Chamber",
     "id": "613",
-    "labelZh": "Trial Chamber",
+    "labelZh": "冠军之路（黑／白）",
     "locationNameEn": "Trial Chamber",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "trophy-garden-area": {
     "areaNameEn": "Trophy Garden",
@@ -7681,9 +8353,9 @@
   "tunnel-to-the-top-area": {
     "areaNameEn": "Tunnel to the Top",
     "id": "938",
-    "labelZh": "Tunnel to the Top",
+    "labelZh": "登顶隧道",
     "locationNameEn": "Tunnel to the Top",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "turffield-area": {
     "areaNameEn": "Turffield",
@@ -7772,23 +8444,23 @@
   "ulaula-beach-area": {
     "areaNameEn": "ulaula-beach-area",
     "id": "1138",
-    "labelZh": "Ula'ula Beach",
+    "labelZh": "乌拉乌拉海滩",
     "locationNameEn": "Ula'ula Beach",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "ulaula-meadow-area": {
     "areaNameEn": "ulaula-meadow-area",
     "id": "1139",
-    "labelZh": "Ula’ula Meadow",
+    "labelZh": "乌拉乌拉花园",
     "locationNameEn": "Ula’ula Meadow",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ultra-megalopolis-area": {
     "areaNameEn": "ultra-megalopolis-area",
     "id": "1162",
-    "labelZh": "Ultra Megalopolis",
+    "labelZh": "究极大都会",
     "locationNameEn": "Ultra Megalopolis",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "ultra-space-ultra-crater": {
     "areaNameEn": "ultra-space-ultra-crater",
@@ -7912,9 +8584,9 @@
   "underground-ruins-area": {
     "areaNameEn": "Underground Ruins",
     "id": "696",
-    "labelZh": "Underground Ruins",
+    "labelZh": "地底遗迹",
     "locationNameEn": "Underground Ruins",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "union-cave-1f": {
     "areaNameEn": "Union Cave (1F)",
@@ -7940,30 +8612,30 @@
   "unknown-all-bugs-area": {
     "areaNameEn": "Unknown Area; all bugs",
     "id": "208",
-    "labelZh": "Unknown; all bugs",
+    "labelZh": "未知地点（虫宝可梦）",
     "locationNameEn": "Unknown; all bugs",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "unknown-all-poliwag-area": {
     "areaNameEn": "Unknown Area; all Poliwag",
     "id": "257",
-    "labelZh": "Unknown; all Poliwag",
+    "labelZh": "未知地点（蚊香蝌蚪）",
     "locationNameEn": "Unknown; all Poliwag",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "unknown-all-rattata-area": {
     "areaNameEn": "Unknown Area; all Rattata",
     "id": "275",
-    "labelZh": "Unknown; all Rattata",
+    "labelZh": "未知地点（小拉达）",
     "locationNameEn": "Unknown; all Rattata",
-    "source": "english_fallback"
+    "source": "slug_override"
   },
   "unknown-dungeon-area": {
     "areaNameEn": "unknown-dungeon-area",
     "id": "1175",
-    "labelZh": "Unknown Dungeon",
+    "labelZh": "无名洞窟",
     "locationNameEn": "Unknown Dungeon",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "unova-route-1-area": {
     "areaNameEn": "Road 1",
@@ -8416,9 +9088,9 @@
   "ursas-ring-area": {
     "areaNameEn": "ursas-ring-area",
     "id": "1027",
-    "labelZh": "Ursa's Ring",
+    "labelZh": "熊的比武场",
     "locationNameEn": "Ursa's Ring",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "valley-windworks-area": {
     "areaNameEn": "Valley Windworks",
@@ -8458,9 +9130,9 @@
   "veilstone-cape-area": {
     "areaNameEn": "veilstone-cape-area",
     "id": "1028",
-    "labelZh": "Veilstone Cape",
+    "labelZh": "帷幕海角",
     "locationNameEn": "Veilstone Cape",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "veilstone-city-area": {
     "areaNameEn": "Veilstone City",
@@ -8521,9 +9193,9 @@
   "village-bridge-area": {
     "areaNameEn": "Village Bridge",
     "id": "621",
-    "labelZh": "Village Bridge",
+    "labelZh": "村庄桥",
     "locationNameEn": "Village Bridge",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "violet-city-area": {
     "areaNameEn": "Violet City",
@@ -8563,16 +9235,16 @@
   "virbank-complex-inner": {
     "areaNameEn": "Virbank Complex (inner)",
     "id": "676",
-    "labelZh": "Virbank Complex",
+    "labelZh": "立涌联合工业区",
     "locationNameEn": "Virbank Complex",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "virbank-complex-outer": {
     "areaNameEn": "Virbank Complex (outer)",
     "id": "675",
-    "labelZh": "Virbank Complex",
+    "labelZh": "立涌联合工业区",
     "locationNameEn": "Virbank Complex",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "viridian-city-area": {
     "areaNameEn": "Viridian City",
@@ -8591,13 +9263,27 @@
   "warm-up-tunnel-area": {
     "areaNameEn": "Warm-Up Tunnel",
     "id": "940",
-    "labelZh": "Warm-Up Tunnel",
+    "labelZh": "热身洞穴",
     "locationNameEn": "Warm-Up Tunnel",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "watchtower-ruins-area": {
     "areaNameEn": "Watchtower Ruins",
     "id": "941",
+    "labelZh": "瞭望塔遗迹",
+    "locationNameEn": "Watchtower Ruins",
+    "source": "composite_en"
+  },
+  "watchtower-ruins-max-den-a": {
+    "areaNameEn": "Watchtower Ruins (Max Den A)",
+    "id": "1404",
+    "labelZh": "瞭望塔遗迹",
+    "locationNameEn": "Watchtower Ruins",
+    "source": "composite_en"
+  },
+  "watchtower-ruins-max-den-c": {
+    "areaNameEn": "Watchtower Ruins (Max Den C)",
+    "id": "1405",
     "labelZh": "瞭望塔遗迹",
     "locationNameEn": "Watchtower Ruins",
     "source": "composite_en"
@@ -8612,9 +9298,9 @@
   "water-path-area": {
     "areaNameEn": "Water Path",
     "id": "523",
-    "labelZh": "Water Path",
+    "labelZh": "水之步道",
     "locationNameEn": "Water Path",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "wayward-cave-1f": {
     "areaNameEn": "Wayward Cave (1F)",
@@ -8633,9 +9319,9 @@
   "wayward-wood-area": {
     "areaNameEn": "wayward-wood-area",
     "id": "1030",
-    "labelZh": "Wayward Wood",
+    "labelZh": "迷失山林",
     "locationNameEn": "Wayward Wood",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "wedgehurst-area": {
     "areaNameEn": "Wegehurst",
@@ -8675,6 +9361,48 @@
   "west-lake-axewell-area": {
     "areaNameEn": "West Lake Axewell",
     "id": "943",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-a": {
+    "areaNameEn": "West Lake Axewell (Max Den A)",
+    "id": "1398",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-b": {
+    "areaNameEn": "West Lake Axewell (Max Den B)",
+    "id": "1399",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-c": {
+    "areaNameEn": "West Lake Axewell (Max Den C)",
+    "id": "1400",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-d": {
+    "areaNameEn": "West Lake Axewell (Max Den D)",
+    "id": "1401",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-e": {
+    "areaNameEn": "West Lake Axewell (Max Den E)",
+    "id": "1402",
+    "labelZh": "牙牙湖西",
+    "locationNameEn": "West Lake Axewell",
+    "source": "composite_en"
+  },
+  "west-lake-axewell-max-den-f": {
+    "areaNameEn": "West Lake Axewell (Max Den F)",
+    "id": "1403",
     "labelZh": "牙牙湖西",
     "locationNameEn": "West Lake Axewell",
     "source": "composite_en"
@@ -8724,37 +9452,37 @@
   "whiteout-valley-area": {
     "areaNameEn": "whiteout-valley-area",
     "id": "1031",
-    "labelZh": "Whiteout Valley",
+    "labelZh": "雪涛谷",
     "locationNameEn": "Whiteout Valley",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "windbreak-stand-area": {
     "areaNameEn": "windbreak-stand-area",
     "id": "1032",
-    "labelZh": "Windbreak Stand",
+    "labelZh": "迎风林",
     "locationNameEn": "Windbreak Stand",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "windswept-run-area": {
     "areaNameEn": "windswept-run-area",
     "id": "1033",
-    "labelZh": "Windswept Run",
+    "labelZh": "驰风道",
     "locationNameEn": "Windswept Run",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "workout-sea-area": {
     "areaNameEn": "Workout Sea",
     "id": "944",
-    "labelZh": "Workout Sea",
+    "labelZh": "健身之海",
     "locationNameEn": "Workout Sea",
-    "source": "english_fallback"
+    "source": "52poke_wiki"
   },
   "worn-bridge-area": {
     "areaNameEn": "worn-bridge-area",
     "id": "1034",
-    "labelZh": "Worn Bridge",
+    "labelZh": "削石桥",
     "locationNameEn": "Worn Bridge",
-    "source": "english_fallback"
+    "source": "bulbapedia_langlink"
   },
   "wyndon-area": {
     "areaNameEn": "Wyndon",

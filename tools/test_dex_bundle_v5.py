@@ -17,7 +17,10 @@ from build_dex_bundle import (  # noqa: E402
     GAME_EDITIONS,
     ability_description_zh,
     encounter_area_label_zh,
+    fetch_species_obtain_locations,
+    merge_obtain_location_versions,
     parse_pokedex_numbers,
+    parse_obtain_locations_by_version,
 )
 
 
@@ -50,6 +53,154 @@ class DexBundleV5ValidationTests(unittest.TestCase):
 
     def test_game_editions_count(self) -> None:
         self.assertEqual(len(GAME_EDITIONS), 23)
+        by_slug = {edition.slug: edition for edition in GAME_EDITIONS}
+        self.assertEqual(by_slug["lza"].version_group, "legends-za")
+        self.assertEqual(by_slug["champions"].version_group, "champions")
+        self.assertIn(
+            "the-crown-tundra-shield", by_slug["swsh"].encounter_versions
+        )
+        self.assertIn(
+            "the-indigo-disk-violet", by_slug["sv"].encounter_versions
+        )
+
+    def test_encounters_preserve_exact_versions_and_details(self) -> None:
+        encounters = [
+            {
+                "location_area": {
+                    "name": "route-3-area",
+                    "url": "https://pokeapi.co/api/v2/location-area/route-3-area/"
+                },
+                "version_details": [
+                    {
+                        "version": {"name": "red"},
+                        "max_chance": 25,
+                        "encounter_details": [
+                            {
+                                "min_level": 3,
+                                "max_level": 5,
+                                "method": {"name": "walk"},
+                                "condition_values": [{"name": "time-day"}],
+                            }
+                        ],
+                    },
+                    {
+                        "version": {"name": "blue"},
+                        "max_chance": 15,
+                        "encounter_details": [
+                            {
+                                "min_level": 4,
+                                "max_level": 7,
+                                "method": {"name": "walk"},
+                                "condition_values": [],
+                            }
+                        ],
+                    },
+                ],
+            }
+        ]
+        by_version = parse_obtain_locations_by_version(
+            encounters,
+            pokemon_id=10091,
+            species_id=19,
+            form_slug="rattata-alola",
+            is_default_form=False,
+        )
+        self.assertEqual(set(by_version), {"blue", "red"})
+        self.assertEqual(by_version["red"][0]["versions"], ["red"])
+        self.assertEqual(by_version["red"][0]["minLevel"], 3)
+        self.assertEqual(by_version["red"][0]["maxLevel"], 5)
+        self.assertEqual(by_version["red"][0]["methods"], ["walk"])
+        self.assertEqual(by_version["red"][0]["conditions"], ["time-day"])
+        self.assertEqual(by_version["red"][0]["pokemonId"], 10091)
+        self.assertEqual(by_version["red"][0]["speciesId"], 19)
+        self.assertEqual(by_version["red"][0]["formSlug"], "rattata-alola")
+
+        grouped = merge_obtain_location_versions(by_version, {"red", "blue"})
+        self.assertEqual(grouped[0]["versions"], ["blue", "red"])
+        self.assertEqual(grouped[0]["minLevel"], 3)
+        self.assertEqual(grouped[0]["maxLevel"], 7)
+        self.assertEqual(grouped[0]["maxChance"], 25)
+
+    def test_encounter_corrections_remove_known_bad_cross_region_rows(self) -> None:
+        roaming = parse_obtain_locations_by_version(
+            [{
+                "location_area": {
+                    "name": "team-flare-secret-hq-area",
+                    "url": "https://pokeapi.co/api/v2/location-area/1176/",
+                },
+                "version_details": [{
+                    "version": {"name": "black"},
+                    "max_chance": 100,
+                    "encounter_details": [],
+                }],
+            }],
+            pokemon_id=641,
+            species_id=641,
+            form_slug="tornadus-incarnate",
+            is_default_form=True,
+        )
+        self.assertEqual(roaming["black"][0]["areaSlug"], "unova-roaming-area")
+        self.assertIn("roaming", roaming["black"][0]["conditions"])
+
+        invalid = parse_obtain_locations_by_version(
+            [{
+                "location_area": {
+                    "name": "new-mauville-area",
+                    "url": "https://pokeapi.co/api/v2/location-area/388/",
+                },
+                "version_details": [{
+                    "version": {"name": "sun"},
+                    "max_chance": 100,
+                    "encounter_details": [],
+                }],
+            }],
+            pokemon_id=100,
+            species_id=100,
+            form_slug="voltorb",
+            is_default_form=True,
+        )
+        self.assertEqual(invalid, {})
+
+    def test_species_encounters_keep_varieties_separate_in_same_area(self) -> None:
+        class Builder:
+            def _get_json_list(self, path: str):
+                return [{
+                    "location_area": {
+                        "name": "route-1-area",
+                        "url": "https://pokeapi.co/api/v2/location-area/1/",
+                    },
+                    "version_details": [{
+                        "version": {"name": "sun"},
+                        "max_chance": 20,
+                        "encounter_details": [],
+                    }],
+                }]
+
+        species = {
+            "id": 19,
+            "varieties": [
+                {
+                    "is_default": True,
+                    "pokemon": {
+                        "name": "rattata",
+                        "url": "https://pokeapi.co/api/v2/pokemon/19/",
+                    },
+                },
+                {
+                    "is_default": False,
+                    "pokemon": {
+                        "name": "rattata-alola",
+                        "url": "https://pokeapi.co/api/v2/pokemon/10091/",
+                    },
+                },
+            ],
+        }
+        _by_game, by_version = fetch_species_obtain_locations(Builder(), species, 19)
+        self.assertEqual(len(by_version["sun"]), 2)
+        self.assertEqual(
+            {entry["pokemonId"] for entry in by_version["sun"]},
+            {19, 10091},
+        )
 
     def test_sample_detail_json_has_v5_fields(self) -> None:
         bundle_dir = REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX
@@ -62,6 +213,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             "abilities",
             "obtainLocations",
             "obtainLocationsByGame",
+            "obtainLocationsByVersion",
             "moveSets",
             "baseHappiness",
             "captureRate",
@@ -72,6 +224,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         self.assertIsInstance(detail["abilities"], list)
         self.assertIsInstance(detail["obtainLocations"], list)
         self.assertIsInstance(detail["obtainLocationsByGame"], dict)
+        self.assertIsInstance(detail["obtainLocationsByVersion"], dict)
         self.assertIn("heartgold-soulsilver", detail["obtainLocationsByGame"])
 
         if detail["abilities"]:
