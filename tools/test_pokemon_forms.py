@@ -91,6 +91,31 @@ class PokemonFormsTests(unittest.TestCase):
         }
         self.assertNotIn("基格尔德（1%形态）", known)
 
+    def test_golden_form_classification_matrix(self) -> None:
+        cases = (
+            ("charizard", "charizard-mega-x", {"is_mega": True}, "mega"),
+            ("charizard", "charizard-gmax", {}, "gigantamax"),
+            ("rotom", "rotom-heat", {}, "form"),
+            ("typhlosion", "typhlosion-hisui", {}, "regional"),
+            ("meloetta", "meloetta-pirouette", {"is_battle_only": True}, "battle"),
+            ("zygarde", "zygarde-complete", {"is_battle_only": True}, "battle"),
+            ("pumpkaboo", "pumpkaboo-small", {}, "form"),
+            ("meowstic", "meowstic-female", {}, "form"),
+            ("indeedee", "indeedee-female", {}, "form"),
+            ("necrozma", "necrozma-dusk", {}, "form"),
+            ("calyrex", "calyrex-ice", {}, "form"),
+            ("ogerpon", "ogerpon-wellspring-mask", {}, "form"),
+            ("terapagos", "terapagos-terastal", {"is_battle_only": True}, "battle"),
+            ("alcremie", "alcremie-ruby-cream", {"cosmetic_only": True}, "cosmetic"),
+            ("vivillon", "vivillon-fancy", {"cosmetic_only": True}, "cosmetic"),
+        )
+        for species, pokemon, flags, expected in cases:
+            with self.subTest(pokemon=pokemon):
+                self.assertEqual(
+                    classify_form(species, pokemon, **flags),
+                    expected,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

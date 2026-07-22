@@ -403,10 +403,19 @@ class DexOfflineService {
           typeMultipliers: detail.typeMultipliers,
           flavorEntries: detail.flavorEntries,
           obtainLocations: detail.obtainLocations,
+          obtainLocationsByGame: detail.obtainLocationsByGame,
+          obtainLocationsByVersion: detail.obtainLocationsByVersion,
+          abilities: detail.abilities,
+          abilitiesByGame: detail.abilitiesByGame,
           moveSet: detail.moveSet,
+          moveSets: detail.moveSets,
+          baseHappiness: detail.baseHappiness,
+          captureRate: detail.captureRate,
+          evYield: detail.evYield,
           genderFemalePercent: detail.genderFemalePercent,
           eggGroups: detail.eggGroups,
           hatchCounter: detail.hatchCounter,
+          forms: detail.forms,
         );
 
         await _store.writeDetail(id, localizedDetail);
@@ -627,6 +636,16 @@ class DexOfflineService {
     final evolution = await _attachAbsoluteSpritesToEvolution(
       detail.evolutionChain,
     );
+    final forms = <PokemonFormDetail>[];
+    for (final form in detail.forms) {
+      final relative = form.localSpritePath;
+      if (relative == null || relative.startsWith('http')) {
+        forms.add(form);
+        continue;
+      }
+      final absolute = await _store.absolutePathForRelative(relative);
+      forms.add(form.withLocalSpritePath(absolute ?? relative));
+    }
     return PokemonDetail(
       summary: summary,
       genusZh: detail.genusZh,
@@ -642,10 +661,19 @@ class DexOfflineService {
       typeMultipliers: detail.typeMultipliers,
       flavorEntries: detail.flavorEntries,
       obtainLocations: detail.obtainLocations,
+      obtainLocationsByGame: detail.obtainLocationsByGame,
+      obtainLocationsByVersion: detail.obtainLocationsByVersion,
+      abilities: detail.abilities,
+      abilitiesByGame: detail.abilitiesByGame,
       moveSet: detail.moveSet,
+      moveSets: detail.moveSets,
+      baseHappiness: detail.baseHappiness,
+      captureRate: detail.captureRate,
+      evYield: detail.evYield,
       genderFemalePercent: detail.genderFemalePercent,
       eggGroups: detail.eggGroups,
       hatchCounter: detail.hatchCounter,
+      forms: forms,
     );
   }
 

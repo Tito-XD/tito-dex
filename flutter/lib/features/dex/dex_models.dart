@@ -635,7 +635,16 @@ class PokemonFormDetail {
     required this.weightHg,
     this.formId,
     this.formNameZh,
+    this.formGroup,
     this.introducedVersionGroup,
+    this.availableVersionGroups = const [],
+    this.obtainableVersionGroups = const [],
+    this.obtainable = true,
+    this.eventOnly = false,
+    this.deprecated = false,
+    this.inheritsFromDefault = false,
+    this.dataCompleteness = 'unknown',
+    this.sources = const [],
     this.spriteUrl,
     this.artworkUrl,
     this.localSpritePath,
@@ -643,8 +652,11 @@ class PokemonFormDetail {
     this.typeMultipliers = const {},
     this.stabSuperEffective = const [],
     this.abilities = const [],
+    this.abilitiesByGame = const {},
     this.obtainLocationsByGame = const {},
+    this.obtainLocationsByVersion = const {},
     this.moveSets = const {},
+    this.evolutionChain,
   });
 
   final String key;
@@ -653,12 +665,21 @@ class PokemonFormDetail {
   final String nameEn;
   final String nameZh;
   final String? formNameZh;
+  final String? formGroup;
   final PokemonFormKind kind;
   final bool isDefault;
   final bool isBattleOnly;
   final bool isMega;
   final bool isCosmetic;
   final String? introducedVersionGroup;
+  final List<String> availableVersionGroups;
+  final List<String> obtainableVersionGroups;
+  final bool obtainable;
+  final bool eventOnly;
+  final bool deprecated;
+  final bool inheritsFromDefault;
+  final String dataCompleteness;
+  final List<String> sources;
   final List<String> types;
   final int heightDm;
   final int weightHg;
@@ -669,19 +690,64 @@ class PokemonFormDetail {
   final Map<String, double> typeMultipliers;
   final List<String> stabSuperEffective;
   final List<PokemonAbility> abilities;
+  final Map<String, List<PokemonAbility>> abilitiesByGame;
   final Map<String, List<ObtainLocationEntry>> obtainLocationsByGame;
+  final Map<String, List<ObtainLocationEntry>> obtainLocationsByVersion;
   final Map<String, PokemonMoveSet> moveSets;
+  final EvolutionNode? evolutionChain;
 
-  PokemonSummary summaryFor(PokemonSummary species) => PokemonSummary(
-    id: species.id,
+  PokemonSummary summaryFor(PokemonSummary species) {
+    final mayInheritAssets = isDefault || isCosmetic || inheritsFromDefault;
+    return PokemonSummary(
+      id: species.id,
+      nameEn: nameEn,
+      nameZh: nameZh,
+      types: types,
+      spriteUrl: spriteUrl ?? (mayInheritAssets ? species.spriteUrl : null),
+      artworkUrl: artworkUrl ?? (mayInheritAssets ? species.artworkUrl : null),
+      localSpritePath: localSpritePath,
+      pokedexNumbers: species.pokedexNumbers,
+      formSearchTerms: species.formSearchTerms,
+    );
+  }
+
+  PokemonFormDetail withLocalSpritePath(String? path) => PokemonFormDetail(
+    key: key,
+    pokemonId: pokemonId,
+    formId: formId,
     nameEn: nameEn,
     nameZh: nameZh,
+    formNameZh: formNameZh,
+    formGroup: formGroup,
+    kind: kind,
+    isDefault: isDefault,
+    isBattleOnly: isBattleOnly,
+    isMega: isMega,
+    isCosmetic: isCosmetic,
+    introducedVersionGroup: introducedVersionGroup,
+    availableVersionGroups: availableVersionGroups,
+    obtainableVersionGroups: obtainableVersionGroups,
+    obtainable: obtainable,
+    eventOnly: eventOnly,
+    deprecated: deprecated,
+    inheritsFromDefault: inheritsFromDefault,
+    dataCompleteness: dataCompleteness,
+    sources: sources,
     types: types,
-    spriteUrl: spriteUrl ?? species.spriteUrl,
-    artworkUrl: artworkUrl ?? species.artworkUrl,
-    localSpritePath: localSpritePath,
-    pokedexNumbers: species.pokedexNumbers,
-    formSearchTerms: species.formSearchTerms,
+    heightDm: heightDm,
+    weightHg: weightHg,
+    spriteUrl: spriteUrl,
+    artworkUrl: artworkUrl,
+    localSpritePath: path,
+    baseStats: baseStats,
+    typeMultipliers: typeMultipliers,
+    stabSuperEffective: stabSuperEffective,
+    abilities: abilities,
+    abilitiesByGame: abilitiesByGame,
+    obtainLocationsByGame: obtainLocationsByGame,
+    obtainLocationsByVersion: obtainLocationsByVersion,
+    moveSets: moveSets,
+    evolutionChain: evolutionChain,
   );
 
   Map<String, dynamic> toJson() => {
@@ -691,6 +757,7 @@ class PokemonFormDetail {
     'nameEn': nameEn,
     'nameZh': nameZh,
     if (formNameZh != null) 'formNameZh': formNameZh,
+    if (formGroup != null) 'formGroup': formGroup,
     'kind': kind.name,
     'isDefault': isDefault,
     'isBattleOnly': isBattleOnly,
@@ -698,6 +765,16 @@ class PokemonFormDetail {
     'isCosmetic': isCosmetic,
     if (introducedVersionGroup != null)
       'introducedVersionGroup': introducedVersionGroup,
+    if (availableVersionGroups.isNotEmpty)
+      'availableVersionGroups': availableVersionGroups,
+    if (obtainableVersionGroups.isNotEmpty)
+      'obtainableVersionGroups': obtainableVersionGroups,
+    'obtainable': obtainable,
+    if (eventOnly) 'eventOnly': true,
+    if (deprecated) 'deprecated': true,
+    if (inheritsFromDefault) 'inheritsFromDefault': true,
+    'dataCompleteness': dataCompleteness,
+    if (sources.isNotEmpty) 'sources': sources,
     'types': types,
     'heightDm': heightDm,
     'weightHg': weightHg,
@@ -708,13 +785,24 @@ class PokemonFormDetail {
     if (typeMultipliers.isNotEmpty) 'typeMultipliers': typeMultipliers,
     if (stabSuperEffective.isNotEmpty) 'stabSuperEffective': stabSuperEffective,
     'abilities': abilities.map((entry) => entry.toJson()).toList(),
+    if (abilitiesByGame.isNotEmpty)
+      'abilitiesByGame': abilitiesByGame.map(
+        (key, value) =>
+            MapEntry(key, value.map((entry) => entry.toJson()).toList()),
+      ),
     if (obtainLocationsByGame.isNotEmpty)
       'obtainLocationsByGame': obtainLocationsByGame.map(
         (key, value) =>
             MapEntry(key, value.map((entry) => entry.toJson()).toList()),
       ),
+    if (obtainLocationsByVersion.isNotEmpty)
+      'obtainLocationsByVersion': obtainLocationsByVersion.map(
+        (key, value) =>
+            MapEntry(key, value.map((entry) => entry.toJson()).toList()),
+      ),
     if (moveSets.isNotEmpty)
       'moveSets': moveSets.map((key, value) => MapEntry(key, value.toJson())),
+    if (evolutionChain != null) 'evolutionChain': evolutionChain!.toJson(),
   };
 
   factory PokemonFormDetail.fromJson(
@@ -725,6 +813,10 @@ class PokemonFormDetail {
         json['typeMultipliers'] as Map<String, dynamic>? ?? const {};
     final obtainJson =
         json['obtainLocationsByGame'] as Map<String, dynamic>? ?? const {};
+    final obtainVersionJson =
+        json['obtainLocationsByVersion'] as Map<String, dynamic>? ?? const {};
+    final abilitiesByGameJson =
+        json['abilitiesByGame'] as Map<String, dynamic>? ?? const {};
     final moveSetsJson = json['moveSets'] as Map<String, dynamic>? ?? const {};
     return PokemonFormDetail(
       key: json['key'] as String,
@@ -733,12 +825,27 @@ class PokemonFormDetail {
       nameEn: json['nameEn'] as String,
       nameZh: json['nameZh'] as String,
       formNameZh: json['formNameZh'] as String?,
+      formGroup: json['formGroup'] as String?,
       kind: PokemonFormKind.parse(json['kind'] as String?),
       isDefault: json['isDefault'] as bool? ?? false,
       isBattleOnly: json['isBattleOnly'] as bool? ?? false,
       isMega: json['isMega'] as bool? ?? false,
       isCosmetic: json['isCosmetic'] as bool? ?? false,
       introducedVersionGroup: json['introducedVersionGroup'] as String?,
+      availableVersionGroups:
+          (json['availableVersionGroups'] as List<dynamic>? ?? const [])
+              .cast<String>(),
+      obtainableVersionGroups:
+          (json['obtainableVersionGroups'] as List<dynamic>? ?? const [])
+              .cast<String>(),
+      obtainable: json['obtainable'] as bool? ??
+          !(json['isBattleOnly'] as bool? ?? false),
+      eventOnly: json['eventOnly'] as bool? ?? false,
+      deprecated: json['deprecated'] as bool? ?? false,
+      inheritsFromDefault: json['inheritsFromDefault'] as bool? ??
+          (json['isCosmetic'] as bool? ?? false),
+      dataCompleteness: json['dataCompleteness'] as String? ?? 'unknown',
+      sources: (json['sources'] as List<dynamic>? ?? const []).cast<String>(),
       types: (json['types'] as List<dynamic>? ?? const []).cast<String>(),
       heightDm: (json['heightDm'] as num?)?.toInt() ?? 0,
       weightHg: (json['weightHg'] as num?)?.toInt() ?? 0,
@@ -759,7 +866,29 @@ class PokemonFormDetail {
       abilities: (json['abilities'] as List<dynamic>? ?? const [])
           .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
+      abilitiesByGame: abilitiesByGameJson.map(
+        (key, value) => MapEntry(
+          key,
+          (value as List<dynamic>)
+              .map(
+                (item) =>
+                    PokemonAbility.fromJson(item as Map<String, dynamic>),
+              )
+              .toList(),
+        ),
+      ),
       obtainLocationsByGame: obtainJson.map(
+        (key, value) => MapEntry(
+          key,
+          (value as List<dynamic>)
+              .map(
+                (item) =>
+                    ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+              )
+              .toList(),
+        ),
+      ),
+      obtainLocationsByVersion: obtainVersionJson.map(
         (key, value) => MapEntry(
           key,
           (value as List<dynamic>)
@@ -779,6 +908,11 @@ class PokemonFormDetail {
           ),
         ),
       ),
+      evolutionChain: json['evolutionChain'] == null
+          ? null
+          : EvolutionNode.fromJson(
+              json['evolutionChain'] as Map<String, dynamic>,
+            ),
     );
   }
 }
@@ -855,27 +989,46 @@ class PokemonDetail {
 
   /// Reuse the existing detail widgets with form-dependent battle data.
   PokemonDetail forForm(PokemonFormDetail form) {
-    final inheritsSpeciesData = form.isDefault || form.isCosmetic;
+    final inheritsSpeciesData =
+        form.isDefault || form.isCosmetic || form.inheritsFromDefault;
     final resolvedMoveSets = inheritsSpeciesData ? moveSets : form.moveSets;
     final resolvedMoveSet = resolvedMoveSets['heartgold-soulsilver'] ??
         (inheritsSpeciesData ? moveSet : const PokemonMoveSet());
-    final resolvedObtain = inheritsSpeciesData
+    final mayUseLegacySpeciesLocations =
+        !form.isDefault &&
+        (form.isCosmetic || form.inheritsFromDefault) &&
+        form.obtainLocationsByGame.isEmpty &&
+        form.obtainLocationsByVersion.isEmpty;
+    final resolvedObtain = mayUseLegacySpeciesLocations
         ? obtainLocationsByGame
         : form.obtainLocationsByGame;
+    final resolvedObtainByVersion = mayUseLegacySpeciesLocations
+        ? obtainLocationsByVersion
+        : form.obtainLocationsByVersion;
     final hgssObtain = resolvedObtain['heartgold-soulsilver'] ??
-        (inheritsSpeciesData ? obtainLocations : const []);
+        (mayUseLegacySpeciesLocations ? obtainLocations : const []);
     return PokemonDetail(
       summary: form.summaryFor(summary),
       genusZh: genusZh,
       heightDm: form.heightDm,
       weightHg: form.weightHg,
-      weaknesses: weaknesses,
-      resistances: resistances,
-      immunities: immunities,
+      weaknesses: inheritsSpeciesData
+          ? weaknesses
+          : _typesAtMultiplier(form.typeMultipliers, (value) => value > 1),
+      resistances: inheritsSpeciesData
+          ? resistances
+          : _typesAtMultiplier(
+              form.typeMultipliers,
+              (value) => value > 0 && value < 1,
+            ),
+      immunities: inheritsSpeciesData
+          ? immunities
+          : _typesAtMultiplier(form.typeMultipliers, (value) => value == 0),
       stabSuperEffective: form.stabSuperEffective.isEmpty
           ? stabSuperEffective
           : form.stabSuperEffective,
-      evolutionChain: evolutionChain,
+      evolutionChain:
+          inheritsSpeciesData ? evolutionChain : form.evolutionChain,
       johtoDexNumber: johtoDexNumber,
       baseStats:
           inheritsSpeciesData ? (form.baseStats ?? baseStats) : form.baseStats,
@@ -885,10 +1038,12 @@ class PokemonDetail {
       flavorEntries: flavorEntries,
       obtainLocations: hgssObtain,
       obtainLocationsByGame: resolvedObtain,
+      obtainLocationsByVersion: resolvedObtainByVersion,
       abilities: inheritsSpeciesData && form.abilities.isEmpty
           ? abilities
           : form.abilities,
-      abilitiesByGame: abilitiesByGame,
+      abilitiesByGame:
+          inheritsSpeciesData ? abilitiesByGame : form.abilitiesByGame,
       moveSet: resolvedMoveSet,
       moveSets: resolvedMoveSets,
       baseHappiness: baseHappiness,
@@ -900,6 +1055,14 @@ class PokemonDetail {
       forms: forms,
     );
   }
+
+  static List<String> _typesAtMultiplier(
+    Map<String, double> multipliers,
+    bool Function(double value) matches,
+  ) => multipliers.entries
+      .where((entry) => matches(entry.value))
+      .map((entry) => typeNameZh(entry.key))
+      .toList(growable: false);
 
   int get hatchSteps => hatchCounter == null ? 0 : hatchCounter! * 256;
 

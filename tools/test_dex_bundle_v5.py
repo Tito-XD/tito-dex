@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from build_dex_bundle import (  # noqa: E402
     encounter_area_label_zh,
     fetch_species_obtain_locations,
     merge_obtain_location_versions,
+    parse_ev_yield,
     parse_pokedex_numbers,
     parse_obtain_locations_by_version,
 )
@@ -51,6 +53,15 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             ]
         }
         self.assertEqual(ability_description_zh(detail), "静电")
+
+    def test_ev_yield_reads_pokemon_stat_effort_values(self) -> None:
+        self.assertEqual(
+            parse_ev_yield([
+                {"effort": 0, "stat": {"name": "hp"}},
+                {"effort": 2, "stat": {"name": "special-attack"}},
+            ]),
+            {"specialAttack": 2},
+        )
 
     def test_game_editions_count(self) -> None:
         self.assertEqual(len(GAME_EDITIONS), 23)
@@ -240,6 +251,142 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         self.assertNotIn("pokemonId", entry)
         self.assertNotIn("formKey", entry)
 
+    def test_form_builder_omits_single_default_and_keeps_all_cosmetics(self) -> None:
+        builder = dex_builder.PokeApiBuilder(delay_s=0)
+        builder.load_type_relations = lambda: {}
+        single = {
+            "id": 1,
+            "name": "bulbasaur",
+            "forms": [{
+                "name": "bulbasaur",
+                "url": "https://pokeapi.co/api/v2/pokemon-form/1/",
+            }],
+        }
+        species = {
+            "name": "bulbasaur",
+            "varieties": [{
+                "is_default": True,
+                "pokemon": {
+                    "name": "bulbasaur",
+                    "url": "https://pokeapi.co/api/v2/pokemon/1/",
+                },
+            }],
+        }
+        forms, terms, ambiguous_ids = builder.build_forms(
+            species_id=1,
+            species=species,
+            default_pokemon=single,
+            species_name_zh="妙蛙种子",
+            cdn_base="https://example.invalid",
+            default_move_sets={},
+            default_abilities=[],
+            obtain_locations_by_game={},
+            obtain_locations_by_version={},
+        )
+        self.assertEqual(forms, [])
+        self.assertEqual(terms, [])
+        self.assertEqual(ambiguous_ids, set())
+
+        alcremie = {
+            "id": 869,
+            "name": "alcremie",
+            "types": [{"slot": 1, "type": {"name": "fairy"}}],
+            "stats": [{"stat": {"name": "hp"}, "base_stat": 65}],
+            "abilities": [],
+            "moves": [],
+            "height": 3,
+            "weight": 5,
+            "sprites": {"front_default": "https://example.invalid/base.png"},
+            "forms": [
+                {
+                    "name": "alcremie-vanilla-cream-strawberry-sweet",
+                    "url": "https://pokeapi.co/api/v2/pokemon-form/10168/",
+                },
+                {
+                    "name": "alcremie-ruby-cream-strawberry-sweet",
+                    "url": "https://pokeapi.co/api/v2/pokemon-form/10169/",
+                },
+            ],
+        }
+        form_payloads = {
+            ref["url"]: {
+                "id": 10168 + index,
+                "name": ref["name"],
+                "is_default": index == 0,
+                "is_battle_only": False,
+                "is_mega": False,
+                "types": alcremie["types"],
+                "sprites": {
+                    "front_default": f"https://example.invalid/{index}.png"
+                },
+                "version_group": {"name": "sword-shield"},
+            }
+            for index, ref in enumerate(alcremie["forms"])
+        }
+        builder._get_json = lambda path: form_payloads[path]
+        encounter = {
+            "areaSlug": "route-1-area",
+            "areaLabelZh": "1号道路",
+            "pokemonId": 869,
+            "speciesId": 869,
+            "formKey": "alcremie",
+            "formAmbiguous": False,
+        }
+        forms, _terms, ambiguous_ids = builder.build_forms(
+            species_id=869,
+            species={
+                "name": "alcremie",
+                "varieties": [{
+                    "is_default": True,
+                    "pokemon": {
+                        "name": "alcremie",
+                        "url": "https://pokeapi.co/api/v2/pokemon/869/",
+                    },
+                }],
+            },
+            default_pokemon=alcremie,
+            species_name_zh="霜奶仙",
+            cdn_base="https://example.invalid",
+            default_move_sets={},
+            default_abilities=[],
+            obtain_locations_by_game={"sword-shield": [encounter]},
+            obtain_locations_by_version={"sword": [encounter]},
+        )
+        self.assertEqual(len(forms), 2)
+        self.assertEqual({form["formId"] for form in forms}, {10168, 10169})
+        self.assertEqual(len({form["key"] for form in forms}), 2)
+        self.assertEqual(set(builder.form_sprite_jobs), {"10169"})
+        self.assertEqual(ambiguous_ids, {869})
+        for form in forms:
+            location = form["obtainLocationsByVersion"]["sword"][0]
+            self.assertTrue(location["formAmbiguous"])
+            self.assertNotIn("formKey", location)
+
+    def test_resume_hydrates_move_and_ability_caches(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            staging = Path(temp)
+            (staging / "moves.json").write_text(
+                json.dumps({"33": {"id": 33, "nameEn": "Tackle"}}),
+                encoding="utf-8",
+            )
+            (staging / "abilities.json").write_text(
+                json.dumps({
+                    "65": {
+                        "nameEn": "Overgrow",
+                        "nameZh": "茂盛",
+                        "descriptionZh": "",
+                        "pokemonIds": [1],
+                    },
+                }),
+                encoding="utf-8",
+            )
+            builder = dex_builder.PokeApiBuilder(delay_s=0)
+            dex_builder.hydrate_builder_indexes_from_staging(builder, staging)
+            self.assertIn(33, builder.move_cache)
+            self.assertIn(65, builder.ability_index)
+            self.assertIn(("overgrow", False), builder.ability_cache)
+            self.assertIn(("overgrow", True), builder.ability_cache)
+
     def test_sample_detail_json_has_v5_fields(self) -> None:
         bundle_dir = REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX
         detail_path = bundle_dir / "details" / "1.json"
@@ -323,6 +470,8 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["bundleVersion"], BUNDLE_VERSION)
+        self.assertEqual(manifest["schemaFeatures"]["pokemonForms"], 2)
+        self.assertEqual(manifest["schemaFeatures"]["encounterFormIdentity"], 3)
         self.assertIn(f"/{BUNDLE_CDN_PREFIX}/bundle.tar.zst", manifest["archiveUrl"])
 
 
