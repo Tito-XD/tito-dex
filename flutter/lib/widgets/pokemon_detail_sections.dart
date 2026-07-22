@@ -1046,6 +1046,16 @@ class ObtainLocationsCard extends StatelessWidget {
   final List<ObtainLocationEntry> locations;
   final String? gameLabel;
 
+  List<String> _encounterTags(ObtainLocationEntry entry) => [
+    if (entry.formAmbiguous) '形态未区分',
+    if (entry.teraType != null) '太晶：${typeNameZh(entry.teraType!)}',
+    if (entry.isAlpha) '头目',
+    if (entry.isTitan) '霸主',
+    if (entry.isTotem) '图腾',
+    if (entry.isRaid) '团体战',
+    if (entry.isFixedEncounter) '固定出现',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return StickerCard(
@@ -1059,8 +1069,9 @@ class ObtainLocationsCard extends StatelessWidget {
             style: SecondaryTypography.onCard.h15,
           ),
           const SizedBox(height: 10),
-          ...locations.map(
-            (entry) => Padding(
+          ...locations.map((entry) {
+            final tags = _encounterTags(entry);
+            return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1082,6 +1093,16 @@ class ObtainLocationsCard extends StatelessWidget {
                                 .join(' / '),
                             style: SecondaryTypography.onCard.small12.copyWith(
                               color: TitoColors.mutedInk,
+                            ),
+                          ),
+                        if (tags.isNotEmpty)
+                          Text(
+                            tags.join(' · '),
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              color: entry.formAmbiguous
+                                  ? TitoColors.coral
+                                  : TitoColors.mutedInk,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                       ],
@@ -1108,8 +1129,8 @@ class ObtainLocationsCard extends StatelessWidget {
                   ],
                 ],
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

@@ -382,7 +382,7 @@ class PokeApiClient {
             variety['pokemon'] as Map<String, dynamic>? ?? const {};
         final pokemonUrl = pokemonRef['url'] as String?;
         final pokemonId = pokemonUrl == null ? id : _idFromUrl(pokemonUrl);
-        final formSlug = pokemonRef['name'] as String? ?? '$pokemonId';
+        final formKey = pokemonRef['name'] as String? ?? '$pokemonId';
         final isDefaultForm = variety['is_default'] as bool? ?? pokemonId == id;
         List<dynamic> list;
         try {
@@ -458,8 +458,9 @@ class PokeApiClient {
               areaLabelZh: resolveObtainAreaLabelZh(slug),
               pokemonId: pokemonId,
               speciesId: id,
-              formSlug: formSlug,
+              formKey: formKey,
               isDefaultForm: isDefaultForm,
+              formAmbiguous: false,
               minLevel: minLevel == 100 ? null : minLevel,
               maxLevel: maxLevel == 0 ? null : maxLevel,
               maxChance: detailMap['max_chance'] as int? ?? 0,
@@ -501,7 +502,7 @@ class PokeApiClient {
     for (final version in versions) {
       for (final entry in byVersion[version] ?? const []) {
         final identity =
-            '${entry.pokemonId ?? ''}:${entry.formSlug ?? ''}:${entry.areaSlug}';
+            '${entry.pokemonId ?? ''}:${entry.formKey ?? ''}:${entry.areaSlug}';
         grouped.putIfAbsent(identity, () => []).add(entry);
       }
     }
@@ -514,8 +515,15 @@ class PokeApiClient {
         areaLabelZh: first.areaLabelZh,
         pokemonId: first.pokemonId,
         speciesId: first.speciesId,
-        formSlug: first.formSlug,
+        formKey: first.formKey,
         isDefaultForm: first.isDefaultForm,
+        teraType: first.teraType,
+        isAlpha: first.isAlpha,
+        isTitan: first.isTitan,
+        isTotem: first.isTotem,
+        isRaid: first.isRaid,
+        isFixedEncounter: first.isFixedEncounter,
+        formAmbiguous: first.formAmbiguous,
         minLevel: minLevels.isEmpty ? null : minLevels.reduce(math.min),
         maxLevel: maxLevels.isEmpty ? null : maxLevels.reduce(math.max),
         maxChance: entries.map((entry) => entry.maxChance).reduce(math.max),

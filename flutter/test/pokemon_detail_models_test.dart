@@ -52,7 +52,7 @@ void main() {
       'areaLabelZh': '3号道路',
       'pokemonId': 10091,
       'speciesId': 19,
-      'formSlug': 'rattata-alola',
+      'formKey': 'rattata-alola',
       'isDefaultForm': false,
       'minLevel': 3,
       'maxLevel': 7,
@@ -68,6 +68,7 @@ void main() {
     expect(entry.pokemonId, 10091);
     expect(entry.speciesId, 19);
     expect(entry.formSlug, 'rattata-alola');
+    expect(entry.formKey, 'rattata-alola');
     expect(entry.isDefaultForm, isFalse);
     expect(entry.maxLevel, 7);
     expect(entry.versions, ['blue', 'red']);
@@ -75,5 +76,27 @@ void main() {
     expect(entry.conditions, ['time-day']);
     expect(entry.toJson()['maxLevel'], 7);
     expect(entry.toJson()['rateValue'], 25);
+    expect(entry.toJson()['formKey'], 'rattata-alola');
+    expect(entry.toJson().containsKey('formSlug'), isFalse);
+
+    final legacy = ObtainLocationEntry.fromJson({
+      'areaSlug': 'route-3-area',
+      'areaLabelZh': '3号道路',
+      'pokemonId': 10091,
+      'formSlug': 'rattata-alola',
+    });
+    expect(legacy.formKey, 'rattata-alola');
+    expect(legacy.formAmbiguous, isFalse);
+
+    final ambiguous = ObtainLocationEntry.fromJson({
+      'areaSlug': 'unknown-area',
+      'areaLabelZh': '未知区域',
+      'speciesId': 194,
+      'teraType': 'water',
+      'isFixedEncounter': true,
+    });
+    expect(ambiguous.formAmbiguous, isTrue);
+    expect(ambiguous.teraType, 'water');
+    expect(ambiguous.isFixedEncounter, isTrue);
   });
 }

@@ -11,6 +11,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
+import build_dex_bundle as dex_builder  # noqa: E402
 from build_dex_bundle import (  # noqa: E402
     BUNDLE_CDN_PREFIX,
     BUNDLE_VERSION,
@@ -102,7 +103,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             encounters,
             pokemon_id=10091,
             species_id=19,
-            form_slug="rattata-alola",
+            form_key="rattata-alola",
             is_default_form=False,
         )
         self.assertEqual(set(by_version), {"blue", "red"})
@@ -113,7 +114,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         self.assertEqual(by_version["red"][0]["conditions"], ["time-day"])
         self.assertEqual(by_version["red"][0]["pokemonId"], 10091)
         self.assertEqual(by_version["red"][0]["speciesId"], 19)
-        self.assertEqual(by_version["red"][0]["formSlug"], "rattata-alola")
+        self.assertEqual(by_version["red"][0]["formKey"], "rattata-alola")
 
         grouped = merge_obtain_location_versions(by_version, {"red", "blue"})
         self.assertEqual(grouped[0]["versions"], ["blue", "red"])
@@ -136,7 +137,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             }],
             pokemon_id=641,
             species_id=641,
-            form_slug="tornadus-incarnate",
+            form_key="tornadus-incarnate",
             is_default_form=True,
         )
         self.assertEqual(roaming["black"][0]["areaSlug"], "unova-roaming-area")
@@ -156,7 +157,7 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             }],
             pokemon_id=100,
             species_id=100,
-            form_slug="voltorb",
+            form_key="voltorb",
             is_default_form=True,
         )
         self.assertEqual(invalid, {})
@@ -201,6 +202,43 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             {entry["pokemonId"] for entry in by_version["sun"]},
             {19, 10091},
         )
+
+    def test_species_only_overlay_is_explicitly_form_ambiguous(self) -> None:
+        original = dex_builder._ENCOUNTER_OVERLAYS
+        dex_builder._ENCOUNTER_OVERLAYS = {
+            "scarlet": {
+                "species:194": [{
+                    "areaSlug": "south-province-area-one",
+                    "areaLabelZh": "南第1区",
+                    "pokemonId": 10253,
+                    "formKey": "wooper-paldea",
+                    "versions": ["scarlet"],
+                }],
+            },
+        }
+        try:
+            _by_game, by_version = fetch_species_obtain_locations(
+                type("Builder", (), {"_get_json_list": lambda _self, _path: []})(),
+                {
+                    "id": 194,
+                    "varieties": [{
+                        "is_default": True,
+                        "pokemon": {
+                            "name": "wooper",
+                            "url": "https://pokeapi.co/api/v2/pokemon/194/",
+                        },
+                    }],
+                },
+                194,
+            )
+        finally:
+            dex_builder._ENCOUNTER_OVERLAYS = original
+
+        entry = by_version["scarlet"][0]
+        self.assertEqual(entry["speciesId"], 194)
+        self.assertTrue(entry["formAmbiguous"])
+        self.assertNotIn("pokemonId", entry)
+        self.assertNotIn("formKey", entry)
 
     def test_sample_detail_json_has_v5_fields(self) -> None:
         bundle_dir = REPO_ROOT / "dist" / "dex-v5-smoke" / "upload" / BUNDLE_CDN_PREFIX
