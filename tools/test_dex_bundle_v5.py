@@ -344,6 +344,29 @@ def validate_detail_dir(details_dir: Path) -> list[str]:
             flavor = detail["flavorEntries"][0]
             if "gameEdition" not in flavor:
                 errors.append(f"{detail_file.name}: flavorEntries missing gameEdition")
+        for form in detail.get("forms", []):
+            for key in (
+                "key",
+                "pokemonId",
+                "nameZh",
+                "kind",
+                "isDefault",
+                "types",
+                "heightDm",
+                "weightHg",
+            ):
+                if key not in form:
+                    errors.append(
+                        f"{detail_file.name}: form missing {key}"
+                    )
+            if not form.get("isCosmetic") and not form.get("isDefault"):
+                # Battle-relevant forms must carry their own profile. An empty
+                # profile is preferable to silently borrowing the species one,
+                # but a completed production bundle should not leave it empty.
+                if not form.get("types"):
+                    errors.append(
+                        f"{detail_file.name}: battle form has no types"
+                    )
     return errors
 
 

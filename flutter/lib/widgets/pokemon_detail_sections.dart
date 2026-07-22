@@ -24,6 +24,66 @@ import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'type_badge.dart';
 
+class PokemonFormSelector extends StatelessWidget {
+  const PokemonFormSelector({
+    super.key,
+    required this.forms,
+    required this.selectedKey,
+    required this.onSelected,
+  });
+
+  final List<PokemonFormDetail> forms;
+  final String selectedKey;
+  final ValueChanged<PokemonFormDetail> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    if (forms.length < 2) {
+      return const SizedBox.shrink();
+    }
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('形态', style: SecondaryTypography.onCard.h15),
+          const SizedBox(height: 4),
+          Text(
+            '属性、能力、招式与出现地点会随形态切换',
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final form in forms)
+                ChoiceChip(
+                  selected: form.key == selectedKey,
+                  onSelected: (_) => onSelected(form),
+                  label: Text(form.nameZh),
+                  tooltip: form.kind.labelZh,
+                  showCheckmark: false,
+                  selectedColor: TitoColors.softYellow,
+                  backgroundColor: TitoColors.card,
+                  side: const BorderSide(
+                    color: TitoColors.ink,
+                    width: TitoBorders.element,
+                  ),
+                  labelStyle: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.ink,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class PokemonDetailHeader extends StatelessWidget {
   const PokemonDetailHeader({
     super.key,

@@ -46,6 +46,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   GameEdition _moveGameEdition = defaultGameEdition;
   GameEdition _obtainGameEdition = defaultGameEdition;
   _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
+  String? _selectedFormKey;
 
   @override
   void initState() {
@@ -103,6 +104,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       setState(() {
         _detail = detail;
         _abilities = abilities;
+        _selectedFormKey = detail.defaultForm?.key;
         _loading = false;
       });
     } catch (error) {
@@ -119,6 +121,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   @override
   Widget build(BuildContext context) {
     final detail = _detail;
+    final displayDetail = detail == null ? null : _displayDetail(detail);
     final errorCopy = _errorCopy;
     final padding = DeviceLayout.pagePadding(context);
 
@@ -132,63 +135,97 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           systemNavigationBarIconBrightness: Brightness.dark,
         ),
         child: Column(
-        children: [
-          Expanded(
-            child: TitoSkeletonGate(
-              loading: _loading,
-              skeleton: ListView(
-                padding: padding,
-                children: const [
-                  TitoDetailHeaderSkeleton(),
-                  SizedBox(height: 12),
-                  TitoCardSkeleton(height: 140),
-                  SizedBox(height: 12),
-                  TitoCardSkeleton(height: 88),
-                ],
-              ),
-              child: errorCopy != null
-                  ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
-                  : detail == null
-                  ? const SizedBox.shrink()
-                  : ListView(
-                      padding: padding.copyWith(bottom: 12),
-                      children: [
-                        const SecondaryPageAppBar(
-                          title: AppZh.navDex,
-                          showSettings: false,
-                        ),
-                        const SizedBox(height: 8),
-                        PokemonDetailHeader(
-                          detail: detail,
-                          compact: true,
-                          showSettingsAction: false,
-                        ),
-                        const SizedBox(height: 12),
-                        // Keyed tab-body swap without a custom transition.
-                        TitoAnimatedSizeSwitcher(
-                          switchKey: ValueKey<int>(_currentTabIndex),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: _tabSections(detail, _currentTabIndex),
+          children: [
+            Expanded(
+              child: TitoSkeletonGate(
+                loading: _loading,
+                skeleton: ListView(
+                  padding: padding,
+                  children: const [
+                    TitoDetailHeaderSkeleton(),
+                    SizedBox(height: 12),
+                    TitoCardSkeleton(height: 140),
+                    SizedBox(height: 12),
+                    TitoCardSkeleton(height: 88),
+                  ],
+                ),
+                child: errorCopy != null
+                    ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                    : displayDetail == null
+                    ? const SizedBox.shrink()
+                    : ListView(
+                        padding: padding.copyWith(bottom: 12),
+                        children: [
+                          const SecondaryPageAppBar(
+                            title: AppZh.navDex,
+                            showSettings: false,
                           ),
-                        ),
-                        const SizedBox(height: 72),
-                      ],
-                    ),
+                          const SizedBox(height: 8),
+                          PokemonDetailHeader(
+                            detail: displayDetail,
+                            compact: true,
+                            showSettingsAction: false,
+                          ),
+                          if (displayDetail.hasMultipleForms) ...[
+                            const SizedBox(height: 12),
+                            PokemonFormSelector(
+                              forms: displayDetail.forms,
+                              selectedKey:
+                                  _selectedFormKey ??
+                                  displayDetail.defaultForm!.key,
+                              onSelected: (form) {
+                              setState(() {
+                                _selectedFormKey = form.key;
+                                _abilities = form.abilities.isEmpty &&
+                                        (form.isDefault || form.isCosmetic)
+                                    ? _detail!.abilities
+                                    : form.abilities;
+                                });
+                              },
+                            ),
+                          ],
+                          const SizedBox(height: 12),
+                          // Keyed tab-body swap without a custom transition.
+                          TitoAnimatedSizeSwitcher(
+                            switchKey: ValueKey<int>(_currentTabIndex),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: _tabSections(
+                                displayDetail,
+                                _currentTabIndex,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 72),
+                        ],
+                      ),
+              ),
             ),
-          ),
-          _DetailBottomTabs(
-            currentIndex: _currentTabIndex,
-            onSelected: (index) {
-              if (_currentTabIndex != index) {
-                setState(() => _currentTabIndex = index);
-              }
-            },
-          ),
-        ],
+            _DetailBottomTabs(
+              currentIndex: _currentTabIndex,
+              onSelected: (index) {
+                if (_currentTabIndex != index) {
+                  setState(() => _currentTabIndex = index);
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  PokemonDetail _displayDetail(PokemonDetail detail) {
+    final selectedKey = _selectedFormKey;
+    if (selectedKey == null) {
+      return detail;
+    }
+    for (final form in detail.forms) {
+      if (form.key == selectedKey) {
+        return form.isDefault ? detail : detail.forForm(form);
+      }
+    }
+    return detail;
   }
 
   List<Widget> _tabSections(PokemonDetail detail, int tabIndex) {
