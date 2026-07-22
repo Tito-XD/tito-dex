@@ -222,7 +222,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     }
     for (final form in detail.forms) {
       if (form.key == selectedKey) {
-        return form.isDefault ? detail : detail.forForm(form);
+        return detail.forForm(form);
       }
     }
     return detail;

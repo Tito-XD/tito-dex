@@ -12,6 +12,7 @@ import hashlib
 import io
 import json
 import re
+import shutil
 import struct
 import sys
 import tarfile
@@ -296,7 +297,7 @@ CURATED_ITEM_SLUGS = [
     "clear-amulet", "covert-cloak", "punching-glove", "loaded-dice",
     "safety-goggles", "protective-pads", "heavy-duty-boots", "utility-umbrella",
     "kings-rock", "razor-claw", "razor-fang", "metal-coat", "dragon-scale",
-    "upgrade", "dubious-disc", "protector", "electirizer", "magmarizer",
+    "up-grade", "dubious-disc", "protector", "electirizer", "magmarizer",
     "reaper-cloth", "prism-scale", "sachet", "whipped-dream", "oval-stone",
     "moon-stone", "sun-stone", "fire-stone", "water-stone", "thunder-stone",
     "leaf-stone", "shiny-stone", "dusk-stone", "dawn-stone", "ice-stone",
@@ -435,9 +436,10 @@ class PokeApiBuilder:
         self.session.headers["User-Agent"] = "TitoDex-dex-bundle-builder/1.0"
         self.delay_s = delay_s
         self.move_cache: dict[int, dict[str, Any]] = {}
+        self.ability_cache: dict[tuple[str, bool], dict[str, Any]] = {}
         self.ability_index: dict[int, dict[str, Any]] = {}
         self.type_relations: dict[str, TypeDamageRelations] = {}
-        self.form_sprite_jobs: dict[int, tuple[str | None, str | None]] = {}
+        self.form_sprite_jobs: dict[str, tuple[str | None, str | None]] = {}
 
     def _get_json(self, path: str) -> dict[str, Any]:
         url = path if path.startswith("http") else f"{POKEAPI_BASE}{path}"
@@ -548,15 +550,20 @@ class PokeApiBuilder:
         return cached
 
     def fetch_ability(self, slug: str, *, is_hidden: bool) -> dict[str, Any]:
+        cache_key = (slug, is_hidden)
+        if cache_key in self.ability_cache:
+            return self.ability_cache[cache_key]
         detail = self._get_json(f"/ability/{slug}")
         ability_id = detail["id"]
-        return {
+        ability = {
             "id": ability_id,
             "nameEn": capitalize(detail["name"]),
             "nameZh": localized_name(detail.get("names", []), detail["name"]),
             "descriptionZh": ability_description_zh(detail),
             "isHidden": is_hidden,
         }
+        self.ability_cache[cache_key] = ability
+        return ability
 
     def register_ability(self, ability: dict[str, Any], pokemon_id: int) -> None:
         ability_id = ability["id"]
@@ -600,12 +607,23 @@ class PokeApiBuilder:
         default_pokemon: dict[str, Any],
         species_name_zh: str,
         cdn_base: str,
-    ) -> tuple[list[dict[str, Any]], list[str]]:
-        """Build every PokeAPI variety nested under one National Dex entry."""
+        default_move_sets: dict[str, dict[str, list[dict[str, Any]]]],
+        default_abilities: list[dict[str, Any]],
+        obtain_locations_by_game: dict[str, list[dict[str, Any]]],
+        obtain_locations_by_version: dict[str, list[dict[str, Any]]],
+    ) -> tuple[list[dict[str, Any]], list[str], set[int]]:
+        """Build meaningful PokeAPI varieties and every nested form resource.
+
+        A species with one Pokémon entity and one form resource has no selector
+        value, so it emits no ``forms`` array. Default battle data is reused
+        from ``build_detail``; non-default entities are computed once even when
+        they expose many cosmetic form resources (for example Alcremie).
+        """
         from pokeapi_assets import official_artwork_url
 
         forms: list[dict[str, Any]] = []
         search_terms: set[str] = set()
+        multi_form_pokemon_ids: set[int] = set()
         varieties = species.get("varieties") or [
             {
                 "is_default": True,
@@ -615,128 +633,221 @@ class PokeApiBuilder:
                 },
             }
         ]
+
+        candidates: list[
+            tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]
+        ] = []
         for variety in varieties:
             ref = variety["pokemon"]
-            is_default = bool(variety.get("is_default"))
-            pokemon = default_pokemon if is_default else self._get_json(ref["url"])
-            pokemon_id = int(pokemon["id"])
-            form_ref = next(iter(pokemon.get("forms") or []), None)
-            form_meta: dict[str, Any] = {}
-            if form_ref:
-                form_meta = self._get_json(form_ref["url"])
+            variety_is_default = bool(variety.get("is_default"))
+            pokemon = (
+                default_pokemon
+                if variety_is_default
+                else self._get_json(ref["url"])
+            )
+            form_refs = list(pokemon.get("forms") or [])
+            if not form_refs:
+                form_refs = [
+                    {
+                        "name": pokemon["name"],
+                        "url": "",
+                    }
+                ]
+            candidates.append((variety, pokemon, form_refs))
 
+        total_records = sum(len(form_refs) for _, _, form_refs in candidates)
+        if total_records < 2:
+            return [], [], set()
+
+        relations = self.load_type_relations()
+        for variety, pokemon, form_refs in candidates:
+            variety_is_default = bool(variety.get("is_default"))
+            pokemon_id = int(pokemon["id"])
             pokemon_slug = pokemon["name"]
-            form_name_zh = localized_optional_name(
-                form_meta.get("form_names", [])
-            )
-            full_name_zh = localized_optional_name(form_meta.get("names", []))
-            name_zh = form_label_zh(
-                species_name_zh,
-                species["name"],
-                pokemon_slug,
-                upstream_form_name_zh=full_name_zh or form_name_zh,
-                is_default=is_default,
-            )
-            is_battle_only = bool(form_meta.get("is_battle_only"))
-            is_mega = bool(form_meta.get("is_mega"))
-            cosmetic_only = not is_default and is_cosmetic_variety(
+            entity_has_multiple_forms = len(form_refs) > 1
+            if entity_has_multiple_forms:
+                multi_form_pokemon_ids.add(pokemon_id)
+
+            entity_cosmetic_only = not variety_is_default and is_cosmetic_variety(
                 default_pokemon,
                 pokemon,
-                is_battle_only=is_battle_only,
-            )
-            kind = classify_form(
-                species["name"],
-                pokemon_slug,
-                is_battle_only=is_battle_only,
-                is_mega=is_mega,
-                cosmetic_only=cosmetic_only,
             )
 
-            types = extract_types(pokemon.get("types", []))
-            relations = self.load_type_relations()
-            multipliers = compute_defensive_multipliers(types, relations)
-            stab = compute_stab_super_effective(types, relations)
-            abilities = self.fetch_abilities(
-                pokemon.get("abilities", []),
-                species_id,
-            )
-            move_sets: dict[str, dict[str, list[dict[str, Any]]]] = {}
-            for version_group in ALL_VERSION_GROUPS:
-                move_set = fetch_move_set_for_version_group(
-                    self,
-                    pokemon.get("moves", []),
-                    version_group,
-                )
-                if any(move_set.values()):
-                    move_sets[version_group] = move_set
-            obtain_by_game = fetch_obtain_locations_by_game(self, pokemon_id)
-
-            sprite_payload = pokemon.get("sprites") or {}
-            remote_sprite = sprite_url(sprite_payload)
-            remote_artwork = official_artwork_url(sprite_payload)
-            if is_default:
-                sprite_cdn = (
-                    f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/{species_id}.png"
-                )
-                artwork_cdn = (
-                    f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/{species_id}.png"
-                )
-                local_sprite = f"sprites/{species_id}.png"
+            if variety_is_default:
+                abilities = default_abilities
+                move_sets = default_move_sets
             else:
-                sprite_cdn = (
-                    f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/forms/{pokemon_id}.png"
+                abilities = self.fetch_abilities(
+                    pokemon.get("abilities", []),
+                    species_id,
                 )
-                artwork_cdn = (
-                    f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/forms/{pokemon_id}.png"
-                )
-                local_sprite = f"sprites/forms/{pokemon_id}.png"
-                self.form_sprite_jobs[pokemon_id] = (
-                    remote_sprite,
-                    remote_artwork or remote_sprite,
-                )
+                move_sets = {}
+                for version_group in ALL_VERSION_GROUPS:
+                    move_set = fetch_move_set_for_version_group(
+                        self,
+                        pokemon.get("moves", []),
+                        version_group,
+                    )
+                    if any(move_set.values()):
+                        move_sets[version_group] = move_set
 
-            entry: dict[str, Any] = {
-                "key": pokemon_slug,
-                "pokemonId": pokemon_id,
-                "nameEn": capitalize(pokemon_slug),
-                "nameZh": name_zh,
-                "kind": kind,
-                "isDefault": is_default,
-                "isBattleOnly": is_battle_only,
-                "isMega": is_mega,
-                "isCosmetic": cosmetic_only,
-                "types": types,
-                "heightDm": pokemon.get("height", 0),
-                "weightHg": pokemon.get("weight", 0),
-                "spriteUrl": sprite_cdn,
-                "artworkUrl": artwork_cdn,
-                "localSpritePath": local_sprite,
-                "baseStats": parse_base_stats(pokemon.get("stats", [])),
-                "typeMultipliers": multipliers,
-                "stabSuperEffective": stab,
-                "abilities": abilities,
-                "obtainLocationsByGame": obtain_by_game,
-                "moveSets": move_sets,
-            }
-            if form_meta.get("id") is not None:
-                entry["formId"] = form_meta["id"]
-            if form_name_zh:
-                entry["formNameZh"] = form_name_zh
-            version_group = (form_meta.get("version_group") or {}).get("name")
-            if version_group:
-                entry["introducedVersionGroup"] = version_group
-            forms.append(entry)
-            search_terms.update(
-                form_search_terms(
-                    species["name"],
-                    pokemon_slug,
-                    name_zh,
-                    form_name_zh,
-                )
+            obtain_by_game = filter_form_obtain_locations(
+                obtain_locations_by_game,
+                pokemon_id,
+                entity_has_multiple_forms=entity_has_multiple_forms,
+            )
+            obtain_by_version = filter_form_obtain_locations(
+                obtain_locations_by_version,
+                pokemon_id,
+                entity_has_multiple_forms=entity_has_multiple_forms,
             )
 
-        forms.sort(key=lambda item: (not item["isDefault"], item["pokemonId"]))
-        return forms, sorted(search_terms)
+            for form_index, form_ref in enumerate(form_refs):
+                form_url = str(form_ref.get("url") or "")
+                form_meta = self._get_json(form_url) if form_url else {}
+                record_key = str(
+                    form_meta.get("name") or form_ref.get("name") or pokemon_slug
+                )
+                record_is_default = variety_is_default and bool(
+                    form_meta.get("is_default", form_index == 0)
+                )
+                form_name_zh = localized_optional_name(
+                    form_meta.get("form_names", [])
+                )
+                full_name_zh = localized_optional_name(form_meta.get("names", []))
+                name_zh = form_label_zh(
+                    species_name_zh,
+                    species["name"],
+                    record_key,
+                    upstream_form_name_zh=full_name_zh or form_name_zh,
+                    is_default=record_is_default,
+                )
+                is_battle_only = bool(form_meta.get("is_battle_only"))
+                is_mega = bool(form_meta.get("is_mega"))
+                cosmetic_only = (
+                    entity_cosmetic_only
+                    or (entity_has_multiple_forms and not record_is_default)
+                ) and not is_battle_only
+                kind = classify_form(
+                    species["name"],
+                    record_key,
+                    is_battle_only=is_battle_only,
+                    is_mega=is_mega,
+                    cosmetic_only=cosmetic_only,
+                )
+
+                form_types = form_meta.get("types") or pokemon.get("types", [])
+                types = extract_types(form_types)
+                multipliers = compute_defensive_multipliers(types, relations)
+                stab = compute_stab_super_effective(types, relations)
+
+                pokemon_sprites = pokemon.get("sprites") or {}
+                form_sprites = form_meta.get("sprites") or {}
+                remote_sprite = sprite_url(form_sprites) or sprite_url(
+                    pokemon_sprites
+                )
+                remote_artwork = official_artwork_url(pokemon_sprites)
+                if entity_has_multiple_forms and not record_is_default:
+                    remote_artwork = remote_sprite
+
+                if record_is_default:
+                    sprite_cdn = (
+                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/{species_id}.png"
+                    )
+                    artwork_cdn = (
+                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/{species_id}.png"
+                    )
+                    local_sprite = f"sprites/{species_id}.png"
+                else:
+                    form_id = form_meta.get("id")
+                    asset_key = str(form_id or f"pokemon-{pokemon_id}-{form_index}")
+                    sprite_cdn = (
+                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/forms/"
+                        f"{asset_key}.png"
+                    )
+                    artwork_cdn = (
+                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/forms/"
+                        f"{asset_key}.png"
+                    )
+                    local_sprite = f"sprites/forms/{asset_key}.png"
+                    self.form_sprite_jobs[asset_key] = (
+                        remote_sprite,
+                        remote_artwork or remote_sprite,
+                    )
+
+                version_group = (form_meta.get("version_group") or {}).get("name")
+                available_groups = sorted(move_sets)
+                obtainable_groups = sorted(
+                    key for key, locations in obtain_by_game.items() if locations
+                )
+                has_battle_data = bool(
+                    types
+                    and parse_base_stats(pokemon.get("stats", []))
+                    and abilities
+                    and move_sets
+                )
+                sources = [
+                    str((variety.get("pokemon") or {}).get("url") or ""),
+                    form_url,
+                ]
+                entry: dict[str, Any] = {
+                    "key": record_key,
+                    "pokemonId": pokemon_id,
+                    "nameEn": capitalize(record_key),
+                    "nameZh": name_zh,
+                    "kind": kind,
+                    "formGroup": kind,
+                    "isDefault": record_is_default,
+                    "isBattleOnly": is_battle_only,
+                    "isMega": is_mega,
+                    "isCosmetic": cosmetic_only,
+                    "availableVersionGroups": available_groups,
+                    "obtainableVersionGroups": obtainable_groups,
+                    "obtainable": not is_battle_only,
+                    "eventOnly": False,
+                    "deprecated": False,
+                    "inheritsFromDefault": cosmetic_only,
+                    "dataCompleteness": "complete" if has_battle_data else "partial",
+                    "sources": sorted(source for source in sources if source),
+                    "types": types,
+                    "heightDm": pokemon.get("height", 0),
+                    "weightHg": pokemon.get("weight", 0),
+                    "spriteUrl": sprite_cdn,
+                    "artworkUrl": artwork_cdn,
+                    "localSpritePath": local_sprite,
+                    "baseStats": parse_base_stats(pokemon.get("stats", [])),
+                    "typeMultipliers": multipliers,
+                    "stabSuperEffective": stab,
+                    "abilities": abilities,
+                    "obtainLocationsByGame": obtain_by_game,
+                    "obtainLocationsByVersion": obtain_by_version,
+                    "moveSets": move_sets,
+                }
+                if form_meta.get("id") is not None:
+                    entry["formId"] = form_meta["id"]
+                if form_name_zh:
+                    entry["formNameZh"] = form_name_zh
+                if version_group:
+                    entry["introducedVersionGroup"] = version_group
+                forms.append(entry)
+                search_terms.update(
+                    form_search_terms(
+                        species["name"],
+                        record_key,
+                        name_zh,
+                        form_name_zh,
+                    )
+                )
+
+        forms.sort(
+            key=lambda item: (
+                not item["isDefault"],
+                item["pokemonId"],
+                item.get("formId") or 0,
+                item["key"],
+            )
+        )
+        return forms, sorted(search_terms), multi_form_pokemon_ids
 
     def build_detail(
         self, pokemon_id: int, cdn_base: str
@@ -778,16 +889,6 @@ class PokeApiBuilder:
         if animated_cdn:
             summary["animatedSpriteUrl"] = animated_cdn
 
-        forms, form_search_terms = self.build_forms(
-            species_id=pokemon_id,
-            species=species,
-            default_pokemon=pokemon,
-            species_name_zh=species_name_zh,
-            cdn_base=cdn_base,
-        )
-        if len(forms) > 1:
-            summary["formSearchTerms"] = form_search_terms
-
         profile = compute_defensive_profile(types, relations)
         multipliers = compute_defensive_multipliers(types, relations)
         stab = compute_stab_super_effective(types, relations)
@@ -815,6 +916,32 @@ class PokeApiBuilder:
             obtain_locations_by_game,
             obtain_locations_by_version,
         ) = fetch_species_obtain_locations(self, species, pokemon_id)
+        (
+            forms,
+            form_search_terms,
+            multi_form_pokemon_ids,
+        ) = self.build_forms(
+            species_id=pokemon_id,
+            species=species,
+            default_pokemon=pokemon,
+            species_name_zh=species_name_zh,
+            cdn_base=cdn_base,
+            default_move_sets=move_sets,
+            default_abilities=abilities,
+            obtain_locations_by_game=obtain_locations_by_game,
+            obtain_locations_by_version=obtain_locations_by_version,
+        )
+        if multi_form_pokemon_ids:
+            obtain_locations_by_game = mark_multi_form_encounters_ambiguous(
+                obtain_locations_by_game,
+                multi_form_pokemon_ids,
+            )
+            obtain_locations_by_version = mark_multi_form_encounters_ambiguous(
+                obtain_locations_by_version,
+                multi_form_pokemon_ids,
+            )
+        if forms:
+            summary["formSearchTerms"] = form_search_terms
         obtain_locations = obtain_locations_by_game.get(
             HGSS_VERSION_GROUP,
             [],
@@ -826,7 +953,7 @@ class PokeApiBuilder:
         hatch_counter = species.get("hatch_counter")
         base_happiness = species.get("base_happiness")
         capture_rate = species.get("capture_rate")
-        ev_yield = parse_ev_yield(species.get("ev_yield", []))
+        ev_yield = parse_ev_yield(pokemon.get("stats", []))
 
         evolution_url = species.get("evolution_chain", {}).get("url")
         evolution = None
@@ -1372,11 +1499,51 @@ def fetch_version_obtain_locations(
     return merge_obtain_location_versions(by_version, versions)
 
 
-def fetch_obtain_locations_by_game(
-    builder: PokeApiBuilder, pokemon_id: int
+def filter_form_obtain_locations(
+    locations_by_key: dict[str, list[dict[str, Any]]],
+    pokemon_id: int,
+    *,
+    entity_has_multiple_forms: bool = False,
 ) -> dict[str, list[dict[str, Any]]]:
-    by_game, _by_version = fetch_obtain_locations(builder, pokemon_id)
-    return by_game
+    """Keep one Pokémon entity's rows plus explicitly ambiguous species rows."""
+    result: dict[str, list[dict[str, Any]]] = {}
+    for key, entries in locations_by_key.items():
+        selected: list[dict[str, Any]] = []
+        for source in entries:
+            if source.get("pokemonId") != pokemon_id and not source.get(
+                "formAmbiguous"
+            ):
+                continue
+            entry = dict(source)
+            if entity_has_multiple_forms and entry.get("pokemonId") == pokemon_id:
+                entry.pop("formKey", None)
+                entry.pop("formSlug", None)
+                entry["formAmbiguous"] = True
+            selected.append(entry)
+        if selected:
+            result[key] = selected
+    return result
+
+
+def mark_multi_form_encounters_ambiguous(
+    locations_by_key: dict[str, list[dict[str, Any]]],
+    pokemon_ids: set[int],
+) -> dict[str, list[dict[str, Any]]]:
+    """Do not claim a cosmetic form when PokeAPI only identifies its entity."""
+    if not pokemon_ids:
+        return locations_by_key
+    result: dict[str, list[dict[str, Any]]] = {}
+    for key, entries in locations_by_key.items():
+        normalized: list[dict[str, Any]] = []
+        for source in entries:
+            entry = dict(source)
+            if entry.get("pokemonId") in pokemon_ids:
+                entry.pop("formKey", None)
+                entry.pop("formSlug", None)
+                entry["formAmbiguous"] = True
+            normalized.append(entry)
+        result[key] = normalized
+    return result
 
 
 def parse_ev_yield(entries: list[dict[str, Any]]) -> dict[str, int]:
@@ -1786,11 +1953,6 @@ def stage_bundle_reference_data(
     }
     write_json(config_dir / "app_config.json", app_config)
 
-    # Keep APK fallback in sync with bundle config.
-    apk_config_dir = ROOT / "flutter" / "assets" / "config"
-    apk_config_dir.mkdir(parents=True, exist_ok=True)
-    write_json(apk_config_dir / "app_config.json", app_config)
-
     return {
         "l10nVersion": l10n_stats.get("l10nVersion", published_at),
         "configVersion": APP_CONFIG_VERSION,
@@ -1898,6 +2060,8 @@ def fetch_items_index(builder: PokeApiBuilder) -> dict[str, dict[str, Any]]:
 
 
 def fetch_version_sprite_url(builder: PokeApiBuilder, icon_slug: str) -> str | None:
+    if icon_slug in {"lza", "champions"}:
+        return None
     version_name = ICON_SLUG_TO_POKEAPI_VERSION.get(icon_slug, icon_slug)
     try:
         detail = builder._get_json(f"/version/{version_name}")
@@ -1956,7 +2120,7 @@ def warm_builder_caches_from_details(
         return
     print("Collecting move/ability caches from detail files…", flush=True)
     move_ids: set[int] = set()
-    ability_jobs: list[tuple[str, bool, int]] = []
+    ability_jobs: set[tuple[str, bool, int]] = set()
     for pokemon_id in range(1, max_id + 1):
         detail_path = details_dir / f"{pokemon_id}.json"
         if not detail_path.exists():
@@ -1968,7 +2132,7 @@ def warm_builder_caches_from_details(
             for ability in payload.get("abilities", []):
                 slug = str(ability.get("nameEn", "")).lower().replace(" ", "-")
                 if slug:
-                    ability_jobs.append(
+                    ability_jobs.add(
                         (slug, ability.get("isHidden", False), pokemon_id)
                     )
 
@@ -1981,12 +2145,50 @@ def warm_builder_caches_from_details(
             print(f"  warn: move #{move_id}: {exc}", file=sys.stderr)
 
     print(f"  abilities to register: {len(ability_jobs)}", flush=True)
-    for slug, is_hidden, pokemon_id in ability_jobs:
+    for slug, is_hidden, pokemon_id in sorted(ability_jobs):
         try:
             fetched = builder.fetch_ability(slug, is_hidden=is_hidden)
             builder.register_ability(fetched, pokemon_id)
         except requests.RequestException as exc:
             print(f"  warn: ability {slug}: {exc}", file=sys.stderr)
+
+
+def hydrate_builder_indexes_from_staging(
+    builder: PokeApiBuilder, staging: Path
+) -> None:
+    """Reuse completed resume indexes instead of refetching moves/abilities."""
+    moves_path = staging / "moves.json"
+    if moves_path.is_file():
+        builder.move_cache.update(
+            {
+                int(move_id): payload
+                for move_id, payload in json.loads(
+                    moves_path.read_text(encoding="utf-8")
+                ).items()
+            }
+        )
+
+    abilities_path = staging / "abilities.json"
+    if not abilities_path.is_file():
+        return
+    for ability_id_raw, payload in json.loads(
+        abilities_path.read_text(encoding="utf-8")
+    ).items():
+        ability_id = int(ability_id_raw)
+        indexed = dict(payload)
+        indexed["pokemonIds"] = list(payload.get("pokemonIds") or [])
+        builder.ability_index[ability_id] = indexed
+        slug = str(payload.get("nameEn") or "").lower().replace(" ", "-")
+        if not slug:
+            continue
+        for is_hidden in (False, True):
+            builder.ability_cache[(slug, is_hidden)] = {
+                "id": ability_id,
+                "nameEn": payload.get("nameEn", slug),
+                "nameZh": payload.get("nameZh", slug),
+                "descriptionZh": payload.get("descriptionZh", ""),
+                "isHidden": is_hidden,
+            }
 
 
 def summaries_from_details(staging: Path, max_id: int) -> list[dict[str, Any]]:
@@ -2067,13 +2269,12 @@ def build_bundle(
     max_id: int,
     delay_s: float,
     resume: bool = False,
+    selected_ids: tuple[int, ...] | None = None,
 ) -> None:
     cdn_base = cdn_base.rstrip("/")
     staging = output_dir / "staging"
     upload_bundle = output_dir / "upload" / BUNDLE_CDN_PREFIX
     artwork_staging = output_dir / "artwork_staging"
-
-    import shutil
 
     if resume and staging.exists():
         print(f"Resuming into existing staging at {staging}")
@@ -2094,6 +2295,8 @@ def build_bundle(
 
     builder = PokeApiBuilder(delay_s=delay_s)
     session = builder.session
+    if resume:
+        hydrate_builder_indexes_from_staging(builder, staging)
 
     if not (staging / "types.json").exists():
         print("Loading type relations…")
@@ -2157,11 +2360,12 @@ def build_bundle(
         print("Downloading game icons…")
         download_game_icons(builder, session, staging)
 
-    for pokemon_id in range(min_id, max_id + 1):
+    build_ids = selected_ids or tuple(range(min_id, max_id + 1))
+    for build_index, pokemon_id in enumerate(build_ids, start=1):
         detail_path = staging / "details" / f"{pokemon_id}.json"
         if resume and detail_path.exists():
             continue
-        print(f"#{pokemon_id}/{max_id}…", flush=True)
+        print(f"#{pokemon_id} ({build_index}/{len(build_ids)})…", flush=True)
         summary, detail, sprite_remote = builder.build_detail(pokemon_id, cdn_base)
         write_json(detail_path, detail)
 
@@ -2217,6 +2421,12 @@ def build_bundle(
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     reference_meta = stage_bundle_reference_data(staging, published_at=published_at)
 
+    # Offline archives must contain the same nested form artwork that the
+    # upload tree exposes separately. Older bundles omitted artwork entirely;
+    # keeping it under staging makes tar inclusion directly auditable.
+    if artwork_staging.is_dir():
+        shutil.copytree(artwork_staging, staging / "artwork", dirs_exist_ok=True)
+
     games_payload = json.loads((staging / "games.json").read_text(encoding="utf-8"))
     natures_payload = json.loads((staging / "natures.json").read_text(encoding="utf-8"))
     egg_groups_payload = json.loads(
@@ -2233,6 +2443,10 @@ def build_bundle(
         "downloadedAt": published_at,
         "pokemonCount": len(summaries),
         "formCount": form_count,
+        "schemaFeatures": {
+            "pokemonForms": 2,
+            "encounterFormIdentity": 3,
+        },
         "moveCount": len(moves_payload),
         "abilityCount": len(abilities_payload),
         "gameCount": len(games_payload),
@@ -2250,8 +2464,6 @@ def build_bundle(
     create_zst_tar(staging, archive_path)
 
     # Copy to upload/{BUNDLE_CDN_PREFIX} (v2 clients keep using prior upload/v2 builds)
-    import shutil
-
     if upload_bundle.exists():
         shutil.rmtree(upload_bundle.parent)
     upload_bundle.mkdir(parents=True)
@@ -2287,6 +2499,10 @@ def build_bundle(
         "bundleVersion": BUNDLE_VERSION,
         "pokemonCount": len(summaries),
         "formCount": form_count,
+        "schemaFeatures": {
+            "pokemonForms": 2,
+            "encounterFormIdentity": 3,
+        },
         "archiveUrl": f"{cdn_base}/{BUNDLE_CDN_PREFIX}/bundle.tar.zst",
         "archiveSha256": archive_sha,
         "archiveSizeBytes": (upload_bundle / "bundle.tar.zst").stat().st_size,
@@ -2321,6 +2537,10 @@ def main() -> None:
     parser.add_argument("--min-id", type=int, default=1)
     parser.add_argument("--max-id", type=int, default=TITODEX_MAX_NATIONAL_ID)
     parser.add_argument(
+        "--ids",
+        help="Comma-separated non-contiguous species IDs for a smoke build",
+    )
+    parser.add_argument(
         "--delay",
         type=float,
         default=0.35,
@@ -2332,6 +2552,17 @@ def main() -> None:
         help="Continue into existing staging/; skip completed detail JSON files",
     )
     args = parser.parse_args()
+    selected_ids = None
+    if args.ids:
+        selected_ids = tuple(
+            sorted({int(value.strip()) for value in args.ids.split(",") if value.strip()})
+        )
+        if not selected_ids:
+            parser.error("--ids must contain at least one species ID")
+        if selected_ids[0] < 1 or selected_ids[-1] > TITODEX_MAX_NATIONAL_ID:
+            parser.error(f"--ids must stay within 1..{TITODEX_MAX_NATIONAL_ID}")
+        args.min_id = selected_ids[0]
+        args.max_id = selected_ids[-1]
 
     build_bundle(
         cdn_base=args.cdn_base,
@@ -2340,6 +2571,7 @@ def main() -> None:
         max_id=args.max_id,
         delay_s=args.delay,
         resume=args.resume,
+        selected_ids=selected_ids,
     )
 
 

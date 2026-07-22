@@ -26,6 +26,9 @@ void main() {
     heightDm: 4,
     weightHg: 110,
     baseStats: paldeanStats,
+    typeMultipliers: {'water': 2, 'grass': 0.25, 'electric': 0},
+    dataCompleteness: 'complete',
+    sources: ['https://pokeapi.co/api/v2/pokemon/10253/'],
     abilities: [
       PokemonAbility(
         nameEn: 'Poison-point',
@@ -45,6 +48,8 @@ void main() {
     expect(restored.types, ['poison', 'ground']);
     expect(restored.baseStats?.total, paldeanStats.total);
     expect(restored.abilities.single.nameZh, '毒刺');
+    expect(restored.dataCompleteness, 'complete');
+    expect(restored.sources, hasLength(1));
   });
 
   test(
@@ -75,6 +80,9 @@ void main() {
       expect(selected.summary.types, ['poison', 'ground']);
       expect(selected.weightHg, 110);
       expect(selected.abilities.single.nameZh, '毒刺');
+      expect(selected.weaknesses, ['水']);
+      expect(selected.resistances, ['草']);
+      expect(selected.immunities, ['电']);
     },
   );
 
@@ -89,6 +97,94 @@ void main() {
     final restored = PokemonSummary.fromJson(summary.toJson());
     expect(restored.formSearchTerms, contains('typhlosion-hisui'));
     expect(restored.formSearchTerms, contains('火暴兽（洗翠的样子）'));
+  });
+
+  test('default and regional forms keep separate exact-version locations', () {
+    const defaultForm = PokemonFormDetail(
+      key: 'wooper',
+      pokemonId: 194,
+      nameEn: 'Wooper',
+      nameZh: '乌波',
+      kind: PokemonFormKind.form,
+      isDefault: true,
+      isBattleOnly: false,
+      isMega: false,
+      isCosmetic: false,
+      types: ['water', 'ground'],
+      heightDm: 4,
+      weightHg: 85,
+      obtainLocationsByVersion: {
+        'crystal': [
+          ObtainLocationEntry(
+            areaSlug: 'route-32-area',
+            areaLabelZh: '32号道路',
+            pokemonId: 194,
+            formKey: 'wooper',
+          ),
+        ],
+      },
+    );
+    const paldeaWithLocation = PokemonFormDetail(
+      key: 'wooper-paldea',
+      pokemonId: 10253,
+      nameEn: 'Wooper-paldea',
+      nameZh: '乌波（帕底亚的样子）',
+      kind: PokemonFormKind.regional,
+      isDefault: false,
+      isBattleOnly: false,
+      isMega: false,
+      isCosmetic: false,
+      types: ['poison', 'ground'],
+      heightDm: 4,
+      weightHg: 110,
+      obtainLocationsByVersion: {
+        'scarlet': [
+          ObtainLocationEntry(
+            areaSlug: 'south-province-area-one',
+            areaLabelZh: '南第1区',
+            pokemonId: 10253,
+            formKey: 'wooper-paldea',
+          ),
+        ],
+      },
+    );
+    const detail = PokemonDetail(
+      summary: PokemonSummary(
+        id: 194,
+        nameEn: 'Wooper',
+        nameZh: '乌波',
+        types: ['water', 'ground'],
+      ),
+      genusZh: '水鱼宝可梦',
+      heightDm: 4,
+      weightHg: 85,
+      weaknesses: [],
+      resistances: [],
+      immunities: [],
+      stabSuperEffective: [],
+      evolutionChain: null,
+      obtainLocationsByVersion: {
+        'crystal': [
+          ObtainLocationEntry(
+            areaSlug: 'route-32-area',
+            areaLabelZh: '32号道路',
+          ),
+        ],
+        'scarlet': [
+          ObtainLocationEntry(
+            areaSlug: 'south-province-area-one',
+            areaLabelZh: '南第1区',
+          ),
+        ],
+      },
+      forms: [defaultForm, paldeaWithLocation],
+    );
+
+    expect(detail.forForm(defaultForm).obtainLocationsByVersion.keys, ['crystal']);
+    expect(
+      detail.forForm(paldeaWithLocation).obtainLocationsByVersion.keys,
+      ['scarlet'],
+    );
   });
 
   test('incomplete battle form never borrows misleading default data', () {
@@ -112,6 +208,7 @@ void main() {
         nameEn: 'Dragonite',
         nameZh: '快龙',
         types: ['dragon', 'flying'],
+        spriteUrl: 'https://example.invalid/dragonite.png',
       ),
       genusZh: '龙宝可梦',
       heightDm: 22,
@@ -132,12 +229,30 @@ void main() {
       abilities: [
         PokemonAbility(nameEn: 'Inner-focus', nameZh: '精神力', descriptionZh: ''),
       ],
+      abilitiesByGame: {
+        'scarlet-violet': [
+          PokemonAbility(
+            nameEn: 'Inner-focus',
+            nameZh: '精神力',
+            descriptionZh: '',
+          ),
+        ],
+      },
+      obtainLocationsByVersion: {
+        'violet': [
+          ObtainLocationEntry(areaSlug: 'test', areaLabelZh: '测试地点'),
+        ],
+      },
     );
 
     final selected = detail.forForm(unknownMega);
     expect(selected.baseStats, isNull);
     expect(selected.abilities, isEmpty);
     expect(selected.obtainLocationsByGame, isEmpty);
+    expect(selected.obtainLocationsByVersion, isEmpty);
     expect(selected.moveSets, isEmpty);
+    expect(selected.abilitiesByGame, isEmpty);
+    expect(selected.evolutionChain, isNull);
+    expect(selected.summary.spriteUrl, isNull);
   });
 }

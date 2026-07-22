@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-07-22",
+  "forms": [],
+  "pendingForms": [],
+  "resolvedByPokeApi": [
+    "dragonite-mega",
+    "victreebel-mega",
+    "hawlucha-mega",
+    "malamar-mega",
+    "chesnaught-mega",
+    "delphox-mega",
+    "greninja-mega",
+    "meganium-mega",
+    "emboar-mega",
+    "feraligatr-mega",
+    "eelektross-mega",
+    "raichu-mega-x",
+    "raichu-mega-y",
+    "chimecho-mega",
+    "baxcalibur-mega",
+    "zeraora-mega",
+    "lucario-mega-z",
+    "garchomp-mega-z"
+  ],
+  "sources": [
+    {
+      "url": "https://legends.pokemon.com/en-us/story-world/pokemon",
+      "scope": ["base-game-form-existence"]
+    },
+    {
+      "url": "https://legends.pokemon.com/en-us/dlc",
+      "scope": ["mega-dimension-form-existence"]
+    }
+  ]
+}
