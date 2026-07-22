@@ -361,6 +361,11 @@ class DexRepository {
       if (entry.nameZh.contains(trimmed)) {
         return true;
       }
+      if (entry.formSearchTerms.any(
+        (term) => term.toLowerCase().contains(lower) || term.contains(trimmed),
+      )) {
+        return true;
+      }
       if (entry.types.any((type) => typeNameZh(type).contains(trimmed))) {
         return true;
       }
