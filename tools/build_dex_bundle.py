@@ -28,6 +28,7 @@ from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+ENCOUNTER_OVERLAY_DIR = ROOT / "data" / "encounters"
 
 try:
     from location_zh_resolver import resolve_location_area_zh  # noqa: E402
@@ -76,7 +77,8 @@ class GameEdition:
 GAME_EDITIONS: tuple[GameEdition, ...] = (
     GameEdition(
         "rgb", "红/绿/蓝", "red-blue", ("red", "blue"),
-        frozenset({"red", "blue"}), "red-blue",
+        frozenset({"red", "blue", "red-japan", "green-japan", "blue-japan"}),
+        "red-blue",
     ),
     GameEdition(
         "yellow", "皮卡丘", "yellow", ("yellow",),
@@ -149,7 +151,11 @@ GAME_EDITIONS: tuple[GameEdition, ...] = (
     ),
     GameEdition(
         "swsh", "剑/盾", "sword-shield", ("sword", "shield"),
-        frozenset({"sword", "shield"}), "sword-shield",
+        frozenset({
+            "sword", "shield",
+            "the-isle-of-armor-sword", "the-isle-of-armor-shield",
+            "the-crown-tundra-sword", "the-crown-tundra-shield",
+        }), "sword-shield",
     ),
     GameEdition(
         "bdsp", "晶灿钻石/明亮珍珠", "brilliant-diamond-shining-pearl",
@@ -163,15 +169,27 @@ GAME_EDITIONS: tuple[GameEdition, ...] = (
     ),
     GameEdition(
         "sv", "朱/紫", "scarlet-violet", ("scarlet", "violet"),
-        frozenset({"scarlet", "violet"}), "scarlet-violet",
+        frozenset({
+            "scarlet", "violet",
+            "the-teal-mask-scarlet", "the-teal-mask-violet",
+            "the-indigo-disk-scarlet", "the-indigo-disk-violet",
+        }), "scarlet-violet",
     ),
-    GameEdition("lza", "传说 Z-A", None, (), frozenset(), "lza", "sv"),
-    GameEdition("champions", "Champions", None, (), frozenset(), "champions", "sv"),
+    GameEdition(
+        "lza", "传说 Z-A", "legends-za", ("legends-za", "mega-dimension"),
+        frozenset({"legends-za", "mega-dimension"}), "lza", "sv",
+    ),
+    GameEdition(
+        "champions", "Champions", "champions", ("champions",),
+        frozenset({"champions"}), "champions", "sv",
+    ),
 )
 
 ALL_VERSION_GROUPS = tuple(
     edition.version_group for edition in GAME_EDITIONS if edition.version_group
 )
+
+_ENCOUNTER_OVERLAYS: dict[str, dict[str, list[dict[str, Any]]]] | None = None
 
 ICON_SLUG_TO_POKEAPI_VERSION = {
     "red-blue": "red",
@@ -191,6 +209,8 @@ ICON_SLUG_TO_POKEAPI_VERSION = {
     "brilliant-diamond-shining-pearl": "brilliant-diamond",
     "legends-arceus": "legends-arceus",
     "scarlet-violet": "scarlet",
+    "legends-za": "legends-za",
+    "champions": "champions",
     "yellow": "yellow",
     "crystal": "crystal",
     "emerald": "emerald",
@@ -307,7 +327,28 @@ ENCOUNTER_AREA_LABELS_ZH = {
     "dark-cave-area": "黑暗洞窟",
     "union-cave-1f": "连接洞窟",
     "slowpoke-well-1f": "呆呆兽之井",
+    "kalos-berry-fields-area": "树果园（卡洛斯）",
+    "unova-roaming-area": "合众地区（游走）",
 }
+
+
+def corrected_pokeapi_encounter_slug(
+    version: str, pokemon_id: int | None, slug: str
+) -> str | None:
+    """Correct a small set of verified semantic errors in PokeAPI encounters."""
+    if (
+        slug == "team-flare-secret-hq-area"
+        and (version, pokemon_id) in {("black", 641), ("white", 642)}
+    ):
+        return "unova-roaming-area"
+    if (
+        slug == "new-mauville-area"
+        and version in {"sun", "moon"}
+        and pokemon_id in {100, 101}
+    ):
+        # Voltorb/Electrode are not wild or Island Scan encounters in Sun/Moon.
+        return None
+    return slug
 
 TYPE_NAMES = [
     "normal",
@@ -605,12 +646,13 @@ class PokeApiBuilder:
             move_sets[HGSS_VERSION_GROUP] = move_set
 
         abilities = self.fetch_abilities(pokemon.get("abilities", []), pokemon_id)
-        obtain_locations_by_game = fetch_obtain_locations_by_game(self, pokemon_id)
+        (
+            obtain_locations_by_game,
+            obtain_locations_by_version,
+        ) = fetch_species_obtain_locations(self, species, pokemon_id)
         obtain_locations = obtain_locations_by_game.get(
             HGSS_VERSION_GROUP,
-            fetch_version_obtain_locations(
-                self, pokemon_id, HGSS_ENCOUNTER_VERSIONS
-            ),
+            [],
         )
         gender_female = gender_female_percent(species.get("gender_rate"))
         egg_groups = [
@@ -642,6 +684,7 @@ class PokeApiBuilder:
             "abilities": abilities,
             "obtainLocations": obtain_locations,
             "obtainLocationsByGame": obtain_locations_by_game,
+            "obtainLocationsByVersion": obtain_locations_by_version,
             "eggGroups": egg_groups,
         }
         if base_happiness is not None:
@@ -795,71 +838,310 @@ def ability_description_zh(detail: dict[str, Any]) -> str:
     return ""
 
 
-def fetch_version_obtain_locations(
-    builder: PokeApiBuilder,
-    pokemon_id: int,
-    versions: set[str],
-) -> list[dict[str, Any]]:
-    try:
-        encounters = builder._get_json_list(f"/pokemon/{pokemon_id}/encounters")
-    except requests.RequestException:
-        return []
-
-    merged: dict[str, dict[str, Any]] = {}
+def parse_obtain_locations_by_version(
+    encounters: list[dict[str, Any]],
+    *,
+    pokemon_id: int | None = None,
+    species_id: int | None = None,
+    form_slug: str | None = None,
+    is_default_form: bool | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """Preserve every PokeAPI version and form identity from one response."""
+    by_version: dict[str, dict[str, dict[str, Any]]] = {}
     for encounter in encounters:
-        area_url = (encounter.get("location_area") or {}).get("url")
+        area = encounter.get("location_area") or {}
+        area_url = area.get("url")
         if not area_url:
             continue
-        raw_slug = area_url.rstrip("/").split("/")[-1]
+        raw_slug = area.get("name") or area_url.rstrip("/").split("/")[-1]
         if _LOCATION_AREA_CATALOG is None:
             encounter_area_label_zh(raw_slug)
         slug = raw_slug
         if slug.isdigit():
             slug = _LOCATION_AREA_ID_TO_SLUG.get(slug, slug)
-        min_level = 100
-        max_chance = 0
-        in_scope = False
 
         for detail in encounter.get("version_details", []):
             version = detail.get("version", {}).get("name", "")
-            if version not in versions:
+            if not version:
                 continue
-            in_scope = True
-            chance = detail.get("max_chance") or 0
-            if chance > max_chance:
-                max_chance = chance
+            corrected_slug = corrected_pokeapi_encounter_slug(
+                version, pokemon_id, slug
+            )
+            if corrected_slug is None:
+                continue
+            entry_slug = corrected_slug
+            min_levels: list[int] = []
+            max_levels: list[int] = []
+            methods: set[str] = set()
+            conditions: set[str] = set()
             for encounter_detail in detail.get("encounter_details", []):
-                level = encounter_detail.get("min_level") or 100
-                if level < min_level:
-                    min_level = level
+                min_level = encounter_detail.get("min_level")
+                max_level = encounter_detail.get("max_level")
+                if isinstance(min_level, int) and min_level > 0:
+                    min_levels.append(min_level)
+                if isinstance(max_level, int) and max_level > 0:
+                    max_levels.append(max_level)
+                method = (encounter_detail.get("method") or {}).get("name")
+                if method:
+                    methods.add(method)
+                for condition in encounter_detail.get("condition_values", []):
+                    condition_slug = condition.get("name")
+                    if condition_slug:
+                        conditions.add(condition_slug)
 
-        if not in_scope:
+            entry: dict[str, Any] = {
+                "areaSlug": entry_slug,
+                "areaLabelZh": encounter_area_label_zh(entry_slug),
+                "maxChance": detail.get("max_chance") or 0,
+                "rateKind": "percentage",
+                "rateValue": detail.get("max_chance") or 0,
+                "versions": [version],
+            }
+            if pokemon_id is not None:
+                entry["pokemonId"] = pokemon_id
+            if species_id is not None:
+                entry["speciesId"] = species_id
+            if form_slug:
+                entry["formSlug"] = form_slug
+            if is_default_form is not None:
+                entry["isDefaultForm"] = is_default_form
+            if min_levels:
+                entry["minLevel"] = min(min_levels)
+            if max_levels:
+                entry["maxLevel"] = max(max_levels)
+            if methods:
+                entry["methods"] = sorted(methods)
+            if conditions:
+                entry["conditions"] = sorted(conditions)
+            if entry_slug == "unova-roaming-area":
+                entry["conditions"] = sorted(
+                    set(entry.get("conditions") or []) | {"roaming"}
+                )
+            by_version.setdefault(version, {})[entry_slug] = entry
+
+    return {
+        version: sorted(entries.values(), key=lambda item: item["areaLabelZh"])
+        for version, entries in sorted(by_version.items())
+    }
+
+
+def merge_obtain_location_versions(
+    by_version: dict[str, list[dict[str, Any]]],
+    versions: set[str] | frozenset[str],
+) -> list[dict[str, Any]]:
+    """Merge paired editions while retaining which exact versions contain an area."""
+    merged: dict[str, dict[str, Any]] = {}
+    for version in sorted(versions):
+        for source in by_version.get(version, []):
+            slug = source["areaSlug"]
+            identity = f"{source.get('pokemonId', '')}:{source.get('formSlug', '')}:{slug}"
+            current = merged.get(identity)
+            if current is None:
+                current = dict(source)
+                current["versions"] = list(source.get("versions") or [version])
+                merged[identity] = current
+                continue
+            current["maxChance"] = max(
+                int(current.get("maxChance") or 0),
+                int(source.get("maxChance") or 0),
+            )
+            if current.get("rateKind") == source.get("rateKind"):
+                rate_values = [
+                    value
+                    for value in (current.get("rateValue"), source.get("rateValue"))
+                    if isinstance(value, (int, float))
+                ]
+                if rate_values:
+                    current["rateValue"] = max(rate_values)
+            for key, chooser in (("minLevel", min), ("maxLevel", max)):
+                values = [
+                    value
+                    for value in (current.get(key), source.get(key))
+                    if isinstance(value, int)
+                ]
+                if values:
+                    current[key] = chooser(values)
+            for key in ("versions", "methods", "conditions"):
+                current[key] = sorted(
+                    set(current.get(key) or []) | set(source.get(key) or [])
+                )
+    return sorted(merged.values(), key=lambda item: item["areaLabelZh"])
+
+
+def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
+    """Load attributed per-version encounter files for gaps in PokeAPI."""
+    global _ENCOUNTER_OVERLAYS
+    if _ENCOUNTER_OVERLAYS is not None:
+        return _ENCOUNTER_OVERLAYS
+    overlays: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    if not ENCOUNTER_OVERLAY_DIR.is_dir():
+        _ENCOUNTER_OVERLAYS = overlays
+        return overlays
+    for path in sorted(ENCOUNTER_OVERLAY_DIR.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        version = str(payload.get("version") or "")
+        source = payload.get("source") or {}
+        if not version or not all(source.get(key) for key in ("name", "url", "license")):
+            raise ValueError(
+                f"{path}: encounter overlay requires version and attributed "
+                "source name/url/license"
+            )
+        species_entries: dict[str, list[dict[str, Any]]] = {}
+        for pokemon_id, entries in (payload.get("encounters") or {}).items():
+            normalized: list[dict[str, Any]] = []
+            for raw in entries:
+                entry = dict(raw)
+                slug = str(entry.get("areaSlug") or "")
+                if not slug:
+                    raise ValueError(f"{path}: Pokémon {pokemon_id} has blank areaSlug")
+                entry.setdefault("areaLabelZh", encounter_area_label_zh(slug))
+                entry.setdefault("maxChance", 0)
+                entry.setdefault("rateKind", "percentage")
+                entry.setdefault("rateValue", entry.get("maxChance", 0))
+                entry.setdefault("pokemonId", int(pokemon_id))
+                entry["versions"] = [version]
+                normalized.append(entry)
+            species_entries[str(pokemon_id)] = normalized
+        overlays[version] = species_entries
+    _ENCOUNTER_OVERLAYS = overlays
+    return overlays
+
+
+def apply_encounter_overlays(
+    by_version: dict[str, list[dict[str, Any]]],
+    pokemon_id: int,
+    *,
+    species_id: int | None = None,
+    form_slug: str | None = None,
+    is_default_form: bool | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """Overlay attributed modern-game rows, replacing duplicate version/area rows."""
+    result = {version: list(entries) for version, entries in by_version.items()}
+    for version, species_entries in load_encounter_overlays().items():
+        overlay_entries = species_entries.get(str(pokemon_id))
+        if not overlay_entries:
             continue
+        for entry in overlay_entries:
+            if species_id is not None:
+                entry.setdefault("speciesId", species_id)
+            if form_slug:
+                entry.setdefault("formSlug", form_slug)
+            if is_default_form is not None:
+                entry.setdefault("isDefaultForm", is_default_form)
+        merged = {entry["areaSlug"]: entry for entry in result.get(version, [])}
+        merged.update({entry["areaSlug"]: entry for entry in overlay_entries})
+        result[version] = sorted(
+            merged.values(), key=lambda item: item["areaLabelZh"]
+        )
+    return result
 
-        entry: dict[str, Any] = {
-            "areaSlug": slug,
-            "areaLabelZh": encounter_area_label_zh(slug),
-            "maxChance": max_chance,
+
+def fetch_obtain_locations(
+    builder: PokeApiBuilder,
+    pokemon_id: int,
+    *,
+    species_id: int | None = None,
+    form_slug: str | None = None,
+    is_default_form: bool | None = None,
+) -> tuple[
+    dict[str, list[dict[str, Any]]],
+    dict[str, list[dict[str, Any]]],
+]:
+    """Fetch the encounter endpoint once, then derive group and exact-version maps."""
+    try:
+        encounters = builder._get_json_list(f"/pokemon/{pokemon_id}/encounters")
+    except requests.RequestException:
+        encounters = []
+    by_version = apply_encounter_overlays(
+        parse_obtain_locations_by_version(
+            encounters,
+            pokemon_id=pokemon_id,
+            species_id=species_id,
+            form_slug=form_slug,
+            is_default_form=is_default_form,
+        ),
+        pokemon_id,
+        species_id=species_id,
+        form_slug=form_slug,
+        is_default_form=is_default_form,
+    )
+    by_game = {
+        edition.version_group: merge_obtain_location_versions(
+            by_version, edition.encounter_versions
+        )
+        for edition in GAME_EDITIONS
+        if edition.version_group and edition.encounter_versions
+    }
+    return by_game, by_version
+
+
+def fetch_species_obtain_locations(
+    builder: PokeApiBuilder,
+    species: dict[str, Any],
+    default_pokemon_id: int,
+) -> tuple[
+    dict[str, list[dict[str, Any]]],
+    dict[str, list[dict[str, Any]]],
+]:
+    """Collect encounters for every PokeAPI variety belonging to one species."""
+    species_id = int(species.get("id") or default_pokemon_id)
+    varieties = species.get("varieties") or [
+        {
+            "is_default": True,
+            "pokemon": {
+                "name": str(default_pokemon_id),
+                "url": f"{POKEAPI_BASE}/pokemon/{default_pokemon_id}/",
+            },
         }
-        if min_level != 100:
-            entry["minLevel"] = min_level
-        merged[slug] = entry
+    ]
+    combined_by_version: dict[str, list[dict[str, Any]]] = {}
+    seen_pokemon_ids: set[int] = set()
+    for variety in varieties:
+        pokemon_ref = variety.get("pokemon") or {}
+        url = str(pokemon_ref.get("url") or "")
+        try:
+            pokemon_id = id_from_url(url) if url else default_pokemon_id
+        except (TypeError, ValueError):
+            continue
+        if pokemon_id in seen_pokemon_ids:
+            continue
+        seen_pokemon_ids.add(pokemon_id)
+        form_slug = str(pokemon_ref.get("name") or pokemon_id)
+        is_default = bool(variety.get("is_default"))
+        _by_game, by_version = fetch_obtain_locations(
+            builder,
+            pokemon_id,
+            species_id=species_id,
+            form_slug=form_slug,
+            is_default_form=is_default,
+        )
+        for version, entries in by_version.items():
+            combined_by_version.setdefault(version, []).extend(entries)
 
-    results = sorted(merged.values(), key=lambda item: item["areaLabelZh"])
-    return results
+    by_game = {
+        edition.version_group: merge_obtain_location_versions(
+            combined_by_version, edition.encounter_versions
+        )
+        for edition in GAME_EDITIONS
+        if edition.version_group and edition.encounter_versions
+    }
+    return by_game, combined_by_version
+
+
+def fetch_version_obtain_locations(
+    builder: PokeApiBuilder,
+    pokemon_id: int,
+    versions: set[str],
+) -> list[dict[str, Any]]:
+    """Backward-compatible helper for callers that need one version subset."""
+    _by_game, by_version = fetch_obtain_locations(builder, pokemon_id)
+    return merge_obtain_location_versions(by_version, versions)
 
 
 def fetch_obtain_locations_by_game(
     builder: PokeApiBuilder, pokemon_id: int
 ) -> dict[str, list[dict[str, Any]]]:
-    by_game: dict[str, list[dict[str, Any]]] = {}
-    for edition in GAME_EDITIONS:
-        if not edition.version_group or not edition.encounter_versions:
-            continue
-        locations = fetch_version_obtain_locations(
-            builder, pokemon_id, edition.encounter_versions
-        )
-        by_game[edition.version_group] = locations
+    by_game, _by_version = fetch_obtain_locations(builder, pokemon_id)
     return by_game
 
 

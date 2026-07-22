@@ -7,10 +7,7 @@ import '../../l10n/zh_catalog.dart';
 
 const hgssVersionGroup = 'heartgold-soulsilver';
 
-const johtoPokedexNames = <String>{
-  'original-johto',
-  'updated-johto',
-};
+const johtoPokedexNames = <String>{'original-johto', 'updated-johto'};
 
 /// HeartGold / SoulSilver first — primary game scope for TitoDex.
 const hgssFlavorVersions = <String>[
@@ -26,6 +23,9 @@ const maxBaseStatValue = 255;
 const flavorVersionLabelsZh = <String, String>{
   'red': '红',
   'blue': '蓝',
+  'red-japan': '红（日版）',
+  'green-japan': '绿（日版）',
+  'blue-japan': '蓝（日版）',
   'yellow': '皮卡丘',
   'gold': '金',
   'silver': '银',
@@ -56,12 +56,64 @@ const flavorVersionLabelsZh = <String, String>{
   'lets-go-eevee': "Let's Go 伊布",
   'sword': '剑',
   'shield': '盾',
+  'the-isle-of-armor-sword': '剑·铠之孤岛',
+  'the-isle-of-armor-shield': '盾·铠之孤岛',
+  'the-crown-tundra-sword': '剑·冠之雪原',
+  'the-crown-tundra-shield': '盾·冠之雪原',
   'brilliant-diamond': '晶灿钻石',
   'shining-pearl': '明亮珍珠',
   'legends-arceus': '传说阿尔宙斯',
   'scarlet': '朱',
   'violet': '紫',
+  'the-teal-mask-scarlet': '朱·碧之假面',
+  'the-teal-mask-violet': '紫·碧之假面',
+  'the-indigo-disk-scarlet': '朱·蓝之圆盘',
+  'the-indigo-disk-violet': '紫·蓝之圆盘',
+  'legends-za': '传说 Z-A',
+  'mega-dimension': '超次元爆涌',
+  'champions': 'Champions',
   'zh-reference': '心金·魂银（中文参考）',
+};
+
+/// Exact PokeAPI versions represented by each combined game-edition key.
+const encounterVersionsByVersionGroup = <String, List<String>>{
+  'red-blue': ['red', 'blue', 'red-japan', 'green-japan', 'blue-japan'],
+  'yellow': ['yellow'],
+  'gold-silver': ['gold', 'silver'],
+  'crystal': ['crystal'],
+  'ruby-sapphire': ['ruby', 'sapphire'],
+  'emerald': ['emerald'],
+  'firered-leafgreen': ['firered', 'leafgreen'],
+  'diamond-pearl': ['diamond', 'pearl'],
+  'platinum': ['platinum'],
+  'heartgold-soulsilver': ['heartgold', 'soulsilver'],
+  'black-white': ['black', 'white'],
+  'black-2-white-2': ['black-2', 'white-2'],
+  'x-y': ['x', 'y'],
+  'omega-ruby-alpha-sapphire': ['omega-ruby', 'alpha-sapphire'],
+  'sun-moon': ['sun', 'moon'],
+  'ultra-sun-ultra-moon': ['ultra-sun', 'ultra-moon'],
+  'lets-go-pikachu-lets-go-eevee': ['lets-go-pikachu', 'lets-go-eevee'],
+  'sword-shield': [
+    'sword',
+    'shield',
+    'the-isle-of-armor-sword',
+    'the-isle-of-armor-shield',
+    'the-crown-tundra-sword',
+    'the-crown-tundra-shield',
+  ],
+  'brilliant-diamond-shining-pearl': ['brilliant-diamond', 'shining-pearl'],
+  'legends-arceus': ['legends-arceus'],
+  'scarlet-violet': [
+    'scarlet',
+    'violet',
+    'the-teal-mask-scarlet',
+    'the-teal-mask-violet',
+    'the-indigo-disk-scarlet',
+    'the-indigo-disk-violet',
+  ],
+  'legends-za': ['legends-za', 'mega-dimension'],
+  'champions': ['champions'],
 };
 
 bool flavorVersionHasLabel(String version) =>
@@ -87,6 +139,8 @@ const encounterAreaLabelsZh = <String, String>{
   'dark-cave-area': '黑暗洞窟',
   'union-cave-1f': '连接洞窟',
   'slowpoke-well-1f': '呆呆兽之井',
+  'kalos-berry-fields-area': '树果园（卡洛斯）',
+  'unova-roaming-area': '合众地区（游走）',
 };
 
 String encounterAreaLabelZh(String slug) {
@@ -97,9 +151,7 @@ String encounterAreaLabelZh(String slug) {
   if (route != null) {
     return '${route.group(1)}号道路';
   }
-  final cleaned = slug
-      .replaceAll(RegExp(r'-area$'), '')
-      .replaceAll('-', ' ');
+  final cleaned = slug.replaceAll(RegExp(r'-area$'), '').replaceAll('-', ' ');
   return cleaned;
 }
 
@@ -147,8 +199,7 @@ const moveMethodLabelsZh = <String, String>{
 String flavorVersionLabelZh(String version) =>
     flavorVersionLabelsZh[version] ?? version;
 
-String moveMethodLabelZh(String method) =>
-    moveMethodLabelsZh[method] ?? method;
+String moveMethodLabelZh(String method) => moveMethodLabelsZh[method] ?? method;
 
 /// Regional pokedex scopes backed by CDN `pokedexNumbers` keys.
 enum DexRegionalPokedex {
@@ -171,26 +222,26 @@ enum DexRegionalPokedex {
 
   /// All CDN / PokeAPI pokedex name keys that belong to this regional dex.
   List<String> get pokedexKeys => switch (this) {
-        DexRegionalPokedex.national => const ['national'],
-        DexRegionalPokedex.kanto => const ['kanto'],
-        DexRegionalPokedex.johto => const ['original-johto', 'updated-johto'],
-        DexRegionalPokedex.hoenn => const ['hoenn', 'updated-hoenn'],
-        DexRegionalPokedex.sinnoh => const ['original-sinnoh', 'extended-sinnoh'],
-        DexRegionalPokedex.unova => const ['unova', 'updated-unova'],
-        DexRegionalPokedex.kalos => const [
-            'kalos-central',
-            'kalos-mountain',
-            'kalos-coastal',
-          ],
-        DexRegionalPokedex.alola => const ['original-alola', 'updated-alola'],
-        DexRegionalPokedex.galar => const [
-            'galar',
-            'isle-of-armor',
-            'crown-tundra',
-          ],
-        DexRegionalPokedex.paldea => const ['paldea', 'kitakami', 'blueberry'],
-        DexRegionalPokedex.hisui => const ['hisui'],
-      };
+    DexRegionalPokedex.national => const ['national'],
+    DexRegionalPokedex.kanto => const ['kanto'],
+    DexRegionalPokedex.johto => const ['original-johto', 'updated-johto'],
+    DexRegionalPokedex.hoenn => const ['hoenn', 'updated-hoenn'],
+    DexRegionalPokedex.sinnoh => const ['original-sinnoh', 'extended-sinnoh'],
+    DexRegionalPokedex.unova => const ['unova', 'updated-unova'],
+    DexRegionalPokedex.kalos => const [
+      'kalos-central',
+      'kalos-mountain',
+      'kalos-coastal',
+    ],
+    DexRegionalPokedex.alola => const ['original-alola', 'updated-alola'],
+    DexRegionalPokedex.galar => const [
+      'galar',
+      'isle-of-armor',
+      'crown-tundra',
+    ],
+    DexRegionalPokedex.paldea => const ['paldea', 'kitakami', 'blueberry'],
+    DexRegionalPokedex.hisui => const ['hisui'],
+  };
 
   static DexRegionalPokedex? fromStorageKey(String? key) {
     if (key == null) {

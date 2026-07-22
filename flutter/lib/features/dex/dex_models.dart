@@ -30,6 +30,7 @@ class PokemonSummary {
   final String? artworkUrl;
   final String? localSpritePath;
   final Map<String, int>? pokedexNumbers;
+
   /// CDN URLs keyed by PokeAPI version-group slug (e.g. heartgold-soulsilver).
   final Map<String, String>? spriteUrlsByVersion;
   final String? animatedSpriteUrl;
@@ -42,19 +43,19 @@ class PokemonSummary {
   String? get displaySpritePath => localSpritePath ?? spriteUrl;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nameEn': nameEn,
-        'nameZh': nameZh,
-        'types': types,
-        if (spriteUrl != null) 'spriteUrl': spriteUrl,
-        if (artworkUrl != null) 'artworkUrl': artworkUrl,
-        if (localSpritePath != null) 'localSpritePath': localSpritePath,
-        if (pokedexNumbers != null && pokedexNumbers!.isNotEmpty)
-          'pokedexNumbers': pokedexNumbers,
-        if (spriteUrlsByVersion != null && spriteUrlsByVersion!.isNotEmpty)
-          'spriteUrlsByVersion': spriteUrlsByVersion,
-        if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
-      };
+    'id': id,
+    'nameEn': nameEn,
+    'nameZh': nameZh,
+    'types': types,
+    if (spriteUrl != null) 'spriteUrl': spriteUrl,
+    if (artworkUrl != null) 'artworkUrl': artworkUrl,
+    if (localSpritePath != null) 'localSpritePath': localSpritePath,
+    if (pokedexNumbers != null && pokedexNumbers!.isNotEmpty)
+      'pokedexNumbers': pokedexNumbers,
+    if (spriteUrlsByVersion != null && spriteUrlsByVersion!.isNotEmpty)
+      'spriteUrlsByVersion': spriteUrlsByVersion,
+    if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
+  };
 
   factory PokemonSummary.fromJson(Map<String, dynamic> json) {
     final pokedexRaw = json['pokedexNumbers'] as Map<String, dynamic>?;
@@ -103,11 +104,7 @@ class PokemonSummary {
   }
 }
 
-enum DexEncounterStatus {
-  caught,
-  seen,
-  unknown,
-}
+enum DexEncounterStatus { caught, seen, unknown }
 
 class CachedAbility {
   const CachedAbility({
@@ -125,26 +122,25 @@ class CachedAbility {
   final List<int> pokemonIds;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nameEn': nameEn,
-        'nameZh': nameZh,
-        'descriptionZh': descriptionZh,
-        if (pokemonIds.isNotEmpty) 'pokemonIds': pokemonIds,
-      };
+    'id': id,
+    'nameEn': nameEn,
+    'nameZh': nameZh,
+    'descriptionZh': descriptionZh,
+    if (pokemonIds.isNotEmpty) 'pokemonIds': pokemonIds,
+  };
 
   factory CachedAbility.fromJson(
     Map<String, dynamic> json, {
     int? fallbackId,
-  }) =>
-      CachedAbility(
-        id: json['id'] as int? ?? fallbackId ?? 0,
-        nameEn: json['nameEn'] as String,
-        nameZh: json['nameZh'] as String,
-        descriptionZh: json['descriptionZh'] as String? ?? '',
-        pokemonIds: (json['pokemonIds'] as List<dynamic>? ?? const [])
-            .map((value) => (value as num).toInt())
-            .toList(growable: false),
-      );
+  }) => CachedAbility(
+    id: json['id'] as int? ?? fallbackId ?? 0,
+    nameEn: json['nameEn'] as String,
+    nameZh: json['nameZh'] as String,
+    descriptionZh: json['descriptionZh'] as String? ?? '',
+    pokemonIds: (json['pokemonIds'] as List<dynamic>? ?? const [])
+        .map((value) => (value as num).toInt())
+        .toList(growable: false),
+  );
 }
 
 class CachedMove {
@@ -171,28 +167,28 @@ class CachedMove {
   final String? descriptionZh;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nameEn': nameEn,
-        'nameZh': nameZh,
-        'type': type,
-        'category': category,
-        if (power != null) 'power': power,
-        if (accuracy != null) 'accuracy': accuracy,
-        if (pp != null) 'pp': pp,
-        if (descriptionZh != null) 'descriptionZh': descriptionZh,
-      };
+    'id': id,
+    'nameEn': nameEn,
+    'nameZh': nameZh,
+    'type': type,
+    'category': category,
+    if (power != null) 'power': power,
+    if (accuracy != null) 'accuracy': accuracy,
+    if (pp != null) 'pp': pp,
+    if (descriptionZh != null) 'descriptionZh': descriptionZh,
+  };
 
   factory CachedMove.fromJson(Map<String, dynamic> json) => CachedMove(
-        id: json['id'] as int,
-        nameEn: json['nameEn'] as String,
-        nameZh: json['nameZh'] as String,
-        type: json['type'] as String,
-        category: json['category'] as String,
-        power: json['power'] as int?,
-        accuracy: json['accuracy'] as int?,
-        pp: json['pp'] as int?,
-        descriptionZh: json['descriptionZh'] as String?,
-      );
+    id: json['id'] as int,
+    nameEn: json['nameEn'] as String,
+    nameZh: json['nameZh'] as String,
+    type: json['type'] as String,
+    category: json['category'] as String,
+    power: json['power'] as int?,
+    accuracy: json['accuracy'] as int?,
+    pp: json['pp'] as int?,
+    descriptionZh: json['descriptionZh'] as String?,
+  );
 }
 
 class PokemonMoveRef {
@@ -207,24 +203,20 @@ class PokemonMoveRef {
   final int? level;
 
   Map<String, dynamic> toJson() => {
-        'moveId': moveId,
-        'method': method,
-        if (level != null) 'level': level,
-      };
+    'moveId': moveId,
+    'method': method,
+    if (level != null) 'level': level,
+  };
 
   factory PokemonMoveRef.fromJson(Map<String, dynamic> json) => PokemonMoveRef(
-        moveId: json['moveId'] as int,
-        method: json['method'] as String,
-        level: json['level'] as int?,
-      );
+    moveId: json['moveId'] as int,
+    method: json['method'] as String,
+    level: json['level'] as int?,
+  );
 }
 
 class PokemonMove {
-  const PokemonMove({
-    required this.move,
-    required this.method,
-    this.level,
-  });
+  const PokemonMove({required this.move, required this.method, this.level});
 
   final CachedMove move;
   final String method;
@@ -252,13 +244,13 @@ class PokemonBaseStats {
       hp + attack + defense + specialAttack + specialDefense + speed;
 
   Map<String, dynamic> toJson() => {
-        'hp': hp,
-        'attack': attack,
-        'defense': defense,
-        'specialAttack': specialAttack,
-        'specialDefense': specialDefense,
-        'speed': speed,
-      };
+    'hp': hp,
+    'attack': attack,
+    'defense': defense,
+    'specialAttack': specialAttack,
+    'specialDefense': specialDefense,
+    'speed': speed,
+  };
 
   factory PokemonBaseStats.fromJson(Map<String, dynamic> json) =>
       PokemonBaseStats(
@@ -271,13 +263,13 @@ class PokemonBaseStats {
       );
 
   List<MapEntry<String, int>> get entries => [
-        MapEntry('hp', hp),
-        MapEntry('attack', attack),
-        MapEntry('defense', defense),
-        MapEntry('special-attack', specialAttack),
-        MapEntry('special-defense', specialDefense),
-        MapEntry('speed', speed),
-      ];
+    MapEntry('hp', hp),
+    MapEntry('attack', attack),
+    MapEntry('defense', defense),
+    MapEntry('special-attack', specialAttack),
+    MapEntry('special-defense', specialDefense),
+    MapEntry('speed', speed),
+  ];
 }
 
 class FlavorTextEntry {
@@ -307,17 +299,18 @@ class FlavorTextEntry {
   }
 
   Map<String, dynamic> toJson() => {
-        'version': version,
-        'text': text,
-        if (gameEdition != null) 'gameEdition': gameEdition,
-        if (versionGroup != null) 'versionGroup': versionGroup,
-        if (labelZh != null) 'labelZh': labelZh,
-        if (iconUrl != null) 'iconUrl': iconUrl,
-      };
+    'version': version,
+    'text': text,
+    if (gameEdition != null) 'gameEdition': gameEdition,
+    if (versionGroup != null) 'versionGroup': versionGroup,
+    if (labelZh != null) 'labelZh': labelZh,
+    if (iconUrl != null) 'iconUrl': iconUrl,
+  };
 
   factory FlavorTextEntry.fromJson(Map<String, dynamic> json) =>
       FlavorTextEntry(
-        version: json['version'] as String? ??
+        version:
+            json['version'] as String? ??
             json['gameEdition'] as String? ??
             'unknown',
         text: json['text'] as String,
@@ -353,21 +346,21 @@ class PokemonAbility {
   }
 
   Map<String, dynamic> toJson() => {
-        'nameEn': nameEn,
-        'nameZh': nameZh,
-        'descriptionZh': descriptionZh,
-        if (isHidden) 'isHidden': true,
-        if (gameLabelsZh.isNotEmpty) 'gameLabelsZh': gameLabelsZh,
-      };
+    'nameEn': nameEn,
+    'nameZh': nameZh,
+    'descriptionZh': descriptionZh,
+    if (isHidden) 'isHidden': true,
+    if (gameLabelsZh.isNotEmpty) 'gameLabelsZh': gameLabelsZh,
+  };
 
   factory PokemonAbility.fromJson(Map<String, dynamic> json) => PokemonAbility(
-        nameEn: json['nameEn'] as String,
-        nameZh: json['nameZh'] as String,
-        descriptionZh: json['descriptionZh'] as String? ?? '',
-        isHidden: json['isHidden'] as bool? ?? false,
-        gameLabelsZh: (json['gameLabelsZh'] as List<dynamic>? ?? const [])
-            .cast<String>(),
-      );
+    nameEn: json['nameEn'] as String,
+    nameZh: json['nameZh'] as String,
+    descriptionZh: json['descriptionZh'] as String? ?? '',
+    isHidden: json['isHidden'] as bool? ?? false,
+    gameLabelsZh: (json['gameLabelsZh'] as List<dynamic>? ?? const [])
+        .cast<String>(),
+  );
 
   PokemonAbility copyWith({
     String? nameEn,
@@ -390,21 +383,51 @@ class ObtainLocationEntry {
   const ObtainLocationEntry({
     required this.areaSlug,
     required this.areaLabelZh,
+    this.pokemonId,
+    this.speciesId,
+    this.formSlug,
+    this.isDefaultForm,
     this.minLevel,
+    this.maxLevel,
     this.maxChance = 0,
+    this.rateKind = 'percentage',
+    this.rateValue,
+    this.versions = const [],
+    this.methods = const [],
+    this.conditions = const [],
   });
 
   final String areaSlug;
   final String areaLabelZh;
+  final int? pokemonId;
+  final int? speciesId;
+  final String? formSlug;
+  final bool? isDefaultForm;
   final int? minLevel;
+  final int? maxLevel;
   final int maxChance;
+  final String rateKind;
+  final num? rateValue;
+  final List<String> versions;
+  final List<String> methods;
+  final List<String> conditions;
 
   Map<String, dynamic> toJson() => {
-        'areaSlug': areaSlug,
-        'areaLabelZh': areaLabelZh,
-        if (minLevel != null) 'minLevel': minLevel,
-        'maxChance': maxChance,
-      };
+    'areaSlug': areaSlug,
+    'areaLabelZh': areaLabelZh,
+    if (pokemonId != null) 'pokemonId': pokemonId,
+    if (speciesId != null) 'speciesId': speciesId,
+    if (formSlug != null) 'formSlug': formSlug,
+    if (isDefaultForm != null) 'isDefaultForm': isDefaultForm,
+    if (minLevel != null) 'minLevel': minLevel,
+    if (maxLevel != null) 'maxLevel': maxLevel,
+    'maxChance': maxChance,
+    'rateKind': rateKind,
+    if (rateValue != null) 'rateValue': rateValue,
+    if (versions.isNotEmpty) 'versions': versions,
+    if (methods.isNotEmpty) 'methods': methods,
+    if (conditions.isNotEmpty) 'conditions': conditions,
+  };
 
   factory ObtainLocationEntry.fromJson(Map<String, dynamic> json) {
     final slug = json['areaSlug'] as String;
@@ -420,8 +443,19 @@ class ObtainLocationEntry {
     return ObtainLocationEntry(
       areaSlug: slug,
       areaLabelZh: unresolved ? resolveObtainAreaLabelZh(slug) : baked,
-      minLevel: json['minLevel'] as int?,
-      maxChance: json['maxChance'] as int? ?? 0,
+      pokemonId: (json['pokemonId'] as num?)?.toInt(),
+      speciesId: (json['speciesId'] as num?)?.toInt(),
+      formSlug: json['formSlug'] as String?,
+      isDefaultForm: json['isDefaultForm'] as bool?,
+      minLevel: (json['minLevel'] as num?)?.toInt(),
+      maxLevel: (json['maxLevel'] as num?)?.toInt(),
+      maxChance: (json['maxChance'] as num?)?.toInt() ?? 0,
+      rateKind: json['rateKind'] as String? ?? 'percentage',
+      rateValue: json['rateValue'] as num?,
+      versions: (json['versions'] as List<dynamic>? ?? const []).cast<String>(),
+      methods: (json['methods'] as List<dynamic>? ?? const []).cast<String>(),
+      conditions: (json['conditions'] as List<dynamic>? ?? const [])
+          .cast<String>(),
     );
   }
 }
@@ -440,11 +474,11 @@ class PokemonMoveSet {
   final List<PokemonMove> tutor;
 
   Map<String, dynamic> toJson() => {
-        'levelUp': _refs(levelUp),
-        'machine': _refs(machine),
-        'egg': _refs(egg),
-        'tutor': _refs(tutor),
-      };
+    'levelUp': _refs(levelUp),
+    'machine': _refs(machine),
+    'egg': _refs(egg),
+    'tutor': _refs(tutor),
+  };
 
   static List<Map<String, dynamic>> _refs(List<PokemonMove> moves) => moves
       .map(
@@ -469,13 +503,15 @@ class PokemonMoveSet {
         if (moveId == null) {
           continue;
         }
-        final move = moveLookup[moveId] ?? CachedMove(
-          id: moveId,
-          nameEn: 'move-$moveId',
-          nameZh: '招式 #$moveId',
-          type: 'normal',
-          category: 'status',
-        );
+        final move =
+            moveLookup[moveId] ??
+            CachedMove(
+              id: moveId,
+              nameEn: 'move-$moveId',
+              nameZh: '招式 #$moveId',
+              type: 'normal',
+              category: 'status',
+            );
         moves.add(
           PokemonMove(
             move: move,
@@ -528,6 +564,7 @@ class PokemonDetail {
     this.flavorEntries = const [],
     this.obtainLocations = const [],
     this.obtainLocationsByGame = const {},
+    this.obtainLocationsByVersion = const {},
     this.abilities = const [],
     this.abilitiesByGame = const {},
     this.moveSet = const PokemonMoveSet(),
@@ -555,6 +592,7 @@ class PokemonDetail {
   final List<FlavorTextEntry> flavorEntries;
   final List<ObtainLocationEntry> obtainLocations;
   final Map<String, List<ObtainLocationEntry>> obtainLocationsByGame;
+  final Map<String, List<ObtainLocationEntry>> obtainLocationsByVersion;
   final List<PokemonAbility> abilities;
   final Map<String, List<PokemonAbility>> abilitiesByGame;
   final PokemonMoveSet moveSet;
@@ -568,8 +606,7 @@ class PokemonDetail {
 
   int get hatchSteps => hatchCounter == null ? 0 : hatchCounter! * 256;
 
-  String get nationalDexLabel =>
-      '#${summary.id.toString().padLeft(3, '0')}';
+  String get nationalDexLabel => '#${summary.id.toString().padLeft(3, '0')}';
 
   String? get johtoDexLabel => johtoDexNumber == null
       ? null
@@ -630,8 +667,10 @@ class PokemonDetail {
         return (entry.key, entry.value);
       }
     }
-    return (obtainLocations.isEmpty ? null : 'heartgold-soulsilver',
-        obtainLocations);
+    return (
+      obtainLocations.isEmpty ? null : 'heartgold-soulsilver',
+      obtainLocations,
+    );
   }
 
   /// First non-empty obtain key + locations (for UI labels).
@@ -652,58 +691,55 @@ class PokemonDetail {
       return null;
     }
     return evYield.entries
-        .map((entry) => '${statLabelsZh[entry.key] ?? entry.key} +${entry.value}')
+        .map(
+          (entry) => '${statLabelsZh[entry.key] ?? entry.key} +${entry.value}',
+        )
         .join(' / ');
   }
 
   Map<String, dynamic> toJson() => {
-        'summary': summary.toJson(),
-        'genusZh': genusZh,
-        'heightDm': heightDm,
-        'weightHg': weightHg,
-        'weaknesses': weaknesses,
-        'resistances': resistances,
-        'immunities': immunities,
-        'stabSuperEffective': stabSuperEffective,
-        if (johtoDexNumber != null) 'johtoDexNumber': johtoDexNumber,
-        if (baseStats != null) 'baseStats': baseStats!.toJson(),
-        'typeMultipliers': typeMultipliers.map(
-          (key, value) => MapEntry(key, value),
-        ),
-        'flavorEntries':
-            flavorEntries.map((entry) => entry.toJson()).toList(),
-        'obtainLocations':
-            obtainLocations.map((entry) => entry.toJson()).toList(),
-        if (obtainLocationsByGame.isNotEmpty)
-          'obtainLocationsByGame': obtainLocationsByGame.map(
-            (key, value) => MapEntry(
-              key,
-              value.map((entry) => entry.toJson()).toList(),
-            ),
-          ),
-        'abilities': abilities.map((entry) => entry.toJson()).toList(),
-        if (abilitiesByGame.isNotEmpty)
-          'abilitiesByGame': abilitiesByGame.map(
-            (key, value) => MapEntry(
-              key,
-              value.map((entry) => entry.toJson()).toList(),
-            ),
-          ),
-        'moveSet': moveSet.toJson(),
-        if (moveSets.isNotEmpty)
-          'moveSets': moveSets.map(
-            (key, value) => MapEntry(key, value.toJson()),
-          ),
-        if (baseHappiness != null) 'baseHappiness': baseHappiness,
-        if (captureRate != null) 'captureRate': captureRate,
-        if (evYield.isNotEmpty) 'evYield': evYield,
-        if (genderFemalePercent != null)
-          'genderFemalePercent': genderFemalePercent,
-        'eggGroups': eggGroups,
-        if (hatchCounter != null) 'hatchCounter': hatchCounter,
-        if (evolutionChain != null)
-          'evolutionChain': evolutionChain!.toJson(),
-      };
+    'summary': summary.toJson(),
+    'genusZh': genusZh,
+    'heightDm': heightDm,
+    'weightHg': weightHg,
+    'weaknesses': weaknesses,
+    'resistances': resistances,
+    'immunities': immunities,
+    'stabSuperEffective': stabSuperEffective,
+    if (johtoDexNumber != null) 'johtoDexNumber': johtoDexNumber,
+    if (baseStats != null) 'baseStats': baseStats!.toJson(),
+    'typeMultipliers': typeMultipliers.map(
+      (key, value) => MapEntry(key, value),
+    ),
+    'flavorEntries': flavorEntries.map((entry) => entry.toJson()).toList(),
+    'obtainLocations': obtainLocations.map((entry) => entry.toJson()).toList(),
+    if (obtainLocationsByGame.isNotEmpty)
+      'obtainLocationsByGame': obtainLocationsByGame.map(
+        (key, value) =>
+            MapEntry(key, value.map((entry) => entry.toJson()).toList()),
+      ),
+    if (obtainLocationsByVersion.isNotEmpty)
+      'obtainLocationsByVersion': obtainLocationsByVersion.map(
+        (key, value) =>
+            MapEntry(key, value.map((entry) => entry.toJson()).toList()),
+      ),
+    'abilities': abilities.map((entry) => entry.toJson()).toList(),
+    if (abilitiesByGame.isNotEmpty)
+      'abilitiesByGame': abilitiesByGame.map(
+        (key, value) =>
+            MapEntry(key, value.map((entry) => entry.toJson()).toList()),
+      ),
+    'moveSet': moveSet.toJson(),
+    if (moveSets.isNotEmpty)
+      'moveSets': moveSets.map((key, value) => MapEntry(key, value.toJson())),
+    if (baseHappiness != null) 'baseHappiness': baseHappiness,
+    if (captureRate != null) 'captureRate': captureRate,
+    if (evYield.isNotEmpty) 'evYield': evYield,
+    if (genderFemalePercent != null) 'genderFemalePercent': genderFemalePercent,
+    'eggGroups': eggGroups,
+    if (hatchCounter != null) 'hatchCounter': hatchCounter,
+    if (evolutionChain != null) 'evolutionChain': evolutionChain!.toJson(),
+  };
 
   factory PokemonDetail.fromJson(
     Map<String, dynamic> json, {
@@ -722,13 +758,15 @@ class PokemonDetail {
       if (moveId == null) {
         continue;
       }
-      final move = moveLookup[moveId] ?? CachedMove(
-        id: moveId,
-        nameEn: 'move-$moveId',
-        nameZh: '招式 #$moveId',
-        type: 'normal',
-        category: 'status',
-      );
+      final move =
+          moveLookup[moveId] ??
+          CachedMove(
+            id: moveId,
+            nameEn: 'move-$moveId',
+            nameZh: '招式 #$moveId',
+            type: 'normal',
+            category: 'status',
+          );
       legacyMoves.add(
         PokemonMove(
           move: move,
@@ -782,6 +820,19 @@ class PokemonDetail {
             .toList();
       }
     }
+    final obtainByVersionJson =
+        json['obtainLocationsByVersion'] as Map<String, dynamic>?;
+    final resolvedObtainByVersion = <String, List<ObtainLocationEntry>>{};
+    if (obtainByVersionJson != null) {
+      for (final entry in obtainByVersionJson.entries) {
+        resolvedObtainByVersion[entry.key] = (entry.value as List<dynamic>)
+            .map(
+              (item) =>
+                  ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      }
+    }
 
     final abilitiesByGameJson =
         json['abilitiesByGame'] as Map<String, dynamic>?;
@@ -802,9 +853,7 @@ class PokemonDetail {
     );
 
     return PokemonDetail(
-      summary: PokemonSummary.fromJson(
-        json['summary'] as Map<String, dynamic>,
-      ),
+      summary: PokemonSummary.fromJson(json['summary'] as Map<String, dynamic>),
       genusZh: json['genusZh'] as String? ?? '',
       heightDm: json['heightDm'] as int? ?? 0,
       weightHg: json['weightHg'] as int? ?? 0,
@@ -829,10 +878,12 @@ class PokemonDetail {
           .toList(),
       obtainLocations: (json['obtainLocations'] as List<dynamic>? ?? const [])
           .map(
-            (item) => ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
+            (item) =>
+                ObtainLocationEntry.fromJson(item as Map<String, dynamic>),
           )
           .toList(),
       obtainLocationsByGame: resolvedObtainByGame,
+      obtainLocationsByVersion: resolvedObtainByVersion,
       abilities: (json['abilities'] as List<dynamic>? ?? const [])
           .map((item) => PokemonAbility.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -843,12 +894,14 @@ class PokemonDetail {
       captureRate: json['captureRate'] as int?,
       evYield: evYield,
       genderFemalePercent: (json['genderFemalePercent'] as num?)?.toDouble(),
-      eggGroups:
-          (json['eggGroups'] as List<dynamic>? ?? const []).cast<String>(),
+      eggGroups: (json['eggGroups'] as List<dynamic>? ?? const [])
+          .cast<String>(),
       hatchCounter: json['hatchCounter'] as int?,
       evolutionChain: json['evolutionChain'] == null
           ? null
-          : EvolutionNode.fromJson(json['evolutionChain'] as Map<String, dynamic>),
+          : EvolutionNode.fromJson(
+              json['evolutionChain'] as Map<String, dynamic>,
+            ),
     );
   }
 }
@@ -886,30 +939,30 @@ class EvolutionNode {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'nameEn': nameEn,
-        'nameZh': nameZh,
-        if (spriteUrl != null) 'spriteUrl': spriteUrl,
-        if (artworkUrl != null) 'artworkUrl': artworkUrl,
-        if (localSpritePath != null) 'localSpritePath': localSpritePath,
-        if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
-        if (triggerZh != null) 'triggerZh': triggerZh,
-        'children': children.map((child) => child.toJson()).toList(),
-      };
+    'id': id,
+    'nameEn': nameEn,
+    'nameZh': nameZh,
+    if (spriteUrl != null) 'spriteUrl': spriteUrl,
+    if (artworkUrl != null) 'artworkUrl': artworkUrl,
+    if (localSpritePath != null) 'localSpritePath': localSpritePath,
+    if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
+    if (triggerZh != null) 'triggerZh': triggerZh,
+    'children': children.map((child) => child.toJson()).toList(),
+  };
 
   factory EvolutionNode.fromJson(Map<String, dynamic> json) => EvolutionNode(
-        id: json['id'] as int,
-        nameEn: json['nameEn'] as String,
-        nameZh: json['nameZh'] as String,
-        spriteUrl: json['spriteUrl'] as String?,
-        artworkUrl: json['artworkUrl'] as String?,
-        localSpritePath: json['localSpritePath'] as String?,
-        evolvesFrom: json['evolvesFrom'] as String?,
-        triggerZh: json['triggerZh'] as String?,
-        children: (json['children'] as List<dynamic>? ?? const [])
-            .map((item) => EvolutionNode.fromJson(item as Map<String, dynamic>))
-            .toList(),
-      );
+    id: json['id'] as int,
+    nameEn: json['nameEn'] as String,
+    nameZh: json['nameZh'] as String,
+    spriteUrl: json['spriteUrl'] as String?,
+    artworkUrl: json['artworkUrl'] as String?,
+    localSpritePath: json['localSpritePath'] as String?,
+    evolvesFrom: json['evolvesFrom'] as String?,
+    triggerZh: json['triggerZh'] as String?,
+    children: (json['children'] as List<dynamic>? ?? const [])
+        .map((item) => EvolutionNode.fromJson(item as Map<String, dynamic>))
+        .toList(),
+  );
 
   EvolutionNode copyWithLocalSprite(String path) {
     return EvolutionNode(
@@ -952,16 +1005,16 @@ class DexCacheManifest {
   final int? configVersion;
 
   Map<String, dynamic> toJson() => {
-        'version': version,
-        'complete': complete,
-        'preferOffline': preferOffline,
-        if (downloadedAt != null) 'downloadedAt': downloadedAt,
-        'pokemonCount': pokemonCount,
-        'moveCount': moveCount,
-        'sizeBytes': sizeBytes,
-        if (l10nVersion != null) 'l10nVersion': l10nVersion,
-        if (configVersion != null) 'configVersion': configVersion,
-      };
+    'version': version,
+    'complete': complete,
+    'preferOffline': preferOffline,
+    if (downloadedAt != null) 'downloadedAt': downloadedAt,
+    'pokemonCount': pokemonCount,
+    'moveCount': moveCount,
+    'sizeBytes': sizeBytes,
+    if (l10nVersion != null) 'l10nVersion': l10nVersion,
+    if (configVersion != null) 'configVersion': configVersion,
+  };
 
   factory DexCacheManifest.fromJson(Map<String, dynamic> json) =>
       DexCacheManifest(

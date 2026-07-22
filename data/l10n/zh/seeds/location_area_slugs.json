@@ -1,1 +1,27 @@
-{}
+{
+  "glacier-room-area": "冰川房间",
+  "galar-wild-area-max-dens-area": "旷野地带（极巨巢穴）",
+  "hoenn-pokecenter-area": "丰缘地区宝可梦中心",
+  "hoenn-pokemart-area": "丰缘地区友好商店",
+  "iron-room-area": "钢铁房间",
+  "isle-of-armor-caves-area": "铠岛洞窟",
+  "johto-pokemart-area": "城都地区友好商店",
+  "kanto-pokecenter-area": "关都地区宝可梦中心",
+  "kanto-pokemart-area": "关都地区友好商店",
+  "kanto-underground-path-area": "关都地下通道",
+  "onbs-2f": "ONBS 2楼",
+  "onbs-3f": "ONBS 3楼",
+  "onbs-4f": "ONBS 4楼",
+  "onbs-roof": "ONBS 屋顶",
+  "roaming-hoenn-area": "丰缘地区（游走）",
+  "roaming-johto-area": "城都地区（游走）",
+  "roaming-kalos-area": "卡洛斯地区（游走）",
+  "roaming-kanto-area": "关都地区（游走）",
+  "roaming-sinnoh-area": "神奥地区（游走）",
+  "rocky-mountain-room-area": "岩山房间",
+  "roaming-galar-wild-area-area": "旷野地带（游走）",
+  "sinnoh-pokemart-area": "神奥地区友好商店",
+  "unknown-all-bugs-area": "未知地点（虫宝可梦）",
+  "unknown-all-poliwag-area": "未知地点（蚊香蝌蚪）",
+  "unknown-all-rattata-area": "未知地点（小拉达）"
+}

@@ -285,8 +285,8 @@ bash tools/upload_dex_bundle.sh dist/dex-v5/upload v3
 | 19 | 晶灿钻石/明亮珍珠 (BDSP) | bdsp | `brilliant-diamond-shining-pearl` | PokeAPI（招式/描述可能稀疏 → fallback） |
 | 20 | 传说阿尔宙斯 (LA) | pla | `legends-arceus` | PokeAPI |
 | 21 | 朱/紫 (SV) | sv | `scarlet-violet` | PokeAPI |
-| 22 | 传说 Z-A (LZA) | lza | — | **无 PokeAPI** → UI 显示「暂无」，引导自选版本 |
-| 23 | Champions (Champions) | champions | — | **无 PokeAPI** → 同上 |
+| 22 | 传说 Z-A (LZA) | lza | `legends-za`（含 `mega-dimension`） | PokeAPI（数据可能稀疏 → fallback） |
+| 23 | Champions (Champions) | champions | `champions` | PokeAPI（数据可能稀疏 → fallback） |
 
 ### 5.1 图鉴描述（flavor）规则
 
