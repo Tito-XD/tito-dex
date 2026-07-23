@@ -24,7 +24,7 @@ pattern = "dex.tito.cafe/*"
 zone_name = "tito.cafe"
 
 [triggers]
-crons = ["0 4 * * 0", "0 */6 * * *"]
+crons = ["0 4 * * SUN", "0 */6 * * *"]
 
 [vars]
 CDN_VERSION = "4"

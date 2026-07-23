@@ -2,7 +2,7 @@ import { buildHealthReport, sendHealthAlert } from './health.js';
 import { triggerGitHubWorkflow } from './github-dispatch.js';
 
 /** Sunday 04:00 UTC — weekly l10n sync. */
-export const CRON_L10N_SYNC = '0 4 * * 0';
+export const CRON_L10N_SYNC = '0 4 * * SUN';
 
 /** Every 6 hours — deep CDN probe + optional alert. */
 export const CRON_HEALTH_PROBE = '0 */6 * * *';

@@ -93,7 +93,7 @@ Worker → **Settings** → **Bindings** → KV namespace → `MANIFEST_KV`
 
 | Cron | 时间 (UTC) | 动作 |
 | --- | --- | --- |
-| `0 4 * * 0` | 每周日 04:00 | `repository_dispatch` → **Sync l10n Catalog** |
+| `0 4 * * SUN` | 每周日 04:00 | `repository_dispatch` → **Sync l10n Catalog** |
 | `0 */6 * * *` | 每 6 小时 | 深度 R2 探活，失败时可选 webhook 告警 |
 
 Worker → **Settings** → **Variables** → **Secrets**：
