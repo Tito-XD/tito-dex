@@ -33,7 +33,7 @@ def verify(upload_dir: Path) -> None:
     assert root["complete"] is True, root
     assert root["exactVersionLocations"] is True, root
     assert root["archiveSha256"] == sha256(archive), "archive SHA-256 mismatch"
-    assert manifest["bundleVersion"] == 6, manifest
+    assert manifest["version"] == 6, manifest
     assert manifest["pokemonCount"] == 1025, manifest
     assert manifest["complete"] is True, manifest
     assert manifest["formCount"] == root["formCount"], (manifest, root)

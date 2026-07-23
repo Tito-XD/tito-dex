@@ -69,6 +69,15 @@ jobs:
           python3 tools/audit_dex_golden_samples.py dist/dex-v6/staging --strict
           python3 tools/verify_dex_upload_tree.py dist/dex-v6/upload
 
+      - name: Preserve generated bundle when an audit fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v6-diagnostic-${{ github.run_id }}
+          path: dist/dex-v6/upload
+          if-no-files-found: warn
+          retention-days: 3
+
       - name: Upload verified bundle artifact
         uses: actions/upload-artifact@v4
         with:
