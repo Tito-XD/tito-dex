@@ -12,7 +12,7 @@ import requests
 
 BOOTSTRAP_KEY = "titodex-bootstrap-947b"
 CDN_BASE = "https://dex.tito.cafe"
-DEFAULT_CDN_PREFIX = "v4"
+DEFAULT_CDN_PREFIX = "v5"
 LEGACY_CDN_PREFIX = "v2"
 
 
@@ -52,7 +52,7 @@ def main() -> None:
         "upload_dir",
         type=Path,
         nargs="?",
-        default=Path("dist/dex-v6/upload"),
+        default=Path("dist/dex-v7/upload"),
     )
     parser.add_argument(
         "--cdn-prefix",

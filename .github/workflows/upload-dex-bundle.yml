@@ -1,15 +1,15 @@
-name: Build and Publish Dex Bundle v6
+name: Patch and Publish Dex Bundle v7
 
 on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Upload verified /v4 objects and switch the root manifest last
+        description: Upload verified /v5 objects and switch the root manifest last
         required: true
         default: true
         type: boolean
       reuse_run_id:
-        description: Reuse a preserved v6 diagnostic artifact from this workflow run
+        description: Reuse a preserved v7 diagnostic artifact from this workflow run
         required: false
         default: ""
         type: string
@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: dex-bundle-v6-production
+  group: dex-bundle-v7-production
   cancel-in-progress: false
 
 jobs:
@@ -40,19 +40,19 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r tools/dex_bundle_requirements.txt
 
-      - name: Preserve the current v5 root manifest for rollback
+      - name: Preserve the current v6 root manifest for rollback
         if: inputs.publish
         run: |
           mkdir -p dist/rollback
-          curl --fail --location --retry 5 --output dist/rollback/bundle-manifest-v5.json https://dex.tito.cafe/bundle-manifest.json
-          python3 -c 'import json; m=json.load(open("dist/rollback/bundle-manifest-v5.json")); assert m["bundleVersion"] == 5 and "/v3/" in m["archiveUrl"], m'
+          curl --fail --location --retry 5 --output dist/rollback/bundle-manifest-v6.json https://dex.tito.cafe/bundle-manifest.json
+          python3 -c 'import json; m=json.load(open("dist/rollback/bundle-manifest-v6.json")); assert m["bundleVersion"] == 6 and "/v4/" in m["archiveUrl"], m'
 
       - name: Upload rollback manifest backup
         if: inputs.publish
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-root-manifest-v5-rollback
-          path: dist/rollback/bundle-manifest-v5.json
+          name: titodex-root-manifest-v6-rollback
+          path: dist/rollback/bundle-manifest-v6.json
           if-no-files-found: error
           retention-days: 30
 
@@ -60,50 +60,59 @@ jobs:
         run: |
           python3 tools/test_pokemon_forms.py
           python3 tools/test_dex_bundle_v6.py
+          python3 tools/test_patch_dex_bundle_v7.py
 
-      - name: Restore preserved v6 bundle
+      - name: Restore preserved v7 bundle
         if: inputs.reuse_run_id != ''
         uses: actions/download-artifact@v4
         with:
-          name: titodex-dex-v6-diagnostic-${{ inputs.reuse_run_id }}
-          path: dist/dex-v6/upload
+          name: titodex-dex-v7-diagnostic-${{ inputs.reuse_run_id }}
+          path: dist/dex-v7/upload
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ inputs.reuse_run_id }}
 
-      - name: Build complete Dex bundle v6
+      - name: Download immutable v5/v6 seed archives
+        if: inputs.reuse_run_id == ''
+        run: |
+          mkdir -p dist/dex-seeds
+          curl --fail --location --retry 5 --output dist/dex-seeds/v6.tar.zst https://dex.tito.cafe/v4/bundle.tar.zst
+          curl --fail --location --retry 5 --output dist/dex-seeds/v5.tar.zst https://dex.tito.cafe/v3/bundle.tar.zst
+
+      - name: Patch v6 into complete Dex bundle v7
         if: inputs.reuse_run_id == ''
         run: >-
-          python3 tools/build_dex_bundle.py
+          python3 tools/patch_dex_bundle_v7.py
+          --base-bundle dist/dex-seeds/v6.tar.zst
+          --legacy-media-bundle dist/dex-seeds/v5.tar.zst
           --cdn-base https://dex.tito.cafe
-          --output dist/dex-v6
-          --delay 0.2
+          --output dist/dex-v7
 
       - name: Audit bundle data and upload tree
         run: |
           if [ -n "${{ inputs.reuse_run_id }}" ]; then
-            data_dir=dist/dex-v6/upload/v4
+            data_dir=dist/dex-v7/upload/v5
           else
-            data_dir=dist/dex-v6/staging
+            data_dir=dist/dex-v7/staging
           fi
           python3 tools/audit_encounter_coverage.py "$data_dir" --strict
           python3 tools/audit_form_coverage.py "$data_dir" --strict
           python3 tools/audit_dex_golden_samples.py "$data_dir" --strict
-          python3 tools/verify_dex_upload_tree.py dist/dex-v6/upload
+          python3 tools/verify_dex_upload_tree.py dist/dex-v7/upload
 
       - name: Preserve generated bundle when an audit fails
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-dex-v6-diagnostic-${{ github.run_id }}
-          path: dist/dex-v6/upload
+          name: titodex-dex-v7-diagnostic-${{ github.run_id }}
+          path: dist/dex-v7/upload
           if-no-files-found: warn
           retention-days: 3
 
       - name: Upload verified bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-dex-v6
-          path: dist/dex-v6/upload
+          name: titodex-dex-v7
+          path: dist/dex-v7/upload
           if-no-files-found: error
           retention-days: 14
 
@@ -120,7 +129,7 @@ jobs:
         working-directory: cloudflare/dex-cdn
         run: npm ci
 
-      - name: Upload and verify immutable /v4 objects
+      - name: Upload and verify immutable /v5 objects
         if: inputs.publish
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -128,8 +137,8 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload
-          --cdn-prefix v4 --phase objects
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload
+          --cdn-prefix v5 --phase objects
 
       - name: Atomically switch the root manifest
         if: inputs.publish
@@ -139,11 +148,11 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload
-          --cdn-prefix v4 --phase manifest
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload
+          --cdn-prefix v5 --phase manifest
 
-      - name: Verify public v6 cutover
+      - name: Verify public v7 cutover
         if: inputs.publish
         run: |
-          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 6 and m["cdnPrefix"] == "v4" and m["complete"] is True'
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 7 and m["cdnPrefix"] == "v5" and m["complete"] is True'
           curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'

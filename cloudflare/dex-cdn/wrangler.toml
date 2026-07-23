@@ -29,7 +29,7 @@ crons = ["0 4 * * SUN", "0 */6 * * *"]
 [vars]
 CDN_VERSION = "4"
 CDN_BASE_URL = "https://dex.tito.cafe"
-DEPLOY_REV = "2026-07-23-v4"
+DEPLOY_REV = "2026-07-23-v5"
 GITHUB_REPO = "Tito-XD/tito-dex"
 
 # Secrets (Dashboard → Settings → Variables → Secrets):

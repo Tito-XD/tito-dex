@@ -72,8 +72,8 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 在域名 zone 下添加 Cache Rules（见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)）：
 
-- `/v2/`、`/v3/`、`/v4/` 的详情、图片、索引和 archive → 1 年 immutable
-- `/v4/l10n/*`、`/v4/maps/*`、`/v4/config/*` → 短缓存，允许受控增量同步
+- `/v2/`、`/v3/`、`/v4/`、`/v5/` 的详情、图片、索引和 archive → 1 年 immutable
+- `/v5/l10n/*`、`/v5/maps/*`、`/v5/config/*` → 短缓存，允许受控增量同步
 - `/bundle-manifest.json` → 5 分钟
 
 Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
@@ -142,12 +142,12 @@ Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 
-# 当前生产 v6（1025 物种 → R2 /v4/）
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v6 --max-id 1025
+# 当前生产 v7（1025 物种 → R2 /v5/）
+python3 tools/patch_dex_bundle_v7.py --base-bundle dist/dex-seeds/v6.tar.zst --legacy-media-bundle dist/dex-seeds/v5.tar.zst --output dist/dex-v7
 
-# 必须先上传并验证 /v4/，再最后更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload --cdn-prefix v4 --phase objects
-python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload --cdn-prefix v4 --phase manifest
+# 必须先上传并验证 /v5/，再最后更新根 manifest
+python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload --cdn-prefix v5 --phase objects
+python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload --cdn-prefix v5 --phase manifest
 ```
 
 上传目录结构：
@@ -156,10 +156,11 @@ python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload --cdn-prefix v4 --phase
 | --- | --- | --- |
 | `upload/v2/` | `v2/` | bundle **v4**，493 物种（遗留） |
 | `upload/v3/` | `v3/` | bundle **v5**，1025 物种（回滚 / 旧客户端，不修改） |
-| `upload/v4/` | `v4/` | bundle **v6**，完整形态与精确版本地点 |
-| `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的 v4 archive |
+| `upload/v4/` | `v4/` | bundle **v6**，完整形态与精确版本地点（回滚） |
+| `upload/v5/` | `v5/` | bundle **v7**，清晰默认图与形态历代 sprite |
+| `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的 v5 archive |
 
-Bundle v6 增加全部形态 JSON、选择性形态小图、形态安全的 encounter identity、精确版本地点与覆盖审计。`/v3/` 不覆盖、不删除。
+Bundle v7 复用 v6 的全部数据，只增量修复默认图片和形态历代 sprite 元数据。`/v4/` 不覆盖、不删除。
 
 详见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
@@ -187,15 +188,15 @@ Worker + R2 资源就绪后：
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v4/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=6
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=7
 ```
 
 当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25/v0.2.28](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
 
 ---
 
-## Worker 职责（v2026-07-23-v4）
+## Worker 职责（v2026-07-23-v5）
 
 | 能力 | 路由 / 触发 | 说明 |
 | --- | --- | --- |

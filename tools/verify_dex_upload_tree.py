@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify a complete TitoDex v6 upload tree and its archive before publishing."""
+"""Verify a complete TitoDex upload tree and its archive before publishing."""
 
 from __future__ import annotations
 
@@ -23,17 +23,19 @@ def sha256(path: Path) -> str:
 
 def verify(upload_dir: Path) -> None:
     root = json.loads((upload_dir / "bundle-manifest.json").read_text(encoding="utf-8"))
-    versioned = upload_dir / "v4"
+    bundle_version = int(root["bundleVersion"])
+    cdn_prefix = str(root["cdnPrefix"])
+    versioned = upload_dir / cdn_prefix
     manifest = json.loads((versioned / "manifest.json").read_text(encoding="utf-8"))
     archive = versioned / "bundle.tar.zst"
 
-    assert root["bundleVersion"] == 6, root
-    assert root["cdnPrefix"] == "v4", root
+    assert bundle_version >= 6, root
+    assert cdn_prefix == f"v{bundle_version - 2}", root
     assert root["pokemonCount"] == 1025, root
     assert root["complete"] is True, root
     assert root["exactVersionLocations"] is True, root
     assert root["archiveSha256"] == sha256(archive), "archive SHA-256 mismatch"
-    assert manifest["version"] == 6, manifest
+    assert manifest["version"] == bundle_version, manifest
     assert manifest["pokemonCount"] == 1025, manifest
     assert manifest["complete"] is True, manifest
     assert manifest["formCount"] == root["formCount"], (manifest, root)
@@ -77,7 +79,7 @@ def main() -> int:
     parser.add_argument("upload_dir", type=Path)
     args = parser.parse_args()
     verify(args.upload_dir)
-    print(f"OK: verified TitoDex v6 upload tree at {args.upload_dir}")
+    print(f"OK: verified TitoDex upload tree at {args.upload_dir}")
     return 0
 
 

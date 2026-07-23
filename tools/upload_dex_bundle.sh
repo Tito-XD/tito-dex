@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-UPLOAD_DIR="${1:-dist/dex-v6/upload}"
-CDN_PREFIX="${2:-v4}"
+UPLOAD_DIR="${1:-dist/dex-v7/upload}"
+CDN_PREFIX="${2:-v5}"
 
 exec python3 tools/upload_dex_bundle_r2.py \
   "$UPLOAD_DIR" \

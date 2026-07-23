@@ -13,21 +13,24 @@ class DexCdnConfig {
     defaultValue: 'https://dex.tito.cafe',
   );
 
-  static const String bundleVersionPrefix = 'v4';
+  static const String bundleVersionPrefix = 'v5';
 
-  static const String previousBundleVersionPrefix = 'v3';
+  static const String previousBundleVersionPrefix = 'v4';
 
-  static const String legacyBundleVersionPrefix = 'v2';
+  static const String legacyBundleVersionPrefix = 'v3';
+
+  static const String oldestBundleVersionPrefix = 'v2';
 
   static const List<String> apiVersionPrefixes = [
     bundleVersionPrefix,
     previousBundleVersionPrefix,
     legacyBundleVersionPrefix,
+    oldestBundleVersionPrefix,
   ];
 
   static const String bundleUrl = String.fromEnvironment(
     'TITODEX_DEX_BUNDLE_URL',
-    defaultValue: 'https://dex.tito.cafe/v4/bundle.tar.zst',
+    defaultValue: 'https://dex.tito.cafe/v5/bundle.tar.zst',
   );
 
   static const String legacyBundleUrl =
@@ -35,7 +38,7 @@ class DexCdnConfig {
 
   static const int bundleVersion = int.fromEnvironment(
     'TITODEX_DEX_BUNDLE_VERSION',
-    defaultValue: 6,
+    defaultValue: 7,
   );
 
   String get manifestUrl => '$cdnBase/bundle-manifest.json';

@@ -75,22 +75,22 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
           git push origin "refs/tags/$tag"
-          cat > /tmp/release-notes.md <<'EOF'
-          这次更新补全了图鉴形态系统和跨世代出现地点，并发布全新的完整离线图鉴包。
+          cat > /tmp/release-notes.md <<EOF
+          这次补丁修复图鉴图片与长页面导航，并更新完整离线图鉴包。
 
           ### 主要更新
 
-          - 图鉴可搜索和切换地区形态、超级进化、超极巨化、战斗形态及其他具有独立资料的形态。
-          - 形态切换会同步更新属性、种族值、特性、招式、身高体重、图片和出现地点，不再错误借用默认形态资料。
-          - 出现地点支持精确到单独版本和 DLC，并补充现代作品的野外、固定、团体战、头目、霸主及大量出现记录。
-          - 形态地点映射保留宝可梦实体、形态、太晶属性和无法确认形态等身份信息，避免把模糊记录错误归给默认形态。
-          - Offline APK 内置与在线下载相同、经 SHA-256 验证的 v6 图鉴归档；Lite APK 可按需下载。
-          - 合并并验证 iOS 平台源码；本次 Release 只提供 Android arm64-v8a Lite 与 Offline APK。
+          - 恢复 1025 个默认图鉴的清晰图片，不再把 80×80 像素图误作默认立绘。
+          - 形态切换精简为 chips；切换形态后可继续查看该形态实际存在的历代 sprite。
+          - 精确出现版本改为下拉菜单，保留版本与 DLC 的独立地点数据。
+          - 二级页面标题栏固定；长图鉴页增加快速回顶。
+          - Offline APK 内置与在线下载相同、经 SHA-256 验证的 v7 图鉴归档；Lite APK 可按需下载。
+          - v7 完整复用 v6 的 1025 物种、803 形态及全部出现地点，仅增量修复媒体和形态 sprite 元数据。
 
           ### 下载说明
 
-          - `TitoDex-0.7.0-lite-rg-arm64.apk`：推荐版本，按需下载离线图鉴。
-          - `TitoDex-0.7.0-offline-rg-arm64.apk`：内置完整离线图鉴，文件更大。
+          - `TitoDex-$VERSION-lite-rg-arm64.apk`：推荐版本，按需下载离线图鉴。
+          - `TitoDex-$VERSION-offline-rg-arm64.apk`：内置完整离线图鉴，文件更大。
 
           两个 APK 均仅包含 arm64-v8a Release 运行库。
           EOF
@@ -104,5 +104,5 @@ jobs:
             "dist/release/TitoDex-$VERSION-offline-rg-arm64.apk" \
             --verify-tag \
             --draft \
-            --title "TitoDex $tag · 完整形态与现代地点" \
+            --title "TitoDex $tag · 清晰图鉴与固定导航" \
             --notes-file /tmp/release-notes.md

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build TitoDex offline dex bundle v6 for Cloudflare R2 / CDN.
+"""Build TitoDex offline dex bundle v7 for Cloudflare R2 / CDN.
 
 Output matches flutter/lib/features/dex/dex_cache_store.dart layout.
-Published under {cdn_base}/v4/ (bundle v6; v3 and v2 remain for older clients).
+Published under {cdn_base}/v5/ (older prefixes remain for rollback).
 """
 
 from __future__ import annotations
@@ -62,8 +62,8 @@ POKESPRITE_TYPE_ICON_DIR = ROOT / "data" / "assets" / "type_icons"
 POKESPRITE_RAW_BASE = (
     "https://raw.githubusercontent.com/msikma/pokesprite/master/misc"
 )
-BUNDLE_VERSION = 6
-BUNDLE_CDN_PREFIX = "v4"
+BUNDLE_VERSION = 7
+BUNDLE_CDN_PREFIX = "v5"
 TITODEX_MAX_NATIONAL_ID = 1025
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
@@ -2628,20 +2628,21 @@ def build_bundle(
         )
         write_json(detail_path, detail)
 
-        if sprite_remote and not (staging / "sprites" / f"{pokemon_id}.png").exists():
+        sprite_dest = staging / "sprites" / f"{pokemon_id}.png"
+        artwork_dest = artwork_staging / f"{pokemon_id}.png"
+        if sprite_remote and not sprite_dest.exists():
             try:
                 png = download_bytes(session, sprite_remote)
-                (staging / "sprites" / f"{pokemon_id}.png").write_bytes(
-                    optimize_png(png, max_width=220)
-                )
+                optimized = optimize_png(png, max_width=220)
+                sprite_dest.write_bytes(optimized)
+                if artwork_remote == sprite_remote and not artwork_dest.exists():
+                    artwork_dest.write_bytes(optimized)
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
-        if artwork_remote and not (artwork_staging / f"{pokemon_id}.png").exists():
+        if artwork_remote and not artwork_dest.exists():
             try:
                 artwork_png = download_bytes(session, artwork_remote)
-                (artwork_staging / f"{pokemon_id}.png").write_bytes(
-                    optimize_png(artwork_png, max_width=None)
-                )
+                artwork_dest.write_bytes(optimize_png(artwork_png, max_width=220))
             except requests.RequestException as exc:
                 print(f"  warn: artwork #{pokemon_id}: {exc}", file=sys.stderr)
 
@@ -2795,7 +2796,7 @@ def build_bundle(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v6")
+    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v7")
     parser.add_argument(
         "--cdn-base",
         default="https://dex.example.com",
@@ -2804,7 +2805,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("dist/dex-v6"),
+        default=Path("dist/dex-v7"),
         help="Output directory",
     )
     parser.add_argument("--min-id", type=int, default=1)
