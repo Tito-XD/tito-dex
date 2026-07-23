@@ -65,7 +65,8 @@ def verify(upload_dir: Path) -> None:
         "sprites/1.png",
         "sprites/1025.png",
         "games.json",
-        "l10n/zh/location_areas.json",
+        "l10n/zh/location_area_labels.json",
+        "l10n/zh/location_area_id_to_slug.json",
     }
     missing = sorted(required - names)
     assert not missing, f"archive missing: {missing}"
