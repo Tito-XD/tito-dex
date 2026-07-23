@@ -1,77 +1,24 @@
 /**
- * TitoDex dex CDN Worker — R2 proxy with CORS and cache headers.
+ * TitoDex dex CDN Worker — R2 proxy, cron scheduler, health probes, admin API.
  *
- * Routes:
- *   GET /bundle/latest  → 302 to bundle-manifest.json archiveUrl
- *   GET /*              → R2 object from titodex-dex bucket
+ * Public routes:
+ *   GET /bundle/latest       → 302 to bundle-manifest.json archiveUrl
+ *   GET /cdn-health          → liveness (+ ?probe=1 for deep R2 checks)
+ *   GET /*                   → R2 object (sprites use version-group fallbacks)
+ *
+ * Admin routes (Authorization: Bearer ADMIN_SECRET):
+ *   GET  /admin/status       → deep health + manifest summary
+ *   POST /admin/trigger-sync → repository_dispatch to GitHub Actions
+ *   PUT  /admin/manifest     → merge-update bundle-manifest.json in R2
  */
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
-  'Access-Control-Max-Age': '86400',
-};
-
-const LONG_CACHE = 'public, max-age=31536000, immutable';
-const SHORT_CACHE = 'public, max-age=300';
-
-function cacheControlForKey(key) {
-  if (key === 'bundle-manifest.json') {
-    return SHORT_CACHE;
-  }
-  if (
-    key.startsWith('v2/sprites/') ||
-    key.startsWith('v2/artwork/') ||
-    key.startsWith('v2/type_icons/') ||
-    key.startsWith('v2/details/') ||
-    key === 'v2/bundle.tar.zst'
-  ) {
-    return LONG_CACHE;
-  }
-  if (
-    key.startsWith('v2/summaries.json') ||
-    key.startsWith('v2/types.json') ||
-    key.startsWith('v2/moves.json') ||
-    key.startsWith('v2/manifest.json')
-  ) {
-    return LONG_CACHE;
-  }
-  if (
-    key.startsWith('v3/sprites/') ||
-    key.startsWith('v3/artwork/') ||
-    key.startsWith('v3/type_icons/') ||
-    key.startsWith('v3/game_icons/') ||
-    key.startsWith('v3/details/') ||
-    key === 'v3/bundle.tar.zst'
-  ) {
-    return LONG_CACHE;
-  }
-  if (
-    key.startsWith('v3/summaries.json') ||
-    key.startsWith('v3/types.json') ||
-    key.startsWith('v3/moves.json') ||
-    key.startsWith('v3/manifest.json') ||
-    key.startsWith('v3/abilities.json') ||
-    key.startsWith('v3/games.json') ||
-    key.startsWith('v3/natures.json') ||
-    key.startsWith('v3/egg_groups.json') ||
-    key.startsWith('v3/status_conditions.json') ||
-    key.startsWith('v3/weather.json') ||
-    key.startsWith('v3/terrains.json') ||
-    key.startsWith('v3/items.json')
-  ) {
-    return LONG_CACHE;
-  }
-  return SHORT_CACHE;
-}
-
-function contentTypeForKey(key) {
-  if (key.endsWith('.json')) return 'application/json; charset=utf-8';
-  if (key.endsWith('.jpg')) return 'image/jpeg';
-  if (key.endsWith('.png')) return 'image/png';
-  if (key.endsWith('.tar.zst')) return 'application/octet-stream';
-  return 'application/octet-stream';
-}
+import { CORS_HEADERS, DEPLOY_REV } from './lib/constants.js';
+import { jsonResponse, methodNotAllowed, textResponse } from './lib/http.js';
+import { buildHealthReport } from './lib/health.js';
+import { handleAdminRequest } from './lib/admin.js';
+import { handleScheduledCron } from './lib/cron.js';
+import { sendAlert, hasAlertConfigured } from './lib/alerts.js';
+import { serveR2Object, serveWithFallbacks } from './lib/r2-serve.js';
 
 function objectKeyFromPath(pathname) {
   const path = pathname.replace(/^\/+/, '');
@@ -89,52 +36,61 @@ export default {
 
     const url = new URL(request.url);
 
+    if (url.pathname.startsWith('/admin/')) {
+      if (request.method !== 'GET' && request.method !== 'POST' && request.method !== 'PUT') {
+        return methodNotAllowed();
+      }
+      return handleAdminRequest(request, env);
+    }
+
     if (request.method !== 'GET' && request.method !== 'HEAD') {
-      return new Response('Method Not Allowed', { status: 405, headers: CORS_HEADERS });
+      return methodNotAllowed();
     }
 
     if (url.pathname === '/bundle/latest') {
       const manifestObj = await env.DEX_BUCKET.get('bundle-manifest.json');
       if (!manifestObj) {
-        return new Response('bundle-manifest.json not found', {
-          status: 404,
-          headers: CORS_HEADERS,
-        });
+        return textResponse('bundle-manifest.json not found', 404);
       }
       const manifest = JSON.parse(await manifestObj.text());
       return Response.redirect(manifest.archiveUrl, 302);
     }
 
     if (url.pathname === '/cdn-health') {
-      const headers = new Headers(CORS_HEADERS);
-      headers.set('Content-Type', 'application/json; charset=utf-8');
-      headers.set('Cache-Control', 'no-store');
-      return new Response(
-        JSON.stringify({
-          ok: true,
-          service: 'tito-dex-cdn',
-          rev: '2026-07-10e',
-          bucket: 'titodex-dex',
-        }),
-        { status: 200, headers },
-      );
+      const deep = url.searchParams.get('probe') === '1';
+      const report = await buildHealthReport(env, { deep });
+      return jsonResponse(report, report.ok ? 200 : 503);
     }
 
     const key = objectKeyFromPath(url.pathname);
-    const object = await env.DEX_BUCKET.get(key);
-    if (!object) {
-      return new Response('Not Found', { status: 404, headers: CORS_HEADERS });
+    const response =
+      key.includes('/sprites/by-version/') || key.match(/^v[23]\/sprites\/\d+\.png$/)
+        ? await serveWithFallbacks(env, request, key)
+        : await serveR2Object(env, request, key);
+
+    if (!response) {
+      return textResponse('Not Found', 404);
     }
 
-    const headers = new Headers(CORS_HEADERS);
-    headers.set('Content-Type', contentTypeForKey(key));
-    headers.set('Cache-Control', cacheControlForKey(key));
-    headers.set('ETag', object.httpEtag);
+    return response;
+  },
 
-    if (request.method === 'HEAD') {
-      return new Response(null, { status: 200, headers });
+  async scheduled(event, env) {
+    try {
+      await handleScheduledCron(env, event.cron);
+    } catch (error) {
+      console.error('scheduled handler failed', event.cron, error);
+      if (hasAlertConfigured(env)) {
+        await sendAlert(
+          env,
+          `TitoDex Worker cron failed (${event.cron}): ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+          { title: 'Worker cron error' },
+        ).catch(() => {});
+      }
     }
-
-    return new Response(object.body, { status: 200, headers });
   },
 };
+
+export { DEPLOY_REV };

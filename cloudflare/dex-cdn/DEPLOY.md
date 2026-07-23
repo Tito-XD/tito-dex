@@ -77,6 +77,62 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
 
+### 6. KV（可选，manifest 热缓存）
+
+Dashboard → **Workers KV** → Create namespace → 名称建议 `titodex-dex-kv`
+
+Worker → **Settings** → **Bindings** → KV namespace → `MANIFEST_KV`
+
+或在 `wrangler.toml` 取消注释 `[[kv_namespaces]]` 并填入 `id`。
+
+未绑定 KV 时 Worker 仍正常工作，只是 `bundle-manifest.json` 不走边缘 KV 缓存。
+
+### 7. Cron 与 Secrets（调度 + 管理面）
+
+`wrangler.toml` 已配置两条 cron：
+
+| Cron | 时间 (UTC) | 动作 |
+| --- | --- | --- |
+| `0 4 * * 0` | 每周日 04:00 | `repository_dispatch` → **Sync l10n Catalog** |
+| `0 */6 * * *` | 每 6 小时 | 深度 R2 探活，失败时可选 webhook 告警 |
+
+Worker → **Settings** → **Variables** → **Secrets**：
+
+| Secret | 用途 |
+| --- | --- |
+| `GITHUB_DISPATCH_TOKEN` | GitHub PAT，`repo` 范围 + **Actions: Read and write**，用于 cron / admin 触发 workflow |
+| `ADMIN_SECRET` | `/admin/*` 路由的 Bearer token |
+| `TELEGRAM_BOT_TOKEN` | *(可选)* Telegram Bot token（@BotFather 创建） |
+| `TELEGRAM_CHAT_ID` | *(可选)* 接收告警的 chat id（私聊或群组） |
+| `ALERT_WEBHOOK_URL` | *(可选)* Discord / Slack webhook（不用 Telegram 时可配） |
+
+**GitHub PAT 创建：** Settings → Developer settings → Fine-grained token → Repository `Tito-XD/tito-dex` → Permissions: **Actions: Read and write**, **Contents: Read**.
+
+l10n 定时已从 GitHub `schedule:` 迁移到 Worker cron；手动触发仍可用 Actions **Run workflow** 或 Worker admin API。
+
+#### Telegram 告警配置（推荐）
+
+1. 在 Telegram 搜索 **@BotFather** → `/newbot` → 按提示取名 → 复制 **bot token**（形如 `123456789:ABCdef...`）
+2. 在 Telegram 搜索你刚创建的 bot → 点 **Start**，随便发一条消息（例如 `hi`）
+3. 浏览器打开（把 `<TOKEN>` 换成 bot token）：
+   `https://api.telegram.org/bot<TOKEN>/getUpdates`
+4. 在返回 JSON 里找 `"chat":{"id":123456789}` → 这个数字就是 **chat id**
+   - 私聊：id 通常是正数
+   - 群组：id 通常是负数（先把 bot 拉进群并 @ 它发一条消息，再查 getUpdates）
+5. Cloudflare Worker Secrets 填入：
+   - `TELEGRAM_BOT_TOKEN` = 步骤 1 的 token
+   - `TELEGRAM_CHAT_ID` = 步骤 4 的 id
+
+验证（本地或任意终端）：
+
+```bash
+curl -s -X POST "https://api.telegram.org/bot<TOKEN>/sendMessage" \
+  -H "Content-Type: application/json" \
+  -d '{"chat_id":"<CHAT_ID>","text":"TitoDex CDN alert test OK"}'
+```
+
+Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会自动发同类通知。
+
 ---
 
 ## 图鉴包构建与上传
@@ -99,8 +155,8 @@ python3 tools/upload_dex_via_worker.py dist/dex-v5/upload   # 需临时 bootstra
 
 | 本地路径 | R2 前缀 | 说明 |
 | --- | --- | --- |
-| `upload/v2/` | `v2/` | bundle **v4**，493 物种（v0.2.28 生产） |
-| `upload/v3/` | `v3/` | bundle **v5**，1025 物种（v0.3.0） |
+| `upload/v2/` | `v2/` | bundle **v4**，493 物种（遗留） |
+| `upload/v3/` | `v3/` | bundle **v5**，1025 物种 + l10n/config（**v0.4.x 生产**） |
 | `upload/bundle-manifest.json` | 根 | 指向当前 `archiveUrl` |
 
 Bundle v5 相对 v4 新增：`abilities.json`，summary 内 `pokedexNumbers`，detail 内 `abilities` / `obtainLocations` / 多版本 `moveSets`。
@@ -143,11 +199,58 @@ TITODEX_DEX_BUNDLE_VERSION=4
 
 ---
 
+## Worker 职责（v2026-07-13）
+
+| 能力 | 路由 / 触发 | 说明 |
+| --- | --- | --- |
+| **CDN 网关** | `GET /*` | R2 只读代理 + CORS + Cache-Control |
+| **版本跳转** | `GET /bundle/latest` | 302 → manifest 中的 `archiveUrl` |
+| **存活探针** | `GET /cdn-health` | 轻量 `{ ok: true }` |
+| **深度探活** | `GET /cdn-health?probe=1` | 抽查 9 个关键 R2 key + manifest 摘要 |
+| **Sprite 回退** | `GET /v3/sprites/by-version/...` | 缺失时依次尝试其他 version group → 默认 sprite → artwork；响应头 `X-TitoDex-Sprite-Fallback` |
+| **条件请求** | 任意 GET | 支持 `If-None-Match` → 304 |
+| **Manifest KV 缓存** | `bundle-manifest.json` | 5 分钟 KV 热缓存（需绑定 `MANIFEST_KV`） |
+| **Cron 调度** | 见上表 | 触发 GitHub Actions，不跑 Python 构建 |
+| **管理面** | 见下表 | 需 `Authorization: Bearer $ADMIN_SECRET` |
+
+### Admin API
+
+```bash
+export ADMIN_SECRET="..."
+export CDN=https://dex.tito.cafe
+
+# 深度状态（等同 probe=1 + 上次 cron 记录）
+curl -s -H "Authorization: Bearer $ADMIN_SECRET" "$CDN/admin/status" | jq .
+
+# 手动触发 l10n 同步
+curl -s -X POST -H "Authorization: Bearer $ADMIN_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"workflow":"sync-l10n","inputs":{"force_full":false}}' \
+  "$CDN/admin/trigger-sync" | jq .
+
+# 手动触发 PokeAPI 资源构建
+curl -s -X POST -H "Authorization: Bearer $ADMIN_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"workflow":"pokeapi-assets","inputs":{"min_id":1,"max_id":1025,"upload":true}}' \
+  "$CDN/admin/trigger-sync" | jq .
+
+# 仅更新 bundle-manifest.json 指针（合并 patch，自动 bump publishedAt）
+curl -s -X PUT -H "Authorization: Bearer $ADMIN_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"l10nVersion":"2026-07-13T12:00:00+00:00"}' \
+  "$CDN/admin/manifest" | jq .
+```
+
+`workflow` 可选值：`sync-l10n`、`pokeapi-assets`。
+
+---
+
 ## 相关文件
 
 | 文件 | 作用 |
 | --- | --- |
-| `wrangler.toml` | Worker 名、R2 binding、路由 |
+| `wrangler.toml` | Worker 名、R2 binding、路由、cron |
 | `package.json` | Wrangler 版本、`npm run deploy` |
-| `src/worker.js` | R2 代理 + CORS + `/bundle/latest` |
+| `src/worker.js` | 入口：fetch + scheduled |
+| `src/lib/*.js` | CDN 代理、探活、回退、admin、cron |
 | `../../docs/CLOUDFLARE_DEX_CDN.md` | R2 目录结构、图鉴包构建 |
