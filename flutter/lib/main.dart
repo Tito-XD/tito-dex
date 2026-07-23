@@ -14,6 +14,9 @@ void main() {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
+      // iOS reads statusBarBrightness (background brightness), not icon
+      // brightness: dark background → white status bar text.
+      statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: TitoColors.deepBlue,
       systemNavigationBarIconBrightness: Brightness.light,
     ),
