@@ -43,3 +43,4 @@ tools/pkhex_encounters/obj/
 
 # WorkBuddy agent workspace memory
 .workbuddy/
+.wrangler/
