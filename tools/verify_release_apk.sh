@@ -105,6 +105,30 @@ if "$offline"; then
     fi
     echo "    OK $asset"
   done
+
+  tmp_dir=$(mktemp -d)
+  trap 'rm -rf "$tmp_dir"' EXIT
+  unzip -p "$APK" assets/flutter_assets/assets/dex/bundle-manifest.json > "$tmp_dir/bundle-manifest.json"
+  unzip -p "$APK" assets/flutter_assets/assets/dex/bundle.tar.zst > "$tmp_dir/bundle.tar.zst"
+  python3 - "$tmp_dir/bundle-manifest.json" <<'PY'
+import json
+import sys
+
+manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+assert manifest.get("bundleVersion") == 6, manifest
+assert manifest.get("pokemonCount") == 1025, manifest
+assert manifest.get("complete") is True, manifest
+assert manifest.get("cdnPrefix") == "v4", manifest
+assert "/v4/" in str(manifest.get("archiveUrl", "")), manifest
+assert len(str(manifest.get("archiveSha256", ""))) == 64, manifest
+PY
+  expected_sha=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["archiveSha256"])' "$tmp_dir/bundle-manifest.json")
+  actual_sha=$(sha256sum "$tmp_dir/bundle.tar.zst" 2>/dev/null | awk '{print $1}' || shasum -a 256 "$tmp_dir/bundle.tar.zst" | awk '{print $1}')
+  if [[ "$actual_sha" != "$expected_sha" ]]; then
+    echo "ERROR: bundled Dex archive SHA-256 mismatch." >&2
+    exit 1
+  fi
+  echo "    OK v6 manifest and archive SHA-256"
 fi
 
 echo "PASS: release APK looks complete."

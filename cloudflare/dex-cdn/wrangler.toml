@@ -4,7 +4,7 @@
 
 name = "tito-dex"
 main = "src/worker.js"
-compatibility_date = "2024-09-23"
+compatibility_date = "2026-07-23"
 
 # Set in Dashboard → Settings → Variables, or uncomment after first deploy:
 # account_id = "YOUR_ACCOUNT_ID"
@@ -13,11 +13,10 @@ compatibility_date = "2024-09-23"
 binding = "DEX_BUCKET"
 bucket_name = "titodex-dex"
 
-# Optional: create KV namespace "titodex-dex-kv" in Dashboard, paste id below.
-# Worker degrades gracefully when MANIFEST_KV is not bound.
-# [[kv_namespaces]]
-# binding = "MANIFEST_KV"
-# id = "YOUR_KV_NAMESPACE_ID"
+# Dedicated TitoDex KV (never reuse the unrelated FODI_CACHE namespace).
+[[kv_namespaces]]
+binding = "MANIFEST_KV"
+id = "38305ab2b6b249079241407b5e1e0366"
 
 # Custom domain — zone tito.cafe must be on this Cloudflare account.
 [[routes]]
@@ -28,9 +27,9 @@ zone_name = "tito.cafe"
 crons = ["0 4 * * 0", "0 */6 * * *"]
 
 [vars]
-CDN_VERSION = "3"
+CDN_VERSION = "4"
 CDN_BASE_URL = "https://dex.tito.cafe"
-DEPLOY_REV = "2026-07-13a"
+DEPLOY_REV = "2026-07-23-v4"
 GITHUB_REPO = "Tito-XD/tito-dex"
 
 # Secrets (Dashboard → Settings → Variables → Secrets):

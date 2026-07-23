@@ -1,78 +1,119 @@
-name: Upload Dex Bundle to R2
+name: Build and Publish Dex Bundle v6
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - deploy/dex-cdn
-    paths:
-      - dist/dex-v2/upload/**
-      - tools/build_dex_bundle.py
-      - tools/upload_dex_bundle.sh
-      - .github/workflows/upload-dex-bundle.yml
+    inputs:
+      publish:
+        description: Upload verified /v4 objects and switch the root manifest last
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dex-bundle-v6-production
+  cancel-in-progress: false
 
 jobs:
-  build-and-upload:
+  build-verify-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    permissions:
-      contents: read
+    timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v6
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
 
-      - name: Install Python deps
+      - name: Install Python dependencies
         run: pip install -r tools/dex_bundle_requirements.txt
 
-      - name: Build dex bundle v2
+      - name: Preserve the current v5 root manifest for rollback
+        if: inputs.publish
         run: |
-          python3 tools/build_dex_bundle.py \
-            --cdn-base https://dex.tito.cafe \
-            --output dist/dex-v2 \
-            --delay 0.2
+          mkdir -p dist/rollback
+          curl --fail --location --retry 5 --output dist/rollback/bundle-manifest-v5.json https://dex.tito.cafe/bundle-manifest.json
+          python3 -c 'import json; m=json.load(open("dist/rollback/bundle-manifest-v5.json")); assert m["bundleVersion"] == 5 and "/v3/" in m["archiveUrl"], m'
 
-      - uses: actions/setup-node@v6
+      - name: Upload rollback manifest backup
+        if: inputs.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-root-manifest-v5-rollback
+          path: dist/rollback/bundle-manifest-v5.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Run bundle unit tests
+        run: |
+          python3 tools/test_pokemon_forms.py
+          python3 tools/test_dex_bundle_v6.py
+
+      - name: Build complete Dex bundle v6
+        run: >-
+          python3 tools/build_dex_bundle.py
+          --cdn-base https://dex.tito.cafe
+          --output dist/dex-v6
+          --delay 0.2
+
+      - name: Audit bundle data and upload tree
+        run: |
+          python3 tools/audit_encounter_coverage.py dist/dex-v6/staging --strict
+          python3 tools/audit_form_coverage.py dist/dex-v6/staging --strict
+          python3 tools/audit_dex_golden_samples.py dist/dex-v6/staging --strict
+          python3 tools/verify_dex_upload_tree.py dist/dex-v6/upload
+
+      - name: Upload verified bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v6
+          path: dist/dex-v6/upload
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Set up Node for Wrangler
+        if: inputs.publish
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
 
-      - name: Upload to R2
+      - name: Install Wrangler
+        if: inputs.publish
+        working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Upload and verify immutable /v4 objects
+        if: inputs.publish
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          cd cloudflare/dex-cdn
-          npm ci
-          WR="npx wrangler r2 object put --remote"
-          $WR titodex-dex/bundle-manifest.json \
-            --file=../../dist/dex-v2/upload/bundle-manifest.json \
-            --content-type=application/json
-          V2=../../dist/dex-v2/upload/v2
-          for f in manifest.json summaries.json types.json moves.json bundle.tar.zst; do
-            $WR "titodex-dex/v2/$f" --file="$V2/$f"
-          done
-          find "$V2/details" -type f | while read -r file; do
-            rel="${file#"$V2/"}"
-            $WR "titodex-dex/v2/$rel" --file="$file" --content-type=application/json
-          done
-          find "$V2/sprites" -type f | while read -r file; do
-            rel="${file#"$V2/"}"
-            $WR "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
-          done
-          if [ -d "$V2/artwork" ]; then
-            find "$V2/artwork" -type f | while read -r file; do
-              rel="${file#"$V2/"}"
-              $WR "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
-            done
-          fi
-          find "$V2/type_icons" -type f | while read -r file; do
-            rel="${file#"$V2/"}"
-            $WR "titodex-dex/v2/$rel" --file="$file" --content-type=image/png
-          done
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload
+          --cdn-prefix v4 --phase objects
 
-      - name: Verify CDN
+      - name: Atomically switch the root manifest
+        if: inputs.publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload
+          --cdn-prefix v4 --phase manifest
+
+      - name: Verify public v6 cutover
+        if: inputs.publish
         run: |
-          curl -sf https://dex.tito.cafe/cdn-health
-          curl -sfI https://dex.tito.cafe/bundle-manifest.json | head -5
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 6 and m["cdnPrefix"] == "v4" and m["complete"] is True'
+          curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'

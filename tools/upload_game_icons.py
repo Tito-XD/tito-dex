@@ -62,13 +62,13 @@ def make_icon(slug: str, label: str) -> bytes:
 
 
 def main() -> None:
-    out_dir = ROOT / "dist" / "dex-v5" / "upload" / "v3" / "game_icons"
+    out_dir = ROOT / "dist" / "dex-v6" / "upload" / "v4" / "game_icons"
     out_dir.mkdir(parents=True, exist_ok=True)
     for edition in GAME_EDITIONS:
         png = make_icon(edition.icon_slug, edition.label_zh)
         path = out_dir / f"{edition.icon_slug}.png"
         path.write_bytes(png)
-        key = f"v3/game_icons/{edition.icon_slug}.png"
+        key = f"v4/game_icons/{edition.icon_slug}.png"
         subprocess.run(
             [
                 "npx",

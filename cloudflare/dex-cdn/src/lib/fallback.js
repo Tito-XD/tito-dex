@@ -38,7 +38,7 @@ export function spriteFallbackKeys(key) {
  * @returns {string[] | null}
  */
 export function genericSpriteFallbackKeys(key) {
-  const match = key.match(/^(v[23])\/sprites\/(\d+)\.png$/);
+  const match = key.match(/^(v\d+)\/sprites\/(\d+)\.png$/);
   if (!match) {
     return null;
   }

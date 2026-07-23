@@ -15,10 +15,10 @@ on:
         description: Monotonically increasing Android versionCode for Offline
         required: true
         type: string
-      offline_seed_apk:
-        description: Previous verified Offline APK used to reuse the unchanged dex v5 seed
+      bundle_manifest_url:
+        description: Published v6 root manifest used to seed the Offline APK
         required: true
-        default: releases/TitoDex-0.6.2.1-offline-rg-arm64.apk
+        default: https://dex.tito.cafe/bundle-manifest.json
         type: string
 
 permissions:
@@ -118,19 +118,31 @@ jobs:
             printf 'storeFile=../titodex-upload.keystore\n'
           } > android/key.properties
 
-      - name: Reuse verified offline dex seed
+      - name: Download and verify published v6 offline dex seed
         if: matrix.variant == 'offline'
         env:
-          OFFLINE_SEED_APK: ${{ inputs.offline_seed_apk }}
+          BUNDLE_MANIFEST_URL: ${{ inputs.bundle_manifest_url }}
         run: |
           set -euo pipefail
-          seed="../$OFFLINE_SEED_APK"
-          test -f "$seed"
           mkdir -p assets/dex
-          unzip -p "$seed" assets/flutter_assets/assets/dex/bundle.tar.zst > assets/dex/bundle.tar.zst
-          unzip -p "$seed" assets/flutter_assets/assets/dex/bundle-manifest.json > assets/dex/bundle-manifest.json
+          curl --fail --location --retry 5 --output assets/dex/bundle-manifest.json "$BUNDLE_MANIFEST_URL"
+          archive_url="$(python3 -c 'import json; print(json.load(open("assets/dex/bundle-manifest.json"))["archiveUrl"])')"
+          expected_sha="$(python3 -c 'import json; print(json.load(open("assets/dex/bundle-manifest.json"))["archiveSha256"])')"
+          python3 - <<'PY'
+          import json
+          manifest = json.load(open("assets/dex/bundle-manifest.json", encoding="utf-8"))
+          assert manifest["bundleVersion"] == 6, manifest
+          assert manifest["pokemonCount"] == 1025, manifest
+          assert manifest["complete"] is True, manifest
+          assert manifest["cdnPrefix"] == "v4", manifest
+          assert "/v4/" in manifest["archiveUrl"], manifest
+          assert len(manifest["archiveSha256"]) == 64, manifest
+          PY
+          curl --fail --location --retry 5 --output assets/dex/bundle.tar.zst "$archive_url"
           test -s assets/dex/bundle.tar.zst
           test -s assets/dex/bundle-manifest.json
+          actual_sha="$(sha256sum assets/dex/bundle.tar.zst | awk '{print $1}')"
+          test "$actual_sha" = "$expected_sha"
           sed -i '\|    - assets/config/|a\    - assets/dex/' pubspec.yaml
 
       - name: Install dependencies
