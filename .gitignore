@@ -33,5 +33,9 @@ android/local.properties
 # Kotlin compiler session artifacts
 flutter/android/.kotlin/
 
+# Local PKHeX exporter build artifacts
+tools/pkhex_encounters/bin/
+tools/pkhex_encounters/obj/
+
 # WorkBuddy agent workspace memory
 .workbuddy/

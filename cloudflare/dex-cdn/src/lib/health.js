@@ -1,5 +1,32 @@
-import { DEPLOY_REV, PROBE_KEYS } from './constants.js';
+import { DEPLOY_REV } from './constants.js';
 import { sendAlert } from './alerts.js';
+
+function activePrefixForManifest(manifest) {
+  if (typeof manifest?.cdnPrefix === 'string' && /^v\d+$/.test(manifest.cdnPrefix)) {
+    return manifest.cdnPrefix;
+  }
+  const archiveMatch = String(manifest?.archiveUrl ?? '').match(/\/(v\d+)\/bundle\.tar\.zst(?:\?|$)/);
+  if (archiveMatch) return archiveMatch[1];
+  const bundleVersion = Number(manifest?.bundleVersion);
+  if (Number.isInteger(bundleVersion) && bundleVersion >= 2) {
+    return `v${bundleVersion - 2}`;
+  }
+  return null;
+}
+
+function probeKeysForPrefix(prefix) {
+  return [
+    'bundle-manifest.json',
+    `${prefix}/manifest.json`,
+    `${prefix}/summaries.json`,
+    `${prefix}/l10n/zh/manifest.json`,
+    `${prefix}/config/app_config.json`,
+    `${prefix}/sprites/25.png`,
+    `${prefix}/artwork/25.png`,
+    `${prefix}/type_icons/fire.png`,
+    `${prefix}/bundle.tar.zst`,
+  ];
+}
 
 /**
  * HEAD-check a list of R2 keys.
@@ -43,26 +70,34 @@ export async function buildHealthReport(env, options = {}) {
   };
 
   if (options.deep) {
-    const probe = await probeR2Keys(env, PROBE_KEYS);
-    report.probe = probe;
-    report.ok = probe.ok;
-
     const manifestObj = await env.DEX_BUCKET.get('bundle-manifest.json');
     if (manifestObj) {
       try {
         const manifest = JSON.parse(await manifestObj.text());
+        const activePrefix = activePrefixForManifest(manifest);
         report.manifest = {
           bundleVersion: manifest.bundleVersion,
+          activePrefix,
           l10nVersion: manifest.l10nVersion,
           publishedAt: manifest.publishedAt,
           archiveUrl: manifest.archiveUrl,
         };
+        if (!activePrefix) {
+          report.probe = { ok: false, checked: 0, missing: ['active-prefix'], keys: [] };
+          report.ok = false;
+        } else {
+          const probe = await probeR2Keys(env, probeKeysForPrefix(activePrefix));
+          report.probe = probe;
+          report.ok = probe.ok;
+        }
       } catch {
         report.manifest = { parseError: true };
+        report.probe = { ok: false, checked: 0, missing: ['manifest-parse'], keys: [] };
         report.ok = false;
       }
     } else {
       report.manifest = null;
+      report.probe = { ok: false, checked: 0, missing: ['bundle-manifest.json'], keys: [] };
       report.ok = false;
     }
   }

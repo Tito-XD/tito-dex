@@ -10,8 +10,8 @@ Usage:
     python3 tools/seed_starter_media.py --upload       # download + wrangler put
 
 R2 layout (matches DexCdnConfig in the Flutter app):
-    v3/sprites/animated/{id}.gif
-    v3/cries/{id}.ogg
+    v4/sprites/animated/{id}.gif
+    v4/cries/{id}.ogg
 """
 
 from __future__ import annotations
@@ -80,7 +80,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--upload", action="store_true",
                         help="upload to R2 via wrangler after downloading")
-    parser.add_argument("--prefix", default="v3")
+    parser.add_argument("--prefix", default="v4")
     args = parser.parse_args()
 
     upload_root = args.output / "upload"

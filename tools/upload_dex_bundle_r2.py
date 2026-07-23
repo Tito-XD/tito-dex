@@ -9,10 +9,13 @@ import os
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
 from pathlib import Path
 
-DEFAULT_CDN_PREFIX = "v3"
-LEGACY_CDN_PREFIX = "v2"
+DEFAULT_CDN_PREFIX = "v4"
 
 
 def _wrangler_oauth_ready() -> bool:
@@ -32,12 +35,6 @@ def resolve_bundle_dir(upload_dir: Path, cdn_prefix: str) -> Path:
     bundle_dir = upload_dir / cdn_prefix
     if bundle_dir.is_dir():
         return bundle_dir
-    if cdn_prefix == DEFAULT_CDN_PREFIX and (upload_dir / LEGACY_CDN_PREFIX).is_dir():
-        print(
-            f"Note: {bundle_dir} missing; falling back to upload/{LEGACY_CDN_PREFIX}",
-            file=sys.stderr,
-        )
-        return upload_dir / LEGACY_CDN_PREFIX
     raise FileNotFoundError(f"Missing bundle directory: {bundle_dir}")
 
 
@@ -47,9 +44,47 @@ def load_uploaded_keys(log_path: Path | None) -> set[str]:
         return uploaded
     for line in log_path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
-        if line.startswith("→ "):
+        if line.startswith("✓ "):
             uploaded.add(line[2:].strip())
     return uploaded
+
+
+def bundle_files(bundle_dir: Path, cdn_prefix: str) -> list[tuple[str, Path]]:
+    return [
+        (f"{cdn_prefix}/{file.relative_to(bundle_dir).as_posix()}", file)
+        for file in sorted(bundle_dir.rglob("*"))
+        if file.is_file()
+    ]
+
+
+def verify_public_objects(
+    objects: list[tuple[str, Path]], *, cdn_base: str, workers: int = 16
+) -> None:
+    def verify(item: tuple[str, Path]) -> str:
+        key, file = item
+        request = urllib.request.Request(
+            f"{cdn_base.rstrip('/')}/{key}",
+            method="HEAD",
+            headers={"User-Agent": "TitoDex-release-verifier/1.0"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                if response.status != 200:
+                    raise RuntimeError(f"HTTP {response.status}")
+                remote_size = response.headers.get("Content-Length")
+                if remote_size and int(remote_size) != file.stat().st_size:
+                    raise RuntimeError(
+                        f"size mismatch: local={file.stat().st_size} remote={remote_size}"
+                    )
+        except (OSError, urllib.error.HTTPError) as exc:
+            raise RuntimeError(f"{key}: {exc}") from exc
+        return key
+
+    print(f"Verifying {len(objects)} public CDN objects…", flush=True)
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        for index, _key in enumerate(executor.map(verify, objects), start=1):
+            if index % 250 == 0 or index == len(objects):
+                print(f"  verified {index}/{len(objects)}", flush=True)
 
 
 def upload_with_wrangler(
@@ -57,6 +92,10 @@ def upload_with_wrangler(
     bucket: str,
     cdn_prefix: str,
     *,
+    phase: str,
+    cdn_base: str,
+    verify: bool,
+    workers: int,
     resume: bool = False,
     resume_log: Path | None = None,
 ) -> None:
@@ -69,11 +108,13 @@ def upload_with_wrangler(
         prefix = [wrangler]
 
     uploaded = load_uploaded_keys(resume_log) if resume else set()
+    upload_lock = Lock()
 
     def put(key: str, file: Path, content_type: str | None = None) -> None:
-        if resume and key in uploaded:
-            print(f"  skip {key} (already uploaded)", flush=True)
-            return
+        with upload_lock:
+            if resume and key in uploaded:
+                print(f"  skip {key} (already uploaded)", flush=True)
+                return
         cmd = [
             *prefix,
             "r2",
@@ -90,7 +131,13 @@ def upload_with_wrangler(
             try:
                 print(f"→ {key}", flush=True)
                 subprocess.run(cmd, check=True)
-                uploaded.add(key)
+                with upload_lock:
+                    uploaded.add(key)
+                    if resume and resume_log is not None:
+                        resume_log.parent.mkdir(parents=True, exist_ok=True)
+                        with resume_log.open("a", encoding="utf-8") as log:
+                            log.write(f"✓ {key}\n")
+                print(f"✓ {key}", flush=True)
                 return
             except subprocess.CalledProcessError as exc:
                 last_error = exc
@@ -103,50 +150,33 @@ def upload_with_wrangler(
                 time.sleep(wait)
         raise last_error  # type: ignore[misc]
 
-    put("bundle-manifest.json", upload_dir / "bundle-manifest.json", "application/json")
-    for name in (
-        "manifest.json",
-        "summaries.json",
-        "types.json",
-        "moves.json",
-        "abilities.json",
-        "games.json",
-        "natures.json",
-        "egg_groups.json",
-        "status_conditions.json",
-        "weather.json",
-        "terrains.json",
-        "items.json",
-        "bundle.tar.zst",
-    ):
-        file = bundle_dir / name
-        if not file.exists():
-            if name in ("abilities.json", "games.json", "natures.json", "egg_groups.json",
-                        "status_conditions.json", "weather.json", "terrains.json", "items.json"):
-                print(f"  skip missing {name} (pre-v0.4.0 bundle)", file=sys.stderr)
-                continue
-            raise FileNotFoundError(file)
-        ct = "application/json" if name.endswith(".json") else "application/octet-stream"
-        put(f"{cdn_prefix}/{name}", file, ct)
+    objects = bundle_files(bundle_dir, cdn_prefix)
+    if phase in ("objects", "all"):
+        def upload_item(item: tuple[str, Path]) -> None:
+            key, file = item
+            put(
+                key,
+                file,
+                mimetypes.guess_type(str(file))[0] or "application/octet-stream",
+            )
 
-    for folder, default_ct in (
-        ("details", "application/json"),
-        ("sprites", "image/png"),
-        ("artwork", "image/png"),
-        ("type_icons", "image/png"),
-        ("game_icons", "image/png"),
-    ):
-        folder_path = bundle_dir / folder
-        if not folder_path.exists():
-            continue
-        for file in sorted(folder_path.rglob("*")):
-            if file.is_file():
-                rel = file.relative_to(bundle_dir).as_posix()
-                put(f"{cdn_prefix}/{rel}", file, default_ct)
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            list(executor.map(upload_item, objects))
+        if verify:
+            verify_public_objects(objects, cdn_base=cdn_base)
+    if phase in ("manifest", "all"):
+        put("bundle-manifest.json", upload_dir / "bundle-manifest.json", "application/json")
 
 
 def upload_with_boto3(
-    upload_dir: Path, bucket: str, endpoint: str, cdn_prefix: str
+    upload_dir: Path,
+    bucket: str,
+    endpoint: str,
+    cdn_prefix: str,
+    *,
+    phase: str,
+    verify: bool,
+    workers: int,
 ) -> None:
     import boto3
     from botocore.config import Config
@@ -166,10 +196,22 @@ def upload_with_boto3(
         print(f"→ {key}")
         client.upload_file(str(file), bucket, key, ExtraArgs={"ContentType": ct})
 
-    put("bundle-manifest.json", upload_dir / "bundle-manifest.json")
-    for file in bundle_dir.rglob("*"):
-        if file.is_file():
-            put(f"{cdn_prefix}/{file.relative_to(bundle_dir).as_posix()}", file)
+    objects = bundle_files(bundle_dir, cdn_prefix)
+    if phase in ("objects", "all"):
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            list(executor.map(lambda item: put(*item), objects))
+        if verify:
+            print(f"Verifying {len(objects)} R2 objects…")
+            def verify_item(item: tuple[str, Path]) -> None:
+                key, file = item
+                head = client.head_object(Bucket=bucket, Key=key)
+                if head["ContentLength"] != file.stat().st_size:
+                    raise RuntimeError(f"R2 size mismatch for {key}")
+
+            with ThreadPoolExecutor(max_workers=workers * 2) as executor:
+                list(executor.map(verify_item, objects))
+    if phase in ("manifest", "all"):
+        put("bundle-manifest.json", upload_dir / "bundle-manifest.json")
 
 
 def main() -> None:
@@ -177,14 +219,28 @@ def main() -> None:
     parser.add_argument(
         "upload_dir",
         type=Path,
-        default=Path("dist/dex-v5/upload"),
+        default=Path("dist/dex-v6/upload"),
         nargs="?",
     )
     parser.add_argument("--bucket", default="titodex-dex")
     parser.add_argument(
         "--cdn-prefix",
         default=DEFAULT_CDN_PREFIX,
-        help=f"CDN path prefix under bucket (default: {DEFAULT_CDN_PREFIX}; use v2 for legacy)",
+        help=f"CDN path prefix under bucket (default: {DEFAULT_CDN_PREFIX})",
+    )
+    parser.add_argument(
+        "--phase",
+        choices=("all", "objects", "manifest"),
+        default="all",
+        help="Two-phase release control. 'all' uploads+verifies versioned objects before the root manifest.",
+    )
+    parser.add_argument("--cdn-base", default="https://dex.tito.cafe")
+    parser.add_argument("--skip-verify", action="store_true")
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=8,
+        help="Concurrent object uploads (default: 8)",
     )
     parser.add_argument(
         "--resume",
@@ -198,6 +254,8 @@ def main() -> None:
         help="Log file listing prior successful uploads (default: /tmp/dex-upload.log)",
     )
     args = parser.parse_args()
+    if args.workers < 1 or args.workers > 32:
+        parser.error("--workers must be between 1 and 32")
 
     if not args.upload_dir.exists():
         print(f"Missing {args.upload_dir}", file=sys.stderr)
@@ -216,12 +274,19 @@ def main() -> None:
             args.bucket,
             f"https://{account_id}.r2.cloudflarestorage.com",
             args.cdn_prefix,
+            phase=args.phase,
+            verify=not args.skip_verify,
+            workers=args.workers,
         )
     elif os.environ.get("CLOUDFLARE_API_TOKEN") or _wrangler_oauth_ready():
         upload_with_wrangler(
             args.upload_dir,
             args.bucket,
             args.cdn_prefix,
+            phase=args.phase,
+            cdn_base=args.cdn_base,
+            verify=not args.skip_verify,
+            workers=args.workers,
             resume=args.resume,
             resume_log=args.resume_log,
         )

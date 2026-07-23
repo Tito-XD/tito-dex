@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "dist" / "l10n-upload"
-CDN_PREFIX = "v3"
+CDN_PREFIX = "v4"
 
 
 def _import_build_helpers():
@@ -27,17 +27,17 @@ def _import_build_helpers():
 
 
 def stage_l10n_upload(output_dir: Path) -> dict[str, str | int]:
-    """Copy compact l10n assets + maps + config into [output_dir]/v3/…"""
+    """Copy compact l10n assets + maps + config into [output_dir]/v4/…"""
     from generate_zh_catalog_assets import write_compact_l10n
 
     DEFAULT_APP_CONFIG, APP_CONFIG_VERSION, build_hgss_map_list_with_zh, write_json = (
         _import_build_helpers()
     )
 
-    v3_root = output_dir / CDN_PREFIX
-    l10n_dir = v3_root / "l10n" / "zh"
-    maps_dir = v3_root / "maps"
-    config_dir = v3_root / "config"
+    version_root = output_dir / CDN_PREFIX
+    l10n_dir = version_root / "l10n" / "zh"
+    maps_dir = version_root / "maps"
+    config_dir = version_root / "config"
 
     if output_dir.exists():
         shutil.rmtree(output_dir)
@@ -68,15 +68,6 @@ def stage_l10n_upload(output_dir: Path) -> dict[str, str | int]:
     }
 
 
-DEFAULT_MANIFEST_FALLBACK: dict[str, object] = {
-    "bundleVersion": 5,
-    "pokemonCount": 1025,
-    "archiveUrl": "https://dex.tito.cafe/v3/bundle.tar.zst",
-    "archiveSha256": "",
-    "archiveSizeBytes": 0,
-}
-
-
 def _fetch_remote_manifest(url: str) -> dict[str, object]:
     import urllib.request
 
@@ -104,11 +95,24 @@ def update_bundle_manifest(
         try:
             manifest = _fetch_remote_manifest(url)
         except OSError as exc:
-            print(f"WARN: could not fetch remote manifest: {exc}", file=sys.stderr)
-            manifest = {}
+            raise RuntimeError(
+                "refusing to stage a root manifest without the current published manifest"
+            ) from exc
 
-    for key, value in DEFAULT_MANIFEST_FALLBACK.items():
-        manifest.setdefault(key, value)
+    required = {
+        "bundleVersion": 6,
+        "cdnPrefix": "v4",
+        "pokemonCount": 1025,
+        "complete": True,
+    }
+    for key, expected in required.items():
+        if manifest.get(key) != expected:
+            raise RuntimeError(
+                f"refusing l10n update: root manifest {key}={manifest.get(key)!r}, "
+                f"expected {expected!r}"
+            )
+    if not manifest.get("archiveSha256"):
+        raise RuntimeError("refusing l10n update: current root manifest has no archive SHA")
 
     manifest["l10nVersion"] = l10n_version
     manifest["configVersion"] = config_version

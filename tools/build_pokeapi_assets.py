@@ -59,7 +59,7 @@ def fetch_pokemon(session: requests.Session, pokemon_id: int) -> dict[str, Any]:
 
 
 def cdn_object_exists(session: requests.Session, rel_path: str) -> bool:
-    """True when dex.tito.cafe already serves this v3 asset."""
+    """True when dex.tito.cafe already serves this versioned asset."""
     url = f"{CDN_BASE}/{BUNDLE_CDN_PREFIX}/{rel_path.lstrip('/')}"
     try:
         response = session.head(url, timeout=20, allow_redirects=True)

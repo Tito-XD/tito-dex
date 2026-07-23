@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Upload pokesprite type icons to Cloudflare R2 (v3/type_icons/).
+# Upload pokesprite type icons to Cloudflare R2 (v4/type_icons/).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -19,10 +19,10 @@ WR="npx wrangler r2 object put --remote"
 count=0
 for f in "$ICON_DIR"/*.png; do
   base=$(basename "$f")
-  $WR "titodex-dex/v3/type_icons/$base" \
+  $WR "titodex-dex/v4/type_icons/$base" \
     --file="$f" \
     --content-type=image/png
   count=$((count + 1))
 done
 
-echo "Uploaded $count type icons to titodex-dex/v3/type_icons/"
+echo "Uploaded $count type icons to titodex-dex/v4/type_icons/"

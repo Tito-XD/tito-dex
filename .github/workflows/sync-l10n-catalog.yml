@@ -69,21 +69,21 @@ jobs:
           WR="npx wrangler r2 object put --remote"
 
           # l10n/zh/*.json
-          L10N=../../dist/l10n-upload/v3/l10n/zh
+          L10N=../../dist/l10n-upload/v4/l10n/zh
           for f in "$L10N"/*.json; do
             base=$(basename "$f")
-            $WR "titodex-dex/v3/l10n/zh/$base" \
+            $WR "titodex-dex/v4/l10n/zh/$base" \
               --file="$f" \
               --content-type=application/json
           done
 
           # maps + config
-          $WR titodex-dex/v3/maps/hgss_map_list.json \
-            --file=../../dist/l10n-upload/v3/maps/hgss_map_list.json \
+          $WR titodex-dex/v4/maps/hgss_map_list.json \
+            --file=../../dist/l10n-upload/v4/maps/hgss_map_list.json \
             --content-type=application/json
 
-          $WR titodex-dex/v3/config/app_config.json \
-            --file=../../dist/l10n-upload/v3/config/app_config.json \
+          $WR titodex-dex/v4/config/app_config.json \
+            --file=../../dist/l10n-upload/v4/config/app_config.json \
             --content-type=application/json
 
           # Root bundle-manifest.json — bump l10nVersion + publishedAt
@@ -93,8 +93,8 @@ jobs:
 
       - name: Verify CDN l10n upload
         run: |
-          curl -sfI https://dex.tito.cafe/v3/l10n/zh/manifest.json | head -5
-          curl -sf https://dex.tito.cafe/v3/l10n/zh/manifest.json | python3 -c "
+          curl -sfI https://dex.tito.cafe/v4/l10n/zh/manifest.json | head -5
+          curl -sf https://dex.tito.cafe/v4/l10n/zh/manifest.json | python3 -c "
           import json, sys
           m = json.load(sys.stdin)
           assert m.get('generatedAt'), f'unexpected l10n manifest: {m}'

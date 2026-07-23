@@ -1,15 +1,17 @@
 {
   "name": "titodex-dex-cdn",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "TitoDex offline dex CDN — R2 proxy Worker",
   "scripts": {
     "build": "echo \"titodex-dex-cdn: no static build\"",
     "deploy": "wrangler deploy",
-    "dry-run": "wrangler deploy --dry-run"
+    "dry-run": "wrangler deploy --dry-run",
+    "test": "node --test"
   },
   "devDependencies": {
-    "wrangler": "^4.24.0"
+    "wrangler": "4.107.1"
   },
   "engines": {
     "node": ">=22"

@@ -64,7 +64,7 @@ export default {
 
     const key = objectKeyFromPath(url.pathname);
     const response =
-      key.includes('/sprites/by-version/') || key.match(/^v[23]\/sprites\/\d+\.png$/)
+      key.includes('/sprites/by-version/') || key.match(/^v\d+\/sprites\/\d+\.png$/)
         ? await serveWithFallbacks(env, request, key)
         : await serveR2Object(env, request, key);
 
