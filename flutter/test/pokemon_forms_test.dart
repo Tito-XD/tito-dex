@@ -25,6 +25,10 @@ void main() {
     types: ['poison', 'ground'],
     heightDm: 4,
     weightHg: 110,
+    spriteUrlsByVersion: {
+      'scarlet-violet': 'https://example.invalid/wooper-paldea-sv.png',
+    },
+    animatedSpriteUrl: 'https://example.invalid/wooper-paldea.gif',
     baseStats: paldeanStats,
     typeMultipliers: {'water': 2, 'grass': 0.25, 'electric': 0},
     dataCompleteness: 'complete',
@@ -50,6 +54,11 @@ void main() {
     expect(restored.abilities.single.nameZh, '毒刺');
     expect(restored.dataCompleteness, 'complete');
     expect(restored.sources, hasLength(1));
+    expect(
+      restored.spriteUrlsByVersion['scarlet-violet'],
+      endsWith('wooper-paldea-sv.png'),
+    );
+    expect(restored.animatedSpriteUrl, endsWith('wooper-paldea.gif'));
   });
 
   test(
@@ -76,8 +85,13 @@ void main() {
 
       final selected = detail.forForm(paldeanWooper);
       expect(selected.summary.id, 194);
+      expect(selected.summary.spriteResourceId, 10253);
       expect(selected.summary.nameZh, '乌波（帕底亚的样子）');
       expect(selected.summary.types, ['poison', 'ground']);
+      expect(
+        selected.summary.spriteUrlsByVersion?['scarlet-violet'],
+        endsWith('wooper-paldea-sv.png'),
+      );
       expect(selected.weightHg, 110);
       expect(selected.abilities.single.nameZh, '毒刺');
       expect(selected.weaknesses, ['水']);
@@ -165,10 +179,7 @@ void main() {
       evolutionChain: null,
       obtainLocationsByVersion: {
         'crystal': [
-          ObtainLocationEntry(
-            areaSlug: 'route-32-area',
-            areaLabelZh: '32号道路',
-          ),
+          ObtainLocationEntry(areaSlug: 'route-32-area', areaLabelZh: '32号道路'),
         ],
         'scarlet': [
           ObtainLocationEntry(
@@ -180,11 +191,12 @@ void main() {
       forms: [defaultForm, paldeaWithLocation],
     );
 
-    expect(detail.forForm(defaultForm).obtainLocationsByVersion.keys, ['crystal']);
-    expect(
-      detail.forForm(paldeaWithLocation).obtainLocationsByVersion.keys,
-      ['scarlet'],
-    );
+    expect(detail.forForm(defaultForm).obtainLocationsByVersion.keys, [
+      'crystal',
+    ]);
+    expect(detail.forForm(paldeaWithLocation).obtainLocationsByVersion.keys, [
+      'scarlet',
+    ]);
   });
 
   test('incomplete battle form never borrows misleading default data', () {
@@ -239,9 +251,7 @@ void main() {
         ],
       },
       obtainLocationsByVersion: {
-        'violet': [
-          ObtainLocationEntry(areaSlug: 'test', areaLabelZh: '测试地点'),
-        ],
+        'violet': [ObtainLocationEntry(areaSlug: 'test', areaLabelZh: '测试地点')],
       },
     );
 

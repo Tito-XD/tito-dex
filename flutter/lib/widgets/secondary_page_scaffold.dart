@@ -27,18 +27,36 @@ class SecondaryPageScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: (padding ?? DeviceLayout.pagePadding(context)).copyWith(
-        bottom: 96,
-      ),
+    final pagePadding = padding ?? DeviceLayout.pagePadding(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SecondaryPageAppBar(title: title, showSettings: showSettings),
-        if (subtitle != null) ...[
-          const SizedBox(height: 6),
-          SecondaryPageSubtitle(text: subtitle!),
-        ],
-        const SizedBox(height: 12),
-        ...children,
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            pagePadding.left,
+            pagePadding.top,
+            pagePadding.right,
+            0,
+          ),
+          child: SecondaryPageAppBar(title: title, showSettings: showSettings),
+        ),
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(
+              pagePadding.left,
+              subtitle == null ? 12 : 6,
+              pagePadding.right,
+              96,
+            ),
+            children: [
+              if (subtitle != null) ...[
+                SecondaryPageSubtitle(text: subtitle!),
+                const SizedBox(height: 12),
+              ],
+              ...children,
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import build_dex_bundle as dex_builder  # noqa: E402
+from pokeapi_assets import build_sprite_url_map  # noqa: E402
 from build_dex_bundle import (  # noqa: E402
     BUNDLE_CDN_PREFIX,
     BUNDLE_VERSION,
@@ -30,6 +31,72 @@ from build_dex_bundle import (  # noqa: E402
 
 
 class DexBundleV5ValidationTests(unittest.TestCase):
+    def test_default_sprite_prefers_clear_official_artwork(self) -> None:
+        sprites = {
+            "front_default": "https://example.invalid/default-pixel.png",
+            "versions": {
+                "generation-iv": {
+                    "heartgold-soulsilver": {
+                        "front_default": "https://example.invalid/hgss-pixel.png"
+                    }
+                }
+            },
+            "other": {
+                "official-artwork": {
+                    "front_default": "https://example.invalid/official.png"
+                }
+            },
+        }
+        self.assertEqual(
+            dex_builder.sprite_url(sprites),
+            "https://example.invalid/official.png",
+        )
+
+    def test_version_sprite_map_does_not_invent_missing_generations(self) -> None:
+        sprites = {
+            "versions": {
+                "generation-vi": {
+                    "x-y": {
+                        "front_default": "https://example.invalid/mega-x.png"
+                    }
+                }
+            },
+            "other": {
+                "official-artwork": {
+                    "front_default": "https://example.invalid/official.png"
+                }
+            },
+        }
+        result = build_sprite_url_map(sprites)
+        self.assertEqual(result["x-y"], "https://example.invalid/mega-x.png")
+        self.assertNotIn("red-blue", result)
+        self.assertNotIn("heartgold-soulsilver", result)
+
+    def test_form_sprite_versions_follow_introduction_and_availability(self) -> None:
+        result = dex_builder.filter_form_sprite_versions(
+            {
+                "black-white": "bw.png",
+                "x-y": "xy.png",
+                "omega-ruby-alpha-sapphire": "oras.png",
+                "sun-moon": "sm.png",
+                "sword-shield": "swsh.png",
+            },
+            introduced_version_group="x-y",
+            available_version_groups=[
+                "x-y",
+                "omega-ruby-alpha-sapphire",
+                "sun-moon",
+            ],
+        )
+        self.assertEqual(
+            result,
+            {
+                "x-y": "xy.png",
+                "omega-ruby-alpha-sapphire": "oras.png",
+                "sun-moon": "sm.png",
+            },
+        )
+
     def test_helper_pokedex_numbers(self) -> None:
         entries = [
             {"entry_number": 25, "pokedex": {"name": "national"}},

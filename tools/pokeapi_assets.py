@@ -80,6 +80,8 @@ def _dig(data: dict[str, Any], *keys: str) -> Any:
 def sprite_url_for_version_group(
     sprites: dict[str, Any],
     version_group: str,
+    *,
+    allow_universal_fallback: bool = True,
 ) -> str | None:
     """Pick in-game front sprite for a PokeAPI version-group slug."""
     path = VERSION_GROUP_SPRITE_PATH.get(version_group)
@@ -96,6 +98,9 @@ def sprite_url_for_version_group(
                     url = sub.get("front_default")
                     if url:
                         return url
+
+    if not allow_universal_fallback:
+        return None
 
     other = sprites.get("other") or {}
     for key in ("home", "official-artwork"):
@@ -162,7 +167,11 @@ def build_sprite_url_map(
     """Build version-group → remote URL map for one Pokémon."""
     result: dict[str, str] = {}
     for vg in version_groups:
-        url = sprite_url_for_version_group(sprites, vg)
+        url = sprite_url_for_version_group(
+            sprites,
+            vg,
+            allow_universal_fallback=False,
+        )
         if url:
             result[vg] = url
     return result

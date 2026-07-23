@@ -41,45 +41,29 @@ class PokemonFormSelector extends StatelessWidget {
     if (forms.length < 2) {
       return const SizedBox.shrink();
     }
-    return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('形态', style: SecondaryTypography.onCard.h15),
-          const SizedBox(height: 4),
-          Text(
-            '属性、能力、招式与出现地点会随形态切换',
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final form in forms)
+          ChoiceChip(
+            selected: form.key == selectedKey,
+            onSelected: (_) => onSelected(form),
+            label: Text(form.nameZh),
+            tooltip: form.kind.labelZh,
+            showCheckmark: false,
+            selectedColor: TitoColors.softYellow,
+            backgroundColor: TitoColors.card,
+            side: const BorderSide(
+              color: TitoColors.ink,
+              width: TitoBorders.element,
+            ),
+            labelStyle: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.ink,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final form in forms)
-                ChoiceChip(
-                  selected: form.key == selectedKey,
-                  onSelected: (_) => onSelected(form),
-                  label: Text(form.nameZh),
-                  tooltip: form.kind.labelZh,
-                  showCheckmark: false,
-                  selectedColor: TitoColors.softYellow,
-                  backgroundColor: TitoColors.card,
-                  side: const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.element,
-                  ),
-                  labelStyle: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.ink,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
