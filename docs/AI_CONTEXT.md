@@ -4,10 +4,10 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.6.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.9) |
-| **`main` / lite source** | `0.6.9+91` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.6.9-offline+92` — APK-bundled dex data |
-| **Offline dex bundle** | **v5** — 1025 species, CDN prefix `/v3/` |
+| **Latest release** | [v0.7.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.0) |
+| **`main` / lite source** | `0.7.0+93` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.7.0-offline+94` — APK-bundled verified v6 archive |
+| **Offline dex bundle** | **v6** — 1025 species, CDN prefix `/v4/`; `/v3/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.6.9)
+## Current feature status (latest release line: v0.7.0)
 
-> `main` matches the v0.6.9 release line (party grid rework + tablet home rows, validated via the v0.6.9-pre.1 preview). The offline package adds only the bundled dex seed and offline package version.
+> `main` matches the v0.7.0 release line. Lite downloads bundle v6 when requested; Offline embeds the exact same published archive and verified manifest.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -49,11 +49,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Manual dex marks when save not linked.
 
 ### Dex (national 1–1025)
-- Grid + search; 4-tab detail (简介 / 基本信息 / 获取 / 招式).
+- Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
 - **23 game editions**, **11 regional dexes**, `DexScope` filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
-- Bundle includes: summaries, precomputed filter catalog, details, sprites, moves, abilities, **l10n/zh**, **maps**, **config**, game icons.
-- Chinese location labels via zh catalog; HGSS map id lookup.
+- Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
+- Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
+- Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
 
 ### Search hub
 - **常用资料:** moves, abilities, natures, egg groups, items, weather, terrain, status.
@@ -62,6 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.7.0: searchable form variants replace types, stats, abilities, moves, size, image and locations together; obtain locations can be selected by exact paired version or DLC and remain tied to the selected form without borrowing the default form; bundle v6 publishes all 1025 species plus attributed modern-game encounter overlays under a new immutable prefix with v4→v3→v2 online fallback; iOS platform source is merged and Xcode 27 no-codesign build-verified.
 - v0.6.9: party cells go upright (sprite over full-width name) with the level moved onto the sprite corner as a `_PartyLevelBadge` softYellow pill; square `gridMode` lays 2×3 in the save-linked half-width column and 6×1 via `stripMode` in the no-save full-width bar, with cells capped near-square and centered instead of stretching; tablet/tall-landscape home switches to `_WideRowsContent` (intrinsic-height trainer + journey row, party as one capped strip) so the journey card stops ballooning — square handhelds and short landscape phones keep the packed two-column layout.
 - v0.6.8: header gradient recolored from light-top skyBlue→slateBlue (1.64:1 title contrast) to dark-top `#5D728A`→slateBlue picked via `docs/mockups/titodex_header_gradient_template.html`; on-gradient subtitles switch from invisible skyBlue to cream through the shared `SecondaryPageSubtitle` (deep-blue-card skyBlue text untouched — it was already readable); dex top bar slims to 「图鉴」 with the game name as subtitle; square dashboard gets a 3×2 party grid, tighter trainer card, journey-card overflow fix, and a stacked layout when no save is linked; quick damage gains the doubles spread ×0.75 toggle and the stat-calc → quick-damage one-shot handoff (`battle_handoff.dart`).
 - v0.6.7: Retro phase 2 from the five mock templates — settings group-label pills + StickerSwitch + icon plates, deep-blue damage hero card (oversized percentage, mint/coral HP bar, power slider, engraved fields, pill toggles), dex detail hero header with type-tinted plate + sticker tabs, team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons (`assets/icons/`), responsive dex grid, hold-press physics, pinned damage result, obtain tab follows the selected edition. Cream screen base and weak/resist tinted cells remain intentionally excluded.
@@ -86,7 +88,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Not shipped / partial
 - Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
 - Broader real-save fixtures and validation beyond HGSS (more real saves incoming from the maintainer).
-- Community (52poke) Chinese flavor-text import for older generations — planned as dex bundle v6; attribution (CC BY-NC-SA) is mandatory when it lands.
+- Community (52poke) Chinese flavor-text import for older generations remains a separate future data patch; attribution (CC BY-NC-SA) is mandatory when it lands.
 - Hand-drawn icons for the home quick tiles / entry cards (artwork in progress; the old bottom nav was removed). APK assets only, not on CDN.
 
 > Cloud sync was dropped as a direction (2026-07): TitoDex stays local-first. Journey JSON import/export remains the portability path.
@@ -124,11 +126,14 @@ flutter/lib/
 | CDN prefix | Bundle version | Species |
 | --- | --- | --- |
 | `/v2/` | v4 | 493 (legacy) |
-| `/v3/` | v5 | 1025 (current) |
+| `/v3/` | v5 | 1025 (rollback / older clients) |
+| `/v4/` | v6 | 1025 + forms + exact-version modern encounters (current) |
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
-- Build: `python3 tools/build_dex_bundle.py --cdn-base "$TITODEX_DEX_CDN_BASE" --output dist/dex-v5 --max-id 1025`
+- Build: `python3 tools/build_dex_bundle.py --cdn-base "$TITODEX_DEX_CDN_BASE" --output dist/dex-v6 --max-id 1025`
+- Release order: upload and verify every immutable `/v4/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v3/` during v6 publication.
+- Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.
 - Secrets: [PERMISSIONS.md](./PERMISSIONS.md) — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 
 ---
@@ -138,7 +143,7 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; 205 tests
+flutter test                    # regression gate; 215 tests
 flutter build apk --release --target-platform android-arm64  # ~21 MB
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
@@ -158,7 +163,7 @@ Bump `flutter/pubspec.yaml` **before** building. Tag `v<x.y.z>` + GitHub Release
 
 ---
 
-## iOS platform (in progress, 2026-07)
+## iOS platform (merged source, Android-only 0.7.0 distribution)
 
 Same codebase, no diverging fork — `ios/` generated via
 `flutter create --platforms=ios --org com.tito .` (bundle id
@@ -176,13 +181,11 @@ Same codebase, no diverging fork — `ios/` generated via
   `#2F4361` matching Android.
 - **Info.plist**: display name `TitoDex`,
   `NSPhotoLibraryUsageDescription` for trainer-avatar picking (gallery only).
-- **Verified**: `flutter analyze` clean, `flutter test` 198 passing (incl.
-  zstandard FFI via `zstandard_ios`).
-- **Still needed (blocked on host setup)**: accept the Xcode license
-  (`sudo xcodebuild -license accept`), `brew install cocoapods`, then
-  `cd ios && pod install` and `flutter build ios`. Distribution needs an
-  Apple Developer account; prefer TestFlight/sideload — App Store review is a
-  Pokémon-IP risk.
+- **Verified 2026-07-23**: `pod install`, `flutter analyze`, 215 Flutter tests,
+  and `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
+  Runner.app). Generated Pods/build files are not committed.
+- Signing, IPA, TestFlight, and App Store distribution are intentionally not
+  part of v0.7.0 and require an Apple Developer account.
 
 ---
 

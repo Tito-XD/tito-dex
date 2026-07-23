@@ -88,9 +88,9 @@ Run the **Android Release APKs** workflow manually with:
 - `version` — product version without `v`
 - `lite_build_number` — Lite Android versionCode
 - `offline_build_number` — a larger Offline versionCode
-- `offline_seed_apk` — a previous verified Offline APK whose unchanged dex v5 seed should be reused
+- `bundle_manifest_url` — the already-published v6 root manifest; CI downloads its archive and verifies `bundleVersion=6`, 1025 species, `/v4/`, completeness, and SHA-256 before embedding it
 
-The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload.
+For v0.7.0 use `version=0.7.0`, Lite build `93`, and Offline build `94`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The Offline verifier also checks its embedded v6 manifest and archive SHA-256.
 
 ### Offline variant
 

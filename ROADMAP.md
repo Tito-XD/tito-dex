@@ -1,13 +1,14 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.6.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.6.9) · Lite `0.6.9+91` · Offline `0.6.9-offline+92`.
+> **Latest release:** [v0.7.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.0) · Lite `0.7.0+93` · Offline `0.7.0-offline+94`.
 >
-> **Current `main` source baseline:** `0.6.9+91`.
+> **Current `main` source baseline:** `0.7.0+93`.
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.7.0** | Bundle v6 with complete form records, form-safe exact-version encounters for modern games and DLC, v4→v3→v2 fallback, plus merged iOS platform source |
 | **v0.6.9** | Party grid rework (upright cells, sprite-corner level badges, 2×3 / 6×1 by context) and a fixed-row tablet home, validated via the 0.6.9-pre.1 preview |
 | **v0.6.8** | Header gradient recolor to a readable dark-top `#5D728A→slateBlue`, cream on-gradient subtitles, slim dex title, square-dashboard polish, doubles spread modifier and stat→damage handoff |
 | **v0.6.7** | Retro phase 2 (settings groups, damage hero, dex hero tabs, template-aligned team page) plus hand-drawn tile icons, validated via two previews |
@@ -52,7 +53,7 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 | Matchup, stat/damage estimates, blind spots, modifiers, and team weaknesses | Shipped; calculation depth remains partial |
 | APK-bundled offline variant | Available as an optional distribution |
 | Standby companion, shiny party surprise, silhouette quiz | Shipped in v0.5.5; companion sizing/media in v0.6.1–v0.6.2 |
-| Community Chinese flavor text for older generations | Planned as dex bundle v6 (attribution required) |
+| Community Chinese flavor text for older generations | Still planned separately; bundle v6 focuses on forms and encounter locations |
 
 ## Next priorities
 
@@ -60,22 +61,24 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
 3. **Save workflow validation** — add real fixtures for supported pre-Switch games and expand format-specific imports.
 4. **Distribution polish** — refine splash, install guidance, and release consistency.
-5. **Offline maintenance** — keep bundle v5 manifests and Chinese labels current without exposing private service URLs in public copy.
+5. **Offline maintenance** — keep bundle v6 manifests, modern encounter overlays, forms, and Chinese labels current without exposing private service URLs in public copy.
 
 ## Active TODO
 
-- [ ] Restore the deep CDN health check: upload the missing Scarlet/Violet Pikachu version sprite or make the probe accept the intentional shared-sprite fallback, so the six-hour cron does not emit false alarms.
-- [ ] Restore the production Worker Cron Triggers (currently none are attached): deploy the weekly l10n dispatch and six-hour deep-health schedules declared on `deploy/dex-cdn`, then verify both handlers from Cloudflare's trigger inventory.
-- [ ] Create and bind a dedicated TitoDex KV namespace for hot-object caching plus last-probe / last-dispatch state; do not reuse the unrelated `FODI_CACHE` namespace.
-- [ ] Reconcile the two Worker-only commits on `deploy/dex-cdn` with `main`, while keeping `deploy/dex-cdn` as the production deployment branch.
-- [ ] Refresh the Worker compatibility date and locked Wrangler release, then run a dry-run validation before the next production deployment.
+- [x] Make deep CDN health derive the active prefix from the manifest and accept a legal default-sprite fallback.
+- [x] Reconcile production Worker health, alerts, cron handlers, caching, and fallback semantics into `main`.
+- [x] Create and bind a dedicated TitoDex `MANIFEST_KV`; the unrelated `FODI_CACHE` remains untouched.
+- [x] Refresh the Worker compatibility date and locked Wrangler release, with a dry-run gate before deployment.
+- [ ] Re-audit the dedicated TitoDex KV binding and production cron inventory after each Cloudflare configuration change.
 - [ ] Verify whether the legacy `autumn-shape-2b65` Worker still has traffic or an owner; retire it only after that read-only check confirms it is unused.
-- [ ] Rebuild and publish the dex bundle with the new exact-version encounter schema; before claiming full modern-game coverage, audit and add attributed redistributable overlays for modern version groups whose upstream encounter tables are empty or not yet verified (BDSP, Legends: Arceus, Scarlet/Violet, Z-A, and Champions).
+- [x] Publish exact-version encounter schema with attributed PKHeX overlays for BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension; Champions is explicitly not applicable.
 - [ ] Add persistent caching or bounded concurrency to the full PokeAPI location-area refresh; the current first-run catalog sync is correct but serial and slow.
 
 ## Future work
 
 - deeper generation-specific save adapters beyond trainer metadata (more real save fixtures incoming)
+- form-aware deep links, grouped/collapsible cosmetic form controls, and battle/team tool handoff for the currently selected form
+- curated Z-A / Mega Dimension patches whenever a new form is absent from PokeAPI; partial records must keep unknown stats, locations, and images empty
 - Linux handheld packaging
 - hand-drawn artwork for the home quick tiles / entry cards (in progress)
 - broader accessibility and controller-navigation validation

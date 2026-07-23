@@ -6,6 +6,8 @@ TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 ob
 | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Account API token with **Workers R2 Storage → Edit** (see below) |
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID shown in Workers dashboard (must match the token’s account) |
+| `R2_ACCESS_KEY_ID` | Optional S3-compatible R2 key used for faster bulk bundle uploads |
+| `R2_SECRET_ACCESS_KEY` | Optional S3-compatible R2 secret paired with the access key |
 
 ## Cloudflare API token — required permissions
 
@@ -72,9 +74,9 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 
 | Workflow | 触发方式 | 上传内容 |
 | --- | --- | --- |
-| `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v3/l10n/zh/*`, maps, config, `bundle-manifest.json` |
+| `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v4/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动 / push `deploy/dex-cdn` | Full dex bundle under `v2/` or `v3/` |
+| `upload-dex-bundle.yml` | 手动 | Build/audit v6, upload and verify immutable `v4/` objects, then switch the root manifest last |
 
 Both R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
 
@@ -99,7 +101,7 @@ GitHub repository secrets (`CLOUDFLARE_*`) are unchanged — Actions still write
 ```bash
 export CLOUDFLARE_API_TOKEN=...
 export CLOUDFLARE_ACCOUNT_ID=...
-./tools/upload_dex_bundle.sh dist/dex-v5/upload v3
+./tools/upload_dex_bundle.sh dist/dex-v6/upload v4
 ```
 
 Or: `python3 tools/stage_l10n_upload.py` then upload `dist/l10n-upload/` with Wrangler.

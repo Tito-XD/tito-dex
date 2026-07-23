@@ -1,12 +1,12 @@
 # TitoDex iOS platform — status & constraints
 
-**Audience:** maintainers / agents working on the `feature/ios-platform` branch.
+**Audience:** maintainers / agents working on the shared Flutter source.
 
-Last updated: 2026-07-21.
+Last updated: 2026-07-23.
 
 ## Current status
 
-iOS support lives on the **`feature/ios-platform`** branch, rebased onto `main` at **v0.6.9 (`0dad858`, build 91)**. Branch commits:
+iOS support is merged into **`main`** for v0.7.0. The original platform branch supplied:
 
 | Commit | What it does |
 |---|---|
@@ -15,9 +15,9 @@ iOS support lives on the **`feature/ios-platform`** branch, rebased onto `main` 
 | Xcode 27 fixes | Fixes to make the build work under **Xcode 27 beta** |
 | shell adaptation | iOS renders the real native shell instead of the web preview frame (see below) |
 
-**Verified on 2026-07-21 against v0.6.9:** `flutter analyze` clean, `flutter test` 205 passing, `flutter build ios --no-codesign` succeeds under Xcode 27 beta (27.5 MB Runner.app). Signing / TestFlight / device runs still pending.
+**Verified on 2026-07-23 against v0.7.0:** `pod install`, `flutter analyze`, 215 Flutter tests, and `flutter build ios --no-codesign --release` succeed under Xcode 27 beta (27.6 MB Runner.app). Pods and generated files were cleaned afterward. Signing / TestFlight / device runs remain intentionally outside the 0.7.0 Android release.
 
-## iOS shell & layout adaptation (v0.6.9 rebase)
+## iOS shell & layout adaptation (merged for v0.7.0)
 
 `DeviceLayout.isNativeTarget` previously meant Android/Linux only, so iOS fell
 through to `_PreviewShell` — the web preview frame (520 px card, fake status
@@ -36,7 +36,7 @@ strip). Fixed:
   `system_ui_coordinator.dart`) — iOS ignores `statusBarIconBrightness`
   (Android-only) and reads background brightness instead.
 
-The v0.6.7–v0.6.9 feature work itself (retro forms, party grid, tablet rows,
+The v0.6.7–v0.7.0 feature work itself (retro forms, party grid, tablet rows,
 battle handoff, …) is pure widget/layout code — no platform channels, no new
 plugins — and needed no per-platform changes. `battery_plus` /
 `connectivity_plus` (header Wi-Fi/battery icons) support iOS and the service
@@ -54,10 +54,10 @@ already falls back on errors.
 
 ## Upstream sync policy
 
-Android Flutter builds are the primary release target. New `main` changes are
-validated and shipped on Android **first**; only after that do we rebase this
-branch and re-verify the iOS build. After rebasing, rebuild under Xcode 27 and
-push with `--force-with-lease`.
+Android Flutter builds remain the primary release target. iOS now shares
+`main` directly: platform-sensitive changes must keep `flutter analyze` and the
+full Flutter suite green, then repeat `pod install` and the no-codesign Xcode
+build before an Android release is tagged.
 
 ## Xcode 27 beta workarounds — do not remove
 

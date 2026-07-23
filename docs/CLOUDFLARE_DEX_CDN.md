@@ -1,354 +1,178 @@
-# TitoDex 图鉴 — Cloudflare 配置说明
+# TitoDex 图鉴 CDN 与 bundle v6
 
-> **受众：** Cloudflare 侧 Agent / 运维（**内部文档**）。只负责 **R2 + CDN + 离线图鉴包**，不涉及 App UI。
->
-> **请勿**在 App 文案、GitHub Release 说明、公开 README 中粘贴 CDN 直链，避免被滥用刷流量。
->
-> **App 对齐：** 离线目录格式与 `flutter/lib/features/dex/dex_cache_store.dart` 一致。
+> **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
----
+## 当前版本
 
-## 目标
+| CDN 前缀 | bundleVersion | 物种 | 状态 |
+| --- | ---: | ---: | --- |
+| `/v4/` | 6 | 1025 | 当前生产：完整形态、精确版本地点、现代游戏 overlay |
+| `/v3/` | 5 | 1025 | 保留不动，供旧客户端和 v6 回滚 |
+| `/v2/` | 4 | 493 | 遗留客户端 |
 
-为 TitoDex（Flutter 掌机 App）提供：
-
-1. **预构建离线图鉴包** — 全国图鉴 #1–**1025**（当前 v0.4.x 发布线默认 bundle v5）
-2. **CDN 加速** — 精灵图、属性图标、单条详情 JSON
-3. **一次下载完整包** — 掌机不必逐条请求 PokeAPI
-
-App 侧环境变量（由 CDN 部署交付）：
+0.7.0 App 访问 JSON 时按 `v4 → v3 → v2` 回退。根
+`bundle-manifest.json` 是短缓存的活跃指针；所有版本前缀对象不可变。
 
 ```bash
-# Current production (v0.4.x release line)
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=5
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v4/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=6
 ```
 
-自定义域名配置详解：[`cloudflare/dex-cdn/DOMAIN.md`](../cloudflare/dex-cdn/DOMAIN.md)
+## v6 内容与 schema
 
----
+- 全国图鉴 1–1025，`complete=true`。
+- 每个多形态物种保存全部 form JSON：名称、分类、属性、种族值、特性、招式、身高体重、可用版本、出现地点和来源。
+- 默认 1025 张小图继续保留。非外观且视觉不同的形态仅在可靠图片存在时额外保存一张小图；外观重复形态复用默认图；不批量复制形态高清 artwork。
+- 出现地点同时保存版本组和精确版本，并保留 `speciesId / pokemonId / formKey / teraType / formAmbiguous / isAlpha / isTitan / isRaid / isFixedEncounter`。
+- 现代地点来自 PokeAPI 加固定 PKHeX 提交的 GPL-3.0-or-later 规范化 overlay，详见 [DEX_FORMS.md](DEX_FORMS.md) 与 `data/encounters/PKHEX_LICENSE.md`。
+- Champions 明确写入 `encounterCoverage.notApplicable`，不虚构野外地点。
 
-## CDN 路径版本
-
-| R2 / CDN 前缀 | bundleVersion | 物种数 | 说明 |
-| --- | --- | --- | --- |
-| **`/v2/`** | **4** | 493 | 遗留 — 旧客户端 |
-| **`/v3/`** | **5** | **1025** | **当前生产** — v0.4.x App 默认 |
-
-v5 与 v4 可并存：旧客户端继续读 `/v2/`；新客户端读 `/v3/` 与 `bundle-manifest.json` 中的 `archiveUrl`。
-
----
-
-## Worker 自动部署（Workers Builds）
-
-**不用本地 wrangler deploy。** 在 Cloudflare Dashboard 连接 GitHub，推送 **`deploy/dex-cdn`** 分支即自动部署。
-
-| 设置 | 值 |
-| --- | --- |
-| 仓库 | `Tito-XD/tito-dex` |
-| 生产分支 | **`deploy/dex-cdn`** |
-| Root directory | `cloudflare/dex-cdn` |
-| Build command | *(留空)* |
-| Deploy command | `npx wrangler deploy` |
-
-详细步骤：[`cloudflare/dex-cdn/DEPLOY.md`](../cloudflare/dex-cdn/DEPLOY.md)
-
----
-
-| 项目 | 说明 |
-| --- | --- |
-| 宝可梦 | 全国图鉴 #1–**1025**（bundle v5）；#1–493（bundle v4 遗留） |
-| 元数据 | 中英文名、属性、详情、多版本招式、进化链（来源 PokeAPI） |
-| 精灵图 | `official-artwork.front_default`，无则 `front_default` |
-| 属性图标 | PokeAPI `type` → `sprites.generation-iii.colosseum.name_icon` |
-| 中文名 | `pokemon-species` → `names` 里 `zh-Hans` |
-
----
-
-## R2 Bucket 结构
-
-**Bucket 名建议：** `titodex-dex`
-
-```txt
-titodex-dex/
-├── bundle-manifest.json          # latest 指针（短 TTL；archiveUrl 指向活跃 bundle）
-├── v2/                           # bundle v4 — 493 物种（当前生产）
-│   ├── manifest.json
-│   ├── summaries.json
-│   ├── types.json
-│   ├── moves.json
-│   ├── bundle.tar.zst
-│   ├── details/1.json … 493.json
-│   ├── sprites/1.png … 493.png
-│   └── type_icons/*.png
-└── v3/                           # bundle v5 — 1025 物种（v0.4.6+）
-    ├── manifest.json
-    ├── summaries.json
-    ├── types.json
-    ├── moves.json
-    ├── abilities.json            # 特性索引（v5 新增）
-    ├── bundle.tar.zst            # 含 l10n/ maps/ config/ game_icons/
-    ├── l10n/zh/*.json            # 中文对照表（可单独热更新）
-    ├── maps/hgss_map_list.json   # HGSS 地图 id → 中英文名
-    ├── config/app_config.json    # Sleep 工具链接等应用配置
-    ├── game_icons/*.png          # 游戏版本选择图标
-    ├── details/1.json … 1025.json
-    ├── sprites/1.png … 1025.png
-    └── type_icons/*.png
-
-> **不进 CDN：** 手绘底部导航图标（nav icons）随 APK `assets/` 内置，用户自行绘制替换。
-
-CDN 大图（按需，不进 bundle.tar.zst）：
-
-    v2/artwork/ … v3/artwork/
-```
-
-### `bundle-manifest.json`（CDN 根目录 / R2 根）
+根 manifest 的关键字段：
 
 ```json
 {
-  "bundleVersion": 5,
+  "bundleVersion": 6,
+  "cdnPrefix": "v4",
   "pokemonCount": 1025,
-  "archiveUrl": "https://dex.tito.cafe/v3/bundle.tar.zst",
+  "formCount": 0,
+  "formSpriteCount": 0,
+  "complete": true,
+  "exactVersionLocations": true,
+  "schemaFeatures": {
+    "pokemonForms": 2,
+    "encounterFormIdentity": 3,
+    "exactVersionLocations": 1
+  },
+  "archiveUrl": "https://dex.tito.cafe/v4/bundle.tar.zst",
   "archiveSha256": "<sha256>",
   "archiveSizeBytes": 0,
-  "publishedAt": "2026-07-11T00:00:00Z",
-  "l10nVersion": "2026-07-13T04:52:57+00:00",
-  "configVersion": 1
+  "encounterSources": [],
+  "encounterCoverage": {}
 }
 ```
 
-### `manifest.json`（App 离线目录根文件）
+## R2 结构
 
-```json
-{
-  "version": 5,
-  "complete": true,
-  "preferOffline": true,
-  "downloadedAt": "2026-07-11T00:00:00Z",
-  "pokemonCount": 1025,
-  "moveCount": 0,
-  "abilityCount": 0,
-  "l10nVersion": "2026-07-13T04:52:57+00:00",
-  "configVersion": 1,
-  "sizeBytes": 0
-}
+```text
+titodex-dex/
+├── bundle-manifest.json        # 最后更新的活跃指针
+├── v2/ …                       # 不修改
+├── v3/ …                       # 不覆盖、不删除
+└── v4/
+    ├── manifest.json
+    ├── summaries.json
+    ├── dex_catalog.json
+    ├── details/1.json … 1025.json
+    ├── sprites/1.png … 1025.png
+    ├── sprites/forms/*.png     # 选择性形态小图
+    ├── artwork/1.png …         # 默认形态按需大图
+    ├── moves.json / abilities.json / types.json / items.json …
+    ├── l10n/zh/*.json
+    ├── maps/hgss_map_list.json
+    ├── config/app_config.json
+    ├── game_icons/*.png
+    ├── type_icons/*.png
+    └── bundle.tar.zst
 ```
 
-### Bundle v5 schema 变更（相对 v4）
+`bundle.tar.zst` 解压后的根直接对应 App 文档目录 `dex_offline/`，不包含 `v4/`
+这一层。大图可以留在 CDN 上传树而不进入离线 archive；所有详情、摘要、默认小图、
+选择性形态小图、l10n、maps、config 和引用索引必须进入 archive。
 
-| 字段 | 位置 | 说明 |
-| --- | --- | --- |
-| `pokedexNumbers` | `summaries.json` 每条 | PokeAPI pokedex name → regional number，供 `DexScope` 地区过滤 |
-| `abilities` | `details/{id}.json` | 特性名/描述/是否隐藏 |
-| `obtainLocations` | `details/{id}.json` | 按游戏版本的遭遇地点列表 |
-| `moveSets` | `details/{id}.json` | 多 version-group（HGSS / SV / SwSh）招式表 |
-| `abilities.json` | bundle 根 | 特性百科索引 + `pokemonIds` 反向列表 |
-
-### `summaries.json` 单条格式（v5）
-
-```json
-{
-  "id": 155,
-  "nameEn": "Cyndaquil",
-  "nameZh": "火球鼠",
-  "types": ["fire"],
-  "pokedexNumbers": {
-    "national": 155,
-    "original-johto": 155
-  },
-  "spriteUrl": "https://dex.tito.cafe/v3/sprites/155.png",
-  "artworkUrl": "https://dex.tito.cafe/v3/artwork/155.png",
-  "localSpritePath": "sprites/155.png"
-}
-```
-
-### 解压 `bundle.tar.zst` 后目录
-
-须与 App 本地路径 **1:1** 对应（解压到 `dex_offline/`）：
-
-```txt
-dex_offline/
-├── manifest.json
-├── summaries.json
-├── types.json
-├── moves.json
-├── abilities.json       # v5+
-├── l10n/zh/             # 中文对照（优先于 APK assets）
-│   ├── location_area_labels.json
-│   ├── hgss_map_labels.json
-│   └── …
-├── maps/
-│   └── hgss_map_list.json
-├── config/
-│   └── app_config.json  # Sleep 工具链接等
-├── game_icons/*.png     # 游戏版本图标
-├── details/{id}.json
-├── sprites/{id}.png
-└── type_icons/{type}.png
-```
-
-**加载顺序：** `dex_offline/`（bundle 安装后）→ APK `assets/` 回退。App 不在运行时抓取 52poke / PokeAPI 更新对照表。
-
-> 仓库内 `tools/build_dex_bundle.py` 生成的 tar 根目录即为上述结构（无 `v3/` 前缀）。
-
----
-
-## CDN 直链规则
-
-| URL | 内容 |
-| --- | --- |
-| `https://dex.<域名>/v3/sprites/{id}.png` | 精灵缩略图（v5） |
-| `https://dex.<域名>/v3/artwork/{id}.png` | 精灵大图（v5） |
-| `https://dex.<域名>/v3/type_icons/{type}.png` | 属性图标 |
-| `https://dex.<域名>/v3/details/{id}.json` | 详情 JSON |
-| `https://dex.<域名>/v3/summaries.json` | 摘要列表 |
-| `https://dex.<域名>/v3/bundle.tar.zst` | 完整离线包 v5 |
-| `https://dex.<域名>/v2/...` | 同上结构 — bundle v4（493） |
-| `https://dex.<域名>/bundle-manifest.json` | 版本索引 |
-| `https://dex.<域名>/bundle/latest` | Worker 302 → `archiveUrl` |
-
-### Cache Rules
-
-| 路径 | TTL | Cache-Control |
-| --- | --- | --- |
-| `/v2/sprites/*`, `/v3/sprites/*` | 1 年 | `public, max-age=31536000, immutable` |
-| `/v2/artwork/*`, `/v3/artwork/*` | 1 年 | 同上 |
-| `/v2/type_icons/*`, `/v3/type_icons/*` | 1 年 | 同上 |
-| `/v2/details/*`, `/v3/details/*` | 1 年 | 同上 |
-| `/v2/bundle.tar.zst`, `/v3/bundle.tar.zst` | 1 年 | 同上 |
-| `/bundle-manifest.json` | 5 分钟 | `public, max-age=300` |
-
-### CORS
-
-```
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET, HEAD
-```
-
----
-
-## 数据生成（本地 / CI）
-
-### 依赖
+## 构建与审计
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
-```
 
-### 构建 bundle v5（1025 只）
+python3 tools/test_pokemon_forms.py
+python3 tools/test_dex_bundle_v6.py
 
-```bash
 python3 tools/build_dex_bundle.py \
   --cdn-base https://dex.tito.cafe \
-  --output dist/dex-v5 \
+  --output dist/dex-v6 \
   --max-id 1025
+
+python3 tools/audit_encounter_coverage.py dist/dex-v6/staging --strict
+python3 tools/audit_form_coverage.py dist/dex-v6/staging --strict
+python3 tools/audit_dex_golden_samples.py dist/dex-v6/staging --strict
+python3 tools/verify_dex_upload_tree.py dist/dex-v6/upload
 ```
 
 产物：
 
-- `dist/dex-v5/staging/` — 与 `dex_offline/` 同结构的明文目录
-- `dist/dex-v5/upload/v3/` — 待上传 R2 的 **v3** 前缀内容
-- `dist/dex-v5/upload/bundle-manifest.json` — 根 manifest
+- `dist/dex-v6/staging/`：解压后目录。
+- `dist/dex-v6/upload/v4/`：不可变对象上传树。
+- `dist/dex-v6/upload/bundle-manifest.json`：最后切换的根指针。
 
-### 冒烟构建（仅前 3 只）
-
-```bash
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --max-id 3
-```
-
-### 遗留 v4 构建（493）
+PKHeX overlay 需要重新生成时：
 
 ```bash
-python3 tools/build_dex_bundle.py \
-  --cdn-base https://dex.tito.cafe \
-  --output dist/dex-v4 \
-  --max-id 493
+python3 tools/generate_pkhex_encounter_overlays.py \
+  --pkhex-root /path/to/PKHeX-at-pinned-commit
 ```
 
-（构建脚本默认 `BUNDLE_VERSION=5` / `v3`；如需纯 v4 产物请使用 main 上 v0.2.28 对应 commit 或手动改常量。）
+生成器会验证 PKHeX HEAD；不能唯一确认的 form 只保留物种并标记歧义。
 
-### 上传 R2
+## 两阶段发布与回滚
+
+首选 GitHub Actions **Build and Publish Dex Bundle v6**。本地等价命令：
 
 ```bash
-export CLOUDFLARE_ACCOUNT_ID=...
-export WRANGLER_R2_BUCKET=titodex-dex
-./tools/upload_dex_bundle.sh dist/dex-v5/upload
+# 阶段一：上传并校验所有 /v4/ 对象
+python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload \
+  --cdn-prefix v4 --phase objects
+
+# 阶段二：只有阶段一全部成功后才更新根 manifest
+python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload \
+  --cdn-prefix v4 --phase manifest
 ```
 
-上传后 **Purge CDN cache**（至少 purge `/bundle-manifest.json`）。
+上传器优先使用 `R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY` 的 boto3 路径；没有时使用
+Wrangler OAuth 或 `CLOUDFLARE_API_TOKEN`。两条路径都遵守 manifest-last。
 
----
-
-## 交付清单
-
-| 项 | 验收 |
-| --- | --- |
-| R2 bucket `titodex-dex` | v2 + v3 资源已上传 |
-| 自定义域名 `dex.tito.cafe` | 已绑定 |
-| `bundle-manifest.json` | 公网可 GET，`archiveUrl` 正确 |
-| v3 `bundle.tar.zst` | 可下载，SHA256 与 manifest 一致 |
-| 解压后 | `manifest.complete=true`，`pokemonCount=1025` |
-| 抽测 CDN | #1 #25 #155 #493 #1000 #1025 精灵图可直链 |
-| CORS + Cache Rules | 已配 |
-
----
-
-Or run `python3 tools/stage_l10n_upload.py` then upload `dist/l10n-upload/` manually with Wrangler.
-
----
-
-## 自动化：每周 l10n 同步（52poke → R2）
-
-GitHub Actions workflow [`.github/workflows/sync-l10n-catalog.yml`](../.github/workflows/sync-l10n-catalog.yml) 每周日 04:00 UTC 运行（也可 `workflow_dispatch` 手动触发）。
-
-### 流程
-
-1. `tools/fetch_52poke_location_zh.py` — 从 `location_areas_unresolved.json` 读取 slug，尝试从 52poke wiki 抓取中文名（礼貌限速，User-Agent: `TitoDex-maintainer`），合并到 `data/l10n/zh/location_areas.json`
-2. `tools/generate_zh_catalog_assets.py` — 生成紧凑 APK / CDN 用 `flutter/assets/l10n/zh/*.json`
-3. `tools/stage_l10n_upload.py` — 复制 l10n + maps + config 到 `dist/l10n-upload/v3/`
-4. Wrangler 上传到 R2：
-   - `v3/l10n/zh/*`
-   - `v3/maps/hgss_map_list.json`（如有变更）
-   - `v3/config/app_config.json`
-   - 根目录 `bundle-manifest.json`（更新 `l10nVersion` + `publishedAt`）
-
-### workflow_dispatch 输入
-
-| 输入 | 说明 |
-| --- | --- |
-| `force_full` | `true` 时重新解析所有仍缺中文的 slug（不限 unresolved 列表） |
-
-### 所需 GitHub Secrets
-
-| Secret | 说明 |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | R2 Object Write |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 账户 ID |
-
-详见 [`docs/PERMISSIONS.md`](PERMISSIONS.md)。
-
-### 52poke 抓取限制
-
-52poke wiki 可能启用 Cloudflare 人机验证，导致 CI 无法自动抓取。脚本会记录失败并将 slug 保留在 `location_areas_unresolved.json`；可在本地网络环境手动运行：
+切换后验证：
 
 ```bash
-pip install beautifulsoup4 -r tools/dex_bundle_requirements.txt
-python3 tools/fetch_52poke_location_zh.py --limit 20
-python3 tools/generate_zh_catalog_assets.py
-python3 tools/stage_l10n_upload.py
+curl -fsS https://dex.tito.cafe/bundle-manifest.json | jq .
+curl -fsS 'https://dex.tito.cafe/cdn-health?probe=1' | jq .
 ```
 
----
+若 v6 发布异常，将预先备份的 v5 根 manifest 重新写到
+`bundle-manifest.json`。不要删除 `/v4/`，也不要修改 `/v3/`；0.7.0 在线 JSON 仍可从
+v4 自动回退 v3/v2。
 
-## 相关仓库文件
+## Worker
 
-| 路径 | 说明 |
-| --- | --- |
-| `tools/build_dex_bundle.py` | 构建脚本（`--max-id 1025`） |
-| `tools/upload_dex_bundle.sh` | Wrangler 批量上传 |
-| `cloudflare/dex-cdn/` | Worker + wrangler.toml |
-| `flutter/lib/features/dex/dex_cache_store.dart` | App 本地离线目录布局 |
-| `flutter/lib/features/dex/dex_models.dart` | JSON schema |
-| `flutter/lib/features/dex/dex_scope.dart` | `DexScope` / 1025 browse |
+生产分支是 `deploy/dex-cdn`，根目录 `cloudflare/dex-cdn`。Worker：
+
+- 对任意 `/vN/` 对象使用长期 immutable 缓存；根 manifest 使用短缓存。
+- 从根 manifest 动态解析活跃前缀进行深度探活。
+- 合法的版本 sprite 缺失可回退默认 sprite 或 artwork，并通过响应头说明。
+- 每周触发 l10n，同步；每六小时运行深度探活并按配置告警。
+- `/bundle/latest` 按 manifest 跳转 archive。
+
+推送 Worker 前：
+
+```bash
+cd cloudflare/dex-cdn
+npm ci
+npm run dry-run
+```
+
+部署与绑定见 [cloudflare/dex-cdn/DEPLOY.md](../cloudflare/dex-cdn/DEPLOY.md)，权限见
+[PERMISSIONS.md](PERMISSIONS.md)。
+
+## 增量 l10n
+
+`stage_l10n_upload.py` 与 `sync-l10n-catalog.yml` 只更新当前 `/v4/l10n`、maps 和 config；
+不得覆写 `/v3/`。l10n 同步不改变 bundleVersion 或 archive SHA。若需要让根 manifest 的
+`l10nVersion` 生效，必须读取当前根 manifest、只合并允许字段，并仍保持 archive 指针不变。
+
+## 发布验收
+
+- 根 manifest：v6、v4、1025、complete、archive SHA 正确。
+- `/v4/manifest.json`、摘要、1025 详情、1025 默认小图、选择性形态小图、archive 可读。
+- archive 与上传树资源审计通过；没有批量 `artwork/forms`。
+- 现代精确版本覆盖和金样本通过；所有地点有可显示中文标签。
+- 深度健康 `ok=true`，并实测合法 sprite 回退、v4 在线读取和 v3 回滚路径。
