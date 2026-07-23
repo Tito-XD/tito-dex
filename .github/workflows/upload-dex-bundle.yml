@@ -8,8 +8,14 @@ on:
         required: true
         default: true
         type: boolean
+      reuse_run_id:
+        description: Reuse a preserved v6 diagnostic artifact from this workflow run
+        required: false
+        default: ""
+        type: string
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -55,7 +61,17 @@ jobs:
           python3 tools/test_pokemon_forms.py
           python3 tools/test_dex_bundle_v6.py
 
+      - name: Restore preserved v6 bundle
+        if: inputs.reuse_run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: titodex-dex-v6-diagnostic-${{ inputs.reuse_run_id }}
+          path: dist/dex-v6/upload
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.reuse_run_id }}
+
       - name: Build complete Dex bundle v6
+        if: inputs.reuse_run_id == ''
         run: >-
           python3 tools/build_dex_bundle.py
           --cdn-base https://dex.tito.cafe
@@ -64,9 +80,14 @@ jobs:
 
       - name: Audit bundle data and upload tree
         run: |
-          python3 tools/audit_encounter_coverage.py dist/dex-v6/staging --strict
-          python3 tools/audit_form_coverage.py dist/dex-v6/staging --strict
-          python3 tools/audit_dex_golden_samples.py dist/dex-v6/staging --strict
+          if [ -n "${{ inputs.reuse_run_id }}" ]; then
+            data_dir=dist/dex-v6/upload/v4
+          else
+            data_dir=dist/dex-v6/staging
+          fi
+          python3 tools/audit_encounter_coverage.py "$data_dir" --strict
+          python3 tools/audit_form_coverage.py "$data_dir" --strict
+          python3 tools/audit_dex_golden_samples.py "$data_dir" --strict
           python3 tools/verify_dex_upload_tree.py dist/dex-v6/upload
 
       - name: Preserve generated bundle when an audit fails
