@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # Capacitor
 android/.gradle
 android/app/build

@@ -21,6 +21,7 @@ from build_dex_bundle import (  # noqa: E402
     encounter_area_label_zh,
     fetch_obtain_locations,
     fetch_species_obtain_locations,
+    mark_multi_form_encounters_ambiguous,
     merge_obtain_location_versions,
     parse_ev_yield,
     parse_pokedex_numbers,
@@ -281,6 +282,97 @@ class DexBundleV5ValidationTests(unittest.TestCase):
             by_version["legends-za"][0]["formKey"],
             "meloetta-aria",
         )
+
+    def test_species_encounters_use_default_pokemon_form_key(self) -> None:
+        original = dex_builder._ENCOUNTER_OVERLAYS
+        dex_builder._ENCOUNTER_OVERLAYS = {
+            "scarlet": {
+                "1007": [{
+                    "speciesId": 1007,
+                    "pokemonId": 1007,
+                    "formIndex": 0,
+                    "formKey": "koraidon",
+                    "areaSlug": "south-province-area-four",
+                    "areaLabelZh": "南第4区",
+                }],
+            },
+        }
+
+        class Builder:
+            def _get_json_list(self, _path: str):
+                return []
+
+            def _get_json(self, _path: str):
+                return {
+                    "forms": [{
+                        "name": "koraidon-apex-build",
+                        "url": "https://pokeapi.co/api/v2/pokemon-form/1007/",
+                    }],
+                }
+
+        try:
+            _by_game, by_version = fetch_species_obtain_locations(
+                Builder(),
+                {
+                    "id": 1007,
+                    "varieties": [{
+                        "is_default": True,
+                        "pokemon": {
+                            "name": "koraidon",
+                            "url": "https://pokeapi.co/api/v2/pokemon/1007/",
+                        },
+                    }],
+                },
+                1007,
+            )
+        finally:
+            dex_builder._ENCOUNTER_OVERLAYS = original
+
+        self.assertEqual(
+            by_version["scarlet"][0]["formKey"],
+            "koraidon-apex-build",
+        )
+
+    def test_ambiguous_cosmetic_encounters_are_aggregated(self) -> None:
+        locations = {
+            "scarlet": [
+                {
+                    "speciesId": 585,
+                    "pokemonId": 585,
+                    "formKey": "deerling-spring",
+                    "formIndex": 0,
+                    "formAmbiguous": False,
+                    "areaSlug": "south-province-area-five",
+                    "areaLabelZh": "南第5区",
+                    "versions": ["scarlet"],
+                    "methods": ["walk"],
+                    "minLevel": 12,
+                    "maxLevel": 18,
+                },
+                {
+                    "speciesId": 585,
+                    "pokemonId": 585,
+                    "formKey": "deerling-summer",
+                    "formIndex": 1,
+                    "formAmbiguous": False,
+                    "areaSlug": "south-province-area-five",
+                    "areaLabelZh": "南第5区",
+                    "versions": ["scarlet"],
+                    "methods": ["walk"],
+                    "minLevel": 10,
+                    "maxLevel": 20,
+                },
+            ],
+        }
+
+        normalized = mark_multi_form_encounters_ambiguous(locations, {585})
+        self.assertEqual(len(normalized["scarlet"]), 1)
+        entry = normalized["scarlet"][0]
+        self.assertTrue(entry["formAmbiguous"])
+        self.assertNotIn("formKey", entry)
+        self.assertNotIn("formIndex", entry)
+        self.assertEqual(entry["minLevel"], 10)
+        self.assertEqual(entry["maxLevel"], 20)
 
     def test_form_builder_omits_single_default_and_keeps_all_cosmetics(self) -> None:
         builder = dex_builder.PokeApiBuilder(delay_s=0)
