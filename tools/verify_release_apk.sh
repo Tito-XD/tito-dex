@@ -33,8 +33,11 @@ if ! "$offline" && (( size_bytes > 35000000 )); then
   exit 1
 fi
 
-if "$offline" && (( size_bytes > 100000000 )); then
-  echo "ERROR: offline APK larger than expected (>100 MB)." >&2
+# Bundle v6 is ~80.6 MB compressed; together with the signed arm64 app the
+# expected Offline APK is ~106 MB. Keep headroom for metadata without allowing
+# a universal/debug package to pass unnoticed.
+if "$offline" && (( size_bytes > 125000000 )); then
+  echo "ERROR: offline APK larger than expected (>125 MB)." >&2
   exit 1
 fi
 
