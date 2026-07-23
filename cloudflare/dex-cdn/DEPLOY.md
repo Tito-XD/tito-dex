@@ -72,20 +72,20 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 在域名 zone 下添加 Cache Rules（见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)）：
 
-- `/v2/sprites/*`、`/v2/artwork/*`、`/v2/type_icons/*`、`/v2/details/*` → 1 年 immutable
+- `/v2/`、`/v3/`、`/v4/` 的详情、图片、索引和 archive → 1 年 immutable
+- `/v4/l10n/*`、`/v4/maps/*`、`/v4/config/*` → 短缓存，允许受控增量同步
 - `/bundle-manifest.json` → 5 分钟
 
 Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
 
-### 6. KV（可选，manifest 热缓存）
+### 6. KV（manifest 热缓存与 cron 状态）
 
-Dashboard → **Workers KV** → Create namespace → 名称建议 `titodex-dex-kv`
+生产已使用独立 `MANIFEST_KV` namespace，并在 `wrangler.toml` 绑定。不得复用同账号中
+无关的 `FODI_CACHE`。新环境可在 Dashboard → **Workers KV** 创建独立 namespace。
 
 Worker → **Settings** → **Bindings** → KV namespace → `MANIFEST_KV`
 
-或在 `wrangler.toml` 取消注释 `[[kv_namespaces]]` 并填入 `id`。
-
-未绑定 KV 时 Worker 仍正常工作，只是 `bundle-manifest.json` 不走边缘 KV 缓存。
+绑定名必须为 `MANIFEST_KV`；它保存根 manifest 热缓存、上次深度探活和上次 dispatch 状态。
 
 ### 7. Cron 与 Secrets（调度 + 管理面）
 
@@ -142,13 +142,12 @@ Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 
-# 当前生产 v5（1025 物种 → R2 /v3/，含 l10n/maps/config）
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v5 --max-id 1025
+# 当前生产 v6（1025 物种 → R2 /v4/）
+python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v6 --max-id 1025
 
-# 遗留 v4（493 物种 → R2 /v2/）
-python3 tools/build_dex_bundle.py --cdn-base https://dex.tito.cafe --output dist/dex-v4 --max-id 493
-
-python3 tools/upload_dex_via_worker.py dist/dex-v5/upload   # 需临时 bootstrap 路由，或 wrangler / CI
+# 必须先上传并验证 /v4/，再最后更新根 manifest
+python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload --cdn-prefix v4 --phase objects
+python3 tools/upload_dex_bundle_r2.py dist/dex-v6/upload --cdn-prefix v4 --phase manifest
 ```
 
 上传目录结构：
@@ -156,10 +155,11 @@ python3 tools/upload_dex_via_worker.py dist/dex-v5/upload   # 需临时 bootstra
 | 本地路径 | R2 前缀 | 说明 |
 | --- | --- | --- |
 | `upload/v2/` | `v2/` | bundle **v4**，493 物种（遗留） |
-| `upload/v3/` | `v3/` | bundle **v5**，1025 物种 + l10n/config（**v0.4.x 生产**） |
-| `upload/bundle-manifest.json` | 根 | 指向当前 `archiveUrl` |
+| `upload/v3/` | `v3/` | bundle **v5**，1025 物种（回滚 / 旧客户端，不修改） |
+| `upload/v4/` | `v4/` | bundle **v6**，完整形态与精确版本地点 |
+| `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的 v4 archive |
 
-Bundle v5 相对 v4 新增：`abilities.json`，summary 内 `pokedexNumbers`，detail 内 `abilities` / `obtainLocations` / 多版本 `moveSets`。
+Bundle v6 增加全部形态 JSON、选择性形态小图、形态安全的 encounter identity、精确版本地点与覆盖审计。`/v3/` 不覆盖、不删除。
 
 详见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
@@ -187,27 +187,23 @@ Worker + R2 资源就绪后：
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
-# v0.2.28 生产：
-TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v2/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=4
-# v0.3.0 计划：
-# TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v3/bundle.tar.zst
-# TITODEX_DEX_BUNDLE_VERSION=5
+TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v4/bundle.tar.zst
+TITODEX_DEX_BUNDLE_VERSION=6
 ```
 
 当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25/v0.2.28](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
 
 ---
 
-## Worker 职责（v2026-07-13）
+## Worker 职责（v2026-07-23-v4）
 
 | 能力 | 路由 / 触发 | 说明 |
 | --- | --- | --- |
 | **CDN 网关** | `GET /*` | R2 只读代理 + CORS + Cache-Control |
 | **版本跳转** | `GET /bundle/latest` | 302 → manifest 中的 `archiveUrl` |
 | **存活探针** | `GET /cdn-health` | 轻量 `{ ok: true }` |
-| **深度探活** | `GET /cdn-health?probe=1` | 抽查 9 个关键 R2 key + manifest 摘要 |
-| **Sprite 回退** | `GET /v3/sprites/by-version/...` | 缺失时依次尝试其他 version group → 默认 sprite → artwork；响应头 `X-TitoDex-Sprite-Fallback` |
+| **深度探活** | `GET /cdn-health?probe=1` | 从根 manifest 动态取活跃前缀，抽查关键 R2 key + manifest 摘要 |
+| **Sprite 回退** | `GET /vN/sprites/by-version/...` | 缺失时依次尝试其他 version group → 默认 sprite → artwork；合法默认图回退也算健康 |
 | **条件请求** | 任意 GET | 支持 `If-None-Match` → 304 |
 | **Manifest KV 缓存** | `bundle-manifest.json` | 5 分钟 KV 热缓存（需绑定 `MANIFEST_KV`） |
 | **Cron 调度** | 见上表 | 触发 GitHub Actions，不跑 Python 构建 |
