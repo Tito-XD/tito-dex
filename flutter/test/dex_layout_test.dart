@@ -123,13 +123,22 @@ void main() {
       ),
     );
 
-    final containers = find.descendant(
+    final track = find.descendant(
       of: find.byType(TitoProgressBar),
       matching: find.byType(Container),
     );
-    expect(containers, findsNWidgets(2));
-    final trackWidth = tester.getSize(containers.first).width;
-    final fillWidth = tester.getSize(containers.last).width;
+    final fill = find.descendant(
+      of: find.byType(TitoProgressBar),
+      matching: find.byType(FractionallySizedBox),
+    );
+    expect(track, findsOneWidget);
+    expect(fill, findsOneWidget);
+    final trackWidth = tester.getSize(track).width;
+    final fillWidth = tester
+        .getSize(
+          find.descendant(of: fill, matching: find.byType(DecoratedBox)),
+        )
+        .width;
     expect(fillWidth, moreOrLessEquals(trackWidth * 0.5, epsilon: 1));
   });
 

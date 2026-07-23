@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SaveDocument {
   const SaveDocument({
@@ -53,6 +54,9 @@ class PlatformSaveDocumentSource implements SaveDocumentSource {
     if (bytes == null) {
       return null;
     }
+    if (!kIsWeb && Platform.isIOS) {
+      return _persistPickedCopy(file.name, bytes);
+    }
     return SaveDocument(
       uri: file.path ?? file.name,
       fileName: file.name,
@@ -93,6 +97,37 @@ class PlatformSaveDocumentSource implements SaveDocumentSource {
     if (!kIsWeb && Platform.isAndroid) {
       await _channel.invokeMethod<void>('releaseSaveDocument', {'uri': uri});
     }
+    if (!kIsWeb && Platform.isIOS) {
+      // Only remove the copy this source persisted itself; never touch a
+      // user-owned file outside the app container.
+      if (uri.contains('/save_import/')) {
+        final file = File(uri);
+        if (await file.exists()) {
+          await file.delete();
+        }
+      }
+    }
+  }
+
+  /// iOS document picker hands out a short-lived temporary URL, so persist
+  /// a copy inside the app container to keep the save readable across
+  /// launches (mirrors the persistable-permission flow on Android).
+  Future<SaveDocument> _persistPickedCopy(
+    String fileName,
+    Uint8List bytes,
+  ) async {
+    final docs = await getApplicationDocumentsDirectory();
+    final dir = Directory('${docs.path}/save_import');
+    await dir.create(recursive: true);
+    final dest = File('${dir.path}/$fileName');
+    await dest.writeAsBytes(bytes, flush: true);
+    final stat = await dest.stat();
+    return SaveDocument(
+      uri: dest.path,
+      fileName: fileName,
+      bytes: bytes,
+      modifiedMs: stat.modified.millisecondsSinceEpoch,
+    );
   }
 
   SaveDocument? _decode(Map<Object?, Object?>? raw) {

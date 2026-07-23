@@ -32,3 +32,6 @@ android/local.properties
 
 # Kotlin compiler session artifacts
 flutter/android/.kotlin/
+
+# WorkBuddy agent workspace memory
+.workbuddy/

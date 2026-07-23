@@ -384,6 +384,15 @@ Future<T?> showTitoModalBottomSheet<T>({
       borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
       side: BorderSide(color: TitoColors.ink, width: 2),
     ),
-    builder: builder,
+    // viewInsets keeps content above the system keyboard (iOS/phones — RG
+    // handhelds never show one); SafeArea(top: false) clears the iPhone home
+    // indicator. Sheets that already wrap themselves in SafeArea are fine:
+    // nested SafeAreas consume the padding only once.
+    builder: (sheetContext) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+      ),
+      child: SafeArea(top: false, child: builder(sheetContext)),
+    ),
   );
 }
