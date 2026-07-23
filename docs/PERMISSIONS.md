@@ -70,12 +70,29 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 
 ## Workflows
 
-| Workflow | What it uploads |
-| --- | --- |
-| `sync-l10n-catalog.yml` | `v3/l10n/zh/*`, maps, config, `bundle-manifest.json` |
-| `upload-dex-bundle.yml` | Full dex bundle under `v2/` or `v3/` |
+| Workflow | 触发方式 | 上传内容 |
+| --- | --- | --- |
+| `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v3/l10n/zh/*`, maps, config, `bundle-manifest.json` |
+| `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
+| `upload-dex-bundle.yml` | 手动 / push `deploy/dex-cdn` | Full dex bundle under `v2/` or `v3/` |
 
-Both require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
+Both R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
+
+---
+
+## Worker secrets (Cloudflare Dashboard)
+
+These live on the **Worker**, not in GitHub Secrets:
+
+| Secret | Purpose |
+| --- | --- |
+| `GITHUB_DISPATCH_TOKEN` | Fine-grained PAT: repo `Tito-XD/tito-dex`, **Actions: Read and write** |
+| `ADMIN_SECRET` | Bearer token for `https://dex.tito.cafe/admin/*` |
+| `TELEGRAM_BOT_TOKEN` | BotFather token for CDN probe / cron failure alerts |
+| `TELEGRAM_CHAT_ID` | Telegram chat id to receive alerts |
+| `ALERT_WEBHOOK_URL` | Optional Discord/Slack webhook (alternative to Telegram) |
+
+GitHub repository secrets (`CLOUDFLARE_*`) are unchanged — Actions still write R2 directly.
 
 ## Local upload (alternative)
 

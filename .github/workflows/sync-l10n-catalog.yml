@@ -7,8 +7,8 @@ on:
         description: Re-resolve all slugs lacking proper Chinese labels
         type: boolean
         default: false
-  schedule:
-    - cron: "0 4 * * 0"
+  repository_dispatch:
+    types: [sync-l10n]
 
 jobs:
   sync-l10n:
@@ -27,9 +27,13 @@ jobs:
         run: pip install beautifulsoup4 -r tools/dex_bundle_requirements.txt
 
       - name: Fetch 52poke location labels (incremental)
+        env:
+          FORCE_FULL: ${{ github.event.client_payload.force_full || inputs.force_full || false }}
+          DISPATCH_SOURCE: ${{ github.event.client_payload.source || 'manual' }}
         run: |
+          echo "Trigger source: ${DISPATCH_SOURCE}"
           EXTRA=""
-          if [ "${{ inputs.force_full }}" = "true" ]; then
+          if [ "$FORCE_FULL" = "true" ]; then
             EXTRA="--force-full"
           fi
           python3 tools/fetch_52poke_location_zh.py --limit 50 $EXTRA || true
@@ -101,6 +105,12 @@ jobs:
           m = json.load(sys.stdin)
           assert m.get('l10nVersion'), f'missing l10nVersion: {m}'
           print('bundle-manifest l10nVersion:', m['l10nVersion'])
+          "
+          curl -sf 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c "
+          import json, sys
+          h = json.load(sys.stdin)
+          assert h.get('ok'), h
+          print('cdn-health probe ok')
           "
 
       - name: Commit catalog changes (if any)
