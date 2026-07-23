@@ -1,0 +1,90 @@
+{
+  "648:aria": {
+    "pokemonId": 648,
+    "formKey": "meloetta-aria"
+  },
+  "555:galar": {
+    "pokemonId": 10177,
+    "formKey": "darmanitan-galar-standard"
+  },
+  "678:f": {
+    "pokemonId": 10025,
+    "formKey": "meowstic-female"
+  },
+  "710:jumbo": {
+    "pokemonId": 10029,
+    "formKey": "pumpkaboo-super"
+  },
+  "710:large": {
+    "pokemonId": 10028,
+    "formKey": "pumpkaboo-large"
+  },
+  "710:small": {
+    "pokemonId": 10027,
+    "formKey": "pumpkaboo-small"
+  },
+  "710:super": {
+    "pokemonId": 10029,
+    "formKey": "pumpkaboo-super"
+  },
+  "774:c-blue": {
+    "pokemonId": 10140,
+    "formKey": "minior-blue"
+  },
+  "774:c-indigo": {
+    "pokemonId": 10141,
+    "formKey": "minior-indigo"
+  },
+  "774:c-red": {
+    "pokemonId": 10136,
+    "formKey": "minior-red"
+  },
+  "774:c-violet": {
+    "pokemonId": 10142,
+    "formKey": "minior-violet"
+  },
+  "774:c-yellow": {
+    "pokemonId": 10138,
+    "formKey": "minior-yellow"
+  },
+  "876:f": {
+    "pokemonId": 10186,
+    "formKey": "indeedee-female"
+  },
+  "902:f": {
+    "pokemonId": 10248,
+    "formKey": "basculegion-female"
+  },
+  "916:f": {
+    "pokemonId": 10254,
+    "formKey": "oinkologne-female"
+  },
+  "157:hisui": {
+    "pokemonId": 10233,
+    "formKey": "typhlosion-hisui"
+  },
+  "194:paldea": {
+    "pokemonId": 10253,
+    "formKey": "wooper-paldea"
+  },
+  "479:fan": {
+    "pokemonId": 10011,
+    "formKey": "rotom-fan"
+  },
+  "479:frost": {
+    "pokemonId": 10010,
+    "formKey": "rotom-frost"
+  },
+  "479:heat": {
+    "pokemonId": 10008,
+    "formKey": "rotom-heat"
+  },
+  "479:mow": {
+    "pokemonId": 10012,
+    "formKey": "rotom-mow"
+  },
+  "479:wash": {
+    "pokemonId": 10009,
+    "formKey": "rotom-wash"
+  }
+}

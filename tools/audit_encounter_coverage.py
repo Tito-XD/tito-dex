@@ -14,6 +14,25 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CATALOG = ROOT / "data" / "l10n" / "zh" / "location_areas.json"
 UNRESOLVED_SOURCES = {"english_fallback"}
 CHINESE_RE = re.compile(r"[\u3400-\u9fff]")
+REQUIRED_MODERN_VERSIONS = {
+    "brilliant-diamond",
+    "shining-pearl",
+    "legends-arceus",
+    "sword",
+    "shield",
+    "the-isle-of-armor-sword",
+    "the-isle-of-armor-shield",
+    "the-crown-tundra-sword",
+    "the-crown-tundra-shield",
+    "scarlet",
+    "violet",
+    "the-teal-mask-scarlet",
+    "the-teal-mask-violet",
+    "the-indigo-disk-scarlet",
+    "the-indigo-disk-violet",
+    "legends-za",
+    "mega-dimension",
+}
 
 
 def load_json(path: Path) -> Any:
@@ -74,11 +93,15 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
     source_counts: Counter[str] = Counter()
     unknown_groups: Counter[str] = Counter()
     detail_count = 0
+    exact_version_counts: Counter[str] = Counter()
+    observed_labels: defaultdict[str, set[str]] = defaultdict(set)
 
     for detail_path in sorted(details_dir.glob("*.json")):
         detail = load_json(detail_path)
         detail_count += 1
         by_game = detail.get("obtainLocationsByGame") or {}
+        for version, locations in (detail.get("obtainLocationsByVersion") or {}).items():
+            exact_version_counts[version] += len(locations)
         for group, locations in by_game.items():
             if group not in stats:
                 unknown_groups[group] += 1
@@ -116,6 +139,8 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
                 if not slug:
                     continue
                 referenced_slugs.add(slug)
+                if label:
+                    observed_labels[slug].add(label)
                 stats[group]["distinctAreaSlugs"].add(slug)
                 catalog_match = catalog_by_id.get(slug)
                 canonical_slug = catalog_match[0] if catalog_match else slug
@@ -151,11 +176,16 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
         catalog_match = catalog_by_id.get(slug)
         canonical_slug = catalog_match[0] if catalog_match else slug
         entry = catalog.get(slug) or (catalog_match[1] if catalog_match else {})
-        if not is_unresolved_label(
-            slug,
-            str(entry.get("labelZh") or ""),
-            entry.get("source"),
-        ):
+        observed_label = next(
+            (
+                label
+                for label in sorted(observed_labels.get(slug, set()))
+                if CHINESE_RE.search(label)
+            ),
+            "",
+        )
+        effective_label = str(entry.get("labelZh") or observed_label)
+        if not is_unresolved_label(slug, effective_label, entry.get("source")):
             continue
         referenced_unresolved.append(
             {
@@ -163,11 +193,19 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
                 "id": str(entry.get("id") or (slug if slug.isdigit() else "")),
                 "areaNameEn": str(entry.get("areaNameEn") or ""),
                 "locationNameEn": str(entry.get("locationNameEn") or ""),
-                "labelZh": str(entry.get("labelZh") or ""),
+                "labelZh": effective_label,
                 "source": str(entry.get("source") or "missing_catalog"),
             }
         )
     referenced_unresolved.sort(key=lambda entry: entry["slug"])
+    manifest_path = bundle_dir / "manifest.json"
+    manifest = load_json(manifest_path) if manifest_path.is_file() else {}
+    missing_required_versions = sorted(
+        version for version in REQUIRED_MODERN_VERSIONS if exact_version_counts[version] <= 0
+    )
+    champions_not_applicable = "champions" in (
+        (manifest.get("encounterCoverage") or {}).get("notApplicable") or []
+    )
     return {
         "detailCount": detail_count,
         "gameGroups": rows,
@@ -176,6 +214,12 @@ def audit(bundle_dir: Path, catalog_path: Path) -> dict[str, Any]:
         "referencedUnresolvedAreas": referenced_unresolved,
         "catalogSourceReferenceCounts": dict(sorted(source_counts.items())),
         "unknownGroups": dict(sorted(unknown_groups.items())),
+        "exactVersionEntryCounts": dict(sorted(exact_version_counts.items())),
+        "missingRequiredModernVersions": missing_required_versions,
+        "championsNotApplicable": champions_not_applicable,
+        "ok": not referenced_unresolved
+        and not missing_required_versions
+        and champions_not_applicable,
     }
 
 
@@ -207,6 +251,7 @@ def main() -> int:
     parser.add_argument("bundle_dir", type=Path, help="Extracted bundle root")
     parser.add_argument("--catalog", type=Path, default=DEFAULT_CATALOG)
     parser.add_argument("--json", action="store_true", dest="as_json")
+    parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
 
     report = audit(args.bundle_dir, args.catalog)
@@ -214,7 +259,7 @@ def main() -> int:
         print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
         print_table(report)
-    return 0
+    return 1 if args.strict and not report["ok"] else 0
 
 
 if __name__ == "__main__":

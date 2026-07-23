@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build TitoDex offline dex bundle v5 for Cloudflare R2 / CDN.
+"""Build TitoDex offline dex bundle v6 for Cloudflare R2 / CDN.
 
 Output matches flutter/lib/features/dex/dex_cache_store.dart layout.
-Published under {cdn_base}/v3/ (bundle v5; v2 remains for older clients).
+Published under {cdn_base}/v4/ (bundle v6; v3 and v2 remain for older clients).
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ import json
 import re
 import shutil
 import struct
+import subprocess
 import sys
 import tarfile
 import time
@@ -24,7 +25,10 @@ from typing import Any
 from urllib.parse import urlparse
 
 import requests
-import zstandard as zstd
+try:
+    import zstandard as zstd
+except ImportError:  # pragma: no cover - exercised on maintainer Macs using zstd CLI
+    zstd = None  # type: ignore[assignment]
 from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,8 +56,8 @@ POKESPRITE_TYPE_ICON_DIR = ROOT / "data" / "assets" / "type_icons"
 POKESPRITE_RAW_BASE = (
     "https://raw.githubusercontent.com/msikma/pokesprite/master/misc"
 )
-BUNDLE_VERSION = 5
-BUNDLE_CDN_PREFIX = "v3"
+BUNDLE_VERSION = 6
+BUNDLE_CDN_PREFIX = "v4"
 TITODEX_MAX_NATIONAL_ID = 1025
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
@@ -619,8 +623,6 @@ class PokeApiBuilder:
         from ``build_detail``; non-default entities are computed once even when
         they expose many cosmetic form resources (for example Alcremie).
         """
-        from pokeapi_assets import official_artwork_url
-
         forms: list[dict[str, Any]] = []
         search_terms: set[str] = set()
         multi_form_pokemon_ids: set[int] = set()
@@ -660,6 +662,7 @@ class PokeApiBuilder:
             return [], [], set()
 
         relations = self.load_type_relations()
+        default_remote_sprite = sprite_url(default_pokemon.get("sprites") or {})
         for variety, pokemon, form_refs in candidates:
             variety_is_default = bool(variety.get("is_default"))
             pokemon_id = int(pokemon["id"])
@@ -690,17 +693,6 @@ class PokeApiBuilder:
                     )
                     if any(move_set.values()):
                         move_sets[version_group] = move_set
-
-            obtain_by_game = filter_form_obtain_locations(
-                obtain_locations_by_game,
-                pokemon_id,
-                entity_has_multiple_forms=entity_has_multiple_forms,
-            )
-            obtain_by_version = filter_form_obtain_locations(
-                obtain_locations_by_version,
-                pokemon_id,
-                entity_has_multiple_forms=entity_has_multiple_forms,
-            )
 
             for form_index, form_ref in enumerate(form_refs):
                 form_url = str(form_ref.get("url") or "")
@@ -735,6 +727,18 @@ class PokeApiBuilder:
                     is_mega=is_mega,
                     cosmetic_only=cosmetic_only,
                 )
+                obtain_by_game = filter_form_obtain_locations(
+                    obtain_locations_by_game,
+                    pokemon_id,
+                    form_key=record_key,
+                    entity_has_multiple_forms=entity_has_multiple_forms,
+                )
+                obtain_by_version = filter_form_obtain_locations(
+                    obtain_locations_by_version,
+                    pokemon_id,
+                    form_key=record_key,
+                    entity_has_multiple_forms=entity_has_multiple_forms,
+                )
 
                 form_types = form_meta.get("types") or pokemon.get("types", [])
                 types = extract_types(form_types)
@@ -746,11 +750,13 @@ class PokeApiBuilder:
                 remote_sprite = sprite_url(form_sprites) or sprite_url(
                     pokemon_sprites
                 )
-                remote_artwork = official_artwork_url(pokemon_sprites)
-                if entity_has_multiple_forms and not record_is_default:
-                    remote_artwork = remote_sprite
+                reuses_default_visual = bool(
+                    remote_sprite
+                    and default_remote_sprite
+                    and remote_sprite == default_remote_sprite
+                )
 
-                if record_is_default:
+                if record_is_default or cosmetic_only or reuses_default_visual:
                     sprite_cdn = (
                         f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/{species_id}.png"
                     )
@@ -761,19 +767,19 @@ class PokeApiBuilder:
                 else:
                     form_id = form_meta.get("id")
                     asset_key = str(form_id or f"pokemon-{pokemon_id}-{form_index}")
-                    sprite_cdn = (
-                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/forms/"
-                        f"{asset_key}.png"
-                    )
-                    artwork_cdn = (
-                        f"{cdn_base}/{BUNDLE_CDN_PREFIX}/artwork/forms/"
-                        f"{asset_key}.png"
-                    )
-                    local_sprite = f"sprites/forms/{asset_key}.png"
-                    self.form_sprite_jobs[asset_key] = (
-                        remote_sprite,
-                        remote_artwork or remote_sprite,
-                    )
+                    sprite_cdn = None
+                    artwork_cdn = None
+                    local_sprite = None
+                    if remote_sprite:
+                        sprite_cdn = (
+                            f"{cdn_base}/{BUNDLE_CDN_PREFIX}/sprites/forms/"
+                            f"{asset_key}.png"
+                        )
+                        local_sprite = f"sprites/forms/{asset_key}.png"
+                        # One compact sprite is sufficient for visually distinct
+                        # forms.  High-resolution form artwork is intentionally
+                        # not duplicated into the bundle.
+                        self.form_sprite_jobs[asset_key] = (remote_sprite, None)
 
                 version_group = (form_meta.get("version_group") or {}).get("name")
                 available_groups = sorted(move_sets)
@@ -812,9 +818,6 @@ class PokeApiBuilder:
                     "types": types,
                     "heightDm": pokemon.get("height", 0),
                     "weightHg": pokemon.get("weight", 0),
-                    "spriteUrl": sprite_cdn,
-                    "artworkUrl": artwork_cdn,
-                    "localSpritePath": local_sprite,
                     "baseStats": parse_base_stats(pokemon.get("stats", [])),
                     "typeMultipliers": multipliers,
                     "stabSuperEffective": stab,
@@ -823,6 +826,12 @@ class PokeApiBuilder:
                     "obtainLocationsByVersion": obtain_by_version,
                     "moveSets": move_sets,
                 }
+                if sprite_cdn:
+                    entry["spriteUrl"] = sprite_cdn
+                if artwork_cdn:
+                    entry["artworkUrl"] = artwork_cdn
+                if local_sprite:
+                    entry["localSpritePath"] = local_sprite
                 if form_meta.get("id") is not None:
                     entry["formId"] = form_meta["id"]
                 if form_name_zh:
@@ -1235,11 +1244,10 @@ def merge_obtain_location_versions(
     versions: set[str] | frozenset[str],
 ) -> list[dict[str, Any]]:
     """Merge paired editions while retaining which exact versions contain an area."""
-    merged: dict[str, dict[str, Any]] = {}
+    merged: dict[tuple[Any, ...], dict[str, Any]] = {}
     for version in sorted(versions):
         for source in by_version.get(version, []):
-            slug = source["areaSlug"]
-            identity = f"{source.get('pokemonId', '')}:{source.get('formKey', source.get('formSlug', ''))}:{slug}"
+            identity = encounter_identity(source)
             current = merged.get(identity)
             if current is None:
                 current = dict(source)
@@ -1273,6 +1281,23 @@ def merge_obtain_location_versions(
     return sorted(merged.values(), key=lambda item: item["areaLabelZh"])
 
 
+def encounter_identity(entry: dict[str, Any]) -> tuple[Any, ...]:
+    """Identity used for source precedence and lossless encounter de-duplication."""
+    return (
+        entry.get("speciesId"),
+        entry.get("pokemonId"),
+        entry.get("formKey", entry.get("formSlug")),
+        entry.get("areaSlug"),
+        tuple(sorted(entry.get("methods") or [])),
+        entry.get("teraType"),
+        bool(entry.get("isAlpha")),
+        bool(entry.get("isTitan")),
+        bool(entry.get("isTotem")),
+        bool(entry.get("isRaid")),
+        bool(entry.get("isFixedEncounter")),
+    )
+
+
 def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
     """Load attributed per-version encounter files for gaps in PokeAPI."""
     global _ENCOUNTER_OVERLAYS
@@ -1282,8 +1307,12 @@ def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
     if not ENCOUNTER_OVERLAY_DIR.is_dir():
         _ENCOUNTER_OVERLAYS = overlays
         return overlays
-    for path in sorted(ENCOUNTER_OVERLAY_DIR.glob("*.json")):
+    payloads: list[tuple[int, Path, dict[str, Any]]] = []
+    for path in sorted(ENCOUNTER_OVERLAY_DIR.rglob("*.json")):
         payload = json.loads(path.read_text(encoding="utf-8"))
+        payloads.append((int(payload.get("priority") or 200), path, payload))
+    merged_overlays: dict[str, dict[str, dict[tuple[Any, ...], dict[str, Any]]]] = {}
+    for _priority, path, payload in sorted(payloads, key=lambda item: (item[0], str(item[1]))):
         version = str(payload.get("version") or "")
         source = payload.get("source") or {}
         if not version or not all(source.get(key) for key in ("name", "url", "license")):
@@ -1316,7 +1345,18 @@ def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
                 entry["versions"] = [version]
                 normalized.append(entry)
             species_entries[str(encounter_key)] = normalized
-        overlays[version] = species_entries
+        version_entries = merged_overlays.setdefault(version, {})
+        for encounter_key, entries in species_entries.items():
+            bucket = version_entries.setdefault(encounter_key, {})
+            for entry in entries:
+                bucket[encounter_identity(entry)] = entry
+    overlays = {
+        version: {
+            encounter_key: list(entries.values())
+            for encounter_key, entries in buckets.items()
+        }
+        for version, buckets in merged_overlays.items()
+    }
     _ENCOUNTER_OVERLAYS = overlays
     return overlays
 
@@ -1335,16 +1375,32 @@ def apply_encounter_overlays(
         overlay_entries = species_entries.get(str(pokemon_id))
         if not overlay_entries:
             continue
-        for entry in overlay_entries:
+        normalized_overlay: list[dict[str, Any]] = []
+        for source in overlay_entries:
+            entry = dict(source)
             if species_id is not None:
                 entry.setdefault("speciesId", species_id)
             if form_key:
-                entry.setdefault("formKey", form_key)
+                # PKHeX form index 0 means the default Pokémon entity, but
+                # its display key is not always the species slug
+                # (meloetta-aria, meowstic-male, zygarde-50, …).  The
+                # species payload already gives us the authoritative PokeAPI
+                # variety key, so normalize only index 0 and preserve exact
+                # non-default form mappings.
+                if entry.get("formIndex") == 0 and is_default_form:
+                    entry["formKey"] = form_key
+                else:
+                    entry.setdefault("formKey", form_key)
             if is_default_form is not None:
                 entry.setdefault("isDefaultForm", is_default_form)
             entry.setdefault("formAmbiguous", False)
-        merged = {entry["areaSlug"]: entry for entry in result.get(version, [])}
-        merged.update({entry["areaSlug"]: entry for entry in overlay_entries})
+            normalized_overlay.append(entry)
+        merged = {
+            encounter_identity(entry): entry for entry in result.get(version, [])
+        }
+        merged.update(
+            {encounter_identity(entry): entry for entry in normalized_overlay}
+        )
         result[version] = sorted(
             merged.values(), key=lambda item: item["areaLabelZh"]
         )
@@ -1377,16 +1433,9 @@ def apply_species_ambiguous_overlays(
             entry.pop("formSlug", None)
             entry["formAmbiguous"] = True
             normalized.append(entry)
-        merged = {
-            (
-                entry["areaSlug"],
-                entry.get("pokemonId"),
-                entry.get("formKey", entry.get("formSlug")),
-            ): entry
-            for entry in result.get(version, [])
-        }
+        merged = {encounter_identity(entry): entry for entry in result.get(version, [])}
         for entry in normalized:
-            merged[(entry["areaSlug"], None, None)] = entry
+            merged[encounter_identity(entry)] = entry
         result[version] = sorted(
             merged.values(), key=lambda item: item["areaLabelZh"]
         )
@@ -1503,6 +1552,7 @@ def filter_form_obtain_locations(
     locations_by_key: dict[str, list[dict[str, Any]]],
     pokemon_id: int,
     *,
+    form_key: str,
     entity_has_multiple_forms: bool = False,
 ) -> dict[str, list[dict[str, Any]]]:
     """Keep one Pokémon entity's rows plus explicitly ambiguous species rows."""
@@ -1516,9 +1566,19 @@ def filter_form_obtain_locations(
                 continue
             entry = dict(source)
             if entity_has_multiple_forms and entry.get("pokemonId") == pokemon_id:
-                entry.pop("formKey", None)
-                entry.pop("formSlug", None)
-                entry["formAmbiguous"] = True
+                source_form_key = entry.get("formKey", entry.get("formSlug"))
+                has_exact_form_index = entry.get("formIndex") is not None
+                if has_exact_form_index:
+                    if source_form_key != form_key:
+                        continue
+                else:
+                    entry.pop("formKey", None)
+                    entry.pop("formSlug", None)
+                    entry["formAmbiguous"] = True
+            elif entry.get("pokemonId") == pokemon_id:
+                source_form_key = entry.get("formKey", entry.get("formSlug"))
+                if source_form_key and source_form_key != form_key:
+                    continue
             selected.append(entry)
         if selected:
             result[key] = selected
@@ -1868,7 +1928,6 @@ def directory_size(path: Path) -> int:
 
 def create_zst_tar(source_dir: Path, archive_path: Path) -> None:
     archive_path.parent.mkdir(parents=True, exist_ok=True)
-    compressor = zstd.ZstdCompressor(level=19)
     buffer = io.BytesIO()
     with tarfile.open(fileobj=buffer, mode="w") as tar:
         for file in sorted(source_dir.rglob("*")):
@@ -1877,7 +1936,18 @@ def create_zst_tar(source_dir: Path, archive_path: Path) -> None:
             if file.name == "bundle.tar.zst":
                 continue
             tar.add(file, arcname=file.relative_to(source_dir).as_posix())
-    archive_path.write_bytes(compressor.compress(buffer.getvalue()))
+    tar_bytes = buffer.getvalue()
+    if zstd is not None:
+        compressor = zstd.ZstdCompressor(level=19)
+        archive_path.write_bytes(compressor.compress(tar_bytes))
+        return
+    process = subprocess.run(
+        ["zstd", "-19", "--stdout"],
+        input=tar_bytes,
+        capture_output=True,
+        check=True,
+    )
+    archive_path.write_bytes(process.stdout)
 
 
 def sha256_file(path: Path) -> str:
@@ -2214,6 +2284,82 @@ def form_count_from_details(staging: Path, max_id: int) -> int:
     return total
 
 
+def encounter_coverage_from_details(staging: Path, max_id: int) -> dict[str, Any]:
+    exact: dict[str, dict[str, Any]] = {}
+    for pokemon_id in range(1, max_id + 1):
+        detail_path = staging / "details" / f"{pokemon_id}.json"
+        if not detail_path.is_file():
+            continue
+        detail = json.loads(detail_path.read_text(encoding="utf-8"))
+        for version, entries in (detail.get("obtainLocationsByVersion") or {}).items():
+            stats = exact.setdefault(
+                version,
+                {
+                    "species": set(),
+                    "entries": 0,
+                    "formLinked": 0,
+                    "formAmbiguous": 0,
+                    "tera": 0,
+                    "alpha": 0,
+                    "titan": 0,
+                    "raid": 0,
+                    "fixed": 0,
+                },
+            )
+            if entries:
+                stats["species"].add(pokemon_id)
+            stats["entries"] += len(entries)
+            for entry in entries:
+                linked = entry.get("pokemonId") is not None and bool(entry.get("formKey"))
+                stats["formLinked"] += int(linked)
+                stats["formAmbiguous"] += int(bool(entry.get("formAmbiguous")))
+                stats["tera"] += int(bool(entry.get("teraType")))
+                stats["alpha"] += int(bool(entry.get("isAlpha")))
+                stats["titan"] += int(bool(entry.get("isTitan")))
+                stats["raid"] += int(bool(entry.get("isRaid")))
+                stats["fixed"] += int(bool(entry.get("isFixedEncounter")))
+    return {
+        "exactVersions": {
+            version: {
+                **{key: value for key, value in stats.items() if key != "species"},
+                "speciesWithLocations": len(stats["species"]),
+            }
+            for version, stats in sorted(exact.items())
+        },
+        "notApplicable": ["champions"],
+    }
+
+
+def encounter_source_metadata() -> list[dict[str, Any]]:
+    sources: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    for path in sorted(ENCOUNTER_OVERLAY_DIR.rglob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        source = payload.get("source") or {}
+        version = str(payload.get("version") or "")
+        if not source or not version:
+            continue
+        identity = (
+            str(source.get("name") or ""),
+            str(source.get("url") or ""),
+            str(source.get("license") or ""),
+            str(source.get("commit") or ""),
+        )
+        record = sources.setdefault(
+            identity,
+            {
+                "name": identity[0],
+                "url": identity[1],
+                "license": identity[2],
+                **({"commit": identity[3]} if identity[3] else {}),
+                "versions": [],
+            },
+        )
+        record["versions"].append(version)
+    for record in sources.values():
+        record["versions"] = sorted(set(record["versions"]))
+    return sorted(sources.values(), key=lambda item: item["name"])
+
+
 def build_runtime_catalog(
     staging: Path,
     summaries: list[dict[str, Any]],
@@ -2289,7 +2435,6 @@ def build_bundle(
     (staging / "details").mkdir(exist_ok=True)
     (staging / "sprites").mkdir(exist_ok=True)
     (staging / "sprites" / "forms").mkdir(exist_ok=True)
-    (artwork_staging / "forms").mkdir(exist_ok=True)
     (staging / "type_icons").mkdir(exist_ok=True)
     (staging / "game_icons").mkdir(exist_ok=True)
 
@@ -2381,27 +2526,23 @@ def build_bundle(
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
 
-    for form_id, (sprite_remote, artwork_remote) in sorted(
+    for form_id, (sprite_remote, _artwork_remote) in sorted(
         builder.form_sprite_jobs.items()
     ):
         sprite_dest = staging / "sprites" / "forms" / f"{form_id}.png"
-        artwork_dest = artwork_staging / "forms" / f"{form_id}.png"
         if sprite_remote and not sprite_dest.exists():
             try:
                 png = download_bytes(session, sprite_remote)
                 sprite_dest.write_bytes(optimize_png(png, max_width=220))
             except requests.RequestException as exc:
                 print(f"  warn: form sprite #{form_id}: {exc}", file=sys.stderr)
-        if artwork_remote and not artwork_dest.exists():
-            try:
-                png = download_bytes(session, artwork_remote)
-                artwork_dest.write_bytes(optimize_png(png, max_width=None))
-            except requests.RequestException as exc:
-                print(f"  warn: form artwork #{form_id}: {exc}", file=sys.stderr)
 
     warm_builder_caches_from_details(builder, staging, max_id)
     summaries = summaries_from_details(staging, max_id)
     form_count = form_count_from_details(staging, max_id)
+    form_sprite_count = len(list((staging / "sprites" / "forms").glob("*.png")))
+    encounter_coverage = encounter_coverage_from_details(staging, max_id)
+    encounter_sources = encounter_source_metadata()
     write_json(staging / "summaries.json", summaries)
     moves_payload = {str(move_id): move for move_id, move in builder.move_cache.items()}
     write_json(staging / "moves.json", moves_payload)
@@ -2443,10 +2584,15 @@ def build_bundle(
         "downloadedAt": published_at,
         "pokemonCount": len(summaries),
         "formCount": form_count,
+        "formSpriteCount": form_sprite_count,
         "schemaFeatures": {
             "pokemonForms": 2,
             "encounterFormIdentity": 3,
+            "exactVersionLocations": 1,
         },
+        "exactVersionLocations": True,
+        "encounterSources": encounter_sources,
+        "encounterCoverage": encounter_coverage,
         "moveCount": len(moves_payload),
         "abilityCount": len(abilities_payload),
         "gameCount": len(games_payload),
@@ -2499,10 +2645,18 @@ def build_bundle(
         "bundleVersion": BUNDLE_VERSION,
         "pokemonCount": len(summaries),
         "formCount": form_count,
+        "formSpriteCount": form_sprite_count,
         "schemaFeatures": {
             "pokemonForms": 2,
             "encounterFormIdentity": 3,
+            "exactVersionLocations": 1,
         },
+        "cdnPrefix": BUNDLE_CDN_PREFIX,
+        "complete": max_id >= TITODEX_MAX_NATIONAL_ID
+        and len(summaries) >= TITODEX_MAX_NATIONAL_ID,
+        "exactVersionLocations": True,
+        "encounterSources": encounter_sources,
+        "encounterCoverage": encounter_coverage,
         "archiveUrl": f"{cdn_base}/{BUNDLE_CDN_PREFIX}/bundle.tar.zst",
         "archiveSha256": archive_sha,
         "archiveSizeBytes": (upload_bundle / "bundle.tar.zst").stat().st_size,
@@ -2522,7 +2676,7 @@ def build_bundle(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v5")
+    parser = argparse.ArgumentParser(description="Build TitoDex dex CDN bundle v6")
     parser.add_argument(
         "--cdn-base",
         default="https://dex.example.com",
@@ -2531,7 +2685,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("dist/dex-v5"),
+        default=Path("dist/dex-v6"),
         help="Output directory",
     )
     parser.add_argument("--min-id", type=int, default=1)

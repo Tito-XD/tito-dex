@@ -19,6 +19,7 @@ from build_dex_bundle import (  # noqa: E402
     GAME_EDITIONS,
     ability_description_zh,
     encounter_area_label_zh,
+    fetch_obtain_locations,
     fetch_species_obtain_locations,
     merge_obtain_location_versions,
     parse_ev_yield,
@@ -251,6 +252,36 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         self.assertNotIn("pokemonId", entry)
         self.assertNotIn("formKey", entry)
 
+    def test_default_overlay_uses_authoritative_variety_key(self) -> None:
+        original = dex_builder._ENCOUNTER_OVERLAYS
+        dex_builder._ENCOUNTER_OVERLAYS = {
+            "legends-za": {
+                "648": [{
+                    "speciesId": 648,
+                    "pokemonId": 648,
+                    "formIndex": 0,
+                    "formKey": "meloetta",
+                    "areaSlug": "pkhex-za-test",
+                    "areaLabelZh": "密阿雷市",
+                }],
+            },
+        }
+        try:
+            _by_game, by_version = fetch_obtain_locations(
+                type("Builder", (), {"_get_json_list": lambda _self, _path: []})(),
+                648,
+                species_id=648,
+                form_key="meloetta-aria",
+                is_default_form=True,
+            )
+        finally:
+            dex_builder._ENCOUNTER_OVERLAYS = original
+
+        self.assertEqual(
+            by_version["legends-za"][0]["formKey"],
+            "meloetta-aria",
+        )
+
     def test_form_builder_omits_single_default_and_keeps_all_cosmetics(self) -> None:
         builder = dex_builder.PokeApiBuilder(delay_s=0)
         builder.load_type_relations = lambda: {}
@@ -355,7 +386,11 @@ class DexBundleV5ValidationTests(unittest.TestCase):
         self.assertEqual(len(forms), 2)
         self.assertEqual({form["formId"] for form in forms}, {10168, 10169})
         self.assertEqual(len({form["key"] for form in forms}), 2)
-        self.assertEqual(set(builder.form_sprite_jobs), {"10169"})
+        self.assertEqual(set(builder.form_sprite_jobs), set())
+        self.assertEqual(
+            {form["localSpritePath"] for form in forms},
+            {"sprites/869.png"},
+        )
         self.assertEqual(ambiguous_ids, {869})
         for form in forms:
             location = form["obtainLocationsByVersion"]["sword"][0]

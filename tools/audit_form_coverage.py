@@ -60,12 +60,20 @@ def audit(
     missing_assets: list[str] = []
     species_ids: set[int] = set()
     encounter = Counter()
+    duplicate_encounters: list[str] = []
+    encounter_species_mismatches: list[str] = []
+    encounter_form_mismatches: list[str] = []
 
     for detail_path in sorted(details_dir.glob("*.json")):
         detail = load_json(detail_path)
         species_id = int(detail.get("summary", {}).get("id") or detail_path.stem)
         species_ids.add(species_id)
         forms = detail.get("forms") or []
+        valid_form_pairs = {
+            (int(form["pokemonId"]), str(form["key"]))
+            for form in forms
+            if form.get("pokemonId") is not None and form.get("key")
+        }
         if len(forms) == 1:
             single_form_species.append(species_id)
         if forms and sum(bool(form.get("isDefault")) for form in forms) != 1:
@@ -99,17 +107,12 @@ def audit(
             local_sprite = form.get("localSpritePath")
             if local_sprite and not (bundle_dir / local_sprite).is_file():
                 missing_assets.append(str(local_sprite))
-            if local_sprite and local_sprite.startswith("sprites/forms/"):
-                artwork = Path("artwork/forms") / Path(local_sprite).name
-                if (bundle_dir / "artwork").is_dir() and not (
-                    bundle_dir / artwork
-                ).is_file():
-                    missing_assets.append(str(artwork))
 
         encounter_maps = detail.get("obtainLocationsByVersion") or detail.get(
             "obtainLocationsByGame"
         ) or {}
-        for entries in encounter_maps.values():
+        for version, entries in encounter_maps.items():
+            seen_encounters: set[tuple[Any, ...]] = set()
             for entry in entries:
                 pokemon_id = entry.get("pokemonId")
                 form_key = entry.get("formKey") or entry.get("formSlug")
@@ -125,6 +128,34 @@ def audit(
                     encounter["identityMismatch"] += 1
                 if entry.get("teraType"):
                     encounter["teraType"] += 1
+                if entry.get("speciesId") not in (None, species_id):
+                    encounter_species_mismatches.append(
+                        f"{species_id}:{version}:{entry.get('speciesId')}"
+                    )
+                if pokemon_id is not None and form_key and forms and (
+                    int(pokemon_id), str(form_key)
+                ) not in valid_form_pairs:
+                    encounter_form_mismatches.append(
+                        f"{species_id}:{version}:{pokemon_id}:{form_key}"
+                    )
+                identity = (
+                    entry.get("speciesId"),
+                    pokemon_id,
+                    form_key,
+                    entry.get("areaSlug"),
+                    tuple(sorted(entry.get("methods") or [])),
+                    entry.get("teraType"),
+                    bool(entry.get("isAlpha")),
+                    bool(entry.get("isTitan")),
+                    bool(entry.get("isTotem")),
+                    bool(entry.get("isRaid")),
+                    bool(entry.get("isFixedEncounter")),
+                )
+                if identity in seen_encounters:
+                    duplicate_encounters.append(
+                        f"{species_id}:{version}:{entry.get('areaSlug')}"
+                    )
+                seen_encounters.add(identity)
 
     duplicate_keys = {key: ids for key, ids in keys.items() if len(ids) > 1}
     duplicate_form_ids = {
@@ -148,6 +179,9 @@ def audit(
         "missingSources": missing["sources"],
         "missingAssets": sorted(set(missing_assets)),
         "encounterIdentityMismatchCount": encounter["identityMismatch"],
+        "encounterSpeciesMismatches": encounter_species_mismatches,
+        "encounterFormMismatches": encounter_form_mismatches,
+        "duplicateEncounters": duplicate_encounters,
     }
     changes: dict[str, list[str]] = {}
     if previous_bundle is not None:
