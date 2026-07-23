@@ -99,19 +99,19 @@ void main() {
   });
 
   group('DexCdnConfig l10n URLs', () {
-    test('l10nFileUrl points to v3/l10n/zh/', () {
+    test('l10nFileUrl points to active v4 paths', () {
       const config = DexCdnConfig();
       expect(
         config.l10nFileUrl('location_area_labels.json'),
-        '${DexCdnConfig.cdnBase}/v3/l10n/zh/location_area_labels.json',
+        '${DexCdnConfig.cdnBase}/v4/l10n/zh/location_area_labels.json',
       );
       expect(
         config.mapFileUrl('hgss_map_list.json'),
-        '${DexCdnConfig.cdnBase}/v3/maps/hgss_map_list.json',
+        '${DexCdnConfig.cdnBase}/v4/maps/hgss_map_list.json',
       );
       expect(
         config.configFileUrl('app_config.json'),
-        '${DexCdnConfig.cdnBase}/v3/config/app_config.json',
+        '${DexCdnConfig.cdnBase}/v4/config/app_config.json',
       );
     });
   });

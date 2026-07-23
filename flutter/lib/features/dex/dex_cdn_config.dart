@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 
 /// CDN configuration for the pre-built dex offline bundle.
 class DexCdnConfig {
-  const DexCdnConfig({http.Client? httpClient})
-      : _httpClient = httpClient;
+  const DexCdnConfig({http.Client? httpClient}) : _httpClient = httpClient;
 
   final http.Client? _httpClient;
 
@@ -14,13 +13,21 @@ class DexCdnConfig {
     defaultValue: 'https://dex.tito.cafe',
   );
 
-  static const String bundleVersionPrefix = 'v3';
+  static const String bundleVersionPrefix = 'v4';
+
+  static const String previousBundleVersionPrefix = 'v3';
 
   static const String legacyBundleVersionPrefix = 'v2';
 
+  static const List<String> apiVersionPrefixes = [
+    bundleVersionPrefix,
+    previousBundleVersionPrefix,
+    legacyBundleVersionPrefix,
+  ];
+
   static const String bundleUrl = String.fromEnvironment(
     'TITODEX_DEX_BUNDLE_URL',
-    defaultValue: 'https://dex.tito.cafe/v3/bundle.tar.zst',
+    defaultValue: 'https://dex.tito.cafe/v4/bundle.tar.zst',
   );
 
   static const String legacyBundleUrl =
@@ -28,7 +35,7 @@ class DexCdnConfig {
 
   static const int bundleVersion = int.fromEnvironment(
     'TITODEX_DEX_BUNDLE_VERSION',
-    defaultValue: 5,
+    defaultValue: 6,
   );
 
   String get manifestUrl => '$cdnBase/bundle-manifest.json';
@@ -45,7 +52,7 @@ class DexCdnConfig {
   String abilitiesUrl({String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/abilities.json';
 
-  /// v3 reference indices (natures, weather, items, …).
+  /// Versioned reference indices (natures, weather, items, …).
   String referenceUrl(String filename, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/$filename';
 
@@ -59,8 +66,7 @@ class DexCdnConfig {
     int id,
     String versionGroup, {
     String prefix = bundleVersionPrefix,
-  }) =>
-      '$cdnBase/$prefix/sprites/by-version/$versionGroup/$id.png';
+  }) => '$cdnBase/$prefix/sprites/by-version/$versionGroup/$id.png';
 
   String animatedSpriteUrl(int id, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/sprites/animated/$id.gif';
@@ -77,15 +83,17 @@ class DexCdnConfig {
   String mapFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>
       '$cdnBase/$prefix/maps/$filename';
 
-  String configFileUrl(String filename, {String prefix = bundleVersionPrefix}) =>
-      '$cdnBase/$prefix/config/$filename';
+  String configFileUrl(
+    String filename, {
+    String prefix = bundleVersionPrefix,
+  }) => '$cdnBase/$prefix/config/$filename';
 
   DexBundleManifest fallbackManifest() => DexBundleManifest(
-        bundleVersion: bundleVersion,
-        archiveUrl: bundleUrl,
-        archiveSha256: '',
-        archiveSizeBytes: 0,
-      );
+    bundleVersion: bundleVersion,
+    archiveUrl: bundleUrl,
+    archiveSha256: '',
+    archiveSizeBytes: 0,
+  );
 
   Future<DexBundleManifest> fetchManifest({http.Client? client}) async {
     final httpClient = client ?? _httpClient ?? http.Client();
@@ -132,19 +140,20 @@ class DexBundleManifest {
   bool get hasIntegrityCheck => archiveSha256.isNotEmpty;
 
   Map<String, dynamic> toJson() => {
-        'bundleVersion': bundleVersion,
-        'archiveUrl': archiveUrl,
-        'archiveSha256': archiveSha256,
-        'archiveSizeBytes': archiveSizeBytes,
-        if (pokemonCount != null) 'pokemonCount': pokemonCount,
-        if (publishedAt != null) 'publishedAt': publishedAt,
-        if (l10nVersion != null) 'l10nVersion': l10nVersion,
-        if (configVersion != null) 'configVersion': configVersion,
-      };
+    'bundleVersion': bundleVersion,
+    'archiveUrl': archiveUrl,
+    'archiveSha256': archiveSha256,
+    'archiveSizeBytes': archiveSizeBytes,
+    if (pokemonCount != null) 'pokemonCount': pokemonCount,
+    if (publishedAt != null) 'publishedAt': publishedAt,
+    if (l10nVersion != null) 'l10nVersion': l10nVersion,
+    if (configVersion != null) 'configVersion': configVersion,
+  };
 
   factory DexBundleManifest.fromJson(Map<String, dynamic> json) {
     return DexBundleManifest(
-      bundleVersion: json['bundleVersion'] as int? ?? DexCdnConfig.bundleVersion,
+      bundleVersion:
+          json['bundleVersion'] as int? ?? DexCdnConfig.bundleVersion,
       archiveUrl: json['archiveUrl'] as String? ?? DexCdnConfig.bundleUrl,
       archiveSha256: (json['archiveSha256'] as String? ?? '').toLowerCase(),
       archiveSizeBytes: json['archiveSizeBytes'] as int? ?? 0,

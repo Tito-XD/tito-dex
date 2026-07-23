@@ -45,6 +45,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   GameEdition _gameEdition = defaultGameEdition;
   GameEdition _moveGameEdition = defaultGameEdition;
   GameEdition _obtainGameEdition = defaultGameEdition;
+  String? _selectedObtainVersion;
   _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
   String? _selectedFormKey;
 
@@ -73,6 +74,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       _gameEdition = edition;
       _moveGameEdition = edition;
       _obtainGameEdition = edition;
+      _selectedObtainVersion = null;
     });
   }
 
@@ -85,6 +87,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       _gameEdition = edition;
       _moveGameEdition = edition;
       _obtainGameEdition = edition;
+      _selectedObtainVersion = null;
     });
   }
 
@@ -174,12 +177,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                                   _selectedFormKey ??
                                   displayDetail.defaultForm!.key,
                               onSelected: (form) {
-                              setState(() {
-                                _selectedFormKey = form.key;
-                                _abilities = form.abilities.isEmpty &&
-                                        (form.isDefault || form.isCosmetic)
-                                    ? _detail!.abilities
-                                    : form.abilities;
+                                setState(() {
+                                  _selectedFormKey = form.key;
+                                  _abilities =
+                                      form.abilities.isEmpty &&
+                                          (form.isDefault || form.isCosmetic)
+                                      ? _detail!.abilities
+                                      : form.abilities;
                                 });
                               },
                             ),
@@ -365,10 +369,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     // selected edition, same pattern as the moves tab.
     final obtainGroups = _allObtainGroups(detail);
     final editionKey = _obtainGameEdition.dataVersionGroupKey;
-    final matchIndex = obtainGroups.indexWhere(
-      (group) => group.$1 == editionKey,
-    );
-    final locations = matchIndex >= 0 ? obtainGroups[matchIndex].$2 : null;
+    final selectedVersion = _selectedObtainVersion;
+    final exactVersions =
+        encounterVersionsByVersionGroup[editionKey] ?? const [];
+    final List<ObtainLocationEntry>? locations;
+    if (selectedVersion != null) {
+      locations = detail.obtainLocationsByVersion[selectedVersion];
+    } else {
+      final matchIndex = obtainGroups.indexWhere(
+        (group) => group.$1 == editionKey,
+      );
+      locations = matchIndex >= 0 ? obtainGroups[matchIndex].$2 : null;
+    }
 
     final sections = <Widget>[
       HandheldFocusDecorator(
@@ -388,10 +400,49 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
       ),
       const SizedBox(height: 12),
+      if (exactVersions.length > 1) ...[
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexObtainExactVersion,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text(AppZh.dexObtainCombinedVersions),
+                    selected: selectedVersion == null,
+                    onSelected: (_) {
+                      setState(() => _selectedObtainVersion = null);
+                    },
+                  ),
+                  ...exactVersions.map(
+                    (version) => ChoiceChip(
+                      label: Text(flavorVersionLabelZh(version)),
+                      selected: selectedVersion == version,
+                      onSelected: (_) {
+                        setState(() => _selectedObtainVersion = version);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
       if (locations != null && locations.isNotEmpty)
         ObtainLocationsCard(
           locations: locations,
-          gameLabel: gameEditionLabelForVersionGroup(editionKey),
+          gameLabel: selectedVersion == null
+              ? gameEditionLabelForVersionGroup(editionKey)
+              : flavorVersionLabelZh(selectedVersion),
         )
       else
         StickerCard(
@@ -432,7 +483,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       selected: _obtainGameEdition,
     );
     if (picked != null && mounted) {
-      setState(() => _obtainGameEdition = picked);
+      setState(() {
+        _obtainGameEdition = picked;
+        _selectedObtainVersion = null;
+      });
       await dexSettingsRepository.saveDefaultGameEdition(picked);
     }
   }

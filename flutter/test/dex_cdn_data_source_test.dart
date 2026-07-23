@@ -107,20 +107,39 @@ MockClient _mockCdn() {
 }
 
 void main() {
-  test('fetchAllSummaries parses v3 CDN list and strips localSpritePath',
-      () async {
-    final source = DexCdnDataSource(client: _mockCdn());
+  test(
+    'fetchAllSummaries parses v3 CDN list and strips localSpritePath',
+    () async {
+      final source = DexCdnDataSource(client: _mockCdn());
 
-    final summaries = await source.fetchAllSummaries();
+      final summaries = await source.fetchAllSummaries();
 
-    expect(summaries, hasLength(2));
-    expect(summaries.first.nameZh, '妙蛙种子');
-    expect(summaries.first.pokedexNumbers?['kanto'], 1);
-    expect(summaries.first.localSpritePath, isNull);
-    expect(
-      summaries.first.displaySpritePath,
-      'https://dex.tito.cafe/v3/sprites/1.png',
+      expect(summaries, hasLength(2));
+      expect(summaries.first.nameZh, '妙蛙种子');
+      expect(summaries.first.pokedexNumbers?['kanto'], 1);
+      expect(summaries.first.localSpritePath, isNull);
+      expect(
+        summaries.first.displaySpritePath,
+        'https://dex.tito.cafe/v3/sprites/1.png',
+      );
+    },
+  );
+
+  test('fetchAllSummaries falls back from v4 to v3', () async {
+    final requested = <String>[];
+    final source = DexCdnDataSource(
+      client: MockClient((request) async {
+        requested.add(request.url.path);
+        if (request.url.path == '/v3/summaries.json') {
+          return http.Response('[]', 200);
+        }
+        return http.Response('not found', 404);
+      }),
     );
+
+    await source.fetchAllSummaries();
+
+    expect(requested, ['/v4/summaries.json', '/v3/summaries.json']);
   });
 
   test('fetchDetail resolves moves via v3 CDN moves.json', () async {
