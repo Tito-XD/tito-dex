@@ -1298,6 +1298,52 @@ def encounter_identity(entry: dict[str, Any]) -> tuple[Any, ...]:
     )
 
 
+def dedupe_encounter_entries(
+    entries: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Aggregate rows that resolve to the same public encounter identity."""
+    merged: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for source in entries:
+        identity = encounter_identity(source)
+        current = merged.get(identity)
+        if current is None:
+            merged[identity] = dict(source)
+            continue
+
+        current["maxChance"] = max(
+            int(current.get("maxChance") or 0),
+            int(source.get("maxChance") or 0),
+        )
+        if current.get("rateKind") == source.get("rateKind"):
+            rate_values = [
+                value
+                for value in (current.get("rateValue"), source.get("rateValue"))
+                if isinstance(value, (int, float))
+            ]
+            if rate_values:
+                current["rateValue"] = max(rate_values)
+        for field, chooser in (("minLevel", min), ("maxLevel", max)):
+            values = [
+                value
+                for value in (current.get(field), source.get(field))
+                if isinstance(value, int)
+            ]
+            if values:
+                current[field] = chooser(values)
+        for field in ("versions", "methods", "conditions"):
+            values = set(current.get(field) or []) | set(source.get(field) or [])
+            if values:
+                current[field] = sorted(values)
+
+    return sorted(
+        merged.values(),
+        key=lambda item: (
+            str(item.get("areaLabelZh") or ""),
+            str(item.get("formKey") or ""),
+        ),
+    )
+
+
 def load_encounter_overlays() -> dict[str, dict[str, list[dict[str, Any]]]]:
     """Load attributed per-version encounter files for gaps in PokeAPI."""
     global _ENCOUNTER_OVERLAYS
@@ -1512,7 +1558,20 @@ def fetch_species_obtain_locations(
         if pokemon_id in seen_pokemon_ids:
             continue
         seen_pokemon_ids.add(pokemon_id)
+        # The variety slug is not always the default pokemon-form slug.  SV
+        # ride/treasure entities are the important examples: ``koraidon`` is
+        # represented by the default form ``koraidon-apex-build`` and
+        # ``gimmighoul`` by ``gimmighoul-chest``.  Encounter identities must
+        # use the same key emitted by build_forms or the app cannot match the
+        # location row to its selector record.
         form_key = str(pokemon_ref.get("name") or pokemon_id)
+        try:
+            pokemon_payload = builder._get_json(url or f"/pokemon/{pokemon_id}")
+        except (AttributeError, KeyError, requests.RequestException):
+            pokemon_payload = {}
+        form_refs = pokemon_payload.get("forms") or []
+        if form_refs and form_refs[0].get("name"):
+            form_key = str(form_refs[0]["name"])
         is_default = bool(variety.get("is_default"))
         _by_game, by_version = fetch_obtain_locations(
             builder,
@@ -1523,6 +1582,11 @@ def fetch_species_obtain_locations(
         )
         for version, entries in by_version.items():
             combined_by_version.setdefault(version, []).extend(entries)
+
+    combined_by_version = {
+        version: dedupe_encounter_entries(entries)
+        for version, entries in combined_by_version.items()
+    }
 
     combined_by_version = apply_species_ambiguous_overlays(
         combined_by_version, species_id
@@ -1600,9 +1664,13 @@ def mark_multi_form_encounters_ambiguous(
             if entry.get("pokemonId") in pokemon_ids:
                 entry.pop("formKey", None)
                 entry.pop("formSlug", None)
+                entry.pop("formIndex", None)
                 entry["formAmbiguous"] = True
             normalized.append(entry)
-        result[key] = normalized
+        # Several cosmetic form indices can collapse to the same intentionally
+        # ambiguous public identity.  Aggregate them here so the species-level
+        # map stays lossless but never emits repeated rows.
+        result[key] = dedupe_encounter_entries(normalized)
     return result
 
 
