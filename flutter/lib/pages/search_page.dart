@@ -443,7 +443,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefNatures,
-                    cdnPath: '/v3/natures.json',
+                    cdnPath: '/v4/natures.json',
                   ),
                   label: Text(AppZh.searchRefNatures),
                 ),
@@ -451,7 +451,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefEggGroups,
-                    cdnPath: '/v3/egg_groups.json',
+                    cdnPath: '/v4/egg_groups.json',
                   ),
                   label: Text(AppZh.searchRefEggGroups),
                 ),
@@ -459,7 +459,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefItems,
-                    cdnPath: '/v3/items.json',
+                    cdnPath: '/v4/items.json',
                   ),
                   label: Text(AppZh.searchRefItems),
                 ),
@@ -467,7 +467,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefWeather,
-                    cdnPath: '/v3/weather.json',
+                    cdnPath: '/v4/weather.json',
                   ),
                   label: Text(AppZh.searchRefWeather),
                 ),
@@ -475,7 +475,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefTerrains,
-                    cdnPath: '/v3/terrains.json',
+                    cdnPath: '/v4/terrains.json',
                   ),
                   label: Text(AppZh.searchRefTerrains),
                 ),
@@ -483,7 +483,7 @@ class _SearchPageState extends State<SearchPage> {
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefStatus,
-                    cdnPath: '/v3/status_conditions.json',
+                    cdnPath: '/v4/status_conditions.json',
                   ),
                   label: Text(AppZh.searchRefStatus),
                 ),

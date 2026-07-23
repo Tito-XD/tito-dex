@@ -154,6 +154,8 @@ abstract final class AppZh {
   static const dexCaptureRate = '捕获率';
   static const dexEvYield = '基础点数 (EV)';
   static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
+  static const dexObtainExactVersion = '精确版本';
+  static const dexObtainCombinedVersions = '版本合并';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
   static String dexObtainScope(String gameLabel) => '以下出现地点：$gameLabel';
   static const dexFlavorNoEdition = '当前版本暂无图鉴描述';

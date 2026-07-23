@@ -15,8 +15,8 @@ class DexCdnDataSource {
   DexCdnDataSource({
     http.Client? client,
     DexCdnConfig config = const DexCdnConfig(),
-  })  : _client = client ?? http.Client(),
-        _config = config;
+  }) : _client = client ?? http.Client(),
+       _config = config;
 
   final http.Client _client;
   final DexCdnConfig _config;
@@ -47,28 +47,25 @@ class DexCdnDataSource {
   }
 
   Future<List<PokemonSummary>> _loadSummaries() async {
-    final prefixes = [
-      DexCdnConfig.bundleVersionPrefix,
-      DexCdnConfig.legacyBundleVersionPrefix,
-    ];
+    final prefixes = DexCdnConfig.apiVersionPrefixes;
     Object? lastError;
     for (final prefix in prefixes) {
       try {
         final body = await _getBody(_config.summariesUrl(prefix: prefix));
         _activeApiPrefix = prefix;
         final list = jsonDecode(body) as List<dynamic>;
-        return list.map((item) {
-          final json = item as Map<String, dynamic>;
-          _stripLocalPaths(json);
-          return PokemonSummary.fromJson(json);
-        }).toList(growable: false);
+        return list
+            .map((item) {
+              final json = item as Map<String, dynamic>;
+              _stripLocalPaths(json);
+              return PokemonSummary.fromJson(json);
+            })
+            .toList(growable: false);
       } catch (error) {
         lastError = error;
       }
     }
-    throw DexCdnException(
-      'Failed to load summaries from CDN: $lastError',
-    );
+    throw DexCdnException('Failed to load summaries from CDN: $lastError');
   }
 
   Future<Map<int, CachedMove>> fetchAllMoves() => _fetchMoves();
@@ -89,8 +86,9 @@ class DexCdnDataSource {
     return _referenceArrayFutures.putIfAbsent(filename, () async {
       try {
         final prefix = await _resolveApiPrefix();
-        final body =
-            await _getBody(_config.referenceUrl(filename, prefix: prefix));
+        final body = await _getBody(
+          _config.referenceUrl(filename, prefix: prefix),
+        );
         final decoded = jsonDecode(body);
         if (decoded is List) {
           return decoded
@@ -99,9 +97,7 @@ class DexCdnDataSource {
               .toList(growable: false);
         }
         if (decoded is Map) {
-          return objectEntriesToList(
-            Map<String, dynamic>.from(decoded),
-          );
+          return objectEntriesToList(Map<String, dynamic>.from(decoded));
         }
         return const [];
       } catch (error) {
@@ -116,8 +112,9 @@ class DexCdnDataSource {
     return _referenceObjectFutures.putIfAbsent(filename, () async {
       try {
         final prefix = await _resolveApiPrefix();
-        final body =
-            await _getBody(_config.referenceUrl(filename, prefix: prefix));
+        final body = await _getBody(
+          _config.referenceUrl(filename, prefix: prefix),
+        );
         final decoded = jsonDecode(body);
         if (decoded is Map) {
           return Map<String, dynamic>.from(decoded);
@@ -133,16 +130,18 @@ class DexCdnDataSource {
   static List<Map<String, dynamic>> objectEntriesToList(
     Map<String, dynamic> object,
   ) {
-    return object.entries.map((entry) {
-      final value = entry.value;
-      if (value is Map) {
-        final map = Map<String, dynamic>.from(value);
-        map.putIfAbsent('id', () => int.tryParse(entry.key) ?? entry.key);
-        map.putIfAbsent('slug', () => entry.key);
-        return map;
-      }
-      return {'id': entry.key, 'value': value};
-    }).toList(growable: false);
+    return object.entries
+        .map((entry) {
+          final value = entry.value;
+          if (value is Map) {
+            final map = Map<String, dynamic>.from(value);
+            map.putIfAbsent('id', () => int.tryParse(entry.key) ?? entry.key);
+            map.putIfAbsent('slug', () => entry.key);
+            return map;
+          }
+          return {'id': entry.key, 'value': value};
+        })
+        .toList(growable: false);
   }
 
   Future<Map<int, CachedMove>> _fetchMoves() {
@@ -175,9 +174,12 @@ class DexCdnDataSource {
   }
 
   Future<Map<int, CachedAbility>> _loadAbilities() async {
+    final activePrefix = await _resolveApiPrefix();
     final prefixes = [
-      await _resolveApiPrefix(),
-      DexCdnConfig.legacyBundleVersionPrefix,
+      activePrefix,
+      ...DexCdnConfig.apiVersionPrefixes.where(
+        (prefix) => prefix != activePrefix,
+      ),
     ];
     Object? lastError;
     for (final prefix in prefixes) {
@@ -200,9 +202,7 @@ class DexCdnDataSource {
         lastError = error;
       }
     }
-    throw DexCdnException(
-      'Failed to load abilities from CDN: $lastError',
-    );
+    throw DexCdnException('Failed to load abilities from CDN: $lastError');
   }
 
   Future<String> _resolveApiPrefix() async {
@@ -221,10 +221,7 @@ class DexCdnDataSource {
       }
     }
 
-    for (final prefix in [
-      DexCdnConfig.bundleVersionPrefix,
-      DexCdnConfig.legacyBundleVersionPrefix,
-    ]) {
+    for (final prefix in DexCdnConfig.apiVersionPrefixes) {
       try {
         final response = await _client
             .head(Uri.parse(_config.summariesUrl(prefix: prefix)))
@@ -246,8 +243,7 @@ class DexCdnDataSource {
   }
 
   Future<String> _getBody(String url) async {
-    final response =
-        await _client.get(Uri.parse(url)).timeout(_timeout);
+    final response = await _client.get(Uri.parse(url)).timeout(_timeout);
     if (response.statusCode != 200) {
       throw DexCdnException('GET $url failed: HTTP ${response.statusCode}');
     }
