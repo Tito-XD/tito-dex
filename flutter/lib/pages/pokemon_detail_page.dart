@@ -27,6 +27,8 @@ import '../widgets/tito_animated_size_switcher.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
 
+const _combinedObtainVersions = '__combined_versions__';
+
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({super.key, required this.pokemonId});
 
@@ -127,6 +129,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final displayDetail = detail == null ? null : _displayDetail(detail);
     final errorCopy = _errorCopy;
     final padding = DeviceLayout.pagePadding(context);
+    final bodyPadding = EdgeInsets.fromLTRB(padding.left, 8, padding.right, 12);
 
     return TitoFontScale(
       multiplier: 1.0,
@@ -139,11 +142,23 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
         child: Column(
           children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                padding.left,
+                padding.top,
+                padding.right,
+                0,
+              ),
+              child: const SecondaryPageAppBar(
+                title: AppZh.navDex,
+                showSettings: false,
+              ),
+            ),
             Expanded(
               child: TitoSkeletonGate(
                 loading: _loading,
                 skeleton: ListView(
-                  padding: padding,
+                  padding: bodyPadding,
                   children: const [
                     TitoDetailHeaderSkeleton(),
                     SizedBox(height: 12),
@@ -157,13 +172,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     : displayDetail == null
                     ? const SizedBox.shrink()
                     : ListView(
-                        padding: padding.copyWith(bottom: 12),
+                        padding: bodyPadding,
                         children: [
-                          const SecondaryPageAppBar(
-                            title: AppZh.navDex,
-                            showSettings: false,
-                          ),
-                          const SizedBox(height: 8),
                           PokemonDetailHeader(
                             detail: displayDetail,
                             compact: true,
@@ -401,39 +411,49 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       ),
       const SizedBox(height: 12),
       if (exactVersions.length > 1) ...[
-        StickerCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.dexObtainExactVersion,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ChoiceChip(
-                    label: const Text(AppZh.dexObtainCombinedVersions),
-                    selected: selectedVersion == null,
-                    onSelected: (_) {
-                      setState(() => _selectedObtainVersion = null);
-                    },
-                  ),
-                  ...exactVersions.map(
-                    (version) => ChoiceChip(
-                      label: Text(flavorVersionLabelZh(version)),
-                      selected: selectedVersion == version,
-                      onSelected: (_) {
-                        setState(() => _selectedObtainVersion = version);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
+        DropdownButtonFormField<String>(
+          key: ValueKey(
+            'obtain-version-$editionKey-'
+            '${selectedVersion ?? _combinedObtainVersions}',
           ),
+          initialValue: selectedVersion ?? _combinedObtainVersions,
+          isExpanded: true,
+          decoration: InputDecoration(
+            labelText: AppZh.dexObtainExactVersion,
+            filled: true,
+            fillColor: TitoColors.card,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+            ),
+          ),
+          items: [
+            const DropdownMenuItem(
+              value: _combinedObtainVersions,
+              child: Text(AppZh.dexObtainCombinedVersions),
+            ),
+            ...exactVersions.map(
+              (version) => DropdownMenuItem(
+                value: version,
+                child: Text(flavorVersionLabelZh(version)),
+              ),
+            ),
+          ],
+          onChanged: (version) {
+            setState(() {
+              _selectedObtainVersion = version == _combinedObtainVersions
+                  ? null
+                  : version;
+            });
+          },
         ),
         const SizedBox(height: 12),
       ],

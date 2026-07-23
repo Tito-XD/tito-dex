@@ -47,15 +47,21 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   @override
   void initState() {
     super.initState();
+    final spriteResourceId =
+        widget.summary.spriteResourceId ?? widget.summary.id;
     _options = spriteEditionOptionsForPokemon(
-      widget.summary.id,
+      spriteResourceId,
       cdnUrlsByVersion: widget.summary.spriteUrlsByVersion,
       fallbackSpriteUrl:
           widget.summary.displaySpritePath ?? widget.summary.spriteUrl,
     );
     _grouped = groupSpriteOptionsByGeneration(_options);
     _mainSource =
-        widget.summary.artworkUrl ?? officialArtworkUrlFor(widget.summary.id);
+        widget.summary.artworkUrl ??
+        (spriteResourceId == widget.summary.id
+            ? officialArtworkUrlFor(widget.summary.id)
+            : widget.summary.displaySpritePath ??
+                  officialArtworkUrlFor(spriteResourceId));
     _showAnimated = false;
   }
 

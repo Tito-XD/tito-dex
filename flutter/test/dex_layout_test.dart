@@ -111,6 +111,55 @@ void main() {
     );
   });
 
+  testWidgets('form selector is chips only without redundant heading copy', (
+    tester,
+  ) async {
+    const forms = [
+      PokemonFormDetail(
+        key: 'wooper',
+        pokemonId: 194,
+        nameEn: 'Wooper',
+        nameZh: '乌波',
+        kind: PokemonFormKind.form,
+        isDefault: true,
+        isBattleOnly: false,
+        isMega: false,
+        isCosmetic: false,
+        types: ['water', 'ground'],
+        heightDm: 4,
+        weightHg: 85,
+      ),
+      PokemonFormDetail(
+        key: 'wooper-paldea',
+        pokemonId: 10253,
+        nameEn: 'Wooper-paldea',
+        nameZh: '帕底亚乌波',
+        kind: PokemonFormKind.regional,
+        isDefault: false,
+        isBattleOnly: false,
+        isMega: false,
+        isCosmetic: false,
+        types: ['poison', 'ground'],
+        heightDm: 4,
+        weightHg: 110,
+      ),
+    ];
+
+    await tester.pumpWidget(
+      _wrap(
+        PokemonFormSelector(
+          forms: forms,
+          selectedKey: 'wooper',
+          onSelected: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.byType(ChoiceChip), findsNWidgets(2));
+    expect(find.text('形态'), findsNothing);
+    expect(find.text('属性、能力、招式与出现地点会随形态切换'), findsNothing);
+  });
+
   testWidgets('TitoProgressBar fill width matches value fraction', (
     tester,
   ) async {
@@ -135,9 +184,7 @@ void main() {
     expect(fill, findsOneWidget);
     final trackWidth = tester.getSize(track).width;
     final fillWidth = tester
-        .getSize(
-          find.descendant(of: fill, matching: find.byType(DecoratedBox)),
-        )
+        .getSize(find.descendant(of: fill, matching: find.byType(DecoratedBox)))
         .width;
     expect(fillWidth, moreOrLessEquals(trackWidth * 0.5, epsilon: 1));
   });

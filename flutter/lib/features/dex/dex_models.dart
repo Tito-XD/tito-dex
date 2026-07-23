@@ -18,8 +18,9 @@ class PokemonSummary {
     this.artworkUrl,
     this.localSpritePath,
     this.pokedexNumbers,
-    this.spriteUrlsByVersion,
+    this.spriteUrlsByVersion = const {},
     this.animatedSpriteUrl,
+    this.spriteResourceId,
     this.formSearchTerms = const [],
   });
 
@@ -35,6 +36,12 @@ class PokemonSummary {
   /// CDN URLs keyed by PokeAPI version-group slug (e.g. heartgold-soulsilver).
   final Map<String, String>? spriteUrlsByVersion;
   final String? animatedSpriteUrl;
+
+  /// PokeAPI Pokémon entity used for form-specific sprite history.
+  ///
+  /// The national dex [id] remains the species id so navigation, evolution
+  /// highlighting, and progress continue to work when a form is selected.
+  final int? spriteResourceId;
 
   /// Alternate-form names/slugs folded into species-level dex search.
   final List<String> formSearchTerms;
@@ -59,6 +66,7 @@ class PokemonSummary {
     if (spriteUrlsByVersion != null && spriteUrlsByVersion!.isNotEmpty)
       'spriteUrlsByVersion': spriteUrlsByVersion,
     if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
+    if (spriteResourceId != null) 'spriteResourceId': spriteResourceId,
     if (formSearchTerms.isNotEmpty) 'formSearchTerms': formSearchTerms,
   };
 
@@ -83,6 +91,7 @@ class PokemonSummary {
       pokedexNumbers: pokedexNumbers,
       spriteUrlsByVersion: spriteUrlsByVersion,
       animatedSpriteUrl: json['animatedSpriteUrl'] as String?,
+      spriteResourceId: (json['spriteResourceId'] as num?)?.toInt(),
       formSearchTerms: (json['formSearchTerms'] as List<dynamic>? ?? const [])
           .cast<String>(),
     );
@@ -95,6 +104,7 @@ class PokemonSummary {
     Map<String, int>? pokedexNumbers,
     Map<String, String>? spriteUrlsByVersion,
     String? animatedSpriteUrl,
+    int? spriteResourceId,
     List<String>? formSearchTerms,
   }) {
     return PokemonSummary(
@@ -108,6 +118,7 @@ class PokemonSummary {
       pokedexNumbers: pokedexNumbers ?? this.pokedexNumbers,
       spriteUrlsByVersion: spriteUrlsByVersion ?? this.spriteUrlsByVersion,
       animatedSpriteUrl: animatedSpriteUrl ?? this.animatedSpriteUrl,
+      spriteResourceId: spriteResourceId ?? this.spriteResourceId,
       formSearchTerms: formSearchTerms ?? this.formSearchTerms,
     );
   }
@@ -648,6 +659,8 @@ class PokemonFormDetail {
     this.spriteUrl,
     this.artworkUrl,
     this.localSpritePath,
+    this.spriteUrlsByVersion = const {},
+    this.animatedSpriteUrl,
     this.baseStats,
     this.typeMultipliers = const {},
     this.stabSuperEffective = const [],
@@ -686,6 +699,8 @@ class PokemonFormDetail {
   final String? spriteUrl;
   final String? artworkUrl;
   final String? localSpritePath;
+  final Map<String, String> spriteUrlsByVersion;
+  final String? animatedSpriteUrl;
   final PokemonBaseStats? baseStats;
   final Map<String, double> typeMultipliers;
   final List<String> stabSuperEffective;
@@ -707,6 +722,13 @@ class PokemonFormDetail {
       artworkUrl: artworkUrl ?? (mayInheritAssets ? species.artworkUrl : null),
       localSpritePath: localSpritePath,
       pokedexNumbers: species.pokedexNumbers,
+      spriteUrlsByVersion: spriteUrlsByVersion.isNotEmpty
+          ? spriteUrlsByVersion
+          : (mayInheritAssets ? species.spriteUrlsByVersion : null),
+      animatedSpriteUrl:
+          animatedSpriteUrl ??
+          (mayInheritAssets ? species.animatedSpriteUrl : null),
+      spriteResourceId: pokemonId,
       formSearchTerms: species.formSearchTerms,
     );
   }
@@ -739,6 +761,8 @@ class PokemonFormDetail {
     spriteUrl: spriteUrl,
     artworkUrl: artworkUrl,
     localSpritePath: path,
+    spriteUrlsByVersion: spriteUrlsByVersion,
+    animatedSpriteUrl: animatedSpriteUrl,
     baseStats: baseStats,
     typeMultipliers: typeMultipliers,
     stabSuperEffective: stabSuperEffective,
@@ -781,6 +805,9 @@ class PokemonFormDetail {
     if (spriteUrl != null) 'spriteUrl': spriteUrl,
     if (artworkUrl != null) 'artworkUrl': artworkUrl,
     if (localSpritePath != null) 'localSpritePath': localSpritePath,
+    if (spriteUrlsByVersion.isNotEmpty)
+      'spriteUrlsByVersion': spriteUrlsByVersion,
+    if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
     if (baseStats != null) 'baseStats': baseStats!.toJson(),
     if (typeMultipliers.isNotEmpty) 'typeMultipliers': typeMultipliers,
     if (stabSuperEffective.isNotEmpty) 'stabSuperEffective': stabSuperEffective,
@@ -838,11 +865,13 @@ class PokemonFormDetail {
       obtainableVersionGroups:
           (json['obtainableVersionGroups'] as List<dynamic>? ?? const [])
               .cast<String>(),
-      obtainable: json['obtainable'] as bool? ??
+      obtainable:
+          json['obtainable'] as bool? ??
           !(json['isBattleOnly'] as bool? ?? false),
       eventOnly: json['eventOnly'] as bool? ?? false,
       deprecated: json['deprecated'] as bool? ?? false,
-      inheritsFromDefault: json['inheritsFromDefault'] as bool? ??
+      inheritsFromDefault:
+          json['inheritsFromDefault'] as bool? ??
           (json['isCosmetic'] as bool? ?? false),
       dataCompleteness: json['dataCompleteness'] as String? ?? 'unknown',
       sources: (json['sources'] as List<dynamic>? ?? const []).cast<String>(),
@@ -852,6 +881,10 @@ class PokemonFormDetail {
       spriteUrl: json['spriteUrl'] as String?,
       artworkUrl: json['artworkUrl'] as String?,
       localSpritePath: json['localSpritePath'] as String?,
+      spriteUrlsByVersion:
+          (json['spriteUrlsByVersion'] as Map<String, dynamic>? ?? const {})
+              .map((key, value) => MapEntry(key, value as String)),
+      animatedSpriteUrl: json['animatedSpriteUrl'] as String?,
       baseStats: json['baseStats'] == null
           ? null
           : PokemonBaseStats.fromJson(
@@ -871,8 +904,7 @@ class PokemonFormDetail {
           key,
           (value as List<dynamic>)
               .map(
-                (item) =>
-                    PokemonAbility.fromJson(item as Map<String, dynamic>),
+                (item) => PokemonAbility.fromJson(item as Map<String, dynamic>),
               )
               .toList(),
         ),
@@ -992,7 +1024,8 @@ class PokemonDetail {
     final inheritsSpeciesData =
         form.isDefault || form.isCosmetic || form.inheritsFromDefault;
     final resolvedMoveSets = inheritsSpeciesData ? moveSets : form.moveSets;
-    final resolvedMoveSet = resolvedMoveSets['heartgold-soulsilver'] ??
+    final resolvedMoveSet =
+        resolvedMoveSets['heartgold-soulsilver'] ??
         (inheritsSpeciesData ? moveSet : const PokemonMoveSet());
     final mayUseLegacySpeciesLocations =
         !form.isDefault &&
@@ -1005,7 +1038,8 @@ class PokemonDetail {
     final resolvedObtainByVersion = mayUseLegacySpeciesLocations
         ? obtainLocationsByVersion
         : form.obtainLocationsByVersion;
-    final hgssObtain = resolvedObtain['heartgold-soulsilver'] ??
+    final hgssObtain =
+        resolvedObtain['heartgold-soulsilver'] ??
         (mayUseLegacySpeciesLocations ? obtainLocations : const []);
     return PokemonDetail(
       summary: form.summaryFor(summary),
@@ -1027,11 +1061,13 @@ class PokemonDetail {
       stabSuperEffective: form.stabSuperEffective.isEmpty
           ? stabSuperEffective
           : form.stabSuperEffective,
-      evolutionChain:
-          inheritsSpeciesData ? evolutionChain : form.evolutionChain,
+      evolutionChain: inheritsSpeciesData
+          ? evolutionChain
+          : form.evolutionChain,
       johtoDexNumber: johtoDexNumber,
-      baseStats:
-          inheritsSpeciesData ? (form.baseStats ?? baseStats) : form.baseStats,
+      baseStats: inheritsSpeciesData
+          ? (form.baseStats ?? baseStats)
+          : form.baseStats,
       typeMultipliers: form.typeMultipliers.isEmpty
           ? typeMultipliers
           : form.typeMultipliers,
@@ -1042,8 +1078,9 @@ class PokemonDetail {
       abilities: inheritsSpeciesData && form.abilities.isEmpty
           ? abilities
           : form.abilities,
-      abilitiesByGame:
-          inheritsSpeciesData ? abilitiesByGame : form.abilitiesByGame,
+      abilitiesByGame: inheritsSpeciesData
+          ? abilitiesByGame
+          : form.abilitiesByGame,
       moveSet: resolvedMoveSet,
       moveSets: resolvedMoveSets,
       baseHappiness: baseHappiness,

@@ -46,6 +46,12 @@ from pokemon_forms import (  # noqa: E402
     form_search_terms,
     is_cosmetic_variety,
 )
+from pokeapi_assets import (  # noqa: E402
+    animated_sprite_url,
+    build_sprite_url_map,
+    generation_for_version_group,
+    official_artwork_url,
+)
 
 POKEAPI_BASE = "https://pokeapi.co/api/v2"
 TYPE_ICON_BASE = (
@@ -747,9 +753,21 @@ class PokeApiBuilder:
 
                 pokemon_sprites = pokemon.get("sprites") or {}
                 form_sprites = form_meta.get("sprites") or {}
-                remote_sprite = sprite_url(form_sprites) or sprite_url(
-                    pokemon_sprites
+                remote_artwork = official_artwork_url(
+                    form_sprites
+                ) or official_artwork_url(pokemon_sprites)
+                remote_sprite = (
+                    remote_artwork
+                    or sprite_url(form_sprites)
+                    or sprite_url(pokemon_sprites)
                 )
+                version_sprite_urls = build_sprite_url_map(form_sprites)
+                if not version_sprite_urls:
+                    version_sprite_urls = build_sprite_url_map(pokemon_sprites)
+                version_group = (form_meta.get("version_group") or {}).get("name")
+                animated_remote = animated_sprite_url(
+                    form_sprites
+                ) or animated_sprite_url(pokemon_sprites)
                 reuses_default_visual = bool(
                     remote_sprite
                     and default_remote_sprite
@@ -781,8 +799,12 @@ class PokeApiBuilder:
                         # not duplicated into the bundle.
                         self.form_sprite_jobs[asset_key] = (remote_sprite, None)
 
-                version_group = (form_meta.get("version_group") or {}).get("name")
                 available_groups = sorted(move_sets)
+                version_sprite_urls = filter_form_sprite_versions(
+                    version_sprite_urls,
+                    introduced_version_group=version_group,
+                    available_version_groups=available_groups,
+                )
                 obtainable_groups = sorted(
                     key for key, locations in obtain_by_game.items() if locations
                 )
@@ -830,8 +852,16 @@ class PokeApiBuilder:
                     entry["spriteUrl"] = sprite_cdn
                 if artwork_cdn:
                     entry["artworkUrl"] = artwork_cdn
+                elif remote_artwork:
+                    # Keep high-resolution form artwork remote-only. The
+                    # compact distinct-form sprite remains inside the bundle.
+                    entry["artworkUrl"] = remote_artwork
                 if local_sprite:
                     entry["localSpritePath"] = local_sprite
+                if version_sprite_urls:
+                    entry["spriteUrlsByVersion"] = version_sprite_urls
+                if animated_remote:
+                    entry["animatedSpriteUrl"] = animated_remote
                 if form_meta.get("id") is not None:
                     entry["formId"] = form_meta["id"]
                 if form_name_zh:
@@ -860,7 +890,7 @@ class PokeApiBuilder:
 
     def build_detail(
         self, pokemon_id: int, cdn_base: str
-    ) -> tuple[dict, dict, str | None]:
+    ) -> tuple[dict, dict, str | None, str | None]:
         pokemon = self._get_json(f"/pokemon/{pokemon_id}")
         species = self._get_json(f"/pokemon-species/{pokemon_id}")
         relations = self.load_type_relations()
@@ -871,8 +901,6 @@ class PokeApiBuilder:
         sprite_remote = sprite_url(sprites_payload)
         sprite_cdn = f"{cdn_base}/{cdn_prefix}/sprites/{pokemon_id}.png"
         artwork_cdn = f"{cdn_base}/{cdn_prefix}/artwork/{pokemon_id}.png"
-        from pokeapi_assets import animated_sprite_url, build_sprite_url_map
-
         sprite_urls_by_version = {
             vg: f"{cdn_base}/{cdn_prefix}/sprites/by-version/{vg}/{pokemon_id}.png"
             for vg in build_sprite_url_map(sprites_payload)
@@ -1006,7 +1034,8 @@ class PokeApiBuilder:
         if evolution is not None:
             detail["evolutionChain"] = evolution
 
-        return summary, detail, sprite_remote
+        artwork_remote = official_artwork_url(sprites_payload)
+        return summary, detail, sprite_remote, artwork_remote
 
 
 def capitalize(value: str) -> str:
@@ -1050,14 +1079,29 @@ def extract_types(types: list[dict[str, Any]]) -> list[str]:
 
 
 def sprite_url(sprites: dict[str, Any]) -> str | None:
-    """Legacy default: HGSS in-game sprite, then home/official artwork."""
-    from pokeapi_assets import official_artwork_url, sprite_url_for_version_group
+    """Clear default thumbnail; per-game pixel sprites live in their picker."""
+    return official_artwork_url(sprites) or sprites.get("front_default")
 
-    return (
-        sprite_url_for_version_group(sprites, "heartgold-soulsilver")
-        or official_artwork_url(sprites)
-        or sprites.get("front_default")
+
+def filter_form_sprite_versions(
+    sprite_urls: dict[str, str],
+    *,
+    introduced_version_group: str | None,
+    available_version_groups: list[str],
+) -> dict[str, str]:
+    """Keep only sprite sources that can belong to the selected form."""
+    introduced_generation = (
+        generation_for_version_group(introduced_version_group)
+        if introduced_version_group
+        else 1
     )
+    available = set(available_version_groups)
+    return {
+        key: value
+        for key, value in sprite_urls.items()
+        if generation_for_version_group(key) >= introduced_generation
+        and (not available or key in available)
+    }
 
 
 def id_from_url(url: str) -> int:
@@ -2579,7 +2623,9 @@ def build_bundle(
         if resume and detail_path.exists():
             continue
         print(f"#{pokemon_id} ({build_index}/{len(build_ids)})…", flush=True)
-        summary, detail, sprite_remote = builder.build_detail(pokemon_id, cdn_base)
+        summary, detail, sprite_remote, artwork_remote = builder.build_detail(
+            pokemon_id, cdn_base
+        )
         write_json(detail_path, detail)
 
         if sprite_remote and not (staging / "sprites" / f"{pokemon_id}.png").exists():
@@ -2588,11 +2634,16 @@ def build_bundle(
                 (staging / "sprites" / f"{pokemon_id}.png").write_bytes(
                     optimize_png(png, max_width=220)
                 )
-                (artwork_staging / f"{pokemon_id}.png").write_bytes(
-                    optimize_png(png, max_width=None)
-                )
             except requests.RequestException as exc:
                 print(f"  warn: sprite #{pokemon_id}: {exc}", file=sys.stderr)
+        if artwork_remote and not (artwork_staging / f"{pokemon_id}.png").exists():
+            try:
+                artwork_png = download_bytes(session, artwork_remote)
+                (artwork_staging / f"{pokemon_id}.png").write_bytes(
+                    optimize_png(artwork_png, max_width=None)
+                )
+            except requests.RequestException as exc:
+                print(f"  warn: artwork #{pokemon_id}: {exc}", file=sys.stderr)
 
     for form_id, (sprite_remote, _artwork_remote) in sorted(
         builder.form_sprite_jobs.items()
