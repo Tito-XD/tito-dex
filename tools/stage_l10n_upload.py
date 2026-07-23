@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "dist" / "l10n-upload"
-CDN_PREFIX = "v4"
+CDN_PREFIX = "v5"
 
 
 def _import_build_helpers():
@@ -27,7 +27,7 @@ def _import_build_helpers():
 
 
 def stage_l10n_upload(output_dir: Path) -> dict[str, str | int]:
-    """Copy compact l10n assets + maps + config into [output_dir]/v4/…"""
+    """Copy compact l10n assets + maps + config into [output_dir]/v5/…"""
     from generate_zh_catalog_assets import write_compact_l10n
 
     DEFAULT_APP_CONFIG, APP_CONFIG_VERSION, build_hgss_map_list_with_zh, write_json = (
@@ -100,8 +100,8 @@ def update_bundle_manifest(
             ) from exc
 
     required = {
-        "bundleVersion": 6,
-        "cdnPrefix": "v4",
+        "bundleVersion": 7,
+        "cdnPrefix": "v5",
         "pokemonCount": 1025,
         "complete": True,
     }

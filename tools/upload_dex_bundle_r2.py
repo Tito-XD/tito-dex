@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from pathlib import Path
 
-DEFAULT_CDN_PREFIX = "v4"
+DEFAULT_CDN_PREFIX = "v5"
 
 
 def _wrangler_oauth_ready() -> bool:
@@ -219,7 +219,7 @@ def main() -> None:
     parser.add_argument(
         "upload_dir",
         type=Path,
-        default=Path("dist/dex-v6/upload"),
+        default=Path("dist/dex-v7/upload"),
         nargs="?",
     )
     parser.add_argument("--bucket", default="titodex-dex")

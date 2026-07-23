@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       bundle_manifest_url:
-        description: Published v6 root manifest used to seed the Offline APK
+        description: Published v7 root manifest used to seed the Offline APK
         required: true
         default: https://dex.tito.cafe/bundle-manifest.json
         type: string
@@ -118,7 +118,7 @@ jobs:
             printf 'storeFile=../titodex-upload.keystore\n'
           } > android/key.properties
 
-      - name: Download and verify published v6 offline dex seed
+      - name: Download and verify published v7 offline dex seed
         if: matrix.variant == 'offline'
         env:
           BUNDLE_MANIFEST_URL: ${{ inputs.bundle_manifest_url }}
@@ -131,11 +131,11 @@ jobs:
           python3 - <<'PY'
           import json
           manifest = json.load(open("assets/dex/bundle-manifest.json", encoding="utf-8"))
-          assert manifest["bundleVersion"] == 6, manifest
+          assert manifest["bundleVersion"] == 7, manifest
           assert manifest["pokemonCount"] == 1025, manifest
           assert manifest["complete"] is True, manifest
-          assert manifest["cdnPrefix"] == "v4", manifest
-          assert "/v4/" in manifest["archiveUrl"], manifest
+          assert manifest["cdnPrefix"] == "v5", manifest
+          assert "/v5/" in manifest["archiveUrl"], manifest
           assert len(manifest["archiveSha256"]) == 64, manifest
           PY
           curl --fail --location --retry 5 --output assets/dex/bundle.tar.zst "$archive_url"

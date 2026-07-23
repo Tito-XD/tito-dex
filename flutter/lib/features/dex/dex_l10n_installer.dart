@@ -70,7 +70,7 @@ class DexL10nInstaller {
     }
     if (downloaded == null) {
       throw DexCdnException(
-        'Failed to download a complete l10n slice from v4, v3, or v2',
+        'Failed to download a complete l10n slice from v5, v4, v3, or v2',
       );
     }
 

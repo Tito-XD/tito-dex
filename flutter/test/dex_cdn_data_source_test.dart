@@ -125,7 +125,7 @@ void main() {
     },
   );
 
-  test('fetchAllSummaries falls back from v4 to v3', () async {
+  test('fetchAllSummaries falls back from v5 through v4 to v3', () async {
     final requested = <String>[];
     final source = DexCdnDataSource(
       client: MockClient((request) async {
@@ -139,7 +139,11 @@ void main() {
 
     await source.fetchAllSummaries();
 
-    expect(requested, ['/v4/summaries.json', '/v3/summaries.json']);
+    expect(requested, [
+      '/v5/summaries.json',
+      '/v4/summaries.json',
+      '/v3/summaries.json',
+    ]);
   });
 
   test('fetchDetail resolves moves via v3 CDN moves.json', () async {

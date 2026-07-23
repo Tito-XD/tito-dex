@@ -88,9 +88,9 @@ Run the **Android Release APKs** workflow manually with:
 - `version` — product version without `v`
 - `lite_build_number` — Lite Android versionCode
 - `offline_build_number` — a larger Offline versionCode
-- `bundle_manifest_url` — the already-published v6 root manifest; CI downloads its archive and verifies `bundleVersion=6`, 1025 species, `/v4/`, completeness, and SHA-256 before embedding it
+- `bundle_manifest_url` — the already-published v7 root manifest; CI downloads its archive and verifies `bundleVersion=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
 
-For v0.7.0 use `version=0.7.0`, Lite build `93`, and Offline build `94`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The Offline verifier also checks its embedded v6 manifest and archive SHA-256.
+For v0.7.1 use `version=0.7.1`, Lite build `95`, and Offline build `96`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The Offline verifier also checks its embedded v7 manifest and archive SHA-256.
 
 ### Offline variant
 
@@ -110,7 +110,7 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 ## Post-build checklist
 
 - [ ] `unzip -t releases/TitoDex-*-rg-arm64.apk` → **No errors**
-- [ ] Lite file size **≥ 15 MB** (expect **19–23 MB**); Offline can be about **64 MB**
+- [ ] Lite file size **≥ 15 MB** (expect **19–23 MB**); Offline is about **100–110 MB** with the v7 archive
 - [ ] `lib/arm64-v8a/libflutter.so` present (~11 MB)
 - [ ] `lib/arm64-v8a/libapp.so` present (~7–8 MB)
 - [ ] `lib/arm64-v8a/libzstandard_android.so` present

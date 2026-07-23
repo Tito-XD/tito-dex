@@ -1,6 +1,6 @@
 /** @typedef {import('./types.js').Env} Env */
 
-export const DEPLOY_REV = '2026-07-23-v4';
+export const DEPLOY_REV = '2026-07-23-v5';
 
 export const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

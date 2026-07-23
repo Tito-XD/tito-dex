@@ -74,9 +74,9 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 
 | Workflow | 触发方式 | 上传内容 |
 | --- | --- | --- |
-| `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v4/l10n/zh/*`, maps, config |
+| `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v5/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动 | Build/audit v6, upload and verify immutable `v4/` objects, then switch the root manifest last |
+| `upload-dex-bundle.yml` | 手动 | Patch/audit v7 from verified v5/v6 seeds, upload immutable `v5/` objects, then switch the root manifest last |
 
 Both R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
 
@@ -101,7 +101,7 @@ GitHub repository secrets (`CLOUDFLARE_*`) are unchanged — Actions still write
 ```bash
 export CLOUDFLARE_API_TOKEN=...
 export CLOUDFLARE_ACCOUNT_ID=...
-./tools/upload_dex_bundle.sh dist/dex-v6/upload v4
+./tools/upload_dex_bundle.sh dist/dex-v7/upload v5
 ```
 
 Or: `python3 tools/stage_l10n_upload.py` then upload `dist/l10n-upload/` with Wrangler.

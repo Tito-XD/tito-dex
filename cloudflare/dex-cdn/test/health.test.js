@@ -18,14 +18,14 @@ function envForManifest(manifest, seen) {
   };
 }
 
-test('deep health derives v4 keys and accepts the default sprite probe', async () => {
+test('deep health derives v5 keys and accepts the default sprite probe', async () => {
   const seen = [];
   const report = await buildHealthReport(
     envForManifest(
       {
-        bundleVersion: 6,
-        cdnPrefix: 'v4',
-        archiveUrl: 'https://example.invalid/v4/bundle.tar.zst',
+        bundleVersion: 7,
+        cdnPrefix: 'v5',
+        archiveUrl: 'https://example.invalid/v5/bundle.tar.zst',
       },
       seen,
     ),
@@ -33,8 +33,8 @@ test('deep health derives v4 keys and accepts the default sprite probe', async (
   );
 
   assert.equal(report.ok, true);
-  assert.equal(report.manifest.activePrefix, 'v4');
-  assert.ok(seen.includes('v4/sprites/25.png'));
+  assert.equal(report.manifest.activePrefix, 'v5');
+  assert.ok(seen.includes('v5/sprites/25.png'));
   assert.ok(!seen.some((key) => key.includes('/sprites/by-version/')));
 });
 

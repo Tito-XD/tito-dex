@@ -2,7 +2,7 @@
 # Report dex bundle build progress every 5% (based on details/*.json count).
 set -euo pipefail
 
-STAGING="${1:-/workspace/dist/dex-v6/staging/details}"
+STAGING="${1:-/workspace/dist/dex-v7/staging/details}"
 MAX_ID="${2:-1025}"
 LOG="${3:-/tmp/dex-build.log}"
 REPORT="${4:-/tmp/dex-build-progress.txt}"
