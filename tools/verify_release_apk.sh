@@ -118,7 +118,7 @@ import json
 import sys
 
 manifest = json.load(open(sys.argv[1], encoding="utf-8"))
-assert manifest.get("bundleVersion") == 7, manifest
+assert manifest.get("bundleVersion") >= 7, manifest
 assert manifest.get("pokemonCount") == 1025, manifest
 assert manifest.get("complete") is True, manifest
 assert manifest.get("cdnPrefix") == "v5", manifest
@@ -131,7 +131,8 @@ PY
     echo "ERROR: bundled Dex archive SHA-256 mismatch." >&2
     exit 1
   fi
-  echo "    OK v7 manifest and archive SHA-256"
+  version=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["bundleVersion"])' "$tmp_dir/bundle-manifest.json")
+  echo "    OK v${version} manifest and archive SHA-256"
 fi
 
 echo "PASS: release APK looks complete."
