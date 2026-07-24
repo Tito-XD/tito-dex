@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.7.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.14) |
-| **`main` / lite source** | `0.7.14+105` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.7.14-offline+106` — APK-bundled verified v9 archive |
+| **Latest release** | [v0.7.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.15) |
+| **`main` / lite source** | `0.7.15+107` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.7.15-offline+108` — APK-bundled verified v9 archive |
 | **Offline dex bundle** | **v9** — 1025 species, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.7.14)
+## Current feature status (latest release line: v0.7.15)
 
-> `main` matches the v0.7.14 release line. Lite downloads bundle v9 when requested; Offline embeds the exact same published archive and verified manifest.
+> `main` matches the v0.7.15 release line. Lite downloads bundle v9 when requested; Offline embeds the exact same published archive and verified manifest.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -63,6 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - `/search?q=` deep link supported.
 
 ### Latest release-line highlights
+- v0.7.15: official single-version icons for secondary flavors (Violet, Shield, Shining Pearl, Y, …) replace generated badges; offline caching stores per-form sprites (`sprites/forms/<key>.png`) so non-default forms keep their art; edge-to-edge shell makes predictive back retract the whole screen with no skyBlue flash; dex route joins the gesture so release fades out; dex enter reveal starts after the shell lands.
 - v0.7.14: per-flavor game icons in the edition picker; companion position drag no longer spams SharedPreferences; Dex tab re-entry restores the list fade/slide reveal; predictive-back gesture now moves the Dex content layer together with the shell.
 - v0.7.13: merged-vs-flavor game picker with secondary flavor sheet; generated/fallback game icons for older titles; companion draggable position in Settings; simplified Dex Hero entry and one-shot list reveal.
 - v0.7.12: reverted detail sprite display to local assets and added shimmer placeholders for network images.

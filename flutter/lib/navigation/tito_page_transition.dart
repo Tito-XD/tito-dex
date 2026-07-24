@@ -45,9 +45,12 @@ Page<T> titoDexPage<T>({
   String? heroTag,
   Widget? content,
 }) {
-  final page = content == null
+  // The content layer is not inside [TitoPageContainer], so it needs its own
+  // SafeArea now that the shell is edge-to-edge.
+  final safeContent = content == null ? null : SafeArea(child: content);
+  final page = safeContent == null
       ? child
-      : Stack(fit: StackFit.expand, children: [child, content]);
+      : Stack(fit: StackFit.expand, children: [child, safeContent]);
   if (heroTag == null) {
     return titoMaterialPage<T>(key: key, child: page);
   }
@@ -61,7 +64,7 @@ Page<T> titoDexPage<T>({
       flightShuttleBuilder: _homeActionFlightShuttle,
       child: child,
     ),
-    overlay: content,
+    overlay: safeContent,
   );
 }
 
@@ -115,9 +118,12 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   @override
   bool get fullscreenDialog => false;
 
-  @override
-  bool get popGestureEnabled =>
-      _page.kind == _TitoMaterialPageKind.dex ? false : super.popGestureEnabled;
+  // Note: popGestureEnabled intentionally uses the MaterialRouteTransitionMixin
+  // default for every kind, dex included. The dex route used to disable it,
+  // which made Android play the system back-to-home window animation on
+  // release — the "flash out on release" glitch. With the default, the whole
+  // page scales away over home (the Hero stays put thanks to
+  // transitionOnUserGestures: false) and the commit plays a fade-out.
 
   @override
   Duration get transitionDuration => _page.kind == _TitoMaterialPageKind.dex

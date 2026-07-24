@@ -34,6 +34,8 @@ class DexCachePaths {
 
   File detailFile(int id) => File('${detailsDir.path}/$id.json');
   File spriteFile(int id) => File('${spritesDir.path}/$id.png');
+  File formSpriteFile(String formKey) =>
+      File('${spritesDir.path}/forms/$formKey.png');
   File artworkFile(int id) => File('${artworkDir.path}/$id.png');
   File typeIconFile(String type) => File('${typeIconsDir.path}/$type.png');
 
@@ -47,6 +49,7 @@ class DexCachePaths {
     await root.create(recursive: true);
     await detailsDir.create(recursive: true);
     await spritesDir.create(recursive: true);
+    await Directory('${spritesDir.path}/forms').create(recursive: true);
     await artworkDir.create(recursive: true);
     await typeIconsDir.create(recursive: true);
   }
@@ -305,6 +308,12 @@ class DexCacheStore {
     await paths.spriteFile(id).writeAsBytes(bytes);
   }
 
+  Future<void> writeFormSpriteBytes(String formKey, List<int> bytes) async {
+    final paths = await _pathsFuture;
+    await paths.ensureLayout();
+    await paths.formSpriteFile(formKey).writeAsBytes(bytes);
+  }
+
   Future<void> writeArtworkBytes(int id, List<int> bytes) async {
     final paths = await _pathsFuture;
     await paths.ensureLayout();
@@ -333,6 +342,15 @@ class DexCacheStore {
       return null;
     }
     return 'sprites/$id.png';
+  }
+
+  Future<String?> formSpriteRelativePath(String formKey) async {
+    final paths = await _pathsFuture;
+    final file = paths.formSpriteFile(formKey);
+    if (!await file.exists()) {
+      return null;
+    }
+    return 'sprites/forms/$formKey.png';
   }
 
   Future<String?> typeIconRelativePath(String type) async {
