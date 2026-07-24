@@ -639,7 +639,7 @@ class _CompanionFormTile extends StatelessWidget {
               children: [
                 Expanded(
                   child: DexSpriteImage(
-                    source: summary.displayArtworkPath,
+                    source: summary.displaySpritePath,
                     height: null,
                     width: null,
                   ),
