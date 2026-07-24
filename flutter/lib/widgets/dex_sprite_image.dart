@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../theme/tito_colors.dart';
 
@@ -49,14 +50,14 @@ class DexSpriteImage extends StatelessWidget {
         if (wasSynchronouslyLoaded || frame != null) {
           return child;
         }
-        return _placeholder();
+        return _placeholder(shimmer: true);
       },
       errorBuilder: (_, __, ___) => _placeholder(),
     );
   }
 
-  Widget _placeholder() {
-    return Container(
+  Widget _placeholder({bool shimmer = false}) {
+    final box = Container(
       height: height,
       width: width,
       decoration: BoxDecoration(
@@ -67,6 +68,14 @@ class DexSpriteImage extends StatelessWidget {
           width: 2,
         ),
       ),
+    );
+    if (!shimmer) {
+      return box;
+    }
+    return Shimmer.fromColors(
+      baseColor: TitoColors.card.withValues(alpha: 0.3),
+      highlightColor: TitoColors.card.withValues(alpha: 0.7),
+      child: box,
     );
   }
 }

@@ -238,7 +238,7 @@ class _FormPickerTile extends StatelessWidget {
                   builder: (context, constraints) {
                     final imageSize = math.min(constraints.maxWidth, constraints.maxHeight) - 8;
                     return DexSpriteImage(
-                      source: form.summaryFor(_dummySpecies).displayArtworkPath,
+                      source: form.summaryFor(_dummySpecies).displaySpritePath,
                       width: imageSize,
                       height: imageSize,
                     );
@@ -348,7 +348,7 @@ class PokemonDetailHeader extends StatelessWidget {
                       child: Hero(
                         tag: pokemonArtworkHeroTag(summary),
                         child: DexSpriteImage(
-                          source: summary.displayArtworkPath,
+                          source: summary.displaySpritePath,
                           width: plateSize - 14,
                           height: plateSize - 14,
                         ),
@@ -441,14 +441,14 @@ class PokemonDetailHeader extends StatelessWidget {
               GestureDetector(
                 onTap: () =>
                     showPokemonArtworkViewer(context, summary: summary),
-                child: Hero(
-                  tag: pokemonArtworkHeroTag(summary),
-                  child: DexSpriteImage(
-                    source: summary.displayArtworkPath,
-                    width: square ? 72 : (compactLayout ? 84 : 108),
-                    height: square ? 72 : (compactLayout ? 84 : 108),
-                  ),
+              child: Hero(
+                tag: pokemonArtworkHeroTag(summary),
+                child: DexSpriteImage(
+                  source: summary.displaySpritePath,
+                  width: square ? 72 : (compactLayout ? 84 : 108),
+                  height: square ? 72 : (compactLayout ? 84 : 108),
                 ),
+              ),
               ),
             ],
           ),
