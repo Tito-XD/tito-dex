@@ -36,16 +36,64 @@ class PokemonFormSelector extends StatelessWidget {
   final String selectedKey;
   final ValueChanged<PokemonFormDetail> onSelected;
 
+  static const int _maxInlineChips = 4;
+
+  List<PokemonFormDetail> get _sortedForms {
+    final copy = List<PokemonFormDetail>.from(forms);
+    copy.sort((a, b) {
+      if (a.isDefault != b.isDefault) {
+        return a.isDefault ? -1 : 1;
+      }
+      if (a.isMega != b.isMega) {
+        return a.isMega ? -1 : 1;
+      }
+      if (a.isBattleOnly != b.isBattleOnly) {
+        return a.isBattleOnly ? -1 : 1;
+      }
+      if (a.isCosmetic != b.isCosmetic) {
+        return a.isCosmetic ? 1 : -1;
+      }
+      return a.nameZh.compareTo(b.nameZh);
+    });
+    return copy;
+  }
+
+  List<PokemonFormDetail> get _inlineForms {
+    if (forms.length <= _maxInlineChips) {
+      return forms;
+    }
+    final sorted = _sortedForms;
+    return sorted.take(_maxInlineChips - 1).toList();
+  }
+
+  bool get _hasMore => forms.length > _maxInlineChips;
+
+  void _showMore(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: TitoColors.deepBlue,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.md)),
+      ),
+      builder: (context) => _FormPickerSheet(
+        forms: forms,
+        selectedKey: selectedKey,
+        onSelected: (form) {
+          Navigator.of(context).pop();
+          onSelected(form);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (forms.length < 2) {
-      return const SizedBox.shrink();
-    }
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
-        for (final form in forms)
+        for (final form in _inlineForms)
           ChoiceChip(
             selected: form.key == selectedKey,
             onSelected: (_) => onSelected(form),
@@ -63,9 +111,164 @@ class PokemonFormSelector extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
+        if (_hasMore)
+          ActionChip(
+            onPressed: () => _showMore(context),
+            label: Text('更多 (${forms.length - _inlineForms.length})'),
+            tooltip: '展开全部形态',
+            backgroundColor: TitoColors.skyBlue.withValues(alpha: 0.15),
+            side: const BorderSide(
+              color: TitoColors.ink,
+              width: TitoBorders.element,
+            ),
+            labelStyle: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.ink,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
       ],
     );
   }
+}
+
+class _FormPickerSheet extends StatelessWidget {
+  const _FormPickerSheet({
+    required this.forms,
+    required this.selectedKey,
+    required this.onSelected,
+  });
+
+  final List<PokemonFormDetail> forms;
+  final String selectedKey;
+  final ValueChanged<PokemonFormDetail> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return SizedBox(
+      height: size.height * 0.55,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '选择形态',
+                    style: SecondaryTypography.onGradient.h15.copyWith(
+                      color: TitoColors.card,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: TitoColors.card,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.92,
+                ),
+                itemCount: forms.length,
+                itemBuilder: (context, index) {
+                  final form = forms[index];
+                  final selected = form.key == selectedKey;
+                  return _FormPickerTile(
+                    form: form,
+                    selected: selected,
+                    onTap: () => onSelected(form),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FormPickerTile extends StatelessWidget {
+  const _FormPickerTile({
+    required this.form,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final PokemonFormDetail form;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? TitoColors.softYellow.withValues(alpha: 0.18)
+          : TitoColors.card.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(TitoRadii.sm),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(TitoRadii.sm),
+            border: Border.all(
+              color: selected ? TitoColors.softYellow : TitoColors.card.withValues(alpha: 0.35),
+              width: 2,
+            ),
+          ),
+          padding: const EdgeInsets.all(6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final imageSize = math.min(constraints.maxWidth, constraints.maxHeight) - 8;
+                    return DexSpriteImage(
+                      source: form.summaryFor(_dummySpecies).displayArtworkPath,
+                      width: imageSize,
+                      height: imageSize,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                form.nameZh,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.card,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static final PokemonSummary _dummySpecies = PokemonSummary(
+    id: 1,
+    nameEn: '',
+    nameZh: '',
+    types: const [],
+  );
 }
 
 class PokemonDetailHeader extends StatelessWidget {
@@ -142,10 +345,13 @@ class PokemonDetailHeader extends StatelessWidget {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Center(
-                      child: DexSpriteImage(
-                        source: summary.displaySpritePath,
-                        width: plateSize - 14,
-                        height: plateSize - 14,
+                      child: Hero(
+                        tag: pokemonArtworkHeroTag(summary),
+                        child: DexSpriteImage(
+                          source: summary.displayArtworkPath,
+                          width: plateSize - 14,
+                          height: plateSize - 14,
+                        ),
                       ),
                     ),
                   ),
@@ -235,10 +441,13 @@ class PokemonDetailHeader extends StatelessWidget {
               GestureDetector(
                 onTap: () =>
                     showPokemonArtworkViewer(context, summary: summary),
-                child: DexSpriteImage(
-                  source: summary.displaySpritePath,
-                  width: square ? 72 : (compactLayout ? 84 : 108),
-                  height: square ? 72 : (compactLayout ? 84 : 108),
+                child: Hero(
+                  tag: pokemonArtworkHeroTag(summary),
+                  child: DexSpriteImage(
+                    source: summary.displayArtworkPath,
+                    width: square ? 72 : (compactLayout ? 84 : 108),
+                    height: square ? 72 : (compactLayout ? 84 : 108),
+                  ),
                 ),
               ),
             ],

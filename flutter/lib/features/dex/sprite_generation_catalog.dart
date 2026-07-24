@@ -82,6 +82,7 @@ class SpriteEditionOption {
     required this.editionLabelZh,
     required this.spriteUrl,
     this.animatedUrl,
+    this.isOfficialArtwork = false,
   });
 
   final String versionGroup;
@@ -89,6 +90,7 @@ class SpriteEditionOption {
   final String editionLabelZh;
   final String spriteUrl;
   final String? animatedUrl;
+  final bool isOfficialArtwork;
 
   String get generationLabel => generationRomanLabel(generation);
 }
@@ -113,6 +115,7 @@ List<SpriteEditionOption> spriteEditionOptions({
         editionLabelZh: editionShortLabelForVersionGroup(versionGroup),
         spriteUrl: url,
         animatedUrl: animatedSpriteUrl,
+        isOfficialArtwork: url.contains('/official-artwork/'),
       ),
     );
   }
@@ -135,6 +138,7 @@ List<SpriteEditionOption> spriteEditionOptions({
         editionLabelZh: '默认',
         spriteUrl: fallbackSpriteUrl,
         animatedUrl: animatedSpriteUrl,
+        isOfficialArtwork: fallbackSpriteUrl.contains('/official-artwork/'),
       ),
     );
   }
@@ -213,6 +217,9 @@ String shinySpriteUrlFor(int id) => '$pokeApiSpritesBase/shiny/$id.png';
 
 String officialArtworkUrlFor(int id) =>
     '$pokeApiSpritesBase/other/official-artwork/$id.png';
+
+String shinyOfficialArtworkUrlFor(int id) =>
+    '$pokeApiSpritesBase/other/official-artwork/shiny/$id.png';
 
 String homeSpriteUrlFor(int id) => '$pokeApiSpritesBase/other/home/$id.png';
 
@@ -318,6 +325,8 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
         editionLabelZh: labelZh,
         spriteUrl: url,
         animatedUrl: animatedUrl,
+        isOfficialArtwork:
+            versionGroup == 'official-artwork' || url.contains('/official-artwork/'),
       ),
     );
   }

@@ -455,11 +455,11 @@ class _PartyMemberAvatar extends StatelessWidget {
         ? FutureBuilder(
             future: dexRepository.getSummary(speciesId),
             builder: (context, snapshot) {
-              final sprite = snapshot.data?.displaySpritePath;
+              final sprite = snapshot.data?.displayArtworkPath;
               if (sprite != null && sprite.isNotEmpty) {
                 if (isShiny) {
                   return FallbackSpriteImage(
-                    sources: [shinySpriteUrlFor(speciesId), sprite],
+                    sources: [shinyOfficialArtworkUrlFor(speciesId), sprite],
                     width: size,
                     height: size,
                   );

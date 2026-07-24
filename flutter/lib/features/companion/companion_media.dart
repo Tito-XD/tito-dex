@@ -29,10 +29,14 @@ String? bundledCompanionCryAsset(int id) =>
 
 /// GIF network candidates worth caching (animated only — the static PNG
 /// fallbacks stay a render-time concern).
-List<String> companionGifDownloadCandidates(int id) => [
-  cdnAnimatedGifUrlFor(id),
-  showdownGifUrlFor(id),
-  if (id <= bwAnimatedMaxId) bwAnimatedGifUrlFor(id),
+///
+/// [mediaId] is usually the species id, but for a selected alternate form it
+/// should be the form's [PokemonFormDetail.pokemonId] (a.k.a. spriteResourceId)
+/// so the downloaded animation matches the chosen form.
+List<String> companionGifDownloadCandidates(int mediaId) => [
+  cdnAnimatedGifUrlFor(mediaId),
+  showdownGifUrlFor(mediaId),
+  if (mediaId <= bwAnimatedMaxId) bwAnimatedGifUrlFor(mediaId),
 ];
 
 /// Disk cache for non-bundled companion media under app documents.
@@ -51,14 +55,14 @@ class CompanionMediaCache {
     return dir;
   }
 
-  Future<File> _file(int id, String extension) async {
+  Future<File> _file(int mediaId, String extension) async {
     final dir = await _cacheDir();
-    return File('${dir.path}/$id.$extension');
+    return File('${dir.path}/$mediaId.$extension');
   }
 
-  Future<String?> _existingPath(int id, String extension) async {
+  Future<String?> _existingPath(int mediaId, String extension) async {
     try {
-      final file = await _file(id, extension);
+      final file = await _file(mediaId, extension);
       if (await file.exists() && await file.length() > 0) {
         return file.path;
       }
@@ -68,16 +72,16 @@ class CompanionMediaCache {
     return null;
   }
 
-  Future<String?> cachedGifPath(int id) => _existingPath(id, 'gif');
+  Future<String?> cachedGifPath(int mediaId) => _existingPath(mediaId, 'gif');
 
-  Future<String?> cachedCryPath(int id) => _existingPath(id, 'ogg');
+  Future<String?> cachedCryPath(int speciesId) => _existingPath(speciesId, 'ogg');
 
   Future<String?> _download(
-    int id,
+    int mediaId,
     String extension,
     List<String> candidates,
   ) async {
-    final existing = await _existingPath(id, extension);
+    final existing = await _existingPath(mediaId, extension);
     if (existing != null) {
       return existing;
     }
@@ -87,7 +91,7 @@ class CompanionMediaCache {
             .get(Uri.parse(url))
             .timeout(const Duration(seconds: 20));
         if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
-          final file = await _file(id, extension);
+          final file = await _file(mediaId, extension);
           await file.writeAsBytes(response.bodyBytes, flush: true);
           return file.path;
         }
@@ -99,20 +103,22 @@ class CompanionMediaCache {
   }
 
   /// Download-and-cache the animated GIF; returns the local path or null.
-  Future<String?> ensureGif(int id) =>
-      _download(id, 'gif', companionGifDownloadCandidates(id));
+  /// [mediaId] defaults to [speciesId] for backward compatibility.
+  Future<String?> ensureGif(int mediaId) =>
+      _download(mediaId, 'gif', companionGifDownloadCandidates(mediaId));
 
-  Future<String?> cachedShinyGifPath(int id) =>
-      _existingPath(id, 'shiny.gif');
+  Future<String?> cachedShinyGifPath(int mediaId) =>
+      _existingPath(mediaId, 'shiny.gif');
 
   /// Download-and-cache the shiny GIF (fetched lazily on a shiny session,
   /// never part of the picker preload).
-  Future<String?> ensureShinyGif(int id) =>
-      _download(id, 'shiny.gif', animatedShinySpriteCandidatesFor(id));
+  Future<String?> ensureShinyGif(int mediaId) =>
+      _download(mediaId, 'shiny.gif', animatedShinySpriteCandidatesFor(mediaId));
 
   /// Download-and-cache the cry; returns the local path or null.
-  Future<String?> ensureCry(int id) =>
-      _download(id, 'ogg', cryCandidatesFor(id));
+  /// Cries are species-level, so [speciesId] is always used here.
+  Future<String?> ensureCry(int speciesId) =>
+      _download(speciesId, 'ogg', cryCandidatesFor(speciesId));
 }
 
 final companionMediaCache = CompanionMediaCache();
