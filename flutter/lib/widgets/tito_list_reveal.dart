@@ -11,6 +11,7 @@ class TitoListReveal extends StatefulWidget {
   const TitoListReveal({
     super.key,
     this.delay = Duration.zero,
+    this.enabled = true,
     required this.child,
   });
 
@@ -27,6 +28,7 @@ class TitoListReveal extends StatefulWidget {
   }
 
   final Duration delay;
+  final bool enabled;
   final Widget child;
 
   @override
@@ -52,7 +54,7 @@ class _TitoListRevealState extends State<TitoListReveal>
       end: Offset.zero,
     ).animate(_opacity);
 
-    if (!motionPreferences.listAnimationsEnabled) {
+    if (!widget.enabled || !motionPreferences.listAnimationsEnabled) {
       _controller.value = 1.0;
       return;
     }

@@ -105,6 +105,53 @@ const companionNamesZh = <String, String>{
 
 String localizeGame(String game) => gameTitlesZh[game] ?? game;
 
+/// PokeAPI version slug → short Chinese flavor label for the edition picker.
+const flavorVersionLabelsZh = <String, String>{
+  'red': '红',
+  'blue': '蓝',
+  'yellow': '皮卡丘',
+  'gold': '金',
+  'silver': '银',
+  'crystal': '水晶',
+  'ruby': '红宝石',
+  'sapphire': '蓝宝石',
+  'emerald': '绿宝石',
+  'firered': '火红',
+  'leafgreen': '叶绿',
+  'diamond': '钻石',
+  'pearl': '珍珠',
+  'platinum': '白金',
+  'heartgold': '心金',
+  'soulsilver': '魂银',
+  'black': '黑',
+  'white': '白',
+  'black-2': '黑2',
+  'white-2': '白2',
+  'x': 'X',
+  'y': 'Y',
+  'omega-ruby': '欧米加红宝石',
+  'alpha-sapphire': '阿尔法蓝宝石',
+  'sun': '太阳',
+  'moon': '月亮',
+  'ultra-sun': '究极之日',
+  'ultra-moon': '究极之月',
+  'lets-go-pikachu': "Let's Go 皮卡丘",
+  'lets-go-eevee': "Let's Go 伊布",
+  'sword': '剑',
+  'shield': '盾',
+  'brilliant-diamond': '晶灿钻石',
+  'shining-pearl': '明亮珍珠',
+  'legends-arceus': '传说阿尔宙斯',
+  'scarlet': '朱',
+  'violet': '紫',
+  'legends-za': '传说 Z-A',
+  'mega-dimension': '超级维度',
+  'champions': 'Champions',
+};
+
+String localizeFlavorVersion(String flavor) =>
+    flavorVersionLabelsZh[flavor] ?? flavor;
+
 String localizeSpecies(String species) => speciesNamesZh[species] ?? species;
 
 String localizeCompanion(String companion) =>

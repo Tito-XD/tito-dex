@@ -13,10 +13,10 @@ abstract final class TitoHomeActionHero {
 
 enum TitoSideSlideDirection { fromLeft, fromRight }
 
-/// Android's current forward transition is 450 ms. Dex keeps a slightly
-/// slower expansion going in, and a snappier collapse coming back.
-const titoDexTransitionDuration = Duration(milliseconds: 480);
-const titoDexReverseTransitionDuration = Duration(milliseconds: 380);
+/// Android's current forward transition is 450 ms. Dex keeps a modest Hero
+/// expansion but lands faster, while the reverse collapse stays snappy.
+const titoDexTransitionDuration = Duration(milliseconds: 320);
+const titoDexReverseTransitionDuration = Duration(milliseconds: 280);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
@@ -154,8 +154,8 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
           key: const ValueKey<String>('tito-dex-content-reveal'),
           opacity: CurvedAnimation(
             parent: animation,
-            curve: const Interval(0.7, 1, curve: Curves.easeOutCubic),
-            reverseCurve: const Interval(0.7, 1, curve: Curves.easeInCubic),
+            curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
+            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
           ),
           child: _page.overlay!,
         ),

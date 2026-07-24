@@ -261,18 +261,27 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     if (entries.isEmpty) {
       return 0;
     }
-    int indexFor(GameEdition edition) => entries.indexWhere(
+    int indexForVersion(String? versionGroup) => entries.indexWhere(
       (entry) =>
-          entry.versionGroup == edition.dataVersionGroupKey ||
-          entry.gameEdition == edition.slug,
+          entry.versionGroup == versionGroup ||
+          entry.gameEdition == _gameEdition.slug,
     );
-    final primary = indexFor(_gameEdition);
+    // Prefer the exact sub-version (e.g. 朱) when one has been selected.
+    if (_gameEdition.selectedFlavor != null) {
+      final flavorIndex = entries.indexWhere(
+        (entry) => entry.version == _gameEdition.selectedFlavor,
+      );
+      if (flavorIndex >= 0) {
+        return flavorIndex;
+      }
+    }
+    final primary = indexForVersion(_gameEdition.dataVersionGroupKey);
     if (primary >= 0) {
       return primary;
     }
     final fallback = gameEditionFromSlug(_gameEdition.fallbackSlug);
     if (fallback != null) {
-      final fb = indexFor(fallback);
+      final fb = indexForVersion(fallback.dataVersionGroupKey);
       if (fb >= 0) {
         return fb;
       }

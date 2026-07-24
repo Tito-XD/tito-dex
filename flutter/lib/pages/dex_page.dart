@@ -50,9 +50,11 @@ enum _DexMode { national, journey }
 
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
+  static var _sessionRevealAnimationsEnabled = true;
 
   late final DateTime _openedAt;
   late final ScrollController _scrollController;
+  var _revealAnimationsEnabled = false;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
@@ -80,12 +82,21 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
+    _revealAnimationsEnabled = _sessionRevealAnimationsEnabled;
+    _sessionRevealAnimationsEnabled = false; // Consume the one-shot reveal.
     _openedAt = DateTime.now();
     _scrollController = ScrollController()..addListener(_onScroll);
     _openedWithReferenceFilter = dexFilterController.hasActiveFilter;
     gameEditionRepository.addListener(_onEditionChanged);
     dexFilterController.addListener(_onReferenceFilterChanged);
     _bootstrap();
+    if (_revealAnimationsEnabled) {
+      Future<void>.delayed(const Duration(milliseconds: 900), () {
+        if (mounted) {
+          setState(() => _revealAnimationsEnabled = false);
+        }
+      });
+    }
   }
 
   @override
@@ -324,20 +335,17 @@ class _DexPageState extends State<DexPage> {
   }
 
   Duration _cardRevealDelay(int index, int columns) {
-    // Let the page shell finish first. If data arrives later than the shell,
-    // cards start immediately while preserving their row-by-row cadence.
     final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    final shellWaitMs = math.max(0, 620 - elapsedMs);
+    final shellWaitMs = math.max(0, 180 - elapsedMs);
     final row = index ~/ columns;
     final staggerMs = math.min(row, 7) * 42;
     return Duration(milliseconds: shellWaitMs + staggerMs);
   }
 
-  /// Header text/tool bars reveal just as the shell expansion lands — a beat
-  /// ahead of the first card row.
+  /// Header text/tool bars reveal just as the shell expansion lands.
   Duration _headerRevealDelay() {
     final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    return Duration(milliseconds: math.max(0, 440 - elapsedMs));
+    return Duration(milliseconds: math.max(0, 120 - elapsedMs));
   }
 
   Future<void> _setMode(_DexMode mode) async {
@@ -607,6 +615,7 @@ class _DexPageState extends State<DexPage> {
                         sliver: SliverToBoxAdapter(
                           child: TitoListReveal(
                             key: const ValueKey('dex-header-reveal'),
+                            enabled: _revealAnimationsEnabled,
                             delay: _headerRevealDelay(),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -771,6 +780,7 @@ class _DexPageState extends State<DexPage> {
                                 key: ValueKey<String>(
                                   'dex-grid-entry-${entry.id}',
                                 ),
+                                enabled: _revealAnimationsEnabled,
                                 delay: _cardRevealDelay(index, columns),
                                 child: PokemonMiniCard(
                                   summary: entry,

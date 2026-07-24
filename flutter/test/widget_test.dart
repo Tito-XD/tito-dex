@@ -18,7 +18,7 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
   });
 
-  testWidgets('Dex expands in 480ms and collapses in 380ms', (tester) async {
+  testWidgets('Dex expands in 320ms and collapses in 280ms', (tester) async {
     final page = titoDexPage<void>(
       key: const ValueKey<String>('dex-page'),
       heroTag: TitoHomeActionHero.dex,
@@ -36,10 +36,10 @@ void main() {
     final route = ModalRoute.of(tester.element(find.byType(Placeholder)))!;
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexReverseTransitionDuration);
-    expect(titoDexTransitionDuration, const Duration(milliseconds: 480));
+    expect(titoDexTransitionDuration, const Duration(milliseconds: 320));
     expect(
       titoDexReverseTransitionDuration,
-      const Duration(milliseconds: 380),
+      const Duration(milliseconds: 280),
     );
     expect(route.opaque, isTrue);
     expect(route.popGestureEnabled, isFalse);
@@ -64,12 +64,12 @@ void main() {
     expect(fade.opacity.value, lessThan(0.1));
     expect(tester.getTopLeft(home), initialPosition);
 
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 150));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
     expect(fade.opacity.value, lessThan(0.1));
-    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 130));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );

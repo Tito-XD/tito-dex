@@ -582,7 +582,10 @@ class CompanionStandbyOverlay extends StatelessWidget {
         return SafeArea(
           top: false,
           child: Align(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment(
+              companionRepository.offsetX,
+              companionRepository.offsetY,
+            ),
             child: Padding(
               padding: EdgeInsets.only(
                 right: square ? 8 : (compact ? 6 : 10),

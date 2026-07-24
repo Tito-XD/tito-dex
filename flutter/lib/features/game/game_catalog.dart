@@ -24,18 +24,7 @@ const _badgeToGameKey = <String, String>{
   'USUM': 'USUM',
 };
 
-const _gameKeyToBadge = <String, String>{
-  'SoulSilver': 'HGSS',
-  'HeartGold': 'HGSS',
-  'Platinum': 'Pt',
-  'BlackWhite': 'B/W',
-  'Black2White2': 'B2W2',
-  'XY': 'X/Y',
-  'ORAS': 'ORAS',
-  'USUM': 'USUM',
-};
-
-String badgeForGame(String gameKey) => _gameKeyToBadge[gameKey] ?? 'HGSS';
+String badgeForGame(String gameKey) => _badgeToGameKey[gameKey] ?? 'HGSS';
 
 String badgeForEdition(GameEdition edition) {
   if (edition.journeyGameKey != null) {
@@ -75,7 +64,9 @@ String localizedGameTitle(String gameKey) {
   return localizeGame(gameKey);
 }
 
-/// Grid bottom sheet — 23 games with icon slot (name-only until assets land).
+/// Grid bottom sheet — 23 games with icon slot. Editions with sub-versions
+/// open a secondary sheet where the user can choose the merged edition or a
+/// specific flavor (e.g. 朱/紫 → 朱, 紫, or 合并版本).
 Future<GameEdition?> showGameEditionGridPicker(
   BuildContext context, {
   GameEdition? selected,
@@ -126,7 +117,16 @@ Future<GameEdition?> showGameEditionGridPicker(
                             : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         child: InkWell(
-                          onTap: () => Navigator.pop(context, edition),
+                          onTap: () async {
+                            final result = await _resolveEditionWithFlavor(
+                              context,
+                              edition: edition,
+                              current: current,
+                            );
+                            if (context.mounted && result != null) {
+                              Navigator.pop(context, result);
+                            }
+                          },
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
                             decoration: BoxDecoration(
@@ -163,6 +163,172 @@ Future<GameEdition?> showGameEditionGridPicker(
                               ],
                             ),
                           ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
+/// List bottom sheet (used in detail pages). Same merged-or-flavor behavior as
+/// the grid picker.
+Future<GameEdition?> showGameEditionPicker(
+  BuildContext context, {
+  GameEdition? selected,
+}) {
+  return showModalBottomSheet<GameEdition>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) {
+      final current = selected ?? defaultGameEdition;
+      return SafeArea(
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.55,
+          minChildSize: 0.35,
+          maxChildSize: 0.9,
+          builder: (context, scrollController) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(
+                    '选择游戏版本',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: GameEdition.all.length,
+                    itemBuilder: (context, index) {
+                      final edition = GameEdition.all[index];
+                      final isSelected = edition.slug == current.slug;
+                      return ListTile(
+                        leading: GameEditionIcon(edition: edition, size: 32),
+                        title: Text(edition.labelZh),
+                        subtitle: edition.hasPokeApiData
+                            ? null
+                            : const Text('暂无 PokeAPI 数据'),
+                        trailing: isSelected
+                            ? const Icon(Icons.check_rounded)
+                            : null,
+                        selected: isSelected,
+                        onTap: () async {
+                          final result = await _resolveEditionWithFlavor(
+                            context,
+                            edition: edition,
+                            current: current,
+                          );
+                          if (context.mounted && result != null) {
+                            Navigator.pop(context, result);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
+/// If the edition has multiple flavors, push a secondary flavor picker;
+/// otherwise return the edition itself.
+Future<GameEdition?> _resolveEditionWithFlavor(
+  BuildContext context, {
+  required GameEdition edition,
+  required GameEdition current,
+}) async {
+  if (!edition.hasFlavorVersions) {
+    return edition.withFlavor(null);
+  }
+  return _showFlavorPicker(context, edition: edition, current: current);
+}
+
+/// Secondary bottom sheet for choosing a merged edition or one of its flavors.
+Future<GameEdition?> _showFlavorPicker(
+  BuildContext context, {
+  required GameEdition edition,
+  required GameEdition current,
+}) {
+  return showModalBottomSheet<GameEdition>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) {
+      final flavors = edition.flavorVersions;
+      return SafeArea(
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.45,
+          minChildSize: 0.3,
+          maxChildSize: 0.7,
+          builder: (context, scrollController) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(
+                    edition.labelZh,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    controller: scrollController,
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                    itemCount: flavors.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        final isSelected =
+                            current.slug == edition.slug &&
+                            current.selectedFlavor == null;
+                        return ListTile(
+                          leading: GameEditionIcon(edition: edition, size: 32),
+                          title: const Text('合并版本'),
+                          trailing: isSelected
+                              ? const Icon(Icons.check_rounded)
+                              : null,
+                          selected: isSelected,
+                          onTap: () => Navigator.pop(
+                            context,
+                            edition.withFlavor(null),
+                          ),
+                        );
+                      }
+                      final flavor = flavors[index - 1];
+                      final isSelected =
+                          current.slug == edition.slug &&
+                          current.selectedFlavor == flavor;
+                      return ListTile(
+                        leading: GameEditionIcon(edition: edition, size: 32),
+                        title: Text(localizeFlavorVersion(flavor)),
+                        trailing: isSelected
+                            ? const Icon(Icons.check_rounded)
+                            : null,
+                        selected: isSelected,
+                        onTap: () => Navigator.pop(
+                          context,
+                          edition.withFlavor(flavor),
                         ),
                       );
                     },
@@ -269,65 +435,4 @@ class _GameEditionGridIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GameEditionIcon(edition: edition, size: 40);
   }
-}
-
-/// List bottom sheet (legacy — prefer [showGameEditionGridPicker] on home).
-Future<GameEdition?> showGameEditionPicker(
-  BuildContext context, {
-  GameEdition? selected,
-}) {
-  return showModalBottomSheet<GameEdition>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) {
-      final current = selected ?? defaultGameEdition;
-      return SafeArea(
-        child: DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.55,
-          minChildSize: 0.35,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Text(
-                    '选择游戏版本',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: GameEdition.all.length,
-                    itemBuilder: (context, index) {
-                      final edition = GameEdition.all[index];
-                      final isSelected = edition.slug == current.slug;
-                      return ListTile(
-                        leading: GameEditionIcon(edition: edition, size: 32),
-                        title: Text(edition.labelZh),
-                        subtitle: edition.hasPokeApiData
-                            ? null
-                            : const Text('暂无 PokeAPI 数据'),
-                        trailing: isSelected
-                            ? const Icon(Icons.check_rounded)
-                            : null,
-                        selected: isSelected,
-                        onTap: () => Navigator.pop(context, edition),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    },
-  );
 }

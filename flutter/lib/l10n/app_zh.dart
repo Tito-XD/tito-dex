@@ -353,6 +353,10 @@ abstract final class AppZh {
   static const settingsListAnimationsHint = '图鉴、搜索、常用资料等列表的渐入小动画；关闭后内容会立即显示。';
   static const companionSettingsPick = '更换同伴';
   static const companionSettingsReset = '恢复默认（随存档御三家）';
+  static const companionSettingsPosition = '调整位置';
+  static const companionPositionTitle = '调整同行位置';
+  static const companionPositionHint = '拖拽下方预览里的图标到你想让同行宝可梦停留的位置。';
+  static const companionPositionReset = '恢复默认位置';
   static String shinyPartyFound(String name) => '✨ 你的 $name 今天在闪光！';
   static const quizTitle = '猜猜我是谁';
   static const quizEntryHint = '剪影问答';

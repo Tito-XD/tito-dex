@@ -27,6 +27,7 @@ import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
+import 'companion_position_page.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -1141,35 +1142,53 @@ class _CompanionSection extends StatelessWidget {
                 ],
               ),
               ),
+              const StickerRowDivider(),
               Padding(
                 padding: const EdgeInsets.only(top: 2, bottom: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-              FilledButton(
-                onPressed: () async {
-                  final picked = await showCompanionPickerSheet(context);
-                  if (picked != null && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(AppZh.companionPicked(picked.nameZh)),
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => CompanionPositionPage(
+                              journey: journey,
+                            ),
+                          ),
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TitoColors.skyBlue,
+                        foregroundColor: TitoColors.ink,
                       ),
-                    );
-                  }
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: TitoColors.coral,
-                  foregroundColor: TitoColors.ink,
-                ),
-                child: const Text(AppZh.companionSettingsPick),
-              ),
-              if (choice != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: companionRepository.clear,
-                  child: const Text(AppZh.companionSettingsReset),
-                ),
-              ],
+                      child: const Text(AppZh.companionSettingsPosition),
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      onPressed: () async {
+                        final picked = await showCompanionPickerSheet(context);
+                        if (picked != null && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(AppZh.companionPicked(picked.nameZh)),
+                            ),
+                          );
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TitoColors.coral,
+                        foregroundColor: TitoColors.ink,
+                      ),
+                      child: const Text(AppZh.companionSettingsPick),
+                    ),
+                    if (choice != null) ...[
+                      const SizedBox(height: 8),
+                      OutlinedButton(
+                        onPressed: companionRepository.clear,
+                        child: const Text(AppZh.companionSettingsReset),
+                      ),
+                    ],
                   ],
                 ),
               ),
