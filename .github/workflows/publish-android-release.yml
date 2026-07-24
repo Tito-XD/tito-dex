@@ -76,16 +76,18 @@ jobs:
           git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
           git push origin "refs/tags/$tag"
           cat > /tmp/release-notes.md <<EOF
-          这次补丁修复图鉴图片与长页面导航，并更新完整离线图鉴包。
+          这次补丁修复形态高清图、闪光显示、形态选择交互与游戏图标。
 
           ### 主要更新
 
-          - 恢复 1025 个默认图鉴的清晰图片，不再把 80×80 像素图误作默认立绘。
-          - 形态切换精简为 chips；切换形态后可继续查看该形态实际存在的历代 sprite。
-          - 精确出现版本改为下拉菜单，保留版本与 DLC 的独立地点数据。
-          - 二级页面标题栏固定；长图鉴页增加快速回顶。
-          - Offline APK 内置与在线下载相同、经 SHA-256 验证的 v7 图鉴归档；Lite APK 可按需下载。
-          - v7 完整复用 v6 的 1025 物种、803 形态及全部出现地点，仅增量修复媒体和形态 sprite 元数据。
+          - 形态详情页默认显示清晰官方绘图，不再使用 96×96 像素小图。
+          - 离线包升级到 v9：补齐形态 official-artwork，缺失时自动回落到物种绘图。
+          - 修复图鉴详情游戏描述区的游戏 logo 显示（已补传 CDN /v5/game_icons）。
+          - Sprite 预览：第一次返回即可关闭浮窗，上下区域各占一半，点击 sprite 有过渡动画。
+          - 闪光切换：队伍闪光使用清晰官方绘图闪光；预览里按当前来源切换闪光变体。
+          - 多形态宝可梦（如霜奶仙、未知图腾）的形态 chips 折叠为「更多」，在二级弹窗中选择。
+          - 搜索页标题拆分出游戏名副标题，与图鉴页一致。
+          - 同行宝可梦：选择后可挑形态、开闪光，桌面 standby 按选择展示对应动图。
 
           ### 下载说明
 
@@ -104,5 +106,5 @@ jobs:
             "dist/release/TitoDex-$VERSION-offline-rg-arm64.apk" \
             --verify-tag \
             --draft \
-            --title "TitoDex $tag · 清晰图鉴与固定导航" \
+            --title "TitoDex $tag · 形态高清图与闪光选择" \
             --notes-file /tmp/release-notes.md
