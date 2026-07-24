@@ -1,12 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// User-chosen standby companion; falls back to the journey starter when null.
+/// User-chosen standby companion; [formKey] selects a non-default form and
+/// [isShiny] forces the shiny variant. A null [formKey] keeps the species
+/// default form.
 class CompanionChoice {
-  const CompanionChoice({required this.pokemonId, required this.nameZh});
+  const CompanionChoice({
+    required this.pokemonId,
+    required this.nameZh,
+    this.formKey,
+    this.isShiny = false,
+  });
 
   final int pokemonId;
   final String nameZh;
+  final String? formKey;
+  final bool isShiny;
+
+  CompanionChoice copyWith({String? formKey, bool? isShiny}) => CompanionChoice(
+        pokemonId: pokemonId,
+        nameZh: nameZh,
+        formKey: formKey ?? this.formKey,
+        isShiny: isShiny ?? this.isShiny,
+      );
 }
 
 /// Persists the standby companion selection (Settings → 同行宝可梦).
@@ -15,6 +31,8 @@ class CompanionChoice {
 class CompanionRepository extends ChangeNotifier {
   static const _idKey = 'companion.pokemonId';
   static const _nameKey = 'companion.nameZh';
+  static const _formKey = 'companion.formKey';
+  static const _shinyKey = 'companion.isShiny';
   static const _enabledKey = 'companion.enabled';
   static const _sizeScaleKey = 'companion.sizeScale';
 
@@ -44,13 +62,20 @@ class CompanionRepository extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getInt(_idKey);
     final name = prefs.getString(_nameKey);
+    final formKey = prefs.getString(_formKey);
+    final isShiny = prefs.getBool(_shinyKey) ?? false;
     final enabled = prefs.getBool(_enabledKey) ?? true;
     final sizeScale = prefs.getDouble(_sizeScaleKey) ?? defaultSizeScale;
     _loaded = true;
     _enabled = enabled;
     _sizeScale = sizeScale.clamp(minSizeScale, maxSizeScale);
     if (id != null && id > 0) {
-      _choice = CompanionChoice(pokemonId: id, nameZh: name ?? '#$id');
+      _choice = CompanionChoice(
+        pokemonId: id,
+        nameZh: name ?? '#$id',
+        formKey: formKey,
+        isShiny: isShiny,
+      );
     }
     notifyListeners();
   }
@@ -76,6 +101,12 @@ class CompanionRepository extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_idKey, choice.pokemonId);
     await prefs.setString(_nameKey, choice.nameZh);
+    if (choice.formKey != null && choice.formKey!.isNotEmpty) {
+      await prefs.setString(_formKey, choice.formKey!);
+    } else {
+      await prefs.remove(_formKey);
+    }
+    await prefs.setBool(_shinyKey, choice.isShiny);
   }
 
   static String _patsKey(int pokemonId) => 'companion.pats.$pokemonId';
@@ -101,6 +132,8 @@ class CompanionRepository extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_idKey);
     await prefs.remove(_nameKey);
+    await prefs.remove(_formKey);
+    await prefs.remove(_shinyKey);
   }
 }
 

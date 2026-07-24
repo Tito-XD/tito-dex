@@ -9,8 +9,8 @@ import '../features/companion/companion_art.dart';
 import '../features/companion/companion_media.dart';
 import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
+import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
-import '../features/dex/shiny_odds.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
@@ -32,12 +32,21 @@ class CompanionStandby extends StatefulWidget {
     super.key,
     required this.speciesId,
     required this.nameZh,
+    this.formKey,
+    this.isShiny = false,
     this.compact = false,
     this.sizeScale = 1.0,
   });
 
   final int speciesId;
   final String nameZh;
+
+  /// Selected alternate form; null keeps the species default.
+  final String? formKey;
+
+  /// Whether to show the shiny variant.
+  final bool isShiny;
+
   final bool compact;
 
   /// User multiplier from Settings (1.0–1.5) on top of height-based sizing.
@@ -65,10 +74,6 @@ class _CompanionStandbyState extends State<CompanionStandby>
   static const _quoteDuration = Duration(milliseconds: 1900);
   static const _easterEggOdds = 50;
 
-  /// One roll per app session per species — same scheme as the party strip,
-  /// so remounts don't reroll the sparkle.
-  static final int _sessionSeed = DateTime.now().millisecondsSinceEpoch;
-
   late final AnimationController _bounce;
   late final Animation<double> _bounceScale;
   final _random = math.Random();
@@ -82,7 +87,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
   var _cryBusy = false;
   var _nextHeartId = 0;
   var _pats = 0;
-  var _shiny = false;
+  var _spriteResourceId = 0;
 
   bool get _friend => _pats >= _friendshipPats;
 
@@ -104,7 +109,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
   @override
   void didUpdateWidget(covariant CompanionStandby oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.speciesId != widget.speciesId) {
+    if (oldWidget.speciesId != widget.speciesId ||
+        oldWidget.formKey != widget.formKey ||
+        oldWidget.isShiny != widget.isShiny) {
       _pats = 0;
       _hearts.clear();
       _quoteTemplate = null;
@@ -117,7 +124,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
 
   void _initForSpecies() {
     final id = widget.speciesId;
-    _shiny = shinyRoll(_sessionSeed, id);
+    _spriteResourceId = id;
     _heightFuture = _loadHeight(id);
     _resolveSpriteSources();
     _loadPats(id);
@@ -130,23 +137,44 @@ class _CompanionStandbyState extends State<CompanionStandby>
     }
   }
 
-  /// Sprite source order: (shiny session: cached/network shiny first) →
-  /// bundled asset (starters) → disk cache (chosen via the picker's preload
-  /// dialog) → network candidates. Every miss falls through to the normal
-  /// look, so a shiny roll can never blank the companion.
+  /// Sprite source order: (shiny: cached/network shiny first) → bundled
+  /// asset (starters) → disk cache (chosen via the picker's preload dialog)
+  /// → network candidates. Every miss falls through to the normal look, so
+  /// a shiny choice can never blank the companion.
   Future<void> _resolveSpriteSources() async {
     final id = widget.speciesId;
-    final shiny = _shiny;
-    final bundled = bundledCompanionGifAsset(id);
-    final cached = bundled == null
-        ? await companionMediaCache.cachedGifPath(id)
+    final shiny = widget.isShiny;
+
+    // Resolve the sprite resource id for the chosen form.
+    var mediaId = id;
+    try {
+      final detail = await dexRepository.getDetail(id);
+      if (widget.formKey != null) {
+        final form = detail.forms.cast<PokemonFormDetail?>().firstWhere(
+              (f) => f?.key == widget.formKey,
+              orElse: () => null,
+            );
+        if (form != null) {
+          mediaId = form.pokemonId;
+        }
+      }
+      if (mounted) {
+        _spriteResourceId = mediaId;
+      }
+    } catch (_) {
+      mediaId = id;
+    }
+
+    final bundled = bundledCompanionGifAsset(mediaId);
+    final cached = bundled == null && !shiny
+        ? await companionMediaCache.cachedGifPath(mediaId)
         : null;
     final cachedShiny = shiny
-        ? await companionMediaCache.cachedShinyGifPath(id)
+        ? await companionMediaCache.cachedShinyGifPath(mediaId)
         : null;
     if (shiny && cachedShiny == null) {
       // Prime the disk cache so the sparkle survives going offline later.
-      unawaited(companionMediaCache.ensureShinyGif(id));
+      unawaited(companionMediaCache.ensureShinyGif(mediaId));
     }
     if (!mounted || id != widget.speciesId) {
       return;
@@ -154,10 +182,10 @@ class _CompanionStandbyState extends State<CompanionStandby>
     setState(() {
       _spriteSources = [
         if (cachedShiny != null) cachedShiny,
-        if (shiny) ...animatedShinySpriteCandidatesFor(id),
+        if (shiny) ...animatedShinySpriteCandidatesFor(mediaId),
         if (bundled != null) bundled,
         if (cached != null) cached,
-        ...animatedSpriteCandidatesFor(id),
+        ...animatedSpriteCandidatesFor(mediaId),
       ];
     });
   }
@@ -254,7 +282,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
                 editionSlug: edition.slug,
                 patCount: _pats,
                 hour: DateTime.now().hour,
-                shiny: _shiny,
+                shiny: widget.isShiny,
               ),
               _random,
               previous: _quoteTemplate,
@@ -321,9 +349,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
         sources:
             _spriteSources ??
             [
-              if (bundledCompanionGifAsset(widget.speciesId) != null)
-                bundledCompanionGifAsset(widget.speciesId)!,
-              ...animatedSpriteCandidatesFor(widget.speciesId),
+              if (bundledCompanionGifAsset(_spriteResourceId) != null)
+                bundledCompanionGifAsset(_spriteResourceId)!,
+              ...animatedSpriteCandidatesFor(_spriteResourceId),
             ],
         width: spriteSize,
         height: spriteSize,
@@ -372,7 +400,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
                 child: sticker,
               ),
             ),
-            if (_shiny)
+            if (widget.isShiny)
               Positioned(
                 right: spriteSize - 10,
                 bottom: spriteSize - 10,
@@ -563,6 +591,8 @@ class CompanionStandbyOverlay extends StatelessWidget {
               child: CompanionStandby(
                 speciesId: speciesId,
                 nameZh: nameZh,
+                formKey: choice?.formKey,
+                isShiny: choice?.isShiny ?? false,
                 compact: compact,
                 sizeScale: companionRepository.sizeScale,
               ),

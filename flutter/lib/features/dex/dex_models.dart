@@ -53,6 +53,10 @@ class PokemonSummary {
 
   String? get displaySpritePath => localSpritePath ?? spriteUrl;
 
+  /// Prefer the clear official-artwork asset; fall back to remote sprite or the
+  /// bundled local sprite. Used by detail headers and companion media.
+  String? get displayArtworkPath => artworkUrl ?? spriteUrl ?? localSpritePath;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'nameEn': nameEn,

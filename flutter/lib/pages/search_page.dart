@@ -181,12 +181,13 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final edition = gameEditionRepository.edition;
 
-    return TitoFontScale(
+        return TitoFontScale(
       multiplier: 1.0,
       child: Material(
         type: MaterialType.transparency,
         child: SecondaryPageScaffold(
-          title: '${AppZh.navSearch} · ${edition.labelZh}',
+          title: AppZh.navSearch,
+          subtitle: edition.labelZh,
           children: [
             _SearchHubSegmentBar(
               selected: _hubSegment,
