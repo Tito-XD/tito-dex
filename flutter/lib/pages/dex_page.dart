@@ -109,6 +109,12 @@ class _DexPageState extends State<DexPage> {
     if (_openedWithReferenceFilter) {
       dexFilterController.clearFilter();
     }
+    // Re-enable the reveal animation for the next clean Dex tab entry so
+    // switching tabs keeps the fade/slide-up effect while still avoiding
+    // staggered replays while the same page instance scrolls.
+    if (!_openedWithReferenceFilter) {
+      _sessionRevealAnimationsEnabled = true;
+    }
     super.dispose();
   }
 

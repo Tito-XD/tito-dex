@@ -111,6 +111,8 @@ Future<GameEdition?> showGameEditionGridPicker(
                     itemBuilder: (context, index) {
                       final edition = GameEdition.all[index];
                       final isSelected = edition.slug == current.slug;
+                      final displayEdition =
+                          isSelected ? current : edition;
                       return Material(
                         color: isSelected
                             ? const Color(0xFFFFF3B0)
@@ -145,7 +147,7 @@ Future<GameEdition?> showGameEditionGridPicker(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _GameEditionGridIcon(edition: edition),
+                                _GameEditionGridIcon(edition: displayEdition),
                                 const SizedBox(height: 6),
                                 Text(
                                   edition.labelZh,
@@ -215,8 +217,13 @@ Future<GameEdition?> showGameEditionPicker(
                     itemBuilder: (context, index) {
                       final edition = GameEdition.all[index];
                       final isSelected = edition.slug == current.slug;
+                      final displayEdition =
+                          isSelected ? current : edition;
                       return ListTile(
-                        leading: GameEditionIcon(edition: edition, size: 32),
+                        leading: GameEditionIcon(
+                          edition: displayEdition,
+                          size: 32,
+                        ),
                         title: Text(edition.labelZh),
                         subtitle: edition.hasPokeApiData
                             ? null
@@ -320,7 +327,10 @@ Future<GameEdition?> _showFlavorPicker(
                           current.slug == edition.slug &&
                           current.selectedFlavor == flavor;
                       return ListTile(
-                        leading: GameEditionIcon(edition: edition, size: 32),
+                        leading: GameEditionIcon(
+                          edition: edition.withFlavor(flavor),
+                          size: 32,
+                        ),
                         title: Text(localizeFlavorVersion(flavor)),
                         trailing: isSelected
                             ? const Icon(Icons.check_rounded)

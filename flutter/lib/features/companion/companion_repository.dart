@@ -113,6 +113,15 @@ class CompanionRepository extends ChangeNotifier {
     await prefs.setDouble(_sizeScaleKey, _sizeScale);
   }
 
+  /// Update the in-memory offset and notify listeners without writing to disk.
+  /// Use this while a drag is in progress to avoid spamming the platform
+  /// channel with SharedPreferences writes on every frame.
+  void setOffsetLocal(double x, double y) {
+    _offsetX = x.clamp(-1.0, 1.0);
+    _offsetY = y.clamp(-1.0, 1.0);
+    notifyListeners();
+  }
+
   Future<void> setOffset(double x, double y) async {
     _offsetX = x.clamp(-1.0, 1.0);
     _offsetY = y.clamp(-1.0, 1.0);

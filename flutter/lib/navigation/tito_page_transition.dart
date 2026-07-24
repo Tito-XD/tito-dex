@@ -137,19 +137,22 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final transitioned = super.buildTransitions(
-      context,
-      animation,
-      secondaryAnimation,
-      child,
-    );
     if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
-      return transitioned;
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        child,
+      );
     }
-    return Stack(
+    // Include the dex content inside the transitioned child so Android's
+    // predictive-back gesture moves the entire page (shell + content) together.
+    // During the Hero expansion the content sits at opacity 0 behind the Hero
+    // overlay and only fades in once the shell has landed.
+    final pageWithOverlay = Stack(
       fit: StackFit.expand,
       children: [
-        transitioned,
+        child,
         FadeTransition(
           key: const ValueKey<String>('tito-dex-content-reveal'),
           opacity: CurvedAnimation(
@@ -160,6 +163,12 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
           child: _page.overlay!,
         ),
       ],
+    );
+    return super.buildTransitions(
+      context,
+      animation,
+      secondaryAnimation,
+      pageWithOverlay,
     );
   }
 
