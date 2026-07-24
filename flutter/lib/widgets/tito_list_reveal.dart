@@ -46,11 +46,14 @@ class _TitoListRevealState extends State<TitoListReveal>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 220),
+      // Slower, smaller travel than the original 220ms / 0.12: the reveal
+      // plays right after the route transition lands, so a gentle drift reads
+      // as a cascade instead of a flash.
+      duration: const Duration(milliseconds: 300),
     );
     _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
     _position = Tween<Offset>(
-      begin: const Offset(0, 0.12),
+      begin: const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(_opacity);
 

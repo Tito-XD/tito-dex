@@ -25,7 +25,10 @@ class TitoPageContainer extends StatelessWidget {
             colors: [Color(0xFF5D728A), Color(0xFF7B91A6)],
           ),
         ),
-        child: child,
+        // Edge-to-edge shell: the gradient paints behind the system bars so
+        // predictive back retracts the whole screen; the SafeArea keeps page
+        // content where the old shell-level SafeArea put it.
+        child: SafeArea(child: child),
       ),
     );
   }

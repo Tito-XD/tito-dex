@@ -388,6 +388,7 @@ class DexOfflineService {
         final localizedEvolution = await _localizeEvolutionSprites(
           detail.evolutionChain,
         );
+        final localizedForms = await _localizeFormSprites(detail.forms, id);
         final localizedDetail = PokemonDetail(
           summary: summary,
           genusZh: detail.genusZh,
@@ -415,7 +416,7 @@ class DexOfflineService {
           genderFemalePercent: detail.genderFemalePercent,
           eggGroups: detail.eggGroups,
           hatchCounter: detail.hatchCounter,
-          forms: detail.forms,
+          forms: localizedForms,
         );
 
         await _store.writeDetail(id, localizedDetail);
@@ -582,6 +583,41 @@ class DexOfflineService {
     }
     await _store.writeSpriteBytes(id, compressed);
     return _store.spriteRelativePath(id);
+  }
+
+  Future<String?> _cacheFormSprite(
+    PokemonFormDetail form,
+    int speciesId,
+    int index,
+  ) async {
+    final remoteUrl = form.spriteUrl;
+    if (remoteUrl == null) {
+      return null;
+    }
+    final response = await _http.get(Uri.parse(remoteUrl));
+    if (response.statusCode != 200) {
+      return null;
+    }
+    final compressed = _compressForPokemon(response.bodyBytes);
+    if (compressed == null) {
+      return null;
+    }
+    final formKey = form.formId?.toString() ?? 'pokemon-$speciesId-$index';
+    await _store.writeFormSpriteBytes(formKey, compressed);
+    return _store.formSpriteRelativePath(formKey);
+  }
+
+  Future<List<PokemonFormDetail>> _localizeFormSprites(
+    List<PokemonFormDetail> forms,
+    int speciesId,
+  ) async {
+    final result = <PokemonFormDetail>[];
+    for (var i = 0; i < forms.length; i++) {
+      final form = forms[i];
+      final localPath = await _cacheFormSprite(form, speciesId, i);
+      result.add(form.withLocalSpritePath(localPath));
+    }
+    return result;
   }
 
   Uint8List? _compressForPokemon(Uint8List bytes) {

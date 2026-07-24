@@ -54,9 +54,11 @@ class _HandheldNativeShell extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+            // Match TitoPageContainer's page gradient: predictive-back corner
+            // reveals then blend into the pages instead of flashing skyBlue.
             colors: [
-              TitoColors.skyBlue,
-              TitoColors.slateBlue,
+              Color(0xFF5D728A),
+              Color(0xFF7B91A6),
             ],
           ),
         ),
@@ -79,7 +81,14 @@ class _HandheldNativeShell extends StatelessWidget {
   }
 }
 
-/// Phone / non-handheld native — standard safe areas, system status + nav bars.
+/// Phone / non-handheld native — edge-to-edge, system status + nav bars.
+///
+/// No SafeArea here on purpose: routes paint full-bleed so Android's
+/// predictive-back gesture retracts the whole screen (Telegram-style) instead
+/// of starting below the status bar. Content insets live in
+/// [TitoPageContainer]'s own SafeArea. The backdrop reuses the page gradient
+/// (not the old light skyBlue ramp) so anything revealed behind a
+/// transitioning route — rounded corners, commit gaps — blends in seamlessly.
 class _RegularNativeShell extends StatelessWidget {
   const _RegularNativeShell({required this.child});
 
@@ -89,20 +98,18 @@ class _RegularNativeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return ColoredBox(
       color: TitoColors.deepBlue,
-      child: SafeArea(
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                TitoColors.skyBlue,
-                TitoColors.slateBlue,
-              ],
-            ),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF5D728A),
+              Color(0xFF7B91A6),
+            ],
           ),
-          child: child,
         ),
+        child: child,
       ),
     );
   }

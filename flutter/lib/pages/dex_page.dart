@@ -91,7 +91,7 @@ class _DexPageState extends State<DexPage> {
     dexFilterController.addListener(_onReferenceFilterChanged);
     _bootstrap();
     if (_revealAnimationsEnabled) {
-      Future<void>.delayed(const Duration(milliseconds: 900), () {
+      Future<void>.delayed(const Duration(milliseconds: 1000), () {
         if (mounted) {
           setState(() => _revealAnimationsEnabled = false);
         }
@@ -340,18 +340,21 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
+  /// Cards reveal only after the shell expansion + content fade have fully
+  /// landed (~320ms route transition). Starting them earlier overlapped the
+  /// route fade with the per-card reveals, which read as a flash-in.
   Duration _cardRevealDelay(int index, int columns) {
     final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    final shellWaitMs = math.max(0, 180 - elapsedMs);
+    final shellWaitMs = math.max(0, 300 - elapsedMs);
     final row = index ~/ columns;
     final staggerMs = math.min(row, 7) * 42;
     return Duration(milliseconds: shellWaitMs + staggerMs);
   }
 
-  /// Header text/tool bars reveal just as the shell expansion lands.
+  /// Header text/tool bars reveal right behind the landing shell fade.
   Duration _headerRevealDelay() {
     final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    return Duration(milliseconds: math.max(0, 120 - elapsedMs));
+    return Duration(milliseconds: math.max(0, 240 - elapsedMs));
   }
 
   Future<void> _setMode(_DexMode mode) async {
