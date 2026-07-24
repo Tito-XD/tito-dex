@@ -89,18 +89,50 @@ class GameEdition {
   /// square per-game icons (Nintendo never drew them for older games), so
   /// earlier editions fall back to a version-tinted letter badge. Bundled in
   /// the APK on purpose: 11 files ≈ 88 KB, no CDN round trip.
-  String? get iconAsset => switch (slug) {
-    'xy' ||
-    'oras' ||
-    'sm' ||
-    'usum' ||
-    'lgpe' ||
-    'swsh' ||
-    'bdsp' ||
-    'pla' ||
-    'sv' ||
-    'lza' ||
-    'champions' => 'assets/game_icons/$slug.png',
+  ///
+  /// When a [selectedFlavor] is set, the matching per-flavor icon is used so
+  /// X/Y, Sword/Shield, etc. show distinct art in the flavor picker.
+  String? get iconAsset {
+    final flavor = selectedFlavor;
+    if (flavor != null) {
+      final flavorAsset = _flavorIconAsset(flavor);
+      if (flavorAsset != null) return flavorAsset;
+    }
+    return switch (slug) {
+      'xy' ||
+      'oras' ||
+      'sm' ||
+      'usum' ||
+      'lgpe' ||
+      'swsh' ||
+      'bdsp' ||
+      'pla' ||
+      'sv' ||
+      'lza' ||
+      'champions' => 'assets/game_icons/$slug.png',
+      _ => null,
+    };
+  }
+
+  String? _flavorIconAsset(String flavor) => switch (flavor) {
+    'x' => 'assets/game_icons/x.png',
+    'y' => 'assets/game_icons/y.png',
+    'omega-ruby' => 'assets/game_icons/omega-ruby.png',
+    'alpha-sapphire' => 'assets/game_icons/alpha-sapphire.png',
+    'sun' => 'assets/game_icons/sun.png',
+    'moon' => 'assets/game_icons/moon.png',
+    'ultra-sun' => 'assets/game_icons/ultra-sun.png',
+    'ultra-moon' => 'assets/game_icons/ultra-moon.png',
+    'lets-go-pikachu' => 'assets/game_icons/lets-go-pikachu.png',
+    'lets-go-eevee' => 'assets/game_icons/lets-go-eevee.png',
+    'sword' => 'assets/game_icons/sword.png',
+    'shield' => 'assets/game_icons/shield.png',
+    'brilliant-diamond' => 'assets/game_icons/brilliant-diamond.png',
+    'shining-pearl' => 'assets/game_icons/shining-pearl.png',
+    'scarlet' => 'assets/game_icons/scarlet.png',
+    'violet' => 'assets/game_icons/violet.png',
+    'legends-za' => 'assets/game_icons/legends-za.png',
+    'mega-dimension' => 'assets/game_icons/mega-dimension.png',
     _ => null,
   };
 
