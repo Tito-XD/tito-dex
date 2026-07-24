@@ -35,6 +35,8 @@ class CompanionRepository extends ChangeNotifier {
   static const _shinyKey = 'companion.isShiny';
   static const _enabledKey = 'companion.enabled';
   static const _sizeScaleKey = 'companion.sizeScale';
+  static const _offsetXKey = 'companion.offsetX';
+  static const _offsetYKey = 'companion.offsetY';
 
   /// Slider bounds — 0.75 lets the companion shrink below the default,
   /// 1.5 is a hard ceiling per product decision. Default stays 1.0.
@@ -42,9 +44,16 @@ class CompanionRepository extends ChangeNotifier {
   static const double maxSizeScale = 1.5;
   static const double defaultSizeScale = 1.0;
 
+  /// Alignment-like position on the home screen (-1..1). Default keeps the
+  /// companion anchored at the bottom-right corner.
+  static const double defaultOffsetX = 1.0;
+  static const double defaultOffsetY = 1.0;
+
   CompanionChoice? _choice;
   bool _enabled = true;
   double _sizeScale = defaultSizeScale;
+  double _offsetX = defaultOffsetX;
+  double _offsetY = defaultOffsetY;
   bool _loaded = false;
 
   CompanionChoice? get choice => _choice;
@@ -54,6 +63,12 @@ class CompanionRepository extends ChangeNotifier {
 
   /// User size multiplier applied on top of the height-based sprite size.
   double get sizeScale => _sizeScale;
+
+  /// Horizontal alignment on the home screen (-1 left, 1 right).
+  double get offsetX => _offsetX;
+
+  /// Vertical alignment on the home screen (-1 top, 1 bottom).
+  double get offsetY => _offsetY;
 
   Future<void> load() async {
     if (_loaded) {
@@ -66,9 +81,13 @@ class CompanionRepository extends ChangeNotifier {
     final isShiny = prefs.getBool(_shinyKey) ?? false;
     final enabled = prefs.getBool(_enabledKey) ?? true;
     final sizeScale = prefs.getDouble(_sizeScaleKey) ?? defaultSizeScale;
+    final offsetX = prefs.getDouble(_offsetXKey) ?? defaultOffsetX;
+    final offsetY = prefs.getDouble(_offsetYKey) ?? defaultOffsetY;
     _loaded = true;
     _enabled = enabled;
     _sizeScale = sizeScale.clamp(minSizeScale, maxSizeScale);
+    _offsetX = offsetX.clamp(-1.0, 1.0);
+    _offsetY = offsetY.clamp(-1.0, 1.0);
     if (id != null && id > 0) {
       _choice = CompanionChoice(
         pokemonId: id,
@@ -93,6 +112,17 @@ class CompanionRepository extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_sizeScaleKey, _sizeScale);
   }
+
+  Future<void> setOffset(double x, double y) async {
+    _offsetX = x.clamp(-1.0, 1.0);
+    _offsetY = y.clamp(-1.0, 1.0);
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_offsetXKey, _offsetX);
+    await prefs.setDouble(_offsetYKey, _offsetY);
+  }
+
+  Future<void> resetOffset() => setOffset(defaultOffsetX, defaultOffsetY);
 
   Future<void> save(CompanionChoice choice) async {
     _choice = choice;

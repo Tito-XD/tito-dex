@@ -26,7 +26,8 @@ class JourneyPage extends StatelessWidget {
     return TitoFontScale(
       multiplier: 1.0,
       child: SecondaryPageScaffold(
-        title: '${AppZh.navJourney} · ${localizeGame(journey.game)}',
+        title: AppZh.navJourney,
+        subtitle: localizeGame(journey.game),
         children: [
         if (onLaunchEmulator != null) ...[
           StickerCard(

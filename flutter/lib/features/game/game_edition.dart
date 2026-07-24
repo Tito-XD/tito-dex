@@ -12,6 +12,8 @@ class GameEdition {
     required this.fallbackSlug,
     required this.defaultRegionalPokedex,
     this.journeyGameKey,
+    this.flavorVersions = const [],
+    this.selectedFlavor,
   });
 
   final String slug;
@@ -23,6 +25,13 @@ class GameEdition {
   final String fallbackSlug;
   final DexRegionalPokedex defaultRegionalPokedex;
 
+  /// Sub-versions that share the same [versionGroup] (e.g. scarlet/violet).
+  /// Empty when the edition has only one flavor.
+  final List<String> flavorVersions;
+
+  /// Currently preferred sub-version, or null to use the merged edition.
+  final String? selectedFlavor;
+
   /// Journey save `game` field key (e.g. SoulSilver for HGSS).
   final String? journeyGameKey;
 
@@ -33,6 +42,27 @@ class GameEdition {
     }
     final fallback = gameEditionFromSlug(fallbackSlug);
     return fallback?.versionGroup ?? fallbackSlug;
+  }
+
+  /// Whether this edition has sub-versions to choose from.
+  bool get hasFlavorVersions => flavorVersions.length > 1;
+
+  /// A copy with the preferred sub-version selected (or null for merged).
+  GameEdition withFlavor(String? flavor) {
+    if (flavor == selectedFlavor) {
+      return this;
+    }
+    return GameEdition(
+      slug: slug,
+      labelZh: labelZh,
+      versionGroup: versionGroup,
+      hasPokeApiData: hasPokeApiData,
+      fallbackSlug: fallbackSlug,
+      defaultRegionalPokedex: defaultRegionalPokedex,
+      journeyGameKey: journeyGameKey,
+      flavorVersions: flavorVersions,
+      selectedFlavor: flavor,
+    );
   }
 
   /// National dex generation (1–9) for default sprite / battle scope display.
@@ -98,6 +128,7 @@ class GameEdition {
     hasPokeApiData: true,
     fallbackSlug: 'hgss',
     defaultRegionalPokedex: DexRegionalPokedex.johto,
+    flavorVersions: ['heartgold', 'soulsilver'],
     journeyGameKey: 'SoulSilver',
   );
 
@@ -109,6 +140,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'rgb',
       defaultRegionalPokedex: DexRegionalPokedex.kanto,
+      flavorVersions: ['red', 'blue'],
     ),
     const GameEdition(
       slug: 'yellow',
@@ -117,6 +149,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'yellow',
       defaultRegionalPokedex: DexRegionalPokedex.kanto,
+      flavorVersions: ['yellow'],
     ),
     const GameEdition(
       slug: 'gs',
@@ -125,6 +158,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'gs',
       defaultRegionalPokedex: DexRegionalPokedex.johto,
+      flavorVersions: ['gold', 'silver'],
     ),
     const GameEdition(
       slug: 'crystal',
@@ -133,6 +167,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'crystal',
       defaultRegionalPokedex: DexRegionalPokedex.johto,
+      flavorVersions: ['crystal'],
     ),
     const GameEdition(
       slug: 'rs',
@@ -141,6 +176,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'rs',
       defaultRegionalPokedex: DexRegionalPokedex.hoenn,
+      flavorVersions: ['ruby', 'sapphire'],
     ),
     const GameEdition(
       slug: 'emerald',
@@ -149,6 +185,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'emerald',
       defaultRegionalPokedex: DexRegionalPokedex.hoenn,
+      flavorVersions: ['emerald'],
     ),
     const GameEdition(
       slug: 'frlg',
@@ -157,6 +194,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'frlg',
       defaultRegionalPokedex: DexRegionalPokedex.kanto,
+      flavorVersions: ['firered', 'leafgreen'],
     ),
     const GameEdition(
       slug: 'dp',
@@ -165,6 +203,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'dp',
       defaultRegionalPokedex: DexRegionalPokedex.sinnoh,
+      flavorVersions: ['diamond', 'pearl'],
     ),
     const GameEdition(
       slug: 'pt',
@@ -173,6 +212,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'pt',
       defaultRegionalPokedex: DexRegionalPokedex.sinnoh,
+      flavorVersions: ['platinum'],
       journeyGameKey: 'Platinum',
     ),
     hgss,
@@ -183,6 +223,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'bw',
       defaultRegionalPokedex: DexRegionalPokedex.unova,
+      flavorVersions: ['black', 'white'],
       journeyGameKey: 'BlackWhite',
     ),
     const GameEdition(
@@ -192,6 +233,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'bw2',
       defaultRegionalPokedex: DexRegionalPokedex.unova,
+      flavorVersions: ['black-2', 'white-2'],
       journeyGameKey: 'Black2White2',
     ),
     const GameEdition(
@@ -201,6 +243,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'xy',
       defaultRegionalPokedex: DexRegionalPokedex.kalos,
+      flavorVersions: ['x', 'y'],
       journeyGameKey: 'XY',
     ),
     const GameEdition(
@@ -210,6 +253,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'oras',
       defaultRegionalPokedex: DexRegionalPokedex.hoenn,
+      flavorVersions: ['omega-ruby', 'alpha-sapphire'],
       journeyGameKey: 'ORAS',
     ),
     const GameEdition(
@@ -219,6 +263,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'sm',
       defaultRegionalPokedex: DexRegionalPokedex.alola,
+      flavorVersions: ['sun', 'moon'],
     ),
     const GameEdition(
       slug: 'usum',
@@ -227,6 +272,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'usum',
       defaultRegionalPokedex: DexRegionalPokedex.alola,
+      flavorVersions: ['ultra-sun', 'ultra-moon'],
       journeyGameKey: 'USUM',
     ),
     const GameEdition(
@@ -236,6 +282,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'lgpe',
       defaultRegionalPokedex: DexRegionalPokedex.kanto,
+      flavorVersions: ['lets-go-pikachu', 'lets-go-eevee'],
     ),
     const GameEdition(
       slug: 'swsh',
@@ -244,6 +291,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'swsh',
       defaultRegionalPokedex: DexRegionalPokedex.galar,
+      flavorVersions: ['sword', 'shield'],
     ),
     const GameEdition(
       slug: 'bdsp',
@@ -252,6 +300,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'dp',
       defaultRegionalPokedex: DexRegionalPokedex.sinnoh,
+      flavorVersions: ['brilliant-diamond', 'shining-pearl'],
     ),
     const GameEdition(
       slug: 'pla',
@@ -260,6 +309,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'pla',
       defaultRegionalPokedex: DexRegionalPokedex.hisui,
+      flavorVersions: ['legends-arceus'],
     ),
     const GameEdition(
       slug: 'sv',
@@ -268,6 +318,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'sv',
       defaultRegionalPokedex: DexRegionalPokedex.paldea,
+      flavorVersions: ['scarlet', 'violet'],
     ),
     const GameEdition(
       slug: 'lza',
@@ -276,6 +327,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'sv',
       defaultRegionalPokedex: DexRegionalPokedex.kalos,
+      flavorVersions: ['legends-za', 'mega-dimension'],
     ),
     const GameEdition(
       slug: 'champions',
@@ -284,6 +336,7 @@ class GameEdition {
       hasPokeApiData: true,
       fallbackSlug: 'sv',
       defaultRegionalPokedex: DexRegionalPokedex.national,
+      flavorVersions: ['champions'],
     ),
   ];
 }

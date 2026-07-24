@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'game_edition.dart';
 
 const _globalGameEditionKey = 'titodex.global_game_edition';
+const _globalGameFlavorKey = 'titodex.global_game_flavor';
 
 class GameEditionRepository extends ChangeNotifier {
   GameEdition _edition = defaultGameEdition;
@@ -15,7 +16,9 @@ class GameEditionRepository extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final slug = prefs.getString(_globalGameEditionKey);
-    _edition = gameEditionFromSlug(slug) ?? defaultGameEdition;
+    final base = gameEditionFromSlug(slug) ?? defaultGameEdition;
+    final flavor = prefs.getString(_globalGameFlavorKey);
+    _edition = base.withFlavor(flavor);
     _loaded = true;
     notifyListeners();
   }
@@ -31,6 +34,11 @@ class GameEditionRepository extends ChangeNotifier {
     _edition = edition;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_globalGameEditionKey, edition.slug);
+    if (edition.selectedFlavor == null) {
+      await prefs.remove(_globalGameFlavorKey);
+    } else {
+      await prefs.setString(_globalGameFlavorKey, edition.selectedFlavor!);
+    }
     notifyListeners();
   }
 
