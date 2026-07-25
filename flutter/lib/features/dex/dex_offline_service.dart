@@ -590,7 +590,10 @@ class DexOfflineService {
     int speciesId,
     int index,
   ) async {
-    final remoteUrl = form.spriteUrl;
+    // Prefer the clear official artwork: form sprite URLs point at the
+    // pixelated in-game sprite, which made cached form thumbnails look
+    // pixelated next to the artwork viewer.
+    final remoteUrl = form.artworkUrl ?? form.spriteUrl;
     if (remoteUrl == null) {
       return null;
     }
