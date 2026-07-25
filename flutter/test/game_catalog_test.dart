@@ -14,17 +14,36 @@ void main() {
     );
   });
 
-  test('Gen VI+ editions carry a bundled HOME icon asset', () {
-    const bundled = {
+  test('every edition carries a bundled game icon asset', () {
+    const slugFiles = {
       'xy', 'oras', 'sm', 'usum', 'lgpe', 'swsh',
       'bdsp', 'pla', 'sv', 'lza', 'champions', //
     };
+    const flavorFiles = {
+      'rgb': 'red',
+      'gs': 'gold',
+      'rs': 'ruby',
+      'frlg': 'firered',
+      'dp': 'diamond',
+      'hgss': 'heartgold',
+      'bw': 'black',
+      'bw2': 'black-2',
+      'yellow': 'yellow',
+      'crystal': 'crystal',
+      'emerald': 'emerald',
+      'pt': 'platinum',
+    };
     for (final edition in GameEdition.all) {
       final asset = edition.iconAsset;
-      if (bundled.contains(edition.slug)) {
+      if (slugFiles.contains(edition.slug)) {
         expect(asset, 'assets/game_icons/${edition.slug}.png');
       } else {
-        expect(asset, isNull, reason: '${edition.slug} predates HOME icons');
+        final flavor = flavorFiles[edition.slug];
+        expect(
+          asset,
+          'assets/game_icons/$flavor.png',
+          reason: '${edition.slug} shows its primary flavor icon',
+        );
       }
     }
   });

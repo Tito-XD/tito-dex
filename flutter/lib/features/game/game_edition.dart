@@ -85,20 +85,35 @@ class GameEdition {
   /// PokeAPI version-group key used for in-game dex sprites.
   String get spriteVersionGroup => dataVersionGroupKey;
 
-  /// Bundled official Pokémon HOME game icon — only Gen VI+ titles have
-  /// square per-game icons (Nintendo never drew them for older games), so
-  /// earlier editions fall back to a version-tinted letter badge. Bundled in
-  /// the APK on purpose: 11 files ≈ 88 KB, no CDN round trip.
+  /// Bundled game icon — Gen VI+ titles use their Pokémon HOME game icon,
+  /// Gen I–V titles use the DS/3DS launch icon (via SteamGridDB), and the two
+  /// versions with no official icon (white-2, mega-dimension) use a Pokémon
+  /// artwork badge. Every flavor owns `<flavor>.png`; merged edition slugs
+  /// show the primary flavor's art. Bundled in the APK so there is no CDN
+  /// round trip.
   ///
   /// When a [selectedFlavor] is set, the matching per-flavor icon is used so
   /// X/Y, Sword/Shield, etc. show distinct art in the flavor picker.
   String? get iconAsset {
     final flavor = selectedFlavor;
     if (flavor != null) {
-      final flavorAsset = _flavorIconAsset(flavor);
-      if (flavorAsset != null) return flavorAsset;
+      return 'assets/game_icons/$flavor.png';
     }
     return switch (slug) {
+      // Older merged editions have no slug file of their own — show the
+      // primary flavor's icon for a consistent look.
+      'rgb' => 'assets/game_icons/red.png',
+      'gs' => 'assets/game_icons/gold.png',
+      'rs' => 'assets/game_icons/ruby.png',
+      'frlg' => 'assets/game_icons/firered.png',
+      'dp' => 'assets/game_icons/diamond.png',
+      'hgss' => 'assets/game_icons/heartgold.png',
+      'bw' => 'assets/game_icons/black.png',
+      'bw2' => 'assets/game_icons/black-2.png',
+      'yellow' => 'assets/game_icons/yellow.png',
+      'crystal' => 'assets/game_icons/crystal.png',
+      'emerald' => 'assets/game_icons/emerald.png',
+      'pt' => 'assets/game_icons/platinum.png',
       'xy' ||
       'oras' ||
       'sm' ||
@@ -113,28 +128,6 @@ class GameEdition {
       _ => null,
     };
   }
-
-  String? _flavorIconAsset(String flavor) => switch (flavor) {
-    'x' => 'assets/game_icons/x.png',
-    'y' => 'assets/game_icons/y.png',
-    'omega-ruby' => 'assets/game_icons/omega-ruby.png',
-    'alpha-sapphire' => 'assets/game_icons/alpha-sapphire.png',
-    'sun' => 'assets/game_icons/sun.png',
-    'moon' => 'assets/game_icons/moon.png',
-    'ultra-sun' => 'assets/game_icons/ultra-sun.png',
-    'ultra-moon' => 'assets/game_icons/ultra-moon.png',
-    'lets-go-pikachu' => 'assets/game_icons/lets-go-pikachu.png',
-    'lets-go-eevee' => 'assets/game_icons/lets-go-eevee.png',
-    'sword' => 'assets/game_icons/sword.png',
-    'shield' => 'assets/game_icons/shield.png',
-    'brilliant-diamond' => 'assets/game_icons/brilliant-diamond.png',
-    'shining-pearl' => 'assets/game_icons/shining-pearl.png',
-    'scarlet' => 'assets/game_icons/scarlet.png',
-    'violet' => 'assets/game_icons/violet.png',
-    'legends-za' => 'assets/game_icons/legends-za.png',
-    'mega-dimension' => 'assets/game_icons/mega-dimension.png',
-    _ => null,
-  };
 
   /// Representative version color for the letter-badge fallback.
   Color get accentColor => switch (slug) {

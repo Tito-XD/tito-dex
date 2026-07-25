@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
-"""Generate per-flavor game icons for editions with multiple versions.
+"""Generate the complete TitoDex game icon set from official sources.
 
-For the primary flavor we reuse the existing bundled official icon (e.g.
-xy.png -> x.png). For secondary flavors we download the real per-version icon
-from Nintendo's public servers:
+Source of truth (2026-07-25, confirmed with the project owner):
 
-- Switch titles: tinfoil.media serves the official 1024x1024 title icon.
-- 3DS titles: idbe-ctr.cdn.nintendo.net serves an encrypted IDBE blob; we
-  decrypt it with the public nn_idbe AES keys and extract the 48x48 RGB565
-  icon (8x8 tiled).
+- Gen 6+ flavors, merged edition slugs, and single editions (PLA, Z-A,
+  Champions): Pokémon HOME game icons via Bulbagarden archives
+  (128x128 PNG, one consistent family). Any file resolves through
+  https://archives.bulbagarden.net/wiki/Special:FilePath/<name>.
+- Gen 1-5 flavors: Nintendo DS/3DS launch icons via SteamGridDB
+  (cdn2.steamgriddb.com/icon/<hash>.png).
+- No official game icon exists for white-2 (SteamGridDB has no usable
+  direct link) or mega-dimension (no HOME icon): fall back to a Pokémon
+  artwork badge per the "game icon first, Pokémon as fallback" rule.
 
-The output is a 64x64 rounded-square PNG so all flavors share the same shape
-and shadow treatment as the bundled primary icons.
+Output: 64x64 rounded-square PNGs into flutter/assets/game_icons/ plus the
+merged-slug CDN set (dist/game_icons_upload/v5/game_icons/) for the flavor
+text rows that load https://dex.tito.cafe/v5/game_icons/<slug>.png.
 """
 
 from __future__ import annotations
@@ -19,103 +23,159 @@ from __future__ import annotations
 import io
 import subprocess
 import sys
+import time
 from pathlib import Path
-from typing import cast
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from build_dex_bundle import GAME_EDITIONS, GameEdition, optimize_png  # noqa: E402
+from build_dex_bundle import optimize_png  # noqa: E402
 
 ASSET_DIR = ROOT / "flutter" / "assets" / "game_icons"
-UPLOAD_DIR = ROOT / "dist" / "dex-v9" / "upload" / "v5" / "game_icons"
+CDN_DIR = ROOT / "dist" / "game_icons_upload" / "v5" / "game_icons"
+DOWNLOAD_CACHE = ROOT / "tools" / ".icon_cache"
 
-# Title IDs for per-flavor official icons.  Only editions with distinct
-# per-version artwork need entries here; single-flavor editions fall back to
-# the bundled edition slug icon.
-FLAVOR_TITLE_IDS: dict[str, tuple[str, str]] = {
-    # 3DS
-    "x": ("3ds", "0004000000055D00"),
-    "y": ("3ds", "0004000000055E00"),
-    "omega-ruby": ("3ds", "000400000011C400"),
-    "alpha-sapphire": ("3ds", "000400000011C500"),
-    "sun": ("3ds", "0004000000164800"),
-    "moon": ("3ds", "0004000000175E00"),
-    "ultra-sun": ("3ds", "00040000001B5000"),
-    "ultra-moon": ("3ds", "00040000001B5100"),
-    # Switch
-    "lets-go-pikachu": ("switch", "010003F003A34000"),
-    "lets-go-eevee": ("switch", "0100187003A36000"),
-    "sword": ("switch", "0100ABF008968000"),
-    "shield": ("switch", "01008DB008C2C000"),
-    "brilliant-diamond": ("switch", "0100000011D90000"),
-    "shining-pearl": ("switch", "010018E011D92000"),
-    "legends-arceus": ("switch", "01001F5010DFA000"),
-    "scarlet": ("switch", "0100A3D008C5C000"),
-    "violet": ("switch", "01008F6008C5E000"),
+BULBA_FILE = "https://archives.bulbagarden.net/media/upload/{}"
+SGDB_FILE = "https://cdn2.steamgriddb.com/icon/{}.png"
+POKEAPI_ART = (
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
+    "sprites/pokemon/other/official-artwork/{}.png"
+)
+
+# Gen 6+ flavors (and single editions) -> Pokémon HOME icon path under
+# /media/upload/ (wiki pages are Cloudflare-blocked for non-curl clients,
+# but direct media links work). Any new name resolves via
+# https://archives.bulbagarden.net/wiki/Special:FilePath/HOME_<Name>_icon.png
+HOME_ICONS: dict[str, str] = {
+    "x": "7/73/HOME_X_icon.png",
+    "y": "d/d5/HOME_Y_icon.png",
+    "omega-ruby": "b/b7/HOME_Omega_Ruby_icon.png",
+    "alpha-sapphire": "e/e3/HOME_Alpha_Sapphire_icon.png",
+    "sun": "7/7c/HOME_Sun_icon.png",
+    "moon": "2/25/HOME_Moon_icon.png",
+    "ultra-sun": "b/be/HOME_Ultra_Sun_icon.png",
+    "ultra-moon": "b/bb/HOME_Ultra_Moon_icon.png",
+    "lets-go-pikachu": "1/19/HOME_Let%27s_Go_Pikachu_icon.png",
+    "lets-go-eevee": "3/3f/HOME_Let%27s_Go_Eevee_icon.png",
+    "sword": "f/fe/HOME_Sword_icon.png",
+    "shield": "c/c8/HOME_Shield_icon.png",
+    "brilliant-diamond": "c/cf/HOME_Brilliant_Diamond_icon.png",
+    "shining-pearl": "7/75/HOME_Shining_Pearl_icon.png",
+    "scarlet": "2/29/HOME_Scarlet_icon.png",
+    "violet": "9/92/HOME_Violet_icon.png",
+    "legends-arceus": "b/ba/HOME_Legends_Arceus_icon.png",
+    "legends-za": "4/4c/HOME_Legends_Z-A_icon.png",
+    "champions": "6/65/HOME_Champions_icon.png",
 }
 
-# Public nn_idbe AES constants (from nn_idbe.rpl .rodata+0x4c).
-IDBE_IV = bytes.fromhex("A46987AE47D82BB4FA8ABC0450285FA4")
-IDBE_KEYS = [
-    bytes.fromhex(k)
-    for k in (
-        "4AB9A40E146975A84BB1B4F3ECEFC47B",
-        "90A0BB1E0E864AE87D13A6A03D28C9B8",
-        "FFBB57C14E98EC6975B384FCF40786B5",
-        "80923799B41F36A6A75FB8B48C95F66F",
-    )
-]
-
-FLAVOR_LABELS: dict[str, str] = {
-    "y": "Y",
-    "alpha-sapphire": "α",
-    "moon": "M",
-    "ultra-moon": "UM",
-    "lets-go-eevee": "E",
-    "shield": "Sh",
-    "shining-pearl": "SP",
-    "violet": "V",
-    "mega-dimension": "MD",
+# Gen 1-5 flavors -> SteamGridDB image hash (from the icon page URL).
+SGDB_ICONS: dict[str, str] = {
+    "red": "ef8ff3bb5f926198d139c3e9750a3739",
+    "blue": "e4e13c3ff0c5a77ff11d6cb979ba7187",
+    "yellow": "9cb9c75c1489b79a085eb7f56d82f2bf",
+    "gold": "c98e1bdd3a3a02c4c664baf039cf630b",
+    "silver": "4d88df11c5d0c37fe147eb1d94f1a06b",
+    "crystal": "9052eeb1dacdc32a450c59a90121fe66",
+    "ruby": "243153b1d3e9aae08821d40e3b402ffe",
+    "sapphire": "31482ea3105f2635db24a0077677930f",
+    "emerald": "5d12d5a76a9683536eb23a6a1c9767cc",
+    "firered": "a7c1543e35a5fbc383363e39ccb7701d",
+    "leafgreen": "e736598ba2c84d7313c8614de041cae3",
+    "diamond": "c1ba099b22d65b3903891b885dc686f9",
+    "pearl": "a979ca2444b34449a2c80b012749e9cd",
+    "platinum": "691f73fdf1c5edeb3f600c515715a358",
+    "heartgold": "33abbac390f933b4d29d1ccae857ea98",
+    "soulsilver": "1a371879ae7ae905850d5dee733f303e",
+    "black": "8d65294979cf7c59fa43f91f993fb5c2",
+    "white": "5b97f793636f8baec3ff8cd0ebf5c33c",
+    "black-2": "f4cbadcb99fd2c1fc88b97adfae24854",
 }
 
-FLAVOR_COLORS: dict[str, str] = {
-    "y": "#C2185B",
-    "alpha-sapphire": "#1565C0",
-    "moon": "#6A1B9A",
-    "ultra-moon": "#4A148C",
-    "lets-go-eevee": "#8D6E63",
-    "shield": "#C62828",
-    "shining-pearl": "#D81B60",
-    "violet": "#7B1FA2",
-    "mega-dimension": "#455A64",
+# Flavors with no official game icon -> (PokeAPI official-artwork id, bg top,
+# bg bottom). The mascot of the version/DLC.
+FALLBACK_ART_BADGES: dict[str, tuple[int, str, str]] = {
+    "white-2": (10023, "#8FB4D9", "#4E6E96"),  # Black Kyurem, icy gradient
+    "mega-dimension": (491, "#4A3A72", "#241E3E"),  # Darkrai, hyperspace night
+}
+
+# Merged edition slug -> flavor whose icon represents the merged entry.
+MERGED_TO_FLAVOR: dict[str, str] = {
+    # app slug icons (assets)
+    "xy": "x",
+    "oras": "omega-ruby",
+    "sm": "sun",
+    "usum": "ultra-sun",
+    "lgpe": "lets-go-pikachu",
+    "swsh": "sword",
+    "bdsp": "brilliant-diamond",
+    "pla": "legends-arceus",
+    "sv": "scarlet",
+    "lza": "legends-za",
+    "champions": "champions",
+}
+
+# CDN merged-slug file names (games.json + flavor text iconUrl) -> flavor.
+CDN_TO_FLAVOR: dict[str, str] = {
+    "red-blue": "red",
+    "yellow": "yellow",
+    "gold-silver": "gold",
+    "crystal": "crystal",
+    "ruby-sapphire": "ruby",
+    "emerald": "emerald",
+    "firered-leafgreen": "firered",
+    "diamond-pearl": "diamond",
+    "platinum": "platinum",
+    "heartgold-soulsilver": "heartgold",
+    "black-white": "black",
+    "black-2-white-2": "black-2",
+    "x-y": "x",
+    "omega-ruby-alpha-sapphire": "omega-ruby",
+    "sun-moon": "sun",
+    "ultra-sun-ultra-moon": "ultra-sun",
+    "lets-go-pikachu-lets-go-eevee": "lets-go-pikachu",
+    "sword-shield": "sword",
+    "brilliant-diamond-shining-pearl": "brilliant-diamond",
+    "legends-arceus": "legends-arceus",
+    "scarlet-violet": "scarlet",
+    "lza": "legends-za",
+    "champions": "champions",
 }
 
 
-def _find_bold_font() -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
-    candidates = [
-        ("/System/Library/Fonts/Helvetica.ttc", 0),
-        ("/System/Library/Fonts/HelveticaNeue.ttc", 0),
-        ("/Library/Fonts/Arial Bold.ttf", None),
-        ("/Library/Fonts/Arial.ttf", None),
-        ("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", None),
-    ]
-    for path, index in candidates:
-        file_path = Path(path)
-        if not file_path.exists():
-            continue
+def _http_get(url: str) -> bytes | None:
+    # Bulbagarden's Cloudflare throttles bursts aggressively; cache every
+    # download on disk so retries and re-runs never re-fetch.
+    import hashlib
+
+    cache_key = hashlib.sha1(url.encode()).hexdigest()[:16]
+    cache_path = DOWNLOAD_CACHE / f"{cache_key}.bin"
+    if cache_path.is_file():
+        return cache_path.read_bytes()
+
+    for attempt in range(4):
         try:
-            if index is not None and file_path.suffix.lower() == ".ttc":
-                return ImageFont.truetype(path, 16, index=index)
-            return ImageFont.truetype(path, 16)
-        except OSError:
-            continue
-    return ImageFont.load_default()
-
-
-_BOLD_FONT = _find_bold_font()
+            # Bulbagarden's Cloudflare is picky: HTTP/1.1 with a bare
+            # "Mozilla/5.0" UA passes; HTTP/2 resets and browser-looking UAs
+            # without a matching TLS fingerprint get 403/connection resets.
+            result = subprocess.run(
+                ["curl", "-sfL", "--http1.1", "-A", "Mozilla/5.0", url],
+                capture_output=True,
+                timeout=60,
+            )
+        except subprocess.TimeoutExpired:
+            print(f"  warn: fetch timeout {url}", file=sys.stderr)
+            return None
+        if result.returncode == 0 and result.stdout:
+            DOWNLOAD_CACHE.mkdir(parents=True, exist_ok=True)
+            cache_path.write_bytes(result.stdout)
+            return result.stdout
+        if attempt < 3:
+            # Bulbagarden rate-limits bursts; back off generously.
+            time.sleep(4.0 * (attempt + 1))
+    print(f"  warn: fetch failed {url}", file=sys.stderr)
+    return None
 
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
@@ -123,226 +183,16 @@ def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))  # type: ignore[return-value]
 
 
-def _lerp_channel(a: int, b: int, t: float) -> int:
-    return int(a + (b - a) * t)
-
-
-def _adjust_brightness(hex_color: str, factor: float) -> str:
-    r, g, b = _hex_to_rgb(hex_color)
-    if factor > 0:
-        r = _lerp_channel(r, 255, factor)
-        g = _lerp_channel(g, 255, factor)
-        b = _lerp_channel(b, 255, factor)
-    else:
-        t = -factor
-        r = _lerp_channel(r, 0, t)
-        g = _lerp_channel(g, 0, t)
-        b = _lerp_channel(b, 0, t)
-    return f"#{r:02x}{g:02x}{b:02x}"
-
-
-def _draw_rounded_gradient(
-    image: Image.Image,
-    bounds: tuple[int, int, int, int],
-    radius: int,
-    top_color: str,
-    bottom_color: str,
-) -> None:
-    width = bounds[2] - bounds[0]
-    height = bounds[3] - bounds[1]
-    gradient = Image.new("RGBA", (width, height))
-    tr, tg, tb = _hex_to_rgb(top_color)
-    br, bg, bb = _hex_to_rgb(bottom_color)
-    for y in range(height):
-        t = y / max(height - 1, 1)
-        r = _lerp_channel(tr, br, t)
-        g = _lerp_channel(tg, bg, t)
-        b = _lerp_channel(tb, bb, t)
-        for x in range(width):
-            gradient.putpixel((x, y), (r, g, b, 255))
-    mask = Image.new("L", (width, height), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.rounded_rectangle((0, 0, width - 1, height - 1), radius=radius, fill=255)
-    image.paste(gradient, bounds, mask)
-
-
-def _make_badge(flavor: str) -> bytes:
-    size = 64
-    pad = 4
-    radius = 12
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-
-    color = FLAVOR_COLORS.get(flavor, "#607D8B")
-    top_color = _adjust_brightness(color, 0.18)
-    bottom_color = _adjust_brightness(color, -0.15)
-    shadow_color = (0, 0, 0, 55)
-    border_color = (255, 255, 255, 55)
-    highlight_color = (255, 255, 255, 35)
-
-    draw.rounded_rectangle(
-        (pad + 2, pad + 2, size - pad + 2, size - pad + 2),
-        radius=radius,
-        fill=shadow_color,
-    )
-    _draw_rounded_gradient(
-        image,
-        (pad, pad, size - pad, size - pad),
-        radius,
-        top_color,
-        bottom_color,
-    )
-    draw.rounded_rectangle(
-        (pad + 1, pad + 1, size - pad - 1, size - pad - 1),
-        radius=radius - 1,
-        outline=border_color,
-        width=2,
-    )
-    draw.rounded_rectangle(
-        (pad + 3, pad + 2, size - pad - 3, pad + 5),
-        radius=3,
-        fill=highlight_color,
-    )
-
-    text = FLAVOR_LABELS.get(flavor, flavor[:2].upper())
-    font_size = 26 if len(text) <= 2 else (18 if len(text) == 3 else 14)
-    try:
-        if isinstance(_BOLD_FONT, ImageFont.FreeTypeFont):
-            font = ImageFont.truetype(cast(str, _BOLD_FONT.path), font_size)
-        else:
-            font = _BOLD_FONT
-    except OSError:
-        font = _BOLD_FONT
-
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(
-        ((size - tw) / 2, (size - th) / 2 - 1),
-        text,
-        fill=(255, 255, 255, 245),
-        font=font,
-        stroke_width=1,
-        stroke_fill=(0, 0, 0, 90),
-    )
-
-    buf = io.BytesIO()
-    image.save(buf, format="PNG", optimize=True)
-    return optimize_png(buf.getvalue(), max_width=64)
-
-
-def _http_get(url: str) -> bytes | None:
-    import urllib.request
-    import urllib.error
-    import ssl
-    import time
-
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/126.0.0.0 Safari/537.36"
-            ),
-        },
-    )
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, context=ctx, timeout=30) as response:
-                return response.read()
-        except urllib.error.HTTPError as exc:
-            if exc.code >= 500 and attempt < 2:
-                time.sleep(0.5 * (attempt + 1))
-                continue
-            print(f"  warn: fetch failed {url}: {exc}", file=sys.stderr)
-            return None
-        except Exception as exc:
-            print(f"  warn: fetch failed {url}: {exc}", file=sys.stderr)
-            return None
-    return None
-
-
-def _download_switch_icon(title_id: str) -> Image.Image | None:
-    url = f"https://tinfoil.media/ti/{title_id}/0/0/"
-    data = _http_get(url)
-    if data is None:
-        return None
-    try:
-        return Image.open(io.BytesIO(data)).convert("RGBA")
-    except Exception as exc:
-        print(f"  warn: cannot open Switch icon for {title_id}: {exc}", file=sys.stderr)
-        return None
-
-
-def _download_3ds_icon(title_id: str) -> Image.Image | None:
-    url = f"https://idbe-ctr.cdn.nintendo.net/icondata/10/{title_id}.idbe"
-    data = _http_get(url)
-    if data is None:
-        return None
-    if len(data) < 2:
-        return None
-    key_index = data[1]
-    if key_index >= len(IDBE_KEYS):
-        print(f"  warn: unknown key index {key_index} for {title_id}", file=sys.stderr)
-        return None
-    try:
-        from Crypto.Cipher import AES
-    except ImportError as exc:
-        print(
-            f"  warn: pycryptodome required for 3DS icon decryption: {exc}",
-            file=sys.stderr,
-        )
-        return None
-    cipher = AES.new(IDBE_KEYS[key_index], AES.MODE_CBC, IDBE_IV)
-    decrypted = cipher.decrypt(data[2:])
-    # Decrypted layout: 0x20 SHA256, 0x50 header, 0x200*16 title strings,
-    # then 24x24 RGB565 at 0x2050 and 48x48 RGB565 at 0x24D0.
-    icon_offset = 0x24D0
-    icon_size = 48 * 48 * 2
-    if len(decrypted) < icon_offset + icon_size:
-        print(f"  warn: decrypted IDBE too short for {title_id}", file=sys.stderr)
-        return None
-    raw = decrypted[icon_offset : icon_offset + icon_size]
-    return _decode_rgb565_tiled(raw, 48, 48)
-
-
-def _decode_rgb565_tiled(raw: bytes, width: int, height: int) -> Image.Image:
-    """Decode a 3DS RGB565 icon stored as 8x8 tiles."""
-    image = Image.new("RGBA", (width, height))
-    tile_size = 8
-    tiles_x = width // tile_size
-    tiles_y = height // tile_size
-    idx = 0
-    for ty in range(tiles_y):
-        for tx in range(tiles_x):
-            for y in range(tile_size):
-                for x in range(tile_size):
-                    px = tx * tile_size + x
-                    py = ty * tile_size + y
-                    value = raw[idx] | (raw[idx + 1] << 8)
-                    idx += 2
-                    r = ((value >> 11) & 0x1F) << 3
-                    g = ((value >> 5) & 0x3F) << 2
-                    b = (value & 0x1F) << 3
-                    image.putpixel((px, py), (r, g, b, 255))
-    return image
-
-
 def _render_rounded_icon(source: Image.Image) -> bytes:
+    """Resize to 64x64 and clip to the shared rounded-square shape."""
     size = 64
     radius = 12
-    # Resize using Lanczos to keep crisp edges on the 48x48 3DS icons.
     resized = source.resize((size, size), Image.Resampling.LANCZOS)
 
-    # Build a rounded mask.
     mask = Image.new("L", (size, size), 0)
     draw = ImageDraw.Draw(mask)
     draw.rounded_rectangle((0, 0, size - 1, size - 1), radius=radius, fill=255)
 
-    # Composite onto a transparent canvas with a soft drop shadow.
     canvas = Image.new("RGBA", (size + 4, size + 4), (0, 0, 0, 0))
     shadow = Image.new("RGBA", (size, size), (0, 0, 0, 55))
     shadow.putalpha(mask)
@@ -357,55 +207,98 @@ def _render_rounded_icon(source: Image.Image) -> bytes:
     return optimize_png(buf.getvalue(), max_width=64)
 
 
-def _download_official_icon(flavor: str) -> bytes | None:
-    mapping = FLAVOR_TITLE_IDS.get(flavor)
-    if mapping is None:
+def _download_image(url: str) -> Image.Image | None:
+    data = _http_get(url)
+    # Pace requests: Bulbagarden 403s bursts even from curl.
+    time.sleep(3.0)
+    if data is None:
         return None
-    platform, title_id = mapping
-    print(f"  downloading {platform} icon for {flavor} ({title_id})...")
-    if platform == "switch":
-        image = _download_switch_icon(title_id)
-    else:
-        image = _download_3ds_icon(title_id)
-    if image is None:
+    try:
+        return Image.open(io.BytesIO(data)).convert("RGBA")
+    except Exception as exc:
+        print(f"  warn: cannot decode {url}: {exc}", file=sys.stderr)
         return None
-    return _render_rounded_icon(image)
 
 
-def _build_flavor_icon(edition: GameEdition, flavor: str) -> bytes:
-    flavors = list(edition.flavor_versions)
-    if flavors and flavors[0] == flavor:
-        # Primary flavor: reuse the bundled official merged icon.
-        source = ASSET_DIR / f"{edition.slug}.png"
-        if source.exists():
-            return optimize_png(source.read_bytes(), max_width=64)
+def _gradient_background(size: int, top: str, bottom: str) -> Image.Image:
+    top_rgb, bottom_rgb = _hex_to_rgb(top), _hex_to_rgb(bottom)
+    image = Image.new("RGBA", (size, size))
+    for y in range(size):
+        t = y / max(size - 1, 1)
+        rgb = tuple(int(top_rgb[c] + (bottom_rgb[c] - top_rgb[c]) * t) for c in range(3))
+        for x in range(size):
+            image.putpixel((x, y), (*rgb, 255))
+    return image
 
-    # Secondary flavor: try an official per-version icon first.
-    official = _download_official_icon(flavor)
-    if official is not None:
-        return official
 
-    # Fallback to the generated badge so the UI never breaks.
-    return _make_badge(flavor)
+def _build_art_badge(pokemon_id: int, top: str, bottom: str) -> bytes | None:
+    art = _download_image(POKEAPI_ART.format(pokemon_id))
+    if art is None:
+        return None
+    size = 64
+    background = _gradient_background(size, top, bottom)
+    padded = art.copy()
+    padded.thumbnail((size - 10, size - 10), Image.Resampling.LANCZOS)
+    background.paste(
+        padded,
+        ((size - padded.width) // 2, (size - padded.height) // 2),
+        padded,
+    )
+    return _render_rounded_icon(background)
+
+
+def _flavor_png(flavor: str) -> bytes | None:
+    if flavor in HOME_ICONS:
+        image = _download_image(BULBA_FILE.format(HOME_ICONS[flavor]))
+        if image is not None:
+            return _render_rounded_icon(image)
+    if flavor in SGDB_ICONS:
+        image = _download_image(SGDB_FILE.format(SGDB_ICONS[flavor]))
+        if image is not None:
+            return _render_rounded_icon(image)
+    if flavor in FALLBACK_ART_BADGES:
+        pokemon_id, top, bottom = FALLBACK_ART_BADGES[flavor]
+        return _build_art_badge(pokemon_id, top, bottom)
+    return None
 
 
 def main() -> None:
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    CDN_DIR.mkdir(parents=True, exist_ok=True)
 
-    generated: list[tuple[str, bytes]] = []
-    for edition in GAME_EDITIONS:
-        if len(edition.flavor_versions) <= 1:
+    flavors = sorted(set(HOME_ICONS) | set(SGDB_ICONS) | set(FALLBACK_ART_BADGES))
+    rendered: dict[str, bytes] = {}
+    for flavor in flavors:
+        png = _flavor_png(flavor)
+        if png is None:
+            print(f"  !! no icon produced for {flavor}", file=sys.stderr)
             continue
-        for flavor in edition.flavor_versions:
-            png = _build_flavor_icon(edition, flavor)
-            filename = f"{flavor}.png"
-            (ASSET_DIR / filename).write_bytes(png)
-            (UPLOAD_DIR / filename).write_bytes(png)
-            generated.append((filename, png))
-            print(f"→ {filename} ({len(png)} bytes)")
+        rendered[flavor] = png
+        (ASSET_DIR / f"{flavor}.png").write_bytes(png)
+        print(f"→ {flavor}.png ({len(png)} bytes)")
 
-    print(f"\nGenerated {len(generated)} flavor icons.")
+    # Merged app slug icons reuse the primary flavor's art.
+    for slug, flavor in MERGED_TO_FLAVOR.items():
+        png = rendered.get(flavor) or _flavor_png(flavor)
+        if png is None:
+            print(f"  !! no merged icon for {slug} (flavor {flavor})", file=sys.stderr)
+            continue
+        (ASSET_DIR / f"{slug}.png").write_bytes(png)
+        print(f"→ {slug}.png (merged, from {flavor})")
+
+    # CDN merged-slug set for games.json / flavor-text iconUrl rows.
+    for name, flavor in CDN_TO_FLAVOR.items():
+        png = rendered.get(flavor) or _flavor_png(flavor)
+        if png is None:
+            print(f"  !! no CDN icon for {name} (flavor {flavor})", file=sys.stderr)
+            continue
+        (CDN_DIR / f"{name}.png").write_bytes(png)
+        print(f"→ cdn {name}.png (from {flavor})")
+
+    print(
+        f"\nGenerated {len(rendered)} flavor icons, "
+        f"{len(MERGED_TO_FLAVOR)} merged assets, {len(CDN_TO_FLAVOR)} CDN files."
+    )
 
 
 if __name__ == "__main__":

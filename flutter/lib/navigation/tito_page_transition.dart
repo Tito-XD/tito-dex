@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../theme/tito_colors.dart';
@@ -20,10 +22,15 @@ const titoDexReverseTransitionDuration = Duration(milliseconds: 280);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
-/// A Material page lets Android provide the standard route transition.
-///
+/// A Material page lets Android provide the standard route transition. It
+/// still goes through the controlled route so every page shares the same
+/// predictive-back fixes (commit-runway clamp, static underlying pages).
 Page<T> titoMaterialPage<T>({required LocalKey key, required Widget child}) {
-  return MaterialPage<T>(key: key, child: child);
+  return _TitoControlledMaterialPage<T>(
+    key: key,
+    kind: _TitoMaterialPageKind.plain,
+    child: child,
+  );
 }
 
 /// Home keeps the standard Material route so Android's root predictive-back
@@ -80,7 +87,7 @@ Page<T> titoSideSlidePage<T>({
   return _TitoSideSlidePage<T>(key: key, direction: direction, child: child);
 }
 
-enum _TitoMaterialPageKind { home, dex }
+enum _TitoMaterialPageKind { home, dex, plain }
 
 class _TitoControlledMaterialPage<T> extends Page<T> {
   const _TitoControlledMaterialPage({
@@ -125,6 +132,23 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   // page scales away over home (the Hero stays put thanks to
   // transitionOnUserGestures: false) and the commit plays a fade-out.
 
+  /// Minimum controller value while a predictive-back drag is in progress.
+  ///
+  /// The framework drives the controller to exactly 0.0 when the finger
+  /// reaches the far edge. On commit, [TransitionRoute.didPop] then runs
+  /// `reverse()` over zero distance and the "restart from 1.0" commit
+  /// animation is skipped — the page vanishes with no fade at all. Clamping
+  /// a tiny runway keeps the commit fade (and its full-length restart)
+  /// guaranteed to play, with no visible difference during the drag.
+  static const double _kBackGestureRunway = 0.02;
+
+  @override
+  void handleUpdateBackGestureProgress({required double progress}) {
+    super.handleUpdateBackGestureProgress(
+      progress: math.max(_kBackGestureRunway, progress),
+    );
+  }
+
   @override
   Duration get transitionDuration => _page.kind == _TitoMaterialPageKind.dex
       ? titoDexTransitionDuration
@@ -143,7 +167,25 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
+    final isDexWithOverlay =
+        _page.kind == _TitoMaterialPageKind.dex && _page.overlay != null;
+
+    // While a predictive-back gesture is active on a route ABOVE this one,
+    // keep this page completely static. The framework's shared-element
+    // transition would otherwise corner-clip and y-shift this route with the
+    // finger, then snap it back on commit/cancel — the release flash. The
+    // gesture drives every route's rebuild because popGestureInProgress is
+    // navigator-wide.
+    if (popGestureInProgress && !isCurrent) {
+      return isDexWithOverlay
+          ? Stack(
+              fit: StackFit.expand,
+              children: [child, _page.overlay!],
+            )
+          : child;
+    }
+
+    if (!isDexWithOverlay) {
       return super.buildTransitions(
         context,
         animation,
@@ -155,17 +197,29 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     // predictive-back gesture moves the entire page (shell + content) together.
     // During the Hero expansion the content sits at opacity 0 behind the Hero
     // overlay and only fades in once the shell has landed.
+    //
+    // During a pop gesture the content must NOT fade ahead of the page: the
+    // gesture drives the route animation towards 0 (and commit restarts it
+    // from 1.0), which made the content blink out and back. Force full
+    // opacity for the whole gesture; the framework's commit fade handles the
+    // exit for shell and content as one surface.
     final pageWithOverlay = Stack(
       fit: StackFit.expand,
       children: [
         child,
         FadeTransition(
           key: const ValueKey<String>('tito-dex-content-reveal'),
-          opacity: CurvedAnimation(
-            parent: animation,
-            curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
-            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
-          ),
+          opacity: popGestureInProgress
+              ? kAlwaysCompleteAnimation
+              : CurvedAnimation(
+                  parent: animation,
+                  curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
+                  reverseCurve: const Interval(
+                    0.55,
+                    1,
+                    curve: Curves.easeInCubic,
+                  ),
+                ),
           child: _page.overlay!,
         ),
       ],
@@ -180,10 +234,13 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
 
   @override
   bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
-    if (_page.kind == _TitoMaterialPageKind.home &&
-        (nextRoute is _TitoSideSlidePageRoute ||
-            nextRoute is _TitoControlledMaterialPageRoute &&
-                nextRoute._page.kind == _TitoMaterialPageKind.dex)) {
+    // Keep every Tito page fully visible and static underneath pushed pages.
+    // FadeForwards would otherwise fade the underlying page to opacity 0 as
+    // its "covered" state and cross-fade it back in over the slateBlue
+    // backdrop — a flash on every programmatic push/pop.
+    if (nextRoute is _TitoSideSlidePageRoute ||
+        nextRoute is _TitoControlledMaterialPageRoute ||
+        nextRoute is MaterialPageRoute) {
       return false;
     }
     return super.canTransitionTo(nextRoute);

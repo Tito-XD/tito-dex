@@ -50,6 +50,12 @@ void main() {
       tester.widget<Hero>(find.byType(Hero)).transitionOnUserGestures,
       isFalse,
     );
+
+    // Predictive-back drags keep a runway above 0 so a full-edge commit
+    // always plays the framework fade instead of vanishing instantly.
+    route.handleUpdateBackGestureProgress(progress: 0.0);
+    expect(route.animation?.value, greaterThan(0.0));
+    route.handleUpdateBackGestureProgress(progress: 1.0);
   });
 
   testWidgets('Dex shell expands before its list cards fade in', (
