@@ -55,6 +55,8 @@ flutter/lib/
 
 ## Dex CDN (maintainers)
 
+Bundle version and CDN prefix are **decoupled** — every release since v7 has patched in place over `/v5/`, so a new prefix is not needed for new fields (see `docs/CLOUDFLARE_DEX_CDN.md`).
+
 R2-proxy Worker lives in `cloudflare/dex-cdn/` (deploy branch `deploy/dex-cdn`); config in `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env). Bundles are immutable per prefix (`/v5/` current, `/v4/` rollback). Release order: upload+verify every immutable object, update root `bundle-manifest.json` **last**, never overwrite `/v4/`. Worker uses the dedicated `MANIFEST_KV` namespace — never bind the unrelated `FODI_CACHE`. Details: `docs/CLOUDFLARE_DEX_CDN.md`, secrets in `docs/PERMISSIONS.md`.
 
 ## Guardrails
@@ -63,6 +65,8 @@ R2-proxy Worker lives in `cloudflare/dex-cdn/` (deploy branch `deploy/dex-cdn`);
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`); GitHub artifacts (commits, PRs, releases) in **English** unless asked otherwise.
 - **Never** paste production CDN URLs into README / release notes / user-facing copy.
 - No runtime 52poke/PokeAPI fetches for the zh catalog in the app; hand-drawn nav icons ship as APK assets only, never on CDN.
+- **Bundles carry slugs, the app carries labels.** Anything a user reads (body style, colour, growth rate, habitat names) belongs in `flutter/lib/l10n/` or `dex_search_terms.dart`, never baked into the bundle — `/v5/` objects are immutable, so a label typo there costs a full republish.
+- **Searchable fields live on the summary.** Search reads `summaries.json` only; putting a searchable field in `details/<id>.json` means walking 1025 files. That is why `genusZh` and `heightDm` are duplicated onto the summary.
 - Don't expand TitoDex into a full wiki mirror or competitive simulator without an explicit product decision.
 - Don't overwrite the manual journey timeline on save import without the merge rules in `docs/PARSER_PROPOSAL.md`.
 - When torn between reference breadth and playthrough utility, choose **playthrough utility**.
