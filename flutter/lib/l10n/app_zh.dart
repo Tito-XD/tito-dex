@@ -172,6 +172,13 @@ abstract final class AppZh {
   static String dexGenderFemale(double percent) =>
       '雌性 ${percent.toStringAsFixed(1)}%';
   static const dexEggGroups = '生蛋分组';
+  static const dexGrowthRate = '经验组';
+  static const dexBaseExperience = '基础经验值';
+  static const dexHabitat = '栖息地';
+  static const dexGenderDifferences = '性别外观差异';
+  static const dexGenderDifferencesYes = '有';
+  static const dexSpeciesAxes = '体形 · 颜色 · 大小';
+  static String dexShapeBeforeGen6(String label) => '$label（六代前）';
   static const dexHatchSteps = '孵化步数';
   static const dexNoEvolution = '没有进化链记录。';
   static const dexMovesHgssScope = '以下招式范围：心金 / 魂银';
@@ -225,6 +232,14 @@ abstract final class AppZh {
   static String dexFilterByEggGroup(String name) => '蛋群：$name';
   static const dexFilterClear = '清除筛选';
   static const dexFilterActive = '已启用图鉴筛选';
+  static const dexSpeciesFilterOpen = '体形筛选';
+  static const dexSpeciesFilterTitle = '按体形 · 颜色 · 大小筛选';
+  static const dexSpeciesFilterShape = '体形';
+  static const dexSpeciesFilterColor = '颜色';
+  static const dexSpeciesFilterColorHint = '可多选：图鉴配色没有橙色，橙色系请同时选「棕」和「红」';
+  static const dexSpeciesFilterSize = '大小';
+  static const dexSpeciesFilterReset = '重置';
+  static const dexSpeciesFilterApply = '查看结果';
   static String dexFilterByMove(String name) => '招式 · $name';
   static String dexFilterByAbility(String name) => '特性 · $name';
   static String dexFilterMoveLabel(String name) => dexFilterByMove(name);
@@ -240,6 +255,16 @@ abstract final class AppZh {
   static const settingsDexOfflineUnset = '尚未下载离线数据包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
+  static const settingsDexVerify = '校验离线数据';
+  static const settingsDexVerifyRunning = '正在校验…';
+  static const settingsDexVerifyNoData = '尚未安装离线数据包，无需校验。';
+  static String settingsDexVerifyOk(int pokemonCount) =>
+      '校验通过：$pokemonCount 只宝可梦的离线资料完整。';
+  static String settingsDexVerifyProblems(int missingDetails) =>
+      '发现问题：缺失 $missingDetails 份详情资料，建议重新下载数据包。';
+  static const settingsDexVerifyIncomplete = '离线数据不完整（下载未完成或索引缺失），建议继续或重新下载数据包。';
+  static String settingsDexVerifySpriteNote(int missingSprites) =>
+      '另有 $missingSprites 张图片缺失（在线时会自动回退加载）。';
   static String settingsDexOfflineReady(
     int pokemonCount,
     int moveCount,
@@ -302,7 +327,9 @@ abstract final class AppZh {
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
   static const searchPrompt = '搜索宝可梦';
-  static const searchEmptyHint = '可搜索 1–1025 号宝可梦的中文名、英文名、编号或属性。';
+  static const searchEmptyHint =
+      '可搜索 1–1025 号宝可梦的中文名、英文名、编号、分类或属性。空格分隔可叠加条件，如「四足 棕」。';
+  static const searchSuggestionTitle = '试试这些';
   static const searchRecent = '最近搜索';
   static const searchRecentClear = '清空';
   static const settingsSwitchGame = '更换';

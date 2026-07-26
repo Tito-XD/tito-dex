@@ -12,9 +12,9 @@ import 'dex_models.dart';
 import 'dex_offline_service.dart';
 import 'dex_progress.dart';
 import 'dex_scope.dart';
+import 'dex_search_terms.dart';
 import 'dex_settings_repository.dart';
 import 'pokeapi_client.dart';
-import 'type_chart.dart';
 
 /// Data priority: Settings-installed offline bundle → live pre-built dex CDN
 /// (summaries + per-id details) → PokeAPI.
@@ -338,62 +338,63 @@ class DexRepository {
     ];
   }
 
+  /// Multi-word dex search.
+  ///
+  /// Each whitespace-separated word resolves to one constraint (type, body
+  /// style, colour, generation, tag, or plain text) and the words are ANDed, so
+  /// 「四足 棕」 narrows to brown quadrupeds. A single word behaves like the old
+  /// substring search, which keeps every existing entry point working.
   Future<List<PokemonSummary>> search(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
       return const [];
     }
 
+    final constraints = parseDexSearchQuery(trimmed);
+    if (constraints.isEmpty) {
+      return const [];
+    }
+
     final all = await getAllSummaries();
-    final lower = trimmed.toLowerCase();
-    final numeric = int.tryParse(trimmed);
-
-    final matches = all.where((entry) {
-      if (numeric != null && entry.id == numeric) {
-        return true;
-      }
-      if (entry.id.toString().contains(trimmed)) {
-        return true;
-      }
-      if (entry.nameEn.toLowerCase().contains(lower)) {
-        return true;
-      }
-      if (entry.nameZh.contains(trimmed)) {
-        return true;
-      }
-      if (entry.formSearchTerms.any(
-        (term) => term.toLowerCase().contains(lower) || term.contains(trimmed),
-      )) {
-        return true;
-      }
-      if (entry.types.any((type) => typeNameZh(type).contains(trimmed))) {
-        return true;
-      }
-      return false;
-    }).toList();
-
-    return matches;
+    return all
+        .where((entry) => dexQueryMatches(constraints, entry))
+        .toList(growable: false);
   }
 
+  /// Resolve a filter to the species that satisfy **every** active axis.
+  ///
+  /// Reference drill-downs (move / ability / egg group) each need their own
+  /// reverse index, so at most one of those is applied; the stackable species
+  /// axes (body style, colour, generation, tag) then narrow that result — or
+  /// the whole dex when no drill-down is set.
   Future<List<PokemonSummary>> filterSummaries(DexFilter filter) async {
     if (!filter.isActive) {
       return getAllSummaries();
     }
 
+    List<PokemonSummary>? base;
     if (filter.learnsMoveId != null) {
       final ids = await findPokemonWithMove(filter.learnsMoveId!);
-      return getSummariesForIds(ids);
+      base = await getSummariesForIds(ids);
+    } else if (filter.abilityId != null) {
+      base = await findByAbility(filter.abilityId!);
+    } else if (filter.eggGroupSlug != null) {
+      base = await findByEggGroup(filter.eggGroupSlug!);
     }
 
-    if (filter.abilityId != null) {
-      return findByAbility(filter.abilityId!);
+    if (base == null) {
+      if (!filter.hasSpeciesAxis) {
+        return const [];
+      }
+      base = await getAllSummaries();
     }
 
-    if (filter.eggGroupSlug != null) {
-      return findByEggGroup(filter.eggGroupSlug!);
+    if (!filter.hasSpeciesAxis) {
+      return base;
     }
-
-    return const [];
+    return base
+        .where(filter.matchesSpeciesAxes)
+        .toList(growable: false);
   }
 
   Future<List<int>> findPokemonWithMove(int moveId) async {
