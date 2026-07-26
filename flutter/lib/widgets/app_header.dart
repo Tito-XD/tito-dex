@@ -32,10 +32,11 @@ class AppHeader extends StatelessWidget {
     final barHeight = DeviceLayout.headerBarHeight(context);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: square ? 4 : (compact ? 8 : 16)),
+      padding: EdgeInsets.only(bottom: square ? 2 : (compact ? 4 : 8)),
       child: SizedBox(
         height: barHeight,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: Align(

@@ -253,7 +253,7 @@ abstract final class DeviceLayout {
 
   static double headerBarHeight(BuildContext context) {
     final title = headerTitleSize(context);
-    return title + 4.0; // tight fit with the icon row
+    return title + 16.0; // room for border stroke + visual breathing
   }
 
   static double dexBackControlSize(BuildContext context) => dim(context, 40.0);
