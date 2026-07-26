@@ -19,6 +19,20 @@ import '../../widgets/type_badge.dart';
 
 typedef DexReferenceFilter<T> = bool Function(T entry, String query);
 
+/// Optional category filter configuration for the reference list.
+class DexReferenceCategoryFilter<T> {
+  const DexReferenceCategoryFilter({
+    required this.options,
+    required this.label,
+    required this.filter,
+  });
+
+  /// Ordered category labels (null = "全部").
+  final List<String?> options;
+  final String Function(T entry) label;
+  final bool Function(T entry, String? category) filter;
+}
+
 class DexReferenceListPage<T> extends StatefulWidget {
   const DexReferenceListPage({
     super.key,
@@ -28,6 +42,8 @@ class DexReferenceListPage<T> extends StatefulWidget {
     required this.primaryLabel,
     required this.secondaryLabel,
     required this.detailSheet,
+    this.leadingBuilder,
+    this.categoryFilter,
   });
 
   final String title;
@@ -36,6 +52,8 @@ class DexReferenceListPage<T> extends StatefulWidget {
   final String Function(T entry) primaryLabel;
   final String Function(T entry) secondaryLabel;
   final void Function(BuildContext context, T entry) detailSheet;
+  final Widget? Function(T entry)? leadingBuilder;
+  final DexReferenceCategoryFilter<T>? categoryFilter;
 
   @override
   State<DexReferenceListPage<T>> createState() =>
@@ -45,6 +63,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
 class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   final _queryController = TextEditingController();
   List<T> _entries = const [];
+  String? _selectedCategory;
   bool _loading = true;
   String? _error;
 
@@ -88,12 +107,20 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
 
   List<T> get _visible {
     final query = _queryController.text.trim().toLowerCase();
-    if (query.isEmpty) {
-      return _entries;
+    var list = _entries;
+    // Category filter.
+    final catFilter = widget.categoryFilter;
+    final cat = _selectedCategory;
+    if (catFilter != null && cat != null) {
+      list = list.where((e) => catFilter.filter(e, cat)).toList();
     }
-    return _entries
-        .where((entry) => widget.filterEntry(entry, query))
-        .toList(growable: false);
+    // Text search.
+    if (query.isNotEmpty) {
+      list = list
+          .where((entry) => widget.filterEntry(entry, query))
+          .toList(growable: false);
+    }
+    return list;
   }
 
   @override
@@ -117,6 +144,14 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
           ),
         ),
         const SizedBox(height: 12),
+        if (widget.categoryFilter != null)
+          _CategoryFilterChips<T>(
+            options: widget.categoryFilter!.options,
+            label: widget.categoryFilter!.label,
+            entries: _entries,
+            selected: _selectedCategory,
+            onSelected: (cat) => setState(() => _selectedCategory = cat),
+          ),
         if (_loading)
           const TitoLoadingPanel(message: AppZh.referenceLoading, compact: true)
         else if (_error != null)
@@ -181,6 +216,10 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                           ),
                           child: Row(
                             children: [
+                              if (widget.leadingBuilder != null) ...[
+                                widget.leadingBuilder!(entry) ?? const SizedBox(width: 4),
+                                const SizedBox(width: 10),
+                              ],
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,4 +426,52 @@ bool filterCachedAbility(CachedAbility ability, String query) {
       ability.nameEn.toLowerCase().contains(query) ||
       ability.descriptionZh.contains(query) ||
       ability.id.toString().contains(query);
+}
+
+class _CategoryFilterChips<T> extends StatelessWidget {
+  const _CategoryFilterChips({
+    required this.options,
+    required this.label,
+    required this.entries,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<String?> options;
+  final String Function(T entry) label;
+  final List<T> entries;
+  final String? selected;
+  final ValueChanged<String?> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        itemCount: options.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          final cat = options[index];
+          final sel = selected == cat;
+          final count = cat == null
+              ? entries.length
+              : entries.where((e) => label(e) == cat).length;
+          return FilterChip(
+            selected: sel,
+            label: Text('${cat ?? "全部"} ($count)', style: const TextStyle(fontSize: 11)),
+            onSelected: (_) => onSelected(sel ? null : cat),
+            backgroundColor: TitoColors.card,
+            selectedColor: TitoColors.mint,
+            checkmarkColor: TitoColors.deepBlue,
+            side: BorderSide(
+              color: sel ? TitoColors.mint : TitoColors.ink.withValues(alpha: 0.2),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

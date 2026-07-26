@@ -145,14 +145,6 @@ List<_QuickAction> _quickActions() {
       iconAsset: 'assets/icons/Search.png',
       tileColor: const Color(0xFFDFF1F9),
     ),
-    _QuickAction(
-      label: AppZh.navItems,
-      icon: Icons.category_rounded,
-      route: '/items',
-      tone: TitoPolaroidTone.coral,
-      iconAsset: null, // Uses Icons.category_rounded
-      tileColor: const Color(0xFFFCE4EC),
-    ),
   ];
 }
 
@@ -163,7 +155,7 @@ class _QuickAction {
     required this.route,
     this.heroTag,
     required this.tone,
-    this.iconAsset,
+    required this.iconAsset,
     required this.tileColor,
   });
 
@@ -174,7 +166,7 @@ class _QuickAction {
   final TitoPolaroidTone tone;
 
   /// Hand-drawn transparent icon, shown directly on the tile (no frame).
-  final String? iconAsset;
+  final String iconAsset;
 
   /// Pastel card tint close to the icon's main color.
   final Color tileColor;

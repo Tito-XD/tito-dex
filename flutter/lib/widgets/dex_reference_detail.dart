@@ -9,6 +9,7 @@ import '../l10n/game_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/sticker_card.dart';
+import 'dex_sprite_image.dart';
 import 'type_badge.dart';
 
 enum DexReferenceKind {
@@ -389,16 +390,25 @@ class ItemReferenceDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final category =
         entry['category'] as String? ?? entry['categoryEn'] as String?;
-    final categoryLabel = itemCategoryLabelZh(category);
+    final categoryLabel = itemCategoryLabelZh(category) != ''
+        ? itemCategoryLabelZh(category)
+        : (entry['categoryZh'] as String? ?? '');
     final costLabel = itemCostLabel(entry['cost']);
     final effect =
         referenceDescriptionZh(entry) ??
         entry['effectZh'] as String? ??
         entry['shortEffectZh'] as String?;
+    final spriteUrl = entry['spriteUrl'] as String?;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (spriteUrl != null) ...[
+          Center(
+            child: DexSpriteImage(source: spriteUrl, width: 48, height: 48),
+          ),
+          const SizedBox(height: 8),
+        ],
         if (categoryLabel.isNotEmpty) ...[
           Align(
             alignment: Alignment.centerLeft,
