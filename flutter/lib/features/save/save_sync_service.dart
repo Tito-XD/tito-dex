@@ -1,4 +1,5 @@
 import '../../models/journey.dart';
+import '../game/game_edition_repository.dart';
 import '../parser/pokemon_save_parser.dart';
 import 'save_document_source.dart';
 import 'save_file_repository.dart';
@@ -11,13 +12,16 @@ class SaveSyncService {
     SaveFileRepository? fileRepository,
     PokemonSaveParser? parser,
     SaveDocumentSource? documentSource,
+    GameEditionRepository? editionRepository,
   }) : _fileRepository = fileRepository ?? SaveFileRepository(),
        _parser = parser ?? const PokemonSaveParser(),
-       _documentSource = documentSource ?? PlatformSaveDocumentSource();
+       _documentSource = documentSource ?? PlatformSaveDocumentSource(),
+       _editionRepository = editionRepository ?? gameEditionRepository;
 
   final SaveFileRepository _fileRepository;
   final PokemonSaveParser _parser;
   final SaveDocumentSource _documentSource;
+  final GameEditionRepository _editionRepository;
 
   Future<SaveFileConfig> loadConfig() => _fileRepository.load();
 
@@ -150,6 +154,10 @@ class SaveSyncService {
       lastLoadedFileName: document.fileName,
     );
     await _fileRepository.save(nextConfig);
+    // Keep the global game version in step with the imported save. An
+    // explicit pick (force) always applies; startup re-syncs only apply when
+    // the save's game changed, so they never fight a manual edition choice.
+    await _editionRepository.applyForSaveGame(summary.game, force: force);
     return SaveSyncResult(
       journey: journey,
       updated: true,
