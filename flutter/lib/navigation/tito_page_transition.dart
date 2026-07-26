@@ -125,12 +125,13 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   @override
   bool get fullscreenDialog => false;
 
-  // Note: popGestureEnabled intentionally uses the MaterialRouteTransitionMixin
-  // default for every kind, dex included. The dex route used to disable it,
-  // which made Android play the system back-to-home window animation on
-  // release — the "flash out on release" glitch. With the default, the whole
-  // page scales away over home (the Hero stays put thanks to
-  // transitionOnUserGestures: false) and the commit plays a fade-out.
+  // The dex route's Hero expand/collapse animation conflicts with Android's
+  // predictive-back gesture (the reveal animation replays and the two systems
+  // fight over the transition).  Disable the gesture for dex so the shell
+  // only responds to the explicit back button / Hero collapse.
+  @override
+  bool get popGestureEnabled =>
+      _page.kind == _TitoMaterialPageKind.dex ? false : super.popGestureEnabled;
 
   /// Minimum controller value while a predictive-back drag is in progress.
   ///

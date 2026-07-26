@@ -172,7 +172,7 @@ class _HeaderIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = DeviceLayout.headerIconSize(context);
-    final iconSize = size * 0.55;
+    final iconSize = size * 0.62;
 
     return HandheldFocusDecorator(
       onActivate: onTap,

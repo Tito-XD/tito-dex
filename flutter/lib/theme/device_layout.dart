@@ -241,10 +241,7 @@ abstract final class DeviceLayout {
   static double rLg(BuildContext context) => radius(context, TitoRadii.lg);
 
   static double headerIconSize(BuildContext context) {
-    final raw = useSquareDashboard(context)
-        ? 72.0
-        : (isCompact(context) ? 68.0 : 80.0);
-    return dim(context, raw);
+    return headerTitleSize(context);
   }
 
   static double headerTitleSize(BuildContext context) {
@@ -255,10 +252,8 @@ abstract final class DeviceLayout {
   }
 
   static double headerBarHeight(BuildContext context) {
-    final raw = useSquareDashboard(context)
-        ? 80.0
-        : (isCompact(context) ? 72.0 : 80.0);
-    return dim(context, raw);
+    final title = headerTitleSize(context);
+    return title + 4.0; // tight fit with the icon row
   }
 
   static double dexBackControlSize(BuildContext context) => dim(context, 40.0);
