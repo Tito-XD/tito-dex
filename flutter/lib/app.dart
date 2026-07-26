@@ -28,6 +28,7 @@ import 'navigation/tito_page_transition.dart';
 import 'pages/dex/ability_encyclopedia_page.dart';
 import 'pages/dex/move_encyclopedia_page.dart';
 import 'pages/dex_page.dart';
+import 'pages/items_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
@@ -150,6 +151,15 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     journey: _journey,
                     onLaunchEmulator: () => _onContinue(context),
                   ),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/items',
+              pageBuilder: (context, state) => titoMaterialPage(
+                key: state.pageKey,
+                child: TitoPageContainer(
+                  child: const ItemsPage(),
                 ),
               ),
             ),
