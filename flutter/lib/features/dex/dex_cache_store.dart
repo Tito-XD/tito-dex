@@ -335,6 +335,11 @@ class DexCacheStore {
     await paths.typeIconFile(type).writeAsBytes(bytes);
   }
 
+  Future<bool> hasDetail(int id) async {
+    final paths = await _pathsFuture;
+    return paths.detailFile(id).exists();
+  }
+
   Future<String?> spriteRelativePath(int id) async {
     final paths = await _pathsFuture;
     final file = paths.spriteFile(id);
