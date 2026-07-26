@@ -126,7 +126,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   }
 
   Widget _buildItemGrid(List<T> items) {
-    final columns = DeviceLayout.useSquareDashboard(context) ? 4 : 5;
+    final columns = DeviceLayout.dexGridColumns(context);
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

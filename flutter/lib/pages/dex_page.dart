@@ -50,7 +50,9 @@ enum _DexMode { national, journey }
 
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
-  static var _sessionRevealAnimationsEnabled = true;
+  /// True until the dex tab has been opened once this session; subsequent
+  /// visits (incl. popping detail back to list) reuse the settled layout.
+  static var _hasPlayedReveal = false;
 
   late final DateTime _openedAt;
   late final ScrollController _scrollController;
@@ -82,8 +84,8 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
-    _revealAnimationsEnabled = _sessionRevealAnimationsEnabled;
-    _sessionRevealAnimationsEnabled = false; // Consume the one-shot reveal.
+    _revealAnimationsEnabled = !_hasPlayedReveal;
+    _hasPlayedReveal = true;
     _openedAt = DateTime.now();
     _scrollController = ScrollController()..addListener(_onScroll);
     _openedWithReferenceFilter = dexFilterController.hasActiveFilter;
@@ -108,12 +110,6 @@ class _DexPageState extends State<DexPage> {
     dexFilterController.removeListener(_onReferenceFilterChanged);
     if (_openedWithReferenceFilter) {
       dexFilterController.clearFilter();
-    }
-    // Re-enable the reveal animation for the next clean Dex tab entry so
-    // switching tabs keeps the fade/slide-up effect while still avoiding
-    // staggered replays while the same page instance scrolls.
-    if (!_openedWithReferenceFilter) {
-      _sessionRevealAnimationsEnabled = true;
     }
     super.dispose();
   }
