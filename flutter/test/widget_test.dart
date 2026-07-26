@@ -86,13 +86,12 @@ void main() {
     expect(fade.opacity.value, lessThan(1));
     await tester.pumpAndSettle();
 
-    // Settled with home underneath: the dex route allows predictive back, so
-    // Android plays the in-app whole-screen retract instead of the system
-    // back-to-home window animation that flashed on release.
+    // Dex routes intentionally disable predictive back so the Hero
+    // expand/collapse animation owns the transition without gesture conflict.
     final dexRoute = ModalRoute.of(
       tester.element(find.byKey(const ValueKey<String>('close-page'))),
     )!;
-    expect(dexRoute.popGestureEnabled, isTrue);
+    expect(dexRoute.popGestureEnabled, isFalse);
 
     await tester.tap(find.byKey(const ValueKey<String>('close-page')));
     await tester.pump(const Duration(milliseconds: 300));

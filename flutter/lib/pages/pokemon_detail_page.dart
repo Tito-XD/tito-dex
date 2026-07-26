@@ -494,7 +494,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               Text(AppZh.dexEvolution, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 12),
               EvolutionChainVerticalView(
-                root: detail.evolutionChain!,
+                root: detail.evolutionChain!.filteredForForm(_selectedFormKey),
                 highlightId: detail.summary.id,
               ),
             ],

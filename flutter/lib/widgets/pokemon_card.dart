@@ -254,7 +254,7 @@ class _EvolutionCard extends StatelessWidget {
                 if (node.triggerZh != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    node.triggerZh!,
+                    _triggerLabel(node.triggerZh!),
                     textAlign: TextAlign.center,
                     style: context.tito.caption,
                   ),
@@ -308,26 +308,142 @@ class EvolutionChainVerticalView extends StatelessWidget {
       children: [
         _EvolutionCard(node: node, highlighted: node.id == highlightId),
         const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var i = 0; i < node.children.length; i++) ...[
-              if (i > 0) ...[
-                const Padding(
-                  padding: EdgeInsets.only(top: 40),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: TitoColors.ink,
-                  ),
-                ),
-                const SizedBox(width: 6),
-              ],
-              Flexible(child: _buildNode(context, node.children[i])),
-            ],
-          ],
-        ),
+        const SizedBox(height: 4),
+        _ChildrenRow(children: node.children, highlightId: highlightId),
       ],
     );
   }
 }
+
+class _ChildrenRow extends StatelessWidget {
+  const _ChildrenRow({required this.children, required this.highlightId});
+  final List<EvolutionNode> children;
+  final int highlightId;
+
+  @override
+  Widget build(BuildContext context) {
+    if (children.length <= 3) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0)
+              const Padding(
+                padding: EdgeInsets.only(top: 40),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  color: TitoColors.ink,
+                ),
+              ),
+            Flexible(child: _childCard(context, children[i])),
+          ],
+        ],
+      );
+    }
+    // Many children (e.g. Eevee) → wrap layout with branching arrows.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Wrap(
+          spacing: 4,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: [
+            for (final child in children)
+              SizedBox(
+                width: (constraints.maxWidth - 4) / 2,
+                child: _childCard(context, child),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _childCard(BuildContext context, EvolutionNode node) {
+    if (node.children.isNotEmpty) {
+      return EvolutionChainVerticalView(
+        root: node,
+        highlightId: highlightId,
+      );
+    }
+    return _EvolutionCard(node: node, highlighted: node.id == highlightId);
+  }
+}
+
+/// Map PokeAPI evolution trigger/item slugs to Chinese display labels.
+String _triggerLabel(String raw) {
+  return raw
+      .replaceAll('level-up', '升级')
+      .replaceAll('use-item', '使用道具')
+      .replaceAll('trade', '通讯交换')
+      .replaceAll('shed', '蜕皮')
+      .replaceAll('spin', '旋转')
+      .replaceAll('tower-of-darkness', '暗之塔')
+      .replaceAll('tower-of-waters', '水之塔')
+      .replaceAll('three-critical-hits', '连续3次击中要害')
+      .replaceAll('take-damage', '受到伤害')
+      .replaceAll('other', '特殊条件')
+      .replaceAll('agile-style-move', '迅疾')
+      .replaceAll('strong-style-move', '刚猛')
+      .replaceAll('recoil-damage', '反伤')
+      .replaceAll('Water-stone', '水之石')
+      .replaceAll('Thunder-stone', '雷之石')
+      .replaceAll('Fire-stone', '火之石')
+      .replaceAll('Leaf-stone', '叶之石')
+      .replaceAll('Moon-stone', '月之石')
+      .replaceAll('Sun-stone', '日之石')
+      .replaceAll('Shiny-stone', '光之石')
+      .replaceAll('Dusk-stone', '暗之石')
+      .replaceAll('Dawn-stone', '觉醒之石')
+      .replaceAll('Ice-stone', '冰之石')
+      .replaceAll('Oval-stone', '浑圆之石')
+      .replaceAll('King\'s-rock', '王者之证')
+      .replaceAll('Metal-coat', '金属膜')
+      .replaceAll('Dragon-scale', '龙之鳞片')
+      .replaceAll('Up-grade', '升级数据')
+      .replaceAll('Dubious-disc', '可疑补丁')
+      .replaceAll('Protector', '护具')
+      .replaceAll('Electirizer', '电力增幅器')
+      .replaceAll('Magmarizer', '熔岩增幅器')
+      .replaceAll('Razor-claw', '锐利之爪')
+      .replaceAll('Razor-fang', '锐利之牙')
+      .replaceAll('Reaper-cloth', '灵界之布')
+      .replaceAll('Prism-scale', '美丽鳞片')
+      .replaceAll('Deep-sea-tooth', '深海之牙')
+      .replaceAll('Deep-sea-scale', '深海鳞片')
+      .replaceAll('Sachet', '香袋')
+      .replaceAll('Whipped-dream', '泡沫奶油')
+      .replaceAll('Strawberry-sweet', '草莓糖饰')
+      .replaceAll('Love-sweet', '爱心糖饰')
+      .replaceAll('Berry-sweet', '野莓糖饰')
+      .replaceAll('Clover-sweet', '幸运草糖饰')
+      .replaceAll('Flower-sweet', '花朵糖饰')
+      .replaceAll('Star-sweet', '星星糖饰')
+      .replaceAll('Ribbon-sweet', '蝴蝶结糖饰')
+      .replaceAll('Galarica-cuff', '伽勒尔手环')
+      .replaceAll('Galarica-wreath', '伽勒尔花环')
+      .replaceAll('Black-augurite', '黑奇石')
+      .replaceAll('Peat-block', '泥炭块')
+      .replaceAll('Auspecious-armor', '庆贺之铠')
+      .replaceAll('Malicious-armor', '咒术之铠')
+      .replaceAll('Leader\'s-crest', '首领之证')
+      .replaceAll('Unremarkable-teacup', '凡作茶碗')
+      .replaceAll('Masterpiece-teacup', '杰作茶碗')
+      .replaceAll('Syrupy-apple', '蜜汁苹果')
+      .replaceAll('Tart-apple', '酸酸苹果')
+      .replaceAll('Sweet-apple', '甜甜苹果')
+      .replaceAll('Cracked-pot', '破裂的茶壶')
+      .replaceAll('Chipped-pot', '缺损的茶壶')
+      .replaceAll('Scroll-of-darkness', '暗之挂轴')
+      .replaceAll('Scroll-of-waters', '水之挂轴')
+      .replaceAll('Ability-patch', '特性膏药')
+      .replaceAll('Lv.', 'Lv.')
+      .replaceAll(getMegaTrigger, 'mega')
+      .replaceAll('道具：', '')
+      .replaceAll('Item:', '')
+      .replaceAll('item: ', '')
+      .trim();
+}
+
+const getMegaTrigger = 'mega';

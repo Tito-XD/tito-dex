@@ -1454,6 +1454,43 @@ class EvolutionNode {
     return children.any((child) => child.containsId(pokemonId));
   }
 
+  /// Returns a filtered copy with only the children relevant to [formKey].
+  ///
+  /// Regional variants (e.g. wooper-paldea, growlithe-hisui) evolve into
+  /// different species than the default form — PokeAPI bundles both branches
+  /// under the same species node.  This filter splits them.
+  EvolutionNode filteredForForm(String? formKey) {
+    if (children.length <= 1) return this;
+    final keepIds = _formEvolutionTargets[id];
+    if (keepIds != null && formKey != null) {
+      final allowed = keepIds[formKey];
+      if (allowed != null) {
+        return EvolutionNode(
+          id: id, nameEn: nameEn, nameZh: nameZh,
+          spriteUrl: spriteUrl, artworkUrl: artworkUrl,
+          localSpritePath: localSpritePath,
+          evolvesFrom: evolvesFrom, triggerZh: triggerZh,
+          children: children.where((c) => allowed.contains(c.id)).toList(),
+        );
+      }
+    }
+    return this;
+  }
+
+  /// Hardcoded form → child-species map for species where regional variants
+  /// diverge in the evolution chain.
+  static const _formEvolutionTargets = <int, Map<String, Set<int>>>{
+    194: { // Wooper
+      'wooper': {195},         // → Quagsire
+      'wooper-paldea': {980},  // → Clodsire
+    },
+    58: {  // Growlithe
+      'growlithe': {59},
+      'growlithe-hisui': {59},
+    },
+    // Add more species here as needed.
+  };
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'nameEn': nameEn,
