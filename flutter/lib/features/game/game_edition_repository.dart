@@ -5,6 +5,7 @@ import 'game_edition.dart';
 
 const _globalGameEditionKey = 'titodex.global_game_edition';
 const _globalGameFlavorKey = 'titodex.global_game_flavor';
+const _autoSourceSaveGameKey = 'titodex.global_game_edition_auto_source';
 
 class GameEditionRepository extends ChangeNotifier {
   GameEdition _edition = defaultGameEdition;
@@ -45,6 +46,28 @@ class GameEditionRepository extends ChangeNotifier {
   Future<void> saveSlug(String slug) async {
     final edition = gameEditionFromSlug(slug) ?? defaultGameEdition;
     await save(edition);
+  }
+
+  /// Auto-selects the edition matching a freshly parsed save.
+  ///
+  /// With [force] (explicit user import) the edition is applied
+  /// unconditionally; otherwise it only switches when the save's game differs
+  /// from the last one auto-applied, so a background startup re-sync never
+  /// fights a manual edition pick made afterwards. Returns whether the global
+  /// edition changed.
+  Future<bool> applyForSaveGame(String? saveGame, {bool force = false}) async {
+    final target = gameEditionForSaveGame(saveGame);
+    if (target == null) {
+      return false;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final lastApplied = prefs.getString(_autoSourceSaveGameKey);
+    if (!force && lastApplied == saveGame) {
+      return false;
+    }
+    await prefs.setString(_autoSourceSaveGameKey, saveGame!);
+    await save(target);
+    return true;
   }
 }
 

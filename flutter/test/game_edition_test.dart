@@ -35,4 +35,77 @@ void main() {
     expect(bdsp.fallbackSlug, 'dp');
     expect(bdsp.versionGroup, 'brilliant-diamond-shining-pearl');
   });
+
+  group('gameEditionForSaveGame', () {
+    test('picks the flavor when the save pins a single version', () {
+      final soulSilver = gameEditionForSaveGame('SoulSilver')!;
+      expect(soulSilver.slug, 'hgss');
+      expect(soulSilver.selectedFlavor, 'soulsilver');
+
+      final pearl = gameEditionForSaveGame('Pearl')!;
+      expect(pearl.slug, 'dp');
+      expect(pearl.selectedFlavor, 'pearl');
+
+      final ultraMoon = gameEditionForSaveGame('UltraMoon')!;
+      expect(ultraMoon.slug, 'usum');
+      expect(ultraMoon.selectedFlavor, 'ultra-moon');
+    });
+
+    test('stays merged when the save cannot pin a version', () {
+      final rgb = gameEditionForSaveGame('RedBlueYellow')!;
+      expect(rgb.slug, 'rgb');
+      expect(rgb.selectedFlavor, isNull);
+
+      final frlg = gameEditionForSaveGame('FireRedLeafGreen')!;
+      expect(frlg.slug, 'frlg');
+      expect(frlg.selectedFlavor, isNull);
+    });
+
+    test('covers every game name the save parser can emit', () {
+      const parserGames = [
+        'RedBlueYellow',
+        'GoldSilver',
+        'Crystal',
+        'RubySapphire',
+        'Emerald',
+        'FireRedLeafGreen',
+        'Diamond',
+        'Pearl',
+        'DiamondPearl',
+        'Platinum',
+        'HeartGold',
+        'SoulSilver',
+        'Black',
+        'White',
+        'BlackWhite',
+        'Black2',
+        'White2',
+        'X',
+        'Y',
+        'XY',
+        'OmegaRuby',
+        'AlphaSapphire',
+        'ORAS',
+        'Sun',
+        'Moon',
+        'SunMoon',
+        'UltraSun',
+        'UltraMoon',
+        'USUM',
+      ];
+      for (final game in parserGames) {
+        expect(
+          gameEditionForSaveGame(game),
+          isNotNull,
+          reason: 'parser game "$game" must map to an edition',
+        );
+      }
+    });
+
+    test('returns null for unknown names instead of defaulting', () {
+      expect(gameEditionForSaveGame('Champions'), isNull);
+      expect(gameEditionForSaveGame(''), isNull);
+      expect(gameEditionForSaveGame(null), isNull);
+    });
+  });
 }
