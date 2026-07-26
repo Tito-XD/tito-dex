@@ -7,7 +7,7 @@
 | **Latest release** | [v0.7.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.25) |
 | **`main` / lite source** | `0.7.25+123` (`flutter/pubspec.yaml`) |
 | **Offline package** | `0.7.21-offline+116` — APK-bundled verified v10 archive (v11 offline rebuild pending) |
-| **Offline dex bundle** | **v11** — 1025 species + 542 items (icons + zh descriptions), CDN prefix `/v5/`; `/v4/` rollback |
+| **Offline dex bundle** | **v11** live — 1025 species + 542 items (icons + zh descriptions), CDN prefix `/v5/`; `/v4/` rollback. **v12 built, unpublished** — species search axes |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -68,6 +68,10 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **对战资料:** type matchup, stat calc, quick damage (partial).
 - Reference → **structured detail** + drill-down to dex filter (move / ability / egg group).
 - `/search?q=` deep link supported.
+- **Multi-word species search** (`dex_search_terms.dart`). Each whitespace-separated word resolves to one constraint through an alias table (神 / 传说 / legendary all reach the legendary tag); words of different kinds AND. Single-valued kinds (body style, colour, generation, size) OR with each other, because a species holds exactly one of each and ANDing two could only return nothing — that is what lets 「棕 红」 stand in for the orange the in-game palette lacks. Types and tags are genuinely multi-valued and still AND, so 「火 飞行」 means the dual type.
+- An alias never suppresses a text match: 「鱼」 resolves to the fish body style **and** still finds 鲤鱼王. Genus is searchable because it rides on the summary.
+- **Stackable dex axes** (`DexFilter`): body style × colour (multi-select set) × relative size × generation × tag, intersected with at most one reference drill-down. Size buckets are cut from the real 1025-species height distribution (~19/29/24/16/13 %).
+- Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
 ### Latest release-line highlights
 - v0.7.16: unified game icons — Gen VI+ uses Pokémon HOME game icons, Gen I–V uses DS/3DS launch icons (SteamGridDB), white-2/mega-dimension use Pokémon artwork badges; form sprites in bundle v10 are clear official artwork (were pixelated), offline form caching prefers artwork; predictive-back rework — content stays opaque during the drag, underlying pages stay static, and a gesture-runway clamp keeps the commit fade playing even after a full-edge drag.
@@ -143,10 +147,14 @@ flutter/lib/
 | `/v3/` | v5 | 1025 (rollback / older clients) |
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
 | `/v5/` | v11 | v6 data + clear media + form sprite history + 542 items with icons & zh descriptions (current; v7→v11 patch in place over the same prefix) |
+| `/v5/` | v12 | + body style / colour / size / generation / tag search axes, genus on the summary, structured evolution triggers (**built, not yet published**) |
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
+- **Bundle version and CDN prefix are decoupled.** Every release since v7 (v8–v12) patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
 - Incremental v7 build: `python3 tools/patch_dex_bundle_v7.py --base-bundle <v6.tar.zst> --legacy-media-bundle <v5.tar.zst> --output dist/dex-v7`
+- Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base; builds an upload tree only — release goes through `upload_dex_bundle_r2.py`). Its `--limit` / `--skip-archive` flags are smoke-test only and produce an unpublishable tree.
+- **Slugs ship, labels do not.** Body style / colour / growth rate / habitat ride in the bundle as slugs; their Chinese labels live in `flutter/lib/features/dex/dex_search_terms.dart`. `/v5/` objects cannot be overwritten, so a label baked into the bundle would need a full republish to correct.
 - Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`.
 - Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.
 - Secrets: [PERMISSIONS.md](./PERMISSIONS.md) — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
