@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dex/dex_repository.dart';
+import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/dex_reference_detail.dart';
 import 'dex_reference_list.dart';
 
@@ -29,6 +30,10 @@ class DexJsonReferencePage extends StatelessWidget {
       filterEntry: _filterReferenceEntry,
       primaryLabel: referencePrimaryLabel,
       secondaryLabel: (entry) => _secondaryLabel(entry, _kind),
+      leadingBuilder:
+          _kind == DexReferenceKind.item ? _itemLeading : null,
+      categoryFilter:
+          _kind == DexReferenceKind.item ? _itemCategoryFilter : null,
       detailSheet: (context, entry) => showJsonReferenceDetailSheet(
         context,
         entry: entry,
@@ -96,3 +101,15 @@ void openDexJsonReference(
     extra: {'title': title, 'cdnFilename': filename},
   );
 }
+
+Widget? _itemLeading(Map<String, dynamic> entry) {
+  final spriteUrl = entry['spriteUrl'] as String?;
+  if (spriteUrl == null) return null;
+  return DexSpriteImage(source: spriteUrl, width: 28, height: 28);
+}
+
+final _itemCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
+  options: const [null, '药品', '状态恢复', 'PP恢复', '复活', '标准球', '特殊球', '柑果球', '携带道具', '进化道具', '重要物品', '道具'],
+  label: (entry) => entry['categoryZh'] as String? ?? '道具',
+  filter: (entry, category) => (entry['categoryZh'] as String? ?? '道具') == category,
+);
