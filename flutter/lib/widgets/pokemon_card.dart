@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
@@ -251,14 +252,6 @@ class _EvolutionCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: context.tito.cardBodyEmphasis,
                 ),
-                if (node.triggerZh != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    _triggerLabel(node.triggerZh!),
-                    textAlign: TextAlign.center,
-                    style: context.tito.caption,
-                  ),
-                ],
               ],
             ),
           ),
@@ -293,12 +286,14 @@ class EvolutionChainVerticalView extends StatelessWidget {
     }
 
     if (node.children.length == 1) {
+      final child = node.children.first;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _EvolutionCard(node: node, highlighted: node.id == highlightId),
           const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
-          _buildNode(context, node.children.first),
+          _EvolutionTriggerLabel(node: child),
+          _buildNode(context, child),
         ],
       );
     }
@@ -336,7 +331,16 @@ class _ChildrenRow extends StatelessWidget {
                   color: TitoColors.ink,
                 ),
               ),
-            Flexible(child: _childCard(context, children[i])),
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+                  _EvolutionTriggerLabel(node: children[i]),
+                  _childCard(context, children[i]),
+                ],
+              ),
+            ),
           ],
         ],
       );
@@ -369,6 +373,110 @@ class _ChildrenRow extends StatelessWidget {
     }
     return _EvolutionCard(node: node, highlighted: node.id == highlightId);
   }
+}
+
+class _EvolutionTriggerLabel extends StatelessWidget {
+  const _EvolutionTriggerLabel({required this.node});
+
+  /// The evolution *target* — its `triggers` describe the step leading in.
+  final EvolutionNode node;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = _evolutionStepLabel(node);
+    if (label == null || label.isEmpty) return const SizedBox.shrink();
+    // A link-trade-only step can never be done alone on one cartridge —
+    // mark the pill so the lock is visible at a glance.
+    final tradeLocked = evolutionRequiresTrade(node);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: TitoColors.card,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: tradeLocked ? TitoColors.coral : TitoColors.ink,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (tradeLocked) ...[
+              const Icon(
+                Icons.swap_horiz_rounded,
+                size: 12,
+                color: TitoColors.coral,
+              ),
+              const SizedBox(width: 3),
+            ],
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: context.tito.caption.copyWith(fontWeight: FontWeight.w800),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Label for the step into [node]: structured triggers when the bundle has
+/// them (trade-with-item shows its item, 美纳斯-style alternatives join with
+/// 「/」), the flattened `triggerZh` otherwise.
+String? _evolutionStepLabel(EvolutionNode node) {
+  final triggers = node.triggers;
+  if (triggers.isEmpty) {
+    final legacy = node.triggerZh;
+    return legacy == null ? null : _triggerLabel(legacy);
+  }
+  final labels = <String>[];
+  for (final trigger in triggers) {
+    final label = _singleTriggerLabel(trigger);
+    if (label.isNotEmpty && !labels.contains(label)) {
+      labels.add(label);
+    }
+    if (labels.length == 2) break; // Keep the pill readable.
+  }
+  return labels.isEmpty ? node.triggerZh : labels.join(' / ');
+}
+
+String _singleTriggerLabel(EvolutionTrigger trigger) {
+  final parts = <String>[];
+  if (trigger.isTrade) {
+    parts.add('通讯交换');
+    if (trigger.heldItem != null) {
+      parts.add(_itemLabelZh(trigger.heldItem!));
+    }
+  } else if (trigger.item != null) {
+    parts.add(_itemLabelZh(trigger.item!));
+  } else if (trigger.minLevel != null) {
+    parts.add('Lv.${trigger.minLevel}');
+  } else if (trigger.minHappiness != null) {
+    parts.add('亲密度');
+  } else if (trigger.minBeauty != null) {
+    parts.add('美丽度');
+  } else if (trigger.trigger != null) {
+    parts.add(_triggerLabel(trigger.trigger!));
+  }
+  final time = switch (trigger.timeOfDay) {
+    'day' => '白天',
+    'night' => '夜晚',
+    _ => null,
+  };
+  if (time != null) {
+    parts.add(time);
+  }
+  return parts.join(' · ');
+}
+
+/// PokeAPI item slug → the Chinese names [_triggerLabel] already carries.
+String _itemLabelZh(String slug) {
+  if (slug.isEmpty) return slug;
+  final capitalized = slug[0].toUpperCase() + slug.substring(1);
+  return _triggerLabel(capitalized);
 }
 
 /// Map PokeAPI evolution trigger/item slugs to Chinese display labels.
