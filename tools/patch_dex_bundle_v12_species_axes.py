@@ -62,6 +62,7 @@ from build_dex_bundle import (  # noqa: E402
     species_generation,
     species_tags,
 )
+from build_location_index import LocationIndexBuilder  # noqa: E402
 
 BASE_VERSION = 11
 BUNDLE_VERSION = 12
@@ -277,6 +278,7 @@ def build(args: argparse.Namespace) -> None:
 
     additions_by_id: dict[int, dict[str, Any]] = {}
     chain_cache: dict[str, dict[int, list[dict]]] = {}
+    location_index = LocationIndexBuilder()
     stats = {
         "shape": 0, "color": 0, "generation": 0, "tags": 0, "genus": 0,
         "habitat": 0, "growth": 0, "held": 0, "genderDiff": 0, "triggers": 0,
@@ -302,6 +304,10 @@ def build(args: argparse.Namespace) -> None:
         stats["growth"] += "growthRateSlug" in detail
         stats["held"] += "heldItems" in detail
         stats["genderDiff"] += "hasGenderDifferences" in detail
+
+        # Encounter data is read-only here; the inversion sees the same bytes
+        # the base bundle shipped.
+        location_index.add_detail(species_id, detail)
 
         chain_url = (species.get("evolution_chain") or {}).get("url")
         if chain_url and detail.get("evolutionChain"):
@@ -344,7 +350,23 @@ def build(args: argparse.Namespace) -> None:
         )
         print(f"Patched {patched} summaries in {filename}.", flush=True)
 
-    # 3. Manifest bump.
+    # 2b. Reverse location index — game version → area → entries — at the
+    # bundle root beside egg_groups.json / items.json.  Deliberately NOT part
+    # of dex_catalog.json: that file is decoded on every cold start, this one
+    # only when a location page asks for it.
+    (staging / "location_index.json").write_text(
+        json.dumps(
+            location_index.build(), ensure_ascii=False, separators=(",", ":")
+        ),
+        encoding="utf-8",
+    )
+    print(
+        f"Wrote location_index.json: {location_index.entry_count} entries "
+        f"across {location_index.version_count} versions.",
+        flush=True,
+    )
+
+    # 3. Manifest bump (single bump for axes + index).
     published_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     base_manifest.update(
         {
@@ -354,6 +376,8 @@ def build(args: argparse.Namespace) -> None:
             "speciesWithColor": stats["color"],
             "speciesWithTags": stats["tags"],
             "evolutionNodesWithTriggers": stats["triggers"],
+            "locationIndexVersions": location_index.version_count,
+            "locationIndexEntries": location_index.entry_count,
         }
     )
     base_manifest["sizeBytes"] = directory_size(staging)
@@ -415,6 +439,12 @@ def build(args: argparse.Namespace) -> None:
         ("evolution nodes w/ triggers", "triggers"),
     ):
         print(f"  {label:<28} {stats[key]}", flush=True)
+    print(
+        f"  location index               "
+        f"{location_index.entry_count} entries / "
+        f"{location_index.version_count} versions",
+        flush=True,
+    )
     print(f"  archive sha256               {archive_sha}", flush=True)
     print(
         f"  archive bytes                "

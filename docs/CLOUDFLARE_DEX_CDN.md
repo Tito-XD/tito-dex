@@ -132,10 +132,10 @@ python3 tools/generate_pkhex_encounter_overlays.py \
 
 生成器会验证 PKHeX HEAD；不能唯一确认的 form 只保留物种并标记歧义。
 
-## v12 内容与发布（体形检索轴）
+## v12 内容与发布（体形检索轴 + 地点反向索引）
 
-v12 以**已发布的 v11 archive 为只读基座**，只重写 species 层 JSON；sprite、
-artwork、遭遇、地点、招式、特性、道具全部字节不变。
+v12 以**已发布的 v11 archive 为只读基座**，只重写 species 层 JSON 并新增一个
+根级索引文件；sprite、artwork、遭遇、地点、招式、特性、道具全部字节不变。
 
 新增字段：
 
@@ -148,6 +148,15 @@ artwork、遭遇、地点、招式、特性、道具全部字节不变。
 - **evolutionChain 节点**：`triggers` 结构化进化条件数组，覆盖全部
   `evolution_details`。`triggerZh` 保持字节不变——它只压平第一条且从不读
   `held_item`，巨钳螳螂那类「交换 + 携带道具」用它无法判定。
+- **`location_index.json`**（bundle 根，新文件，与 `egg_groups.json`、
+  `items.json` 同级）：地点反向索引 `byVersion → areaSlug → {labelZh,
+  entries[]}`，由每个 detail（含各 form）的 `obtainLocationsByVersion` 在
+  构建时反转而来，条目保留 P0-2 的形态字段（`formKey` / `formAmbiguous` /
+  alpha·titan·totem·raid·fixed 旗标 / `teraType`）与等级、概率、方式、条件；
+  空值与 false 旗标一律省略，精确重复折叠。**刻意不并入
+  `dex_catalog.json`**——那是冷启动热路径，索引只在地点页需要时按需解码。
+  生成逻辑在 `tools/build_location_index.py`（`test_build_location_index.py`），
+  manifest 新增 `locationIndexVersions` / `locationIndexEntries` 两个计数。
 
 **只发 slug，不发中文标签。** `/v5/` 对象不可覆盖，标签一旦烤进 bundle，改一个
 错别字就要重新发布整包；中文标签统一放在
