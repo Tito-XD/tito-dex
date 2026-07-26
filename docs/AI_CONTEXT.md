@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.7.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.16) |
-| **`main` / lite source** | `0.7.16+109` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.7.16-offline+110` — APK-bundled verified v10 archive |
+| **Latest release** | [v0.7.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.17) |
+| **`main` / lite source** | `0.7.17+111` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.7.17-offline+112` — APK-bundled verified v10 archive |
 | **Offline dex bundle** | **v10** — 1025 species, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |

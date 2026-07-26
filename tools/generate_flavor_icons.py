@@ -193,14 +193,8 @@ def _render_rounded_icon(source: Image.Image) -> bytes:
     draw = ImageDraw.Draw(mask)
     draw.rounded_rectangle((0, 0, size - 1, size - 1), radius=radius, fill=255)
 
-    canvas = Image.new("RGBA", (size + 4, size + 4), (0, 0, 0, 0))
-    shadow = Image.new("RGBA", (size, size), (0, 0, 0, 55))
-    shadow.putalpha(mask)
-    canvas.paste(shadow, (2, 2), shadow)
-
-    icon = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    icon.paste(resized, (0, 0), mask)
-    canvas.paste(icon, (0, 0), icon)
+    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    canvas.paste(resized, (0, 0), mask)
 
     buf = io.BytesIO()
     canvas.save(buf, format="PNG", optimize=True)

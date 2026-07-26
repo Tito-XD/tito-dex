@@ -167,25 +167,7 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final isDexWithOverlay =
-        _page.kind == _TitoMaterialPageKind.dex && _page.overlay != null;
-
-    // While a predictive-back gesture is active on a route ABOVE this one,
-    // keep this page completely static. The framework's shared-element
-    // transition would otherwise corner-clip and y-shift this route with the
-    // finger, then snap it back on commit/cancel — the release flash. The
-    // gesture drives every route's rebuild because popGestureInProgress is
-    // navigator-wide.
-    if (popGestureInProgress && !isCurrent) {
-      return isDexWithOverlay
-          ? Stack(
-              fit: StackFit.expand,
-              children: [child, _page.overlay!],
-            )
-          : child;
-    }
-
-    if (!isDexWithOverlay) {
+    if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
       return super.buildTransitions(
         context,
         animation,
@@ -234,13 +216,10 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
 
   @override
   bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
-    // Keep every Tito page fully visible and static underneath pushed pages.
-    // FadeForwards would otherwise fade the underlying page to opacity 0 as
-    // its "covered" state and cross-fade it back in over the slateBlue
-    // backdrop — a flash on every programmatic push/pop.
-    if (nextRoute is _TitoSideSlidePageRoute ||
-        nextRoute is _TitoControlledMaterialPageRoute ||
-        nextRoute is MaterialPageRoute) {
+    if (_page.kind == _TitoMaterialPageKind.home &&
+        (nextRoute is _TitoSideSlidePageRoute ||
+            nextRoute is _TitoControlledMaterialPageRoute &&
+                nextRoute._page.kind == _TitoMaterialPageKind.dex)) {
       return false;
     }
     return super.canTransitionTo(nextRoute);
