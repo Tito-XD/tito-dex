@@ -109,7 +109,15 @@ Widget? _itemLeading(Map<String, dynamic> entry) {
 }
 
 final _itemCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
-  options: const [null, '药品', '状态恢复', 'PP恢复', '复活', '标准球', '特殊球', '柑果球', '携带道具', '进化道具', '重要物品', '道具'],
-  label: (entry) => entry['categoryZh'] as String? ?? '道具',
-  filter: (entry, category) => (entry['categoryZh'] as String? ?? '道具') == category,
+  options: const [null, '药品', '状态恢复', 'PP恢复', '复活', '精灵球', '特殊球', '球果球', '携带道具', '进化', '训练', '道具'],
+  label: _itemCategoryLabel,
+  filter: (entry, category) => _itemCategoryLabel(entry) == category,
 );
+
+/// Resolve item category label: CDN `categoryZh` first, then PokeAPI slug map.
+String _itemCategoryLabel(Map<String, dynamic> entry) {
+  final zh = entry['categoryZh'] as String?;
+  if (zh != null && zh.isNotEmpty) return zh;
+  final slug = entry['category'] as String? ?? '';
+  return itemCategoryLabelZh(slug).isNotEmpty ? itemCategoryLabelZh(slug) : '道具';
+}
