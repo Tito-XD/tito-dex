@@ -44,6 +44,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
     required this.detailSheet,
     this.leadingBuilder,
     this.categoryFilter,
+    this.gridMode = false,
   });
 
   final String title;
@@ -54,6 +55,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
   final void Function(BuildContext context, T entry) detailSheet;
   final Widget? Function(T entry)? leadingBuilder;
   final DexReferenceCategoryFilter<T>? categoryFilter;
+  final bool gridMode;
 
   @override
   State<DexReferenceListPage<T>> createState() =>
@@ -123,6 +125,32 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
     return list;
   }
 
+  Widget _buildItemGrid(List<T> items) {
+    final columns = DeviceLayout.useSquareDashboard(context) ? 4 : 5;
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: items.length,
+      itemBuilder: (ctx, index) {
+        final entry = items[index];
+        return TitoListReveal(
+          delay: TitoListReveal.staggerDelay(index),
+          child: _GridItemCard(
+            label: widget.primaryLabel(entry),
+            leading: widget.leadingBuilder?.call(entry),
+            onTap: () => widget.detailSheet(ctx, entry),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final visible = _visible;
@@ -182,6 +210,8 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
               style: SecondaryTypography.onCard.body14,
             ),
           )
+        else if (widget.gridMode)
+          _buildItemGrid(visible)
         else
           ListView.separated(
             shrinkWrap: true,
@@ -426,6 +456,54 @@ bool filterCachedAbility(CachedAbility ability, String query) {
       ability.nameEn.toLowerCase().contains(query) ||
       ability.descriptionZh.contains(query) ||
       ability.id.toString().contains(query);
+}
+
+class _GridItemCard extends StatelessWidget {
+  const _GridItemCard({
+    required this.label,
+    this.leading,
+    required this.onTap,
+  });
+  final String label;
+  final Widget? leading;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+      child: GestureDetector(
+        onTap: onTap,
+        child: StickerCard(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (leading != null) ...[
+                leading!,
+                const SizedBox(height: 4),
+              ],
+              Expanded(
+                child: Center(
+                  child: Text(
+                    label,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _CategoryFilterChips<T> extends StatelessWidget {
