@@ -1,4 +1,4 @@
-# TitoDex 图鉴 CDN 与 bundle v7
+# TitoDex 图鉴 CDN 与 bundle v12
 
 > **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
@@ -6,19 +6,30 @@
 
 | CDN 前缀 | bundleVersion | 物种 | 状态 |
 | --- | ---: | ---: | --- |
-| `/v5/` | 7 | 1025 | 当前生产：v6 数据 + 清晰默认图 + 形态历代 sprite |
-| `/v4/` | 6 | 1025 | 保留不动，供旧客户端和 v7 回滚 |
+| `/v5/` | 11 | 1025 | 当前生产：v6 数据 + 清晰默认图 + 形态历代 sprite + 542 道具 |
+| `/v5/` | 12 | 1025 | **待发布**：体形 / 颜色 / 大小 / 世代 / 标签检索轴 + 结构化进化条件 |
+| `/v4/` | 6 | 1025 | 保留不动，供旧客户端和回滚 |
 | `/v3/` | 5 | 1025 | 更早回滚 |
 | `/v2/` | 4 | 493 | 遗留客户端 |
 
+> **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（v8 形态 artwork、v9
+> artwork 回退、v10 清晰形态图、v11 道具、v12 检索轴）都是在**同一个 `/v5/`
+> 前缀上原地增量**发布的，没有新开前缀。不可变约束针对的是**单个对象**：同一个
+> key 不得覆盖成不同内容，而新增 key、以及在两阶段流程里最后切换根 manifest 是
+> 允许的。看到 `/v5/` 就以为 bundleVersion 是 7，会误判成需要新开 `/v6/`。
+
 0.7.1 App 访问 JSON 时按 `v5 → v4 → v3 → v2` 回退。根
-`bundle-manifest.json` 是短缓存的活跃指针；所有版本前缀对象不可变。
+`bundle-manifest.json` 是短缓存的活跃指针。
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
 TITODEX_DEX_BUNDLE_VERSION=7
 ```
+
+> `TITODEX_DEX_BUNDLE_VERSION` 只是 `DexCdnConfig` 里的编译期默认值；版本协商实际
+> 比较的是**根 manifest 的 `bundleVersion`** 与本地 `manifest.version`
+> （`dex_update_service.dart`），所以这个常量落后于线上版本不影响升级判定。
 
 ## v7 内容与 schema
 
@@ -121,17 +132,62 @@ python3 tools/generate_pkhex_encounter_overlays.py \
 
 生成器会验证 PKHeX HEAD；不能唯一确认的 form 只保留物种并标记歧义。
 
+## v12 内容与发布（体形检索轴 + 地点反向索引）
+
+v12 以**已发布的 v11 archive 为只读基座**，只重写 species 层 JSON 并新增一个
+根级索引文件；sprite、artwork、遭遇、地点、招式、特性、道具全部字节不变。
+
+新增字段：
+
+- **summary**（`summaries.json`、`dex_catalog.json`、以及每个
+  `details/<id>.json` 内嵌的那份，三处必须一致）：`genusZh`、`generation`、
+  `shapeSlug`、`colorSlug`、`tags`、`heightDm`。搜索只读 summary，可检索的字段
+  必须放这里，不能留在 1025 个 detail 文件里。
+- **detail**：`growthRateSlug`、`habitatSlug`（仅一~三代物种有值）、
+  `hasGenderDifferences`、`heldItems`、`baseExperience`。
+- **evolutionChain 节点**：`triggers` 结构化进化条件数组，覆盖全部
+  `evolution_details`。`triggerZh` 保持字节不变——它只压平第一条且从不读
+  `held_item`，巨钳螳螂那类「交换 + 携带道具」用它无法判定。
+- **`location_index.json`**（bundle 根，新文件，与 `egg_groups.json`、
+  `items.json` 同级）：地点反向索引 `byVersion → areaSlug → {labelZh,
+  entries[]}`，由每个 detail（含各 form）的 `obtainLocationsByVersion` 在
+  构建时反转而来，条目保留 P0-2 的形态字段（`formKey` / `formAmbiguous` /
+  alpha·titan·totem·raid·fixed 旗标 / `teraType`）与等级、概率、方式、条件；
+  空值与 false 旗标一律省略，精确重复折叠。**刻意不并入
+  `dex_catalog.json`**——那是冷启动热路径，索引只在地点页需要时按需解码。
+  生成逻辑在 `tools/build_location_index.py`（`test_build_location_index.py`），
+  manifest 新增 `locationIndexVersions` / `locationIndexEntries` 两个计数。
+
+**只发 slug，不发中文标签。** `/v5/` 对象不可覆盖，标签一旦烤进 bundle，改一个
+错别字就要重新发布整包；中文标签统一放在
+`flutter/lib/features/dex/dex_search_terms.dart`。
+
+```bash
+python3 tools/patch_dex_bundle_v12_species_axes.py
+python3 tools/verify_dex_upload_tree.py dist/dex-v12/upload
+```
+
+脚本刻意**不含上传**，产物交给下面的两阶段上传器。PokeAPI 读取带磁盘缓存
+（`dist/dex-v12-pokeapi-cache/`），重跑零网络；首跑约 2600 个请求。
+
+> `--limit` / `--skip-archive` 只用于冒烟测试：前者让 `summaries.json` 只补前 N
+> 只，后者跳过重打包，两者产出的树都**不可发布**。
+
+v12 改动了 1025 个 `details/*.json` 加 `summaries.json`、`dex_catalog.json`，
+比 v11（只动 items 与图标）大得多，务必严格遵守 manifest-last。
+
 ## 两阶段发布与回滚
 
-首选 GitHub Actions **Patch and Publish Dex Bundle v7**。本地等价命令：
+首选 GitHub Actions **Patch and Publish Dex Bundle**。本地等价命令（把
+`dist/dex-v12` 换成当前版本的产物目录）：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象
-python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload \
   --cdn-prefix v5 --phase objects
 
 # 阶段二：只有阶段一全部成功后才更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload \
   --cdn-prefix v5 --phase manifest
 ```
 
@@ -145,9 +201,10 @@ curl -fsS https://dex.tito.cafe/bundle-manifest.json | jq .
 curl -fsS 'https://dex.tito.cafe/cdn-health?probe=1' | jq .
 ```
 
-若 v7 发布异常，将预先备份的 v6 根 manifest 重新写到
-`bundle-manifest.json`。不要删除或修改 `/v4/`；0.7.1 在线 JSON 会从
-v5 自动回退 v4/v3/v2。
+发布异常时，把**发布前备份的上一版根 manifest** 重新写回
+`bundle-manifest.json` 即可回退（v12 → v11）。因为增量发布只新增/更新 `/v5/`
+下的 key，旧 archive 的 SHA 仍然有效。不要删除或修改 `/v4/`；0.7.1 在线 JSON
+会从 v5 自动回退 v4/v3/v2。
 
 ## Worker
 

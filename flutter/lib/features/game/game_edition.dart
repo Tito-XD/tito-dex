@@ -412,6 +412,56 @@ GameEdition gameEditionFromJourneyGame(String? journeyGame) {
   return defaultGameEdition;
 }
 
+/// Maps a parsed save `game` name (`ParsedSaveSummary.game`) to the edition —
+/// with the matching flavor when the save pins down a single version — that
+/// should be auto-selected after a save import.
+///
+/// Unlike [gameEditionFromJourneyGame] this returns **null** for unknown
+/// names, so callers never override the user's edition on unrecognized saves.
+GameEdition? gameEditionForSaveGame(String? saveGame) {
+  if (saveGame == null || saveGame.isEmpty) {
+    return null;
+  }
+  final (String? slug, String? flavor) = switch (saveGame) {
+    'RedBlueYellow' => ('rgb', null),
+    'GoldSilver' => ('gs', null),
+    'Crystal' => ('crystal', null),
+    'RubySapphire' => ('rs', null),
+    'Emerald' => ('emerald', null),
+    'FireRedLeafGreen' => ('frlg', null),
+    'Diamond' => ('dp', 'diamond'),
+    'Pearl' => ('dp', 'pearl'),
+    'DiamondPearl' => ('dp', null),
+    'Platinum' => ('pt', null),
+    'HeartGold' => ('hgss', 'heartgold'),
+    'SoulSilver' => ('hgss', 'soulsilver'),
+    'Black' => ('bw', 'black'),
+    'White' => ('bw', 'white'),
+    'BlackWhite' => ('bw', null),
+    'Black2' => ('bw2', 'black-2'),
+    'White2' => ('bw2', 'white-2'),
+    'Black2White2' => ('bw2', null),
+    'X' => ('xy', 'x'),
+    'Y' => ('xy', 'y'),
+    'XY' => ('xy', null),
+    'OmegaRuby' => ('oras', 'omega-ruby'),
+    'AlphaSapphire' => ('oras', 'alpha-sapphire'),
+    'ORAS' => ('oras', null),
+    'Sun' => ('sm', 'sun'),
+    'Moon' => ('sm', 'moon'),
+    'SunMoon' => ('sm', null),
+    'UltraSun' => ('usum', 'ultra-sun'),
+    'UltraMoon' => ('usum', 'ultra-moon'),
+    'USUM' => ('usum', null),
+    _ => (null, null),
+  };
+  final edition = gameEditionFromSlug(slug);
+  if (edition == null) {
+    return null;
+  }
+  return flavor == null ? edition : edition.withFlavor(flavor);
+}
+
 String gameEditionLabelZh(GameEdition edition) => edition.labelZh;
 
 String gameEditionLabelForVersionGroup(String versionGroupKey) {

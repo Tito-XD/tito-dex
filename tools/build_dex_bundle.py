@@ -432,6 +432,49 @@ EGG_GROUP_ZH = {
     "no-eggs": "未发现",
 }
 
+# Body style (`pokemon-species.shape`) — the 14 buckets behind the Gen IV
+# Pokedex shape search — plus the 10-colour Pokedex palette, the growth rate
+# and the habitat all ship as **slugs only**.  Their Chinese labels live in
+# flutter/lib/features/dex/dex_search_terms.dart: bundles are immutable per CDN
+# prefix, so a label typo baked in here would need a full republish to fix.
+
+# Community concept, not a PokeAPI flag: 600 BST, three-stage line, non-legendary.
+PSEUDO_LEGENDARY_IDS = frozenset(
+    {149, 248, 373, 376, 445, 635, 706, 784, 887, 998}
+)
+
+SPECIES_GENERATION_NUMBER = {
+    "generation-i": 1,
+    "generation-ii": 2,
+    "generation-iii": 3,
+    "generation-iv": 4,
+    "generation-v": 5,
+    "generation-vi": 6,
+    "generation-vii": 7,
+    "generation-viii": 8,
+    "generation-ix": 9,
+}
+
+
+def species_generation(species: dict[str, Any]) -> int | None:
+    """Generation the species debuted in — drives 「本世代新增」 dex views."""
+    slug = (species.get("generation") or {}).get("name")
+    return SPECIES_GENERATION_NUMBER.get(slug)
+
+
+def species_tags(species: dict[str, Any], pokemon_id: int) -> list[str]:
+    """Semantic tags the dex search resolves aliases onto ("传说", "准神", …)."""
+    tags: list[str] = []
+    if species.get("is_legendary"):
+        tags.append("legendary")
+    if species.get("is_mythical"):
+        tags.append("mythical")
+    if species.get("is_baby"):
+        tags.append("baby")
+    if pokemon_id in PSEUDO_LEGENDARY_IDS:
+        tags.append("pseudo-legendary")
+    return tags
+
 
 @dataclass
 class TypeDamageRelations:
@@ -926,6 +969,29 @@ class PokeApiBuilder:
         if animated_cdn:
             summary["animatedSpriteUrl"] = animated_cdn
 
+        # Search reads summaries only — anything searchable has to live here,
+        # never in the 1025 detail files.
+        species_genus_zh = genus_zh(species.get("genera", []))
+        if species_genus_zh:
+            summary["genusZh"] = species_genus_zh
+        summary_generation = species_generation(species)
+        if summary_generation is not None:
+            summary["generation"] = summary_generation
+        summary_shape = (species.get("shape") or {}).get("name")
+        if summary_shape:
+            summary["shapeSlug"] = summary_shape
+        summary_color = (species.get("color") or {}).get("name")
+        if summary_color:
+            summary["colorSlug"] = summary_color
+        summary_tags = species_tags(species, pokemon_id)
+        if summary_tags:
+            summary["tags"] = summary_tags
+        # Raw height, not a precomputed bucket: bucket boundaries are a UI
+        # decision and must stay changeable without republishing the bundle.
+        summary_height = pokemon.get("height")
+        if summary_height:
+            summary["heightDm"] = summary_height
+
         profile = compute_defensive_profile(types, relations)
         multipliers = compute_defensive_multipliers(types, relations)
         stab = compute_stab_super_effective(types, relations)
@@ -1017,6 +1083,29 @@ class PokeApiBuilder:
             "eggGroups": egg_groups,
             "forms": forms,
         }
+        if summary_shape:
+            detail["shapeSlug"] = summary_shape
+        if summary_color:
+            detail["colorSlug"] = summary_color
+        if summary_generation is not None:
+            detail["generation"] = summary_generation
+        if summary_tags:
+            detail["tags"] = summary_tags
+        growth_rate = (species.get("growth_rate") or {}).get("name")
+        if growth_rate:
+            detail["growthRateSlug"] = growth_rate
+        # Habitat only exists for Gen I-III species; null everywhere else.
+        habitat = (species.get("habitat") or {}).get("name")
+        if habitat:
+            detail["habitatSlug"] = habitat
+        if species.get("has_gender_differences"):
+            detail["hasGenderDifferences"] = True
+        held_items = parse_held_items(pokemon.get("held_items", []))
+        if held_items:
+            detail["heldItems"] = held_items
+        base_experience = pokemon.get("base_experience")
+        if base_experience is not None:
+            detail["baseExperience"] = base_experience
         if base_happiness is not None:
             detail["baseHappiness"] = base_happiness
         if capture_rate is not None:
@@ -1729,6 +1818,35 @@ def parse_ev_yield(entries: list[dict[str, Any]]) -> dict[str, int]:
     return result
 
 
+def parse_held_items(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Wild held items, keyed by item slug with the best rarity seen per version."""
+    result: list[dict[str, Any]] = []
+    for entry in entries:
+        slug = (entry.get("item") or {}).get("name")
+        if not slug:
+            continue
+        rarity_by_version: dict[str, int] = {}
+        for detail in entry.get("version_details", []) or []:
+            version = (detail.get("version") or {}).get("name")
+            rarity = detail.get("rarity")
+            if not version or rarity is None:
+                continue
+            rarity_by_version[version] = max(
+                rarity_by_version.get(version, 0), int(rarity)
+            )
+        if not rarity_by_version:
+            continue
+        result.append(
+            {
+                "slug": slug,
+                "rarityByVersion": dict(sorted(rarity_by_version.items())),
+                "maxRarity": max(rarity_by_version.values()),
+            }
+        )
+    result.sort(key=lambda item: (-item["maxRarity"], item["slug"]))
+    return result
+
+
 def normalize_flavor_text(text: str) -> str:
     return " ".join(text.replace("\n", " ").replace("\f", " ").split())
 
@@ -1938,6 +2056,66 @@ def evolution_trigger_zh(detail: dict[str, Any]) -> str | None:
     return mapping.get(trigger or "", capitalize(trigger) if trigger else None)
 
 
+# PokeAPI evolution_detail keys worth preserving, grouped by how they decode.
+_TRIGGER_NAMED_KEYS = (
+    "item",
+    "held_item",
+    "known_move",
+    "known_move_type",
+    "location",
+    "party_species",
+    "party_type",
+    "trade_species",
+)
+_TRIGGER_NUMERIC_KEYS = (
+    "min_level",
+    "min_happiness",
+    "min_beauty",
+    "min_affection",
+)
+_TRIGGER_FLAG_KEYS = ("needs_overworld_rain", "turn_upside_down")
+
+
+def _camel(snake: str) -> str:
+    head, *rest = snake.split("_")
+    return head + "".join(part.title() for part in rest)
+
+
+def evolution_trigger_payload(detail: dict[str, Any]) -> dict[str, Any]:
+    """Structured evolution condition for one `evolution_details` entry.
+
+    `triggerZh` flattens a condition to a single display string and only ever
+    covers the first entry, so 巨钳螳螂 ("trade while holding Metal Coat") reads
+    as a bare 「交换」 — the held item lives in `held_item`, which the display
+    string never looks at.  Consumers that need to *decide* something (is this
+    a trade evolution? does it need an item?) must read this instead of parsing
+    the label.
+    """
+    payload: dict[str, Any] = {}
+    trigger = (detail.get("trigger") or {}).get("name")
+    if trigger:
+        payload["trigger"] = trigger
+    for key in _TRIGGER_NAMED_KEYS:
+        named = detail.get(key)
+        if isinstance(named, dict) and named.get("name"):
+            payload[_camel(key)] = named["name"]
+    for key in _TRIGGER_NUMERIC_KEYS:
+        value = detail.get(key)
+        if value:
+            payload[_camel(key)] = value
+    for key in ("gender", "relative_physical_stats"):
+        value = detail.get(key)
+        if value is not None:
+            payload[_camel(key)] = value
+    time_of_day = detail.get("time_of_day")
+    if time_of_day:
+        payload["timeOfDay"] = time_of_day
+    for key in _TRIGGER_FLAG_KEYS:
+        if detail.get(key):
+            payload[_camel(key)] = True
+    return payload
+
+
 def fetch_evolution_chain(
     builder: PokeApiBuilder, url: str, cdn_base: str
 ) -> dict[str, Any]:
@@ -1955,6 +2133,13 @@ def parse_evolution_node(
     details = node.get("evolution_details") or []
     if details:
         trigger_zh = evolution_trigger_zh(details[0])
+    # Every alternative condition, structured. `triggerZh` stays byte-identical
+    # so existing display code is untouched while consumers migrate off it.
+    triggers = [
+        payload
+        for payload in (evolution_trigger_payload(detail) for detail in details)
+        if payload
+    ]
 
     children = [
         parse_evolution_node(builder, child, cdn_base)
@@ -1970,6 +2155,7 @@ def parse_evolution_node(
         "localSpritePath": f"sprites/{species_id}.png",
         **({"evolvesFrom": trigger_zh} if trigger_zh else {}),
         **({"triggerZh": trigger_zh} if trigger_zh else {}),
+        **({"triggers": triggers} if triggers else {}),
         "children": children,
     }
 
@@ -2488,6 +2674,9 @@ def build_runtime_catalog(
     egg_groups: dict[str, set[int]] = {}
     egg_group_slugs = {label: slug for slug, label in EGG_GROUP_ZH.items()}
 
+    # Shape / colour / generation / tags need no reverse index: they ride on the
+    # summaries, which the app already holds in memory.  Only memberships that
+    # live in the 1025 detail files (egg groups, move learners) get indexed.
     for summary in summaries:
         pokemon_id = int(summary["id"])
         detail_path = staging / "details" / f"{pokemon_id}.json"
