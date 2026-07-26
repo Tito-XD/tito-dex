@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dex/dex_repository.dart';
+import '../../theme/tito_colors.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/dex_reference_detail.dart';
+import '../../widgets/type_badge.dart';
 import 'dex_reference_list.dart';
 
 /// CDN / offline reference list (natures, weather, items, …).
@@ -30,8 +32,7 @@ class DexJsonReferencePage extends StatelessWidget {
       filterEntry: _filterReferenceEntry,
       primaryLabel: referencePrimaryLabel,
       secondaryLabel: (entry) => _secondaryLabel(entry, _kind),
-      leadingBuilder:
-          _kind == DexReferenceKind.item ? _itemLeading : null,
+      leadingBuilder: (entry) => _referenceLeading(entry, _kind),
       categoryFilter:
           _kind == DexReferenceKind.item ? _itemCategoryFilter : null,
       gridMode: _kind == DexReferenceKind.item,
@@ -103,14 +104,33 @@ void openDexJsonReference(
   );
 }
 
-Widget? _itemLeading(Map<String, dynamic> entry) {
-  final spriteUrl = entry['spriteUrl'] as String?;
-  if (spriteUrl == null) return null;
-  return DexSpriteImage(source: spriteUrl, width: 28, height: 28);
+Widget? _referenceLeading(Map<String, dynamic> entry, DexReferenceKind kind) {
+  switch (kind) {
+    case DexReferenceKind.item:
+      final spriteUrl = entry['spriteUrl'] as String?;
+      if (spriteUrl == null) return null;
+      return DexSpriteImage(source: spriteUrl, width: 40, height: 40);
+    case DexReferenceKind.move:
+      final type = entry['type'] as String?;
+      if (type == null || type.isEmpty) return null;
+      return TypeIconImage(typeEn: type, size: 28);
+    case DexReferenceKind.ability:
+      return const Icon(
+        Icons.auto_awesome_rounded,
+        size: 28,
+        color: TitoColors.ink,
+      );
+    default:
+      return null;
+  }
 }
 
+// Bulbapedia Browse:Items-style player groups; must match the `categoryZh`
+// values written by tools/build_items_dataset.py (null = 全部).
 final _itemCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
-  options: const [null, '药品', '状态恢复', 'PP恢复', '复活', '精灵球', '特殊球', '球果球', '携带道具', '进化', '训练', '道具'],
+  options: const [
+    null, '精灵球', '回复药品', '树果', '携带道具', '进化道具', '能力提升', '战斗道具',
+  ],
   label: _itemCategoryLabel,
   filter: (entry, category) => _itemCategoryLabel(entry) == category,
 );

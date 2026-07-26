@@ -169,13 +169,45 @@ class DexOfflineService {
     }
     final array = await _store.readJsonArray(filename);
     if (array.isNotEmpty) {
-      return array;
+      return _localizeItemSprites(filename, array);
     }
     final object = await _store.readJsonObject(filename);
     if (object.isEmpty) {
       return const [];
     }
-    return DexCdnDataSource.objectEntriesToList(object);
+    return _localizeItemSprites(
+      filename,
+      DexCdnDataSource.objectEntriesToList(object),
+    );
+  }
+
+  /// Point item entries at the bundled sprite file when reading offline. The
+  /// stored `spriteUrl` is the CDN URL (used verbatim online); offline that URL
+  /// is unreachable, so swap it for `dex_offline/item-sprites/<slug>.png` when
+  /// the bundle carries it. Other reference files pass through untouched.
+  Future<List<Map<String, dynamic>>> _localizeItemSprites(
+    String filename,
+    List<Map<String, dynamic>> entries,
+  ) async {
+    if (filename != 'items.json') {
+      return entries;
+    }
+    final slugs = await _store.availableItemSpriteSlugs();
+    if (slugs.isEmpty) {
+      return entries;
+    }
+    final root = await _store.rootPath();
+    return entries.map((entry) {
+      final slug = entry['slug'];
+      final spriteUrl = entry['spriteUrl'];
+      if (slug is String &&
+          spriteUrl is String &&
+          spriteUrl.startsWith('http') &&
+          slugs.contains(slug)) {
+        return {...entry, 'spriteUrl': '$root/item-sprites/$slug.png'};
+      }
+      return entry;
+    }).toList(growable: false);
   }
 
   Future<Map<int, CachedAbility>> readAbilitiesIndex() async {

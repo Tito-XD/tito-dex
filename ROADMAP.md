@@ -65,6 +65,7 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 
 ## Active TODO
 
+- [x] Complete the items reference: 542 curated items in Bulbapedia-style groups, zh names (100%) and zh in-game descriptions (99%, PokeAPI `zh-hans` + 52poke fallback), and item icons packed into bundle v11 for full offline display (`/v5/`, CDN-first online). Attribution ships as `ITEMS_ATTRIBUTION.txt`.
 - [x] Make deep CDN health derive the active prefix from the manifest and accept a legal default-sprite fallback.
 - [x] Reconcile production Worker health, alerts, cron handlers, caching, and fallback semantics into `main`.
 - [x] Create and bind a dedicated TitoDex `MANIFEST_KV`; the unrelated `FODI_CACHE` remains untouched.
