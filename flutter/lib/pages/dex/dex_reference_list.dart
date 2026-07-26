@@ -134,7 +134,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         crossAxisCount: columns,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
-        childAspectRatio: 0.75,
+        childAspectRatio: 1.0,
       ),
       itemCount: items.length,
       itemBuilder: (ctx, index) {
@@ -479,22 +479,21 @@ class _GridItemCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               if (leading != null) ...[
                 leading!,
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
               ],
-              Expanded(
-                child: Center(
-                  child: Text(
-                    label,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
                   ),
                 ),
               ),

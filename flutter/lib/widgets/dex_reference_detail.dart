@@ -16,6 +16,8 @@ enum DexReferenceKind {
   nature,
   eggGroup,
   item,
+  move,
+  ability,
   weather,
   terrain,
   status,
@@ -32,6 +34,12 @@ DexReferenceKind referenceKindForFilename(String filename) {
   }
   if (lower.contains('item')) {
     return DexReferenceKind.item;
+  }
+  if (lower.contains('move')) {
+    return DexReferenceKind.move;
+  }
+  if (lower.contains('ability')) {
+    return DexReferenceKind.ability;
   }
   if (lower.contains('weather')) {
     return DexReferenceKind.weather;
@@ -239,6 +247,8 @@ class DexReferenceDetailBody extends StatelessWidget {
           DexReferenceKind.nature => NatureReferenceDetail(entry: entry),
           DexReferenceKind.eggGroup => EggGroupReferenceDetail(entry: entry),
           DexReferenceKind.item => ItemReferenceDetail(entry: entry),
+          DexReferenceKind.move => MoveReferenceDetail(entry: entry),
+          DexReferenceKind.ability => AbilityReferenceDetail(entry: entry),
           DexReferenceKind.weather ||
           DexReferenceKind.terrain ||
           DexReferenceKind.status => ConditionReferenceDetail(
@@ -510,6 +520,102 @@ class GenericReferenceDetail extends StatelessWidget {
       return const SizedBox.shrink();
     }
     return Text(description, style: SecondaryTypography.onCard.body14);
+  }
+}
+
+class MoveReferenceDetail extends StatelessWidget {
+  const MoveReferenceDetail({super.key, required this.entry});
+
+  final Map<String, dynamic> entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final type = entry['type'] as String?;
+    final category = entry['category'] as String?;
+    final power = entry['power'] as int?;
+    final accuracy = entry['accuracy'] as int?;
+    final pp = entry['pp'] as int?;
+    final description = referenceDescriptionZh(entry) ??
+        entry['effectZh'] as String? ??
+        entry['shortEffectZh'] as String?;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (type != null && type.isNotEmpty) ...[
+          TitoTypeBadge(typeEn: type, size: TypeBadgeSize.medium),
+          const SizedBox(height: 12),
+        ],
+        if (category != null && category.isNotEmpty)
+          Row(
+            children: [
+              Icon(
+                moveCategoryIcon(category),
+                size: 18,
+                color: TitoColors.ink,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  formatMoveStatLine(
+                    category: category,
+                    power: power,
+                    accuracy: accuracy,
+                    pp: pp,
+                  ),
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        if (description != null && description.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          StickerCard(
+            padding: const EdgeInsets.all(12),
+            child: Text(description, style: SecondaryTypography.onCard.body14),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class AbilityReferenceDetail extends StatelessWidget {
+  const AbilityReferenceDetail({super.key, required this.entry});
+
+  final Map<String, dynamic> entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final description = referenceDescriptionZh(entry) ??
+        entry['effectZh'] as String? ??
+        entry['shortEffectZh'] as String?;
+    final pokemonCount = entry['pokemonCount'] as int? ??
+        (entry['pokemonIds'] as List<dynamic>?)?.length ??
+        0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (description != null && description.isNotEmpty)
+          StickerCard(
+            padding: const EdgeInsets.all(12),
+            child: Text(description, style: SecondaryTypography.onCard.body14),
+          ),
+        if (pokemonCount > 0) ...[
+          const SizedBox(height: 8),
+          Text(
+            AppZh.dexReferencePokemonCount(pokemonCount),
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
 
