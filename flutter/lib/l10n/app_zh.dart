@@ -27,6 +27,7 @@ abstract final class AppZh {
   static const navDex = '图鉴';
   static const navSearch = '搜索';
   static const navSettings = '设置';
+  static const navItems = '道具';
 
   static const trainerCard = '训练家卡片';
   static const companion = '同伴';
