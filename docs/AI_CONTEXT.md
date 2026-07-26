@@ -7,7 +7,7 @@
 | **Latest release** | [v0.7.21](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.21) |
 | **`main` / lite source** | `0.7.21+115` (`flutter/pubspec.yaml`) |
 | **Offline package** | `0.7.21-offline+116` — APK-bundled verified v10 archive |
-| **Offline dex bundle** | **v10** — 1025 species, CDN prefix `/v5/`; `/v4/` rollback |
+| **Offline dex bundle** | **v11** — 1025 species + 542 items (icons + zh descriptions), CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -55,6 +55,13 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
+
+### Items (reference hub → 道具)
+- **542 curated items** grouped into Bulbapedia Browse:Items player categories (`categoryZh`): 精灵球 / 回复药品 / 树果 / 携带道具 / 进化道具 / 能力提升 / 战斗道具.
+- Data source: PokeAPI (list, English name, category, cost, sprite) + Simplified-Chinese in-game descriptions from PokeAPI `zh-hans` flavor, with 52poke (CC BY-NC-SA 4.0) as the fallback for the newest Gen 8/9 items. 100% zh names, 99% zh descriptions.
+- Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
+- Build: `tools/build_items_dataset.py` → `tools/enrich_items_52poke.py` / `enrich_items_52poke_search.py` → `tools/patch_dex_bundle_v11_items.py`. The category-filter option list in `flutter/lib/pages/dex/dex_json_reference_page.dart` must stay in sync with the `categoryZh` groups.
+- Attribution ships in the bundle as `ITEMS_ATTRIBUTION.txt`.
 
 ### Search hub
 - **常用资料:** moves, abilities, natures, egg groups, items, weather, terrain, status.
@@ -135,7 +142,7 @@ flutter/lib/
 | `/v2/` | v4 | 493 (legacy) |
 | `/v3/` | v5 | 1025 (rollback / older clients) |
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
-| `/v5/` | v7 | v6 data + corrected clear media + form sprite history (current) |
+| `/v5/` | v11 | v6 data + clear media + form sprite history + 542 items with icons & zh descriptions (current; v7→v11 patch in place over the same prefix) |
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
