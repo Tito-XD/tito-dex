@@ -71,7 +71,6 @@ class AppHeader extends StatelessWidget {
                 icon: Icons.settings_rounded,
                 onTap: () => context.push('/settings'),
                 label: AppZh.navSettings,
-                compact: compact,
               ),
             ],
           ],
@@ -162,13 +161,11 @@ class _HeaderIconButton extends StatelessWidget {
     required this.icon,
     required this.onTap,
     required this.label,
-    this.compact = false,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final String label;
-  final bool compact;
 
   @override
   Widget build(BuildContext context) {
