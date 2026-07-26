@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_art.dart';
 import '../features/companion/companion_media.dart';
@@ -27,7 +28,6 @@ import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
-import 'companion_position_page.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -1149,15 +1149,8 @@ class _CompanionSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (context) => CompanionPositionPage(
-                              journey: journey,
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: () =>
+                          context.push('/settings/companion-position'),
                       style: FilledButton.styleFrom(
                         backgroundColor: TitoColors.skyBlue,
                         foregroundColor: TitoColors.ink,

@@ -223,6 +223,15 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
                 nextRoute._page.kind == _TitoMaterialPageKind.dex)) {
       return false;
     }
+    // The dex list stays static while its detail (a plain controlled page)
+    // covers it. Without this the covered list ran the default secondary
+    // zoom-out; popping the detail reversed it over the already-settled reveal,
+    // which read as a one-frame twitch of the grid. Mirrors the home opt-out.
+    if (_page.kind == _TitoMaterialPageKind.dex &&
+        nextRoute is _TitoControlledMaterialPageRoute &&
+        nextRoute._page.kind == _TitoMaterialPageKind.plain) {
+      return false;
+    }
     return super.canTransitionTo(nextRoute);
   }
 }
