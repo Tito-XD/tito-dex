@@ -30,9 +30,19 @@ enum _MoveMethodFilter { level, machine, egg, tutor }
 const _combinedObtainVersions = '__combined_versions__';
 
 class PokemonDetailPage extends StatefulWidget {
-  const PokemonDetailPage({super.key, required this.pokemonId});
+  const PokemonDetailPage({
+    super.key,
+    required this.pokemonId,
+    this.initialFormKey,
+    this.initialObtainVersion,
+  });
 
   final int pokemonId;
+
+  /// Deep-link targets from `/dex/:id?form=&version=`; validated against the
+  /// loaded detail before applying, so a stale link degrades to the default.
+  final String? initialFormKey;
+  final String? initialObtainVersion;
 
   @override
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
@@ -89,7 +99,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       _gameEdition = edition;
       _moveGameEdition = edition;
       _obtainGameEdition = edition;
-      _selectedObtainVersion = null;
+      // Races with _loadDetail; never wipe a deep-linked version selection.
+      if (widget.initialObtainVersion == null) {
+        _selectedObtainVersion = null;
+      }
     });
   }
 
@@ -106,10 +119,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       if (!mounted) {
         return;
       }
+      final linkedForm = widget.initialFormKey;
+      final linkedVersion = widget.initialObtainVersion;
       setState(() {
         _detail = detail;
         _abilities = abilities;
-        _selectedFormKey = detail.defaultForm?.key;
+        _selectedFormKey =
+            (linkedForm != null &&
+                detail.forms.any((form) => form.key == linkedForm))
+            ? linkedForm
+            : detail.defaultForm?.key;
+        if (linkedVersion != null &&
+            detail.obtainLocationsByVersion.containsKey(linkedVersion)) {
+          _selectedObtainVersion = linkedVersion;
+        }
         _loading = false;
       });
     } catch (error) {
@@ -242,6 +265,47 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     return detail;
   }
 
+  PokemonFormDetail? get _selectedForm {
+    final detail = _detail;
+    final key = _selectedFormKey;
+    if (detail == null || key == null) {
+      return null;
+    }
+    for (final form in detail.forms) {
+      if (form.key == key) {
+        return form;
+      }
+    }
+    return null;
+  }
+
+  /// Fallback annotation for non-default forms whose data is borrowed or
+  /// incomplete — so "空白" and "游戏中不存在" stop looking identical.
+  Widget? _formDataQualityNote() {
+    final form = _selectedForm;
+    if (form == null || form.isDefault) {
+      return null;
+    }
+    final String? copy;
+    if (form.inheritsFromDefault) {
+      copy = AppZh.dexFormDataInherited;
+    } else if (form.dataCompleteness == 'partial') {
+      copy = AppZh.dexFormDataPartial;
+    } else {
+      copy = null;
+    }
+    if (copy == null) {
+      return null;
+    }
+    return Text(
+      copy,
+      style: SecondaryTypography.onGradient.small12.copyWith(
+        color: TitoColors.softYellow,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
   List<Widget> _tabSections(PokemonDetail detail, int tabIndex) {
     return switch (tabIndex) {
       0 => _introSections(detail),
@@ -351,7 +415,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   ];
 
   List<Widget> _basicSections(PokemonDetail detail) {
+    final qualityNote = _formDataQualityNote();
     return [
+      if (qualityNote != null) ...[
+        qualityNote,
+        const SizedBox(height: 8),
+      ],
       if (detail.baseStats != null) ...[
         BaseStatsSection(stats: detail.baseStats!),
         const SizedBox(height: 12),
