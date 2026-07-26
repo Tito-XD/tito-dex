@@ -22,6 +22,12 @@ class PokemonSummary {
     this.animatedSpriteUrl,
     this.spriteResourceId,
     this.formSearchTerms = const [],
+    this.genusZh,
+    this.generation,
+    this.shapeSlug,
+    this.colorSlug,
+    this.tags = const [],
+    this.heightDm,
   });
 
   final int id;
@@ -45,6 +51,26 @@ class PokemonSummary {
 
   /// Alternate-form names/slugs folded into species-level dex search.
   final List<String> formSearchTerms;
+
+  /// Pokédex genus ("种子宝可梦"). Lives on the summary — not the detail — so
+  /// search can match it without walking 1025 detail files.
+  final String? genusZh;
+
+  /// Generation the species debuted in (1–9); drives 「本世代新增」 dex views.
+  final int? generation;
+
+  /// Body style / colour from the in-game Pokédex search (`quadruped`, `green`).
+  final String? shapeSlug;
+  final String? colorSlug;
+
+  /// Semantic tags resolved by search aliases: `legendary`, `mythical`,
+  /// `baby`, `pseudo-legendary`.
+  final List<String> tags;
+
+  /// Height in decimetres. Duplicated from the detail onto the summary so the
+  /// relative-size axis can filter without opening 1025 detail files — the same
+  /// reason [genusZh] lives here.
+  final int? heightDm;
 
   String get typesLabel => types.map(typeNameZh).join('/');
 
@@ -72,6 +98,12 @@ class PokemonSummary {
     if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
     if (spriteResourceId != null) 'spriteResourceId': spriteResourceId,
     if (formSearchTerms.isNotEmpty) 'formSearchTerms': formSearchTerms,
+    if (genusZh != null) 'genusZh': genusZh,
+    if (generation != null) 'generation': generation,
+    if (shapeSlug != null) 'shapeSlug': shapeSlug,
+    if (colorSlug != null) 'colorSlug': colorSlug,
+    if (tags.isNotEmpty) 'tags': tags,
+    if (heightDm != null) 'heightDm': heightDm,
   };
 
   factory PokemonSummary.fromJson(Map<String, dynamic> json) {
@@ -98,6 +130,12 @@ class PokemonSummary {
       spriteResourceId: (json['spriteResourceId'] as num?)?.toInt(),
       formSearchTerms: (json['formSearchTerms'] as List<dynamic>? ?? const [])
           .cast<String>(),
+      genusZh: json['genusZh'] as String?,
+      generation: (json['generation'] as num?)?.toInt(),
+      shapeSlug: json['shapeSlug'] as String?,
+      colorSlug: json['colorSlug'] as String?,
+      tags: (json['tags'] as List<dynamic>? ?? const []).cast<String>(),
+      heightDm: (json['heightDm'] as num?)?.toInt(),
     );
   }
 
@@ -110,6 +148,12 @@ class PokemonSummary {
     String? animatedSpriteUrl,
     int? spriteResourceId,
     List<String>? formSearchTerms,
+    String? genusZh,
+    int? generation,
+    String? shapeSlug,
+    String? colorSlug,
+    List<String>? tags,
+    int? heightDm,
   }) {
     return PokemonSummary(
       id: id,
@@ -124,6 +168,12 @@ class PokemonSummary {
       animatedSpriteUrl: animatedSpriteUrl ?? this.animatedSpriteUrl,
       spriteResourceId: spriteResourceId ?? this.spriteResourceId,
       formSearchTerms: formSearchTerms ?? this.formSearchTerms,
+      genusZh: genusZh ?? this.genusZh,
+      generation: generation ?? this.generation,
+      shapeSlug: shapeSlug ?? this.shapeSlug,
+      colorSlug: colorSlug ?? this.colorSlug,
+      tags: tags ?? this.tags,
+      heightDm: heightDm ?? this.heightDm,
     );
   }
 }
@@ -987,6 +1037,11 @@ class PokemonDetail {
     this.eggGroups = const [],
     this.hatchCounter,
     this.forms = const [],
+    this.growthRateSlug,
+    this.habitatSlug,
+    this.hasGenderDifferences = false,
+    this.heldItems = const [],
+    this.baseExperience,
   });
 
   final PokemonSummary summary;
@@ -1016,6 +1071,21 @@ class PokemonDetail {
   final List<String> eggGroups;
   final int? hatchCounter;
   final List<PokemonFormDetail> forms;
+
+  /// Experience group slug — how fast this species levels. Chinese labels live
+  /// in dex_search_terms.dart, never in the bundle: CDN prefixes are immutable,
+  /// so a label baked in here could not be corrected without a republish.
+  final String? growthRateSlug;
+
+  /// Habitat only exists for Gen I–III species; null everywhere else.
+  final String? habitatSlug;
+
+  final bool hasGenderDifferences;
+
+  /// Items wild members may hold, best rarity first.
+  final List<PokemonHeldItem> heldItems;
+
+  final int? baseExperience;
 
   bool get hasMultipleForms => forms.length > 1;
 
@@ -1099,6 +1169,12 @@ class PokemonDetail {
       eggGroups: eggGroups,
       hatchCounter: hatchCounter,
       forms: forms,
+      // Species-level reference data — identical across forms.
+      growthRateSlug: growthRateSlug,
+      habitatSlug: habitatSlug,
+      hasGenderDifferences: hasGenderDifferences,
+      heldItems: heldItems,
+      baseExperience: baseExperience,
     );
   }
 
@@ -1247,6 +1323,12 @@ class PokemonDetail {
     if (evolutionChain != null) 'evolutionChain': evolutionChain!.toJson(),
     if (forms.isNotEmpty)
       'forms': forms.map((entry) => entry.toJson()).toList(),
+    if (growthRateSlug != null) 'growthRateSlug': growthRateSlug,
+    if (habitatSlug != null) 'habitatSlug': habitatSlug,
+    if (hasGenderDifferences) 'hasGenderDifferences': true,
+    if (heldItems.isNotEmpty)
+      'heldItems': heldItems.map((entry) => entry.toJson()).toList(),
+    if (baseExperience != null) 'baseExperience': baseExperience,
   };
 
   factory PokemonDetail.fromJson(
@@ -1418,6 +1500,47 @@ class PokemonDetail {
           : EvolutionNode.fromJson(
               json['evolutionChain'] as Map<String, dynamic>,
             ),
+      growthRateSlug: json['growthRateSlug'] as String?,
+      habitatSlug: json['habitatSlug'] as String?,
+      hasGenderDifferences: json['hasGenderDifferences'] as bool? ?? false,
+      heldItems: (json['heldItems'] as List<dynamic>? ?? const [])
+          .map((item) => PokemonHeldItem.fromJson(item as Map<String, dynamic>))
+          .toList(growable: false),
+      baseExperience: (json['baseExperience'] as num?)?.toInt(),
+    );
+  }
+}
+
+/// An item wild members of a species may hold, with per-version rarity.
+class PokemonHeldItem {
+  const PokemonHeldItem({
+    required this.slug,
+    this.rarityByVersion = const {},
+    this.maxRarity = 0,
+  });
+
+  final String slug;
+  final Map<String, int> rarityByVersion;
+  final int maxRarity;
+
+  /// Rarity in a specific game version, or null when that version never
+  /// spawns this species holding the item.
+  int? rarityForVersion(String version) => rarityByVersion[version];
+
+  Map<String, dynamic> toJson() => {
+    'slug': slug,
+    if (rarityByVersion.isNotEmpty) 'rarityByVersion': rarityByVersion,
+    'maxRarity': maxRarity,
+  };
+
+  factory PokemonHeldItem.fromJson(Map<String, dynamic> json) {
+    final rarityRaw = json['rarityByVersion'] as Map<String, dynamic>?;
+    return PokemonHeldItem(
+      slug: json['slug'] as String? ?? '',
+      rarityByVersion:
+          rarityRaw?.map((key, value) => MapEntry(key, (value as num).toInt())) ??
+          const {},
+      maxRarity: (json['maxRarity'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -1432,6 +1555,7 @@ class EvolutionNode {
     this.localSpritePath,
     this.evolvesFrom,
     this.triggerZh,
+    this.triggers = const [],
     this.children = const [],
   });
 
@@ -1443,6 +1567,13 @@ class EvolutionNode {
   final String? localSpritePath;
   final String? evolvesFrom;
   final String? triggerZh;
+
+  /// Structured evolution conditions, one per PokeAPI `evolution_details`
+  /// entry. [triggerZh] is a display string that flattens only the first
+  /// condition — anything that needs to *decide* (is this a trade evolution?
+  /// does it need a held item?) must read these instead of parsing the label.
+  final List<EvolutionTrigger> triggers;
+
   final List<EvolutionNode> children;
 
   String? get displaySpritePath => localSpritePath ?? spriteUrl;
@@ -1470,6 +1601,7 @@ class EvolutionNode {
           spriteUrl: spriteUrl, artworkUrl: artworkUrl,
           localSpritePath: localSpritePath,
           evolvesFrom: evolvesFrom, triggerZh: triggerZh,
+          triggers: triggers,
           children: children.where((c) => allowed.contains(c.id)).toList(),
         );
       }
@@ -1500,6 +1632,8 @@ class EvolutionNode {
     if (localSpritePath != null) 'localSpritePath': localSpritePath,
     if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
     if (triggerZh != null) 'triggerZh': triggerZh,
+    if (triggers.isNotEmpty)
+      'triggers': triggers.map((trigger) => trigger.toJson()).toList(),
     'children': children.map((child) => child.toJson()).toList(),
   };
 
@@ -1512,6 +1646,9 @@ class EvolutionNode {
     localSpritePath: json['localSpritePath'] as String?,
     evolvesFrom: json['evolvesFrom'] as String?,
     triggerZh: json['triggerZh'] as String?,
+    triggers: (json['triggers'] as List<dynamic>? ?? const [])
+        .map((item) => EvolutionTrigger.fromJson(item as Map<String, dynamic>))
+        .toList(growable: false),
     children: (json['children'] as List<dynamic>? ?? const [])
         .map((item) => EvolutionNode.fromJson(item as Map<String, dynamic>))
         .toList(),
@@ -1527,9 +1664,108 @@ class EvolutionNode {
       localSpritePath: path,
       evolvesFrom: evolvesFrom,
       triggerZh: triggerZh,
+      triggers: triggers,
       children: children,
     );
   }
+}
+
+/// One structured evolution condition.
+///
+/// Mirrors a PokeAPI `evolution_details` entry. Only the fields that were
+/// present survive the bundle, so a null means "not part of this condition".
+class EvolutionTrigger {
+  const EvolutionTrigger({
+    this.trigger,
+    this.item,
+    this.heldItem,
+    this.knownMove,
+    this.knownMoveType,
+    this.location,
+    this.partySpecies,
+    this.partyType,
+    this.tradeSpecies,
+    this.minLevel,
+    this.minHappiness,
+    this.minBeauty,
+    this.minAffection,
+    this.gender,
+    this.relativePhysicalStats,
+    this.timeOfDay,
+    this.needsOverworldRain = false,
+    this.turnUpsideDown = false,
+  });
+
+  /// PokeAPI trigger slug: `level-up`, `trade`, `use-item`, `shed`, …
+  final String? trigger;
+  final String? item;
+  final String? heldItem;
+  final String? knownMove;
+  final String? knownMoveType;
+  final String? location;
+  final String? partySpecies;
+  final String? partyType;
+  final String? tradeSpecies;
+  final int? minLevel;
+  final int? minHappiness;
+  final int? minBeauty;
+  final int? minAffection;
+  final int? gender;
+  final int? relativePhysicalStats;
+  final String? timeOfDay;
+  final bool needsOverworldRain;
+  final bool turnUpsideDown;
+
+  /// True for trade evolutions — including 巨钳螳螂-style "trade while holding
+  /// an item", which the display string alone cannot distinguish.
+  bool get isTrade => trigger == 'trade';
+
+  /// Trade evolutions that additionally require a held item.
+  bool get requiresHeldItem => heldItem != null;
+
+  Map<String, dynamic> toJson() => {
+    if (trigger != null) 'trigger': trigger,
+    if (item != null) 'item': item,
+    if (heldItem != null) 'heldItem': heldItem,
+    if (knownMove != null) 'knownMove': knownMove,
+    if (knownMoveType != null) 'knownMoveType': knownMoveType,
+    if (location != null) 'location': location,
+    if (partySpecies != null) 'partySpecies': partySpecies,
+    if (partyType != null) 'partyType': partyType,
+    if (tradeSpecies != null) 'tradeSpecies': tradeSpecies,
+    if (minLevel != null) 'minLevel': minLevel,
+    if (minHappiness != null) 'minHappiness': minHappiness,
+    if (minBeauty != null) 'minBeauty': minBeauty,
+    if (minAffection != null) 'minAffection': minAffection,
+    if (gender != null) 'gender': gender,
+    if (relativePhysicalStats != null)
+      'relativePhysicalStats': relativePhysicalStats,
+    if (timeOfDay != null) 'timeOfDay': timeOfDay,
+    if (needsOverworldRain) 'needsOverworldRain': true,
+    if (turnUpsideDown) 'turnUpsideDown': true,
+  };
+
+  factory EvolutionTrigger.fromJson(Map<String, dynamic> json) =>
+      EvolutionTrigger(
+        trigger: json['trigger'] as String?,
+        item: json['item'] as String?,
+        heldItem: json['heldItem'] as String?,
+        knownMove: json['knownMove'] as String?,
+        knownMoveType: json['knownMoveType'] as String?,
+        location: json['location'] as String?,
+        partySpecies: json['partySpecies'] as String?,
+        partyType: json['partyType'] as String?,
+        tradeSpecies: json['tradeSpecies'] as String?,
+        minLevel: (json['minLevel'] as num?)?.toInt(),
+        minHappiness: (json['minHappiness'] as num?)?.toInt(),
+        minBeauty: (json['minBeauty'] as num?)?.toInt(),
+        minAffection: (json['minAffection'] as num?)?.toInt(),
+        gender: (json['gender'] as num?)?.toInt(),
+        relativePhysicalStats: (json['relativePhysicalStats'] as num?)?.toInt(),
+        timeOfDay: json['timeOfDay'] as String?,
+        needsOverworldRain: json['needsOverworldRain'] as bool? ?? false,
+        turnUpsideDown: json['turnUpsideDown'] as bool? ?? false,
+      );
 }
 
 class DexCacheManifest {

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_search_terms.dart';
 import '../features/dex/type_chart.dart';
 import '../features/game/game_edition_repository.dart';
 import '../pages/dex/dex_json_reference_page.dart';
@@ -351,7 +352,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _searchResultsBody(BuildContext context, String query) {
     if (query.isEmpty) {
-      return const _SearchIdlePlaceholder();
+      return _SearchIdlePlaceholder(onSuggestionTap: _applyQuery);
     }
     if (_searching) {
       return const TitoLoadingPanel(
@@ -589,18 +590,48 @@ class _SearchHubSegmentBar extends StatelessWidget {
   }
 }
 
+/// Offline search cannot learn what people want from query logs, so the empty
+/// state has to teach the vocabulary instead: these chips are how a player
+/// discovers that 「传说」 or 「四足」 are searchable at all.
 class _SearchIdlePlaceholder extends StatelessWidget {
-  const _SearchIdlePlaceholder();
+  const _SearchIdlePlaceholder({required this.onSuggestionTap});
+
+  final ValueChanged<String> onSuggestionTap;
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
       variant: StickerVariant.sky,
-      child: Text(
-        AppZh.searchEmptyHint,
-        style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppZh.searchEmptyHint,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            AppZh.searchSuggestionTitle,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final word in kDexSearchSuggestions)
+                _SearchQueryChip(
+                  label: word,
+                  onTap: () => onSuggestionTap(word),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
