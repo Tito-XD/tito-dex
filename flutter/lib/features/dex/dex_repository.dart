@@ -585,18 +585,19 @@ class DexRepository {
     }
   }
 
-  /// Reference hub entries (natures, weather, …) — local bundle first, then CDN.
+  /// Reference hub entries (natures, weather, items, …).
+  ///
+  /// CDN first so reference enrichments (sprites, effects) are picked up
+  /// without waiting for a new offline archive build.  Falls back to the
+  /// bundled archive copy when the network is unavailable.
   Future<List<Map<String, dynamic>>> getReferenceEntries(
     String filename,
   ) async {
-    final offline = await _offline.readReferenceArray(filename);
-    if (offline.isNotEmpty) {
-      return offline;
-    }
     try {
       return await _cdn.fetchReferenceArray(filename);
     } catch (_) {
-      return const [];
+      final offline = await _offline.readReferenceArray(filename);
+      return offline;
     }
   }
 
