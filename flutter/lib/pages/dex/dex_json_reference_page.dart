@@ -34,6 +34,7 @@ class DexJsonReferencePage extends StatelessWidget {
           _kind == DexReferenceKind.item ? _itemLeading : null,
       categoryFilter:
           _kind == DexReferenceKind.item ? _itemCategoryFilter : null,
+      gridMode: _kind == DexReferenceKind.item,
       detailSheet: (context, entry) => showJsonReferenceDetailSheet(
         context,
         entry: entry,
