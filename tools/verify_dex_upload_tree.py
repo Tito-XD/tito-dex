@@ -30,7 +30,9 @@ def verify(upload_dir: Path) -> None:
     archive = versioned / "bundle.tar.zst"
 
     assert bundle_version >= 6, root
-    assert cdn_prefix == f"v{bundle_version - 2}", root
+    # v7+ patches in place over /v5/; earlier releases used v{bundle_version - 2}.
+    expected_prefix = "v5" if bundle_version >= 7 else f"v{bundle_version - 2}"
+    assert cdn_prefix == expected_prefix, root
     assert root["pokemonCount"] == 1025, root
     assert root["complete"] is True, root
     assert root["exactVersionLocations"] is True, root
