@@ -371,6 +371,24 @@ class DexCacheStore {
     return file.path;
   }
 
+  /// Slugs for which a bundled `item-sprites/<slug>.png` exists. Listed once so
+  /// the item reference page can swap CDN sprite URLs for local files offline
+  /// without a per-item stat. Empty when the bundle predates item sprites.
+  Future<Set<String>> availableItemSpriteSlugs() async {
+    final paths = await _pathsFuture;
+    final dir = Directory('${paths.root.path}/item-sprites');
+    if (!await dir.exists()) {
+      return const {};
+    }
+    final slugs = <String>{};
+    await for (final entity in dir.list()) {
+      if (entity is File && entity.path.endsWith('.png')) {
+        slugs.add(entity.uri.pathSegments.last.replaceAll('.png', ''));
+      }
+    }
+    return slugs;
+  }
+
   /// Scan cached detail JSON for species that learn [moveId].
   Future<List<int>> findPokemonIdsWithMove(int moveId) async {
     final paths = await _pathsFuture;
