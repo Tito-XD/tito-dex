@@ -84,6 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _avatarChanging = false;
   DexCacheStatus? _dexCacheStatus;
   bool _dexDownloading = false;
+  bool _dexVerifying = false;
   GameEdition _defaultGameEdition = defaultGameEdition;
 
   @override
@@ -279,6 +280,31 @@ class _SettingsPageState extends State<SettingsPage> {
         const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
       );
     }
+  }
+
+  Future<void> _verifyDexOffline() async {
+    setState(() => _dexVerifying = true);
+    final result = await dexOfflineService.verifyOfflineData();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _dexVerifying = false);
+    final String message;
+    if (!result.hasData) {
+      message = AppZh.settingsDexVerifyNoData;
+    } else if (result.healthy) {
+      message = result.missingSprites > 0
+          ? '${AppZh.settingsDexVerifyOk(result.summaryCount)}'
+                '${AppZh.settingsDexVerifySpriteNote(result.missingSprites)}'
+          : AppZh.settingsDexVerifyOk(result.summaryCount);
+    } else if (result.missingDetails > 0) {
+      message = AppZh.settingsDexVerifyProblems(result.missingDetails);
+    } else {
+      message = AppZh.settingsDexVerifyIncomplete;
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _clearDexOffline() async {
@@ -730,6 +756,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
                   ),
+                  OutlinedButton(
+                    onPressed: (_dexDownloading || _dexVerifying)
+                        ? null
+                        : _verifyDexOffline,
+                    child: Text(
+                      _dexVerifying
+                          ? AppZh.settingsDexVerifyRunning
+                          : AppZh.settingsDexVerify,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: _dexDownloading ? null : _clearDexOffline,
                     child: const Text(AppZh.settingsDexOfflineClear),

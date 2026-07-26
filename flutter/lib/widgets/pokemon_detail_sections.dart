@@ -12,6 +12,8 @@ import '../features/dex/type_chart.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
+import '../features/dex/dex_search_terms.dart';
+import '../features/dex/dex_filter.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
@@ -1590,6 +1592,22 @@ class IntroMetaCard extends StatelessWidget {
               ),
             ],
           ),
+          if (detail.summary.shapeSlug != null ||
+              detail.summary.colorSlug != null ||
+              detail.summary.tags.isNotEmpty) ...[
+            const Divider(height: 20),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                AppZh.dexSpeciesAxes,
+                style: SecondaryTypography.onCard.team12.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SpeciesAxisChips(summary: detail.summary),
+          ],
           if (female != null) ...[
             const Divider(height: 20),
             Row(
@@ -1662,8 +1680,112 @@ class IntroMetaCard extends StatelessWidget {
             const Divider(height: 20),
             _MetaRow(label: AppZh.dexEvYield, value: detail.evYieldLabel!),
           ],
+          if (detail.growthRateSlug != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexGrowthRate,
+              value:
+                  dexGrowthRateLabelZh(detail.growthRateSlug!) ??
+                  detail.growthRateSlug!,
+            ),
+          ],
+          if (detail.baseExperience != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexBaseExperience,
+              value: '${detail.baseExperience}',
+            ),
+          ],
+          if (detail.habitatSlug != null) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexHabitat,
+              // Habitat is a Gen I–III-only field, so say why it is missing
+              // elsewhere rather than silently dropping the row.
+              value:
+                  dexHabitatLabelZh(detail.habitatSlug!) ??
+                  detail.habitatSlug!,
+            ),
+          ],
+          if (detail.hasGenderDifferences) ...[
+            const Divider(height: 20),
+            _MetaRow(
+              label: AppZh.dexGenderDifferences,
+              value: AppZh.dexGenderDifferencesYes,
+            ),
+          ],
+          // Held items ship in the bundle but stay unrendered until the item
+          // name lookup is wired in — a row of raw `dragon-scale` slugs in a
+          // Chinese UI is worse than no row.
         ],
       ),
+    );
+  }
+}
+
+/// Body style / colour / relative size — the three axes the dex list filters
+/// on. Tapping one jumps to the dex with that axis applied, which is how a
+/// player gets from "this looks like that other one" to the actual short list.
+class SpeciesAxisChips extends StatelessWidget {
+  const SpeciesAxisChips({super.key, required this.summary});
+
+  final PokemonSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = DexSizeBucket.forHeightDm(summary.heightDm);
+    final priorShape = dexPreGen6ShapeSlug(summary.id);
+    final entries = <(String, DexFilter)>[
+      if (summary.shapeSlug != null)
+        (
+          dexShapeLabelZh(summary.shapeSlug!) ?? summary.shapeSlug!,
+          DexFilter(shapeSlug: summary.shapeSlug),
+        ),
+      // Reclassified in Gen VI — HGSS players know it by the older body style,
+      // so both are listed and both are filterable.
+      if (priorShape != null)
+        (
+          AppZh.dexShapeBeforeGen6(
+            dexShapeLabelZh(priorShape) ?? priorShape,
+          ),
+          DexFilter(shapeSlug: priorShape),
+        ),
+      if (summary.colorSlug != null)
+        (
+          dexColorLabelZh(summary.colorSlug!) ?? summary.colorSlug!,
+          DexFilter(colorSlugs: {summary.colorSlug!}),
+        ),
+      if (size != null) (size.labelZh, DexFilter(sizeSlug: size.slug)),
+      for (final tag in summary.tags)
+        (dexTagLabelZh(tag) ?? tag, DexFilter(tag: tag)),
+    ];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final (label, filter) in entries)
+          ActionChip(
+            backgroundColor: TitoColors.card,
+            side: const BorderSide(color: TitoColors.ink, width: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
+            label: Text(
+              label,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            onPressed: () {
+              dexFilterController.setFilter(filter);
+              context.push('/dex');
+            },
+          ),
+      ],
     );
   }
 }

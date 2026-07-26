@@ -19,6 +19,15 @@ class DexFilterBanner extends StatelessWidget {
   final bool loading;
 
   String get _label {
+    // Species axes are stackable, so they describe themselves and take
+    // precedence over the drill-down label a reference sheet may have set.
+    final axes = filter.speciesAxesLabelZh;
+    if (axes != null) {
+      final drillDown = filter.labelZh;
+      return drillDown == null || drillDown.isEmpty
+          ? axes
+          : '$drillDown · $axes';
+    }
     if (filter.labelZh != null && filter.labelZh!.isNotEmpty) {
       return filter.labelZh!;
     }

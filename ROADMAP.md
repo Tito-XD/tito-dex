@@ -57,6 +57,10 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 
 ## Next priorities
 
+> Feature-side sequencing (save auto-edition, offline verify, evolution/version
+> availability, location index) lives in
+> [docs/PHASED_FEATURE_PLAN.md](docs/PHASED_FEATURE_PLAN.md).
+
 1. **Regression coverage** — expand automated coverage for the aligned trainer-card, team-editor, offline, and flavor-title behavior.
 2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
 3. **Save workflow validation** — add real fixtures for supported pre-Switch games and expand format-specific imports.

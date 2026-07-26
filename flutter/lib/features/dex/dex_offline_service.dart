@@ -17,6 +17,45 @@ import 'poke_api_throttle.dart';
 import 'pokeapi_client.dart';
 import 'type_chart.dart';
 
+/// Outcome of an explicit offline-data integrity check (Settings → 校验).
+///
+/// Missing sprites are reported but do not fail [healthy]: the app falls back
+/// to CDN/asset sprites, whereas missing detail JSON breaks the dex offline.
+class DexOfflineVerifyResult {
+  const DexOfflineVerifyResult({
+    required this.hasData,
+    required this.manifestComplete,
+    required this.catalogPresent,
+    required this.summaryCount,
+    required this.missingDetails,
+    required this.missingSprites,
+  });
+
+  const DexOfflineVerifyResult.noData()
+    : this(
+        hasData: false,
+        manifestComplete: false,
+        catalogPresent: false,
+        summaryCount: 0,
+        missingDetails: 0,
+        missingSprites: 0,
+      );
+
+  final bool hasData;
+  final bool manifestComplete;
+  final bool catalogPresent;
+  final int summaryCount;
+  final int missingDetails;
+  final int missingSprites;
+
+  bool get healthy =>
+      hasData &&
+      manifestComplete &&
+      catalogPresent &&
+      summaryCount > 0 &&
+      missingDetails == 0;
+}
+
 class DexOfflineService {
   DexOfflineService({
     PokeApiClient? client,
@@ -83,6 +122,35 @@ class DexOfflineService {
       sizeBytes: sizeBytes,
       isDownloading: _downloading,
       progress: _progress,
+    );
+  }
+
+  /// Re-checks the installed offline data without touching the network:
+  /// manifest + catalog readable, summaries decode, and every summary has its
+  /// detail JSON (and, informationally, its sprite) on disk.
+  Future<DexOfflineVerifyResult> verifyOfflineData() async {
+    final manifest = await _store.readManifest();
+    final summaries = await _store.readSummaries();
+    if (manifest.pokemonCount == 0 && summaries.isEmpty) {
+      return const DexOfflineVerifyResult.noData();
+    }
+    var missingDetails = 0;
+    var missingSprites = 0;
+    for (final summary in summaries) {
+      if (!await _store.hasDetail(summary.id)) {
+        missingDetails++;
+      }
+      if (await _store.spriteRelativePath(summary.id) == null) {
+        missingSprites++;
+      }
+    }
+    return DexOfflineVerifyResult(
+      hasData: true,
+      manifestComplete: manifest.complete,
+      catalogPresent: await _store.hasCatalog(),
+      summaryCount: summaries.length,
+      missingDetails: missingDetails,
+      missingSprites: missingSprites,
     );
   }
 

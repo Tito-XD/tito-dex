@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:titodex/features/game/game_edition_repository.dart';
 import 'package:titodex/features/parser/pokemon_save_parser.dart';
 import 'package:titodex/features/save/save_document_source.dart';
 import 'package:titodex/features/save/save_file_repository.dart';
@@ -58,9 +59,37 @@ void main() {
     });
   });
 
+  group('GameEditionRepository.applyForSaveGame', () {
+    test('applies once per save game unless forced', () async {
+      SharedPreferences.setMockInitialValues({});
+      final repo = GameEditionRepository();
+
+      expect(await repo.applyForSaveGame('SoulSilver'), isTrue);
+      expect(repo.edition.slug, 'hgss');
+
+      // Manual pick afterwards wins over a repeat of the same save game.
+      await repo.saveSlug('sv');
+      expect(await repo.applyForSaveGame('SoulSilver'), isFalse);
+      expect(repo.edition.slug, 'sv');
+
+      // Explicit re-import applies unconditionally.
+      expect(await repo.applyForSaveGame('SoulSilver', force: true), isTrue);
+      expect(repo.edition.slug, 'hgss');
+
+      // A different save game switches again even without force.
+      expect(await repo.applyForSaveGame('Platinum'), isTrue);
+      expect(repo.edition.slug, 'pt');
+
+      // Unknown names never touch the edition.
+      expect(await repo.applyForSaveGame('SomethingElse'), isFalse);
+      expect(repo.edition.slug, 'pt');
+    });
+  });
+
   group('selected save document', () {
     late SaveFileRepository repository;
     late _FakeSaveDocumentSource source;
+    late GameEditionRepository editionRepository;
     late SaveSyncService service;
     late SaveDocument document;
 
@@ -75,10 +104,12 @@ void main() {
       );
       repository = SaveFileRepository();
       source = _FakeSaveDocumentSource(document);
+      editionRepository = GameEditionRepository();
       service = SaveSyncService(
         fileRepository: repository,
         parser: const PokemonSaveParser(),
         documentSource: source,
+        editionRepository: editionRepository,
       );
     });
 
@@ -119,6 +150,35 @@ void main() {
 
       expect(result.updated, isFalse);
       expect(source.readUris, isEmpty);
+    });
+
+    test('explicit import auto-selects the matching game edition', () async {
+      // Start from a deliberately different manual pick.
+      await editionRepository.saveSlug('sv');
+
+      await service.selectSaveDocument(
+        document: document,
+        existing: CurrentJourney.mock(),
+      );
+
+      // PKMSS.sav is a SoulSilver save.
+      expect(editionRepository.edition.slug, 'hgss');
+      expect(editionRepository.edition.selectedFlavor, 'soulsilver');
+    });
+
+    test('startup re-sync does not fight a later manual edition pick',
+        () async {
+      final first = await service.selectSaveDocument(
+        document: document,
+        existing: CurrentJourney.mock(),
+      );
+      expect(editionRepository.edition.slug, 'hgss');
+
+      // User manually switches away, then the same save re-syncs on startup.
+      await editionRepository.saveSlug('sv');
+      await service.syncOnStartup(existing: first.journey);
+
+      expect(editionRepository.edition.slug, 'sv');
     });
 
     test('clearFile releases URI permission and clears file state', () async {

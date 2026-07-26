@@ -23,6 +23,7 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_font_scale.dart';
 import '../widgets/dex_filter_banner.dart';
+import '../widgets/dex_species_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -102,6 +103,15 @@ class _DexPageState extends State<DexPage> {
   }
 
   @override
+  void deactivate() {
+    // Stop any in-flight reveal animations as soon as the page is pushed to
+    // the background (e.g. opening a detail page), so returning to the list
+    // does not replay the floating-card effect.
+    _revealAnimationsEnabled = false;
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _scrollController
       ..removeListener(_onScroll)
@@ -159,6 +169,23 @@ class _DexPageState extends State<DexPage> {
 
   void _onReferenceFilterChanged() {
     _loadReferenceFilter();
+  }
+
+  Future<void> _openSpeciesFilter() async {
+    final picked = await showDexSpeciesFilterSheet(
+      context,
+      selected: dexFilterController.currentFilter,
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    // The picker owns the species axes; an empty result clears them without
+    // disturbing an active reference drill-down.
+    if (picked.isActive) {
+      dexFilterController.setFilter(picked);
+    } else {
+      dexFilterController.clearFilter();
+    }
   }
 
   Future<void> _loadReferenceFilter() async {
@@ -689,6 +716,14 @@ class _DexPageState extends State<DexPage> {
                                                       _encounterFilter = filter,
                                                 );
                                               },
+                                            ),
+                                            SizedBox(
+                                              height: squareGap(context),
+                                            ),
+                                            _DexSpeciesFilterButton(
+                                              filter: dexFilterController
+                                                  .currentFilter,
+                                              onTap: _openSpeciesFilter,
                                             ),
                                           ],
                                         )
@@ -1264,6 +1299,69 @@ class _DexFilterChip extends StatelessWidget {
                 height: 1.2,
                 fontSize: 12,
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Entry point for the stackable body style / colour / size filter.
+class _DexSpeciesFilterButton extends StatelessWidget {
+  const _DexSpeciesFilterButton({required this.filter, required this.onTap});
+
+  final DexFilter filter;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = DeviceLayout.rMd(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final label = filter.speciesAxesLabelZh;
+    final active = label != null;
+
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: BorderRadius.circular(radius),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          canRequestFocus: false,
+          borderRadius: BorderRadius.circular(radius),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: active ? TitoColors.softYellow : TitoColors.card,
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(color: TitoColors.ink, width: 2),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: square ? 6 : 9,
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.tune_rounded, size: 18, color: TitoColors.ink),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label ?? AppZh.dexSpeciesFilterOpen,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Icon(
+                  active
+                      ? Icons.check_circle_rounded
+                      : Icons.chevron_right_rounded,
+                  size: 18,
+                  color: TitoColors.ink,
+                ),
+              ],
             ),
           ),
         ),

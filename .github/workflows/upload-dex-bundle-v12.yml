@@ -1,0 +1,149 @@
+name: Patch and Publish Dex Bundle v12
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload verified /v5 objects and switch the root manifest last
+        required: true
+        default: true
+        type: boolean
+      reuse_run_id:
+        description: Reuse a preserved v12 diagnostic artifact from this workflow run
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: dex-bundle-v12-production
+  cancel-in-progress: false
+
+jobs:
+  build-verify-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r tools/dex_bundle_requirements.txt
+
+      - name: Preserve the current v11 root manifest for rollback
+        if: inputs.publish
+        run: |
+          mkdir -p dist/rollback
+          curl --fail --location --retry 5 --output dist/rollback/bundle-manifest-v11.json https://dex.tito.cafe/bundle-manifest.json
+          python3 -c 'import json; m=json.load(open("dist/rollback/bundle-manifest-v11.json")); assert m["bundleVersion"] == 11 and m["cdnPrefix"] == "v5", m'
+
+      - name: Upload rollback manifest backup
+        if: inputs.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-root-manifest-v11-rollback
+          path: dist/rollback/bundle-manifest-v11.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Run bundle unit tests
+        run: |
+          python3 tools/test_patch_dex_bundle_v12.py
+          python3 tools/test_build_location_index.py
+
+      - name: Restore preserved v12 bundle
+        if: inputs.reuse_run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: titodex-dex-v12-diagnostic-${{ inputs.reuse_run_id }}
+          path: dist/dex-v12/upload
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.reuse_run_id }}
+
+      # v12 pulls its own v11 base straight from the live CDN (~13 MB) and
+      # caches PokeAPI reads on disk. First run is ~2600 requests; reruns hit
+      # zero network for /pokemon-species and /pokemon.
+      - name: Patch v11 into complete Dex bundle v12
+        if: inputs.reuse_run_id == ''
+        run: >-
+          python3 tools/patch_dex_bundle_v12_species_axes.py
+          --output dist/dex-v12
+          --cache dist/dex-v12-pokeapi-cache
+
+      - name: Cache PokeAPI JSON reads across reruns
+        if: inputs.reuse_run_id == ''
+        uses: actions/cache@v4
+        with:
+          path: dist/dex-v12-pokeapi-cache
+          key: pokeapi-species-cache-v1
+
+      - name: Verify upload tree
+        run: python3 tools/verify_dex_upload_tree.py dist/dex-v12/upload
+
+      - name: Preserve generated bundle when a step fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v12-diagnostic-${{ github.run_id }}
+          path: dist/dex-v12/upload
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Upload verified bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v12
+          path: dist/dex-v12/upload
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Set up Node for Wrangler
+        if: inputs.publish
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
+
+      - name: Install Wrangler
+        if: inputs.publish
+        working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Upload and verify immutable /v5 objects
+        if: inputs.publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload
+          --cdn-prefix v5 --phase objects
+
+      - name: Atomically switch the root manifest
+        if: inputs.publish
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload
+          --cdn-prefix v5 --phase manifest
+
+      - name: Verify public v12 cutover
+        if: inputs.publish
+        run: |
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 12 and m["cdnPrefix"] == "v5", m'
+          curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'

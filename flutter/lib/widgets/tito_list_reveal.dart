@@ -61,6 +61,36 @@ class _TitoListRevealState extends State<TitoListReveal>
       _controller.value = 1.0;
       return;
     }
+
+    // Wait for the incoming route transition to finish so the list reveal does
+    // not overlap with the page push animation (which causes visual flash and
+    // dropped frames on long grids).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _startAfterRouteTransition();
+    });
+  }
+
+  void _startAfterRouteTransition() {
+    final route = ModalRoute.of(context);
+    final routeAnimation = route?.animation;
+    if (routeAnimation != null &&
+        routeAnimation.status != AnimationStatus.completed) {
+      late VoidCallback listener;
+      listener = () {
+        if (routeAnimation.status == AnimationStatus.completed) {
+          routeAnimation.removeListener(listener);
+          _startAnimation();
+        }
+      };
+      routeAnimation.addListener(listener);
+      return;
+    }
+    _startAnimation();
+  }
+
+  void _startAnimation() {
+    if (!mounted) return;
     if (widget.delay == Duration.zero) {
       _controller.forward();
     } else {
