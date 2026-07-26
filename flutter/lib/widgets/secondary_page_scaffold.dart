@@ -95,6 +95,9 @@ class SecondaryPageAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Every page using this scaffold must be a GoRouter route: GoRouterState.of
+    // throws for a page pushed with a bare Navigator.push (how the companion
+    // position page used to crash on open — it is a proper /settings child now).
     final path = GoRouterState.of(context).uri.path;
     final canOpenSettings = showSettings && path != '/settings';
     final backIconSize = DeviceLayout.backIconSize(context);
@@ -205,7 +208,9 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = DeviceLayout.headerIconSize(context);
-    final iconSize = size * 0.55;
+    // Same glyph ratio as the home header's settings button (app_header.dart)
+    // so the gear reads at one size on every title bar.
+    final iconSize = size * 0.62;
 
     return HandheldFocusDecorator(
       onActivate: onTap,

@@ -37,6 +37,12 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
   }
 
   void _updateOffset(Offset local, Size size) {
+    // A degenerate box (0×0 during an early layout frame) would make the
+    // divisions 0/0 = NaN, and clamp() passes NaN through — Alignment(NaN)
+    // then throws in the render tree. Ignore the event until the box is laid.
+    if (size.width <= 0 || size.height <= 0) {
+      return;
+    }
     final x = (local.dx / size.width * 2 - 1).clamp(-1.0, 1.0);
     final y = (local.dy / size.height * 2 - 1).clamp(-1.0, 1.0);
     setState(() {
