@@ -199,6 +199,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
                       child: PokemonDetailPage(
                         pokemonId:
                             int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
+                        // Route split agreed with the search branch: bare
+                        // `form`/`version` on /dex/:id are ours; list-filter
+                        // params live on /dex.
+                        initialFormKey: state.uri.queryParameters['form'],
+                        initialObtainVersion:
+                            state.uri.queryParameters['version'],
                       ),
                     ),
                   ),

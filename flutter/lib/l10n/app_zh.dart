@@ -185,6 +185,8 @@ abstract final class AppZh {
   static String dexMovesScope(String gameLabel) => '以下招式范围：$gameLabel';
   static String dexDataFallbackNote(String gameLabel) =>
       '当前游戏暂无此数据，以下来自：$gameLabel';
+  static const dexFormDataInherited = '该形态暂无独立资料，以下数据沿用默认形态。';
+  static const dexFormDataPartial = '该形态资料不完整，部分战斗数据缺失或沿用默认形态。';
   static const dexBaseStatsRadar = '能力雷达';
   static const dexBaseStatsBars = '种族值条';
   static const dexReferenceTitle = '常用资料';
