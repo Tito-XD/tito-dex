@@ -76,7 +76,9 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 | --- | --- | --- |
 | `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v5/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动 | Patch/audit v7 from verified v5/v6 seeds, upload immutable `v5/` objects, then switch the root manifest last |
+| `upload-dex-bundle.yml` | 手动 | 历史：Patch/audit v7 from verified v5/v6 seeds |
+| `upload-dex-bundle-v12.yml` | 手动 | v11 → v12 species search axes（已发布） |
+| `upload-dex-bundle-v13.yml` | 手动 | v12 → v13 per-form evolution chains（当前） |
 
 Both R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
 
