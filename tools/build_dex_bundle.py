@@ -46,6 +46,7 @@ from pokemon_forms import (  # noqa: E402
     form_search_terms,
     is_cosmetic_variety,
 )
+from form_evolution_chains import apply_form_evolution_chains  # noqa: E402
 from pokeapi_assets import (  # noqa: E402
     animated_sprite_url,
     build_sprite_url_map,
@@ -2845,6 +2846,14 @@ def build_bundle(
                 sprite_dest.write_bytes(optimize_png(png, max_width=220))
             except requests.RequestException as exc:
                 print(f"  warn: form sprite #{form_id}: {exc}", file=sys.stderr)
+
+    # Needs every detail on disk: a form's chain is assembled from the *target*
+    # species' form entries, so this cannot run inside the per-species loop.
+    print("Resolving per-form evolution chains…")
+    touched, form_chain_problems = apply_form_evolution_chains(staging / "details")
+    for problem in form_chain_problems:
+        print(f"  warn: {problem}", file=sys.stderr)
+    print(f"  {touched} forms carry their own evolution chain")
 
     warm_builder_caches_from_details(builder, staging, max_id)
     summaries = summaries_from_details(staging, max_id)

@@ -237,9 +237,11 @@ abstract final class AppZh {
   static const dexSpeciesFilterOpen = '体形筛选';
   static const dexSpeciesFilterTitle = '按体形 · 颜色 · 大小筛选';
   static const dexSpeciesFilterShape = '体形';
+  static const dexSpeciesFilterShapeHint = '图标对应游戏内图鉴 / Pokémon HOME 的体形检索';
   static const dexSpeciesFilterColor = '颜色';
   static const dexSpeciesFilterColorHint = '可多选：图鉴配色没有橙色，橙色系请同时选「棕」和「红」';
   static const dexSpeciesFilterSize = '大小';
+  static const dexSpeciesFilterSizeHint = '按身高分档，与图鉴检索里的大小轴一致';
   static const dexSpeciesFilterReset = '重置';
   static const dexSpeciesFilterApply = '查看结果';
   static String dexFilterByMove(String name) => '招式 · $name';

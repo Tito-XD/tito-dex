@@ -6,6 +6,7 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'dex_shape_icon.dart';
 
 /// Swatch for each Pokédex colour.
 ///
@@ -106,14 +107,17 @@ class _SheetBodyState extends State<_SheetBody> {
             controller: widget.scrollController,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             children: [
-              _SectionLabel(AppZh.dexSpeciesFilterShape),
+              _SectionLabel(
+                AppZh.dexSpeciesFilterShape,
+                hint: AppZh.dexSpeciesFilterShapeHint,
+              ),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   for (final slug in kDexShapeSlugs)
-                    _TextChip(
-                      label: dexShapeLabelZh(slug) ?? slug,
+                    _ShapeChip(
+                      slug: slug,
                       selected: _shape == slug,
                       onTap: () => setState(
                         () => _shape = _shape == slug ? null : slug,
@@ -144,14 +148,17 @@ class _SheetBodyState extends State<_SheetBody> {
                 ],
               ),
               const SizedBox(height: 18),
-              _SectionLabel(AppZh.dexSpeciesFilterSize),
+              _SectionLabel(
+                AppZh.dexSpeciesFilterSize,
+                hint: AppZh.dexSpeciesFilterSizeHint,
+              ),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   for (final bucket in DexSizeBucket.values)
-                    _TextChip(
-                      label: bucket.labelZh,
+                    _SizeChip(
+                      bucket: bucket,
                       selected: _size == bucket.slug,
                       onTap: () => setState(
                         () => _size = _size == bucket.slug ? null : bucket.slug,
@@ -210,14 +217,59 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _TextChip extends StatelessWidget {
-  const _TextChip({
-    required this.label,
+class _ShapeChip extends StatelessWidget {
+  const _ShapeChip({
+    required this.slug,
     required this.selected,
     required this.onTap,
   });
 
-  final String label;
+  final String slug;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = dexShapeLabelZh(slug) ?? slug;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: selected ? TitoColors.softYellow : TitoColors.card,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: TitoColors.ink, width: 2),
+          ),
+          padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DexShapeIcon(slug: slug, size: 22),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SizeChip extends StatelessWidget {
+  const _SizeChip({
+    required this.bucket,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final DexSizeBucket bucket;
   final bool selected;
   final VoidCallback onTap;
 
@@ -234,12 +286,19 @@ class _TextChip extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: TitoColors.ink, width: 2),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          child: Text(
-            label,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+          padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DexSizeIcon(bucket: bucket, size: 22),
+              const SizedBox(width: 6),
+              Text(
+                bucket.labelZh,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
         ),
       ),
