@@ -834,6 +834,47 @@ class PokemonFormDetail {
     evolutionChain: evolutionChain,
   );
 
+  PokemonFormDetail withEvolutionChain(EvolutionNode? chain) => PokemonFormDetail(
+    key: key,
+    pokemonId: pokemonId,
+    formId: formId,
+    nameEn: nameEn,
+    nameZh: nameZh,
+    formNameZh: formNameZh,
+    formGroup: formGroup,
+    kind: kind,
+    isDefault: isDefault,
+    isBattleOnly: isBattleOnly,
+    isMega: isMega,
+    isCosmetic: isCosmetic,
+    introducedVersionGroup: introducedVersionGroup,
+    availableVersionGroups: availableVersionGroups,
+    obtainableVersionGroups: obtainableVersionGroups,
+    obtainable: obtainable,
+    eventOnly: eventOnly,
+    deprecated: deprecated,
+    inheritsFromDefault: inheritsFromDefault,
+    dataCompleteness: dataCompleteness,
+    sources: sources,
+    types: types,
+    heightDm: heightDm,
+    weightHg: weightHg,
+    spriteUrl: spriteUrl,
+    artworkUrl: artworkUrl,
+    localSpritePath: localSpritePath,
+    spriteUrlsByVersion: spriteUrlsByVersion,
+    animatedSpriteUrl: animatedSpriteUrl,
+    baseStats: baseStats,
+    typeMultipliers: typeMultipliers,
+    stabSuperEffective: stabSuperEffective,
+    abilities: abilities,
+    abilitiesByGame: abilitiesByGame,
+    obtainLocationsByGame: obtainLocationsByGame,
+    obtainLocationsByVersion: obtainLocationsByVersion,
+    moveSets: moveSets,
+    evolutionChain: chain,
+  );
+
   Map<String, dynamic> toJson() => {
     'key': key,
     'pokemonId': pokemonId,
@@ -1589,7 +1630,19 @@ class EvolutionNode {
 
   final List<EvolutionNode> children;
 
-  String? get displaySpritePath => localSpritePath ?? spriteUrl;
+  /// Prefer a usable local/network path. A still-relative bundle path
+  /// (`sprites/forms/…`) that was never absolutized would make Image.file
+  /// draw a hole, so fall through to [spriteUrl] in that case.
+  String? get displaySpritePath {
+    final local = localSpritePath;
+    if (local != null &&
+        (local.startsWith('/') ||
+            local.startsWith('http') ||
+            local.startsWith('assets/'))) {
+      return local;
+    }
+    return spriteUrl ?? local;
+  }
 
   bool containsId(int pokemonId) {
     if (id == pokemonId) {

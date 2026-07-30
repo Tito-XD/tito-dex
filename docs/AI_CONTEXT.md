@@ -4,10 +4,10 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.7.25](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.25) |
-| **`main` / lite source** | `0.7.25+123` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.7.21-offline+116` — APK-bundled verified v10 archive (v11 offline rebuild pending) |
-| **Offline dex bundle** | **v11** live — 1025 species + 542 items (icons + zh descriptions), CDN prefix `/v5/`; `/v4/` rollback. **v12 built, unpublished** — species search axes |
+| **Latest release** | [v0.7.26](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.26) |
+| **`main` / lite source** | `0.7.26+124` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.7.26-offline+125` — APK-bundled verified v13 archive |
+| **Offline dex bundle** | **v13** live — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.7.25)
+## Current feature status (latest release line: v0.7.26)
 
-> `main` tracks the v0.7.25 release line plus unreleased work (items bundle v11, search axes, structured evolution triggers, save auto-edition, offline verify). Lite downloads bundle v11 when requested; Offline still embeds the verified v10 archive until its rebuild.
+> `main` tracks the v0.7.26 release line. Lite downloads bundle v13 when requested; Offline embeds the verified v13 archive.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.

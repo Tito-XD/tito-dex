@@ -732,7 +732,17 @@ class DexOfflineService {
       return null;
     }
 
-    final spritePath =
+    // Prefer a form-specific relative path already on the node (e.g.
+    // sprites/forms/10399.png for 洗翠风速狗) when that file is on disk —
+    // looking up by species id alone would replace it with the default art.
+    String? spritePath;
+    final existing = node.localSpritePath;
+    if (existing != null &&
+        !existing.startsWith('http') &&
+        await _store.absolutePathForRelative(existing) != null) {
+      spritePath = existing;
+    }
+    spritePath ??=
         await _store.spriteRelativePath(node.id) ??
         await _cachePokemonSprite(node.id, node.spriteUrl);
     final localizedChildren = <EvolutionNode>[];
@@ -748,10 +758,13 @@ class DexOfflineService {
       nameEn: node.nameEn,
       nameZh: node.nameZh,
       spriteUrl: node.spriteUrl,
+      artworkUrl: node.artworkUrl,
       localSpritePath: spritePath,
       evolvesFrom: node.evolvesFrom,
       triggerZh: node.triggerZh,
+      triggers: node.triggers,
       children: localizedChildren,
+      formKey: node.formKey,
     );
   }
 
@@ -778,12 +791,20 @@ class DexOfflineService {
     final forms = <PokemonFormDetail>[];
     for (final form in detail.forms) {
       final relative = form.localSpritePath;
-      if (relative == null || relative.startsWith('http')) {
-        forms.add(form);
-        continue;
+      var resolved = form;
+      if (relative != null && !relative.startsWith('http')) {
+        final absolute = await _store.absolutePathForRelative(relative);
+        resolved = form.withLocalSpritePath(absolute ?? relative);
       }
-      final absolute = await _store.absolutePathForRelative(relative);
-      forms.add(form.withLocalSpritePath(absolute ?? relative));
+      // v13+ bakes a per-form chain with sprites/forms/… paths. Absolutize
+      // those too — otherwise forForm() hands the UI a relative path that
+      // Image.file cannot open, and every regional evolution shows a hole.
+      if (resolved.evolutionChain != null) {
+        resolved = resolved.withEvolutionChain(
+          await _attachAbsoluteSpritesToEvolution(resolved.evolutionChain),
+        );
+      }
+      forms.add(resolved);
     }
     return PokemonDetail(
       summary: summary,
@@ -813,6 +834,11 @@ class DexOfflineService {
       eggGroups: detail.eggGroups,
       hatchCounter: detail.hatchCounter,
       forms: forms,
+      growthRateSlug: detail.growthRateSlug,
+      habitatSlug: detail.habitatSlug,
+      hasGenderDifferences: detail.hasGenderDifferences,
+      heldItems: detail.heldItems,
+      baseExperience: detail.baseExperience,
     );
   }
 
@@ -829,7 +855,10 @@ class DexOfflineService {
     } else if (node.localSpritePath != null) {
       absolute = node.localSpritePath;
     }
-    absolute ??= _cdnConfig.spriteUrl(node.id);
+    // Prefer the node's own spriteUrl (often a form CDN URL) over the
+    // species default — falling back to id alone would show 风速狗 art on
+    // a 洗翠风速狗 node when the local form file is missing.
+    absolute ??= node.spriteUrl ?? _cdnConfig.spriteUrl(node.id);
     final children = <EvolutionNode>[];
     for (final child in node.children) {
       final localized = await _attachAbsoluteSpritesToEvolution(child);
@@ -842,10 +871,13 @@ class DexOfflineService {
       nameEn: node.nameEn,
       nameZh: node.nameZh,
       spriteUrl: node.spriteUrl,
+      artworkUrl: node.artworkUrl,
       localSpritePath: absolute,
       evolvesFrom: node.evolvesFrom,
       triggerZh: node.triggerZh,
+      triggers: node.triggers,
       children: children,
+      formKey: node.formKey,
     );
   }
 }

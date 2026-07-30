@@ -249,6 +249,26 @@ void main() {
     expect(restored.children.single.formKey, 'arcanine-hisui');
   });
 
+  test('displaySpritePath skips unresolved relative form paths', () {
+    final relative = EvolutionNode(
+      id: 59,
+      nameEn: 'Arcanine',
+      nameZh: '风速狗（洗翠的样子）',
+      localSpritePath: 'sprites/forms/10399.png',
+      spriteUrl: 'https://dex.tito.cafe/v5/sprites/forms/10399.png',
+    );
+    expect(relative.displaySpritePath, relative.spriteUrl);
+
+    final absolute = EvolutionNode(
+      id: 59,
+      nameEn: 'Arcanine',
+      nameZh: '风速狗（洗翠的样子）',
+      localSpritePath: '/data/dex_offline/sprites/forms/10399.png',
+      spriteUrl: 'https://dex.tito.cafe/v5/sprites/forms/10399.png',
+    );
+    expect(absolute.displaySpritePath, absolute.localSpritePath);
+  });
+
   test('every curated target names a form suffix the app can label', () {
     for (final entry in kFormEvolutionTargets.entries) {
       for (final target in entry.value) {
