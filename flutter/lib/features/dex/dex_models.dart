@@ -1,4 +1,5 @@
 import 'dex_game_scope.dart';
+import 'form_evolution_targets.dart';
 import 'type_chart.dart';
 
 // HGSS-era national dex cap (Gen IV); browse extends to [titodexMaxNationalDexId].
@@ -1140,9 +1141,14 @@ class PokemonDetail {
       stabSuperEffective: form.stabSuperEffective.isEmpty
           ? stabSuperEffective
           : form.stabSuperEffective,
+      // A form only overrides the chain when the bundle actually built one for
+      // it; otherwise it falls back to the species chain, which the detail
+      // page then narrows with EvolutionNode.filteredForForm. Before this
+      // fallback every regional form (洗翠卡蒂狗, 帕底亚乌波…) showed an empty
+      // evolution card, because no bundle has ever carried forms[].evolutionChain.
       evolutionChain: inheritsSpeciesData
           ? evolutionChain
-          : form.evolutionChain,
+          : (form.evolutionChain ?? evolutionChain),
       johtoDexNumber: johtoDexNumber,
       baseStats: inheritsSpeciesData
           ? (form.baseStats ?? baseStats)
@@ -1557,6 +1563,7 @@ class EvolutionNode {
     this.triggerZh,
     this.triggers = const [],
     this.children = const [],
+    this.formKey,
   });
 
   final int id;
@@ -1567,6 +1574,12 @@ class EvolutionNode {
   final String? localSpritePath;
   final String? evolvesFrom;
   final String? triggerZh;
+
+  /// Set when this node stands for one specific form of [id] rather than the
+  /// species' default — 洗翠风速狗 instead of 风速狗. Also the marker that says
+  /// "this chain has already been resolved for a form", so [filteredForForm]
+  /// leaves a bundle-supplied form chain alone instead of filtering it twice.
+  final String? formKey;
 
   /// Structured evolution conditions, one per PokeAPI `evolution_details`
   /// entry. [triggerZh] is a display string that flattens only the first
@@ -1585,43 +1598,108 @@ class EvolutionNode {
     return children.any((child) => child.containsId(pokemonId));
   }
 
-  /// Returns a filtered copy with only the children relevant to [formKey].
+  /// Returns the chain as it applies to the form [selectedFormKey].
   ///
-  /// Regional variants (e.g. wooper-paldea, growlithe-hisui) evolve into
-  /// different species than the default form — PokeAPI bundles both branches
-  /// under the same species node.  This filter splits them.
-  EvolutionNode filteredForForm(String? formKey) {
-    if (children.length <= 1) return this;
-    final keepIds = _formEvolutionTargets[id];
-    if (keepIds != null && formKey != null) {
-      final allowed = keepIds[formKey];
-      if (allowed != null) {
-        return EvolutionNode(
-          id: id, nameEn: nameEn, nameZh: nameZh,
-          spriteUrl: spriteUrl, artworkUrl: artworkUrl,
-          localSpritePath: localSpritePath,
-          evolvesFrom: evolvesFrom, triggerZh: triggerZh,
-          triggers: triggers,
-          children: children.where((c) => allowed.contains(c.id)).toList(),
-        );
-      }
-    }
-    return this;
+  /// The species chain is a superset: 喵喵 lists both 猫老大 and 喵头目, and
+  /// 卡蒂狗 lists the ordinary 风速狗 even for the Hisuian form. Walking
+  /// [kFormEvolutionTargets] prunes the branches the selected form cannot take
+  /// and relabels the ones it can (风速狗 → 风速狗（洗翠的样子）).
+  ///
+  /// [rootSpritePath] is the selected form's own sprite; it is only applied
+  /// when the selected form belongs to the *root* species, which is the one
+  /// case where the caller's form art is known to be this node's art.
+  ///
+  /// A chain that already carries [formKey] came from the bundle already
+  /// resolved for the form, and is returned untouched.
+  EvolutionNode filteredForForm(String? selectedFormKey, {String? rootSpritePath}) {
+    if (selectedFormKey == null || formKey != null) return this;
+    final rootKey = _rootFormKey(selectedFormKey);
+    if (rootKey == null) return this;
+    final root = rootKey == nameEn.toLowerCase()
+        ? this
+        : _asVariant(rootKey.substring(nameEn.length + 1), rootKey,
+            spritePath: rootKey == selectedFormKey ? rootSpritePath : null);
+    return root._withFormTargets(rootKey);
   }
 
-  /// Hardcoded form → child-species map for species where regional variants
-  /// diverge in the evolution chain.
-  static const _formEvolutionTargets = <int, Map<String, Set<int>>>{
-    194: { // Wooper
-      'wooper': {195},         // → Quagsire
-      'wooper-paldea': {980},  // → Clodsire
-    },
-    58: {  // Growlithe
-      'growlithe': {59},
-      'growlithe-hisui': {59},
-    },
-    // Add more species here as needed.
-  };
+  /// The root species' form key that corresponds to [selectedFormKey].
+  ///
+  /// The selected form usually sits on the root species (卡蒂狗（洗翠）), but it
+  /// can sit further down the chain (风速狗（洗翠）), in which case it is mapped
+  /// back onto the root by its form suffix. Species whose slug itself contains
+  /// a hyphen (`mr-mime-galar`) can fail to map; they fall through to the
+  /// unfiltered species chain, which is what they showed before.
+  String? _rootFormKey(String selectedFormKey) {
+    final rootSlug = nameEn.toLowerCase();
+    if (selectedFormKey == rootSlug ||
+        selectedFormKey.startsWith('$rootSlug-')) {
+      return kFormEvolutionTargets.containsKey(selectedFormKey)
+          ? selectedFormKey
+          : null;
+    }
+    for (var i = 0; i < selectedFormKey.length; i++) {
+      if (selectedFormKey[i] != '-') continue;
+      final candidate = '$rootSlug${selectedFormKey.substring(i)}';
+      if (kFormEvolutionTargets.containsKey(candidate)) return candidate;
+    }
+    // A default form deeper in the chain (直冲熊) still needs the root pruned
+    // to the default branch, or it inherits 堵拦熊 from its Galarian sibling.
+    return kFormEvolutionTargets.containsKey(rootSlug) ? rootSlug : null;
+  }
+
+  EvolutionNode _withFormTargets(String nodeFormKey) {
+    final targets = kFormEvolutionTargets[nodeFormKey];
+    // No entry means the form shares its species' chain — keep it whole.
+    if (targets == null) return this;
+    final kept = <EvolutionNode>[];
+    for (final target in targets) {
+      for (final child in children) {
+        if (child.id != target.speciesId) continue;
+        final suffix = target.formSuffix;
+        final childSlug = child.nameEn.toLowerCase();
+        final childKey = suffix == null ? childSlug : '$childSlug-$suffix';
+        final resolved = suffix == null
+            ? child
+            : child._asVariant(suffix, childKey);
+        kept.add(resolved._withFormTargets(childKey));
+      }
+    }
+    return _copyWith(children: kept);
+  }
+
+  /// This node as the [suffix] form of its species. The species sprite is kept
+  /// unless [spritePath] is given — only the bundle's per-form chain knows the
+  /// variant's own art, so an offline install on an older bundle shows the
+  /// right name over the species sprite rather than nothing at all.
+  EvolutionNode _asVariant(String suffix, String key, {String? spritePath}) {
+    final label = formVariantLabelZh(suffix);
+    return _copyWith(
+      nameZh: label == null || nameZh.contains(label)
+          ? nameZh
+          : '$nameZh（$label）',
+      localSpritePath: spritePath ?? localSpritePath,
+      formKey: key,
+    );
+  }
+
+  EvolutionNode _copyWith({
+    String? nameZh,
+    String? localSpritePath,
+    String? formKey,
+    List<EvolutionNode>? children,
+  }) => EvolutionNode(
+    id: id,
+    nameEn: nameEn,
+    nameZh: nameZh ?? this.nameZh,
+    spriteUrl: spriteUrl,
+    artworkUrl: artworkUrl,
+    localSpritePath: localSpritePath ?? this.localSpritePath,
+    evolvesFrom: evolvesFrom,
+    triggerZh: triggerZh,
+    triggers: triggers,
+    children: children ?? this.children,
+    formKey: formKey ?? this.formKey,
+  );
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -1632,6 +1710,7 @@ class EvolutionNode {
     if (localSpritePath != null) 'localSpritePath': localSpritePath,
     if (evolvesFrom != null) 'evolvesFrom': evolvesFrom,
     if (triggerZh != null) 'triggerZh': triggerZh,
+    if (formKey != null) 'formKey': formKey,
     if (triggers.isNotEmpty)
       'triggers': triggers.map((trigger) => trigger.toJson()).toList(),
     'children': children.map((child) => child.toJson()).toList(),
@@ -1646,6 +1725,7 @@ class EvolutionNode {
     localSpritePath: json['localSpritePath'] as String?,
     evolvesFrom: json['evolvesFrom'] as String?,
     triggerZh: json['triggerZh'] as String?,
+    formKey: json['formKey'] as String?,
     triggers: (json['triggers'] as List<dynamic>? ?? const [])
         .map((item) => EvolutionTrigger.fromJson(item as Map<String, dynamic>))
         .toList(growable: false),
@@ -1654,20 +1734,8 @@ class EvolutionNode {
         .toList(),
   );
 
-  EvolutionNode copyWithLocalSprite(String path) {
-    return EvolutionNode(
-      id: id,
-      nameEn: nameEn,
-      nameZh: nameZh,
-      spriteUrl: spriteUrl,
-      artworkUrl: artworkUrl,
-      localSpritePath: path,
-      evolvesFrom: evolvesFrom,
-      triggerZh: triggerZh,
-      triggers: triggers,
-      children: children,
-    );
-  }
+  EvolutionNode copyWithLocalSprite(String path) =>
+      _copyWith(localSpritePath: path);
 }
 
 /// One structured evolution condition.

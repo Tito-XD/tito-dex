@@ -563,7 +563,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               Text(AppZh.dexEvolution, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 12),
               EvolutionChainVerticalView(
-                root: detail.evolutionChain!.filteredForForm(_selectedFormKey),
+                root: detail.evolutionChain!.filteredForForm(
+                  _selectedFormKey,
+                  rootSpritePath: _selectedForm?.localSpritePath,
+                ),
                 highlightId: detail.summary.id,
               ),
             ],
