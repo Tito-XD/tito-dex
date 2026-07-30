@@ -19,7 +19,7 @@ All app work happens in `flutter/`:
 ```bash
 cd flutter
 flutter pub get
-flutter test                              # regression gate (~217 tests) — run before pushing
+flutter test                              # regression gate — run before pushing
 flutter test test/<file>_test.dart        # single test file
 flutter test --name "<substring>"         # single test by name
 flutter analyze                           # may report pre-existing infos; test is the real gate
