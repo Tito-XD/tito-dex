@@ -1,4 +1,4 @@
-# TitoDex 图鉴 CDN 与 bundle v12
+# TitoDex 图鉴 CDN 与 bundle v13
 
 > **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
@@ -6,25 +6,29 @@
 
 | CDN 前缀 | bundleVersion | 物种 | 状态 |
 | --- | ---: | ---: | --- |
-| `/v5/` | 11 | 1025 | 当前生产：v6 数据 + 清晰默认图 + 形态历代 sprite + 542 道具 |
-| `/v5/` | 12 | 1025 | **待发布**：体形 / 颜色 / 大小 / 世代 / 标签检索轴 + 结构化进化条件 |
+| `/v5/` | **13** | 1025 | **当前生产**：v12 检索轴 + 各形态独立 `evolutionChain` |
+| `/v5/` | 12 | 1025 | 已发布基座：体形 / 颜色 / 大小 / 世代 / 标签检索轴 + 结构化进化条件 |
+| `/v5/` | 11 | 1025 | 历史：v6 数据 + 清晰默认图 + 形态历代 sprite + 542 道具 |
 | `/v4/` | 6 | 1025 | 保留不动，供旧客户端和回滚 |
 | `/v3/` | 5 | 1025 | 更早回滚 |
 | `/v2/` | 4 | 493 | 遗留客户端 |
 
 > **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（v8 形态 artwork、v9
-> artwork 回退、v10 清晰形态图、v11 道具、v12 检索轴）都是在**同一个 `/v5/`
-> 前缀上原地增量**发布的，没有新开前缀。不可变约束针对的是**单个对象**：同一个
-> key 不得覆盖成不同内容，而新增 key、以及在两阶段流程里最后切换根 manifest 是
-> 允许的。看到 `/v5/` 就以为 bundleVersion 是 7，会误判成需要新开 `/v6/`。
+> artwork 回退、v10 清晰形态图、v11 道具、v12 检索轴、v13 形态进化链）都是在
+> **同一个 `/v5/` 前缀上原地增量**发布的，没有新开前缀。不可变约束针对的是
+> **单个对象**：同一个 key 不得覆盖成不同内容，而新增 key、以及在两阶段流程里
+> 最后切换根 manifest 是允许的。看到 `/v5/` 就以为 bundleVersion 是 7，会误判成
+> 需要新开 `/v6/`。
+>
+> 客户端只在 `remote.bundleVersion > local.version` 时升级离线包，所以同版本号
+> 下改内容不会推送给已安装用户——增量必须 bump 版本。
 
-0.7.1 App 访问 JSON 时按 `v5 → v4 → v3 → v2` 回退。根
-`bundle-manifest.json` 是短缓存的活跃指针。
+App 访问 JSON 时按 `v5 → v4 → v3 → v2` 回退。根 `bundle-manifest.json` 是短缓存的活跃指针。
 
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=7
+TITODEX_DEX_BUNDLE_VERSION=13
 ```
 
 > `TITODEX_DEX_BUNDLE_VERSION` 只是 `DexCdnConfig` 里的编译期默认值；版本协商实际
@@ -176,18 +180,37 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v12/upload
 v12 改动了 1025 个 `details/*.json` 加 `summaries.json`、`dex_catalog.json`，
 比 v11（只动 items 与图标）大得多，务必严格遵守 manifest-last。
 
+## v13 内容与发布（形态进化链）
+
+v13 以**已发布的 v12 archive 为只读基座**，只给非外观形态写入
+`forms[].evolutionChain`（剪枝 + 形态名 + 形态立绘路径），然后重打包并 bump
+manifest。无 PokeAPI 请求；sprite / artwork / 遭遇 / 道具字节不变。
+
+```bash
+python3 tools/patch_dex_bundle_v13_form_evolution.py
+python3 tools/verify_dex_upload_tree.py dist/dex-v13/upload
+```
+
+或跑 GitHub Actions **Patch and Publish Dex Bundle v13**（secrets 已在仓库里）。
+镜像表在 `tools/form_evolution_chains.py` 与
+`flutter/lib/features/dex/form_evolution_targets.dart`；`tools/test_form_evolution_targets.py`
+保证两边不漂移。App 还需在离线加载时把 `sprites/forms/…` 绝对化
+（`dex_offline_service.dart`），否则进化卡有名无图。
+
+回滚：把发布前备份的 v12 根 manifest 写回即可（v13 → v12）。
+
 ## 两阶段发布与回滚
 
-首选 GitHub Actions **Patch and Publish Dex Bundle**。本地等价命令（把
-`dist/dex-v12` 换成当前版本的产物目录）：
+首选 GitHub Actions（v12 / v13 各自的 Patch and Publish 工作流）。本地等价命令（把
+`dist/dex-v13` 换成当前版本的产物目录）：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象
-python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v13/upload \
   --cdn-prefix v5 --phase objects
 
 # 阶段二：只有阶段一全部成功后才更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v12/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v13/upload \
   --cdn-prefix v5 --phase manifest
 ```
 
@@ -202,8 +225,8 @@ curl -fsS 'https://dex.tito.cafe/cdn-health?probe=1' | jq .
 ```
 
 发布异常时，把**发布前备份的上一版根 manifest** 重新写回
-`bundle-manifest.json` 即可回退（v12 → v11）。因为增量发布只新增/更新 `/v5/`
-下的 key，旧 archive 的 SHA 仍然有效。不要删除或修改 `/v4/`；0.7.1 在线 JSON
+`bundle-manifest.json` 即可回退。因为增量发布只新增/更新 `/v5/`
+下的 key，旧 archive 的 SHA 仍然有效。不要删除或修改 `/v4/`；在线 JSON
 会从 v5 自动回退 v4/v3/v2。
 
 ## Worker

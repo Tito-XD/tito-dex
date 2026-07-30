@@ -90,7 +90,7 @@ Run the **Android Release APKs** workflow manually with:
 - `offline_build_number` — a larger Offline versionCode
 - `bundle_manifest_url` — the already-published v7 root manifest; CI downloads its archive and verifies `bundleVersion=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
 
-For v0.7.1 use `version=0.7.1`, Lite build `95`, and Offline build `96`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The Offline verifier also checks its embedded v7 manifest and archive SHA-256.
+For v0.8.1 use `version=0.8.1`, Lite build `126`, and Offline build `127`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the published root manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing.
 
 ### Offline variant
 

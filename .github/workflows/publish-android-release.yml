@@ -76,20 +76,16 @@ jobs:
           git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
           git push origin "refs/tags/$tag"
           cat > /tmp/release-notes.md <<EOF
-          这个版本新增道具列表页面，支持按分类筛选和显示道具小图。
-
-          ### 主要更新
-
-          - 新增道具页面：首页「道具」入口进入，208 种道具分为宝可梦球、药品、携带道具、进化道具等 9 大类，支持分类筛选，显示道具图标和中文名。
-          - 道具图标来自 PokeAPI 官方 sprite（24×24），CDN 托管 179 种。
-          - 图鉴列表动画优化，减少卡片上浮卡顿。
+          TitoDex $tag
 
           ### 下载说明
 
-          - `TitoDex-$VERSION-lite-rg-arm64.apk`：推荐版本，按需下载离线图鉴。
-          - `TitoDex-$VERSION-offline-rg-arm64.apk`：内置完整离线图鉴，文件更大。
+          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线图鉴。
+          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置完整离线图鉴，文件更大。
 
-          两个 APK 均仅包含 arm64-v8a Release 运行库。
+          两个 APK 均仅包含 arm64-v8a Release 运行库。若已安装旧签名包，请先卸载再安装。
+
+          > Draft notes are a stub — edit the GitHub Release title and body before publishing.
           EOF
           {
             printf '\n### SHA-256\n\n```text\n'
@@ -101,5 +97,5 @@ jobs:
             "dist/release/TitoDex-$VERSION-offline-rg-arm64.apk" \
             --verify-tag \
             --draft \
-            --title "TitoDex $tag · 道具页面与列表优化" \
+            --title "TitoDex $tag" \
             --notes-file /tmp/release-notes.md
