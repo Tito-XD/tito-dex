@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.7.1` (`0.7.1+95`) | Recommended arm64-v8a download |
-| Offline APK | `v0.7.1` (`0.7.1-offline+96`) | Larger package with the verified v7 dex archive embedded |
-| Source on `main` | `0.7.1+95` | Current default branch baseline |
+| Lite APK | `v0.8.1` (`0.8.1+126`) | Recommended arm64-v8a download |
+| Offline APK | `v0.8.1` (`0.8.1-offline+127`) | Larger package with the verified v13 dex archive embedded |
+| Source on `main` | `0.8.1+126` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,8 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.8.1` | TitoDex v0.8.1 · 形态进化链与体形筛选图标 | Regional forms keep a pruned evolution line with form sprites (e.g. Hisuian Growlithe → Hisuian Arcanine). Body-style and size filter chips gain vector silhouette icons. Offline embeds dex bundle v13. |
+| `v0.8.0` | TitoDex v0.8.0 · 道具页面与列表优化 | Ships the curated items hub (542 items, category filter, icons) and list animation polish. |
 | `v0.7.1` | TitoDex v0.7.1 · 清晰图鉴与固定导航 | Restores clear 220×220 default dex media, adds form-specific historical sprite sources, simplifies form switching to chips, replaces exact-version chips with a dropdown, fixes secondary-page headers in place, and adds quick scroll-to-top to the long dex grid. Bundle v7 reuses every v6 encounter/location record and adds only corrected media and form sprite metadata. |
 | `v0.7.0` | TitoDex v0.7.0 · 完整形态与现代地点 | Adds searchable form variants with independent types, stats, abilities, moves and locations; exact per-game and DLC obtain-location selection; form-safe mappings for modern wild, fixed, raid, alpha, titan and outbreak encounters; and a new complete offline bundle. The Offline APK embeds the same verified archive as the downloadable pack. iOS platform source is merged and build-verified, while this release distributes Android Lite and Offline APKs only. |
 | `v0.6.9` | TitoDex v0.6.9 · 队伍宫格与平板布局 | Reworks the party card: cells go upright with the level as a sprite-corner badge so names stop truncating and sprites scale with the cell; the square dashboard lays 2×3 when a save is linked and six-across when it is not; tablet landscape puts the trainer and journey cards in one equal-height row above a single party strip. Also drops the dead `vertical` / `listMode` party layouts. |

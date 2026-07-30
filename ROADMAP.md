@@ -1,13 +1,17 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.7.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.0) · Lite `0.7.0+93` · Offline `0.7.0-offline+94`.
+> **Latest release:** [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) · Lite `0.8.1+126` · Offline `0.8.1-offline+127`.
 >
-> **Current `main` source baseline:** `0.7.0+93`.
+> **Current `main` source baseline:** `0.8.1+126`.
+>
+> Longer-horizon phases: [`docs/PHASED_FEATURE_PLAN.md`](docs/PHASED_FEATURE_PLAN.md). Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Recent release history
 
 | Version | Summary |
 | --- | --- |
+| **v0.8.1** | Form-aware evolution chains with form sprites; body-style / size filter icons; Offline embeds dex bundle v13 |
+| **v0.8.0** | Items hub (542 curated items, category filter, icons) and list animation polish |
 | **v0.7.0** | Bundle v6 with complete form records, form-safe exact-version encounters for modern games and DLC, v4→v3→v2 fallback, plus merged iOS platform source |
 | **v0.6.9** | Party grid rework (upright cells, sprite-corner level badges, 2×3 / 6×1 by context) and a fixed-row tablet home, validated via the 0.6.9-pre.1 preview |
 | **v0.6.8** | Header gradient recolor to a readable dark-top `#5D728A→slateBlue`, cream on-gradient subtitles, slim dex title, square-dashboard polish, doubles spread modifier and stat→damage handoff |

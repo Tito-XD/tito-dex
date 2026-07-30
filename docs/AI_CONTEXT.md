@@ -53,6 +53,8 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **23 game editions**, **11 regional dexes**, `DexScope` filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
 - Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
+- **Per-form evolution chains** (bundle v13+): regional / cloak splits prune to the real line (洗翠卡蒂狗 → 洗翠风速狗) with form sprites. Older installs fall back to the in-app `kFormEvolutionTargets` table via `EvolutionNode.filteredForForm`. Offline loading absolutizes `sprites/forms/…` paths on `forms[].evolutionChain`.
+- **Species filter sheet icons:** body-style chips use vector HOME-style silhouettes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
 
@@ -74,6 +76,8 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
 ### Latest release-line highlights
+- v0.8.1: form-aware evolution chains show the matching regional line with form sprites; body-style / size filter chips gain APK-local vector icons; Offline embeds dex bundle v13.
+- v0.8.0: curated items hub (542 items, Bulbapedia-style categories, icons) and dex list animation polish.
 - v0.7.16: unified game icons — Gen VI+ uses Pokémon HOME game icons, Gen I–V uses DS/3DS launch icons (SteamGridDB), white-2/mega-dimension use Pokémon artwork badges; form sprites in bundle v10 are clear official artwork (were pixelated), offline form caching prefers artwork; predictive-back rework — content stays opaque during the drag, underlying pages stay static, and a gesture-runway clamp keeps the commit fade playing even after a full-edge drag.
 - v0.7.15: official single-version icons for secondary flavors (Violet, Shield, Shining Pearl, Y, …) replace generated badges; offline caching stores per-form sprites (`sprites/forms/<key>.png`) so non-default forms keep their art; edge-to-edge shell makes predictive back retract the whole screen with no skyBlue flash; dex route joins the gesture so release fades out; dex enter reveal starts after the shell lands.
 - v0.7.14: per-flavor game icons in the edition picker; companion position drag no longer spams SharedPreferences; Dex tab re-entry restores the list fade/slide reveal; predictive-back gesture now moves the Dex content layer together with the shell.
@@ -146,18 +150,19 @@ flutter/lib/
 | `/v2/` | v4 | 493 (legacy) |
 | `/v3/` | v5 | 1025 (rollback / older clients) |
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
-| `/v5/` | v11 | v6 data + clear media + form sprite history + 542 items with icons & zh descriptions (current; v7→v11 patch in place over the same prefix) |
-| `/v5/` | v12 | + body style / colour / size / generation / tag search axes, genus on the summary, structured evolution triggers, reverse location index (**built, not yet published**) |
+| `/v5/` | **v13** | current — v12 axes + per-form `evolutionChain` (575 forms); items, clear media, form sprites unchanged |
+
+Historical `/v5/` patches on the same prefix: v7 media → v8 form artwork → v9 artwork fallback → v10 clear form art → v11 items → v12 species search axes → **v13 form evolution chains**.
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
-- **Bundle version and CDN prefix are decoupled.** Every release since v7 (v8–v12) patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
-- Incremental v7 build: `python3 tools/patch_dex_bundle_v7.py --base-bundle <v6.tar.zst> --legacy-media-bundle <v5.tar.zst> --output dist/dex-v7`
-- Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base; builds an upload tree only — release goes through `upload_dex_bundle_r2.py`). Its `--limit` / `--skip-archive` flags are smoke-test only and produce an unpublishable tree.
-- **Slugs ship, labels do not.** Body style / colour / growth rate / habitat ride in the bundle as slugs; their Chinese labels live in `flutter/lib/features/dex/dex_search_terms.dart`. `/v5/` objects cannot be overwritten, so a label baked into the bundle would need a full republish to correct.
-- Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`.
+- **Bundle version and CDN prefix are decoupled.** Every release since v7 patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
+- Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base).
+- Incremental v13 build: `python3 tools/patch_dex_bundle_v13_form_evolution.py` (live v12 archive as read-only base; no PokeAPI). CI: **Patch and Publish Dex Bundle v13**.
+- **Slugs ship, labels do not.** Body style / colour / growth rate / habitat ride in the bundle as slugs; their Chinese labels live in `flutter/lib/features/dex/dex_search_terms.dart` (and form-suffix labels in `form_evolution_targets.dart`).
+- Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`. Clients only upgrade when `remote.bundleVersion > local.version`.
 - Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.
-- Secrets: [PERMISSIONS.md](./PERMISSIONS.md) — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
+- Secrets: [PERMISSIONS.md](./PERMISSIONS.md) — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (and optional `R2_*` for bulk upload).
 
 ---
 
@@ -166,8 +171,8 @@ flutter/lib/
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate; 217 tests
-flutter build apk --release --target-platform android-arm64  # ~21 MB
+flutter test                    # regression gate
+flutter build apk --release --target-platform android-arm64  # ~21 MB Lite / ~100+ MB Offline
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
 ```
