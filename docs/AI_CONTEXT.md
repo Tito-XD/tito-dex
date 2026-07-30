@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.7.26](https://github.com/Tito-XD/tito-dex/releases/tag/v0.7.26) |
-| **`main` / lite source** | `0.7.26+124` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.7.26-offline+125` — APK-bundled verified v13 archive |
+| **Latest release** | [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) |
+| **`main` / lite source** | `0.8.1+126` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.1-offline+127` — APK-bundled verified v13 archive |
 | **Offline dex bundle** | **v13** live — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.7.26)
+## Current feature status (latest release line: v0.8.1)
 
-> `main` tracks the v0.7.26 release line. Lite downloads bundle v13 when requested; Offline embeds the verified v13 archive.
+> `main` tracks the v0.8.1 release line. Lite downloads bundle v13 when requested; Offline embeds the verified v13 archive.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
