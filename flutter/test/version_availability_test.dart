@@ -112,6 +112,49 @@ void main() {
     });
   });
 
+  group('exact-version helpers', () {
+    test('DLC versions inherit their base-game encounters', () {
+      expect(accessibleEncounterVersions('the-crown-tundra-sword'), {
+        'sword',
+        'the-isle-of-armor-sword',
+        'the-crown-tundra-sword',
+      });
+      expect(accessibleEncounterVersions('mega-dimension'), {
+        'legends-za',
+        'mega-dimension',
+      });
+    });
+
+    test('paired versions include matching DLC flavors', () {
+      expect(pairedEncounterVersion('soulsilver'), 'heartgold');
+      expect(
+        pairedEncounterVersion('the-indigo-disk-scarlet'),
+        'the-indigo-disk-violet',
+      );
+      expect(pairedEncounterVersion('legends-arceus'), isNull);
+    });
+
+    test('progress bucket includes chain-derived methods only', () {
+      expect(chainStageNeedsEvolutionOrTrade(ChainStageMethod.evolve), isTrue);
+      expect(
+        chainStageNeedsEvolutionOrTrade(ChainStageMethod.tradeRequired),
+        isTrue,
+      );
+      expect(
+        chainStageNeedsEvolutionOrTrade(ChainStageMethod.breedRequired),
+        isTrue,
+      );
+      expect(
+        chainStageNeedsEvolutionOrTrade(ChainStageMethod.catchable),
+        isFalse,
+      );
+      expect(
+        chainStageNeedsEvolutionOrTrade(ChainStageMethod.unavailable),
+        isFalse,
+      );
+    });
+  });
+
   group('planChainCompletion', () {
     // 独角虫系 shape: base catchable, both evolutions by level.
     final levelChain = _node(
@@ -193,10 +236,7 @@ void main() {
         ],
       );
 
-      final plan = planChainCompletion(
-        chain: chain,
-        isCatchable: (id) => true,
-      );
+      final plan = planChainCompletion(chain: chain, isCatchable: (id) => true);
 
       expect(plan.selfContained, isTrue);
       expect(plan.stages.last.method, ChainStageMethod.catchable);

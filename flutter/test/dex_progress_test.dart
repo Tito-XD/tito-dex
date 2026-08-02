@@ -14,9 +14,7 @@ void main() {
       badges: 3,
       maxBadges: 8,
       playTime: '1:00:00',
-      party: const [
-        PartyMember(species: 'Quilava', speciesId: 156, level: 27),
-      ],
+      party: const [PartyMember(species: 'Quilava', speciesId: 156, level: 27)],
       timeline: const [],
       companion: 'Togepi',
       saveDexCaughtIds: const [25],
@@ -33,19 +31,22 @@ void main() {
     expect(progress.fromSave, isTrue);
   });
 
-  test('DexProgress statsFor national scope uses full national dex browse cap', () {
-    const progress = DexProgress(
-      caughtIds: {1, 493, 1025},
-      seenIds: {1, 2, 493, 500},
-    );
+  test(
+    'DexProgress statsFor national scope uses full national dex browse cap',
+    () {
+      const progress = DexProgress(
+        caughtIds: {1, 493, 1025},
+        seenIds: {1, 2, 493, 500},
+      );
 
-    final stats = progress.statsFor(DexRegionalScope.national);
+      final stats = progress.statsFor(DexRegionalScope.national);
 
-    expect(stats.total, titodexMaxNationalDexId);
-    expect(stats.caught, 3);
-    expect(stats.seenOnly, 2);
-    expect(stats.unseen, titodexMaxNationalDexId - 5);
-  });
+      expect(stats.total, titodexMaxNationalDexId);
+      expect(stats.caught, 3);
+      expect(stats.seenOnly, 2);
+      expect(stats.unseen, titodexMaxNationalDexId - 5);
+    },
+  );
 
   test('DexProgress statsFor johto scope counts regional ids', () {
     const progress = DexProgress(
@@ -63,15 +64,31 @@ void main() {
   });
 
   test('DexProgress filter matches encounter status buckets', () {
-    const progress = DexProgress(
-      caughtIds: {1},
-      seenIds: {1, 2},
-    );
+    const progress = DexProgress(caughtIds: {1}, seenIds: {1, 2});
 
     expect(progress.matchesFilter(1, DexEncounterFilter.caught), isTrue);
     expect(progress.matchesFilter(2, DexEncounterFilter.seen), isTrue);
     expect(progress.matchesFilter(1, DexEncounterFilter.seen), isTrue);
     expect(progress.matchesFilter(3, DexEncounterFilter.unseen), isTrue);
+    expect(
+      progress.matchesFilter(
+        2,
+        DexEncounterFilter.evolutionOrTrade,
+        evolutionOrTradeIds: const {2},
+      ),
+      isTrue,
+    );
+  });
+
+  test('DexScopeStats counts exchange/evolution-only gaps', () {
+    const progress = DexProgress(caughtIds: {1}, seenIds: {1, 2, 3});
+
+    final stats = progress.statsFor(
+      DexRegionalScope.national,
+      evolutionOrTradeIds: const {2, 3, 9999},
+    );
+
+    expect(stats.evolutionOrTradeOnly, 2);
   });
 
   test('DexProgress manualDexMarks uses journey manual id lists', () {

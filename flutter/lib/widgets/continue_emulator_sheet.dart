@@ -19,7 +19,7 @@ Future<EmulatorAppChoice?> showEmulatorPickerSheet(
         padding: const EdgeInsets.all(24),
         child: Text(
           AppZh.continueSheetDesktopHint,
-          style: context.tito.cardBody,
+          style: context.titoHome.cardBody,
         ),
       ),
     );
@@ -133,7 +133,7 @@ class _EmulatorPickerMessage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(message, style: context.tito.cardBody),
+        Text(message, style: context.titoHome.cardBody),
         const SizedBox(height: 12),
         FilledButton(onPressed: onRetry, child: const Text(AppZh.dexRetry)),
       ],
@@ -200,7 +200,10 @@ class _EmulatorPickerList extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(AppZh.continueSheetPickEmulator, style: context.tito.cardTitle),
+        Text(
+          AppZh.continueSheetPickEmulator,
+          style: context.titoHome.cardTitle,
+        ),
         const SizedBox(height: 12),
         TextField(
           onChanged: onQueryChanged,
@@ -220,7 +223,7 @@ class _EmulatorPickerList extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Text(
                       AppZh.continueSheetNoSearchResults,
-                      style: context.tito.cardBody,
+                      style: context.titoHome.cardBody,
                     ),
                   ),
                 )
@@ -240,7 +243,9 @@ class _AppSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: context.tito.captionStrong.copyWith(color: TitoColors.mutedInk),
+      style: context.titoHome.captionStrong.copyWith(
+        color: TitoColors.mutedInk,
+      ),
     );
   }
 }
@@ -263,13 +268,16 @@ class _AppChoiceTile extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Text(app.appName, style: context.tito.cardBodyEmphasis),
+                child: Text(
+                  app.appName,
+                  style: context.titoHome.cardBodyEmphasis,
+                ),
               ),
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
                   app.packageName,
-                  style: context.tito.caption,
+                  style: context.titoHome.caption,
                   textAlign: TextAlign.end,
                   overflow: TextOverflow.ellipsis,
                 ),

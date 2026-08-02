@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/theme/device_layout.dart';
+import 'package:titodex/theme/tito_typography.dart';
 
 void main() {
   testWidgets('square handheld uses smaller typography scale', (tester) async {
@@ -117,6 +118,34 @@ void main() {
     );
 
     expect(square, isFalse);
+  });
+
+  testWidgets('header action and explicit Home typography keep current sizes', (
+    tester,
+  ) async {
+    late double headerSize;
+    late double secondaryCardTitleSize;
+    late double homeCardTitleSize;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(size: Size(720, 720)),
+          child: Builder(
+            builder: (context) {
+              headerSize = DeviceLayout.headerIconSize(context);
+              secondaryCardTitleSize = context.tito.cardTitle.fontSize!;
+              homeCardTitleSize = context.titoHome.cardTitle.fontSize!;
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(headerSize, 33);
+    expect(secondaryCardTitleSize, 13);
+    expect(homeCardTitleSize, 19.5);
   });
 
   test('isHandheldPanelSize accepts 1:1 and 3:4 either orientation', () {

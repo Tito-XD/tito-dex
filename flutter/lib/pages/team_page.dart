@@ -12,7 +12,6 @@ import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
@@ -46,9 +45,8 @@ class _TeamPageState extends State<TeamPage> {
   /// Fingerprint of the current manual-party vs save-party divergence — the
   /// dismissal only holds while the divergence stays the same.
   String get _diffSig {
-    String encode(List<PartyMember> members) => members
-        .map((m) => '${m.speciesId ?? m.species}:${m.level}')
-        .join(',');
+    String encode(List<PartyMember> members) =>
+        members.map((m) => '${m.speciesId ?? m.species}:${m.level}').join(',');
     return '${encode(widget.journey.party)}|'
         '${encode(widget.journey.saveSyncedParty)}';
   }
@@ -209,9 +207,9 @@ class _TeamPageState extends State<TeamPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.teamAddInvalidId)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppZh.teamAddInvalidId)));
     }
   }
 
@@ -219,99 +217,96 @@ class _TeamPageState extends State<TeamPage> {
   Widget build(BuildContext context) {
     final journey = widget.journey;
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: SecondaryPageScaffold(
-        title: AppZh.navTeam,
-        padding: DeviceLayout.pagePadding(context),
-        children: [
-          if (_showSaveDiffBanner)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: Material(
-                color: TitoColors.softYellow,
+    return SecondaryPageScaffold(
+      title: AppZh.navTeam,
+      padding: DeviceLayout.pagePadding(context),
+      children: [
+        if (_showSaveDiffBanner)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: Material(
+              color: TitoColors.softYellow,
+              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+              child: InkWell(
+                onTap: _confirmSyncFromSave,
                 borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-                child: InkWell(
-                  onTap: _confirmSyncFromSave,
-                  borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.sync_rounded, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            AppZh.partySaveDiffBanner,
-                            style: SecondaryTypography.onCard.body14.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.sync_rounded, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          AppZh.partySaveDiffBanner,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        IconButton(
-                          onPressed: _dismissDiffBanner,
-                          tooltip: AppZh.partySaveDiffDismiss,
-                          visualDensity: VisualDensity.compact,
-                          icon: const Icon(Icons.close_rounded, size: 18),
-                        ),
-                      ],
-                    ),
+                      ),
+                      IconButton(
+                        onPressed: _dismissDiffBanner,
+                        tooltip: AppZh.partySaveDiffDismiss,
+                        visualDensity: VisualDensity.compact,
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          StickerCard(
-            variant: StickerVariant.deep,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppZh.navTeam} · ${localizeGame(journey.game)}',
-                  style: SecondaryTypography.onGradient.h15,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  AppZh.teamSubtitle(_party.length),
-                  style: SecondaryTypography.onGradient.meta14.copyWith(
-                    color: TitoColors.skyBlue,
-                  ),
-                ),
-              ],
-            ),
           ),
-          const SizedBox(height: 14),
-          TeamSummaryCard(party: _party),
-          const SizedBox(height: 14),
-          PartyTeamList(
-            party: _party,
-            showEmptySlots: true,
-            onMemberTap: _toggleEditor,
-            onEmptySlotTap: _party.length < 6 ? _addMember : null,
-            expandedIndex: _editingIndex,
-            editorBuilder: (context, index) => _InlineTeamEditor(
-              key: ValueKey('team-editor-$index'),
-              member: _party[index],
-              index: index,
-              canSwapPrev: index > 0,
-              canSwapNext: index < _party.length - 1,
-              onSave: _handleEditorSave,
-              onDelete: _handleEditorDelete,
-              onSwap: _handleEditorSwap,
-              onClose: () => setState(() => _editingIndex = null),
-            ),
-          ),
-          const SizedBox(height: 14),
-          StickerCard(
-            variant: StickerVariant.cream,
-            child: Text(
-              AppZh.teamNote,
-              style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w700,
+        StickerCard(
+          variant: StickerVariant.deep,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${AppZh.navTeam} · ${localizeGame(journey.game)}',
+                style: SecondaryTypography.onGradient.h15,
               ),
+              const SizedBox(height: 4),
+              Text(
+                AppZh.teamSubtitle(_party.length),
+                style: SecondaryTypography.onGradient.meta14.copyWith(
+                  color: TitoColors.skyBlue,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        TeamSummaryCard(party: _party),
+        const SizedBox(height: 14),
+        PartyTeamList(
+          party: _party,
+          showEmptySlots: true,
+          onMemberTap: _toggleEditor,
+          onEmptySlotTap: _party.length < 6 ? _addMember : null,
+          expandedIndex: _editingIndex,
+          editorBuilder: (context, index) => _InlineTeamEditor(
+            key: ValueKey('team-editor-$index'),
+            member: _party[index],
+            index: index,
+            canSwapPrev: index > 0,
+            canSwapNext: index < _party.length - 1,
+            onSave: _handleEditorSave,
+            onDelete: _handleEditorDelete,
+            onSwap: _handleEditorSwap,
+            onClose: () => setState(() => _editingIndex = null),
+          ),
+        ),
+        const SizedBox(height: 14),
+        StickerCard(
+          variant: StickerVariant.cream,
+          child: Text(
+            AppZh.teamNote,
+            style: SecondaryTypography.onCard.body14.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

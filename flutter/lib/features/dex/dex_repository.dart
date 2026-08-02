@@ -14,6 +14,7 @@ import 'dex_progress.dart';
 import 'dex_scope.dart';
 import 'dex_search_terms.dart';
 import 'dex_settings_repository.dart';
+import 'dex_version_availability_index.dart';
 import 'pokeapi_client.dart';
 
 /// Data priority: Settings-installed offline bundle → live pre-built dex CDN
@@ -24,16 +25,20 @@ class DexRepository {
     DexOfflineService? offline,
     DexCdnDataSource? cdn,
     DexCdnConfig? cdnConfig,
+    DexVersionAvailabilityIndex? versionAvailabilityIndex,
     this.summaryBatchSize = 4,
   }) : _client = client ?? PokeApiClient(),
        _offline = offline ?? dexOfflineService,
        _cdn = cdn ?? DexCdnDataSource(),
-       _cdnConfig = cdnConfig ?? const DexCdnConfig();
+       _cdnConfig = cdnConfig ?? const DexCdnConfig(),
+       _versionAvailabilityIndex =
+           versionAvailabilityIndex ?? DexVersionAvailabilityIndex();
 
   final PokeApiClient _client;
   final DexOfflineService _offline;
   final DexCdnDataSource _cdn;
   final DexCdnConfig _cdnConfig;
+  final DexVersionAvailabilityIndex _versionAvailabilityIndex;
   final int summaryBatchSize;
   final Map<int, PokemonSummary> _summaryCache = {};
   final Map<int, PokemonDetail> _detailCache = {};
@@ -490,11 +495,38 @@ class DexRepository {
   List<PokemonSummary> filterByEncounter(
     Iterable<PokemonSummary> entries,
     DexProgress progress,
-    DexEncounterFilter filter,
-  ) {
+    DexEncounterFilter filter, {
+    Set<int> evolutionOrTradeIds = const {},
+  }) {
     return entries
-        .where((entry) => progress.matchesFilter(entry.id, filter))
+        .where(
+          (entry) => progress.matchesFilter(
+            entry.id,
+            filter,
+            evolutionOrTradeIds: evolutionOrTradeIds,
+          ),
+        )
         .toList(growable: false);
+  }
+
+  /// Uncaught species whose selected-version path is evolution, breeding, or
+  /// trade rather than a direct encounter.
+  ///
+  /// The APK-local precomputed index keeps this a single small asset read: no
+  /// detail-file scan and no per-species CDN calls on Lite or airplane mode.
+  Future<Set<int>> evolutionOrTradeMissingIds({
+    required DexProgress progress,
+    required GameEdition edition,
+  }) async {
+    final indexed = await _versionAvailabilityIndex.idsForEdition(edition);
+    return indexed
+        .where(
+          (id) =>
+              id > 0 &&
+              id <= titodexMaxNationalDexId &&
+              !progress.caughtIds.contains(id),
+        )
+        .toSet();
   }
 
   Future<List<CachedMove>> getAllMoves() async {

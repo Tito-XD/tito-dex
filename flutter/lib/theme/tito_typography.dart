@@ -47,9 +47,21 @@ abstract final class TitoTypography {
     );
   }
 
+  /// Preserves the intentionally larger Home/dashboard typography without a
+  /// route-wide inherited scale that can leak into title bars and dialogs.
+  static TextStyle homeStyle(BuildContext context, TextStyle style) {
+    final size = style.fontSize;
+    if (size == null ||
+        (!DeviceLayout.isNativeTarget &&
+            !DeviceLayout.useSquareDashboard(context))) {
+      return style;
+    }
+    return style.copyWith(fontSize: size * DeviceLayout.handheldUiScale);
+  }
+
   static double _sz(BuildContext context, double phone, double handheld) {
-    final base = DeviceLayout.isNativeTarget ||
-            DeviceLayout.useSquareDashboard(context)
+    final base =
+        DeviceLayout.isNativeTarget || DeviceLayout.useSquareDashboard(context)
         ? handheld
         : phone;
     return base * DeviceLayout.fontMultiplier(context);
@@ -57,168 +69,151 @@ abstract final class TitoTypography {
 
   /// Large titles on the blue gradient shell (Dex, Search, etc.).
   static TextStyle pageTitleOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 22, 18),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-        letterSpacing: -0.3,
-      );
+    fontSize: _sz(context, 22, 18),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+    letterSpacing: -0.3,
+  );
 
   static TextStyle pageSubtitleOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 11),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.card,
-        height: 1.35,
-      );
+    fontSize: _sz(context, 14, 11),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.card,
+    height: 1.35,
+  );
 
   static TextStyle pageNoteOnGradient(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w700,
-        color: TitoColors.card,
-      );
+    fontSize: _sz(context, 14, 12),
+    fontWeight: FontWeight.w700,
+    color: TitoColors.card,
+  );
 
   /// Cream / sky / mint sticker card content.
-  static TextStyle cardTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 18, 13),
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle cardTitle(BuildContext context) =>
+      _base(fontSize: _sz(context, 18, 13), fontWeight: FontWeight.w800);
 
-  static TextStyle cardSectionTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 16, 12),
-        fontWeight: FontWeight.w900,
-      );
+  static TextStyle cardSectionTitle(BuildContext context) =>
+      _base(fontSize: _sz(context, 16, 12), fontWeight: FontWeight.w900);
 
   static TextStyle cardBody(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 11),
-        fontWeight: FontWeight.w600,
-        height: 1.4,
-      );
+    fontSize: _sz(context, 14, 11),
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+  );
 
-  static TextStyle cardBodyStrong(BuildContext context) => cardBody(context).copyWith(
-        fontWeight: FontWeight.w700,
-      );
+  static TextStyle cardBodyStrong(BuildContext context) =>
+      cardBody(context).copyWith(fontWeight: FontWeight.w700);
 
-  static TextStyle cardBodyEmphasis(BuildContext context) => cardBody(context).copyWith(
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle cardBodyEmphasis(BuildContext context) =>
+      cardBody(context).copyWith(fontWeight: FontWeight.w800);
 
   static TextStyle cardMuted(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 11),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.mutedInk,
-      );
+    fontSize: _sz(context, 12, 11),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.mutedInk,
+  );
 
   static TextStyle cardLabel(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.mutedInk,
-      );
+    fontSize: _sz(context, 14, 12),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.mutedInk,
+  );
 
-  static TextStyle cardValue(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle cardValue(BuildContext context) =>
+      _base(fontSize: _sz(context, 14, 12), fontWeight: FontWeight.w800);
 
-  static TextStyle cardValueLarge(BuildContext context) => _base(
-        fontSize: _sz(context, 18, 13),
-        fontWeight: FontWeight.w900,
-      );
+  static TextStyle cardValueLarge(BuildContext context) =>
+      _base(fontSize: _sz(context, 18, 13), fontWeight: FontWeight.w900);
 
   /// Deep-blue sticker cards.
   static TextStyle onDeepTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 22, 18),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-        letterSpacing: -0.3,
-      );
+    fontSize: _sz(context, 22, 18),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+    letterSpacing: -0.3,
+  );
 
   static TextStyle onDeepSubtitle(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.skyBlue,
-      );
+    fontSize: _sz(context, 14, 12),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.skyBlue,
+  );
 
   static TextStyle onDeepMetaLabel(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 10),
-        fontWeight: FontWeight.w700,
-        color: TitoColors.skyBlue,
-      );
+    fontSize: _sz(context, 12, 10),
+    fontWeight: FontWeight.w700,
+    color: TitoColors.skyBlue,
+  );
 
   static TextStyle onDeepMetaValue(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-      );
+    fontSize: _sz(context, 14, 12),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+  );
 
   static TextStyle onDeepOverline(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 10),
-        fontWeight: FontWeight.w700,
-        color: TitoColors.skyBlue,
-        letterSpacing: 0.8,
-      );
+    fontSize: _sz(context, 12, 10),
+    fontWeight: FontWeight.w700,
+    color: TitoColors.skyBlue,
+    letterSpacing: 0.8,
+  );
 
   static TextStyle onDeepHeading(BuildContext context) => _base(
-        fontSize: _sz(context, 20, 13),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-        letterSpacing: -0.3,
-      );
+    fontSize: _sz(context, 20, 13),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+    letterSpacing: -0.3,
+  );
 
   /// Small utility styles.
   static TextStyle overline(BuildContext context) => _base(
-        fontSize: _sz(context, 11, 10),
-        fontWeight: FontWeight.w700,
-        color: TitoColors.mutedInk,
-        letterSpacing: 0.8,
-      );
+    fontSize: _sz(context, 11, 10),
+    fontWeight: FontWeight.w700,
+    color: TitoColors.mutedInk,
+    letterSpacing: 0.8,
+  );
 
   static TextStyle caption(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 10),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.mutedInk,
-      );
+    fontSize: _sz(context, 12, 10),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.mutedInk,
+  );
 
-  static TextStyle captionStrong(BuildContext context) => caption(context).copyWith(
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle captionStrong(BuildContext context) =>
+      caption(context).copyWith(fontWeight: FontWeight.w800);
 
-  static TextStyle chip(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 11),
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle chip(BuildContext context) =>
+      _base(fontSize: _sz(context, 12, 11), fontWeight: FontWeight.w800);
 
-  static TextStyle statusBadge(BuildContext context) => _base(
-        fontSize: _sz(context, 10, 9),
-        fontWeight: FontWeight.w800,
-      );
+  static TextStyle statusBadge(BuildContext context) =>
+      _base(fontSize: _sz(context, 10, 9), fontWeight: FontWeight.w800);
 
   static TextStyle dexNumber(BuildContext context) => _base(
-        fontSize: _sz(context, 11, 10),
-        fontWeight: FontWeight.w700,
-        color: TitoColors.mutedInk,
-      );
+    fontSize: _sz(context, 11, 10),
+    fontWeight: FontWeight.w700,
+    color: TitoColors.mutedInk,
+  );
 
   static TextStyle settingsTitle(BuildContext context) => _base(
-        fontSize: _sz(context, 24, 20),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-      );
+    fontSize: _sz(context, 24, 20),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+  );
 
   static TextStyle accentCoral(BuildContext context) => _base(
-        fontSize: _sz(context, 14, 12),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.coral,
-      );
+    fontSize: _sz(context, 14, 12),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.coral,
+  );
 
-  static TextStyle companionBubble(BuildContext context) => _base(
-        fontSize: _sz(context, 13, 12),
-        fontWeight: FontWeight.w700,
-      );
+  static TextStyle companionBubble(BuildContext context) =>
+      _base(fontSize: _sz(context, 13, 12), fontWeight: FontWeight.w700);
 
   static TextStyle companionName(BuildContext context) => _base(
-        fontSize: _sz(context, 12, 11),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-      );
+    fontSize: _sz(context, 12, 11),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+  );
 
   static TextStyle navLabel(BuildContext context, {required bool selected}) =>
       _base(
@@ -228,23 +223,51 @@ abstract final class TitoTypography {
       );
 
   static TextStyle quickTileLabel(BuildContext context) => _base(
-        fontSize: _sz(context, 13, 10),
-        fontWeight: FontWeight.w800,
-        color: TitoColors.deepBlue,
-      );
+    fontSize: _sz(context, 13, 10),
+    fontWeight: FontWeight.w800,
+    color: TitoColors.deepBlue,
+  );
 
   /// Secondary error detail inside cream cards (not raw exception dumps).
   static TextStyle errorDetail(BuildContext context) => _base(
-        fontSize: _sz(context, 13, 11),
-        fontWeight: FontWeight.w600,
-        color: TitoColors.mutedInk,
-        height: 1.45,
-      );
+    fontSize: _sz(context, 13, 11),
+    fontWeight: FontWeight.w600,
+    color: TitoColors.mutedInk,
+    height: 1.45,
+  );
 }
 
 /// Shorthand: `context.tito.cardTitle`
 extension TitoTextContext on BuildContext {
   TitoTextStyles get tito => TitoTextStyles(this);
+  TitoHomeTextStyles get titoHome => TitoHomeTextStyles(this);
+}
+
+/// Explicitly enlarged dashboard styles. Secondary routes use [TitoTextStyles]
+/// or [SecondaryTypography] directly, so page chrome and shared components no
+/// longer depend on an inherited font-scale override.
+final class TitoHomeTextStyles {
+  const TitoHomeTextStyles(this.context);
+
+  final BuildContext context;
+
+  TextStyle _scale(TextStyle style) => TitoTypography.homeStyle(context, style);
+
+  TextStyle get cardTitle => _scale(TitoTypography.cardTitle(context));
+  TextStyle get cardSectionTitle =>
+      _scale(TitoTypography.cardSectionTitle(context));
+  TextStyle get cardBody => _scale(TitoTypography.cardBody(context));
+  TextStyle get cardBodyEmphasis =>
+      _scale(TitoTypography.cardBodyEmphasis(context));
+  TextStyle get caption => _scale(TitoTypography.caption(context));
+  TextStyle get captionStrong => _scale(TitoTypography.captionStrong(context));
+  TextStyle get onDeepMetaLabel =>
+      _scale(TitoTypography.onDeepMetaLabel(context));
+  TextStyle get onDeepMetaValue =>
+      _scale(TitoTypography.onDeepMetaValue(context));
+  TextStyle get onDeepOverline =>
+      _scale(TitoTypography.onDeepOverline(context));
+  TextStyle get onDeepHeading => _scale(TitoTypography.onDeepHeading(context));
 }
 
 final class TitoTextStyles {
@@ -256,7 +279,8 @@ final class TitoTextStyles {
       TitoTypography.pageTitleOnGradient(context);
   TextStyle get pageSubtitleOnGradient =>
       TitoTypography.pageSubtitleOnGradient(context);
-  TextStyle get pageNoteOnGradient => TitoTypography.pageNoteOnGradient(context);
+  TextStyle get pageNoteOnGradient =>
+      TitoTypography.pageNoteOnGradient(context);
   TextStyle get cardTitle => TitoTypography.cardTitle(context);
   TextStyle get cardSectionTitle => TitoTypography.cardSectionTitle(context);
   TextStyle get cardBody => TitoTypography.cardBody(context);

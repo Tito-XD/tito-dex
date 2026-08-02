@@ -14,11 +14,13 @@ Future<DexCacheProgress?> trackWhileDownloading({
   )
   download,
   required VoidCallback onCancel,
+  Future<void> Function(DexCacheProgress? progress)? onMinimize,
   String? title,
   bool showCancel = true,
 }) async {
   DexCacheProgress? latest;
   var dialogOpen = true;
+  var minimizing = false;
 
   if (!context.mounted) {
     return null;
@@ -78,9 +80,34 @@ Future<DexCacheProgress?> trackWhileDownloading({
                 ],
               ),
               actions: [
+                if (onMinimize != null)
+                  TextButton(
+                    onPressed: minimizing
+                        ? null
+                        : () async {
+                            minimizing = true;
+                            setDialogState(() {});
+                            try {
+                              await onMinimize(latest);
+                              if (dialogContext.mounted && dialogOpen) {
+                                dialogOpen = false;
+                                _activeProgressDialog = null;
+                                Navigator.pop(dialogContext);
+                              }
+                            } catch (_) {
+                              minimizing = false;
+                              if (dialogContext.mounted && dialogOpen) {
+                                setDialogState(() {});
+                              }
+                            }
+                          },
+                    child: const Text(AppZh.settingsDexBackgroundDownload),
+                  ),
                 if (showCancel)
                   TextButton(
                     onPressed: () {
+                      dialogOpen = false;
+                      _activeProgressDialog = null;
                       onCancel();
                       Navigator.pop(dialogContext);
                     },
@@ -101,10 +128,11 @@ Future<DexCacheProgress?> trackWhileDownloading({
       _activeProgressDialog?.call(progress);
     });
   } finally {
-    dialogOpen = false;
     _activeProgressDialog = null;
-    if (context.mounted &&
+    if (dialogOpen &&
+        context.mounted &&
         Navigator.of(context, rootNavigator: true).canPop()) {
+      dialogOpen = false;
       Navigator.of(context, rootNavigator: true).pop();
     }
     await dialogFuture;

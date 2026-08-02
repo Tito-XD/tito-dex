@@ -13,7 +13,6 @@ import '../../models/journey.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/tito_font_scale.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/pokemon_detail_sections.dart';
 import '../../widgets/secondary_page_scaffold.dart';
@@ -209,194 +208,191 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
         final relations = _relations;
         final generation = scope.generation;
 
-        return TitoFontScale(
-          multiplier: 1.0,
-          child: Material(
-            type: MaterialType.transparency,
-            child: SecondaryPageScaffold(
-              title: AppZh.companionToolTypeMatchup,
-              subtitle: edition.labelZh,
-              children: [
-                if (_loading)
-                  const TitoLoadingPanel(
-                    message: AppZh.companionLoading,
-                    compact: true,
-                  )
-                else if (_error != null)
-                  StickerCard(
-                    child: Text(
-                      _error!,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                        height: 1.45,
-                      ),
+        return Material(
+          type: MaterialType.transparency,
+          child: SecondaryPageScaffold(
+            title: AppZh.companionToolTypeMatchup,
+            subtitle: edition.labelZh,
+            children: [
+              if (_loading)
+                const TitoLoadingPanel(
+                  message: AppZh.companionLoading,
+                  compact: true,
+                )
+              else if (_error != null)
+                StickerCard(
+                  child: Text(
+                    _error!,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                      height: 1.45,
                     ),
-                  )
-                else if (relations != null) ...[
-                  CompanionSectionCard(
-                    title: AppZh.companionTypeDefenderTitle,
-                    subtitle:
-                        '${scope.typeChartNote}\n${AppZh.companionGenerationTypeNote}',
-                    children: [
-                      PokemonSearchField(
-                        controller: _defenderQueryController,
-                        hintText: AppZh.companionDefenderSearchHint,
-                        suggestions: _defenderSuggestions,
-                        onQueryChanged: _searchDefender,
-                        onPokemonSelected: _applyDefender,
-                        prefixIcon: Icons.shield_rounded,
-                      ),
-                      const SizedBox(height: 12),
-                      LinkedOrManualTypePicker(
-                        linkedPokemonId: _linkedDefenderId,
-                        label: AppZh.companionTypeManualPick,
-                        selected: _defenderTypes,
-                        onManualChanged: (types) {
-                          if (types.isNotEmpty) {
-                            setState(() {
-                              _defenderTypes = types;
-                              _defenderTeraType =
-                                  defaultTeraTypeFor(types, generation);
-                            });
-                            _clearLinkedDefender();
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      CompanionAbilitySection(
-                        pokemonLabel: AppZh.companionDefenderAbilityPick,
-                        manualLabel: AppZh.companionManualAbilityPick,
-                        manualOptions: kManualDefensiveAbilityOptions,
-                        pokemonOptions: _defenderAbilityOptions,
-                        linkedPokemonId: _linkedDefenderId,
-                        selectedSlug: _defenderAbilitySlug,
-                        onChanged: (slug) =>
-                            setState(() => _defenderAbilitySlug = slug),
-                      ),
-                      if (generation >= 9) ...[
-                        const SizedBox(height: 12),
-                        TerastalPicker(
-                          label: AppZh.companionDefenderTerastal,
-                          enabled: true,
-                          terastallized: _defenderTerastallized,
-                          teraType: _defenderTeraType,
-                          fallbackTypes: _defenderTypes,
-                          generation: generation,
-                          onTerastallizedChanged: (value) => setState(
-                            () => _defenderTerastallized = value,
-                          ),
-                          onTeraTypeChanged: (type) =>
-                              setState(() => _defenderTeraType = type),
-                        ),
-                      ],
-                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Builder(
-                    builder: (context) {
-                      final input = _defenderInput(relations, generation);
-                      final profile = computeBattleDefensiveProfile(input);
-                      final multipliers = computeBattleTypeMultipliers(input);
-                      final normalized = normalizeTypesForGeneration(
-                        _defenderTypes,
-                        generation,
-                      );
+                )
+              else if (relations != null) ...[
+                CompanionSectionCard(
+                  title: AppZh.companionTypeDefenderTitle,
+                  subtitle:
+                      '${scope.typeChartNote}\n${AppZh.companionGenerationTypeNote}',
+                  children: [
+                    PokemonSearchField(
+                      controller: _defenderQueryController,
+                      hintText: AppZh.companionDefenderSearchHint,
+                      suggestions: _defenderSuggestions,
+                      onQueryChanged: _searchDefender,
+                      onPokemonSelected: _applyDefender,
+                      prefixIcon: Icons.shield_rounded,
+                    ),
+                    const SizedBox(height: 12),
+                    LinkedOrManualTypePicker(
+                      linkedPokemonId: _linkedDefenderId,
+                      label: AppZh.companionTypeManualPick,
+                      selected: _defenderTypes,
+                      onManualChanged: (types) {
+                        if (types.isNotEmpty) {
+                          setState(() {
+                            _defenderTypes = types;
+                            _defenderTeraType = defaultTeraTypeFor(
+                              types,
+                              generation,
+                            );
+                          });
+                          _clearLinkedDefender();
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    CompanionAbilitySection(
+                      pokemonLabel: AppZh.companionDefenderAbilityPick,
+                      manualLabel: AppZh.companionManualAbilityPick,
+                      manualOptions: kManualDefensiveAbilityOptions,
+                      pokemonOptions: _defenderAbilityOptions,
+                      linkedPokemonId: _linkedDefenderId,
+                      selectedSlug: _defenderAbilitySlug,
+                      onChanged: (slug) =>
+                          setState(() => _defenderAbilitySlug = slug),
+                    ),
+                    if (generation >= 9) ...[
+                      const SizedBox(height: 12),
+                      TerastalPicker(
+                        label: AppZh.companionDefenderTerastal,
+                        enabled: true,
+                        terastallized: _defenderTerastallized,
+                        teraType: _defenderTeraType,
+                        fallbackTypes: _defenderTypes,
+                        generation: generation,
+                        onTerastallizedChanged: (value) =>
+                            setState(() => _defenderTerastallized = value),
+                        onTeraTypeChanged: (type) =>
+                            setState(() => _defenderTeraType = type),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Builder(
+                  builder: (context) {
+                    final input = _defenderInput(relations, generation);
+                    final profile = computeBattleDefensiveProfile(input);
+                    final multipliers = computeBattleTypeMultipliers(input);
+                    final normalized = normalizeTypesForGeneration(
+                      _defenderTypes,
+                      generation,
+                    );
 
-                      return Column(
-                        children: [
-                          if (generation < 6)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                '世代修正：${normalized.map(typeNameZh).join('/')}',
-                                style: SecondaryTypography.onCard.small12
-                                    .copyWith(color: TitoColors.mutedInk),
-                              ),
-                            ),
-                          TypeEffectivenessGrid(
-                            multipliers: multipliers,
-                            weaknesses: profile.weaknesses,
-                            resistances: profile.resistances,
-                            immunities: profile.immunities,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  CompanionSectionCard(
-                    title: AppZh.companionTypeAttackerTitle,
-                    children: [
-                      PokemonSearchField(
-                        controller: _attackerQueryController,
-                        hintText: AppZh.companionAttackerSearchHint,
-                        suggestions: _attackerSuggestions,
-                        onQueryChanged: _searchAttacker,
-                        onPokemonSelected: _applyAttacker,
-                        prefixIcon: Icons.sports_martial_arts_rounded,
-                      ),
-                      const SizedBox(height: 12),
-                      LinkedOrManualTypePicker(
-                        linkedPokemonId: _linkedAttackerId,
-                        label: AppZh.companionTypeAttackerPick,
-                        selected: _attackerTypes,
-                        maxSelected: 2,
-                        onManualChanged: (types) {
-                          setState(() => _attackerTypes = types);
-                          _clearLinkedAttacker();
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      CompanionAbilitySection(
-                        pokemonLabel: AppZh.companionAttackerAbilityPick,
-                        manualLabel: AppZh.companionAttackerAbilityPick,
-                        manualOptions: kManualAttackerAbilityOptions,
-                        pokemonOptions: _attackerAbilityOptions,
-                        linkedPokemonId: _linkedAttackerId,
-                        selectedSlug: _attackerAbilitySlug,
-                        onChanged: (slug) =>
-                            setState(() => _attackerAbilitySlug = slug),
-                      ),
-                      if (generation >= 9) ...[
-                        const SizedBox(height: 12),
-                        TerastalPicker(
-                          label: AppZh.companionAttackerTerastal,
-                          enabled: true,
-                          terastallized: _attackerTerastallized,
-                          teraType: _attackerTeraType,
-                          fallbackTypes: _attackerTypes,
-                          generation: generation,
-                          onTerastallizedChanged: (value) => setState(
-                            () => _attackerTerastallized = value,
-                          ),
-                          onTeraTypeChanged: (type) =>
-                              setState(() => _attackerTeraType = type),
-                        ),
-                      ],
-                      if (_attackerTypes.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          profileLine(
-                            AppZh.companionOffensiveBlindSpots,
-                            computeOffensiveBlindSpots(
-                              _attackerTypes,
-                              relations,
-                              generation: generation,
-                              attackerAbilitySlug: _attackerAbilitySlug,
-                              attackerTerastallized: _attackerTerastallized,
-                              attackerTeraType: _attackerTeraType,
+                    return Column(
+                      children: [
+                        if (generation < 6)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              '世代修正：${normalized.map(typeNameZh).join('/')}',
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(color: TitoColors.mutedInk),
                             ),
                           ),
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        TypeEffectivenessGrid(
+                          multipliers: multipliers,
+                          weaknesses: profile.weaknesses,
+                          resistances: profile.resistances,
+                          immunities: profile.immunities,
                         ),
                       ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                CompanionSectionCard(
+                  title: AppZh.companionTypeAttackerTitle,
+                  children: [
+                    PokemonSearchField(
+                      controller: _attackerQueryController,
+                      hintText: AppZh.companionAttackerSearchHint,
+                      suggestions: _attackerSuggestions,
+                      onQueryChanged: _searchAttacker,
+                      onPokemonSelected: _applyAttacker,
+                      prefixIcon: Icons.sports_martial_arts_rounded,
+                    ),
+                    const SizedBox(height: 12),
+                    LinkedOrManualTypePicker(
+                      linkedPokemonId: _linkedAttackerId,
+                      label: AppZh.companionTypeAttackerPick,
+                      selected: _attackerTypes,
+                      maxSelected: 2,
+                      onManualChanged: (types) {
+                        setState(() => _attackerTypes = types);
+                        _clearLinkedAttacker();
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    CompanionAbilitySection(
+                      pokemonLabel: AppZh.companionAttackerAbilityPick,
+                      manualLabel: AppZh.companionAttackerAbilityPick,
+                      manualOptions: kManualAttackerAbilityOptions,
+                      pokemonOptions: _attackerAbilityOptions,
+                      linkedPokemonId: _linkedAttackerId,
+                      selectedSlug: _attackerAbilitySlug,
+                      onChanged: (slug) =>
+                          setState(() => _attackerAbilitySlug = slug),
+                    ),
+                    if (generation >= 9) ...[
+                      const SizedBox(height: 12),
+                      TerastalPicker(
+                        label: AppZh.companionAttackerTerastal,
+                        enabled: true,
+                        terastallized: _attackerTerastallized,
+                        teraType: _attackerTeraType,
+                        fallbackTypes: _attackerTypes,
+                        generation: generation,
+                        onTerastallizedChanged: (value) =>
+                            setState(() => _attackerTerastallized = value),
+                        onTeraTypeChanged: (type) =>
+                            setState(() => _attackerTeraType = type),
+                      ),
                     ],
-                  ),
-                ],
+                    if (_attackerTypes.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        profileLine(
+                          AppZh.companionOffensiveBlindSpots,
+                          computeOffensiveBlindSpots(
+                            _attackerTypes,
+                            relations,
+                            generation: generation,
+                            attackerAbilitySlug: _attackerAbilitySlug,
+                            attackerTerastallized: _attackerTerastallized,
+                            attackerTeraType: _attackerTeraType,
+                          ),
+                        ),
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
-            ),
+            ],
           ),
         );
       },

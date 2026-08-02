@@ -2,7 +2,7 @@
 
 > **Status:** Active plan (2026-07-30)。本文取代 `codex/dex-forms` 分支上
 > `docs/handoff/FUNCTIONAL_ROADMAP_IDEAS.md` 的 26 项建议：砍到 9 项，分三批。
-> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.2**，
+> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.5**，
 > CDN 图鉴包 **v13**，Offline APK 紧凑包 **v14**）。
 >
 > **并行约束：** 图鉴检索线（体形/颜色/大小/分类检索 + move/ability 资料详情）
@@ -28,8 +28,8 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 | --- | --- | --- | --- |
 | ① | 存档导入自动选游戏版本 | ✅ **已实现** | `gameEditionForSaveGame`（`game_edition.dart`）+ `GameEditionRepository.applyForSaveGame`；显式导入无条件应用并带 flavor（Pearl→dp/pearl），启动重同步只在存档游戏变化时应用，不会打架手动选择 |
 | ③ | 离线数据「重新校验」 | ✅ **已实现** | `DexOfflineService.verifyOfflineData()` + Settings 按钮；manifest/catalog/summaries/详情逐项检查，缺图仅提示（在线可回退），缺详情判不健康 |
-| ② | 深链接带形态/版本 | 🔒 **预留** | `/dex/:id` 加 `?form=&version=`。检索线要往列表/URL 塞筛选状态，query-param 方案必须一起定，等检索线收口 |
-| ④ | 回退数据标注 | 🔒 **预留** | 只暴露 `dataCompleteness` 的「来自相邻版本」语义，不做四元组。落点 `pokemon_detail_sections.dart` / `dex_reference_detail.dart`，后者检索线正在改 |
+| ② | 深链接带形态/版本 | ✅ **已实现** | `/dex/:id?form=&version=` 会在详情加载后校验并应用形态与精确版本，无效参数安全回退默认值 |
+| ④ | 回退数据标注 | ✅ **已实现** | 形态继承/资料不完整与招式借用来源均会明确标注，不把回退数据显示成当前版本原生资料 |
 
 ## Phase 2 — 目标 3：进化链获得规划 + 版本限定（一个版本的主线）
 
@@ -40,9 +40,9 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 | 部分 | 状态 | 说明 |
 | --- | --- | --- |
 | 逻辑层 | ✅ **已实现** | `features/dex/version_availability.dart`：`versionExclusivity`（配对版本限定判定）、`planChainCompletion`（逐段 catchable / evolve / tradeRequired / breedRequired / unavailable，含生蛋救援与「进化型野生可捕则无需交换」）、`isTradeTriggerZh` |
-| 获取 tab 第二段 UI | 🔒 预留 | 「本版本能否独立集齐这条链 + 缺口在哪」卡片；等检索线对 detail 页的改动落地 |
-| 进化卡标注 | 🔒 预留 | `pokemon_card.dart` 正在检索线上改进化条件展示，标注（交换锁/版本缺失徽标）合并进去而不是再改一层 |
-| 图鉴进度分类 | ⏳ 随后 | 「仅缺交换/进化」计数挂在 `DexScopeStats` 上，直接消费 `ChainCompletionPlan` |
+| 获取 tab 第二段 UI | ✅ **v0.8.5 已发布** | 选择精确版本后显示「能否单版本集齐 + 各阶段获得方式 + 缺口」，DLC 会继承同版本本体遭遇 |
+| 进化卡标注 | ✅ **v0.8.5 已发布** | 进化链保留交换锁；版本规划卡补充配对版本限定与每一阶段的捕获/进化/交换/生蛋/不可用状态 |
+| 图鉴进度分类 | ✅ **v0.8.5 已发布** | `DexScopeStats.evolutionOrTradeOnly` +「待进化」筛选；使用 APK 内置约 27 KB 的预计算索引，不扫描详情文件、不发逐只网络请求 |
 | Bundle 增强 | ✅ **已落地**（检索线，3095ec3） | `EvolutionNode.triggers`：完整 alternatives 结构化（trigger slug / item / heldItem / minLevel / timeOfDay / …），`triggerZh` 保持字节不变。`evolutionRequiresTrade` 已迁移：优先结构化字段（巨钳螳螂式「交换+携带」精确判定，美纳斯式非交换替代路径解锁），旧 bundle 回退字符串匹配 |
 
 剩余限制：alternatives 中的非交换替代路径（如美纳斯的美丽度升级）按可达处理，
@@ -54,9 +54,9 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 
 | 步骤 | 依赖 | 说明 |
 | --- | --- | --- |
-| 1. 地点反向索引 | 🔒 `build_dex_bundle.py` 空闲 | **构建侧**生成 `游戏→地点→方式→宝可梦` 索引写进 bundle，客户端只读；不做运行时 invert（会拖启动，v0.5.0 预计算方向一致） |
-| 2. 结构化地点树 | 依赖 1 | 地点页 = 树 + 完成度；**永远不做交互地图**（素材无底洞） |
-| 3. 存档助手 | 依赖 1 + Phase 2 | 卡片按存档数据分级自动显隐，**不等存档全覆盖**：版本缺失卡（全部 14 格式）→ 阶段可获得/进化线卡（Gen1/2/4 共 7 种有徽章）→ 队伍提醒卡（Gen4 两线有队伍）→ 附近未捕获卡（HGSS 有 mapId）。徽章→进度解锁是每游戏一张人工小表，不是解析问题 |
+| 1. 地点反向索引 | ✅ 构建侧已实现 | bundle 已生成 `location_index.json`（`游戏→地点→方式→宝可梦`）；客户端仍坚持只读，不做运行时 invert |
+| 2. 结构化地点树 | 📌 **待办** | 增加 App 端按需加载器与地点树页面，显示地点完成度；**永远不做交互地图**（素材无底洞） |
+| 3. 存档助手 | 📌 **待办，等存档规则调整后再做** | 在地点树与 Phase 2 之上分级展示版本缺失、阶段可获得/进化线、队伍提醒、附近未捕获；具体字段与显隐规则以后续存档改动为准 |
 
 ## 检索线（并行中，不在本计划内但相关）
 

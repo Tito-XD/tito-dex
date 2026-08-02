@@ -14,6 +14,7 @@ import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
 import '../features/dex/dex_search_terms.dart';
 import '../features/dex/dex_filter.dart';
+import '../features/dex/dex_encounter_labels.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
@@ -25,6 +26,25 @@ import 'sticker_card.dart';
 import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'type_badge.dart';
+
+List<String> pokemonFormStatusLabels(
+  PokemonFormDetail form, {
+  String? versionGroup,
+}) {
+  final labels = <String>[
+    if (form.isMega) AppZh.dexFormStatusMega,
+    if (form.isBattleOnly) AppZh.dexFormStatusBattleOnly,
+    if (!form.obtainable) AppZh.dexFormStatusNotObtainable,
+    if (form.isCosmetic) AppZh.dexFormStatusCosmetic,
+    if (form.dataCompleteness == 'partial') AppZh.dexFormStatusPartial,
+  ];
+  if (versionGroup != null &&
+      form.availableVersionGroups.isNotEmpty &&
+      !form.availableVersionGroups.contains(versionGroup)) {
+    labels.add(AppZh.dexFormStatusUnavailableHere);
+  }
+  return labels;
+}
 
 class PokemonFormSelector extends StatelessWidget {
   const PokemonFormSelector({
@@ -99,8 +119,15 @@ class PokemonFormSelector extends StatelessWidget {
           ChoiceChip(
             selected: form.key == selectedKey,
             onSelected: (_) => onSelected(form),
-            label: Text(form.nameZh),
-            tooltip: form.kind.labelZh,
+            label: Text(
+              pokemonFormStatusLabels(form).isEmpty
+                  ? form.nameZh
+                  : '${form.nameZh} · ${pokemonFormStatusLabels(form).first}',
+            ),
+            tooltip: [
+              form.kind.labelZh,
+              ...pokemonFormStatusLabels(form),
+            ].join(' · '),
             showCheckmark: false,
             selectedColor: TitoColors.softYellow,
             backgroundColor: TitoColors.card,
@@ -167,10 +194,7 @@ class _FormPickerSheet extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: TitoColors.card,
-                  ),
+                  icon: const Icon(Icons.close_rounded, color: TitoColors.card),
                 ),
               ],
             ),
@@ -227,7 +251,9 @@ class _FormPickerTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.sm),
             border: Border.all(
-              color: selected ? TitoColors.softYellow : TitoColors.card.withValues(alpha: 0.35),
+              color: selected
+                  ? TitoColors.softYellow
+                  : TitoColors.card.withValues(alpha: 0.35),
               width: 2,
             ),
           ),
@@ -238,7 +264,9 @@ class _FormPickerTile extends StatelessWidget {
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final imageSize = math.min(constraints.maxWidth, constraints.maxHeight) - 8;
+                    final imageSize =
+                        math.min(constraints.maxWidth, constraints.maxHeight) -
+                        8;
                     return DexSpriteImage(
                       source: form.summaryFor(_dummySpecies).displaySpritePath,
                       width: imageSize,
@@ -258,6 +286,20 @@ class _FormPickerTile extends StatelessWidget {
                   fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
                 ),
               ),
+              if (pokemonFormStatusLabels(form).isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  pokemonFormStatusLabels(form).take(2).join(' · '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.softYellow,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -443,14 +485,14 @@ class PokemonDetailHeader extends StatelessWidget {
               GestureDetector(
                 onTap: () =>
                     showPokemonArtworkViewer(context, summary: summary),
-              child: Hero(
-                tag: pokemonArtworkHeroTag(summary),
-                child: DexSpriteImage(
-                  source: summary.displaySpritePath,
-                  width: square ? 72 : (compactLayout ? 84 : 108),
-                  height: square ? 72 : (compactLayout ? 84 : 108),
+                child: Hero(
+                  tag: pokemonArtworkHeroTag(summary),
+                  child: DexSpriteImage(
+                    source: summary.displaySpritePath,
+                    width: square ? 72 : (compactLayout ? 84 : 108),
+                    height: square ? 72 : (compactLayout ? 84 : 108),
+                  ),
                 ),
-              ),
               ),
             ],
           ),
@@ -479,8 +521,49 @@ class FlavorTextCarousel extends StatefulWidget {
 }
 
 class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
+  static const _localIconVersions = <String>{
+    'red',
+    'blue',
+    'yellow',
+    'gold',
+    'silver',
+    'crystal',
+    'ruby',
+    'sapphire',
+    'emerald',
+    'firered',
+    'leafgreen',
+    'diamond',
+    'pearl',
+    'platinum',
+    'heartgold',
+    'soulsilver',
+    'black',
+    'white',
+    'black-2',
+    'white-2',
+    'x',
+    'y',
+    'omega-ruby',
+    'alpha-sapphire',
+    'sun',
+    'moon',
+    'ultra-sun',
+    'ultra-moon',
+    'lets-go-pikachu',
+    'lets-go-eevee',
+    'sword',
+    'shield',
+    'brilliant-diamond',
+    'shining-pearl',
+    'legends-arceus',
+    'scarlet',
+    'violet',
+  };
+
   late final PageController _controller;
   int _index = 0;
+  bool _iconsPrecached = false;
 
   @override
   void initState() {
@@ -499,6 +582,21 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
       if (_index != page) {
         _index = page;
         _controller.jumpToPage(page);
+      }
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_iconsPrecached) return;
+    _iconsPrecached = true;
+    for (final entry in widget.entries) {
+      if (_localIconVersions.contains(entry.version)) {
+        precacheImage(
+          AssetImage('assets/game_icons/${entry.version}.png'),
+          context,
+        );
       }
     }
   }
@@ -579,7 +677,15 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                   children: [
                     Row(
                       children: [
-                        if (entry.iconUrl != null) ...[
+                        if (_localIconVersions.contains(entry.version)) ...[
+                          Image.asset(
+                            'assets/game_icons/${entry.version}.png',
+                            width: 20,
+                            height: 20,
+                            filterQuality: FilterQuality.high,
+                          ),
+                          const SizedBox(width: 6),
+                        ] else if (entry.iconUrl != null) ...[
                           Image.network(
                             entry.iconUrl!,
                             width: 20,
@@ -1319,73 +1425,134 @@ class ObtainLocationsCard extends StatelessWidget {
         children: [
           Text(
             gameLabel == null
-                ? AppZh.dexObtainHgss
+                ? AppZh.dexObtainLocations
                 : AppZh.dexObtainForGame(gameLabel!),
             style: SecondaryTypography.onCard.h15,
           ),
           const SizedBox(height: 10),
-          ...locations.map((entry) {
-            final tags = _encounterTags(entry);
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+          for (final entry in locations)
+            _ObtainLocationRow(entry: entry, tags: _encounterTags(entry)),
+        ],
+      ),
+    );
+  }
+}
+
+class _ObtainLocationRow extends StatefulWidget {
+  const _ObtainLocationRow({required this.entry, required this.tags});
+
+  final ObtainLocationEntry entry;
+  final List<String> tags;
+
+  @override
+  State<_ObtainLocationRow> createState() => _ObtainLocationRowState();
+}
+
+class _ObtainLocationRowState extends State<_ObtainLocationRow> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final entry = widget.entry;
+    final methods = entry.methods.map(encounterMethodLabelZh).toSet().toList();
+    final conditions = entry.conditions
+        .map(encounterConditionLabelZh)
+        .toSet()
+        .toList();
+    final rateLabel = entry.rateKind == 'weight'
+        ? '权重 ${entry.rateValue ?? entry.maxChance}'
+        : (entry.maxChance > 0 ? '${entry.maxChance}%' : null);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  entry.areaLabelZh,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (entry.minLevel != null)
+                Text(
+                  entry.maxLevel != null && entry.maxLevel != entry.minLevel
+                      ? 'Lv.${entry.minLevel}–${entry.maxLevel}'
+                      : 'Lv.${entry.minLevel}',
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+              if (rateLabel != null) ...[
+                const SizedBox(width: 8),
+                Text(
+                  rateLabel,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: TitoColors.coral,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          if (entry.versions.isNotEmpty)
+            Text(
+              entry.versions.map(flavorVersionLabelZh).join(' / '),
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+              ),
+            ),
+          if (methods.isNotEmpty || widget.tags.isNotEmpty)
+            Text(
+              [...methods.take(2), ...widget.tags].join(' · '),
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: entry.formAmbiguous
+                    ? TitoColors.coral
+                    : TitoColors.mutedInk,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          if (conditions.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.areaLabelZh,
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (entry.versions.isNotEmpty)
-                          Text(
-                            entry.versions
-                                .map(flavorVersionLabelZh)
-                                .join(' / '),
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              color: TitoColors.mutedInk,
-                            ),
-                          ),
-                        if (tags.isNotEmpty)
-                          Text(
-                            tags.join(' · '),
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              color: entry.formAmbiguous
-                                  ? TitoColors.coral
-                                  : TitoColors.mutedInk,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                      ],
+                  Icon(
+                    _expanded
+                        ? Icons.expand_less_rounded
+                        : Icons.expand_more_rounded,
+                    size: 17,
+                    color: TitoColors.deepBlue,
+                  ),
+                  Text(
+                    _expanded ? '收起出现条件' : '出现条件 ${conditions.length} 项',
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.deepBlue,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  if (entry.minLevel != null)
-                    Text(
-                      entry.maxLevel != null && entry.maxLevel != entry.minLevel
-                          ? 'Lv.${entry.minLevel}–${entry.maxLevel}'
-                          : 'Lv.${entry.minLevel}',
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.mutedInk,
-                      ),
-                    ),
-                  if (entry.maxChance > 0) ...[
-                    const SizedBox(width: 8),
-                    Text(
-                      '${entry.maxChance}%',
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: TitoColors.coral,
-                      ),
-                    ),
-                  ],
                 ],
               ),
-            );
-          }),
+            ),
+            if (_expanded)
+              Padding(
+                padding: const EdgeInsets.only(left: 18, top: 2),
+                child: Text(
+                  conditions.join(' · '),
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+          ],
         ],
       ),
     );
@@ -1514,54 +1681,6 @@ class _MoveTile extends StatelessWidget {
   }
 }
 
-/// UI shell for species abilities — data wiring lands with a later bundle.
-class AbilityPlaceholderCard extends StatelessWidget {
-  const AbilityPlaceholderCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppZh.dexAbilities, style: SecondaryTypography.onCard.h15),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: TitoColors.skyBlue,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: TitoColors.ink, width: 2),
-                ),
-                child: Text(
-                  AppZh.dexAbilityUnknownName,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  AppZh.dexAbilityPlaceholder,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class IntroMetaCard extends StatelessWidget {
   const IntroMetaCard({super.key, required this.detail});
 
@@ -1576,90 +1695,43 @@ class IntroMetaCard extends StatelessWidget {
     return StickerCard(
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: _MetaTile(
-                  label: AppZh.dexHeight,
-                  value: '${heightM.toStringAsFixed(1)} m',
-                ),
-              ),
-              Expanded(
-                child: _MetaTile(
-                  label: AppZh.dexWeight,
-                  value: '${weightKg.toStringAsFixed(1)} kg',
-                ),
-              ),
-            ],
+          _MetaRow(
+            label: AppZh.dexHeight,
+            value: '${heightM.toStringAsFixed(1)} m',
+          ),
+          const Divider(height: 20),
+          _MetaRow(
+            label: AppZh.dexWeight,
+            value: '${weightKg.toStringAsFixed(1)} kg',
           ),
           if (detail.summary.shapeSlug != null ||
               detail.summary.colorSlug != null ||
               detail.summary.tags.isNotEmpty) ...[
             const Divider(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                AppZh.dexSpeciesAxes,
-                style: SecondaryTypography.onCard.team12.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+            _MetaWidgetRow(
+              label: AppZh.dexSpeciesAxes,
+              child: SpeciesAxisChips(summary: detail.summary),
             ),
-            const SizedBox(height: 8),
-            SpeciesAxisChips(summary: detail.summary),
           ],
           if (female != null) ...[
             const Divider(height: 20),
-            Row(
-              children: [
-                Text(
-                  AppZh.dexGenderRatio,
-                  style: SecondaryTypography.onCard.team12.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  AppZh.dexGenderFemale(female),
-                  style: SecondaryTypography.onCard.meta14,
-                ),
-              ],
+            _MetaRow(
+              label: AppZh.dexGenderRatio,
+              value: AppZh.dexGenderFemale(female),
             ),
           ],
           if (detail.eggGroups.isNotEmpty) ...[
             const Divider(height: 20),
-            Row(
-              children: [
-                Text(
-                  AppZh.dexEggGroups,
-                  style: SecondaryTypography.onCard.team12.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  detail.eggGroups.join(' / '),
-                  style: SecondaryTypography.onCard.meta14,
-                ),
-              ],
+            _MetaRow(
+              label: AppZh.dexEggGroups,
+              value: detail.eggGroups.join(' / '),
             ),
           ],
           if (detail.hatchCounter != null) ...[
             const Divider(height: 20),
-            Row(
-              children: [
-                Text(
-                  AppZh.dexHatchSteps,
-                  style: SecondaryTypography.onCard.team12.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${detail.hatchCounter} (${detail.hatchSteps})',
-                  style: SecondaryTypography.onCard.meta14,
-                ),
-              ],
+            _MetaRow(
+              label: AppZh.dexHatchSteps,
+              value: '${detail.hatchCounter} (${detail.hatchSteps})',
             ),
           ],
           if (detail.baseHappiness != null) ...[
@@ -1703,8 +1775,7 @@ class IntroMetaCard extends StatelessWidget {
               // Habitat is a Gen I–III-only field, so say why it is missing
               // elsewhere rather than silently dropping the row.
               value:
-                  dexHabitatLabelZh(detail.habitatSlug!) ??
-                  detail.habitatSlug!,
+                  dexHabitatLabelZh(detail.habitatSlug!) ?? detail.habitatSlug!,
             ),
           ],
           if (detail.hasGenderDifferences) ...[
@@ -1745,9 +1816,7 @@ class SpeciesAxisChips extends StatelessWidget {
       // so both are listed and both are filterable.
       if (priorShape != null)
         (
-          AppZh.dexShapeBeforeGen6(
-            dexShapeLabelZh(priorShape) ?? priorShape,
-          ),
+          AppZh.dexShapeBeforeGen6(dexShapeLabelZh(priorShape) ?? priorShape),
           DexFilter(shapeSlug: priorShape),
         ),
       if (summary.colorSlug != null)
@@ -1764,6 +1833,7 @@ class SpeciesAxisChips extends StatelessWidget {
     }
 
     return Wrap(
+      alignment: WrapAlignment.end,
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -1798,45 +1868,41 @@ class _MetaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: SecondaryTypography.onCard.team12.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const Spacer(),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: SecondaryTypography.onCard.meta14,
-          ),
-        ),
-      ],
+    return _MetaWidgetRow(
+      label: label,
+      child: Text(
+        value,
+        textAlign: TextAlign.end,
+        style: SecondaryTypography.onCard.meta14,
+      ),
     );
   }
 }
 
-class _MetaTile extends StatelessWidget {
-  const _MetaTile({required this.label, required this.value});
+class _MetaWidgetRow extends StatelessWidget {
+  const _MetaWidgetRow({required this.label, required this.child});
 
   final String label;
-  final String value;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: SecondaryTypography.onCard.team12.copyWith(
-            color: TitoColors.mutedInk,
+        SizedBox(
+          width: 88,
+          child: Text(
+            label,
+            style: SecondaryTypography.onCard.team12.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
-        Text(value, style: SecondaryTypography.onCard.h15),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Align(alignment: Alignment.centerRight, child: child),
+        ),
       ],
     );
   }

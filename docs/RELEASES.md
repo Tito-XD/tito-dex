@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.8.2` (`0.8.2+134`) | Recommended arm64-v8a download |
-| Offline APK | `v0.8.2` (`0.8.2-offline+135`) | Compact package with the verified v14 dex archive embedded |
-| Source on `main` | `0.8.2+134` | Current default branch baseline |
+| Lite APK | `v0.8.5` (`0.8.5+136`) | Recommended arm64-v8a download |
+| Offline APK | `v0.8.5` (`0.8.5-offline+137`) | Compact package with the verified v14 dex archive embedded |
+| Source on `main` | `0.8.5+136` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.8.5` | TitoDex v0.8.5 · 版本规划与图鉴范围 | Adds background data-pack downloads with notification progress, exact-version chain completion and wild held-item planning, complete evolution/encounter conditions, region-or-generation dex browsing, local flavor icons, aligned detail tables, form status badges, Sleep links, and unified secondary-page typography. Lite and Offline keep the existing v13/v14 data archives. |
 | `v0.8.2` | TitoDex v0.8.2 · 更轻的离线包与加载进度 | Lite and Offline show continuous multi-stage percentages with capacity/current-file details. Offline embeds the compact v14 archive; offline references load local-first; body-style filter icons use clearer HOME-inspired silhouettes. |
 | `v0.8.1` | TitoDex v0.8.1 · 形态进化链与体形筛选图标 | Regional forms keep a pruned evolution line with form sprites (e.g. Hisuian Growlithe → Hisuian Arcanine). Body-style and size filter chips gain vector silhouette icons. Offline embeds dex bundle v13. |
 | `v0.8.0` | TitoDex v0.8.0 · 道具页面与列表优化 | Ships the curated items hub (542 items, category filter, icons) and list animation polish. |

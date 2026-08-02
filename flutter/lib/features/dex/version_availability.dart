@@ -139,9 +139,8 @@ class ChainCompletionPlan {
   );
 
   /// Every stage obtainable at all (possibly via trade).
-  bool get completable => stages.every(
-    (stage) => stage.method != ChainStageMethod.unavailable,
-  );
+  bool get completable =>
+      stages.every((stage) => stage.method != ChainStageMethod.unavailable);
 
   /// Stages that block a solo playthrough from finishing the chain.
   List<ChainStagePlan> get blockers => stages
@@ -152,6 +151,91 @@ class ChainCompletionPlan {
       )
       .toList(growable: false);
 }
+
+/// Whether a missing stage is obtained from another member of its chain rather
+/// than by catching that stage directly.
+///
+/// Breeding is included because the player still needs another chain member;
+/// the Dex UI groups it with evolution/trade instead of ordinary encounters.
+bool chainStageNeedsEvolutionOrTrade(ChainStageMethod method) =>
+    switch (method) {
+      ChainStageMethod.evolve ||
+      ChainStageMethod.tradeRequired ||
+      ChainStageMethod.breedRequired => true,
+      ChainStageMethod.catchable || ChainStageMethod.unavailable => false,
+    };
+
+/// Exact-version keys that are already accessible when the selected entry is
+/// a DLC overlay. A Crown Tundra save, for example, can still catch base Sword
+/// encounters; treating the overlay as a standalone cartridge would create
+/// false trade blockers.
+Set<String> accessibleEncounterVersions(String version) => switch (version) {
+  'the-isle-of-armor-sword' => {'sword', version},
+  'the-isle-of-armor-shield' => {'shield', version},
+  'the-crown-tundra-sword' => {'sword', 'the-isle-of-armor-sword', version},
+  'the-crown-tundra-shield' => {'shield', 'the-isle-of-armor-shield', version},
+  'the-teal-mask-scarlet' => {'scarlet', version},
+  'the-teal-mask-violet' => {'violet', version},
+  'the-indigo-disk-scarlet' => {'scarlet', 'the-teal-mask-scarlet', version},
+  'the-indigo-disk-violet' => {'violet', 'the-teal-mask-violet', version},
+  'mega-dimension' => {'legends-za', version},
+  _ => {version},
+};
+
+/// Paired cartridge/DLC flavor for an exact encounter key.
+///
+/// Single-version games and Japanese Gen-I variants intentionally return null.
+String? pairedEncounterVersion(String version) => switch (version) {
+  'red' => 'blue',
+  'blue' => 'red',
+  'gold' => 'silver',
+  'silver' => 'gold',
+  'ruby' => 'sapphire',
+  'sapphire' => 'ruby',
+  'firered' => 'leafgreen',
+  'leafgreen' => 'firered',
+  'diamond' => 'pearl',
+  'pearl' => 'diamond',
+  'heartgold' => 'soulsilver',
+  'soulsilver' => 'heartgold',
+  'black' => 'white',
+  'white' => 'black',
+  'black-2' => 'white-2',
+  'white-2' => 'black-2',
+  'x' => 'y',
+  'y' => 'x',
+  'omega-ruby' => 'alpha-sapphire',
+  'alpha-sapphire' => 'omega-ruby',
+  'sun' => 'moon',
+  'moon' => 'sun',
+  'ultra-sun' => 'ultra-moon',
+  'ultra-moon' => 'ultra-sun',
+  'lets-go-pikachu' => 'lets-go-eevee',
+  'lets-go-eevee' => 'lets-go-pikachu',
+  'sword' => 'shield',
+  'shield' => 'sword',
+  'the-isle-of-armor-sword' => 'the-isle-of-armor-shield',
+  'the-isle-of-armor-shield' => 'the-isle-of-armor-sword',
+  'the-crown-tundra-sword' => 'the-crown-tundra-shield',
+  'the-crown-tundra-shield' => 'the-crown-tundra-sword',
+  'brilliant-diamond' => 'shining-pearl',
+  'shining-pearl' => 'brilliant-diamond',
+  'scarlet' => 'violet',
+  'violet' => 'scarlet',
+  'the-teal-mask-scarlet' => 'the-teal-mask-violet',
+  'the-teal-mask-violet' => 'the-teal-mask-scarlet',
+  'the-indigo-disk-scarlet' => 'the-indigo-disk-violet',
+  'the-indigo-disk-violet' => 'the-indigo-disk-scarlet',
+  _ => null,
+};
+
+/// Games whose normal progression has no breeding system.
+bool supportsBreedingInVersionGroup(String versionGroup) => !{
+  'lets-go-pikachu-lets-go-eevee',
+  'legends-arceus',
+  'legends-za',
+  'champions',
+}.contains(versionGroup);
 
 /// Plans how every stage of [chain] is obtained in one version.
 ///
@@ -202,8 +286,7 @@ ChainCompletionPlan planChainCompletion({
       root.method == ChainStageMethod.unavailable &&
       order.any(
         (entry) =>
-            entry.$1 != root &&
-            entry.$1.method != ChainStageMethod.unavailable,
+            entry.$1 != root && entry.$1.method != ChainStageMethod.unavailable,
       )) {
     root.method = ChainStageMethod.breedRequired;
     for (final (ref, parent) in order.skip(1)) {

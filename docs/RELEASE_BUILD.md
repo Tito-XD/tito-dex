@@ -31,7 +31,7 @@ These ship **inside** the APK via `pubspec.yaml`:
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
 
-**Lite APK:** users download the 1025-species dex pack through **Settings → 下载预打包图鉴包** into app documents (`dex_offline/`). The optional Offline APK adds `assets/dex/bundle.tar.zst` and its manifest, then seeds the same pack on first launch.
+**Lite APK:** users download the complete offline reference pack through **Settings → 下载完整离线资料包** into app documents (`dex_offline/`). It includes the 1025-species dex and forms, evolution chains, moves, abilities, items, Chinese references, maps, images, and app config. The optional Offline APK adds `assets/dex/bundle.tar.zst` and its manifest, then seeds the same pack on first launch.
 
 ### Compile-time dex CDN config
 
@@ -90,7 +90,7 @@ Run the **Android Release APKs** workflow manually with:
 - `offline_build_number` — a larger Offline versionCode
 - `bundle_manifest_url` — the currently published root manifest; CI downloads its selected archive and verifies `bundleVersion>=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
 
-For v0.8.2 use `version=0.8.2`, Lite build `134`, and Offline build `135`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
+For v0.8.5 use `version=0.8.5`, Lite build `136`, and Offline build `137`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
 
 ### Offline variant
 
@@ -115,6 +115,8 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 - [ ] `lib/arm64-v8a/libapp.so` present (~7–8 MB)
 - [ ] `lib/arm64-v8a/libzstandard_android.so` present
 - [ ] Fresh-install Offline APK shows the one-time local unpack percentage, reaches 100%, then does not show it again on the next launch
+- [ ] Lite Settings download can be minimized; Android requests notification permission, shows the same weighted percentage in a foreground-service notification, and completes while the app is backgrounded
+- [ ] Cancelling a background download removes its progress notification; swiping TitoDex away or an Android 15 `dataSync` timeout stops the service and leaves a non-ongoing explanation instead of stale progress
 - [ ] `assets/flutter_assets/assets/fixtures/PKMSS.sav` present
 - [ ] Offline only: archive and manifest present under `assets/flutter_assets/assets/dex/`
 - [ ] Nunito fonts present under `assets/flutter_assets/assets/fonts/`
@@ -130,7 +132,7 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 | APK ~7 MB, `unzip -t` fails | Copied APK before `flutter build` finished, or partial git commit | Rebuild; run `verify_release_apk.sh` |
 | APK ~40 MB+ | Debug build or universal/multi-ABI APK | Use `flutter build apk --release` only; check `abiFilters` = `arm64-v8a` |
 | Install fails on RG | Signature mismatch vs installed build | Uninstall old TitoDex first |
-| App opens but dex empty | User has not downloaded offline pack | Settings → 下载预打包图鉴包 (not an APK packaging issue) |
+| App opens but dex empty | User has not downloaded offline pack | Settings → 下载完整离线资料包 (not an APK packaging issue) |
 
 ---
 

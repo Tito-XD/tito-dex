@@ -1,5 +1,6 @@
 package com.tito.titodex
 
+import android.Manifest
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
@@ -14,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var pendingSaveDocumentResult: MethodChannel.Result? = null
+    private var pendingNotificationPermissionResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -48,6 +50,54 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            DEX_DOWNLOAD_NOTIFICATION_CHANNEL,
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "start" -> {
+                    val progress = call.argument<Int>("progress") ?: 0
+                    val title = call.argument<String>("title") ?: "TitoDex"
+                    val text = call.argument<String>("text") ?: ""
+                    DexDownloadForegroundService.start(
+                        applicationContext,
+                        progress,
+                        title,
+                        text,
+                    )
+                    resolveNotificationPermission(result)
+                }
+                "update" -> {
+                    DexDownloadForegroundService.update(
+                        applicationContext,
+                        call.argument<Int>("progress") ?: 0,
+                        call.argument<String>("text") ?: "",
+                    )
+                    result.success(null)
+                }
+                "complete" -> {
+                    DexDownloadForegroundService.complete(
+                        applicationContext,
+                        call.argument<String>("title") ?: "TitoDex",
+                        call.argument<String>("text") ?: "",
+                    )
+                    result.success(null)
+                }
+                "fail" -> {
+                    DexDownloadForegroundService.fail(
+                        applicationContext,
+                        call.argument<String>("title") ?: "TitoDex",
+                        call.argument<String>("text") ?: "",
+                    )
+                    result.success(null)
+                }
+                "cancel" -> {
+                    DexDownloadForegroundService.cancel(applicationContext)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
     @Deprecated("Kept for the Storage Access Framework result callback")
@@ -77,6 +127,42 @@ class MainActivity : FlutterActivity() {
             // Some providers return a usable URI without a persistable grant.
         }
         pendingResult.success(readSaveDocument(uri))
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != POST_NOTIFICATIONS_REQUEST) {
+            return
+        }
+        val result = pendingNotificationPermissionResult ?: return
+        pendingNotificationPermissionResult = null
+        result.success(
+            grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED,
+        )
+    }
+
+    private fun resolveNotificationPermission(result: MethodChannel.Result) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            result.success(true)
+            return
+        }
+        if (pendingNotificationPermissionResult != null) {
+            result.success(false)
+            return
+        }
+        pendingNotificationPermissionResult = result
+        requestPermissions(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            POST_NOTIFICATIONS_REQUEST,
+        )
     }
 
     private fun pickSaveDocument(result: MethodChannel.Result) {
@@ -205,6 +291,9 @@ class MainActivity : FlutterActivity() {
     private companion object {
         const val APP_LAUNCHER_CHANNEL = "com.tito.titodex/app_launcher"
         const val SAVE_DOCUMENT_CHANNEL = "com.tito.titodex/save_document"
+        const val DEX_DOWNLOAD_NOTIFICATION_CHANNEL =
+            "com.tito.titodex/dex_download_notification"
         const val PICK_SAVE_DOCUMENT_REQUEST = 47021
+        const val POST_NOTIFICATIONS_REQUEST = 47022
     }
 }

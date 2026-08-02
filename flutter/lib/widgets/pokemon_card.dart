@@ -173,54 +173,6 @@ class TypeChipRow extends StatelessWidget {
 
 enum TypeChipTone { neutral, weak, resist, immune }
 
-class EvolutionChainView extends StatelessWidget {
-  const EvolutionChainView({
-    super.key,
-    required this.root,
-    required this.highlightId,
-  });
-
-  final EvolutionNode root;
-  final int highlightId;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: constraints.maxWidth),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _buildNodes(context, root),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  List<Widget> _buildNodes(BuildContext context, EvolutionNode node) {
-    final widgets = <Widget>[
-      _EvolutionCard(node: node, highlighted: node.id == highlightId),
-    ];
-
-    for (final child in node.children) {
-      widgets.add(
-        const Padding(
-          padding: EdgeInsets.only(top: 36),
-          child: Icon(Icons.arrow_forward_rounded, color: TitoColors.ink),
-        ),
-      );
-      widgets.addAll(_buildNodes(context, child));
-    }
-
-    return widgets;
-  }
-}
-
 class _EvolutionCard extends StatelessWidget {
   const _EvolutionCard({required this.node, required this.highlighted});
 
@@ -326,16 +278,16 @@ class _ChildrenRow extends StatelessWidget {
             if (i > 0)
               const Padding(
                 padding: EdgeInsets.only(top: 40),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: TitoColors.ink,
-                ),
+                child: Icon(Icons.arrow_forward_rounded, color: TitoColors.ink),
               ),
             Flexible(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.arrow_downward_rounded, color: TitoColors.ink),
+                  const Icon(
+                    Icons.arrow_downward_rounded,
+                    color: TitoColors.ink,
+                  ),
                   _EvolutionTriggerLabel(node: children[i]),
                   _childCard(context, children[i]),
                 ],
@@ -366,10 +318,7 @@ class _ChildrenRow extends StatelessWidget {
 
   Widget _childCard(BuildContext context, EvolutionNode node) {
     if (node.children.isNotEmpty) {
-      return EvolutionChainVerticalView(
-        root: node,
-        highlightId: highlightId,
-      );
+      return EvolutionChainVerticalView(root: node, highlightId: highlightId);
     }
     return _EvolutionCard(node: node, highlighted: node.id == highlightId);
   }
@@ -434,7 +383,7 @@ String? _evolutionStepLabel(EvolutionNode node) {
   }
   final labels = <String>[];
   for (final trigger in triggers) {
-    final label = _singleTriggerLabel(trigger);
+    final label = evolutionTriggerLabelZh(trigger);
     if (label.isNotEmpty && !labels.contains(label)) {
       labels.add(label);
     }
@@ -443,23 +392,56 @@ String? _evolutionStepLabel(EvolutionNode node) {
   return labels.isEmpty ? node.triggerZh : labels.join(' / ');
 }
 
-String _singleTriggerLabel(EvolutionTrigger trigger) {
+String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
   final parts = <String>[];
   if (trigger.isTrade) {
     parts.add('通讯交换');
     if (trigger.heldItem != null) {
       parts.add(_itemLabelZh(trigger.heldItem!));
     }
+    if (trigger.tradeSpecies != null) {
+      parts.add('与${_speciesLabelZh(trigger.tradeSpecies!)}交换');
+    }
   } else if (trigger.item != null) {
     parts.add(_itemLabelZh(trigger.item!));
   } else if (trigger.minLevel != null) {
     parts.add('Lv.${trigger.minLevel}');
-  } else if (trigger.minHappiness != null) {
-    parts.add('亲密度');
-  } else if (trigger.minBeauty != null) {
-    parts.add('美丽度');
-  } else if (trigger.trigger != null) {
+  } else if (trigger.trigger != null && trigger.trigger != 'level-up') {
     parts.add(_triggerLabel(trigger.trigger!));
+  }
+  if (trigger.minHappiness != null) {
+    parts.add('亲密度');
+  }
+  if (trigger.minBeauty != null) {
+    parts.add('美丽度');
+  }
+  if (trigger.minAffection != null) {
+    parts.add('友好度≥${trigger.minAffection}');
+  }
+  if (trigger.knownMove != null) {
+    parts.add('学会${_moveLabelZh(trigger.knownMove!)}');
+  }
+  if (trigger.knownMoveType != null) {
+    parts.add('学会${_typeLabelZh(trigger.knownMoveType!)}招式');
+  }
+  if (trigger.location != null) {
+    parts.add('在${_evolutionLocationLabelZh(trigger.location!)}');
+  }
+  if (trigger.partySpecies != null) {
+    parts.add('同行有${_speciesLabelZh(trigger.partySpecies!)}');
+  }
+  if (trigger.partyType != null) {
+    parts.add('同行有${_typeLabelZh(trigger.partyType!)}属性');
+  }
+  if (trigger.gender != null) {
+    parts.add(trigger.gender == 1 ? '雌性' : '雄性');
+  }
+  if (trigger.relativePhysicalStats != null) {
+    parts.add(switch (trigger.relativePhysicalStats!) {
+      -1 => '攻击＜防御',
+      0 => '攻击＝防御',
+      _ => '攻击＞防御',
+    });
   }
   final time = switch (trigger.timeOfDay) {
     'day' => '白天',
@@ -469,8 +451,67 @@ String _singleTriggerLabel(EvolutionTrigger trigger) {
   if (time != null) {
     parts.add(time);
   }
+  if (trigger.needsOverworldRain) {
+    parts.add('雨天');
+  }
+  if (trigger.turnUpsideDown) {
+    parts.add('倒置主机');
+  }
+  if (parts.isEmpty && trigger.trigger != null) {
+    parts.add(_triggerLabel(trigger.trigger!));
+  }
   return parts.join(' · ');
 }
+
+String _moveLabelZh(String slug) =>
+    const {
+      'ancient-power': '原始之力',
+      'barb-barrage': '毒千针',
+      'double-hit': '二连击',
+      'dragon-cheer': '龙声鼓舞',
+      'dragon-pulse': '龙之波动',
+      'hyper-drill': '强力钻',
+      'mimic': '模仿',
+      'rollout': '滚动',
+      'stomp': '踩踏',
+      'taunt': '挑衅',
+      'twin-beam': '双光束',
+    }[slug] ??
+    _humanizeSlug(slug);
+
+String _speciesLabelZh(String slug) =>
+    const {'karrablast': '盖盖虫', 'shelmet': '小嘴蜗', 'remoraid': '铁炮鱼'}[slug] ??
+    _humanizeSlug(slug);
+
+String _typeLabelZh(String slug) =>
+    const {'dark': '恶', 'fairy': '妖精'}[slug] ?? _humanizeSlug(slug);
+
+String _evolutionLocationLabelZh(String slug) =>
+    const {
+      'blush-mountain': '火特力山',
+      'chargestone-cave': '电气石洞穴',
+      'eterna-forest': '百代森林',
+      'frost-cavern': '冰结洞窟',
+      'kalos-route-13': '卡洛斯13号道路',
+      'kalos-route-20': '卡洛斯20号道路',
+      'lush-jungle': '树荫丛林',
+      'mount-lanakila': '拉纳基拉山',
+      'mt-coronet': '天冠山',
+      'new-mauville': '新紫堇',
+      'petalburg-woods': '橙华森林',
+      'pinwheel-forest': '矢车森林',
+      'shoal-cave': '浅滩洞穴',
+      'sinnoh-route-217': '神奥217号道路',
+      'twist-mountain': '螺旋山',
+      'vast-poni-canyon': '波尼大峡谷',
+    }[slug] ??
+    _humanizeSlug(slug);
+
+String _humanizeSlug(String slug) => slug
+    .split('-')
+    .where((part) => part.isNotEmpty)
+    .map((part) => part[0].toUpperCase() + part.substring(1))
+    .join(' ');
 
 /// PokeAPI item slug → the Chinese names [_triggerLabel] already carries.
 String _itemLabelZh(String slug) {

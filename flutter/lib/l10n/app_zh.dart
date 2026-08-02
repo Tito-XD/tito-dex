@@ -90,11 +90,23 @@ abstract final class AppZh {
   static const dexFilterCaught = '已捕获';
   static const dexFilterSeen = '已见过';
   static const dexFilterUnseen = '未见过';
-  static String dexScopeProgress(int caught, int seen, int total) =>
-      '捕获 $caught · 见过 $seen / $total';
+  static String dexScopeProgress(
+    int caught,
+    int seen,
+    int total, {
+    int? evolutionOrTrade,
+  }) =>
+      '捕获 $caught · 见过 $seen'
+      '${evolutionOrTrade == null ? '' : ' · 交换/进化 $evolutionOrTrade'} / $total';
   static const dexTabNational = '全国图鉴';
   static String dexRegionalDexTitle(String regionLabel) => '$regionLabel图鉴';
   static const dexPickRegionalPokedex = '选择地区图鉴';
+  static const dexPickBrowseScope = '选择图鉴范围';
+  static const dexBrowseByRegion = '按地区';
+  static const dexBrowseByRegionHint = '全国、关东、城都及其他地区图鉴';
+  static const dexBrowseByGeneration = '按世代';
+  static const dexBrowseByGenerationHint = '按首次登场世代筛选 G1–G9';
+  static const dexGenerationDebutHint = '按首次登场世代统计';
   static const dexTabJourney = '旅程同行';
   static const dexFilterEmpty = '当前筛选条件下暂无图鉴条目。';
   static String dexRegionProgress(
@@ -115,9 +127,9 @@ abstract final class AppZh {
   static const dexLoadingDetail = '正在从 PokeAPI 拉取详情…';
   static const dexLoadFailed = '图鉴数据加载失败';
   static String dexLoadFailedDetail(int statusCode) =>
-      'PokeAPI 请求失败（HTTP $statusCode）。请检查网络，或在设置中下载离线图鉴后重试。';
+      'PokeAPI 请求失败（HTTP $statusCode）。请检查网络，或在设置中下载离线资料包后重试。';
   static const errorGeneric = '加载失败，请稍后重试。';
-  static const errorFormatDetail = '数据格式异常，请检查网络后重试，或下载离线图鉴。';
+  static const errorFormatDetail = '数据格式异常，请检查网络后重试，或下载离线资料包。';
   static const dexRetry = '重试';
   static const dexHeight = '身高';
   static const dexWeight = '体重';
@@ -126,14 +138,25 @@ abstract final class AppZh {
   static const dexImmunities = '免疫（受到 ×0）';
   static const dexStabEffective = '本系克制（打出 ×2）';
   static const dexEvolution = '进化链';
-  static const dexObtainHgss = '心金·魂银 出现地点';
-  static const dexObtainEmpty =
-      'PokeAPI 未收录该宝可梦在心金/魂银的野外遭遇数据（可能为进化、赠送或不可野生捕获）。';
+  static const dexObtainLocations = '出现地点';
+  static const dexObtainEmpty = '当前版本未收录该宝可梦的野外遭遇数据（可能需进化、交换、赠送，或不可野生捕获）。';
   static const dexFlavorEnglishNote = '该世代暂无官方中文描述，以下为英文原文。';
   static const dexFlavorZhFallbackNote = '心金/魂银世代无中文图鉴文案，以下为近世代中文译名供参考。';
   static const dexNone = '无';
-  static const dexApiNote =
-      '数据来源：PokeAPI。部分后世代属性修正（如妖精系）可能与 HGSS 游戏内略有不同，仅供参考。';
+  static const dexApiNote = '数据主要来自 PokeAPI；属性、招式与获取方式会随所选游戏版本切换，仅供资料查询。';
+  static const dexFormStatusMega = '超级进化';
+  static const dexFormStatusBattleOnly = '对战限定';
+  static const dexFormStatusNotObtainable = '不可常驻';
+  static const dexFormStatusCosmetic = '外观';
+  static const dexFormStatusPartial = '资料不完整';
+  static const dexFormStatusUnavailableHere = '当前版本不可用';
+
+  static const settingsAttributionTitle = '数据来源与许可';
+  static const settingsAttributionHint = '查看资料来源、开放许可与商标说明';
+  static const settingsAttributionBody =
+      '道具列表、分类、价格、英文名称、图像及多数中文说明来自 PokeAPI；道具分组参考 Bulbapedia 的 Browse:Items。\n\n'
+      '部分较新作品的中文说明参考 52Poké Wiki（神奇宝贝百科），依 CC BY-NC-SA 4.0 使用。\n\n'
+      'Pokémon 及相关名称、图像与商标归其各自权利人所有。TitoDex 是非官方、非商业的玩家资料辅助工具。';
   static const dexMoves = '升级招式';
   static String dexMovesMore(int count) => '另有 $count 个招式已缓存';
   static const dexTabIntro = '简介';
@@ -148,7 +171,7 @@ abstract final class AppZh {
   static const dexAbilitySinceGen5 = '第五世代起';
   static const dexAbilityFilter = '特性筛选';
   static const dexAbilityUnknownName = '待收录';
-  static const dexAbilityPlaceholder = '特性资料整理中，将随后续图鉴数据包更新。';
+  static const dexAbilityPlaceholder = '特性资料整理中，将随后续离线资料包更新。';
   static const dexAbilityEmptyPending = '暂无特性数据。';
   static const dexBaseHappiness = '初始亲密度';
   static const dexCaptureRate = '捕获率';
@@ -156,6 +179,27 @@ abstract final class AppZh {
   static const dexObtainEmptyVersion = '暂无野外出现地点（可能为进化、赠送或不可野生捕获）。';
   static const dexObtainExactVersion = '精确版本';
   static const dexObtainCombinedVersions = '版本合并';
+  static const dexWildHeldItems = '野生携带道具';
+  static const dexWildHeldItemsHint = '概率按当前选择的版本分别显示。';
+  static const dexChainPlanningTitle = '当前版本集齐规划';
+  static const dexChainPlanningPickVersion = '选择一个精确版本后，可判断这条进化链能否单版本集齐。';
+  static const dexChainPlanningLoading = '正在整理这条进化链的获得方式…';
+  static const dexChainPlanningUnavailable = '暂时无法读取这条进化链的版本资料。';
+  static String dexChainSelfContained(String version) => '$version可独立集齐这条进化链';
+  static const dexChainTradeRequired = '需要通讯交换才能集齐这条进化链';
+  static String dexChainUnavailable(String version) => '$version无法独立集齐这条进化链';
+  static const dexChainMethodCatch = '直接捕获';
+  static const dexChainMethodEvolve = '进化获得';
+  static const dexChainMethodTrade = '需要通讯交换';
+  static const dexChainMethodBreed = '生蛋获得';
+  static const dexChainMethodUnavailable = '当前版本无获得路径';
+  static const dexVersionBoth = '版本限定：配对版本均可直接遇到';
+  static String dexVersionOnlyThis(String version) => '版本限定：仅$version可直接遇到';
+  static String dexVersionOnlyOther(String version) => '版本限定：可在$version捕获后交换';
+  static const dexVersionNeither = '配对版本均无直接遭遇，通常需要进化、赠送或活动获得';
+  static const dexFilterEvolutionOrTrade = '待进化';
+  static const dexFilterCalculating = '整理中';
+  static const dexEvolutionOrTradeLoading = '正在整理交换/进化缺口…';
   static String dexObtainForGame(String gameLabel) => '$gameLabel 出现地点';
   static String dexObtainScope(String gameLabel) => '以下出现地点：$gameLabel';
   static const dexFlavorNoEdition = '当前版本暂无图鉴描述';
@@ -252,16 +296,16 @@ abstract final class AppZh {
   static const dexGameVersionSv = '朱紫';
   static const dexGameVersionSwsh = '剑盾';
 
-  static const settingsDexOffline = '离线图鉴缓存';
+  static const settingsDexOffline = '离线资料包';
   static const settingsDexOfflineHint =
-      '离线图鉴数据用于完全离线浏览。推荐优先下载预打包数据包，一次安装即可离线使用全部图鉴与中文对照。';
+      '完整离线资料包可一次安装全国图鉴与形态、进化链、招式、特性、道具等资料，以及中文对照、地图、图片和应用配置。';
   static const settingsDexAdvancedOptions = '高级选项';
-  static const settingsDexOfflineUnset = '尚未下载离线数据包';
+  static const settingsDexOfflineUnset = '尚未下载离线资料包';
   static String settingsDexOfflinePartial(int pokemonCount) =>
       '部分缓存 $pokemonCount / $titodexMaxNationalDexId，可点「继续下载」补全';
   static const settingsDexVerify = '校验离线数据';
   static const settingsDexVerifyRunning = '正在校验…';
-  static const settingsDexVerifyNoData = '尚未安装离线数据包，无需校验。';
+  static const settingsDexVerifyNoData = '尚未安装离线资料包，无需校验。';
   static String settingsDexVerifyOk(int pokemonCount) =>
       '校验通过：$pokemonCount 只宝可梦的离线资料完整。';
   static String settingsDexVerifyProblems(int missingDetails) =>
@@ -275,9 +319,10 @@ abstract final class AppZh {
     int moveCount,
     String size,
     String downloadedAt,
-  ) => '已安装 $pokemonCount 只 · $moveCount 招式 · 含中文对照与配置 · $size · $downloadedAt';
-  static const settingsDexOfflineDownload = '下载离线图鉴';
-  static const settingsDexOfflineResume = '继续下载离线图鉴';
+  ) =>
+      '已安装 $pokemonCount 只 · $moveCount 招式 · 含完整资料库与图片 · $size · $downloadedAt';
+  static const settingsDexOfflineDownload = '下载离线资料包';
+  static const settingsDexOfflineResume = '继续下载离线资料包';
   static const settingsDexOfflineClear = '清除离线缓存';
   static const settingsDexOfflinePrefer = '优先使用离线缓存';
   static String settingsDexOfflineProgress(
@@ -324,34 +369,47 @@ abstract final class AppZh {
     return '$verb$phaseLabel${showCount ? ' $current / $total' : ''}';
   }
 
-  static const offlineSeedProgressTitle = '正在准备离线图鉴';
+  static const offlineSeedProgressTitle = '正在准备离线资料包';
 
-  static const settingsDexCdnDownload = '下载预打包数据包';
+  static const settingsDexCdnDownload = '下载完整离线资料包';
   static const settingsDexCdnDownloadHint =
-      '推荐：一次性下载预打包数据包（图鉴 + 中文对照 + HGSS 地图 + 游戏图标 + 应用配置），安装后完全离线可用；无需逐条请求 PokeAPI。';
+      '推荐：一次性下载完整离线资料包，包含全国图鉴与形态、进化链、招式、特性、道具等资料，以及中文对照、地图、图片和应用配置；下载完成后可离线使用。';
+  static const settingsDexBackgroundDownload = '后台下载';
+  static const settingsDexCancelDownload = '取消下载';
+  static const snackDexBackgroundDownload = '已转到后台，可从通知栏查看进度';
+  static const snackDexBackgroundDownloadNoNotification =
+      '已转到后台；通知权限未开启，可返回设置查看进度';
+  static const snackDexBackgroundDownloadFailed = '无法启动后台下载，请保持 TitoDex 在前台';
+  static const dexDownloadNotificationTitle = '正在准备离线资料包';
+  static const dexDownloadNotificationDoneTitle = '离线资料包已准备完成';
+  static const dexDownloadNotificationDoneBody = '现在可以离线使用完整图鉴与资料库';
+  static const dexDownloadNotificationPartialTitle = '离线资料包已部分完成';
+  static const dexDownloadNotificationPartialBody = '返回 TitoDex 可继续补全剩余资料';
+  static const dexDownloadNotificationFailedTitle = '离线资料包准备失败';
+  static const dexDownloadNotificationFailedBody = '返回 TitoDex 后可重新下载';
   static const settingsDexOfflineDownloadPokeApi = '从 PokeAPI 下载（备用）';
   static const settingsDexDefaultGameVersion = '默认图鉴游戏版本';
   static const settingsDexDefaultGameVersionHint =
       '浏览图鉴详情与招式时使用的心金 / 朱紫 / 剑盾等版本组；列表小图默认展示该版本对应世代的游戏内像素图。';
-  static const snackDexCdnDone = '预打包数据包已安装完成';
-  static const snackDexCdnFailed = '预打包数据包下载失败';
+  static const snackDexCdnDone = '完整离线资料包已安装完成';
+  static const snackDexCdnFailed = '完整离线资料包下载失败';
 
-  static const offlinePromptTitle = '下载离线图鉴数据';
+  static const offlinePromptTitle = '下载完整离线资料包';
   static const offlinePromptBody =
-      '建议在设置中下载 CDN 预打包数据包，离线可用全国图鉴 1–1025、中文对照表与 HGSS 地图名。';
+      '建议下载完整离线资料包，包含全国图鉴与形态、进化链、招式、特性、道具等资料，以及中文对照、地图、图片和应用配置。';
   static const offlinePromptLater = '稍后';
   static const offlinePromptGoSettings = '去设置';
 
-  static const updateAvailableTitle = '图鉴数据有更新';
-  static const updateAvailableBody = 'CDN 上有较新的图鉴包或中文对照表，可在设置中下载更新。';
+  static const updateAvailableTitle = '离线资料有更新';
+  static const updateAvailableBody = '有较新的完整离线资料包，可在设置中下载更新。';
   static const updateAvailableLater = '稍后';
   static const updateAvailableGoSettings = '去设置';
 
-  static const snackDexOfflineDone = '离线图鉴已下载完成';
+  static const snackDexOfflineDone = '离线资料包已下载完成';
   static String snackDexOfflinePartial(int count) =>
       '已缓存 $count / $titodexMaxNationalDexId 只宝可梦，可再次点击继续下载补全';
-  static const snackDexOfflineCleared = '已清除离线图鉴缓存';
-  static const snackDexOfflineFailed = '离线图鉴下载失败';
+  static const snackDexOfflineCleared = '已清除离线资料包缓存';
+  static const snackDexOfflineFailed = '离线资料包下载失败';
 
   static const searchPlaceholder = '搜索全国图鉴：中文名、英文名、编号或属性…';
   static const searchPrompt = '搜索宝可梦';
@@ -379,7 +437,7 @@ abstract final class AppZh {
   static const searchRefWeather = '天气';
   static const searchRefTerrains = '场地';
   static const searchRefStatus = '状态异常';
-  static const searchRefPlaceholder = '资料加载中，请先下载预打包图鉴或检查网络。';
+  static const searchRefPlaceholder = '资料加载中，请先下载完整离线资料包或检查网络。';
   static const searchBattleTypeMatchup = '属性克制';
   static const searchBattleStatCalc = '能力值计算';
   static const searchBattleQuickDamage = '伤害速算';

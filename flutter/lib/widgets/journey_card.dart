@@ -66,15 +66,15 @@ class JourneyCard extends StatelessWidget {
                             Text(
                               AppZh.journeyCardTitle.toUpperCase(),
                               style: dense
-                                  ? denseStyle(context.tito.onDeepOverline)
-                                  : context.tito.onDeepOverline,
+                                  ? denseStyle(context.titoHome.onDeepOverline)
+                                  : context.titoHome.onDeepOverline,
                             ),
                             SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
                             Text(
                               location,
                               style: dense
-                                  ? denseStyle(context.tito.onDeepHeading)
-                                  : context.tito.onDeepHeading,
+                                  ? denseStyle(context.titoHome.onDeepHeading)
+                                  : context.titoHome.onDeepHeading,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -103,8 +103,9 @@ class JourneyCard extends StatelessWidget {
                             ' · ${AppZh.labelPlayTime} ${journey.playTime}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: denseStyle(context.tito.onDeepMetaLabel)
-                                .copyWith(fontWeight: FontWeight.w800),
+                            style: denseStyle(
+                              context.titoHome.onDeepMetaLabel,
+                            ).copyWith(fontWeight: FontWeight.w800),
                           ),
                         ),
                       ],
@@ -153,16 +154,16 @@ class _Meta extends StatelessWidget {
           Text(
             label,
             style: dense
-                ? denseStyle(context.tito.onDeepMetaLabel)
-                : context.tito.onDeepMetaLabel,
+                ? denseStyle(context.titoHome.onDeepMetaLabel)
+                : context.titoHome.onDeepMetaLabel,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             value,
             style: dense
-                ? denseStyle(context.tito.onDeepMetaValue)
-                : context.tito.onDeepMetaValue,
+                ? denseStyle(context.titoHome.onDeepMetaValue)
+                : context.titoHome.onDeepMetaValue,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
