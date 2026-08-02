@@ -42,8 +42,8 @@ class PartyStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleStyle = square
-        ? context.tito.cardSectionTitle
-        : context.tito.cardTitle;
+        ? context.titoHome.cardSectionTitle
+        : context.titoHome.cardTitle;
 
     final padding = (compact || square)
         ? DeviceLayout.cardPadding(context)
@@ -137,7 +137,7 @@ class _PartyGridMember extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.tito.captionStrong,
+                style: context.titoHome.captionStrong,
               ),
             ),
           ],
@@ -263,7 +263,9 @@ class _PartyGrid extends StatelessWidget {
           },
         );
         if (contentH < constraints.maxHeight) {
-          return Center(child: SizedBox(height: contentH, child: grid));
+          return Center(
+            child: SizedBox(height: contentH, child: grid),
+          );
         }
         return grid;
       },
@@ -289,7 +291,7 @@ class _PartyGridCell extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final nameStyle = context.tito.captionStrong;
+          final nameStyle = context.titoHome.captionStrong;
           final nameH = (nameStyle.fontSize ?? 11) * 1.4;
           final spriteSize = math.max(
             16.0,

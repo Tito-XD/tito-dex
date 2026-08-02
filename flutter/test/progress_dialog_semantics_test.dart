@@ -188,4 +188,60 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsNothing);
   });
+
+  testWidgets('CDN download can minimize without cancelling the task', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    void Function(DexCacheProgress) progressCallback = (progress) {};
+    late Completer<DexCacheProgress?> downloadCompleter;
+    DexCacheProgress? minimizedProgress;
+    var cancelCount = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: buildTitoTheme(),
+        home: const Scaffold(body: Text('settings page')),
+      ),
+    );
+
+    final tracked = trackWhileDownloading(
+      context: navigatorKey.currentContext!,
+      title: '下载完整离线资料包',
+      onCancel: () => cancelCount++,
+      onMinimize: (progress) async => minimizedProgress = progress,
+      download: (onProgress) {
+        progressCallback = onProgress;
+        downloadCompleter = Completer<DexCacheProgress?>();
+        return downloadCompleter.future;
+      },
+    );
+    await tester.pumpAndSettle();
+    progressCallback(
+      const DexCacheProgress(
+        phase: 'cdn_download',
+        current: 25,
+        total: 100,
+        label: '13.1 MB / 52.2 MB',
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('后台下载'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('settings page'), findsOneWidget);
+    expect(cancelCount, 0);
+    expect(minimizedProgress?.phase, 'cdn_download');
+    expect(minimizedProgress?.current, 25);
+
+    downloadCompleter.complete(
+      const DexCacheProgress(phase: 'done', current: 1, total: 1),
+    );
+    await tracked;
+    await tester.pumpAndSettle();
+    expect(find.text('settings page'), findsOneWidget);
+  });
 }

@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest release:** `0.8.1+126` / `0.8.1-offline+127` · [GitHub Release v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1)
+**Latest release:** `0.8.5+136` / `0.8.5-offline+137` · [GitHub Release v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5)
 
-**Current `main` package version:** `0.8.1+126`
+**Current `main` package version:** `0.8.5+136`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 ## Quick start

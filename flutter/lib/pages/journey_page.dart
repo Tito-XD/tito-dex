@@ -6,29 +6,22 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 
 class JourneyPage extends StatelessWidget {
-  const JourneyPage({
-    super.key,
-    required this.journey,
-    this.onLaunchEmulator,
-  });
+  const JourneyPage({super.key, required this.journey, this.onLaunchEmulator});
 
   final CurrentJourney journey;
   final VoidCallback? onLaunchEmulator;
 
   @override
   Widget build(BuildContext context) {
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: SecondaryPageScaffold(
-        title: AppZh.navJourney,
-        subtitle: localizeGame(journey.game),
-        children: [
+    return SecondaryPageScaffold(
+      title: AppZh.navJourney,
+      subtitle: localizeGame(journey.game),
+      children: [
         if (onLaunchEmulator != null) ...[
           StickerCard(
             child: Column(
@@ -117,7 +110,6 @@ class JourneyPage extends StatelessWidget {
           ),
         ),
       ],
-      ),
     );
   }
 }

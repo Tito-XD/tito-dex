@@ -13,7 +13,6 @@ import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
-import '../../theme/tito_font_scale.dart';
 import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
@@ -162,15 +161,12 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
 
   @override
   Widget build(BuildContext context) {
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: Material(
-        type: MaterialType.transparency,
-        child: SecondaryPageScaffold(
-          title: AppZh.quizTitle,
-          subtitle: gameEditionRepository.edition.labelZh,
-          children: [_body(context)],
-        ),
+    return Material(
+      type: MaterialType.transparency,
+      child: SecondaryPageScaffold(
+        title: AppZh.quizTitle,
+        subtitle: gameEditionRepository.edition.labelZh,
+        children: [_body(context)],
       ),
     );
   }

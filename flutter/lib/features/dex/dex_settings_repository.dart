@@ -3,22 +3,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../game/game_edition.dart';
 import '../game/game_edition_repository.dart';
 import 'dex_game_scope.dart';
+import 'dex_browse_scope.dart';
 import 'dex_scope.dart';
 
 const _regionalScopeKey = 'titodex.dex.default_regional_scope';
+const _browseScopeKey = 'titodex.dex.browse_scope_v2';
 
 class DexSettingsRepository {
   Future<DexScope> loadDefaultScope() async {
     final gameEdition = await gameEditionRepository.loadEdition();
     final prefs = await SharedPreferences.getInstance();
-    final regionalScope = DexRegionalPokedex.fromStorageKey(
-          prefs.getString(_regionalScopeKey),
-        ) ??
+    final regionalScope =
+        DexRegionalPokedex.fromStorageKey(prefs.getString(_regionalScopeKey)) ??
         gameEdition.defaultRegionalPokedex;
-    return DexScope(
-      gameEdition: gameEdition,
-      regionalScope: regionalScope,
-    );
+    return DexScope(gameEdition: gameEdition, regionalScope: regionalScope);
   }
 
   Future<GameEdition> loadDefaultGameEdition() async {
@@ -44,6 +42,17 @@ class DexSettingsRepository {
     await gameEditionRepository.save(scope.gameEdition);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_regionalScopeKey, scope.regionalScope.name);
+  }
+
+  Future<DexBrowseScope> loadBrowseScope() async {
+    final prefs = await SharedPreferences.getInstance();
+    return DexBrowseScope.fromStorageValue(prefs.getString(_browseScopeKey)) ??
+        const DexBrowseScope.region(DexRegionalPokedex.national);
+  }
+
+  Future<void> saveBrowseScope(DexBrowseScope scope) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_browseScopeKey, scope.storageValue);
   }
 }
 

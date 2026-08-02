@@ -6,6 +6,7 @@ import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/type_chart.dart';
+import '../features/dex/version_availability.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/game_catalog.dart';
@@ -14,10 +15,10 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/pokemon_detail_sections.dart';
+import '../widgets/pokemon_obtain_sections.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
@@ -60,6 +61,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   String? _selectedObtainVersion;
   _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
   String? _selectedFormKey;
+  Future<Map<String, HeldItemReference>> _heldItemReferencesFuture =
+      Future.value(const {});
+  Future<Map<int, PokemonDetail>> _chainDetailsFuture = Future.value(const {});
 
   @override
   void initState() {
@@ -121,18 +125,21 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       }
       final linkedForm = widget.initialFormKey;
       final linkedVersion = widget.initialObtainVersion;
+      final selectedFormKey =
+          (linkedForm != null &&
+              detail.forms.any((form) => form.key == linkedForm))
+          ? linkedForm
+          : detail.defaultForm?.key;
+      final displayDetail = _detailForFormKey(detail, selectedFormKey);
       setState(() {
         _detail = detail;
         _abilities = abilities;
-        _selectedFormKey =
-            (linkedForm != null &&
-                detail.forms.any((form) => form.key == linkedForm))
-            ? linkedForm
-            : detail.defaultForm?.key;
+        _selectedFormKey = selectedFormKey;
         if (linkedVersion != null &&
             detail.obtainLocationsByVersion.containsKey(linkedVersion)) {
           _selectedObtainVersion = linkedVersion;
         }
+        _prepareObtainSupport(displayDetail);
         _loading = false;
       });
     } catch (error) {
@@ -154,106 +161,107 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final padding = DeviceLayout.pagePadding(context);
     final bodyPadding = EdgeInsets.fromLTRB(padding.left, 8, padding.right, 12);
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      // This page owns the only warm-white bottom bar in the app — match
-      // the system nav bar to it instead of the global deep blue (v0.6.7).
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          systemNavigationBarColor: TitoColors.card,
-          systemNavigationBarIconBrightness: Brightness.dark,
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                padding.left,
-                padding.top,
-                padding.right,
-                0,
-              ),
-              child: const SecondaryPageAppBar(
-                title: AppZh.navDex,
-                showSettings: false,
-              ),
+    // This page owns the only warm-white bottom bar in the app — match
+    // the system nav bar to it instead of the global deep blue (v0.6.7).
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: TitoColors.card,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              padding.left,
+              padding.top,
+              padding.right,
+              0,
             ),
-            Expanded(
-              child: TitoSkeletonGate(
-                loading: _loading,
-                skeleton: ListView(
-                  padding: bodyPadding,
-                  children: const [
-                    TitoDetailHeaderSkeleton(),
-                    SizedBox(height: 12),
-                    TitoCardSkeleton(height: 140),
-                    SizedBox(height: 12),
-                    TitoCardSkeleton(height: 88),
-                  ],
-                ),
-                child: errorCopy != null
-                    ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
-                    : displayDetail == null
-                    ? const SizedBox.shrink()
-                    : ListView(
-                        padding: bodyPadding,
-                        children: [
-                          PokemonDetailHeader(
-                            detail: displayDetail,
-                            compact: true,
-                            showSettingsAction: false,
-                          ),
-                          if (displayDetail.hasMultipleForms) ...[
-                            const SizedBox(height: 12),
-                            PokemonFormSelector(
-                              forms: displayDetail.forms,
-                              selectedKey:
-                                  _selectedFormKey ??
-                                  displayDetail.defaultForm!.key,
-                              onSelected: (form) {
-                                setState(() {
-                                  _selectedFormKey = form.key;
-                                  _abilities =
-                                      form.abilities.isEmpty &&
-                                          (form.isDefault || form.isCosmetic)
-                                      ? _detail!.abilities
-                                      : form.abilities;
-                                });
-                              },
-                            ),
-                          ],
+            child: const SecondaryPageAppBar(
+              title: AppZh.navDex,
+              showSettings: false,
+            ),
+          ),
+          Expanded(
+            child: TitoSkeletonGate(
+              loading: _loading,
+              skeleton: ListView(
+                padding: bodyPadding,
+                children: const [
+                  TitoDetailHeaderSkeleton(),
+                  SizedBox(height: 12),
+                  TitoCardSkeleton(height: 140),
+                  SizedBox(height: 12),
+                  TitoCardSkeleton(height: 88),
+                ],
+              ),
+              child: errorCopy != null
+                  ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                  : displayDetail == null
+                  ? const SizedBox.shrink()
+                  : ListView(
+                      padding: bodyPadding,
+                      children: [
+                        PokemonDetailHeader(
+                          detail: displayDetail,
+                          compact: true,
+                          showSettingsAction: false,
+                        ),
+                        if (displayDetail.hasMultipleForms) ...[
                           const SizedBox(height: 12),
-                          // Keyed tab-body swap without a custom transition.
-                          TitoAnimatedSizeSwitcher(
-                            switchKey: ValueKey<int>(_currentTabIndex),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: _tabSections(
-                                displayDetail,
-                                _currentTabIndex,
-                              ),
+                          PokemonFormSelector(
+                            forms: displayDetail.forms,
+                            selectedKey:
+                                _selectedFormKey ??
+                                displayDetail.defaultForm!.key,
+                            onSelected: (form) {
+                              setState(() {
+                                _selectedFormKey = form.key;
+                                _prepareObtainSupport(_detail!.forForm(form));
+                                _abilities =
+                                    form.abilities.isEmpty &&
+                                        (form.isDefault || form.isCosmetic)
+                                    ? _detail!.abilities
+                                    : form.abilities;
+                              });
+                            },
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        // Keyed tab-body swap without a custom transition.
+                        TitoAnimatedSizeSwitcher(
+                          switchKey: ValueKey<int>(_currentTabIndex),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: _tabSections(
+                              displayDetail,
+                              _currentTabIndex,
                             ),
                           ),
-                          const SizedBox(height: 72),
-                        ],
-                      ),
-              ),
+                        ),
+                        const SizedBox(height: 72),
+                      ],
+                    ),
             ),
-            _DetailBottomTabs(
-              currentIndex: _currentTabIndex,
-              onSelected: (index) {
-                if (_currentTabIndex != index) {
-                  setState(() => _currentTabIndex = index);
-                }
-              },
-            ),
-          ],
-        ),
+          ),
+          _DetailBottomTabs(
+            currentIndex: _currentTabIndex,
+            onSelected: (index) {
+              if (_currentTabIndex != index) {
+                setState(() => _currentTabIndex = index);
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 
   PokemonDetail _displayDetail(PokemonDetail detail) {
-    final selectedKey = _selectedFormKey;
+    return _detailForFormKey(detail, _selectedFormKey);
+  }
+
+  PokemonDetail _detailForFormKey(PokemonDetail detail, String? selectedKey) {
     if (selectedKey == null) {
       return detail;
     }
@@ -263,6 +271,39 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       }
     }
     return detail;
+  }
+
+  EvolutionNode? _filteredEvolutionChain(PokemonDetail detail) =>
+      detail.evolutionChain?.filteredForForm(
+        _selectedFormKey,
+        rootSpritePath: _selectedForm?.localSpritePath,
+      );
+
+  void _prepareObtainSupport(PokemonDetail detail) {
+    _heldItemReferencesFuture = detail.heldItems.isEmpty
+        ? Future.value(const {})
+        : dexRepository
+              .getReferenceEntries('items.json')
+              .then(heldItemReferencesBySlug)
+              .catchError((Object _) => <String, HeldItemReference>{});
+    final chain = _filteredEvolutionChain(detail);
+    _chainDetailsFuture = chain == null
+        ? Future.value(const {})
+        : _loadChainDetails(chain);
+  }
+
+  Future<Map<int, PokemonDetail>> _loadChainDetails(EvolutionNode chain) async {
+    final ids = <int>{};
+    void collect(EvolutionNode node) {
+      ids.add(node.id);
+      for (final child in node.children) {
+        collect(child);
+      }
+    }
+
+    collect(chain);
+    final details = await Future.wait(ids.map(dexRepository.getDetail));
+    return {for (final detail in details) detail.summary.id: detail};
   }
 
   PokemonFormDetail? get _selectedForm {
@@ -283,26 +324,45 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   /// incomplete — so "空白" and "游戏中不存在" stop looking identical.
   Widget? _formDataQualityNote() {
     final form = _selectedForm;
-    if (form == null || form.isDefault) {
+    if (form == null) {
       return null;
     }
-    final String? copy;
+    final statusLabels = pokemonFormStatusLabels(
+      form,
+      versionGroup: _gameEdition.dataVersionGroupKey,
+    );
+    final String? qualityCopy;
     if (form.inheritsFromDefault) {
-      copy = AppZh.dexFormDataInherited;
+      qualityCopy = AppZh.dexFormDataInherited;
     } else if (form.dataCompleteness == 'partial') {
-      copy = AppZh.dexFormDataPartial;
+      qualityCopy = AppZh.dexFormDataPartial;
     } else {
-      copy = null;
+      qualityCopy = null;
     }
-    if (copy == null) {
+    if (statusLabels.isEmpty && qualityCopy == null) {
       return null;
     }
-    return Text(
-      copy,
-      style: SecondaryTypography.onGradient.small12.copyWith(
-        color: TitoColors.softYellow,
-        fontWeight: FontWeight.w700,
-      ),
+    return Wrap(
+      spacing: 6,
+      runSpacing: 4,
+      children: [
+        for (final label in statusLabels)
+          Text(
+            '· $label',
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              color: TitoColors.softYellow,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        if (qualityCopy != null)
+          Text(
+            qualityCopy,
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              color: TitoColors.card,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+      ],
     );
   }
 
@@ -417,10 +477,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<Widget> _basicSections(PokemonDetail detail) {
     final qualityNote = _formDataQualityNote();
     return [
-      if (qualityNote != null) ...[
-        qualityNote,
-        const SizedBox(height: 8),
-      ],
+      if (qualityNote != null) ...[qualityNote, const SizedBox(height: 8)],
       if (detail.baseStats != null) ...[
         BaseStatsSection(stats: detail.baseStats!),
         const SizedBox(height: 12),
@@ -457,9 +514,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     // selected edition, same pattern as the moves tab.
     final obtainGroups = _allObtainGroups(detail);
     final editionKey = _obtainGameEdition.dataVersionGroupKey;
-    final selectedVersion = _selectedObtainVersion;
     final exactVersions =
         encounterVersionsByVersionGroup[editionKey] ?? const [];
+    final selectedVersion =
+        _selectedObtainVersion ??
+        (exactVersions.contains(_obtainGameEdition.selectedFlavor)
+            ? _obtainGameEdition.selectedFlavor
+            : exactVersions.length == 1
+            ? exactVersions.single
+            : null);
     final List<ObtainLocationEntry>? locations;
     if (selectedVersion != null) {
       locations = detail.obtainLocationsByVersion[selectedVersion];
@@ -553,8 +616,31 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
     ];
 
-    if (detail.evolutionChain != null) {
+    final heldItemVersionKeys = selectedVersion == null
+        ? exactVersions
+        : accessibleEncounterVersions(selectedVersion).toList();
+    if (detail.heldItems.isNotEmpty && heldItemVersionKeys.isNotEmpty) {
       sections.addAll([
+        const SizedBox(height: 12),
+        PokemonHeldItemsCard(
+          items: detail.heldItems,
+          versionKeys: heldItemVersionKeys,
+          referencesFuture: _heldItemReferencesFuture,
+        ),
+      ]);
+    }
+
+    final evolutionChain = _filteredEvolutionChain(detail);
+    if (evolutionChain != null) {
+      sections.addAll([
+        const SizedBox(height: 12),
+        VersionChainPlanningCard(
+          chain: evolutionChain,
+          currentDetail: detail,
+          versionGroup: editionKey,
+          exactVersion: selectedVersion,
+          detailsFuture: _chainDetailsFuture,
+        ),
         const SizedBox(height: 12),
         StickerCard(
           child: Column(
@@ -563,10 +649,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               Text(AppZh.dexEvolution, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 12),
               EvolutionChainVerticalView(
-                root: detail.evolutionChain!.filteredForForm(
-                  _selectedFormKey,
-                  rootSpritePath: _selectedForm?.localSpritePath,
-                ),
+                root: evolutionChain,
                 highlightId: detail.summary.id,
               ),
             ],
@@ -586,7 +669,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     if (picked != null && mounted) {
       setState(() {
         _obtainGameEdition = picked;
-        _selectedObtainVersion = null;
+        _selectedObtainVersion = picked.selectedFlavor;
       });
       await dexSettingsRepository.saveDefaultGameEdition(picked);
     }

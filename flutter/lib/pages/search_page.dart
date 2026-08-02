@@ -18,12 +18,12 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
 import '../theme/device_layout.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/companion_tools_panel.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
@@ -182,33 +182,30 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     final edition = gameEditionRepository.edition;
 
-        return TitoFontScale(
-      multiplier: 1.0,
-      child: Material(
-        type: MaterialType.transparency,
-        child: SecondaryPageScaffold(
-          title: AppZh.navSearch,
-          subtitle: edition.labelZh,
-          children: [
-            _SearchHubSegmentBar(
-              selected: _hubSegment,
-              onSelected: (index) => setState(() => _hubSegment = index),
+    return Material(
+      type: MaterialType.transparency,
+      child: SecondaryPageScaffold(
+        title: AppZh.navSearch,
+        subtitle: edition.labelZh,
+        children: [
+          _SearchHubSegmentBar(
+            selected: _hubSegment,
+            onSelected: (index) => setState(() => _hubSegment = index),
+          ),
+          const SizedBox(height: 12),
+          // Keyed content swap without a custom transition.
+          TitoAnimatedSizeSwitcher(
+            switchKey: ValueKey<int>(_hubSegment),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: switch (_hubSegment) {
+                0 => _searchSegment(context),
+                1 => _referenceSegment(context),
+                _ => _battleSegment(context),
+              },
             ),
-            const SizedBox(height: 12),
-            // Keyed content swap without a custom transition.
-            TitoAnimatedSizeSwitcher(
-              switchKey: ValueKey<int>(_hubSegment),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: switch (_hubSegment) {
-                  0 => _searchSegment(context),
-                  1 => _referenceSegment(context),
-                  _ => _battleSegment(context),
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -503,6 +500,8 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),
+      const SizedBox(height: 12),
+      const SleepToolsSection(),
     ];
   }
 

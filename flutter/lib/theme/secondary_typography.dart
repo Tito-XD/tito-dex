@@ -7,9 +7,9 @@ import 'tito_typography.dart';
 ///
 /// ## Dex Typography Spec (secondary pages)
 ///
-/// Reference: Pokédex list/detail (v0.2.23+). Use with [TitoFontScale] `multiplier: 1.0`
-/// on every secondary route except the home dashboard (Team, Journey, Dex, Search,
-/// Settings, companion battle tools, …).
+/// Reference: Pokédex list/detail (v0.2.23+). Use on every secondary route
+/// except the home dashboard (Team, Journey, Dex, Search, Settings, companion
+/// battle tools, …).
 ///
 /// | Tier | px | Token | Use |
 /// |------|-----|-------|-----|
@@ -52,43 +52,43 @@ final class _SecondaryOnGradient {
 
   /// Page header title — 22.5px white on gradient.
   TextStyle get title => TitoTypography.style(
-        fontSize: 22.5,
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-        letterSpacing: -0.3,
-      );
+    fontSize: 22.5,
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+    letterSpacing: -0.3,
+  );
 
   TextStyle get h15 => TitoTypography.style(
-        fontSize: 15,
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-        letterSpacing: 15 * -0.02,
-      );
+    fontSize: 15,
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+    letterSpacing: 15 * -0.02,
+  );
 
   TextStyle get body14 => TitoTypography.style(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: TitoColors.card,
-        height: 1.4,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: TitoColors.card,
+    height: 1.4,
+  );
 
   TextStyle get small12 => TitoTypography.style(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: TitoColors.card,
-      );
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    color: TitoColors.card,
+  );
 
   TextStyle get meta14 => TitoTypography.style(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: TitoColors.card,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: TitoColors.card,
+  );
 
   TextStyle get team12 => TitoTypography.style(
-        fontSize: 12,
-        fontWeight: FontWeight.w800,
-        color: TitoColors.card,
-      );
+    fontSize: 12,
+    fontWeight: FontWeight.w800,
+    color: TitoColors.card,
+  );
 }
 
 /// Text on cream / sky / mint sticker cards (ink).
@@ -96,32 +96,26 @@ final class _SecondaryOnCard {
   const _SecondaryOnCard();
 
   TextStyle get h15 => TitoTypography.style(
-        fontSize: 15,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 15 * -0.02,
-      );
+    fontSize: 15,
+    fontWeight: FontWeight.w800,
+    letterSpacing: 15 * -0.02,
+  );
 
   TextStyle get body14 => TitoTypography.style(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        height: 1.4,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 1.4,
+  );
 
-  TextStyle get small12 => TitoTypography.style(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      );
+  TextStyle get small12 =>
+      TitoTypography.style(fontSize: 12, fontWeight: FontWeight.w600);
 
-  TextStyle get meta14 => TitoTypography.style(
-        fontSize: 14,
-        fontWeight: FontWeight.w800,
-      );
+  TextStyle get meta14 =>
+      TitoTypography.style(fontSize: 14, fontWeight: FontWeight.w800);
 
   /// Team row name / level / slot / HP.
-  TextStyle get team12 => TitoTypography.style(
-        fontSize: 12,
-        fontWeight: FontWeight.w800,
-      );
+  TextStyle get team12 =>
+      TitoTypography.style(fontSize: 12, fontWeight: FontWeight.w800);
 }
 
 extension SecondaryTextContext on BuildContext {
@@ -150,13 +144,12 @@ final class SecondaryTextStyles {
     FontWeight? fontWeight,
     double? height,
     double? letterSpacing,
-  }) =>
-      SecondaryTypography.onCard.body14.copyWith(
-        color: color,
-        fontWeight: fontWeight,
-        height: height,
-        letterSpacing: letterSpacing,
-      );
+  }) => SecondaryTypography.onCard.body14.copyWith(
+    color: color,
+    fontWeight: fontWeight,
+    height: height,
+    letterSpacing: letterSpacing,
+  );
 
   TextStyle meta14({Color? color, FontWeight? fontWeight}) =>
       SecondaryTypography.onCard.meta14.copyWith(

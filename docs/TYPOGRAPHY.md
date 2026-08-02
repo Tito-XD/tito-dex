@@ -16,18 +16,14 @@ Established from the Pokédex list/detail screens (v0.2.23+). This is the **comf
 
 All values are **fixed logical pixels** — they do not multiply by `handheldUiScale` (1.5×).
 
-### Required wrapper
+### Route behavior
 
-Every secondary page must wrap content in:
+Secondary routes use `SecondaryTypography` for the shared 22.5 / 15 / 14 /
+12px hierarchy. Remaining `context.tito` fallbacks also resolve at the fixed
+secondary-page size, so no route-level font wrapper is required.
 
-```dart
-TitoFontScale(
-  multiplier: 1.0,
-  child: /* page body */,
-)
-```
-
-This keeps any remaining `context.tito` fallbacks at ×1.0 on RG instead of ×1.5.
+`TitoFontScale` was retired for v0.8.5. Page chrome, layout dimensions, and body
+type must not share an inherited multiplier.
 
 ### Pages on this spec
 
@@ -45,8 +41,10 @@ This keeps any remaining `context.tito` fallbacks at ×1.0 on RG instead of ×1.
 The home screen uses **Dashboard Scale** — intentionally larger for glanceability:
 
 - App title ~33px (layout-driven)
-- Quick-action labels 20px (`TitoFontScale 2.0`)
+- Quick-action labels use their explicit compact / regular tile sizes
 - Trainer micro card uses `homeDetailMultiplier` (up to 2.25×)
+- Dashboard cards that keep the larger legacy visual use explicit
+  `context.titoHome` tokens
 
 Do **not** force Dex Spec onto the home dashboard.
 

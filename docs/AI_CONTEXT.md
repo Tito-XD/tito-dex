@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) |
-| **`main` / lite source** | `0.8.2+134` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.2-offline+135` — APK-bundled verified compact v14 archive |
+| **Latest release** | [v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5) |
+| **`main` / lite source** | `0.8.5+136` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.5-offline+137` — APK-bundled verified compact v14 archive |
 | **Offline dex bundle** | **v13** live on CDN; Offline APK embeds compact **v14** — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.2)
+## Current feature status (latest release line: v0.8.5)
 
-> `main` tracks the v0.8.2 release line. Lite downloads live bundle v13 when requested; Offline embeds the verified compact v14 archive.
+> `main` tracks the v0.8.5 release line. Lite downloads live bundle v13 when requested; Offline embeds the byte-identical verified compact v14 archive.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -50,14 +50,15 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ### Dex (national 1–1025)
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
-- **23 game editions**, **11 regional dexes**, `DexScope` filters.
+- **23 game editions**, **11 regional dexes**, and persisted G1–G9 debut-generation browse scopes. Primary browse scope intersects with body/color/size/reference filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
-- Offline APK first install/upgrade shows a blocking local preparation dialog with continuous percentage across read → SHA-256 → decompress → extract → index. Lite and already-ready Offline installs never show it.
+- Offline APK first install/upgrade shows a blocking local preparation dialog with continuous percentage across read → SHA-256 → decompress → extract → index. Lite and already-ready Offline installs never show it. Settings downloads can be minimized on Android: a `dataSync` foreground service keeps the Dart install active and mirrors the weighted percentage into a notification; returning to Settings restores progress and cancellation controls. Cancelling, swiping the app task away, or an Android 15 service timeout stops native foreground work so stale progress cannot remain in the notification drawer.
 - Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
 - **Per-form evolution chains** (bundle v13+): regional / cloak splits prune to the real line (洗翠卡蒂狗 → 洗翠风速狗) with form sprites. Older installs fall back to the in-app `kFormEvolutionTargets` table via `EvolutionNode.filteredForForm`. Offline loading absolutizes `sprites/forms/…` paths on `forms[].evolutionChain`.
 - **Species filter sheet icons:** body-style chips use original vector creature marks that preserve the recognisable HOME poses and white eyes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
+- Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes.
 
 ### Items (reference hub → 道具)
 - **542 curated items** grouped into Bulbapedia Browse:Items player categories (`categoryZh`): 精灵球 / 回复药品 / 树果 / 携带道具 / 进化道具 / 能力提升 / 战斗道具.
@@ -77,6 +78,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
 ### Latest release-line highlights
+- v0.8.5: Android data-pack downloads can continue in the background with notification progress; exact-version obtain planning and held-item rows land; structured evolution and encounter conditions become visible; the dex gains persisted region/G1–G9 scope selection; flavor icons are local, metadata rows align, form status/attribution/Sleep links are restored, and secondary-page scaling is retired. Bundle v13 and compact Offline v14 remain unchanged.
 - v0.8.2: Lite and Offline show continuous weighted progress across manifest/read, download, verification, decompression, extraction and indexing; Offline uses the compact v14 archive (48.7% smaller than v13); offline references load local-first; HOME-style body-filter icons are redrawn for clearer silhouettes.
 - v0.8.1: form-aware evolution chains show the matching regional line with form sprites; body-style / size filter chips gain APK-local vector icons; Offline embeds dex bundle v13.
 - v0.8.0: curated items hub (542 items, Bulbapedia-style categories, icons) and dex list animation polish.

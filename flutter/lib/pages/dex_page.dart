@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,12 +8,14 @@ import '../features/companion/companion_art.dart';
 import '../features/game/journey_capability.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_filter.dart';
+import '../features/dex/dex_browse_scope.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_regional_picker.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_scope.dart';
+import '../features/dex/dex_settings_repository.dart';
 import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
@@ -21,7 +24,6 @@ import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_font_scale.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/dex_species_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
@@ -51,6 +53,7 @@ enum _DexMode { national, journey }
 
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
+
   /// True until the dex tab has been opened once this session; subsequent
   /// visits (incl. popping detail back to list) reuse the settled layout.
   static var _hasPlayedReveal = false;
@@ -63,6 +66,9 @@ class _DexPageState extends State<DexPage> {
   bool _loadingChunk = false;
   bool _loadingJourney = false;
   _DexMode _mode = _DexMode.national;
+  DexBrowseScope _browseScope = const DexBrowseScope.region(
+    DexRegionalPokedex.national,
+  );
   DexRegionalPokedex _region = DexRegionalPokedex.national;
   DexEncounterFilter _encounterFilter = DexEncounterFilter.all;
   List<PokemonSummary> _summaries = const [];
@@ -71,8 +77,12 @@ class _DexPageState extends State<DexPage> {
   bool _loadingReferenceFilter = false;
   int _filterVisibleCount = 0;
   final Map<DexRegionalPokedex, List<PokemonSummary>> _regionCache = {};
+  final Map<int, List<PokemonSummary>> _generationCache = {};
   bool _loadingRegion = false;
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
+  Set<int> _evolutionOrTradeMissingIds = const {};
+  bool _loadingEvolutionOrTrade = false;
+  int _availabilityRequest = 0;
   Set<int> _journeyIds = const {};
   String? _error;
   bool _showScrollToTop = false;
@@ -153,6 +163,7 @@ class _DexPageState extends State<DexPage> {
           manualDexMarks: !_isSaveLinked,
         );
       });
+      unawaited(_refreshEvolutionOrTradeMissing());
     }
   }
 
@@ -165,6 +176,7 @@ class _DexPageState extends State<DexPage> {
         manualDexMarks: !_isSaveLinked,
       );
     });
+    unawaited(_refreshEvolutionOrTradeMissing());
   }
 
   void _onReferenceFilterChanged() {
@@ -230,6 +242,7 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _bootstrap() async {
     try {
+      final browseScope = await dexSettingsRepository.loadBrowseScope();
       _journeyIds = _resolveJourneyIds();
       final progress = dexRepository.progressFor(
         widget.journey,
@@ -238,9 +251,18 @@ class _DexPageState extends State<DexPage> {
       if (!mounted) {
         return;
       }
-      setState(() => _progress = progress);
+      setState(() {
+        _progress = progress;
+        _browseScope = browseScope;
+        _region = browseScope.region ?? DexRegionalPokedex.national;
+      });
+      unawaited(_refreshEvolutionOrTradeMissing());
       if (dexFilterController.hasActiveFilter) {
         await _loadReferenceFilter();
+      } else if (browseScope.generation != null) {
+        await _loadGeneration(browseScope.generation!);
+      } else if (_region != DexRegionalPokedex.national) {
+        await _loadRegion(_region);
       } else {
         await _loadMore();
       }
@@ -313,22 +335,56 @@ class _DexPageState extends State<DexPage> {
     setState(() {
       _progress = dexRepository.progressFor(updated, manualDexMarks: true);
     });
+    unawaited(_refreshEvolutionOrTradeMissing());
+  }
+
+  Future<void> _refreshEvolutionOrTradeMissing() async {
+    final request = ++_availabilityRequest;
+    if (mounted) {
+      setState(() {
+        _evolutionOrTradeMissingIds = const {};
+        _loadingEvolutionOrTrade = true;
+      });
+    }
+    Set<int> result;
+    try {
+      result = await dexRepository.evolutionOrTradeMissingIds(
+        progress: _progress,
+        edition: gameEditionRepository.edition,
+      );
+    } catch (_) {
+      result = const {};
+    }
+    if (!mounted || request != _availabilityRequest) {
+      return;
+    }
+    setState(() {
+      _evolutionOrTradeMissingIds = result;
+      _loadingEvolutionOrTrade = false;
+      if (_encounterFilter == DexEncounterFilter.evolutionOrTrade &&
+          result.isEmpty) {
+        _encounterFilter = DexEncounterFilter.all;
+      }
+    });
   }
 
   void _loadMoreVisible() {
     if (dexFilterController.hasActiveFilter) {
-      if (_filterVisibleCount >= _referenceFilteredSummaries.length) {
+      if (_filterVisibleCount >= _scopedReferenceEntries.length) {
         return;
       }
       setState(() {
         _filterVisibleCount = (_filterVisibleCount + _chunkSize).clamp(
           0,
-          _referenceFilteredSummaries.length,
+          _scopedReferenceEntries.length,
         );
       });
       return;
     }
-    _loadMore();
+    if (_browseScope.generation == null &&
+        _region == DexRegionalPokedex.national) {
+      _loadMore();
+    }
   }
 
   Future<void> _loadMore() async {
@@ -428,24 +484,59 @@ class _DexPageState extends State<DexPage> {
     if (!mounted) {
       return;
     }
-    final picked = await showRegionalPokedexPicker(
+    final picked = await showDexBrowseScopePicker(
       context,
-      selected: _region,
-      gameEdition: gameEditionRepository.edition,
+      selected: _browseScope,
     );
-    if (picked != null && picked != _region) {
-      _setRegion(picked);
+    if (picked != null && picked != _browseScope) {
+      _setBrowseScope(picked);
     }
   }
 
-  void _setRegion(DexRegionalPokedex region) {
+  void _setBrowseScope(DexBrowseScope scope) {
+    final region = scope.region ?? DexRegionalPokedex.national;
     setState(() {
+      _browseScope = scope;
       _region = region;
+      _filterVisibleCount = _chunkSize.clamp(
+        0,
+        _referenceFilteredSummaries.where(scope.matches).length,
+      );
       _mode = _DexMode.national;
       _error = null;
     });
-    if (region != DexRegionalPokedex.national) {
+    unawaited(dexSettingsRepository.saveBrowseScope(scope));
+    if (scope.generation != null) {
+      _loadGeneration(scope.generation!);
+    } else if (region != DexRegionalPokedex.national) {
       _loadRegion(region);
+    } else if (_summaries.isEmpty) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadGeneration(int generation) async {
+    if (_generationCache.containsKey(generation) || _loadingRegion) return;
+    setState(() => _loadingRegion = true);
+    try {
+      final entries = await dexRepository.getSummaryRange(
+        1,
+        titodexMaxNationalDexId,
+      );
+      final filtered = entries
+          .where((entry) => entry.generation == generation)
+          .toList(growable: false);
+      if (!mounted) return;
+      setState(() {
+        _generationCache[generation] = filtered;
+        _loadingRegion = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = _formatDexError(error);
+        _loadingRegion = false;
+      });
     }
   }
 
@@ -487,9 +578,10 @@ class _DexPageState extends State<DexPage> {
   List<PokemonSummary> get _visibleEntries {
     if (dexFilterController.hasActiveFilter) {
       final filtered = dexRepository.filterByEncounter(
-        _referenceFilteredSummaries,
+        _scopedReferenceEntries,
         _progress,
         _encounterFilter,
+        evolutionOrTradeIds: _evolutionOrTradeMissingIds,
       );
       if (_filterVisibleCount <= 0) {
         return filtered;
@@ -500,40 +592,61 @@ class _DexPageState extends State<DexPage> {
     final Iterable<PokemonSummary> entries;
     if (_mode == _DexMode.journey) {
       entries = _journeySummaries;
+    } else if (_browseScope.generation != null) {
+      entries = _generationCache[_browseScope.generation] ?? const [];
     } else if (_region != DexRegionalPokedex.national &&
         _regionCache.containsKey(_region)) {
       entries = _regionCache[_region]!;
     } else {
-      entries = _summaries.where(
-        (entry) => summaryMatchesRegionalPokedex(entry, _region),
-      );
+      entries = _summaries.where(_browseScope.matches);
     }
 
     return dexRepository.filterByEncounter(
       entries,
       _progress,
       _encounterFilter,
+      evolutionOrTradeIds: _evolutionOrTradeMissingIds,
     );
+  }
+
+  List<PokemonSummary> get _scopedReferenceEntries =>
+      _referenceFilteredSummaries
+          .where(_browseScope.matches)
+          .toList(growable: false);
+
+  Iterable<PokemonSummary> get _primaryScopeEntries {
+    final generation = _browseScope.generation;
+    if (generation != null) return _generationCache[generation] ?? const [];
+    if (_region != DexRegionalPokedex.national) {
+      return _regionCache[_region] ?? const [];
+    }
+    return _summaries;
   }
 
   DexScopeStats get _scopeStats {
     final legacyScope = regionalScopeFromPokedex(_region);
-    if (_region == DexRegionalPokedex.national ||
-        _region == DexRegionalPokedex.johto ||
-        _region == DexRegionalPokedex.kanto) {
-      return _progress.statsFor(legacyScope);
+    if (_browseScope.generation == null &&
+        (_region == DexRegionalPokedex.national ||
+            _region == DexRegionalPokedex.johto ||
+            _region == DexRegionalPokedex.kanto)) {
+      return _progress.statsFor(
+        legacyScope,
+        evolutionOrTradeIds: _evolutionOrTradeMissingIds,
+      );
     }
-    final visible = _summaries.where(
-      (entry) => summaryMatchesRegionalPokedex(entry, _region),
-    );
+    final visible = _primaryScopeEntries;
     var caught = 0;
     var seenOnly = 0;
+    var evolutionOrTradeOnly = 0;
     for (final entry in visible) {
       final status = _progress.statusFor(entry.id);
       if (status == DexEncounterStatus.caught) {
         caught++;
       } else if (status == DexEncounterStatus.seen) {
         seenOnly++;
+      }
+      if (_evolutionOrTradeMissingIds.contains(entry.id)) {
+        evolutionOrTradeOnly++;
       }
     }
     final total = visible.length;
@@ -543,6 +656,7 @@ class _DexPageState extends State<DexPage> {
       caught: caught,
       seenOnly: seenOnly,
       unseen: total - caught - seenOnly,
+      evolutionOrTradeOnly: evolutionOrTradeOnly,
     );
   }
 
@@ -556,7 +670,8 @@ class _DexPageState extends State<DexPage> {
       DexEncounterFilter.caught => AppZh.dexCaughtEmpty,
       DexEncounterFilter.seen => AppZh.dexSeenEmpty,
       DexEncounterFilter.unseen => AppZh.dexUnknown,
-      DexEncounterFilter.all => AppZh.dexJourneyEmpty,
+      DexEncounterFilter.evolutionOrTrade => AppZh.dexFilterEmpty,
+      DexEncounterFilter.all => AppZh.dexFilterEmpty,
     };
   }
 
@@ -566,19 +681,25 @@ class _DexPageState extends State<DexPage> {
     }
     return dexRepository
         .filterByEncounter(
-          _referenceFilteredSummaries,
+          _scopedReferenceEntries,
           _progress,
           _encounterFilter,
+          evolutionOrTradeIds: _evolutionOrTradeMissingIds,
         )
         .length;
   }
 
   /// Region progress line, e.g. `#152–251 · 已见 6 / 已捕 6 / 共 100`.
-  String? get _regionProgressLine {
-    if (_mode != _DexMode.national || _region == DexRegionalPokedex.national) {
+  String? get _scopeProgressLine {
+    if (_mode != _DexMode.national) {
       return null;
     }
     final stats = _scopeStats;
+    final generation = _browseScope.generation;
+    if (generation != null) {
+      return 'G$generation · 已见 ${stats.seen} / 已捕 ${stats.caught} / 共 ${stats.total}';
+    }
+    if (_region == DexRegionalPokedex.national) return null;
     final (start, end) = DexScope.idRangeForScope(
       _region,
       gameEdition: gameEditionRepository.edition,
@@ -604,303 +725,307 @@ class _DexPageState extends State<DexPage> {
         : _loadingJourney;
     final padding = DeviceLayout.pagePadding(context);
 
-    return TitoFontScale(
-      multiplier: 1.0,
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  padding.left,
-                  padding.top,
-                  padding.right,
-                  0,
-                ),
-                child: _DexTopBar(
-                  onSearch: () => context.push('/search'),
-                  onReference: () => _showReferenceMenu(context),
-                ),
+    return Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                padding.left,
+                padding.top,
+                padding.right,
+                0,
               ),
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification.metrics.pixels >=
-                        notification.metrics.maxScrollExtent - 240) {
-                      _loadMoreVisible();
-                    }
-                    return false;
-                  },
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      SliverPadding(
-                        padding: EdgeInsets.fromLTRB(
-                          padding.left,
-                          6,
-                          padding.right,
-                          8,
-                        ),
-                        // The header block fades in on the same clock as the grid
-                        // cards below, so the text no longer pops in ahead of them.
-                        sliver: SliverToBoxAdapter(
-                          child: TitoListReveal(
-                            key: const ValueKey('dex-header-reveal'),
-                            enabled: _revealAnimationsEnabled,
-                            delay: _headerRevealDelay(),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                SecondaryPageSubtitle(
-                                  text: gameEditionRepository.edition.labelZh,
+              child: _DexTopBar(
+                onSearch: () => context.push('/search'),
+                onReference: () => _showReferenceMenu(context),
+              ),
+            ),
+            Expanded(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification.metrics.pixels >=
+                      notification.metrics.maxScrollExtent - 240) {
+                    _loadMoreVisible();
+                  }
+                  return false;
+                },
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        padding.left,
+                        6,
+                        padding.right,
+                        8,
+                      ),
+                      // The header block fades in on the same clock as the grid
+                      // cards below, so the text no longer pops in ahead of them.
+                      sliver: SliverToBoxAdapter(
+                        child: TitoListReveal(
+                          key: const ValueKey('dex-header-reveal'),
+                          enabled: _revealAnimationsEnabled,
+                          delay: _headerRevealDelay(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SecondaryPageSubtitle(
+                                text: gameEditionRepository.edition.labelZh,
+                              ),
+                              SizedBox(height: squareGap(context)),
+                              // Square handheld: keep the top area short — at most one
+                              // info line (region progress when 城都/关东 is active).
+                              if (_scopeProgressLine != null) ...[
+                                Text(
+                                  _scopeProgressLine!,
+                                  style: SecondaryTypography.onGradient.body14,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(height: squareGap(context)),
-                                // Square handheld: keep the top area short — at most one
-                                // info line (region progress when 城都/关东 is active).
-                                if (_regionProgressLine != null) ...[
-                                  Text(
-                                    _regionProgressLine!,
-                                    style:
-                                        SecondaryTypography.onGradient.body14,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: squareGap(context)),
-                                ] else if (!DeviceLayout.useSquareDashboard(
-                                  context,
-                                )) ...[
-                                  Text(
-                                    AppZh.dexScopeNote,
-                                    style:
-                                        SecondaryTypography.onGradient.body14,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: squareGap(context)),
-                                ],
-                                if (dexFilterController.hasActiveFilter) ...[
-                                  DexFilterBanner(
-                                    filter: dexFilterController.currentFilter,
-                                    loading: _loadingReferenceFilter,
-                                    onClear: dexFilterController.clearFilter,
-                                  ),
-                                  SizedBox(height: squareGap(context)),
-                                ],
-                                _DexScopeBar(
-                                  mode: _mode,
-                                  region: _region,
-                                  scopeStats: _scopeStats,
-                                  journeyCount: _journeyIds.length,
-                                  onModeSelected: _setMode,
-                                  onNationalRegionPicker: _onNationalTabTap,
-                                ),
-                                // Keyed encounter-filter swap without a custom transition.
-                                TitoAnimatedSizeSwitcher(
-                                  switchKey: ValueKey<bool>(
-                                    _mode == _DexMode.national,
-                                  ),
-                                  child: _mode == _DexMode.national
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            SizedBox(
-                                              height: squareGap(context),
-                                            ),
-                                            _DexEncounterFilterBar(
-                                              filter: _encounterFilter,
-                                              onSelected: (filter) {
-                                                setState(
-                                                  () =>
-                                                      _encounterFilter = filter,
-                                                );
-                                              },
-                                            ),
-                                            SizedBox(
-                                              height: squareGap(context),
-                                            ),
-                                            _DexSpeciesFilterButton(
-                                              filter: dexFilterController
-                                                  .currentFilter,
-                                              onTap: _openSpeciesFilter,
-                                            ),
-                                          ],
-                                        )
-                                      : const SizedBox.shrink(),
+                              ] else if (!DeviceLayout.useSquareDashboard(
+                                context,
+                              )) ...[
+                                Text(
+                                  AppZh.dexScopeNote,
+                                  style: SecondaryTypography.onGradient.body14,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 SizedBox(height: squareGap(context)),
-                                if (_error != null)
-                                  StickerCard(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Text(
-                                          AppZh.dexLoadFailed,
-                                          style: SecondaryTypography
-                                              .onCard
-                                              .body14
-                                              .copyWith(
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          _error!,
-                                          style: SecondaryTypography
-                                              .onCard
-                                              .small12
-                                              .copyWith(
-                                                color: TitoColors.mutedInk,
-                                                height: 1.45,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        FilledButton(
-                                          onPressed: () {
-                                            setState(() => _error = null);
-                                            if (_mode == _DexMode.national) {
-                                              _loadMore();
-                                            } else {
-                                              _setMode(_DexMode.journey);
-                                            }
-                                          },
-                                          child: const Text(AppZh.dexRetry),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                else if (visible.isEmpty && loading)
-                                  TitoDexGridSkeleton(
-                                    crossAxisCount: columns,
-                                    childAspectRatio: aspectRatio,
-                                  )
-                                else if (visible.isEmpty)
-                                  StickerCard(
-                                    child: Text(
-                                      _emptyMessageForMode(),
-                                      style: SecondaryTypography.onCard.body14
-                                          .copyWith(
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                    ),
-                                  ),
                               ],
-                            ),
+                              if (dexFilterController.hasActiveFilter) ...[
+                                DexFilterBanner(
+                                  filter: dexFilterController.currentFilter,
+                                  loading: _loadingReferenceFilter,
+                                  onClear: dexFilterController.clearFilter,
+                                ),
+                                SizedBox(height: squareGap(context)),
+                              ],
+                              _DexScopeBar(
+                                mode: _mode,
+                                browseScope: _browseScope,
+                                scopeStats: _scopeStats,
+                                journeyCount: _journeyIds.length,
+                                availabilityLoading: _loadingEvolutionOrTrade,
+                                onModeSelected: _setMode,
+                                onNationalRegionPicker: _onNationalTabTap,
+                              ),
+                              // Keyed encounter-filter swap without a custom transition.
+                              TitoAnimatedSizeSwitcher(
+                                switchKey: ValueKey<bool>(
+                                  _mode == _DexMode.national,
+                                ),
+                                child: _mode == _DexMode.national
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          SizedBox(height: squareGap(context)),
+                                          _DexEncounterFilterBar(
+                                            filter: _encounterFilter,
+                                            availabilityLoading:
+                                                _loadingEvolutionOrTrade,
+                                            onSelected: (filter) {
+                                              if (filter ==
+                                                      DexEncounterFilter
+                                                          .evolutionOrTrade &&
+                                                  _loadingEvolutionOrTrade) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      AppZh
+                                                          .dexEvolutionOrTradeLoading,
+                                                    ),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              setState(
+                                                () => _encounterFilter = filter,
+                                              );
+                                            },
+                                          ),
+                                          SizedBox(height: squareGap(context)),
+                                          _DexSpeciesFilterButton(
+                                            filter: dexFilterController
+                                                .currentFilter,
+                                            onTap: _openSpeciesFilter,
+                                          ),
+                                        ],
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              SizedBox(height: squareGap(context)),
+                              if (_error != null)
+                                StickerCard(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Text(
+                                        AppZh.dexLoadFailed,
+                                        style: SecondaryTypography.onCard.body14
+                                            .copyWith(
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        _error!,
+                                        style: SecondaryTypography
+                                            .onCard
+                                            .small12
+                                            .copyWith(
+                                              color: TitoColors.mutedInk,
+                                              height: 1.45,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      FilledButton(
+                                        onPressed: () {
+                                          setState(() => _error = null);
+                                          if (_mode == _DexMode.national) {
+                                            _loadMore();
+                                          } else {
+                                            _setMode(_DexMode.journey);
+                                          }
+                                        },
+                                        child: const Text(AppZh.dexRetry),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else if (visible.isEmpty && loading)
+                                TitoDexGridSkeleton(
+                                  crossAxisCount: columns,
+                                  childAspectRatio: aspectRatio,
+                                )
+                              else if (visible.isEmpty)
+                                StickerCard(
+                                  child: Text(
+                                    _emptyMessageForMode(),
+                                    style: SecondaryTypography.onCard.body14
+                                        .copyWith(fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
-                      if (visible.isNotEmpty && _error == null)
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            padding.left,
-                            0,
-                            padding.right,
-                            0,
-                          ),
-                          sliver: SliverGrid(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: columns,
-                                  mainAxisSpacing: 6,
-                                  crossAxisSpacing: 6,
-                                  childAspectRatio: aspectRatio,
-                                ),
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final entry = visible[index];
-                              final status = dexRepository.statusFor(
-                                entry.id,
-                                _progress,
-                              );
-                              return TitoListReveal(
-                                key: ValueKey<String>(
-                                  'dex-grid-entry-${entry.id}',
-                                ),
-                                enabled: _revealAnimationsEnabled,
-                                delay: _cardRevealDelay(index, columns),
-                                child: PokemonMiniCard(
-                                  summary: entry,
-                                  status: status,
-                                  compact: DeviceLayout.isCompact(context),
-                                  onLongPress: _isSaveLinked
-                                      ? null
-                                      : () =>
-                                            _cycleManualMark(entry.id, status),
-                                ),
-                              );
-                            }, childCount: visible.length),
-                          ),
+                    ),
+                    if (visible.isNotEmpty && _error == null)
+                      SliverPadding(
+                        padding: EdgeInsets.fromLTRB(
+                          padding.left,
+                          0,
+                          padding.right,
+                          0,
                         ),
-                      if (_mode == _DexMode.national &&
-                          _loadingChunk &&
-                          visible.isNotEmpty &&
-                          !dexFilterController.hasActiveFilter)
-                        SliverPadding(
-                          padding: padding.copyWith(top: 8),
-                          sliver: SliverToBoxAdapter(
-                            child: TitoDexGridSkeleton(
-                              crossAxisCount: columns,
-                              itemCount: columns,
-                              childAspectRatio: aspectRatio,
-                            ),
-                          ),
-                        ),
-                      if (dexFilterController.hasActiveFilter &&
-                          _filterVisibleCount < _filteredTotalCount)
-                        SliverPadding(
-                          padding: padding.copyWith(top: 8, bottom: 4),
-                          sliver: SliverToBoxAdapter(
-                            child: Text(
-                              AppZh.dexLoadingProgress(
-                                _filterVisibleCount,
-                                _filteredTotalCount,
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                mainAxisSpacing: 6,
+                                crossAxisSpacing: 6,
+                                childAspectRatio: aspectRatio,
                               ),
-                              textAlign: TextAlign.center,
-                              style: SecondaryTypography.onGradient.body14
-                                  .copyWith(
-                                    color: TitoColors.card.withValues(
-                                      alpha: 0.92,
-                                    ),
-                                  ),
-                            ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final entry = visible[index];
+                            final status = dexRepository.statusFor(
+                              entry.id,
+                              _progress,
+                            );
+                            return TitoListReveal(
+                              key: ValueKey<String>(
+                                'dex-grid-entry-${entry.id}',
+                              ),
+                              enabled: _revealAnimationsEnabled,
+                              delay: _cardRevealDelay(index, columns),
+                              child: PokemonMiniCard(
+                                summary: entry,
+                                status: status,
+                                compact: DeviceLayout.isCompact(context),
+                                onLongPress: _isSaveLinked
+                                    ? null
+                                    : () => _cycleManualMark(entry.id, status),
+                              ),
+                            );
+                          }, childCount: visible.length),
+                        ),
+                      ),
+                    if (_mode == _DexMode.national &&
+                        _loadingChunk &&
+                        visible.isNotEmpty &&
+                        !dexFilterController.hasActiveFilter)
+                      SliverPadding(
+                        padding: padding.copyWith(top: 8),
+                        sliver: SliverToBoxAdapter(
+                          child: TitoDexGridSkeleton(
+                            crossAxisCount: columns,
+                            itemCount: columns,
+                            childAspectRatio: aspectRatio,
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                    if (dexFilterController.hasActiveFilter &&
+                        _filterVisibleCount < _filteredTotalCount)
+                      SliverPadding(
+                        padding: padding.copyWith(top: 8, bottom: 4),
+                        sliver: SliverToBoxAdapter(
+                          child: Text(
+                            AppZh.dexLoadingProgress(
+                              _filterVisibleCount,
+                              _filteredTotalCount,
+                            ),
+                            textAlign: TextAlign.center,
+                            style: SecondaryTypography.onGradient.body14
+                                .copyWith(
+                                  color: TitoColors.card.withValues(
+                                    alpha: 0.92,
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          Positioned(
-            right: padding.right,
-            bottom: 16,
-            child: IgnorePointer(
-              ignoring: !_showScrollToTop,
-              child: AnimatedOpacity(
-                opacity: _showScrollToTop ? 1 : 0,
-                duration: const Duration(milliseconds: 180),
-                child: Semantics(
-                  button: true,
-                  label: '回到图鉴顶部',
-                  child: Material(
-                    color: TitoColors.softYellow,
-                    shape: const CircleBorder(
-                      side: BorderSide(color: TitoColors.ink, width: 2),
-                    ),
-                    child: InkWell(
-                      onTap: _scrollToTop,
-                      customBorder: const CircleBorder(),
-                      child: const SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: Icon(
-                          Icons.vertical_align_top_rounded,
-                          color: TitoColors.deepBlue,
-                        ),
+            ),
+          ],
+        ),
+        Positioned(
+          right: padding.right,
+          bottom: 16,
+          child: IgnorePointer(
+            ignoring: !_showScrollToTop,
+            child: AnimatedOpacity(
+              opacity: _showScrollToTop ? 1 : 0,
+              duration: const Duration(milliseconds: 180),
+              child: Semantics(
+                button: true,
+                label: '回到图鉴顶部',
+                child: Material(
+                  color: TitoColors.softYellow,
+                  shape: const CircleBorder(
+                    side: BorderSide(color: TitoColors.ink, width: 2),
+                  ),
+                  child: InkWell(
+                    onTap: _scrollToTop,
+                    customBorder: const CircleBorder(),
+                    child: const SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Icon(
+                        Icons.vertical_align_top_rounded,
+                        color: TitoColors.deepBlue,
                       ),
                     ),
                   ),
@@ -908,8 +1033,8 @@ class _DexPageState extends State<DexPage> {
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -1072,17 +1197,19 @@ class _DexTopBarAction extends StatelessWidget {
 class _DexScopeBar extends StatelessWidget {
   const _DexScopeBar({
     required this.mode,
-    required this.region,
+    required this.browseScope,
     required this.scopeStats,
     required this.journeyCount,
+    required this.availabilityLoading,
     required this.onModeSelected,
     required this.onNationalRegionPicker,
   });
 
   final _DexMode mode;
-  final DexRegionalPokedex region;
+  final DexBrowseScope browseScope;
   final DexScopeStats scopeStats;
   final int journeyCount;
+  final bool availabilityLoading;
   final ValueChanged<_DexMode> onModeSelected;
   final VoidCallback onNationalRegionPicker;
 
@@ -1093,11 +1220,14 @@ class _DexScopeBar extends StatelessWidget {
         Expanded(
           child: _DexModeTab(
             selected: mode == _DexMode.national,
-            title: AppZh.dexRegionalDexTitle(regionalPokedexLabelZh(region)),
+            title: browseScope.titleZh,
             subtitle: AppZh.dexScopeProgress(
               scopeStats.caught,
               scopeStats.seen,
               scopeStats.total,
+              evolutionOrTrade: availabilityLoading
+                  ? null
+                  : scopeStats.evolutionOrTradeOnly,
             ),
             count: scopeStats.total,
             showRegionPicker: true,
@@ -1124,10 +1254,12 @@ class _DexScopeBar extends StatelessWidget {
 class _DexEncounterFilterBar extends StatelessWidget {
   const _DexEncounterFilterBar({
     required this.filter,
+    required this.availabilityLoading,
     required this.onSelected,
   });
 
   final DexEncounterFilter filter;
+  final bool availabilityLoading;
   final ValueChanged<DexEncounterFilter> onSelected;
 
   static const _order = [
@@ -1135,6 +1267,7 @@ class _DexEncounterFilterBar extends StatelessWidget {
     DexEncounterFilter.seen,
     DexEncounterFilter.caught,
     DexEncounterFilter.unseen,
+    DexEncounterFilter.evolutionOrTrade,
   ];
 
   static const _labels = {
@@ -1142,6 +1275,7 @@ class _DexEncounterFilterBar extends StatelessWidget {
     DexEncounterFilter.seen: AppZh.dexFilterSeen,
     DexEncounterFilter.caught: AppZh.dexFilterCaught,
     DexEncounterFilter.unseen: AppZh.dexFilterUnseen,
+    DexEncounterFilter.evolutionOrTrade: AppZh.dexFilterEvolutionOrTrade,
   };
 
   @override
@@ -1152,7 +1286,11 @@ class _DexEncounterFilterBar extends StatelessWidget {
           if (entry != _order.first) const SizedBox(width: 5),
           Expanded(
             child: _DexFilterChip(
-              label: _labels[entry]!,
+              label:
+                  availabilityLoading &&
+                      entry == DexEncounterFilter.evolutionOrTrade
+                  ? AppZh.dexFilterCalculating
+                  : _labels[entry]!,
               selected: filter == entry,
               onTap: () => onSelected(entry),
             ),

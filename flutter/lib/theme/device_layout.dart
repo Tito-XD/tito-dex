@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'tito_colors.dart';
-import 'tito_font_scale.dart';
 
 /// Layout helpers for real Android/iOS/Linux devices vs web preview frame.
 abstract final class DeviceLayout {
@@ -209,17 +208,16 @@ abstract final class DeviceLayout {
   }
 
   static double uiScale(BuildContext context) {
-    final scope = TitoFontScale.maybeOf(context);
-    if (scope != null) {
-      return scope.multiplier;
-    }
     if (isNativeTarget || useSquareDashboard(context)) {
       return handheldUiScale;
     }
     return 1.0;
   }
 
-  static double fontMultiplier(BuildContext context) => uiScale(context);
+  /// Typography now has explicit Home and secondary-page tokens. Layout
+  /// scaling remains handheld-aware, but body text no longer changes through
+  /// an inherited per-route multiplier.
+  static double fontMultiplier(BuildContext context) => 1.0;
 
   /// Scale layout values that were sized for v0.2.18's 2× handheld chrome.
   static double dim(BuildContext context, double at2xHandheld) {
