@@ -102,6 +102,34 @@ class DexOfflineService {
   Future<bool> hasApkBundledOfflinePack() =>
       _assetSeedInstaller.hasBundledArchive();
 
+  Future<bool> needsApkBundledOfflineSeed() => _assetSeedInstaller.needsSeed();
+
+  /// Makes an Offline APK's bundled seed usable before a foreground read.
+  ///
+  /// App startup normally installs the seed in the background. If the user
+  /// opens a reference page while that first install is still running, wait
+  /// for the same local operation instead of beginning a CDN timeout chain.
+  Future<bool> ensureApkBundledOfflinePackReady({
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
+    if (await isReady()) {
+      return true;
+    }
+    if (!await hasApkBundledOfflinePack()) {
+      return false;
+    }
+    if (!_downloading) {
+      await for (final _ in seedFromApkAssetIfNeeded()) {}
+      return isReady();
+    }
+
+    final deadline = DateTime.now().add(timeout);
+    while (_downloading && DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    return isReady();
+  }
+
   bool _downloading = false;
   bool _cancelRequested = false;
   DexCacheProgress? _progress;
@@ -265,17 +293,19 @@ class DexOfflineService {
       return entries;
     }
     final root = await _store.rootPath();
-    return entries.map((entry) {
-      final slug = entry['slug'];
-      final spriteUrl = entry['spriteUrl'];
-      if (slug is String &&
-          spriteUrl is String &&
-          spriteUrl.startsWith('http') &&
-          slugs.contains(slug)) {
-        return {...entry, 'spriteUrl': '$root/item-sprites/$slug.png'};
-      }
-      return entry;
-    }).toList(growable: false);
+    return entries
+        .map((entry) {
+          final slug = entry['slug'];
+          final spriteUrl = entry['spriteUrl'];
+          if (slug is String &&
+              spriteUrl is String &&
+              spriteUrl.startsWith('http') &&
+              slugs.contains(slug)) {
+            return {...entry, 'spriteUrl': '$root/item-sprites/$slug.png'};
+          }
+          return entry;
+        })
+        .toList(growable: false);
   }
 
   Future<Map<int, CachedAbility>> readAbilitiesIndex() async {
@@ -489,33 +519,9 @@ class DexOfflineService {
           detail.evolutionChain,
         );
         final localizedForms = await _localizeFormSprites(detail.forms, id);
-        final localizedDetail = PokemonDetail(
+        final localizedDetail = detail.withResolvedSprites(
           summary: summary,
-          genusZh: detail.genusZh,
-          heightDm: detail.heightDm,
-          weightHg: detail.weightHg,
-          weaknesses: detail.weaknesses,
-          resistances: detail.resistances,
-          immunities: detail.immunities,
-          stabSuperEffective: detail.stabSuperEffective,
           evolutionChain: localizedEvolution,
-          johtoDexNumber: detail.johtoDexNumber,
-          baseStats: detail.baseStats,
-          typeMultipliers: detail.typeMultipliers,
-          flavorEntries: detail.flavorEntries,
-          obtainLocations: detail.obtainLocations,
-          obtainLocationsByGame: detail.obtainLocationsByGame,
-          obtainLocationsByVersion: detail.obtainLocationsByVersion,
-          abilities: detail.abilities,
-          abilitiesByGame: detail.abilitiesByGame,
-          moveSet: detail.moveSet,
-          moveSets: detail.moveSets,
-          baseHappiness: detail.baseHappiness,
-          captureRate: detail.captureRate,
-          evYield: detail.evYield,
-          genderFemalePercent: detail.genderFemalePercent,
-          eggGroups: detail.eggGroups,
-          hatchCounter: detail.hatchCounter,
           forms: localizedForms,
         );
 
@@ -753,18 +759,9 @@ class DexOfflineService {
       }
     }
 
-    return EvolutionNode(
-      id: node.id,
-      nameEn: node.nameEn,
-      nameZh: node.nameZh,
-      spriteUrl: node.spriteUrl,
-      artworkUrl: node.artworkUrl,
+    return node.withResolvedTree(
       localSpritePath: spritePath,
-      evolvesFrom: node.evolvesFrom,
-      triggerZh: node.triggerZh,
-      triggers: node.triggers,
       children: localizedChildren,
-      formKey: node.formKey,
     );
   }
 
@@ -806,39 +803,10 @@ class DexOfflineService {
       }
       forms.add(resolved);
     }
-    return PokemonDetail(
+    return detail.withResolvedSprites(
       summary: summary,
-      genusZh: detail.genusZh,
-      heightDm: detail.heightDm,
-      weightHg: detail.weightHg,
-      weaknesses: detail.weaknesses,
-      resistances: detail.resistances,
-      immunities: detail.immunities,
-      stabSuperEffective: detail.stabSuperEffective,
       evolutionChain: evolution,
-      johtoDexNumber: detail.johtoDexNumber,
-      baseStats: detail.baseStats,
-      typeMultipliers: detail.typeMultipliers,
-      flavorEntries: detail.flavorEntries,
-      obtainLocations: detail.obtainLocations,
-      obtainLocationsByGame: detail.obtainLocationsByGame,
-      obtainLocationsByVersion: detail.obtainLocationsByVersion,
-      abilities: detail.abilities,
-      abilitiesByGame: detail.abilitiesByGame,
-      moveSet: detail.moveSet,
-      moveSets: detail.moveSets,
-      baseHappiness: detail.baseHappiness,
-      captureRate: detail.captureRate,
-      evYield: detail.evYield,
-      genderFemalePercent: detail.genderFemalePercent,
-      eggGroups: detail.eggGroups,
-      hatchCounter: detail.hatchCounter,
       forms: forms,
-      growthRateSlug: detail.growthRateSlug,
-      habitatSlug: detail.habitatSlug,
-      hasGenderDifferences: detail.hasGenderDifferences,
-      heldItems: detail.heldItems,
-      baseExperience: detail.baseExperience,
     );
   }
 
@@ -866,19 +834,7 @@ class DexOfflineService {
         children.add(localized);
       }
     }
-    return EvolutionNode(
-      id: node.id,
-      nameEn: node.nameEn,
-      nameZh: node.nameZh,
-      spriteUrl: node.spriteUrl,
-      artworkUrl: node.artworkUrl,
-      localSpritePath: absolute,
-      evolvesFrom: node.evolvesFrom,
-      triggerZh: node.triggerZh,
-      triggers: node.triggers,
-      children: children,
-      formKey: node.formKey,
-    );
+    return node.withResolvedTree(localSpritePath: absolute, children: children);
   }
 }
 

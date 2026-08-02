@@ -46,6 +46,52 @@ void main() {
     expect(multipliers['water'], 1);
   });
 
+  test('sprite resolution preserves species-level reference fields', () {
+    const detail = PokemonDetail(
+      summary: PokemonSummary(
+        id: 1,
+        nameEn: 'Bulbasaur',
+        nameZh: '妙蛙种子',
+        types: ['grass', 'poison'],
+      ),
+      genusZh: '种子宝可梦',
+      heightDm: 7,
+      weightHg: 69,
+      weaknesses: [],
+      resistances: [],
+      immunities: [],
+      stabSuperEffective: [],
+      evolutionChain: null,
+      growthRateSlug: 'medium-slow',
+      habitatSlug: 'grassland',
+      hasGenderDifferences: true,
+      heldItems: [PokemonHeldItem(slug: 'oran-berry', maxRarity: 5)],
+      baseExperience: 64,
+    );
+    const resolvedSummary = PokemonSummary(
+      id: 1,
+      nameEn: 'Bulbasaur',
+      nameZh: '妙蛙种子',
+      types: ['grass', 'poison'],
+      localSpritePath: '/data/dex_offline/sprites/1.png',
+    );
+    const chain = EvolutionNode(id: 1, nameEn: 'Bulbasaur', nameZh: '妙蛙种子');
+
+    final resolved = detail.withResolvedSprites(
+      summary: resolvedSummary,
+      evolutionChain: chain,
+      forms: const [],
+    );
+
+    expect(resolved.summary, same(resolvedSummary));
+    expect(resolved.evolutionChain, same(chain));
+    expect(resolved.growthRateSlug, detail.growthRateSlug);
+    expect(resolved.habitatSlug, detail.habitatSlug);
+    expect(resolved.hasGenderDifferences, detail.hasGenderDifferences);
+    expect(resolved.heldItems, same(detail.heldItems));
+    expect(resolved.baseExperience, detail.baseExperience);
+  });
+
   test('obtain locations retain exact version encounter details', () {
     final entry = ObtainLocationEntry.fromJson({
       'areaSlug': 'route-3-area',
