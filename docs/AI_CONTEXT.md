@@ -4,10 +4,10 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) |
-| **`main` / lite source** | `0.8.1+126` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.1-offline+127` — APK-bundled verified v13 archive |
-| **Offline dex bundle** | **v13** live — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
+| **Latest release** | [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) |
+| **`main` / lite source** | `0.8.2+134` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.2-offline+135` — APK-bundled verified compact v14 archive |
+| **Offline dex bundle** | **v13** live on CDN; Offline APK embeds compact **v14** — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.1)
+## Current feature status (latest release line: v0.8.2)
 
-> `main` tracks the v0.8.1 release line. Lite downloads bundle v13 when requested; Offline embeds the verified v13 archive.
+> `main` tracks the v0.8.2 release line. Lite downloads live bundle v13 when requested; Offline embeds the verified compact v14 archive.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -52,9 +52,10 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
 - **23 game editions**, **11 regional dexes**, `DexScope` filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
+- Offline APK first install/upgrade shows a blocking local preparation dialog with continuous percentage across read → SHA-256 → decompress → extract → index. Lite and already-ready Offline installs never show it.
 - Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
 - **Per-form evolution chains** (bundle v13+): regional / cloak splits prune to the real line (洗翠卡蒂狗 → 洗翠风速狗) with form sprites. Older installs fall back to the in-app `kFormEvolutionTargets` table via `EvolutionNode.filteredForForm`. Offline loading absolutizes `sprites/forms/…` paths on `forms[].evolutionChain`.
-- **Species filter sheet icons:** body-style chips use vector HOME-style silhouettes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
+- **Species filter sheet icons:** body-style chips use original vector creature marks that preserve the recognisable HOME poses and white eyes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
 
@@ -76,6 +77,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
 ### Latest release-line highlights
+- v0.8.2: Lite and Offline show continuous weighted progress across manifest/read, download, verification, decompression, extraction and indexing; Offline uses the compact v14 archive (48.7% smaller than v13); offline references load local-first; HOME-style body-filter icons are redrawn for clearer silhouettes.
 - v0.8.1: form-aware evolution chains show the matching regional line with form sprites; body-style / size filter chips gain APK-local vector icons; Offline embeds dex bundle v13.
 - v0.8.0: curated items hub (542 items, Bulbapedia-style categories, icons) and dex list animation polish.
 - v0.7.16: unified game icons — Gen VI+ uses Pokémon HOME game icons, Gen I–V uses DS/3DS launch icons (SteamGridDB), white-2/mega-dimension use Pokémon artwork badges; form sprites in bundle v10 are clear official artwork (were pixelated), offline form caching prefers artwork; predictive-back rework — content stays opaque during the drag, underlying pages stay static, and a gesture-runway clamp keeps the commit fade playing even after a full-edge drag.
@@ -139,7 +141,7 @@ flutter/lib/
 
 **Dex offline dir** (`dex_offline/` in app documents): mirrors CDN bundle — see [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md).
 
-**Load order for reference data:** `dex_offline/` → APK `assets/` fallback.
+**Reference-data priority:** a complete/preferred offline install reads `dex_offline/` first and only uses CDN for a missing file; Lite reads CDN first and falls back to any local cache. The Offline APK seed is installed into `dex_offline/` before it is used.
 
 ---
 
@@ -158,7 +160,8 @@ Historical `/v5/` patches on the same prefix: v7 media → v8 form artwork → v
 - **Do not** paste production CDN URLs in public README / release notes.
 - **Bundle version and CDN prefix are decoupled.** Every release since v7 patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
 - Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base).
-- Incremental v13 build: `python3 tools/patch_dex_bundle_v13_form_evolution.py` (live v12 archive as read-only base; no PokeAPI). CI: **Patch and Publish Dex Bundle v13**.
+- Incremental v13 build: `python3 tools/patch_dex_bundle_v13_form_evolution.py` (live v12 archive as read-only base; no PokeAPI). The completed one-shot v12/v13 workflows live under `docs/archive/workflows/`; future releases need a new workflow with the current production version as an explicit precondition.
+- v14 compact-media candidate: `python3 tools/patch_dex_bundle_v14_compact_media.py`. It byte-compares all 1,340 `artwork/` files against their `sprites/` peers before removing only the duplicate archive copies; loose online artwork remains in R2. The new archive key is `/v5/bundle-v14.tar.zst`, so publishing it never overwrites the live v13 archive. Local prerelease result: 106,743,740 → 54,746,615 bytes (−48.7%).
 - **Slugs ship, labels do not.** Body style / colour / growth rate / habitat ride in the bundle as slugs; their Chinese labels live in `flutter/lib/features/dex/dex_search_terms.dart` (and form-suffix labels in `form_evolution_targets.dart`).
 - Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`. Clients only upgrade when `remote.bundleVersion > local.version`.
 - Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.

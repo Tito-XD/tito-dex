@@ -793,48 +793,21 @@ class PokemonFormDetail {
     );
   }
 
-  PokemonFormDetail withLocalSpritePath(String? path) => PokemonFormDetail(
-    key: key,
-    pokemonId: pokemonId,
-    formId: formId,
-    nameEn: nameEn,
-    nameZh: nameZh,
-    formNameZh: formNameZh,
-    formGroup: formGroup,
-    kind: kind,
-    isDefault: isDefault,
-    isBattleOnly: isBattleOnly,
-    isMega: isMega,
-    isCosmetic: isCosmetic,
-    introducedVersionGroup: introducedVersionGroup,
-    availableVersionGroups: availableVersionGroups,
-    obtainableVersionGroups: obtainableVersionGroups,
-    obtainable: obtainable,
-    eventOnly: eventOnly,
-    deprecated: deprecated,
-    inheritsFromDefault: inheritsFromDefault,
-    dataCompleteness: dataCompleteness,
-    sources: sources,
-    types: types,
-    heightDm: heightDm,
-    weightHg: weightHg,
-    spriteUrl: spriteUrl,
-    artworkUrl: artworkUrl,
+  PokemonFormDetail withLocalSpritePath(String? path) => _withResolvedAssets(
     localSpritePath: path,
-    spriteUrlsByVersion: spriteUrlsByVersion,
-    animatedSpriteUrl: animatedSpriteUrl,
-    baseStats: baseStats,
-    typeMultipliers: typeMultipliers,
-    stabSuperEffective: stabSuperEffective,
-    abilities: abilities,
-    abilitiesByGame: abilitiesByGame,
-    obtainLocationsByGame: obtainLocationsByGame,
-    obtainLocationsByVersion: obtainLocationsByVersion,
-    moveSets: moveSets,
     evolutionChain: evolutionChain,
   );
 
-  PokemonFormDetail withEvolutionChain(EvolutionNode? chain) => PokemonFormDetail(
+  PokemonFormDetail withEvolutionChain(EvolutionNode? chain) =>
+      _withResolvedAssets(
+        localSpritePath: localSpritePath,
+        evolutionChain: chain,
+      );
+
+  PokemonFormDetail _withResolvedAssets({
+    required String? localSpritePath,
+    required EvolutionNode? evolutionChain,
+  }) => PokemonFormDetail(
     key: key,
     pokemonId: pokemonId,
     formId: formId,
@@ -872,7 +845,7 @@ class PokemonFormDetail {
     obtainLocationsByGame: obtainLocationsByGame,
     obtainLocationsByVersion: obtainLocationsByVersion,
     moveSets: moveSets,
-    evolutionChain: chain,
+    evolutionChain: evolutionChain,
   );
 
   Map<String, dynamic> toJson() => {
@@ -1139,6 +1112,48 @@ class PokemonDetail {
     }
     return forms.isEmpty ? null : forms.first;
   }
+
+  /// Replace only paths resolved by the offline cache while preserving every
+  /// species field. Keeping this copy in the model prevents cache adapters from
+  /// silently dropping newly added fields when [PokemonDetail] grows.
+  PokemonDetail withResolvedSprites({
+    required PokemonSummary summary,
+    required EvolutionNode? evolutionChain,
+    required List<PokemonFormDetail> forms,
+  }) => PokemonDetail(
+    summary: summary,
+    genusZh: genusZh,
+    heightDm: heightDm,
+    weightHg: weightHg,
+    weaknesses: weaknesses,
+    resistances: resistances,
+    immunities: immunities,
+    stabSuperEffective: stabSuperEffective,
+    evolutionChain: evolutionChain,
+    johtoDexNumber: johtoDexNumber,
+    baseStats: baseStats,
+    typeMultipliers: typeMultipliers,
+    flavorEntries: flavorEntries,
+    obtainLocations: obtainLocations,
+    obtainLocationsByGame: obtainLocationsByGame,
+    obtainLocationsByVersion: obtainLocationsByVersion,
+    abilities: abilities,
+    abilitiesByGame: abilitiesByGame,
+    moveSet: moveSet,
+    moveSets: moveSets,
+    baseHappiness: baseHappiness,
+    captureRate: captureRate,
+    evYield: evYield,
+    genderFemalePercent: genderFemalePercent,
+    eggGroups: eggGroups,
+    hatchCounter: hatchCounter,
+    forms: forms,
+    growthRateSlug: growthRateSlug,
+    habitatSlug: habitatSlug,
+    hasGenderDifferences: hasGenderDifferences,
+    heldItems: heldItems,
+    baseExperience: baseExperience,
+  );
 
   /// Reuse the existing detail widgets with form-dependent battle data.
   PokemonDetail forForm(PokemonFormDetail form) {
@@ -1585,7 +1600,9 @@ class PokemonHeldItem {
     return PokemonHeldItem(
       slug: json['slug'] as String? ?? '',
       rarityByVersion:
-          rarityRaw?.map((key, value) => MapEntry(key, (value as num).toInt())) ??
+          rarityRaw?.map(
+            (key, value) => MapEntry(key, (value as num).toInt()),
+          ) ??
           const {},
       maxRarity: (json['maxRarity'] as num?)?.toInt() ?? 0,
     );
@@ -1664,14 +1681,20 @@ class EvolutionNode {
   ///
   /// A chain that already carries [formKey] came from the bundle already
   /// resolved for the form, and is returned untouched.
-  EvolutionNode filteredForForm(String? selectedFormKey, {String? rootSpritePath}) {
+  EvolutionNode filteredForForm(
+    String? selectedFormKey, {
+    String? rootSpritePath,
+  }) {
     if (selectedFormKey == null || formKey != null) return this;
     final rootKey = _rootFormKey(selectedFormKey);
     if (rootKey == null) return this;
     final root = rootKey == nameEn.toLowerCase()
         ? this
-        : _asVariant(rootKey.substring(nameEn.length + 1), rootKey,
-            spritePath: rootKey == selectedFormKey ? rootSpritePath : null);
+        : _asVariant(
+            rootKey.substring(nameEn.length + 1),
+            rootKey,
+            spritePath: rootKey == selectedFormKey ? rootSpritePath : null,
+          );
     return root._withFormTargets(rootKey);
   }
 
@@ -1738,6 +1761,7 @@ class EvolutionNode {
   EvolutionNode _copyWith({
     String? nameZh,
     String? localSpritePath,
+    bool replaceLocalSpritePath = false,
     String? formKey,
     List<EvolutionNode>? children,
   }) => EvolutionNode(
@@ -1746,7 +1770,9 @@ class EvolutionNode {
     nameZh: nameZh ?? this.nameZh,
     spriteUrl: spriteUrl,
     artworkUrl: artworkUrl,
-    localSpritePath: localSpritePath ?? this.localSpritePath,
+    localSpritePath: replaceLocalSpritePath
+        ? localSpritePath
+        : localSpritePath ?? this.localSpritePath,
     evolvesFrom: evolvesFrom,
     triggerZh: triggerZh,
     triggers: triggers,
@@ -1789,6 +1815,15 @@ class EvolutionNode {
 
   EvolutionNode copyWithLocalSprite(String path) =>
       _copyWith(localSpritePath: path);
+
+  EvolutionNode withResolvedTree({
+    required String? localSpritePath,
+    required List<EvolutionNode> children,
+  }) => _copyWith(
+    localSpritePath: localSpritePath,
+    replaceLocalSpritePath: true,
+    children: children,
+  );
 }
 
 /// One structured evolution condition.

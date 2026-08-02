@@ -14,9 +14,7 @@ genus at all.  v12:
      baseExperience to each detail,
   4. adds the structured `triggers` array to evolution nodes so trade evolutions
      are decidable without parsing the `triggerZh` display string,
-  5. gives every non-cosmetic form its own `evolutionChain`, so 洗翠卡蒂狗 shows
-     洗翠风速狗 instead of an empty card (tools/form_evolution_chains.py),
-  6. bumps the manifest to 12 and lays out an upload tree.
+  5. bumps the manifest to 12 and lays out an upload tree.
 
 Labels are deliberately absent: only slugs ship.  CDN objects are immutable per
 prefix, so a Chinese label baked in here could not be corrected without a
@@ -65,7 +63,6 @@ from build_dex_bundle import (  # noqa: E402
     species_tags,
 )
 from build_location_index import LocationIndexBuilder  # noqa: E402
-from form_evolution_chains import apply_form_evolution_chains  # noqa: E402
 
 BASE_VERSION = 11
 BUNDLE_VERSION = 12
@@ -332,25 +329,6 @@ def build(args: argparse.Namespace) -> None:
                 f"(cache {cache.hits} hit / {cache.misses} miss)",
                 flush=True,
             )
-
-    # 1b. Per-form evolution chains.  Runs after the loop because a form's
-    # chain is assembled from the *target* species' form entries — 洗翠卡蒂狗
-    # needs 风速狗's Hisuian sprite, which lives in details/59.json.
-    form_chains, form_chain_problems = apply_form_evolution_chains(
-        details_dir,
-        compact=True,
-        species_ids=[int(path.stem) for path in detail_paths]
-        if args.limit
-        else None,
-    )
-    for problem in form_chain_problems:
-        print(f"  warn: {problem}", file=sys.stderr)
-    if form_chain_problems:
-        raise ValueError(
-            f"{len(form_chain_problems)} form evolution chains could not be "
-            "resolved; fix tools/form_evolution_chains.py before publishing"
-        )
-    print(f"Wrote {form_chains} per-form evolution chains.", flush=True)
 
     # 2. The two other places the same summaries are stored.
     for filename, mutate in (

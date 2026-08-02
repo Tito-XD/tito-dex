@@ -31,13 +31,19 @@ class DexBundleInstaller {
   Stream<DexCacheProgress> install({DexBundleManifest? manifest}) async* {
     yield _progress(
       phase: 'cdn_manifest',
-      current: 1,
+      current: 0,
       total: 1,
       label: 'bundle-manifest.json',
     );
 
     final bundleManifest =
         manifest ?? await _config.fetchManifest(client: _http);
+    yield _progress(
+      phase: 'cdn_manifest',
+      current: 1,
+      total: 1,
+      label: 'bundle-manifest.json',
+    );
 
     final totalBytes = bundleManifest.archiveSizeBytes > 0
         ? bundleManifest.archiveSizeBytes
@@ -82,7 +88,7 @@ class DexBundleInstaller {
     if (verifySha256) {
       yield _progress(
         phase: '${progressPrefix}_verify',
-        current: 1,
+        current: 0,
         total: 1,
         label: 'SHA-256',
       );
@@ -95,6 +101,13 @@ class DexBundleInstaller {
           );
         }
       }
+
+      yield _progress(
+        phase: '${progressPrefix}_verify',
+        current: 1,
+        total: 1,
+        label: 'SHA-256',
+      );
     }
 
     yield _progress(
@@ -134,7 +147,7 @@ class DexBundleInstaller {
           phase: '${progressPrefix}_extract',
           current: i + 1,
           total: fileCount,
-          label: null,
+          label: entry.name,
         );
       }
     }

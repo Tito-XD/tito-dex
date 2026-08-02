@@ -68,10 +68,7 @@ void main() {
     194,
     'Wooper',
     '乌波',
-    children: [
-      _node(195, 'Quagsire', '沼王'),
-      _node(980, 'Clodsire', '土王'),
-    ],
+    children: [_node(195, 'Quagsire', '沼王'), _node(980, 'Clodsire', '土王')],
   );
   final growlitheChain = _node(
     58,
@@ -131,10 +128,9 @@ void main() {
     });
 
     test('the default 乌波 keeps only 沼王', () {
-      expect(
-        wooperChain.filteredForForm('wooper').children.map((c) => c.id),
-        [195],
-      );
+      expect(wooperChain.filteredForForm('wooper').children.map((c) => c.id), [
+        195,
+      ]);
     });
 
     test('洗翠卡蒂狗 evolves into the Hisuian 风速狗, not the ordinary one', () {
@@ -163,11 +159,14 @@ void main() {
       expect(filtered.children.single.localSpritePath, 'sprites/59.png');
     });
 
-    test('a form selected further down the chain still maps back to the root', () {
-      final filtered = growlitheChain.filteredForForm('arcanine-hisui');
-      expect(filtered.nameZh, '卡蒂狗（洗翠的样子）');
-      expect(filtered.children.single.formKey, 'arcanine-hisui');
-    });
+    test(
+      'a form selected further down the chain still maps back to the root',
+      () {
+        final filtered = growlitheChain.filteredForForm('arcanine-hisui');
+        expect(filtered.nameZh, '卡蒂狗（洗翠的样子）');
+        expect(filtered.children.single.formKey, 'arcanine-hisui');
+      },
+    );
 
     test('multi-stage regional lines stay regional the whole way down', () {
       final zigzagoon = _node(
@@ -198,17 +197,11 @@ void main() {
         412,
         'Burmy',
         '结草儿',
-        children: [
-          _node(413, 'Wormadam', '结草贵妇'),
-          _node(414, 'Mothim', '绅士蛾'),
-        ],
+        children: [_node(413, 'Wormadam', '结草贵妇'), _node(414, 'Mothim', '绅士蛾')],
       );
 
       final trash = burmy.filteredForForm('burmy-trash');
-      expect(trash.children.map((c) => c.nameZh), [
-        '结草贵妇（垃圾蓑衣）',
-        '绅士蛾',
-      ]);
+      expect(trash.children.map((c) => c.nameZh), ['结草贵妇（垃圾蓑衣）', '绅士蛾']);
     });
 
     test('an unlisted form (mega, g-max, cosmetic) keeps the whole chain', () {
@@ -268,6 +261,33 @@ void main() {
     );
     expect(absolute.displaySpritePath, absolute.localSpritePath);
   });
+
+  test(
+    'resolved tree keeps form metadata while replacing paths and children',
+    () {
+      const trigger = EvolutionTrigger(trigger: 'level-up', minLevel: 36);
+      final resolved =
+          EvolutionNode(
+            id: 59,
+            nameEn: 'Arcanine',
+            nameZh: '风速狗（洗翠的样子）',
+            spriteUrl: 'https://example.test/arcanine.png',
+            artworkUrl: 'https://example.test/arcanine-art.png',
+            localSpritePath: 'sprites/forms/10399.png',
+            triggers: const [trigger],
+            formKey: 'arcanine-hisui',
+          ).withResolvedTree(
+            localSpritePath: '/data/dex_offline/sprites/forms/10399.png',
+            children: const [],
+          );
+
+      expect(resolved.localSpritePath, startsWith('/data/dex_offline/'));
+      expect(resolved.spriteUrl, 'https://example.test/arcanine.png');
+      expect(resolved.artworkUrl, 'https://example.test/arcanine-art.png');
+      expect(resolved.triggers, const [trigger]);
+      expect(resolved.formKey, 'arcanine-hisui');
+    },
+  );
 
   test('every curated target names a form suffix the app can label', () {
     for (final entry in kFormEvolutionTargets.entries) {

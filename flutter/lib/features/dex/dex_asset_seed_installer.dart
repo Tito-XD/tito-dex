@@ -29,7 +29,9 @@ class DexAssetSeedInstaller {
 
   Future<bool> hasBundledArchive() async {
     try {
-      await _assets.load(archiveAssetPath);
+      // The sidecar is tiny and is always packaged with the archive. Checking
+      // it avoids reading the full ~55 MB asset merely to identify Offline.
+      await _assets.loadString(manifestAssetPath);
       return true;
     } catch (_) {
       return false;
@@ -68,17 +70,42 @@ class DexAssetSeedInstaller {
       label: 'bundle-manifest.json',
     );
     final sidecar = await loadSidecarManifest();
+
+    yield const DexCacheProgress(
+      phase: 'apk_seed_read',
+      current: 0,
+      total: 1,
+      label: 'bundle.tar.zst',
+    );
     final data = await _assets.load(archiveAssetPath);
     final archiveBytes = data.buffer.asUint8List(
       data.offsetInBytes,
       data.lengthInBytes,
     );
+    yield const DexCacheProgress(
+      phase: 'apk_seed_read',
+      current: 1,
+      total: 1,
+      label: 'bundle.tar.zst',
+    );
 
     if (sidecar.hasIntegrityCheck) {
+      yield const DexCacheProgress(
+        phase: 'apk_seed_verify',
+        current: 0,
+        total: 1,
+        label: 'SHA-256',
+      );
       final digest = sha256.convert(archiveBytes).toString();
       if (digest != sidecar.archiveSha256) {
         throw DexCdnException('APK bundle SHA-256 mismatch');
       }
+      yield const DexCacheProgress(
+        phase: 'apk_seed_verify',
+        current: 1,
+        total: 1,
+        label: 'SHA-256',
+      );
     }
 
     yield* _bundleInstaller.installFromArchiveBytes(

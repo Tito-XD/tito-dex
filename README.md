@@ -6,13 +6,13 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) · App `0.8.1+126` | arm64-v8a, online/CDN dex with offline download |
-| Offline APK | [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) · App `0.8.1-offline+127` | Embeds the verified v13 dex archive |
-| `main` source baseline | App `0.8.1+126` | Form evolution chains, species filter icons, items hub |
+| Lite APK | [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) · App `0.8.2+134` | arm64-v8a, online/CDN dex with detailed download progress |
+| Offline APK | [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) · App `0.8.2-offline+135` | Embeds the verified compact v14 dex archive |
+| `main` source baseline | App `0.8.2+134` | Unified data-pack progress, refreshed body-style icons, local-first references |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
-Offline dex bundle: **v13** · 1025 species · full form records · per-form evolution chains · exact-version locations · items.
+Dex data: CDN **v13** / Offline APK compact **v14** · 1025 species · full form records · per-form evolution chains · exact-version locations · items.
 
 ## Highlights
 
@@ -49,7 +49,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.8.1-lite-rg-arm64.apk`** or **`TitoDex-0.8.1-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.2-lite-rg-arm64.apk`** or **`TitoDex-0.8.2-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

@@ -392,9 +392,7 @@ class DexRepository {
     if (!filter.hasSpeciesAxis) {
       return base;
     }
-    return base
-        .where(filter.matchesSpeciesAxes)
-        .toList(growable: false);
+    return base.where(filter.matchesSpeciesAxes).toList(growable: false);
   }
 
   Future<List<int>> findPokemonWithMove(int moveId) async {
@@ -588,15 +586,35 @@ class DexRepository {
 
   /// Reference hub entries (natures, weather, items, …).
   ///
-  /// CDN first so reference enrichments (sprites, effects) are picked up
-  /// without waiting for a new offline archive build.  Falls back to the
-  /// bundled archive copy when the network is unavailable.
+  /// A complete or explicitly preferred offline bundle is read first so the
+  /// reference hub never waits for CDN timeouts in airplane mode. Lite keeps
+  /// the CDN-first path; either variant falls back to its other source when
+  /// the preferred copy is missing or unreadable.
   Future<List<Map<String, dynamic>>> getReferenceEntries(
     String filename,
   ) async {
+    var preferLocal =
+        await _offline.isReady() || await _offline.shouldPreferOffline();
+    if (!preferLocal) {
+      preferLocal = await _offline.ensureApkBundledOfflinePackReady();
+    }
+    if (preferLocal) {
+      try {
+        final offline = await _offline.readReferenceArray(filename);
+        if (offline.isNotEmpty) {
+          return offline;
+        }
+      } catch (error) {
+        debugPrint('DexRepository: offline $filename unreadable: $error');
+      }
+    }
+
     try {
       return await _cdn.fetchReferenceArray(filename);
-    } catch (_) {
+    } catch (error) {
+      if (preferLocal) {
+        return const [];
+      }
       final offline = await _offline.readReferenceArray(filename);
       return offline;
     }

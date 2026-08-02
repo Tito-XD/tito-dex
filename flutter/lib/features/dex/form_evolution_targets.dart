@@ -18,7 +18,7 @@
 /// app ships labels.
 ///
 /// Bundle v13+ carries a per-form `evolutionChain` built from the mirror of
-/// this table in `tools/form_evolution_targets.py`, with real form sprites.
+/// this table in `tools/form_evolution_chains.py`, with real form sprites.
 /// This table stays as the fallback for installs still on an older bundle;
 /// `tools/test_form_evolution_targets.py` fails if the two drift apart.
 library;

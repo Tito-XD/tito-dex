@@ -1,4 +1,5 @@
 name: Patch and Publish Dex Bundle v13
+# Historical record only. This file is outside .github/workflows on purpose.
 
 on:
   workflow_dispatch:

@@ -1,4 +1,3 @@
-@Tags(['preview'])
 library;
 
 import 'dart:io';
@@ -14,7 +13,7 @@ import 'package:titodex/widgets/dex_shape_icon.dart';
 /// agent) can look at them. Not a golden test — nothing here asserts pixels.
 ///
 /// Run with:
-/// `SHAPE_ICON_PREVIEW_PATH=… flutter test test/shape_icon_preview_test.dart --tags preview`
+/// `SHAPE_ICON_PREVIEW_PATH=… flutter test tool/shape_icon_preview_test.dart`
 void main() {
   testWidgets('render shape and size icon sheet', (tester) async {
     final key = GlobalKey();
@@ -54,10 +53,7 @@ void main() {
                                 dexShapeLabelZh(slug) ?? slug,
                                 style: const TextStyle(fontSize: 11),
                               ),
-                              Text(
-                                slug,
-                                style: const TextStyle(fontSize: 9),
-                              ),
+                              Text(slug, style: const TextStyle(fontSize: 9)),
                             ],
                           ),
                         ),

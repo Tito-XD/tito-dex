@@ -9,6 +9,7 @@ import io
 import json
 import tarfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 import zstandard
 
@@ -27,7 +28,12 @@ def verify(upload_dir: Path) -> None:
     cdn_prefix = str(root["cdnPrefix"])
     versioned = upload_dir / cdn_prefix
     manifest = json.loads((versioned / "manifest.json").read_text(encoding="utf-8"))
-    archive = versioned / "bundle.tar.zst"
+    archive_path = Path(urlparse(str(root["archiveUrl"])).path)
+    assert archive_path.parent.name == cdn_prefix, root
+    assert archive_path.name.startswith("bundle") and archive_path.name.endswith(
+        ".tar.zst"
+    ), root
+    archive = versioned / archive_path.name
 
     assert bundle_version >= 6, root
     # v7+ patches in place over /v5/; earlier releases used v{bundle_version - 2}.
@@ -37,6 +43,7 @@ def verify(upload_dir: Path) -> None:
     assert root["complete"] is True, root
     assert root["exactVersionLocations"] is True, root
     assert root["archiveSha256"] == sha256(archive), "archive SHA-256 mismatch"
+    assert root["archiveSizeBytes"] == archive.stat().st_size, root
     assert manifest["version"] == bundle_version, manifest
     assert manifest["pokemonCount"] == 1025, manifest
     assert manifest["complete"] is True, manifest

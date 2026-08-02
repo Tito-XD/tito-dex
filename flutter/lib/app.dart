@@ -10,6 +10,7 @@ import 'features/game/game_catalog.dart';
 import 'features/game/game_edition_repository.dart';
 import 'features/game/journey_capability.dart';
 import 'features/dex/dex_offline_service.dart';
+import 'features/dex/dex_models.dart';
 import 'features/dex/dex_repository.dart';
 import 'features/dex/dex_settings_repository.dart';
 import 'features/dex/dex_update_service.dart';
@@ -49,6 +50,7 @@ import 'widgets/handheld_input.dart';
 import 'widgets/offline_data_prompt.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
+import 'widgets/tito_progress_dialog.dart';
 
 class TitoDexApp extends StatefulWidget {
   const TitoDexApp({super.key});
@@ -65,6 +67,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   final _journeyIo = const JourneyIo();
   final _emulatorChoiceRefresh = ValueNotifier<EmulatorAppChoice?>(null);
   final _settingsRefresh = ValueNotifier<int>(0);
+  final _rootNavigatorKey = GlobalKey<NavigatorState>();
   late final GoRouter _router;
   CurrentJourney _journey = CurrentJourney.mock();
   SaveFileConfig _saveConfig = const SaveFileConfig();
@@ -77,6 +80,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     ZhCatalog.instance.ensureLoaded();
     AppConfig.instance.ensureLoaded();
     _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
       refreshListenable: Listenable.merge([
         gameEditionRepository,
         _BootstrapGate.instance,
@@ -390,12 +394,33 @@ class _TitoDexAppState extends State<TitoDexApp> {
     return migrated;
   }
 
-  /// Data preparation intentionally happens outside the home bootstrap UI.
-  /// A legacy bundle may need one catalog migration; it must never make the
-  /// home progress animation loop or block the rest of the app from opening.
+  /// Data preparation happens after Home is ready. Lite remains entirely in
+  /// the background; Offline shows progress only while its bundled archive is
+  /// being installed for the first time (or upgraded to a newer bundle).
   Future<void> _prepareDexAfterHomeIsReady() async {
     try {
-      await for (final _ in dexOfflineService.seedFromApkAssetIfNeeded()) {}
+      if (await dexOfflineService.needsApkBundledOfflineSeed()) {
+        final navigationContext = _rootNavigatorKey.currentContext;
+        if (navigationContext != null && navigationContext.mounted) {
+          await trackWhileDownloading(
+            context: navigationContext,
+            title: AppZh.offlineSeedProgressTitle,
+            showCancel: false,
+            onCancel: () {},
+            download: (onProgress) async {
+              DexCacheProgress? latest;
+              await for (final progress
+                  in dexOfflineService.seedFromApkAssetIfNeeded()) {
+                latest = progress;
+                onProgress(progress);
+              }
+              return latest;
+            },
+          );
+        } else {
+          await for (final _ in dexOfflineService.seedFromApkAssetIfNeeded()) {}
+        }
+      }
       if (await dexOfflineService.isReady()) {
         if (!await dexOfflineService.hasCatalog()) {
           await dexOfflineService.ensureCatalog();
@@ -419,21 +444,25 @@ class _TitoDexAppState extends State<TitoDexApp> {
     if (!mounted) {
       return;
     }
+    final navigationContext = _rootNavigatorKey.currentContext;
+    if (navigationContext == null || !navigationContext.mounted) {
+      return;
+    }
 
     final offlineReady = await dexOfflineService.isReady();
     if (!offlineReady) {
-      if (mounted) {
-        await showOfflineDataPrompt(context);
+      if (mounted && navigationContext.mounted) {
+        await showOfflineDataPrompt(navigationContext);
       }
       return;
     }
 
     try {
       final updateInfo = await dexUpdateService.checkForUpdates();
-      if (!mounted || !updateInfo.hasUpdate) {
+      if (!mounted || !navigationContext.mounted || !updateInfo.hasUpdate) {
         return;
       }
-      await showUpdateAvailableDialog(context);
+      await showUpdateAvailableDialog(navigationContext);
     } catch (_) {
       // Network unavailable — skip silently.
     }

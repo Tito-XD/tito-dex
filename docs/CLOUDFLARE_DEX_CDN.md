@@ -1,4 +1,4 @@
-# TitoDex 图鉴 CDN 与 bundle v13
+# TitoDex 图鉴 CDN：v13 生产 / v14 紧凑包候选
 
 > **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
@@ -6,6 +6,7 @@
 
 | CDN 前缀 | bundleVersion | 物种 | 状态 |
 | --- | ---: | ---: | --- |
+| `/v5/` | **14** | 1025 | **未发布候选**：v13 数据不变，archive 去除与 `sprites/` 重复的 `artwork/` |
 | `/v5/` | **13** | 1025 | **当前生产**：v12 检索轴 + 各形态独立 `evolutionChain` |
 | `/v5/` | 12 | 1025 | 已发布基座：体形 / 颜色 / 大小 / 世代 / 标签检索轴 + 结构化进化条件 |
 | `/v5/` | 11 | 1025 | 历史：v6 数据 + 清晰默认图 + 形态历代 sprite + 542 道具 |
@@ -91,12 +92,15 @@ titodex-dex/
     ├── config/app_config.json
     ├── game_icons/*.png
     ├── type_icons/*.png
-    └── bundle.tar.zst
+    ├── bundle.tar.zst          # 当前生产 v13；发布 v14 时保留作回滚
+    └── bundle-v14.tar.zst      # v14 候选使用新 key，禁止覆盖 v13 archive
 ```
 
 `bundle.tar.zst` 解压后的根直接对应 App 文档目录 `dex_offline/`，不包含 `v5/`
 这一层。所有详情、摘要、默认清晰图、
 选择性形态小图、l10n、maps、config 和引用索引必须进入 archive。
+v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重复携带
+`artwork/`；在线详情仍可读取 R2 中既有的 loose `artwork/` 对象。
 
 ## 构建与审计
 
@@ -191,7 +195,8 @@ python3 tools/patch_dex_bundle_v13_form_evolution.py
 python3 tools/verify_dex_upload_tree.py dist/dex-v13/upload
 ```
 
-或跑 GitHub Actions **Patch and Publish Dex Bundle v13**（secrets 已在仓库里）。
+已发布的 v13 一次性 GitHub Actions workflow 存档在
+`docs/archive/workflows/`；它要求生产仍为 v12，不能用于后续版本发布。
 镜像表在 `tools/form_evolution_chains.py` 与
 `flutter/lib/features/dex/form_evolution_targets.dart`；`tools/test_form_evolution_targets.py`
 保证两边不漂移。App 还需在离线加载时把 `sprites/forms/…` 绝对化
@@ -199,18 +204,36 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v13/upload
 
 回滚：把发布前备份的 v12 根 manifest 写回即可（v13 → v12）。
 
+## v14 候选（紧凑离线媒体）
+
+v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件
+比较 `artwork/<path>` 与 `sprites/<path>` 的大小和 SHA-256；1,340 对必须全部字节一致，
+否则立即拒绝构建。验证通过后只从 archive 删除 `artwork/`，R2 既有 loose artwork
+不删除。archive 使用新的不可变 key `/v5/bundle-v14.tar.zst`，根 manifest 最后才切换。
+
+```bash
+python3 -m unittest tools/test_patch_dex_bundle_v14_compact_media.py
+python3 tools/patch_dex_bundle_v14_compact_media.py
+python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
+```
+
+本地预发布实测：删除 `53,285,462` raw duplicate bytes；v13 archive
+`106,743,740` bytes → v14 `54,746,615` bytes，压缩包减少 `51,997,125` bytes
+（48.7%）。解包后仍有 1,025 detail、1,340 sprite、421 道具图标，
+`artwork/` 为 0。脚本与验证器都不上传；生产 R2 和根 manifest 在人工确认前不变。
+
 ## 两阶段发布与回滚
 
-首选 GitHub Actions（v12 / v13 各自的 Patch and Publish 工作流）。本地等价命令（把
-`dist/dex-v13` 换成当前版本的产物目录）：
+v12 / v13 workflow 已随对应发布完成而存档。未来版本应创建带生产版本前置检查的
+新 workflow；v14 底层使用以下两阶段命令：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象
-python3 tools/upload_dex_bundle_r2.py dist/dex-v13/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v14-prerelease/upload \
   --cdn-prefix v5 --phase objects
 
 # 阶段二：只有阶段一全部成功后才更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v13/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v14-prerelease/upload \
   --cdn-prefix v5 --phase manifest
 ```
 

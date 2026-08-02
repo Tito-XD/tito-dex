@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.1) · Lite `0.8.1+126` · Offline `0.8.1-offline+127`.
+> **Latest release:** [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) · Lite `0.8.2+134` · Offline `0.8.2-offline+135`.
 >
-> **Current `main` source baseline:** `0.8.1+126`.
+> **Current `main` source baseline:** `0.8.2+134`.
 >
 > Longer-horizon phases: [`docs/PHASED_FEATURE_PLAN.md`](docs/PHASED_FEATURE_PLAN.md). Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
@@ -10,6 +10,7 @@
 
 | Version | Summary |
 | --- | --- |
+| **v0.8.2** | Continuous multi-stage data-pack progress for Lite and Offline; compact v14 Offline archive; refreshed HOME-style body icons; local-first offline references |
 | **v0.8.1** | Form-aware evolution chains with form sprites; body-style / size filter icons; Offline embeds dex bundle v13 |
 | **v0.8.0** | Items hub (542 curated items, category filter, icons) and list animation polish |
 | **v0.7.0** | Bundle v6 with complete form records, form-safe exact-version encounters for modern games and DLC, v4→v3→v2 fallback, plus merged iOS platform source |

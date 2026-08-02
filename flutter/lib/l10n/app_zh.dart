@@ -266,7 +266,8 @@ abstract final class AppZh {
       '校验通过：$pokemonCount 只宝可梦的离线资料完整。';
   static String settingsDexVerifyProblems(int missingDetails) =>
       '发现问题：缺失 $missingDetails 份详情资料，建议重新下载数据包。';
-  static const settingsDexVerifyIncomplete = '离线数据不完整（下载未完成或索引缺失），建议继续或重新下载数据包。';
+  static const settingsDexVerifyIncomplete =
+      '离线数据不完整（下载未完成或索引缺失），建议继续或重新下载数据包。';
   static String settingsDexVerifySpriteNote(int missingSprites) =>
       '另有 $missingSprites 张图片缺失（在线时会自动回退加载）。';
   static String settingsDexOfflineReady(
@@ -287,20 +288,43 @@ abstract final class AppZh {
     final phaseLabel = switch (phase) {
       'types' => '属性',
       'pokemon' => '宝可梦',
-      'cdn_manifest' => '图鉴包清单',
-      'cdn_download' => '图鉴包下载',
-      'cdn_verify' => '校验',
-      'cdn_decompress' => '解压',
-      'cdn_extract' => '写入',
+      'cdn_manifest' => '获取数据包清单',
+      'cdn_download' => '下载数据包',
+      'cdn_verify' => '校验数据包',
+      'cdn_decompress' => '解压数据包',
+      'cdn_extract' => '写入离线数据',
       'cdn_index' => '准备筛选索引',
+      'apk_seed_manifest' => '准备清单',
+      'apk_seed_read' => '读取内置数据包',
+      'apk_seed_verify' => '校验内置数据包',
+      'apk_seed_decompress' => '解压',
+      'apk_seed_extract' => '写入',
+      'apk_seed_index' => '准备筛选索引',
       'index' => '准备筛选索引',
       'l10n_download' => '中文对照',
       'done' => '完成',
       'partial' => '部分完成',
       _ => phase,
     };
-    return '正在缓存$phaseLabel $current / $total';
+    final isBundlePhase =
+        phase.startsWith('cdn_') || phase.startsWith('apk_seed_');
+    final verb = isBundlePhase ? '正在' : '正在缓存';
+    final showCount =
+        phase != 'cdn_download' &&
+        phase != 'cdn_manifest' &&
+        phase != 'cdn_verify' &&
+        phase != 'cdn_decompress' &&
+        phase != 'cdn_index' &&
+        phase != 'apk_seed_manifest' &&
+        phase != 'apk_seed_read' &&
+        phase != 'apk_seed_verify' &&
+        phase != 'apk_seed_decompress' &&
+        phase != 'apk_seed_index' &&
+        phase != 'done';
+    return '$verb$phaseLabel${showCount ? ' $current / $total' : ''}';
   }
+
+  static const offlineSeedProgressTitle = '正在准备离线图鉴';
 
   static const settingsDexCdnDownload = '下载预打包数据包';
   static const settingsDexCdnDownloadHint =

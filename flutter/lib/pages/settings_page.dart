@@ -407,6 +407,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexCache = _dexCacheStatus;
     final dexManifest = dexCache?.manifest;
     final dexProgress = dexCache?.progress;
+    final dexDisplayProgress = dexProgressDisplayFraction(dexProgress);
     final saveLinked = gameEditionRepository.edition.isSaveLinked;
 
     return TitoFontScale(
@@ -621,23 +622,21 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (_dexDownloading && dexProgress != null) ...[
                   const SizedBox(height: 12),
                   TitoProgressBar(
-                    value: dexProgress.fraction.clamp(0.0, 1.0),
+                    value: dexDisplayProgress,
                     height: 10,
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    AppZh.settingsDexOfflineProgress(
+                    '${AppZh.settingsDexOfflineProgress(
                       dexProgress.phase,
                       dexProgress.current,
                       dexProgress.total,
-                    ),
+                    )} · ${(dexDisplayProgress * 100).round()}%',
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.mutedInk,
                     ),
                   ),
-                  if (dexProgress.label != null &&
-                      (dexProgress.phase == 'cdn_download' ||
-                          dexProgress.phase == 'cdn_manifest')) ...[
+                  if (dexProgress.label != null) ...[
                     const SizedBox(height: 4),
                     Text(
                       dexProgress.label!,
@@ -868,7 +867,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-
 /// v0.6.7 preview grouping: a soft-yellow pill label floats above each
 /// settings card instead of a heading inside it.
 class _SettingsGroup extends StatelessWidget {
