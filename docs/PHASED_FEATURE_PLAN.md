@@ -62,10 +62,12 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 
 三点已提给检索线（本文仅记录，不重复实现）：
 
-1. 颜色用**色块多选**不用色名（PokeAPI 无橙色，卡蒂狗在 brown）。
-2. 补**相对大小**分档（`heightDm` 已在 summary，三到五档）。
+1. 颜色用**色块多选**不用色名（PokeAPI 无橙色，卡蒂狗在 brown）—— ✅ **v0.8.5 已落地**。
+2. 补**相对大小**分档（`heightDm` 已在 summary，三到五档）—— ✅ **v0.8.5 已落地**。
 3. `SHAPE_ZH`/`COLOR_ZH` 的中文标签直接写进 bundle summary，
-   避免 Python/Dart 两份映射（同 `AI_CONTEXT.md` 道具分类同步的坑）。
+   避免 Python/Dart 两份映射（同 `AI_CONTEXT.md` 道具分类同步的坑）—— 📌 **仍待办**：
+   bundle summary 目前只写 `shapeSlug`/`colorSlug`，`build_dex_bundle.py` 与
+   `kDexShapeLabelsZh`/`kDexColorLabelsZh` 仍是两份中文映射。
 
 ## 砍掉清单（速查）
 

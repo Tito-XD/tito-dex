@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.2) · Lite `0.8.2+134` · Offline `0.8.2-offline+135`.
+> **Latest release:** [v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5) · Lite `0.8.5+136` · Offline `0.8.5-offline+137`.
 >
-> **Current `main` source baseline:** `0.8.2+134`.
+> **Current `main` source baseline:** `0.8.5+136`.
 >
 > Longer-horizon phases: [`docs/PHASED_FEATURE_PLAN.md`](docs/PHASED_FEATURE_PLAN.md). Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
@@ -10,6 +10,7 @@
 
 | Version | Summary |
 | --- | --- |
+| **v0.8.5** | Version planning and dex browse scopes: background data-pack downloads with notification progress, exact-version chain completion and wild held-item planning, complete evolution/encounter conditions, region-or-generation dex browsing, local flavor icons, aligned detail tables, form status badges, and Sleep links. Lite and Offline keep the existing v13/v14 data archives |
 | **v0.8.2** | Continuous multi-stage data-pack progress for Lite and Offline; compact v14 Offline archive; refreshed HOME-style body icons; local-first offline references |
 | **v0.8.1** | Form-aware evolution chains with form sprites; body-style / size filter icons; Offline embeds dex bundle v13 |
 | **v0.8.0** | Items hub (542 curated items, category filter, icons) and list animation polish |
@@ -66,11 +67,16 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 > availability, location index) lives in
 > [docs/PHASED_FEATURE_PLAN.md](docs/PHASED_FEATURE_PLAN.md).
 
-1. **Regression coverage** — expand automated coverage for the aligned trainer-card, team-editor, offline, and flavor-title behavior.
-2. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions.
-3. **Save workflow validation** — add real fixtures for supported pre-Switch games and expand format-specific imports.
-4. **Distribution polish** — refine splash, install guidance, and release consistency.
-5. **Offline maintenance** — keep bundle v6 manifests, modern encounter overlays, forms, and Chinese labels current without exposing private service URLs in public copy.
+Regression coverage has largely landed (58 test files covering trainer-card, home dashboard, offline, flavor-title, and device layouts); a dedicated team-editor test is still missing.
+
+1. **CDN release infrastructure** — create a new bundle-publish workflow with production version pre-checks (v12/v13 workflows are archived; only the v7 workflow remains live, and there is no v14 workflow).
+2. **Cloudflare operational audit** — re-audit the dedicated TitoDex KV binding and production cron inventory; retire the legacy `autumn-shape-2b65` Worker only after a read-only check confirms it is unused.
+3. **Location tree (Phase 3-2)** — wire the App-side on-demand loader and location-tree page with location completion; `location_index.json` is already built into the bundle.
+4. **Save workflow validation** — add real fixtures for supported pre-Switch games (only `PKMSS.sav` exists today) and expand format-specific imports.
+5. **Calculation quality** — expand battle formula coverage, fixtures, and user-facing assumptions; stat calc already exposes IV/EV inputs, but depth stays partial.
+6. **Accessibility / controller navigation** — current support is minimal (a few Focus hooks plus semantics tests); needs systematic validation.
+7. **MechanicsProfile** — precise “alternative evolution path available in the current version” rules (e.g. Feebas beauty in HGSS); code currently only references the future profile.
+8. **Offline maintenance** (ongoing) — keep bundle manifests, modern encounter overlays, forms, and Chinese labels current without exposing private service URLs in public copy.
 
 ## Active TODO
 
@@ -82,15 +88,14 @@ Full archive: [docs/RELEASES.md](docs/RELEASES.md).
 - [ ] Re-audit the dedicated TitoDex KV binding and production cron inventory after each Cloudflare configuration change.
 - [ ] Verify whether the legacy `autumn-shape-2b65` Worker still has traffic or an owner; retire it only after that read-only check confirms it is unused.
 - [x] Publish exact-version encounter schema with attributed PKHeX overlays for BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension; Champions is explicitly not applicable.
-- [ ] Add persistent caching or bounded concurrency to the full PokeAPI location-area refresh; the current first-run catalog sync is correct but serial and slow.
+- [x] Bound PokeAPI fetch concurrency: dex detail/catalog refresh batches (`summaryBatchSize`) with throttling; the first-run sync is no longer serial.
 
 ## Future work
 
 - deeper generation-specific save adapters beyond trainer metadata (more real save fixtures incoming)
-- form-aware deep links, grouped/collapsible cosmetic form controls, and battle/team tool handoff for the currently selected form
+- grouped/collapsible cosmetic form controls and battle/team tool handoff for the currently selected form (form/version-aware deep links already shipped)
 - curated Z-A / Mega Dimension patches whenever a new form is absent from PokeAPI; partial records must keep unknown stats, locations, and images empty
 - Linux handheld packaging
-- hand-drawn artwork for the home quick tiles / entry cards (in progress)
 - broader accessibility and controller-navigation validation
 
 > Cloud sync is intentionally **not** planned: TitoDex stays local-first, with journey JSON import/export as the portability path.
