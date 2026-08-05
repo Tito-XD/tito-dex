@@ -90,10 +90,10 @@ class HgssParser {
 | Preserve `trainerName` when `trainerNameCustomized` | ✅ implemented + tested |
 | Set `saveTrainerName` from parsed OT | ✅ |
 | Localize species / location to Chinese | ✅ |
-| **Preserve existing `timeline` entries** | ❌ **TODO** — currently replaces with single parsed entry |
-| Preserve `nextReminder` from user | ❌ overwrites with default zh string |
+| **Preserve existing `timeline` entries** | ✅ `_mergeTimeline` keeps manual entries and prepends one “synced from save” entry |
+| Preserve `nextReminder` from user | ✅ kept when already set |
 
-When fixing timeline merge: update structured fields (location, badges, party, time) from parser; append or update a “synced from save” entry; do not delete manual notes.
+Merge behavior: structured fields (location, badges, party, time) come from the parser; a `parsed-<hash8>` timeline entry is prepended; manual notes and the user `nextReminder` are preserved.
 
 ## Save Ingest Paths
 
@@ -102,7 +102,7 @@ When fixing timeline merge: update structured fields (location, badges, party, t
 | Settings → import bundled fixture | `rootBundle` → parse → persist | ✅ |
 | Settings → pick one save file | Persisted document URI | ✅ |
 | Startup auto-load | `SaveSyncService.syncOnStartup` | ✅ |
-| Single `.sav` file pick | SAF file mode | ❌ planned |
+| Single `.sav` file pick | SAF `ACTION_OPEN_DOCUMENT` | ✅ implemented |
 | User drops file into app | — | ❌ |
 
 Directory sync (`save_sync_service.dart`):

@@ -112,10 +112,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - v0.4.8: generation-aware matchup modifiers and offensive/defensive blind-spot tools.
 
 ### Not shipped / partial
-- Full competitive damage calculator, IV-specific workflow, usage rankings, and simulator parity.
+- Beyond the IV/EV inputs already exposed in stat calc: full competitive damage calculator, dedicated IV workflow, usage rankings, and simulator parity.
 - Broader real-save fixtures and validation beyond HGSS (more real saves incoming from the maintainer).
 - Community (52poke) Chinese flavor-text import for older generations remains a separate future data patch; attribution (CC BY-NC-SA) is mandatory when it lands.
-- Hand-drawn icons for the home quick tiles / entry cards (artwork in progress; the old bottom nav was removed). APK assets only, not on CDN.
 
 > Cloud sync was dropped as a direction (2026-07): TitoDex stays local-first. Journey JSON import/export remains the portability path.
 
