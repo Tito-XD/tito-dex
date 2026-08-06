@@ -1,0 +1,951 @@
+{
+  "schemaVersion": 1,
+  "fetchedAt": "2026-08-06T03:55:50+00:00",
+  "source": {
+    "name": "PokeAPI + 52poke wiki",
+    "license": "PokeAPI data: CC-BY 4.0; 52poke: CC BY-NC-SA 4.0"
+  },
+  "itemsBySlug": {
+    "amulet-coin": {
+      "slug": "amulet-coin",
+      "nameEn": "amulet-coin",
+      "nameZh": "护符金币",
+      "category": "training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/amulet-coin.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "exp-share": {
+      "slug": "exp-share",
+      "nameEn": "exp-share",
+      "nameZh": "学习装置",
+      "category": "training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/exp-share.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "luck-incense": {
+      "slug": "luck-incense",
+      "nameEn": "luck-incense",
+      "nameZh": "幸运薰香",
+      "category": "training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/luck-incense.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "pure-incense": {
+      "slug": "pure-incense",
+      "nameEn": "pure-incense",
+      "nameZh": "洁净薰香",
+      "category": "training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pure-incense.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "soothe-bell": {
+      "slug": "soothe-bell",
+      "nameEn": "soothe-bell",
+      "nameZh": "安抚之铃",
+      "category": "training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/soothe-bell.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "macho-brace": {
+      "slug": "macho-brace",
+      "nameEn": "macho-brace",
+      "nameZh": "强制锻炼器",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/macho-brace.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-anklet": {
+      "slug": "power-anklet",
+      "nameEn": "power-anklet",
+      "nameZh": "力量护踝",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-anklet.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-band": {
+      "slug": "power-band",
+      "nameEn": "power-band",
+      "nameZh": "力量束带",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-band.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-belt": {
+      "slug": "power-belt",
+      "nameEn": "power-belt",
+      "nameZh": "力量腰带",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-belt.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-bracer": {
+      "slug": "power-bracer",
+      "nameEn": "power-bracer",
+      "nameZh": "力量护腕",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-bracer.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-lens": {
+      "slug": "power-lens",
+      "nameEn": "power-lens",
+      "nameZh": "力量镜",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-lens.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "power-weight": {
+      "slug": "power-weight",
+      "nameEn": "power-weight",
+      "nameZh": "力量负重",
+      "category": "effort-training",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/power-weight.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "absolite-z": {
+      "slug": "absolite-z",
+      "nameEn": "absolite-z",
+      "nameZh": "阿勃梭鲁进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "barbaracite": {
+      "slug": "barbaracite",
+      "nameEn": "barbaracite",
+      "nameZh": "龟足巨铠进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "baxcalibrite": {
+      "slug": "baxcalibrite",
+      "nameEn": "baxcalibrite",
+      "nameZh": "戟脊龙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "chandelurite": {
+      "slug": "chandelurite",
+      "nameEn": "chandelurite",
+      "nameZh": "水晶灯火灵进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "chesnaughtite": {
+      "slug": "chesnaughtite",
+      "nameEn": "chesnaughtite",
+      "nameZh": "布里卡隆进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "chimechite": {
+      "slug": "chimechite",
+      "nameEn": "chimechite",
+      "nameZh": "风铃铃进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "clefablite": {
+      "slug": "clefablite",
+      "nameEn": "clefablite",
+      "nameZh": "皮可西进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "crabominite": {
+      "slug": "crabominite",
+      "nameEn": "crabominite",
+      "nameZh": "好胜毛蟹进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "darkranite": {
+      "slug": "darkranite",
+      "nameEn": "darkranite",
+      "nameZh": "达克莱伊进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "delphoxite": {
+      "slug": "delphoxite",
+      "nameEn": "delphoxite",
+      "nameZh": "妖火红狐进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "dragalgite": {
+      "slug": "dragalgite",
+      "nameEn": "dragalgite",
+      "nameZh": "毒藻龙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "dragoninite": {
+      "slug": "dragoninite",
+      "nameEn": "dragoninite",
+      "nameZh": "快龙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "drampanite": {
+      "slug": "drampanite",
+      "nameEn": "drampanite",
+      "nameZh": "老翁龙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "eelektrossite": {
+      "slug": "eelektrossite",
+      "nameEn": "eelektrossite",
+      "nameZh": "麻麻鳗鱼王进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "emboarite": {
+      "slug": "emboarite",
+      "nameEn": "emboarite",
+      "nameZh": "炎武王进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "excadrite": {
+      "slug": "excadrite",
+      "nameEn": "excadrite",
+      "nameZh": "龙头地鼠进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "falinksite": {
+      "slug": "falinksite",
+      "nameEn": "falinksite",
+      "nameZh": "列阵兵进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "feraligite": {
+      "slug": "feraligite",
+      "nameEn": "feraligite",
+      "nameZh": "大力鳄进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "floettite": {
+      "slug": "floettite",
+      "nameEn": "floettite",
+      "nameZh": "花叶蒂进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "froslassite": {
+      "slug": "froslassite",
+      "nameEn": "froslassite",
+      "nameZh": "雪妖女进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "garchompite-z": {
+      "slug": "garchompite-z",
+      "nameEn": "garchompite-z",
+      "nameZh": "烈咬陆鲨进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "glimmoranite": {
+      "slug": "glimmoranite",
+      "nameEn": "glimmoranite",
+      "nameZh": "晶光花进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "golisopite": {
+      "slug": "golisopite",
+      "nameEn": "golisopite",
+      "nameZh": "具甲武者进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "golurkite": {
+      "slug": "golurkite",
+      "nameEn": "golurkite",
+      "nameZh": "泥偶巨人进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "greninjite": {
+      "slug": "greninjite",
+      "nameEn": "greninjite",
+      "nameZh": "甲贺忍蛙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "hawluchanite": {
+      "slug": "hawluchanite",
+      "nameEn": "hawluchanite",
+      "nameZh": "摔角鹰人进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "heatranite": {
+      "slug": "heatranite",
+      "nameEn": "heatranite",
+      "nameZh": "席多蓝恩进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "lucarionite-z": {
+      "slug": "lucarionite-z",
+      "nameEn": "lucarionite-z",
+      "nameZh": "路卡利欧进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "magearnite": {
+      "slug": "magearnite",
+      "nameEn": "magearnite",
+      "nameZh": "玛机雅娜进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "malamarite": {
+      "slug": "malamarite",
+      "nameEn": "malamarite",
+      "nameZh": "乌贼王进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "meganiumite": {
+      "slug": "meganiumite",
+      "nameEn": "meganiumite",
+      "nameZh": "大竺葵进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "meowsticite": {
+      "slug": "meowsticite",
+      "nameEn": "meowsticite",
+      "nameZh": "超能妙喵进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "pyroarite": {
+      "slug": "pyroarite",
+      "nameEn": "pyroarite",
+      "nameZh": "火炎狮进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "raichunite-x": {
+      "slug": "raichunite-x",
+      "nameEn": "raichunite-x",
+      "nameZh": "雷丘进化石Ｘ",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "raichunite-y": {
+      "slug": "raichunite-y",
+      "nameEn": "raichunite-y",
+      "nameZh": "雷丘进化石Ｙ",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "scolipite": {
+      "slug": "scolipite",
+      "nameEn": "scolipite",
+      "nameZh": "蜈蚣王进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "scovillainite": {
+      "slug": "scovillainite",
+      "nameEn": "scovillainite",
+      "nameZh": "狠辣椒进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "scraftinite": {
+      "slug": "scraftinite",
+      "nameEn": "scraftinite",
+      "nameZh": "头巾混混进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "skarmorite": {
+      "slug": "skarmorite",
+      "nameEn": "skarmorite",
+      "nameZh": "盔甲鸟进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "staraptite": {
+      "slug": "staraptite",
+      "nameEn": "staraptite",
+      "nameZh": "姆克鹰进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "starminite": {
+      "slug": "starminite",
+      "nameEn": "starminite",
+      "nameZh": "宝石海星进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "tatsugirinite": {
+      "slug": "tatsugirinite",
+      "nameEn": "tatsugirinite",
+      "nameZh": "米立龙进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "victreebelite": {
+      "slug": "victreebelite",
+      "nameEn": "victreebelite",
+      "nameZh": "大食花进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "zeraorite": {
+      "slug": "zeraorite",
+      "nameEn": "zeraorite",
+      "nameZh": "捷拉奥拉进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "zygardite": {
+      "slug": "zygardite",
+      "nameEn": "zygardite",
+      "nameZh": "基格尔德进化石",
+      "category": "mega-stones",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "aloraichium-z--held": {
+      "slug": "aloraichium-z--held",
+      "nameEn": "aloraichium-z--held",
+      "nameZh": "阿罗雷Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/aloraichium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "buginium-z--held": {
+      "slug": "buginium-z--held",
+      "nameEn": "buginium-z--held",
+      "nameZh": "虫Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/buginium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "darkinium-z--held": {
+      "slug": "darkinium-z--held",
+      "nameEn": "darkinium-z--held",
+      "nameZh": "恶Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/darkinium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "decidium-z--held": {
+      "slug": "decidium-z--held",
+      "nameEn": "decidium-z--held",
+      "nameZh": "狙射树枭Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/decidium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "dragonium-z--held": {
+      "slug": "dragonium-z--held",
+      "nameEn": "dragonium-z--held",
+      "nameZh": "龙Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dragonium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "eevium-z--held": {
+      "slug": "eevium-z--held",
+      "nameEn": "eevium-z--held",
+      "nameZh": "伊布Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/eevium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "electrium-z--held": {
+      "slug": "electrium-z--held",
+      "nameEn": "electrium-z--held",
+      "nameZh": "电Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/electrium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "fairium-z--held": {
+      "slug": "fairium-z--held",
+      "nameEn": "fairium-z--held",
+      "nameZh": "妖精Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/fairium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "fightinium-z--held": {
+      "slug": "fightinium-z--held",
+      "nameEn": "fightinium-z--held",
+      "nameZh": "格斗Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/fightinium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "firium-z--held": {
+      "slug": "firium-z--held",
+      "nameEn": "firium-z--held",
+      "nameZh": "火Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/firium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "flyinium-z--held": {
+      "slug": "flyinium-z--held",
+      "nameEn": "flyinium-z--held",
+      "nameZh": "飞行Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/flyinium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "ghostium-z--held": {
+      "slug": "ghostium-z--held",
+      "nameEn": "ghostium-z--held",
+      "nameZh": "幽灵Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ghostium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "grassium-z--held": {
+      "slug": "grassium-z--held",
+      "nameEn": "grassium-z--held",
+      "nameZh": "草Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/grassium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "groundium-z--held": {
+      "slug": "groundium-z--held",
+      "nameEn": "groundium-z--held",
+      "nameZh": "地面Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/groundium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "icium-z--held": {
+      "slug": "icium-z--held",
+      "nameEn": "icium-z--held",
+      "nameZh": "冰Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/icium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "incinium-z--held": {
+      "slug": "incinium-z--held",
+      "nameEn": "incinium-z--held",
+      "nameZh": "炽焰咆哮虎Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/incinium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "marshadium-z--held": {
+      "slug": "marshadium-z--held",
+      "nameEn": "marshadium-z--held",
+      "nameZh": "玛夏多Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/marshadium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "mewnium-z--held": {
+      "slug": "mewnium-z--held",
+      "nameEn": "mewnium-z--held",
+      "nameZh": "梦幻Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/mewnium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "normalium-z--held": {
+      "slug": "normalium-z--held",
+      "nameEn": "normalium-z--held",
+      "nameZh": "一般Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/normalium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "pikanium-z--held": {
+      "slug": "pikanium-z--held",
+      "nameEn": "pikanium-z--held",
+      "nameZh": "皮卡丘Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pikanium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "pikashunium-z--held": {
+      "slug": "pikashunium-z--held",
+      "nameEn": "pikashunium-z--held",
+      "nameZh": "智皮卡Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pikashunium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "poisonium-z--held": {
+      "slug": "poisonium-z--held",
+      "nameEn": "poisonium-z--held",
+      "nameZh": "毒Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poisonium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "primarium-z--held": {
+      "slug": "primarium-z--held",
+      "nameEn": "primarium-z--held",
+      "nameZh": "西狮海壬Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/primarium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "psychium-z--held": {
+      "slug": "psychium-z--held",
+      "nameEn": "psychium-z--held",
+      "nameZh": "超能力Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/psychium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "rockium-z--held": {
+      "slug": "rockium-z--held",
+      "nameEn": "rockium-z--held",
+      "nameZh": "岩石Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/rockium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "snorlium-z--held": {
+      "slug": "snorlium-z--held",
+      "nameEn": "snorlium-z--held",
+      "nameZh": "卡比兽Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/snorlium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "steelium-z--held": {
+      "slug": "steelium-z--held",
+      "nameEn": "steelium-z--held",
+      "nameZh": "钢Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/steelium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "tapunium-z--held": {
+      "slug": "tapunium-z--held",
+      "nameEn": "tapunium-z--held",
+      "nameZh": "卡璞Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/tapunium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "waterium-z--held": {
+      "slug": "waterium-z--held",
+      "nameEn": "waterium-z--held",
+      "nameZh": "水Ｚ",
+      "category": "z-crystals",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/waterium-z--held.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "armorite-ore": {
+      "slug": "armorite-ore",
+      "nameEn": "armorite-ore",
+      "nameZh": "铠甲矿石",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "dynite-ore": {
+      "slug": "dynite-ore",
+      "nameEn": "dynite-ore",
+      "nameZh": "极矿石",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "galarica-cuff": {
+      "slug": "galarica-cuff",
+      "nameEn": "galarica-cuff",
+      "nameZh": "伽勒豆蔻手环",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "进化道具"
+    },
+    "galarica-twig": {
+      "slug": "galarica-twig",
+      "nameEn": "galarica-twig",
+      "nameZh": "伽勒豆蔻枝",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    },
+    "galarica-wreath": {
+      "slug": "galarica-wreath",
+      "nameEn": "galarica-wreath",
+      "nameZh": "伽勒豆蔻花圈",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": null,
+      "descriptionZh": "",
+      "categoryZh": "进化道具"
+    },
+    "shoal-salt": {
+      "slug": "shoal-salt",
+      "nameEn": "shoal-salt",
+      "nameZh": "浅滩海盐",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shoal-salt.png",
+      "descriptionZh": "",
+      "categoryZh": "进化道具"
+    },
+    "shoal-shell": {
+      "slug": "shoal-shell",
+      "nameEn": "shoal-shell",
+      "nameZh": "浅滩贝壳",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shoal-shell.png",
+      "descriptionZh": "",
+      "categoryZh": "进化道具"
+    },
+    "wishing-piece": {
+      "slug": "wishing-piece",
+      "nameEn": "wishing-piece",
+      "nameZh": "许愿星块",
+      "category": "collectibles",
+      "cost": 0,
+      "spriteUrl": "https://wiki.52poke.com/wiki/Special:FilePath/Bag_%E8%AE%B8%E6%84%BF%E6%98%9F%E5%9D%97_Sprite.png",
+      "descriptionZh": "",
+      "categoryZh": "携带道具"
+    }
+  },
+  "unresolved": []
+}

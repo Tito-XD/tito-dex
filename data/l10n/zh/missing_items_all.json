@@ -1,0 +1,6150 @@
+{
+  "schemaVersion": 1,
+  "note": "All PokeAPI items missing from items.json except unused variants.",
+  "items": [
+    {
+      "slug": "armorite-ore",
+      "category": "collectibles"
+    },
+    {
+      "slug": "dynite-ore",
+      "category": "collectibles"
+    },
+    {
+      "slug": "galarica-cuff",
+      "category": "collectibles"
+    },
+    {
+      "slug": "galarica-twig",
+      "category": "collectibles"
+    },
+    {
+      "slug": "galarica-wreath",
+      "category": "collectibles"
+    },
+    {
+      "slug": "shoal-salt",
+      "category": "collectibles"
+    },
+    {
+      "slug": "shoal-shell",
+      "category": "collectibles"
+    },
+    {
+      "slug": "wishing-piece",
+      "category": "collectibles"
+    },
+    {
+      "slug": "black-flute",
+      "category": "spelunking"
+    },
+    {
+      "slug": "escape-rope",
+      "category": "spelunking"
+    },
+    {
+      "slug": "fluffy-tail",
+      "category": "spelunking"
+    },
+    {
+      "slug": "lure",
+      "category": "spelunking"
+    },
+    {
+      "slug": "max-lure",
+      "category": "spelunking"
+    },
+    {
+      "slug": "max-repel",
+      "category": "spelunking"
+    },
+    {
+      "slug": "poke-doll",
+      "category": "spelunking"
+    },
+    {
+      "slug": "poke-toy",
+      "category": "spelunking"
+    },
+    {
+      "slug": "repel",
+      "category": "spelunking"
+    },
+    {
+      "slug": "super-lure",
+      "category": "spelunking"
+    },
+    {
+      "slug": "super-repel",
+      "category": "spelunking"
+    },
+    {
+      "slug": "white-flute",
+      "category": "spelunking"
+    },
+    {
+      "slug": "macho-brace",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-anklet",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-band",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-belt",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-bracer",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-lens",
+      "category": "effort-training"
+    },
+    {
+      "slug": "power-weight",
+      "category": "effort-training"
+    },
+    {
+      "slug": "amulet-coin",
+      "category": "training"
+    },
+    {
+      "slug": "exp-share",
+      "category": "training"
+    },
+    {
+      "slug": "luck-incense",
+      "category": "training"
+    },
+    {
+      "slug": "pure-incense",
+      "category": "training"
+    },
+    {
+      "slug": "soothe-bell",
+      "category": "training"
+    },
+    {
+      "slug": "auroraticket",
+      "category": "event-items"
+    },
+    {
+      "slug": "azure-flute",
+      "category": "event-items"
+    },
+    {
+      "slug": "crystal-cluster",
+      "category": "event-items"
+    },
+    {
+      "slug": "enigma-stone",
+      "category": "event-items"
+    },
+    {
+      "slug": "eon-ticket",
+      "category": "event-items"
+    },
+    {
+      "slug": "gracidea",
+      "category": "event-items"
+    },
+    {
+      "slug": "koraidons-poke-ball",
+      "category": "event-items"
+    },
+    {
+      "slug": "liberty-pass",
+      "category": "event-items"
+    },
+    {
+      "slug": "lunar-wing",
+      "category": "event-items"
+    },
+    {
+      "slug": "member-card",
+      "category": "event-items"
+    },
+    {
+      "slug": "miraidons-poke-ball",
+      "category": "event-items"
+    },
+    {
+      "slug": "mysticticket",
+      "category": "event-items"
+    },
+    {
+      "slug": "oaks-letter",
+      "category": "event-items"
+    },
+    {
+      "slug": "old-sea-map",
+      "category": "event-items"
+    },
+    {
+      "slug": "rotom-phone",
+      "category": "event-items"
+    },
+    {
+      "slug": "sandwich",
+      "category": "event-items"
+    },
+    {
+      "slug": "scarlet-book",
+      "category": "event-items"
+    },
+    {
+      "slug": "secret-key",
+      "category": "event-items"
+    },
+    {
+      "slug": "strange-ball",
+      "category": "event-items"
+    },
+    {
+      "slug": "suite-key",
+      "category": "event-items"
+    },
+    {
+      "slug": "teal-mask",
+      "category": "event-items"
+    },
+    {
+      "slug": "tera-orb",
+      "category": "event-items"
+    },
+    {
+      "slug": "violet-book",
+      "category": "event-items"
+    },
+    {
+      "slug": "acro-bike",
+      "category": "gameplay"
+    },
+    {
+      "slug": "adamant-crystal",
+      "category": "gameplay"
+    },
+    {
+      "slug": "adventure-rules",
+      "category": "gameplay"
+    },
+    {
+      "slug": "apricorn-box",
+      "category": "gameplay"
+    },
+    {
+      "slug": "berry-pots",
+      "category": "gameplay"
+    },
+    {
+      "slug": "berry-pouch",
+      "category": "gameplay"
+    },
+    {
+      "slug": "bicycle",
+      "category": "gameplay"
+    },
+    {
+      "slug": "blue-card",
+      "category": "gameplay"
+    },
+    {
+      "slug": "camping-gear",
+      "category": "gameplay"
+    },
+    {
+      "slug": "catching-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "coin-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "contest-costume--jacket",
+      "category": "gameplay"
+    },
+    {
+      "slug": "contest-pass",
+      "category": "gameplay"
+    },
+    {
+      "slug": "devon-scope",
+      "category": "gameplay"
+    },
+    {
+      "slug": "dna-splicers",
+      "category": "gameplay"
+    },
+    {
+      "slug": "dowsing-machine",
+      "category": "gameplay"
+    },
+    {
+      "slug": "eon-flute",
+      "category": "gameplay"
+    },
+    {
+      "slug": "exp-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "explorer-kit",
+      "category": "gameplay"
+    },
+    {
+      "slug": "fame-checker",
+      "category": "gameplay"
+    },
+    {
+      "slug": "fashion-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "festival-ticket",
+      "category": "gameplay"
+    },
+    {
+      "slug": "fishing-rod",
+      "category": "gameplay"
+    },
+    {
+      "slug": "fishing-rod--galar",
+      "category": "gameplay"
+    },
+    {
+      "slug": "forage-bag",
+      "category": "gameplay"
+    },
+    {
+      "slug": "gb-sounds",
+      "category": "gameplay"
+    },
+    {
+      "slug": "glimmering-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "go-goggles",
+      "category": "gameplay"
+    },
+    {
+      "slug": "good-rod",
+      "category": "gameplay"
+    },
+    {
+      "slug": "griseous-core",
+      "category": "gameplay"
+    },
+    {
+      "slug": "hi-tech-earbuds",
+      "category": "gameplay"
+    },
+    {
+      "slug": "holo-caster",
+      "category": "gameplay"
+    },
+    {
+      "slug": "journal",
+      "category": "gameplay"
+    },
+    {
+      "slug": "key-stone",
+      "category": "gameplay"
+    },
+    {
+      "slug": "lens-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "lustrous-globe",
+      "category": "gameplay"
+    },
+    {
+      "slug": "mach-bike",
+      "category": "gameplay"
+    },
+    {
+      "slug": "makeup-bag",
+      "category": "gameplay"
+    },
+    {
+      "slug": "mark-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "medal-box",
+      "category": "gameplay"
+    },
+    {
+      "slug": "mega-bracelet",
+      "category": "gameplay"
+    },
+    {
+      "slug": "mega-ring",
+      "category": "gameplay"
+    },
+    {
+      "slug": "old-rod",
+      "category": "gameplay"
+    },
+    {
+      "slug": "oval-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "pal-pad",
+      "category": "gameplay"
+    },
+    {
+      "slug": "permit",
+      "category": "gameplay"
+    },
+    {
+      "slug": "poffin-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "point-card",
+      "category": "gameplay"
+    },
+    {
+      "slug": "poke-radar",
+      "category": "gameplay"
+    },
+    {
+      "slug": "pokeblock-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "pokeblock-kit",
+      "category": "gameplay"
+    },
+    {
+      "slug": "pokemon-box-link",
+      "category": "gameplay"
+    },
+    {
+      "slug": "powder-jar",
+      "category": "gameplay"
+    },
+    {
+      "slug": "prison-bottle",
+      "category": "gameplay"
+    },
+    {
+      "slug": "prop-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "rage-candy-bar",
+      "category": "gameplay"
+    },
+    {
+      "slug": "reveal-glass",
+      "category": "gameplay"
+    },
+    {
+      "slug": "roller-skates",
+      "category": "gameplay"
+    },
+    {
+      "slug": "roto-stick",
+      "category": "gameplay"
+    },
+    {
+      "slug": "rotom-bike",
+      "category": "gameplay"
+    },
+    {
+      "slug": "rotom-catalog",
+      "category": "gameplay"
+    },
+    {
+      "slug": "scroll-of-darkness",
+      "category": "gameplay"
+    },
+    {
+      "slug": "scroll-of-waters",
+      "category": "gameplay"
+    },
+    {
+      "slug": "seal-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "shiny-charm",
+      "category": "gameplay"
+    },
+    {
+      "slug": "soot-sack",
+      "category": "gameplay"
+    },
+    {
+      "slug": "sprayduck",
+      "category": "gameplay"
+    },
+    {
+      "slug": "sprinklotad",
+      "category": "gameplay"
+    },
+    {
+      "slug": "style-card",
+      "category": "gameplay"
+    },
+    {
+      "slug": "super-rod",
+      "category": "gameplay"
+    },
+    {
+      "slug": "teachy-tv",
+      "category": "gameplay"
+    },
+    {
+      "slug": "teal-style-card",
+      "category": "gameplay"
+    },
+    {
+      "slug": "tm-case",
+      "category": "gameplay"
+    },
+    {
+      "slug": "tmv-pass",
+      "category": "gameplay"
+    },
+    {
+      "slug": "town-map",
+      "category": "gameplay"
+    },
+    {
+      "slug": "unown-report",
+      "category": "gameplay"
+    },
+    {
+      "slug": "vs-recorder",
+      "category": "gameplay"
+    },
+    {
+      "slug": "vs-seeker",
+      "category": "gameplay"
+    },
+    {
+      "slug": "wailmer-pail",
+      "category": "gameplay"
+    },
+    {
+      "slug": "xtransceiver",
+      "category": "gameplay"
+    },
+    {
+      "slug": "z-ring",
+      "category": "gameplay"
+    },
+    {
+      "slug": "zygarde-cube",
+      "category": "gameplay"
+    },
+    {
+      "slug": "aqua-suit",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "armor-pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "basement-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "bike-voucher",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "black-mane-hair",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "blue-orb",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "card-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "card-key--letsgo",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "carrot-seeds",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "clear-bell",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "colress-machine",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "coupon-1",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "coupon-2",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "coupon-3",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "crown-pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "dark-stone",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "devon-goods",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "devon-parts",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "devon-scuba-gear",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "dragon-skull",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "dropped-item",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "dynamax-band",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "elevator-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "endorsement",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "enigmatic-card",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "galactic-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "gold-teeth",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "gram-1",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "gram-2",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "gram-3",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "grubby-hanky",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "honor-of-kalos",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "iceroot-carrot",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "intriguing-stone",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "jade-orb",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "key-to-room-1",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "key-to-room-2",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "key-to-room-4",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "key-to-room-6",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "kofus-wallet",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "legendary-clue-1",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "legendary-clue-2",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "legendary-clue-3",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "legendary-clue-question",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "letter",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "lift-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "light-stone",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "looker-ticket",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "lost-item",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "machine-part",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "magma-emblem",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "magma-stone",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "magma-suit",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "meteorite",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "meteorite-shard",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "moon-flute",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "mystery-egg",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "oaks-parcel",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "old-charm",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "old-letter",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "pair-of-tickets",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "parcel",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "parcel--letsgo",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "plasma-card",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "poke-flute",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "power-plant-pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "professors-mask",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "profs-letter",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "radiant-petal",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rainbow-pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rainbow-wing",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "red-orb",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "red-scale",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "reins-of-unity",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rm-1-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rm-2-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rm-4-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "rm-6-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "ruby",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "sapphire",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "scanner",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "secret-key--letsgo",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "secret-potion",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "shaderoot-carrot",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "silph-scope",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "silver-wing",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "sonias-book",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "sparkling-stone",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "squirt-bottle",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "ss-ticket",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "ss-ticket--letsgo",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "storage-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "sun-flute",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "tea",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "tidal-bell",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "tri-pass",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "white-mane-hair",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "wishing-star",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "wooden-crown",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "works-key",
+      "category": "plot-advancement"
+    },
+    {
+      "slug": "beach-glass",
+      "category": "loot"
+    },
+    {
+      "slug": "big-bamboo-shoot",
+      "category": "loot"
+    },
+    {
+      "slug": "chalky-stone",
+      "category": "loot"
+    },
+    {
+      "slug": "discount-coupon",
+      "category": "loot"
+    },
+    {
+      "slug": "gold-bottle-cap",
+      "category": "loot"
+    },
+    {
+      "slug": "gold-leaf",
+      "category": "loot"
+    },
+    {
+      "slug": "leaf-letter--eevee",
+      "category": "loot"
+    },
+    {
+      "slug": "leaf-letter--pikachu",
+      "category": "loot"
+    },
+    {
+      "slug": "lone-earring",
+      "category": "loot"
+    },
+    {
+      "slug": "marble",
+      "category": "loot"
+    },
+    {
+      "slug": "pearl-string",
+      "category": "loot"
+    },
+    {
+      "slug": "polished-mud-ball",
+      "category": "loot"
+    },
+    {
+      "slug": "pretty-wing",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-band",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-copper",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-crown",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-gold",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-silver",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-statue",
+      "category": "loot"
+    },
+    {
+      "slug": "relic-vase",
+      "category": "loot"
+    },
+    {
+      "slug": "silver-leaf",
+      "category": "loot"
+    },
+    {
+      "slug": "small-bouquet",
+      "category": "loot"
+    },
+    {
+      "slug": "strange-souvenir",
+      "category": "loot"
+    },
+    {
+      "slug": "stretchy-spring",
+      "category": "loot"
+    },
+    {
+      "slug": "tiny-bamboo-shoot",
+      "category": "loot"
+    },
+    {
+      "slug": "tropical-shell",
+      "category": "loot"
+    },
+    {
+      "slug": "air-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bead-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bloom-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "brick-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bridge-mail-d",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bridge-mail-m",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bridge-mail-s",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bridge-mail-t",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bridge-mail-v",
+      "category": "all-mail"
+    },
+    {
+      "slug": "bubble-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "dream-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "fab-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "favored-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "flame-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "glitter-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "grass-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "greet-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "harbor-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "heart-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "inquiry-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "like-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "mech-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "mosaic-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "orange-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "reply-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "retro-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "rsvp-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "shadow-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "snow-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "space-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "steel-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "thanks-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "tropic-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "tunnel-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "wave-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "wood-mail",
+      "category": "all-mail"
+    },
+    {
+      "slug": "amaze-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "boost-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "damp-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "gooey-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "growth-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "rich-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "stable-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "surprise-mulch",
+      "category": "mulch"
+    },
+    {
+      "slug": "armor-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "claw-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "cover-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "dome-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "fossilized-bird",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "fossilized-dino",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "fossilized-drake",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "fossilized-fish",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "helix-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "jaw-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "odd-keystone",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "old-amber",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "plume-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "root-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "sail-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "skull-fossil",
+      "category": "dex-completion"
+    },
+    {
+      "slug": "hm01",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm02",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm03",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm04",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm05",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm06",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm07",
+      "category": "all-machines"
+    },
+    {
+      "slug": "hm08",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm00",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm01",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm02",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm03",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm04",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm05",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm06",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm07",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm08",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm09",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm10",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm100",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm101",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm102",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm103",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm104",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm105",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm106",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm107",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm108",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm109",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm11",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm110",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm111",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm112",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm113",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm114",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm115",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm116",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm117",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm118",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm119",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm12",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm120",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm121",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm122",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm123",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm124",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm125",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm126",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm127",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm128",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm129",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm13",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm130",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm131",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm132",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm133",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm134",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm135",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm136",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm137",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm138",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm139",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm14",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm140",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm141",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm142",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm143",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm144",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm145",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm146",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm147",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm148",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm149",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm15",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm150",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm151",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm152",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm153",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm154",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm155",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm156",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm157",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm158",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm159",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm16",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm160",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm161",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm162",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm163",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm164",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm165",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm166",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm167",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm168",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm169",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm17",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm170",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm171",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm172",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm173",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm174",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm175",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm176",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm177",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm178",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm179",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm18",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm180",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm181",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm182",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm183",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm184",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm185",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm186",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm187",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm188",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm189",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm19",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm190",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm191",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm192",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm193",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm194",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm195",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm196",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm197",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm198",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm199",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm20",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm200",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm201",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm202",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm203",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm204",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm205",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm206",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm207",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm208",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm209",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm21",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm210",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm211",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm212",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm213",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm214",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm215",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm216",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm217",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm218",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm219",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm22",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm220",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm221",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm222",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm223",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm224",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm225",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm226",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm227",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm228",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm229",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm23",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm24",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm25",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm26",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm27",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm28",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm29",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm30",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm31",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm32",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm33",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm34",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm35",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm36",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm37",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm38",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm39",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm40",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm41",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm42",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm43",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm44",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm45",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm46",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm47",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm48",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm49",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm50",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm51",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm52",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm53",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm54",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm55",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm56",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm57",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm58",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm59",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm60",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm61",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm62",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm63",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm64",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm65",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm66",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm67",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm68",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm69",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm70",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm71",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm72",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm73",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm74",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm75",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm76",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm77",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm78",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm79",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm80",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm81",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm82",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm83",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm84",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm85",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm86",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm87",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm88",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm89",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm90",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm91",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm92",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm93",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm94",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm95",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm96",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm97",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm98",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tm99",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr00",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr01",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr02",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr03",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr04",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr05",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr06",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr07",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr08",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr09",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr10",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr11",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr12",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr13",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr14",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr15",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr16",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr17",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr18",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr19",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr20",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr21",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr22",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr23",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr24",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr25",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr26",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr27",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr28",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr29",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr30",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr31",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr32",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr33",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr34",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr35",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr36",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr37",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr38",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr39",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr40",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr41",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr42",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr43",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr44",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr45",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr46",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr47",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr48",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr49",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr50",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr51",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr52",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr53",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr54",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr55",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr56",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr57",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr58",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr59",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr60",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr61",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr62",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr63",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr64",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr65",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr66",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr67",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr68",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr69",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr70",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr71",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr72",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr73",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr74",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr75",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr76",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr77",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr78",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr79",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr80",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr81",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr82",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr83",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr84",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr85",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr86",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr87",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr88",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr89",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr90",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr91",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr92",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr93",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr94",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr95",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr96",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr97",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr98",
+      "category": "all-machines"
+    },
+    {
+      "slug": "tr99",
+      "category": "all-machines"
+    },
+    {
+      "slug": "black-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "blue-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "green-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "pink-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "red-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "white-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "yellow-apricorn",
+      "category": "apricorn-box"
+    },
+    {
+      "slug": "data-card-01",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-02",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-03",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-04",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-05",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-06",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-07",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-08",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-09",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-10",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-11",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-12",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-13",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-14",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-15",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-16",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-17",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-18",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-19",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-20",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-21",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-22",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-23",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-24",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-25",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-26",
+      "category": "data-cards"
+    },
+    {
+      "slug": "data-card-27",
+      "category": "data-cards"
+    },
+    {
+      "slug": "absolite-z",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "barbaracite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "baxcalibrite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "chandelurite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "chesnaughtite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "chimechite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "clefablite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "crabominite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "darkranite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "delphoxite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "dragalgite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "dragoninite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "drampanite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "eelektrossite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "emboarite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "excadrite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "falinksite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "feraligite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "floettite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "froslassite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "garchompite-z",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "glimmoranite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "golisopite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "golurkite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "greninjite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "hawluchanite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "heatranite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "lucarionite-z",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "magearnite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "malamarite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "meganiumite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "meowsticite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "pyroarite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "raichunite-x",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "raichunite-y",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "scolipite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "scovillainite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "scraftinite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "skarmorite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "staraptite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "starminite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "tatsugirinite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "victreebelite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "zeraorite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "zygardite",
+      "category": "mega-stones"
+    },
+    {
+      "slug": "aloraichium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "buginium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "darkinium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "decidium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "dragonium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "eevium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "electrium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "fairium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "fightinium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "firium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "flyinium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "ghostium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "grassium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "groundium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "icium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "incinium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "marshadium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "mewnium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "normalium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "pikanium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "pikashunium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "poisonium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "primarium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "psychium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "rockium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "snorlium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "steelium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "tapunium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "waterium-z--held",
+      "category": "z-crystals"
+    },
+    {
+      "slug": "abra-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "aerodactyl-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "articuno-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "bellsprout-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "bulbasaur-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "caterpie-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "chansey-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "charmander-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "clefairy-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "cubone-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "diglett-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "ditto-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "doduo-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "dratini-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "drowzee-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "eevee-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "ekans-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "electabuzz-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "exeggcute-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "farfetchd-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "gastly-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "geodude-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "goldeen-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "grimer-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "growlithe-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "hitmonchan-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "hitmonlee-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "horsea-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "jigglypuff-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "jynx-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "kabuto-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "kangaskhan-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "koffing-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "krabby-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "lapras-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "lickitung-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "machop-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "magikarp-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "magmar-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "magnemite-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "mankey-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "meltan-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "meowth-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "mew-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "mewtwo-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "moltres-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "mr-mime-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "nidoran-f-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "nidoran-m-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "oddish-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "omanyte-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "onix-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "paras-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "pidgey-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "pikachu-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "pinsir-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "poliwag-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "ponyta-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "porygon-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "psyduck-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "rattata-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "rhyhorn-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "sandshrew-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "scyther-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "seel-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "shellder-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "slowpoke-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "snorlax-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "spearow-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "squirtle-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "staryu-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "tangela-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "tauros-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "tentacool-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "venonat-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "voltorb-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "vulpix-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "weedle-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "zapdos-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "zubat-candy",
+      "category": "species-candies"
+    },
+    {
+      "slug": "dynamax-crystal-and15",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-and337",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-and390",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-and458",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-and603",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aql7235",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aql7525",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aql7557",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aql7595",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aql7602",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr7950",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8232",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8264",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8414",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8499",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8518",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8610",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aqr8709",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ara6585",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ari546",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ari553",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ari617",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ari951",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur1577",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur1605",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur1612",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur1641",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur1708",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur2088",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-aur2095",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5235",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5340",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5351",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5435",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5506",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5602",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-boo5733",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cap7754",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cap7773",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cap7776",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cap8278",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cap8322",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-car2326",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-car3307",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-car3685",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-car3699",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas153",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas168",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas21",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas219",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas265",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas403",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cas542",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cen5267",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cen5288",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cen5459",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cen5460",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cen551",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cep8162",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cep8238",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cep8417",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cep8974",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cet188",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cet539",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cet681",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cet804",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cet911",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2282",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2294",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2491",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2618",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2646",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2657",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2693",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cma2827",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cmi2845",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cmi2943",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3208",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3249",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3268",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3429",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3449",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3461",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3572",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cnc3627",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-col1956",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-col2040",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-col2177",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-com4968",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-crt4287",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cru4656",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cru4700",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cru4730",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cru4763",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cru4853",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-crv4623",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-crv4662",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-crv4757",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-crv4786",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cvn4785",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cvn4846",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cvn4915",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg7417",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg7528",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg7796",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg7924",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg7949",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-cyg8301",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-del7852",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-del7882",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-del7906",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra4434",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra5291",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra5744",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6132",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6370",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6396",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6536",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6636",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6688",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra6705",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra7310",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-dra7462",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-equ8131",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1084",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1231",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1298",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1325",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1393",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1464",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri1666",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri472",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri850",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri874",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri897",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-eri984",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2216",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2286",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2421",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2473",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2484",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2650",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2777",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2891",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2930",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gem2990",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gru8353",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gru8425",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-gru8636",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6008",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6117",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6148",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6406",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6410",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-her6526",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-hya3418",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-hya3482",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-hya3748",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-hya3845",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-hya3903",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo3773",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo3852",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo3905",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo3982",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo4031",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo4057",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo4357",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo4359",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-leo4534",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lep1829",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lep1865",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lib5531",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lib5603",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lib5685",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lib5787",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lyr7001",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lyr7106",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lyr7178",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-lyr7298",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oct7228",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6056",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6075",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6149",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6378",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6556",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-oph6603",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1543",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1713",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1790",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1852",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1879",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1899",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1903",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori1948",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori2004",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ori2061",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-pav7790",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg39",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8308",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8450",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8634",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8650",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8684",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8775",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8781",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8880",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-peg8905",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per1017",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per1131",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per1228",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per834",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per936",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-per941",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-phe338",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-phe99",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psa8728",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psc361",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psc437",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psc510",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psc596",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-psc8773",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-pup3045",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-pup3165",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-pup3185",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco5928",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco5944",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco5953",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco5984",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6027",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6084",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6134",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6165",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6241",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6247",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6252",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6508",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6527",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6553",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sco6630",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ser5854",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ser5879",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-ser7141",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sge7479",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr6746",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr6812",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr6859",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr6879",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr6913",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7116",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7121",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7194",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7264",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7337",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7343",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7348",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-sgr7597",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1165",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1346",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1373",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1409",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1412",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1457",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1791",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tau1910",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tra6217",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-tri544",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma3323",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma3569",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma3594",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4033",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4069",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4295",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4301",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4375",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4377",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4518",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4554",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4660",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma4905",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma5054",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-uma5191",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-umi424",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-umi5563",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-umi5735",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-umi6789",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vel3485",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vel3634",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vel3734",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir4540",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir4689",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir4825",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir4910",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir4932",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5056",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5107",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5315",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5338",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5359",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vir5409",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "dynamax-crystal-vul7405",
+      "category": "dynamax-crystals"
+    },
+    {
+      "slug": "bachs-food-tin",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "bobs-food-tin",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "boiled-egg",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "bread",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "brittle-bones",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "coconut-milk",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "fancy-apple",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "fresh-cream",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "fried-food",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "fruit-bunch",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "gigantamix",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "instant-noodles",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "large-leek",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "mixed-mushrooms",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "moomoo-cheese",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "pack-of-potatoes",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "packaged-curry",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "pasta",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "precooked-burger",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "pungent-root",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "salad-mix",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "sausages",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "smoke-poke-tail",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "spice-mix",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "tin-of-beans",
+      "category": "curry-ingredients"
+    },
+    {
+      "slug": "apple",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "avocado",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "bacon",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "baguette",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "banana",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "basil",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "bitter-herba-mystica",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "butter",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "cheese",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "cherry-tomatoes",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "chili-sauce",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "chorizo",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "cream-cheese",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "cucumber",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "curry-powder",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "egg",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "fried-fillet",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "green-bell-pepper",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "ham",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "hamburger",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "herbed-sausage",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "horseradish",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "jalapeno",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "jam",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "ketchup",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "kiwi",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "klawf-stick",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "lettuce",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "marmalade",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "mayonnaise",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "mustard",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "noodles",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "olive-oil",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "onion",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "peanut-butter",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "pepper",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "pickle",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "pineapple",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "potato-salad",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "potato-tortilla",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "prosciutto",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "red-bell-pepper",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "red-onion",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "rice",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "salt",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "salty-herba-mystica",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "smoked-fillet",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "sour-herba-mystica",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "spicy-herba-mystica",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "strawberry",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "sweet-herba-mystica",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "tofu",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "tomato",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "vinegar",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "wasabi",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "watercress",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "whipped-cream",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "yellow-bell-pepper",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "yogurt",
+      "category": "sandwich-ingredients"
+    },
+    {
+      "slug": "aipom-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "alomomola-mucus",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "applin-juice",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "arrokuda-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "axew-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "azurill-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bagon-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "barboach-slime",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "basculin-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bellsprout-vine",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bergmite-ice",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bombirdier-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bonsly-tears",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bounsweet-sweat",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bramblin-twig",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bronzor-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "bruxish-tooth",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "buizel-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cacnea-needle",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "capsakid-seed",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "carbink-jewel",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cetoddle-grease",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "charcadet-soot",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "chewtle-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "chingling-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "clauncher-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cleffa-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "combee-honey",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "corphish-shell",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "crabrawler-shell",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cramorant-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "croagunk-poison",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cryogonal-ice",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cubchoo-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cufant-tarnish",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cutiefly-powder",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "cyclizar-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "dedenne-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "deerling-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "deino-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "delibird-parcel",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "diglett-dirt",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "ditto-goo",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "dondozo-whisker",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "dratini-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "dreepy-powder",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "drifloon-gas",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "drowzee-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "ducklett-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "dunsparce-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "duskull-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "eevee-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "eiscue-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "ekans-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "falinks-sweat",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "feebas-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "fidough-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "finizen-mucus",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "finneon-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "flabebe-pollen",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "flamigo-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "fletchling-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "flittle-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "fomantis-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "foongus-spores",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "frigibax-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gastly-gas",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "geodude-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gible-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gimmighoul-coin",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "girafarig-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gligar-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "glimmet-crystal",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "goomy-goo",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gothita-eyelash",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "greavard-wax",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "grimer-toxin",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "growlithe-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "grubbin-thread",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "gulpin-mucus",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "happiny-dust",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "hatenna-dust",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "hawlucha-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "heracross-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "hippopotas-sand",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "hoothoot-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "hoppip-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "houndour-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "igglybuff-fluff",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "illumise-fluid",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "impidimp-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "indeedee-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "jangmo-o-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "klawf-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "klefki-key",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "koffing-gas",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "komala-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "kricketot-shell",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "larvesta-fuzz",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "larvitar-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "lechonk-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "litleo-tuft",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "litwick-soot",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "lotad-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "luvdisc-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "magikarp-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "magnemite-screw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "makuhita-sweat",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mankey-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mareanie-spike",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mareep-wool",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "maschiff-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "meditite-sweat",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "meowth-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mienfoo-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mimikyu-scrap",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "misdreavus-tears",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "morpeko-snack",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "mudbray-mud",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "munchlax-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "murkrow-bauble",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "nacli-salt",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "noibat-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "nosepass-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "numel-lava",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "nymble-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "oranguru-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "oricorio-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "orthworm-tarnish",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pachirisu-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "passimian-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pawmi-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pawniard-blade",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "petilil-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "phanpy-nail",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "phantump-twig",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pichu-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pincurchin-spines",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "pineco-husk",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "poliwag-slime",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "poltchageist-powder",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "poochyena-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "psyduck-down",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "qwilfish-spines",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "ralts-dust",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rellor-mud",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "riolu-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rockruff-rock",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rolycoly-coal",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rookidee-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rotom-sparks",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "rufflet-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sableye-gem",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "salandit-gas",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sandile-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sandshrew-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sandygast-sand",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "scatterbug-powder",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "scyther-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "seedot-stem",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sentret-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "seviper-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sewaddle-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shellder-pearl",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shellos-mucus",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shinx-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shroodle-ink",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shroomish-spores",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "shuppet-scrap",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "silicobra-sand",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sinistea-chip",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "skiddo-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "skrelp-kelp",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "skwovet-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "slakoth-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "slowpoke-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "slugma-lava",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "smoliv-oil",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sneasel-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "snom-thread",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "snorunt-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "snover-berries",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "spinarak-thread",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "spiritomb-fragment",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "spoink-pearl",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "squawkabilly-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "stantler-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "starly-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "stonjourner-stone",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "stunky-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "sunkern-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "surskit-syrup",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "swablu-fluff",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "swinub-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tadbulb-mucus",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tandemaus-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tarountula-thread",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tatsugiri-scales",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tauros-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "teddiursa-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "timburr-sweat",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tinkatink-hair",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "toedscool-flaps",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "torkoal-coal",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "toxel-sparks",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tropius-leaf",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "tynamo-slime",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "varoom-fume",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "veluza-fillet",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "venonat-fang",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "volbeat-fluid",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "voltorb-sparks",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "vullaby-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "vulpix-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "wattrel-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "wiglett-sand",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "wingull-feather",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "wooper-slime",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "yanma-spike",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "yungoos-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "zangoose-claw",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "zorua-fur",
+      "category": "tm-materials"
+    },
+    {
+      "slug": "academy-ball",
+      "category": "picnic"
+    },
+    {
+      "slug": "academy-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "academy-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "academy-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "auspicious-armor",
+      "category": "picnic"
+    },
+    {
+      "slug": "barred-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "battle-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-flag-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-poke-ball-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-sky-flower-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "blue-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "bronze-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "bronze-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "bw-grass-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "cyber-ball",
+      "category": "picnic"
+    },
+    {
+      "slug": "diamond-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "diamond-pattern-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "diamond-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "eevee-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "exercise-ball",
+      "category": "picnic"
+    },
+    {
+      "slug": "fire-pattern-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "flower-pattern-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "gold-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "gold-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "gold-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "green-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "green-poke-ball-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "heroic-sword-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "leafy-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "lilac-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "magical-heart-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "magical-star-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "marill-ball",
+      "category": "picnic"
+    },
+    {
+      "slug": "mint-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "monstrous-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "orange-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "parasol-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "party-sparkler-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "peach-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "picnic-set",
+      "category": "picnic"
+    },
+    {
+      "slug": "pika-pika-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "pikachu-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "pink-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "pink-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "pink-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "plaid-tablecloth-b",
+      "category": "picnic"
+    },
+    {
+      "slug": "plaid-tablecloth-r",
+      "category": "picnic"
+    },
+    {
+      "slug": "plaid-tablecloth-y",
+      "category": "picnic"
+    },
+    {
+      "slug": "polka-dot-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "polka-dot-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "polka-dot-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "red-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "red-flag-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "red-poke-ball-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "silver-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "silver-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "silver-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "slowpoke-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "smiling-vee-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "spooky-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "steel-bottle-b",
+      "category": "picnic"
+    },
+    {
+      "slug": "steel-bottle-r",
+      "category": "picnic"
+    },
+    {
+      "slug": "steel-bottle-y",
+      "category": "picnic"
+    },
+    {
+      "slug": "striped-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "striped-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "striped-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "sunrise-flower-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "sunset-flower-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "vee-vee-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "whimsical-tablecloth",
+      "category": "picnic"
+    },
+    {
+      "slug": "white-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "winking-pika-pick",
+      "category": "picnic"
+    },
+    {
+      "slug": "yarn-ball",
+      "category": "picnic"
+    },
+    {
+      "slug": "yellow-bottle",
+      "category": "picnic"
+    },
+    {
+      "slug": "yellow-cup",
+      "category": "picnic"
+    },
+    {
+      "slug": "yellow-dish",
+      "category": "picnic"
+    },
+    {
+      "slug": "yellow-tablecloth",
+      "category": "picnic"
+    }
+  ]
+}

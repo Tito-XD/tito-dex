@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "note": "94 core items missing from items.json, sourced from PokeAPI categories training/effort-training/mega-stones/z-crystals/collectibles.",
+  "slugs": [
+    "amulet-coin", "exp-share", "luck-incense", "pure-incense", "soothe-bell",
+    "macho-brace", "power-anklet", "power-band", "power-belt", "power-bracer", "power-lens", "power-weight",
+    "absolite-z", "barbaracite", "baxcalibrite", "chandelurite", "chesnaughtite", "chimechite", "clefablite",
+    "crabominite", "darkranite", "delphoxite", "dragalgite", "dragoninite", "drampanite", "eelektrossite",
+    "emboarite", "excadrite", "falinksite", "feraligite", "floettite", "froslassite", "garchompite-z",
+    "glimmoranite", "golisopite", "golurkite", "greninjite", "hawluchanite", "heatranite", "lucarionite-z",
+    "magearnite", "malamarite", "meganiumite", "meowsticite", "pyroarite", "raichunite-x", "raichunite-y",
+    "scolipite", "scovillainite", "scraftinite", "skarmorite", "staraptite", "starminite", "tatsugirinite",
+    "victreebelite", "zeraorite", "zygardite",
+    "aloraichium-z--held", "buginium-z--held", "darkinium-z--held", "decidium-z--held", "dragonium-z--held",
+    "eevium-z--held", "electrium-z--held", "fairium-z--held", "fightinium-z--held", "firium-z--held",
+    "flyinium-z--held", "ghostium-z--held", "grassium-z--held", "groundium-z--held", "icium-z--held",
+    "incinium-z--held", "marshadium-z--held", "mewnium-z--held", "normalium-z--held", "pikanium-z--held",
+    "pikashunium-z--held", "poisonium-z--held", "primarium-z--held", "psychium-z--held", "rockium-z--held",
+    "snorlium-z--held", "steelium-z--held", "tapunium-z--held", "waterium-z--held",
+    "armorite-ore", "dynite-ore", "galarica-cuff", "galarica-twig", "galarica-wreath", "shoal-salt", "shoal-shell", "wishing-piece"
+  ]
+}
