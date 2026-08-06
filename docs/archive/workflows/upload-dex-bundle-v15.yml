@@ -1,5 +1,5 @@
-name: Patch and Publish Dex Bundle v17
-# Current live bundle publish workflow (2026-08-06).
+name: Patch and Publish Dex Bundle v15
+# Historical record only. This file is outside .github/workflows on purpose.
 
 on:
   workflow_dispatch:
@@ -10,12 +10,12 @@ on:
         default: false
         type: boolean
       expected_production_version:
-        description: Live bundleVersion that must still be production before v17 publish (16 until v17 goes live)
+        description: Live bundleVersion that must still be production before v15 publish (14 until v15 goes live)
         required: true
-        default: 16
+        default: 14
         type: number
       reuse_run_id:
-        description: Reuse a preserved v17 diagnostic artifact from this workflow run
+        description: Reuse a preserved v15 diagnostic artifact from this workflow run
         required: false
         default: ""
         type: string
@@ -25,14 +25,15 @@ permissions:
   contents: read
 
 concurrency:
-  group: dex-bundle-v17-production
+  group: dex-bundle-v15-production
   cancel-in-progress: false
 
 jobs:
   build-verify-publish:
     runs-on: ubuntu-latest
-    # v17 pulls the live v16 archive and merges the full PokeAPI item catalog
-    # (1536 extra items) plus new item sprites. No PokeAPI at build time.
+    # v15 pulls the live v14 compact archive and fills missing zh-Hans flavor
+    # text from data/l10n/zh/flavor_text_52poke.json. No PokeAPI, no sprite
+    # rebuild.
     timeout-minutes: 120
     steps:
       - name: Check out selected release ref
@@ -65,15 +66,15 @@ jobs:
           print(f"production pre-check ok: bundleVersion={m['bundleVersion']} cdnPrefix={m['cdnPrefix']}")
           PY
 
-      - name: Preserve the current v16 root manifest for rollback
+      - name: Preserve the current v14 root manifest for rollback
         if: inputs.publish
         env:
           EXPECTED_VERSION: ${{ inputs.expected_production_version }}
         run: |
-          cp dist/live-manifest.json dist/rollback/bundle-manifest-v16.json
+          cp dist/live-manifest.json dist/rollback/bundle-manifest-v14.json
           python3 - <<'PY'
           import json, os
-          m = json.load(open("dist/rollback/bundle-manifest-v16.json", encoding="utf-8"))
+          m = json.load(open("dist/rollback/bundle-manifest-v14.json", encoding="utf-8"))
           assert m["bundleVersion"] == int(os.environ["EXPECTED_VERSION"]) and m["cdnPrefix"] == "v5", m
           PY
 
@@ -81,61 +82,62 @@ jobs:
         if: inputs.publish
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-root-manifest-v16-rollback
-          path: dist/rollback/bundle-manifest-v16.json
+          name: titodex-root-manifest-v14-rollback
+          path: dist/rollback/bundle-manifest-v14.json
           if-no-files-found: error
           retention-days: 30
 
-      - name: Run v17 item-catalog unit tests
-        run: python3 tools/test_patch_dex_bundle_v17_items.py
+      - name: Run v15 flavor-text unit tests
+        run: python3 tools/test_patch_dex_bundle_v15_flavor_text.py
 
-      - name: Restore preserved v17 bundle
+      - name: Restore preserved v15 bundle
         if: inputs.reuse_run_id != ''
         uses: actions/download-artifact@v4
         with:
-          name: titodex-dex-v17-diagnostic-${{ inputs.reuse_run_id }}
-          path: dist/dex-v17/upload
+          name: titodex-dex-v15-diagnostic-${{ inputs.reuse_run_id }}
+          path: dist/dex-v15/upload
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ inputs.reuse_run_id }}
 
-      - name: Patch v16 into Dex bundle v17
+      - name: Patch v14 into Dex bundle v15
         if: inputs.reuse_run_id == ''
         run: >-
-          python3 tools/patch_dex_bundle_v17_items.py
-          --output dist/dex-v17
+          python3 tools/patch_dex_bundle_v15_flavor_text.py
+          --flavor-json data/l10n/zh/flavor_text_52poke.json
+          --output dist/dex-v15
 
       - name: Verify upload tree
-        run: python3 tools/verify_dex_upload_tree.py dist/dex-v17/upload
+        run: python3 tools/verify_dex_upload_tree.py dist/dex-v15/upload
 
-      - name: Spot-check full item catalog
+      - name: Spot-check zh flavor coverage
         run: |
           python3 - <<'PY'
-          import json
+          import json, re
           from pathlib import Path
-          root = json.loads(Path("dist/dex-v17/upload/bundle-manifest.json").read_text(encoding="utf-8"))
-          assert root["bundleVersion"] == 17 and root["cdnPrefix"] == "v5", root
-          assert root.get("itemCatalogSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)", root
-          items = json.loads(Path("dist/dex-v17/upload/v5/items.json").read_text(encoding="utf-8"))
-          slugs = {item["slug"] for item in items.values()}
-          assert len(items) >= 2100, len(items)
-          assert {"tm01", "hm01", "normalium-z--held", "bicycle", "bacon"} <= slugs, slugs
-          print(f"ok: items.json {len(items)} entries, full catalog present")
+          cjk = re.compile(r'[\u4e00-\u9fff]')
+          root = json.loads(Path("dist/dex-v15/upload/bundle-manifest.json").read_text(encoding="utf-8"))
+          assert root["bundleVersion"] == 15 and root["cdnPrefix"] == "v5", root
+          assert root.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)", root
+          for sid in (1, 152, 906):
+              detail = json.loads(Path(f"dist/dex-v15/upload/v5/details/{sid}.json").read_text(encoding="utf-8"))
+              assert any(cjk.search(e.get("text", "")) for e in detail.get("flavorEntries") or []), sid
+          print("ok: zh flavor present for sample species 1/152/906")
           PY
 
       - name: Preserve generated bundle when a step fails
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-dex-v17-diagnostic-${{ github.run_id }}
-          path: dist/dex-v17/upload
+          name: titodex-dex-v15-diagnostic-${{ github.run_id }}
+          path: dist/dex-v15/upload
           if-no-files-found: warn
           retention-days: 3
 
       - name: Upload verified bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-dex-v17
-          path: dist/dex-v17/upload
+          name: titodex-dex-v15
+          path: dist/dex-v15/upload
           if-no-files-found: error
           retention-days: 14
 
@@ -160,7 +162,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v17/upload
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v15/upload
           --cdn-prefix v5 --phase objects
 
       - name: Atomically switch the root manifest
@@ -171,12 +173,12 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v17/upload
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v15/upload
           --cdn-prefix v5 --phase manifest
 
-      - name: Verify public v17 cutover
+      - name: Verify public v15 cutover
         if: inputs.publish
         run: |
-          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 17 and m["cdnPrefix"] == "v5" and m.get("itemCatalogSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)" and m["archiveUrl"].endswith("/bundle-v17.tar.zst"), m'
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 15 and m["cdnPrefix"] == "v5" and m.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)" and m["archiveUrl"].endswith("/bundle-v15.tar.zst"), m'
           curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'
-          curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v17.tar.zst | head -n 1
+          curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v15.tar.zst | head -n 1
