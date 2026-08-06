@@ -78,6 +78,8 @@ Product direction includes:
 - **Linux handhelds** (e.g. future RG DS–class devices with a Linux OS)
 - **Web** (companion dashboard in a browser later)
 
+> **Note (2026-08):** Linux handheld packaging was later dropped as a target; Android remains primary with web preview only. The Flutter rationale below still stands for Android + web.
+
 Capacitor targets mobile WebView shells. It does **not** target Linux desktop/handheld. **Flutter** is a first-class citizen on Android, Linux, and Web with one UI codebase.
 
 ### 3. Custom-drawn UI fits Flutter

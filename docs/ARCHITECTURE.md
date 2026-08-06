@@ -35,7 +35,6 @@ Capacitor + React + TypeScript + Vite — mock UI and tokens in `src/styles/toke
 | Device | Status |
 | --- | --- |
 | Android phone / RG Rotate | Primary — `flutter/android/` |
-| Linux handheld (future) | `flutter/linux/` scaffold present |
 | Web preview | `flutter/web/` — save sync disabled (`dart:io`) |
 
 Constraints:
@@ -48,7 +47,7 @@ Constraints:
 ## Architecture Goals
 
 - local first
-- Android first (Linux + web follow)
+- Android first; web preview only (Linux handheld dropped as a target in 2026-08)
 - responsive phone + square layouts
 - simple data model
 - game-scoped parser (HGSS only for now)
