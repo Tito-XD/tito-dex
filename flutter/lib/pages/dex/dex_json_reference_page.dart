@@ -130,6 +130,8 @@ Widget? _referenceLeading(Map<String, dynamic> entry, DexReferenceKind kind) {
 final _itemCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
   options: const [
     null, '精灵球', '回复药品', '树果', '携带道具', '进化道具', '能力提升', '战斗道具',
+    '招式学习器', '极巨结晶', '招式材料', '宝可梦糖果', '料理素材', '邮件', '数据卡',
+    '剧情道具', '冒险道具', '其他道具',
   ],
   label: _itemCategoryLabel,
   filter: (entry, category) => _itemCategoryLabel(entry) == category,
