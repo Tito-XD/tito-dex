@@ -66,12 +66,20 @@ def download(url: str, dest: Path) -> None:
 
 def extract_archive(archive: Path, dest: Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
-        ["zstd", "-dc", str(archive)],
-        check=True,
-        stdout=subprocess.PIPE,
-    )
-    with tarfile.open(fileobj=io.BytesIO(result.stdout), mode="r:") as tar:
+    try:
+        result = subprocess.run(
+            ["zstd", "-dc", str(archive)],
+            check=True,
+            stdout=subprocess.PIPE,
+        )
+        data = result.stdout
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        import zstandard
+
+        data = zstandard.ZstdDecompressor().decompress(
+            archive.read_bytes(), max_output_size=2 * 1024 * 1024 * 1024
+        )
+    with tarfile.open(fileobj=io.BytesIO(data), mode="r:") as tar:
         destination = dest.resolve()
         for member in tar.getmembers():
             target = (dest / member.name).resolve()
@@ -88,13 +96,20 @@ def create_zst_tar(source_dir: Path, archive_path: Path) -> None:
             if not file.is_file() or file.resolve() == archive_path.resolve():
                 continue
             tar.add(file, arcname=file.relative_to(source_dir).as_posix())
-    result = subprocess.run(
-        ["zstd", "-19", "--stdout"],
-        input=buffer.getvalue(),
-        capture_output=True,
-        check=True,
-    )
-    archive_path.write_bytes(result.stdout)
+    try:
+        result = subprocess.run(
+            ["zstd", "-19", "--stdout"],
+            input=buffer.getvalue(),
+            capture_output=True,
+            check=True,
+        )
+        archive_path.write_bytes(result.stdout)
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        import zstandard
+
+        archive_path.write_bytes(
+            zstandard.ZstdCompressor(level=19).compress(buffer.getvalue())
+        )
 
 
 def verify_and_remove_duplicate_artwork(staging: Path) -> CompactMediaStats:
