@@ -85,8 +85,8 @@ Regression coverage has largely landed (58 test files covering trainer-card, hom
 - [x] Reconcile production Worker health, alerts, cron handlers, caching, and fallback semantics into `main`.
 - [x] Create and bind a dedicated TitoDex `MANIFEST_KV`; the unrelated `FODI_CACHE` remains untouched.
 - [x] Refresh the Worker compatibility date and locked Wrangler release, with a dry-run gate before deployment.
-- [ ] Re-audit the dedicated TitoDex KV binding and production cron inventory after each Cloudflare configuration change.
-- [ ] Verify whether the legacy `autumn-shape-2b65` Worker still has traffic or an owner; retire it only after that read-only check confirms it is unused.
+- [x] Re-audit the dedicated TitoDex KV binding and production cron inventory (2026-08-06): `MANIFEST_KV` id matches `wrangler.toml`, `FODI_CACHE` is untouched and unbound, the 6-hour deep-probe cron is live (`lastScheduledProbe` every 6 h), secrets match DEPLOY.md, and the live worker rev matches the repo config.
+- [x] Retire the legacy `autumn-shape-2b65` Worker (2026-08-06): audit found a single 2024-04-04 “Automatic migration” deployment with no git source or owner; confirmed unused by the maintainer and deleted via `wrangler delete`.
 - [x] Publish exact-version encounter schema with attributed PKHeX overlays for BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension; Champions is explicitly not applicable.
 - [x] Bound PokeAPI fetch concurrency: dex detail/catalog refresh batches (`summaryBatchSize`) with throttling; the first-run sync is no longer serial.
 
@@ -95,7 +95,6 @@ Regression coverage has largely landed (58 test files covering trainer-card, hom
 - deeper generation-specific save adapters beyond trainer metadata (more real save fixtures incoming)
 - grouped/collapsible cosmetic form controls and battle/team tool handoff for the currently selected form (form/version-aware deep links already shipped)
 - curated Z-A / Mega Dimension patches whenever a new form is absent from PokeAPI; partial records must keep unknown stats, locations, and images empty
-- Linux handheld packaging
 - broader accessibility and controller-navigation validation
 
 > Cloud sync is intentionally **not** planned: TitoDex stays local-first, with journey JSON import/export as the portability path.
