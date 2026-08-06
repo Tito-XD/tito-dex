@@ -76,9 +76,9 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 | --- | --- | --- |
 | `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v5/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动 | 历史：Patch/audit v7 from verified v5/v6 seeds |
+| `upload-dex-bundle.yml` | 手动 | v17 发布：全量道具图鉴 2130 项 + 图标（基线 v16）→ 构建/校验 → 可选 upload + manifest-last |
 
-已完成使命的 v12 / v13 一次性发布 workflow 存档在
+已完成使命的 v7 / v12 / v13 / v14 / v15 / v16 一次性发布 workflow 存档在
 `docs/archive/workflows/`，不再显示在 GitHub Actions；对应 `tools/` 脚本继续保留，
 用于历史复现和下一版本构建参考。
 

@@ -224,8 +224,12 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
 
 ## 两阶段发布与回滚
 
-v12 / v13 workflow 已随对应发布完成而存档。未来版本应创建带生产版本前置检查的
-新 workflow；v14 底层使用以下两阶段命令：
+当前发布使用 `.github/workflows/upload-dex-bundle.yml`（v17，workflow_dispatch，
+带生产版本前置检查：发布前必须确认线上 bundleVersion 仍为 v16，并保存回滚
+manifest；`publish=false` 时只构建 + 校验）。v7 / v12 / v13 / v14 / v15 / v16
+workflow 已存档在 `docs/archive/workflows/`。v14–v17 已通过本地增量脚本
+`tools/publish_dex_bundle_incremental.py` 发布（仅上传相邻版本差异对象 +
+manifest-last）。底层两阶段命令：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象

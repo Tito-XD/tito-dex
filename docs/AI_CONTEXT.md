@@ -58,10 +58,10 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **Species filter sheet icons:** body-style chips use original vector creature marks that preserve the recognisable HOME poses and white eyes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
-- Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes.
+- Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes. **Wild held items (bundle v16 candidate):** PokeAPI data only reached Gen 7, so 52poke imports add SwSh / BDSP / LA / SV / Z-A coverage — 520 species with held items (was 381), plus 52 previously-missing items added to `items.json` (594 total, CC BY-NC-SA attribution in `HELD_ITEMS_ATTRIBUTION.txt`). Versions without an explicit 52poke rate inherit the item's known rate (default 5%).
 
 ### Items (reference hub → 道具)
-- **542 curated items** grouped into Bulbapedia Browse:Items player categories (`categoryZh`): 精灵球 / 回复药品 / 树果 / 携带道具 / 进化道具 / 能力提升 / 战斗道具.
+- **Full item catalog (bundle v17 candidate):** 2130 items across 16 `categoryZh` groups — original 594 + 1536 from PokeAPI (TMs/HMs, Z crystals, mega stones, key items, mail, picnic/cooking, candies, TM materials, Dynamax crystals). zh names 98.8%; 967 bundled sprites; ~55.6 MB archive (+85 KB vs v16). The app filter list in `dex_json_reference_page.dart` is synced to the 16 groups.
 - Data source: PokeAPI (list, English name, category, cost, sprite) + Simplified-Chinese in-game descriptions from PokeAPI `zh-hans` flavor, with 52poke (CC BY-NC-SA 4.0) as the fallback for the newest Gen 8/9 items. 100% zh names, 99% zh descriptions.
 - Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
 - Build: `tools/build_items_dataset.py` → `tools/enrich_items_52poke.py` / `enrich_items_52poke_search.py` → `tools/patch_dex_bundle_v11_items.py`. The category-filter option list in `flutter/lib/pages/dex/dex_json_reference_page.dart` must stay in sync with the `categoryZh` groups.
@@ -114,7 +114,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Not shipped / partial
 - Beyond the IV/EV inputs already exposed in stat calc: full competitive damage calculator, dedicated IV workflow, usage rankings, and simulator parity.
 - Broader real-save fixtures and validation beyond HGSS (more real saves incoming from the maintainer).
-- Community (52poke) Chinese flavor-text import for older generations remains a separate future data patch; attribution (CC BY-NC-SA) is mandatory when it lands.
+- Community (52poke) Chinese flavor text: 850 species imported plus a maintainer-supplied Gholdengo overview (bundle v15 candidate; CC BY-NC-SA attribution ships as `FLAVOR_ATTRIBUTION.txt` in the archive). All 1025 species now have zh flavor; per-entry zh coverage rose to ~71%. Publish path: `upload-dex-bundle-v15.yml` after v14 goes live.
 
 > Cloud sync was dropped as a direction (2026-07): TitoDex stays local-first. Journey JSON import/export remains the portability path.
 
