@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest release:** `0.8.5+136` / `0.8.5-offline+137` · [GitHub Release v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5)
+**Latest release:** `0.8.7+140` / `0.8.7-offline+141` · [GitHub Release v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7)
 
-**Current `main` package version:** `0.8.5+136`
+**Current `main` package version:** `0.8.7+140`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 ## Quick start
@@ -38,7 +38,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | Companion | Configurable standby Pokémon, six-slot party card, shiny surprise, silhouette quiz |
 | Dex 1–1025 | Grid, search, 4-tab detail, 23 editions, regional scope |
 | Offline pack | Settings → CDN bundle; l10n/maps/config; update prompts |
-| Search hub | Structured reference + battle tools; reference → dex filters |
+| Search hub | Structured reference + battle tools; type/category filters; reference → dex filters |
 | UI | Chinese (`lib/l10n/`), DeviceShell, Nunito, RG layout |
 
 ## Navigation

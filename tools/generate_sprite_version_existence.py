@@ -58,6 +58,13 @@ _FRONT_RE = re.compile(r"^(\d+)\.png$")
 _BACK_RE = re.compile(r"^back/(\d+)\.png$")
 _ANIMATED_FRONT_RE = re.compile(r"^animated/(\d+)\.gif$")
 _ANIMATED_BACK_RE = re.compile(r"^animated/back/(\d+)\.gif$")
+_SHINY_FRONT_RE = re.compile(r"^shiny/(\d+)\.png$")
+_SHINY_BACK_RE = re.compile(r"^back/shiny/(\d+)\.png$")
+_ANIMATED_SHINY_FRONT_RE = re.compile(r"^animated/shiny/(\d+)\.gif$")
+_ANIMATED_SHINY_BACK_RE = re.compile(
+    r"^animated/back/shiny/(\d+)\.gif$"
+)
+_NAMED_ASSET_RE = re.compile(r"^(?:back/|shiny/|animated/)*(\d+-[^/]+)\.(?:png|gif)$")
 
 
 def _github_json(path: str, *, token: str | None = None) -> Any:
@@ -112,13 +119,22 @@ def extract_ids(
         "back": [],
         "animatedFront": [],
         "animatedBack": [],
+        "shinyFront": [],
+        "shinyBack": [],
+        "animatedShinyFront": [],
+        "animatedShinyBack": [],
     }
+    named: dict[str, list[str]] = {key: [] for key in result}
     prefix = f"{folder_within_generation}/"
     matchers = (
         ("front", _FRONT_RE),
         ("back", _BACK_RE),
         ("animatedFront", _ANIMATED_FRONT_RE),
         ("animatedBack", _ANIMATED_BACK_RE),
+        ("shinyFront", _SHINY_FRONT_RE),
+        ("shinyBack", _SHINY_BACK_RE),
+        ("animatedShinyFront", _ANIMATED_SHINY_FRONT_RE),
+        ("animatedShinyBack", _ANIMATED_SHINY_BACK_RE),
     )
     for entry in tree_entries:
         if entry.get("type") != "blob":
@@ -134,14 +150,65 @@ def extract_ids(
                 if resource_id > 0:
                     result[key].append(resource_id)
                 break
+        else:
+            if not _NAMED_ASSET_RE.fullmatch(relative):
+                continue
+            for key, matcher in matchers:
+                numeric_pattern = matcher.pattern.replace(r"(\d+)", r"\d+-[^/]+")
+                if re.fullmatch(numeric_pattern, relative):
+                    named[key].append(relative)
+                    break
+    result.update({f"named{key[0].upper()}{key[1:]}": value for key, value in named.items()})
     return result
 
 
+def _tree_child_sha(entries: Iterable[dict[str, Any]], name: str) -> str:
+    for entry in entries:
+        if entry.get("type") == "tree" and entry.get("path") == name:
+            return str(entry["sha"])
+    raise RuntimeError(f"Missing Git tree child: {name}")
+
+
+def _ids_for_pattern(
+    entries: Iterable[dict[str, Any]], pattern: re.Pattern[str]
+) -> list[int]:
+    result: list[int] = []
+    for entry in entries:
+        if entry.get("type") != "blob":
+            continue
+        match = pattern.fullmatch(str(entry.get("path") or ""))
+        if match:
+            resource_id = int(match.group(1))
+            if resource_id > 0:
+                result.append(resource_id)
+    return result
+
+
+def _media_payload(
+    entries: Iterable[dict[str, Any]],
+    pattern: re.Pattern[str],
+    path: str,
+    *,
+    source_prefix: str,
+) -> dict[str, Any]:
+    named_pattern = re.compile(pattern.pattern.replace(r"(\d+)", r"\d+-[^/]+"))
+    return {
+        "pathTemplate": path,
+        "ranges": compress_ranges(_ids_for_pattern(entries, pattern)),
+        "namedPaths": sorted(
+            f"{source_prefix}/{entry['path']}"
+            for entry in entries
+            if entry.get("type") == "blob"
+            and named_pattern.fullmatch(str(entry.get("path") or ""))
+        ),
+    }
+
+
 def build_matrix(*, ref: str = "master", token: str | None = None) -> dict[str, Any]:
-    branch = _github_json(
-        f"/repos/{SOURCE_REPOSITORY}/branches/{ref}", token=token
+    commit = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/commits/{ref}", token=token
     )
-    source_commit = branch["commit"]["sha"]
+    source_commit = commit["sha"]
     versions = _github_json(
         f"/repos/{SOURCE_REPOSITORY}/contents/sprites/pokemon/versions"
         f"?ref={source_commit}",
@@ -184,12 +251,147 @@ def build_matrix(*, ref: str = "master", token: str | None = None) -> dict[str, 
             "backRanges": compress_ranges(extracted["back"]),
             "animatedFrontRanges": compress_ranges(extracted["animatedFront"]),
             "animatedBackRanges": compress_ranges(extracted["animatedBack"]),
+            "shinyFrontRanges": compress_ranges(extracted["shinyFront"]),
+            "shinyBackRanges": compress_ranges(extracted["shinyBack"]),
+            "animatedShinyFrontRanges": compress_ranges(
+                extracted["animatedShinyFront"]
+            ),
+            "animatedShinyBackRanges": compress_ranges(
+                extracted["animatedShinyBack"]
+            ),
+            **{
+                key: [
+                    f"sprites/pokemon/versions/{source_path}/{relative}"
+                    for relative in extracted[key]
+                ]
+                for key in (
+                    "namedFront",
+                    "namedBack",
+                    "namedAnimatedFront",
+                    "namedAnimatedBack",
+                    "namedShinyFront",
+                    "namedShinyBack",
+                    "namedAnimatedShinyFront",
+                    "namedAnimatedShinyBack",
+                )
+            },
         }
 
+    sprites = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/contents/sprites?ref={source_commit}",
+        token=token,
+    )
+    items_sha = next(
+        item["sha"]
+        for item in sprites
+        if item.get("type") == "dir" and item.get("name") == "items"
+    )
+    items_tree_payload = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/git/trees/{items_sha}?recursive=1",
+        token=token,
+    )
+    if items_tree_payload.get("truncated"):
+        raise RuntimeError("GitHub tree was truncated for sprites/items")
+    item_files = sorted(
+        str(entry["path"])
+        for entry in items_tree_payload.get("tree") or []
+        if entry.get("type") == "blob"
+        and str(entry.get("path") or "").endswith(".png")
+    )
+    pokemon_sha = next(
+        item["sha"]
+        for item in sprites
+        if item.get("type") == "dir" and item.get("name") == "pokemon"
+    )
+    pokemon_tree = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/git/trees/{pokemon_sha}", token=token
+    )["tree"]
+    shiny_tree = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/git/trees/"
+        f"{_tree_child_sha(pokemon_tree, 'shiny')}?recursive=1",
+        token=token,
+    )["tree"]
+    other_tree = _github_json(
+        f"/repos/{SOURCE_REPOSITORY}/git/trees/"
+        f"{_tree_child_sha(pokemon_tree, 'other')}",
+        token=token,
+    )["tree"]
+
+    media_trees: dict[str, list[dict[str, Any]]] = {}
+    for folder in ("home", "official-artwork", "showdown"):
+        payload = _github_json(
+            f"/repos/{SOURCE_REPOSITORY}/git/trees/"
+            f"{_tree_child_sha(other_tree, folder)}?recursive=1",
+            token=token,
+        )
+        if payload.get("truncated"):
+            raise RuntimeError(f"GitHub tree was truncated for other/{folder}")
+        media_trees[folder] = list(payload.get("tree") or [])
+
+    direct_png = re.compile(r"^(\d+)\.png$")
+    shiny_png = re.compile(r"^shiny/(\d+)\.png$")
+    direct_gif = re.compile(r"^(\d+)\.gif$")
+    shiny_gif = re.compile(r"^shiny/(\d+)\.gif$")
+    media_assets = {
+        "default": _media_payload(
+            pokemon_tree,
+            direct_png,
+            "sprites/pokemon/{id}.png",
+            source_prefix="sprites/pokemon",
+        ),
+        "defaultShiny": _media_payload(
+            shiny_tree,
+            direct_png,
+            "sprites/pokemon/shiny/{id}.png",
+            source_prefix="sprites/pokemon/shiny",
+        ),
+        "home": _media_payload(
+            media_trees["home"],
+            direct_png,
+            "sprites/pokemon/other/home/{id}.png",
+            source_prefix="sprites/pokemon/other/home",
+        ),
+        "homeShiny": _media_payload(
+            media_trees["home"],
+            shiny_png,
+            "sprites/pokemon/other/home/shiny/{id}.png",
+            source_prefix="sprites/pokemon/other/home",
+        ),
+        "officialArtwork": _media_payload(
+            media_trees["official-artwork"],
+            direct_png,
+            "sprites/pokemon/other/official-artwork/{id}.png",
+            source_prefix="sprites/pokemon/other/official-artwork",
+        ),
+        "officialArtworkShiny": _media_payload(
+            media_trees["official-artwork"],
+            shiny_png,
+            "sprites/pokemon/other/official-artwork/shiny/{id}.png",
+            source_prefix="sprites/pokemon/other/official-artwork",
+        ),
+        "showdownAnimated": _media_payload(
+            media_trees["showdown"],
+            direct_gif,
+            "sprites/pokemon/other/showdown/{id}.gif",
+            source_prefix="sprites/pokemon/other/showdown",
+        ),
+        "showdownAnimatedShiny": _media_payload(
+            media_trees["showdown"],
+            shiny_gif,
+            "sprites/pokemon/other/showdown/shiny/{id}.gif",
+            source_prefix="sprites/pokemon/other/showdown",
+        ),
+    }
+
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "sourceRepository": SOURCE_REPOSITORY,
         "sourceCommit": source_commit,
+        "itemAssets": {
+            "pathPrefix": "sprites/items",
+            "files": item_files,
+        },
+        "mediaAssets": media_assets,
         "versionGroups": groups,
     }
 

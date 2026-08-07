@@ -16,16 +16,20 @@ void main() {
 
     test('uses pre-localized stat labels when provided', () {
       expect(
-        formatNatureStatLine(
-          increasedStatZh: '速度',
-          decreasedStatZh: '防御',
-        ),
+        formatNatureStatLine(increasedStatZh: '速度', decreasedStatZh: '防御'),
         '↑ 速度 · ↓ 防御',
       );
     });
 
     test('returns neutral label when no stat changes', () {
       expect(formatNatureStatLine(), contains('中性'));
+    });
+
+    test('normalizes stat keys from bundle, PokeAPI, and imported data', () {
+      expect(natureStatLabelZh('specialAttack'), '特攻');
+      expect(natureStatLabelZh('special-defense'), '特防');
+      expect(natureStatLabelZh('special_defense'), '特防');
+      expect(natureStatLabelZh('spAtk'), '特攻');
     });
   });
 

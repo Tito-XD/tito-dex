@@ -1,0 +1,4415 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T16:49:07+00:00",
+  "summary": {
+    "items": 440,
+    "sharedTemplates": 26,
+    "dynamaxCrystalItems": 300,
+    "technicalRecordItems": 100,
+    "tmMaterialItems": 25,
+    "picnicTemplateItems": 9,
+    "speciesCandyItems": 6
+  },
+  "itemsBySlug": {
+    "academy-cup": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "academy-tablecloth": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "arrokuda-scales": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "bw-grass-tablecloth": {
+      "spriteMappingStatus": "fallback-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "carbink-jewel": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "clefairy-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:pink",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_粉 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/1/13/Bag_%E7%B3%96%E6%9E%9C_%E7%B2%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "cramorant-down": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "dynamax-crystal-and15": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-and337": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-and390": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-and458": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-and603": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aql7235": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aql7525": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aql7557": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aql7595": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aql7602": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr7950": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8232": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8264": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8414": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8499": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8518": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8610": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aqr8709": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ara6585": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ari546": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ari553": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ari617": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ari951": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur1577": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur1605": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur1612": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur1641": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur1708": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur2088": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-aur2095": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5235": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5340": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5351": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5435": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5506": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5602": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-boo5733": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cap7754": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cap7773": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cap7776": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cap8278": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cap8322": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-car2326": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-car3307": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-car3685": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-car3699": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas153": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas168": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas21": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas219": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas265": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas403": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cas542": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cen5267": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cen5288": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cen5459": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cen5460": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cen551": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cep8162": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cep8238": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cep8417": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cep8974": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cet188": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cet539": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cet681": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cet804": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cet911": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2282": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2294": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2491": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2618": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2646": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2657": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2693": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cma2827": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cmi2845": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cmi2943": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3208": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3249": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3268": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3429": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3449": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3461": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3572": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cnc3627": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-col1956": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-col2040": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-col2177": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-com4968": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-crt4287": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cru4656": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cru4700": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cru4730": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cru4763": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cru4853": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-crv4623": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-crv4662": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-crv4757": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-crv4786": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cvn4785": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cvn4846": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cvn4915": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg7417": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg7528": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg7796": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg7924": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg7949": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-cyg8301": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-del7852": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-del7882": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-del7906": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra4434": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra5291": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra5744": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6132": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6370": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6396": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6536": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6636": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6688": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra6705": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra7310": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-dra7462": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-equ8131": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1084": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1231": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1298": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1325": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1393": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1464": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri1666": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri472": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri850": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri874": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri897": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-eri984": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2216": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2286": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2421": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2473": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2484": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2650": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2777": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2891": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2930": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gem2990": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gru8353": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gru8425": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-gru8636": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6008": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6117": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6148": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6406": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6410": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-her6526": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-hya3418": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-hya3482": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-hya3748": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-hya3845": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-hya3903": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo3773": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo3852": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo3905": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo3982": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo4031": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo4057": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo4357": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo4359": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-leo4534": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lep1829": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lep1865": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lib5531": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lib5603": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lib5685": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lib5787": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lyr7001": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lyr7106": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lyr7178": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-lyr7298": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oct7228": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6056": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6075": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6149": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6378": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6556": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-oph6603": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1543": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1713": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1790": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1852": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1879": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1899": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1903": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori1948": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori2004": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ori2061": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-pav7790": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg39": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8308": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8450": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8634": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8650": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8684": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8775": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8781": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8880": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-peg8905": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per1017": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per1131": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per1228": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per834": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per936": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-per941": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-phe338": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-phe99": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psa8728": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psc361": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psc437": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psc510": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psc596": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-psc8773": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-pup3045": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-pup3165": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-pup3185": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco5928": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco5944": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco5953": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco5984": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6027": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6084": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6134": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6165": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6241": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6247": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6252": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6508": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6527": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6553": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sco6630": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ser5854": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ser5879": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-ser7141": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sge7479": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr6746": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr6812": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr6859": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr6879": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr6913": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7116": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7121": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7194": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7264": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7337": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7343": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7348": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-sgr7597": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1165": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1346": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1373": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1409": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1412": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1457": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1791": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tau1910": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tra6217": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-tri544": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma3323": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma3569": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma3594": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4033": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4069": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4295": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4301": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4375": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4377": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4518": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4554": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4660": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma4905": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma5054": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-uma5191": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-umi424": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-umi5563": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-umi5735": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-umi6789": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vel3485": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vel3634": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vel3734": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir4540": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir4689": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir4825": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir4910": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir4932": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5056": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5107": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5315": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5338": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5359": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vir5409": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "dynamax-crystal-vul7405": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:dynamax-crystal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 极巨结晶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_%E6%9E%81%E5%B7%A8%E7%BB%93%E6%99%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "farfetchd-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:brown",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_褐 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c7/Bag_%E7%B3%96%E6%9E%9C_%E8%A4%90_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "feebas-scales": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "fidough-fur": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "flower-pattern-cup": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "gastly-gas": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "gothita-eyelash": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "grubbin-thread": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "illumise-fluid": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "jynx-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:red",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_红 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/2/2f/Bag_%E7%B3%96%E6%9E%9C_%E7%BA%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "kricketot-shell": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "magikarp-scales": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "monstrous-tablecloth": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "morpeko-snack": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "nidoran-f-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:blue",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_蓝 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/63/Bag_%E7%B3%96%E6%9E%9C_%E8%93%9D_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "oricorio-feather": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "peach-tablecloth": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "porygon-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:pink",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_粉 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/1/13/Bag_%E7%B3%96%E6%9E%9C_%E7%B2%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "rattata-candy": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:lets-go-species-candy:purple",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 糖果_紫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_%E7%B3%96%E6%9E%9C_%E7%B4%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "sableye-gem": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "seedot-stem": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "shroodle-ink": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "skwovet-fur": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "slakoth-fur": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "spoink-pearl": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "spooky-tablecloth": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "steel-bottle-y": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "sunkern-leaf": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "tatsugiri-scales": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "tr00": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr01": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr02": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr03": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr04": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr05": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ice",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 冰 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/d/d7/Bag_TR_%E5%86%B0_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr06": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ice",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 冰 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/d/d7/Bag_TR_%E5%86%B0_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr07": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr08": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:electric",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 电 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/92/Bag_TR_%E7%94%B5_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr09": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:electric",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 电 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/92/Bag_TR_%E7%94%B5_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr10": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ground",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 地面 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_TR_%E5%9C%B0%E9%9D%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr11": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr12": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr13": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr14": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr15": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr16": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr17": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr18": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:bug",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 虫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/72/Bag_TR_%E8%99%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr19": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr20": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr21": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr22": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr23": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ground",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 地面 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_TR_%E5%9C%B0%E9%9D%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr24": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dragon",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 龙 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/62/Bag_TR_%E9%BE%99_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr25": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr26": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr27": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr28": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:bug",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 虫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/72/Bag_TR_%E8%99%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr29": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr30": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr31": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr32": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr33": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ghost",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 幽灵 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c8/Bag_TR_%E5%B9%BD%E7%81%B5_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr34": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr35": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr36": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr37": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr38": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr39": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr40": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr41": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr42": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr43": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr44": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr45": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr46": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr47": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dragon",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 龙 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/62/Bag_TR_%E9%BE%99_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr48": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr49": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr50": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr51": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dragon",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 龙 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/62/Bag_TR_%E9%BE%99_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr52": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr53": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr54": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr55": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr56": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr57": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr58": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr59": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr60": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:bug",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 虫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/72/Bag_TR_%E8%99%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr61": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:bug",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 虫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/72/Bag_TR_%E8%99%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr62": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dragon",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 龙 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/62/Bag_TR_%E9%BE%99_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr63": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:rock",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 岩石 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ee/Bag_TR_%E5%B2%A9%E7%9F%B3_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr64": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr65": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr66": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:flying",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 飞行 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E9%A3%9E%E8%A1%8C_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr67": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ground",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 地面 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_TR_%E5%9C%B0%E9%9D%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr68": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr69": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr70": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr71": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr72": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr73": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr74": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr75": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:rock",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 岩石 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ee/Bag_TR_%E5%B2%A9%E7%9F%B3_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr76": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:rock",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 岩石 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ee/Bag_TR_%E5%B2%A9%E7%9F%B3_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr77": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:grass",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 草 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/7c/Bag_TR_%E8%8D%89_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr78": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr79": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:steel",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 钢 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/09/Bag_TR_%E9%92%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr80": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:electric",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 电 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/92/Bag_TR_%E7%94%B5_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr81": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr82": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr83": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr84": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr85": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:normal",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 一般 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/5/5b/Bag_TR_%E4%B8%80%E8%88%AC_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr86": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:electric",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 电 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/92/Bag_TR_%E7%94%B5_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr87": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ground",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 地面 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_TR_%E5%9C%B0%E9%9D%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr88": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fire",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 火 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/f8/Bag_TR_%E7%81%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr89": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:flying",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 飞行 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E9%A3%9E%E8%A1%8C_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr90": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fairy",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 妖精 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/3/3d/Bag_TR_%E5%A6%96%E7%B2%BE_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr91": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:poison",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 毒 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/4/4f/Bag_TR_%E6%AF%92_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr92": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fairy",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 妖精 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/3/3d/Bag_TR_%E5%A6%96%E7%B2%BE_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr93": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr94": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:ground",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 地面 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_TR_%E5%9C%B0%E9%9D%A2_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr95": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:dark",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 恶 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/c/c1/Bag_TR_%E6%81%B6_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr96": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:bug",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 虫 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/72/Bag_TR_%E8%99%AB_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr97": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:psychic",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 超能力 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/7/77/Bag_TR_%E8%B6%85%E8%83%BD%E5%8A%9B_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr98": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:water",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 水 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/ec/Bag_TR_%E6%B0%B4_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tr99": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:tr:fighting",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag TR 格斗 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/f/fe/Bag_TR_%E6%A0%BC%E6%96%97_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "voltorb-sparks": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "vullaby-feather": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "wingull-feather": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "yellow-tablecloth": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-picnic-set",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 野餐组合 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b7/Bag_%E9%87%8E%E9%A4%90%E7%BB%84%E5%90%88_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "yungoos-fur": {
+      "spriteMappingStatus": "shared-template",
+      "spriteSharedWith": "52poke:sv-tm-material",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 掉落物 SV Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/64/Bag_%E6%8E%89%E8%90%BD%E7%89%A9_SV_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    }
+  }
+}

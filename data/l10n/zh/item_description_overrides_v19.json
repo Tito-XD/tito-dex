@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "name": "52poke bag descriptions",
+      "license": "CC BY-NC-SA 4.0"
+    },
+    {
+      "name": "TitoDex maintainer description",
+      "license": "project data"
+    }
+  ],
+  "itemsBySlug": {
+    "ice-berry": {"descriptionZh": "携带后，可以治愈自己的灼伤状态。", "descriptionSource": "52poke bag description"},
+    "miracleberry": {"descriptionZh": "携带后，可以治愈自己所有的异常状态。", "descriptionSource": "52poke bag description"},
+    "berry": {"descriptionZh": "携带后，可以回复自己１０点体力。", "descriptionSource": "52poke bag description"},
+    "burnt-berry": {"descriptionZh": "携带后，可以治愈自己的冰冻状态。", "descriptionSource": "52poke bag description"},
+    "berserk-gene": {"descriptionZh": "攻击力大幅提高，但会陷入混乱状态。", "descriptionSource": "52poke bag description"},
+    "mysteryberry": {"descriptionZh": "携带后，可以在战斗中回复自己的ＰＰ。", "descriptionSource": "52poke bag description"},
+    "gold-berry": {"descriptionZh": "携带后，可以回复自己３０点体力。", "descriptionSource": "52poke bag description"},
+    "auroraticket": {"descriptionZh": "前往诞生之岛时必要的船票。美丽地散发着光芒。", "descriptionSource": "52poke bag description"},
+    "bead-mail": {"descriptionZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。", "descriptionSource": "52poke bag description"},
+    "berry-pouch": {"descriptionZh": "将树果收集起来的袋子，放在包包的重要物品口袋里。", "descriptionSource": "52poke bag description"},
+    "bicycle": {"descriptionZh": "能以２倍以上的速度移动的折叠式自行车。", "descriptionSource": "52poke bag description"},
+    "bike-voucher": {"descriptionZh": "给华蓝市的奇迹自行车店就能交换得到自行车。", "descriptionSource": "52poke bag description"},
+    "butter": {"descriptionZh": "带有甜味和咸味的调味料。不仅味道浓郁，更能提升面包口感。哞哞鲜奶１００％的乃是高级品。", "descriptionSource": "52poke bag description"},
+    "bw-grass-tablecloth": {"descriptionZh": "以《宝可梦 黑／白》风格的青草图案装饰的野餐桌布。", "descriptionSource": "TitoDex maintainer description"},
+    "cramorant-down": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"},
+    "dream-mail": {"descriptionZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。", "descriptionSource": "52poke bag description"},
+    "fame-checker": {"descriptionZh": "可以重复查看打听到的有名人物的东西。", "descriptionSource": "52poke bag description"},
+    "grubbin-thread": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"},
+    "illumise-fluid": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"},
+    "jam": {"descriptionZh": "甜味和酸味强烈的调味料。用在三明治上时甜味偏强，使用时要足够注意。", "descriptionSource": "52poke bag description"},
+    "kofus-wallet": {"descriptionZh": "玻瓶道馆馆主海岱忘记带的钱包。到渍沁镇的市场交给他吧。", "descriptionSource": "52poke bag description"},
+    "koraidons-poke-ball": {"descriptionZh": "用来装神秘的宝可梦故勒顿的精灵球。是从名为派帕的男生那里得到的。", "descriptionSource": "52poke bag description"},
+    "magma-emblem": {"descriptionZh": "与熔岩队的标志形状相同的徽章模样的东西。", "descriptionSource": "52poke bag description"},
+    "miraidons-poke-ball": {"descriptionZh": "用来装神秘的宝可梦密勒顿的精灵球。是从名为派帕的男生那里得到的。", "descriptionSource": "52poke bag description"},
+    "morpeko-snack": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"},
+    "mysticticket": {"descriptionZh": "前往肚脐岩时必要的船票。神秘地发着光。", "descriptionSource": "52poke bag description"},
+    "noodles": {"descriptionZh": "带有咸味的食材。煮熟的面。作为三明治馅料的潜力还是未知数。", "descriptionSource": "52poke bag description"},
+    "oaks-parcel": {"descriptionZh": "这是常青市的商店托付给你的包裹。需要将它交给大木博士。", "descriptionSource": "52poke bag description"},
+    "old-sea-map": {"descriptionZh": "记录着前往某座岛屿的路线的一张古老的航海图。", "descriptionSource": "52poke bag description"},
+    "pokeblock-case": {"descriptionZh": "用来放置用树果混合器制造的宝可方块的盒子，只要摇一下就会有宝可方块从里面掉出来。", "descriptionSource": "52poke bag description"},
+    "powder-jar": {"descriptionZh": "用来保存树果粉碎制作的树果粉末的瓶子。", "descriptionSource": "52poke bag description"},
+    "rainbow-pass": {"descriptionZh": "能够在枯叶市和七之岛之间用渡船移动的通行证。上面印着彩虹的图片。", "descriptionSource": "52poke bag description"},
+    "rice": {"descriptionZh": "带有甜味的食材。煮熟的米。作为三明治馅料的潜力还是未知数。", "descriptionSource": "52poke bag description"},
+    "ruby": {"descriptionZh": "散发着红色光辉的非常漂亮的宝石。热情的象征。", "descriptionSource": "52poke bag description"},
+    "sapphire": {"descriptionZh": "散发着蓝色光辉的非常漂亮的宝石。真诚的象征。", "descriptionSource": "52poke bag description"},
+    "seedot-stem": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"},
+    "teachy-tv": {"descriptionZh": "可以收看对新手训练家有帮助的节目的电视。", "descriptionSource": "52poke bag description"},
+    "tofu": {"descriptionZh": "带有甜味的食材。生豆腐。作为三明治馅料的潜力还是未知数。", "descriptionSource": "52poke bag description"},
+    "tri-pass": {"descriptionZh": "能够在第１岛、第２岛和第３岛之间用渡船移动的通行证。上面印着三座岛。", "descriptionSource": "52poke bag description"},
+    "vullaby-feather": {"descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。", "descriptionSource": "52poke shared SV TM-material description"}
+  }
+}

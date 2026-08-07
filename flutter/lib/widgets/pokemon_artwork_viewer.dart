@@ -16,19 +16,18 @@ Future<void> showPokemonArtworkViewer(
 }) {
   return showGeneralDialog<void>(
     context: context,
+    // Dex detail pages live inside the ShellRoute navigator. Keeping the
+    // viewer on that same stack makes it the real top route for Android
+    // predictive back and handheld B/Escape; the default root navigator could
+    // pop the detail underneath while leaving this overlay visible.
+    useRootNavigator: false,
     barrierColor: Colors.black.withValues(alpha: 0.88),
     barrierDismissible: false,
     transitionDuration: const Duration(milliseconds: 260),
     pageBuilder: (context, animation, secondaryAnimation) {
-      return PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) {
-            Navigator.of(context).pop();
-          }
-        },
-        child: _PokemonArtworkViewer(summary: summary),
-      );
+      // Do not block the route with `PopScope(canPop: false)`: predictive back
+      // must know at gesture start that this overlay can be dismissed.
+      return _PokemonArtworkViewer(summary: summary);
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(opacity: animation, child: child);
@@ -190,6 +189,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
     final heroTag = pokemonArtworkHeroTag(summary);
 
     return Dialog.fullscreen(
+      key: const ValueKey('pokemon-artwork-viewer'),
       backgroundColor: Colors.transparent,
       child: SafeArea(
         child: Column(

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-07T10:53:54+00:00",
+  "generatedAt": "2026-08-07T16:48:30+00:00",
   "sources": [
     {
       "name": "PokeAPI",
@@ -3258,7 +3258,8 @@
       ]
     },
     "mighty-candy": {
-      "wikiTitle": "力量糖果（道具）"
+      "wikiTitle": "力量糖果（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/mighty-candy.png"
     },
     "tough-candy": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/tough-candy.png",
@@ -3315,13 +3316,15 @@
       ]
     },
     "tough-candy-l": {
-      "wikiTitle": "守护糖果Ｌ（道具）"
+      "wikiTitle": "守护糖果Ｌ（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/tough-candy-l.png"
     },
     "smart-candy-l": {
       "wikiTitle": "知识糖果Ｌ（道具）"
     },
     "courage-candy-l": {
-      "wikiTitle": "心灵糖果Ｌ（道具）"
+      "wikiTitle": "心灵糖果Ｌ（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/courage-candy-l.png"
     },
     "quick-candy-l": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/quick-candy-l.png",
@@ -3351,13 +3354,16 @@
       ]
     },
     "tough-candy-xl": {
-      "wikiTitle": "守护糖果ＸＬ（道具）"
+      "wikiTitle": "守护糖果ＸＬ（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/tough-candy-xl.png"
     },
     "smart-candy-xl": {
-      "wikiTitle": "知识糖果ＸＬ（道具）"
+      "wikiTitle": "知识糖果ＸＬ（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/smart-candy-xl.png"
     },
     "courage-candy-xl": {
-      "wikiTitle": "心灵糖果ＸＬ（道具）"
+      "wikiTitle": "心灵糖果ＸＬ（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/courage-candy-xl.png"
     },
     "quick-candy-xl": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/quick-candy-xl.png",
@@ -3940,10 +3946,12 @@
       ]
     },
     "rock-tera-shard": {
-      "wikiTitle": "岩石太晶碎块（道具）"
+      "wikiTitle": "岩石太晶碎块（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/rock-tera-shard.png"
     },
     "ghost-tera-shard": {
-      "wikiTitle": "幽灵太晶碎块（道具）"
+      "wikiTitle": "幽灵太晶碎块（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/ghost-tera-shard.png"
     },
     "dragon-tera-shard": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/dragon-tera-shard.png",
@@ -4144,7 +4152,8 @@
       ]
     },
     "clever-mochi": {
-      "wikiTitle": "精神粘糕（道具）"
+      "wikiTitle": "精神粘糕（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/clever-mochi.png"
     },
     "swift-mochi": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/swift-mochi.png",
@@ -4319,7 +4328,10 @@
       "spriteDimensions": [
         32,
         32
-      ]
+      ],
+      "descriptionZh": "携带后，可以治愈自己的灼伤状态。",
+      "effectZh": "携带后，可以治愈自己的灼伤状态。",
+      "descriptionSource": "52poke"
     },
     "crunchy-salt": {
       "descriptionZh": "晶莹剔透的矿物。是草类和岩石类宝可梦喜爱的食物，能吸引它们聚集到投向的地方。",
@@ -4388,7 +4400,10 @@
       "spriteDimensions": [
         32,
         32
-      ]
+      ],
+      "descriptionZh": "携带后，可以治愈自己所有的异常状态。",
+      "effectZh": "携带后，可以治愈自己所有的异常状态。",
+      "descriptionSource": "52poke"
     },
     "tiny-mushroom": {
       "descriptionZh": "珍稀的小蘑菇。在一些爱好者中有着相当高的人气。",
@@ -4541,7 +4556,10 @@
       "spriteDimensions": [
         32,
         32
-      ]
+      ],
+      "descriptionZh": "携带后，可以回复自己１０点体力。",
+      "effectZh": "携带后，可以回复自己１０点体力。",
+      "descriptionSource": "52poke"
     },
     "ball-of-mud": {
       "descriptionZh": "硬邦邦的坚固泥丸。被它击中的宝可梦动作会变得迟缓，有时还会生出破绽。",
@@ -4604,7 +4622,11 @@
       ]
     },
     "burnt-berry": {
-      "wikiTitle": "烧烤的果实（道具）"
+      "wikiTitle": "烧烤的果实（道具）",
+      "descriptionZh": "携带后，可以治愈自己的冰冻状态。",
+      "effectZh": "携带后，可以治愈自己的冰冻状态。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/burnt-berry.png"
     },
     "tumblestone": {
       "descriptionZh": "不可思议的圆形石头。与球果组合后，能够激发出精灵球的性能。",
@@ -4685,7 +4707,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "攻击力大幅提高，但会陷入混乱状态。",
+      "effectZh": "攻击力大幅提高，但会陷入混乱状态。",
+      "descriptionSource": "52poke"
     },
     "iron-chunk": {
       "descriptionZh": "天然的金属片。可加工成锁扣等零件，在制作各种精灵球时使用。",
@@ -4706,7 +4731,10 @@
       "spriteDimensions": [
         32,
         32
-      ]
+      ],
+      "descriptionZh": "携带后，可以在战斗中回复自己的ＰＰ。",
+      "effectZh": "携带后，可以在战斗中回复自己的ＰＰ。",
+      "descriptionSource": "52poke"
     },
     "seed-of-mastery": {
       "descriptionZh": "稀有的种子。将它交给某人就能让宝可梦加强招式。",
@@ -4861,7 +4889,10 @@
       "spriteDimensions": [
         32,
         32
-      ]
+      ],
+      "descriptionZh": "携带后，可以回复自己３０点体力。",
+      "effectZh": "携带后，可以回复自己３０点体力。",
+      "descriptionSource": "52poke"
     },
     "black-tumblestone": {
       "descriptionZh": "不可思议的黑色石头。与球果组合后，能够激发出沉重球的性能。",
@@ -4939,13 +4970,15 @@
       "descriptionZh": "学院指定的野餐用杯。杯口造型经过精雕细琢，在学校内外都很有人气。",
       "effectZh": "学院指定的野餐用杯。杯口造型经过精雕细琢，在学校内外都很有人气。",
       "descriptionSource": "52poke",
-      "wikiTitle": "校园水杯（道具）"
+      "wikiTitle": "校园水杯（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/academy-cup.png"
     },
     "academy-tablecloth": {
       "descriptionZh": "学院指定的桌巾。采用耐热材料，以最新的纤维加工技术制成。即使是使用锐利之爪都不能弄破。",
       "effectZh": "学院指定的桌巾。采用耐热材料，以最新的纤维加工技术制成。即使是使用锐利之爪都不能弄破。",
       "descriptionSource": "52poke",
-      "wikiTitle": "校园桌巾（道具）"
+      "wikiTitle": "校园桌巾（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/academy-tablecloth.png"
     },
     "adamant-crystal": {
       "descriptionZh": "光辉灿烂的大珠子。让帝牙卢卡携带后，能使之力量高涨并改变形态。",
@@ -5109,7 +5142,8 @@
       "descriptionZh": "能够在铠岛找出的珍稀石头。把它送给铠岛的收藏家，就会有好事发生。",
       "effectZh": "能够在铠岛找出的珍稀石头。把它送给铠岛的收藏家，就会有好事发生。",
       "descriptionSource": "52poke",
-      "wikiTitle": "铠甲矿石（道具）"
+      "wikiTitle": "铠甲矿石（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/armorite-ore.png"
     },
     "arrokuda-scales": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -5136,7 +5170,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "前往诞生之岛时必要的船票。美丽地散发着光芒。",
+      "effectZh": "前往诞生之岛时必要的船票。美丽地散发着光芒。",
+      "descriptionSource": "52poke"
     },
     "auspicious-armor": {
       "descriptionZh": "能让某些特定宝可梦进化的神奇铠甲。蕴含着祝贺的感情。",
@@ -5368,7 +5405,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。",
+      "effectZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。",
+      "descriptionSource": "52poke"
     },
     "bellsprout-candy": {
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
@@ -5420,17 +5460,24 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "将树果收集起来的袋子，放在包包的重要物品口袋里。",
+      "effectZh": "将树果收集起来的袋子，放在包包的重要物品口袋里。",
+      "descriptionSource": "52poke"
     },
     "big-bamboo-shoot": {
       "descriptionZh": "大大的珍贵竹笋。在部分美食家中拥有非常高人气。",
       "effectZh": "大大的珍贵竹笋。在部分美食家中拥有非常高人气。",
       "descriptionSource": "52poke",
-      "wikiTitle": "大竹笋（道具）"
+      "wikiTitle": "大竹笋（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/big-bamboo-shoot.png"
     },
     "bike-voucher": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/bike-voucher.png",
-      "wikiTitle": "兑换券（道具）"
+      "wikiTitle": "兑换券（道具）",
+      "descriptionZh": "给华蓝市的奇迹自行车店就能交换得到自行车。",
+      "effectZh": "给华蓝市的奇迹自行车店就能交换得到自行车。",
+      "descriptionSource": "52poke"
     },
     "bitter-herba-mystica": {
       "descriptionZh": "拥有浓厚苦味的奇幻调味料。相传能大幅提高身体的免疫力，但事实真实性不明。",
@@ -5849,7 +5896,8 @@
       "descriptionZh": "种在田地里使用的种子。出产的萝卜种类会根据种下的田地而有所不同。",
       "effectZh": "种在田地里使用的种子。出产的萝卜种类会根据种下的田地而有所不同。",
       "descriptionSource": "52poke",
-      "wikiTitle": "萝卜种子（道具）"
+      "wikiTitle": "萝卜种子（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/carrot-seeds.png"
     },
     "catching-charm": {
       "descriptionZh": "带上这个神奇的可增强稳定性的护身符，就能更容易触发会心捕捉。",
@@ -6078,13 +6126,15 @@
       "descriptionZh": "让皮可西携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "effectZh": "让皮可西携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "descriptionSource": "52poke",
-      "wikiTitle": "皮可西进化石（道具）"
+      "wikiTitle": "皮可西进化石（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/clefablite.png"
     },
     "clefairy-candy": {
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "descriptionSource": "52poke",
-      "wikiTitle": "皮皮的糖果（道具）"
+      "wikiTitle": "皮皮的糖果（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/clefairy-candy.png"
     },
     "cleffa-fur": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -6207,7 +6257,8 @@
       "descriptionZh": "带有甜味、酸味和咸味的调味料。意外地与不少食材都很搭配，是能随意运用的调味料。",
       "effectZh": "带有甜味、酸味和咸味的调味料。意外地与不少食材都很搭配，是能随意运用的调味料。",
       "descriptionSource": "52poke",
-      "wikiTitle": "奶油芝士（道具）"
+      "wikiTitle": "奶油芝士（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/cream-cheese.png"
     },
     "croagunk-poison": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -6979,7 +7030,8 @@
       "descriptionZh": "让快龙携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "effectZh": "让快龙携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "descriptionSource": "52poke",
-      "wikiTitle": "快龙进化石（道具）"
+      "wikiTitle": "快龙进化石（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/dragoninite.png"
     },
     "dragonium-z--held": {
       "descriptionZh": "可用它来制造用于对战并能将龙属性招式升级成Ｚ招式的Ｚ力量结晶。",
@@ -7036,7 +7088,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。",
+      "effectZh": "宝可梦携带后，会印上携带它的宝可梦的样子的信纸。",
+      "descriptionSource": "52poke"
     },
     "dreepy-powder": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -8045,7 +8100,8 @@
       "descriptionZh": "让麻麻鳗鱼王携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "effectZh": "让麻麻鳗鱼王携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "descriptionSource": "52poke",
-      "wikiTitle": "麻麻鳗鱼王进化石（道具）"
+      "wikiTitle": "麻麻鳗鱼王进化石（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/eelektrossite.png"
     },
     "eevee-candy": {
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
@@ -8568,7 +8624,8 @@
       "descriptionZh": "野餐时小孩使用的杯子。使用轻巧坚固的材料制成。能够叠起来，因此方便携带。",
       "effectZh": "野餐时小孩使用的杯子。使用轻巧坚固的材料制成。能够叠起来，因此方便携带。",
       "descriptionSource": "52poke",
-      "wikiTitle": "花朵水杯（道具）"
+      "wikiTitle": "花朵水杯（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/flower-pattern-cup.png"
     },
     "fluffy-tail": {
       "descriptionZh": "能吸引宝可梦注意的道具。在和野生宝可梦的战斗中绝对可以逃走。",
@@ -9658,7 +9715,8 @@
       "descriptionZh": "丰饶之王的爱马喜欢吃的农作物。生长于白雪皑皑的田地。",
       "effectZh": "丰饶之王的爱马喜欢吃的农作物。生长于白雪皑皑的田地。",
       "descriptionSource": "52poke",
-      "wikiTitle": "冰萝卜（道具）"
+      "wikiTitle": "冰萝卜（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/iceroot-carrot.png"
     },
     "icium-z--held": {
       "descriptionZh": "可用它来制造用于对战并能将冰属性招式升级成Ｚ招式的Ｚ力量结晶。",
@@ -9817,7 +9875,8 @@
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "descriptionSource": "52poke",
-      "wikiTitle": "迷唇姐的糖果（道具）"
+      "wikiTitle": "迷唇姐的糖果（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/jynx-candy.png"
     },
     "kabuto-candy": {
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
@@ -10401,7 +10460,10 @@
     },
     "magma-emblem": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/magma-emblem.png",
-      "wikiTitle": "熔岩标志（道具）"
+      "wikiTitle": "熔岩标志（道具）",
+      "descriptionZh": "与熔岩队的标志形状相同的徽章模样的东西。",
+      "effectZh": "与熔岩队的标志形状相同的徽章模样的东西。",
+      "descriptionSource": "52poke"
     },
     "magma-stone": {
       "descriptionZh": "被灼热熔岩熔化的岩石凝固后形成的产物。里面还留有熔岩。",
@@ -10572,7 +10634,8 @@
       "descriptionZh": "能让人感受到酸味和苦味的调味料。与油腻的食材很搭配，意外地是种用途广泛的食材。",
       "effectZh": "能让人感受到酸味和苦味的调味料。与油腻的食材很搭配，意外地是种用途广泛的食材。",
       "descriptionSource": "52poke",
-      "wikiTitle": "橘子酱（道具）"
+      "wikiTitle": "橘子酱（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/marmalade.png"
     },
     "marshadium-z--held": {
       "descriptionZh": "可用它来制造用于对战并能将玛夏多的暗影偷盗升级成特殊Ｚ招式的Ｚ力量结晶。",
@@ -10713,7 +10776,8 @@
       "descriptionZh": "让超能妙喵携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "effectZh": "让超能妙喵携带后，在战斗时就能进行超级进化的一种神奇超级石。",
       "descriptionSource": "52poke",
-      "wikiTitle": "超能妙喵进化石（道具）"
+      "wikiTitle": "超能妙喵进化石（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/meowsticite.png"
     },
     "meowth-candy": {
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
@@ -10870,13 +10934,15 @@
       "descriptionZh": "由深灰科学博物馆监制的桌巾。充满学术氛围的配色与图案小孩大人都喜欢。",
       "effectZh": "由深灰科学博物馆监制的桌巾。充满学术氛围的配色与图案小孩大人都喜欢。",
       "descriptionSource": "52poke",
-      "wikiTitle": "怪兽桌巾（道具）"
+      "wikiTitle": "怪兽桌巾（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/monstrous-tablecloth.png"
     },
     "moomoo-cheese": {
       "descriptionZh": "在露营营地制作料理时会使用的一种食材。融化的芝士能为咖喱增添一份独特的浓郁。",
       "effectZh": "在露营营地制作料理时会使用的一种食材。融化的芝士能为咖喱增添一份独特的浓郁。",
       "descriptionSource": "52poke",
-      "wikiTitle": "哞哞乳酪（道具）"
+      "wikiTitle": "哞哞乳酪（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/moomoo-cheese.png"
     },
     "moon-flute": {
       "descriptionZh": "为了对月亮的传说的宝可梦表达感激之情，据说会用它来献上美乐。",
@@ -10971,7 +11037,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "前往肚脐岩时必要的船票。神秘地发着光。",
+      "effectZh": "前往肚脐岩时必要的船票。神秘地发着光。",
+      "descriptionSource": "52poke"
     },
     "nacli-salt": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -11016,7 +11085,10 @@
       "spriteDimensions": [
         160,
         160
-      ]
+      ],
+      "descriptionZh": "带有咸味的食材。煮熟的面。作为三明治馅料的潜力还是未知数。",
+      "effectZh": "带有咸味的食材。煮熟的面。作为三明治馅料的潜力还是未知数。",
+      "descriptionSource": "52poke"
     },
     "normalium-z--held": {
       "descriptionZh": "可用它来制造用于对战并能将一般属性招式升级成Ｚ招式的Ｚ力量结晶。",
@@ -11133,7 +11205,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "记录着前往某座岛屿的路线的一张古老的航海图。",
+      "effectZh": "记录着前往某座岛屿的路线的一张古老的航海图。",
+      "descriptionSource": "52poke"
     },
     "olive-oil": {
       "descriptionZh": "能稍微尝到酸味和苦味的调味料。带有迷你芙喜欢味道的油品质很高，所以会特别受到珍重。",
@@ -11411,13 +11486,15 @@
       "descriptionZh": "柔软的米色桌巾。丝柔顺滑亲近肌肤，放上餐具也不会发出声音。",
       "effectZh": "柔软的米色桌巾。丝柔顺滑亲近肌肤，放上餐具也不会发出声音。",
       "descriptionSource": "52poke",
-      "wikiTitle": "米色桌巾（道具）"
+      "wikiTitle": "米色桌巾（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/peach-tablecloth.png"
     },
     "peanut-butter": {
       "descriptionZh": "甜味强烈的调味料。在帕底亚地区比起无糖，似乎甜甜的更受人欢迎。",
       "effectZh": "甜味强烈的调味料。在帕底亚地区比起无糖，似乎甜甜的更受人欢迎。",
       "descriptionSource": "52poke",
-      "wikiTitle": "花生酱（道具）"
+      "wikiTitle": "花生酱（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/peanut-butter.png"
     },
     "pearl-string": {
       "descriptionZh": "散发着美丽银辉且非常大颗的珍珠。可以在商店高价出售。",
@@ -11819,7 +11896,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "用来放置用树果混合器制造的宝可方块的盒子，只要摇一下就会有宝可方块从里面掉出来。",
+      "effectZh": "用来放置用树果混合器制造的宝可方块的盒子，只要摇一下就会有宝可方块从里面掉出来。",
+      "descriptionSource": "52poke"
     },
     "pokeblock-kit": {
       "descriptionZh": "这是树果混合器和宝可方块盒的套装。树果混合器可利用树果制作宝可方块，而做好的宝可方块可用宝可方块盒来保存。",
@@ -11940,7 +12020,8 @@
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "descriptionSource": "52poke",
-      "wikiTitle": "多边兽的糖果（道具）"
+      "wikiTitle": "多边兽的糖果（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/porygon-candy.png"
     },
     "potato-salad": {
       "descriptionZh": "酸味强烈的食材。以土豆为主的沙拉。与面包的搭配程度不容小觑。",
@@ -11973,7 +12054,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "用来保存树果粉碎制作的树果粉末的瓶子。",
+      "effectZh": "用来保存树果粉碎制作的树果粉末的瓶子。",
+      "descriptionSource": "52poke"
     },
     "power-anklet": {
       "descriptionZh": "虽然携带后战斗中的速度会降低，但宝可梦的速度会比平时成长得更高。",
@@ -12113,7 +12197,8 @@
       "descriptionZh": "咸味很强的食材。因为与火腿不同，并没有加热，所以能享受新鲜的味道。",
       "effectZh": "咸味很强的食材。因为与火腿不同，并没有加热，所以能享受新鲜的味道。",
       "descriptionSource": "52poke",
-      "wikiTitle": "生火腿（道具）"
+      "wikiTitle": "生火腿（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/prosciutto.png"
     },
     "psychium-z--held": {
       "descriptionZh": "可用它来制造用于对战并能将超能力属性招式升级成Ｚ招式的Ｚ力量结晶。",
@@ -12254,7 +12339,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "能够在枯叶市和七之岛之间用渡船移动的通行证。上面印着彩虹的图片。",
+      "effectZh": "能够在枯叶市和七之岛之间用渡船移动的通行证。上面印着彩虹的图片。",
+      "descriptionSource": "52poke"
     },
     "rainbow-wing": {
       "descriptionZh": "散发着虹色光辉的神奇羽毛。",
@@ -12279,7 +12367,8 @@
       "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
       "descriptionSource": "52poke",
-      "wikiTitle": "小拉达的糖果（道具）"
+      "wikiTitle": "小拉达的糖果（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/rattata-candy.png"
     },
     "red-apricorn": {
       "descriptionZh": "红色的球果。有种刺鼻的气味。",
@@ -12532,7 +12621,10 @@
       "spriteDimensions": [
         160,
         160
-      ]
+      ],
+      "descriptionZh": "带有甜味的食材。煮熟的米。作为三明治馅料的潜力还是未知数。",
+      "effectZh": "带有甜味的食材。煮熟的米。作为三明治馅料的潜力还是未知数。",
+      "descriptionSource": "52poke"
     },
     "rich-mulch": {
       "descriptionZh": "培育树果时的肥料。但完全不适合丰缘地区的土壤，所以没什么效果。",
@@ -12742,7 +12834,10 @@
     },
     "ruby": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/ruby.png",
-      "wikiTitle": "路比（道具）"
+      "wikiTitle": "红宝石（道具）",
+      "descriptionZh": "散发着红色光辉的非常漂亮的宝石。热情的象征。",
+      "effectZh": "散发着红色光辉的非常漂亮的宝石。热情的象征。",
+      "descriptionSource": "52poke"
     },
     "rufflet-feather": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -13629,7 +13724,8 @@
       "descriptionZh": "在海军蓝的布料上浮现出宝可梦的脸的时尚桌巾。是幽灵属性爱好者必备的道具。",
       "effectZh": "在海军蓝的布料上浮现出宝可梦的脸的时尚桌巾。是幽灵属性爱好者必备的道具。",
       "descriptionSource": "52poke",
-      "wikiTitle": "鬼祟桌巾（道具）"
+      "wikiTitle": "鬼祟桌巾（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/spooky-tablecloth.png"
     },
     "sprayduck": {
       "descriptionZh": "浇水的道具。能让埋在松软土壤里的树果快快长大。",
@@ -13783,7 +13879,8 @@
       "descriptionZh": "在露营时也会使用到的标准款水壶。以不易导热的不锈钢制成，具备极佳的保温保冷功能。",
       "effectZh": "在露营时也会使用到的标准款水壶。以不易导热的不锈钢制成，具备极佳的保温保冷功能。",
       "descriptionSource": "52poke",
-      "wikiTitle": "黄纹不锈钢水壶（道具）"
+      "wikiTitle": "黄纹不锈钢水壶（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/steel-bottle-y.png"
     },
     "steel-mail": {
       "descriptionZh": "使用该道具时，需要让宝可梦携带着来用。",
@@ -14195,7 +14292,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "可以收看对新手训练家有帮助的节目的电视。",
+      "effectZh": "可以收看对新手训练家有帮助的节目的电视。",
+      "descriptionSource": "52poke"
     },
     "teal-mask": {
       "descriptionZh": "模仿鬼的脸制成的绿色面具。面具是捡到的，在掩面祭遇到的孩子把它掉在了台阶上。",
@@ -14311,7 +14411,8 @@
       "descriptionZh": "小小的珍贵竹笋。在部分美食家中拥有很高人气。",
       "effectZh": "小小的珍贵竹笋。在部分美食家中拥有很高人气。",
       "descriptionSource": "52poke",
-      "wikiTitle": "小竹笋（道具）"
+      "wikiTitle": "小竹笋（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/tiny-bamboo-shoot.png"
     },
     "tm-case": {
       "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/tm-case.png",
@@ -15268,7 +15369,10 @@
       "spriteDimensions": [
         160,
         160
-      ]
+      ],
+      "descriptionZh": "带有甜味的食材。生豆腐。作为三明治馅料的潜力还是未知数。",
+      "effectZh": "带有甜味的食材。生豆腐。作为三明治馅料的潜力还是未知数。",
+      "descriptionSource": "52poke"
     },
     "tomato": {
       "descriptionZh": "酸味强烈的食材。含有许多鲜味成分，所以受到各种宝可梦欢迎。",
@@ -15320,7 +15424,10 @@
       "spriteDimensions": [
         30,
         30
-      ]
+      ],
+      "descriptionZh": "能够在第１岛、第２岛和第３岛之间用渡船移动的通行证。上面印着三座岛。",
+      "effectZh": "能够在第１岛、第２岛和第３岛之间用渡船移动的通行证。上面印着三座岛。",
+      "descriptionSource": "52poke"
     },
     "tropic-mail": {
       "descriptionZh": "使用该道具时，需要让宝可梦携带着来用。",
@@ -15891,13 +15998,15 @@
       "descriptionZh": "稳重的黄色桌巾。丝柔顺滑亲近肌肤，放上餐具也不会发出声音。",
       "effectZh": "稳重的黄色桌巾。丝柔顺滑亲近肌肤，放上餐具也不会发出声音。",
       "descriptionSource": "52poke",
-      "wikiTitle": "黄色桌巾（道具）"
+      "wikiTitle": "黄色桌巾（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/yellow-tablecloth.png"
     },
     "yogurt": {
       "descriptionZh": "甜味和酸味强烈的调味料。与水果类的食物特别搭配，也很容易用在三明治上。",
       "effectZh": "甜味和酸味强烈的调味料。与水果类的食物特别搭配，也很容易用在三明治上。",
       "descriptionSource": "52poke",
-      "wikiTitle": "酸奶（道具）"
+      "wikiTitle": "酸奶（道具）",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/yogurt.png"
     },
     "yungoos-fur": {
       "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
@@ -15995,6 +16104,226 @@
         160,
         160
       ]
+    },
+    "armor-pass": {
+      "descriptionZh": "前往铠岛的车票。在木杆镇的车站，把它出示给站务员看吧。",
+      "effectZh": "前往铠岛的车票。在木杆镇的车站，把它出示给站务员看吧。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/armor-pass.png",
+      "wikiTitle": "铠甲车票（道具）"
+    },
+    "bobs-food-tin": {
+      "descriptionZh": "在露营营地制作料理时会使用的一种食材。不知是什么原因，饱伯卖的罐头在伽勒尔特别受欢迎。",
+      "effectZh": "在露营营地制作料理时会使用的一种食材。不知是什么原因，饱伯卖的罐头在伽勒尔特别受欢迎。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/bobs-food-tin.png",
+      "wikiTitle": "饱伯罐头（道具）"
+    },
+    "card-key--letsgo": {
+      "descriptionZh": "用来打开位于金黄市的西尔佛公司总部大厦门锁的卡片式钥匙。",
+      "effectZh": "用来打开位于金黄市的西尔佛公司总部大厦门锁的卡片式钥匙。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/card-key--letsgo.png",
+      "wikiTitle": "钥匙卡（道具）"
+    },
+    "dynamax-band": {
+      "descriptionZh": "内部嵌入了许愿星，在能量点就会发出光芒，使宝可梦极巨化。",
+      "effectZh": "内部嵌入了许愿星，在能量点就会发出光芒，使宝可梦极巨化。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/dynamax-band.png",
+      "wikiTitle": "极巨腕带（道具）"
+    },
+    "farfetchd-candy": {
+      "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
+      "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/farfetchd-candy.png",
+      "wikiTitle": "大葱鸭的糖果（道具）"
+    },
+    "fishing-rod--galar": {
+      "descriptionZh": "水莲队长制作的钓竿。如果向着岩石阴影那边使用，就能钓到宝可梦。",
+      "effectZh": "水莲队长制作的钓竿。如果向着岩石阴影那边使用，就能钓到宝可梦。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/fishing-rod--galar.png",
+      "wikiTitle": "钓竿（道具）"
+    },
+    "leaf-letter--eevee": {
+      "descriptionZh": "以树叶制作的信件。上面留有皮卡丘的脚印，好像是要表达些什么。",
+      "effectZh": "以树叶制作的信件。上面留有皮卡丘的脚印，好像是要表达些什么。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/leaf-letter--eevee.png",
+      "wikiTitle": "树叶信（道具）"
+    },
+    "leaf-letter--pikachu": {
+      "descriptionZh": "以树叶制作的信件。上面留有皮卡丘的脚印，好像是要表达些什么。",
+      "effectZh": "以树叶制作的信件。上面留有皮卡丘的脚印，好像是要表达些什么。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/leaf-letter--pikachu.png",
+      "wikiTitle": "树叶信（道具）"
+    },
+    "legendary-clue-question": {
+      "descriptionZh": "皮欧尼掉落的神秘笔记。上面贴有极巨巢穴出现光洞的照片。",
+      "effectZh": "皮欧尼掉落的神秘笔记。上面贴有极巨巢穴出现光洞的照片。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/legendary-clue-question.png",
+      "wikiTitle": "传说笔记？（道具）"
+    },
+    "lure": {
+      "descriptionZh": "使用该香水后的一小段时间内，稀有宝可梦会更容易出现。",
+      "effectZh": "使用该香水后的一小段时间内，稀有宝可梦会更容易出现。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/lure.png",
+      "wikiTitle": "引虫香水（道具）"
+    },
+    "nidoran-f-candy": {
+      "descriptionZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
+      "effectZh": "充满能量的糖果。能让特定宝可梦的所有能力上升。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/nidoran-f-candy.png",
+      "wikiTitle": "尼多兰的糖果（道具）"
+    },
+    "parcel--letsgo": {
+      "descriptionZh": "这是常青市的商店托付给你的包裹。需要将它交给大木博士。",
+      "effectZh": "这是常青市的商店托付给你的包裹。需要将它交给大木博士。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/parcel--letsgo.png",
+      "wikiTitle": "包裹（道具）",
+      "spriteFile52poke": "Bag 包裹 BDSP Sprite.png",
+      "spriteDimensions": [
+        40,
+        40
+      ]
+    },
+    "pokemon-box-link": {
+      "descriptionZh": "ーーー",
+      "effectZh": "ーーー",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/pokemon-box-link.png",
+      "wikiTitle": "宝可梦盒（道具）"
+    },
+    "secret-key--letsgo": {
+      "descriptionZh": "能打开红莲岛上那座宝可梦道馆的钥匙。周身都以红色装饰。",
+      "effectZh": "能打开红莲岛上那座宝可梦道馆的钥匙。周身都以红色装饰。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/secret-key--letsgo.png",
+      "wikiTitle": "秘密钥匙（道具）"
+    },
+    "sonias-book": {
+      "descriptionZh": "索妮亚博士出版的书。以风趣的文笔展示了关于伽勒尔地区传说的最新发现。",
+      "effectZh": "索妮亚博士出版的书。以风趣的文笔展示了关于伽勒尔地区传说的最新发现。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/sonias-book.png",
+      "wikiTitle": "索妮亚的书（道具）"
+    },
+    "ss-ticket--letsgo": {
+      "descriptionZh": "乘坐高速船水流号时所需的船票。上面绘有船的图案。",
+      "effectZh": "乘坐高速船水流号时所需的船票。上面绘有船的图案。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/ss-ticket--letsgo.png",
+      "wikiTitle": "船票（道具）"
+    },
+    "bicycle": {
+      "descriptionZh": "能比跑步鞋跑得还快的折叠式自行车。",
+      "effectZh": "能比跑步鞋跑得还快的折叠式自行车。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/bicycle.png",
+      "wikiTitle": "自行车（道具）",
+      "spriteFile52poke": "Bag 自行车 BDSP Sprite.png",
+      "spriteDimensions": [
+        40,
+        40
+      ]
+    },
+    "butter": {
+      "descriptionZh": "带有甜味和咸味的调味料。不仅味道浓郁，更能提升面包口感。哞哞鲜奶１００％的乃是高级品。",
+      "effectZh": "带有甜味和咸味的调味料。不仅味道浓郁，更能提升面包口感。哞哞鲜奶１００％的乃是高级品。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/butter.png",
+      "wikiTitle": "黄油（道具）"
+    },
+    "cramorant-down": {
+      "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "effectZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/cramorant-down.png",
+      "wikiTitle": "古月鳥的羽絨（道具）"
+    },
+    "fame-checker": {
+      "descriptionZh": "可以重复查看打听到的有名人物的东西。",
+      "effectZh": "可以重复查看打听到的有名人物的东西。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/fame-checker.png",
+      "wikiTitle": "声音记录器（道具）"
+    },
+    "grubbin-thread": {
+      "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "effectZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/grubbin-thread.png",
+      "wikiTitle": "強顎雞母蟲的絲（道具）"
+    },
+    "illumise-fluid": {
+      "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "effectZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/illumise-fluid.png",
+      "wikiTitle": "甜甜螢的汁液（道具）"
+    },
+    "jam": {
+      "descriptionZh": "甜味和酸味强烈的调味料。用在三明治上时甜味偏强，使用时要足够注意。",
+      "effectZh": "甜味和酸味强烈的调味料。用在三明治上时甜味偏强，使用时要足够注意。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/jam.png",
+      "wikiTitle": "莓果酱（道具）"
+    },
+    "kofus-wallet": {
+      "descriptionZh": "玻瓶道馆道馆馆主海岱忘记带的钱包。到渍沁镇的市场交给他吧。",
+      "effectZh": "玻瓶道馆道馆馆主海岱忘记带的钱包。到渍沁镇的市场交给他吧。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/kofus-wallet.png",
+      "wikiTitle": "海岱的钱包（道具）"
+    },
+    "koraidons-poke-ball": {
+      "descriptionZh": "用来装神秘的宝可梦故勒顿的精灵球。是从名为派帕的男生那里得到的。",
+      "effectZh": "用来装神秘的宝可梦故勒顿的精灵球。是从名为派帕的男生那里得到的。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/koraidons-poke-ball.png",
+      "wikiTitle": "故勒顿的球（道具）"
+    },
+    "miraidons-poke-ball": {
+      "descriptionZh": "用来装神秘的宝可梦密勒顿的精灵球。是从名为派帕的男生那里得到的。",
+      "effectZh": "用来装神秘的宝可梦密勒顿的精灵球。是从名为派帕的男生那里得到的。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/miraidons-poke-ball.png",
+      "wikiTitle": "密勒顿的球（道具）"
+    },
+    "oaks-parcel": {
+      "descriptionZh": "这是常青市的商店托付给你的包裹。需要将它交给大木博士。",
+      "effectZh": "这是常青市的商店托付给你的包裹。需要将它交给大木博士。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/oaks-parcel.png",
+      "wikiTitle": "包裹（道具）"
+    },
+    "sapphire": {
+      "descriptionZh": "散发着蓝色光辉的非常漂亮的宝石。真诚的象征。",
+      "effectZh": "散发着蓝色光辉的非常漂亮的宝石。真诚的象征。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/sapphire.png",
+      "wikiTitle": "蓝宝石（道具）"
+    },
+    "seedot-stem": {
+      "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "effectZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/seedot-stem.png",
+      "wikiTitle": "橡實果的枝條（道具）"
+    },
+    "vullaby-feather": {
+      "descriptionZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "effectZh": "宝可梦不小心掉落的东西。制作招式学习器时需要用到。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/vullaby-feather.png",
+      "wikiTitle": "禿鷹丫頭的羽毛（道具）"
     }
   }
 }

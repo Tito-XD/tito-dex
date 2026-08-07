@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T16:47:22+00:00",
+  "summary": {
+    "exactItems": 10
+  },
+  "itemsBySlug": {
+    "tough-candy-l": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 守护糖果L Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/90/Bag_%E5%AE%88%E6%8A%A4%E7%B3%96%E6%9E%9CL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "smart-candy-l": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 知识糖果L Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/e2/Bag_%E7%9F%A5%E8%AF%86%E7%B3%96%E6%9E%9CL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "courage-candy-l": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 心灵糖果L Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/01/Bag_%E5%BF%83%E7%81%B5%E7%B3%96%E6%9E%9CL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "tough-candy-xl": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 守护糖果XL Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/0/06/Bag_%E5%AE%88%E6%8A%A4%E7%B3%96%E6%9E%9CXL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "smart-candy-xl": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 知识糖果XL Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b5/Bag_%E7%9F%A5%E8%AF%86%E7%B3%96%E6%9E%9CXL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "courage-candy-xl": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 心灵糖果XL Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/b/b4/Bag_%E5%BF%83%E7%81%B5%E7%B3%96%E6%9E%9CXL_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "legendary-clue-question": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 传说笔记 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/9/97/Bag_%E4%BC%A0%E8%AF%B4%E7%AC%94%E8%AE%B0_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "meowsticite": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 超能妙喵进化石 ZA Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/e0/Bag_%E8%B6%85%E8%83%BD%E5%A6%99%E5%96%B5%E8%BF%9B%E5%8C%96%E7%9F%B3_ZA_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 160,
+      "spriteHeight": 160
+    },
+    "leaf-letter--eevee": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 树叶信 伊布 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/6/6a/Bag_%E6%A0%91%E5%8F%B6%E4%BF%A1_%E4%BC%8A%E5%B8%83_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    },
+    "leaf-letter--pikachu": {
+      "spriteMappingStatus": "exact",
+      "spriteSource": "52poke",
+      "spriteSourceFile": "Bag 树叶信 皮卡丘 Sprite.png",
+      "spriteSourceUrl": "https://media.52poke.com/wiki/e/e9/Bag_%E6%A0%91%E5%8F%B6%E4%BF%A1_%E7%9A%AE%E5%8D%A1%E4%B8%98_Sprite.png",
+      "spriteLicense": "CC BY-NC-SA 4.0",
+      "spriteWidth": 30,
+      "spriteHeight": 30
+    }
+  }
+}

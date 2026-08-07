@@ -34,6 +34,12 @@ DEFAULT_ITEMS = ROOT / "dist" / "dex-v18" / "staging" / "items.json"
 DEFAULT_OUTPUT = ROOT / "data" / "l10n" / "zh" / "items_v19_enrichment.json"
 DEFAULT_SPRITES = ROOT / "data" / "assets" / "item-sprites"
 DEFAULT_CACHE = ROOT / "tools" / ".icon_cache" / "52poke-pages"
+DEFAULT_NAME_OVERRIDES = (
+    ROOT / "data" / "l10n" / "zh" / "item_name_overrides_v19.json"
+)
+DEFAULT_POKEAPI_ENRICHMENT = (
+    ROOT / "data" / "l10n" / "zh" / "items_v19_pokeapi_enrichment.json"
+)
 
 POKEAPI_BASE = "https://pokeapi.co/api/v2/item"
 WIKI_API = "https://wiki.52poke.com/api.php"
@@ -61,6 +67,11 @@ GAME_PRIORITY = {
     "BW": 25,
     "HGSS": 20,
     "DPPt": 15,
+    "FRLG": 12,
+    "E": 11,
+    "RSE": 10,
+    "GSC": 5,
+    "RBY": 1,
 }
 
 _thread_local = threading.local()
@@ -170,16 +181,42 @@ def search_wiki_title(name_zh: str) -> list[str]:
 def wiki_description(wikitext: str) -> str:
     descriptions: list[tuple[int, str]] = []
     for line in wikitext.splitlines():
-        if "{{包包信息框|" not in line:
+        stripped = line.strip()
+        if not stripped.startswith("{{包包信息框|"):
             continue
         match = ZH_HANS_RE.search(line)
         if match:
-            value = normalize(re.sub(r"<br\s*/?>", " ", match.group(1)))
-            if value and "未知" not in value:
-                fields = line.split("|")
-                game = fields[2].strip() if len(fields) > 2 else ""
-                descriptions.append((GAME_PRIORITY.get(game, 0), value))
+            raw_value = match.group(1)
+        else:
+            fields = stripped.split("|", 5)
+            if len(fields) < 6 or not fields[1].strip().isdigit():
+                continue
+            raw_value = re.sub(r"\}\}\s*$", "", fields[5])
+        raw_value = re.sub(r"(?:\|\d*)+$", "", raw_value)
+        value = _plain_wikitext(raw_value)
+        if value and value not in {"未知", "暂无", "—"}:
+            fields = stripped.split("|")
+            game = fields[2].strip() if len(fields) > 2 else ""
+            generation = int(fields[1]) if len(fields) > 1 and fields[1].isdigit() else 0
+            descriptions.append((GAME_PRIORITY.get(game, generation), value))
     return max(descriptions, key=lambda pair: pair[0])[1] if descriptions else ""
+
+
+def _plain_wikitext(value: str) -> str:
+    text = re.sub(r"<br\s*/?>", " ", value, flags=re.I)
+    text = re.sub(r"\[\[[^\]|]+\|([^\]]+)\]\]", r"\1", text)
+    text = re.sub(r"\[\[([^\]]+)\]\]", r"\1", text)
+    # Common inline templates put the user-visible Chinese token last for
+    # status/type icons and first for tooltip/name helpers.
+    text = re.sub(r"\{\{(?:s|i|t)\|([^{}|]+)\}\}", r"\1", text, flags=re.I)
+    text = re.sub(
+        r"\{\{(?:tt|N)\|([^{}|]+)(?:\|[^{}]*)?\}\}",
+        r"\1",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(r"'{2,}", "", text)
+    return normalize(text)
 
 
 def wiki_sprite_candidates(wikitext: str) -> list[str]:
@@ -273,6 +310,9 @@ def download_best_sprite(
 
 
 def wiki_title(item: dict[str, Any]) -> str | None:
+    explicit = normalize(item.get("wikiTitle"))
+    if explicit:
+        return explicit
     name = normalize(item.get("nameZh"))
     if not name or not CJK_RE.search(name) or name in {"？？？", "???"}:
         return None
@@ -317,6 +357,12 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--sprites-dir", type=Path, default=DEFAULT_SPRITES)
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    parser.add_argument(
+        "--name-overrides", type=Path, default=DEFAULT_NAME_OVERRIDES
+    )
+    parser.add_argument(
+        "--pokeapi-enrichment", type=Path, default=DEFAULT_POKEAPI_ENRICHMENT
+    )
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument(
         "--skip-pokeapi",
@@ -333,17 +379,48 @@ def main() -> int:
         nargs="*",
         help="Optional focused run; default refreshes the complete item catalog.",
     )
+    parser.add_argument(
+        "--slugs-file",
+        type=Path,
+        help="Optional newline/TSV file whose first field is a focused slug.",
+    )
+    parser.add_argument(
+        "--merge-output",
+        action="store_true",
+        help="Merge a focused run into an existing enrichment snapshot.",
+    )
     args = parser.parse_args()
 
     items_by_id: dict[str, dict[str, Any]] = json.loads(
         args.items.read_text(encoding="utf-8")
     )
     items = list(items_by_id.values())
+    if args.pokeapi_enrichment.is_file():
+        pokeapi_snapshot = json.loads(
+            args.pokeapi_enrichment.read_text(encoding="utf-8")
+        )
+        by_slug = pokeapi_snapshot.get("itemsBySlug") or {}
+        for item in items:
+            name_zh = (by_slug.get(item.get("slug")) or {}).get("nameZh")
+            if name_zh and CJK_RE.search(normalize(name_zh)):
+                item["nameZh"] = name_zh
+    if args.name_overrides.is_file():
+        overrides = json.loads(args.name_overrides.read_text(encoding="utf-8"))
+        for item in items:
+            patch = (overrides.get("itemsBySlug") or {}).get(item.get("slug"))
+            if patch:
+                item.update(patch)
     original_name_by_slug = {
         item.get("slug", ""): item.get("nameZh") for item in items
     }
-    if args.slugs:
-        wanted = set(args.slugs)
+    wanted = set(args.slugs or [])
+    if args.slugs_file:
+        wanted.update(
+            line.split("\t", 1)[0].strip()
+            for line in args.slugs_file.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        )
+    if wanted:
         items = [item for item in items if item.get("slug") in wanted]
 
     # PokeAPI is queried first only where text/name is actually incomplete.
@@ -423,12 +500,22 @@ def main() -> int:
         ],
         "itemsBySlug": enrichment,
     }
+    if args.merge_output and args.output.is_file():
+        previous = json.loads(args.output.read_text(encoding="utf-8"))
+        merged = dict(previous.get("itemsBySlug") or {})
+        for slug, patch in enrichment.items():
+            merged.setdefault(slug, {}).update(patch)
+        payload["itemsBySlug"] = merged
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    print(f"wrote {len(enrichment)} enriched items -> {args.output}", flush=True)
+    print(
+        f"wrote {len(enrichment)} focused / {len(payload['itemsBySlug'])} total "
+        f"enriched items -> {args.output}",
+        flush=True,
+    )
     return 0
 
 

@@ -89,8 +89,9 @@ Run the **Android Release APKs** workflow manually with:
 - `lite_build_number` — Lite Android versionCode
 - `offline_build_number` — a larger Offline versionCode
 - `bundle_manifest_url` — the currently published root manifest; CI downloads its selected archive and verifies `bundleVersion>=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
+- `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-For v0.8.5 use `version=0.8.5`, Lite build `136`, and Offline build `137`. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
+For v0.8.7 use `version=0.8.7`, Lite build `140`, Offline build `141`, and the v0.8.6 Offline release asset as `offline_seed_apk_url` to retain the compact v14 seed while Lite and installed Offline copies can update to live v19. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
 
 ### Offline variant
 

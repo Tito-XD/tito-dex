@@ -51,6 +51,18 @@ List<String> companionGifDownloadCandidates(int mediaId) => [
   if (mediaId <= bwAnimatedMaxId) bwAnimatedGifUrlFor(mediaId),
 ];
 
+String companionFormArtCacheFileName(
+  int speciesId,
+  String formKey, {
+  bool shiny = false,
+}) {
+  final safeFormKey = formKey.toLowerCase().replaceAll(
+    RegExp(r'[^a-z0-9_-]+'),
+    '-',
+  );
+  return '$speciesId.form-$safeFormKey${shiny ? '-shiny' : ''}.png';
+}
+
 /// Disk cache for non-bundled companion media under app documents.
 class CompanionMediaCache {
   Directory? _dir;
@@ -72,9 +84,26 @@ class CompanionMediaCache {
     return File('${dir.path}/$mediaId.$extension');
   }
 
+  Future<File> _namedFile(String fileName) async {
+    final dir = await _cacheDir();
+    return File('${dir.path}/$fileName');
+  }
+
   Future<String?> _existingPath(int mediaId, String extension) async {
     try {
       final file = await _file(mediaId, extension);
+      if (await file.exists() && await file.length() > 0) {
+        return file.path;
+      }
+    } catch (_) {
+      // Cache probing must never break rendering.
+    }
+    return null;
+  }
+
+  Future<String?> _existingNamedPath(String fileName) async {
+    try {
+      final file = await _namedFile(fileName);
       if (await file.exists() && await file.length() > 0) {
         return file.path;
       }
@@ -88,6 +117,14 @@ class CompanionMediaCache {
 
   Future<String?> cachedCryPath(int speciesId) =>
       _existingPath(speciesId, 'ogg');
+
+  Future<String?> cachedFormArtPath(
+    int speciesId,
+    String formKey, {
+    bool shiny = false,
+  }) => _existingNamedPath(
+    companionFormArtCacheFileName(speciesId, formKey, shiny: shiny),
+  );
 
   Future<String?> _download(
     int mediaId,
@@ -110,6 +147,29 @@ class CompanionMediaCache {
         }
       } catch (_) {
         // Try the next source.
+      }
+    }
+    return null;
+  }
+
+  Future<String?> _downloadNamed(
+    String fileName,
+    List<String> candidates,
+  ) async {
+    final existing = await _existingNamedPath(fileName);
+    if (existing != null) return existing;
+    for (final url in candidates) {
+      try {
+        final response = await http
+            .get(Uri.parse(url))
+            .timeout(const Duration(seconds: 20));
+        if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
+          final file = await _namedFile(fileName);
+          await file.writeAsBytes(response.bodyBytes, flush: true);
+          return file.path;
+        }
+      } catch (_) {
+        // Try the next verified catalog source.
       }
     }
     return null;
@@ -140,6 +200,17 @@ class CompanionMediaCache {
   /// Cries are species-level, so [speciesId] is always used here.
   Future<String?> ensureCry(int speciesId, {List<String>? candidates}) =>
       _download(speciesId, 'ogg', candidates ?? cryCandidatesFor(speciesId));
+
+  /// Cache an explicitly mapped, previously verified static form image.
+  Future<String?> ensureFormArt(
+    int speciesId,
+    String formKey, {
+    bool shiny = false,
+    required List<String> candidates,
+  }) => _downloadNamed(
+    companionFormArtCacheFileName(speciesId, formKey, shiny: shiny),
+    candidates,
+  );
 
   /// List every cached media file (GIF / cry / webm) with its size.
   Future<List<CachedMediaFile>> listCached() async {

@@ -63,7 +63,7 @@ VERSION_GROUP_MAX_NATIONAL_ID: dict[str, int] = {
 
 def _load_sprite_existence() -> dict[str, Any]:
     payload = json.loads(SPRITE_EXISTENCE_PATH.read_text(encoding="utf-8"))
-    if payload.get("schemaVersion") != 1:
+    if payload.get("schemaVersion") not in {1, 2}:
         raise RuntimeError(f"Unsupported sprite matrix: {SPRITE_EXISTENCE_PATH}")
     groups = payload.get("versionGroups") or {}
     for version_group, (generation, folder) in VERSION_GROUP_SPRITE_PATH.items():
@@ -84,6 +84,10 @@ _ASSET_RANGE_KEYS = {
     "back": "backRanges",
     "animatedFront": "animatedFrontRanges",
     "animatedBack": "animatedBackRanges",
+    "shinyFront": "shinyFrontRanges",
+    "shinyBack": "shinyBackRanges",
+    "animatedShinyFront": "animatedShinyFrontRanges",
+    "animatedShinyBack": "animatedShinyBackRanges",
 }
 _NUMERIC_ASSET_RE = re.compile(r"/(\d+)\.(?:png|gif)$")
 

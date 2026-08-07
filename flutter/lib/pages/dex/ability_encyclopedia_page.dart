@@ -17,6 +17,27 @@ class AbilityEncyclopediaPage extends StatelessWidget {
       primaryLabel: (ability) => ability.nameZh,
       secondaryLabel: (ability) => '#${ability.id} · ${ability.nameEn}',
       detailSheet: showAbilityDetailSheet,
+      categoryFilter: abilityUsageCategoryFilter,
     );
   }
+}
+
+/// Group abilities by how broadly they are distributed across species.
+/// `pokemonIds` is already part of the cached ability index, so this adds no
+/// detail scans or network work.
+final abilityUsageCategoryFilter = DexReferenceCategoryFilter<CachedAbility>(
+  options: const [null, '专属', '少见', '常见'],
+  label: abilityUsageCategoryLabel,
+  filter: (ability, category) => abilityUsageCategoryLabel(ability) == category,
+);
+
+String abilityUsageCategoryLabel(CachedAbility ability) {
+  final count = ability.pokemonIds.length;
+  if (count <= 1) {
+    return '专属';
+  }
+  if (count <= 5) {
+    return '少见';
+  }
+  return '常见';
 }
