@@ -135,5 +135,23 @@ void main() {
       expect(xy.backSpriteUrl, isNull);
       expect(xy.animatedBackUrl, isNull);
     });
+
+    test('pre-debut generations are not offered for Gen IV species', () {
+      // Pachirisu (#417) debuted in Gen IV.
+      final options = spriteEditionOptionsForPokemon(417);
+      final groups = options.map((o) => o.versionGroup).toSet();
+
+      expect(groups.contains('red-blue'), isFalse);
+      expect(groups.contains('yellow'), isFalse);
+      expect(groups.contains('gold-silver'), isFalse);
+      expect(groups.contains('crystal'), isFalse);
+      expect(groups.contains('ruby-sapphire'), isFalse);
+      expect(groups.contains('emerald'), isFalse);
+      expect(groups.contains('firered-leafgreen'), isFalse);
+      expect(groups, contains('diamond-pearl'));
+      expect(groups, contains('platinum'));
+      expect(groups, contains('heartgold-soulsilver'));
+      expect(groups, contains('black-white'));
+    });
   });
 }

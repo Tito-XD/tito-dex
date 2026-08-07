@@ -65,6 +65,35 @@ POKESPRITE_RAW_BASE = (
 )
 BUNDLE_VERSION = 7
 BUNDLE_CDN_PREFIX = "v5"
+
+# National-dex debut caps per sprite version group. PokeAPI returns URLs for
+# every generation even when the species had not debuted; those files do not
+# exist and must not be offered in the per-version sprite map.
+VERSION_GROUP_MAX_ID = {
+    "red-blue": 151,
+    "yellow": 151,
+    "gold-silver": 251,
+    "crystal": 251,
+    "ruby-sapphire": 386,
+    "emerald": 386,
+    "firered-leafgreen": 386,
+    "diamond-pearl": 493,
+    "platinum": 493,
+    "heartgold-soulsilver": 493,
+    "black-white": 649,
+    "black-2-white-2": 649,
+    "x-y": 721,
+    "omega-ruby-alpha-sapphire": 721,
+    "sun-moon": 809,
+    "ultra-sun-ultra-moon": 809,
+    "lets-go-pikachu-lets-go-eevee": 809,
+    "sword-shield": 905,
+    "brilliant-diamond-shining-pearl": 905,
+    "legends-arceus": 905,
+    "scarlet-violet": 1025,
+    "legends-za": 1025,
+    "mega-dimension": 1025,
+}
 TITODEX_MAX_NATIONAL_ID = 1025
 HGSS_MAX_ID = 493
 HGSS_VERSION_GROUP = "heartgold-soulsilver"
@@ -948,6 +977,7 @@ class PokeApiBuilder:
         sprite_urls_by_version = {
             vg: f"{cdn_base}/{cdn_prefix}/sprites/by-version/{vg}/{pokemon_id}.png"
             for vg in build_sprite_url_map(sprites_payload)
+            if pokemon_id <= VERSION_GROUP_MAX_ID.get(vg, 1025)
         }
         animated_cdn = (
             f"{cdn_base}/{cdn_prefix}/sprites/animated/{pokemon_id}.gif"
