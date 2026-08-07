@@ -342,6 +342,9 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
 }) {
   final options = <SpriteEditionOption>[];
   final seen = <String>{};
+  final knownMaxId = <String, int>{
+    for (final source in _versionSpriteSources) source.versionGroup: source.maxId,
+  };
 
   void add(
     String versionGroup,
@@ -372,14 +375,17 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
 
   final byVersion = cdnUrlsByVersion ?? const {};
   for (final source in _versionSpriteSources) {
+    if (id > source.maxId) {
+      // The species had not debuted in this generation; never offer it even
+      // when a (fallback) CDN URL exists for the version group.
+      continue;
+    }
     final url =
         byVersion[source.versionGroup] ??
         (id <= source.maxId
             ? '$pokeApiSpritesBase/versions/${source.folder}/$id.png'
             : null);
-    if (url == null) {
-      continue;
-    }
+    if (url == null) continue;
     add(
       source.versionGroup,
       editionShortLabelForVersionGroup(source.versionGroup),
@@ -398,6 +404,10 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
 
   // CDN-only entries for version groups without a GitHub folder.
   for (final entry in byVersion.entries) {
+    final cap = knownMaxId[entry.key];
+    if (cap != null && id > cap) {
+      continue;
+    }
     add(
       entry.key,
       editionShortLabelForVersionGroup(entry.key),
