@@ -82,6 +82,8 @@ class SpriteEditionOption {
     required this.editionLabelZh,
     required this.spriteUrl,
     this.animatedUrl,
+    this.backSpriteUrl,
+    this.animatedBackUrl,
     this.isOfficialArtwork = false,
   });
 
@@ -90,6 +92,8 @@ class SpriteEditionOption {
   final String editionLabelZh;
   final String spriteUrl;
   final String? animatedUrl;
+  final String? backSpriteUrl;
+  final String? animatedBackUrl;
   final bool isOfficialArtwork;
 
   String get generationLabel => generationRomanLabel(generation);
@@ -211,6 +215,24 @@ const List<_VersionSpriteSource> _versionSpriteSources = [
   ),
 ];
 
+/// Version groups with real per-game back sprites in the PokeAPI repo.
+/// Gen III and Gen VI+ have no back folders there (3D models / missing art).
+const List<_VersionSpriteSource> _backSpriteSources = [
+  _VersionSpriteSource('red-blue', 'generation-i/red-blue', 151),
+  _VersionSpriteSource('yellow', 'generation-i/yellow', 151),
+  _VersionSpriteSource('gold-silver', 'generation-ii/gold', 251),
+  _VersionSpriteSource('crystal', 'generation-ii/crystal', 251),
+  _VersionSpriteSource('diamond-pearl', 'generation-iv/diamond-pearl', 493),
+  _VersionSpriteSource('platinum', 'generation-iv/platinum', 493),
+  _VersionSpriteSource(
+    'heartgold-soulsilver',
+    'generation-iv/heartgold-soulsilver',
+    493,
+  ),
+  _VersionSpriteSource('black-white', 'generation-v/black-white', 649),
+  _VersionSpriteSource('black-2-white-2', 'generation-v/black-2-white-2', 649),
+];
+
 String defaultSpriteUrlFor(int id) => '$pokeApiSpritesBase/$id.png';
 
 String shinySpriteUrlFor(int id) => '$pokeApiSpritesBase/shiny/$id.png';
@@ -229,6 +251,19 @@ String showdownGifUrlFor(int id, {bool shiny = false}) => shiny
 
 String bwAnimatedGifUrlFor(int id) =>
     '$pokeApiSpritesBase/versions/generation-v/black-white/animated/$id.gif';
+
+String bwAnimatedBackGifUrlFor(int id) =>
+    '$pokeApiSpritesBase/versions/generation-v/black-white/animated/back/$id.gif';
+
+/// Back sprite for a version group with a real back folder, or null.
+String? pokeApiBackSpriteUrlFor(String versionGroup, int id) {
+  for (final source in _backSpriteSources) {
+    if (source.versionGroup == versionGroup && id <= source.maxId) {
+      return '$pokeApiSpritesBase/versions/${source.folder}/back/$id.png';
+    }
+  }
+  return null;
+}
 
 String bwAnimatedShinyGifUrlFor(int id) =>
     '$pokeApiSpritesBase/versions/generation-v/black-white/animated/shiny'
@@ -314,6 +349,8 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
     int generation,
     String url, {
     String? animatedUrl,
+    String? backSpriteUrl,
+    String? animatedBackUrl,
   }) {
     if (!seen.add(versionGroup)) {
       return;
@@ -325,6 +362,8 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
         editionLabelZh: labelZh,
         spriteUrl: url,
         animatedUrl: animatedUrl,
+        backSpriteUrl: backSpriteUrl,
+        animatedBackUrl: animatedBackUrl,
         isOfficialArtwork:
             versionGroup == 'official-artwork' || url.contains('/official-artwork/'),
       ),
@@ -348,6 +387,11 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
       url,
       animatedUrl: source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
           ? bwAnimatedGifUrlFor(id)
+          : null,
+      backSpriteUrl: pokeApiBackSpriteUrlFor(source.versionGroup, id),
+      animatedBackUrl:
+          source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
+          ? bwAnimatedBackGifUrlFor(id)
           : null,
     );
   }

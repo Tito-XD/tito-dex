@@ -50,6 +50,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   late final Map<int, List<SpriteEditionOption>> _grouped;
   late SpriteEditionOption? _selectedOption;
   late bool _showAnimated;
+  var _showBack = false;
   var _shiny = false;
 
   int get _spriteResourceId =>
@@ -90,6 +91,24 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
     return option.animatedUrl ?? option.spriteUrl;
   }
 
+  String? get _selectedBackStaticSource {
+    final option = _selectedOption;
+    final backUrl = option?.backSpriteUrl;
+    if (backUrl == null) {
+      return null;
+    }
+    return _shiny ? shinySpriteVariantUrl(backUrl) ?? backUrl : backUrl;
+  }
+
+  String? get _selectedBackAnimatedSource {
+    final option = _selectedOption;
+    final backUrl = option?.animatedBackUrl;
+    if (backUrl == null) {
+      return null;
+    }
+    return _shiny ? shinySpriteVariantUrl(backUrl) ?? backUrl : backUrl;
+  }
+
   String? get _selectedAnimatedShinySource {
     final option = _selectedOption;
     if (option == null) {
@@ -109,6 +128,15 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   }
 
   String? get _displaySource {
+    if (_showBack) {
+      final back = _showAnimated
+          ? _selectedBackAnimatedSource
+          : _selectedBackStaticSource;
+      if (back != null) {
+        return back;
+      }
+      // No back art for this edition — fall back to the front view.
+    }
     if (_showAnimated) {
       final animated = _shiny
           ? _selectedAnimatedShinySource
@@ -137,6 +165,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
     setState(() {
       _selectedOption = option;
       _showAnimated = animated;
+      _showBack = false;
     });
   }
 
@@ -176,6 +205,19 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                     icon: const Icon(Icons.auto_awesome_rounded, size: 16),
                     label: const Text(
                       '闪光',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => setState(() => _showBack = !_showBack),
+                    style: TextButton.styleFrom(
+                      foregroundColor: _showBack
+                          ? TitoColors.softYellow
+                          : TitoColors.card.withValues(alpha: 0.8),
+                    ),
+                    icon: const Icon(Icons.flip_rounded, size: 16),
+                    label: const Text(
+                      '背面',
                       style: TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -307,10 +349,37 @@ class _SpritePickerTile extends StatelessWidget {
                     border: Border.all(color: borderColor, width: 2),
                   ),
                   padding: const EdgeInsets.all(4),
-                  child: DexSpriteImage(
-                    source: option.spriteUrl,
-                    width: 56,
-                    height: 56,
+                  child: Stack(
+                    children: [
+                      DexSpriteImage(
+                        source: option.spriteUrl,
+                        width: 56,
+                        height: 56,
+                      ),
+                      if (option.backSpriteUrl != null)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 3,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: TitoColors.ink.withValues(alpha: 0.85),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              '背',
+                              style: TextStyle(
+                                color: TitoColors.softYellow,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
