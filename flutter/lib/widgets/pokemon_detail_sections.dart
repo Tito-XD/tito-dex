@@ -367,6 +367,7 @@ class PokemonDetailHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 GestureDetector(
+                  key: const ValueKey('pokemon-detail-artwork'),
                   onTap: () =>
                       showPokemonArtworkViewer(context, summary: summary),
                   child: Container(
