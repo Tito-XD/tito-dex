@@ -153,5 +153,31 @@ void main() {
       expect(groups, contains('heartgold-soulsilver'));
       expect(groups, contains('black-white'));
     });
+
+    test('Gen IX species only keep Gen IX CDN groups from a full map', () {
+      // Gholdengo (#1000) exists only in Scarlet/Violet.
+      final options = spriteEditionOptionsForPokemon(
+        1000,
+        cdnUrlsByVersion: const {
+          'red-blue': 'https://cdn/1.png',
+          'gold-silver': 'https://cdn/2.png',
+          'diamond-pearl': 'https://cdn/4.png',
+          'black-white': 'https://cdn/5.png',
+          'x-y': 'https://cdn/6.png',
+          'sun-moon': 'https://cdn/7.png',
+          'sword-shield': 'https://cdn/8.png',
+          'brilliant-diamond-shining-pearl': 'https://cdn/8b.png',
+          'legends-arceus': 'https://cdn/8c.png',
+          'scarlet-violet': 'https://cdn/9.png',
+        },
+      );
+      final groups = options.map((o) => o.versionGroup).toSet();
+      expect(groups, contains('scarlet-violet'));
+      expect(groups.contains('red-blue'), isFalse);
+      expect(groups.contains('sword-shield'), isFalse);
+      expect(groups.contains('legends-arceus'), isFalse);
+      expect(groups.contains('diamond-pearl'), isFalse);
+      expect(groups, contains('default'));
+    });
   });
 }

@@ -215,6 +215,36 @@ const List<_VersionSpriteSource> _versionSpriteSources = [
   ),
 ];
 
+/// National-dex debut cap per version group. Mirrors
+/// ``VERSION_GROUP_MAX_ID`` in tools/build_dex_bundle.py. Used to stop
+/// PokeAPI's placeholder URLs for generations a species predates from
+/// appearing in the edition picker.
+const Map<String, int> kSpriteVersionGroupMaxId = {
+  'red-blue': 151,
+  'yellow': 151,
+  'gold-silver': 251,
+  'crystal': 251,
+  'ruby-sapphire': 386,
+  'emerald': 386,
+  'firered-leafgreen': 386,
+  'diamond-pearl': 493,
+  'platinum': 493,
+  'heartgold-soulsilver': 493,
+  'black-white': 649,
+  'black-2-white-2': 649,
+  'x-y': 721,
+  'omega-ruby-alpha-sapphire': 721,
+  'sun-moon': 809,
+  'ultra-sun-ultra-moon': 809,
+  'lets-go-pikachu-lets-go-eevee': 809,
+  'sword-shield': 905,
+  'brilliant-diamond-shining-pearl': 905,
+  'legends-arceus': 905,
+  'scarlet-violet': 1025,
+  'legends-za': 1025,
+  'mega-dimension': 1025,
+};
+
 /// Version groups with real per-game back sprites in the PokeAPI repo.
 /// Gen III and Gen VI+ have no back folders there (3D models / missing art).
 const List<_VersionSpriteSource> _backSpriteSources = [
@@ -342,9 +372,6 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
 }) {
   final options = <SpriteEditionOption>[];
   final seen = <String>{};
-  final knownMaxId = <String, int>{
-    for (final source in _versionSpriteSources) source.versionGroup: source.maxId,
-  };
 
   void add(
     String versionGroup,
@@ -404,7 +431,7 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
 
   // CDN-only entries for version groups without a GitHub folder.
   for (final entry in byVersion.entries) {
-    final cap = knownMaxId[entry.key];
+    final cap = kSpriteVersionGroupMaxId[entry.key];
     if (cap != null && id > cap) {
       continue;
     }
