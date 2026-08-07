@@ -42,7 +42,7 @@ Endpoints are baked in at build time (`flutter/lib/features/dex/dex_cdn_config.d
 ## Prerequisites
 
 1. **Flutter SDK** (stable, matches CI)
-2. **Android SDK** — `compileSdk 36`, NDK `27.0.12077973`
+2. **Android SDK** — `compileSdk 36`, NDK `28.2.13676358`
 3. **Release signing** — `flutter/android/key.properties` + keystore (see `flutter/android/app/build.gradle.kts`). CI/cloud VM must have the same keystore as historical RG builds, or users must uninstall before sideloading a differently signed APK.
 
 ```properties
