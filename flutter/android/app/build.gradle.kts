@@ -18,7 +18,7 @@ android {
     namespace = "com.tito.titodex"
     // Match working RG builds (0.2.11 / local 0.2.23): compile/target SDK 36.
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
