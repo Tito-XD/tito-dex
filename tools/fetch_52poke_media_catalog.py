@@ -143,12 +143,18 @@ def main() -> int:
 
     entries: dict[str, Any] = {}
     if args.output.is_file() and not args.force:
+        raw = json.loads(args.output.read_text(encoding="utf-8"))
         entries = {
             str(item["id"]): item
-            for item in json.loads(args.output.read_text(encoding="utf-8")).get(
-                "entries", []
-            )
+            for item in raw.get("entries", [])
+            if isinstance(item, dict)
         }
+        if not entries and isinstance(raw, dict):
+            entries = {
+                key: value
+                for key, value in raw.items()
+                if key.isdigit() and isinstance(value, dict)
+            }
     session = requests.Session()
     session.headers.update(
         {
@@ -198,18 +204,11 @@ def main() -> int:
             failed.append(species_id)
             print(f"error {species_id:4d}: {exc}", flush=True)
         finally:
+            # Object keyed by id (items.json style) so the app can read it
+            # through DexRepository.getReferenceEntries.
             payload = {
-                "schemaVersion": 1,
-                "source": {
-                    "name": "52poke wiki (rendered media)",
-                    "url": WIKI_BASE,
-                    "license": "CC BY-NC-SA 4.0",
-                    "note": "Online media catalog; not bundled. App fetches once and caches.",
-                },
-                "fetchedAt": datetime.now(timezone.utc)
-                .replace(microsecond=0)
-                .isoformat(),
-                "entries": sorted(entries.values(), key=lambda item: item["id"]),
+                str(item["id"]): item
+                for item in sorted(entries.values(), key=lambda item: item["id"])
             }
             write_payload(payload, args.output)
             time.sleep(args.delay)
