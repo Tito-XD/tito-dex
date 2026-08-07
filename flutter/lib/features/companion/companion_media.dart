@@ -21,6 +21,18 @@ const Set<int> bundledCompanionIds = {
   25, 133,
 };
 
+/// Whether a form may safely reuse animation URLs addressed by [mediaId].
+///
+/// Cosmetic forms such as Unown letters can share the species-level PokeAPI
+/// id while having different static artwork. Reusing the species animation in
+/// that case silently displays the default form, so those forms stay on their
+/// exact static image unless upstream gives them a distinct media id.
+bool companionFormUsesIdAnimation({
+  required int speciesId,
+  required int mediaId,
+  required bool isDefault,
+}) => isDefault || mediaId != speciesId;
+
 String? bundledCompanionGifAsset(int id) =>
     bundledCompanionIds.contains(id) ? 'assets/companion_media/$id.gif' : null;
 
@@ -74,7 +86,8 @@ class CompanionMediaCache {
 
   Future<String?> cachedGifPath(int mediaId) => _existingPath(mediaId, 'gif');
 
-  Future<String?> cachedCryPath(int speciesId) => _existingPath(speciesId, 'ogg');
+  Future<String?> cachedCryPath(int speciesId) =>
+      _existingPath(speciesId, 'ogg');
 
   Future<String?> _download(
     int mediaId,
@@ -104,16 +117,24 @@ class CompanionMediaCache {
 
   /// Download-and-cache the animated GIF; returns the local path or null.
   /// [mediaId] defaults to [speciesId] for backward compatibility.
-  Future<String?> ensureGif(int mediaId) =>
-      _download(mediaId, 'gif', companionGifDownloadCandidates(mediaId));
+  Future<String?> ensureGif(int mediaId, {List<String>? candidates}) =>
+      _download(
+        mediaId,
+        'gif',
+        candidates ?? companionGifDownloadCandidates(mediaId),
+      );
 
   Future<String?> cachedShinyGifPath(int mediaId) =>
       _existingPath(mediaId, 'shiny.gif');
 
   /// Download-and-cache the shiny GIF (fetched lazily on a shiny session,
   /// never part of the picker preload).
-  Future<String?> ensureShinyGif(int mediaId) =>
-      _download(mediaId, 'shiny.gif', animatedShinySpriteCandidatesFor(mediaId));
+  Future<String?> ensureShinyGif(int mediaId, {List<String>? candidates}) =>
+      _download(
+        mediaId,
+        'shiny.gif',
+        candidates ?? animatedShinySpriteCandidatesFor(mediaId),
+      );
 
   /// Download-and-cache the cry; returns the local path or null.
   /// Cries are species-level, so [speciesId] is always used here.

@@ -2,9 +2,17 @@
 
 from __future__ import annotations
 
+import json
+import re
+from pathlib import Path
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[1]
+SPRITE_EXISTENCE_PATH = ROOT / "data" / "dex" / "sprite_version_existence.json"
+
 # PokeAPI version-group slug → (sprites.versions key, sub-key).
+# Only exact front-sprite directories in PokeAPI/sprites belong here. API slots
+# without files must not fall back to another game or to universal artwork.
 VERSION_GROUP_SPRITE_PATH: dict[str, tuple[str, str]] = {
     "red-blue": ("generation-i", "red-blue"),
     "yellow": ("generation-i", "yellow"),
@@ -17,26 +25,104 @@ VERSION_GROUP_SPRITE_PATH: dict[str, tuple[str, str]] = {
     "platinum": ("generation-iv", "platinum"),
     "heartgold-soulsilver": ("generation-iv", "heartgold-soulsilver"),
     "black-white": ("generation-v", "black-white"),
-    "black-2-white-2": ("generation-v", "black-2-white-2"),
     "x-y": ("generation-vi", "x-y"),
-    "omega-ruby-alpha-sapphire": ("generation-vi", "omega-ruby-alpha-sapphire"),
-    "sun-moon": ("generation-vii", "sun-moon"),
-    "ultra-sun-ultra-moon": ("generation-vii", "ultra-sun-ultra-moon"),
-    "lets-go-pikachu-lets-go-eevee": (
-        "generation-vii",
-        "lets-go-pikachu-lets-go-eevee",
+    "omega-ruby-alpha-sapphire": (
+        "generation-vi",
+        "omegaruby-alphasapphire",
     ),
-    "sword-shield": ("generation-viii", "sword-shield"),
+    "ultra-sun-ultra-moon": ("generation-vii", "ultra-sun-ultra-moon"),
     "brilliant-diamond-shining-pearl": (
         "generation-viii",
         "brilliant-diamond-shining-pearl",
     ),
-    "legends-arceus": ("generation-viii", "legends-arceus"),
     "scarlet-violet": ("generation-ix", "scarlet-violet"),
 }
 
 # Unique version groups used for CDN bulk sprite builds.
 ALL_SPRITE_VERSION_GROUPS: tuple[str, ...] = tuple(VERSION_GROUP_SPRITE_PATH.keys())
+
+VERSION_GROUP_MAX_NATIONAL_ID: dict[str, int] = {
+    "red-blue": 151,
+    "yellow": 151,
+    "gold-silver": 251,
+    "crystal": 251,
+    "ruby-sapphire": 386,
+    "emerald": 386,
+    "firered-leafgreen": 386,
+    "diamond-pearl": 493,
+    "platinum": 493,
+    "heartgold-soulsilver": 493,
+    "black-white": 649,
+    "x-y": 721,
+    "omega-ruby-alpha-sapphire": 721,
+    "ultra-sun-ultra-moon": 809,
+    "brilliant-diamond-shining-pearl": 905,
+    "scarlet-violet": 1025,
+}
+
+
+def _load_sprite_existence() -> dict[str, Any]:
+    payload = json.loads(SPRITE_EXISTENCE_PATH.read_text(encoding="utf-8"))
+    if payload.get("schemaVersion") != 1:
+        raise RuntimeError(f"Unsupported sprite matrix: {SPRITE_EXISTENCE_PATH}")
+    groups = payload.get("versionGroups") or {}
+    for version_group, (generation, folder) in VERSION_GROUP_SPRITE_PATH.items():
+        expected_path = f"{generation}/{folder}"
+        actual_path = (groups.get(version_group) or {}).get("sourcePath")
+        if actual_path != expected_path:
+            raise RuntimeError(
+                f"Sprite matrix path mismatch for {version_group}: "
+                f"{actual_path!r} != {expected_path!r}"
+            )
+    return payload
+
+
+SPRITE_VERSION_EXISTENCE = _load_sprite_existence()
+SPRITE_SOURCE_COMMIT = str(SPRITE_VERSION_EXISTENCE["sourceCommit"])
+_ASSET_RANGE_KEYS = {
+    "front": "frontRanges",
+    "back": "backRanges",
+    "animatedFront": "animatedFrontRanges",
+    "animatedBack": "animatedBackRanges",
+}
+_NUMERIC_ASSET_RE = re.compile(r"/(\d+)\.(?:png|gif)$")
+
+
+def sprite_asset_exists(
+    version_group: str,
+    resource_id: int,
+    *,
+    asset: str = "front",
+) -> bool:
+    """True only for an exact file pinned in the generated Git-tree matrix."""
+    if resource_id <= 0:
+        return False
+    cap = VERSION_GROUP_MAX_NATIONAL_ID.get(version_group)
+    if resource_id <= 1025 and cap is not None and resource_id > cap:
+        return False
+    range_key = _ASSET_RANGE_KEYS[asset]
+    ranges = (
+        SPRITE_VERSION_EXISTENCE.get("versionGroups", {})
+        .get(version_group, {})
+        .get(range_key, [])
+    )
+    return any(start <= resource_id <= end for start, end in ranges)
+
+
+def _numeric_asset_id(url: str) -> int | None:
+    match = _NUMERIC_ASSET_RE.search(url)
+    return int(match.group(1)) if match else None
+
+
+def _pinned_front_url(version_group: str, resource_id: int) -> str:
+    source_path = SPRITE_VERSION_EXISTENCE["versionGroups"][version_group][
+        "sourcePath"
+    ]
+    return (
+        "https://raw.githubusercontent.com/PokeAPI/sprites/"
+        f"{SPRITE_SOURCE_COMMIT}/sprites/pokemon/versions/"
+        f"{source_path}/{resource_id}.png"
+    )
 
 # Roman-numeral generation (1–9) for edition default display.
 VERSION_GROUP_GENERATION: dict[str, int] = {
@@ -88,16 +174,14 @@ def sprite_url_for_version_group(
     if path:
         gen_key, sub_key = path
         url = _dig(sprites, "versions", gen_key, sub_key, "front_default")
-        if url:
+        resource_id = _numeric_asset_id(url) if url else None
+        if url and (
+            resource_id is None
+            or sprite_asset_exists(version_group, resource_id, asset="front")
+        ):
+            if resource_id is not None and "PokeAPI/sprites" in url:
+                return _pinned_front_url(version_group, resource_id)
             return url
-        # Same generation fallback (e.g. BDSP missing → DP).
-        gen_bucket = sprites.get("versions", {}).get(gen_key, {})
-        if isinstance(gen_bucket, dict):
-            for sub in gen_bucket.values():
-                if isinstance(sub, dict):
-                    url = sub.get("front_default")
-                    if url:
-                        return url
 
     if not allow_universal_fallback:
         return None

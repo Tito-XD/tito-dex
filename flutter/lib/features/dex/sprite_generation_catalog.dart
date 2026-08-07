@@ -1,5 +1,6 @@
 import '../game/game_edition.dart';
 import 'dex_cdn_config.dart';
+import 'sprite_version_existence.g.dart';
 
 /// PokeAPI version-group slug → national dex generation (1–9).
 const Map<String, int> kSpriteVersionGroupGeneration = {
@@ -161,58 +162,54 @@ List<SpriteEditionOption> spriteEditionOptions({
 /// demand from here instead of being bundled into the APK or the dex CDN
 /// (the per-version files are too many/small to host on the free R2 tier).
 const String pokeApiSpritesBase =
-    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+    'https://raw.githubusercontent.com/PokeAPI/sprites/'
+    '$kSpriteExistenceSourceCommit/sprites/pokemon';
 
 /// Gen V black-white animated GIFs exist for ids 1–649.
 const int bwAnimatedMaxId = 649;
 
 class _VersionSpriteSource {
-  const _VersionSpriteSource(this.versionGroup, this.folder, this.maxId);
+  const _VersionSpriteSource(this.versionGroup, this.folder);
 
   /// PokeAPI version-group slug.
   final String versionGroup;
 
   /// Folder under `sprites/pokemon/versions/`.
   final String folder;
-
-  /// Highest national dex id with a sprite in this folder.
-  final int maxId;
 }
 
 /// Version groups with real per-game sprite folders in the PokeAPI repo.
-/// Gen VIII+ games have no per-version sprites there; they are covered by the
-/// cross-game HOME / Showdown / default sources below.
+/// Unsupported games are covered only by the cross-game HOME / Showdown /
+/// default sources below; BDSP and Scarlet/Violet have exact sparse folders.
 const List<_VersionSpriteSource> _versionSpriteSources = [
-  _VersionSpriteSource('red-blue', 'generation-i/red-blue', 151),
-  _VersionSpriteSource('yellow', 'generation-i/yellow', 151),
-  _VersionSpriteSource('gold-silver', 'generation-ii/gold', 251),
-  _VersionSpriteSource('crystal', 'generation-ii/crystal', 251),
-  _VersionSpriteSource('ruby-sapphire', 'generation-iii/ruby-sapphire', 386),
-  _VersionSpriteSource('emerald', 'generation-iii/emerald', 386),
-  _VersionSpriteSource(
-    'firered-leafgreen',
-    'generation-iii/firered-leafgreen',
-    386,
-  ),
-  _VersionSpriteSource('diamond-pearl', 'generation-iv/diamond-pearl', 493),
-  _VersionSpriteSource('platinum', 'generation-iv/platinum', 493),
+  _VersionSpriteSource('red-blue', 'generation-i/red-blue'),
+  _VersionSpriteSource('yellow', 'generation-i/yellow'),
+  _VersionSpriteSource('gold-silver', 'generation-ii/gold'),
+  _VersionSpriteSource('crystal', 'generation-ii/crystal'),
+  _VersionSpriteSource('ruby-sapphire', 'generation-iii/ruby-sapphire'),
+  _VersionSpriteSource('emerald', 'generation-iii/emerald'),
+  _VersionSpriteSource('firered-leafgreen', 'generation-iii/firered-leafgreen'),
+  _VersionSpriteSource('diamond-pearl', 'generation-iv/diamond-pearl'),
+  _VersionSpriteSource('platinum', 'generation-iv/platinum'),
   _VersionSpriteSource(
     'heartgold-soulsilver',
     'generation-iv/heartgold-soulsilver',
-    493,
   ),
-  _VersionSpriteSource('black-white', 'generation-v/black-white', 649),
-  _VersionSpriteSource('x-y', 'generation-vi/x-y', 721),
+  _VersionSpriteSource('black-white', 'generation-v/black-white'),
+  _VersionSpriteSource('x-y', 'generation-vi/x-y'),
   _VersionSpriteSource(
     'omega-ruby-alpha-sapphire',
     'generation-vi/omegaruby-alphasapphire',
-    721,
   ),
   _VersionSpriteSource(
     'ultra-sun-ultra-moon',
     'generation-vii/ultra-sun-ultra-moon',
-    807,
   ),
+  _VersionSpriteSource(
+    'brilliant-diamond-shining-pearl',
+    'generation-viii/brilliant-diamond-shining-pearl',
+  ),
+  _VersionSpriteSource('scarlet-violet', 'generation-ix/scarlet-violet'),
 ];
 
 /// National-dex debut cap per version group. Mirrors
@@ -245,23 +242,43 @@ const Map<String, int> kSpriteVersionGroupMaxId = {
   'mega-dimension': 1025,
 };
 
-/// Version groups with real per-game back sprites in the PokeAPI repo.
-/// Gen III and Gen VI+ have no back folders there (3D models / missing art).
-const List<_VersionSpriteSource> _backSpriteSources = [
-  _VersionSpriteSource('red-blue', 'generation-i/red-blue', 151),
-  _VersionSpriteSource('yellow', 'generation-i/yellow', 151),
-  _VersionSpriteSource('gold-silver', 'generation-ii/gold', 251),
-  _VersionSpriteSource('crystal', 'generation-ii/crystal', 251),
-  _VersionSpriteSource('diamond-pearl', 'generation-iv/diamond-pearl', 493),
-  _VersionSpriteSource('platinum', 'generation-iv/platinum', 493),
-  _VersionSpriteSource(
-    'heartgold-soulsilver',
-    'generation-iv/heartgold-soulsilver',
-    493,
-  ),
-  _VersionSpriteSource('black-white', 'generation-v/black-white', 649),
-  _VersionSpriteSource('black-2-white-2', 'generation-v/black-2-white-2', 649),
-];
+bool _idInRanges(Map<String, List<int>> rangesByVersion, String group, int id) {
+  final ranges = rangesByVersion[group];
+  if (ranges == null || id <= 0) return false;
+  for (var index = 0; index + 1 < ranges.length; index += 2) {
+    if (id >= ranges[index] && id <= ranges[index + 1]) return true;
+  }
+  return false;
+}
+
+/// Whether the exact official PokeAPI/sprites Git tree contains this asset.
+///
+/// The national-id cap is still required because that repository contains a
+/// handful of retro-style community sprites for species introduced later; a
+/// file alone does not prove that the Pokémon existed in that game.
+bool spriteVersionHasFront(String versionGroup, int id) {
+  final cap = kSpriteVersionGroupMaxId[versionGroup];
+  return (cap == null || id > 1025 || id <= cap) &&
+      _idInRanges(kSpriteFrontIdRanges, versionGroup, id);
+}
+
+bool spriteVersionHasBack(String versionGroup, int id) {
+  final cap = kSpriteVersionGroupMaxId[versionGroup];
+  return (cap == null || id > 1025 || id <= cap) &&
+      _idInRanges(kSpriteBackIdRanges, versionGroup, id);
+}
+
+bool spriteVersionHasAnimatedFront(String versionGroup, int id) {
+  final cap = kSpriteVersionGroupMaxId[versionGroup];
+  return (cap == null || id > 1025 || id <= cap) &&
+      _idInRanges(kSpriteAnimatedFrontIdRanges, versionGroup, id);
+}
+
+bool spriteVersionHasAnimatedBack(String versionGroup, int id) {
+  final cap = kSpriteVersionGroupMaxId[versionGroup];
+  return (cap == null || id > 1025 || id <= cap) &&
+      _idInRanges(kSpriteAnimatedBackIdRanges, versionGroup, id);
+}
 
 String defaultSpriteUrlFor(int id) => '$pokeApiSpritesBase/$id.png';
 
@@ -287,9 +304,31 @@ String bwAnimatedBackGifUrlFor(int id) =>
 
 /// Back sprite for a version group with a real back folder, or null.
 String? pokeApiBackSpriteUrlFor(String versionGroup, int id) {
-  for (final source in _backSpriteSources) {
-    if (source.versionGroup == versionGroup && id <= source.maxId) {
+  for (final source in _versionSpriteSources) {
+    if (source.versionGroup == versionGroup &&
+        spriteVersionHasBack(versionGroup, id)) {
       return '$pokeApiSpritesBase/versions/${source.folder}/back/$id.png';
+    }
+  }
+  return null;
+}
+
+String? pokeApiAnimatedSpriteUrlFor(String versionGroup, int id) {
+  for (final source in _versionSpriteSources) {
+    if (source.versionGroup == versionGroup &&
+        spriteVersionHasAnimatedFront(versionGroup, id)) {
+      return '$pokeApiSpritesBase/versions/${source.folder}/animated/$id.gif';
+    }
+  }
+  return null;
+}
+
+String? pokeApiAnimatedBackSpriteUrlFor(String versionGroup, int id) {
+  for (final source in _versionSpriteSources) {
+    if (source.versionGroup == versionGroup &&
+        spriteVersionHasAnimatedBack(versionGroup, id)) {
+      return '$pokeApiSpritesBase/versions/${source.folder}'
+          '/animated/back/$id.gif';
     }
   }
   return null;
@@ -354,6 +393,13 @@ String cryUrlFor(int id) =>
     'https://raw.githubusercontent.com/PokeAPI/cries/main'
     '/cries/pokemon/latest/$id.ogg';
 
+/// Pre-Gen-V-style cry retained by the official PokeAPI cries repository.
+/// The legacy collection currently covers National Dex ids 1–905.
+String? legacyCryUrlFor(int id) => id <= 905
+    ? 'https://raw.githubusercontent.com/PokeAPI/cries/main'
+          '/cries/pokemon/legacy/$id.ogg'
+    : null;
+
 /// Own-CDN cry (seeded alongside the starter GIFs).
 String cdnCryUrlFor(int id) =>
     '${DexCdnConfig.cdnBase}/${DexCdnConfig.bundleVersionPrefix}'
@@ -362,9 +408,13 @@ String cdnCryUrlFor(int id) =>
 /// Cry candidates, best first — same CDN-first strategy as the sprites.
 List<String> cryCandidatesFor(int id) => [cdnCryUrlFor(id), cryUrlFor(id)];
 
-/// Build the full per-generation picker for one Pokémon from known PokeAPI
-/// repo URL patterns, filtered by each folder's id ceiling. CDN URLs in
-/// [cdnUrlsByVersion] (future bundles) override the GitHub fallback.
+/// Build the per-generation picker from exact files in PokeAPI/sprites.
+///
+/// [cdnUrlsByVersion] remains in the signature for old bundle models, but the
+/// current v18 values are synthetic `/sprites/by-version/` URLs with no stored
+/// objects behind them. They must not override a verified GitHub file or add an
+/// unsupported game slot, otherwise the CDN Worker falls back to the same
+/// default sprite for every row.
 List<SpriteEditionOption> spriteEditionOptionsForPokemon(
   int id, {
   Map<String, String>? cdnUrlsByVersion,
@@ -395,51 +445,31 @@ List<SpriteEditionOption> spriteEditionOptionsForPokemon(
         backSpriteUrl: backSpriteUrl,
         animatedBackUrl: animatedBackUrl,
         isOfficialArtwork:
-            versionGroup == 'official-artwork' || url.contains('/official-artwork/'),
+            versionGroup == 'official-artwork' ||
+            url.contains('/official-artwork/'),
       ),
     );
   }
 
-  final byVersion = cdnUrlsByVersion ?? const {};
   for (final source in _versionSpriteSources) {
-    if (id > source.maxId) {
-      // The species had not debuted in this generation; never offer it even
-      // when a (fallback) CDN URL exists for the version group.
+    // Form ids live above the national range. Their detail map was already
+    // filtered by the form's introduction and in-game availability during the
+    // bundle build, so keep it as an allow-list. The raw upstream folders also
+    // contain retro-style community backfills that are not historical proof.
+    if (id > 1025 &&
+        !(cdnUrlsByVersion?.containsKey(source.versionGroup) ?? false)) {
       continue;
     }
-    final url =
-        byVersion[source.versionGroup] ??
-        (id <= source.maxId
-            ? '$pokeApiSpritesBase/versions/${source.folder}/$id.png'
-            : null);
-    if (url == null) continue;
+    if (!spriteVersionHasFront(source.versionGroup, id)) continue;
+    final url = '$pokeApiSpritesBase/versions/${source.folder}/$id.png';
     add(
       source.versionGroup,
       editionShortLabelForVersionGroup(source.versionGroup),
       kSpriteVersionGroupGeneration[source.versionGroup] ?? 9,
       url,
-      animatedUrl: source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
-          ? bwAnimatedGifUrlFor(id)
-          : null,
+      animatedUrl: pokeApiAnimatedSpriteUrlFor(source.versionGroup, id),
       backSpriteUrl: pokeApiBackSpriteUrlFor(source.versionGroup, id),
-      animatedBackUrl:
-          source.versionGroup == 'black-white' && id <= bwAnimatedMaxId
-          ? bwAnimatedBackGifUrlFor(id)
-          : null,
-    );
-  }
-
-  // CDN-only entries for version groups without a GitHub folder.
-  for (final entry in byVersion.entries) {
-    final cap = kSpriteVersionGroupMaxId[entry.key];
-    if (cap != null && id > cap) {
-      continue;
-    }
-    add(
-      entry.key,
-      editionShortLabelForVersionGroup(entry.key),
-      kSpriteVersionGroupGeneration[entry.key] ?? 9,
-      entry.value,
+      animatedBackUrl: pokeApiAnimatedBackSpriteUrlFor(source.versionGroup, id),
     );
   }
 

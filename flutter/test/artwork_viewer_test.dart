@@ -3,16 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/widgets/pokemon_artwork_viewer.dart';
 
-Future<void> pumpViewer(
-  WidgetTester tester,
-  PokemonSummary summary,
-) async {
+Future<void> pumpViewer(WidgetTester tester, PokemonSummary summary) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: Builder(
           builder: (context) => TextButton(
-            onPressed: () => showPokemonArtworkViewer(context, summary: summary),
+            onPressed: () =>
+                showPokemonArtworkViewer(context, summary: summary),
             child: const Text('open'),
           ),
         ),
@@ -34,13 +32,23 @@ void main() {
     localSpritePath: 'sprites/25.png',
   );
 
-  testWidgets('viewer shows 背面 toggle and auto-selects a back edition', (
+  testWidgets('back control belongs to an edition and never auto-selects', (
     tester,
   ) async {
     await pumpViewer(tester, pikachu);
-    expect(find.text('背面'), findsOneWidget);
+    expect(find.text('背面'), findsNothing);
+    expect(find.byIcon(Icons.swap_horiz_rounded), findsWidgets);
 
-    await tester.tap(find.text('背面'));
+    final before = tester.widgetList(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget.key is ValueKey<String> &&
+            (widget.key! as ValueKey<String>).value.contains('/back/'),
+      ),
+    );
+    expect(before, isEmpty);
+
+    await tester.tap(find.byIcon(Icons.swap_horiz_rounded).first);
     await tester.pump(const Duration(milliseconds: 200));
 
     final backWidgets = tester.widgetList(
@@ -53,15 +61,18 @@ void main() {
     expect(
       backWidgets,
       isNotEmpty,
-      reason: 'back toggle should switch to a /back/ sprite source',
+      reason: 'the edition flip control should use its own /back/ sprite',
     );
   });
 
-  testWidgets('toggling back twice restores the front source', (tester) async {
+  testWidgets('tapping the same edition flip twice restores its front', (
+    tester,
+  ) async {
     await pumpViewer(tester, pikachu);
-    await tester.tap(find.text('背面'));
+    final flip = find.byIcon(Icons.swap_horiz_rounded).first;
+    await tester.tap(flip);
     await tester.pump(const Duration(milliseconds: 200));
-    await tester.tap(find.text('背面'));
+    await tester.tap(flip);
     await tester.pump(const Duration(milliseconds: 200));
 
     final backWidgets = tester.widgetList(

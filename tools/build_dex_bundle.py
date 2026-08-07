@@ -975,8 +975,8 @@ class PokeApiBuilder:
         sprite_cdn = f"{cdn_base}/{cdn_prefix}/sprites/{pokemon_id}.png"
         artwork_cdn = f"{cdn_base}/{cdn_prefix}/artwork/{pokemon_id}.png"
         sprite_urls_by_version = {
-            vg: f"{cdn_base}/{cdn_prefix}/sprites/by-version/{vg}/{pokemon_id}.png"
-            for vg in build_sprite_url_map(sprites_payload)
+            vg: url
+            for vg, url in build_sprite_url_map(sprites_payload).items()
             if pokemon_id <= VERSION_GROUP_MAX_ID.get(vg, 1025)
         }
         animated_cdn = (

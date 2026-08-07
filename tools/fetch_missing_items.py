@@ -130,7 +130,7 @@ def fetch_item(
         (
             name["name"]
             for name in data.get("names", [])
-            if name["language"]["name"] == "zh-Hans"
+            if name["language"]["name"].lower() == "zh-hans"
         ),
         None,
     )
@@ -138,7 +138,7 @@ def fetch_item(
         (
             entry["text"]
             for entry in data.get("flavor_text_entries", [])
-            if entry["language"]["name"] == "zh-Hans"
+            if entry["language"]["name"].lower() == "zh-hans"
         ),
         "",
     )
@@ -173,7 +173,7 @@ def inherit_from_base(session: requests.Session, item: dict[str, Any]) -> None:
             (
                 name["name"]
                 for name in data.get("names", [])
-                if name["language"]["name"] == "zh-Hans"
+                if name["language"]["name"].lower() == "zh-hans"
             ),
             item["nameZh"],
         )
@@ -183,7 +183,7 @@ def inherit_from_base(session: requests.Session, item: dict[str, Any]) -> None:
                 (
                     entry["text"]
                     for entry in data.get("flavor_text_entries", [])
-                    if entry["language"]["name"] == "zh-Hans"
+                    if entry["language"]["name"].lower() == "zh-hans"
                 ),
                 "",
             ).split()

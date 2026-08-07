@@ -1299,6 +1299,8 @@ class _CompanionSection extends StatelessWidget {
                         padding: const EdgeInsets.all(4),
                         child: FallbackSpriteImage(
                           sources: [
+                            if (choice?.animationSourceUrl != null)
+                              choice!.animationSourceUrl!,
                             if (bundledCompanionGifAsset(speciesId) != null)
                               bundledCompanionGifAsset(speciesId)!,
                             ...animatedSpriteCandidatesFor(speciesId),
@@ -1308,11 +1310,32 @@ class _CompanionSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          nameZh,
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              nameZh,
+                              style: SecondaryTypography.onCard.body14.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            if (choice?.animationLabel != null ||
+                                choice?.cryLabel != null) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                [
+                                  if (choice?.animationLabel != null)
+                                    '动图：${choice!.animationLabel}',
+                                  if (choice?.cryLabel != null)
+                                    '叫声：${choice!.cryLabel}',
+                                ].join(' · '),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(color: TitoColors.mutedInk),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],

@@ -197,7 +197,9 @@ def build_assets(
         sprites = detail.get("sprites") or {}
         stats["pokemon"] += 1
 
-        default_url = sprite_url_for_version_group(sprites, "heartgold-soulsilver")
+        default_url = official_artwork_url(sprites) or sprite_url_for_version_group(
+            sprites, "heartgold-soulsilver"
+        )
         if include_default_sprites and default_url:
             default_dir.mkdir(parents=True, exist_ok=True)
             dest = default_dir / f"{pokemon_id}.png"
@@ -230,7 +232,9 @@ def build_assets(
         vg_urls: dict[str, str] = {}
         if include_by_version:
             for vg in version_groups:
-                url = sprite_url_for_version_group(sprites, vg)
+                url = sprite_url_for_version_group(
+                    sprites, vg, allow_universal_fallback=False
+                )
                 if not url:
                     continue
                 dest_dir = vg_root / vg

@@ -4,7 +4,7 @@
 
 ## 0. 环境与仓库状态
 
-- 分支 `main`,领先 `origin/main` 约 16 个提交,**未 push**。
+- 分支 `main`,领先 `origin/main` 约 18 个提交,**未 push**。
 - 本机:Flutter 3.44.6(`C:\Users\tito\Development\flutter`)、Android SDK 36、wrangler 4.107.1(已 OAuth 登录)、三个 AVD(`TitoDex_Phone_API36` / `TitoDex_RG_720` / `TitoDex_Tablet`)。
 - 生产 CDN(已上线):`bundleVersion=18`、`items.json=2130` 条、`mediaCatalogEntries=1020`、CDN 健康检查 ok;`v5/items.json` 的 1 年 immutable 缓存已手动清除并验证(ETag 已变)。
 - 本会话模拟器进程反复被环境回收,integration drive 不稳定(见 §2-H)。
@@ -22,12 +22,13 @@
 - Cloudflare 审计完成,遗留 Worker `autumn-shape-2b65` 已删除。
 - Workflow:线上发布 workflow = `.github/workflows/upload-dex-bundle.yml`(v18);v7/v12–v17 已存档到 `docs/archive/workflows/`。
 - 增量发布工具:`tools/publish_dex_bundle_incremental.py`(本地只传相邻版本差异对象 + manifest-last + 回滚 manifest 保留)。
-- App 功能(代码+测试就绪,**尚未发版**):详情美术查看器「背面」切换、Settings 媒体资源管理页、companion 叫声优先 52poke 形态/世代、道具分类 16 组筛选。
-- 测试:全量 **332 个通过**(含背面查看器、sprite 映射、媒体目录模型测试);手机 AVD 上完整 integration 冒烟**在修复前通过过一次**。
+- App 功能(代码+测试就绪,**尚未发版**):详情美术查看器按图源翻面、Settings 媒体资源管理页、同行宝可梦形态/闪光/动图世代/叫声版本选择并持久化、道具分类 16 组筛选。
+- 本地数据候选:v19(未发布)把道具中文说明提升到 2090/2130、图标提升到 1645/2130、物种媒体目录补到 1025/1025;另有 803 条形态记录(554 个非默认形态,其中 546 个有准确静态图);帕奇利兹的 4 个 LA 携带道具均有图和说明。
+- 测试:全量 **340 个通过**、`flutter analyze` 0 issue;手机 AVD 上完整 integration 冒烟**在修复前通过过一次**。
 
 ## 2. 未完成 / 半成品 / 需完善(按用户提出顺序)
 
-### A. 逐代 sprite 映射(用户重点不满,本次已部分修复)
+### A. 逐代 sprite 映射(用户重点不满,代码修复完成,待打包)
 
 **现象**:搜索 帕奇利兹(417)/赛富豪(1000)会列出其出生前世代,且各世代图相同(全是默认图)。
 
@@ -37,41 +38,50 @@
 - `flutter/lib/features/dex/sprite_generation_catalog.dart`:`kSpriteVersionGroupMaxId` 全版本组上限表;`spriteEditionOptionsForPokemon` 对两个循环都按上限过滤;黑2白2 无真实图(仓库 404)已只进上限表。
 - `tools/build_dex_bundle.py`:`VERSION_GROUP_MAX_ID`,构建 summaries 时过滤未出生世代(下次重建 bundle 生效)。
 - 测试:`test/sprite_generation_catalog_test.dart` 新增「Gen IV 物种不出现在 Gen I–III」「Gen IX 物种只保留朱紫组」。
+- 后续修复:新增 `tools/generate_sprite_version_existence.py`,从 PokeAPI/sprites 官方 Git 树生成 `data/dex/sprite_version_existence.json` + Dart 常量,当前固定到 commit `8777f5066431f39fbe07614e0250a61b2029671c`。
+- App 现在只展示「真实文件存在 × 不早于首发世代」的交集;BDSP/朱紫按真实物种子集过滤;v18 合成的 `/sprites/by-version/` URL 不再覆盖真实源或添加不存在的游戏组。
+- 在线逐代图固定到上述 commit 的 `raw.githubusercontent.com` 路径;`tools/pokeapi_assets.py` 与 `build_dex_bundle.py` 共用同一矩阵,新 summaries 写真实固定源,不再生成无对象的 CDN URL。
+- 验证:`flutter test --concurrency=1` **336 个通过**、`flutter analyze` 0 问题;Python Sprite/bundle 回归 22 个通过(1 个既有 smoke 条件跳过)。
 
 **仍未解决(需要下一步)**:
-1. 全国图鉴上限过滤仍不够精确:**地区限定游戏**(LGPE 仅关都、BDSP/LA/SwSh/SV 各有物种子集)需要「物种 × 版本组」真实存在矩阵。建议:逐物种探测 PokeAPI sprites 仓库文件是否存在(约 1025×14 HEAD,可离线跑一次),生成 `sprite_version_existence` 数据,或直接把真实逐代 sprite 拉到自家 CDN 并按存在矩阵提供 URL。
-2. 当前逐代 URL 仍指向 `raw.githubusercontent.com`;用户网络曾出现加载失败回退默认(用户建议:bundle 只放默认图,逐代走在线、可上自家 CDN,不做离线打包)。
-3. 本次 Dart 修复后的 **APK 尚未重建**;用户手上的旧包不含此修复。
+1. 逐代映射修复已打过 `0.8.5-dev` APK 且用户反馈测试无问题;本轮新增的媒体选择/翻面/v19 数据尚未另打 APK。
+2. 若用户网络仍无法稳定访问 `raw.githubusercontent.com`,可按已生成矩阵把同一批真实逐代文件增量镜像到自家 CDN;仍不放入离线 bundle。
+3. LGPE / SwSh / LA 在 PokeAPI/sprites 没有真实逐版本正面图目录,因此现在正确地不显示;若未来引入其他可署名来源,必须扩展生成器来源表后再开放。
 
-### B. 道具中文简介(用户确认「要补」)
+### B. 道具中文简介(本地 v19 已完成,未发布)
 
-- `items.json` 2130 项中 **1589 项 `descriptionZh`/`effectZh` 为空**(新增的 TM/素材/剧情道具等;原 542 项有简介)。
-- 方案:从 52poke「包包信息 / 效果」抓中文简介 → 打 v20 数据补丁 → 增量发布。
+- 修正了 PokeAPI 语言代码实际为小写 `zh-hans` 的兼容问题;PokeAPI 优先命中 955 个缺口,52poke 再补剩余。
+- v19 最终 **2090/2130** 有中文说明(新增 1549);机器道具通过 PokeAPI machine → move 补上可学招式及招式说明;剩余主要是弃用/内部占位/无正式说明对象。
+- 生成物:`data/l10n/zh/items_v19_pokeapi_enrichment.json` + `items_v19_enrichment.json`;构建工具:`tools/patch_dex_bundle_v19_items.py`。
 
-### C. TM 图标(用户反馈「看起来都一样」)
+### C. TM 图标(本地 v19 已完成,未发布)
 
-- 已确认:`data/assets/item-sprites/` 中 232 个 TM 图标有 **230 个 hash 完全相同**(PokeAPI TM sprite 是通用图)。
-- 方案:52poke 按属性的 TM 图标(`Bag_TM_<属性>_SV_Sprite.png` 等),需要 TM 号 → 招式 → 属性映射(v19)。
+- `tools/enrich_tm_icons_v19.py` 用 PokeAPI 当前机器 → 招式 → 属性映射,再下载 52poke 朱紫 18 属性 160×160 图标。
+- 230 个 TM 已换成属性图;bundle 内 238 个机器图标从 1 个 hash 变为 **19 个 hash**(18 属性 + 通用兜底)。
 
-### D. 道具图标不全(用户反馈「道具图还不全」)
+### D. 道具图标不全(本地 v19 已完成一轮,未发布)
 
-- 2130 项只有 967 张图标;约 33 个下载失败;30 个 LA 物品既无图也无描述。
-- v19 一并补(PokeAPI 有则拉,否则 52poke 抓图)。
+- 全量 2130 项跑 PokeAPI → 52poke 搜索回退;只在像素面积更大时覆盖旧图。
+- 图标覆盖 **967 → 1645**;52poke 成功取得/升级 1240 项,其中 833 张为 160×160。
+- 帕奇利兹 417 的经验糖果Ｓ/橙橙果/精通种子/蛀球果全部有本地图;后三个缺口不再空白。
 
 ### E. 携带物品
 
 - 用户实测「几个是有的」,基本确认无数据问题;已知 **Mega Dimension 携带物为 0 条**(52poke 无数据)。
 - 若再遇具体缺失:需提供 宝可梦名 + 版本 再逐例核对。
 
-### F. 叫声/动图「代数可选」选择器(下一批 app 功能,用户已确认下批做)
+### F. 叫声/动图「代数可选」选择器(代码完成,未发版)
 
-- 现状:companion 自动选形态最优叫声;详情查看器有世代静态图(正/背面);**没有**按世代/形态选择叫声与动图的 UI。
-- 要做:选择器 UI + 选择持久化(companion repository / dex settings)。
+- 同行宝可梦选择页现在提供:形态、闪光、动图来源(按世代)、叫声版本/形态及试听。
+- 选择 URL/标签写入 `CompanionRepository` 的 SharedPreferences;首页优先使用用户选择,失败再回退自动候选。
+- 形态覆盖不能用 1025 这个物种数表示:v19 实际是 803 条形态记录、554 个非默认形态、546 个准确静态形态图。共享物种媒体 ID 的外观形态(如未知图腾字母)固定使用自己的静态图,不会再误借默认形态动图;仅故勒顿/密勒顿 8 个无独立上游图片的骑乘模式回退本体图。
+- PokeAPI 提供 latest/legacy 叫声和逐代动图,52poke 媒体目录提供形态叫声。
 
-### G. 媒体目录小尾巴
+### G. 媒体目录小尾巴(本地 v19 已完成)
 
-- 5 只无媒体:負电拍拍 / 纏红鹤 / 铁轍迹 / 鐵磐岩 / 鐵頭殼(52poke 页面无 `{{形象}}/{{叫声}}`)。
-- 26 项物品用英文名兜底(未解析到中文)。
+- 5 只缺口(312/973/990/1022/1023)已用固定 PokeAPI HOME + latest cry 直接链接补齐,媒体目录 **1025/1025**;同时修正其简体名。
+- PokeAPI `zh-hans` 修复后纠正 476 个名称/编号;最后 6 个英文 slug 由 52poke 页面名/维护者描述兜底。极巨结晶 `★And15` 一类是正式游戏内编号,保留不翻译。
+- 美术查看器已移除全局“背面”开关;只有有背面素材的版本卡显示双向箭头,严格在同一图源正/背间切换,不再跨世代 fallback。
 
 ### H. 集成测试 / 模拟器截图(未完成)
 
@@ -114,5 +124,5 @@ flutter drive --driver=test_driver\integration_test.dart --target=integration_te
 
 ## 5. 当前未提交/刚提交状态
 
-- 本次(handoff 同批提交):`sprite_generation_catalog.dart` + 测试 + `tools/build_dex_bundle.py` 的映射过滤;handoff 文档本身。
-- 待办排序建议:A(存在矩阵/真实 sprite 源)→ C/D(TM 与道具图标)→ B(简介)→ F(叫声/动图选择器)→ H(三尺寸截图)→ I(发布 0.9.0)。
+- 当前工作区包含逐代 sprite、翻面、媒体选择器、形态防串图、v19 道具数据/图标和测试的整批未提交改动;另有约 1511 条 `data/assets/item-sprites/` 状态行。不要清理或拆掉这些成果。
+- 下一台 Codex 的可直接粘贴 prompt:`docs/handoff/handoff-260807-next-codex-prompt.md`。后续优先级改为:形态媒体显式映射与 PokeAPI→52poke 全量缺口审计 → v19 剩余 40 条说明/485 个图标 → 全量验证;截图、APK、发布继续暂缓。

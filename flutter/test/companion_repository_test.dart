@@ -19,7 +19,16 @@ void main() {
     repository.addListener(() => notified += 1);
 
     await repository.save(
-      const CompanionChoice(pokemonId: 700, nameZh: '仙子伊布'),
+      const CompanionChoice(
+        pokemonId: 700,
+        nameZh: '仙子伊布',
+        formKey: 'sylveon-default',
+        isShiny: true,
+        animationSourceUrl: 'https://media/xy.gif',
+        animationLabel: '第六世代 · X/Y',
+        crySourceUrl: 'https://media/0700_cry.opus',
+        cryLabel: '标准叫声',
+      ),
     );
     expect(repository.choice?.pokemonId, 700);
     expect(notified, 1);
@@ -28,6 +37,12 @@ void main() {
     await restored.load();
     expect(restored.choice?.pokemonId, 700);
     expect(restored.choice?.nameZh, '仙子伊布');
+    expect(restored.choice?.formKey, 'sylveon-default');
+    expect(restored.choice?.isShiny, isTrue);
+    expect(restored.choice?.animationSourceUrl, 'https://media/xy.gif');
+    expect(restored.choice?.animationLabel, '第六世代 · X/Y');
+    expect(restored.choice?.crySourceUrl, 'https://media/0700_cry.opus');
+    expect(restored.choice?.cryLabel, '标准叫声');
   });
 
   test('sizeScale defaults to 1.0, persists, and clamps to 1.0–1.5', () async {

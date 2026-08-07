@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T10:17:27+00:00",
+  "sources": [
+    {
+      "name": "PokeAPI",
+      "license": "CC-BY 4.0"
+    },
+    {
+      "name": "52poke",
+      "license": "CC BY-NC-SA 4.0"
+    }
+  ],
+  "itemsBySlug": {
+    "oran-berry": {
+      "wikiTitle": "橙橙果（道具）",
+      "spriteFile52poke": "Bag 橙橙果 ZA Sprite.png",
+      "spriteDimensions": [
+        160,
+        160
+      ]
+    },
+    "exp-candy-s": {
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/exp-candy-s.png",
+      "wikiTitle": "经验糖果Ｓ（道具）",
+      "spriteFile52poke": "Bag 经验糖果Ｓ ZA Sprite.png",
+      "spriteDimensions": [
+        160,
+        160
+      ]
+    },
+    "seed-of-mastery": {
+      "descriptionZh": "稀有的种子。将它交给某人就能让宝可梦加强招式。",
+      "effectZh": "稀有的种子。将它交给某人就能让宝可梦加强招式。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/seed-of-mastery.png",
+      "wikiTitle": "精通种子（道具）",
+      "spriteFile52poke": "Bag 精通种子 ZA Sprite.png",
+      "spriteDimensions": [
+        160,
+        160
+      ]
+    },
+    "spoiled-apricorn": {
+      "descriptionZh": "果肉被吃掉了的球果。被它投中的宝可梦动作会变得迟缓，有时还会生出破绽。",
+      "effectZh": "果肉被吃掉了的球果。被它投中的宝可梦动作会变得迟缓，有时还会生出破绽。",
+      "descriptionSource": "52poke",
+      "spriteUrl": "https://dex.tito.cafe/v5/item-sprites/spoiled-apricorn.png",
+      "wikiTitle": "蛀球果（道具）",
+      "spriteFile52poke": "Bag 蛀球果 LA Sprite.png",
+      "spriteDimensions": [
+        100,
+        100
+      ]
+    }
+  }
+}
