@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../features/companion/companion_media.dart';
 import '../features/dex/online_media_catalog.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_colors.dart';
+import '../widgets/secondary_page_scaffold.dart';
 
 /// Settings resource manager: inspect/delete cached companion media and
 /// selectively download cries / animated GIFs for any species in the
@@ -92,105 +94,112 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
     }).toList()
       ..sort((a, b) => a.id.compareTo(b.id));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '媒体资源管理',
-          style: TextStyle(fontWeight: FontWeight.w800),
+    const fieldBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: Color(0x66FFF7E6)),
+    );
+    return SecondaryPageScaffold(
+      title: '媒体资源管理',
+      children: [
+        Text('已缓存媒体', style: SecondaryTypography.onCard.h15),
+        const SizedBox(height: 8),
+        Text(
+          _cached.isEmpty
+              ? '暂无缓存'
+              : '共 ${_cached.length} 个文件 · ${_sizeLabel(totalBytes)}',
+          style: SecondaryTypography.onCard.body14,
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('已缓存媒体', style: SecondaryTypography.onCard.h15),
-          const SizedBox(height: 8),
-          Text(
-            _cached.isEmpty
-                ? '暂无缓存'
-                : '共 ${_cached.length} 个文件 · ${_sizeLabel(totalBytes)}',
-            style: SecondaryTypography.onCard.body14,
-          ),
-          const SizedBox(height: 8),
-          for (final file in _cached)
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: Text(file.name, style: SecondaryTypography.onCard.body14),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _sizeLabel(file.sizeBytes),
-                    style: SecondaryTypography.onCard.small12,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                    onPressed: () async {
-                      await companionMediaCache.deleteCached(file.name);
-                      _refresh();
-                    },
-                  ),
-                ],
-              ),
+        const SizedBox(height: 8),
+        for (final file in _cached)
+          ListTile(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              file.name,
+              style: SecondaryTypography.onCard.body14,
             ),
-          if (_cached.isNotEmpty)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () async {
-                  for (final file in _cached) {
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _sizeLabel(file.sizeBytes),
+                  style: SecondaryTypography.onCard.small12,
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    size: 18,
+                    color: TitoColors.card,
+                  ),
+                  onPressed: () async {
                     await companionMediaCache.deleteCached(file.name);
-                  }
-                  _refresh();
-                },
-                child: const Text('全部清理'),
-              ),
+                    _refresh();
+                  },
+                ),
+              ],
             ),
-          const Divider(height: 32),
-          Text('按宝可梦下载', style: SecondaryTypography.onCard.h15),
-          const SizedBox(height: 8),
-          TextField(
-            decoration: const InputDecoration(
-              hintText: '搜索宝可梦名称或编号',
-              isDense: true,
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) => setState(() => _query = value),
           ),
-          const SizedBox(height: 8),
-          if (_query.trim().isNotEmpty && matches.isEmpty)
-            Text(
-              '未找到（媒体目录为空时请先更新数据包）',
+        if (_cached.isNotEmpty)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () async {
+                for (final file in _cached) {
+                  await companionMediaCache.deleteCached(file.name);
+                }
+                _refresh();
+              },
+              child: const Text('全部清理'),
+            ),
+          ),
+        const Divider(height: 32, color: Color(0x33FFF7E6)),
+        Text('按宝可梦下载', style: SecondaryTypography.onCard.h15),
+        const SizedBox(height: 8),
+        TextField(
+          style: const TextStyle(color: TitoColors.card),
+          decoration: InputDecoration(
+            hintText: '搜索宝可梦名称或编号',
+            hintStyle: TextStyle(
+              color: TitoColors.card.withValues(alpha: 0.55),
+            ),
+            isDense: true,
+            enabledBorder: fieldBorder,
+            focusedBorder: fieldBorder,
+          ),
+          onChanged: (value) => setState(() => _query = value),
+        ),
+        const SizedBox(height: 8),
+        if (_query.trim().isNotEmpty && matches.isEmpty)
+          Text(
+            '未找到（媒体目录为空时请先更新数据包）',
+            style: SecondaryTypography.onCard.small12,
+          ),
+        for (final entry in matches.take(40))
+          ListTile(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              '#${entry.id} ${entry.nameZh}',
+              style: SecondaryTypography.onCard.body14,
+            ),
+            subtitle: Text(
+              '${entry.cries.length} 条叫声 · ${entry.forms.length} 张形态图',
               style: SecondaryTypography.onCard.small12,
             ),
-          for (final entry in matches.take(40))
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: Text(
-                '#${entry.id} ${entry.nameZh}',
-                style: SecondaryTypography.onCard.body14,
-              ),
-              subtitle: Text(
-                '${entry.cries.length} 条叫声 · ${entry.forms.length} 张形态图',
-                style: SecondaryTypography.onCard.small12,
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    onPressed: _busy ? null : () => _downloadCry(entry),
-                    child: const Text('叫声'),
-                  ),
-                  TextButton(
-                    onPressed: _busy ? null : () => _downloadGif(entry),
-                    child: const Text('动图'),
-                  ),
-                ],
-              ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextButton(
+                  onPressed: _busy ? null : () => _downloadCry(entry),
+                  child: const Text('叫声'),
+                ),
+                TextButton(
+                  onPressed: _busy ? null : () => _downloadGif(entry),
+                  child: const Text('动图'),
+                ),
+              ],
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }
