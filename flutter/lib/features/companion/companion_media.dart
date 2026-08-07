@@ -117,8 +117,65 @@ class CompanionMediaCache {
 
   /// Download-and-cache the cry; returns the local path or null.
   /// Cries are species-level, so [speciesId] is always used here.
-  Future<String?> ensureCry(int speciesId) =>
-      _download(speciesId, 'ogg', cryCandidatesFor(speciesId));
+  Future<String?> ensureCry(int speciesId, {List<String>? candidates}) =>
+      _download(speciesId, 'ogg', candidates ?? cryCandidatesFor(speciesId));
+
+  /// List every cached media file (GIF / cry / webm) with its size.
+  Future<List<CachedMediaFile>> listCached() async {
+    try {
+      final dir = await _cacheDir();
+      final files = await dir.list().toList();
+      final result = <CachedMediaFile>[];
+      for (final entity in files) {
+        if (entity is! File) {
+          continue;
+        }
+        try {
+          final stat = await entity.stat();
+          if (stat.size > 0) {
+            result.add(
+              CachedMediaFile(
+                name: entity.uri.pathSegments.last,
+                path: entity.path,
+                sizeBytes: stat.size,
+              ),
+            );
+          }
+        } catch (_) {
+          // Skip unreadable files.
+        }
+      }
+      result.sort((a, b) => a.name.compareTo(b.name));
+      return result;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> deleteCached(String fileName) async {
+    try {
+      final dir = await _cacheDir();
+      final file = File('${dir.path}/$fileName');
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {
+      // Deletion is best-effort.
+    }
+  }
 }
 
 final companionMediaCache = CompanionMediaCache();
+
+/// A cached companion media file (GIF / cry) with its size on disk.
+class CachedMediaFile {
+  const CachedMediaFile({
+    required this.name,
+    required this.path,
+    required this.sizeBytes,
+  });
+
+  final String name;
+  final String path;
+  final int sizeBytes;
+}
