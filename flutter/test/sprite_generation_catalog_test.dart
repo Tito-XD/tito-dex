@@ -56,10 +56,11 @@ void main() {
       expect(groups, contains('heartgold-soulsilver'));
     });
 
-    test('Gen IX species only get universal sources', () {
+    test('Gen IX species only get Scarlet/Violet plus universal sources', () {
       final options = spriteEditionOptionsForPokemon(1000);
       final generations = options.map((o) => o.generation).toSet();
-      expect(generations, {spriteGenerationUniversal});
+      expect(generations, {9, spriteGenerationUniversal});
+      expect(options.map((o) => o.versionGroup), contains('scarlet-violet'));
     });
 
     test('black-white carries the animated GIF within the BW ceiling', () {
@@ -82,13 +83,34 @@ void main() {
       expect(beyond.versionGroup, 'absent');
     });
 
-    test('CDN URLs override the GitHub fallback per version group', () {
+    test('Crystal animation uses its own exact source folder', () {
+      final crystal = spriteEditionOptionsForPokemon(
+        25,
+      ).firstWhere((option) => option.versionGroup == 'crystal');
+      expect(
+        crystal.animatedUrl,
+        '$pokeApiSpritesBase/versions/generation-ii/crystal/animated/25.gif',
+      );
+      expect(crystal.animatedBackUrl, isNull);
+    });
+
+    test('legacy synthetic CDN URLs cannot override exact GitHub files', () {
       final options = spriteEditionOptionsForPokemon(
         25,
-        cdnUrlsByVersion: const {'yellow': 'https://cdn/yellow-25.png'},
+        cdnUrlsByVersion: const {
+          'yellow': 'https://cdn/yellow-25.png',
+          'sword-shield': 'https://cdn/fake-swsh-25.png',
+        },
       );
       final yellow = options.firstWhere((o) => o.versionGroup == 'yellow');
-      expect(yellow.spriteUrl, 'https://cdn/yellow-25.png');
+      expect(
+        yellow.spriteUrl,
+        '$pokeApiSpritesBase/versions/generation-i/yellow/25.png',
+      );
+      expect(
+        options.map((o) => o.versionGroup),
+        isNot(contains('sword-shield')),
+      );
     });
 
     test('animated candidates prefer CDN then fall back to public sources', () {
@@ -154,6 +176,37 @@ void main() {
       expect(groups, contains('black-white'));
     });
 
+    test('exact matrix filters regional game subsets', () {
+      expect(spriteVersionHasFront('scarlet-violet', 25), isTrue);
+      expect(spriteVersionHasFront('scarlet-violet', 10), isFalse);
+      expect(
+        spriteVersionHasFront('brilliant-diamond-shining-pearl', 493),
+        isTrue,
+      );
+      expect(
+        spriteVersionHasFront('brilliant-diamond-shining-pearl', 494),
+        isFalse,
+      );
+      expect(spriteVersionHasFront('sword-shield', 25), isFalse);
+      // The upstream folder contains retro-style newer sprites, but that does
+      // not make a Gen IX species available in Black/White.
+      expect(spriteVersionHasFront('black-white', 1000), isFalse);
+    });
+
+    test('form detail map remains the introduction allow-list', () {
+      // #10181 has files in multiple retro-style folders, but this form map
+      // says only USUM is historically applicable.
+      final options = spriteEditionOptionsForPokemon(
+        10181,
+        cdnUrlsByVersion: const {
+          'ultra-sun-ultra-moon': 'https://example.invalid/usum.png',
+        },
+      );
+      final groups = options.map((option) => option.versionGroup).toSet();
+      expect(groups, contains('ultra-sun-ultra-moon'));
+      expect(groups.contains('black-white'), isFalse);
+    });
+
     test('Gen IX species only keep Gen IX CDN groups from a full map', () {
       // Gholdengo (#1000) exists only in Scarlet/Violet.
       final options = spriteEditionOptionsForPokemon(
@@ -173,6 +226,10 @@ void main() {
       );
       final groups = options.map((o) => o.versionGroup).toSet();
       expect(groups, contains('scarlet-violet'));
+      expect(
+        options.firstWhere((o) => o.versionGroup == 'scarlet-violet').spriteUrl,
+        '$pokeApiSpritesBase/versions/generation-ix/scarlet-violet/1000.png',
+      );
       expect(groups.contains('red-blue'), isFalse);
       expect(groups.contains('sword-shield'), isFalse);
       expect(groups.contains('legends-arceus'), isFalse);

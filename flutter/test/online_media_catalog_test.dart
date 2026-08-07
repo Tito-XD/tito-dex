@@ -29,6 +29,35 @@ void main() {
       );
     });
 
+    test('named form aliases match compact 52poke cry suffixes', () {
+      const koraidon = OnlineMediaEntry(
+        id: 1007,
+        nameZh: '故勒顿',
+        cries: [
+          OnlineCry(title: '1007_cry.opus', url: 'https://media/default'),
+          OnlineCry(title: '1007L_cry.opus', url: 'https://media/limited'),
+        ],
+        forms: [],
+      );
+      expect(
+        koraidon.bestCryUrl(formKey: 'koraidon-limited-build'),
+        'https://media/limited',
+      );
+    });
+
+    test('cry labels expose standard and form choices in Chinese', () {
+      expect(entry().cries[0].labelZh, '标准叫声');
+      expect(entry().cries[1].labelZh, '超极巨化');
+      expect(entry().cries[2].labelZh, '初始帽子');
+      expect(
+        const OnlineCry(
+          title: '1023_cry.ogg',
+          url: 'https://pokeapi/1023.ogg',
+        ).labelZh,
+        '标准叫声',
+      );
+    });
+
     test('fromJson parses id from string keys too', () {
       final parsed = OnlineMediaEntry.fromJson({
         'id': '25',

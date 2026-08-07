@@ -35,6 +35,8 @@ class CompanionStandby extends StatefulWidget {
     required this.nameZh,
     this.formKey,
     this.isShiny = false,
+    this.animationSourceUrl,
+    this.crySourceUrl,
     this.compact = false,
     this.sizeScale = 1.0,
   });
@@ -47,6 +49,11 @@ class CompanionStandby extends StatefulWidget {
 
   /// Whether to show the shiny variant.
   final bool isShiny;
+
+  /// Persisted media choices from the companion picker. Null keeps automatic
+  /// best-source selection and all existing fallbacks.
+  final String? animationSourceUrl;
+  final String? crySourceUrl;
 
   final bool compact;
 
@@ -112,7 +119,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.speciesId != widget.speciesId ||
         oldWidget.formKey != widget.formKey ||
-        oldWidget.isShiny != widget.isShiny) {
+        oldWidget.isShiny != widget.isShiny ||
+        oldWidget.animationSourceUrl != widget.animationSourceUrl ||
+        oldWidget.crySourceUrl != widget.crySourceUrl) {
       _pats = 0;
       _hearts.clear();
       _quoteTemplate = null;
@@ -148,15 +157,27 @@ class _CompanionStandbyState extends State<CompanionStandby>
 
     // Resolve the sprite resource id for the chosen form.
     var mediaId = id;
+    var useGenericAnimation = true;
+    var formStaticSources = <String>[];
     try {
       final detail = await dexRepository.getDetail(id);
       if (widget.formKey != null) {
         final form = detail.forms.cast<PokemonFormDetail?>().firstWhere(
-              (f) => f?.key == widget.formKey,
-              orElse: () => null,
-            );
+          (f) => f?.key == widget.formKey,
+          orElse: () => null,
+        );
         if (form != null) {
           mediaId = form.pokemonId;
+          useGenericAnimation = companionFormUsesIdAnimation(
+            speciesId: id,
+            mediaId: mediaId,
+            isDefault: form.isDefault,
+          );
+          final formSummary = form.summaryFor(detail.summary);
+          formStaticSources = <String>{
+            if (formSummary.displayArtworkPath case final source?) source,
+            if (formSummary.displaySpritePath case final source?) source,
+          }.toList();
         }
       }
       if (mounted) {
@@ -166,14 +187,19 @@ class _CompanionStandbyState extends State<CompanionStandby>
       mediaId = id;
     }
 
-    final bundled = bundledCompanionGifAsset(mediaId);
-    final cached = bundled == null && !shiny
+    // Keep a species fallback only when upstream has no separate form image
+    // at all (currently the eight Koraidon/Miraidon ride-mode records).
+    useGenericAnimation = useGenericAnimation || formStaticSources.isEmpty;
+    final bundled = useGenericAnimation
+        ? bundledCompanionGifAsset(mediaId)
+        : null;
+    final cached = useGenericAnimation && bundled == null && !shiny
         ? await companionMediaCache.cachedGifPath(mediaId)
         : null;
-    final cachedShiny = shiny
+    final cachedShiny = shiny && useGenericAnimation
         ? await companionMediaCache.cachedShinyGifPath(mediaId)
         : null;
-    if (shiny && cachedShiny == null) {
+    if (shiny && useGenericAnimation && cachedShiny == null) {
       // Prime the disk cache so the sparkle survives going offline later.
       unawaited(companionMediaCache.ensureShinyGif(mediaId));
     }
@@ -181,12 +207,22 @@ class _CompanionStandbyState extends State<CompanionStandby>
       return;
     }
     setState(() {
+      final selected = widget.animationSourceUrl;
+      final selectedShiny = selected == null || !useGenericAnimation
+          ? null
+          : shinySpriteVariantUrl(selected);
       _spriteSources = [
+        if (shiny && selectedShiny != null) selectedShiny,
         if (cachedShiny != null) cachedShiny,
-        if (shiny) ...animatedShinySpriteCandidatesFor(mediaId),
+        if (shiny && useGenericAnimation)
+          ...animatedShinySpriteCandidatesFor(mediaId),
+        if (!shiny && useGenericAnimation && selected != null) selected,
         if (bundled != null) bundled,
         if (cached != null) cached,
-        ...animatedSpriteCandidatesFor(mediaId),
+        if (useGenericAnimation) ...companionGifDownloadCandidates(mediaId),
+        ...formStaticSources,
+        if (useGenericAnimation) cdnStaticSpriteUrlFor(mediaId),
+        if (useGenericAnimation) defaultSpriteUrlFor(mediaId),
       ];
     });
   }
@@ -210,6 +246,17 @@ class _CompanionStandbyState extends State<CompanionStandby>
     _cryBusy = true;
     final id = widget.speciesId;
     try {
+      final selectedCry = widget.crySourceUrl;
+      if (selectedCry != null) {
+        try {
+          await _cryPlayer.stop();
+          await _cryPlayer.play(UrlSource(selectedCry), volume: 0.55);
+          return;
+        } catch (_) {
+          // The persisted source may be temporarily unavailable; continue
+          // through the regular offline/cache/network fallback chain.
+        }
+      }
       final bundled = bundledCompanionCryAsset(id);
       if (bundled != null) {
         await _cryPlayer.stop();
@@ -499,9 +546,7 @@ class _QuoteBubble extends StatelessWidget {
               color: TitoColors.card,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: TitoColors.ink, width: 2),
-              boxShadow: retroStyle.enabled
-                  ? TitoShadows.stickerSmall
-                  : null,
+              boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
             ),
             child: Text(
               quote ?? '',
@@ -602,6 +647,8 @@ class CompanionStandbyOverlay extends StatelessWidget {
                 nameZh: nameZh,
                 formKey: choice?.formKey,
                 isShiny: choice?.isShiny ?? false,
+                animationSourceUrl: choice?.animationSourceUrl,
+                crySourceUrl: choice?.crySourceUrl,
                 compact: compact,
                 sizeScale: companionRepository.sizeScale,
               ),

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "source": "52poke search results; bw-grass-tablecloth is a maintainer descriptive fallback",
+  "itemsBySlug": {
+    "bw-grass-tablecloth": {
+      "nameZh": "青草桌布（ＢＷ）"
+    },
+    "bicycle": {
+      "nameZh": "自行车"
+    },
+    "butter": {
+      "nameZh": "黄油"
+    },
+    "fame-checker": {
+      "nameZh": "声音记录器",
+      "wikiTitle": "声音记录器（道具）"
+    },
+    "kofus-wallet": {
+      "nameZh": "海岱的钱包",
+      "wikiTitle": "海岱的钱包（道具）"
+    },
+    "koraidons-poke-ball": {
+      "nameZh": "故勒顿的球",
+      "wikiTitle": "故勒顿的球（道具）"
+    },
+    "miraidons-poke-ball": {
+      "nameZh": "密勒顿的球",
+      "wikiTitle": "密勒顿的球（道具）"
+    },
+    "jam": {
+      "nameZh": "果酱"
+    },
+    "oaks-parcel": {
+      "nameZh": "包裹",
+      "wikiTitle": "包裹（道具）"
+    },
+    "ruby": {
+      "nameZh": "红宝石"
+    },
+    "sapphire": {
+      "nameZh": "蓝宝石"
+    }
+  }
+}

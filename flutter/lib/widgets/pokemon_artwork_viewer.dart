@@ -169,23 +169,16 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
     });
   }
 
-  void _toggleBack() {
+  void _toggleBackForOption(SpriteEditionOption option) {
+    if (option.backSpriteUrl == null) {
+      return;
+    }
     setState(() {
-      _showBack = !_showBack;
-      if (_showBack) {
-        final current = _selectedOption;
-        if (current == null || current.backSpriteUrl == null) {
-          final withBack = _options
-              .where((option) => option.backSpriteUrl != null)
-              .toList();
-          if (withBack.isNotEmpty) {
-            final bw = withBack
-                .where((option) => option.versionGroup == 'black-white')
-                .toList();
-            _selectedOption = (bw.isNotEmpty ? bw : withBack).last;
-            _showAnimated = false;
-          }
-        }
+      final isSameOption = _selectedOption == option;
+      _selectedOption = option;
+      _showBack = isSameOption ? !_showBack : true;
+      if (_showAnimated && option.animatedBackUrl == null) {
+        _showAnimated = false;
       }
     });
   }
@@ -226,19 +219,6 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                     icon: const Icon(Icons.auto_awesome_rounded, size: 16),
                     label: const Text(
                       '闪光',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                  TextButton.icon(
-                    onPressed: _toggleBack,
-                    style: TextButton.styleFrom(
-                      foregroundColor: _showBack
-                          ? TitoColors.softYellow
-                          : TitoColors.card.withValues(alpha: 0.8),
-                    ),
-                    icon: const Icon(Icons.flip_rounded, size: 16),
-                    label: const Text(
-                      '背面',
                       style: TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
@@ -308,15 +288,21 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                                 !_showAnimated && _selectedOption == option;
                             final selectedAnimated =
                                 _showAnimated && _selectedOption == option;
+                            final showingBack =
+                                _showBack && _selectedOption == option;
                             return _SpritePickerTile(
                               option: option,
                               selected: selectedStatic,
                               animatedSelected: selectedAnimated,
+                              showingBack: showingBack,
                               onSelectStatic: () =>
                                   _selectOption(option, animated: false),
                               onSelectAnimated: option.animatedUrl == null
                                   ? null
                                   : () => _selectOption(option, animated: true),
+                              onToggleBack: option.backSpriteUrl == null
+                                  ? null
+                                  : () => _toggleBackForOption(option),
                             );
                           },
                         ),
@@ -337,15 +323,19 @@ class _SpritePickerTile extends StatelessWidget {
     required this.option,
     required this.selected,
     required this.animatedSelected,
+    required this.showingBack,
     required this.onSelectStatic,
     this.onSelectAnimated,
+    this.onToggleBack,
   });
 
   final SpriteEditionOption option;
   final bool selected;
   final bool animatedSelected;
+  final bool showingBack;
   final VoidCallback onSelectStatic;
   final VoidCallback? onSelectAnimated;
+  final VoidCallback? onToggleBack;
 
   @override
   Widget build(BuildContext context) {
@@ -377,26 +367,31 @@ class _SpritePickerTile extends StatelessWidget {
                         width: 56,
                         height: 56,
                       ),
-                      if (option.backSpriteUrl != null)
+                      if (onToggleBack != null)
                         Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 3,
-                              vertical: 1,
+                          top: -7,
+                          right: -7,
+                          child: IconButton(
+                            key: ValueKey('flip-${option.versionGroup}'),
+                            onPressed: onToggleBack,
+                            tooltip: showingBack ? '切回正面' : '翻到背面',
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(
+                              width: 28,
+                              height: 28,
                             ),
-                            decoration: BoxDecoration(
-                              color: TitoColors.ink.withValues(alpha: 0.85),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              '背',
-                              style: TextStyle(
-                                color: TitoColors.softYellow,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
+                            style: IconButton.styleFrom(
+                              backgroundColor: TitoColors.ink.withValues(
+                                alpha: 0.88,
                               ),
+                              foregroundColor: showingBack
+                                  ? TitoColors.softYellow
+                                  : TitoColors.card,
+                            ),
+                            icon: const Icon(
+                              Icons.swap_horiz_rounded,
+                              size: 17,
                             ),
                           ),
                         ),

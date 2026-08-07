@@ -768,11 +768,22 @@ class PokemonFormDetail {
 
   PokemonSummary summaryFor(PokemonSummary species) {
     final mayInheritAssets = isDefault || isCosmetic || inheritsFromDefault;
+    final speciesVisuals = {species.artworkUrl, species.spriteUrl}
+      ..removeWhere((source) => source == null);
+    final hasOwnVisual =
+        !isDefault &&
+        (localSpritePath != null ||
+            artworkUrl != null && !speciesVisuals.contains(artworkUrl) ||
+            spriteUrl != null && !speciesVisuals.contains(spriteUrl));
     // Forms often ship a pixelated 96x96 in-game sprite as [spriteUrl] while
     // [artworkUrl] is the clear official-artwork asset. Prefer artwork so the
     // detail header matches the clear sprite shown in the artwork viewer.
-    final inheritedSpriteUrl = mayInheritAssets ? species.spriteUrl : null;
-    final inheritedArtworkUrl = mayInheritAssets ? species.artworkUrl : null;
+    final inheritedSpriteUrl = mayInheritAssets && !hasOwnVisual
+        ? species.spriteUrl
+        : null;
+    final inheritedArtworkUrl = mayInheritAssets && !hasOwnVisual
+        ? species.artworkUrl
+        : null;
     return PokemonSummary(
       id: species.id,
       nameEn: nameEn,

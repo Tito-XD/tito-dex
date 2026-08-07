@@ -1,0 +1,5267 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-07T11:03:32+00:00",
+  "sources": [
+    {
+      "name": "PokeAPI",
+      "license": "CC-BY 4.0"
+    },
+    {
+      "name": "52poke",
+      "license": "CC BY-NC-SA 4.0"
+    }
+  ],
+  "itemsBySlug": {
+    "everstone": {
+      "descriptionZh": "携带后，宝可梦在此期间 不会进化的神奇石头。",
+      "effectZh": "携带后，宝可梦在此期间 不会进化的神奇石头。",
+      "descriptionSource": "PokeAPI"
+    },
+    "big-pearl": {
+      "descriptionZh": "散发着美丽银辉 且相当大颗的珍珠。 可以在商店高价出售。",
+      "effectZh": "散发着美丽银辉 且相当大颗的珍珠。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "big-mushroom": {
+      "descriptionZh": "珍稀的大蘑菇。 在一些爱好者中 有着非常高的人气。",
+      "effectZh": "珍稀的大蘑菇。 在一些爱好者中 有着非常高的人气。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tiny-mushroom": {
+      "descriptionZh": "珍稀的小蘑菇。 在一些爱好者中 有着相当高的人气。",
+      "effectZh": "珍稀的小蘑菇。 在一些爱好者中 有着相当高的人气。",
+      "descriptionSource": "PokeAPI"
+    },
+    "big-nugget": {
+      "descriptionZh": "以纯金制成， 闪着金光的大珠子。 可以在商店高价出售。",
+      "effectZh": "以纯金制成， 闪着金光的大珠子。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lucky-egg": {
+      "descriptionZh": "满载着幸福的蛋。 携带它的宝可梦获得的 经验值会少量增加。",
+      "effectZh": "满载着幸福的蛋。 携带它的宝可梦获得的 经验值会少量增加。",
+      "descriptionSource": "PokeAPI"
+    },
+    "comet-shard": {
+      "descriptionZh": "彗星临近时， 掉落到地表上的碎片。 可以在商店高价出售。",
+      "effectZh": "彗星临近时， 掉落到地表上的碎片。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "heart-scale": {
+      "descriptionZh": "有着美丽心形外形 且非常珍稀的鳞片。 有些人收到会很高兴。",
+      "effectZh": "有着美丽心形外形 且非常珍稀的鳞片。 有些人收到会很高兴。",
+      "descriptionSource": "PokeAPI"
+    },
+    "stardust": {
+      "descriptionZh": "手感细腻且十分 美丽的红色沙子。 可以在商店低价出售。",
+      "effectZh": "手感细腻且十分 美丽的红色沙子。 可以在商店低价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "star-piece": {
+      "descriptionZh": "闪着红光且十分 美丽的宝石碎片。 可以在商店高价出售。",
+      "effectZh": "闪着红光且十分 美丽的宝石碎片。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "cleanse-tag": {
+      "descriptionZh": "让排在最前面的宝可梦携带后， 野生宝可梦就会不容易出现。",
+      "effectZh": "让排在最前面的宝可梦携带后， 野生宝可梦就会不容易出现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pearl": {
+      "descriptionZh": "散发着美丽银辉 且有点小的珍珠。 可以在商店低价出售。",
+      "effectZh": "散发着美丽银辉 且有点小的珍珠。 可以在商店低价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "honey": {
+      "descriptionZh": "宝可梦采集的清甜芬芳的花蜜。 可在商店里廉价出售。",
+      "effectZh": "宝可梦采集的清甜芬芳的花蜜。 可在商店里廉价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "red-shard": {
+      "descriptionZh": "红色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "effectZh": "红色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "green-shard": {
+      "descriptionZh": "绿色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "effectZh": "绿色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "balm-mushroom": {
+      "descriptionZh": "能让附近一带 芳香四溢的珍稀蘑菇。 可以在商店高价出售。",
+      "effectZh": "能让附近一带 芳香四溢的珍稀蘑菇。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "blue-shard": {
+      "descriptionZh": "蓝色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "effectZh": "蓝色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rare-bone": {
+      "descriptionZh": "在宝可梦考古学上 非常贵重的骨头。 可以在商店高价出售。",
+      "effectZh": "在宝可梦考古学上 非常贵重的骨头。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "nugget": {
+      "descriptionZh": "闪着金光， 以纯金制成的珠子。 可以在商店高价出售。",
+      "effectZh": "闪着金光， 以纯金制成的珠子。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bottle-cap": {
+      "descriptionZh": "银色的美丽王冠。 有些人收到它会很高兴。",
+      "effectZh": "银色的美丽王冠。 有些人收到它会很高兴。",
+      "descriptionSource": "PokeAPI"
+    },
+    "yellow-shard": {
+      "descriptionZh": "黄色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "effectZh": "黄色的小碎片。 好像是以前制作的 某道具的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "abra-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "acro-bike": {
+      "nameZh": "越野自行车",
+      "descriptionZh": "能做出跳跃或抬前轮动作的 折叠式自行车。",
+      "effectZh": "能做出跳跃或抬前轮动作的 折叠式自行车。",
+      "descriptionSource": "PokeAPI"
+    },
+    "adventure-rules": {
+      "nameZh": "探险心得",
+      "descriptionZh": "一种小型装置。 里面会自动追加和汇总 训练家在旅行时所需要的各种建议。",
+      "effectZh": "一种小型装置。 里面会自动追加和汇总 训练家在旅行时所需要的各种建议。",
+      "descriptionSource": "PokeAPI"
+    },
+    "aerodactyl-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "aloraichium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将阿罗拉地区雷丘的 十万伏特升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将阿罗拉地区雷丘的 十万伏特升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "amaze-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "amulet-coin": {
+      "descriptionZh": "只要携带它的宝可梦 在战斗时出场一次， 就能获得２倍金钱。",
+      "effectZh": "只要携带它的宝可梦 在战斗时出场一次， 就能获得２倍金钱。",
+      "descriptionSource": "PokeAPI"
+    },
+    "apricorn-box": {
+      "descriptionZh": "使用方便，可以保存 ９９个球果的容器。",
+      "effectZh": "使用方便，可以保存 ９９个球果的容器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "aqua-suit": {
+      "descriptionZh": "集海洋队科学技术于一身的服装。 能承受任何冲击。",
+      "effectZh": "集海洋队科学技术于一身的服装。 能承受任何冲击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "armor-fossil": {
+      "descriptionZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是领饰的一部分。",
+      "effectZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是领饰的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "armor-pass": {
+      "nameZh": "铠甲车票",
+      "descriptionZh": "前往铠岛的车票。 在木杆镇的车站， 把它出示给站务员看吧。",
+      "effectZh": "前往铠岛的车票。 在木杆镇的车站， 把它出示给站务员看吧。",
+      "descriptionSource": "PokeAPI"
+    },
+    "armorite-ore": {
+      "descriptionZh": "能够在铠岛找出的珍稀石头。 把它送给铠岛的收藏家， 就会有好事发生。",
+      "effectZh": "能够在铠岛找出的珍稀石头。 把它送给铠岛的收藏家， 就会有好事发生。",
+      "descriptionSource": "PokeAPI"
+    },
+    "articuno-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "azure-flute": {
+      "descriptionZh": "能发出响彻云霄的天籁之音的笛子。 不知道是谁在什么时候制造的它。",
+      "effectZh": "能发出响彻云霄的天籁之音的笛子。 不知道是谁在什么时候制造的它。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bachs-food-tin": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。不知是什么原因， 巴哈卖的罐头在伽勒尔特别受欢迎。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。不知是什么原因， 巴哈卖的罐头在伽勒尔特别受欢迎。",
+      "descriptionSource": "PokeAPI"
+    },
+    "basement-key": {
+      "descriptionZh": "用来打开满金地道 大门的钥匙。",
+      "effectZh": "用来打开满金地道 大门的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "beach-glass": {
+      "nameZh": "海边的玻璃",
+      "descriptionZh": "受到波浪的洗刷从而 变成圆形的彩色玻璃片。 表面摸起来有点粗糙不平。",
+      "effectZh": "受到波浪的洗刷从而 变成圆形的彩色玻璃片。 表面摸起来有点粗糙不平。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bellsprout-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "berry-pots": {
+      "descriptionZh": "可以随时轻松培育树果的 便携式栽培容器。",
+      "effectZh": "可以随时轻松培育树果的 便携式栽培容器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "black-apricorn": {
+      "descriptionZh": "黑色的球果。 有种无法形容的气味。",
+      "effectZh": "黑色的球果。 有种无法形容的气味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "black-flute": {
+      "descriptionZh": "以黑色玻璃制成的哨子。 在使用的地方更容易 遇到强大的宝可梦。",
+      "effectZh": "以黑色玻璃制成的哨子。 在使用的地方更容易 遇到强大的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "black-mane-hair": {
+      "descriptionZh": "丰饶之王的爱马 灵幽马的鬃毛。 摸起来非常柔顺。",
+      "effectZh": "丰饶之王的爱马 灵幽马的鬃毛。 摸起来非常柔顺。",
+      "descriptionSource": "PokeAPI"
+    },
+    "blue-apricorn": {
+      "descriptionZh": "蓝色的球果。 略有一股青草的香味。",
+      "effectZh": "蓝色的球果。 略有一股青草的香味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "blue-card": {
+      "descriptionZh": "可以将《葵妍的密语》 这节目的点数积攒起来的卡片。",
+      "effectZh": "可以将《葵妍的密语》 这节目的点数积攒起来的卡片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "blue-orb": {
+      "descriptionZh": "散发着蓝色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "effectZh": "散发着蓝色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bobs-food-tin": {
+      "nameZh": "饱伯罐头",
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。不知是什么原因， 饱伯卖的罐头在伽勒尔特别受欢迎。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。不知是什么原因， 饱伯卖的罐头在伽勒尔特别受欢迎。",
+      "descriptionSource": "PokeAPI"
+    },
+    "boiled-egg": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。只需一个水煮蛋， 整道料理的水准都能得到升华。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。只需一个水煮蛋， 整道料理的水准都能得到升华。",
+      "descriptionSource": "PokeAPI"
+    },
+    "boost-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bread": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。同时也是用于吸干盘中 最后一滴咖喱的秘密武器。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。同时也是用于吸干盘中 最后一滴咖喱的秘密武器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bridge-mail-d": {
+      "descriptionZh": "印有鲜红色活动桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "印有鲜红色活动桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bridge-mail-m": {
+      "descriptionZh": "印有拱桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "印有拱桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bridge-mail-s": {
+      "descriptionZh": "印有通天桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "印有通天桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bridge-mail-t": {
+      "descriptionZh": "印有钢铁吊桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "印有钢铁吊桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bridge-mail-v": {
+      "descriptionZh": "印有砖桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "印有砖桥图案的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "brittle-bones": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。将骨头精心熬煮而得的 一丝浓缩的精华加深了料理的美味。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。将骨头精心熬煮而得的 一丝浓缩的精华加深了料理的美味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "buginium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将虫属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将虫属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "bulbasaur-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "camping-gear": {
+      "descriptionZh": "可以在旷野地带 或露营营地上搭起帐篷， 在那里制作料理。",
+      "effectZh": "可以在旷野地带 或露营营地上搭起帐篷， 在那里制作料理。",
+      "descriptionSource": "PokeAPI"
+    },
+    "card-key": {
+      "descriptionZh": "用来打开电台卷帘门的 卡片式钥匙。",
+      "effectZh": "用来打开电台卷帘门的 卡片式钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "card-key--letsgo": {
+      "nameZh": "钥匙卡",
+      "descriptionZh": "用来打开位于金黄市的 西尔佛公司总部大厦门锁的 卡片式钥匙。",
+      "effectZh": "用来打开位于金黄市的 西尔佛公司总部大厦门锁的 卡片式钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "carrot-seeds": {
+      "nameZh": "萝卜种子",
+      "descriptionZh": "种在田地里使用的种子。 出产的萝卜种类会根据 种下的田地而有所不同。",
+      "effectZh": "种在田地里使用的种子。 出产的萝卜种类会根据 种下的田地而有所不同。",
+      "descriptionSource": "PokeAPI"
+    },
+    "catching-charm": {
+      "descriptionZh": "带上这个神奇的 可增强稳定性的护身符， 就能更容易触发会心捕捉。",
+      "effectZh": "带上这个神奇的 可增强稳定性的护身符， 就能更容易触发会心捕捉。",
+      "descriptionSource": "PokeAPI"
+    },
+    "caterpie-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "chalky-stone": {
+      "nameZh": "粉笔石",
+      "descriptionZh": "路边捡到的 白白的小石头。",
+      "effectZh": "路边捡到的 白白的小石头。",
+      "descriptionSource": "PokeAPI"
+    },
+    "chansey-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "charmander-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "claw-fossil": {
+      "descriptionZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是爪子的一部分。",
+      "effectZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是爪子的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "clear-bell": {
+      "descriptionZh": "能发出静心宁神音色的， 非常古旧的铃铛。",
+      "effectZh": "能发出静心宁神音色的， 非常古旧的铃铛。",
+      "descriptionSource": "PokeAPI"
+    },
+    "clefairy-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "coconut-milk": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。椰奶那种与众不同的 清甜滋味非常受欢迎。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。椰奶那种与众不同的 清甜滋味非常受欢迎。",
+      "descriptionSource": "PokeAPI"
+    },
+    "coin-case": {
+      "descriptionZh": "可以存放代币的盒子。 最多能放入５００００枚 在游戏城获得的代币。",
+      "effectZh": "可以存放代币的盒子。 最多能放入５００００枚 在游戏城获得的代币。",
+      "descriptionSource": "PokeAPI"
+    },
+    "colress-machine": {
+      "descriptionZh": "能强行让宝可梦的能力 觉醒的特殊装置。 但由于是试制品，功能尚未完善。",
+      "effectZh": "能强行让宝可梦的能力 觉醒的特殊装置。 但由于是试制品，功能尚未完善。",
+      "descriptionSource": "PokeAPI"
+    },
+    "contest-costume--jacket": {
+      "nameZh": "演出礼服",
+      "descriptionZh": "在华丽现场大赛上演出时穿的 非常帅气的礼服。",
+      "effectZh": "在华丽现场大赛上演出时穿的 非常帅气的礼服。",
+      "descriptionSource": "PokeAPI"
+    },
+    "contest-pass": {
+      "descriptionZh": "拿着它就可以参加宝可梦华丽大赛。 上面印有纪念奖章。",
+      "effectZh": "拿着它就可以参加宝可梦华丽大赛。 上面印有纪念奖章。",
+      "descriptionSource": "PokeAPI"
+    },
+    "coupon-1": {
+      "descriptionZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "effectZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "descriptionSource": "PokeAPI"
+    },
+    "coupon-2": {
+      "descriptionZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "effectZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "descriptionSource": "PokeAPI"
+    },
+    "coupon-3": {
+      "descriptionZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "effectZh": "获取宝可梦手表，简称宝可表时 所需的兑换券。需要３张。",
+      "descriptionSource": "PokeAPI"
+    },
+    "cover-fossil": {
+      "descriptionZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是后背的一部分。",
+      "effectZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是后背的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "crown-pass": {
+      "nameZh": "王冠车票",
+      "descriptionZh": "前往王冠雪原的车票。 在木杆镇的车站， 把它出示给站务员看吧。",
+      "effectZh": "前往王冠雪原的车票。 在木杆镇的车站， 把它出示给站务员看吧。",
+      "descriptionSource": "PokeAPI"
+    },
+    "cubone-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "damp-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dark-stone": {
+      "descriptionZh": "捷克罗姆的肉体 毁灭后变成的样子。 据说它在等待着英雄的到来。",
+      "effectZh": "捷克罗姆的肉体 毁灭后变成的样子。 据说它在等待着英雄的到来。",
+      "descriptionSource": "PokeAPI"
+    },
+    "darkinium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将恶属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将恶属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-01": {
+      "nameZh": "数据卡０１",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-02": {
+      "nameZh": "数据卡０２",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-03": {
+      "nameZh": "数据卡０３",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-04": {
+      "nameZh": "数据卡０４",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-05": {
+      "nameZh": "数据卡０５",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-06": {
+      "nameZh": "数据卡０６",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-07": {
+      "nameZh": "数据卡０７",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-08": {
+      "nameZh": "数据卡０８",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-09": {
+      "nameZh": "数据卡０９",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-10": {
+      "nameZh": "数据卡１０",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-11": {
+      "nameZh": "数据卡１１",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-12": {
+      "nameZh": "数据卡１２",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-13": {
+      "nameZh": "数据卡１３",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-14": {
+      "nameZh": "数据卡１４",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-15": {
+      "nameZh": "数据卡１５",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-16": {
+      "nameZh": "数据卡１６",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-17": {
+      "nameZh": "数据卡１７",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-18": {
+      "nameZh": "数据卡１８",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-19": {
+      "nameZh": "数据卡１９",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-20": {
+      "nameZh": "数据卡２０",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-21": {
+      "nameZh": "数据卡２１",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-22": {
+      "nameZh": "数据卡２２",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-23": {
+      "nameZh": "数据卡２３",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-24": {
+      "nameZh": "数据卡２４",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-25": {
+      "nameZh": "数据卡２５",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-26": {
+      "nameZh": "数据卡２６",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "data-card-27": {
+      "nameZh": "数据卡２７",
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "decidium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将狙射树枭的缝影 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将狙射树枭的缝影 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "devon-parts": {
+      "descriptionZh": "此物品里面放着的是 得文制造的某种零件。",
+      "effectZh": "此物品里面放着的是 得文制造的某种零件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "devon-scope": {
+      "descriptionZh": "会对看不见的宝可梦起反应， 并发出声音的得文特制产品。",
+      "effectZh": "会对看不见的宝可梦起反应， 并发出声音的得文特制产品。",
+      "descriptionSource": "PokeAPI"
+    },
+    "devon-scuba-gear": {
+      "descriptionZh": "潜水时装备在身上 用来呼吸氧气的面罩。 得文制造。",
+      "effectZh": "潜水时装备在身上 用来呼吸氧气的面罩。 得文制造。",
+      "descriptionSource": "PokeAPI"
+    },
+    "diglett-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "discount-coupon": {
+      "descriptionZh": "在时装店买道具时， 能以比平时更低的 价格购买的券。",
+      "effectZh": "在时装店买道具时， 能以比平时更低的 价格购买的券。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ditto-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dna-splicers": {
+      "descriptionZh": "据说是能让原本为一体的 酋雷姆和某宝可梦 合体的一对楔子。",
+      "effectZh": "据说是能让原本为一体的 酋雷姆和某宝可梦 合体的一对楔子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "doduo-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dome-fossil": {
+      "descriptionZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是甲壳的一部分。",
+      "effectZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是甲壳的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dowsing-machine": {
+      "descriptionZh": "会对看不见的道具起反应， 并将它的位置告诉你的最尖端机器。 戴在头上使用。",
+      "effectZh": "会对看不见的道具起反应， 并将它的位置告诉你的最尖端机器。 戴在头上使用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dragon-skull": {
+      "descriptionZh": "据说是能在狂风暴雨的 大海上随意翱翔的宝可梦的头骨。",
+      "effectZh": "据说是能在狂风暴雨的 大海上随意翱翔的宝可梦的头骨。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dragonium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将龙属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将龙属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dratini-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dropped-item": {
+      "descriptionZh": "在雷文市的游乐园里 捡到的即时通讯器。 失主好像是个男孩子。",
+      "effectZh": "在雷文市的游乐园里 捡到的即时通讯器。 失主好像是个男孩子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "drowzee-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-band": {
+      "nameZh": "极巨腕带",
+      "descriptionZh": "内部嵌入了许愿星， 在能量点就会发出光芒， 使宝可梦极巨化。",
+      "effectZh": "内部嵌入了许愿星， 在能量点就会发出光芒， 使宝可梦极巨化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-and15": {
+      "nameZh": "★And15",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-and337": {
+      "nameZh": "★And337",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-and390": {
+      "nameZh": "★And390",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-and458": {
+      "nameZh": "★And458",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-and603": {
+      "nameZh": "★And603",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aql7235": {
+      "nameZh": "★Aql7235",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aql7525": {
+      "nameZh": "★Aql7525",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aql7557": {
+      "nameZh": "★Aql7557",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aql7595": {
+      "nameZh": "★Aql7595",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aql7602": {
+      "nameZh": "★Aql7602",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr7950": {
+      "nameZh": "★Aqr7950",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8232": {
+      "nameZh": "★Aqr8232",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8264": {
+      "nameZh": "★Aqr8264",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8414": {
+      "nameZh": "★Aqr8414",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8499": {
+      "nameZh": "★Aqr8499",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8518": {
+      "nameZh": "★Aqr8518",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8610": {
+      "nameZh": "★Aqr8610",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aqr8709": {
+      "nameZh": "★Aqr8709",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ara6585": {
+      "nameZh": "★Ara6585",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ari546": {
+      "nameZh": "★Ari546",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ari553": {
+      "nameZh": "★Ari553",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ari617": {
+      "nameZh": "★Ari617",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ari951": {
+      "nameZh": "★Ari951",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur1577": {
+      "nameZh": "★Aur1577",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur1605": {
+      "nameZh": "★Aur1605",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur1612": {
+      "nameZh": "★Aur1612",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur1641": {
+      "nameZh": "★Aur1641",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur1708": {
+      "nameZh": "★Aur1708",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur2088": {
+      "nameZh": "★Aur2088",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-aur2095": {
+      "nameZh": "★Aur2095",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5235": {
+      "nameZh": "★Boo5235",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5340": {
+      "nameZh": "★Boo5340",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5351": {
+      "nameZh": "★Boo5351",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5435": {
+      "nameZh": "★Boo5435",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5506": {
+      "nameZh": "★Boo5506",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5602": {
+      "nameZh": "★Boo5602",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-boo5733": {
+      "nameZh": "★Boo5733",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cap7754": {
+      "nameZh": "★Cap7754",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cap7773": {
+      "nameZh": "★Cap7773",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cap7776": {
+      "nameZh": "★Cap7776",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cap8278": {
+      "nameZh": "★Cap8278",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cap8322": {
+      "nameZh": "★Cap8322",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-car2326": {
+      "nameZh": "★Car2326",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-car3307": {
+      "nameZh": "★Car3307",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-car3685": {
+      "nameZh": "★Car3685",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-car3699": {
+      "nameZh": "★Car3699",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas153": {
+      "nameZh": "★Cas153",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas168": {
+      "nameZh": "★Cas168",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas21": {
+      "nameZh": "★Cas21",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas219": {
+      "nameZh": "★Cas219",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas265": {
+      "nameZh": "★Cas265",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas403": {
+      "nameZh": "★Cas403",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cas542": {
+      "nameZh": "★Cas542",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cen5267": {
+      "nameZh": "★Cen5267",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cen5288": {
+      "nameZh": "★Cen5288",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cen5459": {
+      "nameZh": "★Cen5459",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cen5460": {
+      "nameZh": "★Cen5460",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cen551": {
+      "nameZh": "★Cen551",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cep8162": {
+      "nameZh": "★Cep8162",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cep8238": {
+      "nameZh": "★Cep8238",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cep8417": {
+      "nameZh": "★Cep8417",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cep8974": {
+      "nameZh": "★Cep8974",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cet188": {
+      "nameZh": "★Cet188",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cet539": {
+      "nameZh": "★Cet539",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cet681": {
+      "nameZh": "★Cet681",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cet804": {
+      "nameZh": "★Cet804",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cet911": {
+      "nameZh": "★Cet911",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2282": {
+      "nameZh": "★CMa2282",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2294": {
+      "nameZh": "★CMa2294",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2491": {
+      "nameZh": "★CMa2491",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2618": {
+      "nameZh": "★CMa2618",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2646": {
+      "nameZh": "★CMa2646",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2657": {
+      "nameZh": "★CMa2657",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2693": {
+      "nameZh": "★CMa2693",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cma2827": {
+      "nameZh": "★CMa2827",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cmi2845": {
+      "nameZh": "★CMi2845",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cmi2943": {
+      "nameZh": "★CMi2943",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3208": {
+      "nameZh": "★Cnc3208",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3249": {
+      "nameZh": "★Cnc3249",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3268": {
+      "nameZh": "★Cnc3268",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3429": {
+      "nameZh": "★Cnc3429",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3449": {
+      "nameZh": "★Cnc3449",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3461": {
+      "nameZh": "★Cnc3461",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3572": {
+      "nameZh": "★Cnc3572",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cnc3627": {
+      "nameZh": "★Cnc3627",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-col1956": {
+      "nameZh": "★Col1956",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-col2040": {
+      "nameZh": "★Col2040",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-col2177": {
+      "nameZh": "★Col2177",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-com4968": {
+      "nameZh": "★Com4968",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-crt4287": {
+      "nameZh": "★Crt4287",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cru4656": {
+      "nameZh": "★Cru4656",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cru4700": {
+      "nameZh": "★Cru4700",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cru4730": {
+      "nameZh": "★Cru4730",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cru4763": {
+      "nameZh": "★Cru4763",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cru4853": {
+      "nameZh": "★Cru4853",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-crv4623": {
+      "nameZh": "★Crv4623",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-crv4662": {
+      "nameZh": "★Crv4662",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-crv4757": {
+      "nameZh": "★Crv4757",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-crv4786": {
+      "nameZh": "★Crv4786",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cvn4785": {
+      "nameZh": "★CVn4785",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cvn4846": {
+      "nameZh": "★CVn4846",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cvn4915": {
+      "nameZh": "★CVn4915",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg7417": {
+      "nameZh": "★Cyg7417",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg7528": {
+      "nameZh": "★Cyg7528",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg7796": {
+      "nameZh": "★Cyg7796",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg7924": {
+      "nameZh": "★Cyg7924",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg7949": {
+      "nameZh": "★Cyg7949",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-cyg8301": {
+      "nameZh": "★Cyg8301",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-del7852": {
+      "nameZh": "★Del7852",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-del7882": {
+      "nameZh": "★Del7882",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-del7906": {
+      "nameZh": "★Del7906",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra4434": {
+      "nameZh": "★Dra4434",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra5291": {
+      "nameZh": "★Dra5291",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra5744": {
+      "nameZh": "★Dra5744",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6132": {
+      "nameZh": "★Dra6132",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6370": {
+      "nameZh": "★Dra6370",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6396": {
+      "nameZh": "★Dra6396",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6536": {
+      "nameZh": "★Dra6536",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6636": {
+      "nameZh": "★Dra6636",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6688": {
+      "nameZh": "★Dra6688",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra6705": {
+      "nameZh": "★Dra6705",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra7310": {
+      "nameZh": "★Dra7310",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-dra7462": {
+      "nameZh": "★Dra7462",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-equ8131": {
+      "nameZh": "★Equ8131",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1084": {
+      "nameZh": "★Eri1084",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1231": {
+      "nameZh": "★Eri1231",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1298": {
+      "nameZh": "★Eri1298",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1325": {
+      "nameZh": "★Eri1325",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1393": {
+      "nameZh": "★Eri1393",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1464": {
+      "nameZh": "★Eri1464",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri1666": {
+      "nameZh": "★Eri1666",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri472": {
+      "nameZh": "★Eri472",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri850": {
+      "nameZh": "★Eri850",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri874": {
+      "nameZh": "★Eri874",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri897": {
+      "nameZh": "★Eri897",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-eri984": {
+      "nameZh": "★Eri984",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2216": {
+      "nameZh": "★Gem2216",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2286": {
+      "nameZh": "★Gem2286",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2421": {
+      "nameZh": "★Gem2421",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2473": {
+      "nameZh": "★Gem2473",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2484": {
+      "nameZh": "★Gem2484",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2650": {
+      "nameZh": "★Gem2650",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2777": {
+      "nameZh": "★Gem2777",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2891": {
+      "nameZh": "★Gem2891",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2930": {
+      "nameZh": "★Gem2930",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gem2990": {
+      "nameZh": "★Gem2990",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gru8353": {
+      "nameZh": "★Gru8353",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gru8425": {
+      "nameZh": "★Gru8425",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-gru8636": {
+      "nameZh": "★Gru8636",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6008": {
+      "nameZh": "★Her6008",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6117": {
+      "nameZh": "★Her6117",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6148": {
+      "nameZh": "★Her6148",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6406": {
+      "nameZh": "★Her6406",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6410": {
+      "nameZh": "★Her6410",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-her6526": {
+      "nameZh": "★Her6526",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-hya3418": {
+      "nameZh": "★Hya3418",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-hya3482": {
+      "nameZh": "★Hya3482",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-hya3748": {
+      "nameZh": "★Hya3748",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-hya3845": {
+      "nameZh": "★Hya3845",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-hya3903": {
+      "nameZh": "★Hya3903",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo3773": {
+      "nameZh": "★Leo3773",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo3852": {
+      "nameZh": "★Leo3852",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo3905": {
+      "nameZh": "★Leo3905",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo3982": {
+      "nameZh": "★Leo3982",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo4031": {
+      "nameZh": "★Leo4031",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo4057": {
+      "nameZh": "★Leo4057",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo4357": {
+      "nameZh": "★Leo4357",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo4359": {
+      "nameZh": "★Leo4359",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-leo4534": {
+      "nameZh": "★Leo4534",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lep1829": {
+      "nameZh": "★Lep1829",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lep1865": {
+      "nameZh": "★Lep1865",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lib5531": {
+      "nameZh": "★Lib5531",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lib5603": {
+      "nameZh": "★Lib5603",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lib5685": {
+      "nameZh": "★Lib5685",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lib5787": {
+      "nameZh": "★Lib5787",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lyr7001": {
+      "nameZh": "★Lyr7001",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lyr7106": {
+      "nameZh": "★Lyr7106",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lyr7178": {
+      "nameZh": "★Lyr7178",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-lyr7298": {
+      "nameZh": "★Lyr7298",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oct7228": {
+      "nameZh": "★Oct7228",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6056": {
+      "nameZh": "★Oph6056",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6075": {
+      "nameZh": "★Oph6075",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6149": {
+      "nameZh": "★Oph6149",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6378": {
+      "nameZh": "★Oph6378",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6556": {
+      "nameZh": "★Oph6556",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-oph6603": {
+      "nameZh": "★Oph6603",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1543": {
+      "nameZh": "★Ori1543",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1713": {
+      "nameZh": "★Ori1713",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1790": {
+      "nameZh": "★Ori1790",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1852": {
+      "nameZh": "★Ori1852",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1879": {
+      "nameZh": "★Ori1879",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1899": {
+      "nameZh": "★Ori1899",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1903": {
+      "nameZh": "★Ori1903",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori1948": {
+      "nameZh": "★Ori1948",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori2004": {
+      "nameZh": "★Ori2004",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ori2061": {
+      "nameZh": "★Ori2061",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-pav7790": {
+      "nameZh": "★Pav7790",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg39": {
+      "nameZh": "★Peg39",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8308": {
+      "nameZh": "★Peg8308",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8450": {
+      "nameZh": "★Peg8450",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8634": {
+      "nameZh": "★Peg8634",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8650": {
+      "nameZh": "★Peg8650",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8684": {
+      "nameZh": "★Peg8684",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8775": {
+      "nameZh": "★Peg8775",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8781": {
+      "nameZh": "★Peg8781",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8880": {
+      "nameZh": "★Peg8880",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-peg8905": {
+      "nameZh": "★Peg8905",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per1017": {
+      "nameZh": "★Per1017",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per1131": {
+      "nameZh": "★Per1131",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per1228": {
+      "nameZh": "★Per1228",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per834": {
+      "nameZh": "★Per834",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per936": {
+      "nameZh": "★Per936",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-per941": {
+      "nameZh": "★Per941",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-phe338": {
+      "nameZh": "★Phe338",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-phe99": {
+      "nameZh": "★Phe99",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psa8728": {
+      "nameZh": "★PsA8728",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psc361": {
+      "nameZh": "★Psc361",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psc437": {
+      "nameZh": "★Psc437",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psc510": {
+      "nameZh": "★Psc510",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psc596": {
+      "nameZh": "★Psc596",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-psc8773": {
+      "nameZh": "★Psc8773",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-pup3045": {
+      "nameZh": "★Pup3045",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-pup3165": {
+      "nameZh": "★Pup3165",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-pup3185": {
+      "nameZh": "★Pup3185",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco5928": {
+      "nameZh": "★Sco5928",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco5944": {
+      "nameZh": "★Sco5944",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco5953": {
+      "nameZh": "★Sco5953",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco5984": {
+      "nameZh": "★Sco5984",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6027": {
+      "nameZh": "★Sco6027",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6084": {
+      "nameZh": "★Sco6084",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6134": {
+      "nameZh": "★Sco6134",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6165": {
+      "nameZh": "★Sco6165",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6241": {
+      "nameZh": "★Sco6241",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6247": {
+      "nameZh": "★Sco6247",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6252": {
+      "nameZh": "★Sco6252",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6508": {
+      "nameZh": "★Sco6508",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6527": {
+      "nameZh": "★Sco6527",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6553": {
+      "nameZh": "★Sco6553",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sco6630": {
+      "nameZh": "★Sco6630",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ser5854": {
+      "nameZh": "★Ser5854",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ser5879": {
+      "nameZh": "★Ser5879",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-ser7141": {
+      "nameZh": "★Ser7141",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sge7479": {
+      "nameZh": "★Sge7479",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr6746": {
+      "nameZh": "★Sgr6746",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr6812": {
+      "nameZh": "★Sgr6812",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr6859": {
+      "nameZh": "★Sgr6859",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr6879": {
+      "nameZh": "★Sgr6879",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr6913": {
+      "nameZh": "★Sgr6913",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7116": {
+      "nameZh": "★Sgr7116",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7121": {
+      "nameZh": "★Sgr7121",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7194": {
+      "nameZh": "★Sgr7194",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7264": {
+      "nameZh": "★Sgr7264",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7337": {
+      "nameZh": "★Sgr7337",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7343": {
+      "nameZh": "★Sgr7343",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7348": {
+      "nameZh": "★Sgr7348",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-sgr7597": {
+      "nameZh": "★Sgr7597",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1165": {
+      "nameZh": "★Tau1165",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1346": {
+      "nameZh": "★Tau1346",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1373": {
+      "nameZh": "★Tau1373",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1409": {
+      "nameZh": "★Tau1409",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1412": {
+      "nameZh": "★Tau1412",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1457": {
+      "nameZh": "★Tau1457",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1791": {
+      "nameZh": "★Tau1791",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tau1910": {
+      "nameZh": "★Tau1910",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tra6217": {
+      "nameZh": "★TrA6217",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-tri544": {
+      "nameZh": "★Tri544",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma3323": {
+      "nameZh": "★UMa3323",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma3569": {
+      "nameZh": "★UMa3569",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma3594": {
+      "nameZh": "★UMa3594",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4033": {
+      "nameZh": "★UMa4033",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4069": {
+      "nameZh": "★UMa4069",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4295": {
+      "nameZh": "★UMa4295",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4301": {
+      "nameZh": "★UMa4301",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4375": {
+      "nameZh": "★UMa4375",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4377": {
+      "nameZh": "★UMa4377",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4518": {
+      "nameZh": "★UMa4518",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4554": {
+      "nameZh": "★UMa4554",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4660": {
+      "nameZh": "★UMa4660",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma4905": {
+      "nameZh": "★UMa4905",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma5054": {
+      "nameZh": "★UMa5054",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-uma5191": {
+      "nameZh": "★UMa5191",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-umi424": {
+      "nameZh": "★UMi424",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-umi5563": {
+      "nameZh": "★UMi5563",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-umi5735": {
+      "nameZh": "★UMi5735",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-umi6789": {
+      "nameZh": "★UMi6789",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vel3485": {
+      "nameZh": "★Vel3485",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vel3634": {
+      "nameZh": "★Vel3634",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vel3734": {
+      "nameZh": "★Vel3734",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir4540": {
+      "nameZh": "★Vir4540",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir4689": {
+      "nameZh": "★Vir4689",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir4825": {
+      "nameZh": "★Vir4825",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir4910": {
+      "nameZh": "★Vir4910",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir4932": {
+      "nameZh": "★Vir4932",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5056": {
+      "nameZh": "★Vir5056",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5107": {
+      "nameZh": "★Vir5107",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5315": {
+      "nameZh": "★Vir5315",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5338": {
+      "nameZh": "★Vir5338",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5359": {
+      "nameZh": "★Vir5359",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vir5409": {
+      "nameZh": "★Vir5409",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynamax-crystal-vul7405": {
+      "nameZh": "★Vul7405",
+      "descriptionZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "effectZh": "使用后的当天， 旷野地带的瞭望塔巨巢中 会出现[VAR (0000)]。",
+      "descriptionSource": "PokeAPI"
+    },
+    "dynite-ore": {
+      "descriptionZh": "能够在极巨巢穴找出的神秘石头。 把它送给王冠雪原的收藏家， 就会有好事发生。",
+      "effectZh": "能够在极巨巢穴找出的神秘石头。 把它送给王冠雪原的收藏家， 就会有好事发生。",
+      "descriptionSource": "PokeAPI"
+    },
+    "eevee-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "eevium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将伊布的珍藏 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将伊布的珍藏 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ekans-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "electabuzz-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "electrium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将电属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将电属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "elevator-key": {
+      "descriptionZh": "可以启动弗拉达利 研究所里电梯的钥匙卡。 上面有着闪焰队的标志。",
+      "effectZh": "可以启动弗拉达利 研究所里电梯的钥匙卡。 上面有着闪焰队的标志。",
+      "descriptionSource": "PokeAPI"
+    },
+    "endorsement": {
+      "descriptionZh": "用于参加道馆挑战 这一大赛的推荐函。",
+      "effectZh": "用于参加道馆挑战 这一大赛的推荐函。",
+      "descriptionSource": "PokeAPI"
+    },
+    "enigma-stone": {
+      "descriptionZh": "从地下挖出的水晶球。 虽然表面覆盖着岩石和尘土， 但非常漂亮。",
+      "effectZh": "从地下挖出的水晶球。 虽然表面覆盖着岩石和尘土， 但非常漂亮。",
+      "descriptionSource": "PokeAPI"
+    },
+    "enigmatic-card": {
+      "descriptionZh": "上面写有“在阿卡拉岛８号道路的 汽车旅馆客房里等”的谜之卡片。",
+      "effectZh": "上面写有“在阿卡拉岛８号道路的 汽车旅馆客房里等”的谜之卡片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "eon-flute": {
+      "descriptionZh": "无论身在何处， 都能召唤拉帝欧斯或 拉帝亚斯的笛子。",
+      "effectZh": "无论身在何处， 都能召唤拉帝欧斯或 拉帝亚斯的笛子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "eon-ticket": {
+      "descriptionZh": "前往南方孤岛的船票。 橙华道馆的馆主千里 知道其中的秘密！？",
+      "effectZh": "前往南方孤岛的船票。 橙华道馆的馆主千里 知道其中的秘密！？",
+      "descriptionSource": "PokeAPI"
+    },
+    "escape-rope": {
+      "descriptionZh": "结实的长绳。 可以从洞窟或迷宫中脱身。 能够反复使用。",
+      "effectZh": "结实的长绳。 可以从洞窟或迷宫中脱身。 能够反复使用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "exeggcute-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "exp-charm": {
+      "descriptionZh": "训练家拥有这个护符后， 宝可梦获得的经验值就会增加。 里面装有类似于机器的部件。",
+      "effectZh": "训练家拥有这个护符后， 宝可梦获得的经验值就会增加。 里面装有类似于机器的部件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "exp-share": {
+      "descriptionZh": "打开开关后， 能让同行的所有宝可梦 获得经验值的装置。",
+      "effectZh": "打开开关后， 能让同行的所有宝可梦 获得经验值的装置。",
+      "descriptionSource": "PokeAPI"
+    },
+    "explorer-kit": {
+      "descriptionZh": "装着有助于探险且 方便使用的道具的袋子。 有了它就可以进入地下通道。",
+      "effectZh": "装着有助于探险且 方便使用的道具的袋子。 有了它就可以进入地下通道。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fairium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将妖精属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将妖精属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fancy-apple": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。历经千挑万选的苹果 不仅形状饱满，表皮更是亮泽鲜艳。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。历经千挑万选的苹果 不仅形状饱满，表皮更是亮泽鲜艳。",
+      "descriptionSource": "PokeAPI"
+    },
+    "farfetchd-candy": {
+      "nameZh": "大葱鸭的糖果",
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fashion-case": {
+      "descriptionZh": "漂亮精美的盒子。 可以存放宝可梦出演音乐剧时 用来装扮自己的多种小物件。",
+      "effectZh": "漂亮精美的盒子。 可以存放宝可梦出演音乐剧时 用来装扮自己的多种小物件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "favored-mail": {
+      "descriptionZh": "方便写表达自己喜好这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写表达自己喜好这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "festival-ticket": {
+      "descriptionZh": "可以在圆庆广场 开启游乐项目。",
+      "effectZh": "可以在圆庆广场 开启游乐项目。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fightinium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将格斗属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将格斗属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "firium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将火属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将火属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fishing-rod": {
+      "descriptionZh": "水莲队长制作的钓竿。 如果向着岩石阴影那边使用， 就能钓到宝可梦。",
+      "effectZh": "水莲队长制作的钓竿。 如果向着岩石阴影那边使用， 就能钓到宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fishing-rod--galar": {
+      "nameZh": "钓竿",
+      "descriptionZh": "在有水的地方使用， 就能钓到各种各样的宝可梦。",
+      "effectZh": "在有水的地方使用， 就能钓到各种各样的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fluffy-tail": {
+      "descriptionZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "effectZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "descriptionSource": "PokeAPI"
+    },
+    "flyinium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将飞行属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将飞行属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "forage-bag": {
+      "descriptionZh": "将丛林里收集到的材料 装在一起的袋子。 在玛奥的考验中使用。",
+      "effectZh": "将丛林里收集到的材料 装在一起的袋子。 在玛奥的考验中使用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fossilized-bird": {
+      "descriptionZh": "远古时代的宝可梦化石残片。 它曾翱翔于天空， 本来面目至今仍是未解之谜。",
+      "effectZh": "远古时代的宝可梦化石残片。 它曾翱翔于天空， 本来面目至今仍是未解之谜。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fossilized-dino": {
+      "descriptionZh": "远古时代的宝可梦化石残片。 它曾栖息于大海， 本来面目至今仍是未解之谜。",
+      "effectZh": "远古时代的宝可梦化石残片。 它曾栖息于大海， 本来面目至今仍是未解之谜。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fossilized-drake": {
+      "descriptionZh": "远古时代的宝可梦化石残片。 它曾栖息于陆地， 本来面目至今仍是未解之谜。",
+      "effectZh": "远古时代的宝可梦化石残片。 它曾栖息于陆地， 本来面目至今仍是未解之谜。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fossilized-fish": {
+      "descriptionZh": "远古时代的宝可梦化石残片。 它曾栖息于大海， 本来面目至今仍是未解之谜。",
+      "effectZh": "远古时代的宝可梦化石残片。 它曾栖息于大海， 本来面目至今仍是未解之谜。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fresh-cream": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。在辣味的咖喱中 加入奶油，使滋味变得香甜可口。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。在辣味的咖喱中 加入奶油，使滋味变得香甜可口。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fried-food": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。炸完出锅后 放置了一段时间，所以稍稍有些油腻。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。炸完出锅后 放置了一段时间，所以稍稍有些油腻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "fruit-bunch": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。煮得粘稠浓厚的水果， 能为料理增添一份热带风情。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。煮得粘稠浓厚的水果， 能为料理增添一份热带风情。",
+      "descriptionSource": "PokeAPI"
+    },
+    "galactic-key": {
+      "descriptionZh": "用于解除银河队基地 安全防范系统的钥匙卡。 弄丢了的话，好像会受到惩罚。",
+      "effectZh": "用于解除银河队基地 安全防范系统的钥匙卡。 弄丢了的话，好像会受到惩罚。",
+      "descriptionSource": "PokeAPI"
+    },
+    "galarica-cuff": {
+      "descriptionZh": "用伽勒豆蔻枝编织的手环。 给伽勒尔地区的呆呆兽戴上， 它就会很开心。",
+      "effectZh": "用伽勒豆蔻枝编织的手环。 给伽勒尔地区的呆呆兽戴上， 它就会很开心。",
+      "descriptionSource": "PokeAPI"
+    },
+    "galarica-twig": {
+      "descriptionZh": "伽勒尔部分地区生长的 伽勒豆蔻这种植物的枝条。 可以用来制作某种宝可梦的饰品。",
+      "effectZh": "伽勒尔部分地区生长的 伽勒豆蔻这种植物的枝条。 可以用来制作某种宝可梦的饰品。",
+      "descriptionSource": "PokeAPI"
+    },
+    "galarica-wreath": {
+      "descriptionZh": "用伽勒豆蔻枝编织的花环头饰。 给伽勒尔地区的呆呆兽戴上这种头饰， 它就会很开心。",
+      "effectZh": "用伽勒豆蔻枝编织的花环头饰。 给伽勒尔地区的呆呆兽戴上这种头饰， 它就会很开心。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gastly-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gb-sounds": {
+      "descriptionZh": "可以听到怀旧歌曲的音乐播放器。 可用一个开关切换歌曲。",
+      "effectZh": "可以听到怀旧歌曲的音乐播放器。 可用一个开关切换歌曲。",
+      "descriptionSource": "PokeAPI"
+    },
+    "geodude-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ghostium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将幽灵属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将幽灵属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gigantamix": {
+      "descriptionZh": "在露营营地制作料理时会使用的食材。 只要把这种神奇的香辛料往咖喱上 轻轻一撒，咖喱就会变得巨大无比。",
+      "effectZh": "在露营营地制作料理时会使用的食材。 只要把这种神奇的香辛料往咖喱上 轻轻一撒，咖喱就会变得巨大无比。",
+      "descriptionSource": "PokeAPI"
+    },
+    "go-goggles": {
+      "descriptionZh": "能在沙漠的沙暴中 保护眼睛的出色护目镜。",
+      "effectZh": "能在沙漠的沙暴中 保护眼睛的出色护目镜。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gold-bottle-cap": {
+      "descriptionZh": "金色的美丽王冠。 比银色王冠珍贵。 有些人收到它会很高兴。",
+      "effectZh": "金色的美丽王冠。 比银色王冠珍贵。 有些人收到它会很高兴。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gold-leaf": {
+      "descriptionZh": "神奇的金色叶子。 至今仍未发现能长出 这种叶子的树木。",
+      "effectZh": "神奇的金色叶子。 至今仍未发现能长出 这种叶子的树木。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gold-teeth": {
+      "descriptionZh": "狩猎地带的园长遗失的金假牙。 装上它后，笑起来十分耀眼。",
+      "effectZh": "狩猎地带的园长遗失的金假牙。 装上它后，笑起来十分耀眼。",
+      "descriptionSource": "PokeAPI"
+    },
+    "goldeen-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "good-rod": {
+      "descriptionZh": "不错的新钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "effectZh": "不错的新钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gooey-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gracidea": {
+      "descriptionZh": "在生日或纪念日等日子里， 为了表达感激之情， 有时会将其扎成花束送出。",
+      "effectZh": "在生日或纪念日等日子里， 为了表达感激之情， 有时会将其扎成花束送出。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gram-1": {
+      "descriptionZh": "长翅鸥投递的 重要信件。",
+      "effectZh": "长翅鸥投递的 重要信件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gram-2": {
+      "descriptionZh": "长翅鸥投递的 重要信件。",
+      "effectZh": "长翅鸥投递的 重要信件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "gram-3": {
+      "descriptionZh": "长翅鸥投递的 重要信件。",
+      "effectZh": "长翅鸥投递的 重要信件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "grassium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将草属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将草属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "green-apricorn": {
+      "descriptionZh": "绿色的球果。 有种焦香的香味，非常神奇。",
+      "effectZh": "绿色的球果。 有种焦香的香味，非常神奇。",
+      "descriptionSource": "PokeAPI"
+    },
+    "greet-mail": {
+      "descriptionZh": "方便写初次见面这类寒暄语的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写初次见面这类寒暄语的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "grimer-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "groundium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将地面属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将地面属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "growlithe-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "growth-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "grubby-hanky": {
+      "descriptionZh": "七宝市仓库咖啡馆的 熟客遗失的手帕。 隐约有着宝可梦的香气。",
+      "effectZh": "七宝市仓库咖啡馆的 熟客遗失的手帕。 隐约有着宝可梦的香气。",
+      "descriptionSource": "PokeAPI"
+    },
+    "helix-fossil": {
+      "descriptionZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是贝壳的一部分。",
+      "effectZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是贝壳的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "hi-tech-earbuds": {
+      "descriptionZh": "这个神奇又厉害的耳塞 可以自由调节各种声音的音量。",
+      "effectZh": "这个神奇又厉害的耳塞 可以自由调节各种声音的音量。",
+      "descriptionSource": "PokeAPI"
+    },
+    "hitmonchan-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "hitmonlee-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm01": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm02": {
+      "descriptionZh": "第１回合飞上天空， 第２回合攻击对手。 还可以飞到去过的城镇。",
+      "effectZh": "第１回合飞上天空， 第２回合攻击对手。 还可以飞到去过的城镇。",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm03": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm04": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm05": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm06": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "hm07": {
+      "descriptionZh": "第１回合潜入， 第２回合浮上来进行攻击。",
+      "effectZh": "第１回合潜入， 第２回合浮上来进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "holo-caster": {
+      "descriptionZh": "可以随时查看接收到的 全息影像数据的装置。",
+      "effectZh": "可以随时查看接收到的 全息影像数据的装置。",
+      "descriptionSource": "PokeAPI"
+    },
+    "honor-of-kalos": {
+      "descriptionZh": "颁发给为卡洛斯地区 作出杰出贡献的人的宝贵勋章。",
+      "effectZh": "颁发给为卡洛斯地区 作出杰出贡献的人的宝贵勋章。",
+      "descriptionSource": "PokeAPI"
+    },
+    "horsea-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "iceroot-carrot": {
+      "nameZh": "冰萝卜",
+      "descriptionZh": "丰饶之王的爱马 喜欢吃的农作物。 生长于白雪皑皑的田地。",
+      "effectZh": "丰饶之王的爱马 喜欢吃的农作物。 生长于白雪皑皑的田地。",
+      "descriptionSource": "PokeAPI"
+    },
+    "icium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将冰属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将冰属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "incinium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将炽焰咆哮虎的ＤＤ金勾臂 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将炽焰咆哮虎的ＤＤ金勾臂 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "inquiry-mail": {
+      "descriptionZh": "方便写询问对方这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写询问对方这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "instant-noodles": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。没想到加入速食食品， 滋味也出乎意料地和谐。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。没想到加入速食食品， 滋味也出乎意料地和谐。",
+      "descriptionSource": "PokeAPI"
+    },
+    "intriguing-stone": {
+      "descriptionZh": "在有些人看来 可能会觉得它十分贵重。 非常与众不同的石头。",
+      "effectZh": "在有些人看来 可能会觉得它十分贵重。 非常与众不同的石头。",
+      "descriptionSource": "PokeAPI"
+    },
+    "jade-orb": {
+      "descriptionZh": "散发着绿色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "effectZh": "散发着绿色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "descriptionSource": "PokeAPI"
+    },
+    "jaw-fossil": {
+      "nameZh": "颚之化石",
+      "descriptionZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是很大的颚的一部分。",
+      "effectZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是很大的颚的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "jigglypuff-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "journal": {
+      "descriptionZh": "记录着到现在为止的 冒险经历的笔记。",
+      "effectZh": "记录着到现在为止的 冒险经历的笔记。",
+      "descriptionSource": "PokeAPI"
+    },
+    "jynx-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "kabuto-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "kangaskhan-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "key-stone": {
+      "descriptionZh": "蕴藏着未知力量的石头。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "effectZh": "蕴藏着未知力量的石头。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "key-to-room-1": {
+      "descriptionZh": "进入海紫堇的房间时 所需的钥匙。",
+      "effectZh": "进入海紫堇的房间时 所需的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "key-to-room-2": {
+      "descriptionZh": "进入海紫堇的房间时 所需的钥匙。",
+      "effectZh": "进入海紫堇的房间时 所需的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "key-to-room-4": {
+      "descriptionZh": "进入海紫堇的房间时 所需的钥匙。",
+      "effectZh": "进入海紫堇的房间时 所需的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "key-to-room-6": {
+      "descriptionZh": "进入海紫堇的房间时 所需的钥匙。",
+      "effectZh": "进入海紫堇的房间时 所需的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "koffing-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "krabby-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lapras-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "large-leek": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。不知是不是宝可梦 大葱鸭最爱的那种植物的茎。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。不知是不是宝可梦 大葱鸭最爱的那种植物的茎。",
+      "descriptionSource": "PokeAPI"
+    },
+    "leaf-letter--eevee": {
+      "nameZh": "树叶信",
+      "descriptionZh": "以树叶制作的信件。 上面留有伊布的脚印， 好像是要表达些什么。",
+      "effectZh": "以树叶制作的信件。 上面留有伊布的脚印， 好像是要表达些什么。",
+      "descriptionSource": "PokeAPI"
+    },
+    "leaf-letter--pikachu": {
+      "nameZh": "树叶信",
+      "descriptionZh": "以树叶制作的信件。 上面留有皮卡丘的脚印， 好像是要表达些什么。",
+      "effectZh": "以树叶制作的信件。 上面留有皮卡丘的脚印， 好像是要表达些什么。",
+      "descriptionSource": "PokeAPI"
+    },
+    "legendary-clue-1": {
+      "nameZh": "传说笔记１",
+      "descriptionZh": "皮欧尼整理的 有关丰饶之王传说的笔记。 上面贴着很旧的照片。",
+      "effectZh": "皮欧尼整理的 有关丰饶之王传说的笔记。 上面贴着很旧的照片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "legendary-clue-2": {
+      "nameZh": "传说笔记２",
+      "descriptionZh": "皮欧尼整理的 有关巨人传说的笔记。 上面绘有充满个性的画。",
+      "effectZh": "皮欧尼整理的 有关巨人传说的笔记。 上面绘有充满个性的画。",
+      "descriptionSource": "PokeAPI"
+    },
+    "legendary-clue-3": {
+      "nameZh": "传说笔记３",
+      "descriptionZh": "皮欧尼整理的 有关鸟宝可梦传说的笔记。 上面绘有充满个性的画。",
+      "effectZh": "皮欧尼整理的 有关鸟宝可梦传说的笔记。 上面绘有充满个性的画。",
+      "descriptionSource": "PokeAPI"
+    },
+    "legendary-clue-question": {
+      "nameZh": "传说笔记？",
+      "descriptionZh": "皮欧尼掉落的神秘笔记。 上面贴有极巨巢穴 出现光洞的照片。",
+      "effectZh": "皮欧尼掉落的神秘笔记。 上面贴有极巨巢穴 出现光洞的照片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lens-case": {
+      "descriptionZh": "可以存放隐形眼镜的， 有点漂亮的盒子。",
+      "effectZh": "可以存放隐形眼镜的， 有点漂亮的盒子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "letter": {
+      "descriptionZh": "从得文社长 那里得到的信。",
+      "effectZh": "从得文社长 那里得到的信。",
+      "descriptionSource": "PokeAPI"
+    },
+    "liberty-pass": {
+      "descriptionZh": "用于前往自由庭园岛的特殊船票。 可以从飞云市上船。",
+      "effectZh": "用于前往自由庭园岛的特殊船票。 可以从飞云市上船。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lickitung-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lift-key": {
+      "descriptionZh": "带有火箭队标志的钥匙。 能启动位于火箭队基地的电梯。",
+      "effectZh": "带有火箭队标志的钥匙。 能启动位于火箭队基地的电梯。",
+      "descriptionSource": "PokeAPI"
+    },
+    "light-stone": {
+      "descriptionZh": "莱希拉姆的肉体 毁灭后变成的样子。 据说它在等待着英雄的到来。",
+      "effectZh": "莱希拉姆的肉体 毁灭后变成的样子。 据说它在等待着英雄的到来。",
+      "descriptionSource": "PokeAPI"
+    },
+    "like-mail": {
+      "descriptionZh": "方便写推荐内容这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写推荐内容这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lone-earring": {
+      "nameZh": "一边的耳环",
+      "descriptionZh": "某人遗失的单只耳环。",
+      "effectZh": "某人遗失的单只耳环。",
+      "descriptionSource": "PokeAPI"
+    },
+    "looker-ticket": {
+      "descriptionZh": "喷有闪闪发光的涂料， 帅哥亲手制作的券。",
+      "effectZh": "喷有闪闪发光的涂料， 帅哥亲手制作的券。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lost-item": {
+      "descriptionZh": "模仿少女丢失的 魔尼尼人偶。",
+      "effectZh": "模仿少女丢失的 魔尼尼人偶。",
+      "descriptionSource": "PokeAPI"
+    },
+    "luck-incense": {
+      "descriptionZh": "只要携带它的宝可梦 在战斗时出场一次， 就能获得２倍金钱。",
+      "effectZh": "只要携带它的宝可梦 在战斗时出场一次， 就能获得２倍金钱。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lunar-wing": {
+      "descriptionZh": "散发着月辉般光芒的羽毛。 据说隐藏着可以驱散恶梦的力量。",
+      "effectZh": "散发着月辉般光芒的羽毛。 据说隐藏着可以驱散恶梦的力量。",
+      "descriptionSource": "PokeAPI"
+    },
+    "lure": {
+      "nameZh": "引虫香水",
+      "descriptionZh": "使用该香水后的一小段时间内， 稀有宝可梦会更容易出现。",
+      "effectZh": "使用该香水后的一小段时间内， 稀有宝可梦会更容易出现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mach-bike": {
+      "nameZh": "音速自行车",
+      "descriptionZh": "能以２倍以上的速度移动的 折叠式自行车。",
+      "effectZh": "能以２倍以上的速度移动的 折叠式自行车。",
+      "descriptionSource": "PokeAPI"
+    },
+    "machine-part": {
+      "descriptionZh": "发电厂里被盗的， 用于发电机的重要零件。",
+      "effectZh": "发电厂里被盗的， 用于发电机的重要零件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "macho-brace": {
+      "descriptionZh": "又硬又重的锻炼器。 虽然携带后速度会降低， 但会比平时更容易茁壮成长。",
+      "effectZh": "又硬又重的锻炼器。 虽然携带后速度会降低， 但会比平时更容易茁壮成长。",
+      "descriptionSource": "PokeAPI"
+    },
+    "machop-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "magikarp-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "magma-stone": {
+      "descriptionZh": "被灼热熔岩熔化的岩石 凝固后形成的产物。 里面还留有熔岩。",
+      "effectZh": "被灼热熔岩熔化的岩石 凝固后形成的产物。 里面还留有熔岩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "magma-suit": {
+      "descriptionZh": "集熔岩队科学技术于一身的服装。 能承受任何冲击。",
+      "effectZh": "集熔岩队科学技术于一身的服装。 能承受任何冲击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "magmar-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "magnemite-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "makeup-bag": {
+      "descriptionZh": "可以存放唇膏的精美小包包。",
+      "effectZh": "可以存放唇膏的精美小包包。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mankey-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "marble": {
+      "nameZh": "弹珠",
+      "descriptionZh": "非常圆润的玻璃球。 能在透明的球体中 看见彩色玻璃的花纹。",
+      "effectZh": "非常圆润的玻璃球。 能在透明的球体中 看见彩色玻璃的花纹。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mark-charm": {
+      "descriptionZh": "神奇而富有个性的护符。 拥有该护符后， 会更容易遇到带有证章的宝可梦。",
+      "effectZh": "神奇而富有个性的护符。 拥有该护符后， 会更容易遇到带有证章的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "marshadium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将玛夏多的暗影偷盗 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将玛夏多的暗影偷盗 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "max-lure": {
+      "nameZh": "黄金香水",
+      "descriptionZh": "使用该香水后， 稀有宝可梦会更容易出现。 效果比白银香水更持久。",
+      "effectZh": "使用该香水后， 稀有宝可梦会更容易出现。 效果比白银香水更持久。",
+      "descriptionSource": "PokeAPI"
+    },
+    "max-repel": {
+      "descriptionZh": "弱小的野生宝可梦 将完全不会出现。 效果比白银喷雾更持久。",
+      "effectZh": "弱小的野生宝可梦 将完全不会出现。 效果比白银喷雾更持久。",
+      "descriptionSource": "PokeAPI"
+    },
+    "medal-box": {
+      "descriptionZh": "可以放入获得的奖牌， 并记录奖牌信息的箱形机器。",
+      "effectZh": "可以放入获得的奖牌， 并记录奖牌信息的箱形机器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mega-bracelet": {
+      "descriptionZh": "蕴藏着未知力量的手镯。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "effectZh": "蕴藏着未知力量的手镯。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mega-ring": {
+      "descriptionZh": "蕴藏着未知力量的圆环。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "effectZh": "蕴藏着未知力量的圆环。 能让携带着超级石战斗的 宝可梦进行超级进化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "meltan-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "member-card": {
+      "descriptionZh": "可以进入水脉市旅馆的卡片。 不知为何，上面刻有 ５０年前左右的日期。",
+      "effectZh": "可以进入水脉市旅馆的卡片。 不知为何，上面刻有 ５０年前左右的日期。",
+      "descriptionSource": "PokeAPI"
+    },
+    "meowth-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "meteorite": {
+      "descriptionZh": "原本是落入流星瀑布里的陨石。 是在烟囱山获得的。",
+      "effectZh": "原本是落入流星瀑布里的陨石。 是在烟囱山获得的。",
+      "descriptionSource": "PokeAPI"
+    },
+    "meteorite-shard": {
+      "descriptionZh": "掉落在石之洞窟里的 陨石碎片之一。 摸上去有一点点暖暖的。",
+      "effectZh": "掉落在石之洞窟里的 陨石碎片之一。 摸上去有一点点暖暖的。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mew-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mewnium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将梦幻的精神强念 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将梦幻的精神强念 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mewtwo-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mixed-mushrooms": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。各种菌菇混在一起的嚼劲 会为口感带来变化。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。各种菌菇混在一起的嚼劲 会为口感带来变化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "moltres-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "moomoo-cheese": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。融化的芝士 能为咖喱增添一份独特的浓郁。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。融化的芝士 能为咖喱增添一份独特的浓郁。",
+      "descriptionSource": "PokeAPI"
+    },
+    "moon-flute": {
+      "descriptionZh": "为了对月亮的 传说的宝可梦表达感激之情， 据说会用它来献上美乐。",
+      "effectZh": "为了对月亮的 传说的宝可梦表达感激之情， 据说会用它来献上美乐。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mr-mime-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "mystery-egg": {
+      "descriptionZh": "从宝可梦爷爷那里得到的 有着神奇花纹的蛋。 不知道是什么的蛋。",
+      "effectZh": "从宝可梦爷爷那里得到的 有着神奇花纹的蛋。 不知道是什么的蛋。",
+      "descriptionSource": "PokeAPI"
+    },
+    "nidoran-f-candy": {
+      "nameZh": "尼多兰的糖果",
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "nidoran-m-candy": {
+      "nameZh": "尼多朗的糖果",
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "normalium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将一般属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将一般属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "oaks-letter": {
+      "nameZh": "大木的信",
+      "descriptionZh": "大木博士的来信。 上面写着请来２２４号道路。",
+      "effectZh": "大木博士的来信。 上面写着请来２２４号道路。",
+      "descriptionSource": "PokeAPI"
+    },
+    "odd-keystone": {
+      "descriptionZh": "没有它，石之塔就会 崩塌的重要石头。 有时能从石头里听到声音。",
+      "effectZh": "没有它，石之塔就会 崩塌的重要石头。 有时能从石头里听到声音。",
+      "descriptionSource": "PokeAPI"
+    },
+    "oddish-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "old-amber": {
+      "nameZh": "秘密琥珀",
+      "descriptionZh": "封存着古代宝可梦 遗传基因的琥珀， 透着点红色。",
+      "effectZh": "封存着古代宝可梦 遗传基因的琥珀， 透着点红色。",
+      "descriptionSource": "PokeAPI"
+    },
+    "old-charm": {
+      "descriptionZh": "要交给神和镇上长老的远古护符。 由宝可梦的骨头制成。",
+      "effectZh": "要交给神和镇上长老的远古护符。 由宝可梦的骨头制成。",
+      "descriptionSource": "PokeAPI"
+    },
+    "old-letter": {
+      "descriptionZh": "女孩子投递的书信 收件人是男孩子。 散发出一种怀旧的气息。",
+      "effectZh": "女孩子投递的书信 收件人是男孩子。 散发出一种怀旧的气息。",
+      "descriptionSource": "PokeAPI"
+    },
+    "old-rod": {
+      "descriptionZh": "又破又旧的钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "effectZh": "又破又旧的钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "omanyte-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "onix-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "oval-charm": {
+      "descriptionZh": "拥有它之后，在寄放屋里 会更容易找到蛋的 神奇浑圆护符。",
+      "effectZh": "拥有它之后，在寄放屋里 会更容易找到蛋的 神奇浑圆护符。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pack-of-potatoes": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。土豆能中和辣味， 使整道料理的滋味变得柔和。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。土豆能中和辣味， 使整道料理的滋味变得柔和。",
+      "descriptionSource": "PokeAPI"
+    },
+    "packaged-curry": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。使用这种成品速食咖喱， 可以有效预防失误。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。使用这种成品速食咖喱， 可以有效预防失误。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pair-of-tickets": {
+      "descriptionZh": "在绿岭宇宙中心举办的 天体展览的双人票。",
+      "effectZh": "在绿岭宇宙中心举办的 天体展览的双人票。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pal-pad": {
+      "descriptionZh": "使用方便的手册。 可以添加朋友或 记录游戏的内容。",
+      "effectZh": "使用方便的手册。 可以添加朋友或 记录游戏的内容。",
+      "descriptionSource": "PokeAPI"
+    },
+    "paras-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "parcel": {
+      "descriptionZh": "这是别人托付给你的包裹。 需要将它交给从双叶镇启程 踏上旅途的青梅竹马。",
+      "effectZh": "这是别人托付给你的包裹。 需要将它交给从双叶镇启程 踏上旅途的青梅竹马。",
+      "descriptionSource": "PokeAPI"
+    },
+    "parcel--letsgo": {
+      "nameZh": "包裹",
+      "descriptionZh": "这是常青市的商店 托付给你的包裹。 需要将它交给大木博士。",
+      "effectZh": "这是常青市的商店 托付给你的包裹。 需要将它交给大木博士。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pass": {
+      "nameZh": "磁浮列车自由票",
+      "descriptionZh": "乘坐磁浮列车时所需的车票。 可以随时自由乘坐。",
+      "effectZh": "乘坐磁浮列车时所需的车票。 可以随时自由乘坐。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pasta": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。是由小麦粉揉制的面条。 搭配咖喱出乎意料地美味。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。是由小麦粉揉制的面条。 搭配咖喱出乎意料地美味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pearl-string": {
+      "descriptionZh": "散发着美丽银辉 且非常大颗的珍珠。 可以在商店高价出售。",
+      "effectZh": "散发着美丽银辉 且非常大颗的珍珠。 可以在商店高价出售。",
+      "descriptionSource": "PokeAPI"
+    },
+    "permit": {
+      "descriptionZh": "只有极少数人才知道的， 进入自然保护区所需的授权卡。",
+      "effectZh": "只有极少数人才知道的， 进入自然保护区所需的授权卡。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pidgey-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pikachu-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pikanium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将皮卡丘的伏特攻击 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将皮卡丘的伏特攻击 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pikashunium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将戴着帽子的皮卡丘的 十万伏特升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将戴着帽子的皮卡丘的 十万伏特升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pink-apricorn": {
+      "descriptionZh": "粉红色的球果。 有种甜甜的，好闻的香味。",
+      "effectZh": "粉红色的球果。 有种甜甜的，好闻的香味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pinsir-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "plasma-card": {
+      "descriptionZh": "在等离子驱逐舰的 船内输入密码时， 需要用到的钥匙卡。",
+      "effectZh": "在等离子驱逐舰的 船内输入密码时， 需要用到的钥匙卡。",
+      "descriptionSource": "PokeAPI"
+    },
+    "plume-fossil": {
+      "descriptionZh": "据说是鸟宝可梦的祖先， 古代宝可梦的化石。 好像是翅膀的一部分。",
+      "effectZh": "据说是鸟宝可梦的祖先， 古代宝可梦的化石。 好像是翅膀的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poffin-case": {
+      "descriptionZh": "用来保存烹饪好的 宝芬的容器。",
+      "effectZh": "用来保存烹饪好的 宝芬的容器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "point-card": {
+      "descriptionZh": "可以查看赢得的 对战点数的卡片。",
+      "effectZh": "可以查看赢得的 对战点数的卡片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poisonium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将毒属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将毒属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poke-doll": {
+      "descriptionZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "effectZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poke-flute": {
+      "descriptionZh": "能吹出让睡着的宝可梦 都会情不自禁醒来的 美妙音色的笛子。",
+      "effectZh": "能吹出让睡着的宝可梦 都会情不自禁醒来的 美妙音色的笛子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poke-radar": {
+      "nameZh": "宝可追踪",
+      "descriptionZh": "能够将藏在草丛里的 宝可梦找出来的道具。 走路就能给电池充电。",
+      "effectZh": "能够将藏在草丛里的 宝可梦找出来的道具。 走路就能给电池充电。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poke-toy": {
+      "descriptionZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "effectZh": "能吸引宝可梦注意的道具。 在和野生宝可梦的 战斗中绝对可以逃走。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pokeblock-kit": {
+      "descriptionZh": "这是树果混合器和宝可方块盒的套装。 树果混合器可利用树果制作宝可方块， 而做好的宝可方块可用宝可方块盒来保存。",
+      "effectZh": "这是树果混合器和宝可方块盒的套装。 树果混合器可利用树果制作宝可方块， 而做好的宝可方块可用宝可方块盒来保存。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pokemon-box-link": {
+      "nameZh": "宝可梦盒",
+      "descriptionZh": "可以随时访问 宝可梦中心电脑里的盒子， 来寄放或领回需要的宝可梦。",
+      "effectZh": "可以随时访问 宝可梦中心电脑里的盒子， 来寄放或领回需要的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "polished-mud-ball": {
+      "descriptionZh": "用泥土制作的丸子。 花了大把时间打磨， 表面油光水滑。",
+      "effectZh": "用泥土制作的丸子。 花了大把时间打磨， 表面油光水滑。",
+      "descriptionSource": "PokeAPI"
+    },
+    "poliwag-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ponyta-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "porygon-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-anklet": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的速度 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的速度 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-band": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的特防 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的特防 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-belt": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的防御 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的防御 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-bracer": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的攻击 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的攻击 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-lens": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的特攻 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的特攻 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-plant-pass": {
+      "descriptionZh": "该通行证可用作进入 １３号道路上的发电厂时 所需的身份证明。",
+      "effectZh": "该通行证可用作进入 １３号道路上的发电厂时 所需的身份证明。",
+      "descriptionSource": "PokeAPI"
+    },
+    "power-weight": {
+      "descriptionZh": "虽然携带后速度会降低， 但宝可梦的ＨＰ 会比平时成长得更高。",
+      "effectZh": "虽然携带后速度会降低， 但宝可梦的ＨＰ 会比平时成长得更高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "precooked-burger": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。不知道该加什么的时候， 选择这种汉堡肉准没错。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。不知道该加什么的时候， 选择这种汉堡肉准没错。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pretty-wing": {
+      "descriptionZh": "仅仅只是漂亮， 没有任何效果， 极其普通的羽毛。",
+      "effectZh": "仅仅只是漂亮， 没有任何效果， 极其普通的羽毛。",
+      "descriptionSource": "PokeAPI"
+    },
+    "primarium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将西狮海壬的泡影的咏叹调 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将西狮海壬的泡影的咏叹调 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "prison-bottle": {
+      "nameZh": "惩戒之壶",
+      "descriptionZh": "据说在很久以前封印着 某只宝可梦力量的壶。",
+      "effectZh": "据说在很久以前封印着 某只宝可梦力量的壶。",
+      "descriptionSource": "PokeAPI"
+    },
+    "professors-mask": {
+      "nameZh": "博士的面罩",
+      "descriptionZh": "皇家蒙面人的面罩。 好像是职业摔角手 自己用缝纫机缝制的。",
+      "effectZh": "皇家蒙面人的面罩。 好像是职业摔角手 自己用缝纫机缝制的。",
+      "descriptionSource": "PokeAPI"
+    },
+    "profs-letter": {
+      "nameZh": "博士的信",
+      "descriptionZh": "布拉塔诺博士写给妈妈的信。 上面带有微微的香气。",
+      "effectZh": "布拉塔诺博士写给妈妈的信。 上面带有微微的香气。",
+      "descriptionSource": "PokeAPI"
+    },
+    "prop-case": {
+      "descriptionZh": "漂亮精美的箱子。 可以存放宝可梦出演音乐剧时 用来装扮自己的多种小物件。",
+      "effectZh": "漂亮精美的箱子。 可以存放宝可梦出演音乐剧时 用来装扮自己的多种小物件。",
+      "descriptionSource": "PokeAPI"
+    },
+    "psychium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将超能力属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将超能力属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "psyduck-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pungent-root": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。将信手摘取的香草 点缀在上面，使料理更加色香味俱全。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。将信手摘取的香草 点缀在上面，使料理更加色香味俱全。",
+      "descriptionSource": "PokeAPI"
+    },
+    "pure-incense": {
+      "descriptionZh": "让排在最前面的宝可梦携带后， 野生宝可梦就会不容易出现。",
+      "effectZh": "让排在最前面的宝可梦携带后， 野生宝可梦就会不容易出现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "radiant-petal": {
+      "descriptionZh": "从丰饶之王那里 得到的一片花瓣。 散发着朦胧的光辉。",
+      "effectZh": "从丰饶之王那里 得到的一片花瓣。 散发着朦胧的光辉。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rage-candy-bar": {
+      "descriptionZh": "卡吉镇特产的馒头。 能治愈１只宝可梦的 所有异常状态。",
+      "effectZh": "卡吉镇特产的馒头。 能治愈１只宝可梦的 所有异常状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rainbow-wing": {
+      "descriptionZh": "散发着虹色光辉的 神奇羽毛。",
+      "effectZh": "散发着虹色光辉的 神奇羽毛。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rattata-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "red-apricorn": {
+      "descriptionZh": "红色的球果。 有种刺鼻的气味。",
+      "effectZh": "红色的球果。 有种刺鼻的气味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "red-orb": {
+      "descriptionZh": "散发着红色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "effectZh": "散发着红色光辉的宝珠。 据说和丰缘地区的传说渊源颇深。",
+      "descriptionSource": "PokeAPI"
+    },
+    "red-scale": {
+      "descriptionZh": "在愤怒之湖里出现的 红色暴鲤龙的鳞片。 散发着像火一样的红色光芒。",
+      "effectZh": "在愤怒之湖里出现的 红色暴鲤龙的鳞片。 散发着像火一样的红色光芒。",
+      "descriptionSource": "PokeAPI"
+    },
+    "reins-of-unity": {
+      "descriptionZh": "拿到光下即可生辉的布。 人们曾经将其进献给 丰饶之王以表感谢之意。",
+      "effectZh": "拿到光下即可生辉的布。 人们曾经将其进献给 丰饶之王以表感谢之意。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-band": {
+      "descriptionZh": "约３０００年前的 文明制造的手镯。",
+      "effectZh": "约３０００年前的 文明制造的手镯。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-copper": {
+      "descriptionZh": "约３０００年前的 文明使用的铜币。",
+      "effectZh": "约３０００年前的 文明使用的铜币。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-crown": {
+      "descriptionZh": "约３０００年前的 文明制造的王冠。",
+      "effectZh": "约３０００年前的 文明制造的王冠。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-gold": {
+      "descriptionZh": "约３０００年前的 文明使用的金币。",
+      "effectZh": "约３０００年前的 文明使用的金币。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-silver": {
+      "descriptionZh": "约３０００年前的 文明使用的银币。",
+      "effectZh": "约３０００年前的 文明使用的银币。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-statue": {
+      "descriptionZh": "约３０００年前的 文明制造的石像。",
+      "effectZh": "约３０００年前的 文明制造的石像。",
+      "descriptionSource": "PokeAPI"
+    },
+    "relic-vase": {
+      "descriptionZh": "约３０００年前的 文明制造的壶。",
+      "effectZh": "约３０００年前的 文明制造的壶。",
+      "descriptionSource": "PokeAPI"
+    },
+    "repel": {
+      "descriptionZh": "使用后，在较短的一段时间内， 弱小的野生宝可梦将完全不会出现。",
+      "effectZh": "使用后，在较短的一段时间内， 弱小的野生宝可梦将完全不会出现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "reply-mail": {
+      "descriptionZh": "方便写回复邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写回复邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "reveal-glass": {
+      "descriptionZh": "能够通过照出真实， 让宝可梦变回原来 样子的神奇镜子。",
+      "effectZh": "能够通过照出真实， 让宝可梦变回原来 样子的神奇镜子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rhyhorn-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rich-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rockium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将岩石属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将岩石属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "roller-skates": {
+      "descriptionZh": "鞋底下装着滑轮。 能在地面上滑行， 或漂亮地表演特技。",
+      "effectZh": "鞋底下装着滑轮。 能在地面上滑行， 或漂亮地表演特技。",
+      "descriptionSource": "PokeAPI"
+    },
+    "root-fossil": {
+      "descriptionZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是根的一部分。",
+      "effectZh": "很久以前栖息在海里的 古代宝可梦的化石。 好像是根的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rotom-bike": {
+      "descriptionZh": "宝可梦洛托姆潜入马达后， 这辆自行车变得可以 通过涡轮发动机加速了。",
+      "effectZh": "宝可梦洛托姆潜入马达后， 这辆自行车变得可以 通过涡轮发动机加速了。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rotom-catalog": {
+      "descriptionZh": "上面记载着洛托姆喜欢的家电。 通过使用这本指南，可以 让洛托姆潜入或脱离家电。",
+      "effectZh": "上面记载着洛托姆喜欢的家电。 通过使用这本指南，可以 让洛托姆潜入或脱离家电。",
+      "descriptionSource": "PokeAPI"
+    },
+    "rsvp-mail": {
+      "descriptionZh": "方便写邀请对方这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写邀请对方这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sail-fossil": {
+      "nameZh": "鳍之化石",
+      "descriptionZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是头鳍的一部分。",
+      "effectZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是头鳍的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "salad-mix": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。将各种蔬菜搭配到一起， 看上去就非常有益健康。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。将各种蔬菜搭配到一起， 看上去就非常有益健康。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sandshrew-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sausages": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。白香肠是香肠的一种。 需要先煮过之后再食用。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。白香肠是香肠的一种。 需要先煮过之后再食用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "scanner": {
+      "descriptionZh": "在海紫堇中 找到的道具。",
+      "effectZh": "在海紫堇中 找到的道具。",
+      "descriptionSource": "PokeAPI"
+    },
+    "scyther-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "seal-case": {
+      "descriptionZh": "放有贴在球壳上的 贴纸的容器。",
+      "effectZh": "放有贴在球壳上的 贴纸的容器。",
+      "descriptionSource": "PokeAPI"
+    },
+    "secret-key": {
+      "descriptionZh": "在特定的地方使用， 就会发出特殊电信号 来开门的高科技钥匙。",
+      "effectZh": "在特定的地方使用， 就会发出特殊电信号 来开门的高科技钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "secret-key--letsgo": {
+      "nameZh": "秘密钥匙",
+      "descriptionZh": "能打开红莲岛上那座 宝可梦道馆的钥匙。 周身都以红色装饰。",
+      "effectZh": "能打开红莲岛上那座 宝可梦道馆的钥匙。 周身都以红色装饰。",
+      "descriptionSource": "PokeAPI"
+    },
+    "secret-potion": {
+      "descriptionZh": "在湛蓝市的药店里得到的， 能让任何宝可梦立刻变得 精力充沛的高效药。",
+      "effectZh": "在湛蓝市的药店里得到的， 能让任何宝可梦立刻变得 精力充沛的高效药。",
+      "descriptionSource": "PokeAPI"
+    },
+    "seel-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "shaderoot-carrot": {
+      "nameZh": "黑萝卜",
+      "descriptionZh": "丰饶之王的爱马 喜欢吃的农作物。 生长于光线暗淡的田地。",
+      "effectZh": "丰饶之王的爱马 喜欢吃的农作物。 生长于光线暗淡的田地。",
+      "descriptionSource": "PokeAPI"
+    },
+    "shellder-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "shiny-charm": {
+      "descriptionZh": "拥有它之后，据说会 更容易遇见发光宝可梦的 神奇闪光护符。",
+      "effectZh": "拥有它之后，据说会 更容易遇见发光宝可梦的 神奇闪光护符。",
+      "descriptionSource": "PokeAPI"
+    },
+    "shoal-salt": {
+      "descriptionZh": "在浅滩洞穴这地方 找到的海盐。",
+      "effectZh": "在浅滩洞穴这地方 找到的海盐。",
+      "descriptionSource": "PokeAPI"
+    },
+    "shoal-shell": {
+      "descriptionZh": "在浅滩洞穴这地方 找到的贝壳。",
+      "effectZh": "在浅滩洞穴这地方 找到的贝壳。",
+      "descriptionSource": "PokeAPI"
+    },
+    "silph-scope": {
+      "descriptionZh": "西尔佛公司制造的透视镜。 可以看见人眼无法看见的东西。",
+      "effectZh": "西尔佛公司制造的透视镜。 可以看见人眼无法看见的东西。",
+      "descriptionSource": "PokeAPI"
+    },
+    "silver-leaf": {
+      "descriptionZh": "神奇的银色叶子。 至今仍未发现能长出 这种叶子的树木。",
+      "effectZh": "神奇的银色叶子。 至今仍未发现能长出 这种叶子的树木。",
+      "descriptionSource": "PokeAPI"
+    },
+    "silver-wing": {
+      "descriptionZh": "散发着银色光辉的 神奇羽毛。",
+      "effectZh": "散发着银色光辉的 神奇羽毛。",
+      "descriptionSource": "PokeAPI"
+    },
+    "skull-fossil": {
+      "descriptionZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是头部的一部分。",
+      "effectZh": "很久以前生活在地上的 古代宝可梦的化石。 好像是头部的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "slowpoke-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "small-bouquet": {
+      "descriptionZh": "竭尽心力制作的素雅花束。 里面满满都是对训练家的心意。",
+      "effectZh": "竭尽心力制作的素雅花束。 里面满满都是对训练家的心意。",
+      "descriptionSource": "PokeAPI"
+    },
+    "smoke-poke-tail": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。宝可梦呆呆兽的尾巴 就算断掉也会很快长出新的。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。宝可梦呆呆兽的尾巴 就算断掉也会很快长出新的。",
+      "descriptionSource": "PokeAPI"
+    },
+    "snorlax-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "snorlium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将卡比兽的终极冲击 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将卡比兽的终极冲击 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sonias-book": {
+      "nameZh": "索妮亚的书",
+      "descriptionZh": "索妮亚博士出版的书。 以风趣的文笔展示了 关于伽勒尔地区传说的最新发现。",
+      "effectZh": "索妮亚博士出版的书。 以风趣的文笔展示了 关于伽勒尔地区传说的最新发现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "soot-sack": {
+      "descriptionZh": "将堆积起来的火山灰 收集起来的袋子。",
+      "effectZh": "将堆积起来的火山灰 收集起来的袋子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "soothe-bell": {
+      "descriptionZh": "音色悦耳的铃铛。 让携带它的宝可梦清心怡神， 变得容易和训练家亲密。",
+      "effectZh": "音色悦耳的铃铛。 让携带它的宝可梦清心怡神， 变得容易和训练家亲密。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sparkling-stone": {
+      "descriptionZh": "从被认为是阿罗拉守护神的 宝可梦那里得到的石头。 据说其光辉下有着某种秘密。",
+      "effectZh": "从被认为是阿罗拉守护神的 宝可梦那里得到的石头。 据说其光辉下有着某种秘密。",
+      "descriptionSource": "PokeAPI"
+    },
+    "spearow-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "spice-mix": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。加入了超过５０种 香辛料调配而成，香辣十足。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。加入了超过５０种 香辛料调配而成，香辣十足。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sprayduck": {
+      "descriptionZh": "浇水的道具。 能让埋在松软土壤里的 树果快快长大。",
+      "effectZh": "浇水的道具。 能让埋在松软土壤里的 树果快快长大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sprinklotad": {
+      "descriptionZh": "浇水的道具。 能让埋在松软土壤里的 树果快快长大。",
+      "effectZh": "浇水的道具。 能让埋在松软土壤里的 树果快快长大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "squirt-bottle": {
+      "descriptionZh": "浇水的道具。 能让树果种植盆里的 树果快快长大。",
+      "effectZh": "浇水的道具。 能让树果种植盆里的 树果快快长大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "squirtle-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ss-ticket": {
+      "descriptionZh": "乘坐高速船水流号时所需的船票。 上面绘有船的图案。",
+      "effectZh": "乘坐高速船水流号时所需的船票。 上面绘有船的图案。",
+      "descriptionSource": "PokeAPI"
+    },
+    "ss-ticket--letsgo": {
+      "nameZh": "船票",
+      "descriptionZh": "乘坐圣特安努号时所需的船票。 上面绘有船只的图案。",
+      "effectZh": "乘坐圣特安努号时所需的船票。 上面绘有船只的图案。",
+      "descriptionSource": "PokeAPI"
+    },
+    "stable-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "staryu-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "steelium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将钢属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将钢属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "storage-key": {
+      "descriptionZh": "用于进入银河队在帷幕市市郊的 可疑仓库的钥匙。",
+      "effectZh": "用于进入银河队在帷幕市市郊的 可疑仓库的钥匙。",
+      "descriptionSource": "PokeAPI"
+    },
+    "strange-souvenir": {
+      "nameZh": "神秘摆设",
+      "descriptionZh": "在阿罗拉地区，据说是模仿 古时候被称为守护神的 神奇宝可梦而制作的摆设。",
+      "effectZh": "在阿罗拉地区，据说是模仿 古时候被称为守护神的 神奇宝可梦而制作的摆设。",
+      "descriptionSource": "PokeAPI"
+    },
+    "stretchy-spring": {
+      "nameZh": "松掉的弹簧",
+      "descriptionZh": "细小的弹簧。 被拉得太长了， 不知道能派上什么用。",
+      "effectZh": "细小的弹簧。 被拉得太长了， 不知道能派上什么用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "style-card": {
+      "nameZh": "时尚名人卡",
+      "descriptionZh": "拥有后，在时装店可以买到的物品 和在美发沙龙可以选择的发型 都会有所增加的卡片。",
+      "effectZh": "拥有后，在时装店可以买到的物品 和在美发沙龙可以选择的发型 都会有所增加的卡片。",
+      "descriptionSource": "PokeAPI"
+    },
+    "suite-key": {
+      "nameZh": "房间钥匙",
+      "descriptionZh": "湖畔高级宾馆的房间钥匙。 不知为何，它经常会丢失。",
+      "effectZh": "湖畔高级宾馆的房间钥匙。 不知为何，它经常会丢失。",
+      "descriptionSource": "PokeAPI"
+    },
+    "sun-flute": {
+      "descriptionZh": "为了对太阳的 传说的宝可梦表达感激之情， 据说会用它来献上美乐。",
+      "effectZh": "为了对太阳的 传说的宝可梦表达感激之情， 据说会用它来献上美乐。",
+      "descriptionSource": "PokeAPI"
+    },
+    "super-lure": {
+      "nameZh": "白银香水",
+      "descriptionZh": "使用该香水后， 稀有宝可梦会更容易出现。 效果比引虫香水更持久。",
+      "effectZh": "使用该香水后， 稀有宝可梦会更容易出现。 效果比引虫香水更持久。",
+      "descriptionSource": "PokeAPI"
+    },
+    "super-repel": {
+      "descriptionZh": "弱小的野生宝可梦 将完全不会出现。 效果比除虫喷雾更持久。",
+      "effectZh": "弱小的野生宝可梦 将完全不会出现。 效果比除虫喷雾更持久。",
+      "descriptionSource": "PokeAPI"
+    },
+    "super-rod": {
+      "descriptionZh": "最新的厉害钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "effectZh": "最新的厉害钓竿。 在有水的地方使用的话， 可以钓到宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "surprise-mulch": {
+      "descriptionZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "effectZh": "培育树果时的肥料。 但完全不适合丰缘地区的土壤， 所以没什么效果。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tangela-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tapunium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将卡璞们的自然之怒 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将卡璞们的自然之怒 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tauros-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tea": {
+      "descriptionZh": "有一点点苦， 却又芬芳宜人的香茶。 抿一口，清咽润喉。",
+      "effectZh": "有一点点苦， 却又芬芳宜人的香茶。 抿一口，清咽润喉。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tentacool-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "thanks-mail": {
+      "descriptionZh": "方便写表达感谢这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "effectZh": "方便写表达感谢这类邮件的信纸。 使用该道具时， 需要让宝可梦携带着来用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tidal-bell": {
+      "descriptionZh": "能发出静心宁神音色的， 非常古旧的铃铛。",
+      "effectZh": "能发出静心宁神音色的， 非常古旧的铃铛。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tin-of-beans": {
+      "descriptionZh": "在露营营地制作料理时会使用的 一种食材。放进料理里一起煮， 豆子的那种香甜就会散发出来。",
+      "effectZh": "在露营营地制作料理时会使用的 一种食材。放进料理里一起煮， 豆子的那种香甜就会散发出来。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm-case": {
+      "descriptionZh": "ー ー ー",
+      "effectZh": "ー ー ー",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm00": {
+      "nameZh": "招式学习器００",
+      "descriptionZh": "用充满力量的拳头攻击对手。",
+      "effectZh": "用充满力量的拳头攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm01": {
+      "nameZh": "招式学习器０１",
+      "descriptionZh": "使出力大无穷的重踢 踢飞对手进行攻击。",
+      "effectZh": "使出力大无穷的重踢 踢飞对手进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm02": {
+      "nameZh": "招式学习器０２",
+      "descriptionZh": "向对手的身体 投掷小金币进行攻击。 战斗后可以拿到钱。",
+      "effectZh": "向对手的身体 投掷小金币进行攻击。 战斗后可以拿到钱。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm03": {
+      "nameZh": "招式学习器０３",
+      "descriptionZh": "用充满火焰的拳头攻击对手。 有时会让对手陷入灼伤状态。",
+      "effectZh": "用充满火焰的拳头攻击对手。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm04": {
+      "nameZh": "招式学习器０４",
+      "descriptionZh": "用充满寒气的拳头攻击对手。 有时会让对手陷入冰冻状态。",
+      "effectZh": "用充满寒气的拳头攻击对手。 有时会让对手陷入冰冻状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm05": {
+      "nameZh": "招式学习器０５",
+      "descriptionZh": "用充满电流的拳头攻击对手。 有时会让对手陷入麻痹状态。",
+      "effectZh": "用充满电流的拳头攻击对手。 有时会让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm06": {
+      "nameZh": "招式学习器０６",
+      "descriptionZh": "第１回合飞上天空， 第２回合攻击对手。",
+      "effectZh": "第１回合飞上天空， 第２回合攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm07": {
+      "nameZh": "招式学习器０７",
+      "descriptionZh": "向对手发射 锐针进行攻击。 连续攻击２～５次。",
+      "effectZh": "向对手发射 锐针进行攻击。 连续攻击２～５次。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm08": {
+      "nameZh": "招式学习器０８",
+      "descriptionZh": "向对手发射 强烈的光线进行攻击。 下一回合自己将无法动弹。",
+      "effectZh": "向对手发射 强烈的光线进行攻击。 下一回合自己将无法动弹。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm09": {
+      "nameZh": "招式学习器０９",
+      "descriptionZh": "使出自己浑身力量突击对手。 下一回合自己将无法动弹。",
+      "effectZh": "使出自己浑身力量突击对手。 下一回合自己将无法动弹。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm10": {
+      "nameZh": "招式学习器１０",
+      "descriptionZh": "散落可以追踪 对手的神奇叶片。 攻击必定会命中。",
+      "effectZh": "散落可以追踪 对手的神奇叶片。 攻击必定会命中。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm100": {
+      "descriptionZh": "和对手进行密语， 使其失去集中力， 从而降低对手的特攻。",
+      "effectZh": "和对手进行密语， 使其失去集中力， 从而降低对手的特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm11": {
+      "nameZh": "招式学习器１１",
+      "descriptionZh": "第１回合收集满满的日光， 第２回合发射光束进行攻击。",
+      "effectZh": "第１回合收集满满的日光， 第２回合发射光束进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm12": {
+      "nameZh": "招式学习器１２",
+      "descriptionZh": "第１回合收集满满的日光， 第２回合将此力量 集中在剑上进行攻击。",
+      "effectZh": "第１回合收集满满的日光， 第２回合将此力量 集中在剑上进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm13": {
+      "nameZh": "招式学习器１３",
+      "descriptionZh": "将对手困在 激烈的火焰旋涡中， 在４～５回合内进行攻击。",
+      "effectZh": "将对手困在 激烈的火焰旋涡中， 在４～５回合内进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm14": {
+      "nameZh": "招式学习器１４",
+      "descriptionZh": "向对手发出 微弱的电击， 从而让对手陷入麻痹状态。",
+      "effectZh": "向对手发出 微弱的电击， 从而让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm15": {
+      "nameZh": "招式学习器１５",
+      "descriptionZh": "第１回合钻入， 第２回合攻击对手。",
+      "effectZh": "第１回合钻入， 第２回合攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm16": {
+      "nameZh": "招式学习器１６",
+      "descriptionZh": "发出不由自主想要 捂起耳朵的刺耳声， 从而大幅降低对手的防御。",
+      "effectZh": "发出不由自主想要 捂起耳朵的刺耳声， 从而大幅降低对手的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm17": {
+      "nameZh": "招式学习器１７",
+      "descriptionZh": "利用神奇的墙壁， 在５回合内减弱从对手那里 受到的特殊攻击的伤害。",
+      "effectZh": "利用神奇的墙壁， 在５回合内减弱从对手那里 受到的特殊攻击的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm18": {
+      "nameZh": "招式学习器１８",
+      "descriptionZh": "利用神奇的墙壁， 在５回合内减弱从对手那里 受到的物理攻击的伤害。",
+      "effectZh": "利用神奇的墙壁， 在５回合内减弱从对手那里 受到的物理攻击的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm19": {
+      "nameZh": "招式学习器１９",
+      "descriptionZh": "在５回合内 被神奇的力量守护， 从而不会陷入异常状态。",
+      "effectZh": "在５回合内 被神奇的力量守护， 从而不会陷入异常状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm20": {
+      "nameZh": "招式学习器２０",
+      "descriptionZh": "引发爆炸， 攻击自己周围所有的宝可梦。 使用后陷入濒死。",
+      "effectZh": "引发爆炸， 攻击自己周围所有的宝可梦。 使用后陷入濒死。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm21": {
+      "nameZh": "招式学习器２１",
+      "descriptionZh": "连续睡上２回合。 回复自己的全部ＨＰ 以及治愈所有异常状态。",
+      "effectZh": "连续睡上２回合。 回复自己的全部ＨＰ 以及治愈所有异常状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm22": {
+      "nameZh": "招式学习器２２",
+      "descriptionZh": "将大岩石 猛烈地撞向对手进行攻击。 有时会使对手畏缩。",
+      "effectZh": "将大岩石 猛烈地撞向对手进行攻击。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm23": {
+      "nameZh": "招式学习器２３",
+      "descriptionZh": "攻击的同时盗取道具。 当自己携带道具时， 不会去盗取。",
+      "effectZh": "攻击的同时盗取道具。 当自己携带道具时， 不会去盗取。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm24": {
+      "nameZh": "招式学习器２４",
+      "descriptionZh": "在自己睡觉时， 发出噪音进行攻击。 有时会使对手畏缩。",
+      "effectZh": "在自己睡觉时， 发出噪音进行攻击。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm25": {
+      "nameZh": "招式学习器２５",
+      "descriptionZh": "完全抵挡 对手的攻击。 连续使出则容易失败。",
+      "effectZh": "完全抵挡 对手的攻击。 连续使出则容易失败。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm26": {
+      "nameZh": "招式学习器２６",
+      "descriptionZh": "用恐怖的表情瞪着对手， 使其害怕， 从而大幅降低对手的速度。",
+      "effectZh": "用恐怖的表情瞪着对手， 使其害怕， 从而大幅降低对手的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm27": {
+      "nameZh": "招式学习器２７",
+      "descriptionZh": "将结冰的冷气 吹向对手进行攻击。 会降低对手的速度。",
+      "effectZh": "将结冰的冷气 吹向对手进行攻击。 会降低对手的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm28": {
+      "nameZh": "招式学习器２８",
+      "descriptionZh": "吸取对手的养分进行攻击。 可以回复给予对手 伤害的一半ＨＰ。",
+      "effectZh": "吸取对手的养分进行攻击。 可以回复给予对手 伤害的一半ＨＰ。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm29": {
+      "nameZh": "招式学习器２９",
+      "descriptionZh": "可爱地凝视， 诱使对手疏忽大意， 从而大幅降低对手的攻击。",
+      "effectZh": "可爱地凝视， 诱使对手疏忽大意， 从而大幅降低对手的攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm30": {
+      "nameZh": "招式学习器３０",
+      "descriptionZh": "用坚硬的翅膀敲打 对手进行攻击。 有时会提高自己的防御。",
+      "effectZh": "用坚硬的翅膀敲打 对手进行攻击。 有时会提高自己的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm31": {
+      "nameZh": "招式学习器３１",
+      "descriptionZh": "♂诱惑♀或♀诱惑♂， 让对手着迷。 对手将很难使出招式。",
+      "effectZh": "♂诱惑♀或♀诱惑♂， 让对手着迷。 对手将很难使出招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm32": {
+      "nameZh": "招式学习器３２",
+      "descriptionZh": "在５回合内扬起沙暴，除岩石、地面和 钢属性以外的宝可梦，都会受到伤害。 岩石属性的特防还会提高。",
+      "effectZh": "在５回合内扬起沙暴，除岩石、地面和 钢属性以外的宝可梦，都会受到伤害。 岩石属性的特防还会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm33": {
+      "nameZh": "招式学习器３３",
+      "descriptionZh": "在５回合内一直降雨， 从而提高水属性的招式威力。 火属性的招式威力则降低。",
+      "effectZh": "在５回合内一直降雨， 从而提高水属性的招式威力。 火属性的招式威力则降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm34": {
+      "nameZh": "招式学习器３４",
+      "descriptionZh": "在５回合内让日照变得强烈， 从而提高火属性的招式威力。 水属性的招式威力则降低。",
+      "effectZh": "在５回合内让日照变得强烈， 从而提高火属性的招式威力。 水属性的招式威力则降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm35": {
+      "nameZh": "招式学习器３５",
+      "descriptionZh": "在５回合内一直降冰雹， 除冰属性的宝可梦以外， 给予全体宝可梦伤害。",
+      "effectZh": "在５回合内一直降冰雹， 除冰属性的宝可梦以外， 给予全体宝可梦伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm36": {
+      "nameZh": "招式学习器３６",
+      "descriptionZh": "将对手困在激烈的 水流旋涡中， 在４～５回合内进行攻击。",
+      "effectZh": "将对手困在激烈的 水流旋涡中， 在４～５回合内进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm37": {
+      "nameZh": "招式学习器３７",
+      "descriptionZh": "我方全员进行攻击。 同行的宝可梦越多， 招式的攻击次数越多。",
+      "effectZh": "我方全员进行攻击。 同行的宝可梦越多， 招式的攻击次数越多。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm38": {
+      "nameZh": "招式学习器３８",
+      "descriptionZh": "放出怪异的火焰， 从而让对手陷入灼伤状态。",
+      "effectZh": "放出怪异的火焰， 从而让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm39": {
+      "nameZh": "招式学习器３９",
+      "descriptionZh": "当自己处于中毒、麻痹、灼伤状态时， 向对手使出此招式的话， 威力会变成２倍。",
+      "effectZh": "当自己处于中毒、麻痹、灼伤状态时， 向对手使出此招式的话， 威力会变成２倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm40": {
+      "nameZh": "招式学习器４０",
+      "descriptionZh": "发射星形的光攻击对手。 攻击必定会命中。",
+      "effectZh": "发射星形的光攻击对手。 攻击必定会命中。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm41": {
+      "nameZh": "招式学习器４１",
+      "descriptionZh": "帮助伙伴。 被帮助的宝可梦， 其招式威力变得比平时大。",
+      "effectZh": "帮助伙伴。 被帮助的宝可梦， 其招式威力变得比平时大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm42": {
+      "nameZh": "招式学习器４２",
+      "descriptionZh": "如果受到对手的招式攻击， 就能给予对手２倍的伤害。",
+      "effectZh": "如果受到对手的招式攻击， 就能给予对手２倍的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm43": {
+      "nameZh": "招式学习器４３",
+      "descriptionZh": "将手刀猛烈地挥下攻击对手。 还可以破坏光墙和反射壁等。",
+      "effectZh": "将手刀猛烈地挥下攻击对手。 还可以破坏光墙和反射壁等。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm44": {
+      "nameZh": "招式学习器４４",
+      "descriptionZh": "如果对手有和自己相同的招式， 那么只有对手无法使用该招式。",
+      "effectZh": "如果对手有和自己相同的招式， 那么只有对手无法使用该招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm45": {
+      "nameZh": "招式学习器４５",
+      "descriptionZh": "第１回合潜入， 第２回合浮上来进行攻击。",
+      "effectZh": "第１回合潜入， 第２回合浮上来进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm46": {
+      "nameZh": "招式学习器４６",
+      "descriptionZh": "根据使用时的天气， 招式属性和威力会改变。",
+      "effectZh": "根据使用时的天气， 招式属性和威力会改变。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm47": {
+      "nameZh": "招式学习器４７",
+      "descriptionZh": "装哭流泪。 使对手不知所措， 从而大幅降低对手的特防。",
+      "effectZh": "装哭流泪。 使对手不知所措， 从而大幅降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm48": {
+      "nameZh": "招式学习器４８",
+      "descriptionZh": "投掷岩石进行攻击。 封住对手的行动， 从而降低速度。",
+      "effectZh": "投掷岩石进行攻击。 封住对手的行动， 从而降低速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm49": {
+      "nameZh": "招式学习器４９",
+      "descriptionZh": "将对手困在 铺天盖地的沙暴中， 在４～５回合内进行攻击。",
+      "effectZh": "将对手困在 铺天盖地的沙暴中， 在４～５回合内进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm50": {
+      "nameZh": "招式学习器５０",
+      "descriptionZh": "向对手猛烈地 发射种子进行攻击。 连续攻击２～５次。",
+      "effectZh": "向对手猛烈地 发射种子进行攻击。 连续攻击２～５次。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm51": {
+      "nameZh": "招式学习器５１",
+      "descriptionZh": "向对手发射 锋利的冰柱进行攻击。 连续攻击２～５次。",
+      "effectZh": "向对手发射 锋利的冰柱进行攻击。 连续攻击２～５次。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm52": {
+      "nameZh": "招式学习器５２",
+      "descriptionZh": "弹跳到高高的空中， 第２回合攻击对手。 有时会让对手陷入麻痹状态。",
+      "effectZh": "弹跳到高高的空中， 第２回合攻击对手。 有时会让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm53": {
+      "nameZh": "招式学习器５３",
+      "descriptionZh": "向对手投掷 泥块进行攻击。 同时降低对手的速度。",
+      "effectZh": "向对手投掷 泥块进行攻击。 同时降低对手的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm54": {
+      "nameZh": "招式学习器５４",
+      "descriptionZh": "向对手发射 坚硬的岩石进行攻击。 连续攻击２～５次。",
+      "effectZh": "向对手发射 坚硬的岩石进行攻击。 连续攻击２～５次。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm55": {
+      "nameZh": "招式学习器５５",
+      "descriptionZh": "当对手的ＨＰ 负伤到一半左右时， 招式威力会变成２倍。",
+      "effectZh": "当对手的ＨＰ 负伤到一半左右时， 招式威力会变成２倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm56": {
+      "nameZh": "招式学习器５６",
+      "descriptionZh": "在攻击之后急速返回， 和后备宝可梦进行替换。",
+      "effectZh": "在攻击之后急速返回， 和后备宝可梦进行替换。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm57": {
+      "nameZh": "招式学习器５７",
+      "descriptionZh": "蓄力攻击。 如果能在对手之后攻击， 招式的威力会变成２倍。",
+      "effectZh": "蓄力攻击。 如果能在对手之后攻击， 招式的威力会变成２倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm58": {
+      "nameZh": "招式学习器５８",
+      "descriptionZh": "如果此回合内对手 已经受到伤害的话， 招式威力会变成２倍。",
+      "effectZh": "如果此回合内对手 已经受到伤害的话， 招式威力会变成２倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm59": {
+      "nameZh": "招式学习器５９",
+      "descriptionZh": "快速投掷携带的道具进行攻击。 根据道具不同， 威力和效果会改变。",
+      "effectZh": "快速投掷携带的道具进行攻击。 根据道具不同， 威力和效果会改变。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm60": {
+      "nameZh": "招式学习器６０",
+      "descriptionZh": "利用超能力互换 自己和对手的攻击 以及特攻的能力变化。",
+      "effectZh": "利用超能力互换 自己和对手的攻击 以及特攻的能力变化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm61": {
+      "nameZh": "招式学习器６１",
+      "descriptionZh": "利用超能力互换 自己和对手的防御 以及特防的能力变化。",
+      "effectZh": "利用超能力互换 自己和对手的防御 以及特防的能力变化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm62": {
+      "nameZh": "招式学习器６２",
+      "descriptionZh": "将对手和自己的速度 进行互换。",
+      "effectZh": "将对手和自己的速度 进行互换。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm63": {
+      "nameZh": "招式学习器６３",
+      "descriptionZh": "用拳头吸取对手的力量。 可以回复给予对手 伤害的一半ＨＰ。",
+      "effectZh": "用拳头吸取对手的力量。 可以回复给予对手 伤害的一半ＨＰ。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm64": {
+      "nameZh": "招式学习器６４",
+      "descriptionZh": "如果受到对手的招式攻击， 就能给予该对手 ２倍威力的攻击。",
+      "effectZh": "如果受到对手的招式攻击， 就能给予该对手 ２倍威力的攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm65": {
+      "nameZh": "招式学习器６５",
+      "descriptionZh": "以影子做成的锐爪， 劈开对手。 容易击中要害。",
+      "effectZh": "以影子做成的锐爪， 劈开对手。 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm66": {
+      "nameZh": "招式学习器６６",
+      "descriptionZh": "用蓄满电流的牙齿咬住对手。 有时会使对手畏缩 或陷入麻痹状态。",
+      "effectZh": "用蓄满电流的牙齿咬住对手。 有时会使对手畏缩 或陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm67": {
+      "nameZh": "招式学习器６７",
+      "descriptionZh": "用藏有冷气的牙齿咬住对手。 有时会使对手畏缩 或陷入冰冻状态。",
+      "effectZh": "用藏有冷气的牙齿咬住对手。 有时会使对手畏缩 或陷入冰冻状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm68": {
+      "nameZh": "招式学习器６８",
+      "descriptionZh": "用覆盖着火焰的牙齿咬住对手。 有时会使对手畏缩 或陷入灼伤状态。",
+      "effectZh": "用覆盖着火焰的牙齿咬住对手。 有时会使对手畏缩 或陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm69": {
+      "nameZh": "招式学习器６９",
+      "descriptionZh": "用实体化的 心之利刃劈开对手。 容易击中要害。",
+      "effectZh": "用实体化的 心之利刃劈开对手。 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm70": {
+      "nameZh": "招式学习器７０",
+      "descriptionZh": "制造出离奇的空间。 在５回合内 速度慢的宝可梦可以先行动。",
+      "effectZh": "制造出离奇的空间。 在５回合内 速度慢的宝可梦可以先行动。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm71": {
+      "nameZh": "招式学习器７１",
+      "descriptionZh": "制造出离奇的空间。 在５回合内互换 所有宝可梦的防御和特防。",
+      "effectZh": "制造出离奇的空间。 在５回合内互换 所有宝可梦的防御和特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm72": {
+      "nameZh": "招式学习器７２",
+      "descriptionZh": "制造出离奇的空间。 在５回合内所有宝可梦 携带道具的效果都会消失。",
+      "effectZh": "制造出离奇的空间。 在５回合内所有宝可梦 携带道具的效果都会消失。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm73": {
+      "nameZh": "招式学习器７３",
+      "descriptionZh": "用毒刃劈开对手。 有时会让对手陷入中毒状态， 也容易击中要害。",
+      "effectZh": "用毒刃劈开对手。 有时会让对手陷入中毒状态， 也容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm74": {
+      "nameZh": "招式学习器７４",
+      "descriptionZh": "将特殊的毒液泼向对手。 对处于中毒状态的对手， 威力会变成２倍。",
+      "effectZh": "将特殊的毒液泼向对手。 对处于中毒状态的对手， 威力会变成２倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm75": {
+      "nameZh": "招式学习器７５",
+      "descriptionZh": "以敏捷的动作瞄准 对手的脚进行攻击。 降低对手的速度。",
+      "effectZh": "以敏捷的动作瞄准 对手的脚进行攻击。 降低对手的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm76": {
+      "nameZh": "招式学习器７６",
+      "descriptionZh": "用歌声攻击对手。 同伴还可以接着使出轮唱招式， 威力也会提高。",
+      "effectZh": "用歌声攻击对手。 同伴还可以接着使出轮唱招式， 威力也会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm77": {
+      "nameZh": "招式学习器７７",
+      "descriptionZh": "接二连三地进行攻击。 对处于异常状态的对手 给予较大的伤害。",
+      "effectZh": "接二连三地进行攻击。 对处于异常状态的对手 给予较大的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm78": {
+      "nameZh": "招式学习器７８",
+      "descriptionZh": "轻巧地攻击对手。 自己没有携带道具时， 会给予较大的伤害。",
+      "effectZh": "轻巧地攻击对手。 自己没有携带道具时， 会给予较大的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm79": {
+      "nameZh": "招式学习器７９",
+      "descriptionZh": "为倒下的同伴报仇。 如果上一回合有同伴倒下， 威力就会提高。",
+      "effectZh": "为倒下的同伴报仇。 如果上一回合有同伴倒下， 威力就会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm80": {
+      "nameZh": "招式学习器８０",
+      "descriptionZh": "在攻击之后急速返回， 和后备宝可梦进行替换。",
+      "effectZh": "在攻击之后急速返回， 和后备宝可梦进行替换。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm81": {
+      "nameZh": "招式学习器８１",
+      "descriptionZh": "用力踩踏地面并攻击 自己周围所有的宝可梦。 降低对方的速度。",
+      "effectZh": "用力踩踏地面并攻击 自己周围所有的宝可梦。 降低对方的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm82": {
+      "nameZh": "招式学习器８２",
+      "descriptionZh": "用电网捉住对手进行攻击。 降低对手的速度。",
+      "effectZh": "用电网捉住对手进行攻击。 降低对手的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm83": {
+      "nameZh": "招式学习器８３",
+      "descriptionZh": "用锋利的贝壳切斩 对手进行攻击。 有时会降低对手的防御。",
+      "effectZh": "用锋利的贝壳切斩 对手进行攻击。 有时会降低对手的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm84": {
+      "nameZh": "招式学习器８４",
+      "descriptionZh": "用坚硬的尾巴 拍打对手进行攻击。 连续攻击２～５次。",
+      "effectZh": "用坚硬的尾巴 拍打对手进行攻击。 连续攻击２～５次。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm85": {
+      "nameZh": "招式学习器８５",
+      "descriptionZh": "没完没了地大声斥责， 从而降低对手的特攻。",
+      "effectZh": "没完没了地大声斥责， 从而降低对手的特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm86": {
+      "nameZh": "招式学习器８６",
+      "descriptionZh": "第１回合消失在某处， 第２回合攻击对手。 可以无视守护进行攻击。",
+      "effectZh": "第１回合消失在某处， 第２回合攻击对手。 可以无视守护进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm87": {
+      "nameZh": "招式学习器８７",
+      "descriptionZh": "用一个吻吸取对手的ＨＰ。 回复给予对手 伤害的一半以上的ＨＰ。",
+      "effectZh": "用一个吻吸取对手的ＨＰ。 回复给予对手 伤害的一半以上的ＨＰ。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm88": {
+      "nameZh": "招式学习器８８",
+      "descriptionZh": "在５回合内变成青草场地。 地面上的宝可梦每回合都能回复。 草属性的招式威力还会提高。",
+      "effectZh": "在５回合内变成青草场地。 地面上的宝可梦每回合都能回复。 草属性的招式威力还会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm89": {
+      "nameZh": "招式学习器８９",
+      "descriptionZh": "在５回合内， 地面上的宝可梦不会陷入异常状态。 龙属性招式的伤害也会减半。",
+      "effectZh": "在５回合内， 地面上的宝可梦不会陷入异常状态。 龙属性招式的伤害也会减半。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm90": {
+      "nameZh": "招式学习器９０",
+      "descriptionZh": "在５回合内变成电气场地。 地面上的宝可梦将无法入眠。 电属性的招式威力还会提高。",
+      "effectZh": "在５回合内变成电气场地。 地面上的宝可梦将无法入眠。 电属性的招式威力还会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm91": {
+      "nameZh": "招式学习器９１",
+      "descriptionZh": "在５回合内，地面上的宝可梦 不会受到先制招式的攻击。 超能力属性的招式威力会提高。",
+      "effectZh": "在５回合内，地面上的宝可梦 不会受到先制招式的攻击。 超能力属性的招式威力会提高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm92": {
+      "nameZh": "招式学习器９２",
+      "descriptionZh": "从口中喷出特别灼热的 火焰进行攻击。 降低对手的特攻。",
+      "effectZh": "从口中喷出特别灼热的 火焰进行攻击。 降低对手的特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm93": {
+      "nameZh": "招式学习器９３",
+      "descriptionZh": "从身体放射出怪异电波， 让对手沐浴其中， 从而大幅降低其特攻。",
+      "effectZh": "从身体放射出怪异电波， 让对手沐浴其中， 从而大幅降低其特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm94": {
+      "nameZh": "招式学习器９４",
+      "descriptionZh": "对手的ＨＰ 至少会留下１ＨＰ， 如此般手下留情地攻击。",
+      "effectZh": "对手的ＨＰ 至少会留下１ＨＰ， 如此般手下留情地攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm95": {
+      "nameZh": "招式学习器９５",
+      "descriptionZh": "用连天空也能劈开的 空气之刃进行攻击。 有时会使对手畏缩。",
+      "effectZh": "用连天空也能劈开的 空气之刃进行攻击。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm96": {
+      "nameZh": "招式学习器９６",
+      "descriptionZh": "用尖尖的角刺入对手进行攻击。 攻击必定会命中。",
+      "effectZh": "用尖尖的角刺入对手进行攻击。 攻击必定会命中。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm97": {
+      "nameZh": "招式学习器９７",
+      "descriptionZh": "用自己的身体狂舞挥打， 给予对手伤害。",
+      "effectZh": "用自己的身体狂舞挥打， 给予对手伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm98": {
+      "nameZh": "招式学习器９８",
+      "descriptionZh": "化悔恨为力量进行攻击。 如果上一回合招式没有打中， 威力就会翻倍。",
+      "effectZh": "化悔恨为力量进行攻击。 如果上一回合招式没有打中， 威力就会翻倍。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tm99": {
+      "nameZh": "招式学习器９９",
+      "descriptionZh": "用坚韧的尾巴 猛扫对手进行攻击， 从而降低对手的攻击。",
+      "effectZh": "用坚韧的尾巴 猛扫对手进行攻击， 从而降低对手的攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tmv-pass": {
+      "descriptionZh": "可以随时乘坐连接着 密阿雷市和奇楠市的 超高速列车的车票。",
+      "effectZh": "可以随时乘坐连接着 密阿雷市和奇楠市的 超高速列车的车票。",
+      "descriptionSource": "PokeAPI"
+    },
+    "town-map": {
+      "descriptionZh": "可以随时轻松 查看的便利地图。 也能清楚自己的位置。",
+      "effectZh": "可以随时轻松 查看的便利地图。 也能清楚自己的位置。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr00": {
+      "descriptionZh": "激烈地跳起战舞提高气势。 大幅提高自己的攻击。",
+      "effectZh": "激烈地跳起战舞提高气势。 大幅提高自己的攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr01": {
+      "descriptionZh": "用整个身体 压住对手进行攻击。 有时会让对手陷入麻痹状态。",
+      "effectZh": "用整个身体 压住对手进行攻击。 有时会让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr02": {
+      "descriptionZh": "向对手发射烈焰进行攻击。 有时会让对手陷入灼伤状态。",
+      "effectZh": "向对手发射烈焰进行攻击。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr03": {
+      "descriptionZh": "向对手猛烈地 喷射大量水流进行攻击。",
+      "effectZh": "向对手猛烈地 喷射大量水流进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr04": {
+      "descriptionZh": "利用大浪 攻击自己周围所有的宝可梦。",
+      "effectZh": "利用大浪 攻击自己周围所有的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr05": {
+      "descriptionZh": "向对手发射冰冻光束进行攻击。 有时会让对手陷入冰冻状态。",
+      "effectZh": "向对手发射冰冻光束进行攻击。 有时会让对手陷入冰冻状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr06": {
+      "descriptionZh": "将猛烈的暴风雪 刮向对手进行攻击。 有时会让对手陷入冰冻状态。",
+      "effectZh": "将猛烈的暴风雪 刮向对手进行攻击。 有时会让对手陷入冰冻状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr07": {
+      "descriptionZh": "用力踢对手的脚， 使其摔倒进行攻击。 对手越重，威力越大。",
+      "effectZh": "用力踢对手的脚， 使其摔倒进行攻击。 对手越重，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr08": {
+      "descriptionZh": "向对手发出强力电击进行攻击。 有时会让对手陷入麻痹状态。",
+      "effectZh": "向对手发出强力电击进行攻击。 有时会让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr09": {
+      "descriptionZh": "向对手劈下暴雷进行攻击。 有时会让对手陷入麻痹状态。",
+      "effectZh": "向对手劈下暴雷进行攻击。 有时会让对手陷入麻痹状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr10": {
+      "descriptionZh": "利用地震的冲击， 攻击自己周围所有的宝可梦。",
+      "effectZh": "利用地震的冲击， 攻击自己周围所有的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr11": {
+      "descriptionZh": "向对手发送强大的念力进行攻击。 有时会降低对手的特防。",
+      "effectZh": "向对手发送强大的念力进行攻击。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr12": {
+      "descriptionZh": "让身体放松变得轻盈， 以便高速移动。 大幅提高自己的速度。",
+      "effectZh": "让身体放松变得轻盈， 以便高速移动。 大幅提高自己的速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr13": {
+      "descriptionZh": "深深地吸口气，集中精神。 自己的攻击会变得 容易击中要害。",
+      "effectZh": "深深地吸口气，集中精神。 自己的攻击会变得 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr14": {
+      "descriptionZh": "挥动手指刺激自己的大脑， 从所有的招式中 任意使出１个。",
+      "effectZh": "挥动手指刺激自己的大脑， 从所有的招式中 任意使出１个。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr15": {
+      "descriptionZh": "用大字形状的火焰烧尽对手。 有时会让对手陷入灼伤状态。",
+      "effectZh": "用大字形状的火焰烧尽对手。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr16": {
+      "descriptionZh": "以惊人的气势扑向对手。 有时会使对手畏缩。",
+      "effectZh": "以惊人的气势扑向对手。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr17": {
+      "descriptionZh": "将头脑清空， 瞬间忘记某事， 从而大幅提高自己的特防。",
+      "effectZh": "将头脑清空， 瞬间忘记某事， 从而大幅提高自己的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr18": {
+      "descriptionZh": "吸取血液攻击对手。 可以回复给予对手伤害的一半ＨＰ。",
+      "effectZh": "吸取血液攻击对手。 可以回复给予对手伤害的一半ＨＰ。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr19": {
+      "descriptionZh": "用３种光线进行攻击。 有时会让对手陷入 麻痹、灼伤或冰冻的状态。",
+      "effectZh": "用３种光线进行攻击。 有时会让对手陷入 麻痹、灼伤或冰冻的状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr20": {
+      "descriptionZh": "削减少许自己的ＨＰ， 制造分身。 分身将成为自己的替身。",
+      "effectZh": "削减少许自己的ＨＰ， 制造分身。 分身将成为自己的替身。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr21": {
+      "descriptionZh": "竭尽全力进行攻击。 自己的ＨＰ越少， 招式的威力越大。",
+      "effectZh": "竭尽全力进行攻击。 自己的ＨＰ越少， 招式的威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr22": {
+      "descriptionZh": "用污泥投掷对手进行攻击。 有时会让对手陷入中毒状态。",
+      "effectZh": "用污泥投掷对手进行攻击。 有时会让对手陷入中毒状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr23": {
+      "descriptionZh": "在对手的脚下扔撒菱。 对替换出场的 对手的宝可梦给予伤害。",
+      "effectZh": "在对手的脚下扔撒菱。 对替换出场的 对手的宝可梦给予伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr24": {
+      "descriptionZh": "在２～３回合内， 乱打一气地进行攻击。 大闹一番后自己会陷入混乱。",
+      "effectZh": "在２～３回合内， 乱打一气地进行攻击。 大闹一番后自己会陷入混乱。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr25": {
+      "descriptionZh": "将神奇的念波实体化攻击对手。 给予物理伤害。",
+      "effectZh": "将神奇的念波实体化攻击对手。 给予物理伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr26": {
+      "descriptionZh": "即使受到攻击， 也至少会留下１ＨＰ。 连续使出则容易失败。",
+      "effectZh": "即使受到攻击， 也至少会留下１ＨＰ。 连续使出则容易失败。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr27": {
+      "descriptionZh": "从自己已学会的招式中 任意使出１个。 只能在自己睡觉时使用。",
+      "effectZh": "从自己已学会的招式中 任意使出１个。 只能在自己睡觉时使用。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr28": {
+      "descriptionZh": "用坚硬且华丽的角狠狠地 刺入对手进行攻击。",
+      "effectZh": "用坚硬且华丽的角狠狠地 刺入对手进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr29": {
+      "descriptionZh": "和后备宝可梦进行替换。 换上的宝可梦 能直接继承其能力的变化。",
+      "effectZh": "和后备宝可梦进行替换。 换上的宝可梦 能直接继承其能力的变化。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr30": {
+      "descriptionZh": "让对手接受再来一次， 连续３次使出最后使用的招式。",
+      "effectZh": "让对手接受再来一次， 连续３次使出最后使用的招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr31": {
+      "descriptionZh": "使用坚硬的尾巴 摔打对手进行攻击。 有时会降低对手的防御。",
+      "effectZh": "使用坚硬的尾巴 摔打对手进行攻击。 有时会降低对手的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr32": {
+      "descriptionZh": "用利牙咬碎对手进行攻击。 有时会降低对手的防御。",
+      "effectZh": "用利牙咬碎对手进行攻击。 有时会降低对手的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr33": {
+      "descriptionZh": "投掷一团黑影进行攻击。 有时会降低对手的特防。",
+      "effectZh": "投掷一团黑影进行攻击。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr34": {
+      "descriptionZh": "在使用招式２回合后， 向对手发送一团念力进行攻击。",
+      "effectZh": "在使用招式２回合后， 向对手发送一团念力进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr35": {
+      "descriptionZh": "在３回合内 用骚乱攻击对手。 在此期间谁都不能入眠。",
+      "effectZh": "在３回合内 用骚乱攻击对手。 在此期间谁都不能入眠。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr36": {
+      "descriptionZh": "将炎热的气息 吹向对手进行攻击。 有时会让对手陷入灼伤状态。",
+      "effectZh": "将炎热的气息 吹向对手进行攻击。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr37": {
+      "descriptionZh": "使对手愤怒。 在３回合内让对手只能使出 给予伤害的招式。",
+      "effectZh": "使对手愤怒。 在３回合内让对手只能使出 给予伤害的招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr38": {
+      "descriptionZh": "抓住对手的空隙， 交换自己和对手的持有物。",
+      "effectZh": "抓住对手的空隙， 交换自己和对手的持有物。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr39": {
+      "descriptionZh": "发挥惊人的力量攻击对手。 自己的攻击和防御会降低。",
+      "effectZh": "发挥惊人的力量攻击对手。 自己的攻击和防御会降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr40": {
+      "descriptionZh": "利用超能力互换 自己和对手的特性。",
+      "effectZh": "利用超能力互换 自己和对手的特性。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr41": {
+      "descriptionZh": "攻击对手后， 有时会使其陷入灼伤状态。 也容易击中要害。",
+      "effectZh": "攻击对手后， 有时会使其陷入灼伤状态。 也容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr42": {
+      "descriptionZh": "给予对手又吵又响的 巨大震动进行攻击。",
+      "effectZh": "给予对手又吵又响的 巨大震动进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr43": {
+      "descriptionZh": "使出全部力量攻击对手。 使用之后会因为反作用力， 自己的特攻大幅降低。",
+      "effectZh": "使出全部力量攻击对手。 使用之后会因为反作用力， 自己的特攻大幅降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr44": {
+      "descriptionZh": "汲取宇宙中神秘的力量， 从而提高自己的防御和特防。",
+      "effectZh": "汲取宇宙中神秘的力量， 从而提高自己的防御和特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr45": {
+      "descriptionZh": "向对手喷射浑浊的水进行攻击。 有时会降低对手的命中率。",
+      "effectZh": "向对手喷射浑浊的水进行攻击。 有时会降低对手的命中率。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr46": {
+      "descriptionZh": "将皮肤变得坚硬如铁， 从而大幅提高自己的防御。",
+      "effectZh": "将皮肤变得坚硬如铁， 从而大幅提高自己的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr47": {
+      "descriptionZh": "用尖锐的巨爪 劈开对手进行攻击。",
+      "effectZh": "用尖锐的巨爪 劈开对手进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr48": {
+      "descriptionZh": "使出全身力气绷紧肌肉， 从而提高自己的攻击和防御。",
+      "effectZh": "使出全身力气绷紧肌肉， 从而提高自己的攻击和防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr49": {
+      "descriptionZh": "静心凝神， 从而提高自己的特攻和特防。",
+      "effectZh": "静心凝神， 从而提高自己的特攻和特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr50": {
+      "descriptionZh": "像用剑一般操纵叶片 切斩对手进行攻击。 容易击中要害。",
+      "effectZh": "像用剑一般操纵叶片 切斩对手进行攻击。 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr51": {
+      "descriptionZh": "激烈地跳起神秘且 强有力的舞蹈。 从而提高自己的攻击和速度。",
+      "effectZh": "激烈地跳起神秘且 强有力的舞蹈。 从而提高自己的攻击和速度。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr52": {
+      "descriptionZh": "让身体高速旋转并撞击对手。 速度比对手越慢，威力越大。",
+      "effectZh": "让身体高速旋转并撞击对手。 速度比对手越慢，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr53": {
+      "descriptionZh": "放弃守护，向对手的怀里突击。 自己的防御和特防会降低。",
+      "effectZh": "放弃守护，向对手的怀里突击。 自己的防御和特防会降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr54": {
+      "descriptionZh": "在对手的脚下撒毒菱。 使对手替换出场的宝可梦中毒。",
+      "effectZh": "在对手的脚下撒毒菱。 使对手替换出场的宝可梦中毒。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr55": {
+      "descriptionZh": "让火焰覆盖全身猛撞向对手。 自己也会受到不小的伤害。 有时会让对手陷入灼伤状态。",
+      "effectZh": "让火焰覆盖全身猛撞向对手。 自己也会受到不小的伤害。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr56": {
+      "descriptionZh": "从体内产生出波导之力， 然后向对手发出。 攻击必定会命中。",
+      "effectZh": "从体内产生出波导之力， 然后向对手发出。 攻击必定会命中。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr57": {
+      "descriptionZh": "用带毒的触手或手臂 刺入对手。 有时会让对手陷入中毒状态。",
+      "effectZh": "用带毒的触手或手臂 刺入对手。 有时会让对手陷入中毒状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr58": {
+      "descriptionZh": "从体内发出 充满恶意的恐怖气场。 有时会使对手畏缩。",
+      "effectZh": "从体内发出 充满恶意的恐怖气场。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr59": {
+      "descriptionZh": "将外壳坚硬的大种子， 从上方砸下攻击对手。",
+      "effectZh": "将外壳坚硬的大种子， 从上方砸下攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr60": {
+      "descriptionZh": "将镰刀或爪子像剪刀般地交叉， 顺势劈开对手。",
+      "effectZh": "将镰刀或爪子像剪刀般地交叉， 顺势劈开对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr61": {
+      "descriptionZh": "利用振动发出音波进行攻击。 有时会降低对手的特防。",
+      "effectZh": "利用振动发出音波进行攻击。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr62": {
+      "descriptionZh": "从大大的口中 掀起冲击波攻击对手。",
+      "effectZh": "从大大的口中 掀起冲击波攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr63": {
+      "descriptionZh": "发射如宝石般闪耀的光芒 攻击对手。",
+      "effectZh": "发射如宝石般闪耀的光芒 攻击对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr64": {
+      "descriptionZh": "提高气势， 释放出全部力量。 有时会降低对手的特防。",
+      "effectZh": "提高气势， 释放出全部力量。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr65": {
+      "descriptionZh": "发射从自然收集的生命力量。 有时会降低对手的特防。",
+      "effectZh": "发射从自然收集的生命力量。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr66": {
+      "descriptionZh": "收拢翅膀， 通过低空飞行突击对手。 自己也会受到不小的伤害。",
+      "effectZh": "收拢翅膀， 通过低空飞行突击对手。 自己也会受到不小的伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr67": {
+      "descriptionZh": "向对手脚下释放出大地之力。 有时会降低对手的特防。",
+      "effectZh": "向对手脚下释放出大地之力。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr68": {
+      "descriptionZh": "谋划诡计，激活头脑。 大幅提高自己的特攻。",
+      "effectZh": "谋划诡计，激活头脑。 大幅提高自己的特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr69": {
+      "descriptionZh": "将思念的力量 集中在前额进行攻击。 有时会使对手畏缩。",
+      "effectZh": "将思念的力量 集中在前额进行攻击。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr70": {
+      "descriptionZh": "将身体的光芒聚集在一点 释放出去。 有时会降低对手的特防。",
+      "effectZh": "将身体的光芒聚集在一点 释放出去。 有时会降低对手的特防。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr71": {
+      "descriptionZh": "用尖尖的叶片向对手卷起风暴。 使用之后因为反作用力 自己的特攻会大幅降低。",
+      "effectZh": "用尖尖的叶片向对手卷起风暴。 使用之后因为反作用力 自己的特攻会大幅降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr72": {
+      "descriptionZh": "激烈地挥舞青藤或触手 摔打对手进行攻击。",
+      "effectZh": "激烈地挥舞青藤或触手 摔打对手进行攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr73": {
+      "descriptionZh": "用肮脏的垃圾 撞向对手进行攻击。 有时会让对手陷入中毒状态。",
+      "effectZh": "用肮脏的垃圾 撞向对手进行攻击。 有时会让对手陷入中毒状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr74": {
+      "descriptionZh": "用钢铁般坚硬的头部进行攻击。 有时会使对手畏缩。",
+      "effectZh": "用钢铁般坚硬的头部进行攻击。 有时会使对手畏缩。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr75": {
+      "descriptionZh": "用尖尖的岩石 刺入对手进行攻击。 容易击中要害。",
+      "effectZh": "用尖尖的岩石 刺入对手进行攻击。 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr76": {
+      "descriptionZh": "将无数岩石悬浮在对手的周围， 从而对替换出场的 对手的宝可梦给予伤害。",
+      "effectZh": "将无数岩石悬浮在对手的周围， 从而对替换出场的 对手的宝可梦给予伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr77": {
+      "descriptionZh": "用草缠住并绊倒对手。 对手越重，威力越大。",
+      "effectZh": "用草缠住并绊倒对手。 对手越重，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr78": {
+      "descriptionZh": "用污泥波攻击 自己周围所有的宝可梦。 有时会陷入中毒状态。",
+      "effectZh": "用污泥波攻击 自己周围所有的宝可梦。 有时会陷入中毒状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr79": {
+      "descriptionZh": "用沉重的身体撞向对手进行攻击。 自己比对手越重，威力越大。",
+      "effectZh": "用沉重的身体撞向对手进行攻击。 自己比对手越重，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr80": {
+      "descriptionZh": "用电气团撞向对手。 自己比对手速度越快，威力越大。",
+      "effectZh": "用电气团撞向对手。 自己比对手速度越快，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr81": {
+      "descriptionZh": "利用对手的力量进行攻击。 正和自己战斗的对手， 其攻击越高，伤害越大。",
+      "effectZh": "利用对手的力量进行攻击。 正和自己战斗的对手， 其攻击越高，伤害越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr82": {
+      "descriptionZh": "用蓄积起来的力量攻击对手。 自己的能力提高得越多，威力就越大。",
+      "effectZh": "用蓄积起来的力量攻击对手。 自己的能力提高得越多，威力就越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr83": {
+      "descriptionZh": "用神奇的力量瞬间移动， 互换自己和同伴所在的位置。",
+      "effectZh": "用神奇的力量瞬间移动， 互换自己和同伴所在的位置。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr84": {
+      "descriptionZh": "向对手喷射煮得翻滚的开水进行攻击。 有时会让对手陷入灼伤状态。",
+      "effectZh": "向对手喷射煮得翻滚的开水进行攻击。 有时会让对手陷入灼伤状态。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr85": {
+      "descriptionZh": "激励自己， 从而提高攻击和特攻。",
+      "effectZh": "激励自己， 从而提高攻击和特攻。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr86": {
+      "descriptionZh": "让电流覆盖全身， 撞向对手进行攻击。 自己也会受到少许伤害。",
+      "effectZh": "让电流覆盖全身， 撞向对手进行攻击。 自己也会受到少许伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr87": {
+      "descriptionZh": "像钢钻一样， 一边旋转身体一边撞击对手。 容易击中要害。",
+      "effectZh": "像钢钻一样， 一边旋转身体一边撞击对手。 容易击中要害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr88": {
+      "descriptionZh": "用燃烧的身体 撞向对手进行攻击。 自己比对手越重，威力越大。",
+      "effectZh": "用燃烧的身体 撞向对手进行攻击。 自己比对手越重，威力越大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr89": {
+      "descriptionZh": "用强烈的风 席卷对手进行攻击。 有时会使对手混乱。",
+      "effectZh": "用强烈的风 席卷对手进行攻击。 有时会使对手混乱。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr90": {
+      "descriptionZh": "与对手嬉闹并攻击。 有时会降低对手的攻击。",
+      "effectZh": "与对手嬉闹并攻击。 有时会降低对手的攻击。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr91": {
+      "descriptionZh": "将特殊的毒液泼向对手。 对处于中毒状态的对手， 其攻击、特攻和速度都会降低。",
+      "effectZh": "将特殊的毒液泼向对手。 对处于中毒状态的对手， 其攻击、特攻和速度都会降低。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr92": {
+      "descriptionZh": "向对手发射强光， 并给予伤害。",
+      "effectZh": "向对手发射强光， 并给予伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr93": {
+      "descriptionZh": "旋转双臂打向对手。 无视对手的能力变化， 直接给予伤害。",
+      "effectZh": "旋转双臂打向对手。 无视对手的能力变化， 直接给予伤害。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr94": {
+      "descriptionZh": "使出全身力量， 猛攻对手。",
+      "effectZh": "使出全身力量， 猛攻对手。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr95": {
+      "descriptionZh": "受到此招式攻击的对手， 会因为地狱般的痛苦，在２回合内， 变得无法使出声音类招式。",
+      "effectZh": "受到此招式攻击的对手， 会因为地狱般的痛苦，在２回合内， 变得无法使出声音类招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr96": {
+      "descriptionZh": "对敌人使用是会爆炸的团子。 对我方使用则是给予回复的团子。",
+      "effectZh": "对敌人使用是会爆炸的团子。 对我方使用则是给予回复的团子。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr97": {
+      "descriptionZh": "利用精神力量咬住对手进行攻击。 还可以破坏光墙和反射壁等。",
+      "effectZh": "利用精神力量咬住对手进行攻击。 还可以破坏光墙和反射壁等。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr98": {
+      "descriptionZh": "用水之力量 撞向对手进行攻击。 有时会降低对手的防御。",
+      "effectZh": "用水之力量 撞向对手进行攻击。 有时会降低对手的防御。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tr99": {
+      "descriptionZh": "用身体撞向对手进行攻击。 防御越高， 给予的伤害就越高。",
+      "effectZh": "用身体撞向对手进行攻击。 防御越高， 给予的伤害就越高。",
+      "descriptionSource": "PokeAPI"
+    },
+    "tropical-shell": {
+      "nameZh": "南国贝壳",
+      "descriptionZh": "美丽的白色贝壳。 或许是从温暖的海域那里 漂流到这里的。",
+      "effectZh": "美丽的白色贝壳。 或许是从温暖的海域那里 漂流到这里的。",
+      "descriptionSource": "PokeAPI"
+    },
+    "unown-report": {
+      "descriptionZh": "记录着已找到的 未知图腾样子的笔记本。",
+      "effectZh": "记录着已找到的 未知图腾样子的笔记本。",
+      "descriptionSource": "PokeAPI"
+    },
+    "venonat-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "voltorb-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "vs-recorder": {
+      "descriptionZh": "很酷的机器。 可以记录和朋友或 在特殊设施里的对战过程。",
+      "effectZh": "很酷的机器。 可以记录和朋友或 在特殊设施里的对战过程。",
+      "descriptionSource": "PokeAPI"
+    },
+    "vs-seeker": {
+      "descriptionZh": "会告诉你想对战的 训练家在哪里的机器。 走路就能给电池充电。",
+      "effectZh": "会告诉你想对战的 训练家在哪里的机器。 走路就能给电池充电。",
+      "descriptionSource": "PokeAPI"
+    },
+    "vulpix-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "wailmer-pail": {
+      "descriptionZh": "浇水的道具。 能让埋在土壤里的 树果快快长大。",
+      "effectZh": "浇水的道具。 能让埋在土壤里的 树果快快长大。",
+      "descriptionSource": "PokeAPI"
+    },
+    "waterium-z--held": {
+      "descriptionZh": "Ｚ力量的结晶。 会将水属性的招式 升级成Ｚ招式。",
+      "effectZh": "Ｚ力量的结晶。 会将水属性的招式 升级成Ｚ招式。",
+      "descriptionSource": "PokeAPI"
+    },
+    "weedle-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "white-apricorn": {
+      "descriptionZh": "白色的球果。 没有任何气味。",
+      "effectZh": "白色的球果。 没有任何气味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "white-flute": {
+      "descriptionZh": "以白色玻璃制成的哨子。 在使用的地方更容易 遇到弱小的宝可梦。",
+      "effectZh": "以白色玻璃制成的哨子。 在使用的地方更容易 遇到弱小的宝可梦。",
+      "descriptionSource": "PokeAPI"
+    },
+    "white-mane-hair": {
+      "descriptionZh": "丰饶之王的爱马 雪暴马的鬃毛。 既结实又柔韧。",
+      "effectZh": "丰饶之王的爱马 雪暴马的鬃毛。 既结实又柔韧。",
+      "descriptionSource": "PokeAPI"
+    },
+    "wishing-piece": {
+      "descriptionZh": "投掷到宝可梦的巢穴里， 就会有极巨化宝可梦出现。",
+      "effectZh": "投掷到宝可梦的巢穴里， 就会有极巨化宝可梦出现。",
+      "descriptionSource": "PokeAPI"
+    },
+    "wishing-star": {
+      "descriptionZh": "这是一块在伽勒尔地区发现的 蕴含着神奇力量的石头。听说 捡到它的人能实现自己的愿望。",
+      "effectZh": "这是一块在伽勒尔地区发现的 蕴含着神奇力量的石头。听说 捡到它的人能实现自己的愿望。",
+      "descriptionSource": "PokeAPI"
+    },
+    "wooden-crown": {
+      "descriptionZh": "用木头雕制而成的神秘物体。 上面有看起来缺了什么的痕迹。 可能是其他物品的一部分。",
+      "effectZh": "用木头雕制而成的神秘物体。 上面有看起来缺了什么的痕迹。 可能是其他物品的一部分。",
+      "descriptionSource": "PokeAPI"
+    },
+    "works-key": {
+      "nameZh": "发电厂钥匙",
+      "descriptionZh": "用来打开或关闭 山谷发电厂大门的大钥匙。 不知为何，它落入了银河队的手中。",
+      "effectZh": "用来打开或关闭 山谷发电厂大门的大钥匙。 不知为何，它落入了银河队的手中。",
+      "descriptionSource": "PokeAPI"
+    },
+    "xtransceiver": {
+      "descriptionZh": "带摄像头功能， 最多能让４人进行通话的 最新型对讲机。",
+      "effectZh": "带摄像头功能， 最多能让４人进行通话的 最新型对讲机。",
+      "descriptionSource": "PokeAPI"
+    },
+    "yellow-apricorn": {
+      "descriptionZh": "黄色的球果。 有种清爽的香味。",
+      "effectZh": "黄色的球果。 有种清爽的香味。",
+      "descriptionSource": "PokeAPI"
+    },
+    "z-ring": {
+      "descriptionZh": "通过使用训练家的 气力和体力来让宝可梦 释放出Ｚ力量的神奇手环。",
+      "effectZh": "通过使用训练家的 气力和体力来让宝可梦 释放出Ｚ力量的神奇手环。",
+      "descriptionSource": "PokeAPI"
+    },
+    "zapdos-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "zubat-candy": {
+      "descriptionZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "effectZh": "充满能量的糖果。 能让特定宝可梦的 所有能力上升。",
+      "descriptionSource": "PokeAPI"
+    },
+    "zygarde-cube": {
+      "descriptionZh": "聚集了宝可梦基格尔德的 核心和细胞的道具。 可以改变基格尔德的样子。",
+      "effectZh": "聚集了宝可梦基格尔德的 核心和细胞的道具。 可以改变基格尔德的样子。",
+      "descriptionSource": "PokeAPI"
+    }
+  }
+}

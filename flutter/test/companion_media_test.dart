@@ -43,4 +43,23 @@ void main() {
       contains('/showdown/shiny/175.gif'),
     );
   });
+
+  test('same-id cosmetic forms do not reuse the default animation', () {
+    expect(
+      companionFormUsesIdAnimation(
+        speciesId: 201,
+        mediaId: 201,
+        isDefault: false,
+      ),
+      isFalse,
+    );
+    expect(
+      companionFormUsesIdAnimation(
+        speciesId: 194,
+        mediaId: 10253,
+        isDefault: false,
+      ),
+      isTrue,
+    );
+  });
 }

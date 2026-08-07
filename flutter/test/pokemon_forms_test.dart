@@ -113,6 +113,36 @@ void main() {
     expect(restored.formSearchTerms, contains('火暴兽（洗翠的样子）'));
   });
 
+  test('cosmetic form sprite is not covered by inherited default artwork', () {
+    const species = PokemonSummary(
+      id: 201,
+      nameEn: 'Unown',
+      nameZh: '未知图腾',
+      types: ['psychic'],
+      spriteUrl: 'https://example.invalid/unown-a.png',
+      artworkUrl: 'https://example.invalid/unown-a-art.png',
+    );
+    const letterB = PokemonFormDetail(
+      key: 'unown-b',
+      pokemonId: 201,
+      nameEn: 'Unown-b',
+      nameZh: '未知图腾（B）',
+      kind: PokemonFormKind.cosmetic,
+      isDefault: false,
+      isBattleOnly: false,
+      isMega: false,
+      isCosmetic: true,
+      types: ['psychic'],
+      heightDm: 5,
+      weightHg: 50,
+      spriteUrl: 'https://example.invalid/unown-b.png',
+    );
+
+    final selected = letterB.summaryFor(species);
+    expect(selected.displayArtworkPath, endsWith('unown-b.png'));
+    expect(selected.artworkUrl, isNull);
+  });
+
   test('default and regional forms keep separate exact-version locations', () {
     const defaultForm = PokemonFormDetail(
       key: 'wooper',

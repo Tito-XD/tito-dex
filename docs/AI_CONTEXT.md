@@ -7,7 +7,7 @@
 | **Latest release** | [v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5) |
 | **`main` / lite source** | `0.8.5+136` (`flutter/pubspec.yaml`) |
 | **Offline package** | `0.8.5-offline+137` — APK-bundled verified compact v14 archive |
-| **Offline dex bundle** | **v13** live on CDN; Offline APK embeds compact **v14** — 1025 species + per-form evolution chains, CDN prefix `/v5/`; `/v4/` rollback |
+| **Offline dex bundle** | **v18** live on CDN; Offline APK embeds compact **v14** — 1025 species + per-form evolution chains, full items + online-media catalog metadata, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -41,7 +41,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.8.5)
 
-> `main` tracks the v0.8.5 release line. Lite downloads live bundle v13 when requested; Offline embeds the byte-identical verified compact v14 archive.
+> `main` tracks the v0.8.5 release line. Lite downloads live bundle v18 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
@@ -55,6 +55,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Offline APK first install/upgrade shows a blocking local preparation dialog with continuous percentage across read → SHA-256 → decompress → extract → index. Lite and already-ready Offline installs never show it. Settings downloads can be minimized on Android: a `dataSync` foreground service keeps the Dart install active and mirrors the weighted percentage into a notification; returning to Settings restores progress and cancellation controls. Cancelling, swiping the app task away, or an Android 15 service timeout stops native foreground work so stale progress cannot remain in the notification drawer.
 - Bundle includes: summaries, precomputed filter catalog, details, all form JSON, selective distinct-form sprites, moves, abilities, **l10n/zh**, **maps**, **config**, and game icons. It does not bulk-copy form artwork.
 - **Per-form evolution chains** (bundle v13+): regional / cloak splits prune to the real line (洗翠卡蒂狗 → 洗翠风速狗) with form sprites. Older installs fall back to the in-app `kFormEvolutionTargets` table via `EvolutionNode.filteredForForm`. Offline loading absolutizes `sprites/forms/…` paths on `forms[].evolutionChain`.
+- **Per-version artwork picker:** exact front/back/animated availability is generated from a pinned PokeAPI/sprites Git tree (`data/dex/sprite_version_existence.json`). The app intersects real file existence with national-debut caps, so regional subsets such as BDSP/SV do not silently fall back to the default image; synthetic legacy `/sprites/by-version/` URLs are ignored. Per-version media remains online-only.
 - **Species filter sheet icons:** body-style chips use original vector creature marks that preserve the recognisable HOME poses and white eyes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
@@ -63,7 +64,8 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Items (reference hub → 道具)
 - **Full item catalog (live since v17):** 2130 items across 16 `categoryZh` groups; zh names 98.8%; 967 bundled sprites; the app filter list in `dex_json_reference_page.dart` is synced to the 16 groups.
 - **Online media catalog (bundle v18):** id-keyed `media_catalog_52poke.json` (1020 species, 1163 cries, 1638 forme/HOME art) ships in the bundle; media files stay online. App side: back sprites + BW back animation in the artwork viewer, forme-aware companion cries, and a Settings media resource manager for selective downloads.
-- Data source: PokeAPI (list, English name, category, cost, sprite) + Simplified-Chinese in-game descriptions from PokeAPI `zh-hans` flavor, with 52poke (CC BY-NC-SA 4.0) as the fallback for the newest Gen 8/9 items. 100% zh names, 99% zh descriptions.
+- **Local v19 candidate (not published):** 2090/2130 Chinese descriptions, 1645 bundled item icons, 230 TMs mapped to 18 type-specific 160×160 SV icons, and species media metadata 1025/1025 via PokeAPI fallback for the five 52poke gaps. Form data contains 803 records (554 alternates); 546 alternates have an exact static visual, while the eight Koraidon/Miraidon ride modes intentionally use the base visual because upstream ships no separate image. Same-id cosmetic forms never borrow the default form animation. Build with `tools/enrich_items_v19.py`, `tools/enrich_tm_icons_v19.py`, then `tools/patch_dex_bundle_v19_items.py`.
+- Data source priority: PokeAPI (lowercase `zh-hans`) for names and in-game descriptions, then 52poke (CC BY-NC-SA 4.0) for gaps and newer original-resolution bag icons. Item icons are bundled rather than hotlinked; cries/animations/HOME art remain online and cached on demand.
 - Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
 - Build: `tools/build_items_dataset.py` → `tools/enrich_items_52poke.py` / `enrich_items_52poke_search.py` → `tools/patch_dex_bundle_v11_items.py`. The category-filter option list in `flutter/lib/pages/dex/dex_json_reference_page.dart` must stay in sync with the `categoryZh` groups.
 - Attribution ships in the bundle as `ITEMS_ATTRIBUTION.txt`.
@@ -154,9 +156,11 @@ flutter/lib/
 | `/v2/` | v4 | 493 (legacy) |
 | `/v3/` | v5 | 1025 (rollback / older clients) |
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
-| `/v5/` | **v13** | current — v12 axes + per-form `evolutionChain` (575 forms); items, clear media, form sprites unchanged |
+| `/v5/` | **v18** | current — v13 form evolution + v14 compact archive + v15 zh flavor + v16 held items + v17 full items + v18 online-media catalog metadata |
 
-Historical `/v5/` patches on the same prefix: v7 media → v8 form artwork → v9 artwork fallback → v10 clear form art → v11 items → v12 species search axes → **v13 form evolution chains**.
+Historical `/v5/` patches on the same prefix: v7 media → v8 form artwork → v9 artwork fallback → v10 clear form art → v11 items → v12 species search axes → v13 form evolution → v14 compact archive → v15 zh flavor → v16 held items → v17 full items → **v18 online-media catalog metadata**.
+
+Local-only next patch: **v19 item descriptions + high-resolution/type-aware item icons + complete media fallback metadata**. It is intentionally not listed as live until published.
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
