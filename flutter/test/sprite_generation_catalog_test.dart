@@ -106,5 +106,34 @@ void main() {
         defaultSpriteUrlFor(1000),
       ]);
     });
+
+    test('back sprites exist for Gen I/II/IV/V folders and BW animation', () {
+      expect(
+        pokeApiBackSpriteUrlFor('black-white', 25),
+        '$pokeApiSpritesBase/versions/generation-v/black-white/back/25.png',
+      );
+      expect(
+        pokeApiBackSpriteUrlFor('red-blue', 25),
+        '$pokeApiSpritesBase/versions/generation-i/red-blue/back/25.png',
+      );
+      expect(pokeApiBackSpriteUrlFor('x-y', 25), isNull);
+      expect(pokeApiBackSpriteUrlFor('emerald', 25), isNull);
+      expect(
+        bwAnimatedBackGifUrlFor(25),
+        '$pokeApiSpritesBase/versions/generation-v/black-white'
+        '/animated/back/25.gif',
+      );
+    });
+
+    test('per-version options expose back URLs where available', () {
+      final options = spriteEditionOptionsForPokemon(25);
+      final bw = options.firstWhere((o) => o.versionGroup == 'black-white');
+      expect(bw.backSpriteUrl, isNotNull);
+      expect(bw.animatedBackUrl, bwAnimatedBackGifUrlFor(25));
+
+      final xy = options.firstWhere((o) => o.versionGroup == 'x-y');
+      expect(xy.backSpriteUrl, isNull);
+      expect(xy.animatedBackUrl, isNull);
+    });
   });
 }
