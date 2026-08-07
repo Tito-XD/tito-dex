@@ -126,6 +126,16 @@ void main() {
     await binding.takeScreenshot('06_viewer_front');
     await tester.tap(find.text('背面'));
     await tester.pump(const Duration(milliseconds: 400));
+    final backSource = find.byWidgetPredicate(
+      (widget) =>
+          widget.key is ValueKey<String> &&
+          (widget.key! as ValueKey<String>).value.contains('/back/'),
+    );
+    expect(
+      backSource,
+      findsWidgets,
+      reason: 'back toggle did not switch to a back sprite source',
+    );
     await binding.takeScreenshot('07_viewer_back');
   });
 }

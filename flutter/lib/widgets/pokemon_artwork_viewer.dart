@@ -169,6 +169,27 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
     });
   }
 
+  void _toggleBack() {
+    setState(() {
+      _showBack = !_showBack;
+      if (_showBack) {
+        final current = _selectedOption;
+        if (current == null || current.backSpriteUrl == null) {
+          final withBack = _options
+              .where((option) => option.backSpriteUrl != null)
+              .toList();
+          if (withBack.isNotEmpty) {
+            final bw = withBack
+                .where((option) => option.versionGroup == 'black-white')
+                .toList();
+            _selectedOption = (bw.isNotEmpty ? bw : withBack).last;
+            _showAnimated = false;
+          }
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final summary = widget.summary;
@@ -209,7 +230,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: () => setState(() => _showBack = !_showBack),
+                    onPressed: _toggleBack,
                     style: TextButton.styleFrom(
                       foregroundColor: _showBack
                           ? TitoColors.softYellow
