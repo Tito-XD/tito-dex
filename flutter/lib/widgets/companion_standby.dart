@@ -11,6 +11,7 @@ import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/online_media_catalog.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
@@ -224,7 +225,12 @@ class _CompanionStandbyState extends State<CompanionStandby>
         await _cryPlayer.play(DeviceFileSource(cached), volume: 0.55);
         return;
       }
-      final candidates = cryCandidatesFor(id);
+      final entry = await onlineMediaCatalog.entryFor(id);
+      final candidates = cryCandidatesForMedia(
+        id,
+        entry,
+        formKey: widget.formKey,
+      );
       for (var i = _cryUrlIndex; i < candidates.length; i++) {
         try {
           await _cryPlayer.stop();
