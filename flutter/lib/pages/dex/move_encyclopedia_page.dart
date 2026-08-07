@@ -19,6 +19,16 @@ class MoveEncyclopediaPage extends StatelessWidget {
       secondaryLabel: (move) =>
           '#${move.id} · ${typeNameZh(move.type)} · ${move.category}',
       detailSheet: showMoveDetailSheet,
+      categoryFilter: moveTypeCategoryFilter,
     );
   }
 }
+
+/// The move reference keeps type filtering deliberately lightweight: one
+/// horizontal row using the canonical 18-type order, intersected with the
+/// existing text query by [DexReferenceListPage].
+final moveTypeCategoryFilter = DexReferenceCategoryFilter<CachedMove>(
+  options: <String?>[null, ...typeNamesZh.values],
+  label: (move) => typeNameZh(move.type),
+  filter: (move, typeZh) => typeNameZh(move.type) == typeZh,
+);

@@ -189,6 +189,39 @@ const statLabelsZh = <String, String>{
   'speed': '速度',
 };
 
+/// Normalize stat keys from every data source before they reach the UI.
+///
+/// Bundle detail JSON uses camelCase (`specialAttack`), PokeAPI uses kebab
+/// case (`special-attack`), and a few imported sources use snake_case. Keeping
+/// this compatibility in one display helper prevents raw storage keys from
+/// leaking into base stats, EV yields, natures, or future reference rows.
+String statLabelZh(String? statKey) {
+  if (statKey == null || statKey.trim().isEmpty) {
+    return '';
+  }
+  final normalized = statKey
+      .trim()
+      .replaceAllMapped(
+        RegExp(r'([a-z0-9])([A-Z])'),
+        (match) => '${match.group(1)}-${match.group(2)}',
+      )
+      .replaceAll('_', '-')
+      .toLowerCase();
+  final canonical = switch (normalized.replaceAll('-', '')) {
+    'hp' || 'hitpoints' => 'hp',
+    'attack' || 'atk' => 'attack',
+    'defense' || 'defence' || 'def' => 'defense',
+    'specialattack' || 'spattack' || 'spatk' => 'special-attack',
+    'specialdefense' ||
+    'specialdefence' ||
+    'spdefense' ||
+    'spdef' => 'special-defense',
+    'speed' || 'spe' => 'speed',
+    _ => normalized,
+  };
+  return statLabelsZh[canonical] ?? statKey;
+}
+
 const moveMethodLabelsZh = <String, String>{
   'level-up': '等级提升',
   'machine': '招式学习器',

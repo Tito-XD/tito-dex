@@ -25,7 +25,21 @@ DEFAULT_TM_ENRICHMENT = ROOT / "data" / "l10n" / "zh" / "tm_v19_enrichment.json"
 DEFAULT_NAME_OVERRIDES = (
     ROOT / "data" / "l10n" / "zh" / "item_name_overrides_v19.json"
 )
+DEFAULT_ITEM_MEDIA_OVERRIDES = (
+    ROOT / "data" / "l10n" / "zh" / "item_media_overrides_v19.json"
+)
+DEFAULT_ITEM_MEDIA_EXACT_OVERRIDES = (
+    ROOT / "data" / "l10n" / "zh" / "item_media_exact_overrides_v19.json"
+)
+DEFAULT_DESCRIPTION_OVERRIDES = (
+    ROOT / "data" / "l10n" / "zh" / "item_description_overrides_v19.json"
+)
 DEFAULT_SPRITES = ROOT / "data" / "assets" / "item-sprites"
+DEFAULT_MEDIA_CATALOG = ROOT / "data" / "l10n" / "zh" / "media_catalog_52poke.json"
+DEFAULT_FORM_MEDIA_AUDIT = ROOT / "data" / "dex" / "form_media_audit.json"
+DEFAULT_ITEM_MEDIA_AUDIT = (
+    ROOT / "data" / "dex" / "item_media_audit_v19.json"
+)
 DEFAULT_OUTPUT = ROOT / "dist" / "dex-v19"
 BUNDLE_VERSION = 19
 CDN_PREFIX = "v5"
@@ -97,6 +111,28 @@ def apply_enrichment(
             item["descriptionZh"] = patch["descriptionZh"]
             item["effectZh"] = patch.get("effectZh") or patch["descriptionZh"]
             text_added += 1
+        for key in (
+            "descriptionSource",
+            "spriteMappingStatus",
+            "spriteSharedWith",
+            "spriteSource",
+            "spriteSourceFile",
+            "spriteSourceUrl",
+            "spriteLicense",
+            "spriteWidth",
+            "spriteHeight",
+        ):
+            if patch.get(key) is not None:
+                item[key] = patch[key]
+        source_file = patch.get("spriteFile52poke")
+        if source_file:
+            item.setdefault("spriteSource", "52poke")
+            item.setdefault("spriteSourceFile", source_file)
+            item.setdefault("spriteLicense", "CC BY-NC-SA 4.0")
+            dimensions = patch.get("spriteDimensions") or []
+            if len(dimensions) == 2:
+                item.setdefault("spriteWidth", dimensions[0])
+                item.setdefault("spriteHeight", dimensions[1])
 
     sprite_dest = staging / "item-sprites"
     sprite_dest.mkdir(parents=True, exist_ok=True)
@@ -160,7 +196,7 @@ def fill_media_tails(staging: Path) -> int:
             summary["nameZh"] = corrected
         if species_id not in MEDIA_FALLBACK_NAMES:
             continue
-        catalog.setdefault(
+        entry = catalog.setdefault(
             str(species_id),
             {
                 "id": species_id,
@@ -184,15 +220,74 @@ def fill_media_tails(staging: Path) -> int:
                 "source": "PokeAPI fallback",
             },
         )
+        entry["nameZh"] = corrected
         detail_path = staging / "details" / f"{species_id}.json"
+        form_key = None
         if detail_path.is_file():
             detail = json.loads(detail_path.read_text(encoding="utf-8"))
             if isinstance(detail.get("summary"), dict):
                 detail["summary"]["nameZh"] = corrected
+            default_form = next(
+                (
+                    form
+                    for form in detail.get("forms") or []
+                    if form.get("isDefault")
+                ),
+                None,
+            )
+            form_key = (default_form or {}).get("key")
             detail_path.write_text(
                 json.dumps(detail, ensure_ascii=False, separators=(",", ":")),
                 encoding="utf-8",
             )
+        if form_key is None:
+            form_key = next(
+                (
+                    key
+                    for art in entry.get("forms") or []
+                    for key in art.get("formKeys") or []
+                ),
+                None,
+            )
+        cries = entry.setdefault("cries", [])
+        if not cries:
+            cries.append(
+                {
+                    "title": f"{species_id:04d}_cry.ogg",
+                    "url": "https://raw.githubusercontent.com/PokeAPI/cries/"
+                    f"main/cries/pokemon/latest/{species_id}.ogg",
+                    "formKeys": [form_key] if form_key else [],
+                    "formKey": form_key,
+                    "formCode": "",
+                    "mappingStatus": "exact" if form_key else "unresolved",
+                    "isFormSpecific": False,
+                    "fallbackForAllForms": True,
+                    "source": "PokeAPI",
+                }
+            )
+        if not entry.get("forms") and form_key:
+            url = (
+                "https://raw.githubusercontent.com/PokeAPI/"
+                f"sprites/{POKEAPI_SPRITES_COMMIT}/sprites/pokemon/"
+                f"other/home/{species_id}.png"
+            )
+            entry["forms"] = [
+                {
+                    "file": url,
+                    "kind": "PokeAPI HOME",
+                    "formKeys": [form_key],
+                    "formKey": form_key,
+                    "formCode": "",
+                    "mappingStatus": "exact",
+                    "url": url,
+                    "source": "PokeAPI",
+                    "license": "CC-BY 4.0",
+                    "mediaType": "static",
+                    "isShiny": False,
+                    "urlVerified": True,
+                }
+            ]
+        entry["source"] = "52poke imageinfo + PokeAPI cry fallback"
     summaries_path.write_text(
         json.dumps(summaries, ensure_ascii=False, separators=(",", ":")),
         encoding="utf-8",
@@ -211,6 +306,15 @@ def build(args: argparse.Namespace) -> dict[str, int]:
         if path.exists():
             shutil.rmtree(path)
     shutil.copytree(args.base_staging, staging)
+    shutil.copyfile(args.media_catalog, staging / "media_catalog_52poke.json")
+    shutil.copyfile(args.form_media_audit, staging / "form_media_audit.json")
+    if not args.item_media_audit.is_file():
+        raise FileNotFoundError(
+            f"Missing item media audit: {args.item_media_audit}"
+        )
+    shutil.copyfile(
+        args.item_media_audit, staging / "item_media_audit_v19.json"
+    )
     # A historical staging tree may contain its already-compressed archive.
     # Never nest that archive inside the next one (it roughly doubles v19).
     for old_archive in staging.glob("bundle*.tar.zst"):
@@ -234,6 +338,28 @@ def build(args: argparse.Namespace) -> dict[str, int]:
         name_overrides = json.loads(args.name_overrides.read_text(encoding="utf-8"))
         for slug, patch in (name_overrides.get("itemsBySlug") or {}).items():
             combined.setdefault(slug, {}).update(patch)
+    if args.description_overrides.is_file():
+        description_overrides = json.loads(
+            args.description_overrides.read_text(encoding="utf-8")
+        )
+        for slug, patch in (
+            description_overrides.get("itemsBySlug") or {}
+        ).items():
+            combined.setdefault(slug, {}).update(patch)
+    if args.item_media_overrides.is_file():
+        media_overrides = json.loads(
+            args.item_media_overrides.read_text(encoding="utf-8")
+        )
+        for slug, patch in (media_overrides.get("itemsBySlug") or {}).items():
+            combined.setdefault(slug, {}).update(patch)
+    if args.item_media_exact_overrides.is_file():
+        exact_media_overrides = json.loads(
+            args.item_media_exact_overrides.read_text(encoding="utf-8")
+        )
+        for slug, patch in (
+            exact_media_overrides.get("itemsBySlug") or {}
+        ).items():
+            combined.setdefault(slug, {}).update(patch)
     stats = apply_enrichment(staging, enrichment, args.sprites_dir)
     stats["mediaCatalogEntries"] = fill_media_tails(staging)
     update_attribution(staging)
@@ -250,8 +376,16 @@ def build(args: argparse.Namespace) -> dict[str, int]:
             "itemSpriteCount": stats["spriteCoverage"],
             "itemHighResolutionSprites": True,
             "mediaCatalogEntries": stats["mediaCatalogEntries"],
+            "formMediaAudit": "form_media_audit.json",
+            "itemMediaAudit": "item_media_audit_v19.json",
         }
     )
+    form_media_summary = json.loads(
+        args.form_media_audit.read_text(encoding="utf-8")
+    )["summary"]
+    manifest["alternateFormMediaCoverage"] = form_media_summary[
+        "alternateCoverage"
+    ]
     manifest["sizeBytes"] = directory_size(staging)
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -275,6 +409,10 @@ def build(args: argparse.Namespace) -> dict[str, int]:
             "itemSpriteCount": stats["spriteCoverage"],
             "itemHighResolutionSprites": True,
             "mediaCatalogEntries": stats["mediaCatalogEntries"],
+            "itemMediaAudit": "item_media_audit_v19.json",
+            "alternateFormMediaCoverage": form_media_summary[
+                "alternateCoverage"
+            ],
         }
     )
     upload.mkdir(parents=True, exist_ok=True)
@@ -301,7 +439,31 @@ def main() -> int:
     parser.add_argument(
         "--name-overrides", type=Path, default=DEFAULT_NAME_OVERRIDES
     )
+    parser.add_argument(
+        "--item-media-overrides",
+        type=Path,
+        default=DEFAULT_ITEM_MEDIA_OVERRIDES,
+    )
+    parser.add_argument(
+        "--item-media-exact-overrides",
+        type=Path,
+        default=DEFAULT_ITEM_MEDIA_EXACT_OVERRIDES,
+    )
+    parser.add_argument(
+        "--description-overrides",
+        type=Path,
+        default=DEFAULT_DESCRIPTION_OVERRIDES,
+    )
     parser.add_argument("--sprites-dir", type=Path, default=DEFAULT_SPRITES)
+    parser.add_argument(
+        "--media-catalog", type=Path, default=DEFAULT_MEDIA_CATALOG
+    )
+    parser.add_argument(
+        "--form-media-audit", type=Path, default=DEFAULT_FORM_MEDIA_AUDIT
+    )
+    parser.add_argument(
+        "--item-media-audit", type=Path, default=DEFAULT_ITEM_MEDIA_AUDIT
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     build(args)

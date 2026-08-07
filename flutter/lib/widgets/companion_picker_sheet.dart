@@ -56,6 +56,8 @@ Future<CompanionChoice?> adoptCompanion(
   String? crySourceUrl,
   String? cryLabel,
   bool useGenericAnimation = true,
+  List<String> formArtCandidates = const [],
+  bool formArtIsShiny = false,
 }) async {
   if (!bundledCompanionIds.contains(summary.id)) {
     final ready = await showDialog<bool>(
@@ -68,6 +70,8 @@ Future<CompanionChoice?> adoptCompanion(
         animationSourceUrl: animationSourceUrl,
         crySourceUrl: crySourceUrl,
         useGenericAnimation: useGenericAnimation,
+        formArtCandidates: formArtCandidates,
+        formArtIsShiny: formArtIsShiny,
       ),
     );
     if (ready != true || !context.mounted) {
@@ -249,6 +253,8 @@ class _CompanionMediaLoadingDialog extends StatefulWidget {
     this.animationSourceUrl,
     this.crySourceUrl,
     this.useGenericAnimation = true,
+    this.formArtCandidates = const [],
+    this.formArtIsShiny = false,
   });
 
   final PokemonSummary summary;
@@ -257,6 +263,8 @@ class _CompanionMediaLoadingDialog extends StatefulWidget {
   final String? animationSourceUrl;
   final String? crySourceUrl;
   final bool useGenericAnimation;
+  final List<String> formArtCandidates;
+  final bool formArtIsShiny;
 
   @override
   State<_CompanionMediaLoadingDialog> createState() =>
@@ -305,6 +313,21 @@ class _CompanionMediaLoadingDialogState
                               ...companionGifDownloadCandidates(mediaId),
                             ],
                     ))
+              .then((path) {
+                _update(() {
+                  _gif = path != null
+                      ? _MediaLoadState.done
+                      : _MediaLoadState.failed;
+                });
+              })
+        : widget.formKey != null && widget.formArtCandidates.isNotEmpty
+        ? companionMediaCache
+              .ensureFormArt(
+                speciesId,
+                widget.formKey!,
+                shiny: widget.formArtIsShiny,
+                candidates: widget.formArtCandidates,
+              )
               .then((path) {
                 _update(() {
                   _gif = path != null
@@ -592,9 +615,16 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
     }
   }
 
-  Future<void> _confirm(PokemonFormDetail? form) async {
+  Future<void> _confirm(
+    PokemonFormDetail? form,
+    OnlineMediaEntry? media,
+  ) async {
     final formKey = form?.key;
     final summary = form?.summaryFor(widget.summary) ?? widget.summary;
+    final shinyArt =
+        media?.artCandidatesFor(formKey, shiny: _isShiny) ?? const [];
+    final normalArt = media?.artCandidatesFor(formKey) ?? const [];
+    final formArtCandidates = shinyArt.isNotEmpty ? shinyArt : normalArt;
     if (!mounted) {
       return;
     }
@@ -614,6 +644,8 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
             mediaId: form.pokemonId,
             isDefault: form.isDefault,
           ),
+      formArtCandidates: formArtCandidates,
+      formArtIsShiny: shinyArt.isNotEmpty,
     );
     if (choice != null && mounted) {
       Navigator.of(context).pop(choice);
@@ -655,6 +687,14 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                   mediaId: previewMediaId,
                   isDefault: selectedForm.isDefault,
                 );
+            final shinyFormArt =
+                media?.artCandidatesFor(_selectedFormKey, shiny: _isShiny) ??
+                const [];
+            final normalFormArt =
+                media?.artCandidatesFor(_selectedFormKey) ?? const [];
+            final formArtCandidates = shinyFormArt.isNotEmpty
+                ? shinyFormArt
+                : normalFormArt;
             final selectedAnimationShiny = _selectedAnimationUrl == null
                 ? null
                 : shinySpriteVariantUrl(_selectedAnimationUrl!);
@@ -669,6 +709,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 _selectedAnimationUrl!,
               if (useGenericAnimation)
                 ...companionGifDownloadCandidates(previewMediaId),
+              ...formArtCandidates,
               if (previewSummary.displayArtworkPath case final source?) source,
               if (previewSummary.displaySpritePath case final source?) source,
               if (useGenericAnimation) cdnStaticSpriteUrlFor(previewMediaId),
@@ -737,6 +778,16 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                         return _CompanionFormTile(
                           form: form,
                           species: widget.summary,
+                          artCandidates: [
+                            ...(media?.artCandidatesFor(
+                                  form.key,
+                                  shiny: _isShiny,
+                                ) ??
+                                const []),
+                            if (_isShiny)
+                              ...(media?.artCandidatesFor(form.key) ??
+                                  const []),
+                          ],
                           selected: selected,
                           onTap: () => setState(() {
                             _selectedFormKey = form.key;
@@ -871,7 +922,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                   ownShadow: false,
                   child: FilledButton(
                     onPressed: snapshot.connectionState == ConnectionState.done
-                        ? () => _confirm(selectedForm)
+                        ? () => _confirm(selectedForm, media)
                         : null,
                     style: FilledButton.styleFrom(
                       backgroundColor: TitoColors.coral,
@@ -910,12 +961,14 @@ class _CompanionFormTile extends StatelessWidget {
   const _CompanionFormTile({
     required this.form,
     required this.species,
+    required this.artCandidates,
     required this.selected,
     required this.onTap,
   });
 
   final PokemonFormDetail form;
   final PokemonSummary species;
+  final List<String> artCandidates;
   final bool selected;
   final VoidCallback onTap;
 
@@ -946,10 +999,12 @@ class _CompanionFormTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: DexSpriteImage(
-                    source: summary.displaySpritePath,
-                    height: null,
-                    width: null,
+                  child: FallbackSpriteImage(
+                    sources: [
+                      ...artCandidates,
+                      if (summary.displayArtworkPath case final source?) source,
+                      if (summary.displaySpritePath case final source?) source,
+                    ],
                   ),
                 ),
                 const SizedBox(height: 4),

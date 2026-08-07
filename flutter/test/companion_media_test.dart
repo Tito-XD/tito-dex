@@ -62,4 +62,15 @@ void main() {
       isTrue,
     );
   });
+
+  test('form art cache names are stable and path-safe', () {
+    expect(
+      companionFormArtCacheFileName(201, 'unown-question'),
+      '201.form-unown-question.png',
+    );
+    expect(
+      companionFormArtCacheFileName(25, '../Pikachu World Cap', shiny: true),
+      '25.form--pikachu-world-cap-shiny.png',
+    );
+  });
 }

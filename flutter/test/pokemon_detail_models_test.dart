@@ -11,6 +11,29 @@ void main() {
     expect(formatTypeMultiplier(1), '1');
   });
 
+  test('detail EV yield never exposes camelCase stat storage keys', () {
+    const detail = PokemonDetail(
+      summary: PokemonSummary(
+        id: 152,
+        nameEn: 'Chikorita',
+        nameZh: '菊草叶',
+        types: ['grass'],
+      ),
+      genusZh: '叶子宝可梦',
+      heightDm: 9,
+      weightHg: 64,
+      weaknesses: [],
+      resistances: [],
+      immunities: [],
+      stabSuperEffective: [],
+      evolutionChain: null,
+      evYield: {'specialDefense': 1, 'specialAttack': 1},
+    );
+
+    expect(detail.evYieldLabel, '特防 +1 / 特攻 +1');
+    expect(detail.evYieldLabel, isNot(contains('special')));
+  });
+
   test('johto dex constants include HGSS flavor versions', () {
     expect(hgssFlavorVersions, contains('heartgold'));
     expect(hgssFlavorVersions, contains('soulsilver'));

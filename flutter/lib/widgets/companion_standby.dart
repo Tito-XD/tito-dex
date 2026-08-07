@@ -159,6 +159,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
     var mediaId = id;
     var useGenericAnimation = true;
     var formStaticSources = <String>[];
+    var verifiedFormSources = <String>[];
     try {
       final detail = await dexRepository.getDetail(id);
       if (widget.formKey != null) {
@@ -178,6 +179,31 @@ class _CompanionStandbyState extends State<CompanionStandby>
             if (formSummary.displayArtworkPath case final source?) source,
             if (formSummary.displaySpritePath case final source?) source,
           }.toList();
+          final media = await onlineMediaCatalog.entryFor(id);
+          final shinyArt =
+              media?.artCandidatesFor(form.key, shiny: shiny) ?? const [];
+          final normalArt = media?.artCandidatesFor(form.key) ?? const [];
+          final formArtCandidates = shinyArt.isNotEmpty ? shinyArt : normalArt;
+          final formArtIsShiny = shinyArt.isNotEmpty;
+          final cachedFormArt = await companionMediaCache.cachedFormArtPath(
+            id,
+            form.key,
+            shiny: formArtIsShiny,
+          );
+          if (cachedFormArt == null && formArtCandidates.isNotEmpty) {
+            unawaited(
+              companionMediaCache.ensureFormArt(
+                id,
+                form.key,
+                shiny: formArtIsShiny,
+                candidates: formArtCandidates,
+              ),
+            );
+          }
+          verifiedFormSources = <String>{
+            if (cachedFormArt != null) cachedFormArt,
+            ...formArtCandidates,
+          }.toList();
         }
       }
       if (mounted) {
@@ -189,7 +215,9 @@ class _CompanionStandbyState extends State<CompanionStandby>
 
     // Keep a species fallback only when upstream has no separate form image
     // at all (currently the eight Koraidon/Miraidon ride-mode records).
-    useGenericAnimation = useGenericAnimation || formStaticSources.isEmpty;
+    useGenericAnimation =
+        useGenericAnimation ||
+        (formStaticSources.isEmpty && verifiedFormSources.isEmpty);
     final bundled = useGenericAnimation
         ? bundledCompanionGifAsset(mediaId)
         : null;
@@ -220,6 +248,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
         if (bundled != null) bundled,
         if (cached != null) cached,
         if (useGenericAnimation) ...companionGifDownloadCandidates(mediaId),
+        ...verifiedFormSources,
         ...formStaticSources,
         if (useGenericAnimation) cdnStaticSpriteUrlFor(mediaId),
         if (useGenericAnimation) defaultSpriteUrlFor(mediaId),

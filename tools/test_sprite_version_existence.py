@@ -32,6 +32,18 @@ class SpriteVersionExistenceTests(unittest.TestCase):
         self.assertIn("scarlet-violet", groups)
         self.assertNotIn("sword-shield", groups)
         self.assertNotIn("legends-arceus", groups)
+        media = SPRITE_VERSION_EXISTENCE["mediaAssets"]
+        self.assertIn("home", media)
+        self.assertIn("officialArtworkShiny", media)
+        self.assertIn("showdownAnimated", media)
+        self.assertEqual(
+            SPRITE_VERSION_EXISTENCE["itemAssets"]["pathPrefix"],
+            "sprites/items",
+        )
+        self.assertIn(
+            "oran-berry.png",
+            SPRITE_VERSION_EXISTENCE["itemAssets"]["files"],
+        )
 
     def test_file_matrix_and_debut_cap_are_both_required(self) -> None:
         self.assertTrue(sprite_asset_exists("scarlet-violet", 25))
@@ -84,6 +96,8 @@ class SpriteVersionExistenceTests(unittest.TestCase):
                 {"type": "blob", "path": "game/back/1.png"},
                 {"type": "blob", "path": "game/animated/1.gif"},
                 {"type": "blob", "path": "game/animated/back/1.gif"},
+                {"type": "blob", "path": "game/493-unknown.png"},
+                {"type": "blob", "path": "game/shiny/493-unknown.png"},
                 {"type": "blob", "path": "other/2.png"},
                 {"type": "blob", "path": "game/0.png"},
             ],
@@ -93,6 +107,28 @@ class SpriteVersionExistenceTests(unittest.TestCase):
         self.assertEqual(extracted["back"], [1])
         self.assertEqual(extracted["animatedFront"], [1])
         self.assertEqual(extracted["animatedBack"], [1])
+        self.assertEqual(extracted["namedFront"], ["493-unknown.png"])
+        self.assertEqual(
+            extracted["namedShinyFront"], ["shiny/493-unknown.png"]
+        )
+
+    def test_generator_classifies_shiny_version_paths_separately(self) -> None:
+        extracted = extract_ids(
+            [
+                {"type": "blob", "path": "game/shiny/1.png"},
+                {"type": "blob", "path": "game/back/shiny/2.png"},
+                {"type": "blob", "path": "game/animated/shiny/3.gif"},
+                {
+                    "type": "blob",
+                    "path": "game/animated/back/shiny/4.gif",
+                },
+            ],
+            folder_within_generation="game",
+        )
+        self.assertEqual(extracted["shinyFront"], [1])
+        self.assertEqual(extracted["shinyBack"], [2])
+        self.assertEqual(extracted["animatedShinyFront"], [3])
+        self.assertEqual(extracted["animatedShinyBack"], [4])
 
 
 if __name__ == "__main__":

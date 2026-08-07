@@ -1,5 +1,5 @@
-name: Patch and Publish Dex Bundle v18
-# Current live bundle publish workflow (2026-08-07).
+name: Patch and Publish Dex Bundle v19
+# Current live bundle publish workflow (2026-08-08).
 
 on:
   workflow_dispatch:
@@ -10,29 +10,21 @@ on:
         default: false
         type: boolean
       expected_production_version:
-        description: Live bundleVersion that must still be production before v18 publish (17 until v18 goes live)
+        description: Live bundleVersion that must still be production before v19 publish
         required: true
-        default: 17
+        default: 18
         type: number
-      reuse_run_id:
-        description: Reuse a preserved v17 diagnostic artifact from this workflow run
-        required: false
-        default: ""
-        type: string
 
 permissions:
-  actions: read
   contents: read
 
 concurrency:
-  group: dex-bundle-v17-production
+  group: dex-bundle-v19-production
   cancel-in-progress: false
 
 jobs:
   build-verify-publish:
     runs-on: ubuntu-latest
-    # v18 pulls the live v17 archive and adds the 52poke online media catalog
-    # (cries + forme art) as an id-keyed reference file. No PokeAPI.
     timeout-minutes: 120
     steps:
       - name: Check out selected release ref
@@ -48,104 +40,88 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r tools/dex_bundle_requirements.txt
 
-      - name: Production version pre-check
+      - name: Download and verify live v18 base
         env:
           EXPECTED_VERSION: ${{ inputs.expected_production_version }}
         run: |
-          mkdir -p dist/rollback
+          set -euo pipefail
+          mkdir -p dist/dex-v18/staging dist/dex-v18/upload dist/rollback
           curl --fail --location --retry 5 --output dist/live-manifest.json https://dex.tito.cafe/bundle-manifest.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
-          m = json.loads(Path("dist/live-manifest.json").read_text(encoding="utf-8"))
+          manifest = json.loads(Path("dist/live-manifest.json").read_text(encoding="utf-8"))
           expected = int(os.environ["EXPECTED_VERSION"])
-          assert m["bundleVersion"] == expected, (m["bundleVersion"], expected)
-          assert m["cdnPrefix"] == "v5", m
-          assert m["complete"] is True, m
-          print(f"production pre-check ok: bundleVersion={m['bundleVersion']} cdnPrefix={m['cdnPrefix']}")
+          assert manifest["bundleVersion"] == expected, (manifest["bundleVersion"], expected)
+          assert manifest["cdnPrefix"] == "v5" and manifest["complete"] is True, manifest
+          Path("dist/archive-url.txt").write_text(manifest["archiveUrl"], encoding="utf-8")
+          print(f"production pre-check ok: bundleVersion={expected}")
+          PY
+          curl --fail --location --retry 5 --output dist/dex-v18.tar.zst "$(cat dist/archive-url.txt)"
+          python3 - <<'PY'
+          import hashlib, json, tarfile
+          from pathlib import Path
+          import zstandard
+          archive = Path("dist/dex-v18.tar.zst")
+          manifest = json.loads(Path("dist/live-manifest.json").read_text(encoding="utf-8"))
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest["archiveSha256"]
+          with archive.open("rb") as source:
+              with zstandard.ZstdDecompressor().stream_reader(source) as stream:
+                  with tarfile.open(fileobj=stream, mode="r|") as bundle:
+                      bundle.extractall("dist/dex-v18/staging", filter="data")
+          Path("dist/dex-v18/upload/bundle-manifest.json").write_bytes(
+              Path("dist/live-manifest.json").read_bytes()
+          )
           PY
 
-      - name: Preserve the current v17 root manifest for rollback
+      - name: Preserve v18 root manifest for rollback
         if: inputs.publish
-        env:
-          EXPECTED_VERSION: ${{ inputs.expected_production_version }}
-        run: |
-          cp dist/live-manifest.json dist/rollback/bundle-manifest-v17.json
-          python3 - <<'PY'
-          import json, os
-          m = json.load(open("dist/rollback/bundle-manifest-v17.json", encoding="utf-8"))
-          assert m["bundleVersion"] == int(os.environ["EXPECTED_VERSION"]) and m["cdnPrefix"] == "v5", m
-          PY
+        run: cp dist/live-manifest.json dist/rollback/bundle-manifest-v18.json
 
       - name: Upload rollback manifest backup
         if: inputs.publish
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-root-manifest-v17-rollback
-          path: dist/rollback/bundle-manifest-v17.json
+          name: titodex-root-manifest-v18-rollback
+          path: dist/rollback/bundle-manifest-v18.json
           if-no-files-found: error
           retention-days: 30
 
-      - name: Validate media catalog reference file
+      - name: Run v19 data tests
         run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          catalog = json.loads(Path("data/l10n/zh/media_catalog_52poke.json").read_text(encoding="utf-8"))
-          assert len(catalog) >= 1000, len(catalog)
-          assert "25" in catalog and catalog["25"]["nameZh"] == "皮卡丘", catalog.get("25")
-          print(f"ok: media catalog {len(catalog)} entries")
-          PY
+          python3 tools/test_enrich_items_v19.py
+          python3 tools/test_sprite_version_existence.py
+          python3 tools/test_audit_form_media.py
+          python3 tools/test_fill_shared_item_icons_v19.py
+          python3 tools/test_audit_item_media_v19.py
+          python3 tools/test_stage_dex_incremental_upload.py
 
-      - name: Restore preserved v17 bundle
-        if: inputs.reuse_run_id != ''
-        uses: actions/download-artifact@v4
-        with:
-          name: titodex-dex-v18-diagnostic-${{ inputs.reuse_run_id }}
-          path: dist/dex-v18/upload
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ inputs.reuse_run_id }}
+      - name: Patch v18 into Dex bundle v19
+        run: |
+          python3 tools/patch_dex_bundle_v19_items.py
+          python3 tools/audit_item_media_v19.py
+          python3 tools/patch_dex_bundle_v19_items.py
 
-      - name: Patch v17 into Dex bundle v18
-        if: inputs.reuse_run_id == ''
+      - name: Verify complete v19 candidate
+        run: |
+          python3 tools/verify_dex_upload_tree.py dist/dex-v19/upload
+          python3 tools/verify_dex_v19_items.py dist/dex-v19/staging
+
+      - name: Stage only changed v19 objects
         run: >-
-          python3 tools/patch_dex_bundle_v18_media_catalog.py
-          --output dist/dex-v18
+          python3 tools/stage_dex_incremental_upload.py dist/dex-v19/upload
+          --base-v5 dist/dex-v18/staging
+          --output dist/dex-v19-incremental
 
-      - name: Verify upload tree
-        run: python3 tools/verify_dex_upload_tree.py dist/dex-v17/upload
-
-      - name: Spot-check media catalog in bundle
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          root = json.loads(Path("dist/dex-v18/upload/bundle-manifest.json").read_text(encoding="utf-8"))
-          assert root["bundleVersion"] == 18 and root["cdnPrefix"] == "v5", root
-          assert root.get("mediaCatalogEntries", 0) >= 1000, root
-          catalog = json.loads(Path("dist/dex-v18/upload/v5/media_catalog_52poke.json").read_text(encoding="utf-8"))
-          assert "25" in catalog and len(catalog["25"]["cries"]) >= 3, catalog.get("25")
-          print(f"ok: media catalog {len(catalog)} entries bundled")
-          PY
-
-      - name: Preserve generated bundle when a step fails
-        if: failure()
+      - name: Upload verified full bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: titodex-dex-v18-diagnostic-${{ github.run_id }}
-          path: dist/dex-v18/upload
-          if-no-files-found: warn
-          retention-days: 3
-
-      - name: Upload verified bundle artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: titodex-dex-v18
-          path: dist/dex-v18/upload
+          name: titodex-dex-v19
+          path: dist/dex-v19/upload
           if-no-files-found: error
           retention-days: 14
 
-      - name: Set up Node for Wrangler
+      - name: Set up Node for Wrangler fallback
         if: inputs.publish
         uses: actions/setup-node@v6
         with:
@@ -153,12 +129,12 @@ jobs:
           cache: npm
           cache-dependency-path: cloudflare/dex-cdn/package-lock.json
 
-      - name: Install Wrangler
+      - name: Install Wrangler fallback
         if: inputs.publish
         working-directory: cloudflare/dex-cdn
         run: npm ci
 
-      - name: Upload and verify immutable /v5 objects
+      - name: Upload and verify changed /v5 objects
         if: inputs.publish
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -166,8 +142,8 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v18/upload
-          --cdn-prefix v5 --phase objects
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v19-incremental
+          --cdn-prefix v5 --phase objects --workers 16
 
       - name: Atomically switch the root manifest
         if: inputs.publish
@@ -177,12 +153,24 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: >-
-          python3 tools/upload_dex_bundle_r2.py dist/dex-v18/upload
+          python3 tools/upload_dex_bundle_r2.py dist/dex-v19-incremental
           --cdn-prefix v5 --phase manifest
 
-      - name: Verify public v18 cutover
+      - name: Verify public v19 cutover
         if: inputs.publish
         run: |
-          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 18 and m["cdnPrefix"] == "v5" and m.get("mediaCatalogEntries", 0) >= 1000 and m["archiveUrl"].endswith("/bundle-v18.tar.zst"), m'
+          set -euo pipefail
+          ready=false
+          for attempt in {1..60}; do
+            if curl --fail --silent --show-error https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 19 and m["cdnPrefix"] == "v5" and m["itemDescriptionCoverage"] == 2130 and m["itemSpriteCount"] == 2130 and m["archiveUrl"].endswith("/bundle-v19.tar.zst"), m'; then
+              ready=true
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" = true
+          curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/v5/items.json?v=19' | python3 -c 'import json,sys; items=json.load(sys.stdin); assert len(items) == 2130; assert sum(bool(x.get("descriptionZh") or x.get("effectZh")) for x in items.values()) == 2130'
+          curl --fail --retry 8 --retry-delay 5 --output /tmp/bicycle-v19.png 'https://dex.tito.cafe/v5/item-sprites/bicycle.png?v=19'
+          cmp /tmp/bicycle-v19.png dist/dex-v19/upload/v5/item-sprites/bicycle.png
           curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'
-          curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v18.tar.zst | head -n 1
+          curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v19.tar.zst | head -n 1

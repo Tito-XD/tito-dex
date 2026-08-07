@@ -1346,9 +1346,7 @@ class PokemonDetail {
       return null;
     }
     return evYield.entries
-        .map(
-          (entry) => '${statLabelsZh[entry.key] ?? entry.key} +${entry.value}',
-        )
+        .map((entry) => '${statLabelZh(entry.key)} +${entry.value}')
         .join(' / ');
   }
 

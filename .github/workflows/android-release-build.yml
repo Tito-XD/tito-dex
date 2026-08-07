@@ -20,6 +20,11 @@ on:
         required: true
         default: https://dex.tito.cafe/bundle-manifest.json
         type: string
+      offline_seed_apk_url:
+        description: Optional prior Offline APK whose verified embedded dex seed should be reused
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -122,10 +127,21 @@ jobs:
         if: matrix.variant == 'offline'
         env:
           BUNDLE_MANIFEST_URL: ${{ inputs.bundle_manifest_url }}
+          OFFLINE_SEED_APK_URL: ${{ inputs.offline_seed_apk_url }}
         run: |
           set -euo pipefail
           mkdir -p assets/dex
-          curl --fail --location --retry 5 --output assets/dex/bundle-manifest.json "$BUNDLE_MANIFEST_URL"
+          if [[ -n "$OFFLINE_SEED_APK_URL" ]]; then
+            curl --fail --location --retry 5 --output /tmp/titodex-offline-seed.apk "$OFFLINE_SEED_APK_URL"
+            unzip -p /tmp/titodex-offline-seed.apk \
+              assets/flutter_assets/assets/dex/bundle-manifest.json \
+              > assets/dex/bundle-manifest.json
+            unzip -p /tmp/titodex-offline-seed.apk \
+              assets/flutter_assets/assets/dex/bundle.tar.zst \
+              > assets/dex/bundle.tar.zst
+          else
+            curl --fail --location --retry 5 --output assets/dex/bundle-manifest.json "$BUNDLE_MANIFEST_URL"
+          fi
           archive_url="$(python3 -c 'import json; print(json.load(open("assets/dex/bundle-manifest.json"))["archiveUrl"])')"
           expected_sha="$(python3 -c 'import json; print(json.load(open("assets/dex/bundle-manifest.json"))["archiveSha256"])')"
           python3 - <<'PY'
@@ -138,7 +154,9 @@ jobs:
           assert "/v5/" in manifest["archiveUrl"], manifest
           assert len(manifest["archiveSha256"]) == 64, manifest
           PY
-          curl --fail --location --retry 5 --output assets/dex/bundle.tar.zst "$archive_url"
+          if [[ -z "$OFFLINE_SEED_APK_URL" ]]; then
+            curl --fail --location --retry 5 --output assets/dex/bundle.tar.zst "$archive_url"
+          fi
           test -s assets/dex/bundle.tar.zst
           test -s assets/dex/bundle-manifest.json
           actual_sha="$(sha256sum assets/dex/bundle.tar.zst | awk '{print $1}')"

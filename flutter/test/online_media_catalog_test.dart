@@ -8,9 +8,24 @@ void main() {
       'id': 25,
       'nameZh': '皮卡丘',
       'cries': [
-        {'title': '0025_cry.opus', 'url': 'https://media/standard.webm'},
-        {'title': '0025GM_cry.opus', 'url': 'https://media/gmax.webm'},
-        {'title': '0025O_cry.opus', 'url': 'https://media/cap.webm'},
+        {
+          'title': '0025_cry.opus',
+          'url': 'https://media/standard.webm',
+          'formKeys': ['pikachu'],
+          'fallbackForAllForms': true,
+        },
+        {
+          'title': '0025GM_cry.opus',
+          'url': 'https://media/gmax.webm',
+          'formKeys': ['pikachu-gmax'],
+          'isFormSpecific': true,
+        },
+        {
+          'title': '0025O_cry.opus',
+          'url': 'https://media/cap.webm',
+          'formKeys': ['pikachu-original-cap'],
+          'isFormSpecific': true,
+        },
       ],
       'forms': [
         {'file': 'HOME_025.png', 'kind': 'HOME'},
@@ -24,7 +39,7 @@ void main() {
 
     test('bestCryUrl matches a forme token when given', () {
       expect(
-        entry().bestCryUrl(formKey: 'gigantamax'),
+        entry().bestCryUrl(formKey: 'pikachu-gmax'),
         'https://media/gmax.webm',
       );
     });
@@ -35,7 +50,12 @@ void main() {
         nameZh: '故勒顿',
         cries: [
           OnlineCry(title: '1007_cry.opus', url: 'https://media/default'),
-          OnlineCry(title: '1007L_cry.opus', url: 'https://media/limited'),
+          OnlineCry(
+            title: '1007L_cry.opus',
+            url: 'https://media/limited',
+            formKeys: ['koraidon-limited-build'],
+            isFormSpecific: true,
+          ),
         ],
         forms: [],
       );
@@ -66,6 +86,55 @@ void main() {
         'forms': <Map<String, dynamic>>[],
       });
       expect(parsed.id, 25);
+    });
+
+    test('cry matching uses explicit keys and never filename substrings', () {
+      expect(
+        entry().bestCryUrl(formKey: 'pikachu-gmax-fake'),
+        'https://media/standard.webm',
+      );
+    });
+
+    test('form art excludes unverified URLs and ranks exact before shared', () {
+      final parsed = OnlineMediaEntry.fromJson({
+        'id': 1007,
+        'nameZh': '故勒顿',
+        'cries': <Map<String, dynamic>>[],
+        'forms': [
+          {
+            'file': 'shared.png',
+            'kind': 'HOME',
+            'formKeys': ['koraidon-limited-build'],
+            'mappingStatus': 'shared',
+            'url': 'https://media/shared.png',
+            'urlVerified': true,
+          },
+          {
+            'file': 'exact.png',
+            'kind': 'forme',
+            'formKeys': ['koraidon-limited-build'],
+            'mappingStatus': 'exact',
+            'url': 'https://media/exact.png',
+            'urlVerified': true,
+          },
+          {
+            'file': 'failed.png',
+            'kind': 'HOME',
+            'formKeys': ['koraidon-limited-build'],
+            'mappingStatus': 'exact',
+            'url': 'https://media/failed.png',
+            'urlVerified': false,
+          },
+        ],
+      });
+      expect(parsed.artCandidatesFor('koraidon-limited-build'), [
+        'https://media/exact.png',
+        'https://media/shared.png',
+      ]);
+      expect(
+        parsed.artCandidatesFor('koraidon-limited-build', shiny: true),
+        isEmpty,
+      );
     });
   });
 

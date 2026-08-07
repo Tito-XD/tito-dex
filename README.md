@@ -6,13 +6,13 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5) · App `0.8.5+136` | arm64-v8a, background offline-pack download with notification progress |
-| Offline APK | [v0.8.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.5) · App `0.8.5-offline+137` | Embeds the verified compact v14 dex archive |
-| `main` source baseline | App `0.8.5+136` | Version-aware obtain planning, complete conditions, region/generation browsing |
+| Lite APK | [v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7) · App `0.8.7+140` | arm64-v8a, exact form media and complete item references |
+| Offline APK | [v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7) · App `0.8.7-offline+141` | Embeds the verified compact v14 dex archive and can update to v19 |
+| `main` source baseline | App `0.8.7+140` | Sprite preview fixes, form-aware companion media, full v19 item data |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
-Dex data: CDN **v13** / Offline APK compact **v14** · 1025 species · full form records · per-form evolution chains · exact-version locations · items.
+Dex data: CDN **v19** / Offline APK compact **v14** · 1025 species · 803 form records · audited static/animated/shiny/cry media · complete item descriptions and icons.
 
 ## Highlights
 
@@ -21,7 +21,7 @@ Dex data: CDN **v13** / Offline APK compact **v14** · 1025 species · full form
 - **Native Android handoff** — choose an installed emulator or game app and resume from TitoDex
 - **Companion touches** — a height-scaled animated standby Pokémon with quotes and cries, a six-slot party card, rare shiny surprises, and a silhouette quiz
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters with icons, form-aware evolution chains, exact game/DLC obtain methods and conditions, moves, abilities, and selective form sprites
-- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status
+- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status, with practical type/category filters
 - **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers
 - **Offline-first data** — downloadable dex bundle with Chinese labels, maps, config, icons, and list sprites
 - **Handheld layouts** — phone, tablet, and square-screen dashboard support with controller focus navigation
@@ -42,14 +42,14 @@ Dex data: CDN **v13** / Offline APK compact **v14** · 1025 species · full form
 | Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
 | Persistence | `shared_preferences` + offline `dex_offline/` |
 | Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |
-| Dex data | Pre-built bundle v7 with v5 → v4 → v3 → v2 CDN fallback and APK asset fallbacks |
+| Dex data | Pre-built bundle v19 with v5 → v4 → v3 → v2 CDN fallback and APK asset fallbacks |
 | UI language | Simplified Chinese |
 
 Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
 
 ## Install
 
-Download **`TitoDex-0.8.5-lite-rg-arm64.apk`** or **`TitoDex-0.8.5-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.7-lite-rg-arm64.apk`** or **`TitoDex-0.8.7-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

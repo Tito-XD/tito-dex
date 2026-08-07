@@ -63,18 +63,7 @@ String referencePrimaryLabel(Map<String, dynamic> entry) {
 
 /// Stat key or Chinese label → display label in Chinese.
 String natureStatLabelZh(String? statKey) {
-  if (statKey == null || statKey.isEmpty) {
-    return '';
-  }
-  final direct = statLabelsZh[statKey];
-  if (direct != null) {
-    return direct;
-  }
-  final normalized = statKey.replaceAllMapped(
-    RegExp(r'([A-Z])'),
-    (match) => '-${match.group(1)!.toLowerCase()}',
-  );
-  return statLabelsZh[normalized] ?? statKey;
+  return statLabelZh(statKey);
 }
 
 /// PokeAPI flavor slug → Chinese (辣/涩/甜/苦/酸).
@@ -535,7 +524,8 @@ class MoveReferenceDetail extends StatelessWidget {
     final power = entry['power'] as int?;
     final accuracy = entry['accuracy'] as int?;
     final pp = entry['pp'] as int?;
-    final description = referenceDescriptionZh(entry) ??
+    final description =
+        referenceDescriptionZh(entry) ??
         entry['effectZh'] as String? ??
         entry['shortEffectZh'] as String?;
 
@@ -549,11 +539,7 @@ class MoveReferenceDetail extends StatelessWidget {
         if (category != null && category.isNotEmpty)
           Row(
             children: [
-              Icon(
-                moveCategoryIcon(category),
-                size: 18,
-                color: TitoColors.ink,
-              ),
+              Icon(moveCategoryIcon(category), size: 18, color: TitoColors.ink),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -589,10 +575,12 @@ class AbilityReferenceDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final description = referenceDescriptionZh(entry) ??
+    final description =
+        referenceDescriptionZh(entry) ??
         entry['effectZh'] as String? ??
         entry['shortEffectZh'] as String?;
-    final pokemonCount = entry['pokemonCount'] as int? ??
+    final pokemonCount =
+        entry['pokemonCount'] as int? ??
         (entry['pokemonIds'] as List<dynamic>?)?.length ??
         0;
 

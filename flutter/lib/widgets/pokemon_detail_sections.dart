@@ -813,7 +813,7 @@ class BaseStatsCard extends StatelessWidget {
           Text(AppZh.dexBaseStats, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 12),
           ...stats.entries.map((entry) {
-            final label = statLabelsZh[entry.key] ?? entry.key;
+            final label = statLabelZh(entry.key);
             final ratio = (entry.value / maxBaseStatValue).clamp(0.0, 1.0);
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -928,9 +928,7 @@ class BaseStatsRadarChart extends StatelessWidget {
                           children: [
                             for (var i = 0; i < labels.length; i++)
                               _RadarStatLabel(
-                                label:
-                                    statLabelsZh[labels[i].key] ??
-                                    labels[i].key,
+                                label: statLabelZh(labels[i].key),
                                 value: labels[i].value,
                                 center: center,
                                 radius: radius + 16,

@@ -46,7 +46,10 @@ AUDIO_RE = re.compile(
 )
 SRC_RE = re.compile(r'src="([^"]+\.webm)"')
 HOME_RE = re.compile(r"File:(HOME_\d+[A-Za-z]*\.png)")
-FORM_ART_RE = re.compile(r"File:(0\d*[A-Za-z][A-Za-z0-9-]*\.png)")
+# Full-name forme art is named like ``003Venusaur-Mega.png`` and
+# ``100Voltorb-Hisui.png``. The old leading-zero-only expression silently
+# stopped collecting these files after National Dex #099.
+FORM_ART_RE = re.compile(r"File:((?:\d{3,4})[A-Za-z][A-Za-z0-9-]*\.png)")
 
 
 def fetch_rendered_html(session: requests.Session, query: str) -> str | None:
@@ -142,7 +145,10 @@ def main() -> int:
         target_ids = sorted(int(k) for k in labels.keys())
 
     entries: dict[str, Any] = {}
-    if args.output.is_file() and not args.force:
+    # Focused refreshes must preserve every non-target species already in the
+    # catalog. ``--force`` means replace the requested ids, not discard the
+    # complete existing file.
+    if args.output.is_file():
         raw = json.loads(args.output.read_text(encoding="utf-8"))
         entries = {
             str(item["id"]): item
@@ -168,6 +174,8 @@ def main() -> int:
     for species_id in target_ids:
         try:
             key = str(species_id)
+            if args.force:
+                entries.pop(key, None)
             if key in entries and not args.force:
                 continue
             meta = labels.get(key)

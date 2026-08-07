@@ -1,4 +1,4 @@
-# TitoDex 图鉴 CDN：v13 生产 / v14 紧凑包候选
+# TitoDex 图鉴 CDN：v19 生产 / v14 Offline 紧凑种子
 
 > **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
@@ -6,16 +6,16 @@
 
 | CDN 前缀 | bundleVersion | 物种 | 状态 |
 | --- | ---: | ---: | --- |
-| `/v5/` | **14** | 1025 | **未发布候选**：v13 数据不变，archive 去除与 `sprites/` 重复的 `artwork/` |
-| `/v5/` | **13** | 1025 | **当前生产**：v12 检索轴 + 各形态独立 `evolutionChain` |
-| `/v5/` | 12 | 1025 | 已发布基座：体形 / 颜色 / 大小 / 世代 / 标签检索轴 + 结构化进化条件 |
-| `/v5/` | 11 | 1025 | 历史：v6 数据 + 清晰默认图 + 形态历代 sprite + 542 道具 |
+| `/v5/` | **19** | 1025 | **当前生产**：逐形态媒体审计 + 2130/2130 道具说明与图标 |
+| `/v5/` | 18 | 1025 | 历史：在线媒体目录元数据 |
+| `/v5/` | 17 | 1025 | 历史：2130 项全量道具目录 |
+| `/v5/` | 14 | 1025 | 历史且仍作 Offline APK 种子：紧凑 archive |
+| `/v5/` | 13 | 1025 | 历史：各形态独立 `evolutionChain` |
 | `/v4/` | 6 | 1025 | 保留不动，供旧客户端和回滚 |
 | `/v3/` | 5 | 1025 | 更早回滚 |
 | `/v2/` | 4 | 493 | 遗留客户端 |
 
-> **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（v8 形态 artwork、v9
-> artwork 回退、v10 清晰形态图、v11 道具、v12 检索轴、v13 形态进化链）都是在
+> **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（直至 v19）都是在
 > **同一个 `/v5/` 前缀上原地增量**发布的，没有新开前缀。不可变约束针对的是
 > **单个对象**：同一个 key 不得覆盖成不同内容，而新增 key、以及在两阶段流程里
 > 最后切换根 manifest 是允许的。看到 `/v5/` 就以为 bundleVersion 是 7，会误判成
@@ -29,7 +29,7 @@ App 访问 JSON 时按 `v5 → v4 → v3 → v2` 回退。根 `bundle-manifest.j
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=13
+TITODEX_DEX_BUNDLE_VERSION=19
 ```
 
 > `TITODEX_DEX_BUNDLE_VERSION` 只是 `DexCdnConfig` 里的编译期默认值；版本协商实际
@@ -92,8 +92,8 @@ titodex-dex/
     ├── config/app_config.json
     ├── game_icons/*.png
     ├── type_icons/*.png
-    ├── bundle.tar.zst          # 当前生产 v13；发布 v14 时保留作回滚
-    └── bundle-v14.tar.zst      # v14 候选使用新 key，禁止覆盖 v13 archive
+    ├── bundle-v14.tar.zst      # Offline APK 仍复用的紧凑种子
+    └── bundle-v19.tar.zst      # 当前生产 archive；旧 archive 保留作回滚
 ```
 
 `bundle.tar.zst` 解压后的根直接对应 App 文档目录 `dex_offline/`，不包含 `v5/`
@@ -204,7 +204,7 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v13/upload
 
 回滚：把发布前备份的 v12 根 manifest 写回即可（v13 → v12）。
 
-## v14 候选（紧凑离线媒体）
+## v14 历史包（当前 Offline APK 紧凑种子）
 
 v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件
 比较 `artwork/<path>` 与 `sprites/<path>` 的大小和 SHA-256；1,340 对必须全部字节一致，
@@ -217,27 +217,28 @@ python3 tools/patch_dex_bundle_v14_compact_media.py
 python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
 ```
 
-本地预发布实测：删除 `53,285,462` raw duplicate bytes；v13 archive
+发布时实测：删除 `53,285,462` raw duplicate bytes；v13 archive
 `106,743,740` bytes → v14 `54,746,615` bytes，压缩包减少 `51,997,125` bytes
 （48.7%）。解包后仍有 1,025 detail、1,340 sprite、421 道具图标，
-`artwork/` 为 0。脚本与验证器都不上传；生产 R2 和根 manifest 在人工确认前不变。
+`artwork/` 为 0。v14 已不再是线上根 manifest 指向的最新版，但其不可变 archive
+继续由 Offline APK 复用；安装后的数据更新仍由线上 v19 manifest 决定。
 
 ## 两阶段发布与回滚
 
-当前发布使用 `.github/workflows/upload-dex-bundle.yml`（v18，workflow_dispatch，
-带生产版本前置检查：发布前必须确认线上 bundleVersion 仍为 v17，并保存回滚
-manifest；`publish=false` 时只构建 + 校验）。v7 / v12 / v13 / v14 / v15 / v16 / v17
-workflow 已存档在 `docs/archive/workflows/`。v14–v18 已通过本地增量脚本
-`tools/publish_dex_bundle_incremental.py` 发布（仅上传相邻版本差异对象 +
-manifest-last）。底层两阶段命令：
+当前发布使用 `.github/workflows/upload-dex-bundle.yml`（v19，workflow_dispatch，
+带生产版本前置检查：发布前必须确认线上 bundleVersion 仍为 v18，并保存回滚
+manifest；`publish=false` 时只构建 + 校验）。workflow 从已验证的线上 v18 archive
+恢复只读基座，只 stage 变化对象，最后切换根 manifest。历史版本 workflow 位于
+`docs/archive/workflows/`；本地也可使用 `tools/publish_dex_bundle_incremental.py`。
+底层两阶段命令：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象
-python3 tools/upload_dex_bundle_r2.py dist/dex-v14-prerelease/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v19-incremental \
   --cdn-prefix v5 --phase objects
 
 # 阶段二：只有阶段一全部成功后才更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v14-prerelease/upload \
+python3 tools/upload_dex_bundle_r2.py dist/dex-v19-incremental \
   --cdn-prefix v5 --phase manifest
 ```
 
@@ -285,7 +286,7 @@ npm run dry-run
 
 ## 发布验收
 
-- 根 manifest：v7、v5、1025、complete、archive SHA 正确。
+- 根 manifest：v19、v5、1025、complete、archive SHA 正确。
 - `/v5/manifest.json`、摘要、1025 详情、1025 默认清晰图、选择性形态小图、archive 可读。
 - archive 与上传树资源审计通过；没有批量 `artwork/forms`。
 - 现代精确版本覆盖和金样本通过；所有地点有可显示中文标签。
