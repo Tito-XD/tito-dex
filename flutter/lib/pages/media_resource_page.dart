@@ -21,6 +21,8 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
   List<OnlineMediaEntry> _catalog = const [];
   var _query = '';
   var _busy = false;
+  var _loading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -28,17 +30,30 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
     _refresh();
   }
 
-  Future<void> _refresh() async {
-    final cached = await companionMediaCache.listCached();
-    final entries = await onlineMediaCatalog.load();
-    if (!mounted) {
-      return;
+  Future<void> _refresh({bool reloadCatalog = false}) async {
+    if (mounted) {
+      setState(() => _loading = true);
     }
-    setState(() {
-      _cached = cached;
-      _catalog = entries.values.toList()
-        ..sort((a, b) => a.id.compareTo(b.id));
-    });
+    try {
+      final (cached, entries) = await (
+        companionMediaCache.listCached(),
+        reloadCatalog ? onlineMediaCatalog.reload() : onlineMediaCatalog.load(),
+      ).wait;
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _loadError = null;
+        _cached = cached;
+        _catalog = entries.values.toList()
+          ..sort((a, b) => a.id.compareTo(b.id));
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _loadError = '媒体缓存读取失败，请重新读取';
+      });
+    }
   }
 
   String _sizeLabel(int bytes) {
@@ -91,8 +106,7 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
         return false;
       }
       return entry.nameZh.contains(q) || entry.id.toString() == q;
-    }).toList()
-      ..sort((a, b) => a.id.compareTo(b.id));
+    }).toList()..sort((a, b) => a.id.compareTo(b.id));
 
     const fieldBorder = OutlineInputBorder(
       borderSide: BorderSide(color: Color(0x66FFF7E6)),
@@ -113,10 +127,7 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
-            title: Text(
-              file.name,
-              style: SecondaryTypography.onCard.body14,
-            ),
+            title: Text(file.name, style: SecondaryTypography.onCard.body14),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -154,6 +165,25 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
         const Divider(height: 32, color: Color(0x33FFF7E6)),
         Text('按宝可梦下载', style: SecondaryTypography.onCard.h15),
         const SizedBox(height: 8),
+        if (_loading) ...[
+          const LinearProgressIndicator(),
+          const SizedBox(height: 8),
+        ] else if (_loadError != null || _catalog.isEmpty) ...[
+          Text(
+            _loadError ?? '媒体目录暂时不可用。请确认数据包已安装，或重新读取资源。',
+            style: SecondaryTypography.onCard.body14,
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => _refresh(reloadCatalog: true),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('重新读取'),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         TextField(
           style: const TextStyle(color: TitoColors.card),
           decoration: InputDecoration(
@@ -168,11 +198,11 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
           onChanged: (value) => setState(() => _query = value),
         ),
         const SizedBox(height: 8),
-        if (_query.trim().isNotEmpty && matches.isEmpty)
-          Text(
-            '未找到（媒体目录为空时请先更新数据包）',
-            style: SecondaryTypography.onCard.small12,
-          ),
+        if (!_loading &&
+            _catalog.isNotEmpty &&
+            _query.trim().isNotEmpty &&
+            matches.isEmpty)
+          Text('未找到匹配的宝可梦', style: SecondaryTypography.onCard.small12),
         for (final entry in matches.take(40))
           ListTile(
             dense: true,

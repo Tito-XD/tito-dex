@@ -116,7 +116,12 @@ jobs:
           if [[ -n "$EXPECTED_SIGNER_SHA256" ]]; then
             test "${lite_signer,,}" = "${EXPECTED_SIGNER_SHA256,,}"
           fi
-          sha256sum "$lite" "$offline" | tee dist/release/SHA256SUMS.txt
+          (
+            cd dist/release
+            sha256sum \
+              "TitoDex-$VERSION-lite-rg-arm64.apk" \
+              "TitoDex-$VERSION-offline-rg-arm64.apk"
+          ) | tee dist/release/SHA256SUMS.txt
 
       - name: Create annotated tag and draft release
         env:
@@ -126,6 +131,8 @@ jobs:
           RELEASE_TITLE: ${{ inputs.release_title }}
           RELEASE_SUMMARY: ${{ inputs.release_summary }}
           RELEASE_HIGHLIGHTS: ${{ inputs.release_highlights }}
+          LITE_BUILD_NUMBER: ${{ inputs.lite_build_number }}
+          OFFLINE_BUILD_NUMBER: ${{ inputs.offline_build_number }}
         run: |
           set -euo pipefail
           tag="v$VERSION"
@@ -145,8 +152,8 @@ jobs:
           cat >> /tmp/release-notes.md <<EOF
           ### 下载
 
-          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线数据包。
-          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置已验证的紧凑离线数据。
+          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线数据包；versionCode \`$LITE_BUILD_NUMBER\`。
+          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置已验证的紧凑离线数据；versionCode \`$OFFLINE_BUILD_NUMBER\`。
 
           ### 验证
 

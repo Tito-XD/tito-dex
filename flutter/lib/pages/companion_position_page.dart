@@ -6,11 +6,11 @@ import '../features/companion/companion_media.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
+import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/sticker_card.dart';
 
 /// Drag-to-position page for the home standby companion.
 ///
@@ -36,22 +36,29 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
     _offsetY = companionRepository.offsetY;
   }
 
-  void _updateOffset(Offset local, Size size) {
+  void _moveBy(Offset delta, Size size, Size handleSize) {
     // A degenerate box (0×0 during an early layout frame) would make the
     // divisions 0/0 = NaN, and clamp() passes NaN through — Alignment(NaN)
     // then throws in the render tree. Ignore the event until the box is laid.
+    final travelWidth = size.width - handleSize.width;
+    final travelHeight = size.height - handleSize.height;
+    if (travelWidth <= 0 || travelHeight <= 0) {
+      return;
+    }
+    setState(() {
+      _offsetX = (_offsetX + delta.dx * 2 / travelWidth).clamp(-1.0, 1.0);
+      _offsetY = (_offsetY + delta.dy * 2 / travelHeight).clamp(-1.0, 1.0);
+    });
+  }
+
+  void _moveTo(Offset local, Size size) {
     if (size.width <= 0 || size.height <= 0) {
       return;
     }
-    final x = (local.dx / size.width * 2 - 1).clamp(-1.0, 1.0);
-    final y = (local.dy / size.height * 2 - 1).clamp(-1.0, 1.0);
     setState(() {
-      _offsetX = x;
-      _offsetY = y;
+      _offsetX = (local.dx / size.width * 2 - 1).clamp(-1.0, 1.0);
+      _offsetY = (local.dy / size.height * 2 - 1).clamp(-1.0, 1.0);
     });
-    // Notify listeners in real time so the home companion follows the drag,
-    // but defer the disk write until the gesture ends.
-    companionRepository.setOffsetLocal(x, y);
   }
 
   void _commitOffset() {
@@ -60,101 +67,139 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: companionRepository,
-      builder: (context, _) {
-        final choice = companionRepository.choice;
-        final speciesId = choice?.pokemonId ??
-            speciesIdForName(widget.journey.companion) ??
-            companionSpeciesIds[hgssDefaultCompanion]!;
+    final choice = companionRepository.choice;
+    final speciesId =
+        choice?.pokemonId ??
+        speciesIdForName(widget.journey.companion) ??
+        companionSpeciesIds[hgssDefaultCompanion]!;
+    final pagePadding = DeviceLayout.pagePadding(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final compact = !square && MediaQuery.sizeOf(context).shortestSide < 520;
+    final companionPadding = EdgeInsets.only(
+      right: square ? 8 : (compact ? 6 : 10),
+      bottom: DeviceLayout.companionOverlayBottom(context),
+    );
 
-        return SecondaryPageScaffold(
-          title: AppZh.companionPositionTitle,
-          children: [
-            StickerCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    AppZh.companionPositionHint,
-                    style: SecondaryTypography.onCard.body14,
+    return Padding(
+      padding: pagePadding,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final canvasSize = constraints.biggest;
+          const handleDiameter = 72.0;
+          final paddedHandleSize = Size(
+            handleDiameter + companionPadding.right,
+            handleDiameter + companionPadding.bottom,
+          );
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: TitoColors.cream.withValues(alpha: 0.16),
+                  border: Border.all(
+                    color: TitoColors.card.withValues(alpha: 0.35),
                   ),
-                  const SizedBox(height: 16),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-                      final height = width * 1.2;
-                      return Container(
-                        width: width,
-                        height: height,
-                        decoration: BoxDecoration(
-                          color: TitoColors.cream.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(TitoRadii.md),
-                          border: Border.all(
-                            color: TitoColors.ink.withValues(alpha: 0.25),
-                            width: 2,
+                  borderRadius: BorderRadius.circular(
+                    DeviceLayout.rMd(context),
+                  ),
+                ),
+                child: GestureDetector(
+                  key: const ValueKey('companion-position-canvas'),
+                  behavior: HitTestBehavior.opaque,
+                  onTapDown: (details) =>
+                      _moveTo(details.localPosition, canvasSize),
+                  onTapUp: (_) => _commitOffset(),
+                  onPanUpdate: (details) =>
+                      _moveBy(details.delta, canvasSize, paddedHandleSize),
+                  onPanEnd: (_) => _commitOffset(),
+                  onPanCancel: _commitOffset,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment(_offsetX, _offsetY),
+                        child: Padding(
+                          padding: companionPadding,
+                          child: _PositionHandle(
+                            diameter: handleDiameter,
+                            speciesId: speciesId,
+                            isShiny: choice?.isShiny ?? false,
                           ),
                         ),
-                        child: GestureDetector(
-                          onTapDown: (details) => _updateOffset(
-                            details.localPosition,
-                            Size(width, height),
-                          ),
-                          onTapUp: (_) => _commitOffset(),
-                          onPanUpdate: (details) => _updateOffset(
-                            details.localPosition,
-                            Size(width, height),
-                          ),
-                          onPanEnd: (_) => _commitOffset(),
-                          onPanCancel: _commitOffset,
-                          behavior: HitTestBehavior.opaque,
-                          child: Stack(
-                            children: [
-                              Align(
-                                alignment: Alignment(_offsetX, _offsetY),
-                                child: _PositionHandle(
-                                  speciesId: speciesId,
-                                  isShiny: choice?.isShiny ?? false,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: () async {
-                      await companionRepository.resetOffset();
-                      setState(() {
-                        _offsetX = companionRepository.offsetX;
-                        _offsetY = companionRepository.offsetY;
-                      });
-                    },
-                    child: Text(AppZh.companionPositionReset),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
-        );
-      },
+              Align(
+                alignment: Alignment.topCenter,
+                child: SecondaryPageAppBar(
+                  title: AppZh.companionPositionTitle,
+                  showSettings: false,
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                    decoration: BoxDecoration(
+                      color: TitoColors.card.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(
+                        DeviceLayout.rMd(context),
+                      ),
+                      border: Border.all(color: TitoColors.ink, width: 1.5),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppZh.companionPositionHint,
+                            style: SecondaryTypography.onCard.body14,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton(
+                          onPressed: () async {
+                            await companionRepository.resetOffset();
+                            if (!mounted) return;
+                            setState(() {
+                              _offsetX = companionRepository.offsetX;
+                              _offsetY = companionRepository.offsetY;
+                            });
+                          },
+                          child: Text(AppZh.companionPositionReset),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
 class _PositionHandle extends StatelessWidget {
-  const _PositionHandle({required this.speciesId, required this.isShiny});
+  const _PositionHandle({
+    required this.diameter,
+    required this.speciesId,
+    required this.isShiny,
+  });
 
+  final double diameter;
   final int speciesId;
   final bool isShiny;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 56,
-      height: 56,
+      width: diameter,
+      height: diameter,
       decoration: BoxDecoration(
         color: TitoColors.card,
         shape: BoxShape.circle,

@@ -117,7 +117,7 @@ class JourneyCard extends StatelessWidget {
                         children: [
                           _Meta(
                             label: AppZh.labelBadges,
-                            value: '${journey.badges}/${journey.maxBadges}',
+                            value: journey.badgeProgressLabel,
                             dense: dense,
                           ),
                           _Meta(
@@ -161,7 +161,7 @@ class _AssistantDenseMeta extends StatelessWidget {
       builder: (context, snapshot) {
         final assistant = snapshot.data?.cardSummary;
         return Text(
-          '${AppZh.labelBadges} ${journey.badges}/${journey.maxBadges}'
+          '${AppZh.labelBadges} ${journey.badgeProgressLabel}'
           ' · ${assistant ?? AppZh.journeyAssistantLoading}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

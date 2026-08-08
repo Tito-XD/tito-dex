@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
+import '../../features/dex/reference_game_scope.dart';
+import '../../features/dex/move_version_data.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
@@ -11,9 +14,32 @@ class MoveEncyclopediaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final edition = gameEditionRepository.edition;
     return DexReferenceListPage<CachedMove>(
+      key: ValueKey('moves:${edition.slug}:${edition.selectedFlavor}'),
       title: AppZh.dexReferenceMoves,
-      loadEntries: dexRepository.getAllMoves,
+      subtitle: edition.labelZh,
+      loadEntries: () async {
+        final results = await (
+          dexRepository.getAllMoves(),
+          moveVersionDataRepository.load(),
+        ).wait;
+        final targetHasMatrixCoverage = moveVersionDataRepository
+            .knownVersionGroups
+            .contains(edition.dataVersionGroupKey);
+        return results.$1
+            .where(
+              (move) => cachedMoveAvailableInEdition(
+                move,
+                edition,
+                indexedVersionGroups: targetHasMatrixCoverage
+                    ? results.$2[move.id] ?? const <String>{}
+                    : null,
+                exactCoverageKnown: targetHasMatrixCoverage,
+              ),
+            )
+            .toList(growable: false);
+      },
       filterEntry: filterCachedMove,
       primaryLabel: (move) => move.nameZh,
       secondaryLabel: (move) =>

@@ -77,6 +77,8 @@ class HgssParser {
           currentHp: slotStats.currentHp,
           maxHp: slotStats.maxHp,
           experience: slotStats.experience,
+          abilityId: slotStats.abilityId,
+          moveIds: slotStats.moveIds,
           warning: slotWarning,
         ),
       );
@@ -100,6 +102,7 @@ class HgssParser {
       mapHeaderId: mapId,
       dexCaughtIds: pokedex.caughtIds,
       dexSeenIds: pokedex.seenIds,
+      badgeProgress: {'城都': popcount(johtoBadges), '关都': popcount(kantoBadges)},
     );
   }
 
@@ -114,7 +117,10 @@ class HgssParser {
     final syncEntry = JourneyTimelineEntry(
       id: 'parsed-$syncId',
       text: '已从本地${gameEditionFromJourneyGame(summary.game).labelZh}存档同步',
-      at: _formatParsedAtLocal(summary.savedAt ?? summary.parsedAt),
+      // This event describes the TitoDex import, so its timestamp is the
+      // import time. The previous file-modified timestamp could be stale,
+      // unavailable, or supplied as zero by an Android document provider.
+      at: _formatParsedAtLocal(summary.parsedAt),
     );
 
     final parsedParty = summary.party
@@ -126,6 +132,8 @@ class HgssParser {
             currentHp: member.currentHp,
             maxHp: member.maxHp,
             experience: member.experience,
+            abilityId: member.abilityId,
+            moveIds: member.moveIds,
           ),
         )
         .toList(growable: false);
@@ -156,6 +164,7 @@ class HgssParser {
       saveDexHash: summary.saveHash,
       manualDexSeenIds: existing?.manualDexSeenIds ?? const [],
       manualDexCaughtIds: existing?.manualDexCaughtIds ?? const [],
+      badgeProgress: summary.badgeProgress,
     );
   }
 

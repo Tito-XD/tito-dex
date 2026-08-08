@@ -2,7 +2,7 @@
 
 > **Status:** Active plan (2026-07-30)。本文取代 `codex/dex-forms` 分支上
 > `docs/handoff/FUNCTIONAL_ROADMAP_IDEAS.md` 的 26 项建议：砍到 9 项，分三批。
-> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.8**，
+> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.9**，
 > CDN 图鉴包 **v19**，Offline APK 紧凑包 **v14**）。
 >
 > **并行约束：** 图鉴检索线（体形/颜色/大小/分类检索 + move/ability 资料详情）

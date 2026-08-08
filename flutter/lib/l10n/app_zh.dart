@@ -300,7 +300,7 @@ abstract final class AppZh {
   static const dexReferenceViewAbilityPokemon = '拥有此特性的宝可梦';
   static const dexReferenceItemEffect = '效果';
   static const dexReferenceNoEffect = '暂无说明';
-  static String dexReferenceItemCost(String cost) => '售价 ¥$cost';
+  static String dexReferenceItemCost(String cost) => '参考价格 ₽$cost';
   static const dexReferenceTypeModifiers = '属性倍率变化';
   static const dexReferenceMovePowerSymbol = '⚔';
   static const dexReferenceMoveAccuracySymbol = '🎯';

@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) |
-| **`main` / lite source** | `0.8.8+142` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.8-offline+143` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) |
+| **`main` / lite source** | `0.8.9+144` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.9-offline+145` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,16 +39,17 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.8)
+## Current feature status (latest release line: v0.8.9)
 
-> v0.8.8 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
+> v0.8.9 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
 
 ### Journey & save
-- Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
+- Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
 - v0.8.8: Android long-press app shortcuts default to Dex + Search and are configurable in Settings (up to three destinations from dex sub-pages, reference catalogs and battle tools); HGSS counts both badge banks, and DeSmuME `.dsv` wrappers are recognized.
 - v0.8.8: save import preserves the numeric trainer ID for Journey/Settings; the Journey card shows a lightweight current-location capture reminder, while the Journey page expands nearby uncaught species, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion gaps. Unknown locations and merged editions show explicit prompts instead of guessed advice.
+- v0.8.9: unknown Android document timestamps no longer become 1970, and the latest Journey event records TitoDex import time. HGSS displays 城都 x/8 + 关都 y/8; parsed ability/moves/EXP flow into Team and can hand a damaging move to quick damage. Manually customized trainer identity remains protected by the existing override rules.
 
 ### Dex (national 1–1025)
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
@@ -62,7 +63,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
 - Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes. Bundle v16 added 52poke SwSh / BDSP / LA / SV / Z-A held-item coverage: 520 species with held items plus 52 previously missing items (`HELD_ITEMS_ATTRIBUTION.txt`). v0.8.8 applies `MechanicsProfile` gates so unavailable alternative evolution routes do not make a version plan look self-contained.
-- v0.8.8: `/dex/locations` loads the existing reverse index on demand and shows selected-version area encounters with caught completion; no interactive map is planned.
+- v0.8.9: `/dex/locations` uses a compact responsive area grid; tapping an area opens a draggable missing-first encounter sheet and preserves direct dex/form navigation. No interactive map is planned.
 - Form metadata now reaches the UI consistently: event-only, historical, current-version availability/obtainability, introduction version, incomplete data, and inherited fallback states are all labelled instead of remaining bundle-only flags.
 
 ### Items (reference hub → 道具)
@@ -73,6 +74,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
 - Build: `tools/build_items_dataset.py` → `tools/enrich_items_52poke.py` / `enrich_items_52poke_search.py` → `tools/patch_dex_bundle_v11_items.py`. The category-filter option list in `flutter/lib/pages/dex/dex_json_reference_page.dart` must stay in sync with the `categoryZh` groups.
 - Attribution ships in the bundle as `ITEMS_ATTRIBUTION.txt`.
+- v0.8.9 bundles an APK-local item matrix derived from the attributed v19 catalog, official PokeAPI CSV data, and cached 52poke source pages: 1465 items have version-group availability, 18 retain exact paired-version exclusivity, and 1114 have game-scoped prices. Unknown/new-game coverage stays visible as unknown instead of being hidden or assigned a guessed price. A second 833-move matrix filters removed/reintroduced moves by version group; generation gates cover abilities and the smaller mechanics references.
 
 ### Search hub
 - **常用资料:** moves, abilities, natures, egg groups, items, weather, terrain, status.
@@ -89,12 +91,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 | Runtime data | Behavior | Reachable UI |
 | --- | --- | --- |
-| Parsed save metadata / party / dex flags | journey merge, progress, edition auto-selection | Home, Team, Journey, Settings, Dex status |
+| Parsed save metadata / party moves/abilities/EXP / dex flags | journey merge, progress, edition auto-selection, battle handoff | Home, Team, Journey, Settings, Dex status, quick damage |
 | Summaries + `dex_catalog.json` | browse, search, stacked species axes | Dex and Search |
 | Per-species details + forms | type/stat/ability/obtain/move/evolution planning | Four detail tabs + form selector |
 | `version_availability_index.json` | evolution/breeding/trade missing classification | Dex progress filter + Journey assistant |
-| `location_index.json` | selected-version area tree and save-location match | Location Dex + Journey card/page |
-| Moves, abilities, items, natures, egg groups, weather, terrain, status | reference search/detail and supported species drill-down | Search reference hub + configurable app shortcuts |
+| `location_index.json` | selected-version area tree and save-location match | Compact Location Dex grid/sheet + Journey card/page |
+| Moves + `move_version_matrix.json`; items + `item_version_matrix.json`; abilities, natures, egg groups, weather, terrain, status | selected-game filtering, scoped prices, reference search/detail and supported species drill-down | Search reference hub, Team assistance, quick damage + configurable app shortcuts |
 | `media_catalog_52poke.json` | form-aware art/animation/cry candidates | companion, picker, media resource page |
 | `app_config.json` | remotely updateable Tier-A link copy | Search → Pokémon Sleep tools |
 
@@ -106,6 +108,7 @@ advertising filters with no implementation. No confirmed runtime feature is
 left without a UI entry after this pass.
 
 ### Latest release-line highlights
+- v0.8.9: repairs media resource management and adds retry; makes companion positioning full-screen and smooth; scopes items, prices, moves and mechanics to the selected game/generation; compacts Location Dex into a missing-first drill-down; and connects parsed party abilities/moves/evolution routes to Team and quick damage. HGSS shows separate Johto/Kanto badge progress, Journey sync time is corrected, and exact HeartGold/SoulSilver selection is no longer represented by a hard-coded SoulSilver team heading.
 - v0.8.8: completes the three-phase correctness and UI closure: hardened l10n/release source binding, configurable Android app shortcuts, location dex, mechanics-aware evolution planning, improved save parsing and fixture gates, canonical Chinese dex axes, explicit battle assumptions, and a Journey save assistant that connects location, party evolution and exact-version completion data. Runtime data-to-UI alignment is audited and covered by 373 Flutter tests.
 - v0.8.7: fixes per-version sprite previews and artwork-viewer back behavior; makes companion art and cries explicitly form-aware across normal/shiny and static/animated sources; publishes the audited v19 media catalog; and completes all 2130 item descriptions and local icons with shared/fallback templates labelled honestly. Offline keeps the compact v14 seed and can update to v19.
 - v0.8.6: moves gain an 18-type filter; abilities, natures, egg groups, weather, and status gain compact category filters; detail stat keys are normalized to Chinese labels across EV yield, base stats, and nature effects; the first system-back action now closes the artwork viewer instead of popping the detail route underneath. Bundle v13 and compact Offline v14 remain unchanged.
@@ -265,8 +268,8 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 **Known baseline:** `flutter analyze --no-pub` is expected to be clean;
 `flutter test --no-pub` is the regression gate.
 
-**Verified v0.8.8 release source (2026-08-08):** `flutter analyze --no-pub` has no
-issues, all 373 Flutter tests pass, all 123 Python tool tests pass, and
+**Verified v0.8.9 release source (2026-08-08):** `flutter analyze --no-pub` has no
+issues, all 386 Flutter tests pass, all 128 Python tool tests pass, and
 `flutter build web --release --no-pub` succeeds. Android native shortcut and
 media smoke coverage runs on an x86_64 emulator in CI; APK packaging and
 physical-device release acceptance remain separate release gates.

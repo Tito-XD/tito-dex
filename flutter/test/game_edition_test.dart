@@ -23,6 +23,16 @@ void main() {
     expect(edition.journeyGameKey, 'SoulSilver');
   });
 
+  test('selected HGSS flavor owns its exact label and journey key', () {
+    final heartGold = GameEdition.hgss.withFlavor('heartgold');
+    final soulSilver = GameEdition.hgss.withFlavor('soulsilver');
+
+    expect(heartGold.selectedLabelZh, '心金');
+    expect(heartGold.selectedJourneyGameKey, 'HeartGold');
+    expect(soulSilver.selectedLabelZh, '魂银');
+    expect(soulSilver.selectedJourneyGameKey, 'SoulSilver');
+  });
+
   test('lza uses its current PokeAPI data key', () {
     final lza = gameEditionFromSlug('lza')!;
     expect(lza.dataVersionGroupKey, 'legends-za');

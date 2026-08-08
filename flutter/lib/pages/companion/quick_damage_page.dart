@@ -5,6 +5,7 @@ import '../../features/companion/battle_handoff.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/battle_effectiveness.dart';
+import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
@@ -87,6 +88,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       battleStatHandoff.clear();
     }
     _loadRelations();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _consumePartyHandoff());
   }
 
   @override
@@ -119,6 +121,67 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
         _error = formatUserFacingError(error);
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _consumePartyHandoff() async {
+    if (battlePartyHandoff.isEmpty) return;
+    final member = battlePartyHandoff.member!;
+    final moveId = battlePartyHandoff.moveId;
+    battlePartyHandoff.clear();
+    await _applyPartyMember(member, preferredMoveId: moveId);
+  }
+
+  Future<void> _applyPartyMember(
+    PartyMember member, {
+    int? preferredMoveId,
+  }) async {
+    final speciesId = member.speciesId;
+    if (speciesId == null) return;
+    CachedMove? selectedMove;
+    final moveId =
+        preferredMoveId ??
+        (member.moveIds.isEmpty ? null : member.moveIds.first);
+    if (moveId != null) {
+      for (final move in await dexRepository.getAllMoves()) {
+        if (move.id == moveId) {
+          selectedMove = move;
+          break;
+        }
+      }
+    }
+    if (selectedMove?.category == 'status') selectedMove = null;
+    if (selectedMove != null && mounted) {
+      setState(() {
+        _category = switch (selectedMove!.category) {
+          'special' => MoveCategory.special,
+          _ => MoveCategory.physical,
+        };
+        _moveType = selectedMove.type;
+        if (selectedMove.power != null) {
+          _powerController.text = '${selectedMove.power}';
+        }
+      });
+    }
+    final summary = await dexRepository.getSummary(speciesId);
+    await _applyAttacker(summary);
+    if (!mounted) return;
+    if (member.level != null) _levelController.text = '${member.level}';
+    final abilityId = member.abilityId;
+    var preferredAbility = member.abilitySlug;
+    if (preferredAbility == null && abilityId != null) {
+      for (final ability in await dexRepository.getAllAbilities()) {
+        if (ability.id == abilityId) {
+          preferredAbility = abilitySlugFromNameEn(ability.nameEn);
+          break;
+        }
+      }
+    }
+    if (preferredAbility != null &&
+        _attackerAbilityOptions.any(
+          (option) => option.slug == preferredAbility,
+        )) {
+      setState(() => _attackerAbilitySlug = preferredAbility);
     }
   }
 
@@ -174,7 +237,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _attackerTerastallized = false;
       _attackerTeraType = defaultTeraTypeFor(summary.types, generation);
     });
-    _loadAttackerAbilities(summary.id);
+    await _loadAttackerAbilities(summary.id);
   }
 
   Future<void> _applyDefender(PokemonSummary summary) async {
@@ -361,6 +424,28 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                             ),
                           ),
                           const SizedBox(height: 12),
+                          if (widget.journey.party.isNotEmpty) ...[
+                            Text(
+                              '从当前队伍带入',
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(fontWeight: FontWeight.w800),
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: [
+                                for (final member in widget.journey.party)
+                                  ActionChip(
+                                    label: Text(
+                                      member.nickname ?? member.species,
+                                    ),
+                                    onPressed: () => _applyPartyMember(member),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                          ],
                           PokemonSearchField(
                             controller: _attackerQueryController,
                             hintText: AppZh.companionAttackerSearchHint,

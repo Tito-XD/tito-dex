@@ -3,13 +3,46 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/l10n/app_zh.dart';
+import 'package:titodex/features/game/game_edition.dart';
+import 'package:titodex/features/game/game_edition_repository.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/team_page.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await gameEditionRepository.save(defaultGameEdition);
+  });
+
+  testWidgets('team heading follows the selected game flavor', (tester) async {
+    await gameEditionRepository.save(GameEdition.hgss.withFlavor('heartgold'));
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: TeamPage(
+              journey: CurrentJourney.mock().copyWith(
+                game: 'SoulSilver',
+                party: const [],
+                saveSyncedParty: const [],
+              ),
+              onSaveJourney: (_) {},
+            ),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('${AppZh.navTeam} · 心金'), findsOneWidget);
+    expect(find.textContaining('魂银'), findsNothing);
+  });
 
   testWidgets('team editor saves a user override and removes a member', (
     tester,
@@ -67,7 +100,10 @@ void main() {
     expect(journey.party.single.nickname, '小火');
     expect(journey.party.single.level, 12);
 
-    await tester.tap(find.text('小火').first);
+    final renamedMember = find.text('小火').first;
+    await tester.ensureVisible(renamedMember);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(renamedMember);
     await tester.pump(const Duration(milliseconds: 300));
     final delete = find.text(AppZh.teamEditDelete);
     await tester.ensureVisible(delete);

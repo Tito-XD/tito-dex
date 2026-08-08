@@ -81,7 +81,7 @@ class JourneyPage extends StatelessWidget {
                   Expanded(
                     child: _SummaryMeta(
                       label: AppZh.settingsBadges,
-                      value: '${journey.badges}/${journey.maxBadges}',
+                      value: journey.badgeProgressLabel,
                     ),
                   ),
                 ],
@@ -122,7 +122,7 @@ class JourneyPage extends StatelessWidget {
               _StatRow(label: AppZh.settingsPlayTime, value: journey.playTime),
               _StatRow(
                 label: AppZh.settingsBadges,
-                value: '${journey.badges}/${journey.maxBadges}',
+                value: journey.badgeProgressLabel,
               ),
               _StatRow(
                 label: AppZh.settingsCurrentGame,

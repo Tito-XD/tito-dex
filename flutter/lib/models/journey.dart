@@ -7,6 +7,8 @@ class PartyMember {
     this.currentHp,
     this.maxHp,
     this.experience,
+    this.abilityId,
+    this.moveIds = const [],
     this.types = const [],
     this.abilitySlug,
     this.userEdited = false,
@@ -19,6 +21,8 @@ class PartyMember {
   final int? currentHp;
   final int? maxHp;
   final int? experience;
+  final int? abilityId;
+  final List<int> moveIds;
   final List<String> types;
   final String? abilitySlug;
   final bool userEdited;
@@ -31,6 +35,8 @@ class PartyMember {
         if (currentHp != null) 'currentHp': currentHp,
         if (maxHp != null) 'maxHp': maxHp,
         if (experience != null) 'experience': experience,
+        if (abilityId != null) 'abilityId': abilityId,
+        if (moveIds.isNotEmpty) 'moveIds': moveIds,
         if (types.isNotEmpty) 'types': types,
         if (abilitySlug != null) 'abilitySlug': abilitySlug,
         if (userEdited) 'userEdited': true,
@@ -44,6 +50,10 @@ class PartyMember {
         currentHp: json['currentHp'] as int?,
         maxHp: json['maxHp'] as int?,
         experience: json['experience'] as int?,
+        abilityId: (json['abilityId'] as num?)?.toInt(),
+        moveIds: (json['moveIds'] as List<dynamic>? ?? const [])
+            .map((value) => (value as num).toInt())
+            .toList(growable: false),
         types: (json['types'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
@@ -60,6 +70,8 @@ class PartyMember {
     int? currentHp,
     int? maxHp,
     int? experience,
+    int? abilityId,
+    List<int>? moveIds,
     List<String>? types,
     String? abilitySlug,
     bool? userEdited,
@@ -74,6 +86,8 @@ class PartyMember {
       currentHp: currentHp ?? this.currentHp,
       maxHp: maxHp ?? this.maxHp,
       experience: experience ?? this.experience,
+      abilityId: abilityId ?? this.abilityId,
+      moveIds: moveIds ?? this.moveIds,
       types: types ?? this.types,
       abilitySlug:
           clearAbilitySlug ? null : (abilitySlug ?? this.abilitySlug),
@@ -130,6 +144,7 @@ class CurrentJourney {
     this.manualDexCaughtIds = const [],
     this.saveSyncedParty = const [],
     this.partyUserOverride = false,
+    this.badgeProgress = const {},
   });
 
   final String game;
@@ -155,6 +170,13 @@ class CurrentJourney {
   /// Last party parsed from save (for diff banner).
   final List<PartyMember> saveSyncedParty;
   final bool partyUserOverride;
+  final Map<String, int> badgeProgress;
+
+  String get badgeProgressLabel => badgeProgress.isEmpty
+      ? '$badges/$maxBadges'
+      : badgeProgress.entries
+          .map((entry) => '${entry.key} ${entry.value}/8')
+          .join(' · ');
 
   bool get partyDiffersFromSave {
     if (!partyUserOverride || saveSyncedParty.isEmpty) {
@@ -202,6 +224,7 @@ class CurrentJourney {
     List<int>? manualDexCaughtIds,
     List<PartyMember>? saveSyncedParty,
     bool? partyUserOverride,
+    Map<String, int>? badgeProgress,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -228,6 +251,7 @@ class CurrentJourney {
       manualDexCaughtIds: manualDexCaughtIds ?? this.manualDexCaughtIds,
       saveSyncedParty: saveSyncedParty ?? this.saveSyncedParty,
       partyUserOverride: partyUserOverride ?? this.partyUserOverride,
+      badgeProgress: badgeProgress ?? this.badgeProgress,
     );
   }
 
@@ -258,6 +282,7 @@ class CurrentJourney {
           'saveSyncedParty':
               saveSyncedParty.map((m) => m.toJson()).toList(growable: false),
         if (partyUserOverride) 'partyUserOverride': true,
+        if (badgeProgress.isNotEmpty) 'badgeProgress': badgeProgress,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -303,6 +328,9 @@ class CurrentJourney {
             .map((item) => PartyMember.fromJson(item as Map<String, dynamic>))
             .toList(),
         partyUserOverride: json['partyUserOverride'] as bool? ?? false,
+        badgeProgress:
+            (json['badgeProgress'] as Map<String, dynamic>? ?? const {})
+                .map((key, value) => MapEntry(key, (value as num).toInt())),
       );
 
   static CurrentJourney mock() => const CurrentJourney(

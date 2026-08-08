@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dex/dex_repository.dart';
+import '../../features/dex/item_game_data.dart';
+import '../../features/dex/reference_game_scope.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../theme/tito_colors.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/dex_reference_detail.dart';
@@ -26,9 +29,29 @@ class DexJsonReferencePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final edition = gameEditionRepository.edition;
     return DexReferenceListPage<Map<String, dynamic>>(
+      key: ValueKey('$cdnFilename:${edition.slug}:${edition.selectedFlavor}'),
       title: title,
-      loadEntries: () => dexRepository.getReferenceEntries(cdnFilename),
+      subtitle: edition.labelZh,
+      loadEntries: () async {
+        final entries = await dexRepository.getReferenceEntries(cdnFilename);
+        if (_kind != DexReferenceKind.item) {
+          return entries
+              .where(
+                (entry) =>
+                    jsonReferenceAvailableInEdition(_kind, entry, edition),
+              )
+              .toList(growable: false);
+        }
+        final scoped = <Map<String, dynamic>>[];
+        for (final entry in entries) {
+          final view = await itemGameDataRepository.viewFor(entry, edition);
+          if (view.availability == ItemGameAvailability.unavailable) continue;
+          scoped.add(itemGameDataRepository.applyView(entry, view, edition));
+        }
+        return scoped;
+      },
       filterEntry: _filterReferenceEntry,
       primaryLabel: referencePrimaryLabel,
       secondaryLabel: (entry) => _secondaryLabel(entry, _kind),
@@ -76,9 +99,9 @@ String _secondaryLabel(Map<String, dynamic> entry, DexReferenceKind kind) {
     if (categoryLabel.isNotEmpty) {
       parts.add(categoryLabel);
     }
-    final cost = entry['cost'];
-    if (cost != null) {
-      parts.add('¥$cost');
+    final price = itemVersionPriceLabel(entry, compact: true);
+    if (price != null) {
+      parts.add(price);
     }
   }
   final desc = referenceDescriptionZh(entry);

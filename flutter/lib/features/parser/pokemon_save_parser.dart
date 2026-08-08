@@ -383,6 +383,8 @@ class PokemonSaveParser {
           currentHp: stats.currentHp,
           maxHp: stats.maxHp,
           experience: stats.experience,
+          abilityId: stats.abilityId,
+          moveIds: stats.moveIds,
         ),
       );
     }

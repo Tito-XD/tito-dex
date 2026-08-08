@@ -42,12 +42,14 @@ class DexReferenceListPage<T> extends StatefulWidget {
     required this.primaryLabel,
     required this.secondaryLabel,
     required this.detailSheet,
+    this.subtitle,
     this.leadingBuilder,
     this.categoryFilter,
     this.gridMode = false,
   });
 
   final String title;
+  final String? subtitle;
   final Future<List<T>> Function() loadEntries;
   final DexReferenceFilter<T> filterEntry;
   final String Function(T entry) primaryLabel;
@@ -157,6 +159,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
 
     return SecondaryPageScaffold(
       title: widget.title,
+      subtitle: widget.subtitle,
       children: [
         StickerCard(
           child: TextField(
@@ -247,7 +250,8 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                           child: Row(
                             children: [
                               if (widget.leadingBuilder != null) ...[
-                                widget.leadingBuilder!(entry) ?? const SizedBox(width: 4),
+                                widget.leadingBuilder!(entry) ??
+                                    const SizedBox(width: 4),
                                 const SizedBox(width: 10),
                               ],
                               Expanded(
@@ -459,11 +463,7 @@ bool filterCachedAbility(CachedAbility ability, String query) {
 }
 
 class _GridItemCard extends StatelessWidget {
-  const _GridItemCard({
-    required this.label,
-    this.leading,
-    required this.onTap,
-  });
+  const _GridItemCard({required this.label, this.leading, required this.onTap});
   final String label;
   final Widget? leading;
   final VoidCallback onTap;
@@ -481,10 +481,7 @@ class _GridItemCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(height: 8),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(height: 8)],
               Flexible(
                 child: Text(
                   label,
@@ -538,13 +535,18 @@ class _CategoryFilterChips<T> extends StatelessWidget {
               : entries.where((e) => label(e) == cat).length;
           return FilterChip(
             selected: sel,
-            label: Text('${cat ?? "全部"} ($count)', style: const TextStyle(fontSize: 11)),
+            label: Text(
+              '${cat ?? "全部"} ($count)',
+              style: const TextStyle(fontSize: 11),
+            ),
             onSelected: (_) => onSelected(sel ? null : cat),
             backgroundColor: TitoColors.card,
             selectedColor: TitoColors.mint,
             checkmarkColor: TitoColors.deepBlue,
             side: BorderSide(
-              color: sel ? TitoColors.mint : TitoColors.ink.withValues(alpha: 0.2),
+              color: sel
+                  ? TitoColors.mint
+                  : TitoColors.ink.withValues(alpha: 0.2),
             ),
           );
         },

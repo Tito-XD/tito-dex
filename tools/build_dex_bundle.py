@@ -629,6 +629,11 @@ class PokeApiBuilder:
             "type": move["type"]["name"],
             "category": move["damage_class"]["name"],
         }
+        generation = SPECIES_GENERATION_NUMBER.get(
+            (move.get("generation") or {}).get("name")
+        )
+        if generation is not None:
+            cached["generation"] = generation
         for key in ("power", "accuracy", "pp"):
             if move.get(key) is not None:
                 cached[key] = move[key]
@@ -648,6 +653,11 @@ class PokeApiBuilder:
             "descriptionZh": ability_description_zh(detail),
             "isHidden": is_hidden,
         }
+        generation = SPECIES_GENERATION_NUMBER.get(
+            (detail.get("generation") or {}).get("name")
+        )
+        if generation is not None:
+            ability["generation"] = generation
         self.ability_cache[cache_key] = ability
         return ability
 
@@ -660,6 +670,11 @@ class PokeApiBuilder:
                 "nameZh": ability["nameZh"],
                 "descriptionZh": ability["descriptionZh"],
                 "pokemonIds": [],
+                **(
+                    {"generation": ability["generation"]}
+                    if ability.get("generation") is not None
+                    else {}
+                ),
             },
         )
         if pokemon_id not in entry["pokemonIds"]:
@@ -2061,7 +2076,11 @@ def fetch_move_set_for_version_group(
             if method == "level-up" and level > 0:
                 ref["level"] = level
             target[move_id] = ref
-            builder.fetch_move(move_id)
+            cached_move = builder.fetch_move(move_id)
+            available = cached_move.setdefault("availableVersionGroups", [])
+            if version_group not in available:
+                available.append(version_group)
+                available.sort()
 
     def sort_refs(refs: dict[int, dict[str, Any]], *, by_level: bool) -> list[dict[str, Any]]:
         items = list(refs.values())

@@ -48,8 +48,8 @@ void main() {
   });
 
   group('itemCostLabel', () {
-    test('formats numeric cost with yen prefix', () {
-      expect(itemCostLabel(200), '售价 ¥200');
+    test('formats numeric cost with Pokémon currency', () {
+      expect(itemCostLabel(200), '参考价格 ₽200');
     });
 
     test('returns null when cost missing', () {

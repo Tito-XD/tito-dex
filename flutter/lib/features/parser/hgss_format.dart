@@ -241,6 +241,8 @@ class PartySlotStats {
     this.currentHp,
     this.maxHp,
     this.experience,
+    this.abilityId,
+    this.moveIds = const [],
   });
 
   final int speciesId;
@@ -248,6 +250,8 @@ class PartySlotStats {
   final int? currentHp;
   final int? maxHp;
   final int? experience;
+  final int? abilityId;
+  final List<int> moveIds;
 }
 
 (int speciesId, int level) decryptPartySlot(List<int> raw) {
@@ -264,7 +268,15 @@ PartySlotStats decryptPartySlotStats(List<int> raw) {
   final encrypted = _cryptArray(slot.sublist(8, 136), checksum);
   final decrypted = _shuffleBlocks(encrypted, sv);
   final speciesId = decrypted[0] | (decrypted[1] << 8);
-  final experience = readUint32(decrypted, 4);
+  // Relative to the decrypted payload (the PK4 file's 0x08 header removed):
+  // EXP is at 0x08, ability at 0x0D, and Block B's four moves at 0x20–0x27.
+  // The old EXP offset 0x04 was the OT ID and produced plausible-looking but
+  // incorrect progress values.
+  final experience = readUint32(decrypted, 8);
+  final abilityId = decrypted[13];
+  final moveIds = <int>[
+    for (final offset in const [32, 34, 36, 38]) readUint16(decrypted, offset),
+  ].where((id) => id > 0 && id <= 467).toList(growable: false);
 
   final stats = _cryptArray(slot.sublist(136, 236), personality);
   // HGSS party stats: level @ +4, max HP @ +6, current HP @ +8.
@@ -283,6 +295,8 @@ PartySlotStats decryptPartySlotStats(List<int> raw) {
     currentHp: validHp?.currentHp,
     maxHp: validHp?.maxHp,
     experience: experience > 0 && experience < 2000000 ? experience : null,
+    abilityId: abilityId > 0 ? abilityId : null,
+    moveIds: moveIds,
   );
 }
 

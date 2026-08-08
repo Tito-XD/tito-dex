@@ -200,6 +200,8 @@ class CachedAbility {
     required this.nameZh,
     required this.descriptionZh,
     this.pokemonIds = const [],
+    this.generation,
+    this.availableVersionGroups = const [],
   });
 
   final int id;
@@ -207,6 +209,8 @@ class CachedAbility {
   final String nameZh;
   final String descriptionZh;
   final List<int> pokemonIds;
+  final int? generation;
+  final List<String> availableVersionGroups;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -214,6 +218,9 @@ class CachedAbility {
     'nameZh': nameZh,
     'descriptionZh': descriptionZh,
     if (pokemonIds.isNotEmpty) 'pokemonIds': pokemonIds,
+    if (generation != null) 'generation': generation,
+    if (availableVersionGroups.isNotEmpty)
+      'availableVersionGroups': availableVersionGroups,
   };
 
   factory CachedAbility.fromJson(
@@ -227,6 +234,11 @@ class CachedAbility {
     pokemonIds: (json['pokemonIds'] as List<dynamic>? ?? const [])
         .map((value) => (value as num).toInt())
         .toList(growable: false),
+    generation: (json['generation'] as num?)?.toInt(),
+    availableVersionGroups:
+        (json['availableVersionGroups'] as List<dynamic>? ?? const [])
+            .whereType<String>()
+            .toList(growable: false),
   );
 }
 
@@ -241,6 +253,8 @@ class CachedMove {
     this.accuracy,
     this.pp,
     this.descriptionZh,
+    this.generation,
+    this.availableVersionGroups = const [],
   });
 
   final int id;
@@ -252,6 +266,8 @@ class CachedMove {
   final int? accuracy;
   final int? pp;
   final String? descriptionZh;
+  final int? generation;
+  final List<String> availableVersionGroups;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -263,6 +279,9 @@ class CachedMove {
     if (accuracy != null) 'accuracy': accuracy,
     if (pp != null) 'pp': pp,
     if (descriptionZh != null) 'descriptionZh': descriptionZh,
+    if (generation != null) 'generation': generation,
+    if (availableVersionGroups.isNotEmpty)
+      'availableVersionGroups': availableVersionGroups,
   };
 
   factory CachedMove.fromJson(Map<String, dynamic> json) => CachedMove(
@@ -275,6 +294,11 @@ class CachedMove {
     accuracy: json['accuracy'] as int?,
     pp: json['pp'] as int?,
     descriptionZh: json['descriptionZh'] as String?,
+    generation: (json['generation'] as num?)?.toInt(),
+    availableVersionGroups:
+        (json['availableVersionGroups'] as List<dynamic>? ?? const [])
+            .whereType<String>()
+            .toList(growable: false),
   );
 }
 

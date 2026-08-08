@@ -29,6 +29,10 @@ void main() {
     expect(summary.party.first.maxHp!, greaterThan(0));
     expect(summary.party[1].speciesName, 'Togepi');
     expect(summary.party[1].level, 6);
+    expect(summary.party.first.abilityId, 66);
+    expect(summary.party.first.moveIds, [172, 15, 108, 52]);
+    expect(summary.party.first.experience, 16005);
+    expect(summary.badgeProgress, {'城都': 3, '关都': 0});
     expect(summary.locationLabel, '满金市');
     expect(summary.mapHeaderId, 76);
     expect(summary.saveHash, isNotEmpty);
@@ -46,6 +50,7 @@ void main() {
     final summary = const HgssParser().parseSummary(bytes);
     expect(summary.badges, 4);
     expect(summary.maxBadges, 16);
+    expect(summary.badgeProgress, {'城都': 3, '关都': 1});
   });
 
   test('decodes Gen IV full-width and half-width trainer characters', () {
@@ -59,7 +64,7 @@ void main() {
     );
   });
 
-  test('uses source save time for the journey timeline', () async {
+  test('uses TitoDex import time for the journey timeline', () async {
     final bytes = await rootBundle.load('assets/fixtures/PKMSS.sav');
     const parser = HgssParser();
     final savedAt = DateTime.utc(2026, 7, 15, 9, 30);
@@ -70,7 +75,12 @@ void main() {
 
     expect(summary.savedAt, savedAt);
     final timelineEntry = parser.toJourney(summary).timeline.first;
-    expect(timelineEntry.at, contains('2026/7/15'));
+    final parsedLocal = summary.parsedAt.toLocal();
+    expect(
+      timelineEntry.at,
+      contains('${parsedLocal.year}/${parsedLocal.month}/${parsedLocal.day}'),
+    );
+    expect(timelineEntry.at, isNot(contains('2026/7/15')));
     expect(timelineEntry.text, contains('心金/魂银'));
   });
 }
