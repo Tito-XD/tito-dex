@@ -1,89 +1,95 @@
+**简体中文** | [English](README.en.md)
+
 # TitoDex
 
-**TitoDex** is a warm, offline-first Pokémon **journey companion** for Android handhelds and phones. It brings save progress, team and journey management, a 1–1025 Pokédex, Chinese reference data, and lightweight battle utilities into one compact, device-like interface.
+**TitoDex** 是一款温暖、离线优先的宝可梦**旅程助手**，面向 Android 掌机与手机。它把存档进度、队伍与旅程管理、全国图鉴 1–1025、中文资料和轻量对战工具装进一套紧凑、有掌机感的界面。
 
-It is built to make returning to a playthrough feel immediate and familiar: see where the journey paused, check the current team, and open the right reference tool without losing the character of a dedicated trainer device. It does not aim to replace a full community wiki or competitive simulator.
+它希望让你每次回到旧存档时都能马上接上旅程：知道停在哪里、队伍里有什么、下一步该抓谁或进化谁，并快速打开对应资料。TitoDex 不打算替代完整社区 Wiki 或竞技模拟器，而是专注于实际游玩时最常用的信息。
 
-| Channel | Version | Notes |
+| 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8+142` | Journey assistant, location dex, configurable Android shortcuts |
-| Offline APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8-offline+143` | Embeds the verified compact v14 dex archive and can update to v19 |
-| `main` source baseline | App `0.8.8+142` | Three-phase correctness/UX closure with aligned data-to-UI coverage |
+| Lite APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8+142` | 旅程存档助手、地点图鉴、可自定义 Android 快捷入口 |
+| Offline APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8-offline+143` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
+| `main` 源码基线 | App `0.8.8+142` | 三个 Phase 已收口，完成数据—功能—UI 对齐审计 |
 
-> Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
+> 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
-Dex data: CDN **v19** / Offline APK compact **v14** · 1025 species · 803 form records · audited static/animated/shiny/cry media · complete item descriptions and icons.
+图鉴数据：在线包 **v19** / Offline 内置紧凑种子 **v14** · 1025 个物种 · 803 条形态记录 · 静态、动态、闪光与叫声媒体已审计 · 道具中文说明和图标完整。
 
-## Highlights
+## 当前亮点
 
-- **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions
-- **Save assistant** — current-location capture reminders, party evolution routes, and exact-version completion gaps
-- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata import and richer HGSS party/map/dex parsing
-- **Native Android handoff** — choose an installed emulator or game app and resume from TitoDex
-- **Companion touches** — a height-scaled animated standby Pokémon with quotes and cries, a six-slot party card, rare shiny surprises, and a silhouette quiz
-- **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters with icons, form-aware evolution chains, exact game/DLC obtain methods and conditions, moves, abilities, and selective form sprites
-- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status, with practical type/category filters
-- **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers
-- **Offline-first data** — downloadable dex bundle with Chinese labels, maps, config, icons, and list sprites
-- **Handheld layouts** — phone, tablet, and square-screen dashboard support with controller focus navigation
+- **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
+- **存档助手**：给出当前位置附近未捕获、队伍进化路线、成对版本可直遇缺口，以及进化／孵蛋／交换补全建议。
+- **存档联动**：绑定一个 `.sav` 文件并保留读取权限；实验性识别 Gen 1–7 元数据，HGSS 可进一步读取队伍、地图、双徽章区、训练家 ID 与图鉴进度。
+- **全国图鉴 1–1025**：支持形态搜索、地区或 G1–G9 范围、体形／颜色／大小等组合筛选、形态进化链、精确游戏与 DLC 获取方式、招式、特性和形态媒体。
+- **地点图鉴**：按所选版本查看地点与遭遇，并结合已捕获状态显示完成度。
+- **资料中心**：招式、特性、性格、蛋群、道具、天气、场地和异常状态，带实用筛选与宝可梦反查。
+- **对战工具**：属性克制、能力值与伤害估算、队伍盲点，以及特性、道具、天气、场地、异常状态和太晶修正；计算假设会明确展示。
+- **Android 快捷入口**：长按 App 图标默认显示“图鉴 + 搜索”，可在设置中自定义至多三个二级功能。
+- **原生应用联动**：选择已安装的模拟器或游戏应用，从 TitoDex 快速继续游玩。
+- **离线优先**：可下载带中文标签、地图、配置和图标的图鉴数据；Offline 版本首次启动直接准备已验证的本地种子。
+- **掌机布局**：覆盖手机、平板、方屏掌机与手柄焦点导航。
 
-## Product principles
+## 产品原则
 
-1. **Resume quickly** — show the information needed to continue a playthrough.
-2. **Respect game context** — filter data and tools by the selected title and generation.
-3. **Work offline** — prefer local saves, cached reference data, and bundled fallbacks.
-4. **Stay focused** — provide practical reference depth without duplicating a full wiki.
-5. **Scale across devices** — support Android phones and compact handheld displays.
+1. **快速继续旅程**：先展示继续游玩真正需要的信息。
+2. **尊重游戏上下文**：资料与机制跟随所选版本和世代。
+3. **离线可用**：优先使用本地存档、缓存数据和随包兜底资源。
+4. **保持聚焦**：提供实用深度，不复制完整 Wiki。
+5. **适配不同设备**：兼顾 Android 手机和紧凑掌机屏幕。
 
-## Stack
+## 技术栈
 
-| Layer | Choice |
+| 层级 | 方案 |
 | --- | --- |
-| App | **Flutter + Dart** (`flutter/`) |
-| Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
-| Persistence | `shared_preferences` + offline `dex_offline/` |
-| Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |
-| Dex data | Pre-built bundle v19 with v5 → v4 → v3 → v2 CDN fallback and APK asset fallbacks |
-| UI language | Simplified Chinese |
+| App | **Flutter + Dart**（`flutter/`） |
+| 路由 | `go_router`：首页、队伍、旅程、图鉴、搜索、设置 |
+| 持久化 | `shared_preferences` + 本地 `dex_offline/` |
+| 存档 | 单文件 URI + Gen 1–7 元数据识别；HGSS 队伍／地图／图鉴解析 |
+| 图鉴数据 | 预构建 v19 数据包，带 v5 → v4 → v3 → v2 回退与 APK 内置兜底 |
+| UI 语言 | 简体中文 |
 
-Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
+详细说明：[架构](docs/ARCHITECTURE.md) · [技术栈决策](docs/STACK_DECISION.md)
 
-## Install
+## 安装
 
-Download **`TitoDex-0.8.8-lite-rg-arm64.apk`** or **`TitoDex-0.8.8-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.8-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.8-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
 
-The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
+- **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
+- **Offline**：内置同一套核心数据，首次启动会准备随包数据，适合网络不稳定的设备。
 
-## Development
+如果 Android 提示与本地 Debug 包签名冲突，请先卸载 Debug 包再安装正式版。
+
+## 开发
 
 ```bash
 cd flutter
 flutter pub get
 flutter test
-flutter run              # device / emulator
-flutter run -d chrome    # limited web preview
+flutter run              # 真机 / 模拟器
+flutter run -d chrome    # 功能有限的 Web 预览
 ```
 
-Build and release instructions: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
+构建与发布：[docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
 
-Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repository permissions](docs/PERMISSIONS.md)
+维护者资料：[图鉴数据包与 CDN](docs/CLOUDFLARE_DEX_CDN.md) · [仓库权限](docs/PERMISSIONS.md)
 
-## Documentation
+## 文档
 
-| Document | Contents |
+| 文档 | 内容 |
 | --- | --- |
-| [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
-| [Vision](VISION.md) | Product goals and boundaries |
-| [Product](PRODUCT.md) | Audience, feature set, and priorities |
-| [Roadmap](ROADMAP.md) | Release history and next work |
-| [Flutter app](flutter/README.md) | App development notes |
-| [Design system](docs/DESIGN_SYSTEM.md) | Visual and interaction tokens |
-| [Release build](docs/RELEASE_BUILD.md) | APK checklist |
-| [Release history](docs/RELEASES.md) | Standardized GitHub Release notes |
+| [AI 上下文](docs/AI_CONTEXT.md) | 当前版本、功能状态、架构和维护约束 |
+| [产品愿景](VISION.md) | 产品体验与边界 |
+| [产品说明](PRODUCT.md) | 用户、功能定位与优先级 |
+| [路线图](ROADMAP.md) | 发布历史与后续方向 |
+| [Flutter App](flutter/README.md) | App 开发说明 |
+| [设计系统](docs/DESIGN_SYSTEM.md) | 视觉与交互规范 |
+| [发布构建](docs/RELEASE_BUILD.md) | APK 构建和校验清单 |
+| [Release Notes](docs/RELEASES.md) | 中文优先的发布文案规范与历史 |
 
-## HGSS test save
+## HGSS 测试存档
 
-The bundled fixture `PKMSS.sav` is available for parser and import testing. Expected fields include three badges, Goldenrod City, and a party containing Quilava and Togepi.
+仓库内置 `PKMSS.sav` fixture，用于解析和导入测试。预期可读出 3 枚徽章、满金市，以及包含火岩鼠和波克比的队伍。
 
 ```bash
 python3 tools/probe_hgss_save.py fixtures/PKMSS.sav

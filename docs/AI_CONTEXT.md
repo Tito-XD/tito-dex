@@ -280,7 +280,10 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 ### Do
 - Edit **`flutter/lib/`** and **`flutter/test/`** only for product work.
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`).
-- GitHub artifacts (commits, PRs, releases) in **English** unless user asks otherwise.
+- Write commits and pull requests in **English**. GitHub Release titles and
+  bodies are **Simplified Chinese by default**, following `docs/RELEASES.md`;
+  keep the standalone English README current instead of duplicating every
+  release note bilingually.
 - Prefer small, focused diffs; match existing patterns.
 - Run `flutter test` before pushing.
 
@@ -306,11 +309,12 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 
 | Doc | Purpose |
 | --- | --- |
-| [README.md](../README.md) | Project intro, quick start |
+| [README.md](../README.md) | 中文项目介绍与快速开始（默认） |
+| [README.en.md](../README.en.md) | Maintained English project overview |
 | [VISION.md](../VISION.md) | Product feeling & philosophy |
 | [PRODUCT.md](../PRODUCT.md) | Feature positioning |
 | [ROADMAP.md](../ROADMAP.md) | Release history & what's next |
-| [RELEASES.md](./RELEASES.md) | Standardized GitHub Release copy archive |
+| [RELEASES.md](./RELEASES.md) | 中文优先的 GitHub Release 文案规范与近期历史 |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical structure |
 | [STACK_DECISION.md](./STACK_DECISION.md) | Why Flutter; migration notes |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
@@ -327,5 +331,7 @@ Legacy handoff docs under `docs/handoff/` are historical — prefer this file fo
 
 ## Communication
 
-- Product discussions use **Chinese** by default; repository artifacts use **English** unless a task requests otherwise.
+- Product discussions and public Release Notes use **Chinese** by default;
+  commits and pull requests use English. The root README is Chinese and links
+  to the maintained English edition.
 - When unsure between reference breadth and playthrough utility, choose **playthrough utility**.

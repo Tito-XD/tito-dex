@@ -23,6 +23,18 @@ on:
         description: Expected Offline Android versionCode
         required: true
         type: string
+      release_title:
+        description: Full Chinese release title, for example TitoDex v0.8.8 · 存档助手与地点图鉴
+        required: true
+        type: string
+      release_summary:
+        description: One-sentence Chinese user-facing summary
+        required: true
+        type: string
+      release_highlights:
+        description: Chinese Markdown bullet list of user-visible changes
+        required: true
+        type: string
 
 permissions:
   actions: read
@@ -111,6 +123,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ inputs.version }}
           SOURCE_SHA: ${{ inputs.source_sha }}
+          RELEASE_TITLE: ${{ inputs.release_title }}
+          RELEASE_SUMMARY: ${{ inputs.release_summary }}
+          RELEASE_HIGHLIGHTS: ${{ inputs.release_highlights }}
         run: |
           set -euo pipefail
           tag="v$VERSION"
@@ -125,15 +140,17 @@ jobs:
             git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
             git push origin "refs/tags/$tag"
           fi
-          cat > /tmp/release-notes.md <<EOF
-          TitoDex $tag ships verified Lite and Offline Android packages.
+          printf '%s\n\n' "$RELEASE_SUMMARY" > /tmp/release-notes.md
+          printf '### 本次更新\n\n%s\n\n' "$RELEASE_HIGHLIGHTS" >> /tmp/release-notes.md
+          cat >> /tmp/release-notes.md <<EOF
+          ### 下载
 
-          ### Downloads
+          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线数据包。
+          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置已验证的紧凑离线数据。
 
-          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`: recommended; downloads the offline data pack on demand.
-          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`: embeds the verified compact offline seed.
+          ### 验证
 
-          Both APKs contain the arm64-v8a Flutter runtime and are verified against the requested app version, build number, package id, archive integrity, and release signer.
+          两个 APK 均为 arm64-v8a，且已核对应用版本、版本码、包名、压缩包完整性与发布签名；Offline 版本额外验证内置数据清单和归档摘要。
           EOF
           {
             printf '\n### SHA-256\n\n```text\n'
@@ -145,5 +162,5 @@ jobs:
             "dist/release/TitoDex-$VERSION-offline-rg-arm64.apk" \
             --verify-tag \
             --draft \
-            --title "TitoDex $tag" \
+            --title "$RELEASE_TITLE" \
             --notes-file /tmp/release-notes.md

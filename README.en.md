@@ -1,0 +1,93 @@
+[简体中文](README.md) | **English**
+
+# TitoDex
+
+**TitoDex** is a warm, offline-first Pokémon **journey companion** for Android handhelds and phones. It brings save progress, team and journey management, a 1–1025 Pokédex, Chinese reference data, and lightweight battle utilities into one compact, device-like interface.
+
+It is designed to make returning to a playthrough feel immediate: see where the journey paused, check the current team, and open the right reference tool without losing the character of a dedicated trainer device. TitoDex does not try to replace a full community wiki or competitive simulator.
+
+| Channel | Version | Notes |
+| --- | --- | --- |
+| Lite APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8+142` | Journey assistant, Location Dex, and configurable Android shortcuts |
+| Offline APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8-offline+143` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.8+142` | Three-phase correctness and UX closure with audited data-to-UI coverage |
+
+> Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
+
+Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species · 803 form records · audited static, animated, shiny, and cry media · complete item descriptions and icons.
+
+## Highlights
+
+- **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
+- **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
+- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition and richer HGSS party, map, badge, Trainer ID, and Pokédex parsing.
+- **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
+- **Location Dex** — selected-version area encounters and caught completion, backed by the existing reverse location index.
+- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status with practical filters and species drill-down.
+- **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers with explicit assumptions.
+- **Android shortcuts** — long-press the app icon for Dex and Search by default; Settings can customize up to three secondary destinations.
+- **Native Android handoff** — select an installed emulator or game app and resume from TitoDex.
+- **Offline-first data** — downloadable Dex bundle with Chinese labels, maps, configuration, icons, and list sprites; the Offline APK starts from a verified local seed.
+- **Handheld layouts** — phones, tablets, square screens, and controller focus navigation.
+
+## Product principles
+
+1. **Resume quickly** — show what is needed to continue a playthrough.
+2. **Respect game context** — filter data and mechanics by the selected title and generation.
+3. **Work offline** — prefer local saves, cached reference data, and bundled fallbacks.
+4. **Stay focused** — provide practical reference depth without duplicating a full wiki.
+5. **Scale across devices** — support Android phones and compact handheld displays.
+
+## Stack
+
+| Layer | Choice |
+| --- | --- |
+| App | **Flutter + Dart** (`flutter/`) |
+| Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
+| Persistence | `shared_preferences` + offline `dex_offline/` |
+| Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |
+| Dex data | Pre-built bundle v19 with v5 → v4 → v3 → v2 fallback and APK asset fallbacks |
+| UI language | Simplified Chinese |
+
+Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
+
+## Install
+
+Download **`TitoDex-0.8.8-lite-rg-arm64.apk`** or **`TitoDex-0.8.8-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+
+The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
+
+## Development
+
+```bash
+cd flutter
+flutter pub get
+flutter test
+flutter run              # device / emulator
+flutter run -d chrome    # limited web preview
+```
+
+Build and release instructions: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
+
+Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repository permissions](docs/PERMISSIONS.md)
+
+## Documentation
+
+| Document | Contents |
+| --- | --- |
+| [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
+| [Vision](VISION.md) | Product goals and boundaries |
+| [Product](PRODUCT.md) | Audience, feature set, and priorities |
+| [Roadmap](ROADMAP.md) | Release history and next work |
+| [Flutter app](flutter/README.md) | App development notes |
+| [Design system](docs/DESIGN_SYSTEM.md) | Visual and interaction tokens |
+| [Release build](docs/RELEASE_BUILD.md) | APK checklist |
+| [Release notes](docs/RELEASES.md) | Chinese-first GitHub Release copy rules and history |
+
+## HGSS test save
+
+The bundled `PKMSS.sav` fixture is available for parser and import testing. Expected fields include three badges, Goldenrod City, and a party containing Quilava and Togepi.
+
+```bash
+python3 tools/probe_hgss_save.py fixtures/PKMSS.sav
+```
