@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · Lite `0.8.8+142` · Offline `0.8.8-offline+143`.
+> **Latest release:** [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · Lite `0.8.9+144` · Offline `0.8.9-offline+145`.
 >
-> **Current `main`:** v0.8.8 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.9 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -10,13 +10,23 @@
 | --- | --- |
 | Android journey companion, routing, persistence and emulator launch | Shipped |
 | Configurable Android app-icon shortcuts | Shipped in v0.8.8; defaults to Dex + Search and can expose up to three selected dex, reference or battle-tool destinations |
-| Save import | HGSS fixture-verified; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
+| Save import | HGSS fixture-verified including party ability/moves/EXP and regional badges; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | Offline data | Live bundle v19; compact v14 Offline seed |
-| Items | 2130/2130 descriptions and local icons; provenance audit closed |
+| Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.9
+
+- Repair the Settings media resource route, make failed catalogs retryable, and keep load failures recoverable.
+- Replace the reduced companion-position preview with a full-screen delta-based drag surface that commits once at drag end.
+- Scope item availability/prices, moves, abilities and reference mechanics to the selected game/generation, while leaving unsupported future data honestly unknown.
+- Turn Location Dex into a compact responsive grid with a draggable missing-first encounter sheet.
+- Parse HGSS party EXP, ability and four move IDs; expose team evolution/move/ability assistance and quick-damage handoff.
+- Display Johto and Kanto badge progress separately and record Journey activity at actual TitoDex import time.
+- Remove the Team page's SoulSilver fallback from visible/current-version state; exact HeartGold and SoulSilver selections now own their label and journey key.
 
 ## Completed in v0.8.8
 

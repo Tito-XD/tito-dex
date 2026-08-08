@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_game_scope.dart';
+import '../features/dex/item_game_data.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -112,6 +113,25 @@ String? itemCostLabel(Object? cost) {
     return null;
   }
   return AppZh.dexReferenceItemCost('$cost');
+}
+
+String? itemVersionPriceLabel(
+  Map<String, dynamic> entry, {
+  bool compact = false,
+}) {
+  final buy = entry['_priceBuy'];
+  final sell = entry['_priceSell'];
+  if (buy == null && sell == null) return null;
+  final currency = itemCurrencyLabelZh(
+    entry['_priceCurrency'] as String? ?? 'poke-dollar',
+  );
+  String amount(Object value) =>
+      currency == '₽' ? '₽$value' : '$value $currency';
+  final parts = [
+    if (buy != null) '${compact ? '买' : '购买'} ${amount(buy)}',
+    if (sell != null) '${compact ? '卖' : '出售'} ${amount(sell)}',
+  ];
+  return parts.join(' · ');
 }
 
 Map<String, double>? parseTypeModifiers(Map<String, dynamic> entry) {
@@ -392,7 +412,9 @@ class ItemReferenceDetail extends StatelessWidget {
     final categoryLabel = itemCategoryLabelZh(category) != ''
         ? itemCategoryLabelZh(category)
         : (entry['categoryZh'] as String? ?? '');
-    final costLabel = itemCostLabel(entry['cost']);
+    final priceLabel = itemVersionPriceLabel(entry);
+    final gameLabel = entry['_gameLabelZh'] as String?;
+    final availability = entry['_gameAvailability'] as String? ?? 'unknown';
     final effect =
         referenceDescriptionZh(entry) ??
         entry['effectZh'] as String? ??
@@ -415,9 +437,13 @@ class ItemReferenceDetail extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
-        if (costLabel != null) ...[
+        if (gameLabel != null) ...[
           Text(
-            costLabel,
+            availability == 'unknown'
+                ? '$gameLabel · 可用性与价格资料待补齐'
+                : priceLabel == null
+                ? '$gameLabel · 可获得，非普通商店售价'
+                : '$gameLabel · $priceLabel',
             style: SecondaryTypography.onCard.body14.copyWith(
               fontWeight: FontWeight.w700,
             ),

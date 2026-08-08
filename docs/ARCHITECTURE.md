@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.8 · Lite `0.8.8+142` · Offline `0.8.8-offline+143` · live bundle v19 / compact seed v14.
+> Current release: v0.8.9 · Lite `0.8.9+144` · Offline `0.8.9-offline+145` · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
@@ -39,6 +39,10 @@ card uses only the cached summary catalog + location index; the Journey page
 loads at most the six party detail records for evolution reminders. Both
 resolve the selected exact flavor (or merge paired flavors) without inverting
 1025 details on-device.
+
+APK-local `item_version_matrix.json` and `move_version_matrix.json` add
+selected-game availability/prices and move-removal gates without requiring a
+new CDN bundle. Future bundle builds also persist move debut/version metadata.
 
 ## Active layout
 

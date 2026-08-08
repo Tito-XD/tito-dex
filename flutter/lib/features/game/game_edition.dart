@@ -47,6 +47,33 @@ class GameEdition {
   /// Whether this edition has sub-versions to choose from.
   bool get hasFlavorVersions => flavorVersions.length > 1;
 
+  /// Exact display name when the user selected one side of a paired release.
+  String get selectedLabelZh =>
+      selectedFlavor == null ? labelZh : flavorVersionLabelZh(selectedFlavor!);
+
+  /// Journey/save key matching the selected side of a paired release.
+  ///
+  /// [journeyGameKey] remains the merged-edition fallback for legacy data.
+  String? get selectedJourneyGameKey => switch (selectedFlavor) {
+    'diamond' => 'Diamond',
+    'pearl' => 'Pearl',
+    'heartgold' => 'HeartGold',
+    'soulsilver' => 'SoulSilver',
+    'black' => 'Black',
+    'white' => 'White',
+    'black-2' => 'Black2',
+    'white-2' => 'White2',
+    'x' => 'X',
+    'y' => 'Y',
+    'omega-ruby' => 'OmegaRuby',
+    'alpha-sapphire' => 'AlphaSapphire',
+    'sun' => 'Sun',
+    'moon' => 'Moon',
+    'ultra-sun' => 'UltraSun',
+    'ultra-moon' => 'UltraMoon',
+    _ => journeyGameKey,
+  };
+
   /// A copy with the preferred sub-version selected (or null for merged).
   GameEdition withFlavor(String? flavor) {
     if (flavor == selectedFlavor) {
@@ -462,7 +489,7 @@ GameEdition? gameEditionForSaveGame(String? saveGame) {
   return flavor == null ? edition : edition.withFlavor(flavor);
 }
 
-String gameEditionLabelZh(GameEdition edition) => edition.labelZh;
+String gameEditionLabelZh(GameEdition edition) => edition.selectedLabelZh;
 
 String gameEditionLabelForVersionGroup(String versionGroupKey) {
   for (final edition in GameEdition.all) {

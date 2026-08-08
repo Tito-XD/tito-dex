@@ -140,11 +140,17 @@ class PlatformSaveDocumentSource implements SaveDocumentSource {
     if (bytes is! Uint8List || uri is! String || fileName is! String) {
       return null;
     }
+    final rawModifiedMs = raw['modifiedMs'];
     return SaveDocument(
       uri: uri,
       fileName: fileName,
       bytes: bytes,
-      modifiedMs: raw['modifiedMs'] as int?,
+      // Android document providers commonly return 0 when the column is
+      // unknown. Treating it as Unix epoch made the newest journey activity
+      // appear in 1970 instead of falling back to the import time.
+      modifiedMs: rawModifiedMs is int && rawModifiedMs > 0
+          ? rawModifiedMs
+          : null,
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
+import '../../features/dex/reference_game_scope.dart';
+import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
@@ -10,9 +12,14 @@ class AbilityEncyclopediaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final edition = gameEditionRepository.edition;
     return DexReferenceListPage<CachedAbility>(
+      key: ValueKey('abilities:${edition.slug}:${edition.selectedFlavor}'),
       title: AppZh.dexReferenceAbilities,
-      loadEntries: dexRepository.getAllAbilities,
+      subtitle: edition.labelZh,
+      loadEntries: () async => (await dexRepository.getAllAbilities())
+          .where((ability) => cachedAbilityAvailableInEdition(ability, edition))
+          .toList(growable: false),
       filterEntry: filterCachedAbility,
       primaryLabel: (ability) => ability.nameZh,
       secondaryLabel: (ability) => '#${ability.id} · ${ability.nameEn}',

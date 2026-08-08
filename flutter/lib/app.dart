@@ -35,6 +35,7 @@ import 'pages/companion_position_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/media_resource_page.dart';
 import 'pages/companion/blind_spot_page.dart';
 import 'pages/companion/quick_damage_page.dart';
 import 'pages/companion/stat_calc_page.dart';
@@ -331,6 +332,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: CompanionPositionPage(journey: _journey),
                     ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'media-resources',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: const TitoPageContainer(child: MediaResourcePage()),
                   ),
                 ),
               ],
@@ -715,8 +723,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
     }
     await gameEditionRepository.save(picked);
     await dexSettingsRepository.saveDefaultGameEdition(picked);
-    final journeyKey = picked.journeyGameKey ?? _journey.game;
-    if (picked.journeyGameKey != null && _journey.game != journeyKey) {
+    final journeyKey = picked.selectedJourneyGameKey ?? _journey.game;
+    if (picked.selectedJourneyGameKey != null && _journey.game != journeyKey) {
       await _persist(_journey.copyWith(game: journeyKey));
     }
     if (!mounted || !context.mounted) {

@@ -230,6 +230,14 @@ class OnlineMediaCatalog {
 
   Future<Map<int, OnlineMediaEntry>> load() => _future ??= _load();
 
+  /// Discard a possibly stale/failed lazy result and read the active bundle
+  /// again. A transient network or bundle-install failure must not leave the
+  /// resource manager empty until the process is restarted.
+  Future<Map<int, OnlineMediaEntry>> reload() {
+    _future = null;
+    return load();
+  }
+
   Future<Map<int, OnlineMediaEntry>> _load() async {
     try {
       final entries = await dexRepository.getReferenceEntries(

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_repository.dart';
+import '../features/dex/ability_type_modifiers.dart';
+import '../features/dex/type_chart.dart';
+import '../features/companion/battle_handoff.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
-import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
@@ -21,6 +24,7 @@ import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_sprite_sticker.dart';
 import '../widgets/team_summary_card.dart';
+import 'dex/dex_reference_list.dart';
 
 class TeamPage extends StatefulWidget {
   const TeamPage({
@@ -138,6 +142,7 @@ class _TeamPageState extends State<TeamPage> {
     required String nickname,
     required List<String> types,
     required String? abilitySlug,
+    required List<int> moveIds,
   }) {
     final member = _party[index];
     final updated = List<PartyMember>.from(_party);
@@ -146,6 +151,7 @@ class _TeamPageState extends State<TeamPage> {
       nickname: nickname.isEmpty ? null : nickname,
       types: types,
       abilitySlug: abilitySlug,
+      moveIds: moveIds,
       userEdited: true,
       clearNickname: nickname.isEmpty,
       clearAbilitySlug: abilitySlug == null,
@@ -215,8 +221,6 @@ class _TeamPageState extends State<TeamPage> {
 
   @override
   Widget build(BuildContext context) {
-    final journey = widget.journey;
-
     return SecondaryPageScaffold(
       title: AppZh.navTeam,
       padding: DeviceLayout.pagePadding(context),
@@ -262,7 +266,7 @@ class _TeamPageState extends State<TeamPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${AppZh.navTeam} · ${localizeGame(journey.game)}',
+                '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabelZh}',
                 style: SecondaryTypography.onGradient.h15,
               ),
               const SizedBox(height: 4),
@@ -296,6 +300,8 @@ class _TeamPageState extends State<TeamPage> {
             onClose: () => setState(() => _editingIndex = null),
           ),
         ),
+        const SizedBox(height: 14),
+        _TeamAssistCard(party: _party),
         const SizedBox(height: 14),
         StickerCard(
           variant: StickerVariant.cream,
@@ -337,6 +343,7 @@ class _InlineTeamEditor extends StatefulWidget {
     required String nickname,
     required List<String> types,
     required String? abilitySlug,
+    required List<int> moveIds,
   })
   onSave;
   final ValueChanged<int> onDelete;
@@ -352,7 +359,9 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
   late final TextEditingController _nicknameController;
   late List<String> _selectedTypes;
   String? _selectedAbility;
+  late Set<int> _selectedMoveIds;
   List<PokemonAbility> _abilities = const [];
+  List<CachedMove> _availableMoves = const [];
   var _speciesLinked = false;
 
   @override
@@ -366,6 +375,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     );
     _selectedTypes = List<String>.from(widget.member.types);
     _selectedAbility = widget.member.abilitySlug;
+    _selectedMoveIds = widget.member.moveIds.toSet();
     _loadDexData();
   }
 
@@ -377,6 +387,20 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     try {
       final summary = await dexRepository.getSummary(speciesId);
       final abilities = await dexRepository.abilitiesForPokemon(speciesId);
+      final detail = await dexRepository.getDetail(speciesId);
+      final moveSet = detail.moveSetForKey(
+        gameEditionRepository.edition.dataVersionGroupKey,
+      );
+      String? parsedAbilitySlug;
+      if (_selectedAbility == null && widget.member.abilityId != null) {
+        final catalog = await dexRepository.getAllAbilities();
+        for (final ability in catalog) {
+          if (ability.id == widget.member.abilityId) {
+            parsedAbilitySlug = abilitySlugFromNameEn(ability.nameEn);
+            break;
+          }
+        }
+      }
       if (!mounted) {
         return;
       }
@@ -386,6 +410,9 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
         }
         _speciesLinked = true;
         _abilities = abilities;
+        _availableMoves = List<CachedMove>.from(moveSet.allMoves)
+          ..sort((a, b) => a.nameZh.compareTo(b.nameZh));
+        _selectedAbility ??= parsedAbilitySlug;
         _selectedAbility ??= defaultAbilitySlugForOptions(
           defensiveAbilityOptionsFrom(abilities),
         );
@@ -400,6 +427,93 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     _levelController.dispose();
     _nicknameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickMoves() async {
+    var query = '';
+    final working = Set<int>.from(_selectedMoveIds);
+    final picked = await showModalBottomSheet<Set<int>>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          final normalized = query.trim().toLowerCase();
+          final visible = normalized.isEmpty
+              ? _availableMoves
+              : _availableMoves
+                    .where(
+                      (move) =>
+                          move.nameZh.contains(query.trim()) ||
+                          move.nameEn.toLowerCase().contains(normalized) ||
+                          move.id.toString() == normalized,
+                    )
+                    .toList(growable: false);
+          return SafeArea(
+            child: SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.76,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '选择招式 · ${working.length}/4',
+                            style: SecondaryTypography.onCard.h15,
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: () => Navigator.pop(sheetContext, working),
+                          child: const Text(AppZh.confirm),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      autofocus: true,
+                      decoration: retroInsetDecoration(labelText: '搜索招式名称或编号'),
+                      onChanged: (value) => setSheetState(() => query = value),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: visible.length,
+                        itemBuilder: (context, index) {
+                          final move = visible[index];
+                          final selected = working.contains(move.id);
+                          return CheckboxListTile(
+                            dense: true,
+                            value: selected,
+                            title: Text(move.nameZh),
+                            subtitle: Text(
+                              '#${move.id} · ${typeNameZh(move.type)} · ${_moveCategoryLabelZh(move.category)}',
+                            ),
+                            onChanged: !selected && working.length >= 4
+                                ? null
+                                : (checked) => setSheetState(() {
+                                    if (checked == true) {
+                                      working.add(move.id);
+                                    } else {
+                                      working.remove(move.id);
+                                    }
+                                  }),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    if (picked != null && mounted) {
+      setState(() => _selectedMoveIds = picked);
+    }
   }
 
   @override
@@ -483,6 +597,35 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               onChanged: (slug) => setState(() => _selectedAbility = slug),
             ),
           ],
+          if (_availableMoves.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              '当前招式（最多 4 个）',
+              style: SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                for (final move in _availableMoves)
+                  if (_selectedMoveIds.contains(move.id))
+                    InputChip(
+                      label: Text(move.nameZh),
+                      onDeleted: () =>
+                          setState(() => _selectedMoveIds.remove(move.id)),
+                    ),
+                ActionChip(
+                  avatar: const Icon(Icons.add_rounded, size: 18),
+                  label: Text(_selectedMoveIds.isEmpty ? '选择招式' : '调整招式'),
+                  onPressed: _pickMoves,
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 14),
           Row(
             children: [
@@ -533,6 +676,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               nickname: _nicknameController.text.trim(),
               types: _selectedTypes,
               abilitySlug: _selectedAbility,
+              moveIds: _selectedMoveIds.toList(growable: false),
             ),
           ),
         ],
@@ -540,6 +684,228 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     );
   }
 }
+
+class _TeamAssistCard extends StatefulWidget {
+  const _TeamAssistCard({required this.party});
+
+  final List<PartyMember> party;
+
+  @override
+  State<_TeamAssistCard> createState() => _TeamAssistCardState();
+}
+
+class _TeamAssistCardState extends State<_TeamAssistCard> {
+  late Future<List<_TeamAssistEntry>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TeamAssistCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.party != widget.party) _future = _load();
+  }
+
+  Future<List<_TeamAssistEntry>> _load() async {
+    final moves = {
+      for (final move in await dexRepository.getAllMoves()) move.id: move,
+    };
+    final abilities = {
+      for (final ability in await dexRepository.getAllAbilities())
+        ability.id: ability,
+    };
+    final abilitiesBySlug = {
+      for (final ability in abilities.values)
+        abilitySlugFromNameEn(ability.nameEn): ability,
+    };
+    final result = <_TeamAssistEntry>[];
+    for (final member in widget.party) {
+      PokemonDetail? detail;
+      final id = member.speciesId;
+      if (id != null) {
+        try {
+          detail = await dexRepository.getDetail(id);
+        } catch (_) {}
+      }
+      final node = id == null
+          ? null
+          : _findEvolutionNode(detail?.evolutionChain, id);
+      result.add(
+        _TeamAssistEntry(
+          member: member,
+          moves: [
+            for (final moveId in member.moveIds)
+              if (moves[moveId] != null) moves[moveId]!,
+          ],
+          ability: member.abilityId == null
+              ? abilitiesBySlug[member.abilitySlug]
+              : abilities[member.abilityId],
+          evolutions: node?.children ?? const [],
+        ),
+      );
+    }
+    return result;
+  }
+
+  EvolutionNode? _findEvolutionNode(EvolutionNode? node, int id) {
+    if (node == null) return null;
+    if (node.id == id) return node;
+    for (final child in node.children) {
+      final found = _findEvolutionNode(child, id);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('队伍与进化', style: SecondaryTypography.onCard.h15),
+          const SizedBox(height: 4),
+          Text(
+            '存档可读取的特性与招式会自动带入；手动队伍可在上方点成员补充。',
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
+          const SizedBox(height: 8),
+          FutureBuilder<List<_TeamAssistEntry>>(
+            future: _future,
+            builder: (context, snapshot) {
+              final entries = snapshot.data;
+              if (entries == null) {
+                return const LinearProgressIndicator();
+              }
+              if (entries.isEmpty) return const Text('添加队伍成员后可查看辅助信息');
+              return Column(
+                children: [
+                  for (final entry in entries)
+                    ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      childrenPadding: const EdgeInsets.only(bottom: 10),
+                      title: Text(
+                        entry.member.nickname ?? entry.member.species,
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      subtitle: Text(
+                        entry.subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      children: [
+                        if (entry.moves.isNotEmpty)
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              for (final move in entry.moves)
+                                ActionChip(
+                                  label: Text(move.nameZh),
+                                  onPressed: () =>
+                                      showMoveDetailSheet(context, move),
+                                ),
+                            ],
+                          ),
+                        if (entry.evolutions.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              for (final evolution in entry.evolutions)
+                                ActionChip(
+                                  avatar: const Icon(
+                                    Icons.auto_awesome_rounded,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    evolution.triggerZh == null
+                                        ? evolution.nameZh
+                                        : '${evolution.nameZh} · ${evolution.triggerZh}',
+                                  ),
+                                  onPressed: () =>
+                                      context.push('/dex/${evolution.id}'),
+                                ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FilledButton.icon(
+                            onPressed: entry.member.speciesId == null
+                                ? null
+                                : () {
+                                    battlePartyHandoff.set(
+                                      entry.member,
+                                      selectedMoveId:
+                                          entry.preferredDamageMove?.id,
+                                    );
+                                    context.push(
+                                      '/search/companion/quick-damage',
+                                    );
+                                  },
+                            icon: const Icon(Icons.calculate_rounded, size: 18),
+                            label: const Text('带入伤害速算'),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TeamAssistEntry {
+  const _TeamAssistEntry({
+    required this.member,
+    required this.moves,
+    required this.ability,
+    required this.evolutions,
+  });
+
+  final PartyMember member;
+  final List<CachedMove> moves;
+  final CachedAbility? ability;
+  final List<EvolutionNode> evolutions;
+
+  CachedMove? get preferredDamageMove {
+    for (final move in moves) {
+      if (move.category != 'status' && (move.power ?? 0) > 0) return move;
+    }
+    return null;
+  }
+
+  String get subtitle {
+    final parts = [
+      if (ability != null) '特性：${ability!.nameZh}',
+      if (moves.isNotEmpty) '招式 ${moves.length}/4',
+      if (evolutions.isNotEmpty)
+        '可进化：${evolutions.map((entry) => entry.nameZh).join(' / ')}',
+    ];
+    return parts.isEmpty ? '点击成员可补充招式与特性' : parts.join(' · ');
+  }
+}
+
+String _moveCategoryLabelZh(String category) => switch (category) {
+  'physical' => '物理',
+  'special' => '特殊',
+  'status' => '变化',
+  _ => category,
+};
 
 /// Sticker action button for the inline editor (small solid drop shadow,
 /// sinks on press like every other sticker).

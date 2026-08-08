@@ -34,7 +34,6 @@ import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/settings_expandable_section.dart';
-import 'media_resource_page.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
@@ -632,8 +631,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   _Row(
                     label: AppZh.settingsBadges,
-                    value:
-                        '${widget.journey.badges}/${widget.journey.maxBadges}',
+                    value: widget.journey.badgeProgressLabel,
                   ),
                 ],
               ],
@@ -1546,11 +1544,8 @@ class _CompanionSection extends StatelessWidget {
                       ],
                       const SizedBox(height: 8),
                       OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => const MediaResourcePage(),
-                          ),
-                        ),
+                        onPressed: () =>
+                            context.push('/settings/media-resources'),
                         icon: const Icon(Icons.folder_zip_outlined, size: 18),
                         label: const Text('媒体资源管理'),
                       ),

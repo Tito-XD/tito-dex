@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8+142` | Journey assistant, Location Dex, and configurable Android shortcuts |
-| Offline APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8-offline+143` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.8+142` | Three-phase correctness and UX closure with audited data-to-UI coverage |
+| Lite APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9+144` | Version-aware references, party handoff, and full-screen companion positioning |
+| Offline APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9-offline+145` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.9+144` | Game-scoped item/move data and tighter party/location workflows |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -20,10 +20,11 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition and richer HGSS party, map, badge, Trainer ID, and Pokédex parsing.
+- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition and richer HGSS party, move, ability, EXP, map, regional badge, Trainer ID, and Pokédex parsing.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
-- **Location Dex** — selected-version area encounters and caught completion, backed by the existing reverse location index.
-- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status with practical filters and species drill-down.
+- **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
+- **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status; item availability/prices, moves, and mechanics follow the selected game and generation.
+- **Party assistance** — inspect moves, abilities, and next evolutions, then hand a party member and damaging move directly to the quick damage tool.
 - **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers with explicit assumptions.
 - **Android shortcuts** — long-press the app icon for Dex and Search by default; Settings can customize up to three secondary destinations.
 - **Native Android handoff** — select an installed emulator or game app and resume from TitoDex.
@@ -53,7 +54,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.8.8-lite-rg-arm64.apk`** or **`TitoDex-0.8.8-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.9-lite-rg-arm64.apk`** or **`TitoDex-0.8.9-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 

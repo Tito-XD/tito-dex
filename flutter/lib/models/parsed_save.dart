@@ -1,6 +1,6 @@
 /// Increment when parsing semantics change so unchanged files are re-imported
 /// once after an app upgrade.
-const saveParserRevision = 2;
+const saveParserRevision = 3;
 
 class ParsedPartyMember {
   const ParsedPartyMember({
@@ -10,6 +10,8 @@ class ParsedPartyMember {
     this.currentHp,
     this.maxHp,
     this.experience,
+    this.abilityId,
+    this.moveIds = const [],
     this.warning,
   });
 
@@ -19,6 +21,8 @@ class ParsedPartyMember {
   final int? currentHp;
   final int? maxHp;
   final int? experience;
+  final int? abilityId;
+  final List<int> moveIds;
   final String? warning;
 }
 
@@ -39,6 +43,7 @@ class ParsedSaveSummary {
     this.mapHeaderId,
     this.dexCaughtIds = const {},
     this.dexSeenIds = const {},
+    this.badgeProgress = const {},
   });
 
   final String game;
@@ -60,4 +65,8 @@ class ParsedSaveSummary {
   final int? mapHeaderId;
   final Set<int> dexCaughtIds;
   final Set<int> dexSeenIds;
+
+  /// Region-specific badge banks when the save format exposes them (HGSS has
+  /// eight Johto plus eight Kanto badges). Empty for single-bank games.
+  final Map<String, int> badgeProgress;
 }
