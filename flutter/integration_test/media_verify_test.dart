@@ -38,8 +38,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
     await binding.takeScreenshot('viewer_front');
-    await tester.tap(find.text('背面'));
+    final flipButton = find.byKey(const ValueKey('flip-red-blue'));
+    expect(flipButton, findsOneWidget);
+    await tester.tap(flipButton);
     await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byTooltip('切回正面'), findsOneWidget);
     await binding.takeScreenshot('viewer_back');
   });
 
@@ -49,7 +52,10 @@ void main() {
       MaterialApp.router(
         routerConfig: GoRouter(
           routes: [
-            GoRoute(path: '/', builder: (_, __) => const MediaResourcePage()),
+            GoRoute(
+              path: '/',
+              builder: (_, __) => const Scaffold(body: MediaResourcePage()),
+            ),
           ],
         ),
       ),
