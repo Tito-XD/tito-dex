@@ -47,7 +47,9 @@ class SummaryAdditionsTests(unittest.TestCase):
                 "genusZh": "小狗宝可梦",
                 "generation": 1,
                 "shapeSlug": "quadruped",
+                "shapeLabelZh": "四足兽形",
                 "colorSlug": "brown",
+                "colorLabelZh": "棕",
                 "heightDm": 7,
             },
         )
@@ -84,12 +86,12 @@ class SummaryAdditionsTests(unittest.TestCase):
 
 
 class DetailAdditionsTests(unittest.TestCase):
-    def test_slugs_only_no_localized_labels(self):
+    def test_slugs_and_canonical_localized_labels(self):
         adds = detail_additions(_species(), {"base_experience": 64})
         self.assertEqual(adds["growthRateSlug"], "slow")
+        self.assertEqual(adds["growthRateLabelZh"], "慢")
         self.assertEqual(adds["habitatSlug"], "grassland")
-        self.assertNotIn("growthRateZh", adds)
-        self.assertNotIn("habitatZh", adds)
+        self.assertEqual(adds["habitatLabelZh"], "草原")
 
     def test_post_gen3_species_get_no_habitat(self):
         adds = detail_additions(_species(habitat=None), {})

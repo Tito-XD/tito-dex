@@ -9,8 +9,6 @@ class DexFilter {
     this.eggGroupSlug,
     this.abilityId,
     this.learnsMoveId,
-    this.natureSlug,
-    this.itemId,
     this.shapeSlug,
     this.colorSlugs = const {},
     this.sizeSlug,
@@ -22,9 +20,6 @@ class DexFilter {
   final String? eggGroupSlug;
   final int? abilityId;
   final int? learnsMoveId;
-  final String? natureSlug;
-  final int? itemId;
-
   /// Species axes that combine with each other: body style × colour × size ×
   /// generation × tag. These are the ones a player stacks to narrow 1025 down
   /// to a handful, so unlike the reference drill-downs they are not exclusive.
@@ -47,8 +42,6 @@ class DexFilter {
       eggGroupSlug != null ||
       abilityId != null ||
       learnsMoveId != null ||
-      natureSlug != null ||
-      itemId != null ||
       hasSpeciesAxis;
 
   /// True when at least one stackable species axis is set.
@@ -65,8 +58,6 @@ class DexFilter {
     String? eggGroupSlug,
     int? abilityId,
     int? learnsMoveId,
-    String? natureSlug,
-    int? itemId,
     String? shapeSlug,
     Set<String>? colorSlugs,
     String? sizeSlug,
@@ -78,8 +69,6 @@ class DexFilter {
         eggGroupSlug: eggGroupSlug ?? this.eggGroupSlug,
         abilityId: abilityId ?? this.abilityId,
         learnsMoveId: learnsMoveId ?? this.learnsMoveId,
-        natureSlug: natureSlug ?? this.natureSlug,
-        itemId: itemId ?? this.itemId,
         shapeSlug: shapeSlug ?? this.shapeSlug,
         colorSlugs: colorSlugs ?? this.colorSlugs,
         sizeSlug: sizeSlug ?? this.sizeSlug,
@@ -100,8 +89,6 @@ class DexFilter {
         eggGroupSlug: eggGroupSlug,
         abilityId: abilityId,
         learnsMoveId: learnsMoveId,
-        natureSlug: natureSlug,
-        itemId: itemId,
         shapeSlug: shape ? null : shapeSlug,
         colorSlugs: color ? const {} : colorSlugs,
         sizeSlug: size ? null : sizeSlug,
@@ -125,8 +112,6 @@ class DexFilter {
         eggGroupSlug: eggGroupSlug,
         abilityId: abilityId,
         learnsMoveId: learnsMoveId,
-        natureSlug: natureSlug,
-        itemId: itemId,
         shapeSlug: shapeSlug,
         colorSlugs: colorSlugs,
         sizeSlug: sizeSlug,

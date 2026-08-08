@@ -6,6 +6,9 @@
 /// that resolve to nothing fall back to plain text matching.
 library;
 
+export 'dex_axis_labels.g.dart';
+
+import 'dex_axis_labels.g.dart';
 import 'dex_models.dart';
 import 'type_chart.dart';
 
@@ -163,23 +166,6 @@ const kDexShapeSlugs = <String>[
   'armor',
 ];
 
-const kDexShapeLabelsZh = <String, String>{
-  'ball': '球形',
-  'squiggle': '蛇形',
-  'fish': '鱼形',
-  'arms': '双手形',
-  'blob': '柱形',
-  'upright': '双足兽形',
-  'legs': '双腿形',
-  'quadruped': '四足兽形',
-  'wings': '双翅形',
-  'tentacles': '触手形',
-  'heads': '组合形',
-  'humanoid': '人形',
-  'bug-wings': '多翅形',
-  'armor': '虫形',
-};
-
 /// Body styles reassigned in Gen VI — PokeAPI only reports the modern value.
 ///
 /// TitoDex is HGSS-first, so the Gen IV value is the one a player searching
@@ -215,19 +201,6 @@ const kDexColorSlugs = <String>[
   'yellow',
 ];
 
-const kDexColorLabelsZh = <String, String>{
-  'black': '黑',
-  'blue': '蓝',
-  'brown': '棕',
-  'gray': '灰',
-  'green': '绿',
-  'pink': '粉',
-  'purple': '紫',
-  'red': '红',
-  'white': '白',
-  'yellow': '黄',
-};
-
 const kDexTagLabelsZh = <String, String>{
   'legendary': '传说',
   'mythical': '幻之宝可梦',
@@ -236,28 +209,8 @@ const kDexTagLabelsZh = <String, String>{
 };
 
 /// Experience group — how fast a species levels.
-const kDexGrowthRateLabelsZh = <String, String>{
-  'slow': '慢',
-  'medium': '中等',
-  'fast': '快',
-  'medium-slow': '偏慢',
-  'slow-then-very-fast': '先慢后快',
-  'fast-then-very-slow': '先快后慢',
-};
-
 /// Habitat exists only for Gen I–III species; the detail view must say so
 /// rather than render a blank row for everything newer.
-const kDexHabitatLabelsZh = <String, String>{
-  'cave': '洞窟',
-  'forest': '森林',
-  'grassland': '草原',
-  'mountain': '山地',
-  'rare': '罕见',
-  'rough-terrain': '险地',
-  'sea': '海洋',
-  'urban': '城市',
-  'waters-edge': '水边',
-};
 
 /// True when [slug] is either the species' current or its pre-Gen VI body
 /// style — the 「双重筛选」 that keeps reclassified species findable both ways.
@@ -311,12 +264,7 @@ Map<String, DexSearchConstraint> _buildAliases() {
     '幻の',
     'mythical',
   ]);
-  add(DexConstraintKind.tag, 'baby', '幼年', [
-    '幼年',
-    '幼年宝可梦',
-    '宝宝',
-    'baby',
-  ]);
+  add(DexConstraintKind.tag, 'baby', '幼年', ['幼年', '幼年宝可梦', '宝宝', 'baby']);
   add(DexConstraintKind.tag, 'pseudo-legendary', '准神', [
     '准神',
     '600族',
@@ -339,20 +287,10 @@ Map<String, DexSearchConstraint> _buildAliases() {
     '直立',
     'upright',
   ]);
-  add(DexConstraintKind.shape, 'wings', '双翅形', [
-    '双翅形',
-    '有翼',
-    '翅膀',
-    'wings',
-  ]);
+  add(DexConstraintKind.shape, 'wings', '双翅形', ['双翅形', '有翼', '翅膀', 'wings']);
   add(DexConstraintKind.shape, 'bug-wings', '多翅形', ['多翅形', 'bug-wings']);
   add(DexConstraintKind.shape, 'fish', '鱼形', ['鱼形', '鱼', 'fish']);
-  add(DexConstraintKind.shape, 'squiggle', '蛇形', [
-    '蛇形',
-    '蛇',
-    '细长',
-    'squiggle',
-  ]);
+  add(DexConstraintKind.shape, 'squiggle', '蛇形', ['蛇形', '蛇', '细长', 'squiggle']);
   add(DexConstraintKind.shape, 'ball', '球形', ['球形', '球状', '球', 'ball']);
   add(DexConstraintKind.shape, 'arms', '双手形', ['双手形', 'arms']);
   add(DexConstraintKind.shape, 'blob', '柱形', ['柱形', 'blob']);
@@ -369,26 +307,10 @@ Map<String, DexSearchConstraint> _buildAliases() {
   // ── Colour ──────────────────────────────────────────────────────────────
   add(DexConstraintKind.color, 'black', '黑', ['黑', '黑色', 'black']);
   add(DexConstraintKind.color, 'blue', '蓝', ['蓝', '蓝色', 'blue']);
-  add(DexConstraintKind.color, 'brown', '棕', [
-    '棕',
-    '棕色',
-    '褐',
-    '褐色',
-    'brown',
-  ]);
-  add(DexConstraintKind.color, 'gray', '灰', [
-    '灰',
-    '灰色',
-    'gray',
-    'grey',
-  ]);
+  add(DexConstraintKind.color, 'brown', '棕', ['棕', '棕色', '褐', '褐色', 'brown']);
+  add(DexConstraintKind.color, 'gray', '灰', ['灰', '灰色', 'gray', 'grey']);
   add(DexConstraintKind.color, 'green', '绿', ['绿', '绿色', 'green']);
-  add(DexConstraintKind.color, 'pink', '粉', [
-    '粉',
-    '粉色',
-    '粉红',
-    'pink',
-  ]);
+  add(DexConstraintKind.color, 'pink', '粉', ['粉', '粉色', '粉红', 'pink']);
   add(DexConstraintKind.color, 'purple', '紫', ['紫', '紫色', 'purple']);
   add(DexConstraintKind.color, 'red', '红', ['红', '红色', 'red']);
   add(DexConstraintKind.color, 'white', '白', ['白', '白色', 'white']);
@@ -484,7 +406,8 @@ bool dexQueryMatches(
   for (final constraint in constraints) {
     final matched = constraint.matches(summary);
     if (constraint.kind.isSingleValued) {
-      orGroups[constraint.kind] = (orGroups[constraint.kind] ?? false) || matched;
+      orGroups[constraint.kind] =
+          (orGroups[constraint.kind] ?? false) || matched;
     } else if (!matched) {
       return false;
     }

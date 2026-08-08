@@ -36,13 +36,37 @@ jobs:
           if [ "$FORCE_FULL" = "true" ]; then
             EXTRA="--force-full"
           fi
-          python3 tools/fetch_52poke_location_zh.py --limit 50 $EXTRA || true
+          python3 tools/fetch_52poke_location_zh.py --limit 50 $EXTRA
 
       - name: Regenerate compact l10n assets
         run: python3 tools/generate_zh_catalog_assets.py
 
+      - name: Test manifest staging guards
+        run: python3 tools/test_stage_l10n_upload.py
+
+      - name: Preserve and verify current production manifest
+        run: |
+          set -euo pipefail
+          mkdir -p dist/l10n-source
+          curl --fail --location --retry 5 \
+            --output dist/l10n-source/bundle-manifest.json \
+            https://dex.tito.cafe/bundle-manifest.json
+          python3 - <<'PY'
+          import json
+          manifest = json.load(open("dist/l10n-source/bundle-manifest.json", encoding="utf-8"))
+          assert manifest["bundleVersion"] == 19, manifest
+          assert manifest["cdnPrefix"] == "v5", manifest
+          assert manifest["pokemonCount"] == 1025, manifest
+          assert manifest["complete"] is True, manifest
+          assert len(manifest["archiveSha256"]) == 64, manifest
+          PY
+
       - name: Stage l10n upload slice
-        run: python3 tools/stage_l10n_upload.py --output dist/l10n-upload
+        run: >-
+          python3 tools/stage_l10n_upload.py
+          --output dist/l10n-upload
+          --remote-manifest dist/l10n-source/bundle-manifest.json
+          --expected-bundle-version 19
 
       - uses: actions/setup-node@v6
         with:
@@ -103,6 +127,7 @@ jobs:
           curl -sf https://dex.tito.cafe/bundle-manifest.json | python3 -c "
           import json, sys
           m = json.load(sys.stdin)
+          assert m.get('bundleVersion') == 19, m
           assert m.get('l10nVersion'), f'missing l10nVersion: {m}'
           print('bundle-manifest l10nVersion:', m['l10nVersion'])
           "

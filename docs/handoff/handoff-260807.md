@@ -4,7 +4,7 @@
 
 ## 最终交付
 
-- App：Lite `0.8.7+140`、Offline `0.8.7-offline+141`。
+- App：Lite `0.8.8+142`、Offline `0.8.8-offline+143`。
 - 数据：生产 CDN bundle v19，继续使用 `/v5/`；Offline APK 保留紧凑 v14 种子，安装后可更新到 v19。
 - 本地 0.8.6 的 sprite 预览修复已并入：逐版本图只展示固定 PokeAPI/sprites commit 中真实存在、且不早于物种首发世代的文件；同图源确有背面图时才提供翻面；Android 第一次返回先关闭查看器。
 - 同行媒体改为显式 `formKey` 映射，普通/闪光、静态/动图、叫声分别选择和缓存；同 ID 外观形态不会借默认形态动图。
@@ -62,3 +62,24 @@ flutter analyze --no-pub
 - `.github/workflows/android-release-build.yml`：并行构建签名 Lite/Offline APK；v0.8.7 使用 build number 140/141，Offline 复用上个版本的紧凑 v14 种子。
 
 公开 README、GitHub Release 文案不得包含生产 CDN 直链；运维细节见 `docs/PERMISSIONS.md`。
+
+## v0.8.8 三阶段收口（2026-08-08）
+
+- P0：l10n 同步绑定线上精确 bundleVersion 并保留当前 manifest；Android 发布器绑定
+  build run 的成功状态与 source SHA，复验双 APK 的 package/versionCode/versionName，
+  并校验签名一致及可选的历史证书指纹。
+- P1：客户端接入 `location_index.json` 地点图鉴；进化规划按版本机制过滤；HGSS 统计
+  16 枚徽章，存档入口识别 DeSmuME `.dsv`；真实存档验证改为 manifest 驱动矩阵，后续
+  每取得一个审核样本即可直接登记回归。
+- P2：v19 道具来源审计无未分类项；图鉴四类中文轴标签改为单一 JSON 数据源；Web
+  子路由统一具备 Scaffold；伤害速查明确列出未覆盖机制并增加金样舍入测试。
+- 新增 Android 长按 App 图标快捷入口，默认图鉴 + 搜索；设置页可从图鉴子页、全部常用
+  资料页与对战工具中替换或补充至多三个，不限制为四个固定候选。
+- Phase 3 存档助手已接入：Journey card 轻量显示当前地点待捕摘要，Journey 二级页展开
+  附近未捕获、队伍进化路线、配对版本直接遭遇缺口与进化/生蛋/交换补全；同时持久化并
+  展示存档训练家 ID。数据→逻辑→UI 反向审计补齐形态事件/历史/版本可获得性/初登场标注，
+  并移除从未实现的 nature/item DexFilter 状态。
+
+本轮验证：Flutter analyze 0 issue、373 个 Flutter 测试、123 个 Python 工具测试和
+Web release 构建全部通过。未在本地构建 APK、未 push/tag/release；Android 原生通道
+由新增的模拟器 CI 覆盖，正式包仍需走 `RELEASE_BUILD.md` 的签名与实机验收。

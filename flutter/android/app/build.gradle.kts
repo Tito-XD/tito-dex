@@ -36,24 +36,29 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        ndk {
-            // RG Rotate (Unisoc arm64-v8a) — same ABI layout as historical -rg-arm64.apk.
-            abiFilters += listOf("arm64-v8a")
-        }
     }
 
     signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+                storePassword = keystoreProperties["storePassword"] as String
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            ndk {
+                // Shipping RG APKs stay arm64-only; debug keeps emulator ABIs
+                // so Android integration tests can run on x86_64 CI hosts.
+                abiFilters += listOf("arm64-v8a")
+            }
         }
     }
 

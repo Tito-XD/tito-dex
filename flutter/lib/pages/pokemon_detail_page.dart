@@ -331,6 +331,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       form,
       versionGroup: _gameEdition.dataVersionGroupKey,
     );
+    final introduced = form.introducedVersionGroup == null
+        ? null
+        : AppZh.dexFormIntroducedIn(
+            gameEditionLabelForVersionGroup(form.introducedVersionGroup!),
+          );
     final String? qualityCopy;
     if (form.inheritsFromDefault) {
       qualityCopy = AppZh.dexFormDataInherited;
@@ -339,7 +344,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     } else {
       qualityCopy = null;
     }
-    if (statusLabels.isEmpty && qualityCopy == null) {
+    if (statusLabels.isEmpty && qualityCopy == null && introduced == null) {
       return null;
     }
     return Wrap(
@@ -357,6 +362,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         if (qualityCopy != null)
           Text(
             qualityCopy,
+            style: SecondaryTypography.onGradient.small12.copyWith(
+              color: TitoColors.card,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        if (introduced != null)
+          Text(
+            introduced,
             style: SecondaryTypography.onGradient.small12.copyWith(
               color: TitoColors.card,
               fontWeight: FontWeight.w700,

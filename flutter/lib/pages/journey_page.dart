@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/journey/journey_assistant.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -7,14 +8,21 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/journey_timeline.dart';
+import '../widgets/journey_assistant_panel.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 
 class JourneyPage extends StatelessWidget {
-  const JourneyPage({super.key, required this.journey, this.onLaunchEmulator});
+  const JourneyPage({
+    super.key,
+    required this.journey,
+    this.onLaunchEmulator,
+    this.assistantFuture,
+  });
 
   final CurrentJourney journey;
   final VoidCallback? onLaunchEmulator;
+  final Future<JourneyAssistantSnapshot>? assistantFuture;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +90,15 @@ class JourneyPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
+        Text(
+          AppZh.journeyAssistantTitle,
+          style: SecondaryTypography.onCard.h15,
+        ),
+        const SizedBox(height: 8),
+        JourneyAssistantPanel(
+          future: assistantFuture ?? journeyAssistantRepository.load(journey),
+        ),
+        const SizedBox(height: 14),
         JourneyTimeline(
           entries: journey.timeline,
           nextReminder: journey.nextReminder,
@@ -97,6 +114,11 @@ class JourneyPage extends StatelessWidget {
                 label: AppZh.settingsDisplayName,
                 value: journey.trainerName,
               ),
+              if (journey.saveTrainerId != null)
+                _StatRow(
+                  label: AppZh.settingsTrainerId,
+                  value: journey.saveTrainerId!.toString().padLeft(5, '0'),
+                ),
               _StatRow(label: AppZh.settingsPlayTime, value: journey.playTime),
               _StatRow(
                 label: AppZh.settingsBadges,

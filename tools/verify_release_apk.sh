@@ -3,12 +3,21 @@
 set -euo pipefail
 
 offline=false
-if [[ "${1:-}" == "--offline" ]]; then
-  offline=true
-  shift
-fi
+expected_package=""
+expected_version_name=""
+expected_version_code=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --offline) offline=true; shift ;;
+    --expected-package) expected_package="${2:?missing package id}"; shift 2 ;;
+    --expected-version-name) expected_version_name="${2:?missing version name}"; shift 2 ;;
+    --expected-version-code) expected_version_code="${2:?missing version code}"; shift 2 ;;
+    --*) echo "ERROR: unknown option: $1" >&2; exit 2 ;;
+    *) APK="$1"; shift ;;
+  esac
+done
 
-APK="${1:?Usage: verify_release_apk.sh [--offline] path/to/TitoDex-x.y.z-rg-arm64.apk}"
+APK="${APK:?Usage: verify_release_apk.sh [--offline] [--expected-package ID] [--expected-version-name NAME] [--expected-version-code CODE] path/to/APK}"
 
 if [[ ! -f "$APK" ]]; then
   echo "ERROR: file not found: $APK" >&2
@@ -33,9 +42,8 @@ if ! "$offline" && (( size_bytes > 35000000 )); then
   exit 1
 fi
 
-# Bundle v10 (clear 220px form artwork) is ~107 MB compressed; together with
-# the signed arm64 app the expected Offline APK is ~133 MB. Keep headroom for
-# metadata without allowing a universal/debug package to pass unnoticed.
+# The compact v14 seed keeps the Offline APK near 80 MB. Keep headroom for
+# future verified metadata without allowing a universal/debug build through.
 if "$offline" && (( size_bytes > 145000000 )); then
   echo "ERROR: offline APK larger than expected (>145 MB)." >&2
   exit 1
@@ -43,6 +51,30 @@ fi
 
 echo "==> zip integrity"
 unzip -t "$APK" >/dev/null
+
+if [[ -n "$expected_package$expected_version_name$expected_version_code" ]]; then
+  apkanalyzer="$(command -v apkanalyzer || true)"
+  if [[ -z "$apkanalyzer" && -n "${ANDROID_HOME:-}" ]]; then
+    apkanalyzer="$(find "$ANDROID_HOME/cmdline-tools" -type f -name apkanalyzer 2>/dev/null | sort -V | tail -n 1)"
+  fi
+  if [[ ! -x "$apkanalyzer" ]]; then
+    echo "ERROR: apkanalyzer is required for manifest expectations." >&2
+    exit 1
+  fi
+  actual_package="$($apkanalyzer manifest application-id "$APK")"
+  actual_version_name="$($apkanalyzer manifest version-name "$APK")"
+  actual_version_code="$($apkanalyzer manifest version-code "$APK")"
+  [[ -z "$expected_package" || "$actual_package" == "$expected_package" ]] || {
+    echo "ERROR: application id $actual_package, expected $expected_package" >&2; exit 1;
+  }
+  [[ -z "$expected_version_name" || "$actual_version_name" == "$expected_version_name" ]] || {
+    echo "ERROR: versionName $actual_version_name, expected $expected_version_name" >&2; exit 1;
+  }
+  [[ -z "$expected_version_code" || "$actual_version_code" == "$expected_version_code" ]] || {
+    echo "ERROR: versionCode $actual_version_code, expected $expected_version_code" >&2; exit 1;
+  }
+  echo "==> manifest $actual_package $actual_version_name ($actual_version_code)"
+fi
 
 echo "==> required native libraries (arm64-v8a)"
 required=(

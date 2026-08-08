@@ -27,12 +27,13 @@ class PokemonSaveParser {
     0x6CC00, // Ultra Sun / Ultra Moon
   };
 
-  bool canParse(Uint8List bytes) => _identify(bytes) != null;
+  bool canParse(Uint8List bytes) => _identify(_unwrapContainer(bytes)) != null;
 
   ParsedSaveSummary parseSummary(
     Uint8List bytes, {
     DateTime? sourceModifiedAt,
   }) {
+    bytes = _unwrapContainer(bytes);
     final format = _identify(bytes);
     if (format == null) {
       throw const FormatException('Unsupported Pokémon save format.');
@@ -150,6 +151,18 @@ class PokemonSaveParser {
     ParsedSaveSummary summary, {
     CurrentJourney? existing,
   }) => const HgssParser().toJourney(summary, existing: existing);
+
+  Uint8List _unwrapContainer(Uint8List bytes) {
+    const retailSize = 0x80000;
+    if (bytes.length <= retailSize) {
+      return bytes;
+    }
+    final footer = String.fromCharCodes(bytes.sublist(retailSize));
+    if (footer.contains('DeSmuME Save')) {
+      return Uint8List.sublistView(bytes, 0, retailSize);
+    }
+    return bytes;
+  }
 
   _SaveFormat? _identify(Uint8List bytes) {
     if (!supportedFileSizes.contains(bytes.length)) return null;

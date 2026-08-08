@@ -11,9 +11,9 @@ class TitoPageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: TitoColors.slateBlue,
-      child: DecoratedBox(
+    return Scaffold(
+      backgroundColor: TitoColors.slateBlue,
+      body: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,

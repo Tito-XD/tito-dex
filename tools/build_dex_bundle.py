@@ -462,11 +462,14 @@ EGG_GROUP_ZH = {
     "no-eggs": "未发现",
 }
 
-# Body style (`pokemon-species.shape`) — the 14 buckets behind the Gen IV
-# Pokedex shape search — plus the 10-colour Pokedex palette, the growth rate
-# and the habitat all ship as **slugs only**.  Their Chinese labels live in
-# flutter/lib/features/dex/dex_search_terms.dart: bundles are immutable per CDN
-# prefix, so a label typo baked in here would need a full republish to fix.
+# Canonical labels are shared with Flutter through a generated Dart file. New
+# bundles persist both slug and label so other clients do not need to duplicate
+# the mapping; old bundles remain compatible through the APK-local fallback.
+DEX_AXES_ZH = json.loads(
+    (ROOT / "data" / "l10n" / "zh" / "dex_axes.json").read_text(
+        encoding="utf-8"
+    )
+)
 
 # Community concept, not a PokeAPI flag: 600 BST, three-stage line, non-legendary.
 PSEUDO_LEGENDARY_IDS = frozenset(
@@ -1011,9 +1014,15 @@ class PokeApiBuilder:
         summary_shape = (species.get("shape") or {}).get("name")
         if summary_shape:
             summary["shapeSlug"] = summary_shape
+            summary["shapeLabelZh"] = DEX_AXES_ZH["shape"].get(
+                summary_shape, summary_shape
+            )
         summary_color = (species.get("color") or {}).get("name")
         if summary_color:
             summary["colorSlug"] = summary_color
+            summary["colorLabelZh"] = DEX_AXES_ZH["color"].get(
+                summary_color, summary_color
+            )
         summary_tags = species_tags(species, pokemon_id)
         if summary_tags:
             summary["tags"] = summary_tags
@@ -1116,8 +1125,10 @@ class PokeApiBuilder:
         }
         if summary_shape:
             detail["shapeSlug"] = summary_shape
+            detail["shapeLabelZh"] = summary["shapeLabelZh"]
         if summary_color:
             detail["colorSlug"] = summary_color
+            detail["colorLabelZh"] = summary["colorLabelZh"]
         if summary_generation is not None:
             detail["generation"] = summary_generation
         if summary_tags:
@@ -1125,10 +1136,16 @@ class PokeApiBuilder:
         growth_rate = (species.get("growth_rate") or {}).get("name")
         if growth_rate:
             detail["growthRateSlug"] = growth_rate
+            detail["growthRateLabelZh"] = DEX_AXES_ZH["growthRate"].get(
+                growth_rate, growth_rate
+            )
         # Habitat only exists for Gen I-III species; null everywhere else.
         habitat = (species.get("habitat") or {}).get("name")
         if habitat:
             detail["habitatSlug"] = habitat
+            detail["habitatLabelZh"] = DEX_AXES_ZH["habitat"].get(
+                habitat, habitat
+            )
         if species.get("has_gender_differences"):
             detail["hasGenderDifferences"] = True
         held_items = parse_held_items(pokemon.get("held_items", []))

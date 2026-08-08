@@ -2,7 +2,7 @@
 
 TitoDex uses a warm, compact, modern-retro trainer-device language that remains readable on Android phones and handheld displays. Its personality should be recognizable without depending on private user information. The original visual reference is documented in [UI Reference Notes](./UI_REFERENCE.md).
 
-**Implementation:** Design tokens live in `src/styles/tokens.css` (React reference) and `flutter/lib/theme/tito_colors.dart` (active). Keep both in sync when changing colors or radii. See [Stack Decision](./STACK_DECISION.md).
+**Implementation:** Active design tokens live in `flutter/lib/theme/tito_colors.dart`. The pre-Flutter React mock was removed in v0.6.5; any CSS examples below are explanatory references, not a second source of truth. See [Stack Decision](./STACK_DECISION.md).
 
 ## Design Personality
 

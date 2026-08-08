@@ -6,9 +6,9 @@ This document is the public-copy reference for TitoDex GitHub Releases. Release 
 
 | Channel | Current version | Purpose |
 | --- | --- | --- |
-| Lite APK | `v0.8.7` (`0.8.7+140`) | Recommended arm64-v8a download |
-| Offline APK | `v0.8.7` (`0.8.7-offline+141`) | Compact v14 seed with live v19 update support |
-| Source on `main` | `0.8.7+140` | Current default branch baseline |
+| Lite APK | `v0.8.8` (`0.8.8+142`) | Recommended arm64-v8a download |
+| Offline APK | `v0.8.8` (`0.8.8-offline+143`) | Compact v14 seed with live v19 update support |
+| Source on `main` | `0.8.8+142` | Current default branch baseline |
 
 Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
 
@@ -16,6 +16,7 @@ Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-
 
 | Tag | Standardized title | Product summary |
 | --- | --- | --- |
+| `v0.8.8` | TitoDex v0.8.8 · 存档助手与地点图鉴 | Connects the existing location and exact-version data to a two-level Journey assistant; adds the structured location dex, configurable Android app shortcuts, mechanics-aware evolution planning, stronger save parsing and release verification, canonical Chinese dex axes, explicit battle assumptions, and data-to-UI alignment fixes. Lite and Offline retain live bundle v19 and the compact v14 seed. |
 | `v0.8.7` | TitoDex v0.8.7 · Form media and complete item references | Fixes exact per-version sprite previews and artwork back navigation; maps companion art and cries explicitly by form, normal/shiny, and static/animated source; and publishes bundle v19 with audited form-media coverage plus Chinese descriptions and local icons for all 2130 items. The Offline APK keeps the compact v14 seed and can update to v19. |
 | `v0.8.6` (unpublished) | Folded into v0.8.7 | Local work added an 18-type move filter, compact reference categories, normalized Chinese stat labels, and the artwork-viewer back fix. It was intentionally folded into the unified v0.8.7 Lite/Offline release rather than published separately. |
 | `v0.8.5` | TitoDex v0.8.5 · 版本规划与图鉴范围 | Adds background data-pack downloads with notification progress, exact-version chain completion and wild held-item planning, complete evolution/encounter conditions, region-or-generation dex browsing, local flavor icons, aligned detail tables, form status badges, Sleep links, and unified secondary-page typography. Lite and Offline keep the existing v13/v14 data archives. |

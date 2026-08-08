@@ -1,10 +1,10 @@
-import 'dart:typed_data';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/features/parser/pokemon_save_parser.dart';
 import 'package:titodex/models/journey.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   const parser = PokemonSaveParser();
 
   test('does not accept an arbitrary 512 KB file as HGSS', () {
@@ -76,6 +76,17 @@ void main() {
     );
     expect(journey.timeline.first.text, contains('红/绿/蓝'));
     expect(journey.timeline.first.text, isNot(contains('魂银存档')));
+  });
+
+  test('unwraps a DeSmuME DSV footer before format detection', () async {
+    final fixture = await rootBundle.load('assets/fixtures/PKMSS.sav');
+    final dsv = Uint8List.fromList([
+      ...fixture.buffer.asUint8List(),
+      ...'|DeSmuME Save|'.codeUnits,
+    ]);
+
+    expect(parser.canParse(dsv), isTrue);
+    expect(parser.parseSummary(dsv).game, 'SoulSilver');
   });
 }
 

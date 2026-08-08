@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest release:** `0.8.7+140` / `0.8.7-offline+141` · [GitHub Release v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7)
+**Latest release:** `0.8.8+142` / `0.8.8-offline+143` · [GitHub Release v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8)
 
-**Current `main` package version:** `0.8.7+140`
+**Current `main` package version:** `0.8.8+142`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 ## Quick start
@@ -35,6 +35,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | Home / Team / Journey | Trainer card, party, timeline, emulator continue |
 | Save import | One selected `.sav`; experimental Gen 1–7 metadata; richer fixture-verified HGSS party/map/dex parsing |
 | Android handoff | Native installed-app picker and emulator/game launcher |
+| App shortcuts | Long-press launcher icon; defaults to Dex + Search, with up to three configurable dex/reference/tool destinations |
 | Companion | Configurable standby Pokémon, six-slot party card, shiny surprise, silhouette quiz |
 | Dex 1–1025 | Grid, search, 4-tab detail, 23 editions, regional scope |
 | Offline pack | Settings → CDN bundle; l10n/maps/config; update prompts |
@@ -49,6 +50,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | `/team`, `/journey` | Party, timeline |
 | `/dex`, `/dex/:id` | Grid, detail |
 | `/dex/moves`, `/dex/abilities` | Encyclopedias |
+| `/dex/locations` | Version-scoped location dex and caught completion |
 | `/search` | Search + hub |
 | `/search/companion/*` | Type matchup, stat calc, damage |
 | `/settings` | Save, offline pack, journey tools |
@@ -94,7 +96,6 @@ assets/
 ## Not yet / partial
 
 - Full competitive damage/IV workflows and usage rankings
-- Community Chinese flavor text for older generations (dex bundle v6, attribution required)
 - Real-save fixtures beyond HGSS
 
 Cloud sync is intentionally out: TitoDex stays local-first (journey JSON import/export covers portability).

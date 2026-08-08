@@ -12,6 +12,60 @@ library;
 
 import 'dex_models.dart';
 
+/// Game-mechanics gates used when an evolution has alternative triggers.
+///
+/// Encounter data answers where a species exists; this profile answers whether
+/// a route such as Feebas's Beauty evolution can actually be performed in the
+/// selected game. Add rules here only when they affect route availability.
+class MechanicsProfile {
+  const MechanicsProfile({
+    required this.versionGroup,
+    required this.supportsBreeding,
+    required this.supportsBeautyEvolution,
+  });
+
+  final String versionGroup;
+  final bool supportsBreeding;
+  final bool supportsBeautyEvolution;
+
+  factory MechanicsProfile.forVersionGroup(String versionGroup) {
+    return MechanicsProfile(
+      versionGroup: versionGroup,
+      supportsBreeding: supportsBreedingInVersionGroup(versionGroup),
+      supportsBeautyEvolution: const {
+        'ruby-sapphire',
+        'emerald',
+        'diamond-pearl',
+        'platinum',
+        'omega-ruby-alpha-sapphire',
+        'brilliant-diamond-shining-pearl',
+      }.contains(versionGroup),
+    );
+  }
+
+  bool supportsTrigger(EvolutionTrigger trigger) {
+    if (trigger.minBeauty != null && !supportsBeautyEvolution) {
+      return false;
+    }
+    if ((trigger.item == 'prism-scale' || trigger.heldItem == 'prism-scale') &&
+        const {
+          'red-blue',
+          'yellow',
+          'gold-silver',
+          'crystal',
+          'ruby-sapphire',
+          'emerald',
+          'firered-leafgreen',
+          'diamond-pearl',
+          'platinum',
+          'heartgold-soulsilver',
+        }.contains(versionGroup)) {
+      return false;
+    }
+    return true;
+  }
+}
+
 /// Whether [triggerZh] describes a link-trade evolution — the one evolution
 /// step that can never be done alone in a single cartridge.
 ///
@@ -35,12 +89,17 @@ bool isTradeTriggerZh(String? triggerZh) {
 ///
 /// When alternatives exist, only an all-trade set counts as trade-locked:
 /// a non-trade alternative (e.g. 美纳斯 beauty level-up vs trade+prism-scale)
-/// is assumed reachable — whether it applies in the *selected* version is a
-/// MechanicsProfile concern once that lands.
-bool evolutionRequiresTrade(EvolutionNode node) {
-  final triggers = node.triggers;
+/// is assumed reachable unless [mechanics] filters that route out for the
+/// selected version.
+bool evolutionRequiresTrade(EvolutionNode node, {MechanicsProfile? mechanics}) {
+  final triggers = mechanics == null
+      ? node.triggers
+      : node.triggers.where(mechanics.supportsTrigger).toList();
   if (triggers.isNotEmpty) {
     return triggers.every((trigger) => trigger.isTrade);
+  }
+  if (mechanics != null && node.triggers.isNotEmpty) {
+    return false;
   }
   return isTradeTriggerZh(node.triggerZh);
 }
@@ -242,12 +301,13 @@ bool supportsBreedingInVersionGroup(String versionGroup) => !{
 /// [isCatchable] answers whether a species has any encounter in the selected
 /// version (typically [hasEncountersInVersion] over that species' detail).
 /// [supportsBreeding] should be false for games without breeding
-/// (PLA, LGPE, SwSh pre-DLC nursery quirks aside) — a MechanicsProfile concern
-/// once that lands.
+/// (PLA, LGPE and LZA). Pass [mechanics] to filter evolution alternatives that
+/// do not exist in the selected version.
 ChainCompletionPlan planChainCompletion({
   required EvolutionNode chain,
   required bool Function(int speciesId) isCatchable,
   bool supportsBreeding = true,
+  MechanicsProfile? mechanics,
 }) {
   // Collect stages parent-first so each node sees its parent's resolution.
   final order = <(_StageRef, _StageRef?)>[];
@@ -267,7 +327,13 @@ ChainCompletionPlan planChainCompletion({
     }
     final parentMethod = parent?.method;
     if (parentMethod != null && parentMethod != ChainStageMethod.unavailable) {
-      return evolutionRequiresTrade(ref.node)
+      final triggers = ref.node.triggers;
+      if (mechanics != null &&
+          triggers.isNotEmpty &&
+          !triggers.any(mechanics.supportsTrigger)) {
+        return ChainStageMethod.unavailable;
+      }
+      return evolutionRequiresTrade(ref.node, mechanics: mechanics)
           ? ChainStageMethod.tradeRequired
           : ChainStageMethod.evolve;
     }

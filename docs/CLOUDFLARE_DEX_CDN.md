@@ -283,6 +283,9 @@ npm run dry-run
 `stage_l10n_upload.py` 与 `sync-l10n-catalog.yml` 只更新当前 `/v5/l10n`、maps 和 config；
 不得覆写 `/v4/`。l10n 同步不改变 bundleVersion 或 archive SHA。若需要让根 manifest 的
 `l10nVersion` 生效，必须读取当前根 manifest、只合并允许字段，并仍保持 archive 指针不变。
+当前命令还必须显式传 `--expected-bundle-version 19`；线上版本不一致、SHA 缺失或拉取失败
+都会中止上传。发布下一版 bundle 时同步更新 workflow 中的精确前置版本，不允许退回宽松的
+`>=` 判断。
 
 ## 发布验收
 

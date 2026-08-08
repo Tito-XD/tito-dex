@@ -46,6 +46,27 @@ void main() {
       expect(scizor.triggers.single.requiresHeldItem, isTrue);
     });
 
+    test('MechanicsProfile removes unavailable Feebas routes in HGSS', () {
+      final milotic = _node(
+        350,
+        '美纳斯',
+        triggers: const [
+          EvolutionTrigger(trigger: 'level-up', minBeauty: 171),
+          EvolutionTrigger(trigger: 'trade', heldItem: 'prism-scale'),
+        ],
+      );
+
+      final hgss = MechanicsProfile.forVersionGroup('heartgold-soulsilver');
+      expect(milotic.triggers.any(hgss.supportsTrigger), isFalse);
+      expect(
+        evolutionRequiresTrade(
+          milotic,
+          mechanics: MechanicsProfile.forVersionGroup('diamond-pearl'),
+        ),
+        isFalse,
+      );
+    });
+
     test('a non-trade alternative unlocks the step', () {
       // 美纳斯-style: beauty level-up OR trade holding prism scale.
       final milotic = _node(

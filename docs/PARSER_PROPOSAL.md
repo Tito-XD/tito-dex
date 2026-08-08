@@ -4,7 +4,7 @@
 
 The save parser helps TitoDex continue Tito's current journey. It is not a save editor and not a multi-generation parser framework.
 
-**Implementation:** `flutter/lib/features/parser/hgss_parser.dart` (Dart). Phase 2 TypeScript stub `src/features/parser/hgssParser.ts` remains a null placeholder.
+**Implementation:** `flutter/lib/features/parser/hgss_parser.dart` and `pokemon_save_parser.dart` (Dart). The removed React/TypeScript prototype is historical and has no active parser stub.
 
 ## Fixture
 
@@ -12,7 +12,6 @@ The save parser helps TitoDex continue Tito's current journey. It is not a save 
 | --- | --- |
 | `flutter/assets/fixtures/PKMSS.sav` | Bundled asset; `flutter test`; Settings → 导入内置 PKMSS.sav |
 | `fixtures/PKMSS.sav` | Repo root; `tools/probe_hgss_save.py` |
-| `src/PKMSS.sav` | Legacy upload path |
 
 | Property | Value |
 | --- | --- |
@@ -44,7 +43,9 @@ Offsets relative to **active partition base**:
 | --- | --- | --- | --- |
 | Trainer name (OT) | `0x64`–`0x73` | Gen IV u16 text | `trainerName` |
 | Trainer ID | `0x74` | u16 | `tid` |
-| Johto badges | `0x7E` | u8 bitmask | `badges` (popcount) |
+| Johto badges | `0x7E` | u8 bitmask | combined `badges` count |
+| Kanto badges | `0x83` | u8 bitmask | combined `badges` count; `maxBadges=16` |
+| Game version | `0x80` | u8 | HeartGold (`7`) / SoulSilver |
 | Play time | `0x86`–`0x89` | u16 h, u8 m, u8 s | `playTime` string |
 | Party count | `0x94` | u8 | loop bound |
 | Party slots | `0x98` + 236×n | encrypted struct | `party[]` |
@@ -66,10 +67,8 @@ Location (`hgss_map_lookup.dart` + `hgss_map_list.dart`):
 
 | Field | Offset | Notes |
 | --- | --- | --- |
-| Kanto badges | `0x83` | Documented in probe script; not in Dart parser |
-| HeartGold vs SoulSilver | — | Game hardcoded `SoulSilver` |
 | Nicknames, moves, IVs, PC boxes | — | Out of scope |
-| Non-retail formats | — | DeSmuME `.dsv`, zip backups — classify first |
+| Archive containers | — | Zip backups must be extracted before import |
 
 ## Parser Boundary (Dart)
 
@@ -105,12 +104,7 @@ Merge behavior: structured fields (location, badges, party, time) come from the 
 | Single `.sav` file pick | SAF `ACTION_OPEN_DOCUMENT` | ✅ implemented |
 | User drops file into app | — | ❌ |
 
-Directory sync (`save_sync_service.dart`):
-
-1. Recursively scan for `.sav` files of exactly 524 288 bytes.
-2. Pick newest by modification time.
-3. Skip if same path + mtime as last sync (unless forced).
-4. Parse and persist; store last-loaded metadata in prefs.
+Single-file sync (`save_sync_service.dart`) re-reads only the persisted document URI, skips an unchanged hash unless forced, parses and merges the result, and stores the last-loaded metadata in preferences.
 
 **Platform note:** uses `dart:io` — works on Android/desktop, not Flutter web.
 
@@ -122,7 +116,7 @@ Before parsing unknown files:
 | --- | --- |
 | `PK` magic | Zip backup — extract inner `.sav` first |
 | 524 288 bytes | Try `HgssParser.canParse` |
-| `|-DESMUME SAVE-|` tail | Strip DeSmuME wrapper |
+| `DeSmuME Save` footer after the 512 KiB payload | Strip DeSmuME wrapper |
 | Other sizes | Reject with `unsupported_save` message |
 
 ## Parser UX (implemented / planned)

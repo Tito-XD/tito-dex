@@ -27,6 +27,8 @@ class PokemonSummary {
     this.generation,
     this.shapeSlug,
     this.colorSlug,
+    this.shapeLabelZh,
+    this.colorLabelZh,
     this.tags = const [],
     this.heightDm,
   });
@@ -63,6 +65,8 @@ class PokemonSummary {
   /// Body style / colour from the in-game Pokédex search (`quadruped`, `green`).
   final String? shapeSlug;
   final String? colorSlug;
+  final String? shapeLabelZh;
+  final String? colorLabelZh;
 
   /// Semantic tags resolved by search aliases: `legendary`, `mythical`,
   /// `baby`, `pseudo-legendary`.
@@ -103,6 +107,8 @@ class PokemonSummary {
     if (generation != null) 'generation': generation,
     if (shapeSlug != null) 'shapeSlug': shapeSlug,
     if (colorSlug != null) 'colorSlug': colorSlug,
+    if (shapeLabelZh != null) 'shapeLabelZh': shapeLabelZh,
+    if (colorLabelZh != null) 'colorLabelZh': colorLabelZh,
     if (tags.isNotEmpty) 'tags': tags,
     if (heightDm != null) 'heightDm': heightDm,
   };
@@ -135,6 +141,8 @@ class PokemonSummary {
       generation: (json['generation'] as num?)?.toInt(),
       shapeSlug: json['shapeSlug'] as String?,
       colorSlug: json['colorSlug'] as String?,
+      shapeLabelZh: json['shapeLabelZh'] as String?,
+      colorLabelZh: json['colorLabelZh'] as String?,
       tags: (json['tags'] as List<dynamic>? ?? const []).cast<String>(),
       heightDm: (json['heightDm'] as num?)?.toInt(),
     );
@@ -153,6 +161,8 @@ class PokemonSummary {
     int? generation,
     String? shapeSlug,
     String? colorSlug,
+    String? shapeLabelZh,
+    String? colorLabelZh,
     List<String>? tags,
     int? heightDm,
   }) {
@@ -173,6 +183,8 @@ class PokemonSummary {
       generation: generation ?? this.generation,
       shapeSlug: shapeSlug ?? this.shapeSlug,
       colorSlug: colorSlug ?? this.colorSlug,
+      shapeLabelZh: shapeLabelZh ?? this.shapeLabelZh,
+      colorLabelZh: colorLabelZh ?? this.colorLabelZh,
       tags: tags ?? this.tags,
       heightDm: heightDm ?? this.heightDm,
     );
@@ -1065,6 +1077,8 @@ class PokemonDetail {
     this.forms = const [],
     this.growthRateSlug,
     this.habitatSlug,
+    this.growthRateLabelZh,
+    this.habitatLabelZh,
     this.hasGenderDifferences = false,
     this.heldItems = const [],
     this.baseExperience,
@@ -1102,9 +1116,11 @@ class PokemonDetail {
   /// in dex_search_terms.dart, never in the bundle: CDN prefixes are immutable,
   /// so a label baked in here could not be corrected without a republish.
   final String? growthRateSlug;
+  final String? growthRateLabelZh;
 
   /// Habitat only exists for Gen I–III species; null everywhere else.
   final String? habitatSlug;
+  final String? habitatLabelZh;
 
   final bool hasGenderDifferences;
 
@@ -1161,6 +1177,8 @@ class PokemonDetail {
     forms: forms,
     growthRateSlug: growthRateSlug,
     habitatSlug: habitatSlug,
+    growthRateLabelZh: growthRateLabelZh,
+    habitatLabelZh: habitatLabelZh,
     hasGenderDifferences: hasGenderDifferences,
     heldItems: heldItems,
     baseExperience: baseExperience,
@@ -1245,6 +1263,8 @@ class PokemonDetail {
       // Species-level reference data — identical across forms.
       growthRateSlug: growthRateSlug,
       habitatSlug: habitatSlug,
+      growthRateLabelZh: growthRateLabelZh,
+      habitatLabelZh: habitatLabelZh,
       hasGenderDifferences: hasGenderDifferences,
       heldItems: heldItems,
       baseExperience: baseExperience,
@@ -1396,6 +1416,8 @@ class PokemonDetail {
       'forms': forms.map((entry) => entry.toJson()).toList(),
     if (growthRateSlug != null) 'growthRateSlug': growthRateSlug,
     if (habitatSlug != null) 'habitatSlug': habitatSlug,
+    if (growthRateLabelZh != null) 'growthRateLabelZh': growthRateLabelZh,
+    if (habitatLabelZh != null) 'habitatLabelZh': habitatLabelZh,
     if (hasGenderDifferences) 'hasGenderDifferences': true,
     if (heldItems.isNotEmpty)
       'heldItems': heldItems.map((entry) => entry.toJson()).toList(),
@@ -1573,6 +1595,8 @@ class PokemonDetail {
             ),
       growthRateSlug: json['growthRateSlug'] as String?,
       habitatSlug: json['habitatSlug'] as String?,
+      growthRateLabelZh: json['growthRateLabelZh'] as String?,
+      habitatLabelZh: json['habitatLabelZh'] as String?,
       hasGenderDifferences: json['hasGenderDifferences'] as bool? ?? false,
       heldItems: (json['heldItems'] as List<dynamic>? ?? const [])
           .map((item) => PokemonHeldItem.fromJson(item as Map<String, dynamic>))

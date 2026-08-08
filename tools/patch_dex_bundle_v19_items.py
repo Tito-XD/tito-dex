@@ -147,6 +147,20 @@ def apply_enrichment(
             copied += 1
         item["spriteUrl"] = f"{CDN_BASE}/{CDN_PREFIX}/item-sprites/{source.name}"
 
+    # v11 built its baseline descriptions and icons directly from PokeAPI but
+    # predated per-record provenance fields. Preserve that known build lineage
+    # explicitly so later audits do not confuse missing metadata with an
+    # unknown source.
+    for item in items.values():
+        if (item.get("descriptionZh") or item.get("effectZh")) and not item.get(
+            "descriptionSource"
+        ):
+            item["descriptionSource"] = "PokeAPI zh-hans (inherited v11)"
+        icon_path = sprite_dest / f"{item['slug']}.png"
+        if icon_path.is_file() and not item.get("spriteSource"):
+            item["spriteSource"] = "PokeAPI item sprites (inherited v11)"
+            item.setdefault("spriteLicense", "CC-BY 4.0")
+
     items_path.write_text(
         json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

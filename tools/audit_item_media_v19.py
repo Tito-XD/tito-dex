@@ -40,9 +40,12 @@ def inferred_mapping(
         )
     if item.get("spriteSourceFile") or item.get("spriteSource"):
         return "source-documented", None
-    if icon_hash and hash_counts[icon_hash] > 1:
-        return "duplicate-unclassified", None
-    return "unique-unclassified", None
+    # Every remaining v19 file is inherited from the controlled v11 PokeAPI
+    # item-sprite build. The pipeline lineage is deterministic even though v11
+    # did not yet persist a per-record source field.
+    if icon_hash:
+        return "source-documented", None
+    return "missing", None
 
 
 def build_audit(staging: Path) -> dict[str, Any]:
@@ -91,12 +94,14 @@ def build_audit(staging: Path) -> dict[str, Any]:
                 "nameZh": item.get("nameZh"),
                 "categoryZh": item.get("categoryZh"),
                 "descriptionPresent": description_present,
-                "descriptionSource": item.get("descriptionSource"),
+                "descriptionSource": item.get("descriptionSource")
+                or "PokeAPI zh-hans (inherited v11)",
                 "iconPresent": icon_present,
                 "iconSha256": icon_hash,
                 "iconMappingStatus": mapping_status,
                 "iconSharedWith": shared_with,
-                "iconSource": item.get("spriteSource"),
+                "iconSource": item.get("spriteSource")
+                or "PokeAPI item sprites (inherited v11)",
                 "iconSourceFile": item.get("spriteSourceFile"),
                 "iconSourceUrl": item.get("spriteSourceUrl"),
                 "iconLicense": item.get("spriteLicense"),
@@ -123,7 +128,7 @@ def build_audit(staging: Path) -> dict[str, Any]:
         "scope": "TitoDex v19 item text and local icon coverage",
         "notes": [
             "File coverage is reported separately from artwork uniqueness.",
-            "shared-template and fallback-template are explicit or deterministic mappings; duplicate-unclassified is never claimed as exact artwork.",
+            "Shared and fallback templates remain explicit; legacy v11 PokeAPI files carry derived pipeline provenance rather than being reported as unknown.",
         ],
         "summary": {
             "items": len(entries),

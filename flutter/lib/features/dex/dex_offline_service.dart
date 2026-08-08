@@ -277,6 +277,13 @@ class DexOfflineService {
     );
   }
 
+  Future<Map<String, dynamic>> readReferenceObject(String filename) async {
+    if (kIsWeb) {
+      return const {};
+    }
+    return _store.readJsonObject(filename);
+  }
+
   /// Point item entries at the bundled sprite file when reading offline. The
   /// stored `spriteUrl` is the CDN URL (used verbatim online); offline that URL
   /// is unreachable, so swap it for `dex_offline/item-sprites/<slug>.png` when

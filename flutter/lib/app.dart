@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'config/app_config.dart';
+import 'features/app_shortcuts/app_shortcuts.dart';
 import 'features/companion/companion_repository.dart';
 import 'theme/motion_preferences.dart';
 import 'theme/retro_style.dart';
@@ -28,6 +29,7 @@ import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
 import 'pages/dex/ability_encyclopedia_page.dart';
 import 'pages/dex/move_encyclopedia_page.dart';
+import 'pages/dex/location_dex_page.dart';
 import 'pages/dex_page.dart';
 import 'pages/companion_position_page.dart';
 import 'pages/pokemon_detail_page.dart';
@@ -65,6 +67,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   final _saveSync = SaveSyncService();
   final _emulatorLauncher = EmulatorLauncher();
   final _journeyIo = const JourneyIo();
+  final _appShortcutsPlatform = AppShortcutsPlatform();
   final _emulatorChoiceRefresh = ValueNotifier<EmulatorAppChoice?>(null);
   final _settingsRefresh = ValueNotifier<int>(0);
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -73,6 +76,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   SaveFileConfig _saveConfig = const SaveFileConfig();
   EmulatorAppChoice? _emulatorChoice;
   bool _bootstrapComplete = false;
+  String? _pendingShortcutRoute;
 
   @override
   void initState() {
@@ -189,6 +193,15 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   ),
                 ),
                 GoRoute(
+                  path: 'locations',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: LocationDexPage(journey: _journey),
+                    ),
+                  ),
+                ),
+                GoRoute(
                   path: 'quiz',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
@@ -264,12 +277,21 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   pageBuilder: (context, state) {
                     final extra = state.extra;
                     final map = extra is Map<String, String> ? extra : const {};
+                    final shortcutReference = AppShortcutOption.fromId(
+                      state.uri.queryParameters['kind'],
+                    );
                     return titoMaterialPage(
                       key: state.pageKey,
                       child: TitoPageContainer(
                         child: DexJsonReferencePage(
-                          title: map['title'] ?? AppZh.searchHubDataTitle,
-                          cdnFilename: map['cdnFilename'] ?? 'natures.json',
+                          title:
+                              map['title'] ??
+                              shortcutReference?.labelZh ??
+                              AppZh.searchHubDataTitle,
+                          cdnFilename:
+                              map['cdnFilename'] ??
+                              shortcutReference?.referenceFilename ??
+                              'natures.json',
                         ),
                       ),
                     );
@@ -317,7 +339,19 @@ class _TitoDexAppState extends State<TitoDexApp> {
         ),
       ],
     );
+    _appShortcutsPlatform.setRouteHandler(_openShortcutRoute);
     _bootstrap();
+  }
+
+  void _openShortcutRoute(String route) {
+    if (!AppShortcutOption.all.any((option) => option.route == route)) {
+      return;
+    }
+    if (!_bootstrapComplete) {
+      _pendingShortcutRoute = route;
+      return;
+    }
+    _router.go(route);
   }
 
   Future<void> _bootstrap() async {
@@ -325,6 +359,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await companionRepository.load();
     await motionPreferences.load();
     await retroStyle.load();
+    await appShortcutPreferences.load();
     var journey = await _repository.load();
     journey = await _migrateLegacyBundledTrainerName(journey);
     if (!mounted) {
@@ -368,6 +403,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
     _emulatorChoiceRefresh.value = emulatorChoice;
     _settingsRefresh.value += 1;
     _BootstrapGate.instance.markReady();
+    final initialShortcut =
+        _pendingShortcutRoute ??
+        await _appShortcutsPlatform.consumeInitialRoute();
+    _pendingShortcutRoute = null;
+    if (initialShortcut != null) {
+      _openShortcutRoute(initialShortcut);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _prepareDexAfterHomeIsReady();
     });
@@ -749,6 +791,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   @override
   void dispose() {
+    _appShortcutsPlatform.setRouteHandler(null);
     _router.dispose();
     _emulatorChoiceRefresh.dispose();
     _settingsRefresh.dispose();

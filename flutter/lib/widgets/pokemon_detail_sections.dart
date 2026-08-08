@@ -35,6 +35,8 @@ List<String> pokemonFormStatusLabels(
     if (form.isMega) AppZh.dexFormStatusMega,
     if (form.isBattleOnly) AppZh.dexFormStatusBattleOnly,
     if (!form.obtainable) AppZh.dexFormStatusNotObtainable,
+    if (form.eventOnly) AppZh.dexFormStatusEventOnly,
+    if (form.deprecated) AppZh.dexFormStatusDeprecated,
     if (form.isCosmetic) AppZh.dexFormStatusCosmetic,
     if (form.dataCompleteness == 'partial') AppZh.dexFormStatusPartial,
   ];
@@ -42,6 +44,10 @@ List<String> pokemonFormStatusLabels(
       form.availableVersionGroups.isNotEmpty &&
       !form.availableVersionGroups.contains(versionGroup)) {
     labels.add(AppZh.dexFormStatusUnavailableHere);
+  } else if (versionGroup != null &&
+      form.obtainableVersionGroups.isNotEmpty &&
+      !form.obtainableVersionGroups.contains(versionGroup)) {
+    labels.add(AppZh.dexFormStatusNotObtainableHere);
   }
   return labels;
 }
@@ -1756,6 +1762,7 @@ class IntroMetaCard extends StatelessWidget {
             _MetaRow(
               label: AppZh.dexGrowthRate,
               value:
+                  detail.growthRateLabelZh ??
                   dexGrowthRateLabelZh(detail.growthRateSlug!) ??
                   detail.growthRateSlug!,
             ),
@@ -1774,7 +1781,9 @@ class IntroMetaCard extends StatelessWidget {
               // Habitat is a Gen I–III-only field, so say why it is missing
               // elsewhere rather than silently dropping the row.
               value:
-                  dexHabitatLabelZh(detail.habitatSlug!) ?? detail.habitatSlug!,
+                  detail.habitatLabelZh ??
+                  dexHabitatLabelZh(detail.habitatSlug!) ??
+                  detail.habitatSlug!,
             ),
           ],
           if (detail.hasGenderDifferences) ...[
@@ -1784,9 +1793,9 @@ class IntroMetaCard extends StatelessWidget {
               value: AppZh.dexGenderDifferencesYes,
             ),
           ],
-          // Held items ship in the bundle but stay unrendered until the item
-          // name lookup is wired in — a row of raw `dragon-scale` slugs in a
-          // Chinese UI is worse than no row.
+          // Wild held items are rendered in the obtain tab after resolving
+          // their Chinese labels from items.json; keep this metadata card
+          // focused on species-level facts.
         ],
       ),
     );
@@ -1808,7 +1817,9 @@ class SpeciesAxisChips extends StatelessWidget {
     final entries = <(String, DexFilter)>[
       if (summary.shapeSlug != null)
         (
-          dexShapeLabelZh(summary.shapeSlug!) ?? summary.shapeSlug!,
+          summary.shapeLabelZh ??
+              dexShapeLabelZh(summary.shapeSlug!) ??
+              summary.shapeSlug!,
           DexFilter(shapeSlug: summary.shapeSlug),
         ),
       // Reclassified in Gen VI — HGSS players know it by the older body style,
@@ -1820,7 +1831,9 @@ class SpeciesAxisChips extends StatelessWidget {
         ),
       if (summary.colorSlug != null)
         (
-          dexColorLabelZh(summary.colorSlug!) ?? summary.colorSlug!,
+          summary.colorLabelZh ??
+              dexColorLabelZh(summary.colorSlug!) ??
+              summary.colorSlug!,
           DexFilter(colorSlugs: {summary.colorSlug!}),
         ),
       if (size != null) (size.labelZh, DexFilter(sizeSlug: size.slug)),

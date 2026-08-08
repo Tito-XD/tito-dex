@@ -6,9 +6,9 @@ It is built to make returning to a playthrough feel immediate and familiar: see 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7) · App `0.8.7+140` | arm64-v8a, exact form media and complete item references |
-| Offline APK | [v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7) · App `0.8.7-offline+141` | Embeds the verified compact v14 dex archive and can update to v19 |
-| `main` source baseline | App `0.8.7+140` | Sprite preview fixes, form-aware companion media, full v19 item data |
+| Lite APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8+142` | Journey assistant, location dex, configurable Android shortcuts |
+| Offline APK | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) · App `0.8.8-offline+143` | Embeds the verified compact v14 dex archive and can update to v19 |
+| `main` source baseline | App `0.8.8+142` | Three-phase correctness/UX closure with aligned data-to-UI coverage |
 
 > Deprecated legacy artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They are retained only for history and are not newer than the current Flutter release.
 
@@ -17,6 +17,7 @@ Dex data: CDN **v19** / Offline APK compact **v14** · 1025 species · 803 form 
 ## Highlights
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions
+- **Save assistant** — current-location capture reminders, party evolution routes, and exact-version completion gaps
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata import and richer HGSS party/map/dex parsing
 - **Native Android handoff** — choose an installed emulator or game app and resume from TitoDex
 - **Companion touches** — a height-scaled animated standby Pokémon with quotes and cries, a six-slot party card, rare shiny surprises, and a silhouette quiz
@@ -49,7 +50,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.8.7-lite-rg-arm64.apk`** or **`TitoDex-0.8.7-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.8-lite-rg-arm64.apk`** or **`TitoDex-0.8.8-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The standard APK can download the offline data pack from Settings. The optional offline APK includes the same core data and seeds it on first launch.
 

@@ -52,12 +52,39 @@ abstract final class AppZh {
 
   static const journeyCardTitle = '旅程';
   static const journeyOpenDetail = '查看旅程详情';
+  static const journeyAssistantTitle = '存档助手';
+  static const journeyAssistantMeta = '助手';
+  static const journeyAssistantLoading = '整理中';
+  static const journeyAssistantLoadFailed = '存档助手暂时无法读取地点或图鉴资料。';
+  static const journeyAssistantNearbyTitle = '附近未捕获';
+  static const journeyAssistantNearbyComplete = '当前地点的宝可梦已经捕获齐全。';
+  static const journeyAssistantLocationUnknown =
+      '存档地点暂时无法和地点图鉴匹配；可以进入地点图鉴手动查找。';
+  static const journeyAssistantLocationDex = '打开地点图鉴';
+  static const journeyAssistantPartyTitle = '队伍与进化';
+  static const journeyAssistantPartyComplete = '当前队伍没有可识别的下一阶段进化提醒。';
+  static const journeyAssistantVersionTitle = '版本补全';
+  static const journeyAssistantPickVersion = '选择一个精确版本后，可区分配对版本的直接遭遇缺口。';
+  static String journeyAssistantNearbyCount(int count) => '附近还有 $count 种未捕获';
+  static String journeyAssistantEncounterGap(
+    String version,
+    String paired,
+    int count,
+  ) => '$version 中无直接遭遇、但 $paired 可直接遇到的未捕获宝可梦：$count 种';
+  static String journeyAssistantEvolutionGap(int count) =>
+      '当前版本另有 $count 种未捕获宝可梦需要进化、生蛋或交换取得';
+  static String journeyAssistantEvolutionRoute(
+    String from,
+    String to,
+    String trigger,
+  ) => '$from → $to · $trigger';
   static const emulatorContinueHint = '从模拟器继续';
   static const partySaveDiffBanner = '与最新存档不同 · 点击同步';
   static const partySaveDiffDismiss = '不再提示本次差异';
   static const partySaveSyncConfirm = '用存档队伍覆盖当前编辑？';
   static const settingsChangeAvatar = '更换头像';
   static const settingsJourneyReadOnly = '旅程信息（来自存档）';
+  static const settingsTrainerId = '训练家 ID';
   static const teamSummaryTitle = '队伍概览';
   static const sleepToolsTitle = 'Pokémon Sleep 工具';
   static const sleepToolsTierAHint = 'Tier A：静态链接，点击复制到剪贴板';
@@ -150,6 +177,10 @@ abstract final class AppZh {
   static const dexFormStatusCosmetic = '外观';
   static const dexFormStatusPartial = '资料不完整';
   static const dexFormStatusUnavailableHere = '当前版本不可用';
+  static const dexFormStatusNotObtainableHere = '当前版本不可常驻获得';
+  static const dexFormStatusEventOnly = '活动限定';
+  static const dexFormStatusDeprecated = '历史形态';
+  static String dexFormIntroducedIn(String game) => '初次登场：$game';
 
   static const settingsAttributionTitle = '数据来源与许可';
   static const settingsAttributionHint = '查看资料来源、开放许可与商标说明';
@@ -437,6 +468,13 @@ abstract final class AppZh {
   static const searchRefWeather = '天气';
   static const searchRefTerrains = '场地';
   static const searchRefStatus = '状态异常';
+  static const locationDexTitle = '地点图鉴';
+  static const locationDexHint = '按当前游戏版本查看每个地点会遇到的宝可梦；展开地点即可核对捕获完成度。';
+  static const locationDexSearchHint = '搜索地点或宝可梦';
+  static const locationDexLoadFailed = '地点资料暂时无法载入，请检查离线资料包或网络。';
+  static const locationDexEmpty = '当前版本没有匹配的地点资料。';
+  static String locationDexCompletion(int caught, int total) =>
+      '已捕获 $caught / $total';
   static const searchRefPlaceholder = '资料加载中，请先下载完整离线资料包或检查网络。';
   static const searchBattleTypeMatchup = '属性克制';
   static const searchBattleStatCalc = '能力值计算';
@@ -464,6 +502,12 @@ abstract final class AppZh {
   static const settingsRetroStyleHint = '实心下沉影加按压回弹的实体按键手感；关闭后为纯扁平贴纸。';
   static const settingsListAnimations = '列表渐入动画';
   static const settingsListAnimationsHint = '图鉴、搜索、常用资料等列表的渐入小动画；关闭后内容会立即显示。';
+  static const settingsAppShortcuts = '桌面快捷入口';
+  static const settingsAppShortcutsHint = '默认显示图鉴和搜索；可替换或补充下方任意资料与工具，最多三个。';
+  static const settingsAppShortcutsLimit = '最多只能选择三个快捷入口。';
+  static const settingsAppShortcutsCustomize = '自定义快捷入口';
+  static const settingsAppShortcutsReset = '恢复默认';
+  static const settingsAppShortcutsNone = '当前不显示快捷入口';
   static const companionSettingsPick = '更换同伴';
   static const companionSettingsReset = '恢复默认（随存档御三家）';
   static const companionSettingsPosition = '调整位置';
@@ -531,6 +575,7 @@ abstract final class AppZh {
       '计算假设：默认单打；勾选「双打·多目标招式」后按命中多个目标 ×0.75 计算；'
       '伤害含 85%–100% 随机浮动；'
       '击中要害按世代倍率（第六世代起 ×1.5，此前 ×2）并无视光墙/反射壁；'
+      '按一次命中的固定威力招式估算，不处理固定伤害、连续攻击、动态威力或招式专属效果；'
       '未收录的特性、道具与场地细节不计入，结果仅供旅途参考。';
   static const companionStatInputsTitle = '输入';
   static String companionStatFacilityNote(String facility) =>

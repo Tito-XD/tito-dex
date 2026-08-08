@@ -439,6 +439,10 @@ class _SearchPageState extends State<SearchPage> {
                   label: Text(AppZh.dexReferenceAbilities),
                 ),
                 ActionChip(
+                  onPressed: () => context.push('/dex/locations'),
+                  label: const Text(AppZh.locationDexTitle),
+                ),
+                ActionChip(
                   onPressed: () => openDexJsonReference(
                     context,
                     title: AppZh.searchRefNatures,

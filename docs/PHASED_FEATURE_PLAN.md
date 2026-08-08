@@ -2,7 +2,7 @@
 
 > **Status:** Active plan (2026-07-30)。本文取代 `codex/dex-forms` 分支上
 > `docs/handoff/FUNCTIONAL_ROADMAP_IDEAS.md` 的 26 项建议：砍到 9 项，分三批。
-> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.7**，
+> 当前状态以 [`AI_CONTEXT.md`](./AI_CONTEXT.md) 为准（最新发布 **v0.8.8**，
 > CDN 图鉴包 **v19**，Offline APK 紧凑包 **v14**）。
 >
 > **并行约束：** 图鉴检索线（体形/颜色/大小/分类检索 + move/ability 资料详情）
@@ -45,18 +45,17 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 | 图鉴进度分类 | ✅ **v0.8.5 已发布** | `DexScopeStats.evolutionOrTradeOnly` +「待进化」筛选；使用 APK 内置约 27 KB 的预计算索引，不扫描详情文件、不发逐只网络请求 |
 | Bundle 增强 | ✅ **已落地**（检索线，3095ec3） | `EvolutionNode.triggers`：完整 alternatives 结构化（trigger slug / item / heldItem / minLevel / timeOfDay / …），`triggerZh` 保持字节不变。`evolutionRequiresTrade` 已迁移：优先结构化字段（巨钳螳螂式「交换+携带」精确判定，美纳斯式非交换替代路径解锁），旧 bundle 回退字符串匹配 |
 
-剩余限制：alternatives 中的非交换替代路径（如美纳斯的美丽度升级）按可达处理，
-但它是否在**当前版本**可用（HGSS 无华丽大赛）属于 MechanicsProfile 的范畴，
-待 P0-4 收敛时精确化。旧安装 bundle（v11 及更早）无 `triggers` 字段，
-自动回退字符串判定，无需强制重下。
+`MechanicsProfile` 已在 v0.8.8 落地：alternatives 会按当前
+version-group 过滤，美纳斯在 HGSS 不再借用不可执行的美丽度/棱镜鳞片路线。
+旧安装 bundle（v11 及更早）无 `triggers` 字段时仍回退字符串判定。
 
 ## Phase 3 — 需要基建（一个版本一块）
 
 | 步骤 | 依赖 | 说明 |
 | --- | --- | --- |
 | 1. 地点反向索引 | ✅ 构建侧已实现 | bundle 已生成 `location_index.json`（`游戏→地点→方式→宝可梦`）；客户端仍坚持只读，不做运行时 invert |
-| 2. 结构化地点树 | 📌 **待办** | 增加 App 端按需加载器与地点树页面，显示地点完成度；**永远不做交互地图**（素材无底洞） |
-| 3. 存档助手 | 📌 **待办，等存档规则调整后再做** | 在地点树与 Phase 2 之上分级展示版本缺失、阶段可获得/进化线、队伍提醒、附近未捕获；具体字段与显隐规则以后续存档改动为准 |
+| 2. 结构化地点树 | ✅ v0.8.8 | App 按需加载并按版本显示地点、遭遇方式、宝可梦与捕获完成度；**永远不做交互地图** |
+| 3. 存档助手 | ✅ v0.8.8 | Journey card 用轻量地点索引摘要显示附近待捕；Journey 二级页展开附近未捕获、队伍下一阶段进化、配对版本直接遭遇缺口及进化/生蛋/交换补全。无法匹配地点或未选精确版本时明确降级，不猜测结果 |
 
 ## 检索线（并行中，不在本计划内但相关）
 
@@ -64,10 +63,9 @@ P5 剩余 7 条等——理由见各节）。保留 9 项分三批。
 
 1. 颜色用**色块多选**不用色名（PokeAPI 无橙色，卡蒂狗在 brown）—— ✅ **v0.8.5 已落地**。
 2. 补**相对大小**分档（`heightDm` 已在 summary，三到五档）—— ✅ **v0.8.5 已落地**。
-3. `SHAPE_ZH`/`COLOR_ZH` 的中文标签直接写进 bundle summary，
-   避免 Python/Dart 两份映射（同 `AI_CONTEXT.md` 道具分类同步的坑）—— 📌 **仍待办**：
-   bundle summary 目前只写 `shapeSlug`/`colorSlug`，`build_dex_bundle.py` 与
-   `kDexShapeLabelsZh`/`kDexColorLabelsZh` 仍是两份中文映射。
+3. 形状/颜色/成长率/栖息地标签统一来源—— ✅ v0.8.8：
+   `data/l10n/zh/dex_axes.json` 是唯一人工维护源，Dart fallback 由脚本生成，
+   新 bundle 会把中文标签与 slug 一起写入；v19 继续用 APK fallback 兼容。
 
 ## 砍掉清单（速查）
 
