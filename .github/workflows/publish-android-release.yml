@@ -116,8 +116,15 @@ jobs:
           tag="v$VERSION"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
-          git push origin "refs/tags/$tag"
+          remote_tags="$(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")"
+          if [[ -n "$remote_tags" ]]; then
+            remote_target="$(printf '%s\n' "$remote_tags" | awk '$2 ~ /\^\{\}$/ {print $1}')"
+            test -n "$remote_target"
+            test "$remote_target" = "$SOURCE_SHA"
+          else
+            git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
+            git push origin "refs/tags/$tag"
+          fi
           cat > /tmp/release-notes.md <<EOF
           TitoDex $tag ships verified Lite and Offline Android packages.
 
