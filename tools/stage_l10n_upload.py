@@ -84,6 +84,7 @@ def update_bundle_manifest(
     *,
     l10n_version: str,
     config_version: int,
+    expected_bundle_version: int,
     remote_manifest_path: Path | None = None,
 ) -> Path:
     """Write bundle-manifest.json with updated l10nVersion / publishedAt."""
@@ -100,7 +101,7 @@ def update_bundle_manifest(
             ) from exc
 
     required = {
-        "bundleVersion": 7,
+        "bundleVersion": expected_bundle_version,
         "cdnPrefix": "v5",
         "pokemonCount": 1025,
         "complete": True,
@@ -142,6 +143,12 @@ def main() -> int:
         default=None,
         help="Existing bundle-manifest.json to merge (optional)",
     )
+    parser.add_argument(
+        "--expected-bundle-version",
+        type=int,
+        required=True,
+        help="Exact currently published bundleVersion; prevents stale root-manifest writes",
+    )
     args = parser.parse_args()
 
     stats = stage_l10n_upload(args.output)
@@ -149,6 +156,7 @@ def main() -> int:
         args.output,
         l10n_version=str(stats["l10nVersion"]),
         config_version=int(stats["configVersion"]),
+        expected_bundle_version=args.expected_bundle_version,
         remote_manifest_path=args.remote_manifest,
     )
 

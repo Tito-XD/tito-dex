@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.7) |
-| **`main` / lite source** | `0.8.7+140` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.7-offline+141` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.8](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.8) |
+| **`main` / lite source** | `0.8.8+142` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.8-offline+143` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,14 +39,16 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.7)
+## Current feature status (latest release line: v0.8.8)
 
-> `main` tracks the v0.8.7 release line. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
+> v0.8.8 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party, map, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
+- v0.8.8: Android long-press app shortcuts default to Dex + Search and are configurable in Settings (up to three destinations from dex sub-pages, reference catalogs and battle tools); HGSS counts both badge banks, and DeSmuME `.dsv` wrappers are recognized.
+- v0.8.8: save import preserves the numeric trainer ID for Journey/Settings; the Journey card shows a lightweight current-location capture reminder, while the Journey page expands nearby uncaught species, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion gaps. Unknown locations and merged editions show explicit prompts instead of guessed advice.
 
 ### Dex (national 1–1025)
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
@@ -59,10 +61,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **Species filter sheet icons:** body-style chips use original vector creature marks that preserve the recognisable HOME poses and white eyes (`DexShapeIcon`); size chips use relative discs (`DexSizeIcon`); colour stays as swatches. Icons ship in the APK only.
 - Per-form exact-version locations preserve `speciesId`, `pokemonId`, `formKey`, `teraType`, `formAmbiguous`, alpha/titan/raid/fixed flags; modern overlays cover BDSP, Legends: Arceus, Sword/Shield+DLC, Scarlet/Violet+DLC, Z-A, and Mega Dimension. Champions is explicitly not applicable.
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
-- Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes. **Wild held items (bundle v16 candidate):** PokeAPI data only reached Gen 7, so 52poke imports add SwSh / BDSP / LA / SV / Z-A coverage — 520 species with held items (was 381), plus 52 previously-missing items added to `items.json` (594 total, CC BY-NC-SA attribution in `HELD_ITEMS_ATTRIBUTION.txt`). Versions without an explicit 52poke rate inherit the item's known rate (default 5%).
+- Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes. Bundle v16 added 52poke SwSh / BDSP / LA / SV / Z-A held-item coverage: 520 species with held items plus 52 previously missing items (`HELD_ITEMS_ATTRIBUTION.txt`). v0.8.8 applies `MechanicsProfile` gates so unavailable alternative evolution routes do not make a version plan look self-contained.
+- v0.8.8: `/dex/locations` loads the existing reverse index on demand and shows selected-version area encounters with caught completion; no interactive map is planned.
+- Form metadata now reaches the UI consistently: event-only, historical, current-version availability/obtainability, introduction version, incomplete data, and inherited fallback states are all labelled instead of remaining bundle-only flags.
 
 ### Items (reference hub → 道具)
-- **Full item catalog (bundle v19):** 2130 items across 16 `categoryZh` groups with 2130/2130 Chinese descriptions and 2130/2130 local icons. Shared artwork is explicit: 300 Dynamax Crystals, 100 TRs, 230 type-mapped TMs, 25 TM materials, and other intentional template groups are not counted as unique art. Only `bw-grass-tablecloth` remains an explicitly labelled generic-template fallback. `data/dex/item_media_audit_v19.json` records coverage, hashes, sources, shared groups, and gaps.
+- **Full item catalog (bundle v19):** 2130 items across 16 `categoryZh` groups with 2130/2130 Chinese descriptions and 2130/2130 local icons. Shared artwork is explicit: 300 Dynamax Crystals, 100 TRs, 230 type-mapped TMs, 25 TM materials, and other intentional template groups are not counted as unique art. Only `bw-grass-tablecloth` remains an explicitly labelled generic-template fallback. The audit now assigns explicit or inherited-pipeline provenance to every record; no item remains unclassified.
 - **Form media catalog (bundle v19):** 1025 species and 803 forms (554 alternates) are audited independently by static, shiny static, animated, shiny animated, and cry availability. Alternate coverage is 548 / 497 / 386 / 386 / 554; 143 have form-specific cries. Six Koraidon/Miraidon ride modes have no separate upstream static artwork and remain named gaps rather than borrowing another mode. `data/dex/form_media_audit.json` is the machine-readable source of truth.
 - PokeAPI media uses one pinned `PokeAPI/sprites` commit and a generated exact-file manifest; 52poke art uses MediaWiki `imageinfo` plus successful original-file requests. The app maps catalog records directly to `formKey`, separates normal/shiny and static/animated candidates, caches selected art, and never gives same-ID cosmetic forms the default animation. Cry matching is explicit rather than suffix substring guessing.
 - Data source priority: PokeAPI (lowercase `zh-hans`) for names and in-game descriptions, then 52poke (CC BY-NC-SA 4.0) for gaps and newer original-resolution bag icons. Item icons are bundled rather than hotlinked; cries/animations/HOME art remain online and cached on demand.
@@ -81,7 +85,28 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **Stackable dex axes** (`DexFilter`): body style × colour (multi-select set) × relative size × generation × tag, intersected with at most one reference drill-down. Size buckets are cut from the real 1025-species height distribution (~19/29/24/16/13 %).
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
+### Data → behavior → UI alignment audit (2026-08-08)
+
+| Runtime data | Behavior | Reachable UI |
+| --- | --- | --- |
+| Parsed save metadata / party / dex flags | journey merge, progress, edition auto-selection | Home, Team, Journey, Settings, Dex status |
+| Summaries + `dex_catalog.json` | browse, search, stacked species axes | Dex and Search |
+| Per-species details + forms | type/stat/ability/obtain/move/evolution planning | Four detail tabs + form selector |
+| `version_availability_index.json` | evolution/breeding/trade missing classification | Dex progress filter + Journey assistant |
+| `location_index.json` | selected-version area tree and save-location match | Location Dex + Journey card/page |
+| Moves, abilities, items, natures, egg groups, weather, terrain, status | reference search/detail and supported species drill-down | Search reference hub + configurable app shortcuts |
+| `media_catalog_52poke.json` | form-aware art/animation/cry candidates | companion, picker, media resource page |
+| `app_config.json` | remotely updateable Tier-A link copy | Search → Pokémon Sleep tools |
+
+`form_media_audit.json`, `item_media_audit_v19.json`, attribution files,
+`games.json`, and `types.json` are bundle verification/build provenance rather
+than dormant product features; they intentionally have no raw end-user page.
+The audit removed unused `DexFilter.natureSlug` / `itemId` states instead of
+advertising filters with no implementation. No confirmed runtime feature is
+left without a UI entry after this pass.
+
 ### Latest release-line highlights
+- v0.8.8: completes the three-phase correctness and UI closure: hardened l10n/release source binding, configurable Android app shortcuts, location dex, mechanics-aware evolution planning, improved save parsing and fixture gates, canonical Chinese dex axes, explicit battle assumptions, and a Journey save assistant that connects location, party evolution and exact-version completion data. Runtime data-to-UI alignment is audited and covered by 373 Flutter tests.
 - v0.8.7: fixes per-version sprite previews and artwork-viewer back behavior; makes companion art and cries explicitly form-aware across normal/shiny and static/animated sources; publishes the audited v19 media catalog; and completes all 2130 item descriptions and local icons with shared/fallback templates labelled honestly. Offline keeps the compact v14 seed and can update to v19.
 - v0.8.6: moves gain an 18-type filter; abilities, natures, egg groups, weather, and status gain compact category filters; detail stat keys are normalized to Chinese labels across EV yield, base stats, and nature effects; the first system-back action now closes the artwork viewer instead of popping the detail route underneath. Bundle v13 and compact Offline v14 remain unchanged.
 - v0.8.5: Android data-pack downloads can continue in the background with notification progress; exact-version obtain planning and held-item rows land; structured evolution and encounter conditions become visible; the dex gains persisted region/G1–G9 scope selection; flavor icons are local, metadata rows align, form status/attribution/Sleep links are restored, and secondary-page scaling is retired. Bundle v13 and compact Offline v14 remain unchanged.
@@ -119,8 +144,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ### Not shipped / partial
 - Beyond the IV/EV inputs already exposed in stat calc: full competitive damage calculator, dedicated IV workflow, usage rankings, and simulator parity.
-- Broader real-save fixtures and validation beyond HGSS (more real saves incoming from the maintainer).
-- Community (52poke) Chinese flavor text: 850 species imported plus a maintainer-supplied Gholdengo overview (bundle v15 candidate; CC BY-NC-SA attribution ships as `FLAVOR_ATTRIBUTION.txt` in the archive). All 1025 species now have zh flavor; per-entry zh coverage rose to ~71%. Publish path: `upload-dex-bundle-v15.yml` after v14 goes live.
+- More reviewed real-save fixtures beyond the bundled SoulSilver save. The manifest-driven fixture matrix is ready for maintainer-provided saves.
 
 > Cloud sync was dropped as a direction (2026-07): TitoDex stays local-first. Journey JSON import/export remains the portability path.
 
@@ -171,7 +195,7 @@ Build/release v19 with `tools/patch_dex_bundle_v19_items.py`, `tools/audit_item_
 - Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base).
 - Incremental v13 build: `python3 tools/patch_dex_bundle_v13_form_evolution.py` (live v12 archive as read-only base; no PokeAPI). The completed one-shot v12/v13 workflows live under `docs/archive/workflows/`; future releases need a new workflow with the current production version as an explicit precondition.
 - v14 compact-media seed: `python3 tools/patch_dex_bundle_v14_compact_media.py`. It byte-compares all 1,340 `artwork/` files against their `sprites/` peers before removing only the duplicate archive copies; loose online artwork remains in R2. Offline APKs still reuse its verified 54,746,615-byte archive while installed copies can update to live v19.
-- **Slugs ship, labels do not.** Body style / colour / growth rate / habitat ride in the bundle as slugs; their Chinese labels live in `flutter/lib/features/dex/dex_search_terms.dart` (and form-suffix labels in `form_evolution_targets.dart`).
+- Body style / colour / growth rate / habitat Chinese labels are canonical in `data/l10n/zh/dex_axes.json`; Flutter's fallback map is generated from it. New bundle builds persist labels beside slugs, while v19 remains compatible through the APK fallback.
 - Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`. Clients only upgrade when `remote.bundleVersion > local.version`.
 - Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.
 - Secrets: [PERMISSIONS.md](./PERMISSIONS.md) — `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (and optional `R2_*` for bulk upload).
@@ -236,9 +260,16 @@ Same codebase, no diverging fork — `ios/` generated via
 - **APK builds** require Android SDK + release keystore (may be unavailable in some cloud VMs).
 - `flutter pub get` on startup (the old root npm mock was removed in the 0.6.5 cleanup).
 
-**Web caveat:** Settings / Search / Dex sub-pages may hit `No Material widget found` on web (missing Scaffold in some scaffolds). Real target is Android RG. Home / Team / Journey work on web for smoke tests.
+Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate in web smoke coverage. Android RG remains the real shipping target.
 
-**Known baseline:** `flutter analyze` may report pre-existing infos; `flutter test` is the regression gate.
+**Known baseline:** `flutter analyze --no-pub` is expected to be clean;
+`flutter test --no-pub` is the regression gate.
+
+**Verified v0.8.8 release source (2026-08-08):** `flutter analyze --no-pub` has no
+issues, all 373 Flutter tests pass, all 123 Python tool tests pass, and
+`flutter build web --release --no-pub` succeeds. Android native shortcut and
+media smoke coverage runs on an x86_64 emulator in CI; APK packaging and
+physical-device release acceptance remain separate release gates.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).
 

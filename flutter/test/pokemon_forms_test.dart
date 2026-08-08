@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/features/dex/dex_models.dart';
+import 'package:titodex/widgets/pokemon_detail_sections.dart';
 
 void main() {
   const paldeanStats = PokemonBaseStats(
@@ -59,6 +60,36 @@ void main() {
       endsWith('wooper-paldea-sv.png'),
     );
     expect(restored.animatedSpriteUrl, endsWith('wooper-paldea.gif'));
+  });
+
+  test('form status exposes event, history and current obtainability', () {
+    const form = PokemonFormDetail(
+      key: 'event-form',
+      pokemonId: 10001,
+      nameEn: 'Event-form',
+      nameZh: '活动形态',
+      kind: PokemonFormKind.form,
+      isDefault: false,
+      isBattleOnly: false,
+      isMega: false,
+      isCosmetic: false,
+      types: ['normal'],
+      heightDm: 1,
+      weightHg: 1,
+      availableVersionGroups: ['scarlet-violet', 'sword-shield'],
+      obtainableVersionGroups: ['scarlet-violet'],
+      eventOnly: true,
+      deprecated: true,
+    );
+
+    expect(
+      pokemonFormStatusLabels(form, versionGroup: 'sword-shield'),
+      containsAll(['活动限定', '历史形态', '当前版本不可常驻获得']),
+    );
+    expect(
+      pokemonFormStatusLabels(form, versionGroup: 'heartgold-soulsilver'),
+      contains('当前版本不可用'),
+    );
   });
 
   test(

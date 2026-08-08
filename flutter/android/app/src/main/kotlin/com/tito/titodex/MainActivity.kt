@@ -5,6 +5,9 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.provider.DocumentsContract
@@ -16,9 +19,33 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private var pendingSaveDocumentResult: MethodChannel.Result? = null
     private var pendingNotificationPermissionResult: MethodChannel.Result? = null
+    private var pendingShortcutRoute: String? = null
+    private var appShortcutChannel: MethodChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        pendingShortcutRoute = shortcutRouteFrom(intent)
+        appShortcutChannel = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            APP_SHORTCUTS_CHANNEL,
+        ).also { channel ->
+            channel.setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getInitialRoute" -> {
+                        result.success(pendingShortcutRoute)
+                        pendingShortcutRoute = null
+                    }
+                    "updateShortcuts" -> {
+                        updateShortcuts(
+                            call.argument<List<Map<String, String>>>("shortcuts") ?: emptyList(),
+                        )
+                        result.success(null)
+                    }
+                    "getDynamicShortcutIds" -> result.success(dynamicShortcutIds())
+                    else -> result.notImplemented()
+                }
+            }
+        }
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             APP_LAUNCHER_CHANNEL,
@@ -98,6 +125,53 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val route = shortcutRouteFrom(intent) ?: return
+        pendingShortcutRoute = null
+        appShortcutChannel?.invokeMethod("shortcutOpened", route)
+    }
+
+    private fun shortcutRouteFrom(intent: Intent?): String? {
+        if (intent?.action != APP_SHORTCUT_ACTION) {
+            return null
+        }
+        return intent.getStringExtra(APP_SHORTCUT_ROUTE)?.takeIf { it.startsWith("/") }
+    }
+
+    private fun updateShortcuts(entries: List<Map<String, String>>) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            return
+        }
+        val manager = getSystemService(ShortcutManager::class.java)
+        manager.dynamicShortcuts = entries.take(3).mapIndexedNotNull { rank, entry ->
+            val id = entry["id"]?.takeIf { it.isNotBlank() } ?: return@mapIndexedNotNull null
+            val label = entry["label"]?.takeIf { it.isNotBlank() } ?: return@mapIndexedNotNull null
+            val route = entry["route"]?.takeIf { it.startsWith("/") }
+                ?: return@mapIndexedNotNull null
+            val shortcutIntent = Intent(applicationContext, MainActivity::class.java).apply {
+                action = APP_SHORTCUT_ACTION
+                putExtra(APP_SHORTCUT_ROUTE, route)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            ShortcutInfo.Builder(this, id)
+                .setShortLabel(label)
+                .setLongLabel("TitoDex · $label")
+                .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
+                .setRank(rank)
+                .setIntent(shortcutIntent)
+                .build()
+        }
+    }
+
+    private fun dynamicShortcutIds(): List<String> {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            return emptyList()
+        }
+        return getSystemService(ShortcutManager::class.java).dynamicShortcuts.map { it.id }
     }
 
     @Deprecated("Kept for the Storage Access Framework result callback")
@@ -293,6 +367,9 @@ class MainActivity : FlutterActivity() {
         const val SAVE_DOCUMENT_CHANNEL = "com.tito.titodex/save_document"
         const val DEX_DOWNLOAD_NOTIFICATION_CHANNEL =
             "com.tito.titodex/dex_download_notification"
+        const val APP_SHORTCUTS_CHANNEL = "com.tito.titodex/app_shortcuts"
+        const val APP_SHORTCUT_ACTION = "com.tito.titodex.OPEN_SHORTCUT"
+        const val APP_SHORTCUT_ROUTE = "route"
         const val PICK_SAVE_DOCUMENT_REQUEST = 47021
         const val POST_NOTIFICATIONS_REQUEST = 47022
     }

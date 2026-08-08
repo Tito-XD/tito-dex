@@ -42,7 +42,8 @@ class HgssParser {
     final trainerName = decodeGen4Text(bytes.sublist(base + 0x64, base + 0x74));
     final tid = readUint16(bytes, base + 0x74);
     final johtoBadges = bytes[base + 0x7E];
-    final badgeCount = popcount(johtoBadges);
+    final kantoBadges = bytes[base + 0x83];
+    final badgeCount = popcount(johtoBadges) + popcount(kantoBadges);
     final hours = readUint16(bytes, base + 0x86);
     final minutes = bytes[base + 0x88];
     final seconds = bytes[base + 0x89];
@@ -88,7 +89,7 @@ class HgssParser {
       playTime:
           '${hours.toString()}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
       badges: badgeCount,
-      maxBadges: 8,
+      maxBadges: 16,
       locationLabel: locationLabelForMapId(mapId),
       party: party,
       saveHash: 'v$saveParserRevision:${sha256.convert(bytes)}',
@@ -136,6 +137,7 @@ class HgssParser {
           ? existing!.trainerName
           : summary.trainerName,
       saveTrainerName: summary.trainerName,
+      saveTrainerId: summary.tid,
       trainerNameCustomized: preserveTrainerName,
       trainerAvatarPath: existing?.trainerAvatarPath,
       trainerAvatarCustomized: existing?.trainerAvatarCustomized ?? false,

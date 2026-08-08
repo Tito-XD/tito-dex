@@ -31,11 +31,11 @@ class ItemMediaAuditTests(unittest.TestCase):
             ("shared-template", "52poke:tm:psychic"),
         )
 
-    def test_unclassified_duplicate_is_not_claimed_as_exact(self) -> None:
+    def test_legacy_pipeline_sprite_has_derived_source(self) -> None:
         item = {"slug": "legacy-item"}
         self.assertEqual(
             inferred_mapping(item, "abc", Counter({"abc": 2})),
-            ("duplicate-unclassified", None),
+            ("source-documented", None),
         )
 
 

@@ -261,6 +261,7 @@ class VersionChainPlanningCard extends StatelessWidget {
           chain: chain,
           isCatchable: catchableIds.contains,
           supportsBreeding: supportsBreedingInVersionGroup(versionGroup),
+          mechanics: MechanicsProfile.forVersionGroup(versionGroup),
         );
         final paired = pairedEncounterVersion(version);
         final exclusivity = paired == null

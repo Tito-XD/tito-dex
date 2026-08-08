@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/app_shortcuts/app_shortcuts.dart';
 import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
@@ -617,6 +618,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     label: AppZh.settingsLocation,
                     value: localizeLocation(widget.journey.location),
                   ),
+                  if (widget.journey.saveTrainerId != null)
+                    _Row(
+                      label: AppZh.settingsTrainerId,
+                      value: widget.journey.saveTrainerId!.toString().padLeft(
+                        5,
+                        '0',
+                      ),
+                    ),
                   _Row(
                     label: AppZh.settingsPlayTime,
                     value: widget.journey.playTime,
@@ -635,6 +644,8 @@ class _SettingsPageState extends State<SettingsPage> {
         _CompanionSection(journey: widget.journey),
         const SizedBox(height: 16),
         const _InterfaceSection(),
+        const SizedBox(height: 16),
+        const _AppShortcutsSection(),
         const SizedBox(height: 16),
         if (saveLinked)
           _SettingsGroup(
@@ -1203,6 +1214,154 @@ class _InterfaceSection extends StatelessWidget {
                   hint: AppZh.settingsListAnimationsHint,
                   value: motionPreferences.listAnimationsEnabled,
                   onChanged: motionPreferences.setListAnimationsEnabled,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AppShortcutsSection extends StatelessWidget {
+  const _AppShortcutsSection();
+
+  Future<void> _showCustomizer(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: TitoColors.card,
+      builder: (sheetContext) => FractionallySizedBox(
+        heightFactor: 0.86,
+        child: SafeArea(
+          child: ListenableBuilder(
+            listenable: appShortcutPreferences,
+            builder: (context, _) {
+              final selected = appShortcutPreferences.selected;
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 16, 10, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppZh.settingsAppShortcutsCustomize,
+                            style: SecondaryTypography.onCard.h15,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => appShortcutPreferences.setSelected(
+                            AppShortcutOption.defaults,
+                          ),
+                          child: const Text(AppZh.settingsAppShortcutsReset),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(18, 0, 18, 20),
+                      children: [
+                        Text(
+                          AppZh.settingsAppShortcutsHint,
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            color: TitoColors.mutedInk,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final section in AppShortcutSection.values) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12, bottom: 2),
+                            child: Text(
+                              section.labelZh,
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    color: TitoColors.mutedInk,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                            ),
+                          ),
+                          for (final option in AppShortcutOption.all.where(
+                            (option) => option.section == section,
+                          ))
+                            CheckboxListTile(
+                              key: ValueKey('app-shortcut-${option.id}'),
+                              contentPadding: EdgeInsets.zero,
+                              dense: true,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: Text(
+                                option.labelZh,
+                                style: SecondaryTypography.onCard.body14,
+                              ),
+                              value: selected.any(
+                                (item) => item.id == option.id,
+                              ),
+                              onChanged: (_) async {
+                                final changed = await appShortcutPreferences
+                                    .toggle(option);
+                                if (!changed && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        AppZh.settingsAppShortcutsLimit,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appShortcutPreferences,
+      builder: (context, _) {
+        final selected = appShortcutPreferences.selected;
+        return _SettingsGroup(
+          title: AppZh.settingsAppShortcuts,
+          child: StickerCard(
+            variant: StickerVariant.sky,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppZh.settingsAppShortcutsHint,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  selected.isEmpty
+                      ? AppZh.settingsAppShortcutsNone
+                      : selected.map((item) => item.labelZh).join('、'),
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: () => _showCustomizer(context),
+                  icon: const Icon(Icons.tune_rounded),
+                  label: const Text(AppZh.settingsAppShortcutsCustomize),
                 ),
               ],
             ),

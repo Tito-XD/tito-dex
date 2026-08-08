@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:titodex/features/app_shortcuts/app_shortcuts.dart';
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/pages/media_resource_page.dart';
 import 'package:titodex/widgets/pokemon_artwork_viewer.dart';
@@ -24,10 +25,8 @@ void main() {
         home: Scaffold(
           body: Builder(
             builder: (context) => TextButton(
-              onPressed: () => showPokemonArtworkViewer(
-                context,
-                summary: pikachu,
-              ),
+              onPressed: () =>
+                  showPokemonArtworkViewer(context, summary: pikachu),
               child: const Text('open'),
             ),
           ),
@@ -50,10 +49,7 @@ void main() {
       MaterialApp.router(
         routerConfig: GoRouter(
           routes: [
-            GoRoute(
-              path: '/',
-              builder: (_, __) => const MediaResourcePage(),
-            ),
+            GoRoute(path: '/', builder: (_, __) => const MediaResourcePage()),
           ],
         ),
       ),
@@ -62,5 +58,19 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
     await binding.takeScreenshot('media_resource');
+  });
+
+  testWidgets('Android dynamic app shortcuts are installed', (tester) async {
+    final platform = AppShortcutsPlatform();
+    await platform.update(const [
+      AppShortcutOption.dex,
+      AppShortcutOption.search,
+      AppShortcutOption.moves,
+    ]);
+
+    expect(
+      await platform.dynamicShortcutIds(),
+      unorderedEquals(['dex', 'search', 'moves']),
+    );
   });
 }

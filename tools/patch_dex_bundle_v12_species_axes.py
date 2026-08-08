@@ -57,6 +57,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 # and evolution_trigger_payload the field mapping.  A second copy here would be
 # the same two-sources-of-truth problem the zh labels were moved out to avoid.
 from build_dex_bundle import (  # noqa: E402
+    DEX_AXES_ZH,
     evolution_trigger_payload,
     parse_held_items,
     species_generation,
@@ -164,9 +165,11 @@ def summary_additions(
     shape = (species.get("shape") or {}).get("name")
     if shape:
         additions["shapeSlug"] = shape
+        additions["shapeLabelZh"] = DEX_AXES_ZH["shape"].get(shape, shape)
     color = (species.get("color") or {}).get("name")
     if color:
         additions["colorSlug"] = color
+        additions["colorLabelZh"] = DEX_AXES_ZH["color"].get(color, color)
     tags = species_tags(species, int(detail["summary"]["id"]))
     if tags:
         additions["tags"] = tags
@@ -183,10 +186,16 @@ def detail_additions(
     growth_rate = (species.get("growth_rate") or {}).get("name")
     if growth_rate:
         additions["growthRateSlug"] = growth_rate
+        additions["growthRateLabelZh"] = DEX_AXES_ZH["growthRate"].get(
+            growth_rate, growth_rate
+        )
     # Habitat only exists for Gen I-III species; null everywhere else.
     habitat = (species.get("habitat") or {}).get("name")
     if habitat:
         additions["habitatSlug"] = habitat
+        additions["habitatLabelZh"] = DEX_AXES_ZH["habitat"].get(
+            habitat, habitat
+        )
     if species.get("has_gender_differences"):
         additions["hasGenderDifferences"] = True
     held_items = parse_held_items(pokemon.get("held_items", []))

@@ -94,6 +94,7 @@ jobs:
           python3 tools/test_audit_form_media.py
           python3 tools/test_fill_shared_item_icons_v19.py
           python3 tools/test_audit_item_media_v19.py
+          python3 tools/test_generate_dex_axis_labels.py
           python3 tools/test_stage_dex_incremental_upload.py
 
       - name: Patch v18 into Dex bundle v19

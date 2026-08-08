@@ -8,6 +8,7 @@ TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 ob
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID shown in Workers dashboard (must match the token’s account) |
 | `R2_ACCESS_KEY_ID` | Optional S3-compatible R2 key used for faster bulk bundle uploads |
 | `R2_SECRET_ACCESS_KEY` | Optional S3-compatible R2 secret paired with the access key |
+| `ANDROID_SIGNER_SHA256` | Recommended SHA-256 certificate digest used by the release publisher to pin both APKs to the historical Android signer |
 
 ## Cloudflare API token — required permissions
 
@@ -59,6 +60,7 @@ Use template **「Edit Cloudflare Workers」** only if it includes **R2 Edit**; 
 | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Token string from above |
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID (32 hex chars) |
+| `ANDROID_SIGNER_SHA256` | Android release certificate SHA-256 digest as printed by `apksigner verify --print-certs` (recommended for publishing) |
 
 Use **Repository secrets**, not Environment secrets (workflows do not set `environment:`).
 
@@ -108,4 +110,7 @@ export CLOUDFLARE_ACCOUNT_ID=...
 ./tools/upload_dex_bundle.sh dist/dex-v7/upload v5
 ```
 
-Or: `python3 tools/stage_l10n_upload.py` then upload `dist/l10n-upload/` with Wrangler.
+Or: download the current production root manifest first, then run
+`python3 tools/stage_l10n_upload.py --remote-manifest <manifest> --expected-bundle-version 19`.
+The exact expected version is deliberate: change it only together with a verified production
+bundle release, never to make a stale-manifest failure pass.

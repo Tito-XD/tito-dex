@@ -19,6 +19,7 @@ void main() {
     expect(summary.trainerName, 'Tito');
     expect(summary.tid, 22813);
     expect(summary.badges, 3);
+    expect(summary.maxBadges, 16);
     expect(summary.playTime, '7:03:41');
     expect(summary.party, isNotEmpty);
     expect(summary.party.first.speciesName, 'Quilava');
@@ -34,6 +35,17 @@ void main() {
     expect(summary.dexCaughtIds, containsAll([156, 175]));
     expect(summary.dexSeenIds.length, 46);
     expect(summary.dexSeenIds, containsAll(summary.dexCaughtIds));
+  });
+
+  test('counts Johto and Kanto badge banks', () async {
+    final fixture = await rootBundle.load('assets/fixtures/PKMSS.sav');
+    final bytes = Uint8List.fromList(fixture.buffer.asUint8List());
+    bytes[0x83] = 0x01;
+    bytes[0x40000 + 0x83] = 0x01;
+
+    final summary = const HgssParser().parseSummary(bytes);
+    expect(summary.badges, 4);
+    expect(summary.maxBadges, 16);
   });
 
   test('decodes Gen IV full-width and half-width trainer characters', () {

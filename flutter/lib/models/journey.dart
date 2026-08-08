@@ -106,7 +106,6 @@ class JourneyTimelineEntry {
         at: json['at'] as String?,
       );
 }
-
 class CurrentJourney {
   const CurrentJourney({
     required this.game,
@@ -120,6 +119,7 @@ class CurrentJourney {
     required this.companion,
     this.nextReminder,
     this.saveTrainerName,
+    this.saveTrainerId,
     this.trainerNameCustomized = false,
     this.trainerAvatarPath,
     this.trainerAvatarCustomized = false,
@@ -143,6 +143,7 @@ class CurrentJourney {
   final String companion;
   final String? nextReminder;
   final String? saveTrainerName;
+  final int? saveTrainerId;
   final bool trainerNameCustomized;
   final String? trainerAvatarPath;
   final bool trainerAvatarCustomized;
@@ -190,6 +191,7 @@ class CurrentJourney {
     String? companion,
     String? nextReminder,
     String? saveTrainerName,
+    int? saveTrainerId,
     bool? trainerNameCustomized,
     String? trainerAvatarPath,
     bool? trainerAvatarCustomized,
@@ -213,6 +215,7 @@ class CurrentJourney {
       companion: companion ?? this.companion,
       nextReminder: nextReminder ?? this.nextReminder,
       saveTrainerName: saveTrainerName ?? this.saveTrainerName,
+      saveTrainerId: saveTrainerId ?? this.saveTrainerId,
       trainerNameCustomized:
           trainerNameCustomized ?? this.trainerNameCustomized,
       trainerAvatarPath: trainerAvatarPath ?? this.trainerAvatarPath,
@@ -240,6 +243,7 @@ class CurrentJourney {
         'companion': companion,
         if (nextReminder != null) 'nextReminder': nextReminder,
         if (saveTrainerName != null) 'saveTrainerName': saveTrainerName,
+        if (saveTrainerId != null) 'saveTrainerId': saveTrainerId,
         if (trainerNameCustomized) 'trainerNameCustomized': true,
         if (trainerAvatarPath != null) 'trainerAvatarPath': trainerAvatarPath,
         if (trainerAvatarCustomized) 'trainerAvatarCustomized': true,
@@ -275,6 +279,7 @@ class CurrentJourney {
         companion: json['companion'] as String,
         nextReminder: json['nextReminder'] as String?,
         saveTrainerName: json['saveTrainerName'] as String?,
+        saveTrainerId: (json['saveTrainerId'] as num?)?.toInt(),
         trainerNameCustomized: json['trainerNameCustomized'] as bool? ?? false,
         trainerAvatarPath: json['trainerAvatarPath'] as String?,
         trainerAvatarCustomized:

@@ -15,6 +15,14 @@ on:
         description: Successful Android Release APKs workflow run
         required: true
         type: string
+      lite_build_number:
+        description: Expected Lite Android versionCode
+        required: true
+        type: string
+      offline_build_number:
+        description: Expected Offline Android versionCode
+        required: true
+        type: string
 
 permissions:
   actions: read
@@ -32,10 +40,23 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Java for apksigner
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
+
+      - name: Verify build run belongs to this source commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          run_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID")"
+          test "$(printf '%s' "$run_json" | jq -r .name)" = "Android Release APKs"
+          test "$(printf '%s' "$run_json" | jq -r .event)" = "workflow_dispatch"
+          test "$(printf '%s' "$run_json" | jq -r .conclusion)" = "success"
+          test "$(printf '%s' "$run_json" | jq -r .head_sha)" = "$SOURCE_SHA"
 
       - name: Download verified APK artifacts
         uses: actions/download-artifact@v4
@@ -50,17 +71,37 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
           SOURCE_SHA: ${{ inputs.source_sha }}
+          LITE_BUILD_NUMBER: ${{ inputs.lite_build_number }}
+          OFFLINE_BUILD_NUMBER: ${{ inputs.offline_build_number }}
+          EXPECTED_SIGNER_SHA256: ${{ secrets.ANDROID_SIGNER_SHA256 }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
           lite="dist/release/TitoDex-$VERSION-lite-rg-arm64.apk"
           offline="dist/release/TitoDex-$VERSION-offline-rg-arm64.apk"
-          tools/verify_release_apk.sh "$lite"
-          tools/verify_release_apk.sh --offline "$offline"
+          tools/verify_release_apk.sh \
+            --expected-package com.tito.titodex \
+            --expected-version-name "$VERSION" \
+            --expected-version-code "$LITE_BUILD_NUMBER" \
+            "$lite"
+          tools/verify_release_apk.sh --offline \
+            --expected-package com.tito.titodex \
+            --expected-version-name "$VERSION-offline" \
+            --expected-version-code "$OFFLINE_BUILD_NUMBER" \
+            "$offline"
           apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -x "$apksigner"
-          "$apksigner" verify --verbose --print-certs "$lite"
-          "$apksigner" verify --verbose --print-certs "$offline"
+          lite_certs="$($apksigner verify --verbose --print-certs "$lite")"
+          offline_certs="$($apksigner verify --verbose --print-certs "$offline")"
+          printf '%s\n' "$lite_certs"
+          printf '%s\n' "$offline_certs"
+          lite_signer="$(printf '%s\n' "$lite_certs" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -n 1)"
+          offline_signer="$(printf '%s\n' "$offline_certs" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -n 1)"
+          test -n "$lite_signer"
+          test "$lite_signer" = "$offline_signer"
+          if [[ -n "$EXPECTED_SIGNER_SHA256" ]]; then
+            test "${lite_signer,,}" = "${EXPECTED_SIGNER_SHA256,,}"
+          fi
           sha256sum "$lite" "$offline" | tee dist/release/SHA256SUMS.txt
 
       - name: Create annotated tag and draft release
@@ -76,16 +117,14 @@ jobs:
           git tag -a "$tag" "$SOURCE_SHA" -m "TitoDex $tag"
           git push origin "refs/tags/$tag"
           cat > /tmp/release-notes.md <<EOF
-          TitoDex $tag
+          TitoDex $tag ships verified Lite and Offline Android packages.
 
-          ### 下载说明
+          ### Downloads
 
-          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线图鉴。
-          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置完整离线图鉴，文件更大。
+          - \`TitoDex-$VERSION-lite-rg-arm64.apk\`: recommended; downloads the offline data pack on demand.
+          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`: embeds the verified compact offline seed.
 
-          两个 APK 均仅包含 arm64-v8a Release 运行库。若已安装旧签名包，请先卸载再安装。
-
-          > Draft notes are a stub — edit the GitHub Release title and body before publishing.
+          Both APKs contain the arm64-v8a Flutter runtime and are verified against the requested app version, build number, package id, archive integrity, and release signer.
           EOF
           {
             printf '\n### SHA-256\n\n```text\n'

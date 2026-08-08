@@ -32,6 +32,7 @@ void main() {
       party: [],
       saveHash: 'abc',
       parsedAt: DateTime.utc(2026, 1, 1),
+      tid: 42,
     );
 
     final existing = CurrentJourney.mock().copyWith(
@@ -43,6 +44,8 @@ void main() {
     final journey = parser.toJourney(summary, existing: existing);
     expect(journey.trainerName, 'Tito');
     expect(journey.saveTrainerName, 'ETeZ');
+    expect(journey.saveTrainerId, 42);
+    expect(CurrentJourney.fromJson(journey.toJson()).saveTrainerId, 42);
     expect(journey.location, '满金市');
   });
 

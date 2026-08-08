@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "fixtures": [
+    {
+      "asset": "assets/fixtures/PKMSS.sav",
+      "format": "HGSS retail",
+      "game": "SoulSilver",
+      "trainerName": "Tito",
+      "badges": 3,
+      "locationLabel": "满金市",
+      "partySpeciesIds": [156, 175]
+    }
+  ]
+}

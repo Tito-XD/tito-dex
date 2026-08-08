@@ -72,6 +72,25 @@ void main() {
     expect(estimate.tankVerdictZh, isNot('完全免疫或无伤'));
   });
 
+  test('golden neutral one-hit estimate keeps integer rounding stable', () {
+    final estimate = estimateDamage(
+      level: 50,
+      power: 100,
+      attack: 100,
+      defense: 100,
+      defenderHp: 200,
+      moveType: 'normal',
+      attackerTypes: const [],
+      defenderTypes: const ['normal'],
+      relationsByType: relations,
+    );
+
+    expect(estimate.minDamage, 39);
+    expect(estimate.maxDamage, 46);
+    expect(estimate.minPercent, closeTo(19.5, 0.001));
+    expect(estimate.maxPercent, closeTo(23, 0.001));
+  });
+
   group('critical hits and screens', () {
     DamageEstimate run({
       bool crit = false,
