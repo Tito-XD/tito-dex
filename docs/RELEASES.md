@@ -1,105 +1,83 @@
-# Release History
+# Release Notes 规范与历史
 
-This document is the public-copy reference for TitoDex GitHub Releases. Release titles and descriptions keep the product's voice and recognizable TitoDex details while avoiding private user data, internal discussion notes, and production CDN addresses.
+本文档是 TitoDex GitHub Release 公开文案的唯一规范。Release 标题与正文默认使用简体中文；英文项目介绍维护在 [`README.en.md`](../README.en.md)，不在每个 Release 中重复一份容易失去同步的英文全文。
 
-## Distribution channels
+## 当前发布渠道
 
-| Channel | Current version | Purpose |
+| 渠道 | 当前版本 | 用途 |
 | --- | --- | --- |
-| Lite APK | `v0.8.8` (`0.8.8+142`) | Recommended arm64-v8a download |
-| Offline APK | `v0.8.8` (`0.8.8-offline+143`) | Compact v14 seed with live v19 update support |
-| Source on `main` | `0.8.8+142` | Current default branch baseline |
+| Lite APK | `v0.8.8`（`0.8.8+142`） | 推荐的 arm64-v8a 安装包，按需下载离线数据 |
+| Offline APK | `v0.8.8`（`0.8.8-offline+143`） | 内置紧凑 v14 种子，并可更新到 v19 |
+| `main` 源码 | `0.8.8+142` | 当前默认分支基线 |
 
-Legacy `TitoDex-1.0.x-*` APKs and the `v1.0.0` tag belong to the deprecated pre-Flutter mock prototype. They remain available only as historical artifacts and do not represent the current product version.
+`TitoDex-1.0.x-*` 和 `v1.0.0` 属于已废弃的 Flutter 之前原型，只作历史保留，不代表比 0.8.x 更新的产品版本。
 
-## Release notes
+## 标准模板
 
-| Tag | Standardized title | Product summary |
+正式版按以下顺序书写；不适用的区块可以省略，但不得更名为英文或使用相邻版本的内容占位。
+
+````markdown
+一句话说明本版给用户带来的核心结果。
+
+### 本次更新
+
+- 先写用户可感知的变化。
+- 再写重要的兼容性、数据或可靠性变化。
+
+### 下载
+
+- `TitoDex-<version>-lite-rg-arm64.apk`：推荐版本；写明 versionCode。
+- `TitoDex-<version>-offline-rg-arm64.apk`：离线版本；写明 versionCode。
+
+### 验证
+
+- 写实际执行并通过的检查，不复制未经确认的测试数字。
+
+### SHA-256
+
+```text
+<digest>  TitoDex-<version>-lite-rg-arm64.apk
+<digest>  TitoDex-<version>-offline-rg-arm64.apk
+```
+````
+
+预发布版本使用 `### 预发布说明` 和 `### 重点验证`，并在 GitHub 上勾选 Pre-release；已有安装包时仍保留 `### 下载`。
+
+## 文案规则
+
+- 标题格式：`TitoDex v<version> · <一个中文结果>`。预发布标题在结果末尾加 `（预览）`，不再把“预发布”重复塞在版本号两侧。
+- 正文第一段必须是一句中文概述，不能以标题、文件名或实现细节开头。
+- 固定一级区块名称为 `### 本次更新`、`### 下载`、`### 验证`、`### SHA-256`；历史兼容或替代关系可另用 `### 版本说明`。内容较多时在“本次更新”下使用 `####` 子标题。
+- 先写用户能看到或使用到的变化，再写数据、兼容性和发布基础设施。
+- 文件名、`versionName`、`versionCode`、ABI、Lite / Offline 差异必须来自本次实际产物。
+- SHA-256 只写附件文件名，不带 CI 中的 `dist/release/` 临时路径。
+- 每版内容必须依据对应 tag / 提交与真实附件，禁止复制相邻版本正文后只改版本号。
+- 已知限制要明确说明；不要把共用图片、缺失数据或实验性解析包装成完整覆盖。
+- 不公开生产 CDN 地址、凭据、内部讨论、真实存档姓名或其他可识别用户数据。
+- 品牌自有示例（TitoDex、默认训练家身份）可以保留。
+- Commit 和 Pull Request 继续使用英文；Release Notes 与根 README 使用中文。
+
+## 最近版本摘要
+
+| Tag | 标准标题 | 版本结果 |
 | --- | --- | --- |
-| `v0.8.8` | TitoDex v0.8.8 · 存档助手与地点图鉴 | Connects the existing location and exact-version data to a two-level Journey assistant; adds the structured location dex, configurable Android app shortcuts, mechanics-aware evolution planning, stronger save parsing and release verification, canonical Chinese dex axes, explicit battle assumptions, and data-to-UI alignment fixes. Lite and Offline retain live bundle v19 and the compact v14 seed. |
-| `v0.8.7` | TitoDex v0.8.7 · Form media and complete item references | Fixes exact per-version sprite previews and artwork back navigation; maps companion art and cries explicitly by form, normal/shiny, and static/animated source; and publishes bundle v19 with audited form-media coverage plus Chinese descriptions and local icons for all 2130 items. The Offline APK keeps the compact v14 seed and can update to v19. |
-| `v0.8.6` (unpublished) | Folded into v0.8.7 | Local work added an 18-type move filter, compact reference categories, normalized Chinese stat labels, and the artwork-viewer back fix. It was intentionally folded into the unified v0.8.7 Lite/Offline release rather than published separately. |
-| `v0.8.5` | TitoDex v0.8.5 · 版本规划与图鉴范围 | Adds background data-pack downloads with notification progress, exact-version chain completion and wild held-item planning, complete evolution/encounter conditions, region-or-generation dex browsing, local flavor icons, aligned detail tables, form status badges, Sleep links, and unified secondary-page typography. Lite and Offline keep the existing v13/v14 data archives. |
-| `v0.8.2` | TitoDex v0.8.2 · 更轻的离线包与加载进度 | Lite and Offline show continuous multi-stage percentages with capacity/current-file details. Offline embeds the compact v14 archive; offline references load local-first; body-style filter icons use clearer HOME-inspired silhouettes. |
-| `v0.8.1` | TitoDex v0.8.1 · 形态进化链与体形筛选图标 | Regional forms keep a pruned evolution line with form sprites (e.g. Hisuian Growlithe → Hisuian Arcanine). Body-style and size filter chips gain vector silhouette icons. Offline embeds dex bundle v13. |
-| `v0.8.0` | TitoDex v0.8.0 · 道具页面与列表优化 | Ships the curated items hub (542 items, category filter, icons) and list animation polish. |
-| `v0.7.1` | TitoDex v0.7.1 · 清晰图鉴与固定导航 | Restores clear 220×220 default dex media, adds form-specific historical sprite sources, simplifies form switching to chips, replaces exact-version chips with a dropdown, fixes secondary-page headers in place, and adds quick scroll-to-top to the long dex grid. Bundle v7 reuses every v6 encounter/location record and adds only corrected media and form sprite metadata. |
-| `v0.7.0` | TitoDex v0.7.0 · 完整形态与现代地点 | Adds searchable form variants with independent types, stats, abilities, moves and locations; exact per-game and DLC obtain-location selection; form-safe mappings for modern wild, fixed, raid, alpha, titan and outbreak encounters; and a new complete offline bundle. The Offline APK embeds the same verified archive as the downloadable pack. iOS platform source is merged and build-verified, while this release distributes Android Lite and Offline APKs only. |
-| `v0.6.9` | TitoDex v0.6.9 · 队伍宫格与平板布局 | Reworks the party card: cells go upright with the level as a sprite-corner badge so names stop truncating and sprites scale with the cell; the square dashboard lays 2×3 when a save is linked and six-across when it is not; tablet landscape puts the trainer and journey cards in one equal-height row above a single party strip. Also drops the dead `vertical` / `listMode` party layouts. |
-| `v0.6.9-pre.1` | TitoDex v0.6.9-pre.1 · 队伍宫格与平板布局（预览） | Preview build of the party grid and tablet layout rework — superseded by v0.6.9. |
-| `v0.6.8` | TitoDex v0.6.8 · 头部渐变与方屏布局 | Recolors the global page gradient from light-top skyBlue→slateBlue (title contrast 1.64:1) to a readable dark-top `#5D728A`→slateBlue chosen via the interactive gradient template; fixes on-gradient subtitles from invisible skyBlue to cream through a shared SecondaryPageSubtitle component (settings, dex, quick damage, detail hero); slims the dex top bar to 「图鉴」 with the game name as subtitle; and polishes the square dashboard — 3×2 party grid with name-over-level cells, tighter trainer card, journey card overflow fix, and a stacked two-bar layout when no save is linked. Also ships the doubles spread ×0.75 modifier and the stat-calc→quick-damage handoff. |
-| `v0.6.7` | TitoDex v0.6.7 · Retro 第二批与手绘图标 | Lands the second Retro batch after two preview rounds: settings group-label pills with sticker switches and icon plates, the deep-blue damage hero card with a visual HP bar and power slider, dex detail hero header with type-tinted plate and sticker tabs, the team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons, plus fixes — obtain tab follows the selected edition, responsive dex grid, hold-press physics, pinned damage result. |
-| `v0.6.7-pre.2` | TitoDex v0.6.7-pre.2 · 修复与 Team 对齐（预览） | Preview build on the pre.1 base: feedback fixes, team template alignment, responsive dex grid, and hold-press physics — superseded by v0.6.7. |
-| `v0.6.7-pre.1` | TitoDex v0.6.7-pre.1 · Retro 第二批（预览） | First preview of the Retro phase-2 batch (settings groups, sticker switches, damage hero, dex hero tabs, engraved forms) — superseded by v0.6.7. |
-| `v0.6.6.1` | TitoDex v0.6.6.1 · Retro 按压反馈扩展 | Extends the Retro press-down physics to every interactive sticker — dex grid cards, search results, moves/abilities reference rows, team rows, the journey card, quiz choices, dex top-bar pills, picker tiles, and battle tool rows — via a shared StickerPressable wrapper that avoids doubled shadows and fully gates on the Retro toggle. |
-| `v0.6.6` | TitoDex v0.6.6 · Retro 贴纸质感 | Adds the Retro sticker-feel toggle (signature solid drop shadows, press-down physics, tightened headings — default on), a generation-scoped silhouette quiz with persisted best streak and adopt-as-companion, shiny companion sessions with intimacy quote tiers and time-of-day greetings, critical-hit and screen toggles in quick damage, a full-dex team picker with species-linked editing, official-style type icons, drill-down back-hierarchy fixes, toggleable list reveal animations, a shiny artwork preview, a branded Android 12+ splash, and matched transition backdrops. |
-| `v0.6.5` | TitoDex v0.6.5 · 体验修补与中文参考 | Save-diff banner scoped to save-linked editions with dismissal, symmetric dex expansion backdrop at 480/380ms, submit-only recent searches, a prominent current-game card in Settings, overflow-free matchup grid, unified dex top-bar pills, a 0.75× companion size floor, and modern official Chinese attached as a reference to untranslated flavor text. |
-| `v0.6.2.1` | TitoDex v0.6.2.1 · 自适应应用图标 | Replaces the inset circular launcher mark with full-bleed artwork so Android can apply each device's circle, squircle, rounded-square, or square adaptive mask naturally. |
-| `v0.6.2` | TitoDex v0.6.2 · 同行大小与即时媒体 | Adds the companion size slider with raised height ceilings and pixel-crisp upscaling, bundles all starter GIFs and cries into the APK, and introduces a cancellable preload dialog when choosing any other companion. |
-| `v0.6.1` | TitoDex v0.6.1 · 同行宝可梦与横屏布局 | Upgrades the standby companion to a frameless height-scaled animation with quotes, cries, and a toggle; bundles official Gen VI+ game icons into the header and pickers; adds a one-screen landscape home layout; and unifies secondary-page header sizing. (v0.6.0 was built but superseded before publication.) |
-| `v0.5.51` | TitoDex v0.5.51 · Home 返回动画修正预发布 | Keeps Team and Search exit motion aligned with their entry edge and removes predictive-back progress from the three Home quick actions. |
-| `v0.5.12` | TitoDex v0.5.12 预发布 · 首页动效拆分预览 | Splits the three Home actions into independent transitions: Dex keeps card expansion while Team and Search slide from their own screen edges. |
-| `v0.5.11` | TitoDex v0.5.11 预发布 · 容器转场预览 | Fixes the solid-color overlay and Team/Search crashes during Home card expansion with a fade-through container transition. |
-| `v0.5.5` | TitoDex v0.5.5 · 存档与同行体验更新 | Moves save sync to one explicitly selected file, adds native Android app selection, refines motion and the six-slot party card, and introduces standby companion interactions and the silhouette quiz. |
-| `v0.5.2-rc.1` | TitoDex v0.5.2-rc.1 预发布 · 首页卡片展开修正 | Isolates the Hero surface from destination pages so Team, Dex, and Search stay interactive through the expansion. |
-| `v0.5.1` | TitoDex v0.5.1 · Android 返回与转场 | Uses Android-standard navigation motion and predictive back, with Home quick-action cards expanding into Team, Dex, and Search. |
-| `v0.5.0` | TitoDex v0.5.0 · 图鉴无感知加载 | Precomputed catalog keeps Dex lists, search, and reference filters responsive in both lite and offline packages. |
-| `v0.4.99` | TitoDex v0.4.99 · Lite 与离线版本同步 | Aligns the full release source and provides matching lite and offline arm64 packages. |
-| `v0.4.98` | TitoDex v0.4.98 · 图鉴版本标题修正 | Flavor-text cards now identify each game edition separately. |
-| `v0.4.97-offline` | TitoDex v0.4.97-offline · 内置离线数据包 | Optional 61 MB build that seeds the core dex data without a first-run download. |
-| `v0.4.97` | TitoDex v0.4.97 · 训练家卡文案调整 | Keeps the default “训练家 Tito” identity while simplifying punctuation. |
-| `v0.4.96` | TitoDex v0.4.96 · 方屏训练家卡修正 | Aligns the square-screen trainer card with the dense portrait layout. |
-| `v0.4.95` | TitoDex v0.4.95 · 首页与队伍体验更新 | Adds bootstrap loading, team editing, download progress controls, and Settings cleanup. |
-| `v0.4.94` | TitoDex v0.4.94 · 设置与筛选性能优化 | Compacts Settings and paginates large Pokédex filter results. |
-| `v0.4.93` | TitoDex v0.4.93 · 特性与出现地点增强 | Improves ability fallback, game labels, location coverage, and ability filtering. |
-| `v0.4.92` | TitoDex v0.4.92 · 界面细节优化 | Combines the matchup card and lets the TitoDex dashboard title follow a custom trainer name. |
-| `v0.4.91` | TitoDex v0.4.91 · 宝可梦与特性筛选 | Adds attacker Pokémon selection and limits abilities to valid choices. |
-| `v0.4.85` | TitoDex v0.4.85 · 对战工具扩展 | Adds Terastal, held items, status effects, defensive abilities, and team shared weaknesses. |
-| `v0.4.8` | TitoDex v0.4.8 · 世代与特性计算 | Adds generation-aware mechanics, ability modifiers, and blind-spot analysis. |
-| `v0.4.7` | TitoDex v0.4.7 · 图鉴与首页更新 | Adds the generation sprite picker, corrects 1–1025 progress, and improves home/avatar layouts. |
-| `v0.4.6` | TitoDex v0.4.6 · 资料筛选与离线同步 | Improves reference drill-down, sprite loading, type pickers, and offline update prompts. |
-| `v0.4.5` | TitoDex v0.4.5 · 离线数据包拆分 | Moves labels, maps, and config into the independently updated offline bundle. |
-| `v0.4.2` | TitoDex v0.4.2 · 公开文案与配置收整 | Removes infrastructure addresses from user-facing copy while preserving downloads. |
-| `v0.4.1` | TitoDex v0.4.1 · 离线缓存与地区图鉴修正 | Fixes offline reference loading, game fallback, transitions, and regional selection. |
-| `v0.4.0` | TitoDex v0.4.0 · 多游戏版本与地区图鉴 | Introduces 23 game editions, 11 regional scopes, 1–1025 data, and the segmented search hub. |
-| `v0.3.0` | TitoDex v0.3.0 · 全国图鉴 1–1025 | Expands the national dex, multi-game scopes, structured details, and bundle v5. |
-| `v0.2.28` | TitoDex v0.2.28 · 图鉴详情与对战工具 | Reworks dex details and adds matchup, stat, and damage estimate tools. |
-| `v0.2.27` | TitoDex v0.2.27 · 方屏图鉴优化 | Improves square-screen dex layouts, controller focus, and seen filtering. |
-| `v0.2.26` | TitoDex v0.2.26 · 存档图鉴进度 | Reads HGSS seen/caught flags and adds regional progress and encounter filters. |
-| `v0.2.25` | TitoDex v0.2.25 · 图鉴界面与离线图包 | Adds the revised detail UI, one-tap bundle download, artwork viewer, and retry controls. |
-| `v0.2.24` | TitoDex v0.2.24 · PNG 图鉴资源 | Migrates dex sprites and type icons to transparent PNG and adds lazy artwork support. |
-| `v0.2.23` | TitoDex v0.2.23 · 图鉴详情重构 | Rebuilds details with unified scrolling, stats, obtain data, evolution, and move tiles. |
-| `v0.2.22` | TitoDex v0.2.22 · 字号与图鉴下载 | Normalizes secondary-page typography and introduces verified offline bundle download. |
-| `v0.2.21` | TitoDex v0.2.21 · 缩放与图鉴导航 | Aligns page scaling and simplifies national/regional dex navigation. |
-| `v0.2.20` | TitoDex v0.2.20 · 掌机缩放修正 | Corrects the handheld UI scale to the intended 1.5× baseline. |
-| `v0.2.19` | TitoDex v0.2.19 · 掌机布局密度调整 | Reduces oversized handheld UI and restores the arm64-only package. |
-| `v0.2.18` | TitoDex v0.2.18 · 首页与头像更新 | Adds avatar crop, denser dashboard cards, and broader game selection. |
-| `v0.2.17` | TitoDex v0.2.17 · 掌机界面优化 | Refines square home/dex layouts, fixed scaling, and status presentation. |
-| `v0.2.16` | TitoDex v0.2.16 · 方屏布局与图鉴修正 | Fixes square quick actions and save-backed dex filters. |
-| `v0.2.15` | TitoDex v0.2.15 · 方屏仪表盘布局 | Introduces aspect-aware dashboard layouts for square and compact handheld screens. |
-| `v0.2.14` | TitoDex v0.2.14 预发布 · 动效规范 | Defines route, tab, loading, and dashboard motion behavior. |
-| `v0.2.13` | TitoDex v0.2.13 预发布 · 贴纸界面与队伍状态 | Adds sticker-style dex cards, party HP bars, filters, and a text avatar fallback. |
-| `v0.2.12` | TitoDex v0.2.12 预发布 · 路由过渡 | Adds page transitions, tab fades, skeleton loading, and opaque route backgrounds. |
-| `v0.2.11` | TitoDex v0.2.11 预发布 · 返回导航修正 | Restores expected system-back navigation from secondary pages. |
-| `v0.2.10` | TitoDex v0.2.10 预发布 · 紧凑首页与手柄导航 | Adds a one-screen dashboard, party sprites, controller focus, and startup save sync. |
-| `v0.2.9` | TitoDex v0.2.9 预发布 · 字体渲染修正 | Fixes font artifacts, Chinese fallback, input decoration, and raw error presentation. |
-| `v0.2.8` | TitoDex v0.2.8 预发布 · RG 体验修正 | Fixes Settings scrolling, dex parsing, emulator selection, and route presentation. |
-| `v0.2.7` | TitoDex v0.2.7 预发布 · 离线图鉴下载 | Adds retry, resume, and partial-use behavior for offline dex downloads. |
-| `v0.2.6` | TitoDex v0.2.6 预发布 · 模拟器与图鉴修正 | Fixes Android 11+ emulator selection and improves API retry/error handling. |
-| `v0.2.5` | TitoDex v0.2.5 预发布 · 方屏首页 | Adds an aspect-aware one-screen dashboard for square displays. |
-| `v0.2.4` | TitoDex v0.2.4 预发布 · 字体与排版统一 | Introduces semantic typography and bundled Nunito fonts. |
-| `v0.2.3` | TitoDex v0.2.3 预发布 · 系统界面优化 | Adds immersive handheld chrome with battery and network status. |
-| `v0.2.2` | TitoDex v0.2.2 预发布 · 方屏仪表盘 | Adds square/compact handheld detection, fullscreen layout, and offline fonts. |
-| `v0.2.1` | TitoDex v0.2.1 预发布 · RG 全屏修正 | Removes the mock phone frame and improves edge-to-edge compact layouts. |
-| `v0.2.0` | TitoDex v0.2.0 预发布 · RG Android 初始版 | First Flutter Android packages for RG-class handhelds. |
-| `v0.1.0-phase2-debug` | TitoDex v0.1.0 · Android 原型验证 | Historical Capacitor debug prototype with dashboard navigation and mock data. |
+| `v0.8.8` | TitoDex v0.8.8 · 存档助手与地点图鉴 | 串联存档地点、附近未捕获、队伍进化与精确版本补全；新增地点图鉴和可自定义 Android 快捷入口，并完成三个 Phase 与数据—UI 审计收口。 |
+| `v0.8.7` | TitoDex v0.8.7 · 形态媒体与完整道具资料 | 修复精确版本 Sprite 预览与图片返回；形态媒体按普通／闪光、静态／动态和叫声显式映射；v19 完成 2130 个道具的中文说明与本地图标。未发布的 0.8.6 一并合入。 |
+| `v0.8.5` | TitoDex v0.8.5 · 版本规划与图鉴范围 | 加入后台数据下载、版本补全和携带道具规划、完整进化／遭遇条件、地区或世代图鉴范围、形态状态与二级页面统一。 |
+| `v0.8.2` | TitoDex v0.8.2 · 更轻的离线包与加载进度 | Lite / Offline 展示连续分阶段进度；Offline 改用紧凑 v14；离线资料本地优先，体形筛选图标更清晰。 |
+| `v0.8.1` | TitoDex v0.8.1 · 形态进化链与体形筛选图标 | 地区形态只显示真实进化支线并使用对应形态图片；体形和大小筛选加入本地图标。 |
+| `v0.8.0` | TitoDex v0.8.0 · 道具页面与列表优化 | 发布分类道具资料页与列表动画优化。 |
+| `v0.7.25` | TitoDex v0.7.25 · 道具 CDN 优先与响应式网格 | 道具图片改为在线优先并保留回退；网格列数适配屏幕，图鉴进入动画只播放一次。 |
+| `v0.7.24` | TitoDex v0.7.24 · 道具网格布局 | 道具资料改为带图片的响应式网格。 |
+| `v0.7.23` | TitoDex v0.7.23 · 道具筛选与标题对齐 | 修复道具分类回退并统一资料页标题栏。 |
+| `v0.7.22` | TitoDex v0.7.22 · 道具资料增强 | 为道具列表补充图片、分类筛选和效果说明。 |
+| `v0.7.21` | TitoDex v0.7.21 · 道具页面初版 | 首次加入带分类和图片的道具资料页，并调整列表动画。 |
+| `v0.7.20` | TitoDex v0.7.20 · 图鉴返回与进化链修复 | 修正图鉴预测性返回、图标对齐、形态进化链过滤和伊布分支布局。 |
+| `v0.7.13` | TitoDex v0.7.13 · 游戏版本选择与同行位置 | 加入合并版本／子版本选择、对应图标、同行位置保存与一次性图鉴进入动画。 |
+| `v0.7.12` | TitoDex v0.7.12 · 本地立绘与加载占位 | 恢复详情、形态和队伍的本地 Sprite 展示，并加入图片 Shimmer 占位。 |
+| `v0.7.11` | TitoDex v0.7.11 · 游戏图标与形态媒体 | 恢复游戏说明图标，接入形态绘图与同行形态／闪光选择，并加强随包数据校验。 |
+| `v0.7.2` | TitoDex v0.7.2 · 形态详情清晰立绘 | 形态详情头图优先使用清晰绘图，不再退回像素较低的游戏内 Sprite。 |
+| `v0.7.1` | TitoDex v0.7.1 · 清晰图鉴与固定导航 | 恢复清晰默认图、加入真实历史形态 Sprite、简化形态与版本选择，并固定长页面导航。 |
+| `v0.7.0` | TitoDex v0.7.0 · 完整形态与现代地点 | 形态独立替换属性、能力和地点；补齐现代游戏与 DLC 的精确获取数据，并发布完整离线包。 |
 
-## Copy rules
-
-- Write commits, pull requests, and GitHub Release titles/bodies in English, matching the canonical contributor guardrail in `AI_CONTEXT.md`. Add a Chinese section only when the user explicitly requests bilingual release copy.
-- Use the version and one clear outcome in the title.
-- Describe user-visible changes before implementation details.
-- Name the attached package and supported ABI when applicable.
-- Mark pre-releases and infrastructure-only releases explicitly.
-- Never include production CDN addresses, credentials, or private operational instructions.
-- Brand-owned examples such as TitoDex and the default trainer identity are allowed; real save names, identifiable user data, and private contributor context are not.
+完整历史以 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 为准。2026-08-08 已逐条审计全部 89 个公开 Release：0.8.8 原本符合模板，其余 88 个版本的英文正文／区块名、缺少开场概述、空下载文件名、CI 临时路径和相邻版本复制错误均已完成统一修正。

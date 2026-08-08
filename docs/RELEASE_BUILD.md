@@ -97,7 +97,9 @@ Run the **Android Release APKs** workflow manually with:
 For v0.8.8 use `version=0.8.8`, Lite build `142`, Offline build `143`, and the published v0.8.7 Offline release asset as `offline_seed_apk_url` to retain the compact v14 seed while Lite and installed Offline copies can update to live v19. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
 
 Publishing is a separate manual **Publish Verified Android Release** workflow. Supply the
-successful build run id, that run's exact source SHA, and both build numbers. The publisher
+successful build run id, that run's exact source SHA, both build numbers, a full Chinese
+`release_title`, a one-sentence Chinese `release_summary`, and a Chinese Markdown
+`release_highlights` bullet list based on the exact tag contents. The publisher
 refuses runs from another commit or workflow, rechecks package id, versionName and versionCode,
 requires Lite and Offline to have the same signer, then creates an annotated tag and a draft
 GitHub Release. Configure `ANDROID_SIGNER_SHA256` to pin that signer to the historical release
@@ -133,6 +135,7 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 - [ ] Nunito fonts present under `assets/flutter_assets/assets/fonts/`
 - [ ] GitHub Release asset uploaded **after** local verify (same bytes as `releases/` copy)
 - [ ] Publisher run is bound to the successful build run's exact `head_sha`; package metadata and signer checks pass
+- [ ] Release title, opening summary, headings and filenames follow `docs/RELEASES.md`; public copy is Chinese-first
 - [ ] Do **not** paste CDN URLs in release notes (see `CLOUDFLARE_DEX_CDN.md`)
 
 ---
