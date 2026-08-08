@@ -95,8 +95,10 @@ jobs:
           offline_certs="$($apksigner verify --verbose --print-certs "$offline")"
           printf '%s\n' "$lite_certs"
           printf '%s\n' "$offline_certs"
-          lite_signer="$(printf '%s\n' "$lite_certs" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -n 1)"
-          offline_signer="$(printf '%s\n' "$offline_certs" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -n 1)"
+          # apksigner labels the same certificate as either "Signer #1" or
+          # "V2 Signer" depending on the installed Android build-tools version.
+          lite_signer="$(printf '%s\n' "$lite_certs" | sed -n 's/^.*certificate SHA-256 digest: //p' | head -n 1)"
+          offline_signer="$(printf '%s\n' "$offline_certs" | sed -n 's/^.*certificate SHA-256 digest: //p' | head -n 1)"
           test -n "$lite_signer"
           test "$lite_signer" = "$offline_signer"
           if [[ -n "$EXPECTED_SIGNER_SHA256" ]]; then
