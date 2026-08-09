@@ -1,6 +1,6 @@
 /// Increment when parsing semantics change so unchanged files are re-imported
 /// once after an app upgrade.
-const saveParserRevision = 3;
+const saveParserRevision = 4;
 
 class ParsedPartyMember {
   const ParsedPartyMember({
@@ -12,6 +12,20 @@ class ParsedPartyMember {
     this.experience,
     this.abilityId,
     this.moveIds = const [],
+    this.nickname,
+    this.heldItemId,
+    this.friendship,
+    this.nature,
+    this.isShiny = false,
+    this.gender,
+    this.status,
+    this.movePp = const [],
+    this.movePpUps = const [],
+    this.ivs = const [],
+    this.evs = const [],
+    this.battleStats = const {},
+    this.isEgg = false,
+    this.formIndex = 0,
     this.warning,
   });
 
@@ -23,6 +37,20 @@ class ParsedPartyMember {
   final int? experience;
   final int? abilityId;
   final List<int> moveIds;
+  final String? nickname;
+  final int? heldItemId;
+  final int? friendship;
+  final String? nature;
+  final bool isShiny;
+  final String? gender;
+  final String? status;
+  final List<int> movePp;
+  final List<int> movePpUps;
+  final List<int> ivs;
+  final List<int> evs;
+  final Map<String, int> battleStats;
+  final bool isEgg;
+  final int formIndex;
   final String? warning;
 }
 
@@ -40,6 +68,15 @@ class ParsedSaveSummary {
     this.savedAt,
     this.warnings = const [],
     this.tid,
+    this.secretId,
+    this.money,
+    this.motherMoney,
+    this.trainerGender,
+    this.language,
+    this.starterSpeciesId,
+    this.mapCoordinates = const [],
+    this.adventureStartedAt,
+    this.leagueChampionAt,
     this.mapHeaderId,
     this.dexCaughtIds = const {},
     this.dexSeenIds = const {},
@@ -62,6 +99,15 @@ class ParsedSaveSummary {
   final DateTime? savedAt;
   final List<String> warnings;
   final int? tid;
+  final int? secretId;
+  final int? money;
+  final int? motherMoney;
+  final String? trainerGender;
+  final String? language;
+  final int? starterSpeciesId;
+  final List<int> mapCoordinates;
+  final DateTime? adventureStartedAt;
+  final DateTime? leagueChampionAt;
   final int? mapHeaderId;
   final Set<int> dexCaughtIds;
   final Set<int> dexSeenIds;

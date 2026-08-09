@@ -721,6 +721,18 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
       for (final ability in abilities.values)
         abilitySlugFromNameEn(ability.nameEn): ability,
     };
+    Map<int, Map<String, dynamic>> items = const {};
+    try {
+      items = {
+        for (final item in await dexRepository.getReferenceEntries(
+          'items.json',
+        ))
+          if (item['id'] is num) (item['id'] as num).toInt(): item,
+      };
+    } catch (_) {
+      // Rich save details remain useful when the optional item catalog is not
+      // installed yet; show the numeric held-item ID as a transparent fallback.
+    }
     final result = <_TeamAssistEntry>[];
     for (final member in widget.party) {
       PokemonDetail? detail;
@@ -743,6 +755,9 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
           ability: member.abilityId == null
               ? abilitiesBySlug[member.abilitySlug]
               : abilities[member.abilityId],
+          heldItemName: member.heldItemId == null
+              ? null
+              : items[member.heldItemId]?['nameZh'] as String?,
           evolutions: node?.children ?? const [],
         ),
       );
@@ -801,16 +816,33 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       children: [
+                        if (entry.saveFacts.isNotEmpty) ...[
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: [
+                              for (final fact in entry.saveFacts)
+                                Chip(label: Text(fact)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         if (entry.moves.isNotEmpty)
                           Wrap(
                             spacing: 6,
                             runSpacing: 6,
                             children: [
-                              for (final move in entry.moves)
+                              for (
+                                var index = 0;
+                                index < entry.moves.length;
+                                index++
+                              )
                                 ActionChip(
-                                  label: Text(move.nameZh),
-                                  onPressed: () =>
-                                      showMoveDetailSheet(context, move),
+                                  label: Text(entry.moveLabel(index)),
+                                  onPressed: () => showMoveDetailSheet(
+                                    context,
+                                    entry.moves[index],
+                                  ),
                                 ),
                             ],
                           ),
@@ -874,12 +906,14 @@ class _TeamAssistEntry {
     required this.member,
     required this.moves,
     required this.ability,
+    required this.heldItemName,
     required this.evolutions,
   });
 
   final PartyMember member;
   final List<CachedMove> moves;
   final CachedAbility? ability;
+  final String? heldItemName;
   final List<EvolutionNode> evolutions;
 
   CachedMove? get preferredDamageMove {
@@ -889,9 +923,44 @@ class _TeamAssistEntry {
     return null;
   }
 
+  String moveLabel(int index) {
+    final move = moves[index];
+    if (index >= member.movePp.length) return move.nameZh;
+    final ppUp = index < member.movePpUps.length ? member.movePpUps[index] : 0;
+    return '${move.nameZh} · PP ${member.movePp[index]}'
+        '${ppUp > 0 ? ' · 增强 $ppUp' : ''}';
+  }
+
+  List<String> get saveFacts {
+    final stats = member.battleStats;
+    return [
+      if (member.nature != null) '${member.nature}性格',
+      if (member.gender != null) member.gender!,
+      if (member.isShiny) '闪光',
+      if (member.isEgg) '蛋',
+      if (member.formIndex != 0) '形态索引 ${member.formIndex}',
+      if (member.status != null) member.status!,
+      if (member.currentHp != null && member.maxHp != null)
+        'HP ${member.currentHp}/${member.maxHp}',
+      if (member.experience != null) '经验 ${member.experience}',
+      if (member.friendship != null) '亲密度 ${member.friendship}',
+      if (member.heldItemId != null)
+        '携带 ${heldItemName ?? '道具 #${member.heldItemId}'}',
+      if (stats.isNotEmpty)
+        '能力 ${stats.entries.map((entry) => '${entry.key}${entry.value}').join(' / ')}',
+      if (member.ivs.length == 6)
+        'IV（HP/攻/防/速/特攻/特防）${member.ivs.join('/')}',
+      if (member.evs.length == 6)
+        'EV（HP/攻/防/速/特攻/特防）${member.evs.join('/')}',
+    ];
+  }
+
   String get subtitle {
     final parts = [
       if (ability != null) '特性：${ability!.nameZh}',
+      if (member.nature != null) '性格：${member.nature}',
+      if (member.heldItemId != null)
+        '携带：${heldItemName ?? '#${member.heldItemId}'}',
       if (moves.isNotEmpty) '招式 ${moves.length}/4',
       if (evolutions.isNotEmpty)
         '可进化：${evolutions.map((entry) => entry.nameZh).join(' / ')}',

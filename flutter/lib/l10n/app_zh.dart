@@ -85,6 +85,16 @@ abstract final class AppZh {
   static const settingsChangeAvatar = '更换头像';
   static const settingsJourneyReadOnly = '旅程信息（来自存档）';
   static const settingsTrainerId = '训练家 ID';
+  static const settingsTrainerSecretId = '隐藏 ID';
+  static const settingsTrainerGender = '训练家性别';
+  static const settingsSaveLanguage = '存档语言';
+  static const settingsSaveMoney = '随身资金';
+  static const settingsMotherMoney = '妈妈保管';
+  static const settingsStarter = '最初的伙伴';
+  static const settingsMapCoordinates = '地图坐标';
+  static const settingsJourneyStarted = '旅程开始';
+  static const settingsLeagueChampion = '首次通关';
+  static const settingsDexProgress = '图鉴进度';
   static const teamSummaryTitle = '队伍概览';
   static const sleepToolsTitle = 'Pokémon Sleep 工具';
   static const sleepToolsTierAHint = 'Tier A：静态链接，点击复制到剪贴板';
@@ -182,12 +192,15 @@ abstract final class AppZh {
   static const dexFormStatusDeprecated = '历史形态';
   static String dexFormIntroducedIn(String game) => '初次登场：$game';
 
-  static const settingsAttributionTitle = '数据来源与许可';
-  static const settingsAttributionHint = '查看资料来源、开放许可与商标说明';
+  static const settingsAttributionTitle = '关于 TitoDex · 数据来源与许可';
+  static const settingsAttributionHint = '非官方学习工具 · 查看完整 Credits 与权利说明';
+  static const settingsUnofficialNotice =
+      '非官方学习工具：与 Nintendo、Creatures、GAME FREAK、The Pokémon Company 无隶属、授权、赞助或认可关系。';
   static const settingsAttributionBody =
-      '道具列表、分类、价格、英文名称、图像及多数中文说明来自 PokeAPI；道具分组参考 Bulbapedia 的 Browse:Items。\n\n'
-      '部分较新作品的中文说明参考 52Poké Wiki（神奇宝贝百科），依 CC BY-NC-SA 4.0 使用。\n\n'
-      'Pokémon 及相关名称、图像与商标归其各自权利人所有。TitoDex 是非官方、非商业的玩家资料辅助工具。';
+      'TitoDex 是非官方、非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo Co., Ltd.、Creatures Inc.、GAME FREAK inc.、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。Pokémon、宝可梦、角色、游戏名称、图像、音频与商标归各自权利人所有；本工具不提供 ROM、密钥、付费内容或存档修改。\n\n'
+      '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点、体形与媒体补全；CC BY-NC-SA 4.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
+      '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、SteamGridDB 社区投稿页，以及 Pokémon HOME 与各代游戏的官方图像／音频。上游贡献者署名和各素材原有权利保持不变，列出来源不表示任何一方认可 TitoDex。\n\n'
+      '来源入口：pokeapi.co · github.com/PokeAPI/sprites · wiki.52poke.com · bulbapedia.bulbagarden.net · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com。固定提交和构建批次说明见项目根目录 CREDITS.md 及数据包随附 attribution 文件。';
   static const dexMoves = '升级招式';
   static String dexMovesMore(int count) => '另有 $count 个招式已缓存';
   static const dexTabIntro = '简介';

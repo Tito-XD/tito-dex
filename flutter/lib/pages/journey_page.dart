@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/journey/journey_assistant.dart';
+import '../features/parser/hgss_format.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -119,6 +120,63 @@ class JourneyPage extends StatelessWidget {
                   label: AppZh.settingsTrainerId,
                   value: journey.saveTrainerId!.toString().padLeft(5, '0'),
                 ),
+              if (journey.saveTrainerSecretId != null)
+                _StatRow(
+                  label: AppZh.settingsTrainerSecretId,
+                  value: journey.saveTrainerSecretId!.toString().padLeft(
+                    5,
+                    '0',
+                  ),
+                ),
+              if (journey.saveTrainerGender != null)
+                _StatRow(
+                  label: AppZh.settingsTrainerGender,
+                  value: journey.saveTrainerGender!,
+                ),
+              if (journey.saveLanguage != null)
+                _StatRow(
+                  label: AppZh.settingsSaveLanguage,
+                  value: journey.saveLanguage!,
+                ),
+              if (journey.saveMoney != null)
+                _StatRow(
+                  label: AppZh.settingsSaveMoney,
+                  value: '₽ ${journey.saveMoney}',
+                ),
+              if (journey.saveMotherMoney != null)
+                _StatRow(
+                  label: AppZh.settingsMotherMoney,
+                  value: '₽ ${journey.saveMotherMoney}',
+                ),
+              if (journey.saveStarterSpeciesId != null)
+                _StatRow(
+                  label: AppZh.settingsStarter,
+                  value: localizeSpecies(
+                    speciesNameFor(journey.saveStarterSpeciesId!),
+                  ),
+                ),
+              if (journey.saveDexSeenIds.isNotEmpty ||
+                  journey.saveDexCaughtIds.isNotEmpty)
+                _StatRow(
+                  label: AppZh.settingsDexProgress,
+                  value:
+                      '已见 ${journey.saveDexSeenIds.length} · 已捕 ${journey.saveDexCaughtIds.length}',
+                ),
+              if (journey.saveMapCoordinates.length == 3)
+                _StatRow(
+                  label: AppZh.settingsMapCoordinates,
+                  value: journey.saveMapCoordinates.join(' / '),
+                ),
+              if (journey.saveAdventureStartedAt != null)
+                _StatRow(
+                  label: AppZh.settingsJourneyStarted,
+                  value: _formatSaveDate(journey.saveAdventureStartedAt!),
+                ),
+              if (journey.saveLeagueChampionAt != null)
+                _StatRow(
+                  label: AppZh.settingsLeagueChampion,
+                  value: _formatSaveDate(journey.saveLeagueChampionAt!),
+                ),
               _StatRow(label: AppZh.settingsPlayTime, value: journey.playTime),
               _StatRow(
                 label: AppZh.settingsBadges,
@@ -135,6 +193,9 @@ class JourneyPage extends StatelessWidget {
     );
   }
 }
+
+String _formatSaveDate(DateTime value) =>
+    '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';
 
 class _StatRow extends StatelessWidget {
   const _StatRow({required this.label, required this.value});
