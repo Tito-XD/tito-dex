@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · Lite `0.8.9+144` · Offline `0.8.9-offline+145`.
+> **Latest release:** [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · Lite `0.8.10+146` · Offline `0.8.10-offline+147`.
 >
-> **Current `main`:** v0.8.9 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.10 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -10,13 +10,21 @@
 | --- | --- |
 | Android journey companion, routing, persistence and emulator launch | Shipped |
 | Configurable Android app-icon shortcuts | Shipped in v0.8.8; defaults to Dex + Search and can expose up to three selected dex, reference or battle-tool destinations |
-| Save import | HGSS fixture-verified including party ability/moves/EXP and regional badges; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
+| Save import | HGSS fixture-verified rich party/trainer/map/dex sync; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | Offline data | Live bundle v19; compact v14 Offline seed |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.10
+
+- Expand HGSS party sync with nicknames, held items, move PP/PP Ups, friendship, nature, shiny/gender/status, IV/EV and battle stats.
+- Add reliable trainer money, Secret ID, gender/language, starter, map coordinates and save milestones to Journey persistence and existing UI.
+- Correct the Gen IV party block's current/max HP offsets and bump the parser revision for one-time re-import.
+- Preserve Dex scope, filter, loaded depth and scroll offset when returning from a detail route.
+- Add bilingual data/media Credits and a visible non-affiliation, rights and learning-use notice to Settings and both READMEs.
 
 ## Completed in v0.8.9
 

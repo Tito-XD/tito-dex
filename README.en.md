@@ -8,19 +8,21 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9+144` | Version-aware references, party handoff, and full-screen companion positioning |
-| Offline APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9-offline+145` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.9+144` | Game-scoped item/move data and tighter party/location workflows |
+| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+146` | Rich HGSS sync, reliable Dex return position, and complete credits |
+| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+147` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.10+146` | Save data, reachable UI, attribution, and rights notices aligned |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
 Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species · 803 form records · audited static, animated, shiny, and cry media · complete item descriptions and icons.
 
+> **Unofficial project notice:** TitoDex is a non-commercial tool intended only for learning and personal gameplay assistance. It is not affiliated with, authorized by, sponsored by, or endorsed by Nintendo, Creatures, GAME FREAK, The Pokémon Company, or their affiliates. Names, characters, images, audio, and trademarks belong to their respective owners. See [CREDITS.md](CREDITS.md) for full sources, licenses, and media credits.
+
 ## Highlights
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition and richer HGSS party, move, ability, EXP, map, regional badge, Trainer ID, and Pokédex parsing.
+- **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
 - **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status; item availability/prices, moves, and mechanics follow the selected game and generation.
@@ -54,7 +56,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.8.9-lite-rg-arm64.apk`** or **`TitoDex-0.8.9-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.10-lite-rg-arm64.apk`** or **`TitoDex-0.8.10-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 
@@ -84,6 +86,7 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | [Design system](docs/DESIGN_SYSTEM.md) | Visual and interaction tokens |
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |
 | [Release notes](docs/RELEASES.md) | Chinese-first GitHub Release copy rules and history |
+| [Data sources and credits](CREDITS.md) | Data, media, licenses, and unofficial-project notice |
 
 ## HGSS test save
 

@@ -21,6 +21,7 @@ import '../features/game/game_catalog.dart';
 import '../features/dex/dex_settings_repository.dart';
 import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
+import '../features/parser/hgss_format.dart';
 import '../features/trainer/trainer_avatar_service.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -625,6 +626,52 @@ class _SettingsPageState extends State<SettingsPage> {
                         '0',
                       ),
                     ),
+                  if (widget.journey.saveTrainerSecretId != null)
+                    _Row(
+                      label: AppZh.settingsTrainerSecretId,
+                      value: widget.journey.saveTrainerSecretId!
+                          .toString()
+                          .padLeft(5, '0'),
+                    ),
+                  if (widget.journey.saveTrainerGender != null)
+                    _Row(
+                      label: AppZh.settingsTrainerGender,
+                      value: widget.journey.saveTrainerGender!,
+                    ),
+                  if (widget.journey.saveLanguage != null)
+                    _Row(
+                      label: AppZh.settingsSaveLanguage,
+                      value: widget.journey.saveLanguage!,
+                    ),
+                  if (widget.journey.saveMoney != null)
+                    _Row(
+                      label: AppZh.settingsSaveMoney,
+                      value: '₽ ${widget.journey.saveMoney}',
+                    ),
+                  if (widget.journey.saveMotherMoney != null)
+                    _Row(
+                      label: AppZh.settingsMotherMoney,
+                      value: '₽ ${widget.journey.saveMotherMoney}',
+                    ),
+                  if (widget.journey.saveStarterSpeciesId != null)
+                    _Row(
+                      label: AppZh.settingsStarter,
+                      value: localizeSpecies(
+                        speciesNameFor(widget.journey.saveStarterSpeciesId!),
+                      ),
+                    ),
+                  if (widget.journey.saveDexSeenIds.isNotEmpty ||
+                      widget.journey.saveDexCaughtIds.isNotEmpty)
+                    _Row(
+                      label: AppZh.settingsDexProgress,
+                      value:
+                          '已见 ${widget.journey.saveDexSeenIds.length} · 已捕 ${widget.journey.saveDexCaughtIds.length}',
+                    ),
+                  if (widget.journey.saveMapCoordinates.length == 3)
+                    _Row(
+                      label: AppZh.settingsMapCoordinates,
+                      value: widget.journey.saveMapCoordinates.join(' / '),
+                    ),
                   _Row(
                     label: AppZh.settingsPlayTime,
                     value: widget.journey.playTime,
@@ -955,10 +1002,30 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         const SizedBox(height: 16),
+        StickerCard(
+          variant: StickerVariant.cream,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.info_outline_rounded,
+                color: TitoColors.deepBlue,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  AppZh.settingsUnofficialNotice,
+                  style: SecondaryTypography.onCard.small12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
         SettingsExpandableSection(
           title: AppZh.settingsAttributionTitle,
           subtitle: AppZh.settingsAttributionHint,
-          child: Text(
+          child: SelectableText(
             AppZh.settingsAttributionBody,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.mutedInk,

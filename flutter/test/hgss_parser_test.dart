@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:titodex/features/parser/hgss_parser.dart';
 import 'package:titodex/features/parser/hgss_format.dart';
+import 'package:titodex/models/journey.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,11 +28,36 @@ void main() {
     expect(summary.party.first.currentHp, isNotNull);
     expect(summary.party.first.maxHp, isNotNull);
     expect(summary.party.first.maxHp!, greaterThan(0));
+    expect(
+      summary.party.first.currentHp!,
+      lessThanOrEqualTo(summary.party.first.maxHp!),
+    );
     expect(summary.party[1].speciesName, 'Togepi');
     expect(summary.party[1].level, 6);
     expect(summary.party.first.abilityId, 66);
     expect(summary.party.first.moveIds, [172, 15, 108, 52]);
     expect(summary.party.first.experience, 16005);
+    expect(summary.party.first.friendship, inInclusiveRange(0, 255));
+    expect(summary.party.first.nature, isNotEmpty);
+    expect(summary.party.first.ivs, hasLength(6));
+    expect(summary.party.first.ivs, everyElement(inInclusiveRange(0, 31)));
+    expect(summary.party.first.evs, hasLength(6));
+    expect(summary.party.first.movePp, hasLength(4));
+    expect(summary.party.first.movePpUps, hasLength(4));
+    expect(summary.party.first.battleStats.keys.toSet(), {
+      '攻击',
+      '防御',
+      '速度',
+      '特攻',
+      '特防',
+    });
+    expect(summary.secretId, isNotNull);
+    expect(summary.money, inInclusiveRange(0, 999999));
+    expect(summary.motherMoney, inInclusiveRange(0, 999999));
+    expect(summary.trainerGender, anyOf('男', '女'));
+    expect(summary.language, isNotEmpty);
+    expect(summary.starterSpeciesId, 155);
+    expect(summary.mapCoordinates, hasLength(3));
     expect(summary.badgeProgress, {'城都': 3, '关都': 0});
     expect(summary.locationLabel, '满金市');
     expect(summary.mapHeaderId, 76);
@@ -39,6 +65,14 @@ void main() {
     expect(summary.dexCaughtIds, containsAll([156, 175]));
     expect(summary.dexSeenIds.length, 46);
     expect(summary.dexSeenIds, containsAll(summary.dexCaughtIds));
+
+    final journey = parser.toJourney(summary);
+    final restored = CurrentJourney.fromJson(journey.toJson());
+    expect(restored.saveTrainerSecretId, summary.secretId);
+    expect(restored.saveMoney, summary.money);
+    expect(restored.saveStarterSpeciesId, 155);
+    expect(restored.party.first.ivs, summary.party.first.ivs);
+    expect(restored.party.first.battleStats, summary.party.first.battleStats);
   });
 
   test('counts Johto and Kanto badge banks', () async {

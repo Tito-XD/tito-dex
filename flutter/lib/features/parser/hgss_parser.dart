@@ -41,20 +41,43 @@ class HgssParser {
 
     final trainerName = decodeGen4Text(bytes.sublist(base + 0x64, base + 0x74));
     final tid = readUint16(bytes, base + 0x74);
+    final secretId = readUint16(bytes, base + 0x76);
+    final money = readUint32(bytes, base + 0x78);
+    final trainerGender = switch (bytes[base + 0x7C]) {
+      0 => '男',
+      1 => '女',
+      _ => null,
+    };
+    final language = _languageLabel(bytes[base + 0x7D]);
     final johtoBadges = bytes[base + 0x7E];
     final kantoBadges = bytes[base + 0x83];
     final badgeCount = popcount(johtoBadges) + popcount(kantoBadges);
     final hours = readUint16(bytes, base + 0x86);
     final minutes = bytes[base + 0x88];
     final seconds = bytes[base + 0x89];
-    final partyCount = bytes[base + 0x94];
+    final rawPartyCount = bytes[base + 0x94];
+    final partyCount = rawPartyCount.clamp(0, 6);
     final mapId = readUint16(bytes, base + 0x1234);
+    final starterSpeciesId = readUint16(bytes, base + 0xE44);
+    final mapCoordinates = [
+      readUint16(bytes, base + 0x236E),
+      readUint16(bytes, base + 0x2372),
+      readUint16(bytes, base + 0x2376),
+    ];
+    final motherMoney = readUint32(bytes, base + 0xC0D8);
+    final adventureStartedAt = _gen4DateTime(readUint32(bytes, base + 0x34));
+    final leagueChampionAt = _gen4DateTime(readUint32(bytes, base + 0x3C));
     final pokedex = HgssPokedexFlags.fromPartition(
       bytes.sublist(base, base + _partitionSize),
     );
 
     if (trainerName.trim().isEmpty) {
       warnings.add('Trainer name could not be decoded cleanly.');
+    }
+    if (rawPartyCount > 6) {
+      warnings.add(
+        'Party count $rawPartyCount is invalid; read first 6 slots.',
+      );
     }
 
     final party = <ParsedPartyMember>[];
@@ -79,6 +102,20 @@ class HgssParser {
           experience: slotStats.experience,
           abilityId: slotStats.abilityId,
           moveIds: slotStats.moveIds,
+          nickname: slotStats.nickname,
+          heldItemId: slotStats.heldItemId,
+          friendship: slotStats.friendship,
+          nature: slotStats.nature,
+          isShiny: slotStats.isShiny,
+          gender: slotStats.gender,
+          status: slotStats.status,
+          movePp: slotStats.movePp,
+          movePpUps: slotStats.movePpUps,
+          ivs: slotStats.ivs,
+          evs: slotStats.evs,
+          battleStats: slotStats.battleStats,
+          isEgg: slotStats.isEgg,
+          formIndex: slotStats.formIndex,
           warning: slotWarning,
         ),
       );
@@ -99,6 +136,17 @@ class HgssParser {
       savedAt: sourceModifiedAt?.toUtc(),
       warnings: warnings,
       tid: tid,
+      secretId: secretId,
+      money: money <= 999999 ? money : null,
+      motherMoney: motherMoney <= 999999 ? motherMoney : null,
+      trainerGender: trainerGender,
+      language: language,
+      starterSpeciesId: starterSpeciesId > 0 && starterSpeciesId <= 493
+          ? starterSpeciesId
+          : null,
+      mapCoordinates: mapCoordinates,
+      adventureStartedAt: adventureStartedAt,
+      leagueChampionAt: leagueChampionAt,
       mapHeaderId: mapId,
       dexCaughtIds: pokedex.caughtIds,
       dexSeenIds: pokedex.seenIds,
@@ -134,6 +182,20 @@ class HgssParser {
             experience: member.experience,
             abilityId: member.abilityId,
             moveIds: member.moveIds,
+            nickname: member.nickname,
+            heldItemId: member.heldItemId,
+            friendship: member.friendship,
+            nature: member.nature,
+            isShiny: member.isShiny,
+            gender: member.gender,
+            status: member.status,
+            movePp: member.movePp,
+            movePpUps: member.movePpUps,
+            ivs: member.ivs,
+            evs: member.evs,
+            battleStats: member.battleStats,
+            isEgg: member.isEgg,
+            formIndex: member.formIndex,
           ),
         )
         .toList(growable: false);
@@ -146,6 +208,15 @@ class HgssParser {
           : summary.trainerName,
       saveTrainerName: summary.trainerName,
       saveTrainerId: summary.tid,
+      saveTrainerSecretId: summary.secretId,
+      saveMoney: summary.money,
+      saveMotherMoney: summary.motherMoney,
+      saveTrainerGender: summary.trainerGender,
+      saveLanguage: summary.language,
+      saveStarterSpeciesId: summary.starterSpeciesId,
+      saveMapCoordinates: summary.mapCoordinates,
+      saveAdventureStartedAt: summary.adventureStartedAt,
+      saveLeagueChampionAt: summary.leagueChampionAt,
       trainerNameCustomized: preserveTrainerName,
       trainerAvatarPath: existing?.trainerAvatarPath,
       trainerAvatarCustomized: existing?.trainerAvatarCustomized ?? false,
@@ -184,6 +255,22 @@ class HgssParser {
         '${local.hour.toString().padLeft(2, '0')}:'
         '${local.minute.toString().padLeft(2, '0')}';
   }
+
+  DateTime? _gen4DateTime(int seconds) {
+    if (seconds <= 0) return null;
+    return DateTime.utc(2000).add(Duration(seconds: seconds));
+  }
+
+  String _languageLabel(int value) => switch (value) {
+    1 => '日文',
+    2 => '英文',
+    3 => '法文',
+    4 => '意大利文',
+    5 => '德文',
+    7 => '西班牙文',
+    8 => '韩文',
+    _ => '未知（$value）',
+  };
 
   int _activePartition(Uint8List bytes) {
     final firstValid = _validPartition(bytes, 0);

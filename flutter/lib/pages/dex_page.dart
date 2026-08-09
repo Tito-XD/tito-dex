@@ -9,6 +9,7 @@ import '../features/game/journey_capability.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_browse_scope.dart';
+import '../features/dex/dex_browse_session.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_regional_picker.dart';
 import '../features/dex/dex_models.dart';
@@ -118,11 +119,13 @@ class _DexPageState extends State<DexPage> {
     // the background (e.g. opening a detail page), so returning to the list
     // does not replay the floating-card effect.
     _revealAnimationsEnabled = false;
+    _saveBrowseSession();
     super.deactivate();
   }
 
   @override
   void dispose() {
+    _saveBrowseSession();
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
@@ -139,6 +142,35 @@ class _DexPageState extends State<DexPage> {
     if (show != _showScrollToTop && mounted) {
       setState(() => _showScrollToTop = show);
     }
+    _saveBrowseSession();
+  }
+
+  void _saveBrowseSession() {
+    DexBrowseSessionStore.save(
+      DexBrowseSession(
+        scrollOffset: _scrollController.hasClients
+            ? _scrollController.offset
+            : 0,
+        loadedThrough: _loadedThrough,
+        filterVisibleCount: _filterVisibleCount,
+        modeName: _mode.name,
+        browseScope: _browseScope,
+        encounterFilter: _encounterFilter,
+        filterFingerprint: dexFilterFingerprint(
+          dexFilterController.currentFilter,
+        ),
+      ),
+    );
+  }
+
+  void _restoreScroll(double offset) {
+    if (offset <= 0) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.jumpTo(
+        offset.clamp(0, _scrollController.position.maxScrollExtent),
+      );
+    });
   }
 
   Future<void> _scrollToTop() async {
@@ -243,6 +275,10 @@ class _DexPageState extends State<DexPage> {
   Future<void> _bootstrap() async {
     try {
       final browseScope = await dexSettingsRepository.loadBrowseScope();
+      final session = DexBrowseSessionStore.current;
+      final restore =
+          session != null &&
+          session.matches(browseScope, dexFilterController.currentFilter);
       _journeyIds = _resolveJourneyIds();
       final progress = dexRepository.progressFor(
         widget.journey,
@@ -255,16 +291,44 @@ class _DexPageState extends State<DexPage> {
         _progress = progress;
         _browseScope = browseScope;
         _region = browseScope.region ?? DexRegionalPokedex.national;
+        if (restore) {
+          _encounterFilter = session.encounterFilter;
+          _mode = session.modeName == _DexMode.journey.name
+              ? _DexMode.journey
+              : _DexMode.national;
+        }
       });
       unawaited(_refreshEvolutionOrTradeMissing());
       if (dexFilterController.hasActiveFilter) {
         await _loadReferenceFilter();
+        if (restore && mounted) {
+          setState(() {
+            final restoredCount = session.filterVisibleCount <= 0
+                ? _chunkSize
+                : session.filterVisibleCount;
+            _filterVisibleCount = restoredCount.clamp(
+              0,
+              _scopedReferenceEntries.length,
+            );
+          });
+        }
       } else if (browseScope.generation != null) {
         await _loadGeneration(browseScope.generation!);
       } else if (_region != DexRegionalPokedex.national) {
         await _loadRegion(_region);
       } else {
         await _loadMore();
+        if (restore) {
+          while (mounted && _loadedThrough < session.loadedThrough) {
+            await _loadMore();
+          }
+        }
+      }
+      if (restore && session.modeName == _DexMode.journey.name) {
+        await _setMode(_DexMode.journey);
+      }
+      if (restore) {
+        _restoreScroll(session.scrollOffset);
       }
     } catch (error) {
       if (!mounted) {
@@ -506,6 +570,9 @@ class _DexPageState extends State<DexPage> {
       _error = null;
     });
     unawaited(dexSettingsRepository.saveBrowseScope(scope));
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
     if (scope.generation != null) {
       _loadGeneration(scope.generation!);
     } else if (region != DexRegionalPokedex.national) {
@@ -752,6 +819,7 @@ class _DexPageState extends State<DexPage> {
                   return false;
                 },
                 child: CustomScrollView(
+                  key: const PageStorageKey<String>('dex-list-scroll'),
                   controller: _scrollController,
                   slivers: [
                     SliverPadding(
@@ -953,6 +1021,10 @@ class _DexPageState extends State<DexPage> {
                                 summary: entry,
                                 status: status,
                                 compact: DeviceLayout.isCompact(context),
+                                onTap: () {
+                                  _saveBrowseSession();
+                                  context.push('/dex/${entry.id}');
+                                },
                                 onLongPress: _isSaveLinked
                                     ? null
                                     : () => _cycleManualMark(entry.id, status),

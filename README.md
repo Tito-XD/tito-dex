@@ -8,19 +8,21 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9+144` | 版本化资料、队伍联动与全屏同行定位 |
-| Offline APK | [v0.8.9](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.9) · App `0.8.9-offline+145` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
-| `main` 源码基线 | App `0.8.9+144` | 道具／招式按游戏对齐，队伍与地点图鉴交互收口 |
+| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+146` | HGSS 丰富同步、图鉴返回位置与完整 Credits |
+| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+147` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
+| `main` 源码基线 | App `0.8.10+146` | 存档信息、现有 UI、来源与权利说明统一对齐 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
 图鉴数据：在线包 **v19** / Offline 内置紧凑种子 **v14** · 1025 个物种 · 803 条形态记录 · 静态、动态、闪光与叫声媒体已审计 · 道具中文说明和图标完整。
 
+> **非官方声明：** TitoDex 是非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo、Creatures、GAME FREAK、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。相关名称、角色、图像、音频与商标归各自权利人所有。完整来源、许可与媒体 Credits 见 [CREDITS.md](CREDITS.md)。
+
 ## 当前亮点
 
 - **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
 - **存档助手**：给出当前位置附近未捕获、队伍进化路线、成对版本可直遇缺口，以及进化／孵蛋／交换补全建议。
-- **存档联动**：绑定一个 `.sav` 文件并保留读取权限；实验性识别 Gen 1–7 元数据，HGSS 可进一步读取队伍、招式、特性、经验、地图、城都／关都徽章区、训练家 ID 与图鉴进度。
+- **存档联动**：绑定一个 `.sav` 文件并保留读取权限；实验性识别 Gen 1–7 元数据，HGSS 会同步队伍、昵称、携带道具、招式与 PP、特性、经验、亲密度、性格、闪光、IV／EV、战斗能力、地图／坐标、资金、训练家资料、城都／关都徽章区与图鉴进度。
 - **全国图鉴 1–1025**：支持形态搜索、地区或 G1–G9 范围、体形／颜色／大小等组合筛选、形态进化链、精确游戏与 DLC 获取方式、招式、特性和形态媒体。
 - **地点图鉴**：按所选版本用紧凑网格查看地点与完成度，弹窗优先列出未捕获并可直达图鉴。
 - **资料中心**：招式、特性、性格、蛋群、道具、天气、场地和异常状态；道具可用性与价格、招式和机制会跟随所选游戏与世代。
@@ -54,7 +56,7 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.9-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.9-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.10-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.10-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置同一套核心数据，首次启动会准备随包数据，适合网络不稳定的设备。
@@ -87,6 +89,7 @@ flutter run -d chrome    # 功能有限的 Web 预览
 | [设计系统](docs/DESIGN_SYSTEM.md) | 视觉与交互规范 |
 | [发布构建](docs/RELEASE_BUILD.md) | APK 构建和校验清单 |
 | [Release Notes](docs/RELEASES.md) | 中文优先的发布文案规范与历史 |
+| [数据来源与 Credits](CREDITS.md) | 数据、媒体、开放许可与非官方声明 |
 
 ## HGSS 测试存档
 

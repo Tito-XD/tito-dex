@@ -243,6 +243,20 @@ class PartySlotStats {
     this.experience,
     this.abilityId,
     this.moveIds = const [],
+    this.nickname,
+    this.heldItemId,
+    this.friendship,
+    this.nature,
+    this.isShiny = false,
+    this.gender,
+    this.status,
+    this.movePp = const [],
+    this.movePpUps = const [],
+    this.ivs = const [],
+    this.evs = const [],
+    this.battleStats = const {},
+    this.isEgg = false,
+    this.formIndex = 0,
   });
 
   final int speciesId;
@@ -252,6 +266,20 @@ class PartySlotStats {
   final int? experience;
   final int? abilityId;
   final List<int> moveIds;
+  final String? nickname;
+  final int? heldItemId;
+  final int? friendship;
+  final String? nature;
+  final bool isShiny;
+  final String? gender;
+  final String? status;
+  final List<int> movePp;
+  final List<int> movePpUps;
+  final List<int> ivs;
+  final List<int> evs;
+  final Map<String, int> battleStats;
+  final bool isEgg;
+  final int formIndex;
 }
 
 (int speciesId, int level) decryptPartySlot(List<int> raw) {
@@ -274,18 +302,41 @@ PartySlotStats decryptPartySlotStats(List<int> raw) {
   // incorrect progress values.
   final experience = readUint32(decrypted, 8);
   final abilityId = decrypted[13];
-  final moveIds = <int>[
+  final heldItemId = readUint16(decrypted, 2);
+  final friendship = decrypted[12];
+  final rawMoveIds = <int>[
     for (final offset in const [32, 34, 36, 38]) readUint16(decrypted, offset),
-  ].where((id) => id > 0 && id <= 467).toList(growable: false);
+  ];
+  final validMoveIndexes = <int>[
+    for (var index = 0; index < rawMoveIds.length; index++)
+      if (rawMoveIds[index] > 0 && rawMoveIds[index] <= 467) index,
+  ];
+  final moveIds = [for (final index in validMoveIndexes) rawMoveIds[index]];
+  final movePp = [for (final index in validMoveIndexes) decrypted[40 + index]];
+  final movePpUps = [
+    for (final index in validMoveIndexes) decrypted[44 + index],
+  ];
+  final ivBits = readUint32(decrypted, 48);
+  final ivs = [
+    for (var index = 0; index < 6; index++) (ivBits >> (index * 5)) & 0x1F,
+  ];
+  final evs = decrypted.sublist(16, 22);
+  final identity = decrypted[56];
+  final isNicknamed = ivBits & (1 << 31) != 0;
+  final decodedNickname = decodeGen4Text(decrypted.sublist(64, 86)).trim();
+  final otId = readUint16(decrypted, 4);
+  final otSecretId = readUint16(decrypted, 6);
+  final shinyValue =
+      otId ^ otSecretId ^ (personality & 0xFFFF) ^ (personality >> 16);
 
   final stats = _cryptArray(slot.sublist(136, 236), personality);
-  // HGSS party stats: level @ +4, max HP @ +6, current HP @ +8.
+  // HGSS party stats: level @ +4, current HP @ +6, max HP @ +8.
   final level = stats[4];
-  final maxHp = readUint16(stats, 6);
-  final currentHp = readUint16(stats, 8);
+  final currentHp = readUint16(stats, 6);
+  final maxHp = readUint16(stats, 8);
 
   final validLevel = level > 0 && level <= 100 ? level : null;
-  final validHp = maxHp > 0 && currentHp >= 0 && currentHp <= maxHp + 999
+  final validHp = maxHp > 0 && currentHp >= 0 && currentHp <= maxHp
       ? (currentHp: currentHp, maxHp: maxHp)
       : null;
 
@@ -297,7 +348,71 @@ PartySlotStats decryptPartySlotStats(List<int> raw) {
     experience: experience > 0 && experience < 2000000 ? experience : null,
     abilityId: abilityId > 0 ? abilityId : null,
     moveIds: moveIds,
+    nickname: isNicknamed && decodedNickname.isNotEmpty
+        ? decodedNickname
+        : null,
+    heldItemId: heldItemId == 0 ? null : heldItemId,
+    friendship: friendship,
+    nature: _natureNamesZh[personality % 25],
+    isShiny: shinyValue < 8,
+    gender: identity & 0x04 != 0
+        ? '无性别'
+        : identity & 0x02 != 0
+        ? '雌性'
+        : '雄性',
+    status: _partyStatusLabel(stats[0]),
+    movePp: movePp,
+    movePpUps: movePpUps,
+    ivs: ivs,
+    evs: evs,
+    battleStats: {
+      '攻击': readUint16(stats, 10),
+      '防御': readUint16(stats, 12),
+      '速度': readUint16(stats, 14),
+      '特攻': readUint16(stats, 16),
+      '特防': readUint16(stats, 18),
+    },
+    isEgg: ivBits & (1 << 30) != 0,
+    formIndex: identity >> 3,
   );
+}
+
+const _natureNamesZh = <String>[
+  '勤奋',
+  '怕寂寞',
+  '勇敢',
+  '固执',
+  '顽皮',
+  '大胆',
+  '坦率',
+  '悠闲',
+  '淘气',
+  '乐天',
+  '胆小',
+  '急躁',
+  '认真',
+  '爽朗',
+  '天真',
+  '内敛',
+  '慢吞吞',
+  '冷静',
+  '害羞',
+  '马虎',
+  '温和',
+  '温顺',
+  '自大',
+  '慎重',
+  '浮躁',
+];
+
+String? _partyStatusLabel(int value) {
+  if (value & 0x80 != 0) return '剧毒';
+  if (value & 0x07 != 0) return '睡眠';
+  if (value & 0x08 != 0) return '中毒';
+  if (value & 0x10 != 0) return '灼伤';
+  if (value & 0x20 != 0) return '冰冻';
+  if (value & 0x40 != 0) return '麻痹';
+  return null;
 }
 
 /// Exposed for fixture/debug tooling.

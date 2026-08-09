@@ -9,6 +9,19 @@ class PartyMember {
     this.experience,
     this.abilityId,
     this.moveIds = const [],
+    this.heldItemId,
+    this.friendship,
+    this.nature,
+    this.isShiny = false,
+    this.gender,
+    this.status,
+    this.movePp = const [],
+    this.movePpUps = const [],
+    this.ivs = const [],
+    this.evs = const [],
+    this.battleStats = const {},
+    this.isEgg = false,
+    this.formIndex = 0,
     this.types = const [],
     this.abilitySlug,
     this.userEdited = false,
@@ -23,6 +36,19 @@ class PartyMember {
   final int? experience;
   final int? abilityId;
   final List<int> moveIds;
+  final int? heldItemId;
+  final int? friendship;
+  final String? nature;
+  final bool isShiny;
+  final String? gender;
+  final String? status;
+  final List<int> movePp;
+  final List<int> movePpUps;
+  final List<int> ivs;
+  final List<int> evs;
+  final Map<String, int> battleStats;
+  final bool isEgg;
+  final int formIndex;
   final List<String> types;
   final String? abilitySlug;
   final bool userEdited;
@@ -37,6 +63,19 @@ class PartyMember {
         if (experience != null) 'experience': experience,
         if (abilityId != null) 'abilityId': abilityId,
         if (moveIds.isNotEmpty) 'moveIds': moveIds,
+        if (heldItemId != null) 'heldItemId': heldItemId,
+        if (friendship != null) 'friendship': friendship,
+        if (nature != null) 'nature': nature,
+        if (isShiny) 'isShiny': true,
+        if (gender != null) 'gender': gender,
+        if (status != null) 'status': status,
+        if (movePp.isNotEmpty) 'movePp': movePp,
+        if (movePpUps.isNotEmpty) 'movePpUps': movePpUps,
+        if (ivs.isNotEmpty) 'ivs': ivs,
+        if (evs.isNotEmpty) 'evs': evs,
+        if (battleStats.isNotEmpty) 'battleStats': battleStats,
+        if (isEgg) 'isEgg': true,
+        if (formIndex != 0) 'formIndex': formIndex,
         if (types.isNotEmpty) 'types': types,
         if (abilitySlug != null) 'abilitySlug': abilitySlug,
         if (userEdited) 'userEdited': true,
@@ -54,6 +93,22 @@ class PartyMember {
         moveIds: (json['moveIds'] as List<dynamic>? ?? const [])
             .map((value) => (value as num).toInt())
             .toList(growable: false),
+        heldItemId: (json['heldItemId'] as num?)?.toInt(),
+        friendship: (json['friendship'] as num?)?.toInt(),
+        nature: json['nature'] as String?,
+        isShiny: json['isShiny'] as bool? ?? false,
+        gender: json['gender'] as String?,
+        status: json['status'] as String?,
+        movePp: _intList(json['movePp']),
+        movePpUps: _intList(json['movePpUps']),
+        ivs: _intList(json['ivs']),
+        evs: _intList(json['evs']),
+        battleStats:
+            (json['battleStats'] as Map<String, dynamic>? ?? const {}).map(
+          (key, value) => MapEntry(key, (value as num).toInt()),
+        ),
+        isEgg: json['isEgg'] as bool? ?? false,
+        formIndex: (json['formIndex'] as num?)?.toInt() ?? 0,
         types: (json['types'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
@@ -72,6 +127,19 @@ class PartyMember {
     int? experience,
     int? abilityId,
     List<int>? moveIds,
+    int? heldItemId,
+    int? friendship,
+    String? nature,
+    bool? isShiny,
+    String? gender,
+    String? status,
+    List<int>? movePp,
+    List<int>? movePpUps,
+    List<int>? ivs,
+    List<int>? evs,
+    Map<String, int>? battleStats,
+    bool? isEgg,
+    int? formIndex,
     List<String>? types,
     String? abilitySlug,
     bool? userEdited,
@@ -88,6 +156,19 @@ class PartyMember {
       experience: experience ?? this.experience,
       abilityId: abilityId ?? this.abilityId,
       moveIds: moveIds ?? this.moveIds,
+      heldItemId: heldItemId ?? this.heldItemId,
+      friendship: friendship ?? this.friendship,
+      nature: nature ?? this.nature,
+      isShiny: isShiny ?? this.isShiny,
+      gender: gender ?? this.gender,
+      status: status ?? this.status,
+      movePp: movePp ?? this.movePp,
+      movePpUps: movePpUps ?? this.movePpUps,
+      ivs: ivs ?? this.ivs,
+      evs: evs ?? this.evs,
+      battleStats: battleStats ?? this.battleStats,
+      isEgg: isEgg ?? this.isEgg,
+      formIndex: formIndex ?? this.formIndex,
       types: types ?? this.types,
       abilitySlug:
           clearAbilitySlug ? null : (abilitySlug ?? this.abilitySlug),
@@ -95,6 +176,11 @@ class PartyMember {
     );
   }
 }
+
+List<int> _intList(Object? value) =>
+    (value as List<dynamic>? ?? const [])
+        .map((entry) => (entry as num).toInt())
+        .toList(growable: false);
 
 class JourneyTimelineEntry {
   const JourneyTimelineEntry({
@@ -134,6 +220,15 @@ class CurrentJourney {
     this.nextReminder,
     this.saveTrainerName,
     this.saveTrainerId,
+    this.saveTrainerSecretId,
+    this.saveMoney,
+    this.saveMotherMoney,
+    this.saveTrainerGender,
+    this.saveLanguage,
+    this.saveStarterSpeciesId,
+    this.saveMapCoordinates = const [],
+    this.saveAdventureStartedAt,
+    this.saveLeagueChampionAt,
     this.trainerNameCustomized = false,
     this.trainerAvatarPath,
     this.trainerAvatarCustomized = false,
@@ -159,6 +254,15 @@ class CurrentJourney {
   final String? nextReminder;
   final String? saveTrainerName;
   final int? saveTrainerId;
+  final int? saveTrainerSecretId;
+  final int? saveMoney;
+  final int? saveMotherMoney;
+  final String? saveTrainerGender;
+  final String? saveLanguage;
+  final int? saveStarterSpeciesId;
+  final List<int> saveMapCoordinates;
+  final DateTime? saveAdventureStartedAt;
+  final DateTime? saveLeagueChampionAt;
   final bool trainerNameCustomized;
   final String? trainerAvatarPath;
   final bool trainerAvatarCustomized;
@@ -194,7 +298,17 @@ class CurrentJourney {
       final right = b[i];
       if (left.speciesId != right.speciesId ||
           left.species != right.species ||
-          left.level != right.level) {
+          left.level != right.level ||
+          left.currentHp != right.currentHp ||
+          left.maxHp != right.maxHp ||
+          left.experience != right.experience ||
+          left.abilityId != right.abilityId ||
+          !_listEquals(left.moveIds, right.moveIds) ||
+          left.heldItemId != right.heldItemId ||
+          left.friendship != right.friendship ||
+          left.nature != right.nature ||
+          left.isShiny != right.isShiny ||
+          left.status != right.status) {
         return false;
       }
     }
@@ -214,6 +328,15 @@ class CurrentJourney {
     String? nextReminder,
     String? saveTrainerName,
     int? saveTrainerId,
+    int? saveTrainerSecretId,
+    int? saveMoney,
+    int? saveMotherMoney,
+    String? saveTrainerGender,
+    String? saveLanguage,
+    int? saveStarterSpeciesId,
+    List<int>? saveMapCoordinates,
+    DateTime? saveAdventureStartedAt,
+    DateTime? saveLeagueChampionAt,
     bool? trainerNameCustomized,
     String? trainerAvatarPath,
     bool? trainerAvatarCustomized,
@@ -239,6 +362,17 @@ class CurrentJourney {
       nextReminder: nextReminder ?? this.nextReminder,
       saveTrainerName: saveTrainerName ?? this.saveTrainerName,
       saveTrainerId: saveTrainerId ?? this.saveTrainerId,
+      saveTrainerSecretId: saveTrainerSecretId ?? this.saveTrainerSecretId,
+      saveMoney: saveMoney ?? this.saveMoney,
+      saveMotherMoney: saveMotherMoney ?? this.saveMotherMoney,
+      saveTrainerGender: saveTrainerGender ?? this.saveTrainerGender,
+      saveLanguage: saveLanguage ?? this.saveLanguage,
+      saveStarterSpeciesId: saveStarterSpeciesId ?? this.saveStarterSpeciesId,
+      saveMapCoordinates: saveMapCoordinates ?? this.saveMapCoordinates,
+      saveAdventureStartedAt:
+          saveAdventureStartedAt ?? this.saveAdventureStartedAt,
+      saveLeagueChampionAt:
+          saveLeagueChampionAt ?? this.saveLeagueChampionAt,
       trainerNameCustomized:
           trainerNameCustomized ?? this.trainerNameCustomized,
       trainerAvatarPath: trainerAvatarPath ?? this.trainerAvatarPath,
@@ -268,6 +402,20 @@ class CurrentJourney {
         if (nextReminder != null) 'nextReminder': nextReminder,
         if (saveTrainerName != null) 'saveTrainerName': saveTrainerName,
         if (saveTrainerId != null) 'saveTrainerId': saveTrainerId,
+        if (saveTrainerSecretId != null)
+          'saveTrainerSecretId': saveTrainerSecretId,
+        if (saveMoney != null) 'saveMoney': saveMoney,
+        if (saveMotherMoney != null) 'saveMotherMoney': saveMotherMoney,
+        if (saveTrainerGender != null) 'saveTrainerGender': saveTrainerGender,
+        if (saveLanguage != null) 'saveLanguage': saveLanguage,
+        if (saveStarterSpeciesId != null)
+          'saveStarterSpeciesId': saveStarterSpeciesId,
+        if (saveMapCoordinates.isNotEmpty)
+          'saveMapCoordinates': saveMapCoordinates,
+        if (saveAdventureStartedAt != null)
+          'saveAdventureStartedAt': saveAdventureStartedAt!.toIso8601String(),
+        if (saveLeagueChampionAt != null)
+          'saveLeagueChampionAt': saveLeagueChampionAt!.toIso8601String(),
         if (trainerNameCustomized) 'trainerNameCustomized': true,
         if (trainerAvatarPath != null) 'trainerAvatarPath': trainerAvatarPath,
         if (trainerAvatarCustomized) 'trainerAvatarCustomized': true,
@@ -305,6 +453,19 @@ class CurrentJourney {
         nextReminder: json['nextReminder'] as String?,
         saveTrainerName: json['saveTrainerName'] as String?,
         saveTrainerId: (json['saveTrainerId'] as num?)?.toInt(),
+        saveTrainerSecretId:
+            (json['saveTrainerSecretId'] as num?)?.toInt(),
+        saveMoney: (json['saveMoney'] as num?)?.toInt(),
+        saveMotherMoney: (json['saveMotherMoney'] as num?)?.toInt(),
+        saveTrainerGender: json['saveTrainerGender'] as String?,
+        saveLanguage: json['saveLanguage'] as String?,
+        saveStarterSpeciesId:
+            (json['saveStarterSpeciesId'] as num?)?.toInt(),
+        saveMapCoordinates: _intList(json['saveMapCoordinates']),
+        saveAdventureStartedAt:
+            DateTime.tryParse(json['saveAdventureStartedAt'] as String? ?? ''),
+        saveLeagueChampionAt:
+            DateTime.tryParse(json['saveLeagueChampionAt'] as String? ?? ''),
         trainerNameCustomized: json['trainerNameCustomized'] as bool? ?? false,
         trainerAvatarPath: json['trainerAvatarPath'] as String?,
         trainerAvatarCustomized:
@@ -332,6 +493,14 @@ class CurrentJourney {
             (json['badgeProgress'] as Map<String, dynamic>? ?? const {})
                 .map((key, value) => MapEntry(key, (value as num).toInt())),
       );
+
+  static bool _listEquals(List<int> left, List<int> right) {
+    if (left.length != right.length) return false;
+    for (var index = 0; index < left.length; index++) {
+      if (left[index] != right[index]) return false;
+    }
+    return true;
+  }
 
   static CurrentJourney mock() => const CurrentJourney(
         game: 'SoulSilver',

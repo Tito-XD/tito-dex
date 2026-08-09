@@ -43,31 +43,42 @@ Offsets relative to **active partition base**:
 | --- | --- | --- | --- |
 | Trainer name (OT) | `0x64`–`0x73` | Gen IV u16 text | `trainerName` |
 | Trainer ID | `0x74` | u16 | `tid` |
+| Secret ID | `0x76` | u16 | `secretId` |
+| Money / trainer gender / language | `0x78`–`0x7D` | u32 + u8 + u8 | journey save metadata |
 | Johto badges | `0x7E` | u8 bitmask | combined `badges` count |
 | Kanto badges | `0x83` | u8 bitmask | combined `badges` count; `maxBadges=16` |
 | Game version | `0x80` | u8 | HeartGold (`7`) / SoulSilver |
 | Play time | `0x86`–`0x89` | u16 h, u8 m, u8 s | `playTime` string |
 | Party count | `0x94` | u8 | loop bound |
 | Party slots | `0x98` + 236×n | encrypted struct | `party[]` |
+| Starter species | `0xE44` | u16 | `starterSpeciesId` |
 | Map header ID | `0x1234` | u16 | `mapHeaderId` → `locationLabel` |
+| Player map X / Y / Z | `0x236E`, `0x2372`, `0x2376` | u16 × 3 | `mapCoordinates` |
+| Money held by mother | `0xC0D8` | u32 | `motherMoney` |
+| Adventure start / League champion time | `0x34`, `0x3C` | seconds since 2000-01-01 | nullable UTC dates |
+| Pokédex flags | small block | bit fields | complete seen / caught ID sets |
 | Full file | — | SHA-256 | `saveHash` |
 
-Party decryption (`hgss_format.dart`):
+Party decryption (`hgss_format.dart`) now reads:
 
-- Personality / checksum shuffle + AES-like crypt
-- Level from decrypted stats block offset `0x8C` (not met level `0x84`)
-- Level > 100 → warning, level nulled (empty slot)
+- personality / checksum block shuffle + Gen IV LCG encryption
+- species, nickname, held item, OT IDs, EXP, friendship and ability
+- four moves with current PP and PP Ups
+- nature, shiny state, gender, egg/form flags, IVs and EVs
+- level, current/max HP, status, Attack/Defense/Speed/Sp. Atk/Sp. Def from the party-only battle block
+- invalid party count is capped at six with an explicit warning
 
 Location (`hgss_map_lookup.dart` + `hgss_map_list.dart`):
 
 - Map list generated from Project Pokémon data (`tools/generate_hgss_map_list.py`)
 - English label → Chinese via `game_zh.dart` (`localizeLocation`)
 
-## Not Yet Parsed
+## Intentionally Not Yet Parsed
 
 | Field | Offset | Notes |
 | --- | --- | --- |
-| Nicknames, moves, IVs, PC boxes | — | Out of scope |
+| PC boxes | big block from `0xF700` | Requires independently verified big-block selection/checksum handling and more real-save fixtures; do not guess from the small-block active partition |
+| Bag pocket UI sync | `0x644` onward | Documented, but not yet useful enough to add to Journey; held items are already synchronized per party member |
 | Archive containers | — | Zip backups must be extracted before import |
 
 ## Parser Boundary (Dart)
