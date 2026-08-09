@@ -40,4 +40,23 @@ void main() {
     const right = DexFilter(colorSlugs: {'brown', 'red'});
     expect(dexFilterFingerprint(left), dexFilterFingerprint(right));
   });
+
+  test('detached list save keeps the last attached scroll offset', () {
+    final memory = DexBrowseScrollMemory();
+
+    expect(memory.offsetForSave(null), 0);
+    expect(memory.offsetForSave(1280), 1280);
+    expect(memory.offsetForSave(null), 1280);
+
+    // A real user scroll to the top is still recorded while attached.
+    expect(memory.offsetForSave(0), 0);
+    expect(memory.offsetForSave(null), 0);
+  });
+
+  test('restore target survives until an attached list can consume it', () {
+    final memory = DexBrowseScrollMemory();
+    memory.rememberRestoreTarget(2048);
+
+    expect(memory.offsetForSave(null), 2048);
+  });
 }
