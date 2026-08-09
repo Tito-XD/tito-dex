@@ -5,8 +5,8 @@
 | Field | Value |
 | --- | --- |
 | **Latest release** | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) |
-| **`main` / lite source** | `0.8.10+146` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.10-offline+147` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **`main` / lite source** | `0.8.10+148` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.10-offline+149` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -65,7 +65,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - Chinese location labels prefer game `zh-Hans` resources for modern overlays, then the maintained catalog; HGSS retains map-id lookup.
 - Detail flavor icons are APK-local and precached; evolution alternatives and encounter methods/conditions render from structured bundle fields with Chinese fallbacks. Version planning shows wild held items, paired-version gaps, and chain completion routes. Bundle v16 added 52poke SwSh / BDSP / LA / SV / Z-A held-item coverage: 520 species with held items plus 52 previously missing items (`HELD_ITEMS_ATTRIBUTION.txt`). v0.8.8 applies `MechanicsProfile` gates so unavailable alternative evolution routes do not make a version plan look self-contained.
 - v0.8.9: `/dex/locations` uses a compact responsive area grid; tapping an area opens a draggable missing-first encounter sheet and preserves direct dex/form navigation. No interactive map is planned.
-- v0.8.10: the Dex keeps its chunk depth, active scope/filter and scroll offset in short-lived in-memory navigation state, so returning from a detail route no longer sporadically reconstructs at the top.
+- v0.8.10 fix rebuild: the Dex content remains mounted in one stable route layer when the home-card Hero extra disappears on a nested detail push. PageStorage no longer competes with the explicit browse session; detached controllers preserve their last real offset, and async list restoration waits for content extent before applying it.
 - Form metadata now reaches the UI consistently: event-only, historical, current-version availability/obtainability, introduction version, incomplete data, and inherited fallback states are all labelled instead of remaining bundle-only flags.
 
 ### Items (reference hub → 道具)
@@ -116,7 +116,7 @@ authorization, sponsorship, or endorsement by Nintendo, Creatures, GAME FREAK,
 The Pokémon Company, or their affiliates.
 
 ### Latest release-line highlights
-- v0.8.10: expands fixture-verified HGSS sync into rich party and trainer data, corrects current/max HP parsing, keeps the Dex return position across route reconstruction, and makes complete data/media credits plus the unofficial-project notice visible in Settings and both READMEs.
+- v0.8.10: expands fixture-verified HGSS sync into rich party and trainer data, corrects current/max HP parsing, keeps the Dex route mounted and its return position stable across nested detail navigation, and makes complete data/media credits plus the unofficial-project notice visible in Settings and both READMEs.
 - v0.8.9: repairs media resource management and adds retry; makes companion positioning full-screen and smooth; scopes items, prices, moves and mechanics to the selected game/generation; compacts Location Dex into a missing-first drill-down; and connects parsed party abilities/moves/evolution routes to Team and quick damage. HGSS shows separate Johto/Kanto badge progress, Journey sync time is corrected, and exact HeartGold/SoulSilver selection is no longer represented by a hard-coded SoulSilver team heading.
 - v0.8.8: completes the three-phase correctness and UI closure: hardened l10n/release source binding, configurable Android app shortcuts, location dex, mechanics-aware evolution planning, improved save parsing and fixture gates, canonical Chinese dex axes, explicit battle assumptions, and a Journey save assistant that connects location, party evolution and exact-version completion data. Runtime data-to-UI alignment is audited and covered by 373 Flutter tests.
 - v0.8.7: fixes per-version sprite previews and artwork-viewer back behavior; makes companion art and cries explicitly form-aware across normal/shiny and static/animated sources; publishes the audited v19 media catalog; and completes all 2130 item descriptions and local icons with shared/fallback templates labelled honestly. Offline keeps the compact v14 seed and can update to v19.
@@ -277,8 +277,8 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 **Known baseline:** `flutter analyze --no-pub` is expected to be clean;
 `flutter test --no-pub` is the regression gate.
 
-**Verified v0.8.10 release candidate (2026-08-09):** `flutter analyze` has no
-issues and all 389 Flutter tests pass. Android native shortcut and
+**Verified v0.8.10 fix rebuild candidate (2026-08-10):** `flutter analyze` has
+no issues and all 391 Flutter tests pass. Android native shortcut and
 media smoke coverage runs on an x86_64 emulator in CI; APK packaging and
 physical-device release acceptance remain separate release gates.
 

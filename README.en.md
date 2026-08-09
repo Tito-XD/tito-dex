@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+146` | Rich HGSS sync, reliable Dex return position, and complete credits |
-| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+147` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.10+146` | Save data, reachable UI, attribution, and rights notices aligned |
+| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+148` | Rich HGSS sync, stable Dex detail returns, and complete credits |
+| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+149` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.10+148` | Save data, reachable UI, attribution, and rights notices aligned |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 

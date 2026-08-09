@@ -61,7 +61,11 @@ class _DexPageState extends State<DexPage> {
 
   late final DateTime _openedAt;
   late final ScrollController _scrollController;
+  final DexBrowseScrollMemory _scrollMemory = DexBrowseScrollMemory();
   var _revealAnimationsEnabled = false;
+  double? _pendingRestoreOffset;
+  bool _restoreScheduled = false;
+  bool _applyingScrollRestore = false;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
@@ -99,7 +103,11 @@ class _DexPageState extends State<DexPage> {
     _revealAnimationsEnabled = !_hasPlayedReveal;
     _hasPlayedReveal = true;
     _openedAt = DateTime.now();
-    _scrollController = ScrollController()..addListener(_onScroll);
+    // Browse-session restoration is the single source of truth. Leaving
+    // PageStorage enabled here creates a second writer whose teardown timing
+    // can race the explicit session restoration below.
+    _scrollController = ScrollController(keepScrollOffset: false)
+      ..addListener(_onScroll);
     _openedWithReferenceFilter = dexFilterController.hasActiveFilter;
     gameEditionRepository.addListener(_onEditionChanged);
     dexFilterController.addListener(_onReferenceFilterChanged);
@@ -138,6 +146,9 @@ class _DexPageState extends State<DexPage> {
   }
 
   void _onScroll() {
+    if (!_applyingScrollRestore && _scrollController.hasClients) {
+      _scrollMemory.offsetForSave(_scrollController.offset);
+    }
     final show = _scrollController.hasClients && _scrollController.offset > 420;
     if (show != _showScrollToTop && mounted) {
       setState(() => _showScrollToTop = show);
@@ -146,11 +157,12 @@ class _DexPageState extends State<DexPage> {
   }
 
   void _saveBrowseSession() {
+    final offset = _scrollMemory.offsetForSave(
+      _scrollController.hasClients ? _scrollController.offset : null,
+    );
     DexBrowseSessionStore.save(
       DexBrowseSession(
-        scrollOffset: _scrollController.hasClients
-            ? _scrollController.offset
-            : 0,
+        scrollOffset: offset,
         loadedThrough: _loadedThrough,
         filterVisibleCount: _filterVisibleCount,
         modeName: _mode.name,
@@ -165,11 +177,44 @@ class _DexPageState extends State<DexPage> {
 
   void _restoreScroll(double offset) {
     if (offset <= 0) return;
+    _scrollMemory.rememberRestoreTarget(offset);
+    _pendingRestoreOffset = offset;
+    _scheduleScrollRestore();
+  }
+
+  void _scheduleScrollRestore() {
+    if (_restoreScheduled || _pendingRestoreOffset == null) return;
+    _restoreScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_scrollController.hasClients) return;
-      _scrollController.jumpTo(
-        offset.clamp(0, _scrollController.position.maxScrollExtent),
-      );
+      _restoreScheduled = false;
+      if (!mounted || _pendingRestoreOffset == null) return;
+      if (!_scrollController.hasClients) {
+        _scheduleScrollRestore();
+        return;
+      }
+
+      final target = _pendingRestoreOffset!;
+      final maxExtent = _scrollController.position.maxScrollExtent;
+      final contentCanStillGrow =
+          _loadingChunk ||
+          _loadingRegion ||
+          _loadingReferenceFilter ||
+          _loadingJourney ||
+          (_encounterFilter == DexEncounterFilter.evolutionOrTrade &&
+              _loadingEvolutionOrTrade);
+
+      // If an async filter has not repopulated the grid yet, keep the original
+      // target and retry when that load completes. Clamping now would turn a
+      // valid deep-list offset into zero permanently.
+      if (maxExtent + 0.5 < target && contentCanStillGrow) return;
+
+      final resolved = target.clamp(0.0, maxExtent).toDouble();
+      _applyingScrollRestore = true;
+      _scrollController.jumpTo(resolved);
+      _applyingScrollRestore = false;
+      _scrollMemory.rememberRestoreTarget(resolved);
+      _pendingRestoreOffset = null;
+      _saveBrowseSession();
     });
   }
 
@@ -430,6 +475,7 @@ class _DexPageState extends State<DexPage> {
         _encounterFilter = DexEncounterFilter.all;
       }
     });
+    _scheduleScrollRestore();
   }
 
   void _loadMoreVisible() {
@@ -819,7 +865,6 @@ class _DexPageState extends State<DexPage> {
                   return false;
                 },
                 child: CustomScrollView(
-                  key: const PageStorageKey<String>('dex-list-scroll'),
                   controller: _scrollController,
                   slivers: [
                     SliverPadding(

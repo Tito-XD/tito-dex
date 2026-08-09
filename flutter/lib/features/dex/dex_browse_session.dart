@@ -39,6 +39,30 @@ class DexBrowseSessionStore {
   static void clear() => current = null;
 }
 
+/// Remembers the last offset observed while the list was still attached.
+///
+/// Route teardown can detach a [ScrollController] before `deactivate` or
+/// `dispose` saves the browse session. Passing `null` in that state must keep
+/// the last real position instead of replacing it with the list default (0).
+class DexBrowseScrollMemory {
+  double _lastKnownOffset = 0;
+
+  double offsetForSave(double? attachedOffset) {
+    if (attachedOffset != null &&
+        attachedOffset.isFinite &&
+        attachedOffset >= 0) {
+      _lastKnownOffset = attachedOffset;
+    }
+    return _lastKnownOffset;
+  }
+
+  void rememberRestoreTarget(double offset) {
+    if (offset.isFinite && offset >= 0) {
+      _lastKnownOffset = offset;
+    }
+  }
+}
+
 String dexFilterFingerprint(DexFilter filter) {
   final colors = filter.colorSlugs.toList()..sort();
   return [

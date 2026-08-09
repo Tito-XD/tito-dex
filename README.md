@@ -8,9 +8,9 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+146` | HGSS 丰富同步、图鉴返回位置与完整 Credits |
-| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+147` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
-| `main` 源码基线 | App `0.8.10+146` | 存档信息、现有 UI、来源与权利说明统一对齐 |
+| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+148` | HGSS 丰富同步、可靠的图鉴详情返回与完整 Credits |
+| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+149` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
+| `main` 源码基线 | App `0.8.10+148` | 存档信息、现有 UI、来源与权利说明统一对齐 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 

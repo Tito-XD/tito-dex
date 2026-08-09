@@ -1,6 +1,6 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · Lite `0.8.10+146` · Offline `0.8.10-offline+147`.
+> **Latest release:** [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · Lite `0.8.10+148` · Offline `0.8.10-offline+149`.
 >
 > **Current `main`:** v0.8.10 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 

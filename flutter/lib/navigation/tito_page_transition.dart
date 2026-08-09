@@ -55,22 +55,22 @@ Page<T> titoDexPage<T>({
   // The content layer is not inside [TitoPageContainer], so it needs its own
   // SafeArea now that the shell is edge-to-edge.
   final safeContent = content == null ? null : SafeArea(child: content);
-  final page = safeContent == null
-      ? child
-      : Stack(fit: StackFit.expand, children: [child, safeContent]);
-  if (heroTag == null) {
-    return titoMaterialPage<T>(key: key, child: page);
-  }
 
   return _TitoControlledMaterialPage<T>(
     key: key,
     kind: _TitoMaterialPageKind.dex,
-    child: Hero(
-      tag: heroTag,
-      transitionOnUserGestures: false,
-      flightShuttleBuilder: _homeActionFlightShuttle,
-      child: child,
-    ),
+    // Keep Dex content in [overlay] for the route's entire lifetime. Nested
+    // pushes do not retain the home-card `extra`, so moving content into the
+    // normal child when [heroTag] becomes null would reparent and recreate the
+    // live list during the detail transition — visibly snapping it to top.
+    child: heroTag == null
+        ? child
+        : Hero(
+            tag: heroTag,
+            transitionOnUserGestures: false,
+            flightShuttleBuilder: _homeActionFlightShuttle,
+            child: child,
+          ),
     overlay: safeContent,
   );
 }

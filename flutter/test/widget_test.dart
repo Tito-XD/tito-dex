@@ -37,10 +37,7 @@ void main() {
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexReverseTransitionDuration);
     expect(titoDexTransitionDuration, const Duration(milliseconds: 320));
-    expect(
-      titoDexReverseTransitionDuration,
-      const Duration(milliseconds: 280),
-    );
+    expect(titoDexReverseTransitionDuration, const Duration(milliseconds: 280));
     expect(route.opaque, isTrue);
     // Single-page stack: the gesture is disabled only because dex isFirst.
     // With home underneath (covered in the fade harness below), the dex route
@@ -100,6 +97,29 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Dex list stays mounted when a nested detail drops Hero extra', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const _DexNestedRouteHarness());
+    await tester.pumpAndSettle();
+
+    final harness = tester.state<_DexNestedRouteHarnessState>(
+      find.byType(_DexNestedRouteHarness),
+    );
+    final listState = harness.listKey.currentState!;
+    listState.controller.jumpTo(720);
+    await tester.pump();
+    expect(listState.controller.offset, 720);
+
+    harness.openDetail();
+    await tester.pump();
+
+    expect(harness.listKey.currentState, same(listState));
+    expect(listState.controller.offset, 720);
+    expect(find.byKey(const ValueKey<String>('nested-detail')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Team and Search slide from their matching screen edges', (
     tester,
   ) async {
@@ -151,6 +171,83 @@ void main() {
       await tester.pumpAndSettle();
     }
   });
+}
+
+class _DexNestedRouteHarness extends StatefulWidget {
+  const _DexNestedRouteHarness();
+
+  @override
+  State<_DexNestedRouteHarness> createState() => _DexNestedRouteHarnessState();
+}
+
+class _DexNestedRouteHarnessState extends State<_DexNestedRouteHarness> {
+  final listKey = GlobalKey<_TrackedDexListState>();
+  bool _detailOpen = false;
+
+  void openDetail() => setState(() => _detailOpen = true);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Navigator(
+        pages: [
+          titoHomePage<void>(
+            key: const ValueKey<String>('nested-home'),
+            child: const Material(
+              child: Center(
+                child: Hero(
+                  tag: TitoHomeActionHero.dex,
+                  child: SizedBox(width: 120, height: 72),
+                ),
+              ),
+            ),
+          ),
+          titoDexPage<void>(
+            key: const ValueKey<String>('nested-dex'),
+            heroTag: _detailOpen ? null : TitoHomeActionHero.dex,
+            child: const ColoredBox(color: Colors.blueGrey),
+            content: _TrackedDexList(key: listKey),
+          ),
+          if (_detailOpen)
+            titoMaterialPage<void>(
+              key: const ValueKey<String>('nested-detail-route'),
+              child: const ColoredBox(
+                key: ValueKey<String>('nested-detail'),
+                color: Colors.white,
+              ),
+            ),
+        ],
+        onDidRemovePage: (_) {},
+      ),
+    );
+  }
+}
+
+class _TrackedDexList extends StatefulWidget {
+  const _TrackedDexList({super.key});
+
+  @override
+  State<_TrackedDexList> createState() => _TrackedDexListState();
+}
+
+class _TrackedDexListState extends State<_TrackedDexList> {
+  final controller = ScrollController(keepScrollOffset: false);
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: controller,
+      itemExtent: 80,
+      itemCount: 30,
+      itemBuilder: (context, index) => Text('Entry $index'),
+    );
+  }
 }
 
 class _DexFadeHarness extends StatefulWidget {
