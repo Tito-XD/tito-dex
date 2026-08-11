@@ -119,7 +119,7 @@
 
 ## K. Pokémon Sleep (Tier A only) ✅
 
-| K1 | **Tier A only** — static tools / links (settings page) | ✅ |
+| K1 | **Tier A only** — local deterministic helpers + links (Search reference section and `/search/sleep-tools`) | ✅ · expanded in v0.8.11 |
 | K2 | No account sync this batch | ✅ |
 
 ---

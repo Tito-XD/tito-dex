@@ -264,7 +264,11 @@ def main() -> int:
                 .isoformat(),
                 "source": {
                     "name": "PokeAPI + 52poke wiki",
-                    "license": "PokeAPI data: CC-BY 4.0; 52poke: CC BY-NC-SA 4.0",
+                    "license": (
+                        "PokeAPI data repository: BSD-3-Clause; 52poke original "
+                        "wiki text: CC BY-NC-SA 3.0; media: upstream/source-page "
+                        "credits, underlying rights vary"
+                    ),
                 },
                 "itemsBySlug": items,
                 "unresolved": sorted(unresolved),
@@ -286,7 +290,11 @@ def main() -> int:
         "fetchedAt": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "source": {
             "name": "PokeAPI + 52poke wiki",
-            "license": "PokeAPI data: CC-BY 4.0; 52poke: CC BY-NC-SA 4.0",
+            "license": (
+                "PokeAPI data repository: BSD-3-Clause; 52poke original wiki "
+                "text: CC BY-NC-SA 3.0; media: upstream/source-page credits, "
+                "underlying rights vary"
+            ),
         },
         "itemsBySlug": items,
         "unresolved": sorted(unresolved),

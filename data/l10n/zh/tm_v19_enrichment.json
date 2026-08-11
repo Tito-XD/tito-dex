@@ -4,11 +4,11 @@
   "sources": [
     {
       "name": "PokeAPI machines + moves",
-      "license": "CC-BY 4.0"
+      "license": "BSD-3-Clause"
     },
     {
       "name": "52poke TM bag icons",
-      "license": "CC BY-NC-SA 4.0"
+      "license": "source page attribution; underlying media rights vary"
     }
   ],
   "itemsBySlug": {

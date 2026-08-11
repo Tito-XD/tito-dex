@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app.dart';
+import 'licenses/third_party_licenses.dart';
 import 'theme/tito_colors.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
+  registerThirdPartyLicenses();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(

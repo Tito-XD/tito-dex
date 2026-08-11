@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · Lite `0.8.10+148` · Offline `0.8.10-offline+149`.
+> **Latest release:** [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · Lite `0.8.11+150` · Offline `0.8.11-offline+151`.
 >
-> **Current `main`:** v0.8.10 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.11 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -16,7 +16,15 @@
 | Offline data | Live bundle v19; compact v14 Offline seed |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
+| Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.11
+
+- Add a dedicated Pokémon Sleep secondary page under Search with overnight sleep duration and score estimates.
+- Add transparent basic cooking-strength estimates using all 19 current ingredients, recipe levels 1–70, recipe bonus, and weekday/Sunday critical references.
+- Pin the ported formulas and values to Neroli’s Lab commit `cb533f2`, bundle its Apache-2.0 license and NOTICE, and correct the in-app/root third-party attribution boundaries.
+- Correct 52Poké, PokeAPI/sprites, PokéSprite, Nunito, game-icon and media provenance throughout source metadata, generated audits, Settings, and public documentation.
 
 ## Completed in v0.8.10
 

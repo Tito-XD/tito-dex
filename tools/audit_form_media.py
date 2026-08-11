@@ -30,7 +30,7 @@ DEFAULT_CATALOG = ROOT / "data" / "l10n" / "zh" / "media_catalog_52poke.json"
 DEFAULT_EXISTENCE = ROOT / "data" / "dex" / "sprite_version_existence.json"
 DEFAULT_OUTPUT = ROOT / "data" / "dex" / "form_media_audit.json"
 WIKI_API = "https://wiki.52poke.com/api.php"
-WIKI_LICENSE = "CC BY-NC-SA 4.0"
+WIKI_MEDIA_RIGHTS = "source page attribution; underlying media rights vary"
 USER_AGENT = "TitoDex-form-media-audit/1.0 (maintainer data build)"
 RETRIES = 4
 INTENTIONALLY_SHARED_VISUAL_SPECIES = {414, 664, 665}
@@ -669,7 +669,7 @@ def _ensure_pokeapi_catalog_art(
                 "mappingStatus": "exact",
                 "url": url,
                 "source": "PokeAPI",
-                "license": "CC-BY 4.0",
+                "license": "upstream credits; media rights vary",
                 "mediaType": "static",
                 "isShiny": shiny,
                 "urlVerified": True,
@@ -810,7 +810,9 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
                     else _mapping_status(keys),
                     "url": direct_url,
                     "source": source,
-                    "license": "CC-BY 4.0" if source == "PokeAPI" else WIKI_LICENSE,
+                    "license": "upstream credits; media rights vary"
+                    if source == "PokeAPI"
+                    else WIKI_MEDIA_RIGHTS,
                     "mediaType": "static",
                     "isShiny": is_shiny,
                 }
@@ -1007,8 +1009,12 @@ def build_audit(args: argparse.Namespace) -> dict[str, Any]:
                         else None,
                     },
                     "attribution": [
-                        "PokeAPI/sprites (CC-BY 4.0)",
-                        *([f"52Poké Wiki ({WIKI_LICENSE})"] if wiki_art or specific_cries else []),
+                        "PokeAPI/sprites (upstream credits; media rights vary)",
+                        *(
+                            [f"52Poké Wiki ({WIKI_MEDIA_RIGHTS})"]
+                            if wiki_art or specific_cries
+                            else []
+                        ),
                     ],
                 }
             )

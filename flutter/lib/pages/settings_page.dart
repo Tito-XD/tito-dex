@@ -1025,12 +1025,27 @@ class _SettingsPageState extends State<SettingsPage> {
         SettingsExpandableSection(
           title: AppZh.settingsAttributionTitle,
           subtitle: AppZh.settingsAttributionHint,
-          child: SelectableText(
-            AppZh.settingsAttributionBody,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              height: 1.5,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SelectableText(
+                AppZh.settingsAttributionBody,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => showLicensePage(
+                  context: context,
+                  applicationName: 'TitoDex',
+                  applicationLegalese: AppZh.settingsUnofficialNotice,
+                ),
+                icon: const Icon(Icons.description_outlined),
+                label: const Text(AppZh.settingsOpenSourceLicenses),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),

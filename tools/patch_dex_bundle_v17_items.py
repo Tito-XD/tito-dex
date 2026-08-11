@@ -167,7 +167,11 @@ def build(args: argparse.Namespace) -> None:
         {
             "version": BUNDLE_VERSION,
             "downloadedAt": published_at,
-            "itemCatalogSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "itemCatalogSource": (
+                "PokeAPI data (BSD-3-Clause) + 52poke original wiki text "
+                "(CC BY-NC-SA 3.0) + media with upstream/source-page credits "
+                "(underlying rights vary)"
+            ),
             "itemsAdded": added,
             "itemSpritesCopied": copied,
         }
@@ -203,7 +207,11 @@ def build(args: argparse.Namespace) -> None:
             "archiveSha256": archive_sha,
             "archiveSizeBytes": (versioned / ARCHIVE_NAME).stat().st_size,
             "publishedAt": published_at,
-            "itemCatalogSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "itemCatalogSource": (
+                "PokeAPI data (BSD-3-Clause) + 52poke original wiki text "
+                "(CC BY-NC-SA 3.0) + media with upstream/source-page credits "
+                "(underlying rights vary)"
+            ),
             "itemsAdded": added,
         }
     )

@@ -8,9 +8,9 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+148` | HGSS 丰富同步、可靠的图鉴详情返回与完整 Credits |
-| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+149` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
-| `main` 源码基线 | App `0.8.10+148` | 存档信息、现有 UI、来源与权利说明统一对齐 |
+| Lite APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11+150` | 内置 Pokémon Sleep 试算与可审计的第三方 Credits |
+| Offline APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11-offline+151` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
+| `main` 源码基线 | App `0.8.11+150` | 功能、UI、来源、许可证与权利说明统一对齐 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
@@ -28,6 +28,7 @@
 - **资料中心**：招式、特性、性格、蛋群、道具、天气、场地和异常状态；道具可用性与价格、招式和机制会跟随所选游戏与世代。
 - **队伍辅助**：队伍页展示招式、特性与下一阶段进化，可将成员和攻击招式直接带入伤害速算。
 - **对战工具**：属性克制、能力值与伤害估算、队伍盲点，以及特性、道具、天气、场地、异常状态和太晶修正；计算假设会明确展示。
+- **Pokémon Sleep 小工具**：搜索资料页内置睡眠分数与料理基础能量试算，支持跨午夜时长、19 种食材、1–70 级食谱倍率与固有加成；公式固定追溯到 Neroli’s Lab 提交并随包提供 Apache-2.0 许可证。
 - **Android 快捷入口**：长按 App 图标默认显示“图鉴 + 搜索”，可在设置中自定义至多三个二级功能。
 - **原生应用联动**：选择已安装的模拟器或游戏应用，从 TitoDex 快速继续游玩。
 - **离线优先**：可下载带中文标签、地图、配置和图标的图鉴数据；Offline 版本首次启动直接准备已验证的本地种子。
@@ -56,7 +57,7 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.10-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.10-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.11-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.11-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置同一套核心数据，首次启动会准备随包数据，适合网络不稳定的设备。
@@ -90,6 +91,7 @@ flutter run -d chrome    # 功能有限的 Web 预览
 | [发布构建](docs/RELEASE_BUILD.md) | APK 构建和校验清单 |
 | [Release Notes](docs/RELEASES.md) | 中文优先的发布文案规范与历史 |
 | [数据来源与 Credits](CREDITS.md) | 数据、媒体、开放许可与非官方声明 |
+| [第三方许可证](THIRD_PARTY_NOTICES.md) | 随包字体、图标、依赖 notices 与权利边界 |
 
 ## HGSS 测试存档
 

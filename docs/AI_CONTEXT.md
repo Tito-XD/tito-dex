@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) |
-| **`main` / lite source** | `0.8.10+148` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.10-offline+149` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) |
+| **`main` / lite source** | `0.8.11+150` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.11-offline+151` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -39,9 +39,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.10)
+## Current feature status (latest release line: v0.8.11)
 
-> v0.8.10 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
+> v0.8.11 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
@@ -72,7 +72,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **Full item catalog (bundle v19):** 2130 items across 16 `categoryZh` groups with 2130/2130 Chinese descriptions and 2130/2130 local icons. Shared artwork is explicit: 300 Dynamax Crystals, 100 TRs, 230 type-mapped TMs, 25 TM materials, and other intentional template groups are not counted as unique art. Only `bw-grass-tablecloth` remains an explicitly labelled generic-template fallback. The audit now assigns explicit or inherited-pipeline provenance to every record; no item remains unclassified.
 - **Form media catalog (bundle v19):** 1025 species and 803 forms (554 alternates) are audited independently by static, shiny static, animated, shiny animated, and cry availability. Alternate coverage is 548 / 497 / 386 / 386 / 554; 143 have form-specific cries. Six Koraidon/Miraidon ride modes have no separate upstream static artwork and remain named gaps rather than borrowing another mode. `data/dex/form_media_audit.json` is the machine-readable source of truth.
 - PokeAPI media uses one pinned `PokeAPI/sprites` commit and a generated exact-file manifest; 52poke art uses MediaWiki `imageinfo` plus successful original-file requests. The app maps catalog records directly to `formKey`, separates normal/shiny and static/animated candidates, caches selected art, and never gives same-ID cosmetic forms the default animation. Cry matching is explicit rather than suffix substring guessing.
-- Data source priority: PokeAPI (lowercase `zh-hans`) for names and in-game descriptions, then 52poke (CC BY-NC-SA 4.0) for gaps and newer original-resolution bag icons. Item icons are bundled rather than hotlinked; cries/animations/HOME art remain online and cached on demand.
+- Data source priority: PokeAPI (lowercase `zh-hans`) for names and in-game descriptions, then 52poke for gaps and newer original-resolution bag icons. 52poke original wiki content is CC BY-NC-SA 3.0; official game media found through its file pages retains its underlying rights and must not be blanket-labelled as CC content. Item icons are bundled rather than hotlinked; cries/animations/HOME art remain online and cached on demand.
 - Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
 - Build: `tools/build_items_dataset.py` → `tools/enrich_items_52poke.py` / `enrich_items_52poke_search.py` → `tools/patch_dex_bundle_v11_items.py`. The category-filter option list in `flutter/lib/pages/dex/dex_json_reference_page.dart` must stay in sync with the `categoryZh` groups.
 - Attribution ships in the bundle as `ITEMS_ATTRIBUTION.txt`.
@@ -89,6 +89,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - **Stackable dex axes** (`DexFilter`): body style × colour (multi-select set) × relative size × generation × tag, intersected with at most one reference drill-down. Size buckets are cut from the real 1025-species height distribution (~19/29/24/16/13 %).
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
+### Pokémon Sleep tools
+- v0.8.11 replaces the link-only Search section with a reachable `/search/sleep-tools` secondary page while retaining Neroli’s Lab website, guide, and documentation links.
+- Offline sleep-score estimation supports same-day and across-midnight sessions and caps at 100 after 8 h 30 min.
+- Basic cooking-strength estimation exposes all 19 current ingredient base values, recipe levels 1–70, the recipe-specific bonus input, and weekday/Sunday critical references. It deliberately does not claim to be the full recipe, pot, inventory, team-production, or long-term simulator.
+- Formula/value ports are pinned to Neroli’s Lab commit `cb533f240a0551da315151c310b4dbd165091672` under Apache-2.0. The complete license and upstream NOTICE ship in APK assets and are registered in Flutter’s license page. Chinese ingredient names follow the 52Poké Pokémon Sleep ingredient catalog under CC BY-NC-SA 3.0.
+
 ### Data → behavior → UI alignment audit (2026-08-08)
 
 | Runtime data | Behavior | Reachable UI |
@@ -100,7 +106,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 | `location_index.json` | selected-version area tree and save-location match | Compact Location Dex grid/sheet + Journey card/page |
 | Moves + `move_version_matrix.json`; items + `item_version_matrix.json`; abilities, natures, egg groups, weather, terrain, status | selected-game filtering, scoped prices, reference search/detail and supported species drill-down | Search reference hub, Team assistance, quick damage + configurable app shortcuts |
 | `media_catalog_52poke.json` | form-aware art/animation/cry candidates | companion, picker, media resource page |
-| `app_config.json` | remotely updateable Tier-A link copy | Search → Pokémon Sleep tools |
+| `app_config.json` + pinned Sleep formula/value constants | remotely updateable external links plus deterministic offline calculations | Search → Pokémon Sleep section → dedicated secondary page |
 
 `form_media_audit.json`, `item_media_audit_v19.json`, attribution files,
 `games.json`, and `types.json` are bundle verification/build provenance rather
@@ -109,13 +115,23 @@ The audit removed unused `DexFilter.natureSlug` / `itemId` states instead of
 advertising filters with no implementation. No confirmed runtime feature is
 left without a UI entry after this pass.
 
-Human-visible attribution is maintained in root `CREDITS.md` and Settings →
-“关于 TitoDex · 数据来源与许可”. The always-visible Settings notice states
+Human-visible attribution is maintained in root `CREDITS.md`,
+`THIRD_PARTY_NOTICES.md`, and Settings → “关于 TitoDex · 数据来源与许可”.
+Settings also exposes Flutter's package notices plus the explicitly registered
+Nunito OFL and PokéSprite MIT licenses. The always-visible Settings notice states
 that TitoDex is an unofficial learning/personal-play tool with no affiliation,
 authorization, sponsorship, or endorsement by Nintendo, Creatures, GAME FREAK,
 The Pokémon Company, or their affiliates.
 
+**Attribution correction (2026-08-10):** source metadata now uses 52poke's
+official CC BY-NC-SA 3.0 site license, PokeAPI/PokeAPI api-data BSD-3-Clause,
+and treats PokeAPI/sprites/official media as rights-varying instead of applying
+an unsupported blanket Creative Commons claim. Live bundle v19 is immutable and still carries historical
+attribution text; publish corrected bundle metadata only under a new bundle
+version/object set rather than overwriting v19 objects.
+
 ### Latest release-line highlights
+- v0.8.11: adds offline Pokémon Sleep score and basic cooking-strength tools from a pinned Neroli’s Lab commit, bundles its Apache-2.0 license/NOTICE, and completes the attribution correction across 52Poké, PokeAPI/sprites, PokéSprite, Nunito, game icons, generated media metadata, Settings, and public documentation.
 - v0.8.10: expands fixture-verified HGSS sync into rich party and trainer data, corrects current/max HP parsing, keeps the Dex route mounted and its return position stable across nested detail navigation, and makes complete data/media credits plus the unofficial-project notice visible in Settings and both READMEs.
 - v0.8.9: repairs media resource management and adds retry; makes companion positioning full-screen and smooth; scopes items, prices, moves and mechanics to the selected game/generation; compacts Location Dex into a missing-first drill-down; and connects parsed party abilities/moves/evolution routes to Team and quick damage. HGSS shows separate Johto/Kanto badge progress, Journey sync time is corrected, and exact HeartGold/SoulSilver selection is no longer represented by a hard-coded SoulSilver team heading.
 - v0.8.8: completes the three-phase correctness and UI closure: hardened l10n/release source binding, configurable Android app shortcuts, location dex, mechanics-aware evolution planning, improved save parsing and fixture gates, canonical Chinese dex axes, explicit battle assumptions, and a Journey save assistant that connects location, party evolution and exact-version completion data. Runtime data-to-UI alignment is audited and covered by 373 Flutter tests.
@@ -277,8 +293,8 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 **Known baseline:** `flutter analyze --no-pub` is expected to be clean;
 `flutter test --no-pub` is the regression gate.
 
-**Verified v0.8.10 fix rebuild candidate (2026-08-10):** `flutter analyze` has
-no issues and all 391 Flutter tests pass. Android native shortcut and
+**Verified v0.8.11 release candidate (2026-08-11):** `flutter analyze` has
+no issues; all 401 Flutter tests and all 132 Python tooling tests pass. Android native shortcut and
 media smoke coverage runs on an x86_64 emulator in CI; APK packaging and
 physical-device release acceptance remain separate release gates.
 

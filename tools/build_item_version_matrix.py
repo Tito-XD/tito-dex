@@ -474,12 +474,12 @@ def main() -> None:
             {
                 "name": "PokeAPI",
                 "url": "https://github.com/PokeAPI/pokeapi/tree/master/data/v2/csv",
-                "license": "CC-BY 4.0",
+                "license": "BSD-3-Clause",
             },
             {
                 "name": "52poke",
                 "url": "https://wiki.52poke.com",
-                "license": "CC BY-NC-SA 4.0",
+                "license": "CC BY-NC-SA 3.0",
             },
         ],
         "coverage": {

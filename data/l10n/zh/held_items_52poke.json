@@ -3,7 +3,7 @@
   "source": {
     "name": "52poke wiki",
     "url": "https://wiki.52poke.com",
-    "license": "CC BY-NC-SA 4.0",
+    "license": "CC BY-NC-SA 3.0",
     "note": "Wild held items for versions missing from PokeAPI"
   },
   "fetchedAt": "2026-08-06T02:56:23+00:00",

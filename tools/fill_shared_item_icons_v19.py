@@ -28,7 +28,7 @@ DEFAULT_SPRITES = ROOT / "data" / "assets" / "item-sprites"
 DEFAULT_OUTPUT = (
     ROOT / "data" / "l10n" / "zh" / "item_media_overrides_v19.json"
 )
-WIKI_LICENSE = "CC BY-NC-SA 4.0"
+WIKI_MEDIA_RIGHTS = "source page attribution; underlying media rights vary"
 SHARED_TM_MATERIAL_SLUGS = {
     "arrokuda-scales",
     "carbink-jewel",
@@ -196,7 +196,7 @@ def main() -> int:
             "spriteSource": "52poke",
             "spriteSourceFile": file_name,
             "spriteSourceUrl": info["url"],
-            "spriteLicense": WIKI_LICENSE,
+            "spriteLicense": WIKI_MEDIA_RIGHTS,
             "spriteWidth": info["width"],
             "spriteHeight": info["height"],
         }

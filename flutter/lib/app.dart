@@ -44,6 +44,7 @@ import 'pages/dex/dex_json_reference_page.dart';
 import 'pages/dex/silhouette_quiz_page.dart';
 import 'pages/search_page.dart';
 import 'pages/settings_page.dart';
+import 'pages/sleep_tools_page.dart';
 import 'pages/team_page.dart';
 import 'theme/tito_theme.dart';
 import 'theme/tito_typography.dart';
@@ -271,6 +272,13 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: QuickDamagePage(journey: _journey),
                     ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'sleep-tools',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: const TitoPageContainer(child: SleepToolsPage()),
                   ),
                 ),
                 GoRoute(

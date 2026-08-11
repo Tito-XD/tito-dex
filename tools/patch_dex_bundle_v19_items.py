@@ -128,7 +128,10 @@ def apply_enrichment(
         if source_file:
             item.setdefault("spriteSource", "52poke")
             item.setdefault("spriteSourceFile", source_file)
-            item.setdefault("spriteLicense", "CC BY-NC-SA 4.0")
+            item.setdefault(
+                "spriteLicense",
+                "source page attribution; underlying media rights vary",
+            )
             dimensions = patch.get("spriteDimensions") or []
             if len(dimensions) == 2:
                 item.setdefault("spriteWidth", dimensions[0])
@@ -159,7 +162,7 @@ def apply_enrichment(
         icon_path = sprite_dest / f"{item['slug']}.png"
         if icon_path.is_file() and not item.get("spriteSource"):
             item["spriteSource"] = "PokeAPI item sprites (inherited v11)"
-            item.setdefault("spriteLicense", "CC-BY 4.0")
+            item.setdefault("spriteLicense", "upstream credits; media rights vary")
 
     items_path.write_text(
         json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -186,9 +189,11 @@ def update_attribution(staging: Path) -> None:
     text = path.read_text(encoding="utf-8")
     addition = (
         "\nNewer high-resolution bag icons and additional Simplified-Chinese item "
-        "descriptions are sourced from 神奇宝贝百科 (52Poké Wiki) under the "
-        "same CC BY-NC-SA 4.0 license. Original-resolution files are bundled; "
-        "the app does not hotlink wiki images.\n"
+        "descriptions are sourced from 神奇宝贝百科 (52Poké Wiki). Original "
+        "wiki text is used under CC BY-NC-SA 3.0; file pages are retained as "
+        "provenance for hosted media whose underlying rights vary. "
+        "Original-resolution files are bundled; the app does not hotlink "
+        "wiki images.\n"
     )
     if "Newer high-resolution bag icons" not in text:
         path.write_text(text.rstrip() + "\n" + addition, encoding="utf-8")
@@ -295,7 +300,7 @@ def fill_media_tails(staging: Path) -> int:
                     "mappingStatus": "exact",
                     "url": url,
                     "source": "PokeAPI",
-                    "license": "CC-BY 4.0",
+                    "license": "upstream credits; media rights vary",
                     "mediaType": "static",
                     "isShiny": False,
                     "urlVerified": True,
@@ -385,7 +390,11 @@ def build(args: argparse.Namespace) -> dict[str, int]:
         {
             "version": BUNDLE_VERSION,
             "downloadedAt": published_at,
-            "itemCatalogSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "itemCatalogSource": (
+                "PokeAPI (BSD-3-Clause) + 52poke original wiki text "
+                "(CC BY-NC-SA 3.0) + source-page-attributed media "
+                "(underlying rights vary)"
+            ),
             "itemDescriptionCoverage": stats["descriptionCoverage"],
             "itemSpriteCount": stats["spriteCoverage"],
             "itemHighResolutionSprites": True,

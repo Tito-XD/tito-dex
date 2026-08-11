@@ -4,7 +4,7 @@
 Merges ``data/l10n/zh/held_items_52poke.json`` into each detail's
 ``heldItems``: existing PokeAPI entries are kept, 52poke rates override the
 same version, and versions missing from the bundle are added. Adds a
-CC BY-NC-SA 4.0 attribution file and bumps both manifests to v16. Never
+CC BY-NC-SA 3.0 attribution file and bumps both manifests to v16. Never
 uploads to R2.
 """
 
@@ -221,14 +221,14 @@ def write_attribution(upload_root: Path, held_data: dict[str, Any]) -> None:
     source = held_data.get("source") or {}
     lines = [
         "TitoDex wild held-item data for versions missing from PokeAPI",
-        "comes from 52poke wiki and is used under CC BY-NC-SA 4.0.",
+        "comes from 52poke wiki and is used under CC BY-NC-SA 3.0.",
         "",
         f"Source: {source.get('url', 'https://wiki.52poke.com')}",
-        f"License: {source.get('license', 'CC BY-NC-SA 4.0')}",
+        f"License: {source.get('license', 'CC BY-NC-SA 3.0')}",
         f"FetchedAt: {held_data.get('fetchedAt', '')}",
         f"Species: {len(held_data.get('entries', []))}",
         "",
-        "52poke (神奇宝贝百科) content is licensed under CC BY-NC-SA 4.0.",
+        "52poke (神奇宝贝百科) content is licensed under CC BY-NC-SA 3.0.",
         "The original pages remain the canonical source of the data.",
     ]
     (upload_root / "HELD_ITEMS_ATTRIBUTION.txt").write_text(
@@ -277,7 +277,7 @@ def build(args: argparse.Namespace) -> None:
         {
             "version": BUNDLE_VERSION,
             "downloadedAt": published_at,
-            "heldItemsSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "heldItemsSource": "PokeAPI + 52poke (CC BY-NC-SA 3.0)",
             "heldItemsPatchedSpecies": patched,
         }
     )
@@ -313,7 +313,7 @@ def build(args: argparse.Namespace) -> None:
             "archiveSha256": archive_sha,
             "archiveSizeBytes": (versioned / ARCHIVE_NAME).stat().st_size,
             "publishedAt": published_at,
-            "heldItemsSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "heldItemsSource": "PokeAPI + 52poke (CC BY-NC-SA 3.0)",
             "heldItemsPatchedSpecies": patched,
         }
     )

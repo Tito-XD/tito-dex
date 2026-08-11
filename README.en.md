@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10+148` | Rich HGSS sync, stable Dex detail returns, and complete credits |
-| Offline APK | [v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10) · App `0.8.10-offline+149` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.10+148` | Save data, reachable UI, attribution, and rights notices aligned |
+| Lite APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11+150` | Built-in Pokémon Sleep estimates and auditable third-party credits |
+| Offline APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11-offline+151` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.11+150` | Features, reachable UI, attribution, licenses, and rights notices aligned |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -28,6 +28,7 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 - **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status; item availability/prices, moves, and mechanics follow the selected game and generation.
 - **Party assistance** — inspect moves, abilities, and next evolutions, then hand a party member and damaging move directly to the quick damage tool.
 - **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers with explicit assumptions.
+- **Pokémon Sleep utilities** — offline sleep-score and basic cooking-strength estimates with overnight duration, 19 ingredients, recipe levels 1–70, and recipe bonus; formulas are pinned to Neroli’s Lab with its Apache-2.0 license bundled in the app.
 - **Android shortcuts** — long-press the app icon for Dex and Search by default; Settings can customize up to three secondary destinations.
 - **Native Android handoff** — select an installed emulator or game app and resume from TitoDex.
 - **Offline-first data** — downloadable Dex bundle with Chinese labels, maps, configuration, icons, and list sprites; the Offline APK starts from a verified local seed.
@@ -56,7 +57,7 @@ Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DEC
 
 ## Install
 
-Download **`TitoDex-0.8.10-lite-rg-arm64.apk`** or **`TitoDex-0.8.10-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.11-lite-rg-arm64.apk`** or **`TitoDex-0.8.11-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 
@@ -87,6 +88,7 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |
 | [Release notes](docs/RELEASES.md) | Chinese-first GitHub Release copy rules and history |
 | [Data sources and credits](CREDITS.md) | Data, media, licenses, and unofficial-project notice |
+| [Third-party notices](THIRD_PARTY_NOTICES.md) | Bundled fonts, icons, package notices, and rights boundaries |
 
 ## HGSS test save
 

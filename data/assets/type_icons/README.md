@@ -7,9 +7,10 @@ Bundled PNG icons for CDN offline bundle (`v3/type_icons/{type}.png`).
 | Field | Value |
 | --- | --- |
 | Project | [msikma/pokesprite](https://github.com/msikma/pokesprite) |
+| Pinned commit | `c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e` |
 | Set | `misc/types/gen8/` (Sword/Shield style) |
-| Metadata | [data/misc.json → `types`](https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json) |
-| License | [MIT](https://github.com/msikma/pokesprite/blob/master/LICENSE) |
+| Metadata | [data/misc.json → `types`](https://github.com/msikma/pokesprite/blob/c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e/data/misc.json) |
+| License | [MIT](https://github.com/msikma/pokesprite/blob/c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e/license.md) |
 | Fetched via | `tools/fetch_pokesprite_type_icons.py` |
 
 PokéSprite has not received major updates since ~2022, but the Gen 8 type icon set is complete (including `fairy`) and stable. Files are **vendored here** so TitoDex does not depend on GitHub availability at build time.

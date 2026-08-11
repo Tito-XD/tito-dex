@@ -20,7 +20,9 @@ text rows that load https://dex.tito.cafe/v5/game_icons/<slug>.png.
 
 from __future__ import annotations
 
+import argparse
 import io
+import json
 import subprocess
 import sys
 import time
@@ -36,11 +38,13 @@ from build_dex_bundle import optimize_png  # noqa: E402
 ASSET_DIR = ROOT / "flutter" / "assets" / "game_icons"
 CDN_DIR = ROOT / "dist" / "game_icons_upload" / "v5" / "game_icons"
 DOWNLOAD_CACHE = ROOT / "tools" / ".icon_cache"
+SOURCE_MANIFEST = ASSET_DIR / "SOURCES.json"
 
 BULBA_FILE = "https://archives.bulbagarden.net/media/upload/{}"
 SGDB_FILE = "https://cdn2.steamgriddb.com/icon/{}.png"
+POKEAPI_SPRITES_COMMIT = "8777f5066431f39fbe07614e0250a61b2029671c"
 POKEAPI_ART = (
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
+    f"https://raw.githubusercontent.com/PokeAPI/sprites/{POKEAPI_SPRITES_COMMIT}/"
     "sprites/pokemon/other/official-artwork/{}.png"
 )
 
@@ -256,7 +260,78 @@ def _flavor_png(flavor: str) -> bytes | None:
     return None
 
 
+def _source_record(flavor: str) -> dict[str, str | int]:
+    if flavor in HOME_ICONS:
+        return {
+            "provider": "Bulbagarden Archives",
+            "sourceUrl": BULBA_FILE.format(HOME_ICONS[flavor]),
+            "sourceKey": HOME_ICONS[flavor],
+            "mediaKind": "Pokémon HOME game icon",
+            "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders",
+        }
+    if flavor in SGDB_ICONS:
+        source_key = SGDB_ICONS[flavor]
+        return {
+            "provider": "SteamGridDB community host",
+            "sourceUrl": SGDB_FILE.format(source_key),
+            "sourceKey": source_key,
+            "mediaKind": "official game launch icon hosted by the community",
+            "contributor": "not retained by the original TitoDex download pipeline",
+            "rights": "Rights vary; source hosting does not imply an open-content license",
+        }
+    pokemon_id = FALLBACK_ART_BADGES[flavor][0]
+    return {
+        "provider": "PokeAPI/sprites",
+        "sourceUrl": POKEAPI_ART.format(pokemon_id),
+        "sourceKey": pokemon_id,
+        "mediaKind": "official Pokémon artwork in a TitoDex-rendered badge",
+        "rights": "Official Pokémon media; upstream credits apply and rights vary",
+    }
+
+
+def write_source_manifest() -> None:
+    flavors = sorted(set(HOME_ICONS) | set(SGDB_ICONS) | set(FALLBACK_ART_BADGES))
+    payload = {
+        "schemaVersion": 1,
+        "auditedAt": "2026-08-10",
+        "notes": [
+            "Every output is resized and rounded by TitoDex; source rights are not changed by that transformation.",
+            "SteamGridDB uploader identities were not retained by the original pipeline, so the exact CDN key and limitation are recorded instead of guessing an author.",
+            "Bulbagarden and PokeAPI media entries are source locations, not claims that official Pokémon media is openly licensed.",
+        ],
+        "flavorAssets": {
+            f"{flavor}.png": _source_record(flavor) for flavor in flavors
+        },
+        "mergedAssets": {
+            f"{slug}.png": {"derivedFrom": f"{flavor}.png"}
+            for slug, flavor in sorted(MERGED_TO_FLAVOR.items())
+        },
+        "cdnAssets": {
+            f"v5/game_icons/{slug}.png": {"derivedFrom": f"{flavor}.png"}
+            for slug, flavor in sorted(CDN_TO_FLAVOR.items())
+        },
+    }
+    SOURCE_MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    SOURCE_MANIFEST.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--manifest-only",
+        action="store_true",
+        help="write the audited source manifest without downloading or rendering icons",
+    )
+    args = parser.parse_args()
+
+    write_source_manifest()
+    if args.manifest_only:
+        print(f"→ {SOURCE_MANIFEST}")
+        return
+
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
     CDN_DIR.mkdir(parents=True, exist_ok=True)
 

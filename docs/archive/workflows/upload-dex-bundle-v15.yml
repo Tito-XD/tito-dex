@@ -117,7 +117,7 @@ jobs:
           cjk = re.compile(r'[\u4e00-\u9fff]')
           root = json.loads(Path("dist/dex-v15/upload/bundle-manifest.json").read_text(encoding="utf-8"))
           assert root["bundleVersion"] == 15 and root["cdnPrefix"] == "v5", root
-          assert root.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)", root
+          assert root.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 3.0)", root
           for sid in (1, 152, 906):
               detail = json.loads(Path(f"dist/dex-v15/upload/v5/details/{sid}.json").read_text(encoding="utf-8"))
               assert any(cjk.search(e.get("text", "")) for e in detail.get("flavorEntries") or []), sid
@@ -179,6 +179,6 @@ jobs:
       - name: Verify public v15 cutover
         if: inputs.publish
         run: |
-          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 15 and m["cdnPrefix"] == "v5" and m.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)" and m["archiveUrl"].endswith("/bundle-v15.tar.zst"), m'
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 15 and m["cdnPrefix"] == "v5" and m.get("flavorTextSource") == "PokeAPI + 52poke (CC BY-NC-SA 3.0)" and m["archiveUrl"].endswith("/bundle-v15.tar.zst"), m'
           curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'
           curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v15.tar.zst | head -n 1
