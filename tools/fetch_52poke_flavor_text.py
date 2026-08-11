@@ -318,7 +318,7 @@ def main() -> int:
                 "source": {
                     "name": "52poke wiki",
                     "url": WIKI_BASE,
-                    "license": "CC BY-NC-SA 4.0",
+                    "license": "CC BY-NC-SA 3.0",
                     "note": "Flavor text for versions missing zh-Hans in PokeAPI",
                 },
                 "fetchedAt": datetime.now(timezone.utc)
@@ -337,7 +337,7 @@ def main() -> int:
         "source": {
             "name": "52poke wiki",
             "url": WIKI_BASE,
-            "license": "CC BY-NC-SA 4.0",
+            "license": "CC BY-NC-SA 3.0",
             "note": "Flavor text for versions missing zh-Hans in PokeAPI",
         },
         "fetchedAt": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),

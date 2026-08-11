@@ -168,13 +168,13 @@ class PatchDetailsTests(unittest.TestCase):
             write_attribution(
                 root,
                 {
-                    "source": {"url": "https://wiki.52poke.com", "license": "CC BY-NC-SA 4.0"},
+                    "source": {"url": "https://wiki.52poke.com", "license": "CC BY-NC-SA 3.0"},
                     "fetchedAt": "2026-08-05T00:00:00+00:00",
                     "entries": [{"id": 152}],
                 },
             )
             text = (root / "FLAVOR_ATTRIBUTION.txt").read_text(encoding="utf-8")
-            self.assertIn("CC BY-NC-SA 4.0", text)
+            self.assertIn("CC BY-NC-SA 3.0", text)
             self.assertIn("wiki.52poke.com", text)
 
 

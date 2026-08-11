@@ -3,7 +3,7 @@
   "fetchedAt": "2026-08-06T05:18:24+00:00",
   "source": {
     "name": "PokeAPI + 52poke wiki",
-    "license": "PokeAPI data: CC-BY 4.0; 52poke: CC BY-NC-SA 4.0"
+    "license": "PokeAPI data repository: BSD-3-Clause; 52poke original wiki text: CC BY-NC-SA 3.0; media: upstream/source-page credits, underlying rights vary"
   },
   "itemsBySlug": {
     "amulet-coin": {

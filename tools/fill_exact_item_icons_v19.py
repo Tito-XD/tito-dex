@@ -11,7 +11,7 @@ from pathlib import Path
 import requests
 
 from enrich_items_v19 import USER_AGENT
-from fill_shared_item_icons_v19 import WIKI_LICENSE, resolve_and_download
+from fill_shared_item_icons_v19 import WIKI_MEDIA_RIGHTS, resolve_and_download
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,7 +52,7 @@ def main() -> int:
             "spriteSource": "52poke",
             "spriteSourceFile": file_name,
             "spriteSourceUrl": info["url"],
-            "spriteLicense": WIKI_LICENSE,
+            "spriteLicense": WIKI_MEDIA_RIGHTS,
             "spriteWidth": info["width"],
             "spriteHeight": info["height"],
         }

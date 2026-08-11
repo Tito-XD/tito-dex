@@ -197,8 +197,11 @@ def main() -> int:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "sources": [
-            {"name": "PokeAPI machines + moves", "license": "CC-BY 4.0"},
-            {"name": "52poke TM bag icons", "license": "CC BY-NC-SA 4.0"},
+            {"name": "PokeAPI machines + moves", "license": "BSD-3-Clause"},
+            {
+                "name": "52poke-hosted TM bag icons",
+                "license": "source page attribution; underlying media rights vary",
+            },
         ],
         "itemsBySlug": resolved,
     }

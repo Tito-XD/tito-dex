@@ -59,9 +59,10 @@ TYPE_ICON_BASE = (
     "https://raw.githubusercontent.com/PokeAPI/sprites/master/"
     "sprites/types/generation-iii/colosseum"
 )
+POKESPRITE_COMMIT = "c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e"
 POKESPRITE_TYPE_ICON_DIR = ROOT / "data" / "assets" / "type_icons"
 POKESPRITE_RAW_BASE = (
-    "https://raw.githubusercontent.com/msikma/pokesprite/master/misc"
+    f"https://raw.githubusercontent.com/msikma/pokesprite/{POKESPRITE_COMMIT}/misc"
 )
 BUNDLE_VERSION = 7
 BUNDLE_CDN_PREFIX = "v5"
@@ -601,7 +602,7 @@ class PokeApiBuilder:
         if not hasattr(self, "_pokesprite_type_paths"):
             request = requests.Request(
                 "GET",
-                "https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json",
+                f"https://raw.githubusercontent.com/msikma/pokesprite/{POKESPRITE_COMMIT}/data/misc.json",
                 headers={"User-Agent": "TitoDex-maintainer/1.0"},
             )
             prepared = self.session.prepare_request(request)

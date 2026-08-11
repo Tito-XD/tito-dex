@@ -201,7 +201,7 @@ def main() -> int:
                 "source": {
                     "name": "52poke wiki",
                     "url": "https://wiki.52poke.com",
-                    "license": "CC BY-NC-SA 4.0",
+                    "license": "CC BY-NC-SA 3.0",
                     "note": "Wild held items for versions missing from PokeAPI",
                 },
                 "fetchedAt": datetime.now(timezone.utc)

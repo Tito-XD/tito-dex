@@ -3,7 +3,7 @@
   "source": {
     "name": "52poke wiki",
     "url": "https://wiki.52poke.com",
-    "license": "CC BY-NC-SA 4.0",
+    "license": "CC BY-NC-SA 3.0",
     "note": "Flavor text for versions missing zh-Hans in PokeAPI"
   },
   "fetchedAt": "2026-08-05T10:42:44+00:00",

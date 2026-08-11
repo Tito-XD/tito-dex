@@ -130,7 +130,9 @@ def build(args: argparse.Namespace) -> None:
                 "file": "media_catalog_52poke.json",
                 "entries": len(catalog),
                 "bytes": catalog_size,
-                "source": "52poke wiki (CC BY-NC-SA 4.0)",
+                "source": (
+                    "52poke source pages; underlying media rights vary"
+                ),
             },
         }
     )

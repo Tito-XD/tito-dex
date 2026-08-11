@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-08-10",
+  "notes": [
+    "Every output is resized and rounded by TitoDex; source rights are not changed by that transformation.",
+    "SteamGridDB uploader identities were not retained by the original pipeline, so the exact CDN key and limitation are recorded instead of guessing an author.",
+    "Bulbagarden and PokeAPI media entries are source locations, not claims that official Pokémon media is openly licensed."
+  ],
+  "flavorAssets": {
+    "alpha-sapphire.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/e/e3/HOME_Alpha_Sapphire_icon.png",
+      "sourceKey": "e/e3/HOME_Alpha_Sapphire_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "black.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/8d65294979cf7c59fa43f91f993fb5c2.png",
+      "sourceKey": "8d65294979cf7c59fa43f91f993fb5c2",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "black-2.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/f4cbadcb99fd2c1fc88b97adfae24854.png",
+      "sourceKey": "f4cbadcb99fd2c1fc88b97adfae24854",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "blue.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/e4e13c3ff0c5a77ff11d6cb979ba7187.png",
+      "sourceKey": "e4e13c3ff0c5a77ff11d6cb979ba7187",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "brilliant-diamond.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/c/cf/HOME_Brilliant_Diamond_icon.png",
+      "sourceKey": "c/cf/HOME_Brilliant_Diamond_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "champions.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/6/65/HOME_Champions_icon.png",
+      "sourceKey": "6/65/HOME_Champions_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "crystal.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/9052eeb1dacdc32a450c59a90121fe66.png",
+      "sourceKey": "9052eeb1dacdc32a450c59a90121fe66",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "diamond.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/c1ba099b22d65b3903891b885dc686f9.png",
+      "sourceKey": "c1ba099b22d65b3903891b885dc686f9",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "emerald.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/5d12d5a76a9683536eb23a6a1c9767cc.png",
+      "sourceKey": "5d12d5a76a9683536eb23a6a1c9767cc",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "firered.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/a7c1543e35a5fbc383363e39ccb7701d.png",
+      "sourceKey": "a7c1543e35a5fbc383363e39ccb7701d",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "gold.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/c98e1bdd3a3a02c4c664baf039cf630b.png",
+      "sourceKey": "c98e1bdd3a3a02c4c664baf039cf630b",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "heartgold.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/33abbac390f933b4d29d1ccae857ea98.png",
+      "sourceKey": "33abbac390f933b4d29d1ccae857ea98",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "leafgreen.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/e736598ba2c84d7313c8614de041cae3.png",
+      "sourceKey": "e736598ba2c84d7313c8614de041cae3",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "legends-arceus.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/b/ba/HOME_Legends_Arceus_icon.png",
+      "sourceKey": "b/ba/HOME_Legends_Arceus_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "legends-za.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/4/4c/HOME_Legends_Z-A_icon.png",
+      "sourceKey": "4/4c/HOME_Legends_Z-A_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "lets-go-eevee.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/3/3f/HOME_Let%27s_Go_Eevee_icon.png",
+      "sourceKey": "3/3f/HOME_Let%27s_Go_Eevee_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "lets-go-pikachu.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/1/19/HOME_Let%27s_Go_Pikachu_icon.png",
+      "sourceKey": "1/19/HOME_Let%27s_Go_Pikachu_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "mega-dimension.png": {
+      "provider": "PokeAPI/sprites",
+      "sourceUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/8777f5066431f39fbe07614e0250a61b2029671c/sprites/pokemon/other/official-artwork/491.png",
+      "sourceKey": 491,
+      "mediaKind": "official Pokémon artwork in a TitoDex-rendered badge",
+      "rights": "Official Pokémon media; upstream credits apply and rights vary"
+    },
+    "moon.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/2/25/HOME_Moon_icon.png",
+      "sourceKey": "2/25/HOME_Moon_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "omega-ruby.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/b/b7/HOME_Omega_Ruby_icon.png",
+      "sourceKey": "b/b7/HOME_Omega_Ruby_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "pearl.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/a979ca2444b34449a2c80b012749e9cd.png",
+      "sourceKey": "a979ca2444b34449a2c80b012749e9cd",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "platinum.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/691f73fdf1c5edeb3f600c515715a358.png",
+      "sourceKey": "691f73fdf1c5edeb3f600c515715a358",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "red.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/ef8ff3bb5f926198d139c3e9750a3739.png",
+      "sourceKey": "ef8ff3bb5f926198d139c3e9750a3739",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "ruby.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/243153b1d3e9aae08821d40e3b402ffe.png",
+      "sourceKey": "243153b1d3e9aae08821d40e3b402ffe",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "sapphire.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/31482ea3105f2635db24a0077677930f.png",
+      "sourceKey": "31482ea3105f2635db24a0077677930f",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "scarlet.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/2/29/HOME_Scarlet_icon.png",
+      "sourceKey": "2/29/HOME_Scarlet_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "shield.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/c/c8/HOME_Shield_icon.png",
+      "sourceKey": "c/c8/HOME_Shield_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "shining-pearl.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/7/75/HOME_Shining_Pearl_icon.png",
+      "sourceKey": "7/75/HOME_Shining_Pearl_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "silver.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/4d88df11c5d0c37fe147eb1d94f1a06b.png",
+      "sourceKey": "4d88df11c5d0c37fe147eb1d94f1a06b",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "soulsilver.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/1a371879ae7ae905850d5dee733f303e.png",
+      "sourceKey": "1a371879ae7ae905850d5dee733f303e",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "sun.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/7/7c/HOME_Sun_icon.png",
+      "sourceKey": "7/7c/HOME_Sun_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "sword.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/f/fe/HOME_Sword_icon.png",
+      "sourceKey": "f/fe/HOME_Sword_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "ultra-moon.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/b/bb/HOME_Ultra_Moon_icon.png",
+      "sourceKey": "b/bb/HOME_Ultra_Moon_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "ultra-sun.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/b/be/HOME_Ultra_Sun_icon.png",
+      "sourceKey": "b/be/HOME_Ultra_Sun_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "violet.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/9/92/HOME_Violet_icon.png",
+      "sourceKey": "9/92/HOME_Violet_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "white.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/5b97f793636f8baec3ff8cd0ebf5c33c.png",
+      "sourceKey": "5b97f793636f8baec3ff8cd0ebf5c33c",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    },
+    "white-2.png": {
+      "provider": "PokeAPI/sprites",
+      "sourceUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/8777f5066431f39fbe07614e0250a61b2029671c/sprites/pokemon/other/official-artwork/10023.png",
+      "sourceKey": 10023,
+      "mediaKind": "official Pokémon artwork in a TitoDex-rendered badge",
+      "rights": "Official Pokémon media; upstream credits apply and rights vary"
+    },
+    "x.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/7/73/HOME_X_icon.png",
+      "sourceKey": "7/73/HOME_X_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "y.png": {
+      "provider": "Bulbagarden Archives",
+      "sourceUrl": "https://archives.bulbagarden.net/media/upload/d/d5/HOME_Y_icon.png",
+      "sourceKey": "d/d5/HOME_Y_icon.png",
+      "mediaKind": "Pokémon HOME game icon",
+      "rights": "Official Pokémon media; underlying rights reserved by the relevant rights holders"
+    },
+    "yellow.png": {
+      "provider": "SteamGridDB community host",
+      "sourceUrl": "https://cdn2.steamgriddb.com/icon/9cb9c75c1489b79a085eb7f56d82f2bf.png",
+      "sourceKey": "9cb9c75c1489b79a085eb7f56d82f2bf",
+      "mediaKind": "official game launch icon hosted by the community",
+      "contributor": "not retained by the original TitoDex download pipeline",
+      "rights": "Rights vary; source hosting does not imply an open-content license"
+    }
+  },
+  "mergedAssets": {
+    "bdsp.png": {
+      "derivedFrom": "brilliant-diamond.png"
+    },
+    "champions.png": {
+      "derivedFrom": "champions.png"
+    },
+    "lgpe.png": {
+      "derivedFrom": "lets-go-pikachu.png"
+    },
+    "lza.png": {
+      "derivedFrom": "legends-za.png"
+    },
+    "oras.png": {
+      "derivedFrom": "omega-ruby.png"
+    },
+    "pla.png": {
+      "derivedFrom": "legends-arceus.png"
+    },
+    "sm.png": {
+      "derivedFrom": "sun.png"
+    },
+    "sv.png": {
+      "derivedFrom": "scarlet.png"
+    },
+    "swsh.png": {
+      "derivedFrom": "sword.png"
+    },
+    "usum.png": {
+      "derivedFrom": "ultra-sun.png"
+    },
+    "xy.png": {
+      "derivedFrom": "x.png"
+    }
+  },
+  "cdnAssets": {
+    "v5/game_icons/black-2-white-2.png": {
+      "derivedFrom": "black-2.png"
+    },
+    "v5/game_icons/black-white.png": {
+      "derivedFrom": "black.png"
+    },
+    "v5/game_icons/brilliant-diamond-shining-pearl.png": {
+      "derivedFrom": "brilliant-diamond.png"
+    },
+    "v5/game_icons/champions.png": {
+      "derivedFrom": "champions.png"
+    },
+    "v5/game_icons/crystal.png": {
+      "derivedFrom": "crystal.png"
+    },
+    "v5/game_icons/diamond-pearl.png": {
+      "derivedFrom": "diamond.png"
+    },
+    "v5/game_icons/emerald.png": {
+      "derivedFrom": "emerald.png"
+    },
+    "v5/game_icons/firered-leafgreen.png": {
+      "derivedFrom": "firered.png"
+    },
+    "v5/game_icons/gold-silver.png": {
+      "derivedFrom": "gold.png"
+    },
+    "v5/game_icons/heartgold-soulsilver.png": {
+      "derivedFrom": "heartgold.png"
+    },
+    "v5/game_icons/legends-arceus.png": {
+      "derivedFrom": "legends-arceus.png"
+    },
+    "v5/game_icons/lets-go-pikachu-lets-go-eevee.png": {
+      "derivedFrom": "lets-go-pikachu.png"
+    },
+    "v5/game_icons/lza.png": {
+      "derivedFrom": "legends-za.png"
+    },
+    "v5/game_icons/omega-ruby-alpha-sapphire.png": {
+      "derivedFrom": "omega-ruby.png"
+    },
+    "v5/game_icons/platinum.png": {
+      "derivedFrom": "platinum.png"
+    },
+    "v5/game_icons/red-blue.png": {
+      "derivedFrom": "red.png"
+    },
+    "v5/game_icons/ruby-sapphire.png": {
+      "derivedFrom": "ruby.png"
+    },
+    "v5/game_icons/scarlet-violet.png": {
+      "derivedFrom": "scarlet.png"
+    },
+    "v5/game_icons/sun-moon.png": {
+      "derivedFrom": "sun.png"
+    },
+    "v5/game_icons/sword-shield.png": {
+      "derivedFrom": "sword.png"
+    },
+    "v5/game_icons/ultra-sun-ultra-moon.png": {
+      "derivedFrom": "ultra-sun.png"
+    },
+    "v5/game_icons/x-y.png": {
+      "derivedFrom": "x.png"
+    },
+    "v5/game_icons/yellow.png": {
+      "derivedFrom": "yellow.png"
+    }
+  }
+}

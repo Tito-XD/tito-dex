@@ -73,15 +73,16 @@ ATTRIBUTION = """\
 TitoDex offline bundle — item data attribution
 ==============================================
 
-Item list, categories, costs, English names, sprites, and most Simplified-
-Chinese in-game descriptions: PokeAPI (https://pokeapi.co/), which redistributes
-game data. Item grouping follows Bulbapedia's Browse:Items player-facing
-taxonomy.
+Item list, categories, costs, English names, and most Simplified-Chinese
+in-game descriptions: PokeAPI (https://pokeapi.co/); its data repository is
+BSD-3-Clause. Item sprites are located through PokeAPI/sprites and retain the
+upstream credits and varying underlying media rights. Item grouping follows
+Bulbapedia's Browse:Items player-facing taxonomy.
 
 Simplified-Chinese descriptions for the newest items (tera shards, SV mochi and
 masks, Legends: Arceus balls, and a few Gen 9 held items) are sourced from
 神奇宝贝百科 (52Poké Wiki, https://wiki.52poke.com/), licensed under
-CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/).
+CC BY-NC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/).
 
 Pokémon and item names/data are trademarks of Nintendo / Creatures Inc. /
 GAME FREAK inc. TitoDex is a non-commercial fan companion.

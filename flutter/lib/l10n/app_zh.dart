@@ -97,7 +97,32 @@ abstract final class AppZh {
   static const settingsDexProgress = '图鉴进度';
   static const teamSummaryTitle = '队伍概览';
   static const sleepToolsTitle = 'Pokémon Sleep 工具';
-  static const sleepToolsTierAHint = 'Tier A：静态链接，点击复制到剪贴板';
+  static const sleepToolsTierAHint = '内置离线试算，并保留 Neroli’s Lab 资料入口';
+  static const sleepToolsOpen = '打开睡眠与料理试算';
+  static const sleepToolsOpenHint = '睡眠分数 · 食材基础能量 · 食谱等级加成';
+  static const sleepToolsSubtitle = '离线小工具 · 不读取 Pokémon Sleep 账号或记录';
+  static const sleepScoreTitle = '睡眠分数';
+  static const sleepScoreHint = '按入睡与起床时间估算；8 小时 30 分达到 100 分。';
+  static const sleepBedtime = '入睡时间';
+  static const sleepWakeup = '起床时间';
+  static String sleepDurationResult(int hours, int minutes) =>
+      '睡眠时长 $hours 小时 $minutes 分钟';
+  static const sleepRecipeTitle = '料理能量试算（基础）';
+  static const sleepRecipeHint = '添加本次食材并设置食谱等级；这是透明的基础公式，不包含完整食谱、锅容量或队伍生产模拟。';
+  static const sleepIngredientAdd = '点击添加食材（名称 · 单个基础能量）';
+  static const sleepIngredientEmpty = '尚未添加食材。';
+  static const sleepIngredientDecrease = '减少一个';
+  static const sleepIngredientIncrease = '增加一个';
+  static String sleepRecipeLevel(int level) => '食谱等级 · Lv $level';
+  static const sleepRecipeBonus = '食谱固有加成（%）';
+  static String sleepRecipeEnergy(int value) => '通常料理能量 · $value';
+  static String sleepRecipeBreakdown(int base, double level, int bonus) =>
+      '食材 $base × 等级 ${level.toStringAsFixed(2)} × 固有加成 ${100 + bonus}%';
+  static String sleepRecipeCrit(int weekday, int sunday) =>
+      '大成功参考：平日 2 倍 $weekday · 周日 3 倍 $sunday';
+  static const sleepSourceTitle = '公式与范围';
+  static const sleepSourceBody =
+      '睡眠分数、19 种食材基础能量、1–70 级食谱倍率与料理公式移植自 Neroli’s Lab 固定提交 cb533f2，依 Apache-2.0 使用并在 App 许可证页完整署名。中文食材名参考神奇宝贝百科。完整配队、食材生产与长期模拟仍请使用 Neroli’s Lab。';
   static const dexManualMarkSeen = '已标记为见过';
   static const dexManualMarkCaught = '已标记为捕获';
   static const dexManualMarkClear = '已清除标记';
@@ -194,13 +219,15 @@ abstract final class AppZh {
 
   static const settingsAttributionTitle = '关于 TitoDex · 数据来源与许可';
   static const settingsAttributionHint = '非官方学习工具 · 查看完整 Credits 与权利说明';
+  static const settingsOpenSourceLicenses = '查看开源许可证';
   static const settingsUnofficialNotice =
       '非官方学习工具：与 Nintendo、Creatures、GAME FREAK、The Pokémon Company 无隶属、授权、赞助或认可关系。';
   static const settingsAttributionBody =
       'TitoDex 是非官方、非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo Co., Ltd.、Creatures Inc.、GAME FREAK inc.、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。Pokémon、宝可梦、角色、游戏名称、图像、音频与商标归各自权利人所有；本工具不提供 ROM、密钥、付费内容或存档修改。\n\n'
-      '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点、体形与媒体补全；CC BY-NC-SA 4.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
-      '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、SteamGridDB 社区投稿页，以及 Pokémon HOME 与各代游戏的官方图像／音频。上游贡献者署名和各素材原有权利保持不变，列出来源不表示任何一方认可 TitoDex。\n\n'
-      '来源入口：pokeapi.co · github.com/PokeAPI/sprites · wiki.52poke.com · bulbapedia.bulbagarden.net · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com。固定提交和构建批次说明见项目根目录 CREDITS.md 及数据包随附 attribution 文件。';
+      '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点与体形；百科原创内容 CC BY-NC-SA 3.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
+      '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、PokéSprite 类型图标（MIT）、SteamGridDB 社区来源页、Pokémon HOME 与各代游戏的官方图像／音频；Nunito 字体依 SIL OFL 1.1 随包分发。百科开放许可不自动覆盖其中的官方游戏媒体，各素材仍按记录级来源与原权利状态处理。\n\n'
+      '外部工具：Pokémon Sleep 二级页的睡眠分数、19 种食材数值、食谱等级倍率与料理能量公式移植自 Neroli’s Lab 固定提交 cb533f2，依 Apache-2.0 使用并随 App 提供许可证与 NOTICE；完整配队和长期模拟仍保留为外部入口。\n\n'
+      '来源入口：pokeapi.co · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · wiki.52poke.com · bulbapedia.bulbagarden.net · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com。固定提交、逐文件来源和构建批次说明见项目根目录 CREDITS.md、THIRD_PARTY_NOTICES.md 及数据包随附 attribution 文件。';
   static const dexMoves = '升级招式';
   static String dexMovesMore(int count) => '另有 $count 个招式已缓存';
   static const dexTabIntro = '简介';

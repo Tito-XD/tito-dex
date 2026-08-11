@@ -2,7 +2,7 @@
 """Patch the live TitoDex bundle into v15 with 52poke zh-Hans flavor text.
 
 Only entries whose current text contains no CJK characters are replaced, so
-existing PokeAPI zh entries stay untouched. Adds a CC BY-NC-SA 4.0 attribution
+existing PokeAPI zh entries stay untouched. Adds a CC BY-NC-SA 3.0 attribution
 file and bumps both manifests to v15. Never uploads to R2.
 """
 
@@ -182,14 +182,14 @@ def write_attribution(upload_root: Path, flavor_data: dict[str, Any]) -> None:
     source = flavor_data.get("source") or {}
     lines = [
         "TitoDex flavor text for versions missing zh-Hans in PokeAPI",
-        "comes from 52poke wiki and is used under CC BY-NC-SA 4.0.",
+        "comes from 52poke wiki and is used under CC BY-NC-SA 3.0.",
         "",
         f"Source: {source.get('url', 'https://wiki.52poke.com')}",
-        f"License: {source.get('license', 'CC BY-NC-SA 4.0')}",
+        f"License: {source.get('license', 'CC BY-NC-SA 3.0')}",
         f"FetchedAt: {flavor_data.get('fetchedAt', '')}",
         f"Species: {len(flavor_data.get('entries', []))}",
         "",
-        "52poke (神奇宝贝百科) content is licensed under CC BY-NC-SA 4.0.",
+        "52poke (神奇宝贝百科) content is licensed under CC BY-NC-SA 3.0.",
         "The original pages remain the canonical source of the text.",
     ]
     (upload_root / "FLAVOR_ATTRIBUTION.txt").write_text(
@@ -232,7 +232,7 @@ def build(args: argparse.Namespace) -> None:
         {
             "version": BUNDLE_VERSION,
             "downloadedAt": published_at,
-            "flavorTextSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "flavorTextSource": "PokeAPI + 52poke (CC BY-NC-SA 3.0)",
             "flavorTextPatchedSpecies": patched,
         }
     )
@@ -268,7 +268,7 @@ def build(args: argparse.Namespace) -> None:
             "archiveSha256": archive_sha,
             "archiveSizeBytes": (versioned / ARCHIVE_NAME).stat().st_size,
             "publishedAt": published_at,
-            "flavorTextSource": "PokeAPI + 52poke (CC BY-NC-SA 4.0)",
+            "flavorTextSource": "PokeAPI + 52poke (CC BY-NC-SA 3.0)",
             "flavorTextPatchedSpecies": patched,
         }
     )

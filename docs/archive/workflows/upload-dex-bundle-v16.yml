@@ -114,7 +114,7 @@ jobs:
           from pathlib import Path
           root = json.loads(Path("dist/dex-v16/upload/bundle-manifest.json").read_text(encoding="utf-8"))
           assert root["bundleVersion"] == 16 and root["cdnPrefix"] == "v5", root
-          assert root.get("heldItemsSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)", root
+          assert root.get("heldItemsSource") == "PokeAPI + 52poke (CC BY-NC-SA 3.0)", root
           detail = json.loads(Path("dist/dex-v16/upload/v5/details/25.json").read_text(encoding="utf-8"))
           items = {item["slug"]: item for item in detail["heldItems"]}
           versions = set(items["light-ball"]["rarityByVersion"])
@@ -179,6 +179,6 @@ jobs:
       - name: Verify public v16 cutover
         if: inputs.publish
         run: |
-          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 16 and m["cdnPrefix"] == "v5" and m.get("heldItemsSource") == "PokeAPI + 52poke (CC BY-NC-SA 4.0)" and m["archiveUrl"].endswith("/bundle-v16.tar.zst"), m'
+          curl --fail --retry 8 --retry-delay 5 https://dex.tito.cafe/bundle-manifest.json | python3 -c 'import json,sys; m=json.load(sys.stdin); assert m["bundleVersion"] == 16 and m["cdnPrefix"] == "v5" and m.get("heldItemsSource") == "PokeAPI + 52poke (CC BY-NC-SA 3.0)" and m["archiveUrl"].endswith("/bundle-v16.tar.zst"), m'
           curl --fail --retry 8 --retry-delay 5 'https://dex.tito.cafe/cdn-health?probe=1' | python3 -c 'import json,sys; h=json.load(sys.stdin); assert h["ok"] is True, h'
           curl --fail --retry 8 --retry-delay 5 -I https://dex.tito.cafe/v5/bundle-v16.tar.zst | head -n 1

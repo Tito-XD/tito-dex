@@ -7,7 +7,7 @@ English name — the first result is the item page `XXX（道具）`. From that 
 take the zh name (title minus the （道具） suffix) and the in-game zh-hans bag
 description, same extraction as enrich_items_52poke.py.
 
-52poke content is CC BY-NC-SA 4.0 (attribution ships with the bundle).
+52poke content is CC BY-NC-SA 3.0 (attribution ships with the bundle).
 
 Run: python3 tools/enrich_items_52poke_search.py [--items dist/items-v11-work/items.json]
 """

@@ -495,8 +495,15 @@ def main() -> int:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "sources": [
-            {"name": "PokeAPI", "license": "CC-BY 4.0"},
-            {"name": "52poke", "license": "CC BY-NC-SA 4.0"},
+            {"name": "PokeAPI", "license": "BSD-3-Clause"},
+            {
+                "name": "52poke original wiki text",
+                "license": "CC BY-NC-SA 3.0",
+            },
+            {
+                "name": "52poke-hosted media",
+                "license": "source page attribution; underlying media rights vary",
+            },
         ],
         "itemsBySlug": enrichment,
     }

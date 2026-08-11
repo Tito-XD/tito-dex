@@ -8,7 +8,7 @@ bag description as `-{zh-hans:…;zh-hant:…}-`, with a `==使用效果==` pros
 as a secondary source. This build-time pass fills `descriptionZh`/`effectZh` for
 gap items that have a Chinese name (used as the 52poke page title).
 
-52poke content is CC BY-NC-SA 4.0 — attribution ships in the bundle (see the
+52poke content is CC BY-NC-SA 3.0 — attribution ships in the bundle (see the
 attribution file written by the v11 patch). Nothing here runs in the app.
 
 Run: python3 tools/enrich_items_52poke.py [--items dist/items-v11-work/items.json]

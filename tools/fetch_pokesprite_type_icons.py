@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Download Pokémon type icons from msikma/pokesprite (Gen 8 misc sprites).
 
-Source metadata: https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json
-Images: https://github.com/msikma/pokesprite/tree/master/misc/types
+Source commit: c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e
+Source metadata and images: https://github.com/msikma/pokesprite
 License: see pokesprite repo (MIT).
 """
 
@@ -16,10 +16,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "data" / "assets" / "type_icons"
+POKESPRITE_COMMIT = "c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e"
 MISC_JSON_URL = (
-    "https://raw.githubusercontent.com/msikma/pokesprite/master/data/misc.json"
+    f"https://raw.githubusercontent.com/msikma/pokesprite/{POKESPRITE_COMMIT}/data/misc.json"
 )
-RAW_BASE = "https://raw.githubusercontent.com/msikma/pokesprite/master/misc"
+RAW_BASE = f"https://raw.githubusercontent.com/msikma/pokesprite/{POKESPRITE_COMMIT}/misc"
 
 TYPE_NAMES = [
     "normal",

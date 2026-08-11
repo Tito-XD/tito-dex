@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest release:** `0.8.10+148` / `0.8.10-offline+149` · [GitHub Release v0.8.10](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.10)
+**Latest release:** `0.8.11+150` / `0.8.11-offline+151` · [GitHub Release v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11)
 
-**Current `main` package version:** `0.8.10+148`
+**Current `main` package version:** `0.8.11+150`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 ## Quick start
@@ -40,6 +40,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | Dex 1–1025 | Grid, search, 4-tab detail, 23 editions, regional scope |
 | Offline pack | Settings → CDN bundle; l10n/maps/config; update prompts |
 | Search hub | Structured reference + battle tools; type/category filters; reference → dex filters |
+| Pokémon Sleep | Offline sleep-score and basic cooking-strength estimates; pinned Neroli’s Lab formulas with bundled Apache-2.0 notices |
 | UI | Chinese (`lib/l10n/`), DeviceShell, Nunito, RG layout |
 
 ## Navigation
@@ -53,6 +54,7 @@ Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local
 | `/dex/locations` | Version-scoped location dex and caught completion |
 | `/search` | Search + hub |
 | `/search/companion/*` | Type matchup, stat calc, damage |
+| `/search/sleep-tools` | Sleep score and basic cooking-strength estimates |
 | `/settings` | Save, offline pack, journey tools |
 
 ## Offline dex layout
