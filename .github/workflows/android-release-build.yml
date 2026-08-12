@@ -285,6 +285,14 @@ jobs:
           cache: true
           pub-cache: true
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: "8.14"
+
+      - name: Prepare Flutter Android project
+        run: flutter pub get
+
       - name: Restore Android release signing
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -313,7 +321,7 @@ jobs:
         run: |
           set -euo pipefail
           cd android
-          ./gradlew \
+          gradle \
             -PjourneyPackVersionName="$EXTENSION_VERSION" \
             -PjourneyPackVersionCode="$EXTENSION_BUILD_NUMBER" \
             -PjourneyPackMinHostVersion="$HOST_VERSION" \
