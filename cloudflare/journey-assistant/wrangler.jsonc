@@ -1,0 +1,63 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "titodex-journey-assistant",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-11",
+  "compatibility_flags": ["nodejs_compat"],
+  // Public HTTPS entry point for the optional App/companion integration.
+  // A custom domain can replace this after the trial endpoint is verified.
+  "workers_dev": true,
+  "ai": {
+    "binding": "AI"
+  },
+  // This instance must be created with @cf/baai/bge-m3 as its embedding model.
+  // Retrieval remains disabled until AI_SEARCH_ENABLED is explicitly changed.
+  "ai_search_namespaces": [
+    {
+      "binding": "JOURNEY_SEARCH_NAMESPACE",
+      "namespace": "tito-dex"
+    }
+  ],
+  // Read-only at runtime: the Worker exposes only the fixed extension catalog
+  // and immutable APK object paths. App clients never receive R2 credentials
+  // or a direct R2 URL.
+  "r2_buckets": [
+    {
+      "binding": "JOURNEY_CONTENT",
+      "bucket_name": "titodex-journey-content"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "QUESTION_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
+    }
+  ],
+  "vars": {
+    "AI_MODEL": "@cf/qwen/qwen3-30b-a3b-fp8",
+    "AI_GATEWAY_ID": "titodex-journey-assistant",
+    "AI_SEARCH_ENABLED": "true",
+    "AI_EXTERNAL_PROVIDER_ENABLED": "false",
+    "AI_PROVIDER": "workers-ai",
+    "AI_PROVIDER_MODEL": "deepseek-chat",
+    "AI_PROVIDER_ENDPOINT": "chat/completions"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+      "persist": true
+    }
+  }
+}

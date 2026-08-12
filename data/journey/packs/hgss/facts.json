@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "packId": "hgss-zh-hans",
+  "contentVersion": 1,
+  "games": ["heartgold", "soulsilver"],
+  "generation": 4,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "hgss-squirt-bottle-requirement",
+      "originHintId": "hgss-route36-sudowoodo",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "category": "requirement",
+      "subjectId": "squirt-bottle",
+      "predicate": "requires_badge",
+      "objectId": "plain_badge",
+      "locationIds": ["Goldenrod City"],
+      "conditions": [],
+      "statementZh": "取得标准徽章后，玩家可在满金市花店领取杰尼龟喷壶。",
+      "sourceLockIds": [
+        "bulba-goldenrod-city-4554699",
+        "bulba-johto-route-36-4595820"
+      ],
+      "authoring": {
+        "method": "titodex_original",
+        "authorIds": ["legacy-titodex-maintainer"],
+        "copiedText": false
+      },
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-12"],
+        "reviewedAt": "2026-08-12T15:21:55Z",
+        "fixtureIds": [],
+        "notes": "Original TitoDex wording independently checked against fixed Bulbapedia revisions; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "hgss-ilex-farfetchd-cut-reward",
+      "originHintId": "hgss-ilex-forest-cut-tree",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "category": "progression",
+      "subjectId": "ilex_farfetchd_returned",
+      "predicate": "unlocks_item",
+      "objectId": "hm01",
+      "locationIds": ["Ilex Forest"],
+      "conditions": ["hive_badge"],
+      "statementZh": "在栎树林赶回两只大葱鸭后，玩家会取得秘传学习器01（居合斩）。",
+      "sourceLockIds": ["bulba-ilex-forest-4509613"],
+      "authoring": {
+        "method": "titodex_original",
+        "authorIds": ["legacy-titodex-maintainer"],
+        "copiedText": false
+      },
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-12"],
+        "reviewedAt": "2026-08-12T15:21:55Z",
+        "fixtureIds": [],
+        "notes": "Original TitoDex wording independently checked against fixed Bulbapedia revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "hgss-radio-tower-card-key-chain",
+      "originHintId": "hgss-radio-tower-shutter",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "category": "blocker",
+      "subjectId": "radio_tower_shutter",
+      "predicate": "requires_item_chain",
+      "objectId": "card-key",
+      "locationIds": ["Goldenrod City", "Goldenrod Tunnel"],
+      "conditions": ["basement-key", "radio_director_rescued"],
+      "statementZh": "满金广播塔事件需要先取得地下钥匙并救出台长，再使用获得的钥匙卡继续前进。",
+      "sourceLockIds": [
+        "bulba-goldenrod-radio-tower-4559213",
+        "bulba-card-key-johto-4539465"
+      ],
+      "authoring": {
+        "method": "titodex_original",
+        "authorIds": ["legacy-titodex-maintainer"],
+        "copiedText": false
+      },
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-12"],
+        "reviewedAt": "2026-08-12T15:21:55Z",
+        "fixtureIds": [],
+        "notes": "Original TitoDex wording independently checked against fixed Bulbapedia revisions; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

@@ -81,6 +81,7 @@ class ParsedSaveSummary {
     this.dexCaughtIds = const {},
     this.dexSeenIds = const {},
     this.badgeProgress = const {},
+    this.verifiedBadgeIds = const [],
   });
 
   final String game;
@@ -115,4 +116,8 @@ class ParsedSaveSummary {
   /// Region-specific badge banks when the save format exposes them (HGSS has
   /// eight Johto plus eight Kanto badges). Empty for single-bank games.
   final Map<String, int> badgeProgress;
+
+  /// Stable badge identifiers whose individual HGSS save bits were read.
+  /// Empty means the parser only knows a count, not which badges are present.
+  final List<String> verifiedBadgeIds;
 }

@@ -15,6 +15,16 @@ on:
         description: Monotonically increasing Android versionCode for Offline
         required: true
         type: string
+      extension_version:
+        description: Journey Assistant extension versionName
+        required: true
+        default: 1.0.0
+        type: string
+      extension_build_number:
+        description: Journey Assistant extension versionCode
+        required: true
+        default: "1"
+        type: string
       bundle_manifest_url:
         description: Published root manifest used to seed the Offline APK
         required: true
@@ -55,11 +65,15 @@ jobs:
           VERSION: ${{ inputs.version }}
           LITE_BUILD_NUMBER: ${{ inputs.lite_build_number }}
           OFFLINE_BUILD_NUMBER: ${{ inputs.offline_build_number }}
+          EXTENSION_VERSION: ${{ inputs.extension_version }}
+          EXTENSION_BUILD_NUMBER: ${{ inputs.extension_build_number }}
         run: |
           set -euo pipefail
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
           [[ "$LITE_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]
           [[ "$OFFLINE_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]
+          [[ "$EXTENSION_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          [[ "$EXTENSION_BUILD_NUMBER" =~ ^[1-9][0-9]*$ ]]
           (( OFFLINE_BUILD_NUMBER > LITE_BUILD_NUMBER ))
 
       - name: Install dependencies
@@ -193,9 +207,33 @@ jobs:
           echo "ARTIFACT_NAME=TitoDex-$VERSION-$VARIANT-rg-arm64.apk" >> "$GITHUB_ENV"
 
       - name: Build signed arm64 APK
-        run: >-
-          flutter build apk --release --no-pub --target-platform android-arm64
-          --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER"
+        env:
+          TITODEX_JOURNEY_ASSISTANT_URL: ${{ secrets.TITODEX_JOURNEY_ASSISTANT_URL }}
+          TITODEX_EXTENSION_CATALOG_URL: ${{ secrets.TITODEX_EXTENSION_CATALOG_URL }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlparse
+
+          expected = {
+              "TITODEX_JOURNEY_ASSISTANT_URL": "/v1/ask",
+              "TITODEX_EXTENSION_CATALOG_URL": "/v1/extensions/journey_assistant/catalog",
+          }
+          origins = set()
+          for name, path in expected.items():
+              value = os.environ.get(name, "")
+              parsed = urlparse(value)
+              assert parsed.scheme == "https" and parsed.netloc, f"{name} is not configured"
+              assert not parsed.username and not parsed.password
+              assert parsed.path == path and not parsed.query and not parsed.fragment
+              origins.add((parsed.scheme, parsed.netloc))
+          assert len(origins) == 1, "Journey endpoints must share one Worker origin"
+          PY
+          flutter build apk --release --no-pub --target-platform android-arm64 \
+            --build-name "$BUILD_NAME" --build-number "$BUILD_NUMBER" \
+            --dart-define="TITODEX_JOURNEY_ASSISTANT_URL=$TITODEX_JOURNEY_ASSISTANT_URL" \
+            --dart-define="TITODEX_EXTENSION_CATALOG_URL=$TITODEX_EXTENSION_CATALOG_URL"
 
       - name: Name and verify APK
         env:
@@ -216,5 +254,84 @@ jobs:
         with:
           name: TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
           path: dist/TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  build-extension:
+    name: Build signed Journey Assistant extension APK
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: flutter
+
+    steps:
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.44.6"
+          cache: true
+          pub-cache: true
+
+      - name: Restore Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_STORE_PASSWORD"
+          test -n "$ANDROID_KEY_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/titodex-upload.keystore
+          {
+            printf 'storePassword=%s\n' "$ANDROID_STORE_PASSWORD"
+            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
+            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
+            printf 'storeFile=../titodex-upload.keystore\n'
+          } > android/key.properties
+
+      - name: Build and verify extension APK
+        env:
+          EXTENSION_VERSION: ${{ inputs.extension_version }}
+          EXTENSION_BUILD_NUMBER: ${{ inputs.extension_build_number }}
+          HOST_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          cd android
+          ./gradlew \
+            -PjourneyPackVersionName="$EXTENSION_VERSION" \
+            -PjourneyPackVersionCode="$EXTENSION_BUILD_NUMBER" \
+            -PjourneyPackMinHostVersion="$HOST_VERSION" \
+            :journey-assistant-pack:check \
+            :journey-assistant-pack:assembleJourneyAssistantPack
+          apk="../build/journey-assistant-pack/outputs/apk/release/journey-assistant-pack-release.apk"
+          test -s "$apk"
+          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -x "$apksigner"
+          "$apksigner" verify --verbose --print-certs "$apk"
+          mkdir -p ../../dist
+          cp "$apk" "../../dist/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
+          sha256sum "../../dist/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
+
+      - name: Upload verified extension APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
+          path: dist/TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
           if-no-files-found: error
           retention-days: 14

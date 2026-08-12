@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "sourceId": "pokeapi-api-data",
+      "displayName": "PokéAPI api-data",
+      "canonicalUrl": "https://github.com/PokeAPI/api-data",
+      "sourceKind": "repository_data",
+      "license": {
+        "expression": "BSD-3-Clause",
+        "name": "BSD 3-Clause License",
+        "url": "https://github.com/PokeAPI/api-data/blob/master/LICENSE.txt",
+        "noticeRequired": true,
+        "shareAlike": false,
+        "nonCommercial": false
+      },
+      "allowedUses": ["structured_data", "fact_check", "ai_index"],
+      "acquisition": {
+        "mode": "pinned_auto_import",
+        "automatedImport": true,
+        "policyUrl": "https://github.com/PokeAPI/api-data"
+      },
+      "scopeNotes": "Only commit-pinned structured API data. This permission does not treat PokeAPI/sprites, official media, or long in-game prose as BSD data."
+    },
+    {
+      "sourceId": "wikidata",
+      "displayName": "Wikidata structured data",
+      "canonicalUrl": "https://www.wikidata.org/",
+      "sourceKind": "knowledge_graph",
+      "license": {
+        "expression": "CC0-1.0",
+        "name": "Creative Commons CC0 1.0 Universal",
+        "url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+        "noticeRequired": false,
+        "shareAlike": false,
+        "nonCommercial": false
+      },
+      "allowedUses": ["structured_data", "fact_check", "ai_index"],
+      "acquisition": {
+        "mode": "pinned_auto_import",
+        "automatedImport": true,
+        "policyUrl": "https://www.wikidata.org/wiki/Wikidata:Data_access"
+      },
+      "scopeNotes": "Only revision-locked structured entity data from CC0 namespaces; wiki explanatory prose is outside this scope."
+    },
+    {
+      "sourceId": "bulbapedia",
+      "displayName": "Bulbapedia",
+      "canonicalUrl": "https://bulbapedia.bulbagarden.net/",
+      "sourceKind": "community_wiki",
+      "license": {
+        "expression": "CC-BY-NC-SA-2.5",
+        "name": "Creative Commons Attribution-NonCommercial-ShareAlike 2.5",
+        "url": "https://bulbapedia.bulbagarden.net/wiki/Bulbapedia:Copyrights",
+        "noticeRequired": true,
+        "shareAlike": true,
+        "nonCommercial": true
+      },
+      "allowedUses": ["fact_check"],
+      "acquisition": {
+        "mode": "manual_reference",
+        "automatedImport": false,
+        "policyUrl": "https://bulbapedia.bulbagarden.net/wiki/Bulbapedia:Copyrights"
+      },
+      "scopeNotes": "Manual fact checking only. Do not copy prose or send it to embeddings or a generation model. Pin the exact oldid used for every approved fact."
+    },
+    {
+      "sourceId": "wiki52poke",
+      "displayName": "神奇宝贝百科（52Poké Wiki）",
+      "canonicalUrl": "https://wiki.52poke.com/",
+      "sourceKind": "community_wiki",
+      "license": {
+        "expression": "CC-BY-NC-SA-3.0",
+        "name": "Creative Commons Attribution-NonCommercial-ShareAlike 3.0",
+        "url": "https://wiki.52poke.com/wiki/神奇宝贝百科:版权声明",
+        "noticeRequired": true,
+        "shareAlike": true,
+        "nonCommercial": true
+      },
+      "allowedUses": ["fact_check"],
+      "acquisition": {
+        "mode": "manual_reference",
+        "automatedImport": false,
+        "policyUrl": "https://wiki.52poke.com/wiki/神奇宝贝百科:机器读取守则"
+      },
+      "scopeNotes": "Manual fact checking only unless the project receives separate written permission. No bulk import, copied prose, AI indexing, model input, images, or audio."
+    },
+    {
+      "sourceId": "strategywiki",
+      "displayName": "StrategyWiki",
+      "canonicalUrl": "https://strategywiki.org/",
+      "sourceKind": "community_wiki",
+      "license": {
+        "expression": "CC-BY-SA-4.0",
+        "name": "Creative Commons Attribution-ShareAlike 4.0",
+        "url": "https://strategywiki.org/wiki/StrategyWiki:License",
+        "noticeRequired": true,
+        "shareAlike": true,
+        "nonCommercial": false
+      },
+      "allowedUses": ["fact_check", "text_adaptation"],
+      "acquisition": {
+        "mode": "manual_reference",
+        "automatedImport": false,
+        "policyUrl": "https://strategywiki.org/wiki/StrategyWiki:Copyrights"
+      },
+      "scopeNotes": "Revision-locked text may be adapted only in a separately attributed CC-BY-SA component. Images and game scripts are excluded."
+    }
+  ]
+}

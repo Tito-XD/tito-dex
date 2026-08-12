@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": 1,
+  "entries": [
+    {
+      "id": "hgss-route36-sudowoodo",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "locations": ["johto-route-36-area"],
+      "locationAliases": ["route_36", "36号道路", "三十六号道路"],
+      "destinationAliases": ["圆朱市", "缘朱市", "37号道路"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "sudowoodo",
+        "labelZh": "树才怪",
+        "aliases": ["树才怪", "奇怪的树", "挡路的树", "这棵树", "路上的树", "杰尼龟水壶", "杰尼龟喷壶", "喷壶在哪"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "plain_badge",
+          "labelZh": "标准徽章",
+          "reliability": "save_verified"
+        },
+        {
+          "type": "key_item",
+          "id": "squirt-bottle",
+          "labelZh": "杰尼龟喷壶",
+          "itemId": 448,
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_gym_leader",
+          "targetId": "whitney",
+          "locationId": "Goldenrod City",
+          "instructionZh": "先在满金道馆击败小茜并取得标准徽章。"
+        },
+        {
+          "order": 2,
+          "action": "receive_key_item",
+          "targetId": "squirt-bottle",
+          "locationId": "Goldenrod City",
+          "instructionZh": "前往满金市东北侧的花店领取杰尼龟喷壶。"
+        },
+        {
+          "order": 3,
+          "action": "use_key_item",
+          "targetId": "sudowoodo",
+          "locationId": "Route 36",
+          "instructionZh": "回到36号道路，对挡路的树使用喷壶并完成树才怪战斗。"
+        }
+      ],
+      "overviewZh": "36号道路的树才怪需要用杰尼龟喷壶触发；取得标准徽章后可在满金市花店领取。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Goldenrod City flower shop",
+          "url": "https://bulbapedia.bulbagarden.net/wiki/Goldenrod_Flower_Shop",
+          "accessedAt": "2026-08-12"
+        },
+        {
+          "title": "Bulbapedia — Johto Route 36",
+          "url": "https://bulbapedia.bulbagarden.net/wiki/Johto_Route_36",
+          "accessedAt": "2026-08-12"
+        }
+      ]
+    },
+    {
+      "id": "hgss-ilex-forest-cut-tree",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "locations": ["ilex-forest-area"],
+      "locationAliases": ["栎树林", "桧树林", "ilex_forest"],
+      "destinationAliases": ["满金市", "34号道路"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "ilex_cut_tree",
+        "labelZh": "栎树林的小树",
+        "aliases": ["大葱鸭", "两只大葱鸭", "砍树", "小树", "挡路的小树", "居合斩"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "hive_badge",
+          "labelZh": "昆虫徽章",
+          "reliability": "save_verified"
+        },
+        {
+          "type": "milestone",
+          "id": "ilex_farfetchd_returned",
+          "labelZh": "赶回栎树林的大葱鸭",
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "key_item",
+          "id": "hm01",
+          "labelZh": "秘传学习器01（居合斩）",
+          "itemId": 397,
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_rival",
+          "targetId": "silver",
+          "locationId": "Azalea Town",
+          "instructionZh": "先完成桧皮镇道馆并在进入栎树林前击败劲敌。"
+        },
+        {
+          "order": 2,
+          "action": "return_pokemon",
+          "targetId": "farfetchd",
+          "locationId": "Ilex Forest",
+          "instructionZh": "从背后接近并把两只大葱鸭赶回炭窑老板的徒弟处。"
+        },
+        {
+          "order": 3,
+          "action": "receive_key_item",
+          "targetId": "hm01",
+          "locationId": "Ilex Forest",
+          "instructionZh": "领取秘传学习器01，让宝可梦学会居合斩，再砍掉挡路的小树。"
+        }
+      ],
+      "overviewZh": "栎树林需要先赶回大葱鸭并领取居合斩，才能砍掉通往34号道路的小树。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Ilex Forest",
+          "url": "https://bulbapedia.bulbagarden.net/wiki/Ilex_Forest",
+          "accessedAt": "2026-08-12"
+        }
+      ]
+    },
+    {
+      "id": "hgss-radio-tower-shutter",
+      "games": ["heartgold", "soulsilver"],
+      "generation": 4,
+      "locations": ["goldenrod-city-north-gate"],
+      "locationAliases": ["广播塔", "满金广播塔", "满金市", "goldenrod_radio_tower"],
+      "destinationAliases": ["44号道路", "烟墨市"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "radio_tower_shutter",
+        "labelZh": "广播塔卷帘门",
+        "aliases": ["广播塔", "卷帘门", "钥匙卡", "地下钥匙", "火箭队", "卡吉镇出不去"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "glacier_badge",
+          "labelZh": "冰冻徽章",
+          "reliability": "save_verified"
+        },
+        {
+          "type": "key_item",
+          "id": "basement-key",
+          "labelZh": "地下钥匙",
+          "itemId": 476,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "key_item",
+          "id": "card-key",
+          "labelZh": "钥匙卡",
+          "itemId": 475,
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_executive",
+          "targetId": "petrel",
+          "locationId": "Goldenrod City",
+          "instructionZh": "进入满金广播塔并击败假扮台长的拉姆达，取得地下钥匙。"
+        },
+        {
+          "order": 2,
+          "action": "rescue_npc",
+          "targetId": "radio_director",
+          "locationId": "Goldenrod Tunnel",
+          "instructionZh": "用地下钥匙进入满金地下通道的仓库，救出真正的广播塔台长。"
+        },
+        {
+          "order": 3,
+          "action": "use_key_item",
+          "targetId": "card-key",
+          "locationId": "Goldenrod City",
+          "instructionZh": "领取钥匙卡后回广播塔，在3楼打开卷帘门并继续清除火箭队。"
+        }
+      ],
+      "overviewZh": "广播塔上层的卷帘门要用钥匙卡；先取得地下钥匙并在满金地下仓库救出真正的台长。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Goldenrod Radio Tower",
+          "url": "https://bulbapedia.bulbagarden.net/wiki/Goldenrod_City_Radio_Tower",
+          "accessedAt": "2026-08-12"
+        },
+        {
+          "title": "Bulbapedia — Card Key (Johto)",
+          "url": "https://bulbapedia.bulbagarden.net/wiki/Card_Key_%28Johto%29",
+          "accessedAt": "2026-08-12"
+        }
+      ]
+    }
+  ]
+}

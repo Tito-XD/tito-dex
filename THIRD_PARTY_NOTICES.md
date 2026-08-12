@@ -28,6 +28,11 @@ and Dart packages. Release APKs also contain Flutter's generated `NOTICES.Z`.
   blanket CC-BY-licensed media collection.
 - Game-icon provenance is recorded per output in
   [`flutter/assets/game_icons/SOURCES.json`](flutter/assets/game_icons/SOURCES.json).
+- The initial HGSS progression-hint dataset in
+  [`data/journey/progression_hints.json`](data/journey/progression_hints.json)
+  contains TitoDex-authored summaries and steps fact-checked against the
+  per-record Bulbapedia pages. Bulbapedia original text is CC BY-NC-SA 2.5;
+  the dataset keeps source URLs and access dates and does not copy long passages.
 
 ## TitoDex source-code license
 

@@ -45,3 +45,9 @@ tools/pkhex_encounters/obj/
 .workbuddy/
 .wrangler/
 tools/.icon_cache/
+
+# Android release signing material is private and must only be supplied by
+# local secure storage or GitHub Actions secrets.
+flutter/android/key.properties
+flutter/android/*.keystore
+flutter/android/*.jks

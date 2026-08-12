@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/journey/source_registry.schema.json",
+  "title": "TitoDex journey source registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "sources"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "name",
+        "url",
+        "noticeRequired",
+        "shareAlike",
+        "nonCommercial"
+      ],
+      "properties": {
+        "expression": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "noticeRequired": { "type": "boolean" },
+        "shareAlike": { "type": "boolean" },
+        "nonCommercial": { "type": "boolean" }
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "automatedImport", "policyUrl"],
+      "properties": {
+        "mode": {
+          "enum": ["pinned_auto_import", "manual_reference"]
+        },
+        "automatedImport": { "type": "boolean" },
+        "policyUrl": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "displayName",
+        "canonicalUrl",
+        "sourceKind",
+        "license",
+        "allowedUses",
+        "acquisition",
+        "scopeNotes"
+      ],
+      "properties": {
+        "sourceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+        "displayName": { "type": "string", "minLength": 1 },
+        "canonicalUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "sourceKind": {
+          "enum": ["repository_data", "knowledge_graph", "community_wiki"]
+        },
+        "license": { "$ref": "#/$defs/license" },
+        "allowedUses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["structured_data", "fact_check", "text_adaptation", "ai_index"]
+          }
+        },
+        "acquisition": { "$ref": "#/$defs/acquisition" },
+        "scopeNotes": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'config/app_config.dart';
 import 'features/app_shortcuts/app_shortcuts.dart';
 import 'features/companion/companion_repository.dart';
+import 'features/extensions/journey_assistant_extension.dart';
 import 'theme/motion_preferences.dart';
 import 'theme/retro_style.dart';
 import 'features/game/game_catalog.dart';
@@ -18,6 +19,7 @@ import 'features/dex/dex_update_service.dart';
 import 'l10n/zh_catalog.dart';
 import 'features/journey/journey_io.dart';
 import 'features/journey/journey_repository.dart';
+import 'features/journey/ask_titodex_settings.dart';
 import 'features/launcher/emulator_launcher.dart';
 import 'features/launcher/emulator_launcher_repository.dart';
 import 'features/parser/pokemon_save_parser.dart';
@@ -35,6 +37,7 @@ import 'pages/companion_position_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/ask_titodex_page.dart';
 import 'pages/media_resource_page.dart';
 import 'pages/companion/blind_spot_page.dart';
 import 'pages/companion/quick_damage_page.dart';
@@ -92,6 +95,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
         _BootstrapGate.instance,
         _emulatorChoiceRefresh,
         _settingsRefresh,
+        askTitoDexSettings,
+        journeyAssistantExtension,
       ]),
       redirect: (context, state) {
         if (!_bootstrapComplete && state.uri.path != '/') {
@@ -160,9 +165,39 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   child: JourneyPage(
                     journey: _journey,
                     onLaunchEmulator: () => _onContinue(context),
+                    askTitoDexEnabled:
+                        journeyAssistantExtension.installed &&
+                        askTitoDexSettings.extensionEnabled,
+                    onAskTitoDex: () => context.push('/journey/ask'),
+                    askTitoDexExtensionInstalled:
+                        journeyAssistantExtension.installed,
+                    extensionInstallAvailable:
+                        journeyAssistantExtension.catalogConfigured,
+                    extensionInstalling: journeyAssistantExtension.busy,
+                    onInstallExtension: () =>
+                        _installJourneyAssistantExtension(context),
                   ),
                 ),
               ),
+              routes: [
+                GoRoute(
+                  path: 'ask',
+                  redirect: (context, state) =>
+                      journeyAssistantExtension.installed &&
+                          askTitoDexSettings.extensionEnabled
+                      ? null
+                      : '/journey',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: AskTitoDexPage(
+                        journey: _journey,
+                        edition: gameEditionRepository.edition,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '/dex',
@@ -235,9 +270,31 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoSideSlidePage(
                 key: state.pageKey,
                 direction: TitoSideSlideDirection.fromRight,
-                child: TitoPageContainer(child: SearchPage(journey: _journey)),
+                child: TitoPageContainer(
+                  child: SearchPage(
+                    journey: _journey,
+                    onAskTitoDex: () => context.push('/search/ask'),
+                  ),
+                ),
               ),
               routes: [
+                GoRoute(
+                  path: 'ask',
+                  redirect: (context, state) =>
+                      journeyAssistantExtension.installed &&
+                          askTitoDexSettings.extensionEnabled
+                      ? null
+                      : '/search',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: AskTitoDexPage(
+                        journey: _journey,
+                        edition: gameEditionRepository.edition,
+                      ),
+                    ),
+                  ),
+                ),
                 GoRoute(
                   path: 'companion/type-matchup',
                   pageBuilder: (context, state) => titoMaterialPage(
@@ -370,8 +427,25 @@ class _TitoDexAppState extends State<TitoDexApp> {
     _router.go(route);
   }
 
+  Future<void> _installJourneyAssistantExtension(BuildContext context) async {
+    final result = await journeyAssistantExtension.installFromCatalog();
+    if (!context.mounted) return;
+    final message = result == 'started' || result == 'permission_required'
+        ? AppZh.extensionInstallStarted
+        : result == 'up_to_date'
+        ? AppZh.extensionUpToDate
+        : result == 'catalog_not_configured'
+        ? AppZh.extensionCatalogUnavailable
+        : AppZh.extensionInstallFailed;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _bootstrap() async {
     await gameEditionRepository.load();
+    await askTitoDexSettings.load();
+    await journeyAssistantExtension.refresh();
     await companionRepository.load();
     await motionPreferences.load();
     await retroStyle.load();

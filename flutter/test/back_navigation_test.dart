@@ -24,6 +24,7 @@ void main() {
     );
     expect(TitoBackNavigation.parentPath('/search/reference/json'), '/search');
     expect(TitoBackNavigation.parentPath('/search/sleep-tools'), '/search');
+    expect(TitoBackNavigation.parentPath('/journey/ask'), '/journey');
   });
 
   test('fallback back path returns first-level pages to home', () {
