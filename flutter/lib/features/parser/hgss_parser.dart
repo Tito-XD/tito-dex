@@ -17,6 +17,28 @@ const _generalSize = 0xF628;
 const _footerMagic = 0x20060623;
 const _footerMagicKorean = 0x20070903;
 
+const _johtoBadgeIds = <String>[
+  'zephyr_badge',
+  'hive_badge',
+  'plain_badge',
+  'fog_badge',
+  'storm_badge',
+  'mineral_badge',
+  'glacier_badge',
+  'rising_badge',
+];
+
+const _kantoBadgeIds = <String>[
+  'boulder_badge',
+  'cascade_badge',
+  'thunder_badge',
+  'rainbow_badge',
+  'soul_badge',
+  'marsh_badge',
+  'volcano_badge',
+  'earth_badge',
+];
+
 class HgssParser {
   const HgssParser();
 
@@ -151,6 +173,10 @@ class HgssParser {
       dexCaughtIds: pokedex.caughtIds,
       dexSeenIds: pokedex.seenIds,
       badgeProgress: {'城都': popcount(johtoBadges), '关都': popcount(kantoBadges)},
+      verifiedBadgeIds: [
+        ..._badgeIdsFromBits(johtoBadges, _johtoBadgeIds),
+        ..._badgeIdsFromBits(kantoBadges, _kantoBadgeIds),
+      ],
     );
   }
 
@@ -236,8 +262,14 @@ class HgssParser {
       manualDexSeenIds: existing?.manualDexSeenIds ?? const [],
       manualDexCaughtIds: existing?.manualDexCaughtIds ?? const [],
       badgeProgress: summary.badgeProgress,
+      verifiedBadgeIds: summary.verifiedBadgeIds,
     );
   }
+
+  List<String> _badgeIdsFromBits(int bits, List<String> ids) => [
+    for (var index = 0; index < ids.length; index++)
+      if ((bits & (1 << index)) != 0) ids[index],
+  ];
 
   List<JourneyTimelineEntry> _mergeTimeline(
     List<JourneyTimelineEntry> existing,

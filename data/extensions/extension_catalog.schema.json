@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/extensions/extension_catalog.schema.json",
+  "title": "TitoDex extension CDN catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "entries"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "extensionId",
+          "packageId",
+          "versionName",
+          "versionCode",
+          "minHostVersion",
+          "displayNameZh",
+          "summaryZh",
+          "downloadPath",
+          "sizeBytes",
+          "sha256",
+          "capabilities"
+        ],
+        "properties": {
+          "extensionId": { "const": "journey_assistant" },
+          "packageId": {
+            "const": "com.tito.titodex.extension.journeyassistant"
+          },
+          "versionName": { "type": "string", "minLength": 1 },
+          "versionCode": { "type": "integer", "minimum": 1 },
+          "minHostVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+          "displayNameZh": { "type": "string", "minLength": 1 },
+          "summaryZh": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "downloadPath": {
+            "type": "string",
+            "pattern": "^objects/[A-Za-z0-9._-]+\\.apk$"
+          },
+          "sizeBytes": { "type": "integer", "minimum": 1, "maximum": 536870912 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "capabilities": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "enum": ["progression_hints", "online_ai_search"] }
+          }
+        }
+      }
+    }
+  }
+}

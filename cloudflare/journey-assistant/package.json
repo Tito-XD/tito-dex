@@ -1,0 +1,23 @@
+{
+  "name": "titodex-journey-assistant",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "TitoDex optional Journey blocker assistant Worker",
+  "scripts": {
+    "types": "wrangler types --strict-vars false",
+    "check": "wrangler types --check --strict-vars false && tsc --noEmit",
+    "dry-run": "wrangler deploy --dry-run",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.21.1",
+    "@types/node": "^26.2.0",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10",
+    "wrangler": "4.121.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -23,3 +23,4 @@ plugins {
 }
 
 include(":app")
+include(":journey-assistant-pack")

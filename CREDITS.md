@@ -8,7 +8,7 @@ TitoDex 会在构建阶段整理公开 API、社区资料与技术文档，并�
 
 - [PokéAPI](https://pokeapi.co/) 与 [PokéAPI 数据仓库](https://github.com/PokeAPI/pokeapi)：物种、形态、属性、能力值、特性、招式、道具、进化、版本与基础地点资料。其代码／数据仓库以 BSD-3-Clause 发布；Pokémon 名称与角色商标不因此获得授权。
 - [52Poké Wiki／神奇宝贝百科](https://wiki.52poke.com/)：部分中文图鉴描述、道具说明、携带道具、地点标签与体形标签；相关百科原创内容依站点标注的 [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/) 使用。经其文件页定位的官方游戏图像只把文件页作为来源记录，不宣称由百科的开放许可重新授权。
-- [Bulbapedia](https://bulbapedia.bulbagarden.net/)：道具分组思路及少量地点语言链接；其原创百科内容依 CC BY-NC-SA 2.5 使用。
+- [Bulbapedia](https://bulbapedia.bulbagarden.net/)：道具分组思路、少量地点语言链接，以及 HGSS 卡关助手首批树才怪/花店、栎树林、满金广播塔/钥匙卡事实核对；TitoDex 只保存自行撰写的短摘要、步骤与逐条来源链接，其原创百科内容依 CC BY-NC-SA 2.5 使用。
 - [PKHeX](https://github.com/kwsch/PKHeX)：固定提交导出的现代作品遭遇表，经 TitoDex 规范化后作为版本补全数据；PKHeX 与对应衍生覆盖数据依 GPL-3.0-or-later，App 不嵌入或执行 PKHeX。固定提交与细节见 [PKHEX_LICENSE.md](data/encounters/PKHEX_LICENSE.md)。
 - [Project Pokémon](https://projectpokemon.org/)：HGSS 存档结构、第四世代 Pokémon 数据结构与 HGSS 地图编号等技术参考。TitoDex 只读导入的偏移与解密实现依据这些公开技术文档交叉验证。
 
@@ -44,7 +44,7 @@ TitoDex compiles public APIs, community references, and technical documentation 
 
 - **PokéAPI / PokéAPI data repository** — species, forms, types, stats, abilities, moves, items, evolution, versions, and baseline locations; repository license: BSD-3-Clause.
 - **52Poké Wiki** — selected Chinese text, held-item data, locations, and body labels; original wiki content is used under CC BY-NC-SA 3.0. Wiki file pages used to locate official game media are recorded as provenance and are not treated as relicensing those files.
-- **Bulbapedia** — item grouping inspiration and selected location language links; original wiki content is licensed under CC BY-NC-SA 2.5.
+- **Bulbapedia** — item grouping inspiration, selected location links, and fact-checking for the initial HGSS blocker-hint dataset (Sudowoodo/flower shop, Ilex Forest, Goldenrod Radio Tower/Card Key). TitoDex stores newly written summaries/steps with per-record provenance; original wiki content is licensed under CC BY-NC-SA 2.5.
 - **PKHeX** — normalized modern-game encounter overlays from a pinned commit; GPL-3.0-or-later. TitoDex neither embeds nor executes PKHeX.
 - **Project Pokémon** — HGSS save structure, Gen IV Pokémon structure, and HGSS map-index technical references.
 - **PokéAPI/sprites and Pokémon Showdown / Smogon contributors** — upstream sprite, animation, cry, artwork, and item-icon sources. Rights and upstream contributor credits remain with their respective owners.

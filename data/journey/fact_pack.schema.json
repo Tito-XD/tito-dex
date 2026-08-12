@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/journey/fact_pack.schema.json",
+  "title": "TitoDex reviewed journey fact pack source",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "packId",
+    "contentVersion",
+    "games",
+    "generation",
+    "locale",
+    "licenseExpression",
+    "reviewPolicyVersion",
+    "facts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "packId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+    "contentVersion": { "type": "integer", "minimum": 1 },
+    "games": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9_-]+$" }
+    },
+    "generation": { "type": "integer", "minimum": 1, "maximum": 9 },
+    "locale": { "const": "zh-Hans" },
+    "licenseExpression": { "type": "string", "minLength": 1 },
+    "reviewPolicyVersion": { "type": "integer", "minimum": 1 },
+    "facts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/fact" }
+    }
+  },
+  "$defs": {
+    "authoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "authorIds", "copiedText"],
+      "properties": {
+        "method": {
+          "enum": ["titodex_original", "structured_import", "licensed_text_adaptation"]
+        },
+        "authorIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "copiedText": { "type": "boolean" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewerIds", "reviewedAt", "fixtureIds", "notes"],
+      "properties": {
+        "status": {
+          "enum": ["migration_pending", "in_review", "approved", "rejected"]
+        },
+        "reviewerIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "reviewedAt": { "type": ["string", "null"], "format": "date-time" },
+        "fixtureIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "approved" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "reviewerIds": { "minItems": 1 },
+              "reviewedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      ]
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factId",
+        "originHintId",
+        "games",
+        "generation",
+        "category",
+        "subjectId",
+        "predicate",
+        "objectId",
+        "locationIds",
+        "conditions",
+        "statementZh",
+        "sourceLockIds",
+        "authoring",
+        "review",
+        "allowedForAiIndex"
+      ],
+      "properties": {
+        "factId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+        "originHintId": { "type": ["string", "null"], "pattern": "^[a-z0-9_-]+$" },
+        "games": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9_-]+$" }
+        },
+        "generation": { "type": "integer", "minimum": 1, "maximum": 9 },
+        "category": {
+          "enum": ["progression", "blocker", "location", "requirement", "reference"]
+        },
+        "subjectId": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+        "predicate": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "objectId": { "type": ["string", "null"], "pattern": "^[a-z0-9_-]+$" },
+        "locationIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9_-]+$" }
+        },
+        "statementZh": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "sourceLockIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" }
+        },
+        "authoring": { "$ref": "#/$defs/authoring" },
+        "review": { "$ref": "#/$defs/review" },
+        "allowedForAiIndex": { "type": "boolean" }
+      }
+    }
+  }
+}

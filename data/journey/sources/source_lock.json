@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "locks": [
+    {
+      "lockId": "bulba-goldenrod-city-4554699",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Goldenrod_City",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4554699",
+        "timestamp": "2026-05-20T12:56:34Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4554699"
+      },
+      "retrievedAt": "2026-08-12T15:21:55Z",
+      "contentSha256": "6edb5f0c3349f526310a8699f5c8d7dcb869f9e4bbc1d15bf7398c07bd577c1c",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulba-johto-route-36-4595820",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Johto_Route_36",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4595820",
+        "timestamp": "2026-07-25T21:08:47Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4595820"
+      },
+      "retrievedAt": "2026-08-12T15:21:55Z",
+      "contentSha256": "9a14a5b04ceac66004e18c8b1839d34a3fc213681e4be9f11086a6557e837a49",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulba-ilex-forest-4509613",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Ilex_Forest",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4509613",
+        "timestamp": "2026-03-16T07:53:22Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4509613"
+      },
+      "retrievedAt": "2026-08-12T15:21:55Z",
+      "contentSha256": "dc77edb134e57836df2d9c74062a503fc8a2151f1db4c3b7123a7cc4b7922e0d",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulba-goldenrod-radio-tower-4559213",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Goldenrod_Radio_Tower",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4559213",
+        "timestamp": "2026-05-26T08:36:37Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4559213"
+      },
+      "retrievedAt": "2026-08-12T15:21:55Z",
+      "contentSha256": "6ae12bc11b0780e9e37a0d2f9ac04a09de6de281faaa61628c9a6953db354aad",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulba-card-key-johto-4539465",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Card_Key_%28Johto%29",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4539465",
+        "timestamp": "2026-04-28T08:19:41Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4539465"
+      },
+      "retrievedAt": "2026-08-12T15:21:55Z",
+      "contentSha256": "873290d2a429ea1ee71e9360f512a12dcbf8a7a5624601cf2a4d94e9d70e817c",
+      "acquisitionMethod": "manual_fact_check"
+    }
+  ]
+}

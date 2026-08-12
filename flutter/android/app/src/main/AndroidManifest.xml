@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <permission
+        android:name="com.tito.titodex.permission.READ_EXTENSION_PACK"
+        android:protectionLevel="signature" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -6,6 +9,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="com.tito.titodex.permission.READ_EXTENSION_PACK" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -77,5 +82,7 @@
         <package android:name="com.citra.citra_emu.canary" />
         <package android:name="com.duckstation.psx" />
         <package android:name="org.easyrpg.player" />
+        <package android:name="com.tito.titodex.extension.journeyassistant" />
+        <provider android:authorities="com.tito.titodex.extension.journeyassistant.provider" />
     </queries>
 </manifest>

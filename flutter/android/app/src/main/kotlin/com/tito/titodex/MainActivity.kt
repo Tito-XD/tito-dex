@@ -21,9 +21,14 @@ class MainActivity : FlutterActivity() {
     private var pendingNotificationPermissionResult: MethodChannel.Result? = null
     private var pendingShortcutRoute: String? = null
     private var appShortcutChannel: MethodChannel? = null
+    private lateinit var journeyAssistantExtensionHost: JourneyAssistantExtensionHost
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        journeyAssistantExtensionHost = JourneyAssistantExtensionHost(this).also {
+            it.configure(flutterEngine)
+            it.handleIntent(intent)
+        }
         pendingShortcutRoute = shortcutRouteFrom(intent)
         appShortcutChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -130,6 +135,7 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (journeyAssistantExtensionHost.handleIntent(intent)) return
         val route = shortcutRouteFrom(intent) ?: return
         pendingShortcutRoute = null
         appShortcutChannel?.invokeMethod("shortcutOpened", route)

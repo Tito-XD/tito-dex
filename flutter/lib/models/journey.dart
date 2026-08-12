@@ -240,6 +240,7 @@ class CurrentJourney {
     this.saveSyncedParty = const [],
     this.partyUserOverride = false,
     this.badgeProgress = const {},
+    this.verifiedBadgeIds = const [],
   });
 
   final String game;
@@ -275,6 +276,7 @@ class CurrentJourney {
   final List<PartyMember> saveSyncedParty;
   final bool partyUserOverride;
   final Map<String, int> badgeProgress;
+  final List<String> verifiedBadgeIds;
 
   String get badgeProgressLabel => badgeProgress.isEmpty
       ? '$badges/$maxBadges'
@@ -348,6 +350,7 @@ class CurrentJourney {
     List<PartyMember>? saveSyncedParty,
     bool? partyUserOverride,
     Map<String, int>? badgeProgress,
+    List<String>? verifiedBadgeIds,
   }) {
     return CurrentJourney(
       game: game ?? this.game,
@@ -386,6 +389,7 @@ class CurrentJourney {
       saveSyncedParty: saveSyncedParty ?? this.saveSyncedParty,
       partyUserOverride: partyUserOverride ?? this.partyUserOverride,
       badgeProgress: badgeProgress ?? this.badgeProgress,
+      verifiedBadgeIds: verifiedBadgeIds ?? this.verifiedBadgeIds,
     );
   }
 
@@ -431,6 +435,7 @@ class CurrentJourney {
               saveSyncedParty.map((m) => m.toJson()).toList(growable: false),
         if (partyUserOverride) 'partyUserOverride': true,
         if (badgeProgress.isNotEmpty) 'badgeProgress': badgeProgress,
+        if (verifiedBadgeIds.isNotEmpty) 'verifiedBadgeIds': verifiedBadgeIds,
       };
 
   factory CurrentJourney.fromJson(Map<String, dynamic> json) => CurrentJourney(
@@ -492,6 +497,10 @@ class CurrentJourney {
         badgeProgress:
             (json['badgeProgress'] as Map<String, dynamic>? ?? const {})
                 .map((key, value) => MapEntry(key, (value as num).toInt())),
+        verifiedBadgeIds:
+            (json['verifiedBadgeIds'] as List<dynamic>? ?? const [])
+                .whereType<String>()
+                .toList(growable: false),
       );
 
   static bool _listEquals(List<int> left, List<int> right) {

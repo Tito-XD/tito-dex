@@ -1,5 +1,10 @@
 # Repository Secrets (GitHub Actions)
 
+> Android signing was rotated for v0.8.13 after legacy signing material was
+> found in public Git history. v0.8.13 and later use the private V2 key stored
+> only in maintainer secure storage and GitHub Actions secrets. Existing users
+> must export their journey, uninstall the older app, then install v0.8.13.
+
 TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 object put --remote`).
 
 | Secret | Purpose |
@@ -9,6 +14,8 @@ TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 ob
 | `R2_ACCESS_KEY_ID` | Optional S3-compatible R2 key used for faster bulk bundle uploads |
 | `R2_SECRET_ACCESS_KEY` | Optional S3-compatible R2 secret paired with the access key |
 | `ANDROID_SIGNER_SHA256` | Recommended SHA-256 certificate digest used by the release publisher to pin both APKs to the historical Android signer |
+| `TITODEX_JOURNEY_ASSISTANT_URL` | Journey Assistant Worker 的完整 HTTPS `/v1/ask` 入口；仅用于 release build 的 dart-define |
+| `TITODEX_EXTENSION_CATALOG_URL` | 同一 Worker 的完整 HTTPS extension catalog 入口；仅用于 release build 的 dart-define |
 
 ## Cloudflare API token — required permissions
 
@@ -61,6 +68,8 @@ Use template **「Edit Cloudflare Workers」** only if it includes **R2 Edit**; 
 | `CLOUDFLARE_API_TOKEN` | Token string from above |
 | `CLOUDFLARE_ACCOUNT_ID` | Account ID (32 hex chars) |
 | `ANDROID_SIGNER_SHA256` | Android release certificate SHA-256 digest as printed by `apksigner verify --print-certs` (recommended for publishing) |
+| `TITODEX_JOURNEY_ASSISTANT_URL` | Journey Assistant Worker 的完整 HTTPS `/v1/ask` 入口 |
+| `TITODEX_EXTENSION_CATALOG_URL` | 同一 Worker 的完整 HTTPS `/v1/extensions/journey_assistant/catalog` 入口 |
 
 Use **Repository secrets**, not Environment secrets (workflows do not set `environment:`).
 

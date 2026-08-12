@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/journey/assistant_api.schema.json",
+  "title": "TitoDex Journey Assistant API",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question", "context"],
+  "properties": {
+    "question": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["game", "generation", "badgeIds", "milestoneIds", "locale", "parserRevision"],
+      "properties": {
+        "game": { "enum": ["heartgold", "soulsilver"] },
+        "generation": { "const": 4 },
+        "locationId": { "$ref": "#/$defs/id" },
+        "badgeIds": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "badgeCount": { "type": "integer", "minimum": 0, "maximum": 16 },
+        "milestoneIds": {
+          "type": "array",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "locale": { "const": "zh-Hans" },
+        "parserRevision": { "type": "integer", "minimum": 0 },
+        "contextReliability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["game", "location", "badges", "milestones"],
+          "properties": {
+            "game": { "enum": ["save_verified", "user_selected"] },
+            "location": { "enum": ["save_verified", "unknown"] },
+            "badges": { "enum": ["save_verified", "count_only", "unknown"] },
+            "milestones": { "enum": ["save_verified", "unsupported"] }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "maxLength": 80,
+      "pattern": "^[a-z0-9_-]+$"
+    }
+  }
+}

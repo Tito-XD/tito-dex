@@ -11,6 +11,8 @@ import '../features/companion/companion_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
+import '../features/extensions/journey_assistant_extension.dart';
+import '../features/journey/ask_titodex_settings.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_download_notification.dart';
@@ -155,6 +157,52 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     setState(() => _defaultGameEdition = edition);
+  }
+
+  Future<void> _toggleAskTitoDex(bool enabled) async {
+    if (!enabled) {
+      await askTitoDexSettings.setEnabled(false);
+      return;
+    }
+    final accepted =
+        askTitoDexSettings.noticeAcknowledged ||
+        await showDialog<bool>(
+              context: context,
+              barrierDismissible: false,
+              builder: (dialogContext) => AlertDialog(
+                title: const Text(AppZh.askTitoDexNoticeTitle),
+                content: const Text(AppZh.askTitoDexNoticeBody),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: const Text(AppZh.cancel),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                    child: const Text(AppZh.askTitoDexNoticeAccept),
+                  ),
+                ],
+              ),
+            ) ==
+            true;
+    if (!accepted) return;
+    await askTitoDexSettings.acknowledgeNotice();
+    await askTitoDexSettings.setEnabled(true);
+  }
+
+  Future<void> _installJourneyAssistantExtension() async {
+    final result = await journeyAssistantExtension.installFromCatalog();
+    if (!mounted) return;
+    final message = result == 'started' || result == 'permission_required'
+        ? AppZh.extensionInstallStarted
+        : result == 'up_to_date'
+        ? AppZh.extensionUpToDate
+        : result == 'catalog_not_configured'
+        ? AppZh.extensionCatalogUnavailable
+        : AppZh.extensionInstallFailed;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickDefaultGameEdition() async {
@@ -555,6 +603,132 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   }
                 }),
+        ),
+        const SizedBox(height: 16),
+        _SettingsGroup(
+          title: AppZh.extensionOnlineTitle,
+          child: StickerCard(
+            variant: StickerVariant.softYellow,
+            child: ListenableBuilder(
+              listenable: Listenable.merge([
+                askTitoDexSettings,
+                journeyAssistantExtension,
+              ]),
+              builder: (context, _) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '${AppZh.extensionJourneyTitle} · '
+                    '${journeyAssistantExtension.installed ? AppZh.extensionInstalled : AppZh.extensionNotInstalled}',
+                    style: SecondaryTypography.onCard.h15,
+                  ),
+                  if (journeyAssistantExtension.info.versionName != null)
+                    Text(
+                      'v${journeyAssistantExtension.info.versionName}',
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  if (!journeyAssistantExtension.installed)
+                    FilledButton.icon(
+                      key: const Key('settings-install-extension'),
+                      onPressed:
+                          journeyAssistantExtension.catalogConfigured &&
+                              !journeyAssistantExtension.busy
+                          ? _installJourneyAssistantExtension
+                          : null,
+                      icon: const Icon(Icons.download_rounded),
+                      label: Text(
+                        journeyAssistantExtension.busy
+                            ? AppZh.extensionInstalling
+                            : AppZh.extensionInstall,
+                      ),
+                    )
+                  else ...[
+                    _SettingsToggleRow(
+                      icon: Icons.extension_outlined,
+                      plateColor: TitoColors.softYellow,
+                      label: AppZh.extensionEnabled,
+                      hint: AppZh.settingsAskTitoDexHint,
+                      value: askTitoDexSettings.extensionEnabled,
+                      onChanged: askTitoDexSettings.setExtensionEnabled,
+                    ),
+                    _SettingsToggleRow(
+                      icon: Icons.auto_awesome_outlined,
+                      plateColor: TitoColors.skyBlue,
+                      label: AppZh.settingsAskTitoDex,
+                      hint: AppZh.askTitoDexNoticeBody,
+                      value: askTitoDexSettings.enabled,
+                      onChanged: _toggleAskTitoDex,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppZh.extensionSearchDisplay,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                    DropdownButton<SearchAssistantDisplayMode>(
+                      key: const Key('extension-search-display-mode'),
+                      isExpanded: true,
+                      value: askTitoDexSettings.searchDisplayMode,
+                      items: const [
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.prominent,
+                          child: Text(AppZh.extensionSearchProminent),
+                        ),
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.compact,
+                          child: Text(AppZh.extensionSearchCompact),
+                        ),
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.hidden,
+                          child: Text(AppZh.extensionSearchHidden),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          askTitoDexSettings.setSearchDisplayMode(value);
+                        }
+                      },
+                    ),
+                    if (journeyAssistantExtension.catalogConfigured)
+                      OutlinedButton.icon(
+                        key: const Key('settings-update-extension'),
+                        onPressed: journeyAssistantExtension.busy
+                            ? null
+                            : _installJourneyAssistantExtension,
+                        icon: const Icon(Icons.system_update_alt_rounded),
+                        label: Text(
+                          journeyAssistantExtension.busy
+                              ? AppZh.extensionInstalling
+                              : AppZh.extensionCheckUpdate,
+                        ),
+                      ),
+                    OutlinedButton(
+                      onPressed: journeyAssistantExtension.uninstall,
+                      child: const Text(AppZh.extensionUninstall),
+                    ),
+                    Text(
+                      AppZh.extensionUninstallHint,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                  ],
+                  if (!journeyAssistantExtension.catalogConfigured &&
+                      !journeyAssistantExtension.installed) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      AppZh.extensionCatalogUnavailable,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         _SettingsGroup(

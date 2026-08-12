@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.12 · Lite `0.8.12+152` · Offline `0.8.12-offline+153` · live bundle v19 / compact seed v14.
+> Current release: v0.8.13 · Lite `0.8.13+154` · Offline `0.8.13-offline+155` · Journey Assistant `1.0.0+1` · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
@@ -28,6 +28,7 @@ is the portability path, and parser coverage remains fixture-gated.
 | Dex data | Installed bundle first when preferred, then versioned CDN, then PokeAPI fallback |
 | Offline install | SHA-256 verified zstd/tar bundle into app documents |
 | Android native | Save document channel, emulator launcher, foreground download service, dynamic app shortcuts |
+| Optional blocker Q&A | Separately installed, same-signer content APK; save-first local fuzzy match; opt-in AI Search/DeepSeek only for unresolved intent |
 
 ## Main data flow
 
@@ -58,6 +59,22 @@ selected-game availability/prices and move-removal gates without requiring a
 new CDN bundle. Pinned local constants provide the limited Pokémon Sleep
 formula/value helpers; their upstream license and NOTICE ship in APK assets.
 
+The “Ask TitoDex” source preview is a separate, privacy-bounded flow.
+`data/journey/progression_hints.json` is canonical; Gradle copies it into the
+independently installed, same-signer companion APK and generates a content
+manifest. The host validates catalog digest, APK identity/signer, provider
+contract, protocol/host compatibility, and payload digest before use. The main
+APK does not carry the fact payload. See [EXTENSIONS.md](./EXTENSIONS.md).
+
+The App sends only fields allowed by `data/journey/assistant_api.schema.json`,
+including explicit save-field reliability. Deterministic fuzzy matching always
+runs first. On a miss/tie, optional BGE-M3 hybrid AI Search may return candidate
+IDs, but returned text is discarded and every ID is checked against the same
+local audited facts. DeepSeek through AI Gateway or Workers AI may only select a
+candidate/reorder deterministic sections. Invalid JSON, timeouts, unsupported
+versions and unknown conditions return a local/follow-up state rather than
+invented guidance. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md).
+
 ## Active layout
 
 ```text
@@ -73,6 +90,10 @@ flutter/integration_test/
 tools/
 data/l10n/zh/
 cloudflare/dex-cdn/
+cloudflare/journey-assistant/
+data/journey/
+data/extensions/
+flutter/android/journey-assistant-pack/
 ```
 
 The React/Capacitor source tree no longer exists.

@@ -59,6 +59,11 @@ void main() {
     expect(summary.starterSpeciesId, 155);
     expect(summary.mapCoordinates, hasLength(3));
     expect(summary.badgeProgress, {'城都': 3, '关都': 0});
+    expect(summary.verifiedBadgeIds, [
+      'zephyr_badge',
+      'hive_badge',
+      'plain_badge',
+    ]);
     expect(summary.locationLabel, '满金市');
     expect(summary.mapHeaderId, 76);
     expect(summary.saveHash, isNotEmpty);
@@ -73,6 +78,7 @@ void main() {
     expect(restored.saveStarterSpeciesId, 155);
     expect(restored.party.first.ivs, summary.party.first.ivs);
     expect(restored.party.first.battleStats, summary.party.first.battleStats);
+    expect(restored.verifiedBadgeIds, summary.verifiedBadgeIds);
   });
 
   test('counts Johto and Kanto badge banks', () async {
@@ -85,6 +91,7 @@ void main() {
     expect(summary.badges, 4);
     expect(summary.maxBadges, 16);
     expect(summary.badgeProgress, {'城都': 3, '关都': 1});
+    expect(summary.verifiedBadgeIds, contains('boulder_badge'));
   });
 
   test('decodes Gen IV full-width and half-width trainer characters', () {

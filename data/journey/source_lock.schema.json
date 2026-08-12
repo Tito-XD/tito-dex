@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/journey/source_lock.schema.json",
+  "title": "TitoDex journey source lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "locks"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "locks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/lock" }
+    }
+  },
+  "$defs": {
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "timestamp", "permalink"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "git_commit",
+            "wikidata_revision",
+            "mediawiki_revision",
+            "unlocked_legacy"
+          ]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": ["string", "null"], "format": "date-time" },
+        "permalink": { "type": "string", "format": "uri", "pattern": "^https://" }
+      }
+    },
+    "lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lockId",
+        "sourceId",
+        "resourceUrl",
+        "revision",
+        "retrievedAt",
+        "contentSha256",
+        "acquisitionMethod"
+      ],
+      "properties": {
+        "lockId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+        "sourceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+        "resourceUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "revision": { "$ref": "#/$defs/revision" },
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "contentSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "acquisitionMethod": {
+          "enum": ["pinned_auto_import", "manual_reference", "legacy_migration"]
+        }
+      }
+    }
+  }
+}

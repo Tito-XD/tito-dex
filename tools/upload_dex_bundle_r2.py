@@ -267,8 +267,14 @@ def main() -> None:
         print(exc, file=sys.stderr)
         sys.exit(1)
 
-    account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "e84aed053d6584bebf0f8a6e4870cd8c")
+    account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
     if os.environ.get("R2_ACCESS_KEY_ID") and os.environ.get("R2_SECRET_ACCESS_KEY"):
+        if not account_id:
+            print(
+                "CLOUDFLARE_ACCOUNT_ID is required when using R2 access keys",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         upload_with_boto3(
             args.upload_dir,
             args.bucket,

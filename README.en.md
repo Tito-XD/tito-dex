@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12+152` | Refined RG home proportions and immersive insets; consolidated project documentation |
-| Offline APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12-offline+153` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.12+152` | Features, reachable UI, attribution, licenses, and rights notices aligned |
+| Lite APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13+154` | Adds the optional Journey Assistant, save-first fuzzy matching, and online AI Search |
+| Offline APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13-offline+155` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| Journey Assistant | `1.0.0+1` | Installed on demand from Journey; the first reviewed pack covers three HGSS blockers |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -22,6 +22,7 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
+- **Ask TitoDex** — an independently installable Journey Assistant APK. It prioritizes parsed save context and local reviewed facts, then uses BGE-M3 AI Search and Workers AI Qwen only for unresolved intent. Journey owns installation; Settings controls a prominent/compact/hidden Search entry. Raw saves and trainer/party data are never uploaded. The v0.8.13 initial pack covers three reviewed HGSS blocker chains.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
@@ -57,7 +58,7 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.8.12-lite-rg-arm64.apk`** or **`TitoDex-0.8.12-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.13-lite-rg-arm64.apk`** or **`TitoDex-0.8.13-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. Android signing was rotated in v0.8.13; export your journey and uninstall v0.8.12 or earlier before installing this release.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 
@@ -82,6 +83,8 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
 | [Roadmap](ROADMAP.md) | Release history and next work |
 | [Architecture](docs/ARCHITECTURE.md) | Technology choice, data flow, and platform boundaries |
+| [Journey blocker assistant](docs/JOURNEY_ASSISTANT.md) | Save-first fuzzy matching, privacy contract, AI Search/DeepSeek, and deployment gates |
+| [Android extension packs](docs/EXTENSIONS.md) | On-demand install protocol, signing checks, CDN catalog, and independent iteration |
 | [Flutter app](flutter/README.md) | App development notes |
 | [Design system](docs/DESIGN_SYSTEM.md) | Visual, typography, layout, and interaction rules |
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |

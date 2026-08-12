@@ -11,6 +11,8 @@ import '../features/dex/dex_repository.dart';
 import '../features/dex/dex_search_terms.dart';
 import '../features/dex/type_chart.dart';
 import '../features/game/game_edition_repository.dart';
+import '../features/extensions/journey_assistant_extension.dart';
+import '../features/journey/ask_titodex_settings.dart';
 import '../pages/dex/dex_json_reference_page.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
@@ -29,11 +31,21 @@ import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_animated_size_switcher.dart';
+import '../theme/tito_buttons.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key, required this.journey});
+  const SearchPage({
+    super.key,
+    required this.journey,
+    this.extensionInstalled,
+    this.assistantDisplayMode,
+    this.onAskTitoDex,
+  });
 
   final CurrentJourney journey;
+  final bool? extensionInstalled;
+  final SearchAssistantDisplayMode? assistantDisplayMode;
+  final VoidCallback? onAskTitoDex;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -180,6 +192,13 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: askTitoDexSettings,
+      builder: (context, _) => _buildPage(context),
+    );
+  }
+
+  Widget _buildPage(BuildContext context) {
     final edition = gameEditionRepository.edition;
 
     return Material(
@@ -231,6 +250,10 @@ class _SearchPageState extends State<SearchPage> {
     final query = _controller.text.trim();
 
     return [
+      if (_showAssistant(SearchAssistantDisplayMode.prominent)) ...[
+        _assistantCard(prominent: true),
+        const SizedBox(height: 12),
+      ],
       StickerCard(
         variant: StickerVariant.deep,
         child: Column(
@@ -417,6 +440,10 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Widget> _referenceSegment(BuildContext context) {
     return [
+      if (_showAssistant(SearchAssistantDisplayMode.compact)) ...[
+        _assistantCard(prominent: false),
+        const SizedBox(height: 12),
+      ],
       StickerCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,6 +535,43 @@ class _SearchPageState extends State<SearchPage> {
       const SleepToolsSection(),
     ];
   }
+
+  bool _showAssistant(SearchAssistantDisplayMode mode) {
+    final installed =
+        widget.extensionInstalled ?? journeyAssistantExtension.installed;
+    final enabled = askTitoDexSettings.extensionEnabled;
+    final selected =
+        widget.assistantDisplayMode ?? askTitoDexSettings.searchDisplayMode;
+    return installed && enabled && selected == mode;
+  }
+
+  Widget _assistantCard({required bool prominent}) => StickerCard(
+    key: Key(
+      prominent ? 'search-assistant-prominent' : 'search-assistant-compact',
+    ),
+    variant: prominent ? StickerVariant.softYellow : StickerVariant.cream,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(AppZh.extensionSearchAsk, style: SecondaryTypography.onCard.h15),
+        if (prominent) ...[
+          const SizedBox(height: 4),
+          Text(
+            AppZh.extensionSearchAskHint,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
+        ],
+        const SizedBox(height: 8),
+        TitoPrimaryButton(
+          label: AppZh.askTitoDexEntry,
+          onPressed: widget.onAskTitoDex,
+          expanded: true,
+        ),
+      ],
+    ),
+  );
 
   List<Widget> _battleSegment(BuildContext context) {
     return [
