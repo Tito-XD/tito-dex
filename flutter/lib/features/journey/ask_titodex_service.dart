@@ -33,7 +33,7 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
   HttpAskTitoDexOnlineClient({
     http.Client? client,
     String endpoint = AskTitoDexConfig.workerUrl,
-    this.timeout = const Duration(seconds: 8),
+    this.timeout = const Duration(seconds: 12),
     Future<String> Function()? deviceKeyProvider,
   }) : _client = client ?? http.Client(),
        endpoint = endpoint.trim(),

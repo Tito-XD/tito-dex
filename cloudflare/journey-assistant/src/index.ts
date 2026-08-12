@@ -10,7 +10,7 @@ import type { ProgressionHint } from './progression_hints';
 import { buildLogRecord } from './logging';
 import { getJourneySearch, retrieveAuditedHintIds } from './retrieval';
 
-const MODEL_TIMEOUT_MS = 5_000;
+const MODEL_TIMEOUT_MS = 10_000;
 const MAX_PROVIDER_RESPONSE_BYTES = 16_384;
 const EXTENSION_CATALOG_PATH = '/v1/extensions/journey_assistant/catalog';
 const EXTENSION_OBJECT_PATH_PREFIX = '/v1/extensions/journey_assistant/objects/';

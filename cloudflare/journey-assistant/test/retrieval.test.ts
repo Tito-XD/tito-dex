@@ -119,6 +119,38 @@ describe('audited AI Search retrieval', () => {
     );
     expect(captured?.ai_search_options?.retrieval?.filters).not.toHaveProperty('location_id');
   });
+
+  it('accepts reviewed BGE-M3 paraphrases at the production threshold only', async () => {
+    const search = vi.fn(async () => ({
+      search_query: request.question,
+      chunks: [
+        chunk('accepted', 0.511, {
+          audited: true,
+          game: 'soulsilver',
+          generation: 4,
+          location_id: 'johto-route-36-area',
+          hint_id: 'hgss-route36-sudowoodo',
+        }),
+        chunk('rejected', 0.509, {
+          audited: true,
+          game: 'soulsilver',
+          generation: 4,
+          location_id: 'johto-route-36-area',
+          hint_id: 'hgss-ilex-forest-cut-tree',
+        }),
+      ],
+    }));
+    await expect(retrieveAuditedHintIds(
+      { search } as SearchBinding,
+      progressionHints,
+      request,
+    )).resolves.toEqual(['hgss-route36-sudowoodo']);
+    expect(search).toHaveBeenCalledWith(expect.objectContaining({
+      ai_search_options: expect.objectContaining({
+        retrieval: expect.objectContaining({ match_threshold: 0.51 }),
+      }),
+    }));
+  });
 });
 
 describe('OpenAI-compatible provider response limits', () => {

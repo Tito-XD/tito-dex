@@ -2,7 +2,10 @@ import { effectiveContextReliability, type AssistantRequest } from './contract';
 import type { ProgressionHint } from './progression_hints';
 
 const MAX_SEARCH_RESULTS = 6;
-const MIN_SEARCH_SCORE = 0.55;
+// BGE-M3's reviewed HGSS paraphrase smoke cases cluster just above 0.51.
+// Keep the threshold conservative and always enforce the local hint allowlist
+// plus game/generation/audited metadata before accepting a result.
+const MIN_SEARCH_SCORE = 0.51;
 
 export type SearchBinding = Pick<AiSearchInstance, 'search'>;
 export type SearchNamespaceBinding = {
