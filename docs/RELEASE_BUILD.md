@@ -1,8 +1,11 @@
 # TitoDex RG APK — Release build checklist
 
-**Audience:** maintainers / Cloud Agents packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
+**Audience:** maintainers packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
 
-A valid **arm64-v8a release** APK is about **20–23 MB** on disk. If you see **~7 MB**, the file is **truncated or corrupt** (missing `libflutter.so` tail / broken ZIP central directory) — **do not ship it**.
+A valid **arm64-v8a Lite** APK is about **20–23 MB** on disk; the compact v14
+Offline APK is roughly **80 MB**. If a Lite build is only **~7 MB**, the file is
+truncated or corrupt (missing `libflutter.so` tail / broken ZIP central
+directory) — **do not ship it**.
 
 ---
 
@@ -30,7 +33,7 @@ These ship **inside** the APK via `pubspec.yaml`:
 | --- | --- |
 | `assets/fixtures/PKMSS.sav` | Settings → 导入内置存档 |
 | `assets/companion_media/*` | Starter companion GIFs + cries (29 species) |
-| `assets/game_icons/*.png` | Official HOME game icons (Gen VI+) |
+| `assets/game_icons/*.png` | Bundled game icons with per-file provenance in `assets/game_icons/SOURCES.json` |
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
 
@@ -94,7 +97,20 @@ Run the **Android Release APKs** workflow manually with:
 - `bundle_manifest_url` — the currently published root manifest; CI downloads its selected archive and verifies `bundleVersion>=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
 - `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-For v0.8.9 use `version=0.8.9`, Lite build `144`, Offline build `145`, and the published v0.8.8 Offline release asset as `offline_seed_apk_url` to retain the compact v14 seed while Lite and installed Offline copies can update to live v19. The workflow analyzes and tests once, then builds the signed Lite and Offline APKs in parallel. Each artifact is named `TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before upload. The offline verifier also checks its embedded manifest and archive SHA-256 against the selected manifest. **Always bump past the latest published product version** (do not regress from 0.8.x back to 0.7.x); Lite/Offline `versionCode`s must be strictly increasing. The v14 compact archive uses a versioned key and reduces the Offline APK from roughly 130 MB to roughly 80 MB without changing the Lite APK.
+The latest published pair is v0.8.12 with Lite versionCode `152` and Offline
+versionCode `153`. A later release must use a product version newer than
+`0.8.12`, a Lite versionCode greater than `153`, and an even larger Offline
+versionCode. Reuse the published v0.8.12 Offline asset through
+`offline_seed_apk_url` when the compact v14 seed is intentionally unchanged;
+do not seed a new Offline APK from the live v19 archive unless accepting the
+larger package is an explicit release decision.
+
+The workflow analyzes and tests once, then builds the signed Lite and Offline
+APKs in parallel. Each artifact is named
+`TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before
+upload. The Offline verifier also checks its embedded manifest and archive
+SHA-256 against the selected manifest. Product versions and both Android
+versionCodes must always increase monotonically.
 
 Publishing is a separate manual **Publish Verified Android Release** workflow. Supply the
 successful build run id, that run's exact source SHA, both build numbers, a full Chinese

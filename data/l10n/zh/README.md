@@ -66,6 +66,11 @@ HGSS 存档 **map id**（纯数字 slug）走 `hgss_map_ids.json`。
 
 运行 `python3 tools/fetch_zh_catalog.py` 后查看 `manifest.json`。
 
+当前受版本控制快照生成于 2026-07-22：1025 物种、937 招式、373 特性、
+2221 道具、1356 地点区域、500 个 HGSS map id，地点未解析数为 0。这里的
+2221 是上游中文目录快照计数，不等同于 v19 App 道具页经过产品筛选和审计后的
+2130 条记录。
+
 - **物种/招式/特性**：优先 PokeAPI `zh-Hans`，无则 `zh-Hant`，再无则 `nameZh = nameEn`
 - **地点**：PokeAPI 无中文；靠 `location_names_en_zh` + slug 表 + 英文复合规则（如「随意镇」+「遗迹」）
 - **存档 map id**：`hgss_map_ids.json`

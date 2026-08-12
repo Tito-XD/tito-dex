@@ -34,6 +34,7 @@ void main() {
   testWidgets('detects RG Rotate square handheld', (tester) async {
     late bool square;
     late bool compact;
+    late EdgeInsets pagePadding;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -43,6 +44,7 @@ void main() {
             builder: (context) {
               square = DeviceLayout.useSquareDashboard(context);
               compact = DeviceLayout.isCompact(context);
+              pagePadding = DeviceLayout.pagePadding(context);
               return const SizedBox();
             },
           ),
@@ -52,12 +54,16 @@ void main() {
 
     expect(square, isTrue);
     expect(compact, isTrue);
+    expect(pagePadding.top, 6);
+    expect(pagePadding.bottom, 6);
   });
 
   testWidgets('detects short landscape RG screen', (tester) async {
     late bool square;
     late bool compact;
     late bool short;
+    late double trainerHeight;
+    late double minimumTrainerHeight;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -68,6 +74,8 @@ void main() {
               square = DeviceLayout.useSquareDashboard(context);
               compact = DeviceLayout.isCompact(context);
               short = DeviceLayout.isShortScreen(context);
+              trainerHeight = DeviceLayout.trainerSquareCardHeight(context);
+              minimumTrainerHeight = DeviceLayout.dim(context, 116);
               return const SizedBox();
             },
           ),
@@ -78,6 +86,7 @@ void main() {
     expect(square, isTrue);
     expect(compact, isTrue);
     expect(short, isTrue);
+    expect(trainerHeight, greaterThan(minimumTrainerHeight));
   });
 
   testWidgets('detects 3:4 portrait handheld', (tester) async {

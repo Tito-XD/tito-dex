@@ -78,13 +78,13 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 | --- | --- | --- |
 | `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v5/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动 | v19 发布：以线上 v18 为只读基线，构建/审计形态媒体与完整道具尾项 → 仅上传变化对象 → manifest-last |
+| `upload-dex-bundle.yml` | 手动、历史复现 | 已完成的 v19 专用流程：以线上 v18 为只读基线；生产已为 v19，**不得再次用于发布** |
 
-已完成使命的 v7 / v12 / v13 / v14 / v15 / v16 / v17 / v18 一次性发布 workflow 存档在
-`docs/archive/workflows/`，不再显示在 GitHub Actions；对应 `tools/` 脚本继续保留，
-用于历史复现和下一版本构建参考。
+已完成使命的一次性发布 workflow 已从工作树移除，避免被误当成当前发布入口；
+对应提交、构建脚本与演进过程仍可从 Git 历史和 `tools/` 追溯。下一版本必须新建
+带精确生产前置版本的 workflow。
 
-Both R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
+All R2 upload workflows require **`--remote`** on every `wrangler r2 object put` (Wrangler 4 defaults to local without it).
 
 ---
 
@@ -107,8 +107,11 @@ GitHub repository secrets (`CLOUDFLARE_*`) are unchanged — Actions still write
 ```bash
 export CLOUDFLARE_API_TOKEN=...
 export CLOUDFLARE_ACCOUNT_ID=...
-./tools/upload_dex_bundle.sh dist/dex-v7/upload v5
+./tools/upload_dex_bundle.sh <verified-candidate-upload-dir> v5
 ```
+
+该命令只适用于已经通过当前版本审计、且拥有精确生产版本前置检查的未来候选；不要把
+历史 `dist/dex-v7` 示例当作当前可发布数据。
 
 Or: download the current production root manifest first, then run
 `python3 tools/stage_l10n_upload.py --remote-manifest <manifest> --expected-bundle-version 19`.

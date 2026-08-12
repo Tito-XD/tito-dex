@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) |
-| **`main` / lite source** | `0.8.11+150` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.11-offline+151` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) |
+| **`main` / lite source** | `0.8.12+152` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.12-offline+153` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
@@ -22,7 +22,7 @@
 - **Game context first:** edition, generation, and regional scope affect data and calculations.
 - **Focused reference:** provide practical depth without reproducing a full community wiki or simulator.
 
-Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bundled Nunito — see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md), [UI_REFERENCE.md](./UI_REFERENCE.md).
+Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bundled Nunito — see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md).
 
 ---
 
@@ -34,14 +34,14 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 | `tools/` | Python: dex bundle build, zh catalog fetch, HGSS save probe |
 | `cloudflare/dex-cdn/` | R2 proxy Worker (deploy branch `deploy/dex-cdn`) |
 | `data/l10n/zh/` | Master zh catalog (git); copied to bundle + APK assets |
-| `releases/` | RG APK binaries (`TitoDex-<ver>-rg-arm64.apk`) |
+| `releases/` | RG APK binaries (`TitoDex-<ver>-{lite,offline}-rg-arm64.apk`) |
 | `fixtures/` | Test saves (e.g. `PKMSS.sav`) |
 
 ---
 
-## Current feature status (latest release line: v0.8.11)
+## Current feature status (latest release line: v0.8.12)
 
-> v0.8.11 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
+> v0.8.12 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data.
 
 ### Journey & save
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
@@ -131,44 +131,14 @@ attribution text; publish corrected bundle metadata only under a new bundle
 version/object set rather than overwriting v19 objects.
 
 ### Latest release-line highlights
+- v0.8.12: enlarges and rebalances the immersive RG home Trainer Card, gives normal handheld Journey metadata two readable lines with a compact fallback, adds small top/bottom optical insets, and consolidates obsolete handoffs, phase plans, UI fragments and one-shot CDN workflows into current canonical documentation plus Git history.
 - v0.8.11: adds offline Pokémon Sleep score and basic cooking-strength tools from a pinned Neroli’s Lab commit, bundles its Apache-2.0 license/NOTICE, and completes the attribution correction across 52Poké, PokeAPI/sprites, PokéSprite, Nunito, game icons, generated media metadata, Settings, and public documentation.
 - v0.8.10: expands fixture-verified HGSS sync into rich party and trainer data, corrects current/max HP parsing, keeps the Dex route mounted and its return position stable across nested detail navigation, and makes complete data/media credits plus the unofficial-project notice visible in Settings and both READMEs.
 - v0.8.9: repairs media resource management and adds retry; makes companion positioning full-screen and smooth; scopes items, prices, moves and mechanics to the selected game/generation; compacts Location Dex into a missing-first drill-down; and connects parsed party abilities/moves/evolution routes to Team and quick damage. HGSS shows separate Johto/Kanto badge progress, Journey sync time is corrected, and exact HeartGold/SoulSilver selection is no longer represented by a hard-coded SoulSilver team heading.
 - v0.8.8: completes the three-phase correctness and UI closure: hardened l10n/release source binding, configurable Android app shortcuts, location dex, mechanics-aware evolution planning, improved save parsing and fixture gates, canonical Chinese dex axes, explicit battle assumptions, and a Journey save assistant that connects location, party evolution and exact-version completion data. Runtime data-to-UI alignment is audited and covered by 373 Flutter tests.
-- v0.8.7: fixes per-version sprite previews and artwork-viewer back behavior; makes companion art and cries explicitly form-aware across normal/shiny and static/animated sources; publishes the audited v19 media catalog; and completes all 2130 item descriptions and local icons with shared/fallback templates labelled honestly. Offline keeps the compact v14 seed and can update to v19.
-- v0.8.6: moves gain an 18-type filter; abilities, natures, egg groups, weather, and status gain compact category filters; detail stat keys are normalized to Chinese labels across EV yield, base stats, and nature effects; the first system-back action now closes the artwork viewer instead of popping the detail route underneath. Bundle v13 and compact Offline v14 remain unchanged.
-- v0.8.5: Android data-pack downloads can continue in the background with notification progress; exact-version obtain planning and held-item rows land; structured evolution and encounter conditions become visible; the dex gains persisted region/G1–G9 scope selection; flavor icons are local, metadata rows align, form status/attribution/Sleep links are restored, and secondary-page scaling is retired. Bundle v13 and compact Offline v14 remain unchanged.
-- v0.8.2: Lite and Offline show continuous weighted progress across manifest/read, download, verification, decompression, extraction and indexing; Offline uses the compact v14 archive (48.7% smaller than v13); offline references load local-first; HOME-style body-filter icons are redrawn for clearer silhouettes.
-- v0.8.1: form-aware evolution chains show the matching regional line with form sprites; body-style / size filter chips gain APK-local vector icons; Offline embeds dex bundle v13.
-- v0.8.0: curated items hub (542 items, Bulbapedia-style categories, icons) and dex list animation polish.
-- v0.7.16: unified game icons — Gen VI+ uses Pokémon HOME game icons, Gen I–V uses DS/3DS launch icons (SteamGridDB), white-2/mega-dimension use Pokémon artwork badges; form sprites in bundle v10 are clear official artwork (were pixelated), offline form caching prefers artwork; predictive-back rework — content stays opaque during the drag, underlying pages stay static, and a gesture-runway clamp keeps the commit fade playing even after a full-edge drag.
-- v0.7.15: official single-version icons for secondary flavors (Violet, Shield, Shining Pearl, Y, …) replace generated badges; offline caching stores per-form sprites (`sprites/forms/<key>.png`) so non-default forms keep their art; edge-to-edge shell makes predictive back retract the whole screen with no skyBlue flash; dex route joins the gesture so release fades out; dex enter reveal starts after the shell lands.
-- v0.7.14: per-flavor game icons in the edition picker; companion position drag no longer spams SharedPreferences; Dex tab re-entry restores the list fade/slide reveal; predictive-back gesture now moves the Dex content layer together with the shell.
-- v0.7.13: merged-vs-flavor game picker with secondary flavor sheet; generated/fallback game icons for older titles; companion draggable position in Settings; simplified Dex Hero entry and one-shot list reveal.
-- v0.7.12: reverted detail sprite display to local assets and added shimmer placeholders for network images.
-- v0.7.11: restored game description logos and added form artwork CDN support; companion form/shiny selection.
-- v0.7.1: restores the verified clear 220×220 default images; adds real form-specific historical sprite sources without inventing missing generations; reduces the form selector to chips; changes exact encounter version selection to a dropdown; pins secondary-page headers and adds quick scroll-to-top to the dex. Bundle v7 reuses v6 encounter/location data byte-for-byte and publishes only corrected media plus form sprite metadata under `/v5/`.
-- v0.7.0: searchable form variants replace types, stats, abilities, moves, size, image and locations together; obtain locations can be selected by exact paired version or DLC and remain tied to the selected form without borrowing the default form; bundle v6 publishes all 1025 species plus attributed modern-game encounter overlays under a new immutable prefix with v4→v3→v2 online fallback; iOS platform source is merged and Xcode 27 no-codesign build-verified.
-- v0.6.9: party cells go upright (sprite over full-width name) with the level moved onto the sprite corner as a `_PartyLevelBadge` softYellow pill; square `gridMode` lays 2×3 in the save-linked half-width column and 6×1 via `stripMode` in the no-save full-width bar, with cells capped near-square and centered instead of stretching; tablet/tall-landscape home switches to `_WideRowsContent` (intrinsic-height trainer + journey row, party as one capped strip) so the journey card stops ballooning — square handhelds and short landscape phones keep the packed two-column layout.
-- v0.6.8: header gradient recolored from light-top skyBlue→slateBlue (1.64:1 title contrast) to dark-top `#5D728A`→slateBlue picked via `docs/mockups/titodex_header_gradient_template.html`; on-gradient subtitles switch from invisible skyBlue to cream through the shared `SecondaryPageSubtitle` (deep-blue-card skyBlue text untouched — it was already readable); dex top bar slims to 「图鉴」 with the game name as subtitle; square dashboard gets a 3×2 party grid, tighter trainer card, journey-card overflow fix, and a stacked layout when no save is linked; quick damage gains the doubles spread ×0.75 toggle and the stat-calc → quick-damage one-shot handoff (`battle_handoff.dart`).
-- v0.6.7: Retro phase 2 from the five mock templates — settings group-label pills + StickerSwitch + icon plates, deep-blue damage hero card (oversized percentage, mint/coral HP bar, power slider, engraved fields, pill toggles), dex detail hero header with type-tinted plate + sticker tabs, team page aligned to the mock (inline editor, type pills, dashed empty slots), hand-drawn quick tile icons (`assets/icons/`), responsive dex grid, hold-press physics, pinned damage result, obtain tab follows the selected edition. Cream screen base and weak/resist tinted cells remain intentionally excluded.
-- v0.6.6.1: Retro press physics extended to every interactive sticker (dex grid cards, search/reference/team rows, journey card, quiz choices, dex top-bar pills, picker tiles, battle tool rows) via `StickerPressable` with `ownShadow` to avoid doubled shadows; DESIGN_SYSTEM canonizes the solid sticker-shadow signature.
-- v0.6.6: Retro sticker-feel toggle (Settings → 界面风格, default on — TitoShadows solid drops, StickerPressable press physics, -0.02em headings), generation-scoped silhouette quiz with persisted best streak + adopt-as-companion, shiny companion sessions (Showdown shiny GIFs, disk-cached) with intimacy quote tiers / time-of-day greetings / pat-count persistence, crit + screen toggles and an assumptions note in quick damage, full-dex team picker with species-linked editing, bundled official-style type icons, drill-down back-hierarchy fixes, toggleable list reveal animations, shiny artwork preview, branded Android 12+ splash, matched transition backdrop, repository cleanup.
-- v0.6.5: save-diff banner scoping + dismissal, unified dex transition backdrop and timing (480/380 ms), submit-only recent searches (max 10), prominent current-game card in Settings, matchup grid overflow fix, companion size floor ×0.75, Chinese reference note for untranslated flavor text.
-- v0.6.2.1: full-bleed launcher artwork lets Android adaptive-icon masks define the circle, squircle, rounded-square, or square silhouette.
-- v0.6.2: companion size control, bundled starter GIF/cry media, and cancellable preload for other companions.
-- v0.6.1: companion 2.0, landscape Home, bundled modern game icons, header polish, and Settings cleanup.
-- v0.5.51 preview: Home Team and Search routes keep their designed entry/exit edge, while Team, Dex, and Search opt out of predictive-back progress.
-- v0.5.5: single-file save import, native Android app picker, experimental Gen 1–7 save metadata, polished route/list motion, six-slot party layout, standby companion, shiny surprises, and silhouette quiz.
-- v0.5.1: Android-standard route motion and predictive back; Home Team / Dex / Search cards expand into their matching first-level page, while all other routes use Material transitions.
-- v0.5.0: precomputed Dex catalog keeps list, search, and reference filters in memory; home no longer blocks on a looping bootstrap bar.
-- v0.4.99: source-line consolidation and aligned lite/offline packages.
-- v0.4.98: per-game titles in the flavor-text carousel for paired editions.
-- v0.4.95–v0.4.97: trainer-card bootstrap and square layout, loading panels, team editor improvements, download progress/cancel, and copy cleanup.
-- v0.4.94: compact Settings sections and paginated dex filter results.
-- v0.4.93: ability fallback, game labels, obtain-location coverage, and ability filters.
-- v0.4.85: Terastal, held items, status, defensive abilities, and team shared weaknesses.
-- v0.4.8: generation-aware matchup modifiers and offensive/defensive blind-spot tools.
+
+Earlier release history belongs in [RELEASES.md](RELEASES.md), [ROADMAP.md](../ROADMAP.md),
+GitHub Releases, and Git history; this agent context keeps only the active release line.
 
 ### Not shipped / partial
 - Beyond the IV/EV inputs already exposed in stat calc: full competitive damage calculator, dedicated IV workflow, usage rankings, and simulator parity.
@@ -196,7 +166,10 @@ flutter/lib/
   widgets/                    # DeviceShell, dex_reference_detail, …
 ```
 
-**Routing:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/search`, `/settings`, companion sub-routes under `/search/companion/*`.
+**Routing:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, Dex sub-routes
+(`moves`, `abilities`, `locations`, `quiz`), `/search`, companion tools,
+`/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings
+media/companion-position sub-routes.
 
 **Dex offline dir** (`dex_offline/` in app documents): mirrors CDN bundle — see [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md).
 
@@ -213,15 +186,17 @@ flutter/lib/
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
 | `/v5/` | **v19** | current — v13 form evolution + v14 compact archive + v15 zh flavor + v16 held items + v17 full items + v18 online-media catalog + v19 audited form media and complete item text/icons |
 
-Historical `/v5/` patches on the same prefix: v7 media → v8 form artwork → v9 artwork fallback → v10 clear form art → v11 items → v12 species search axes → v13 form evolution → v14 compact archive → v15 zh flavor → v16 held items → v17 full items → v18 online-media catalog metadata → **v19 audited form media + complete item text/icons**.
-
-Build/release v19 with `tools/patch_dex_bundle_v19_items.py`, `tools/audit_item_media_v19.py`, `tools/verify_dex_v19_items.py`, and `.github/workflows/upload-dex-bundle.yml`. The workflow restores live v18 as a read-only base, stages only changed `/v5/` objects, and switches the root manifest last.
+Bundle v19 was built with `tools/patch_dex_bundle_v19_items.py`,
+`tools/audit_item_media_v19.py`, `tools/verify_dex_v19_items.py`, and the
+version-specific `.github/workflows/upload-dex-bundle.yml`. That workflow
+requires live v18 as its base and must not be used to republish now that live
+production is v19. A future bundle needs a new version-specific workflow with
+v19 as the explicit read-only production precondition; stage changed `/v5/`
+objects first and switch the root manifest last.
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
 - **Bundle version and CDN prefix are decoupled.** Every release since v7 patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
-- Incremental v12 build: `python3 tools/patch_dex_bundle_v12_species_axes.py` (v11 archive as read-only base).
-- Incremental v13 build: `python3 tools/patch_dex_bundle_v13_form_evolution.py` (live v12 archive as read-only base; no PokeAPI). The completed one-shot v12/v13 workflows live under `docs/archive/workflows/`; future releases need a new workflow with the current production version as an explicit precondition.
 - v14 compact-media seed: `python3 tools/patch_dex_bundle_v14_compact_media.py`. It byte-compares all 1,340 `artwork/` files against their `sprites/` peers before removing only the duplicate archive copies; loose online artwork remains in R2. Offline APKs still reuse its verified 54,746,615-byte archive while installed copies can update to live v19.
 - Body style / colour / growth rate / habitat Chinese labels are canonical in `data/l10n/zh/dex_axes.json`; Flutter's fallback map is generated from it. New bundle builds persist labels beside slugs, while v19 remains compatible through the APK fallback.
 - Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`. Clients only upgrade when `remote.bundleVersion > local.version`.
@@ -235,16 +210,16 @@ Build/release v19 with `tools/patch_dex_bundle_v19_items.py`, `tools/audit_item_
 ```bash
 cd flutter
 flutter pub get
-flutter test                    # regression gate
+flutter test --no-pub           # regression gate
 flutter build apk --release --target-platform android-arm64  # ~21 MB Lite / ~80 MB compact Offline
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
-cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
+cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-lite-rg-arm64.apk
 ```
 
 | Rule | Detail |
 | --- | --- |
 | ABI | arm64-v8a only |
-| Filename | `releases/TitoDex-<ver>-rg-arm64.apk` |
+| Filename | `releases/TitoDex-<ver>-{lite,offline}-rg-arm64.apk` |
 | SDK | compile/target 36, min 24 |
 | Size | ~20–23 MB; verify script must PASS |
 | Signing | `flutter/android/key.properties` + upload keystore |
@@ -273,9 +248,11 @@ Same codebase, no diverging fork — `ios/` generated via
   `#2F4361` matching Android.
 - **Info.plist**: display name `TitoDex`,
   `NSPhotoLibraryUsageDescription` for trainer-avatar picking (gallery only).
-- **Verified 2026-07-23**: `pod install`, `flutter analyze`, 215 Flutter tests,
-  and `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
-  Runner.app). Generated Pods/build files are not committed.
+- **Last iOS build verification (2026-07-23, v0.7.0)**: `pod install`,
+  `flutter analyze`, 215 Flutter tests, and
+  `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
+  Runner.app). v0.8.12 passes the shared Dart suite, but its iOS no-codesign
+  build has not been repeated; generated Pods/build files are not committed.
 - Signing, IPA, TestFlight, and App Store distribution are intentionally not
   part of the Android release and require an Apple Developer account.
 
@@ -293,8 +270,9 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 **Known baseline:** `flutter analyze --no-pub` is expected to be clean;
 `flutter test --no-pub` is the regression gate.
 
-**Verified v0.8.11 release candidate (2026-08-11):** `flutter analyze` has
-no issues; all 401 Flutter tests and all 132 Python tooling tests pass. Android native shortcut and
+**Verified v0.8.12 source baseline (2026-08-12 documentation/layout audit):**
+`flutter analyze --no-pub` has no issues; all 402 Flutter tests and all 132
+Python tooling tests pass. Android native shortcut and
 media smoke coverage runs on an x86_64 emulator in CI; APK packaging and
 physical-device release acceptance remain separate release gates.
 
@@ -338,21 +316,17 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 | --- | --- |
 | [README.md](../README.md) | 中文项目介绍与快速开始（默认） |
 | [README.en.md](../README.en.md) | Maintained English project overview |
-| [VISION.md](../VISION.md) | Product feeling & philosophy |
-| [PRODUCT.md](../PRODUCT.md) | Feature positioning |
 | [ROADMAP.md](../ROADMAP.md) | Release history & what's next |
 | [RELEASES.md](./RELEASES.md) | 中文优先的 GitHub Release 文案规范与近期历史 |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical structure |
-| [STACK_DECISION.md](./STACK_DECISION.md) | Why Flutter; migration notes |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technology choice, structure and platform boundaries |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
 | [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md) | R2 / Worker / bundle layout |
 | [PERMISSIONS.md](./PERMISSIONS.md) | GitHub Actions secrets |
-| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Colors, typography |
+| [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Visual, typography, layout and interaction rules |
 | [PARSER_PROPOSAL.md](./PARSER_PROPOSAL.md) | Save parser design |
-| [JOURNEY_PROFILE_PLAN.md](./JOURNEY_PROFILE_PLAN.md) | Journey UX plans |
-| [PHASED_FEATURE_PLAN.md](./PHASED_FEATURE_PLAN.md) | Active three-phase feature plan (supersedes the codex roadmap ideas) |
 
-Legacy handoff docs under `docs/handoff/` are historical — prefer this file for current state.
+Completed plans and handoff notes are consolidated into this file, `ROADMAP.md`
+and Git history rather than kept as parallel documentation.
 
 ---
 

@@ -43,9 +43,9 @@ class TrainerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Square dashboards need the whole micro treatment (height AND font
-    // sizes) — dense height with dense 33/27pt type still overflows the
-    // 720px column's journey card below.
+    // Square dashboards keep the micro card height so the Journey card below
+    // still fits, but the micro content itself is intentionally larger: the
+    // old avatar/type left most of the card visually empty on the RG panel.
     final density = DeviceLayout.useSquareDashboard(context)
         ? TrainerCardDensity.micro
         : _density;
@@ -95,10 +95,10 @@ class _TrainerCardMetrics {
       TrainerCardDensity.micro => _TrainerCardMetrics(
         cardHeight: DeviceLayout.trainerMicroCardHeight(context),
         avatarSize: DeviceLayout.trainerMicroAvatarSize(context),
-        gutter: DeviceLayout.dim(context, 8),
-        textGap: DeviceLayout.dim(context, 4),
-        greetingFontSize: DeviceLayout.dim(context, 15),
-        nameFontSize: DeviceLayout.dim(context, 14),
+        gutter: DeviceLayout.dim(context, 12),
+        textGap: DeviceLayout.dim(context, 5),
+        greetingFontSize: DeviceLayout.dim(context, 20),
+        nameFontSize: DeviceLayout.dim(context, 18),
       ),
       TrainerCardDensity.dense => _TrainerCardMetrics(
         cardHeight: DeviceLayout.useSquareDashboard(context)

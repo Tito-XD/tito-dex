@@ -1,8 +1,11 @@
 # TitoDex Design System
 
-TitoDex uses a warm, compact, modern-retro trainer-device language that remains readable on Android phones and handheld displays. Its personality should be recognizable without depending on private user information. The original visual reference is documented in [UI Reference Notes](./UI_REFERENCE.md).
+TitoDex uses a warm, compact, modern-retro trainer-device language that remains readable on Android phones and handheld displays. Its personality should be recognizable without depending on private user information.
 
-**Implementation:** Active design tokens live in `flutter/lib/theme/tito_colors.dart`. The pre-Flutter React mock was removed in v0.6.5; any CSS examples below are explanatory references, not a second source of truth. See [Stack Decision](./STACK_DECISION.md).
+**Implementation:** Active design tokens live in `flutter/lib/theme/`. The
+pre-Flutter React mock was removed in v0.6.5; values below document the Flutter
+implementation rather than a second UI stack. Architecture boundaries live in
+[ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Design Personality
 
@@ -89,78 +92,49 @@ package through `retroStyle`:
 
 ## Typography
 
-Prefer friendly, readable type. Avoid overly futuristic UI fonts.
+Bundled Nunito and `SecondaryTypography` provide the fixed comfort baseline for
+secondary routes. These sizes do not multiply by `handheldUiScale`:
 
-Guidelines:
+| Tier | px | Token | Typical use |
+| --- | ---: | --- | --- |
+| Page title | 22.5 | `onGradient.title` | Secondary app bars |
+| Section | 15 | `onCard.h15` / `onGradient.h15` | Card headings |
+| Body | 14 | `onCard.body14` | Descriptions and paths |
+| Meta | 14 | `onCard.meta14` | Counts, values and tabs |
+| Small | 12 | `small12` / `team12` | Hints, HP/EXP and compact labels |
 
-- Use compact headings.
-- Use strong labels for device-like panels.
-- Keep dense information readable on square screens.
-- Use `clamp()` for responsive text.
+Dex, Team, Journey, Search, Settings and battle/Sleep tools use this hierarchy.
+The Home dashboard intentionally stays larger for glanceability: its title is
+layout-driven near 33 px, quick tiles own explicit sizes, and trainer details
+may use `homeDetailMultiplier`. `TitoFontScale` is retired; layout dimensions
+and body type must not share an inherited multiplier.
 
-Example:
+## Layout and system UI
 
-```css
-.title {
-  font-size: clamp(1.6rem, 5dvw, 3rem);
-  letter-spacing: -0.03em;
-}
+| Device | System UI | Header status | Home composition |
+| --- | --- | --- | --- |
+| Handheld panel around 1:1 / 3:4 / 4:3 | Immersive | TitoDex Wi-Fi/battery | Square or short-landscape dashboard |
+| Regular phone/tablet | Native status/navigation bars | OS chrome | Portrait stack or wide rows |
 
-.card-title {
-  font-size: clamp(1rem, 2.8dvw, 1.4rem);
-}
-```
+`DeviceLayout`, `SystemUiCoordinator` and `DeviceShell` own that split. Regular
+phones must not use immersive sticky. Web keeps the mock device frame for
+preview only. The handheld gradient remains full bleed, while page content
+keeps a small 6 px top/bottom optical inset because immersive mode removes the
+system status and gesture-bar safe areas.
 
-## Layout System
+`HomeDashboardBody` has three explicit compositions:
 
-TitoDex must adapt across:
+| Composition | Condition | Shape |
+| --- | --- | --- |
+| Portrait | Non-square portrait | trainer → journey → party → quick actions |
+| Horizontal | Square or landscape under 560 px tall | trainer/journey beside party |
+| Wide rows | Non-square landscape at least 560 px tall | natural-height top row plus capped party strip |
 
-- RG Rotate square screen
-- ordinary Android phones
-- tablets
-- foldables
-
-Rules:
-
-- mobile first
-- use CSS Grid and Flexbox
-- use `dvh` / `dvw`
-- respect safe areas
-- never hard-code the app to `720×720`
-- square screens should use available space as a dashboard, not a narrow phone column
-
-Base shell example:
-
-```css
-.app-shell {
-  min-height: 100dvh;
-  padding:
-    max(16px, env(safe-area-inset-top))
-    max(16px, env(safe-area-inset-right))
-    max(16px, env(safe-area-inset-bottom))
-    max(16px, env(safe-area-inset-left));
-}
-```
-
-Dashboard example:
-
-```css
-.home-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: clamp(12px, 2.5dvw, 24px);
-}
-```
-
-Dex grid example:
-
-```css
-.dex-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-  gap: clamp(10px, 2dvw, 18px);
-}
-```
+`PartyStrip` always renders six slots: portrait uses 3×2 horizontal cells,
+save-linked square/short landscape uses 2×3 upright cells, and no-save/wide-row
+layouts use a centered 6×1 strip. Callers select the mode explicitly rather
+than inferring it from width. The header game pill opens the 3–4 column edition
+grid and always retains a text fallback for missing icons.
 
 ## Home Screen Composition
 
@@ -168,9 +142,9 @@ The home screen should prioritize:
 
 1. TitoDex title
 2. Trainer Card
-3. Continue Journey large card
-4. Quick widgets
-5. Recent journey timeline
+3. Journey status card when the selected game has save-linked support
+4. Six-slot party card
+5. Team / Dex / Search quick widgets
 
 Square screens may show these as a dashboard with multiple panels visible at once. Phone portrait can stack them.
 
@@ -188,19 +162,25 @@ Core content:
 - badge strip
 - soft yellow or blue-gray panel
 
-### Continue Journey Card
+On normal RG panels the compact Trainer Card uses a slightly taller frame and
+larger avatar/type; only the minimum 360 px compatibility layout keeps the
+short micro height.
 
-The dominant action, inspired by the reference Goldenrod City card: deep-blue framed panel, city illustration area, play-time block, badge progress, and clear Continue affordance.
+### Journey Card
+
+The save-linked journey entry is a compact deep-blue status block rather than a
+literal “continue game” button. It opens Journey detail; emulator launch is a
+separate action there and in Settings. Manual/dex-only editions omit the card.
+On the narrow RG half-column, badge progress owns one line and play time plus
+the save-assistant summary own a second line; do not concatenate all metadata
+into one truncated row.
 
 Core content:
 
-- big card
-- current game: SoulSilver
-- location: Goldenrod City
-- 3 badges
-- play time
-- party mini chips
-- warm accent CTA
+- localized current location and selected game context
+- play time and separate regional badge progress where available
+- latest save-assistant reminder / nearby-capture summary
+- clear secondary-page affordance
 
 ### Party Card
 
@@ -221,7 +201,6 @@ Rules:
 Small chunky buttons:
 
 - Team
-- Journey
 - Dex
 - Search
 
@@ -229,15 +208,11 @@ Each widget should look like a friendly sticker or device tile.
 
 ### Companion Character
 
-Riolu can be represented initially as:
-
-- placeholder sticker
-- silhouette
-- small badge icon
-- future custom illustration
-
-Avoid depending on copyrighted official art assets unless licensing is clear.
+The companion is user-selectable and may use static, animated, shiny and cry
+media where the audited catalog has an explicit candidate. Missing form media
+must remain missing rather than silently borrowing another form. Source and
+rights boundaries are maintained in `CREDITS.md` and the in-app credits page.
 
 ## Supplied Reference Translation
 
-The reference image should be interpreted as a product direction, not a requirement to copy every pixel. Preserve the feeling: warm blue device, cream sticker cards, thick navy outlines, Riolu companion presence, dashboard density, and playful Trainer Card energy.
+The reference image should be interpreted as a product direction, not a requirement to copy every pixel. Preserve the feeling: warm blue device, cream sticker cards, thick navy outlines, companion presence, dashboard density, and playful Trainer Card energy.

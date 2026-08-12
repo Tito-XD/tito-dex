@@ -83,13 +83,17 @@ PokeAPI Pokémon endpoint，并已链接进相应 species 的 `varieties`，因�
 收录，不启用手工覆盖。状态记录在 `data/forms/overrides.json`；后续新增而上游未收录的
 形态先进入 `pendingForms`，资料与独立图片齐全后才可转为有效覆盖。
 
+形态媒体的新鲜度由 v19 的 `data/dex/form_media_audit.json` 单独记录：1025 个物种、
+803 条形态记录按普通／闪光、静态／动态和叫声逐项审计。六个故勒顿／密勒顿骑乘模式
+没有独立上游静态图，保持为明确缺口，不借用其他模式。
+
 自动审计：
 
 ```bash
 python3 tools/audit_form_coverage.py <bundle-root> --strict --pokeapi
 python3 tools/audit_encounter_coverage.py <bundle-root> --strict
 python3 tools/audit_dex_golden_samples.py <bundle-root> --strict
-python3 tools/verify_dex_upload_tree.py dist/dex-v7/upload
+python3 tools/verify_dex_upload_tree.py <candidate-upload-root>
 ```
 
 金样本覆盖皮卡丘、喷火龙 Mega X/Y 与超极巨、洛托姆、帕底亚乌波、洗翠火暴兽、

@@ -130,7 +130,7 @@ Before parsing unknown files:
 | `DeSmuME Save` footer after the 512 KiB payload | Strip DeSmuME wrapper |
 | Other sizes | Reject with `unsupported_save` message |
 
-## Parser UX (implemented / planned)
+## Parser UX (implemented)
 
 | State | UX |
 | --- | --- |
@@ -143,7 +143,7 @@ Before parsing unknown files:
 
 ## Non-Goals
 
-- all-generation parser framework
+- full rich all-generation parser framework (Gen I–VII metadata recognition remains experimental)
 - full save editing
 - PC box management
 - emulator memory reading

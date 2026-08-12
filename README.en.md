@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11+150` | Built-in Pokémon Sleep estimates and auditable third-party credits |
-| Offline APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11-offline+151` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| `main` source baseline | App `0.8.11+150` | Features, reachable UI, attribution, licenses, and rights notices aligned |
+| Lite APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12+152` | Refined RG home proportions and immersive insets; consolidated project documentation |
+| Offline APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12-offline+153` | Embeds the verified compact v14 Dex archive and can update to v19 |
+| `main` source baseline | App `0.8.12+152` | Features, reachable UI, attribution, licenses, and rights notices aligned |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -53,11 +53,11 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 | Dex data | Pre-built bundle v19 with v5 → v4 → v3 → v2 fallback and APK asset fallbacks |
 | UI language | Simplified Chinese |
 
-Details: [Architecture](docs/ARCHITECTURE.md) · [Stack decision](docs/STACK_DECISION.md)
+Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.8.11-lite-rg-arm64.apk`** or **`TitoDex-0.8.11-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
+Download **`TitoDex-0.8.12-lite-rg-arm64.apk`** or **`TitoDex-0.8.12-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. If Android reports a signature conflict with a locally built debug package, uninstall that package before installing the release APK.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 
@@ -80,11 +80,10 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | Document | Contents |
 | --- | --- |
 | [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
-| [Vision](VISION.md) | Product goals and boundaries |
-| [Product](PRODUCT.md) | Audience, feature set, and priorities |
 | [Roadmap](ROADMAP.md) | Release history and next work |
+| [Architecture](docs/ARCHITECTURE.md) | Technology choice, data flow, and platform boundaries |
 | [Flutter app](flutter/README.md) | App development notes |
-| [Design system](docs/DESIGN_SYSTEM.md) | Visual and interaction tokens |
+| [Design system](docs/DESIGN_SYSTEM.md) | Visual, typography, layout, and interaction rules |
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |
 | [Release notes](docs/RELEASES.md) | Chinese-first GitHub Release copy rules and history |
 | [Data sources and credits](CREDITS.md) | Data, media, licenses, and unofficial-project notice |

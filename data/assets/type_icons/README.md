@@ -1,6 +1,7 @@
 # Type icons (18 types)
 
-Bundled PNG icons for CDN offline bundle (`v3/type_icons/{type}.png`).
+Bundled PNG icons for the APK and current CDN bundle (`v5/type_icons/{type}.png`).
+Older rollback prefixes retain their historical copies.
 
 ## Source
 
@@ -19,7 +20,7 @@ PokéSprite has not received major updates since ~2022, but the Gen 8 type icon 
 
 ```bash
 python3 tools/fetch_pokesprite_type_icons.py
-./tools/upload_type_icons.sh   # optional: push to R2 v3/type_icons/
+./tools/upload_type_icons.sh   # optional maintainer upload to R2 v5/type_icons/
 ```
 
 ## Alternatives considered
