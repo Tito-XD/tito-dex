@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | [`dex-cdn/`](dex-cdn/) | 离线图鉴 CDN Worker（R2 代理） | **`deploy/dex-cdn`** |
 
-**Production:** `https://dex.tito.cafe` · Worker **`tito-dex`** · R2 **`titodex-dex`** · Bundle **v4** (PNG)
+**Production:** `https://dex.tito.cafe` · Worker **`tito-dex`** · R2 **`titodex-dex`** · live bundle **v19** on `/v5/` (v14 compact Offline seed)
 
 Worker 部署说明：[`dex-cdn/DEPLOY.md`](dex-cdn/DEPLOY.md)
 

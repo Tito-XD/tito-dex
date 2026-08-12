@@ -85,7 +85,10 @@ abstract final class DeviceLayout {
 
   static EdgeInsets pagePadding(BuildContext context) {
     if (useSquareDashboard(context)) {
-      return const EdgeInsets.fromLTRB(8, 2, 8, 0);
+      // RG runs edge-to-edge with the system bars hidden. Keep the gradient
+      // full bleed, but pull interactive content slightly away from the
+      // physical panel edges so the header and quick bar do not feel clipped.
+      return const EdgeInsets.fromLTRB(8, 6, 8, 6);
     }
     if (isCompact(context)) {
       return const EdgeInsets.fromLTRB(10, 6, 10, 4);
@@ -264,19 +267,18 @@ abstract final class DeviceLayout {
   static double dexBackIconSize(BuildContext context) => backIconSize(context);
 
   static double trainerMicroCardHeight(BuildContext context) =>
-      dim(context, 116.0);
+      dim(context, sizeOf(context).height >= 480 ? 132.0 : 116.0);
 
   static double trainerDenseCardHeight(BuildContext context) =>
       dim(context, 124.0);
 
-  /// Square-dashboard trainer card — tighter than portrait dense so the
-  /// journey card below it gets the room it needs (720px square: the
-  /// journey meta row was overflowing by 21px at dense height).
+  /// Square-dashboard trainer card. Normal RG panels get a little more
+  /// presence; only the minimum 360px compatibility layout keeps 116px.
   static double trainerSquareCardHeight(BuildContext context) =>
-      dim(context, 116.0);
+      trainerMicroCardHeight(context);
 
   static double trainerMicroAvatarSize(BuildContext context) =>
-      dim(context, 56.0);
+      dim(context, 72.0);
 
   static double trainerDenseAvatarSize(BuildContext context) =>
       dim(context, 88.0);

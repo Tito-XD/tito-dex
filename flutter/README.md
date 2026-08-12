@@ -2,9 +2,9 @@
 
 Flutter implementation of the TitoDex journey companion. Parent repo: [../README.md](../README.md).
 
-**Latest release:** `0.8.11+150` / `0.8.11-offline+151` · [GitHub Release v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11)
+**Latest release:** `0.8.12+152` / `0.8.12-offline+153` · [GitHub Release v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12)
 
-**Current `main` package version:** `0.8.11+150`
+**Current `main` package version:** `0.8.12+152`
 
 **AI / agent context:** [../docs/AI_CONTEXT.md](../docs/AI_CONTEXT.md)
 ## Quick start
@@ -18,12 +18,12 @@ flutter run -d chrome # web preview (limited)
 
 ## Release APK (RG handheld)
 
-arm64-v8a only, approximately 23 MB for the standard APK, SDK 36.
+arm64-v8a only, approximately 23 MB for the Lite APK, SDK 36.
 
 ```bash
-flutter build apk --release
-cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-rg-arm64.apk
-../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-rg-arm64.apk
+flutter build apk --release --target-platform android-arm64
+cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-lite-rg-arm64.apk
+../tools/verify_release_apk.sh ../releases/TitoDex-<ver>-lite-rg-arm64.apk
 ```
 
 Checklist: [../docs/RELEASE_BUILD.md](../docs/RELEASE_BUILD.md). Uninstall local debug builds before sideloading CI APK.
@@ -88,7 +88,7 @@ assets/
   fixtures/PKMSS.sav
   l10n/zh/            # APK fallback catalog
   config/
-  companion/
+  companion_media/
 ```
 
 ## Dependencies (highlights)

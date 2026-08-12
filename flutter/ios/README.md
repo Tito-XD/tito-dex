@@ -1,8 +1,8 @@
 # TitoDex iOS platform — status & constraints
 
-**Audience:** maintainers / agents working on the shared Flutter source.
+**Audience:** maintainers working on the shared Flutter source.
 
-Last updated: 2026-07-23.
+Last reviewed: 2026-08-12.
 
 ## Current status
 
@@ -15,7 +15,13 @@ iOS support is merged into **`main`** for v0.7.0. The original platform branch s
 | Xcode 27 fixes | Fixes to make the build work under **Xcode 27 beta** |
 | shell adaptation | iOS renders the real native shell instead of the web preview frame (see below) |
 
-**Verified on 2026-07-23 against v0.7.0:** `pod install`, `flutter analyze`, 215 Flutter tests, and `flutter build ios --no-codesign --release` succeed under Xcode 27 beta (27.6 MB Runner.app). Pods and generated files were cleaned afterward. Signing / TestFlight / device runs remain intentionally outside the 0.7.0 Android release.
+**Last iOS build verification:** on 2026-07-23 against v0.7.0,
+`pod install`, `flutter analyze`, 215 Flutter tests, and
+`flutter build ios --no-codesign --release` succeeded under Xcode 27 beta
+(27.6 MB Runner.app). Pods and generated files were cleaned afterward.
+Current v0.8.12 Dart tests are covered by the shared Flutter suite, but the
+iOS no-codesign build has not been rerun for this release line; do not present
+v0.8.12 as device/TestFlight verified until that gate is repeated.
 
 ## iOS shell & layout adaptation (merged for v0.7.0)
 
@@ -52,12 +58,13 @@ already falls back on errors.
 - Save import via `file_picker` (copies into `save_import/` under app
   documents), photo-library avatar picking (`NSPhotoLibraryUsageDescription`).
 
-## Upstream sync policy
+## Shared-source verification policy
 
 Android Flutter builds remain the primary release target. iOS now shares
 `main` directly: platform-sensitive changes must keep `flutter analyze` and the
-full Flutter suite green, then repeat `pod install` and the no-codesign Xcode
-build before an Android release is tagged.
+full Flutter suite green. Repeat `pod install` and the no-codesign Xcode build
+before claiming iOS compatibility for a release; Android-only releases may
+ship while this remains an explicitly documented, unverified iOS gate.
 
 ## Xcode 27 beta workarounds — do not remove
 

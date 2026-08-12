@@ -22,7 +22,7 @@ flutter pub get
 flutter test                              # regression gate — run before pushing
 flutter test test/<file>_test.dart        # single test file
 flutter test --name "<substring>"         # single test by name
-flutter analyze                           # may report pre-existing infos; test is the real gate
+flutter analyze                           # must be clean for release work
 flutter run -d chrome                     # web smoke target when no Android SDK
 flutter build apk --release --target-platform android-arm64   # ~21 MB, arm64 only
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
@@ -49,8 +49,8 @@ flutter/lib/
   pages/  widgets/      # DeviceShell, dex_reference_detail, home/dex/search/settings
 ```
 
-- **Routes:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/search`, `/settings`, plus `/search/companion/*`. `/search?q=` deep link supported.
-- **Reference-data load order:** app-documents `dex_offline/` (mirrors the CDN bundle) → APK `assets/` fallback.
+- **Routes:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/dex/{moves,abilities,locations,quiz}`, `/search`, `/search/companion/*`, `/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings media/companion-position sub-routes. `/search?q=` deep link supported.
+- **Reference-data load order:** a complete preferred install reads app-documents `dex_offline/` first; Lite normally reads CDN first and falls back through local cache/APK assets. See `docs/AI_CONTEXT.md` for the exact policy.
 - **Game context is first-class:** edition / generation / regional `DexScope` drive which data and calculations apply.
 
 ## Dex CDN (maintainers)
@@ -62,7 +62,7 @@ R2-proxy Worker lives in `cloudflare/dex-cdn/` (deploy branch `deploy/dex-cdn`);
 ## Guardrails
 
 - Edit **`flutter/lib/`** and **`flutter/test/`** only for product work; prefer small focused diffs matching existing patterns.
-- Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`); GitHub artifacts (commits, PRs, releases) in **English** unless asked otherwise.
+- Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`). Commits and PRs use English; GitHub Release titles/bodies and the root README use Simplified Chinese by default per `docs/RELEASES.md`.
 - **Never** paste production CDN URLs into README / release notes / user-facing copy.
 - No runtime 52poke/PokeAPI fetches for the zh catalog in the app; hand-drawn nav icons ship as APK assets only, never on CDN.
 - **Bundles carry slugs, the app carries labels.** Anything a user reads (body style, colour, growth rate, habitat names) belongs in `flutter/lib/l10n/` or `dex_search_terms.dart`, never baked into the bundle — `/v5/` objects are immutable, so a label typo there costs a full republish.

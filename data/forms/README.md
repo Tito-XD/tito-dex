@@ -18,3 +18,7 @@ species `varieties` array. The normal builder therefore owns those records and
 their PokeAPI/sprites provenance; no curated override is active. A future form
 returns to `pendingForms` if upstream removes it or a newly announced form lacks
 independent battle data and redistributable offline art.
+
+Bundle v19's media audit is tracked separately in
+`data/dex/form_media_audit.json`; it records availability and named upstream
+gaps without turning missing artwork into a curated battle-data override.

@@ -36,39 +36,14 @@ TITODEX_DEX_BUNDLE_VERSION=19
 > 比较的是**根 manifest 的 `bundleVersion`** 与本地 `manifest.version`
 > （`dex_update_service.dart`），所以这个常量落后于线上版本不影响升级判定。
 
-## v7 内容与 schema
+## 当前 bundle 契约
 
-- 全国图鉴 1–1025，`complete=true`。
-- 每个多形态物种保存全部 form JSON：名称、分类、属性、种族值、特性、招式、身高体重、可用版本、出现地点和来源。
-- 默认 1025 张小图恢复为已验证的 220×220 清晰官方绘图，并供详情主图复用。非外观且视觉不同的形态仅在可靠图片存在时额外保存一张小图；外观重复形态复用默认图；不批量复制形态高清 artwork。
-- 803 条形态 JSON 保存真实存在的历代 sprite URL；缺少来源的世代不伪造默认图。
-- 出现地点同时保存版本组和精确版本，并保留 `speciesId / pokemonId / formKey / teraType / formAmbiguous / isAlpha / isTitan / isRaid / isFixedEncounter`。
-- 现代地点来自 PokeAPI 加固定 PKHeX 提交的 GPL-3.0-or-later 规范化 overlay，详见 [DEX_FORMS.md](DEX_FORMS.md) 与 `data/encounters/PKHEX_LICENSE.md`。
-- Champions 明确写入 `encounterCoverage.notApplicable`，不虚构野外地点。
-
-根 manifest 的关键字段：
-
-```json
-{
-  "bundleVersion": 7,
-  "cdnPrefix": "v5",
-  "pokemonCount": 1025,
-  "formCount": 803,
-  "formSpriteCount": 315,
-  "complete": true,
-  "exactVersionLocations": true,
-  "schemaFeatures": {
-    "pokemonForms": 3,
-    "encounterFormIdentity": 3,
-    "exactVersionLocations": 1
-  },
-  "archiveUrl": "https://dex.tito.cafe/v5/bundle.tar.zst",
-  "archiveSha256": "<sha256>",
-  "archiveSizeBytes": 0,
-  "encounterSources": [],
-  "encounterCoverage": {}
-}
-```
+- 全国图鉴 1–1025，`complete=true`；多形态物种保留独立资料、媒体、招式、特性、进化与精确版本地点。
+- `summaries.json`、`dex_catalog.json` 与 detail 内嵌 summary 的可检索字段必须一致；地点反向索引位于根级 `location_index.json`，不并入冷启动目录。
+- encounter 条目保留物种／形态身份、等级、概率、方式、条件以及 Alpha、Titan、Totem、Raid、固定遭遇和太晶属性等标记；不能唯一确认的形态必须显式标记歧义。
+- 现代地点来自 PokeAPI 与固定 PKHeX 提交的规范化 overlay；来源、许可和形态规则见 [DEX_FORMS.md](DEX_FORMS.md)。
+- 默认图与有可靠来源的差异形态媒体进入 archive；缺少来源的世代或形态不伪造图片。当前媒体与道具完整性由 v19 审计文件记录。
+- 根 manifest 必须包含版本、前缀、数量、完整性、schema feature、archive URL/SHA/大小与遭遇覆盖信息；客户端以根 manifest 协商升级。
 
 ## R2 结构
 
@@ -104,107 +79,23 @@ v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重�
 
 ## 构建与审计
 
+当前生产 v19 已完成发布。未来版本必须以线上 v19 为只读基线，新建版本专用 patch、
+审计与 workflow，并以精确生产版本作为上传前置条件。通用校验入口：
+
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
-
-python3 tools/test_pokemon_forms.py
-python3 tools/test_dex_bundle_v6.py
-
-python3 tools/patch_dex_bundle_v7.py \
-  --base-bundle dist/dex-seeds/v6.tar.zst \
-  --legacy-media-bundle dist/dex-seeds/v5.tar.zst \
-  --cdn-base https://dex.tito.cafe \
-  --output dist/dex-v7
-
-python3 tools/audit_encounter_coverage.py dist/dex-v7/staging --strict
-python3 tools/audit_form_coverage.py dist/dex-v7/staging --strict
-python3 tools/audit_dex_golden_samples.py dist/dex-v7/staging --strict
-python3 tools/verify_dex_upload_tree.py dist/dex-v7/upload
+python3 tools/audit_encounter_coverage.py <staging> --strict
+python3 tools/audit_form_coverage.py <staging> --strict
+python3 tools/audit_dex_golden_samples.py <staging> --strict
+python3 tools/verify_dex_upload_tree.py <upload-tree>
 ```
 
-产物：
+v19 的版本专用构建与审计脚本仍保留在 `tools/`；v7–v18 的演进细节可从脚本与
+Git 历史追溯，不作为下一次发布说明。需要重建 PKHeX overlay 时使用
+`tools/generate_pkhex_encounter_overlays.py` 并固定、验证上游 commit；不能唯一确认的
+form 只保留物种并标记歧义。
 
-- `dist/dex-v7/staging/`：解压后目录。
-- `dist/dex-v7/upload/v5/`：不可变对象上传树。
-- `dist/dex-v7/upload/bundle-manifest.json`：最后切换的根指针。
-
-v7 增量构建以已发布且验证过的 v6 archive 为只读数据源；不会重新生成
-encounter、地点、招式或特性。v5 archive 只用于复用 1025 张清晰默认小图。
-
-PKHeX overlay 需要重新生成时：
-
-```bash
-python3 tools/generate_pkhex_encounter_overlays.py \
-  --pkhex-root /path/to/PKHeX-at-pinned-commit
-```
-
-生成器会验证 PKHeX HEAD；不能唯一确认的 form 只保留物种并标记歧义。
-
-## v12 内容与发布（体形检索轴 + 地点反向索引）
-
-v12 以**已发布的 v11 archive 为只读基座**，只重写 species 层 JSON 并新增一个
-根级索引文件；sprite、artwork、遭遇、地点、招式、特性、道具全部字节不变。
-
-新增字段：
-
-- **summary**（`summaries.json`、`dex_catalog.json`、以及每个
-  `details/<id>.json` 内嵌的那份，三处必须一致）：`genusZh`、`generation`、
-  `shapeSlug`、`colorSlug`、`tags`、`heightDm`。搜索只读 summary，可检索的字段
-  必须放这里，不能留在 1025 个 detail 文件里。
-- **detail**：`growthRateSlug`、`habitatSlug`（仅一~三代物种有值）、
-  `hasGenderDifferences`、`heldItems`、`baseExperience`。
-- **evolutionChain 节点**：`triggers` 结构化进化条件数组，覆盖全部
-  `evolution_details`。`triggerZh` 保持字节不变——它只压平第一条且从不读
-  `held_item`，巨钳螳螂那类「交换 + 携带道具」用它无法判定。
-- **`location_index.json`**（bundle 根，新文件，与 `egg_groups.json`、
-  `items.json` 同级）：地点反向索引 `byVersion → areaSlug → {labelZh,
-  entries[]}`，由每个 detail（含各 form）的 `obtainLocationsByVersion` 在
-  构建时反转而来，条目保留 P0-2 的形态字段（`formKey` / `formAmbiguous` /
-  alpha·titan·totem·raid·fixed 旗标 / `teraType`）与等级、概率、方式、条件；
-  空值与 false 旗标一律省略，精确重复折叠。**刻意不并入
-  `dex_catalog.json`**——那是冷启动热路径，索引只在地点页需要时按需解码。
-  生成逻辑在 `tools/build_location_index.py`（`test_build_location_index.py`），
-  manifest 新增 `locationIndexVersions` / `locationIndexEntries` 两个计数。
-
-**只发 slug，不发中文标签。** `/v5/` 对象不可覆盖，标签一旦烤进 bundle，改一个
-错别字就要重新发布整包；中文标签统一放在
-`flutter/lib/features/dex/dex_search_terms.dart`。
-
-```bash
-python3 tools/patch_dex_bundle_v12_species_axes.py
-python3 tools/verify_dex_upload_tree.py dist/dex-v12/upload
-```
-
-脚本刻意**不含上传**，产物交给下面的两阶段上传器。PokeAPI 读取带磁盘缓存
-（`dist/dex-v12-pokeapi-cache/`），重跑零网络；首跑约 2600 个请求。
-
-> `--limit` / `--skip-archive` 只用于冒烟测试：前者让 `summaries.json` 只补前 N
-> 只，后者跳过重打包，两者产出的树都**不可发布**。
-
-v12 改动了 1025 个 `details/*.json` 加 `summaries.json`、`dex_catalog.json`，
-比 v11（只动 items 与图标）大得多，务必严格遵守 manifest-last。
-
-## v13 内容与发布（形态进化链）
-
-v13 以**已发布的 v12 archive 为只读基座**，只给非外观形态写入
-`forms[].evolutionChain`（剪枝 + 形态名 + 形态立绘路径），然后重打包并 bump
-manifest。无 PokeAPI 请求；sprite / artwork / 遭遇 / 道具字节不变。
-
-```bash
-python3 tools/patch_dex_bundle_v13_form_evolution.py
-python3 tools/verify_dex_upload_tree.py dist/dex-v13/upload
-```
-
-已发布的 v13 一次性 GitHub Actions workflow 存档在
-`docs/archive/workflows/`；它要求生产仍为 v12，不能用于后续版本发布。
-镜像表在 `tools/form_evolution_chains.py` 与
-`flutter/lib/features/dex/form_evolution_targets.dart`；`tools/test_form_evolution_targets.py`
-保证两边不漂移。App 还需在离线加载时把 `sprites/forms/…` 绝对化
-（`dex_offline_service.dart`），否则进化卡有名无图。
-
-回滚：把发布前备份的 v12 根 manifest 写回即可（v13 → v12）。
-
-## v14 历史包（当前 Offline APK 紧凑种子）
+## Offline 紧凑种子 v14
 
 v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件
 比较 `artwork/<path>` 与 `sprites/<path>` 的大小和 SHA-256；1,340 对必须全部字节一致，
@@ -225,12 +116,13 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
 
 ## 两阶段发布与回滚
 
-当前发布使用 `.github/workflows/upload-dex-bundle.yml`（v19，workflow_dispatch，
-带生产版本前置检查：发布前必须确认线上 bundleVersion 仍为 v18，并保存回滚
-manifest；`publish=false` 时只构建 + 校验）。workflow 从已验证的线上 v18 archive
-恢复只读基座，只 stage 变化对象，最后切换根 manifest。历史版本 workflow 位于
-`docs/archive/workflows/`；本地也可使用 `tools/publish_dex_bundle_incremental.py`。
-底层两阶段命令：
+`.github/workflows/upload-dex-bundle.yml` 是已经完成使命的 v19 专用 workflow：它要求
+线上 bundleVersion 仍为 v18，从已验证的 v18 archive 恢复只读基座，只 stage 变化
+对象，最后切换根 manifest。生产现已为 v19，因此不得再次使用该 workflow 发布；
+下一版需复制其安全结构并把输入、路径、测试和精确生产前置版本一起升级。
+更早的一次性 workflow 已从工作树移除，可从 Git 历史追溯；本地底层工具
+`tools/publish_dex_bundle_incremental.py` 仍须遵守相同前置检查。
+v19 当时使用的底层两阶段命令（历史复现）：
 
 ```bash
 # 阶段一：上传并校验所有 /v5/ 对象

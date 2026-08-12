@@ -38,6 +38,8 @@ class JourneyCard extends StatelessWidget {
     // or the stacked meta rows read as squeezed against the card's center.
     TextStyle denseStyle(TextStyle style) =>
         style.copyWith(fontSize: (style.fontSize ?? 14) * 0.85);
+    final expandedDenseMeta =
+        dense && DeviceLayout.sizeOf(context).height >= 480;
 
     return Semantics(
       button: true,
@@ -77,7 +79,7 @@ class JourneyCard extends StatelessWidget {
                                       )
                                     : context.titoHome.onDeepOverline,
                               ),
-                              SizedBox(height: dense ? 4 : (compact ? 6 : 8)),
+                              SizedBox(height: dense ? 5 : (compact ? 6 : 8)),
                               Text(
                                 location,
                                 style: dense
@@ -98,10 +100,11 @@ class JourneyCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: dense ? 4 : (compact ? 8 : 10)),
-                    // Square dashboards only get ~78px for this card — the two
-                    // meta columns merge into one row in dense mode so the
-                    // badge count and play time survive instead of overflowing.
+                    SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
+                    // Normal RG panels have useful vertical room but a narrow
+                    // half-screen width. Keep badges on their own line and
+                    // time + assistant status below. The minimum 360px
+                    // dashboard falls back to one line.
                     if (dense)
                       _AssistantDenseMeta(
                         journey: journey,
@@ -111,6 +114,7 @@ class JourneyCard extends StatelessWidget {
                         style: denseStyle(
                           context.titoHome.onDeepMetaLabel,
                         ).copyWith(fontWeight: FontWeight.w800),
+                        expanded: expandedDenseMeta,
                       )
                     else
                       Row(
@@ -148,11 +152,13 @@ class _AssistantDenseMeta extends StatelessWidget {
     required this.journey,
     required this.future,
     required this.style,
+    required this.expanded,
   });
 
   final CurrentJourney journey;
   final Future<JourneyAssistantSnapshot> future;
   final TextStyle style;
+  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
@@ -160,12 +166,33 @@ class _AssistantDenseMeta extends StatelessWidget {
       future: future,
       builder: (context, snapshot) {
         final assistant = snapshot.data?.cardSummary;
-        return Text(
-          '${AppZh.labelBadges} ${journey.badgeProgressLabel}'
-          ' · ${assistant ?? AppZh.journeyAssistantLoading}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: style,
+        if (!expanded) {
+          return Text(
+            '${AppZh.labelBadges} ${journey.badgeProgressLabel}'
+            ' · ${assistant ?? AppZh.journeyAssistantLoading}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${AppZh.labelBadges} ${journey.badgeProgressLabel}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '${AppZh.labelPlayTime} ${journey.playTime}'
+              ' · ${assistant ?? AppZh.journeyAssistantLoading}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            ),
+          ],
         );
       },
     );

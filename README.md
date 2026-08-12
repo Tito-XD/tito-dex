@@ -8,9 +8,9 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11+150` | 内置 Pokémon Sleep 试算与可审计的第三方 Credits |
-| Offline APK | [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · App `0.8.11-offline+151` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
-| `main` 源码基线 | App `0.8.11+150` | 功能、UI、来源、许可证与权利说明统一对齐 |
+| Lite APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12+152` | RG 首页比例与沉浸式边距优化，项目文档完成收口 |
+| Offline APK | [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · App `0.8.12-offline+153` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
+| `main` 源码基线 | App `0.8.12+152` | 功能、UI、来源、许可证与权利说明统一对齐 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
@@ -53,11 +53,11 @@
 | 图鉴数据 | 预构建 v19 数据包，带 v5 → v4 → v3 → v2 回退与 APK 内置兜底 |
 | UI 语言 | 简体中文 |
 
-详细说明：[架构](docs/ARCHITECTURE.md) · [技术栈决策](docs/STACK_DECISION.md)
+详细说明：[架构](docs/ARCHITECTURE.md)
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.11-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.11-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.12-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.12-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置同一套核心数据，首次启动会准备随包数据，适合网络不稳定的设备。
@@ -83,11 +83,10 @@ flutter run -d chrome    # 功能有限的 Web 预览
 | 文档 | 内容 |
 | --- | --- |
 | [AI 上下文](docs/AI_CONTEXT.md) | 当前版本、功能状态、架构和维护约束 |
-| [产品愿景](VISION.md) | 产品体验与边界 |
-| [产品说明](PRODUCT.md) | 用户、功能定位与优先级 |
 | [路线图](ROADMAP.md) | 发布历史与后续方向 |
+| [架构](docs/ARCHITECTURE.md) | 技术选型、数据流与平台边界 |
 | [Flutter App](flutter/README.md) | App 开发说明 |
-| [设计系统](docs/DESIGN_SYSTEM.md) | 视觉与交互规范 |
+| [设计系统](docs/DESIGN_SYSTEM.md) | 视觉、字体、布局与交互规范 |
 | [发布构建](docs/RELEASE_BUILD.md) | APK 构建和校验清单 |
 | [Release Notes](docs/RELEASES.md) | 中文优先的发布文案规范与历史 |
 | [数据来源与 Credits](CREDITS.md) | 数据、媒体、开放许可与非官方声明 |

@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.11](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.11) · Lite `0.8.11+150` · Offline `0.8.11-offline+151`.
+> **Latest release:** [v0.8.12](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.12) · Lite `0.8.12+152` · Offline `0.8.12-offline+153`.
 >
-> **Current `main`:** v0.8.11 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.12 release source. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -18,6 +18,12 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.12
+
+- Rebalance the immersive RG home dashboard: a larger Trainer Card, clearer two-line Journey metadata on normal handheld panels, safe compact fallback, and small top/bottom optical insets.
+- Consolidate overlapping product, architecture, design, phase, handoff and CDN documents into current canonical references; remove obsolete one-shot workflows while retaining history in Git.
+- Refresh both READMEs, release/build instructions, iOS status, data-source notes and agent context against the v0.8.12 / bundle v19 baseline.
 
 ## Completed in v0.8.11
 
@@ -73,4 +79,4 @@
 - No invented media for upstream gaps.
 - iOS signing/distribution requires a separate product decision.
 
-Full release archive: [docs/RELEASES.md](docs/RELEASES.md). Active phase record: [docs/PHASED_FEATURE_PLAN.md](docs/PHASED_FEATURE_PLAN.md).
+Full release archive: [docs/RELEASES.md](docs/RELEASES.md). Completed implementation plans were folded into this roadmap and the canonical [AI context](docs/AI_CONTEXT.md); new work should be added here only after a fresh product decision.

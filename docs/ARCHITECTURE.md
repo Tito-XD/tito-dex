@@ -1,15 +1,28 @@
 # TitoDex Architecture
 
-> Current release: v0.8.9 · Lite `0.8.9+144` · Offline `0.8.9-offline+145` · live bundle v19 / compact seed v14.
+> Current release: v0.8.12 · Lite `0.8.12+152` · Offline `0.8.12-offline+153` · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
+
+## Technology decision
+
+Flutter + Dart under `flutter/` is the only application implementation. The
+pre-Flutter React/Capacitor mock was removed in v0.6.5 and survives only in
+historical GitHub releases. Flutter was chosen for native Android rendering,
+custom device-like UI, single-file save access, emulator handoff, offline
+bundle installation and one responsive codebase for phones, square handhelds,
+iOS source and web preview. Do not introduce a second application framework.
+
+Android arm64 is the shipping target; web is a limited preview, and iOS signing
+and distribution remain separate gates. Persistence stays local, Journey JSON
+is the portability path, and parser coverage remains fixture-gated.
 
 ## Runtime shape
 
 | Concern | Implementation |
 | --- | --- |
 | UI | Flutter custom widgets, `DeviceShell`, `TitoPageContainer`, Nunito |
-| Routing | `go_router`: Home, Team, Journey, Dex, Search, Settings and secondary tools |
+| Routing | `go_router`: Home, Team, Journey, Dex, Search, Settings, reference pages, battle tools and Sleep tools |
 | Persistence | `shared_preferences` repositories |
 | Save import | One persisted document URI; HGSS rich parser; experimental Gen I–VII metadata adapters |
 | Dex data | Installed bundle first when preferred, then versioned CDN, then PokeAPI fallback |
@@ -42,7 +55,8 @@ resolve the selected exact flavor (or merge paired flavors) without inverting
 
 APK-local `item_version_matrix.json` and `move_version_matrix.json` add
 selected-game availability/prices and move-removal gates without requiring a
-new CDN bundle. Future bundle builds also persist move debut/version metadata.
+new CDN bundle. Pinned local constants provide the limited Pokémon Sleep
+formula/value helpers; their upstream license and NOTICE ship in APK assets.
 
 ## Active layout
 
@@ -73,6 +87,7 @@ The React/Capacitor source tree no longer exists.
 
 ```bash
 cd flutter
+flutter analyze --no-pub
 flutter test
 flutter build web --release
 ```

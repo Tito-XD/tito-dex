@@ -19,7 +19,7 @@ import 'tito_typography.dart';
 /// | Small / team | 12 | `small12` / `team12` | Hints, HP row, bottom tabs |
 ///
 /// **Home dashboard** intentionally uses a separate scale (1.5×–2.25×) — do not apply
-/// this spec there. See `docs/TYPOGRAPHY.md`.
+/// this spec there. See `docs/DESIGN_SYSTEM.md`.
 ///
 /// Sizes are not scaled by [DeviceLayout.handheldUiScale] when using these tokens directly.
 abstract final class SecondaryTypography {

@@ -58,25 +58,36 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 专用图鉴 CDN 子域名。**推荐**，App 与离线包 URL 均使用该域名。
 
-详细步骤：**[DOMAIN.md](./DOMAIN.md)**
-
-简要：
-
 1. Worker → **Settings** → **Domains & Routes** → Add custom domain → `dex.tito.cafe`
 2. 确认 `tito.cafe` zone 在本 CF 账号（DNS 通常自动创建）
-3. 在 **tito.cafe** zone 配置 Cache Rules（见 DOMAIN.md）
+3. 等 Custom domain 状态变成 Active；若向导没有自动创建 DNS，按向导给出的
+   类型/目标补记录，不要把 `dex` 直接指向 R2 公开 bucket
+4. 用根 manifest 与 `/cdn-health` 验证 HTTPS、CORS 和 Worker 路由
 
 `wrangler.toml` 已含 `dex.tito.cafe/*` 路由；push `deploy/dex-cdn` 后会同步。
 
 ### 5. Cache Rules（Dashboard）
 
-在域名 zone 下添加 Cache Rules（见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)）：
+在 `tito.cafe` zone 下添加 Cache Rules：
 
-- `/v2/`、`/v3/`、`/v4/`、`/v5/` 的详情、图片、索引和 archive → 1 年 immutable
-- `/v5/l10n/*`、`/v5/maps/*`、`/v5/config/*` → 短缓存，允许受控增量同步
-- `/bundle-manifest.json` → 5 分钟
+| 匹配 | 策略 |
+| --- | --- |
+| `/v2/`、`/v3/`、`/v4/` | 1 年 immutable |
+| `/v5/` 下详情、图片、索引和 archive | 1 年 immutable |
+| `/v5/l10n/`、`/v5/maps/`、`/v5/config/` | 短缓存，允许受控同步 |
+| `/bundle-manifest.json` | 5 分钟 |
 
 Worker 已注入 CORS；若直接用 R2 公开域名，需在 R2 设置 CORS。
+
+域名与缓存抽测：
+
+```bash
+curl -I https://dex.tito.cafe/bundle-manifest.json
+curl -s https://dex.tito.cafe/cdn-health
+curl -I https://dex.tito.cafe/v5/sprites/25.png
+curl -I https://dex.tito.cafe/v5/type_icons/fire.png
+curl -I https://dex.tito.cafe/bundle/latest  # 应 302 到当前 archive
+```
 
 ### 6. KV（manifest 热缓存与 cron 状态）
 
@@ -137,18 +148,15 @@ Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会
 
 ## 图鉴包构建与上传
 
-与 Worker 部署 **分开**进行：
+与 Worker 部署 **分开**进行。当前生产是 bundle v19（仍使用 `/v5/`），
+Offline APK 继续复用不可变的紧凑 v14 archive。
 
-```bash
-pip install -r tools/dex_bundle_requirements.txt
-
-# 当前生产 v7（1025 物种 → R2 /v5/）
-python3 tools/patch_dex_bundle_v7.py --base-bundle dist/dex-seeds/v6.tar.zst --legacy-media-bundle dist/dex-seeds/v5.tar.zst --output dist/dex-v7
-
-# 必须先上传并验证 /v5/，再最后更新根 manifest
-python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload --cdn-prefix v5 --phase objects
-python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload --cdn-prefix v5 --phase manifest
-```
+`.github/workflows/upload-dex-bundle.yml` 是已经完成发布的 **v19 专用**
+workflow，前置条件是线上仍为 v18；生产已经切到 v19 后不得再次用它发布。
+下一版数据包必须新增版本专用 patch/workflow，以线上 v19 为只读基线并把
+`expected_production_version` 锁定为 19。先用 `publish=false` 构建和审计，确认候选后
+再按 objects → manifest 两阶段发布。完整要求见
+[`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
 上传目录结构：
 
@@ -157,10 +165,11 @@ python3 tools/upload_dex_bundle_r2.py dist/dex-v7/upload --cdn-prefix v5 --phase
 | `upload/v2/` | `v2/` | bundle **v4**，493 物种（遗留） |
 | `upload/v3/` | `v3/` | bundle **v5**，1025 物种（回滚 / 旧客户端，不修改） |
 | `upload/v4/` | `v4/` | bundle **v6**，完整形态与精确版本地点（回滚） |
-| `upload/v5/` | `v5/` | bundle **v7**，清晰默认图与形态历代 sprite |
-| `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的 v5 archive |
+| `upload/v5/` | `v5/` | bundle **v7–v19** 的增量对象；当前生产 v19 |
+| `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的当前 archive |
 
-Bundle v7 复用 v6 的全部数据，只增量修复默认图片和形态历代 sprite 元数据。`/v4/` 不覆盖、不删除。
+`bundleVersion` 与前缀解耦；不要因为下一版数据包而自动新建 `/v6/`。
+`/v4/` 不覆盖、不删除，已有 `/v5/` 对象也不得用不同内容覆写。
 
 详见 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
@@ -189,10 +198,11 @@ Worker + R2 资源就绪后：
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=7
+TITODEX_DEX_BUNDLE_VERSION=19
 ```
 
-当前生产 bundle SHA256 见 GitHub Release [v0.2.24/v0.2.25/v0.2.28](https://github.com/Tito-XD/tito-dex/releases) 或 live `bundle-manifest.json`。
+根 manifest 才是版本协商和 archive SHA-256 的权威来源；App 源码中的较旧编译期
+默认值只作无 manifest 时的兼容回退。不要从历史 App Release 抄录当前数据包摘要。
 
 ---
 
