@@ -4,7 +4,6 @@ import {
   MAX_REQUEST_BYTES,
   parseAssistantRequest,
   type AssistantRequest,
-  type AssistantResponse,
 } from './contract';
 import type { ProgressionHint } from './progression_hints';
 import { buildLogRecord } from './logging';
@@ -72,8 +71,7 @@ export default {
 
     const response = await answerQuestion(
       parsed,
-      env.AI ? (hint, assistantRequest, fallback) =>
-        runComposer(env, hint, assistantRequest, fallback) : undefined,
+      undefined,
       env.AI ? (hints, assistantRequest) =>
         resolveHint(env, hints, assistantRequest) : undefined,
     );
@@ -132,42 +130,6 @@ async function serveExtensionContent(
   }
 }
 
-async function runComposer(
-  env: Env,
-  hint: ProgressionHint,
-  request: AssistantRequest,
-  fallback: AssistantResponse,
-): Promise<unknown> {
-  const prompt = {
-    question: request.question,
-    context: modelSafeContext(request),
-    allowedAnswerSections: (fallback.answer ?? '')
-      .split('\n\n')
-      .map((text, index) => ({ id: `section-${index}`, text })),
-  };
-  const sectionIds = prompt.allowedAnswerSections.map((section) => section.id);
-  return runJsonModel(env, `answer-composition:${hint.id}`, [
-    {
-      role: 'system',
-      content: '你是 TitoDex 旅程卡关助手。只能为 allowedAnswerSections 排序，不得改写、删除或补充内容。只输出包含全部 ID 且不重复的 {"sectionOrder":["section-0"]}。',
-    },
-    { role: 'user', content: JSON.stringify(prompt) },
-  ], {
-    type: 'object',
-    additionalProperties: false,
-    required: ['sectionOrder'],
-    properties: {
-      sectionOrder: {
-        type: 'array',
-        minItems: sectionIds.length,
-        maxItems: sectionIds.length,
-        uniqueItems: true,
-        items: { type: 'string', enum: sectionIds },
-      },
-    },
-  }, 420, 0.1);
-}
-
 async function resolveHint(
   env: Env,
   hints: ProgressionHint[],
@@ -201,7 +163,7 @@ async function resolveHintWithModel(
   return runJsonModel(env, 'intent-resolution', [
     {
       role: 'system',
-      content: '你只做意图分类。根据问题从 candidates 选择唯一 hintId；不能确定时输出无效空字符串。不得回答游戏问题。只输出 {"hintId":"..."}。',
+      content: '/no_think\n你只做意图分类。根据问题从 candidates 选择唯一 hintId；不能确定时输出无效空字符串。不得回答游戏问题。只输出 {"hintId":"..."}。',
     },
     {
       role: 'user',

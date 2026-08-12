@@ -73,7 +73,11 @@ export async function answerQuestion(
   // A unique local rule is already final. Model calls are reserved for hints
   // selected from an unresolved miss/tie, preserving offline-first behavior
   // and the public Workers AI quota.
-  if (!runAi || !selectedByAi) return deterministic;
+  if (!selectedByAi) return deterministic;
+  // A retrieval/model-selected hint is already an online result. When the
+  // optional composer is omitted, return the exact audited answer directly;
+  // this avoids spending a second model call merely to reorder its sections.
+  if (!runAi) return { ...deterministic, onlineComposed: true };
   try {
     const modelValue = await runAi(hint, request, deterministic);
     const sections = (deterministic.answer ?? '').split('\n\n');
