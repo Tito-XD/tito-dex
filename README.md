@@ -8,9 +8,9 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13+156` | 修复附加 APK 安装后的识别与 Journey / Search 即时刷新 |
-| Offline APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13-offline+157` | 内置已验证的紧凑 v14 图鉴数据，并可更新到 v19 |
-| Journey Assistant | `1.0.0+1` | 在 Journey 内按需下载安装；首版审核三条 HGSS 卡关链路 |
+| Lite APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13+158` | 内建旅程助手，不再要求安装第二个 APK |
+| Offline APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13-offline+159` | 内置紧凑 v14 图鉴数据与旅程助手 |
+| Journey Assistant | 主 App 内建 | 首版审核三条 HGSS 卡关链路；旧 1.0.0 附加包仅保留兼容 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
@@ -22,7 +22,7 @@
 
 - **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
 - **存档助手**：给出当前位置附近未捕获、队伍进化路线、成对版本可直遇缺口，以及进化／孵蛋／交换补全建议。
-- **问 TitoDex**：按需安装的独立旅程助手 APK；优先用已解析存档和审核资料做本地模糊匹配，未唯一命中时才调用 BGE-M3 AI Search 与免费额度内的 Workers AI Qwen。Journey 提供安装入口，Search 展示可在设置中选大/紧凑/隐藏；绝不上传原始存档或训练家、队伍资料。首版审核三条 HGSS 卡关链路；当前 0.8.13 修正版修复安装完成后的宿主识别与页面刷新。
+- **问 TitoDex**：旅程助手与三条 HGSS 审核资料直接内建主 App，不再安装第二个 APK；优先用已解析存档和本地资料模糊匹配，未唯一命中时才调用 BGE-M3 AI Search 与免费额度内的 Workers AI Qwen。Search 展示可在设置中选大/紧凑/隐藏；绝不上传原始存档或训练家、队伍资料。
 - **存档联动**：绑定一个 `.sav` 文件并保留读取权限；实验性识别 Gen 1–7 元数据，HGSS 会同步队伍、昵称、携带道具、招式与 PP、特性、经验、亲密度、性格、闪光、IV／EV、战斗能力、地图／坐标、资金、训练家资料、城都／关都徽章区与图鉴进度。
 - **全国图鉴 1–1025**：支持形态搜索、地区或 G1–G9 范围、体形／颜色／大小等组合筛选、形态进化链、精确游戏与 DLC 获取方式、招式、特性和形态媒体。
 - **地点图鉴**：按所选版本用紧凑网格查看地点与完成度，弹窗优先列出未捕获并可直达图鉴。
@@ -87,7 +87,7 @@ flutter run -d chrome    # 功能有限的 Web 预览
 | [路线图](ROADMAP.md) | 发布历史与后续方向 |
 | [架构](docs/ARCHITECTURE.md) | 技术选型、数据流与平台边界 |
 | [旅程卡关助手](docs/JOURNEY_ASSISTANT.md) | 存档优先模糊匹配、隐私 contract、AI Search/DeepSeek 与部署闸门 |
-| [Android 附加包](docs/EXTENSIONS.md) | 按需下载/安装协议、签名校验、CDN catalog 与独立迭代 |
+| [旧 Android 附加包兼容](docs/EXTENSIONS.md) | 1.0.0 兼容协议与迁移到主 App 内建资料的说明 |
 | [Flutter App](flutter/README.md) | App 开发说明 |
 | [设计系统](docs/DESIGN_SYSTEM.md) | 视觉、字体、布局与交互规范 |
 | [发布构建](docs/RELEASE_BUILD.md) | APK 构建和校验清单 |

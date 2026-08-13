@@ -163,24 +163,12 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: ListenableBuilder(
-                    listenable: Listenable.merge([
-                      journeyAssistantExtension,
-                      askTitoDexSettings,
-                    ]),
+                    listenable: askTitoDexSettings,
                     builder: (context, _) => JourneyPage(
                       journey: _journey,
                       onLaunchEmulator: () => _onContinue(context),
-                      askTitoDexEnabled:
-                          journeyAssistantExtension.installed &&
-                          askTitoDexSettings.extensionEnabled,
+                      askTitoDexEnabled: askTitoDexSettings.extensionEnabled,
                       onAskTitoDex: () => context.push('/journey/ask'),
-                      askTitoDexExtensionInstalled:
-                          journeyAssistantExtension.installed,
-                      extensionInstallAvailable:
-                          journeyAssistantExtension.catalogConfigured,
-                      extensionInstalling: journeyAssistantExtension.busy,
-                      onInstallExtension: () =>
-                          _installJourneyAssistantExtension(context),
                     ),
                   ),
                 ),
@@ -189,10 +177,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 GoRoute(
                   path: 'ask',
                   redirect: (context, state) =>
-                      journeyAssistantExtension.installed &&
-                          askTitoDexSettings.extensionEnabled
-                      ? null
-                      : '/journey',
+                      askTitoDexSettings.extensionEnabled ? null : '/journey',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
@@ -287,10 +272,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 GoRoute(
                   path: 'ask',
                   redirect: (context, state) =>
-                      journeyAssistantExtension.installed &&
-                          askTitoDexSettings.extensionEnabled
-                      ? null
-                      : '/search',
+                      askTitoDexSettings.extensionEnabled ? null : '/search',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
@@ -431,21 +413,6 @@ class _TitoDexAppState extends State<TitoDexApp> {
       return;
     }
     _router.go(route);
-  }
-
-  Future<void> _installJourneyAssistantExtension(BuildContext context) async {
-    final result = await journeyAssistantExtension.installFromCatalog();
-    if (!context.mounted) return;
-    final message = result == 'started' || result == 'permission_required'
-        ? AppZh.extensionInstallStarted
-        : result == 'up_to_date'
-        ? AppZh.extensionUpToDate
-        : result == 'catalog_not_configured'
-        ? AppZh.extensionCatalogUnavailable
-        : AppZh.extensionInstallFailed;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _bootstrap() async {

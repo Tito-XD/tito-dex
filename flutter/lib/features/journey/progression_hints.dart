@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
+
 import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
 import '../extensions/journey_assistant_extension.dart';
@@ -344,21 +346,40 @@ class InstalledExtensionProgressionHintDataSource
       extension.readTextFile('progression_hints.json');
 }
 
+class BundledProgressionHintDataSource implements ProgressionHintDataSource {
+  const BundledProgressionHintDataSource();
+
+  static const assetPath = 'assets/data/journey/progression_hints.json';
+
+  @override
+  Future<String?> loadJson() => rootBundle.loadString(assetPath);
+}
+
 class ProgressionHintRepository {
-  ProgressionHintRepository({ProgressionHintDataSource? extensionDataSource})
-    : _extensionDataSource =
-          extensionDataSource ??
-          InstalledExtensionProgressionHintDataSource(
-            journeyAssistantExtension,
-          );
+  ProgressionHintRepository({
+    ProgressionHintDataSource? extensionDataSource,
+    ProgressionHintDataSource? bundledDataSource,
+  }) : _extensionDataSource =
+           extensionDataSource ??
+           InstalledExtensionProgressionHintDataSource(
+             journeyAssistantExtension,
+           ),
+       _bundledDataSource =
+           bundledDataSource ?? const BundledProgressionHintDataSource();
 
   final ProgressionHintDataSource _extensionDataSource;
+  final ProgressionHintDataSource _bundledDataSource;
   List<ProgressionHint>? _cached;
 
   Future<List<ProgressionHint>> load() async {
     final cached = _cached;
     if (cached != null) return cached;
-    final source = await _extensionDataSource.loadJson();
+    // Keep already-installed content APKs compatible, but the assistant no
+    // longer depends on Android package discovery. The reviewed HGSS seed is
+    // always available from the host APK when no extension data can be read.
+    final source =
+        await _extensionDataSource.loadJson() ??
+        await _bundledDataSource.loadJson();
     if (source == null) return const [];
     final json = jsonDecode(source) as Map<String, dynamic>;
     if (json['schemaVersion'] != 1) {

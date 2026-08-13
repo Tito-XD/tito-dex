@@ -193,48 +193,48 @@ void main() {
     },
   );
 
-  testWidgets('Journey shows install CTA only for an uninstalled extension', (
+  test('bundled HGSS hints load when no content APK is available', () async {
+    final repository = ProgressionHintRepository(
+      extensionDataSource: const _FakeProgressionDataSource(null),
+    );
+
+    final hints = await repository.load();
+
+    expect(hints, hasLength(3));
+    expect(hints.map((hint) => hint.id), contains('hgss-route36-sudowoodo'));
+  });
+
+  testWidgets('Journey exposes the built-in assistant without an install CTA', (
     tester,
   ) async {
-    Future<void> pump({required bool installed}) async {
-      final router = GoRouter(
-        initialLocation: '/journey',
-        routes: [
-          GoRoute(
-            path: '/journey',
-            builder: (_, _) => TitoPageContainer(
-              child: JourneyPage(
-                journey: _journey,
-                assistantFuture: Future.value(_snapshot),
-                askTitoDexExtensionInstalled: installed,
-                extensionInstallAvailable: true,
-                onInstallExtension: () {},
-              ),
+    final router = GoRouter(
+      initialLocation: '/journey',
+      routes: [
+        GoRoute(
+          path: '/journey',
+          builder: (_, _) => TitoPageContainer(
+            child: JourneyPage(
+              journey: _journey,
+              assistantFuture: Future.value(_snapshot),
+              askTitoDexEnabled: true,
+              onAskTitoDex: () {},
             ),
           ),
-          GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
-        ],
-      );
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-      await tester.pump();
-      addTearDown(router.dispose);
-    }
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+    addTearDown(router.dispose);
 
-    await pump(installed: false);
     await tester.scrollUntilVisible(
-      find.byKey(const Key('journey-assistant-extension-cta')),
+      find.byKey(const Key('ask-titodex-entry')),
       240,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(
-      find.byKey(const Key('journey-assistant-extension-cta')),
-      findsOneWidget,
-    );
-    await pump(installed: true);
-    expect(
-      find.byKey(const Key('journey-assistant-extension-cta')),
-      findsNothing,
-    );
+    expect(find.byKey(const Key('ask-titodex-entry')), findsOneWidget);
+    expect(find.text('下载并安装'), findsNothing);
   });
 
   testWidgets('Search honors prominent, compact, and hidden display modes', (
@@ -249,7 +249,6 @@ void main() {
             builder: (_, _) => TitoPageContainer(
               child: SearchPage(
                 journey: _journey,
-                extensionInstalled: true,
                 assistantDisplayMode: mode,
                 onAskTitoDex: () {},
               ),
@@ -318,7 +317,7 @@ class _FakeExtensionPlatform implements JourneyAssistantExtensionPlatform {
 
 class _FakeProgressionDataSource implements ProgressionHintDataSource {
   const _FakeProgressionDataSource(this.json);
-  final String json;
+  final String? json;
 
   @override
   Future<String?> loadJson() async => json;

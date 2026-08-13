@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.13 · Lite `0.8.13+156` · Offline `0.8.13-offline+157` · Journey Assistant `1.0.0+1` · live bundle v19 / compact seed v14.
+> Current release: v0.8.13 · Lite `0.8.13+158` · Offline `0.8.13-offline+159` · built-in Journey Assistant · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
@@ -28,7 +28,7 @@ is the portability path, and parser coverage remains fixture-gated.
 | Dex data | Installed bundle first when preferred, then versioned CDN, then PokeAPI fallback |
 | Offline install | SHA-256 verified zstd/tar bundle into app documents |
 | Android native | Save document channel, emulator launcher, foreground download service, dynamic app shortcuts |
-| Optional blocker Q&A | Separately installed, same-signer content APK; save-first local fuzzy match; opt-in AI Search/DeepSeek only for unresolved intent |
+| Optional blocker Q&A | Built-in reviewed seed; save-first local fuzzy match; opt-in Workers AI only for unresolved intent; legacy same-signer pack remains read-compatible |
 
 ## Main data flow
 
@@ -61,7 +61,7 @@ formula/value helpers; their upstream license and NOTICE ship in APK assets.
 
 The “Ask TitoDex” source preview is a separate, privacy-bounded flow.
 `data/journey/progression_hints.json` is canonical; Gradle copies it into the
-independently installed, same-signer companion APK and generates a content
+bundled host asset (with a legacy same-signer companion fallback) and generates a content
 manifest. The host validates catalog digest, APK identity/signer, provider
 contract, protocol/host compatibility, and payload digest before use. The main
 APK does not carry the fact payload. See [EXTENSIONS.md](./EXTENSIONS.md).

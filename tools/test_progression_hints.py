@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data/journey/progression_hints.json"
+BUNDLED_DATA_PATH = ROOT / "flutter/assets/data/journey/progression_hints.json"
 SCHEMA_PATH = ROOT / "data/journey/progression_hints.schema.json"
 API_SCHEMA_PATH = ROOT / "data/journey/assistant_api.schema.json"
 LOCATION_PATH = ROOT / "data/l10n/zh/location_areas.json"
@@ -60,6 +61,9 @@ class ProgressionHintsTest(unittest.TestCase):
         )
         forbidden = {"rawSave", "trainerName", "trainerId", "party", "money", "coordinates"}
         self.assertTrue(forbidden.isdisjoint(context["properties"]))
+
+    def test_host_apk_bundles_the_canonical_reviewed_dataset(self):
+        self.assertEqual(BUNDLED_DATA_PATH.read_bytes(), DATA_PATH.read_bytes())
 
     def test_schema_and_entries_are_strictly_valid(self):
         self.assertEqual(self.schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
