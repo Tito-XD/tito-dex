@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) |
-| **`main` / lite source** | `0.8.14+156` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.14-offline+157` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) |
+| **`main` / lite source** | `0.8.13+156` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.13-offline+157` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Journey Assistant** | `1.0.0+1` — optional same-signer content APK; three reviewed HGSS blocker chains |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
@@ -44,13 +44,13 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.14)
+## Current feature status (latest release line: v0.8.13)
 
-> v0.8.14 is the latest published release. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier require export, uninstall, and reinstall.
+> v0.8.13 is the latest published release. The current rebuild uses Lite versionCode 156 and Offline versionCode 157. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier require export, uninstall, and reinstall.
 
 ### Journey & save
 - **Shipped in v0.8.13:** independently installable Journey Assistant APK, Journey install CTA, Settings management, configurable Search entry, and three reviewed HGSS blocker chains. Installed provider facts and parsed-save reliability are preferred; local fuzzy matching runs first. AI Search uses BGE-M3 only to retrieve audited `hintId`s; public inference defaults to Workers AI, while DeepSeek requires an explicit private gate. The App reaches R2 catalog/APK, Search, and Gateway only through the Journey Assistant Worker. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
-- **Fixed in v0.8.14:** returning from Android's package installer now forces a fresh extension inspection, the host discovers the protected provider from installed package metadata before resolver fallback, installation is polled briefly as a final safety net, and Journey/Search react immediately when the pack becomes available.
+- **Fixed in the current v0.8.13 rebuild:** returning from Android's package installer now forces a fresh extension inspection, the host discovers the protected provider from installed package metadata before resolver fallback, installation is polled briefly as a final safety net, and Journey/Search react immediately when the pack becomes available.
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
@@ -138,7 +138,7 @@ attribution text; publish corrected bundle metadata only under a new bundle
 version/object set rather than overwriting v19 objects.
 
 ### Latest release-line highlights
-- v0.8.14: fixes Journey Assistant recognition after the companion APK is installed and makes Journey/Search update immediately without restarting the App or reinstalling the pack.
+- v0.8.13 rebuild (versionCodes 156/157): fixes Journey Assistant recognition after the companion APK is installed and makes Journey/Search update immediately without restarting the App or reinstalling the pack.
 - v0.8.13: ships the optional Journey Assistant 1.0.0, save-first local fuzzy matching, audited BGE-M3 retrieval and Workers AI Qwen fallback for three HGSS blocker chains; rotates the Android signer after legacy material was found in public history.
 - v0.8.12: enlarges and rebalances the immersive RG home Trainer Card, gives normal handheld Journey metadata two readable lines with a compact fallback, adds small top/bottom optical insets, and consolidates obsolete handoffs, phase plans, UI fragments and one-shot CDN workflows into current canonical documentation plus Git history.
 - v0.8.11: adds offline Pokémon Sleep score and basic cooking-strength tools from a pinned Neroli’s Lab commit, bundles its Apache-2.0 license/NOTICE, and completes the attribution correction across 52Poké, PokeAPI/sprites, PokéSprite, Nunito, game icons, generated media metadata, Settings, and public documentation.
@@ -260,7 +260,7 @@ Same codebase, no diverging fork — `ios/` generated via
 - **Last iOS build verification (2026-07-23, v0.7.0)**: `pod install`,
   `flutter analyze`, 215 Flutter tests, and
   `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
-  Runner.app). v0.8.14 passes the shared Dart suite, but its iOS no-codesign
+  Runner.app). v0.8.13 passes the shared Dart suite, but its iOS no-codesign
   build has not been repeated; generated Pods/build files are not committed.
 - Signing, IPA, TestFlight, and App Store distribution are intentionally not
   part of the Android release and require an Apple Developer account.
@@ -283,7 +283,7 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 `flutter analyze --no-pub`, full `flutter test --no-pub`, Python tool tests,
 Journey Assistant Worker typecheck/Vitest/dry-run, companion Gradle
 check/assemble, signer comparison, and physical-device install/update/uninstall.
-Published v0.8.14 artifacts are verified through the Android release workflows;
+Published v0.8.13 artifacts are verified through the Android release workflows;
 the optional extension is additionally checked for the same V2 signer as the host.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).
