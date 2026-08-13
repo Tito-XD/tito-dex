@@ -21,10 +21,6 @@ class JourneyPage extends StatelessWidget {
     this.assistantFuture,
     this.askTitoDexEnabled = false,
     this.onAskTitoDex,
-    this.askTitoDexExtensionInstalled = true,
-    this.extensionInstallAvailable = false,
-    this.extensionInstalling = false,
-    this.onInstallExtension,
   });
 
   final CurrentJourney journey;
@@ -32,10 +28,6 @@ class JourneyPage extends StatelessWidget {
   final Future<JourneyAssistantSnapshot>? assistantFuture;
   final bool askTitoDexEnabled;
   final VoidCallback? onAskTitoDex;
-  final bool askTitoDexExtensionInstalled;
-  final bool extensionInstallAvailable;
-  final bool extensionInstalling;
-  final VoidCallback? onInstallExtension;
 
   @override
   Widget build(BuildContext context) {
@@ -111,42 +103,7 @@ class JourneyPage extends StatelessWidget {
         JourneyAssistantPanel(
           future: assistantFuture ?? journeyAssistantRepository.load(journey),
         ),
-        if (!askTitoDexExtensionInstalled) ...[
-          const SizedBox(height: 12),
-          StickerCard(
-            key: const Key('journey-assistant-extension-cta'),
-            variant: StickerVariant.softYellow,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '${AppZh.extensionJourneyTitle} · ${AppZh.extensionNotInstalled}',
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  extensionInstallAvailable
-                      ? AppZh.extensionInstallHint
-                      : AppZh.extensionCatalogUnavailable,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TitoPrimaryButton(
-                  key: const Key('install-journey-assistant-extension'),
-                  label: extensionInstalling
-                      ? AppZh.extensionInstalling
-                      : AppZh.extensionInstall,
-                  onPressed: extensionInstallAvailable && !extensionInstalling
-                      ? onInstallExtension
-                      : null,
-                  expanded: true,
-                ),
-              ],
-            ),
-          ),
-        ] else if (askTitoDexEnabled && onAskTitoDex != null) ...[
+        if (askTitoDexEnabled && onAskTitoDex != null) ...[
           const SizedBox(height: 12),
           StickerCard(
             variant: StickerVariant.softYellow,

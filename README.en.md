@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13+156` | Fixes companion APK recognition and immediate Journey/Search refresh |
-| Offline APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13-offline+157` | Embeds the verified compact v14 Dex archive and can update to v19 |
-| Journey Assistant | `1.0.0+1` | Installed on demand from Journey; the first reviewed pack covers three HGSS blockers |
+| Lite APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13+158` | Builds Journey Assistant into the host; no second APK required |
+| Offline APK | [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · App `0.8.13-offline+159` | Embeds compact v14 Dex data and Journey Assistant |
+| Journey Assistant | Built in | Three reviewed HGSS blockers; legacy 1.0.0 pack remains compatible |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -22,7 +22,7 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Ask TitoDex** — an independently installable Journey Assistant APK. It prioritizes parsed save context and local reviewed facts, then uses BGE-M3 AI Search and Workers AI Qwen only for unresolved intent. Journey owns installation; Settings controls a prominent/compact/hidden Search entry. Raw saves and trainer/party data are never uploaded. The initial pack covers three reviewed HGSS blocker chains; the current v0.8.13 rebuild fixes host recognition and UI refresh after installation.
+- **Ask TitoDex** — Journey Assistant and three reviewed HGSS blocker chains are built into the host App, with no second APK. It prioritizes parsed save context and local reviewed facts, then uses BGE-M3 AI Search and Workers AI Qwen only for unresolved intent. Settings controls a prominent/compact/hidden Search entry. Raw saves and trainer/party data are never uploaded.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
@@ -84,7 +84,7 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | [Roadmap](ROADMAP.md) | Release history and next work |
 | [Architecture](docs/ARCHITECTURE.md) | Technology choice, data flow, and platform boundaries |
 | [Journey blocker assistant](docs/JOURNEY_ASSISTANT.md) | Save-first fuzzy matching, privacy contract, AI Search/DeepSeek, and deployment gates |
-| [Android extension packs](docs/EXTENSIONS.md) | On-demand install protocol, signing checks, CDN catalog, and independent iteration |
+| [Legacy Android extension compatibility](docs/EXTENSIONS.md) | 1.0.0 compatibility protocol and migration to bundled host data |
 | [Flutter app](flutter/README.md) | App development notes |
 | [Design system](docs/DESIGN_SYSTEM.md) | Visual, typography, layout, and interaction rules |
 | [Release build](docs/RELEASE_BUILD.md) | APK checklist |

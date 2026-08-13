@@ -1,8 +1,8 @@
-# TitoDex Android 附加包
+# TitoDex 旧 Android 附加包兼容
 
-> 状态：v0.8.13 首次提供 Journey Assistant 1.0.0 可选扩展；当前 156/157 修正版修复安装后的宿主发现与 UI 刷新。资料仍只覆盖三条 HGSS 试用链路。
+> 状态：Journey Assistant 1.0.0 曾作为可选扩展发布；当前 v0.8.13 158/159 修正版已把资料和助手集成进主 App，不再提供安装入口。本页记录旧包读取兼容与维护协议。
 
-TitoDex 的附加包是一个可单独安装和卸载的 Android APK。第一包是“旅程助手”，主 APK 保留下载、安装、启停与入口管理，审核资料放在附加 APK 中独立迭代。用户不需要时可以不安装。
+旧附加包是一个无桌面入口的独立 Android APK。当前主 App 不要求它存在：有效的旧包仍可作为兼容数据源；包不存在、Provider 不可见或任何校验失败时，立即使用主 APK 内建审核资料。
 
 ## 第一包契约
 
@@ -20,18 +20,16 @@ canonical schema：
 - [`extension_catalog.schema.json`](../data/extensions/extension_catalog.schema.json)：CDN catalog
 - [`extension_pack_manifest.schema.json`](../data/extensions/extension_pack_manifest.schema.json)：已安装包 manifest
 
-## 用户流程
+## 当前用户流程
 
-1. Journey 未安装时显示“安装旅程助手”；设置页同时提供统一管理入口。
-2. App 从构建时配置的 Journey Assistant Worker catalog 路径拉取版本信息，再从同一 Worker 流式下载 immutable APK；不直连 R2/CDN。
-3. App 核对 catalog SHA-256/size，原生层再核对 APK package、provider 与 TitoDex 签名。
-4. Android 系统安装器要求用户确认；未授权侧载时先进入“允许来自此来源”。
-5. 安装后 Journey 可进入问答；Search 可在设置中选择“大入口 / 紧凑 / 隐藏”（默认紧凑）。
-6. 设置页可检查/安装更高 `versionCode` 的同签名更新、关闭功能或打开系统卸载页；低版本和重复版本不会安装。在线 AI 是另一独立、默认关闭的开关。
+1. Journey 与 Search 直接使用主 App 内建助手，无安装确认和未知来源权限。
+2. 设置页可关闭内建助手、单独开启在线 AI，并选择 Search 的“大入口 / 紧凑 / 隐藏”。
+3. 已安装旧 1.0.0 包时，主 App 可继续按严格协议读取；用户可在 Android 系统设置自行卸载，不影响内建功能。
+4. 未来资料扩充使用 App 私有数据包，不再发布可执行 APK。
 
-Web 与非 Android 构建不会尝试安装 APK。`REQUEST_INSTALL_PACKAGES` 适用于当前 GitHub/RG 侧载发行；如果以后进入 Google Play，需要按 Play 政策采用对应的可选模块分发方案，不能直接沿用这条安装路径。
+当前 UI 不再触发 APK 安装。遗留 host/catalog 代码暂时保留一版兼容，后续确认迁移完成后可连同 `REQUEST_INSTALL_PACKAGES` 一并移除。
 
-## 构建与 R2 staging
+## 旧包构建与 R2 staging（仅兼容维护）
 
 附加 APK 直接从 [`progression_hints.json`](../data/journey/progression_hints.json) 复制资料并生成 manifest，不维护第二份事实源：
 
@@ -50,7 +48,7 @@ python3 tools/build_journey_extension_release.py \
   --version-name 1.0.0 --version-code 1 --min-host-version 0.8.13
 ```
 
-后续获批上传时，把产物放到 `titodex-journey-content` 的 `extensions/journey-assistant/` 下：先传 `objects/*.apk`，确认经 Worker 返回字节的 SHA-256 后，最后传 `extension-catalog.json`。不要覆盖旧对象；更新只发布新 digest 文件并最后替换 catalog。App 构建只配置 Journey Assistant Worker 的完整 catalog URL：
+若仅为旧兼容包发布安全修复，把产物放到 `titodex-journey-content` 的 `extensions/journey-assistant/` 下：先传 `objects/*.apk`，确认经 Worker 返回字节的 SHA-256 后，最后传 `extension-catalog.json`。不要覆盖旧对象。当前内建助手不读取 catalog，也不需要下列构建参数：
 
 ```bash
 flutter build apk \

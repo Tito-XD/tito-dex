@@ -104,7 +104,10 @@ abstract final class AppZh {
   static const askTitoDexNoticeAccept = '我知道了';
   static const settingsAskTitoDex = '问 TitoDex / 旅程卡关助手';
   static const settingsAskTitoDexHint = '默认关闭；已知问题优先离线回答，必要时才使用独立在线服务。';
-  static const extensionJourneyTitle = '旅程助手扩展';
+  static const extensionJourneyTitle = '旅程助手';
+  static const extensionBuiltIn = '主 App 内建';
+  static const extensionBuiltInHint =
+      '审核资料随主 App 提供，不需要另装 APK；关闭后会隐藏 Journey 与 Search 的问答入口。';
   static const extensionNotInstalled = '未安装';
   static const extensionInstallHint = '按需从 TitoDex 扩展目录下载；Android 会显示系统安装确认。';
   static const extensionInstall = '下载并安装';
@@ -115,10 +118,10 @@ abstract final class AppZh {
   static const extensionInstallStarted = '已交给 Android，请在系统页面确认安装';
   static const extensionInstallFailed = '扩展安装未能开始，请稍后再试';
   static const extensionInstalled = '已安装';
-  static const extensionEnabled = '启用旅程助手扩展';
+  static const extensionEnabled = '启用内建旅程助手';
   static const extensionUninstall = '卸载扩展';
   static const extensionUninstallHint = '将打开 Android 系统卸载确认页面。';
-  static const extensionOnlineTitle = '扩展与在线功能';
+  static const extensionOnlineTitle = '旅程助手与在线功能';
   static const extensionSearchDisplay = '在搜索页显示';
   static const extensionSearchProminent = '重点显示';
   static const extensionSearchCompact = '紧凑显示';
