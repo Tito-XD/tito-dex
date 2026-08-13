@@ -91,19 +91,29 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
         return true
     }
 
+    fun notifyStatusChanged(reason: String) {
+        channel?.invokeMethod(
+            "statusChanged",
+            mapOf("reason" to reason),
+        )
+    }
+
     private fun inspect(
         expectedPackageId: String?,
         expectedAuthority: String?,
         expectedPermission: String?,
     ): Map<String, Any?> {
         requireContract(expectedPackageId, expectedAuthority, expectedPermission)
+        val authority = expectedAuthority!!
         val packageInfo = installedPackageInfo(expectedPackageId!!) ?: return mapOf(
             "installed" to false,
         )
         if (!sameSigner(packageInfo, hostPackageInfo())) return mapOf("installed" to false)
-        val provider = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val provider = packageInfo.providers?.firstOrNull {
+            it.authority?.split(';')?.contains(authority) == true
+        } ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.resolveContentProvider(
-                expectedAuthority!!,
+                authority,
                 PackageManager.ComponentInfoFlags.of(
                     PackageManager.MATCH_DISABLED_COMPONENTS.toLong(),
                 ),
@@ -111,7 +121,7 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
         } else {
             @Suppress("DEPRECATION")
             packageManager.resolveContentProvider(
-                expectedAuthority!!,
+                authority,
                 PackageManager.MATCH_DISABLED_COMPONENTS,
             )
         }
@@ -120,7 +130,7 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
         ) {
             return mapOf("installed" to false)
         }
-        val packManifest = readPackManifest(expectedAuthority)
+        val packManifest = readPackManifest(authority)
             ?: return mapOf("installed" to false)
         return mapOf(
             "installed" to true,

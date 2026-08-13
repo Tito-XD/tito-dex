@@ -162,20 +162,26 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
                 child: TitoPageContainer(
-                  child: JourneyPage(
-                    journey: _journey,
-                    onLaunchEmulator: () => _onContinue(context),
-                    askTitoDexEnabled:
-                        journeyAssistantExtension.installed &&
-                        askTitoDexSettings.extensionEnabled,
-                    onAskTitoDex: () => context.push('/journey/ask'),
-                    askTitoDexExtensionInstalled:
-                        journeyAssistantExtension.installed,
-                    extensionInstallAvailable:
-                        journeyAssistantExtension.catalogConfigured,
-                    extensionInstalling: journeyAssistantExtension.busy,
-                    onInstallExtension: () =>
-                        _installJourneyAssistantExtension(context),
+                  child: ListenableBuilder(
+                    listenable: Listenable.merge([
+                      journeyAssistantExtension,
+                      askTitoDexSettings,
+                    ]),
+                    builder: (context, _) => JourneyPage(
+                      journey: _journey,
+                      onLaunchEmulator: () => _onContinue(context),
+                      askTitoDexEnabled:
+                          journeyAssistantExtension.installed &&
+                          askTitoDexSettings.extensionEnabled,
+                      onAskTitoDex: () => context.push('/journey/ask'),
+                      askTitoDexExtensionInstalled:
+                          journeyAssistantExtension.installed,
+                      extensionInstallAvailable:
+                          journeyAssistantExtension.catalogConfigured,
+                      extensionInstalling: journeyAssistantExtension.busy,
+                      onInstallExtension: () =>
+                          _installJourneyAssistantExtension(context),
+                    ),
                   ),
                 ),
               ),

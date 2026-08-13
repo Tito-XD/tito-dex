@@ -52,6 +52,29 @@ void main() {
     expect(controller.info.capabilities, contains('progression_hints'));
   });
 
+  test('native resume or install status re-inspects the extension', () async {
+    final platform = _FakeExtensionPlatform(
+      JourneyAssistantExtensionInfo.notInstalled,
+    );
+    final controller = JourneyAssistantExtensionController(platform: platform);
+    await controller.refresh();
+    expect(controller.installed, isFalse);
+
+    platform.info = const JourneyAssistantExtensionInfo(
+      installed: true,
+      versionName: '1.0.0',
+      versionCode: 1,
+      contentVersion: 1,
+      capabilities: ['progression_hints'],
+    );
+    platform.emitStatusChanged();
+    await pumpEventQueue();
+
+    expect(controller.installed, isTrue);
+    expect(platform.inspectCalls, 2);
+    controller.dispose();
+  });
+
   test('canonical catalog selects the journey assistant entry', () {
     final catalog = JourneyAssistantExtensionCatalog.fromJson({
       'schemaVersion': 1,
@@ -264,9 +287,14 @@ class _FakeExtensionPlatform implements JourneyAssistantExtensionPlatform {
 
   JourneyAssistantExtensionInfo info;
   int installCalls = 0;
+  int inspectCalls = 0;
+  VoidCallback? _statusChangedHandler;
 
   @override
-  Future<JourneyAssistantExtensionInfo> inspect() async => info;
+  Future<JourneyAssistantExtensionInfo> inspect() async {
+    inspectCalls += 1;
+    return info;
+  }
 
   @override
   Future<String> install(String apkPath) async {
@@ -278,7 +306,11 @@ class _FakeExtensionPlatform implements JourneyAssistantExtensionPlatform {
   Future<String?> readTextFile(String path) async => null;
 
   @override
-  void setStatusChangedHandler(VoidCallback handler) {}
+  void setStatusChangedHandler(VoidCallback handler) {
+    _statusChangedHandler = handler;
+  }
+
+  void emitStatusChanged() => _statusChangedHandler?.call();
 
   @override
   Future<void> uninstall() async {}

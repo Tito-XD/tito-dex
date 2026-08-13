@@ -141,6 +141,13 @@ class MainActivity : FlutterActivity() {
         appShortcutChannel?.invokeMethod("shortcutOpened", route)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (this::journeyAssistantExtensionHost.isInitialized) {
+            journeyAssistantExtensionHost.notifyStatusChanged("activity_resumed")
+        }
+    }
+
     private fun shortcutRouteFrom(intent: Intent?): String? {
         if (intent?.action != APP_SHORTCUT_ACTION) {
             return null
