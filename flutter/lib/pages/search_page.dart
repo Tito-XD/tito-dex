@@ -193,7 +193,10 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: askTitoDexSettings,
+      listenable: Listenable.merge([
+        askTitoDexSettings,
+        journeyAssistantExtension,
+      ]),
       builder: (context, _) => _buildPage(context),
     );
   }

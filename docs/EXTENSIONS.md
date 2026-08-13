@@ -1,6 +1,6 @@
 # TitoDex Android 附加包
 
-> 状态：v0.8.13 首次提供 Journey Assistant 1.0.0 可选扩展；资料仍只覆盖三条 HGSS 试用链路。
+> 状态：v0.8.13 首次提供 Journey Assistant 1.0.0 可选扩展；v0.8.14 修复安装后的宿主发现与 UI 刷新。资料仍只覆盖三条 HGSS 试用链路。
 
 TitoDex 的附加包是一个可单独安装和卸载的 Android APK。第一包是“旅程助手”，主 APK 保留下载、安装、启停与入口管理，审核资料放在附加 APK 中独立迭代。用户不需要时可以不安装。
 

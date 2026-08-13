@@ -204,15 +204,23 @@ class JourneyAssistantExtensionController extends ChangeNotifier {
     JourneyAssistantExtensionPlatform? platform,
     http.Client? client,
     String catalogUrl = ExtensionCatalogConfig.catalogUrl,
+    Duration installPollInterval = const Duration(seconds: 1),
+    int installPollAttempts = 30,
   }) : _platform = platform ?? MethodChannelJourneyAssistantExtensionPlatform(),
        _client = client,
-       _catalogUrl = catalogUrl.trim() {
+       _catalogUrl = catalogUrl.trim(),
+       _installPollInterval = installPollInterval,
+       _installPollAttempts = installPollAttempts {
     _platform.setStatusChangedHandler(() => unawaited(refresh()));
   }
 
   final JourneyAssistantExtensionPlatform _platform;
   final http.Client? _client;
   final String _catalogUrl;
+  final Duration _installPollInterval;
+  final int _installPollAttempts;
+  Timer? _installRecognitionTimer;
+  int _installPollsRemaining = 0;
 
   JourneyAssistantExtensionInfo _info =
       JourneyAssistantExtensionInfo.notInstalled;
@@ -239,7 +247,30 @@ class JourneyAssistantExtensionController extends ChangeNotifier {
       _info = JourneyAssistantExtensionInfo.notInstalled;
       _errorCode = 'inspect_failed';
     }
+    if (_info.installed) {
+      _stopInstallRecognitionPolling();
+    }
     notifyListeners();
+  }
+
+  void _startInstallRecognitionPolling() {
+    _stopInstallRecognitionPolling();
+    if (_installPollAttempts <= 0) return;
+    _installPollsRemaining = _installPollAttempts;
+    _installRecognitionTimer = Timer.periodic(_installPollInterval, (timer) {
+      if (installed || _installPollsRemaining <= 0) {
+        _stopInstallRecognitionPolling();
+        return;
+      }
+      _installPollsRemaining -= 1;
+      unawaited(refresh());
+    });
+  }
+
+  void _stopInstallRecognitionPolling() {
+    _installRecognitionTimer?.cancel();
+    _installRecognitionTimer = null;
+    _installPollsRemaining = 0;
   }
 
   Future<String> installFromCatalog() async {
@@ -312,6 +343,9 @@ class JourneyAssistantExtensionController extends ChangeNotifier {
       }
       final result = await _platform.install(apk.path);
       await refresh();
+      if (result == 'started' && !installed) {
+        _startInstallRecognitionPolling();
+      }
       return result;
     } on FormatException {
       _errorCode = 'catalog_invalid';
@@ -343,6 +377,12 @@ class JourneyAssistantExtensionController extends ChangeNotifier {
 
   Future<void> uninstall() async {
     await _platform.uninstall();
+  }
+
+  @override
+  void dispose() {
+    _stopInstallRecognitionPolling();
+    super.dispose();
   }
 
   Future<String?> readTextFile(String path) async {
