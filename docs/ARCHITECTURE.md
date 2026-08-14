@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.13 · Lite `0.8.13+158` · Offline `0.8.13-offline+159` · built-in Journey Assistant · live bundle v19 / compact seed v14.
+> Current release: v0.8.14 · Lite `0.8.14+160` · Offline `0.8.14-offline+161` · observable built-in Journey Assistant · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
@@ -62,18 +62,22 @@ formula/value helpers; their upstream license and NOTICE ship in APK assets.
 The “Ask TitoDex” source preview is a separate, privacy-bounded flow.
 `data/journey/progression_hints.json` is canonical; Gradle copies it into the
 bundled host asset (with a legacy same-signer companion fallback) and generates a content
-manifest. The host validates catalog digest, APK identity/signer, provider
-contract, protocol/host compatibility, and payload digest before use. The main
-APK does not carry the fact payload. See [EXTENSIONS.md](./EXTENSIONS.md).
+manifest. The host APK always carries the reviewed HGSS seed. A legacy optional
+pack may override it only after catalog digest, APK identity/signer, provider
+contract, protocol/host compatibility, and payload digest validation. See
+[EXTENSIONS.md](./EXTENSIONS.md).
 
 The App sends only fields allowed by `data/journey/assistant_api.schema.json`,
 including explicit save-field reliability. Deterministic fuzzy matching always
 runs first. On a miss/tie, optional BGE-M3 hybrid AI Search may return candidate
 IDs, but returned text is discarded and every ID is checked against the same
-local audited facts. DeepSeek through AI Gateway or Workers AI may only select a
-candidate/reorder deterministic sections. Invalid JSON, timeouts, unsupported
-versions and unknown conditions return a local/follow-up state rather than
-invented guidance. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md).
+local audited facts. On a reviewed-corpus miss, a strict scope gate may fetch
+bounded PokeAPI, StrategyWiki and Wikidata data. Exact move fields are resolved
+for the selected version before use; Qwen composition must pass direct-support
+classification, numeric/version guards and a second verification call. Invalid
+JSON, timeouts, unsupported versions and unknown conditions return a
+local/follow-up state rather than invented guidance. See
+[JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md).
 
 ## Active layout
 

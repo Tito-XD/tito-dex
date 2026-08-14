@@ -9,6 +9,33 @@ import '../game/game_edition.dart';
 
 enum AskTitoDexStatus { answered, needsClarification, noMatch, failed }
 
+enum AskTitoDexAnswerMode {
+  localAudited('local_audited'),
+  auditedOnline('audited_online'),
+  aiSearchAudited('ai_search_audited'),
+  curatedSourcesDeterministic('curated_sources_deterministic'),
+  curatedSourcesQwen('curated_sources_qwen'),
+  noMatch('no_match');
+
+  const AskTitoDexAnswerMode(this.wireValue);
+
+  final String wireValue;
+
+  static AskTitoDexAnswerMode fromWire(
+    Object? value, {
+    required bool onlineComposed,
+    required List<String> matchedHintIds,
+  }) {
+    for (final mode in values) {
+      if (mode.wireValue == value) return mode;
+    }
+    if (!onlineComposed) return AskTitoDexAnswerMode.localAudited;
+    return matchedHintIds.isEmpty
+        ? AskTitoDexAnswerMode.curatedSourcesQwen
+        : AskTitoDexAnswerMode.auditedOnline;
+  }
+}
+
 bool isAskTitoDexSupported(CurrentJourney journey, GameEdition edition) {
   final context = AskTitoDexContext.fromJourney(journey, edition);
   return context.generation == 4 &&
@@ -56,23 +83,26 @@ class AskTitoDexContext {
     String? locationId,
   }) {
     final saveEdition = gameEditionForSaveGame(journey.game);
-    final exactGame = saveEdition?.selectedFlavor ?? edition.selectedFlavor;
-    final hasParsedSave = journey.saveDexHash != null;
+    final hasParsedSave =
+        journey.saveDexHash != null &&
+        saveEdition != null &&
+        saveEdition.slug == edition.slug;
+    final exactGame = hasParsedSave
+        ? saveEdition.selectedFlavor ?? edition.selectedFlavor
+        : edition.selectedFlavor;
     final exactHgss =
         hasParsedSave &&
         (exactGame == 'heartgold' || exactGame == 'soulsilver');
     return AskTitoDexContext(
       game: exactGame,
-      generation: saveEdition?.generation ?? edition.generation,
+      generation: hasParsedSave ? saveEdition.generation : edition.generation,
       locationLabel: journey.location,
       locationId: locationId,
       badgeIds: journey.verifiedBadgeIds,
       badgeCount: exactHgss ? null : (hasParsedSave ? journey.badges : null),
       milestoneIds: const [],
       parserRevision: hasParsedSave ? saveParserRevision : 0,
-      gameReliability: hasParsedSave && saveEdition != null
-          ? 'save_verified'
-          : 'user_selected',
+      gameReliability: hasParsedSave ? 'save_verified' : 'user_selected',
       locationReliability: hasParsedSave ? 'save_verified' : 'unknown',
       badgesReliability: exactHgss
           ? 'save_verified'
@@ -174,6 +204,11 @@ class AskTitoDexResult {
     this.followUp,
     this.errorCode,
     this.onlineComposed = false,
+    this.answerMode = AskTitoDexAnswerMode.localAudited,
+    this.modelUsed = false,
+    this.aiSearchUsed = false,
+    this.sourceKinds = const [],
+    this.onlineAttempted = false,
   });
 
   final AskTitoDexStatus status;
@@ -187,6 +222,33 @@ class AskTitoDexResult {
   final String? followUp;
   final String? errorCode;
   final bool onlineComposed;
+  final AskTitoDexAnswerMode answerMode;
+  final bool modelUsed;
+  final bool aiSearchUsed;
+  final List<String> sourceKinds;
+  final bool onlineAttempted;
+
+  AskTitoDexResult withRuntimeTrace({
+    bool? onlineAttempted,
+    String? errorCode,
+  }) => AskTitoDexResult(
+    status: status,
+    answer: answer,
+    contextUsed: contextUsed,
+    matchedHintIds: matchedHintIds,
+    verifiedFacts: verifiedFacts,
+    unknowns: unknowns,
+    confidence: confidence,
+    sources: sources,
+    followUp: followUp,
+    errorCode: errorCode ?? this.errorCode,
+    onlineComposed: onlineComposed,
+    answerMode: answerMode,
+    modelUsed: modelUsed,
+    aiSearchUsed: aiSearchUsed,
+    sourceKinds: sourceKinds,
+    onlineAttempted: onlineAttempted ?? this.onlineAttempted,
+  );
 
   factory AskTitoDexResult.fromJson(Map<String, dynamic> json) {
     final status = switch (json['status']) {
@@ -195,13 +257,15 @@ class AskTitoDexResult {
       'no_match' => AskTitoDexStatus.noMatch,
       _ => AskTitoDexStatus.failed,
     };
+    final matchedHintIds = _strings(json['matchedHintIds']);
+    final onlineComposed = json['onlineComposed'] as bool? ?? true;
     return AskTitoDexResult(
       status: status,
       answer: json['answer'] as String?,
       contextUsed: Map<String, dynamic>.from(
         json['contextUsed'] as Map? ?? const {},
       ),
-      matchedHintIds: _strings(json['matchedHintIds']),
+      matchedHintIds: matchedHintIds,
       verifiedFacts: _strings(json['verifiedFacts']),
       unknowns: _strings(json['unknowns']),
       confidence: json['confidence'] as String? ?? 'low',
@@ -214,7 +278,16 @@ class AskTitoDexResult {
           .toList(growable: false),
       followUp: json['followUp'] as String?,
       errorCode: json['errorCode'] as String?,
-      onlineComposed: json['onlineComposed'] as bool? ?? true,
+      onlineComposed: onlineComposed,
+      answerMode: AskTitoDexAnswerMode.fromWire(
+        json['answerMode'],
+        onlineComposed: onlineComposed,
+        matchedHintIds: matchedHintIds,
+      ),
+      modelUsed: json['modelUsed'] as bool? ?? onlineComposed,
+      aiSearchUsed: json['aiSearchUsed'] as bool? ?? false,
+      sourceKinds: _strings(json['sourceKinds']),
+      onlineAttempted: true,
     );
   }
 

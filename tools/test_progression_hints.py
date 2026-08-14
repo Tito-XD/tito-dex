@@ -14,7 +14,14 @@ HGSS_MAP_PATH = ROOT / "data/l10n/zh/hgss_map_ids.json"
 ITEM_PATH = ROOT / "data/l10n/zh/items.json"
 
 ID_PATTERN = re.compile(r"^[a-z0-9_-]+$")
-GAMES = {"heartgold", "soulsilver"}
+GAMES = {
+    "diamond", "pearl", "platinum", "heartgold", "soulsilver",
+    "black", "white", "black-2", "white-2",
+    "x", "y", "omega-ruby", "alpha-sapphire",
+    "sun", "moon", "ultra-sun", "ultra-moon",
+    "sword", "shield", "brilliant-diamond", "shining-pearl",
+    "legends-arceus", "scarlet", "violet",
+}
 RELIABILITIES = {"save_verified", "not_currently_parsed"}
 
 
@@ -62,8 +69,13 @@ class ProgressionHintsTest(unittest.TestCase):
         forbidden = {"rawSave", "trainerName", "trainerId", "party", "money", "coordinates"}
         self.assertTrue(forbidden.isdisjoint(context["properties"]))
 
-    def test_host_apk_bundles_the_canonical_reviewed_dataset(self):
-        self.assertEqual(BUNDLED_DATA_PATH.read_bytes(), DATA_PATH.read_bytes())
+    def test_host_apk_bundles_a_reviewed_offline_subset(self):
+        bundled = json.loads(BUNDLED_DATA_PATH.read_text())
+        canonical_by_id = {entry["id"]: entry for entry in self.data["entries"]}
+        self.assertEqual(bundled["schemaVersion"], self.data["schemaVersion"])
+        self.assertLessEqual(bundled["datasetVersion"], self.data["datasetVersion"])
+        for entry in bundled["entries"]:
+            self.assertEqual(entry, canonical_by_id[entry["id"]])
 
     def test_schema_and_entries_are_strictly_valid(self):
         self.assertEqual(self.schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
@@ -93,7 +105,7 @@ class ProgressionHintsTest(unittest.TestCase):
             self.assertNotIn(entry["id"], ids)
             ids.add(entry["id"])
             self.assertTrue(set(entry["games"]).issubset(GAMES))
-            self.assertEqual(entry["generation"], 4)
+            self.assertIn(entry["generation"], {4, 5, 6, 7, 8, 9})
             self.assertEqual(
                 set(entry["subject"]),
                 {"type", "id", "labelZh", "aliases"},
@@ -130,12 +142,16 @@ class ProgressionHintsTest(unittest.TestCase):
             "mineral_badge",
             "glacier_badge",
             "rising_badge",
+            "quake_badge",
+            "legend_badge",
+            "insect_badge",
         }
         for entry in self.data["entries"]:
             for location in entry["locations"]:
                 self.assertIn(location, self.locations)
-            for step in entry["steps"]:
-                self.assertIn(step["locationId"], self.hgss_map_names)
+            if set(entry["games"]).issubset({"heartgold", "soulsilver"}):
+                for step in entry["steps"]:
+                    self.assertIn(step["locationId"], self.hgss_map_names)
             for requirement in entry["requirements"]:
                 if requirement["type"] == "badge":
                     self.assertIn(requirement["id"], supported_badges)

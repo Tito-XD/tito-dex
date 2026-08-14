@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "sv-zh-hans",
+  "contentVersion": 1,
+  "games": ["scarlet", "violet"],
+  "generation": 9,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "sv-area-zero-after-three-stories",
+      "originHintId": "sv-area-zero-unlock",
+      "games": ["scarlet", "violet"],
+      "generation": 9,
+      "category": "progression",
+      "subjectId": "area_zero_gate",
+      "predicate": "unlocks_after_events",
+      "objectId": "the-way-home",
+      "locationIds": ["Zero Gate", "Area Zero"],
+      "conditions": ["victory_road_completed", "path_of_legends_completed", "starfall_street_completed"],
+      "statementZh": "朱紫完成冠军之路、传说之路和星尘之路三条主线后，可在零区闸口与伙伴会合并开始归乡之路。",
+      "sourceLockIds": ["bulbapedia-scarlet-violet-4607603"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T11:25:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed Bulbapedia revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

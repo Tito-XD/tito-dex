@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "pla-zh-hans",
+  "contentVersion": 1,
+  "games": ["legends-arceus"],
+  "generation": 8,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "pla-snowpoint-temple-panel-sequences",
+      "originHintId": "pla-snowpoint-temple-panels",
+      "games": ["legends-arceus"],
+      "generation": 8,
+      "category": "blocker",
+      "subjectId": "snowpoint_temple_panel_doors",
+      "predicate": "requires_sequences",
+      "objectId": "rock-steel-ice",
+      "locationIds": ["Snowpoint Temple"],
+      "conditions": ["mission12_snowpoint_temple"],
+      "statementZh": "雪峰神殿三道机关门的图案顺序为岩钢冰、冰岩钢岩冰、钢冰岩冰钢岩。",
+      "sourceLockIds": ["bulbapedia-pla-walkthrough-part9-4315766"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T11:25:00Z",
+        "fixtureIds": [],
+        "notes": "Original compact sequence fact checked against a fixed Bulbapedia walkthrough revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "packId": "dpp-zh-hans",
+  "contentVersion": 1,
+  "games": ["diamond", "pearl", "platinum"],
+  "generation": 4,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "dpp-route210-secret-potion",
+      "originHintId": "dpp-route210-psyduck",
+      "games": ["diamond", "pearl", "platinum"],
+      "generation": 4,
+      "category": "blocker",
+      "subjectId": "route210_psyduck",
+      "predicate": "requires_item_after_event",
+      "objectId": "secret-potion",
+      "locationIds": ["Route 210", "Valor Lakefront"],
+      "conditions": ["valor_lakefront_galactic_grunt"],
+      "statementZh": "完成湿原市之后的银河队追逐并与竹兰交谈，可取得治疗210号道路可达鸭的秘传药。",
+      "sourceLockIds": ["strategywiki-dpp-pastoria-1186451", "strategywiki-dpp-route210-north-1170493"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against fixed StrategyWiki revisions; no source prose is stored or indexed. Save progression fields remain unverified."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "dp-route222-after-spear-pillar",
+      "originHintId": "dp-route222-sunyshore",
+      "games": ["diamond", "pearl"],
+      "generation": 4,
+      "category": "blocker",
+      "subjectId": "route222_blockade",
+      "predicate": "unlocks_after_event",
+      "objectId": "spear_pillar_completed",
+      "locationIds": ["Route 222", "Spear Pillar"],
+      "conditions": ["galactic_hq_completed"],
+      "statementZh": "钻石与珍珠完成枪之柱主线后，222号道路才会开放前往滨海市。",
+      "sourceLockIds": ["strategywiki-dpp-route222-1170447"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed StrategyWiki revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "platinum-route222-after-distortion-world",
+      "originHintId": "platinum-route222-sunyshore",
+      "games": ["platinum"],
+      "generation": 4,
+      "category": "blocker",
+      "subjectId": "route222_blockade_platinum",
+      "predicate": "unlocks_after_event",
+      "objectId": "distortion_world_completed",
+      "locationIds": ["Route 222", "Distortion World"],
+      "conditions": ["spear_pillar_reached"],
+      "statementZh": "白金完成毁坏的世界主线并返回后，222号道路才会开放前往滨海市。",
+      "sourceLockIds": ["strategywiki-platinum-distortion-1187355", "strategywiki-dpp-route222-1170447"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against fixed StrategyWiki revisions; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}
