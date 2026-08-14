@@ -12,5 +12,8 @@ export function buildLogRecord(
     hasLocation: request.context.locationId !== undefined,
     badgeCount: request.context.badgeCount ?? request.context.badgeIds.length,
     errorCode: response.errorCode ?? null,
+    answerMode: response.answerMode ?? null,
+    modelUsed: response.modelUsed ?? false,
+    aiSearchUsed: response.aiSearchUsed ?? false,
   };
 }

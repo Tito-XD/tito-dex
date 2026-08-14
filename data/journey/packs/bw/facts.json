@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "packId": "bw-zh-hans",
+  "contentVersion": 1,
+  "games": ["black", "white"],
+  "generation": 5,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "bw-chargestone-web-cleared-by-clay",
+      "originHintId": "bw-route6-chargestone-web",
+      "games": ["black", "white"],
+      "generation": 5,
+      "category": "blocker",
+      "subjectId": "chargestone_web",
+      "predicate": "unlocks_after_badge",
+      "objectId": "quake_badge",
+      "locationIds": ["Route 6", "Chargestone Cave"],
+      "conditions": ["driftveil_gym_completed"],
+      "statementZh": "完成帆巴道馆后靠近电石洞穴入口，菊老大会在剧情中清除挡路的蛛网。",
+      "sourceLockIds": ["strategywiki-bw-route6-1181291", "strategywiki-bw-chargestone-1170554"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against fixed StrategyWiki revisions; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "bw-opelucid-to-league",
+      "originHintId": "bw-after-opelucid-league",
+      "games": ["black", "white"],
+      "generation": 5,
+      "category": "progression",
+      "subjectId": "opelucid_north_route",
+      "predicate": "next_destination",
+      "objectId": "route-10",
+      "locationIds": ["Opelucid City", "Route 10"],
+      "conditions": ["legend_badge"],
+      "statementZh": "取得双龙道馆的第八枚徽章后，从城市北侧进入10号道路，经徽章检查门与冠军之路前往联盟。",
+      "sourceLockIds": ["strategywiki-bw-opelucid-1170578"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed StrategyWiki revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

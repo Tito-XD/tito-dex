@@ -73,9 +73,36 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "enum": ["heartgold", "soulsilver"] }
+          "items": {
+            "enum": [
+              "diamond",
+              "pearl",
+              "platinum",
+              "heartgold",
+              "soulsilver",
+              "black",
+              "white",
+              "black-2",
+              "white-2",
+              "x",
+              "y",
+              "omega-ruby",
+              "alpha-sapphire",
+              "sun",
+              "moon",
+              "ultra-sun",
+              "ultra-moon",
+              "sword",
+              "shield",
+              "brilliant-diamond",
+              "shining-pearl",
+              "legends-arceus",
+              "scarlet",
+              "violet"
+            ]
+          }
         },
-        "generation": { "const": 4 },
+        "generation": { "type": "integer", "minimum": 4, "maximum": 9 },
         "locations": {
           "type": "array",
           "minItems": 1,

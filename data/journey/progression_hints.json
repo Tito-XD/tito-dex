@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "datasetVersion": 1,
+  "datasetVersion": 4,
   "entries": [
     {
       "id": "hgss-route36-sudowoodo",
@@ -202,6 +202,832 @@
           "title": "Bulbapedia — Card Key (Johto)",
           "url": "https://bulbapedia.bulbagarden.net/wiki/Card_Key_%28Johto%29",
           "accessedAt": "2026-08-12"
+        }
+      ]
+    },
+    {
+      "id": "dpp-route210-psyduck",
+      "games": ["diamond", "pearl", "platinum"],
+      "generation": 4,
+      "locations": ["sinnoh-route-210-south-towards-solaceon-town"],
+      "locationAliases": ["210号道路", "随意镇北边", "咖啡馆旁边", "route_210"],
+      "destinationAliases": ["神和镇", "210号道路北部", "雾里的道路"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route210_psyduck",
+        "labelZh": "挡路的可达鸭",
+        "aliases": ["可达鸭", "一群可达鸭", "头痛的可达鸭", "挡路的鸭子", "秘传药", "秘密药", "怎么去神和镇"]
+      },
+      "requirements": [
+        {
+          "type": "key_item",
+          "id": "secret-potion",
+          "labelZh": "秘传药",
+          "itemId": 441,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "valor_lakefront_galactic_grunt",
+          "labelZh": "追完立志湖畔的银河队手下",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "follow_story_npc",
+          "targetId": "galactic_grunt",
+          "locationId": "Valor Lakefront",
+          "instructionZh": "先完成湿原市道馆后的银河队手下追逐，并在立志湖畔击败他。"
+        },
+        {
+          "order": 2,
+          "action": "receive_key_item",
+          "targetId": "secret-potion",
+          "locationId": "Valor Lakefront",
+          "instructionZh": "继续向北与竹兰交谈，领取用来治疗可达鸭的秘传药。"
+        },
+        {
+          "order": 3,
+          "action": "use_key_item",
+          "targetId": "route210_psyduck",
+          "locationId": "Route 210",
+          "instructionZh": "回到210号道路咖啡馆附近，对挡路的可达鸭使用秘传药，再向北前往神和镇。"
+        }
+      ],
+      "overviewZh": "210号道路的可达鸭要用竹兰交给你的秘传药治疗；先完成湿原市之后的银河队追逐事件。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Pastoria City (oldid 1186451)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1186451",
+          "accessedAt": "2026-08-13"
+        },
+        {
+          "title": "StrategyWiki — Route 210 north (oldid 1170493)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1170493",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "dp-route222-sunyshore",
+      "games": ["diamond", "pearl"],
+      "generation": 4,
+      "locations": ["sinnoh-route-222-area"],
+      "locationAliases": ["222号道路", "立志湖畔东边", "滨海市入口", "route_222"],
+      "destinationAliases": ["滨海市", "最后一个道馆", "电次"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "route222_blockade",
+        "labelZh": "222号道路封路",
+        "aliases": ["222号道路进不去", "滨海市进不去", "有人挡路", "最后道馆去不了", "怎么去滨海市", "枪之柱"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "spear_pillar_completed",
+          "labelZh": "完成枪之柱事件",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "clear_story_event",
+          "targetId": "galactic_hq",
+          "locationId": "Veilstone City",
+          "instructionZh": "先推进银河队总部与三湖事件，确认主线已经指向天冠山。"
+        },
+        {
+          "order": 2,
+          "action": "clear_story_event",
+          "targetId": "spear_pillar",
+          "locationId": "Spear Pillar",
+          "instructionZh": "从天冠山登上枪之柱，完成银河队与帝牙卢卡／帕路奇亚事件。"
+        },
+        {
+          "order": 3,
+          "action": "travel",
+          "targetId": "sunyshore-city",
+          "locationId": "Route 222",
+          "instructionZh": "事件结束后回到立志湖畔东侧，222号道路会开放，可前往滨海市挑战最后道馆。"
+        }
+      ],
+      "overviewZh": "钻石／珍珠的222号道路会一直封闭到枪之柱主线完成；打完银河队与封面神兽事件后再回来。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Route 222 (oldid 1170447)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1170447",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "platinum-route222-sunyshore",
+      "games": ["platinum"],
+      "generation": 4,
+      "locations": ["sinnoh-route-222-area"],
+      "locationAliases": ["222号道路", "立志湖畔东边", "滨海市入口", "route_222"],
+      "destinationAliases": ["滨海市", "最后一个道馆", "电次"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "route222_blockade_platinum",
+        "labelZh": "白金的222号道路封路",
+        "aliases": ["222号道路进不去", "滨海市进不去", "有人挡路", "最后道馆去不了", "怎么去滨海市", "毁坏的世界", "反转世界"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "distortion_world_completed",
+          "labelZh": "完成毁坏的世界事件",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "clear_story_event",
+          "targetId": "spear_pillar",
+          "locationId": "Spear Pillar",
+          "instructionZh": "先推进银河队总部并登上枪之柱，跟随竹兰进入毁坏的世界。"
+        },
+        {
+          "order": 2,
+          "action": "clear_story_event",
+          "targetId": "distortion_world",
+          "locationId": "Distortion World",
+          "instructionZh": "在毁坏的世界解开三只湖之众神对应的推石机关，击败赤日并处理骑拉帝纳事件。"
+        },
+        {
+          "order": 3,
+          "action": "travel",
+          "targetId": "sunyshore-city",
+          "locationId": "Route 222",
+          "instructionZh": "离开毁坏的世界并向山梨博士报告后，立志湖畔东侧的222号道路会开放。"
+        }
+      ],
+      "overviewZh": "白金需要先完成枪之柱之后的毁坏的世界主线，222号道路才会开放到滨海市。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Distortion World (oldid 1187355)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1187355",
+          "accessedAt": "2026-08-13"
+        },
+        {
+          "title": "StrategyWiki — Route 222 (oldid 1170447)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1170447",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "bw-route6-chargestone-web",
+      "games": ["black", "white"],
+      "generation": 5,
+      "locations": ["unova-route-6-area"],
+      "locationAliases": ["6号道路", "电石洞穴入口", "chargestone_cave", "route_6"],
+      "destinationAliases": ["电石洞穴", "吹寄市", "风露"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "chargestone_web",
+        "labelZh": "电石洞穴的蛛网",
+        "aliases": ["蜘蛛网", "蛛网挡路", "电石洞穴进不去", "电气石洞穴", "菊老大不来", "怎么去吹寄市"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "quake_badge",
+          "labelZh": "震动徽章",
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "driftveil_gym_completed",
+          "labelZh": "完成帆巴道馆",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_gym_leader",
+          "targetId": "clay",
+          "locationId": "Driftveil City",
+          "instructionZh": "先在帆巴市完成冷冻仓库剧情并击败道馆馆主菊老大。"
+        },
+        {
+          "order": 2,
+          "action": "travel",
+          "targetId": "chargestone-cave",
+          "locationId": "Route 6",
+          "instructionZh": "从帆巴市向西北经过6号道路，走到电石洞穴入口的蛛网前。"
+        },
+        {
+          "order": 3,
+          "action": "trigger_story_npc",
+          "targetId": "clay",
+          "locationId": "Chargestone Cave",
+          "instructionZh": "靠近蛛网会触发菊老大出现并让流氓鳄清除蛛网，之后即可进入洞穴。"
+        }
+      ],
+      "overviewZh": "电石洞穴入口的蛛网不是用招式处理；完成帆巴道馆后靠近入口，菊老大会在剧情中清除它。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Route 6 (oldid 1181291)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1181291",
+          "accessedAt": "2026-08-13"
+        },
+        {
+          "title": "StrategyWiki — Chargestone Cave (oldid 1170554)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1170554",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "bw-after-opelucid-league",
+      "games": ["black", "white"],
+      "generation": 5,
+      "locations": ["unova-route-10-area"],
+      "locationAliases": ["双龙市", "双龙道馆", "opelucid_city", "10号道路入口"],
+      "destinationAliases": ["宝可梦联盟", "冠军之路", "10号道路"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "opelucid_north_route",
+        "labelZh": "双龙市之后的联盟路线",
+        "aliases": ["打完双龙道馆去哪", "拿完第八徽章去哪", "联盟怎么走", "冠军之路怎么去", "10号道路", "下一步做什么"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "legend_badge",
+          "labelZh": "传说徽章",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_gym_leader",
+          "targetId": "opelucid-leader",
+          "locationId": "Opelucid City",
+          "instructionZh": "完成双龙道馆并取得第八枚传说徽章。"
+        },
+        {
+          "order": 2,
+          "action": "travel",
+          "targetId": "route-10",
+          "locationId": "Opelucid City",
+          "instructionZh": "从双龙市北侧出口进入10号道路，沿路前往徽章检查门。"
+        },
+        {
+          "order": 3,
+          "action": "travel",
+          "targetId": "pokemon-league",
+          "locationId": "Victory Road",
+          "instructionZh": "通过八道徽章检查后穿越冠军之路，即可到达宝可梦联盟。"
+        }
+      ],
+      "overviewZh": "黑／白取得双龙道馆的第八枚徽章后，主线从城市北侧进入10号道路，再经过徽章检查门与冠军之路。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Opelucid City (oldid 1170578)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1170578",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "bw2-route4-crustle",
+      "games": ["black-2", "white-2"],
+      "generation": 5,
+      "locations": ["unova-route-4-area"],
+      "locationAliases": ["4号道路", "飞云市北边", "route_4", "沙漠入口"],
+      "destinationAliases": ["雷文市", "沙漠度假地", "4号道路北部"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route4_crustle",
+        "labelZh": "4号道路的岩殿居蟹",
+        "aliases": ["岩殿居蟹", "石居蟹", "一排螃蟹", "宝可梦挡路", "阿克罗玛", "机器移开", "4号道路过不去"]
+      },
+      "requirements": [
+        {
+          "type": "badge",
+          "id": "insect_badge",
+          "labelZh": "甲虫徽章",
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "castelia_gym_completed",
+          "labelZh": "完成飞云道馆",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "defeat_gym_leader",
+          "targetId": "burgh",
+          "locationId": "Castelia City",
+          "instructionZh": "先完成飞云下水道与飞云道馆，取得第三枚甲虫徽章。"
+        },
+        {
+          "order": 2,
+          "action": "trigger_story_npc",
+          "targetId": "colress",
+          "locationId": "Castelia City",
+          "instructionZh": "从飞云市北侧出口前进，接受阿克罗玛提出的4号道路对战。"
+        },
+        {
+          "order": 3,
+          "action": "defeat_trainer",
+          "targetId": "colress",
+          "locationId": "Route 4",
+          "instructionZh": "在4号道路看完机器移开岩殿居蟹的演示并击败阿克罗玛，北侧道路就会开放。"
+        }
+      ],
+      "overviewZh": "黑2／白2的4号道路由阿克罗玛剧情解锁；先完成飞云道馆，再到北门触发约战并击败他。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Black 2 and White 2 Route 4 (oldid 1169413)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1169413",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "xy-route7-snorlax",
+      "games": ["x", "y"],
+      "generation": 6,
+      "locations": ["kalos-route-7-area"],
+      "locationAliases": ["7号道路", "古木镇西边", "桥上", "route_7"],
+      "destinationAliases": ["遥香市", "连接洞穴", "培育屋"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route7_snorlax",
+        "labelZh": "7号道路的卡比兽",
+        "aliases": ["卡比兽", "睡觉的卡比兽", "桥上挡路", "宝可梦之笛", "笛子在哪", "怎么叫醒卡比兽", "7号道路过不去"]
+      },
+      "requirements": [
+        {
+          "type": "key_item",
+          "id": "poke-flute",
+          "labelZh": "宝可梦之笛",
+          "itemId": 544,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "parfum_palace_furfrou_completed",
+          "labelZh": "完成巴尔法姆香殿的多丽米亚事件",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "visit_location",
+          "targetId": "parfum-palace",
+          "locationId": "Parfum Palace",
+          "instructionZh": "从古木镇向北经过6号道路前往巴尔法姆香殿，先完成寻找多丽米亚的剧情。"
+        },
+        {
+          "order": 2,
+          "action": "receive_key_item",
+          "targetId": "poke-flute",
+          "locationId": "Parfum Palace",
+          "instructionZh": "完成庭院事件和烟火剧情后取得宝可梦之笛，再返回7号道路。"
+        },
+        {
+          "order": 3,
+          "action": "wake_pokemon",
+          "targetId": "snorlax",
+          "locationId": "Route 7",
+          "instructionZh": "在桥边触发吹笛剧情，击败或收服醒来的卡比兽后，西侧道路就会开放。"
+        }
+      ],
+      "overviewZh": "XY 的7号道路要先去巴尔法姆香殿完成多丽米亚事件并取得宝可梦之笛，再回来叫醒卡比兽。",
+      "sources": [
+        {
+          "title": "StrategyWiki — Pokémon X and Y Route 7 (oldid 1172875)",
+          "url": "https://strategywiki.org/w/index.php?oldid=1172875",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "oras-fortree-kecleon",
+      "games": ["omega-ruby", "alpha-sapphire"],
+      "generation": 6,
+      "locations": ["fortree-city-area"],
+      "locationAliases": ["茵郁市", "茵郁道馆", "树屋城市", "fortree_city"],
+      "destinationAliases": ["茵郁道馆", "飞行道馆", "娜琪"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "fortree_kecleon",
+        "labelZh": "茵郁道馆前的隐形变隐龙",
+        "aliases": ["看不见的东西", "隐形宝可梦", "变隐龙", "得文侦测镜", "道馆进不去", "茵郁市卡住", "看不见的墙"]
+      },
+      "requirements": [
+        {
+          "type": "key_item",
+          "id": "devon-scope",
+          "labelZh": "得文侦测镜",
+          "itemId": 542,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "route120_steven_kecleon",
+          "labelZh": "完成120号道路大吾的变隐龙事件",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "travel",
+          "targetId": "route-120",
+          "locationId": "Route 120",
+          "instructionZh": "从茵郁市向东进入120号道路，在北侧木桥找到大吾。"
+        },
+        {
+          "order": 2,
+          "action": "battle_pokemon",
+          "targetId": "kecleon",
+          "locationId": "Route 120",
+          "instructionZh": "用大吾展示的得文侦测镜发现变隐龙，完成战斗后取得侦测镜。"
+        },
+        {
+          "order": 3,
+          "action": "use_key_item",
+          "targetId": "fortree_kecleon",
+          "locationId": "Fortree City",
+          "instructionZh": "返回茵郁市，在道馆前对隐形障碍使用得文侦测镜，处理变隐龙后即可进馆。"
+        }
+      ],
+      "overviewZh": "ORAS 茵郁道馆前的隐形障碍是变隐龙；先到120号道路找大吾取得得文侦测镜，再回来使用。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Devon Scope (oldid 4551287)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4551287",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "sm-route6-sudowoodo",
+      "games": ["sun", "moon"],
+      "generation": 7,
+      "locations": ["alola-route-6-north"],
+      "locationAliases": ["6号道路", "欧哈纳牧场南边", "皇家大道入口", "route_6"],
+      "destinationAliases": ["皇家大道", "7号道路", "维拉火山公园"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route6_sudowoodo_sm",
+        "labelZh": "日月6号道路的树才怪",
+        "aliases": ["树才怪", "一排假树", "宝可梦挡路", "水莲考验", "水Z", "水Z纯晶", "怎么去皇家大道", "6号道路过不去"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "brooklet_hill_wishiwashi_trial",
+          "labelZh": "完成潺潺之丘的霸主弱丁鱼考验",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "complete_trial",
+          "targetId": "totem-wishiwashi",
+          "locationId": "Brooklet Hill",
+          "instructionZh": "先在潺潺之丘完成水莲的考验；日月版本的霸主是弱丁鱼鱼群形态。"
+        },
+        {
+          "order": 2,
+          "action": "receive_reward",
+          "targetId": "waterium-z",
+          "locationId": "Brooklet Hill",
+          "instructionZh": "击败霸主后从水莲处取得水Z等奖励，确认考验已正式完成。"
+        },
+        {
+          "order": 3,
+          "action": "travel",
+          "targetId": "royal-avenue",
+          "locationId": "Route 6",
+          "instructionZh": "回到欧哈纳牧场南侧的6号道路，树才怪会离开，随后可向皇家大道前进。"
+        }
+      ],
+      "overviewZh": "日月的6号道路要先完成潺潺之丘水莲考验并击败霸主弱丁鱼；之后树才怪才会让路。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Brooklet Hill (oldid 4576234)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4576234",
+          "accessedAt": "2026-08-13"
+        },
+        {
+          "title": "Bulbapedia — Alola Route 6 (oldid 4229010)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4229010",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "usum-route6-sudowoodo",
+      "games": ["ultra-sun", "ultra-moon"],
+      "generation": 7,
+      "locations": ["alola-route-6-north"],
+      "locationAliases": ["6号道路", "欧哈纳牧场南边", "皇家大道入口", "route_6"],
+      "destinationAliases": ["皇家大道", "7号道路", "维拉火山公园"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route6_sudowoodo_usum",
+        "labelZh": "究极日月6号道路的树才怪",
+        "aliases": ["树才怪", "一排假树", "宝可梦挡路", "水莲考验", "滴蛛霸", "霸主滴蛛霸", "水Z", "怎么去皇家大道", "6号道路过不去"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "brooklet_hill_araquanid_trial",
+          "labelZh": "完成潺潺之丘的霸主滴蛛霸考验",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "complete_trial",
+          "targetId": "totem-araquanid",
+          "locationId": "Brooklet Hill",
+          "instructionZh": "先在潺潺之丘完成水莲的考验；究极日月版本要赶弱丁鱼并击败霸主滴蛛霸。"
+        },
+        {
+          "order": 2,
+          "action": "receive_reward",
+          "targetId": "waterium-z",
+          "locationId": "Brooklet Hill",
+          "instructionZh": "击败霸主滴蛛霸后从水莲处取得水Z等奖励，确认考验已完成。"
+        },
+        {
+          "order": 3,
+          "action": "travel",
+          "targetId": "royal-avenue",
+          "locationId": "Route 6",
+          "instructionZh": "回到欧哈纳牧场南侧的6号道路，树才怪会离开，随后可向皇家大道前进。"
+        }
+      ],
+      "overviewZh": "究极日月的6号道路要先完成潺潺之丘水莲考验并击败霸主滴蛛霸；不要按日月的弱丁鱼流程判断。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Brooklet Hill (oldid 4576234)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4576234",
+          "accessedAt": "2026-08-13"
+        },
+        {
+          "title": "Bulbapedia — Alola Route 6 (oldid 4229010)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4229010",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "swsh-route9-water-bike",
+      "games": ["sword", "shield"],
+      "generation": 8,
+      "locations": ["galar-route-9-circhester-bay"],
+      "locationAliases": ["9号道路", "战竞湾", "冰水路段", "route_9", "circhester_bay"],
+      "destinationAliases": ["尖钉镇", "9号道路南段", "水上骑行"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route9_water_crossing",
+        "labelZh": "剑盾9号道路的水面",
+        "aliases": ["水上自行车", "自行车不能下水", "洛托姆自行车升级", "怎么过水", "不能骑到水里", "呐喊队挡路", "战竞湾卡住"]
+      },
+      "requirements": [
+        {
+          "type": "key_item",
+          "id": "rotom-bike",
+          "labelZh": "可在水上行驶的洛托姆自行车",
+          "itemId": 1143,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "route9_rescue_bike_man",
+          "labelZh": "在9号道路救下自行车店员工",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "travel",
+          "targetId": "route-9-circhester-bay",
+          "locationId": "Route 9",
+          "instructionZh": "从战竞镇向南进入9号道路，沿主路走到呐喊队围住自行车店员工的位置。"
+        },
+        {
+          "order": 2,
+          "action": "defeat_trainers",
+          "targetId": "team-yell-route9",
+          "locationId": "Route 9",
+          "instructionZh": "击败这里的呐喊队成员并救下员工，他会为洛托姆自行车加上水上行驶功能。"
+        },
+        {
+          "order": 3,
+          "action": "ride_on_water",
+          "targetId": "circhester-bay",
+          "locationId": "Route 9",
+          "instructionZh": "骑车朝水面前进会自动切换为水上模式，随后穿过战竞湾继续前往尖钉镇。"
+        }
+      ],
+      "overviewZh": "剑盾9号道路不用另找冲浪招式；击败围住自行车店员工的呐喊队后，洛托姆自行车会当场获得水上模式。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Galar Route 9 (oldid 4542427)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4542427",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "bdsp-route210-psyduck",
+      "games": ["brilliant-diamond", "shining-pearl"],
+      "generation": 8,
+      "locations": ["sinnoh-route-210-south-towards-solaceon-town"],
+      "locationAliases": ["210号道路", "随意镇北边", "咖啡馆旁边", "route_210"],
+      "destinationAliases": ["神和镇", "210号道路北部", "雾里的道路"],
+      "subject": {
+        "type": "overworld_blocker",
+        "id": "route210_psyduck_bdsp",
+        "labelZh": "晶钻明珠210号道路的可达鸭",
+        "aliases": ["可达鸭", "一群可达鸭", "头痛的可达鸭", "挡路的鸭子", "秘传药", "秘密药", "怎么去神和镇"]
+      },
+      "requirements": [
+        {
+          "type": "key_item",
+          "id": "secret-potion",
+          "labelZh": "秘传之药",
+          "itemId": 441,
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "bdsp_valor_lakefront_grunt",
+          "labelZh": "完成湿原市后的银河队手下追逐",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "follow_story_npc",
+          "targetId": "galactic-grunt",
+          "locationId": "Valor Lakefront",
+          "instructionZh": "先打完湿原道馆，再从大湿地入口附近一路追赶银河队手下到立志湖畔并击败他。"
+        },
+        {
+          "order": 2,
+          "action": "receive_key_item",
+          "targetId": "secret-potion",
+          "locationId": "Valor Lakefront",
+          "instructionZh": "战斗后继续向北与竹兰交谈，取得治疗可达鸭头痛的秘传之药。"
+        },
+        {
+          "order": 3,
+          "action": "use_key_item",
+          "targetId": "route210_psyduck_bdsp",
+          "locationId": "Route 210",
+          "instructionZh": "回到210号道路咖啡馆附近调查可达鸭，使用秘传之药后即可向北前往神和镇。"
+        }
+      ],
+      "overviewZh": "晶灿钻石／明亮珍珠的210号道路可达鸭仍需竹兰的秘传之药；先完成湿原道馆后的银河队追逐。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Sinnoh Route 210 (oldid 4590444)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4590444",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "pla-snowpoint-temple-panels",
+      "games": ["legends-arceus"],
+      "generation": 8,
+      "locations": ["hisui-snowpoint-temple-area"],
+      "locationAliases": ["雪峰神殿", "纯白冻土", "神殿地下", "snowpoint_temple"],
+      "destinationAliases": ["屋顶", "勇士雄鹰", "山葵", "睿智湖"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "snowpoint_temple_panel_doors",
+        "labelZh": "雪峰神殿石像门谜题",
+        "aliases": ["石像顺序", "岩石钢冰", "机关门", "门的答案", "神殿谜题", "图案顺序", "雪峰神殿卡住"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "mission12_snowpoint_temple",
+          "labelZh": "推进主任务12沉睡的雪原王",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "enter_sequence",
+          "targetId": "snowpoint-door-1",
+          "locationId": "Snowpoint Temple",
+          "instructionZh": "第一道门依次选择：岩石、钢、冰。可沿石像视线从最里面的石像开始核对。"
+        },
+        {
+          "order": 2,
+          "action": "enter_sequence",
+          "targetId": "snowpoint-door-2",
+          "locationId": "Snowpoint Temple",
+          "instructionZh": "第二道门依次选择：冰、岩石、钢、岩石、冰。"
+        },
+        {
+          "order": 3,
+          "action": "enter_sequence",
+          "targetId": "snowpoint-door-3",
+          "locationId": "Snowpoint Temple",
+          "instructionZh": "第三道门依次选择：钢、冰、岩石、冰、钢、岩石；开门后继续追赶山葵。"
+        }
+      ],
+      "overviewZh": "传说阿尔宙斯雪峰神殿三道门的答案依次为：岩钢冰；冰岩钢岩冰；钢冰岩冰钢岩。",
+      "sources": [
+        {
+          "title": "Bulbapedia Walkthrough — Pokémon Legends: Arceus Part 9 (oldid 4315766)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4315766",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "sv-area-zero-unlock",
+      "games": ["scarlet", "violet"],
+      "generation": 9,
+      "locations": ["pkhex-modern-00050-great-crater-of-paldea"],
+      "locationAliases": ["第零区", "零区", "零区闸口", "帕底亚巨坑", "area_zero", "zero_gate"],
+      "destinationAliases": ["第零区", "帕底亚巨坑", "观测站", "研究所"],
+      "subject": {
+        "type": "story_blocker",
+        "id": "area_zero_gate",
+        "labelZh": "第零区主线入口",
+        "aliases": ["怎么进第零区", "零区进不去", "闸口不开", "归乡之路", "三个主线", "冠军之路", "传说之路", "星尘之路"]
+      },
+      "requirements": [
+        {
+          "type": "milestone",
+          "id": "victory_road_completed",
+          "labelZh": "完成冠军之路",
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "path_of_legends_completed",
+          "labelZh": "完成传说之路",
+          "reliability": "not_currently_parsed"
+        },
+        {
+          "type": "milestone",
+          "id": "starfall_street_completed",
+          "labelZh": "完成星尘之路",
+          "reliability": "not_currently_parsed"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "action": "complete_story_routes",
+          "targetId": "paldea-three-stories",
+          "locationId": "Paldea",
+          "instructionZh": "分别完成冠军之路、传说之路和星尘之路；只完成其中一条不会开放最终主线。"
+        },
+        {
+          "order": 2,
+          "action": "travel",
+          "targetId": "zero-gate",
+          "locationId": "Zero Gate",
+          "instructionZh": "三条主线都结算后，按派帕的联络前往锦汇镇东南侧的零区闸口。"
+        },
+        {
+          "order": 3,
+          "action": "start_final_story",
+          "targetId": "the-way-home",
+          "locationId": "Area Zero",
+          "instructionZh": "在闸口与派帕、妮莫和牡丹会合，触发归乡之路并进入第零区。"
+        }
+      ],
+      "overviewZh": "朱紫的第零区必须先完成冠军之路、传说之路和星尘之路三条主线，再到零区闸口与伙伴会合。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Pokémon Scarlet and Violet (oldid 4607603)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4607603",
+          "accessedAt": "2026-08-13"
         }
       ]
     }

@@ -34,12 +34,42 @@ describe('journey assistant Worker contract', () => {
     await Promise.all(listed.objects.map((object) => env.JOURNEY_CONTENT.delete(object.key)));
   });
 
+  it('reports sanitized configured capabilities without secrets or URLs', async () => {
+    const response = await SELF.fetch('https://assistant.test/health');
+    expect(response.status).toBe(200);
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({
+      ok: true,
+      schemaVersion: 2,
+      capabilities: {
+        worker: true,
+        publicModel: 'unavailable',
+        aiSearch: false,
+        curatedSources: false,
+        sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
+        braveSearch: false,
+        externalProvider: false,
+      },
+    });
+    expect(JSON.stringify(value)).not.toContain('account');
+    expect(JSON.stringify(value)).not.toContain('https://');
+  });
+
   it('serves local HGSS answers without an AI binding', async () => {
     const response = await post(body(), 'local-answer-key-123');
     expect(response.status).toBe(200);
-    const value = await response.json() as { status: string; onlineComposed: boolean };
+    const value = await response.json() as {
+      status: string;
+      onlineComposed: boolean;
+      answerMode: string;
+      modelUsed: boolean;
+      aiSearchUsed: boolean;
+    };
     expect(value.status).toBe('answered');
     expect(value.onlineComposed).toBe(false);
+    expect(value.answerMode).toBe('local_audited');
+    expect(value.modelUsed).toBe(false);
+    expect(value.aiSearchUsed).toBe(false);
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
 
@@ -49,11 +79,123 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ errorCode: 'invalid_request' });
   });
 
-  it('rejects the wrong game version instead of returning HGSS facts', async () => {
+  it('rejects unsupported games instead of returning unrelated facts', async () => {
     const value = JSON.parse(body()) as { context: Record<string, unknown> };
-    value.context.game = 'platinum';
+    value.context.game = 'scarlet';
     const response = await post(JSON.stringify(value), 'wrong-game-key-123');
     expect(response.status).toBe(400);
+  });
+
+  it('accepts an exact Platinum generation pair and answers its audited route blocker', async () => {
+    const value = JSON.parse(body()) as {
+      question: string;
+      context: Record<string, unknown>;
+    };
+    value.question = '白金去滨海市的222号道路为什么进不去？';
+    value.context = {
+      game: 'platinum',
+      generation: 4,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+    const response = await post(JSON.stringify(value), 'platinum-key-12345');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['platinum-route222-sunyshore'],
+    });
+  });
+
+  it('accepts an exact Black 2 generation pair', async () => {
+    const value = JSON.parse(body()) as {
+      question: string;
+      context: Record<string, unknown>;
+    };
+    value.question = '黑2的4号道路岩殿居蟹怎么移开？';
+    value.context = {
+      game: 'black-2',
+      generation: 5,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+    const response = await post(JSON.stringify(value), 'black2-key-123456');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['bw2-route4-crustle'],
+    });
+  });
+
+  it('keeps Sun/Moon and Ultra Sun/Moon trial targets separate', async () => {
+    const value = JSON.parse(body()) as {
+      question: string;
+      context: Record<string, unknown>;
+    };
+    value.question = '究极月6号道路的树才怪怎么让开？';
+    value.context = {
+      game: 'ultra-moon',
+      generation: 7,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+    const response = await post(JSON.stringify(value), 'ultramoon-key-1234');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['usum-route6-sudowoodo'],
+    });
+  });
+
+  it('answers an exact Scarlet Area Zero blocker from reviewed local data', async () => {
+    const value = JSON.parse(body()) as {
+      question: string;
+      context: Record<string, unknown>;
+    };
+    value.question = '朱版零区闸口为什么还进不去？';
+    value.context = {
+      game: 'scarlet',
+      generation: 9,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+    const response = await post(JSON.stringify(value), 'scarlet-key-12345');
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['sv-area-zero-unlock'],
+    });
   });
 
   it('rejects oversized requests before inference', async () => {

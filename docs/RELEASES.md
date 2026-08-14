@@ -6,9 +6,9 @@
 
 | 渠道 | 当前版本 | 用途 |
 | --- | --- | --- |
-| Lite APK | `v0.8.13`（`0.8.13+158`） | 推荐的 arm64-v8a 安装包，内建旅程助手 |
-| Offline APK | `v0.8.13`（`0.8.13-offline+159`） | 内置紧凑 v14 种子与旅程助手，并可更新到 v19 |
-| Journey Assistant | 主 App 内建 | 旧 `1.0.0+1` 附加包只保留读取兼容 |
+| Lite APK | `v0.8.14`（`0.8.14+160`） | 推荐的 arm64-v8a 安装包，内建可观测旅程助手 |
+| Offline APK | `v0.8.14`（`0.8.14-offline+161`） | 内置紧凑 v14 种子与旅程助手，并可更新到 v19 |
+| Journey Assistant | 主 App 内建 | 连接状态、逐回答路径与伴侣等待动画 |
 
 `TitoDex-1.0.x-*` 和 `v1.0.0` 属于已废弃的 Flutter 之前原型，只作历史保留，不代表比 0.8.x 更新的产品版本。
 
@@ -61,6 +61,7 @@
 
 | Tag | 标准标题 | 版本结果 |
 | --- | --- | --- |
+| `v0.8.14` | TitoDex v0.8.14 · 可观测 AI 旅程助手 | 进入“问 TitoDex”即可看到 Worker、Qwen、AI Search 与限定来源状态；每条回答明示实际路径，加入伴侣等待动画、多版本审核索引与双重事实门槛。 |
 | `v0.8.13` | TitoDex v0.8.13 · 内建魂银旅程助手 | 将 Journey Assistant 与三条审核 HGSS 卡关链路直接放入主 App，取消第二 APK 安装门槛；保留存档优先模糊匹配、BGE-M3 AI Search、Workers AI Qwen 回退及旧 1.0.0 读取兼容。 |
 | `v0.8.12` | TitoDex v0.8.12 · RG 首页与文档收口 | 放大并重新平衡 RG 首页 Trainer Card，Journey 信息在常见掌机屏分成两行且保留极小屏回退，沉浸式内容增加上下内缩；合并重复文档并移除过期 handoff、阶段计划和一次性 CDN workflow。 |
 | `v0.8.11` | TitoDex v0.8.11 · Sleep 试算与来源收口 | 搜索资料页新增离线睡眠分数和料理基础能量试算；Neroli’s Lab 公式固定版本、Apache-2.0 与 NOTICE 随包可查；统一纠正 52Poké、PokeAPI/sprites、PokéSprite、字体、游戏图标和媒体的 Credits／许可边界。 |

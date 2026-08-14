@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "usum-zh-hans",
+  "contentVersion": 1,
+  "games": ["ultra-sun", "ultra-moon"],
+  "generation": 7,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "usum-route6-after-araquanid-trial",
+      "originHintId": "usum-route6-sudowoodo",
+      "games": ["ultra-sun", "ultra-moon"],
+      "generation": 7,
+      "category": "blocker",
+      "subjectId": "route6_sudowoodo_usum",
+      "predicate": "unlocks_after_event",
+      "objectId": "brooklet_hill_araquanid_trial",
+      "locationIds": ["Route 6", "Brooklet Hill"],
+      "conditions": [],
+      "statementZh": "究极日月完成潺潺之丘的霸主滴蛛霸考验后，6号道路的树才怪会让路。",
+      "sourceLockIds": ["bulbapedia-brooklet-hill-4576234", "bulbapedia-alola-route6-4229010"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T10:40:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against fixed Bulbapedia revisions; USUM uses Totem Araquanid rather than SM's Totem Wishiwashi."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

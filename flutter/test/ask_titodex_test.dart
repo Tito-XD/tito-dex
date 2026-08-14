@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,11 +8,13 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:titodex/features/companion/companion_repository.dart';
 import 'package:titodex/features/game/game_edition.dart';
 import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/features/journey/journey_assistant.dart';
 import 'package:titodex/features/journey/progression_hints.dart';
+import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/models/parsed_save.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
@@ -23,6 +26,7 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    await companionRepository.clear();
     askTitoDexSettings.resetForTest();
     await askTitoDexSettings.load();
   });
@@ -110,6 +114,25 @@ void main() {
     },
   );
 
+  test('manual modern version sends an exact user-selected game context', () {
+    final context = AskTitoDexContext.fromJourney(
+      _journey,
+      gameEditionFromSlug('sv')!.withFlavor('violet'),
+    );
+    final request = context.toRequestJson();
+
+    expect(request['game'], 'violet');
+    expect(request['generation'], 9);
+    expect(request['badgeIds'], isEmpty);
+    expect(request['milestoneIds'], isEmpty);
+    expect(request['contextReliability'], {
+      'game': 'user_selected',
+      'location': 'unknown',
+      'badges': 'unknown',
+      'milestones': 'unsupported',
+    });
+  });
+
   test(
     'online client sends the bounded contract and anonymous abuse key',
     () async {
@@ -156,6 +179,47 @@ void main() {
       ).isConfigured,
       isFalse,
     );
+  });
+
+  test('health check exposes only sanitized Worker capabilities', () async {
+    final client = MockClient((request) async {
+      expect(request.method, 'GET');
+      expect(request.url.path, '/health');
+      return http.Response(
+        jsonEncode({
+          'ok': true,
+          'schemaVersion': 2,
+          'capabilities': {
+            'worker': true,
+            'publicModel': 'workers-ai-qwen',
+            'aiSearch': true,
+            'curatedSources': true,
+            'sourceProviders': [
+              'pokeapi',
+              'strategywiki',
+              'wikidata',
+              'unexpected-provider',
+            ],
+            'braveSearch': false,
+            'externalProvider': false,
+          },
+        }),
+        200,
+      );
+    });
+    final online = HttpAskTitoDexOnlineClient(
+      client: client,
+      endpoint: 'https://example.test/v1/ask',
+    );
+
+    final status = await online.checkStatus();
+
+    expect(status.availability, AskTitoDexAvailability.online);
+    expect(status.qwenConfigured, isTrue);
+    expect(status.aiSearchEnabled, isTrue);
+    expect(status.curatedSourcesEnabled, isTrue);
+    expect(status.braveSearchEnabled, isFalse);
+    expect(status.sourceProviders, ['pokeapi', 'strategywiki', 'wikidata']);
   });
 
   group('HGSS deterministic progression hints', () {
@@ -220,6 +284,19 @@ void main() {
     });
 
     test(
+      'Espeon mechanics miss the local blocker pack and require online lookup',
+      () async {
+        final result = await repository.answer(
+          '魂银里伊布白天怎么进化成太阳伊布？',
+          _context.copyWith(includeLocation: false),
+        );
+
+        expect(result.status, AskTitoDexStatus.noMatch);
+        expect(result.onlineComposed, isFalse);
+      },
+    );
+
+    test(
       'online resource failure returns the local deterministic result',
       () async {
         await askTitoDexSettings.setEnabled(true);
@@ -234,10 +311,72 @@ void main() {
 
         expect(result.status, AskTitoDexStatus.noMatch);
         expect(result.onlineComposed, isFalse);
-        expect(result.errorCode, isNull);
+        expect(result.onlineAttempted, isTrue);
+        expect(result.errorCode, 'online_resource_unavailable_fallback');
       },
     );
   });
+
+  testWidgets(
+    'loading scene uses the home companion and answer shows the actual online path',
+    (tester) async {
+      await askTitoDexSettings.setEnabled(true);
+      await askTitoDexSettings.acknowledgeNotice();
+      final service = _CompleterService();
+      final router = GoRouter(
+        initialLocation: '/journey/ask',
+        routes: [
+          GoRoute(
+            path: '/journey/ask',
+            builder: (_, _) => TitoPageContainer(
+              child: AskTitoDexPage(
+                journey: _journey,
+                edition: GameEdition.hgss.withFlavor('soulsilver'),
+                service: service,
+              ),
+            ),
+          ),
+          GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppZh.askTitoDexWorkerOnline), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexQwenConfigured), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexAiSearchEnabled), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexBraveNotConnected), findsOneWidget);
+
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '魂银里伊布白天怎么进化成太阳伊布？',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+
+      expect(find.byKey(const Key('ask-titodex-loading-card')), findsOneWidget);
+      expect(find.textContaining('火球鼠'), findsOneWidget);
+      expect(find.text('正在连接 Journey Assistant'), findsOneWidget);
+
+      service.complete(
+        const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '白天、亲密度较高时升级。',
+          onlineComposed: true,
+          answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
+          modelUsed: true,
+          sourceKinds: ['pokeapi'],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
+      expect(find.text('PokeAPI'), findsOneWidget);
+      expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
+    },
+  );
 
   testWidgets(
     'journey entry is hidden by default and visible only when enabled',
@@ -323,10 +462,14 @@ void main() {
         find.byKey(const Key('ask-titodex-question')),
         '帮帮我',
       );
+      await tester.ensureVisible(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pumpAndSettle();
       expect(find.text('请补充你所在地点。'), findsOneWidget);
 
+      await tester.ensureVisible(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('ask-titodex-retry')), findsOneWidget);
@@ -352,11 +495,47 @@ class _FakeService extends AskTitoDexService {
   @override
   Future<AskTitoDexResult> ask(
     String question,
-    AskTitoDexContext context,
-  ) async => results.removeAt(0);
+    AskTitoDexContext context, {
+    void Function(AskTitoDexProgress progress)? onProgress,
+  }) async => results.removeAt(0);
+}
+
+class _CompleterService extends AskTitoDexService {
+  final Completer<AskTitoDexResult> _answer = Completer<AskTitoDexResult>();
+
+  @override
+  Future<AskTitoDexWorkerStatus> checkConnection() async =>
+      const AskTitoDexWorkerStatus(
+        availability: AskTitoDexAvailability.online,
+        qwenConfigured: true,
+        aiSearchEnabled: true,
+        curatedSourcesEnabled: true,
+        sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
+      );
+
+  @override
+  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async =>
+      context.copyWith(locationId: 'johto-route-36-area');
+
+  @override
+  Future<AskTitoDexResult> ask(
+    String question,
+    AskTitoDexContext context, {
+    void Function(AskTitoDexProgress progress)? onProgress,
+  }) {
+    onProgress?.call(AskTitoDexProgress.checkingLocal);
+    onProgress?.call(AskTitoDexProgress.contactingWorker);
+    return _answer.future;
+  }
+
+  void complete(AskTitoDexResult result) => _answer.complete(result);
 }
 
 class _ThrowingOnlineClient implements AskTitoDexOnlineClient {
+  @override
+  Future<AskTitoDexWorkerStatus> checkStatus() async =>
+      const AskTitoDexWorkerStatus.unavailable('resource_unavailable');
+
   @override
   Future<AskTitoDexResult> ask(
     String question,

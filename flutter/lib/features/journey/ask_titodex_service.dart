@@ -13,6 +13,46 @@ class AskTitoDexConfig {
 }
 
 const _workerAskPath = '/v1/ask';
+const _workerHealthPath = '/health';
+const _maxHealthResponseBytes = 8192;
+
+enum AskTitoDexProgress { checkingLocal, contactingWorker }
+
+enum AskTitoDexAvailability { checking, online, disabled, unavailable }
+
+class AskTitoDexWorkerStatus {
+  const AskTitoDexWorkerStatus({
+    required this.availability,
+    this.qwenConfigured = false,
+    this.aiSearchEnabled = false,
+    this.curatedSourcesEnabled = false,
+    this.sourceProviders = const [],
+    this.braveSearchEnabled = false,
+    this.externalProviderEnabled = false,
+    this.errorCode,
+  });
+
+  const AskTitoDexWorkerStatus.checking()
+    : this(availability: AskTitoDexAvailability.checking);
+
+  const AskTitoDexWorkerStatus.disabled()
+    : this(availability: AskTitoDexAvailability.disabled);
+
+  const AskTitoDexWorkerStatus.unavailable([String? errorCode])
+    : this(
+        availability: AskTitoDexAvailability.unavailable,
+        errorCode: errorCode,
+      );
+
+  final AskTitoDexAvailability availability;
+  final bool qwenConfigured;
+  final bool aiSearchEnabled;
+  final bool curatedSourcesEnabled;
+  final List<String> sourceProviders;
+  final bool braveSearchEnabled;
+  final bool externalProviderEnabled;
+  final String? errorCode;
+}
 
 bool _isJourneyWorkerAskEndpoint(String value) {
   final uri = Uri.tryParse(value);
@@ -27,13 +67,15 @@ bool _isJourneyWorkerAskEndpoint(String value) {
 
 abstract class AskTitoDexOnlineClient {
   Future<AskTitoDexResult> ask(String question, AskTitoDexContext context);
+
+  Future<AskTitoDexWorkerStatus> checkStatus();
 }
 
 class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
   HttpAskTitoDexOnlineClient({
     http.Client? client,
     String endpoint = AskTitoDexConfig.workerUrl,
-    this.timeout = const Duration(seconds: 12),
+    this.timeout = const Duration(seconds: 20),
     Future<String> Function()? deviceKeyProvider,
   }) : _client = client ?? http.Client(),
        endpoint = endpoint.trim(),
@@ -46,6 +88,50 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
   final Future<String> Function() _deviceKeyProvider;
 
   bool get isConfigured => _isJourneyWorkerAskEndpoint(endpoint);
+
+  @override
+  Future<AskTitoDexWorkerStatus> checkStatus() async {
+    if (!isConfigured) {
+      throw const AskTitoDexOnlineException('worker_not_configured');
+    }
+    final uri = Uri.parse(endpoint).replace(path: _workerHealthPath);
+    final response = await _client.get(uri).timeout(const Duration(seconds: 5));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw AskTitoDexOnlineException('health_http_${response.statusCode}');
+    }
+    if (response.bodyBytes.length > _maxHealthResponseBytes) {
+      throw const AskTitoDexOnlineException('health_response_too_large');
+    }
+    final decoded = jsonDecode(utf8.decode(response.bodyBytes));
+    if (decoded is! Map ||
+        decoded['ok'] != true ||
+        decoded['capabilities'] is! Map) {
+      throw const AskTitoDexOnlineException('invalid_health_response');
+    }
+    final capabilities = Map<String, dynamic>.from(
+      decoded['capabilities'] as Map,
+    );
+    final providers =
+        (capabilities['sourceProviders'] as List<dynamic>? ?? const [])
+            .whereType<String>()
+            .where(
+              (provider) => const {
+                'pokeapi',
+                'strategywiki',
+                'wikidata',
+              }.contains(provider),
+            )
+            .toList(growable: false);
+    return AskTitoDexWorkerStatus(
+      availability: AskTitoDexAvailability.online,
+      qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
+      aiSearchEnabled: capabilities['aiSearch'] == true,
+      curatedSourcesEnabled: capabilities['curatedSources'] == true,
+      sourceProviders: providers,
+      braveSearchEnabled: capabilities['braveSearch'] == true,
+      externalProviderEnabled: capabilities['externalProvider'] == true,
+    );
+  }
 
   @override
   Future<AskTitoDexResult> ask(
@@ -103,6 +189,25 @@ class AskTitoDexService {
   final ProgressionHintRepository _hints;
   final AskTitoDexOnlineClient? _online;
 
+  Future<AskTitoDexWorkerStatus> checkConnection() async {
+    if (!askTitoDexSettings.enabled) {
+      return const AskTitoDexWorkerStatus.disabled();
+    }
+    final online = _online;
+    if (online == null) {
+      return const AskTitoDexWorkerStatus.unavailable('worker_not_configured');
+    }
+    try {
+      return await online.checkStatus();
+    } on TimeoutException {
+      return const AskTitoDexWorkerStatus.unavailable('health_timeout');
+    } on AskTitoDexOnlineException catch (error) {
+      return AskTitoDexWorkerStatus.unavailable(error.code);
+    } on Object {
+      return const AskTitoDexWorkerStatus.unavailable('health_failed');
+    }
+  }
+
   Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async =>
       context.copyWith(
         locationId: await _hints.resolveLocationId(context.locationLabel),
@@ -110,22 +215,35 @@ class AskTitoDexService {
 
   Future<AskTitoDexResult> ask(
     String question,
-    AskTitoDexContext context,
-  ) async {
+    AskTitoDexContext context, {
+    void Function(AskTitoDexProgress progress)? onProgress,
+  }) async {
+    onProgress?.call(AskTitoDexProgress.checkingLocal);
     final local = await _hints.answer(question, context);
     if (local.status == AskTitoDexStatus.answered ||
         _online == null ||
         !askTitoDexSettings.enabled) {
       return local;
     }
+    onProgress?.call(AskTitoDexProgress.contactingWorker);
     try {
-      return await _online.ask(question, context);
+      final online = await _online.ask(question, context);
+      return online.withRuntimeTrace(onlineAttempted: true);
     } on TimeoutException {
-      return local;
-    } on AskTitoDexOnlineException {
-      return local;
+      return local.withRuntimeTrace(
+        onlineAttempted: true,
+        errorCode: 'online_timeout_fallback',
+      );
+    } on AskTitoDexOnlineException catch (error) {
+      return local.withRuntimeTrace(
+        onlineAttempted: true,
+        errorCode: 'online_${error.code}_fallback',
+      );
     } on Object {
-      return local;
+      return local.withRuntimeTrace(
+        onlineAttempted: true,
+        errorCode: 'online_failed_fallback',
+      );
     }
   }
 }
