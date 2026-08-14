@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "oras-zh-hans",
+  "contentVersion": 1,
+  "games": ["omega-ruby", "alpha-sapphire"],
+  "generation": 6,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "oras-fortree-kecleon-devon-scope",
+      "originHintId": "oras-fortree-kecleon",
+      "games": ["omega-ruby", "alpha-sapphire"],
+      "generation": 6,
+      "category": "blocker",
+      "subjectId": "fortree_kecleon",
+      "predicate": "requires_item_after_event",
+      "objectId": "devon-scope",
+      "locationIds": ["Fortree City", "Route 120"],
+      "conditions": ["route120_steven_kecleon"],
+      "statementZh": "在120号道路完成大吾的变隐龙事件并取得得文侦测镜后，可清除茵郁道馆前的隐形变隐龙。",
+      "sourceLockIds": ["bulbapedia-devon-scope-4551287"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T10:40:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed Bulbapedia revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

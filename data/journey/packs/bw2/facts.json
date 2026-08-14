@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "bw2-zh-hans",
+  "contentVersion": 1,
+  "games": ["black-2", "white-2"],
+  "generation": 5,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "bw2-route4-colress-crustle",
+      "originHintId": "bw2-route4-crustle",
+      "games": ["black-2", "white-2"],
+      "generation": 5,
+      "category": "blocker",
+      "subjectId": "route4_crustle",
+      "predicate": "unlocks_after_trainer",
+      "objectId": "colress",
+      "locationIds": ["Castelia City", "Route 4"],
+      "conditions": ["castelia_gym_completed"],
+      "statementZh": "完成飞云道馆后从北门触发阿克罗玛约战，并在4号道路击败他即可让北侧道路开放。",
+      "sourceLockIds": ["strategywiki-bw2-route4-1169413"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T09:30:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed StrategyWiki revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

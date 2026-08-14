@@ -70,6 +70,230 @@
       "retrievedAt": "2026-08-12T15:21:55Z",
       "contentSha256": "873290d2a429ea1ee71e9360f512a12dcbf8a7a5624601cf2a4d94e9d70e817c",
       "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-dpp-pastoria-1186451",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Diamond_and_Pearl/Pastoria_City",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1186451",
+        "timestamp": "2026-06-07T00:32:03Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1186451"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "4633eb1433eac042ffd7de6e8a1613b318e152153b1a295b475f2d19623f81db",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-dpp-route210-north-1170493",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Diamond_and_Pearl/Route_210_%28north%29",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1170493",
+        "timestamp": "2026-03-07T21:23:01Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1170493"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "cc46a5a79e0459c90976329408533f1b34121787ccfca3c6aa7d4d0608b70d9e",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-dpp-route222-1170447",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Diamond_and_Pearl/Route_222",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1170447",
+        "timestamp": "2026-03-07T18:50:33Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1170447"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "8d063779cb21536af68b1a118a82c2fca117497c2160b2cd889b5ee708026fd4",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-platinum-distortion-1187355",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Platinum/Distortion_World",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1187355",
+        "timestamp": "2026-06-12T01:03:39Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1187355"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "4c64cb089e1936d88088a2adf46d3c3661bdf8e3d9564c6431cccd477bb5a289",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-bw-route6-1181291",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Black_and_White/Route_6",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1181291",
+        "timestamp": "2026-05-06T03:41:01Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1181291"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "7a0efa95330f1bb408d7b5d8a5a2562987534b0d1f121b49d3abe3fb61b17201",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-bw-chargestone-1170554",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Black_and_White/Chargestone_Cave",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1170554",
+        "timestamp": "2026-03-08T01:49:16Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1170554"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "36cceb4a1b7c07a8699295617c6a5889e4cf2e0c33e8040c7fd0b0ca597d15da",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-bw-opelucid-1170578",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Black_and_White/Opelucid_City",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1170578",
+        "timestamp": "2026-03-08T02:10:46Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1170578"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "959851b44ceb5097a35148b59ffa7745b47f96ab3b9227b6a49d0c2620db4066",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-bw2-route4-1169413",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_Black_2_and_White_2/Route_4",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1169413",
+        "timestamp": "2026-03-05T17:47:56Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1169413"
+      },
+      "retrievedAt": "2026-08-13T09:30:00Z",
+      "contentSha256": "d3cd1e204604177bcc5f7ef5b12c1617aa65784c501b79a8584d16d458b76ea8",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "strategywiki-xy-route7-1172875",
+      "sourceId": "strategywiki",
+      "resourceUrl": "https://strategywiki.org/wiki/Pok%C3%A9mon_X_and_Y/Route_7",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "1172875",
+        "timestamp": "2026-03-26T02:54:46Z",
+        "permalink": "https://strategywiki.org/w/index.php?oldid=1172875"
+      },
+      "retrievedAt": "2026-08-13T10:35:00Z",
+      "contentSha256": "e60570883cfc5fbbdf704a694b8330b6a80b1166bd6674f703e03366d2d5359a",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-devon-scope-4551287",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Devon_Scope",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4551287",
+        "timestamp": "2026-05-13T20:21:30Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4551287"
+      },
+      "retrievedAt": "2026-08-13T10:35:00Z",
+      "contentSha256": "059bced8d605d7db526e83aa3de1a67e971d684fd9f5cdc96a320f00884af64a",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-brooklet-hill-4576234",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Brooklet_Hill",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4576234",
+        "timestamp": "2026-06-20T13:43:14Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4576234"
+      },
+      "retrievedAt": "2026-08-13T10:35:00Z",
+      "contentSha256": "7a616b4691a1e7fc1d7e1f7511e131295e0b76e5b827a4a16413c2b9050723ad",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-alola-route6-4229010",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Alola_Route_6",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4229010",
+        "timestamp": "2025-01-26T21:25:02Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4229010"
+      },
+      "retrievedAt": "2026-08-13T10:35:00Z",
+      "contentSha256": "eec0d89ae8df4fe10b4514e5f75a3c98eedd9abe8052ca2c8fe6bd274e3cf9f7",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-galar-route9-4542427",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Galar_Route_9",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4542427",
+        "timestamp": "2026-05-01T16:01:09Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4542427"
+      },
+      "retrievedAt": "2026-08-13T11:20:00Z",
+      "contentSha256": "c87bcd3cb5e20cf9b3e96d20300469ed73495807f8305b23e7e8e66e18341a61",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-sinnoh-route210-4590444",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Sinnoh_Route_210",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4590444",
+        "timestamp": "2026-07-15T09:06:59Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4590444"
+      },
+      "retrievedAt": "2026-08-13T11:20:00Z",
+      "contentSha256": "50c86a6c2abb1a2ccb67a4691885856df35095e6432ace44917689a9ee119182",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-pla-walkthrough-part9-4315766",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Walkthrough:Pok%C3%A9mon_Legends:_Arceus/Part_9",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4315766",
+        "timestamp": "2025-06-04T09:22:19Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4315766"
+      },
+      "retrievedAt": "2026-08-13T11:20:00Z",
+      "contentSha256": "27596191963f6146891ddbb6ff486eee5fe9999207e5c3e1900752c2f00c2c2c",
+      "acquisitionMethod": "manual_fact_check"
+    },
+    {
+      "lockId": "bulbapedia-scarlet-violet-4607603",
+      "sourceId": "bulbapedia",
+      "resourceUrl": "https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Scarlet_and_Violet",
+      "revision": {
+        "kind": "mediawiki_revision",
+        "id": "4607603",
+        "timestamp": "2026-08-06T22:45:47Z",
+        "permalink": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4607603"
+      },
+      "retrievedAt": "2026-08-13T11:20:00Z",
+      "contentSha256": "15c29fa6ba68d57a836742c318cf6d8a7b69c57fd8e9c396328cd9e597735976",
+      "acquisitionMethod": "manual_fact_check"
     }
   ]
 }

@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.13](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.13) · Lite `0.8.13+154` · Offline `0.8.13-offline+155` · Journey Assistant `1.0.0+1`.
+> **Latest release:** [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · Lite `0.8.14+160` · Offline `0.8.14-offline+161`.
 >
-> **Current `main`:** v0.8.13 release baseline with the optional Journey Assistant companion APK and AI Search; DeepSeek remains an explicitly gated future provider. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.14 release baseline with built-in Journey Assistant observability, reviewed multi-game retrieval, BGE-M3 AI Search and bounded Workers AI Qwen; DeepSeek remains explicitly private-gated. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -13,16 +13,24 @@
 | Save import | HGSS fixture-verified rich party/trainer/map/dex sync; Gen I–VII metadata experimental; DeSmuME `.dsv` recognized |
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
-| “Ask TitoDex” blocker Q&A | Shipped in v0.8.13; optional companion APK, save-first local fuzzy matching, BGE-M3 candidate retrieval and Workers AI composition; first pack has three reviewed HGSS chains |
+| “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
 | Offline data | Live bundle v19; compact v14 Offline seed |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
 
+## Completed in v0.8.14
+
+- Add a sanitized connection card for Worker, Qwen, AI Search and bounded sources; explicitly show that Brave Search is not connected.
+- Label every answer with the actual route, model use, AI Search hit and source providers instead of silently collapsing online failures into a normal no-match.
+- Animate the selected home companion with reduced-motion support and stage-accurate waiting messages.
+- Expand the reviewed online blocker corpus across supported Gen IV–IX editions while retaining exact game/reliability gates.
+- Resolve move values against the selected version, reject unsupported source composition, and run a second Qwen fact-support verification pass.
+
 ## Completed in v0.8.13
 
-- Ship the independently installable Journey Assistant 1.0.0, Journey/Settings/Search management, save-first local fuzzy matching, reviewed BGE-M3 retrieval and Workers AI Qwen fallback for three HGSS blocker chains.
+- Ship the independently installable Journey Assistant 1.0.0, then build its reviewed seed and Ask flow directly into the host so a second APK is no longer required.
 - Rotate the Android signing key after legacy signing material was found in public history; v0.8.13 requires a one-time uninstall/reinstall from older releases.
 
 ## Completed in v0.8.12

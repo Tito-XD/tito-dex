@@ -1,8 +1,9 @@
 # TitoDex Journey Assistant Worker
 
-Independent Worker source for the Journey blocker helper. v0.8.13 publishes
-the optional content APK and enables the reviewed BGE-M3 index. The current
-audited corpus still contains only three HGSS hints.
+Independent Worker source for the Journey blocker helper. v0.8.13 keeps three
+HGSS hints available offline in the host APK. The reviewed online corpus also
+covers selected blockers in DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP,
+Legends: Arceus, and Scarlet/Violet.
 
 The request path is deliberately fail-safe:
 
@@ -13,9 +14,62 @@ The request path is deliberately fail-safe:
 4. Workers AI is the public default and may classify an allowed candidate and
    reorder deterministic answer sections. It cannot add, remove, or rewrite
    facts. A unique local match makes zero model calls.
-5. DeepSeek (or an authenticated custom provider) is an explicitly gated,
+5. If the audited corpus still has no match and `CURATED_WEB_ENABLED=true`, a
+   strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
+   and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
+   the bounded results. No general search engine or arbitrary URL is accepted.
+6. DeepSeek (or an authenticated custom provider) is an explicitly gated,
    non-public option. Search/provider/quota failures fall back through Workers
    AI and finally to the deterministic answer/no-match/clarification response.
+
+## Key-free curated source fallback
+
+This fallback needs no new binding, account resource, or API key. The App still
+calls only `/v1/ask`; all source requests originate in the Worker. The existing
+per-device 20 requests/minute limiter remains the public abuse/cost guard, with
+no daily five-request cap.
+
+- PokéAPI REST v2 is queried only for a validated resource kind and slug. The
+  Worker first resolves Chinese species/move/item/ability/location names from
+  the App's existing compact label catalogs, then uses the model value only as
+  a fallback. Species evolution links are followed only when they
+  remain on the exact `pokeapi.co/api/v2/evolution-chain/<id>` allowlist.
+- StrategyWiki uses one search request and one latest-revision request. Its
+  revision URL and CC-BY-SA attribution are returned with the answer. This is
+  best-effort because StrategyWiki may return 403 to Cloudflare egress; such a
+  denial is skipped without weakening the other sources or local fallback.
+- Wikidata uses its entity search API and contributes only the returned CC0
+  structured label/description.
+- Model output cannot provide a hostname, URL, `site:` operator, or Boolean
+  search operator. Responses and source text are byte/length bounded, fetched
+  with timeouts, and treated as untrusted prompt-injection input.
+- 52Poké remains in the manual fact-check/source-lock workflow for future
+  reviewed R2 facts. Its page prose is not sent to Qwen or automatically added
+  to AI Search, preserving the current CC-BY-NC-SA and machine-reading boundary.
+
+Every live-source answer is visibly labelled `未经 TitoDex 人工审核`. A source
+failure, invalid model result, quota exhaustion, or scope rejection returns the
+original deterministic `no_match` response. Live answers never write to R2.
+
+## Client-visible status and execution trace
+
+`GET /health` returns only sanitized capability flags: Worker reachability,
+Workers AI Qwen configuration, AI Search/curated-source switches, the three
+fixed source provider names, and explicit `braveSearch: false`. It never returns
+an Account ID, binding identifier, production origin, model credential, or
+secret.
+
+Every `/v1/ask` response also carries a privacy-safe trace:
+
+- `answerMode`: local audited, online audited, AI Search audited, curated
+  sources + Qwen, or no match;
+- `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
+  what the deployment has configured;
+- `sourceKinds`: only `pokeapi`, `strategywiki`, or `wikidata` when those
+  sources actually support the returned answer.
+
+No prompt, generated query, source excerpt, location ID, or user text is added
+to the trace or Worker log.
 
 ## Local verification
 
@@ -32,8 +86,8 @@ Do not deploy from ordinary feature work.
 ## Optional AI Search setup
 
 The checked-in configuration binds `JOURNEY_SEARCH_NAMESPACE` to the AI Search
-namespace `tito-dex` and enables retrieval after the six reviewed v1 documents
-have completed indexing. A single-instance
+namespace `tito-dex` and enables retrieval only after reviewed documents have
+completed indexing. A single-instance
 `ai_search` binding cannot address non-default namespaces, so the Worker calls
 `JOURNEY_SEARCH_NAMESPACE.get("titodex-journey-search")` only after retrieval
 is enabled. Before enabling retrieval, confirm that instance has:
@@ -107,7 +161,7 @@ provider in AI Gateway. Then set `AI_PROVIDER` to `custom-<slug>` and use either
 `chat/completions` or `v1/chat/completions`. The code does not accept arbitrary
 origin URLs, so a model credential cannot be redirected to another host.
 
-Provider calls use a five-second timeout, one attempt, no response cache, no AI
+Provider calls use a ten-second timeout, one attempt, no response cache, no AI
 Gateway prompt logging, strict JSON parsing, and a 16 KiB response cap. AI
 Search receives only the bounded question and derived context; neither API can
 accept raw save bytes under the request schema. Worker logs contain only coarse

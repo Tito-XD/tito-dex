@@ -57,7 +57,7 @@ export async function answerQuestion(
       status: 'no_match',
       answer: null,
       confidence: 'low',
-      followUp: '目前只收录少量 HGSS 主线阻塞点。请补充地点、挡路角色或所需道具。',
+      followUp: '目前只收录少量主线阻塞点。请补充游戏版本、地点、挡路角色或所需道具。',
     };
   }
   if (!hint) {
