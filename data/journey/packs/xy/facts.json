@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "xy-zh-hans",
+  "contentVersion": 1,
+  "games": ["x", "y"],
+  "generation": 6,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "xy-route7-snorlax-poke-flute",
+      "originHintId": "xy-route7-snorlax",
+      "games": ["x", "y"],
+      "generation": 6,
+      "category": "blocker",
+      "subjectId": "route7_snorlax",
+      "predicate": "requires_item_after_event",
+      "objectId": "poke-flute",
+      "locationIds": ["Route 7", "Parfum Palace"],
+      "conditions": ["parfum_palace_furfrou_completed"],
+      "statementZh": "完成巴尔法姆香殿的多丽米亚事件并取得宝可梦之笛后，可叫醒7号道路的卡比兽。",
+      "sourceLockIds": ["strategywiki-xy-route7-1172875"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T10:40:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed StrategyWiki revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

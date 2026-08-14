@@ -44,7 +44,7 @@ class JourneySearchDocumentsTest(unittest.TestCase):
                 )
                 self.assertIn(metadata["hint_id"], allowed_ids)
                 self.assertEqual(metadata["audited"], "true")
-                self.assertEqual(metadata["generation"], "4")
+                self.assertIn(metadata["generation"], {"4", "5", "6", "7", "8", "9"})
                 self.assertTrue(metadata["location_id"])
                 self.assertNotIn(item["objectKey"], object_keys)
                 object_keys.add(item["objectKey"])

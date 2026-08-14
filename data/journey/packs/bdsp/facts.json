@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "bdsp-zh-hans",
+  "contentVersion": 1,
+  "games": ["brilliant-diamond", "shining-pearl"],
+  "generation": 8,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "bdsp-route210-secret-potion",
+      "originHintId": "bdsp-route210-psyduck",
+      "games": ["brilliant-diamond", "shining-pearl"],
+      "generation": 8,
+      "category": "blocker",
+      "subjectId": "route210_psyduck_bdsp",
+      "predicate": "requires_item_after_event",
+      "objectId": "secret-potion",
+      "locationIds": ["Route 210", "Valor Lakefront"],
+      "conditions": ["bdsp_valor_lakefront_grunt"],
+      "statementZh": "晶灿钻石与明亮珍珠完成湿原市后的银河队追逐并与竹兰交谈，可取得治疗210号道路可达鸭的秘传之药。",
+      "sourceLockIds": ["bulbapedia-sinnoh-route210-4590444"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T11:25:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed Bulbapedia revision; it is kept separate from the generation-four DPP rule."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

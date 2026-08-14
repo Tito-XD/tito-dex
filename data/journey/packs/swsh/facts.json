@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "swsh-zh-hans",
+  "contentVersion": 1,
+  "games": ["sword", "shield"],
+  "generation": 8,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "swsh-route9-rotom-bike-water-mode",
+      "originHintId": "swsh-route9-water-bike",
+      "games": ["sword", "shield"],
+      "generation": 8,
+      "category": "blocker",
+      "subjectId": "route9_water_crossing",
+      "predicate": "unlocks_after_event",
+      "objectId": "rotom-bike-water-mode",
+      "locationIds": ["Route 9", "Circhester Bay"],
+      "conditions": ["route9_rescue_bike_man"],
+      "statementZh": "剑盾在9号道路击败围住自行车店员工的呐喊队后，洛托姆自行车会获得水上行驶功能。",
+      "sourceLockIds": ["bulbapedia-galar-route9-4542427"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T11:25:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against a fixed Bulbapedia revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

@@ -8,6 +8,7 @@
     "AI_MODEL": "@cf/qwen/qwen3-30b-a3b-fp8",
     "AI_GATEWAY_ID": "test",
     "AI_SEARCH_ENABLED": "false",
+    "CURATED_WEB_ENABLED": "false",
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",
     "AI_PROVIDER": "workers-ai",
     "AI_PROVIDER_MODEL": "deepseek-chat",

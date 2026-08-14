@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "packId": "sm-zh-hans",
+  "contentVersion": 1,
+  "games": ["sun", "moon"],
+  "generation": 7,
+  "locale": "zh-Hans",
+  "licenseExpression": "LicenseRef-TitoDex-Journey-Data",
+  "reviewPolicyVersion": 1,
+  "facts": [
+    {
+      "factId": "sm-route6-after-wishiwashi-trial",
+      "originHintId": "sm-route6-sudowoodo",
+      "games": ["sun", "moon"],
+      "generation": 7,
+      "category": "blocker",
+      "subjectId": "route6_sudowoodo_sm",
+      "predicate": "unlocks_after_event",
+      "objectId": "brooklet_hill_wishiwashi_trial",
+      "locationIds": ["Route 6", "Brooklet Hill"],
+      "conditions": [],
+      "statementZh": "日月完成潺潺之丘的霸主弱丁鱼考验后，6号道路的树才怪会让路。",
+      "sourceLockIds": ["bulbapedia-brooklet-hill-4576234", "bulbapedia-alola-route6-4229010"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-13"],
+        "reviewedAt": "2026-08-13T10:40:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese fact checked against fixed Bulbapedia revisions; SM and USUM trial targets remain separate."
+      },
+      "allowedForAiIndex": true
+    }
+  ]
+}

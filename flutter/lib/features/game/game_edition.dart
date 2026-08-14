@@ -71,6 +71,13 @@ class GameEdition {
     'moon' => 'Moon',
     'ultra-sun' => 'UltraSun',
     'ultra-moon' => 'UltraMoon',
+    'sword' => 'sword',
+    'shield' => 'shield',
+    'brilliant-diamond' => 'brilliant-diamond',
+    'shining-pearl' => 'shining-pearl',
+    'legends-arceus' => 'legends-arceus',
+    'scarlet' => 'scarlet',
+    'violet' => 'violet',
     _ => journeyGameKey,
   };
 

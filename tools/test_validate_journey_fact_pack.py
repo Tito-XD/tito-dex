@@ -29,8 +29,18 @@ class JourneyFactPackSupplyChainTest(unittest.TestCase):
             schema = read(name)
             self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
             self.assertFalse(schema["additionalProperties"])
-        validate_supply_chain(self.registry, self.lock, self.pack)
-        validate_supply_chain(self.registry, self.lock, self.pack, release=True)
+        packs = sorted((DATA / "packs").glob("*/facts.json"))
+        self.assertEqual(
+            [path.parent.name for path in packs],
+            [
+                "bdsp", "bw", "bw2", "dpp", "hgss", "oras", "pla",
+                "sm", "sv", "swsh", "usum", "xy",
+            ],
+        )
+        for pack_path in packs:
+            pack = json.loads(pack_path.read_text(encoding="utf-8"))
+            validate_supply_chain(self.registry, self.lock, pack)
+            validate_supply_chain(self.registry, self.lock, pack, release=True)
 
     def test_only_pokeapi_and_wikidata_can_enable_automated_import(self):
         enabled = {

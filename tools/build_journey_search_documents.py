@@ -40,24 +40,41 @@ def build_documents(
     *,
     registry: Path = DEFAULT_REGISTRY,
     source_lock: Path = DEFAULT_LOCK,
-    fact_pack: Path = DEFAULT_FACT_PACK,
+    fact_pack: Path | None = None,
+    fact_packs: list[Path] | None = None,
 ) -> dict:
     data = json.loads(source.read_text(encoding="utf-8"))
     if data.get("schemaVersion") != 1 or not isinstance(data.get("entries"), list):
         raise ValueError("unsupported progression-hint dataset")
-    reviewed_pack = load_json(fact_pack)
-    validate_supply_chain(
-        load_json(registry),
-        load_json(source_lock),
-        reviewed_pack,
-        release=True,
-    )
-    approved_hint_ids = {
-        fact["originHintId"]
-        for fact in reviewed_pack["facts"]
-        if fact.get("allowedForAiIndex") is True
-        and fact.get("review", {}).get("status") == "approved"
-    }
+    registry_value = load_json(registry)
+    source_lock_value = load_json(source_lock)
+    selected_packs = fact_packs
+    if selected_packs is None:
+        selected_packs = (
+            [fact_pack]
+            if fact_pack is not None
+            else sorted((ROOT / "data/journey/packs").glob("*/facts.json"))
+        )
+    if not selected_packs:
+        raise ValueError("at least one reviewed fact pack is required")
+    approved_hint_ids: set[str] = set()
+    for pack_path in selected_packs:
+        reviewed_pack = load_json(pack_path)
+        validate_supply_chain(
+            registry_value,
+            source_lock_value,
+            reviewed_pack,
+            release=True,
+        )
+        for fact in reviewed_pack["facts"]:
+            if (
+                fact.get("allowedForAiIndex") is True
+                and fact.get("review", {}).get("status") == "approved"
+            ):
+                hint_id = fact.get("originHintId")
+                if not isinstance(hint_id, str) or hint_id in approved_hint_ids:
+                    raise ValueError("approved originHintId values must be unique")
+                approved_hint_ids.add(hint_id)
     dataset_hint_ids = {entry.get("id") for entry in data["entries"]}
     if dataset_hint_ids != approved_hint_ids:
         raise ValueError("progression hints and approved AI-index facts differ")
@@ -141,14 +158,14 @@ def main() -> None:
     parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
-    parser.add_argument("--fact-pack", type=Path, default=DEFAULT_FACT_PACK)
+    parser.add_argument("--fact-pack", type=Path, action="append")
     args = parser.parse_args()
     build_documents(
         args.source,
         args.output,
         registry=args.registry,
         source_lock=args.lock,
-        fact_pack=args.fact_pack,
+        fact_packs=args.fact_pack,
     )
 
 

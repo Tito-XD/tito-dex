@@ -3,9 +3,39 @@ export const MAX_REQUEST_BYTES = 4096;
 export const MAX_CONTEXT_IDS = 16;
 export const MAX_ANSWER_LENGTH = 1200;
 
+const supportedGameGenerations = {
+  diamond: 4,
+  pearl: 4,
+  platinum: 4,
+  heartgold: 4,
+  soulsilver: 4,
+  black: 5,
+  white: 5,
+  'black-2': 5,
+  'white-2': 5,
+  x: 6,
+  y: 6,
+  'omega-ruby': 6,
+  'alpha-sapphire': 6,
+  sun: 7,
+  moon: 7,
+  'ultra-sun': 7,
+  'ultra-moon': 7,
+  sword: 8,
+  shield: 8,
+  'brilliant-diamond': 8,
+  'shining-pearl': 8,
+  'legends-arceus': 8,
+  scarlet: 9,
+  violet: 9,
+} as const;
+
+type SupportedGame = keyof typeof supportedGameGenerations;
+type SupportedGeneration = (typeof supportedGameGenerations)[SupportedGame];
+
 export type AssistantContext = {
-  game: 'heartgold' | 'soulsilver';
-  generation: 4;
+  game: SupportedGame;
+  generation: SupportedGeneration;
   locationId?: string;
   badgeIds: string[];
   badgeCount?: number;
@@ -13,8 +43,8 @@ export type AssistantContext = {
   locale: 'zh-Hans';
   parserRevision: number;
   /**
-   * Optional for schema-v1 callers. When omitted, the current HGSS parser's
-   * capabilities are used as a backwards-compatible default.
+   * Optional for schema-v1 HGSS callers. New callers always send explicit
+   * reliability so unsupported fields cannot be promoted to save facts.
    */
   contextReliability?: ContextReliability;
 };
@@ -43,6 +73,17 @@ export type AssistantResponse = {
   followUp: string | null;
   errorCode?: string;
   onlineComposed?: boolean;
+  /** Privacy-safe execution trace for the client UI. No prompts or queries. */
+  answerMode?:
+    | 'local_audited'
+    | 'audited_online'
+    | 'ai_search_audited'
+    | 'curated_sources_deterministic'
+    | 'curated_sources_qwen'
+    | 'no_match';
+  modelUsed?: boolean;
+  aiSearchUsed?: boolean;
+  sourceKinds?: ('pokeapi' | 'strategywiki' | 'wikidata')[];
 };
 
 const allowedRequestKeys = new Set(['question', 'context']);
@@ -75,6 +116,9 @@ const allowedBadges = new Set([
   'marsh_badge',
   'volcano_badge',
   'earth_badge',
+  'quake_badge',
+  'legend_badge',
+  'insect_badge',
 ]);
 
 export function parseAssistantRequest(value: unknown): AssistantRequest | null {
@@ -84,8 +128,10 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   if (question.length < 1 || question.length > MAX_QUESTION_LENGTH) return null;
   if (!isPlainObject(value.context) || hasUnexpectedKeys(value.context, allowedContextKeys)) return null;
   const context = value.context;
-  if (context.game !== 'heartgold' && context.game !== 'soulsilver') return null;
-  if (context.generation !== 4 || context.locale !== 'zh-Hans') return null;
+  if (typeof context.game !== 'string' || !(context.game in supportedGameGenerations)) return null;
+  const game = context.game as SupportedGame;
+  const generation = supportedGameGenerations[game];
+  if (context.generation !== generation || context.locale !== 'zh-Hans') return null;
   if (!Number.isInteger(context.parserRevision) || (context.parserRevision as number) < 0) return null;
   if (context.locationId !== undefined && (typeof context.locationId !== 'string' || context.locationId.length > 80)) return null;
   if (!validIds(context.badgeIds, allowedBadges) || !validIds(context.milestoneIds)) return null;
@@ -108,8 +154,8 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   return {
     question,
     context: {
-      game: context.game,
-      generation: 4,
+      game,
+      generation,
       ...(context.locationId === undefined ? {} : { locationId: context.locationId }),
       badgeIds: context.badgeIds as string[],
       ...(context.badgeCount === undefined ? {} : { badgeCount: context.badgeCount as number }),
@@ -125,7 +171,9 @@ export function effectiveContextReliability(context: AssistantContext): ContextR
   return context.contextReliability ?? {
     game: 'save_verified',
     location: context.locationId === undefined ? 'unknown' : 'save_verified',
-    badges: 'save_verified',
+    badges: context.game === 'heartgold' || context.game === 'soulsilver'
+      ? 'save_verified'
+      : 'unknown',
     milestones: 'unsupported',
   };
 }

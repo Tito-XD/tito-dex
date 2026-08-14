@@ -33,6 +33,29 @@ void main() {
     expect(soulSilver.selectedJourneyGameKey, 'SoulSilver');
   });
 
+  test('manual modern editions expose exact Assistant game keys', () {
+    expect(
+      gameEditionFromSlug('swsh')!.withFlavor('shield').selectedJourneyGameKey,
+      'shield',
+    );
+    expect(
+      gameEditionFromSlug('bdsp')!
+          .withFlavor('brilliant-diamond')
+          .selectedJourneyGameKey,
+      'brilliant-diamond',
+    );
+    expect(
+      gameEditionFromSlug('pla')!
+          .withFlavor('legends-arceus')
+          .selectedJourneyGameKey,
+      'legends-arceus',
+    );
+    expect(
+      gameEditionFromSlug('sv')!.withFlavor('violet').selectedJourneyGameKey,
+      'violet',
+    );
+  });
+
   test('lza uses its current PokeAPI data key', () {
     final lza = gameEditionFromSlug('lza')!;
     expect(lza.dataVersionGroupKey, 'legends-za');

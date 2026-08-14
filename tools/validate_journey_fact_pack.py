@@ -24,6 +24,10 @@ def load_json(path: Path) -> dict:
     return value
 
 
+def default_fact_packs() -> list[Path]:
+    return sorted((ROOT / "data/journey/packs").glob("*/facts.json"))
+
+
 def validate_supply_chain(
     registry: dict,
     source_lock: dict,
@@ -157,15 +161,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
-    parser.add_argument("--pack", type=Path, default=DEFAULT_PACK)
+    parser.add_argument("--pack", type=Path, action="append")
     parser.add_argument("--release", action="store_true")
     args = parser.parse_args()
-    validate_supply_chain(
-        load_json(args.registry),
-        load_json(args.lock),
-        load_json(args.pack),
-        release=args.release,
-    )
+    registry = load_json(args.registry)
+    source_lock = load_json(args.lock)
+    for pack_path in args.pack or default_fact_packs():
+        validate_supply_chain(
+            registry,
+            source_lock,
+            load_json(pack_path),
+            release=args.release,
+        )
 
 
 if __name__ == "__main__":
