@@ -8,21 +8,27 @@ Legends: Arceus, and Scarlet/Violet.
 The request path is deliberately fail-safe:
 
 1. Exact game + local aliases + verified save location are scored first.
-2. Only a local miss or tie may use the optional AI Search binding.
-3. AI Search returns candidate `hintId` values; its chunk text is never used as
+2. On a miss, the Worker may read the current versioned TitoDex Dex bundle
+   through the read-only `DEX_CONTENT` R2 binding. Exact species encounter,
+   held-item, versioned learnset, profile, item, and ability questions are
+   validated and answered without a model. Open-ended questions receive only a
+   bounded entity evidence object before any web request. Evolution conditions
+   and standalone move values retain the existing exact-version source path.
+3. Only a remaining local miss or tie may use the optional AI Search binding.
+4. AI Search returns candidate `hintId` values; its chunk text is never used as
    an answer.
-4. Workers AI is the public default and may classify an allowed candidate and
+5. Workers AI is the public default and may classify an allowed candidate and
    reorder deterministic answer sections. It cannot add, remove, or rewrite
    facts. A unique local match makes zero model calls.
-5. If the audited corpus still has no match and `CURATED_WEB_ENABLED=true`, a
+6. If the audited corpus still has no match and `CURATED_WEB_ENABLED=true`, a
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
    and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
    the bounded results.
-6. Only when those fixed sources cannot support an answer, an explicitly
+7. Only when those fixed sources cannot support an answer, an explicitly
    enabled Tavily adapter may make one `basic` search over a server-owned
    Pokémon domain allowlist. Its snippets still pass through the same Qwen
    support check and second verifier. No client/model URL or domain is accepted.
-7. If the public Tavily + Qwen path still cannot support an answer, an
+8. If the public Tavily + Qwen path still cannot support an answer, an
    explicitly enabled DeepSeek V4 Flash custom provider may try one native
    server-side web search. TitoDex accepts it only when the response contains
    linked search-result blocks on the same domain allowlist and a second Qwen
@@ -61,10 +67,10 @@ original deterministic `no_match` response. Live answers never write to R2.
 
 ## Optional Tavily allowlist search
 
-Tavily is a final retrieval adapter, not an answer provider. It is disabled in
-the checked-in configuration and is never called until local audited hints, AI
-Search candidates, and the fixed PokéAPI/StrategyWiki/Wikidata pass have all
-failed to answer.
+Tavily is a final retrieval adapter, not an answer provider. It is never called
+until local audited hints, exact Dex-bundle encounter facts, AI Search
+candidates, and the fixed PokéAPI/StrategyWiki/Wikidata pass have all failed to
+answer.
 
 - Install `TAVILY_API_KEY` as a Worker secret; never place it in
   `wrangler.jsonc`, source, an APK, documentation examples, or logs.
@@ -93,7 +99,7 @@ until the intended deployment has the secret.
 ## Client-visible status and execution trace
 
 `GET /health` returns only sanitized capability flags: Worker reachability,
-Workers AI Qwen configuration, AI Search/curated-source switches, the three
+Workers AI Qwen configuration, Dex-bundle/AI Search/curated-source switches, the three
 fixed source provider names, generic `webSearch` plus
 `webSearchProviders` containing `tavily` only when its flag and secret are
 present, and `deepseek-native` only after its server flag is enabled following
@@ -147,6 +153,12 @@ is enabled. Before enabling retrieval, confirm that instance has:
 Every indexed document must use a `hint_id` already present in the reviewed
 TitoDex progression-hint bundle. The Worker additionally checks the metadata
 against the request and local allowlist. It ignores all returned chunk text.
+
+Structured entity questions do not need a second copy of the Dex bundle inside
+this index. They are answered from `DEX_CONTENT` before web retrieval. A future
+fuzzy-entity index may return only a candidate species/item/move/game identity;
+the Worker must still rebuild the answer from the current bounded R2 detail
+object instead of trusting indexed chunk prose.
 
 Build the audited documents and R2 custom-metadata upload plan from the
 canonical dataset (do not hand-author a second index corpus):
@@ -246,16 +258,24 @@ result metadata and never the question or exact location.
 ## Worker-only content access
 
 `JOURNEY_CONTENT` is a Worker-side R2 binding to
-`titodex-journey-content`. The App never receives an R2 URL or credential. The
-Worker serves only these read-only paths:
+`titodex-journey-content`. `DEX_CONTENT` binds the existing versioned Dex
+bucket for structured entity lookup. Both are used read-only and the App never
+receives an R2 URL or credential. The Worker serves only these public paths:
 
 - `/v1/extensions/journey_assistant/catalog`
 - `/v1/extensions/journey_assistant/objects/<immutable-name>.apk`
 
 The catalog must contain a same-origin relative `objects/*.apk` path. All other
-bucket keys, including AI Search documents, remain unreachable through the
-Worker. Empty or unavailable R2, Search, Gateway, or model resources fail
-closed; Journey answers continue to use the installed deterministic pack.
+bucket keys, including AI Search documents and Dex detail objects, remain
+unreachable as raw files through the Worker. Dex lookup accepts only the root
+manifest and `v<number>/details/<numeric-species-id>.json`, enforces byte caps,
+and selects only `obtainLocationsByVersion[request.game]`. Empty or unavailable
+R2, Search, Gateway, or model resources fail closed; Journey answers continue
+to use the installed deterministic pack. The structured reader permits only the
+validated root manifest, numeric species details, and fixed `items.json`,
+`moves.json`, or `dex_catalog.json` objects under that manifest prefix. Flavor
+prose and held-item rows are not supplied to embeddings or Qwen. Held-item
+answers are deterministic and retain the bundle's PokeAPI / 52Poké attribution.
 
 References:
 

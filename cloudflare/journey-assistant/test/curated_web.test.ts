@@ -32,6 +32,58 @@ function json(value: unknown, status = 200): Response {
 }
 
 describe('curated key-free web research', () => {
+  it('uses bounded local Dex-bundle evidence before any web request', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      expect(messages.map((message) => message.content).join('\n')).not.toContain('heldItems');
+      if (phase === 'curated-web-compose') {
+        return {
+          supported: true,
+          answer: '利欧路速度与攻击更突出，但防御端较薄，培养时应留意其弱点。',
+          usedSourceIds: ['dex-bundle-v19'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        return {
+          supported: true,
+          answer: '利欧路速度与攻击更突出，但防御端较薄，培养时应留意其弱点。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>();
+    const result = await researchCuratedWeb(
+      { ...request, question: '利欧路值不值得培养？' },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-15T00:00:00Z'),
+      undefined,
+      {
+        localSources: [{
+          id: 'dex-bundle-v19',
+          title: 'TitoDex Dex bundle v19 · 结构化事实',
+          text: JSON.stringify({
+            species: {
+              nameZh: '利欧路',
+              baseStats: { attack: 70, defense: 40, speed: 60 },
+              weaknessesZh: ['妖精', '超能力', '飞行'],
+            },
+          }),
+        }],
+      },
+    );
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      status: 'answered',
+      sources: [],
+      verifiedFacts: ['TitoDex Dex bundle v19 · 结构化事实'],
+    });
+    expect(result?.answer).toContain('TitoDex 图鉴包整理');
+    expect(result?.answer).not.toContain('http');
+  });
+
   it('rejects out-of-scope questions before any source request', async () => {
     const fetcher = vi.fn<typeof fetch>();
     const runModel: CuratedWebModelRunner = async () => ({
