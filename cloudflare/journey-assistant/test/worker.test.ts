@@ -1,5 +1,6 @@
 import { env, SELF } from 'cloudflare:test';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import worker from '../src/index';
 
 function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -29,6 +30,10 @@ async function post(payload: string, deviceKey = 'test-device-key-12345'): Promi
 }
 
 describe('journey assistant Worker contract', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(async () => {
     const listed = await env.JOURNEY_CONTENT.list();
     await Promise.all(listed.objects.map((object) => env.JOURNEY_CONTENT.delete(object.key)));
@@ -47,12 +52,132 @@ describe('journey assistant Worker contract', () => {
         aiSearch: false,
         curatedSources: false,
         sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
+        webSearch: false,
+        webSearchProviders: [],
         braveSearch: false,
         externalProvider: false,
       },
     });
     expect(JSON.stringify(value)).not.toContain('account');
     expect(JSON.stringify(value)).not.toContain('https://');
+  });
+
+  it('reports DeepSeek native search only from fixed server configuration', async () => {
+    const fakeEnv = deepSeekEnv({
+      aiRun: vi.fn(),
+    });
+    const response = await worker.fetch(
+      new Request('https://assistant.test/health'),
+      fakeEnv,
+    );
+    expect(await response.json()).toMatchObject({
+      capabilities: {
+        webSearch: true,
+        webSearchProviders: ['deepseek-native'],
+      },
+    });
+  });
+
+  it('accepts a real DeepSeek server-search result only after Qwen support verification', async () => {
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-route') {
+        return {
+          response: {
+            hintId: '',
+            webAllowed: true,
+            queryZh: '宝可梦 紫 悖谬宝可梦',
+            queryEn: 'Pokémon Violet Paradox Pokémon',
+            pokeApiKind: '',
+            pokeApiSlug: '',
+          },
+        };
+      }
+      if (phase === 'deepseek-native-verify') {
+        return {
+          response: {
+            supported: true,
+            answer: '悖谬宝可梦是《宝可梦 紫》中与未来意象有关的一组宝可梦。',
+          },
+        };
+      }
+      throw new Error(`unexpected_phase_${String(phase)}`);
+    });
+    const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
+      type: 'message',
+      stop_reason: 'end_turn',
+      content: [
+        {
+          type: 'server_tool_use',
+          id: 'srvtoolu_paradox',
+          name: 'web_search',
+          input: { query: 'Pokémon Violet Paradox Pokémon' },
+        },
+        {
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_paradox',
+          content: [{
+            type: 'web_search_result',
+            title: 'Paradox Pokémon - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Paradox_Pok%C3%A9mon',
+          }],
+        },
+        {
+          type: 'text',
+          text: '悖谬宝可梦是《宝可梦 紫》中与未来意象有关的一组宝可梦。',
+          citations: [{
+            type: 'web_search_result_location',
+            title: 'Paradox Pokémon - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Paradox_Pok%C3%A9mon',
+            cited_text: 'Pokémon Violet features a group of futuristic Paradox Pokémon.',
+          }],
+        },
+      ],
+    }), { headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', gatewayRun);
+    const fakeEnv = deepSeekEnv({ aiRun });
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'deepseek-test-key-12345',
+        },
+        body: JSON.stringify({
+          question: '紫里未来主题的神秘宝可梦都是什么来历？',
+          context: {
+            game: 'violet',
+            generation: 9,
+            badgeIds: [],
+            milestoneIds: [],
+            locale: 'zh-Hans',
+            parserRevision: 0,
+            contextReliability: {
+              game: 'user_selected',
+              location: 'unknown',
+              badges: 'unknown',
+              milestones: 'unsupported',
+            },
+          },
+        }),
+      }),
+      fakeEnv,
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'deepseek_native_search',
+      modelUsed: true,
+      sourceKinds: ['deepseek-native'],
+      sources: [{ title: 'Paradox Pokémon - Bulbapedia' }],
+    });
+    expect(JSON.stringify(value)).not.toContain('snippet');
+    expect(gatewayRun).toHaveBeenCalledTimes(1);
+    expect(aiRun).toHaveBeenCalledTimes(2);
   });
 
   it('serves local HGSS answers without an AI binding', async () => {
@@ -269,3 +394,35 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ errorCode: 'not_found' });
   });
 });
+
+function deepSeekEnv({
+  aiRun,
+}: {
+  aiRun: ReturnType<typeof vi.fn>;
+}): Env {
+  return {
+    JOURNEY_CONTENT: env.JOURNEY_CONTENT,
+    QUESTION_RATE_LIMITER: {
+      limit: async () => ({ success: true }),
+    },
+    JOURNEY_SEARCH_NAMESPACE: undefined,
+    AI: {
+      run: aiRun,
+    },
+    CF_ACCOUNT_ID: 'a'.repeat(32),
+    CF_AIG_TOKEN: 'test-gateway-run-token-123456',
+    AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8',
+    AI_GATEWAY_ID: 'titodex-journey-assistant',
+    AI_SEARCH_ENABLED: 'false',
+    CURATED_WEB_ENABLED: 'false',
+    TAVILY_WEB_ENABLED: 'false',
+    DEEPSEEK_NATIVE_SEARCH_ENABLED: 'true',
+    DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
+    DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
+    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
+    AI_PROVIDER: 'workers-ai',
+    AI_PROVIDER_MODEL: 'deepseek-v4-flash',
+    AI_PROVIDER_ENDPOINT: 'chat/completions',
+    TAVILY_API_KEY: '',
+  } as unknown as Env;
+}

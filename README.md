@@ -8,9 +8,9 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · App `0.8.14+160` | 内建可观测的问 TitoDex 与旅程助手 |
-| Offline APK | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · App `0.8.14-offline+161` | 内置紧凑 v14 图鉴数据与旅程助手 |
-| Journey Assistant | 主 App 内建 | 连接状态、回答路径、伴侣等待动画与多版本审核索引 |
+| Lite APK | [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · App `0.8.15+162` | 内建通用问答、紧凑对话页与旅程助手 |
+| Offline APK | [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · App `0.8.15-offline+163` | 内置紧凑 v14 图鉴数据与旅程助手 |
+| Journey Assistant | 主 App 内建 | 4/4 连接提示、固定对话框、伴侣等待动画与限定来源搜索 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。
 
@@ -22,7 +22,7 @@
 
 - **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
 - **存档助手**：给出当前位置附近未捕获、队伍进化路线、成对版本可直遇缺口，以及进化／孵蛋／交换补全建议。
-- **问 TitoDex**：优先用存档与本地审核资料模糊匹配，未唯一命中时再进入 BGE-M3 AI Search、限定来源和 Workers AI Qwen；页面会区分服务连接状态与每次回答的实际路径，并用首页伴侣宝可梦展示可爱等待动画。绝不上传原始存档或训练家、队伍资料。
+- **问 TitoDex**：优先用所选版本、存档与本地审核资料模糊匹配，未唯一命中时再进入 BGE-M3 AI Search、固定公开来源或 Tavily 限定搜索，并由 Workers AI Qwen 做有界整理与二次核验；页面用紧凑 4/4 状态、可展开详情、固定对话输入框和首页伴侣等待动画呈现。切换版本会清空不兼容的地点／徽章上下文，绝不上传原始存档或训练家、队伍资料。
 - **存档联动**：绑定一个 `.sav` 文件并保留读取权限；实验性识别 Gen 1–7 元数据，HGSS 会同步队伍、昵称、携带道具、招式与 PP、特性、经验、亲密度、性格、闪光、IV／EV、战斗能力、地图／坐标、资金、训练家资料、城都／关都徽章区与图鉴进度。
 - **全国图鉴 1–1025**：支持形态搜索、地区或 G1–G9 范围、体形／颜色／大小等组合筛选、形态进化链、精确游戏与 DLC 获取方式、招式、特性和形态媒体。
 - **地点图鉴**：按所选版本用紧凑网格查看地点与完成度，弹窗优先列出未捕获并可直达图鉴。
@@ -58,7 +58,7 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.14-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.14-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.8.14 与 v0.8.13 使用同一新签名，可直接升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.8.15-lite-rg-arm64.apk`** 或 **`TitoDex-0.8.15-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.8.15 可直接从 v0.8.13 / v0.8.14 升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置同一套核心数据，首次启动会准备随包数据，适合网络不稳定的设备。

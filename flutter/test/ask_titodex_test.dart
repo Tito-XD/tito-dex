@@ -201,6 +201,12 @@ void main() {
               'unexpected-provider',
             ],
             'braveSearch': false,
+            'webSearch': true,
+            'webSearchProviders': [
+              'tavily',
+              'deepseek-native',
+              'unexpected-provider',
+            ],
             'externalProvider': false,
           },
         }),
@@ -219,8 +225,31 @@ void main() {
     expect(status.aiSearchEnabled, isTrue);
     expect(status.curatedSourcesEnabled, isTrue);
     expect(status.braveSearchEnabled, isFalse);
+    expect(status.webSearchEnabled, isTrue);
+    expect(status.webSearchProviders, ['tavily', 'deepseek-native']);
     expect(status.sourceProviders, ['pokeapi', 'strategywiki', 'wikidata']);
   });
+
+  test(
+    'client preserves the actual DeepSeek native-search execution trace',
+    () {
+      final result = AskTitoDexResult.fromJson({
+        'status': 'answered',
+        'answer': '悖谬宝可梦说明',
+        'confidence': 'medium',
+        'followUp': null,
+        'onlineComposed': true,
+        'answerMode': 'deepseek_native_search',
+        'modelUsed': true,
+        'aiSearchUsed': false,
+        'sourceKinds': ['deepseek-native'],
+      });
+
+      expect(result.answerMode, AskTitoDexAnswerMode.deepseekNativeSearch);
+      expect(result.modelUsed, isTrue);
+      expect(result.sourceKinds, ['deepseek-native']);
+    },
+  );
 
   group('HGSS deterministic progression hints', () {
     final repository = ProgressionHintRepository(
@@ -343,10 +372,32 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text(AppZh.askTitoDexWorkerOnline), findsOneWidget);
-      expect(find.text(AppZh.askTitoDexQwenConfigured), findsOneWidget);
-      expect(find.text(AppZh.askTitoDexAiSearchEnabled), findsOneWidget);
-      expect(find.text(AppZh.askTitoDexBraveNotConnected), findsOneWidget);
+      expect(find.text('在线能力 · 3/4'), findsOneWidget);
+      expect(find.text('Journey Worker'), findsNothing);
+      expect(
+        find.byKey(const Key('ask-titodex-companion-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('ask-titodex-companion-idle')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('ask-titodex-connection-dialog')),
+        findsOneWidget,
+      );
+      expect(find.text('Journey Worker'), findsOneWidget);
+      expect(find.text('Qwen'), findsOneWidget);
+      expect(find.text('AI Search'), findsOneWidget);
+      expect(find.text('联网搜索'), findsOneWidget);
+      expect(find.text('可用'), findsNWidgets(3));
+      expect(find.text('未连接'), findsOneWidget);
+      await tester.tap(find.text('知道了'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(
         find.byKey(const Key('ask-titodex-question')),
@@ -356,8 +407,12 @@ void main() {
       await tester.pump();
 
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsOneWidget);
-      expect(find.textContaining('火球鼠'), findsOneWidget);
+      expect(find.textContaining('火球鼠'), findsWidgets);
       expect(find.text('正在连接 Journey Assistant'), findsOneWidget);
+      expect(
+        find.byKey(const Key('ask-titodex-question-bubble')),
+        findsOneWidget,
+      );
 
       service.complete(
         const AskTitoDexResult(
@@ -375,8 +430,77 @@ void main() {
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
+      expect(
+        find.byKey(const Key('ask-titodex-companion-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('ask-titodex-companion-idle')),
+        findsOneWidget,
+      );
     },
   );
+
+  testWidgets('compact connection summary expands 4/4 provider details', (
+    tester,
+  ) async {
+    await askTitoDexSettings.acknowledgeNotice();
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: GameEdition.hgss.withFlavor('soulsilver'),
+              service: _CompleterService(webSearchEnabled: true),
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.text('在线能力 · 4/4'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
+    await tester.pumpAndSettle();
+    expect(find.text('联网搜索（Tavily）'), findsOneWidget);
+    expect(find.text('可用'), findsNWidgets(4));
+  });
+
+  testWidgets('manual Violet context never displays HGSS save badges', (
+    tester,
+  ) async {
+    await askTitoDexSettings.acknowledgeNotice();
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: gameEditionFromSlug('sv')!.withFlavor('violet'),
+              service: _FakeService(const []),
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.text('当前游戏版本：紫 · SV'), findsOneWidget);
+    expect(find.text(AppZh.askTitoDexBadgeContext(3)), findsNothing);
+    expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
+    expect(find.byKey(const Key('ask-titodex-badge-context')), findsNothing);
+  });
 
   testWidgets(
     'journey entry is hidden by default and visible only when enabled',
@@ -458,6 +582,18 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
+      final composerTop = tester.getTopLeft(
+        find.byKey(const Key('ask-titodex-composer')),
+      );
+      expect(
+        tester.getBottomRight(find.byKey(const Key('ask-titodex-composer'))).dy,
+        lessThanOrEqualTo(568),
+      );
+      expect(
+        find.byKey(const Key('ask-titodex-answer-scroll')),
+        findsOneWidget,
+      );
+
       await tester.enterText(
         find.byKey(const Key('ask-titodex-question')),
         '帮帮我',
@@ -467,13 +603,20 @@ void main() {
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pumpAndSettle();
       expect(find.text('请补充你所在地点。'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('ask-titodex-composer'))).dy,
+        composerTop.dy,
+      );
 
       await tester.ensureVisible(find.byKey(const Key('ask-titodex-submit')));
       await tester.pump();
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('ask-titodex-retry')), findsOneWidget);
-      await tester.drag(find.byType(ListView), const Offset(0, -260));
+      await tester.drag(
+        find.byKey(const Key('ask-titodex-answer-scroll')),
+        const Offset(0, -260),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('ask-titodex-retry')));
       await tester.pumpAndSettle();
@@ -501,16 +644,21 @@ class _FakeService extends AskTitoDexService {
 }
 
 class _CompleterService extends AskTitoDexService {
+  _CompleterService({this.webSearchEnabled = false});
+
+  final bool webSearchEnabled;
   final Completer<AskTitoDexResult> _answer = Completer<AskTitoDexResult>();
 
   @override
   Future<AskTitoDexWorkerStatus> checkConnection() async =>
-      const AskTitoDexWorkerStatus(
+      AskTitoDexWorkerStatus(
         availability: AskTitoDexAvailability.online,
         qwenConfigured: true,
         aiSearchEnabled: true,
         curatedSourcesEnabled: true,
-        sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
+        sourceProviders: const ['pokeapi', 'strategywiki', 'wikidata'],
+        webSearchEnabled: webSearchEnabled,
+        webSearchProviders: webSearchEnabled ? const ['tavily'] : const [],
       );
 
   @override

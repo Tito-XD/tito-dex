@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "sv-zh-hans",
-  "contentVersion": 1,
+  "contentVersion": 2,
   "games": ["scarlet", "violet"],
   "generation": 9,
   "locale": "zh-Hans",
@@ -28,6 +28,52 @@
         "reviewedAt": "2026-08-13T11:25:00Z",
         "fixtureIds": [],
         "notes": "Original concise Chinese fact checked against a fixed Bulbapedia revision; no source prose is stored or indexed."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "sv-violet-newcomer-overview",
+      "originHintId": "sv-violet-newcomer-overview",
+      "games": ["violet"],
+      "generation": 9,
+      "category": "reference",
+      "subjectId": "violet_newcomer_overview",
+      "predicate": "has_overview",
+      "objectId": null,
+      "locationIds": [],
+      "conditions": [],
+      "statementZh": "《宝可梦 紫》以开放世界探索帕底亚，三条主线可交错推进，核心新机制是太晶化，骑乘搭档为密勒顿。",
+      "sourceLockIds": ["bulbapedia-scarlet-violet-4607603"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-15"],
+        "reviewedAt": "2026-08-15T21:05:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese overview checked against the fixed Scarlet/Violet revision; paired-version details are explicitly isolated to Violet."
+      },
+      "allowedForAiIndex": true
+    },
+    {
+      "factId": "sv-violet-paradox-overview",
+      "originHintId": "sv-violet-paradox-overview",
+      "games": ["violet"],
+      "generation": 9,
+      "category": "reference",
+      "subjectId": "paradox_pokemon_overview",
+      "predicate": "has_overview",
+      "objectId": null,
+      "locationIds": ["Area Zero"],
+      "conditions": [],
+      "statementZh": "悖谬宝可梦是外形与已知宝可梦相似、带有古代或未来特征的独立宝可梦；《紫》主要对应未来主题，多数主线接触发生在第零区。",
+      "sourceLockIds": ["bulbapedia-scarlet-violet-4607603"],
+      "authoring": {"method": "titodex_original", "authorIds": ["titodex-maintainer"], "copiedText": false},
+      "review": {
+        "status": "approved",
+        "reviewerIds": ["codex-source-audit-2026-08-15"],
+        "reviewedAt": "2026-08-15T21:05:00Z",
+        "fixtureIds": [],
+        "notes": "Original concise Chinese concept summary checked against the fixed Scarlet/Violet revision; no exhaustive species list is claimed."
       },
       "allowedForAiIndex": true
     }
