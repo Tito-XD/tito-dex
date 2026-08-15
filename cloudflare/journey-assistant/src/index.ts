@@ -121,20 +121,12 @@ export default {
 
     const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
     let curatedDecision: unknown;
-    let response = await answerQuestion(
-      parsed,
-      undefined,
-      env.AI ? async (hints, assistantRequest) => {
-        const route = await resolveQuestionRoute(env, hints, assistantRequest);
-        trace.modelUsed ||= route.modelUsed;
-        trace.aiSearchUsed = route.aiSearchUsed;
-        curatedDecision = route.curatedDecision;
-        return { hintId: route.hintId };
-      } : undefined,
-    );
-    let curatedSourcesUsed = false;
+    // Resolve a unique reviewed hint and exact Dex-bundle facts before any
+    // retrieval or model call. This keeps common entity questions truly
+    // model-free even when their wording overlaps a generic Journey alias.
+    let response = await answerQuestion(parsed);
     let dexBundleSources: CuratedSource[] = [];
-    if (response.status === 'no_match' && env.DEX_CONTENT) {
+    if (response.status !== 'answered' && env.DEX_CONTENT) {
       try {
         const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
         if (bundleAnswer) response = bundleAnswer;
@@ -144,6 +136,20 @@ export default {
         // missing/invalid object falls through to the existing safe pipeline.
       }
     }
+    if (response.status !== 'answered' && env.AI) {
+      response = await answerQuestion(
+        parsed,
+        undefined,
+        async (hints, assistantRequest) => {
+        const route = await resolveQuestionRoute(env, hints, assistantRequest);
+        trace.modelUsed ||= route.modelUsed;
+        trace.aiSearchUsed = route.aiSearchUsed;
+        curatedDecision = route.curatedDecision;
+        return { hintId: route.hintId };
+        },
+      );
+    }
+    let curatedSourcesUsed = false;
     if (
       response.status === 'no_match' &&
       env.CURATED_WEB_ENABLED === 'true' &&
