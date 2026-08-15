@@ -39,6 +39,8 @@ export async function searchTavily(
   exactGameName: string,
   apiKey: string,
   fetcher: typeof fetch = fetch,
+  queryMode: 'mixed' | 'english' | 'chinese' = 'mixed',
+  idPrefix = 'tavily',
 ): Promise<CuratedSource[]> {
   const key = apiKey.trim();
   if (!/^[A-Za-z0-9._-]{16,256}$/.test(key)) return [];
@@ -50,9 +52,12 @@ export async function searchTavily(
     /(?:beginner guide|Paradox Pok[eé]mon|game mechanics version guide)/iu.test(
       decision.queryEn,
     );
-  const query = `${exactGameName} ${decision.queryEn}${
-    broadOverview ? '' : ` ${decision.queryZh}`
-  }`
+  const queryTerms = broadOverview || queryMode === 'english'
+    ? decision.queryEn
+    : queryMode === 'chinese'
+      ? decision.queryZh
+      : `${decision.queryEn} ${decision.queryZh}`;
+  const query = `${exactGameName} ${queryTerms}`
     .replace(/\s+/gu, ' ')
     .trim()
     .slice(0, MAX_QUERY_CHARS);
@@ -111,13 +116,49 @@ export async function searchTavily(
     if (text.length < 20) continue;
     totalTextChars += text.length;
     sources.push({
-      id: `tavily-${sources.length + 1}`,
+      id: `${idPrefix}-${sources.length + 1}`,
       title: result.title,
       url: result.url,
       text,
     });
   }
   return sources;
+}
+
+/**
+ * Broad advice benefits from independent English and Chinese result pools.
+ * Both bounded searches run concurrently, then results are deduplicated and
+ * selected by hostname diversity before entering the model context.
+ */
+export async function searchTavilyCorroborating(
+  decision: ScopeDecision,
+  exactGameName: string,
+  apiKey: string,
+  fetcher: typeof fetch = fetch,
+): Promise<CuratedSource[]> {
+  const [english, chinese] = await Promise.all([
+    searchTavily(decision, exactGameName, apiKey, fetcher, 'english', 'tavily-en'),
+    searchTavily(decision, exactGameName, apiKey, fetcher, 'chinese', 'tavily-zh'),
+  ]);
+  const seenUrls = new Set<string | undefined>();
+  const deduplicated = [...english, ...chinese].filter((source) => {
+    if (seenUrls.has(source.url)) return false;
+    seenUrls.add(source.url);
+    return true;
+  });
+  const selected: CuratedSource[] = [];
+  const deferred: CuratedSource[] = [];
+  const hosts = new Set<string>();
+  for (const source of deduplicated) {
+    const host = source.url ? new URL(source.url).hostname : '';
+    if (host && !hosts.has(host)) {
+      hosts.add(host);
+      selected.push(source);
+    } else {
+      deferred.push(source);
+    }
+  }
+  return [...selected, ...deferred].slice(0, MAX_RESULTS);
 }
 
 function validateResult(value: unknown): TavilyResult | null {
