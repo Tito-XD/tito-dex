@@ -12,8 +12,11 @@ The request path is deliberately fail-safe:
    through the read-only `DEX_CONTENT` R2 binding. Exact species encounter,
    held-item, versioned learnset, profile, item, and ability questions are
    validated and answered without a model. Open-ended questions receive only a
-   bounded entity evidence object before any web request. Evolution conditions
-   and standalone move values retain the existing exact-version source path.
+   bounded entity evidence object. Cultivation, strategy, route, and
+   recommendation questions retrieve fixed sources and Tavily in parallel,
+   then use bundle fields to cross-check entities, versions, and numbers before
+   Qwen composition and a second verification pass. Evolution conditions and
+   standalone move values retain the existing exact-version source path.
 3. Only a remaining local miss or tie may use the optional AI Search binding.
 4. AI Search returns candidate `hintId` values; its chunk text is never used as
    an answer.

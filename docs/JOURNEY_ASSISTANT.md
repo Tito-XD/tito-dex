@@ -13,13 +13,14 @@
       → 唯一命中：完全本地回答
       → 未命中 / 并列：可选 Worker
           → 宝可梦／道具／招式／特性问题先从现有 Dex R2 bundle 读取结构化事实
-          → 精确版本遭遇、携带物与招式表直接回答；开放式问题只给 Qwen 有界实体证据
+          → 精确版本遭遇、携带物与招式表直接回答
+          → 开放式培养／攻略／路线问题：bundle 事实 + 固定来源 + Tavily 并行取证
           → AI Search（BGE-M3 hybrid/RRF）只召回候选 hintId
           → 只接受本地审核白名单中的 hintId
           → 默认 Workers AI 只做候选分类/段落排序
           → 审核库仍未命中：严格范围门禁后限定查询 PokéAPI / StrategyWiki / Wikidata
           → 结构化进化/招式可先按当前版本确定性提取
-          → 固定来源仍不足时：可选 Tavily 对固定宝可梦域名做一次 basic search
+          → 窄问题固定来源仍不足时：可选 Tavily 对固定宝可梦域名做一次 basic search
           → Qwen 只根据白名单来源生成，再做第二遍事实支持核对
           → 上述公共路径仍无答案时，才可选用 DeepSeek V4 Flash 做一次原生限定搜索
           → DeepSeek 回答仍需 Qwen 根据有界引用片段复核；不能作为公共无限兜底
@@ -44,7 +45,8 @@ PokéAPI REST v2 的结构化实体、StrategyWiki 的最新 revision 与 Wikida
 CC0 实体搜索，随后由 Workers AI Qwen 只根据这些有界资料生成明确标为“未经
 TitoDex 人工审核”的回答。精确招式数值会根据所选游戏的 version-group 与
 `past_values` 在来源层先行解析；Qwen 组成必须先确认资料直接支持问题，并经过
-第二次事实支持核对。固定来源仍无法支持问题时，可显式开启 Tavily，仅对
+第二次事实支持核对。开放式培养／攻略／路线／推荐问题可显式开启 Tavily，与固定
+来源并行检索；窄问题则仅在固定来源仍无法支持时调用。Tavily 只对
 Pokémon.com、Bulbapedia、Serebii、StrategyWiki、PokéAPI、Pokémon Database 与 52Poké wiki
 做一次 `basic` 搜索。Tavily 不生成答案、不返回页面全文，其短片段仍必须通过同一遍 Qwen
 组成与第二遍事实支持核对。Worker 不接收客户端或模型给出的 URL/域名，也不会
@@ -97,10 +99,10 @@ Journey 直接提供问答入口；Search 为通用/非存档入口提供“大�
 ## Cloudflare 选型
 
 - **AI Search + BGE-M3：需要，但保持可选。** BGE-M3 运行在 Cloudflare 托管侧，不塞进 Worker bundle，也不在设备下载模型。它支持中文/多语言 embedding；hybrid + RRF 同时利用别名关键词和语义近似。
-- **Dex R2 结构化事实：模型前置。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题直接确定性组装；开放式培养或攻略问题只把当前实体的最多 6,000 字符结构化证据交给 Qwen，先于任何联网请求。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
+- **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题可直接确定性组装；开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 Qwen，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
 - **Workers AI Qwen：公共默认。** 唯一本地命中不会调用模型；只有未命中/并列才可能消耗 Workers AI 免费额度，额度或模型失败后返回本地确定性澄清/no_match。
 - **免 Key 限定来源：审核库未命中时可选。** `CURATED_WEB_ENABLED=true` 时仅查询 PokéAPI、StrategyWiki、Wikidata；不需要新 Cloudflare 资源或第三方 key。现有每设备 20 次/分钟限流继续生效，不另设每天 5 次上限。范围分类、来源请求或生成任何一步失败都保留原本的本地 `no_match`。
-- **Tavily 限定搜索：可选的最后一层。** 仅当审核资料、AI Search 和三个固定来源都未能回答时请求一次。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。basic search、4 条上限、短超时、响应字节上限、无重试；额度/网络/验证失败继续本地回退。
+- **Tavily 限定搜索：可选的联网证据层。** 有 bundle 证据的开放式培养／攻略／路线／推荐问题会与三个固定来源并行请求；窄问题仍只在固定来源不足时作为最后回退，以节省额度。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。basic search、4 条上限、短超时、响应字节上限、无重试；额度/网络/验证失败继续本地回退。
 - **DeepSeek V4 Flash 原生搜索：付费可选末级回退，当前关闭。** AI Gateway custom provider 的 slug 为 `deepseek-anthropic`、base URL 为 `https://api.deepseek.com`；Worker 固定调用 `custom-deepseek-anthropic` 的 `anthropic/v1/messages` 与 `deepseek-v4-flash`，并显式选择 BYOK 别名 `TitoDex`，缺失时不会回退到 `default`。密钥仍只保存在 BYOK/Secrets Store，Gateway 身份与 Run token 只保存在加密 Worker Secrets。实测该 provider-native 搜索未可靠遵守域名/次数参数，也没有返回可供第二次 Qwen 核验的有界引用片段，因此生产开关保持关闭；任何失败都会继续回退到 Tavily + Qwen 或本地确定性回答。
 - **不使用 Agents SDK / Durable Objects / Queues / Workflows。** 当前是短请求、无会话状态、事实白名单的检索分类，普通 Worker 已足够。
 
@@ -145,7 +147,8 @@ AI Search 数据源只包含 `journey-search/`，不能索引 `extensions/`。�
 
 现有 Dex bundle 不复制到 `journey-search/`：精确实体、版本遭遇、携带物和招式表
 直接从 `DEX_CONTENT` 读取并确定性组装，优先于联网搜索，也不会消耗 Qwen；开放式
-问题只抽取当前实体所需的小型证据对象。后续若为口语别名增加派生 AI Search
+问题抽取当前实体所需的小型证据对象作为联网回答的校验底座，并与固定来源、Tavily
+证据共同组成和复核。后续若为口语别名增加派生 AI Search
 文档，索引只负责返回候选宝可梦／道具／招式与版本；Worker 仍必须
 回读当前 R2 详情对象并重新校验，不能把向量 chunk 文本当作事实答案。这样可复用
 已有 bundle，又不会产生两套容易漂移的图鉴数据。
