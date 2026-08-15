@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.14 · Lite `0.8.14+160` · Offline `0.8.14-offline+161` · observable built-in Journey Assistant · live bundle v19 / compact seed v14.
+> Current release: v0.8.15 · Lite `0.8.15+162` · Offline `0.8.15-offline+163` · chat-first built-in Journey Assistant with allowlisted web retrieval · live bundle v19 / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 

@@ -8,9 +8,9 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · App `0.8.14+160` | Observable Ask TitoDex and Journey Assistant built into the host |
-| Offline APK | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · App `0.8.14-offline+161` | Embeds compact v14 Dex data and Journey Assistant |
-| Journey Assistant | Built in | Connection/answer traces, companion loading motion, and reviewed multi-game retrieval |
+| Lite APK | [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · App `0.8.15+162` | Broader Ask TitoDex search and compact chat UI built into the host |
+| Offline APK | [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · App `0.8.15-offline+163` | Embeds compact v14 Dex data and Journey Assistant |
+| Journey Assistant | Built in | Compact 4/4 status, fixed chat composer, companion motion, and allowlisted search |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -22,7 +22,7 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Ask TitoDex** — save context and local reviewed facts run first; unresolved questions may use BGE-M3 AI Search, bounded public sources, and Workers AI Qwen. The page distinguishes configured connectivity from the actual route taken by each answer and animates the selected home companion while it waits. Raw saves and trainer/party data are never uploaded.
+- **Ask TitoDex** — the selected version, compatible save context, and reviewed local facts run first; unresolved questions may use BGE-M3 AI Search, fixed public sources, or one Tavily allowlist search before bounded Workers AI Qwen composition and verification. The compact page keeps a 4/4 details popup, independent answer scrolling, a fixed composer, and the selected home companion's loading motion. Switching games clears incompatible badge/location context. Raw saves and trainer/party data are never uploaded.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
@@ -58,7 +58,7 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.8.14-lite-rg-arm64.apk`** or **`TitoDex-0.8.14-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.8.14 upgrades directly from v0.8.13; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.8.15-lite-rg-arm64.apk`** or **`TitoDex-0.8.15-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.8.15 upgrades directly from v0.8.13 or v0.8.14; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "datasetVersion": 4,
+  "datasetVersion": 5,
   "entries": [
     {
       "id": "hgss-route36-sudowoodo",
@@ -1023,6 +1023,98 @@
         }
       ],
       "overviewZh": "朱紫的第零区必须先完成冠军之路、传说之路和星尘之路三条主线，再到零区闸口与伙伴会合。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Pokémon Scarlet and Violet (oldid 4607603)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4607603",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "sv-violet-newcomer-overview",
+      "games": ["violet"],
+      "generation": 9,
+      "locations": [],
+      "locationAliases": [],
+      "destinationAliases": ["帕底亚", "开放世界", "三条主线"],
+      "subject": {
+        "type": "reference_topic",
+        "id": "violet_newcomer_overview",
+        "labelZh": "《宝可梦 紫》新手游玩亮点",
+        "aliases": ["刚开始玩紫", "开始玩紫", "紫有什么亮点", "紫有哪些亮点", "紫有什么特色", "紫新手", "紫注意事项"]
+      },
+      "requirements": [],
+      "steps": [
+        {
+          "order": 1,
+          "action": "explain_structure",
+          "targetId": "paldea-three-stories",
+          "locationId": "Paldea",
+          "instructionZh": "冠军之路、传说之路和星尘之路可以交错推进，不必先把其中一条全部打完。"
+        },
+        {
+          "order": 2,
+          "action": "explain_mechanic",
+          "targetId": "terastal",
+          "locationId": "Paldea",
+          "instructionZh": "太晶化是本作核心战斗机制，会按太晶属性改变防守属性，并强化相应属性招式。"
+        },
+        {
+          "order": 3,
+          "action": "explain_exploration",
+          "targetId": "miraidon-ride",
+          "locationId": "Paldea",
+          "instructionZh": "《紫》的骑乘搭档是密勒顿；随着传说之路推进，它会逐步获得更多探索能力。"
+        }
+      ],
+      "overviewZh": "《宝可梦 紫》以开放世界探索帕底亚，三条主线可交错推进，核心新机制是太晶化，骑乘搭档为密勒顿。",
+      "sources": [
+        {
+          "title": "Bulbapedia — Pokémon Scarlet and Violet (oldid 4607603)",
+          "url": "https://bulbapedia.bulbagarden.net/w/index.php?oldid=4607603",
+          "accessedAt": "2026-08-13"
+        }
+      ]
+    },
+    {
+      "id": "sv-violet-paradox-overview",
+      "games": ["violet"],
+      "generation": 9,
+      "locations": ["pkhex-modern-00050-great-crater-of-paldea"],
+      "locationAliases": ["第零区", "零区", "帕底亚巨坑", "area_zero"],
+      "destinationAliases": ["未来种", "未来宝可梦", "未来悖谬"],
+      "subject": {
+        "type": "reference_topic",
+        "id": "paradox_pokemon_overview",
+        "labelZh": "《宝可梦 紫》的悖谬宝可梦",
+        "aliases": ["悖谬宝可梦是什么", "什么是悖谬宝可梦", "紫里的悖谬宝可梦", "悖谬种", "未来种"]
+      },
+      "requirements": [],
+      "steps": [
+        {
+          "order": 1,
+          "action": "explain_concept",
+          "targetId": "paradox-pokemon",
+          "locationId": "Area Zero",
+          "instructionZh": "它们应按独立宝可梦处理，不是那些相似宝可梦的普通进化形态。"
+        },
+        {
+          "order": 2,
+          "action": "explain_version",
+          "targetId": "future-paradox-pokemon",
+          "locationId": "Area Zero",
+          "instructionZh": "《紫》主要对应未来主题的悖谬宝可梦；《朱》主要对应古代主题，版本限定不要混用。"
+        },
+        {
+          "order": 3,
+          "action": "explain_progression",
+          "targetId": "the-way-home",
+          "locationId": "Area Zero",
+          "instructionZh": "如果你想在主线里接触它们，先完成三条主线并进入第零区。"
+        }
+      ],
+      "overviewZh": "悖谬宝可梦是外形与已知宝可梦相似、带有古代或未来特征的独立宝可梦；《紫》主要对应未来主题，多数主线接触发生在第零区。",
       "sources": [
         {
           "title": "Bulbapedia — Pokémon Scarlet and Violet (oldid 4607603)",

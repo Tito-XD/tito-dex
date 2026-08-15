@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) · Lite `0.8.14+160` · Offline `0.8.14-offline+161`.
+> **Latest release:** [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · Lite `0.8.15+162` · Offline `0.8.15-offline+163`.
 >
-> **Current `main`:** v0.8.14 release baseline with built-in Journey Assistant observability, reviewed multi-game retrieval, BGE-M3 AI Search and bounded Workers AI Qwen; DeepSeek remains explicitly private-gated. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.15 release baseline with a chat-first Journey Assistant, selected-game context isolation, reviewed multi-game retrieval, BGE-M3 AI Search, Tavily allowlist search and bounded Workers AI Qwen; DeepSeek native search remains explicitly disabled. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,15 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.15
+
+- Compress Ask TitoDex connectivity into a 4/4 indicator and details popup; keep the answer area independently scrollable above a fixed chat composer.
+- Keep the selected home companion visible, then animate it with rotating playful lookup messages and shimmer only while a request is running, with reduced-motion support.
+- Clear incompatible save location, badge and milestone fields whenever the selected edition changes; SV and BDSP no longer inherit HGSS progress labels.
+- Add one bounded Tavily allowlist search after audited/fixed-source misses, then require Qwen composition and a second evidence check before returning an answer.
+- Add audited deterministic Violet newcomer and Paradox-Pokémon overviews, while long-tail questions such as encounter locations continue through the allowlisted web route.
+- Configure the explicit Cloudflare BYOK alias `TitoDex` without a `default` fallback; keep DeepSeek native search disabled after live evidence-shape validation failed.
 
 ## Completed in v0.8.14
 

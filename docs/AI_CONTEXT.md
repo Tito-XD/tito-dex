@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.14](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.14) |
-| **`main` / lite source** | `0.8.14+160` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.14-offline+161` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) |
+| **`main` / lite source** | `0.8.15+162` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.15-offline+163` — APK-bundled verified compact v14 archive; updates to live v19 |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
@@ -44,12 +44,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.14)
+## Current feature status (latest release line: v0.8.15)
 
-> v0.8.14 uses Lite versionCode 160 and Offline versionCode 161. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data. It upgrades directly from v0.8.13. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.8.15 uses Lite versionCode 162 and Offline versionCode 163. Lite downloads live bundle v19 when requested; Offline embeds the verified compact v14 archive and can update to the newer live data. It upgrades directly from v0.8.13 or v0.8.14. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Journey & save
-- **Current v0.8.14:** Journey Assistant and three HGSS blocker chains are built into the host APK. The optional online audited corpus additionally covers selected DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV blockers; it is not a complete walkthrough. The Ask page displays sanitized Worker/Qwen/AI Search/source connectivity separately from each answer's actual execution path, and uses the selected home companion in a reduced-motion-aware waiting animation. Local fuzzy matching runs first. AI Search uses BGE-M3 only to retrieve audited `hintId`s. On an audited miss, bounded PokeAPI/StrategyWiki/Wikidata research can use Workers AI Qwen with a second support-verification pass; exact move values are resolved for the selected version before composition. DeepSeek remains private-gated. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
+- **Current v0.8.15:** Journey Assistant and three HGSS blocker chains are built into the host APK. The optional online audited corpus additionally covers selected DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV blockers; it is not a complete walkthrough. The Ask page now uses a compact 4/4 connection indicator with a details popup, persistent selected companion, reduced-motion-aware search animation, a scrollable conversation area and fixed composer. Switching the selected game physically clears incompatible save location/badge context, so HGSS progress cannot leak into SV/BDSP. Local fuzzy matching runs first; two common Violet overview questions are audited deterministic answers. AI Search uses BGE-M3 only to retrieve audited `hintId`s. On an audited miss, bounded PokeAPI/StrategyWiki/Wikidata research or one Tavily allowlist search can use Workers AI Qwen with a second support-verification pass. DeepSeek BYOK is configured under the explicit `TitoDex` alias but native search remains disabled after its live response failed the evidence gate. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
@@ -137,6 +137,7 @@ attribution text; publish corrected bundle metadata only under a new bundle
 version/object set rather than overwriting v19 objects.
 
 ### Latest release-line highlights
+- v0.8.15: compacts Ask TitoDex into a chat-first layout with a 4/4 status popup and companion search motion; isolates selected-game save context; adds Tavily allowlist retrieval and audited Violet newcomer/Paradox answers while retaining Qwen evidence verification and deterministic fallback.
 - v0.8.14: makes Ask TitoDex observable with a connection card, per-answer route/model/source chips and companion waiting motion; expands reviewed multi-game retrieval and hardens bounded-source Qwen answers with exact-version move values, support gating and a second verification pass.
 - v0.8.13 rebuild (versionCodes 158/159): embeds Journey Assistant and its reviewed HGSS seed in the host, removes the second-APK feature gate, and retains legacy 1.0.0 read compatibility.
 - v0.8.13: ships the optional Journey Assistant 1.0.0, save-first local fuzzy matching, audited BGE-M3 retrieval and Workers AI Qwen fallback for three HGSS blocker chains; rotates the Android signer after legacy material was found in public history.
@@ -260,7 +261,7 @@ Same codebase, no diverging fork — `ios/` generated via
 - **Last iOS build verification (2026-07-23, v0.7.0)**: `pod install`,
   `flutter analyze`, 215 Flutter tests, and
   `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
-  Runner.app). v0.8.14 passes the shared Dart suite, but its iOS no-codesign
+  Runner.app). v0.8.15 passes the shared Dart suite, but its iOS no-codesign
   build has not been repeated; generated Pods/build files are not committed.
 - Signing, IPA, TestFlight, and App Store distribution are intentionally not
   part of the Android release and require an Apple Developer account.
@@ -283,7 +284,7 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 `flutter analyze --no-pub`, full `flutter test --no-pub`, Python tool tests,
 Journey Assistant Worker typecheck/Vitest/dry-run, bundled-data byte equality,
 legacy companion Gradle checks, and physical-device host update tests.
-Published v0.8.14 artifacts are verified through the Android release workflows;
+Published v0.8.15 artifacts are verified through the Android release workflows;
 the optional extension is additionally checked for the same V2 signer as the host.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).

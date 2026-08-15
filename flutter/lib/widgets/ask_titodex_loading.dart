@@ -16,18 +16,19 @@ import '../theme/tito_colors.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
 
-/// A small, asset-light waiting scene. Motion follows the popular fade/slide/
-/// bob patterns used by Flutter animation packages, but stays on framework
-/// primitives so the assistant does not add a Lottie runtime or JSON assets.
+/// Keeps the selected home companion beside the conversation at all times.
+/// The orbit, bob, rotating copy and shimmer start only while a request runs.
 class AskTitoDexLoadingCard extends StatefulWidget {
   const AskTitoDexLoadingCard({
     super.key,
     required this.journey,
+    required this.loading,
     required this.progress,
     required this.requestSeed,
   });
 
   final CurrentJourney journey;
+  final bool loading;
   final AskTitoDexProgress progress;
   final int requestSeed;
 
@@ -46,14 +47,14 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
   ];
   static const _workerMessageTemplates = <String>[
     '{name}正在等洛托姆线路传回消息…',
-    '{name}在等 Worker 判断该由索引还是 Qwen 接手…',
-    '{name}正在询问 PokeAPI 与审核索引…',
-    '{name}正在确认这条提示真的适合当前版本…',
+    '{name}在等索引或模型接手这道题…',
+    '{name}正在询问资料库与联网来源…',
+    '{name}正在确认答案真的适合当前版本…',
   ];
 
   late final AnimationController _motion;
-  late final List<String> _localMessages;
-  late final List<String> _workerMessages;
+  late List<String> _localMessages;
+  late List<String> _workerMessages;
   Timer? _messageTimer;
   var _messageIndex = 0;
   var _reduceMotion = false;
@@ -65,30 +66,47 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
       vsync: this,
       duration: const Duration(milliseconds: 1800),
     );
+    _shuffleMessages();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduceMotion = MediaQuery.disableAnimationsOf(context);
+    _syncMotion();
+  }
+
+  @override
+  void didUpdateWidget(covariant AskTitoDexLoadingCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.requestSeed != widget.requestSeed) {
+      _messageIndex = 0;
+      _shuffleMessages();
+    }
+    if (oldWidget.loading != widget.loading ||
+        oldWidget.requestSeed != widget.requestSeed) {
+      _syncMotion();
+    }
+  }
+
+  void _shuffleMessages() {
     _localMessages = List<String>.of(_localMessageTemplates)
       ..shuffle(math.Random(widget.requestSeed));
     _workerMessages = List<String>.of(_workerMessageTemplates)
       ..shuffle(math.Random(widget.requestSeed + 1));
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    if (_reduceMotion == reduceMotion &&
-        (_motion.isAnimating || reduceMotion)) {
-      return;
-    }
-    _reduceMotion = reduceMotion;
+  void _syncMotion() {
     _messageTimer?.cancel();
-    if (reduceMotion) {
+    _messageTimer = null;
+    if (!widget.loading || _reduceMotion) {
       _motion.stop();
-      _motion.value = 0.5;
+      _motion.value = widget.loading ? 0.12 : 0;
       return;
     }
     _motion.repeat();
     _messageTimer = Timer.periodic(const Duration(milliseconds: 2200), (_) {
-      if (mounted) {
+      if (mounted && widget.loading) {
         setState(() => _messageIndex += 1);
       }
     });
@@ -130,30 +148,35 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
         ];
 
         return Semantics(
-          liveRegion: true,
-          label: '$nameZh正在查找答案',
+          liveRegion: widget.loading,
+          label: widget.loading ? '$nameZh正在查找答案' : '$nameZh已准备好',
           child: StickerCard(
-            key: const Key('ask-titodex-loading-card'),
+            key: const Key('ask-titodex-companion-card'),
             variant: StickerVariant.sky,
+            padding: const EdgeInsets.fromLTRB(10, 7, 12, 7),
             child: Row(
               children: [
                 SizedBox.square(
-                  dimension: 92,
+                  dimension: 68,
                   child: AnimatedBuilder(
                     animation: _motion,
                     builder: (context, child) {
                       final phase = _motion.value * math.pi * 2;
-                      final bob = _reduceMotion ? 0.0 : math.sin(phase) * 4;
+                      final bob = widget.loading && !_reduceMotion
+                          ? math.sin(phase) * 3
+                          : 0.0;
                       return Stack(
                         alignment: Alignment.center,
                         children: [
-                          CustomPaint(
-                            size: const Size.square(88),
-                            painter: _BerryOrbitPainter(
-                              progress: _motion.value,
-                              still: _reduceMotion,
+                          if (widget.loading)
+                            CustomPaint(
+                              key: const Key('ask-titodex-loading-card'),
+                              size: const Size.square(66),
+                              painter: _BerryOrbitPainter(
+                                progress: _motion.value,
+                                still: _reduceMotion,
+                              ),
                             ),
-                          ),
                           Transform.translate(
                             offset: Offset(0, bob),
                             child: child,
@@ -163,63 +186,76 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                     },
                     child: FallbackSpriteImage(
                       sources: sources,
-                      width: 66,
-                      height: 66,
+                      width: 52,
+                      height: 52,
                       filterQuality: FilterQuality.none,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Shimmer.fromColors(
-                        enabled: !_reduceMotion,
-                        baseColor: TitoColors.deepBlue,
-                        highlightColor: TitoColors.card,
-                        child: Text(
-                          widget.progress == AskTitoDexProgress.checkingLocal
-                              ? '先翻本地审核笔记'
-                              : '正在连接 Journey Assistant',
-                          key: const Key('ask-titodex-loading-stage'),
-                          style: SecondaryTypography.onCard.h15,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      AnimatedSwitcher(
-                        duration: _reduceMotion
-                            ? Duration.zero
-                            : const Duration(milliseconds: 260),
-                        transitionBuilder: (child, animation) => FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0, 0.18),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
+                  child: AnimatedSwitcher(
+                    duration: _reduceMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 220),
+                    child: widget.loading
+                        ? Column(
+                            key: const ValueKey('loading'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Shimmer.fromColors(
+                                enabled: !_reduceMotion,
+                                baseColor: TitoColors.deepBlue,
+                                highlightColor: TitoColors.card,
+                                child: Text(
+                                  widget.progress ==
+                                          AskTitoDexProgress.checkingLocal
+                                      ? '先翻本地审核笔记'
+                                      : '正在连接 Journey Assistant',
+                                  key: const Key('ask-titodex-loading-stage'),
+                                  style: SecondaryTypography.onCard.h15,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              AnimatedSwitcher(
+                                duration: _reduceMotion
+                                    ? Duration.zero
+                                    : const Duration(milliseconds: 260),
+                                child: Text(
+                                  message,
+                                  key: ValueKey(message),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: SecondaryTypography.onCard.small12
+                                      .copyWith(
+                                        color: TitoColors.deepBlue,
+                                        height: 1.25,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            key: const ValueKey('idle'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '$nameZh在这里陪你',
+                                key: const Key('ask-titodex-companion-idle'),
+                                style: SecondaryTypography.onCard.h15,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '可以问路线、捕捉地点，也可以问刚开始玩什么最重要。',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(color: TitoColors.mutedInk),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: Text(
-                          message,
-                          key: ValueKey(message),
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            color: TitoColors.deepBlue,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        widget.progress == AskTitoDexProgress.checkingLocal
-                            ? '这一阶段不会调用在线模型'
-                            : '本地未唯一命中；正在请求 Worker',
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
@@ -249,14 +285,14 @@ class _BerryOrbitPainter extends CustomPainter {
       final point = center + Offset(math.cos(angle), math.sin(angle)) * orbit;
       canvas.drawCircle(
         point,
-        5.5,
+        5,
         Paint()
           ..color = TitoColors.ink
           ..style = PaintingStyle.fill,
       );
       canvas.drawCircle(
         point,
-        3.5,
+        3.2,
         Paint()
           ..color = colors[index]
           ..style = PaintingStyle.fill,

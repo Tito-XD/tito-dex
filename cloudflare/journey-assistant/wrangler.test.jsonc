@@ -9,9 +9,13 @@
     "AI_GATEWAY_ID": "test",
     "AI_SEARCH_ENABLED": "false",
     "CURATED_WEB_ENABLED": "false",
+    "TAVILY_WEB_ENABLED": "false",
+    "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
+    "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
+    "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",
     "AI_PROVIDER": "workers-ai",
-    "AI_PROVIDER_MODEL": "deepseek-chat",
+    "AI_PROVIDER_MODEL": "deepseek-v4-flash",
     "AI_PROVIDER_ENDPOINT": "chat/completions"
   },
   "r2_buckets": [

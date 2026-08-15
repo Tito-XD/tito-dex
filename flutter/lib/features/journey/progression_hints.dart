@@ -15,6 +15,7 @@ enum AskTitoDexAnswerMode {
   aiSearchAudited('ai_search_audited'),
   curatedSourcesDeterministic('curated_sources_deterministic'),
   curatedSourcesQwen('curated_sources_qwen'),
+  deepseekNativeSearch('deepseek_native_search'),
   noMatch('no_match');
 
   const AskTitoDexAnswerMode(this.wireValue);
@@ -77,38 +78,67 @@ class AskTitoDexContext {
   final bool includeBadges;
   final String locale;
 
+  bool get hasVerifiedLocationContext =>
+      includeLocation &&
+      locationReliability == 'save_verified' &&
+      locationLabel != null &&
+      locationId != null;
+
+  bool get hasVerifiedBadgeContext =>
+      includeBadges &&
+      ((badgesReliability == 'save_verified' && badgeIds.isNotEmpty) ||
+          (badgesReliability == 'count_only' && badgeCount != null));
+
   factory AskTitoDexContext.fromJourney(
     CurrentJourney journey,
     GameEdition edition, {
     String? locationId,
   }) {
     final saveEdition = gameEditionForSaveGame(journey.game);
-    final hasParsedSave =
+    final hasLinkedSave =
         journey.saveDexHash != null &&
         saveEdition != null &&
-        saveEdition.slug == edition.slug;
-    final exactGame = hasParsedSave
-        ? saveEdition.selectedFlavor ?? edition.selectedFlavor
-        : edition.selectedFlavor;
+        isSaveEditionCompatible(selected: edition, save: saveEdition);
+    final saveGame = hasLinkedSave ? saveEdition.assistantGameKey : null;
+    final exactGame = saveGame ?? edition.assistantGameKey;
+    final gameWasVerifiedBySave = hasLinkedSave && saveGame != null;
     final exactHgss =
-        hasParsedSave &&
+        hasLinkedSave &&
         (exactGame == 'heartgold' || exactGame == 'soulsilver');
+    final hasVerifiedBadgeCount =
+        hasLinkedSave &&
+        const {
+          'rgb',
+          'yellow',
+          'gs',
+          'crystal',
+          'dp',
+          'pt',
+        }.contains(saveEdition.slug);
+    final badgeIds = exactHgss
+        ? List<String>.unmodifiable(journey.verifiedBadgeIds)
+        : const <String>[];
+    final badgeCount = hasVerifiedBadgeCount ? journey.badges : null;
     return AskTitoDexContext(
       game: exactGame,
-      generation: hasParsedSave ? saveEdition.generation : edition.generation,
-      locationLabel: journey.location,
-      locationId: locationId,
-      badgeIds: journey.verifiedBadgeIds,
-      badgeCount: exactHgss ? null : (hasParsedSave ? journey.badges : null),
+      generation: edition.generation,
+      locationLabel: exactHgss ? journey.location : null,
+      locationId: exactHgss ? locationId : null,
+      badgeIds: badgeIds,
+      badgeCount: badgeCount,
       milestoneIds: const [],
-      parserRevision: hasParsedSave ? saveParserRevision : 0,
-      gameReliability: hasParsedSave ? 'save_verified' : 'user_selected',
-      locationReliability: hasParsedSave ? 'save_verified' : 'unknown',
+      parserRevision: hasLinkedSave ? saveParserRevision : 0,
+      gameReliability: gameWasVerifiedBySave
+          ? 'save_verified'
+          : 'user_selected',
+      locationReliability: exactHgss ? 'save_verified' : 'unknown',
       badgesReliability: exactHgss
           ? 'save_verified'
-          : hasParsedSave
+          : hasVerifiedBadgeCount
           ? 'count_only'
           : 'unknown',
+      includeLocation: exactHgss,
+      includeBadges: exactHgss || hasVerifiedBadgeCount,
     );
   }
 
@@ -168,23 +198,36 @@ class AskTitoDexContext {
   /// Context for the separately installed extension. Reliability is explicit:
   /// recognizing a save format does not imply every progression field was
   /// decoded. Raw save bytes and personal trainer/party fields are never sent.
-  Map<String, dynamic> toExtensionJson(CurrentJourney journey) {
+  Map<String, dynamic> toExtensionJson(CurrentJourney _) {
+    final sendsLocation =
+        includeLocation &&
+        locationId != null &&
+        locationReliability == 'save_verified';
+    final sendsBadgeIds = includeBadges && badgesReliability == 'save_verified';
+    final sendsBadgeCount =
+        includeBadges &&
+        badgesReliability == 'count_only' &&
+        badgeCount != null;
+    final sendsMilestones = milestonesReliability == 'save_verified';
     return {
       'protocolVersion': 1,
       'game': {'value': game, 'reliability': gameReliability},
       'location': {
-        'id': includeLocation ? locationId : null,
-        'label': includeLocation ? locationLabel : null,
-        'reliability': includeLocation && locationId != null
-            ? locationReliability
-            : 'unknown',
+        'id': sendsLocation ? locationId : null,
+        'label': sendsLocation ? locationLabel : null,
+        'reliability': sendsLocation ? 'save_verified' : 'unknown',
       },
       'badges': {
-        'ids': includeBadges ? badgeIds : const <String>[],
-        'count': includeBadges ? badgeCount ?? journey.badges : null,
-        'reliability': includeBadges ? badgesReliability : 'unknown',
+        'ids': sendsBadgeIds ? badgeIds : const <String>[],
+        'count': sendsBadgeCount ? badgeCount : null,
+        'reliability': sendsBadgeIds || sendsBadgeCount
+            ? badgesReliability
+            : 'unknown',
       },
-      'milestones': {'ids': milestoneIds, 'reliability': milestonesReliability},
+      'milestones': {
+        'ids': sendsMilestones ? milestoneIds : const <String>[],
+        'reliability': sendsMilestones ? 'save_verified' : 'unsupported',
+      },
       'locale': locale,
       'parserRevision': parserRevision,
     };
@@ -555,7 +598,9 @@ class ProgressionHintRepository {
     final unknowns = <String>[];
     final progressNotes = <String>[];
     for (final requirement in hint.requirements) {
-      if (requirement.type == 'badge' && context.includeBadges) {
+      if (requirement.type == 'badge' &&
+          context.includeBadges &&
+          context.badgesReliability == 'save_verified') {
         if (context.badgeIds.contains(requirement.id)) {
           progressNotes.add('你的存档可以确认已取得${requirement.labelZh}。');
           verifiedFacts.add('存档已确认${requirement.labelZh}');

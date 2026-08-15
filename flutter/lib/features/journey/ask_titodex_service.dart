@@ -27,10 +27,12 @@ class AskTitoDexWorkerStatus {
     this.aiSearchEnabled = false,
     this.curatedSourcesEnabled = false,
     this.sourceProviders = const [],
-    this.braveSearchEnabled = false,
+    bool webSearchEnabled = false,
+    this.webSearchProviders = const [],
+    bool? braveSearchEnabled,
     this.externalProviderEnabled = false,
     this.errorCode,
-  });
+  }) : webSearchEnabled = braveSearchEnabled ?? webSearchEnabled;
 
   const AskTitoDexWorkerStatus.checking()
     : this(availability: AskTitoDexAvailability.checking);
@@ -49,7 +51,13 @@ class AskTitoDexWorkerStatus {
   final bool aiSearchEnabled;
   final bool curatedSourcesEnabled;
   final List<String> sourceProviders;
-  final bool braveSearchEnabled;
+  final bool webSearchEnabled;
+  final List<String> webSearchProviders;
+
+  /// Read-only compatibility for the v0.8.14 health schema and older tests.
+  bool get braveSearchEnabled =>
+      webSearchEnabled && webSearchProviders.contains('brave');
+
   final bool externalProviderEnabled;
   final String? errorCode;
 }
@@ -122,13 +130,30 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
               }.contains(provider),
             )
             .toList(growable: false);
+    final webSearchProviders =
+        (capabilities['webSearchProviders'] as List<dynamic>? ?? const [])
+            .whereType<String>()
+            .where(
+              (provider) => const {
+                'tavily',
+                'deepseek-native',
+                'brave',
+              }.contains(provider),
+            )
+            .toList(growable: false);
+    final legacyBraveSearch = capabilities['braveSearch'] == true;
     return AskTitoDexWorkerStatus(
       availability: AskTitoDexAvailability.online,
       qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
       aiSearchEnabled: capabilities['aiSearch'] == true,
       curatedSourcesEnabled: capabilities['curatedSources'] == true,
       sourceProviders: providers,
-      braveSearchEnabled: capabilities['braveSearch'] == true,
+      webSearchEnabled: capabilities['webSearch'] == true || legacyBraveSearch,
+      webSearchProviders: webSearchProviders.isNotEmpty
+          ? webSearchProviders
+          : legacyBraveSearch
+          ? const ['brave']
+          : const [],
       externalProviderEnabled: capabilities['externalProvider'] == true,
     );
   }

@@ -80,10 +80,17 @@ export type AssistantResponse = {
     | 'ai_search_audited'
     | 'curated_sources_deterministic'
     | 'curated_sources_qwen'
+    | 'deepseek_native_search'
     | 'no_match';
   modelUsed?: boolean;
   aiSearchUsed?: boolean;
-  sourceKinds?: ('pokeapi' | 'strategywiki' | 'wikidata')[];
+  sourceKinds?: (
+    | 'pokeapi'
+    | 'strategywiki'
+    | 'wikidata'
+    | 'tavily'
+    | 'deepseek-native'
+  )[];
 };
 
 const allowedRequestKeys = new Set(['question', 'context']);

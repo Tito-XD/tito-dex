@@ -7,6 +7,9 @@
   // Public HTTPS entry point for the optional App/companion integration.
   // A custom domain can replace this after the trial endpoint is verified.
   "workers_dev": true,
+  "secrets": {
+    "required": ["TAVILY_API_KEY", "CF_ACCOUNT_ID", "CF_AIG_TOKEN"]
+  },
   "ai": {
     "binding": "AI"
   },
@@ -42,9 +45,17 @@
     "AI_GATEWAY_ID": "titodex-journey-assistant",
     "AI_SEARCH_ENABLED": "true",
     "CURATED_WEB_ENABLED": "true",
+    // The production secret is installed in Worker Secrets Store. Failures
+    // remain optional and fall through to the deterministic answer.
+    "TAVILY_WEB_ENABLED": "true",
+    // BYOK alias is selected explicitly below. Account identity and Gateway
+    // Run authentication stay in Worker Secrets Store.
+    "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
+    "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
+    "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",
     "AI_PROVIDER": "workers-ai",
-    "AI_PROVIDER_MODEL": "deepseek-chat",
+    "AI_PROVIDER_MODEL": "deepseek-v4-flash",
     "AI_PROVIDER_ENDPOINT": "chat/completions"
   },
   "observability": {
