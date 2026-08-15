@@ -8,7 +8,9 @@ import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
 class AbilityEncyclopediaPage extends StatelessWidget {
-  const AbilityEncyclopediaPage({super.key});
+  const AbilityEncyclopediaPage({super.key, this.initialQuery});
+
+  final String? initialQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class AbilityEncyclopediaPage extends StatelessWidget {
       secondaryLabel: (ability) => '#${ability.id} · ${ability.nameEn}',
       detailSheet: showAbilityDetailSheet,
       categoryFilter: abilityUsageCategoryFilter,
+      initialQuery: initialQuery,
     );
   }
 }

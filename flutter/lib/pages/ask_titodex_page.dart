@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_repository.dart';
 import '../features/game/game_edition.dart';
+import '../features/journey/ask_titodex_entity_links.dart';
+import '../features/journey/ask_titodex_history.dart';
 import '../features/journey/ask_titodex_service.dart';
 import '../features/journey/ask_titodex_settings.dart';
 import '../features/journey/progression_hints.dart';
@@ -24,11 +27,15 @@ class AskTitoDexPage extends StatefulWidget {
     required this.journey,
     required this.edition,
     this.service,
+    this.historyStore,
+    this.entityResolver,
   });
 
   final CurrentJourney journey;
   final GameEdition edition;
   final AskTitoDexService? service;
+  final AskTitoDexHistoryStore? historyStore;
+  final AskTitoDexEntityResolver? entityResolver;
 
   @override
   State<AskTitoDexPage> createState() => _AskTitoDexPageState();
@@ -38,8 +45,11 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   late final TextEditingController _questionController;
   late final ScrollController _answerScrollController;
   late final AskTitoDexService _service;
+  late final AskTitoDexHistoryStore _historyStore;
+  late final AskTitoDexEntityResolver _entityResolver;
+  late final Future<void> _historyReady;
   AskTitoDexContext? _context;
-  AskTitoDexResult? _result;
+  List<AskTitoDexHistoryEntry> _history = const [];
   AskTitoDexWorkerStatus _workerStatus =
       const AskTitoDexWorkerStatus.checking();
   AskTitoDexProgress _progress = AskTitoDexProgress.checkingLocal;
@@ -53,18 +63,23 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     _questionController = TextEditingController();
     _answerScrollController = ScrollController();
     _service = widget.service ?? askTitoDexService;
+    _historyStore = widget.historyStore ?? askTitoDexHistoryStore;
+    _entityResolver = widget.entityResolver ?? askTitoDexEntityResolver;
+    _historyReady = _loadHistory();
     askTitoDexSettings.addListener(_handleSettingsChanged);
     unawaited(companionRepository.load());
     _prepareContext();
     _checkConnection();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && !askTitoDexSettings.noticeAcknowledged) {
-        _showOnlineNotice();
-      }
-    });
   }
 
   void _handleSettingsChanged() => _checkConnection();
+
+  Future<void> _loadHistory() async {
+    final loaded = await _historyStore.load();
+    if (!mounted) return;
+    setState(() => _history = loaded);
+    _scrollToLatest();
+  }
 
   Future<void> _checkConnection() async {
     if (mounted) {
@@ -83,38 +98,15 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (mounted) setState(() => _context = resolved);
   }
 
-  Future<void> _showOnlineNotice() async {
-    final accepted = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text(AppZh.askTitoDexNoticeTitle),
-        content: const Text(AppZh.askTitoDexNoticeBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text(AppZh.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(AppZh.askTitoDexNoticeAccept),
-          ),
-        ],
-      ),
-    );
-    if (accepted == true) {
-      await askTitoDexSettings.acknowledgeNotice();
-    }
-  }
-
-  Future<void> _submit() async {
+  Future<void> _submit([String? retryQuestion]) async {
+    await _historyReady;
+    if (!mounted) return;
     final contextValue = _context;
-    final question = _questionController.text.trim();
+    final question = (retryQuestion ?? _questionController.text).trim();
     if (contextValue == null || question.isEmpty || _loading) return;
     FocusScope.of(context).unfocus();
     setState(() {
       _loading = true;
-      _result = null;
       _submittedQuestion = question;
       _progress = AskTitoDexProgress.checkingLocal;
       _requestSeed += 1;
@@ -122,29 +114,56 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final result = await _service.ask(
       question,
       contextValue,
+      history: askTitoDexRequestHistory(
+        _history,
+        game: contextValue.game ?? '',
+      ),
       onProgress: (progress) {
         if (mounted) setState(() => _progress = progress);
       },
     );
     if (!mounted) return;
+    final entry = AskTitoDexHistoryEntry(
+      game: contextValue.game ?? 'unknown',
+      question: question,
+      result: result,
+      createdAt: DateTime.now(),
+    );
+    List<AskTitoDexHistoryEntry> saved;
+    try {
+      saved = await _historyStore.append(entry);
+    } on Object {
+      saved = [..._history, entry];
+      if (saved.length > askTitoDexHistoryLimit) {
+        saved = saved.sublist(saved.length - askTitoDexHistoryLimit);
+      }
+    }
+    if (!mounted) return;
     setState(() {
       _loading = false;
-      _result = result;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _answerScrollController.hasClients) {
-        _answerScrollController.animateTo(
-          _answerScrollController.position.maxScrollExtent,
-          duration: MediaQuery.disableAnimationsOf(context)
-              ? Duration.zero
-              : const Duration(milliseconds: 220),
-          curve: Curves.easeOut,
-        );
+      _history = saved;
+      _submittedQuestion = null;
+      if (retryQuestion == null && result.status == AskTitoDexStatus.answered) {
+        _questionController.clear();
       }
     });
+    _scrollToLatest();
     if (result.errorCode?.contains('_fallback') == true) {
       unawaited(_checkConnection());
     }
+  }
+
+  void _scrollToLatest() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_answerScrollController.hasClients) return;
+      _answerScrollController.animateTo(
+        _answerScrollController.position.maxScrollExtent,
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   @override
@@ -185,6 +204,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
               children: [
                 _ConnectionStatusCard(
                   status: _workerStatus,
+                  historyCount: _history.length,
                   onRefresh: _checkConnection,
                 ),
                 SizedBox(height: spacing),
@@ -234,14 +254,27 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                         controller: _answerScrollController,
                         padding: const EdgeInsets.all(8),
                         children: [
-                          if (_submittedQuestion == null && !_loading)
+                          if (_history.isEmpty &&
+                              _submittedQuestion == null &&
+                              !_loading)
                             const _ConversationEmptyState(),
+                          for (final entry in _history) ...[
+                            _QuestionBubble(
+                              question: entry.question,
+                              game: entry.game,
+                              showGame: entry.game != contextValue?.game,
+                            ),
+                            const SizedBox(height: 8),
+                            _AnswerCard(
+                              question: entry.question,
+                              result: entry.result,
+                              entityResolver: _entityResolver,
+                              onRetry: () => _submit(entry.question),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
                           if (_submittedQuestion case final question?)
                             _QuestionBubble(question: question),
-                          if (_result case final result?) ...[
-                            const SizedBox(height: 8),
-                            _AnswerCard(result: result, onRetry: _submit),
-                          ],
                         ],
                       ),
                     ),
@@ -264,20 +297,24 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
 }
 
 class _ConnectionStatusCard extends StatelessWidget {
-  const _ConnectionStatusCard({required this.status, required this.onRefresh});
+  const _ConnectionStatusCard({
+    required this.status,
+    required this.historyCount,
+    required this.onRefresh,
+  });
 
   final AskTitoDexWorkerStatus status;
+  final int historyCount;
   final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
     final online = status.availability == AskTitoDexAvailability.online;
+    final capabilities = _connectionCapabilities(status);
     final enabledCount = online
-        ? 1 +
-              (status.qwenConfigured ? 1 : 0) +
-              (status.aiSearchEnabled ? 1 : 0) +
-              (status.webSearchEnabled ? 1 : 0)
+        ? capabilities.where((capability) => capability.$2).length
         : 0;
+    final capabilityCount = capabilities.length;
     final color = switch (status.availability) {
       AskTitoDexAvailability.checking => TitoColors.skyBlue,
       AskTitoDexAvailability.online => TitoColors.mint,
@@ -285,10 +322,14 @@ class _ConnectionStatusCard extends StatelessWidget {
       AskTitoDexAvailability.unavailable => TitoColors.coral,
     };
     final summary = switch (status.availability) {
-      AskTitoDexAvailability.checking => '检查中 · --/4',
-      AskTitoDexAvailability.online => '在线能力 · $enabledCount/4',
-      AskTitoDexAvailability.disabled => '在线能力已关闭 · 0/4',
-      AskTitoDexAvailability.unavailable => '当前仅本地 · 0/4',
+      AskTitoDexAvailability.checking =>
+        '检查中 · -- · 问答 $historyCount/$askTitoDexHistoryLimit',
+      AskTitoDexAvailability.online =>
+        '在线能力 · $enabledCount/$capabilityCount · 问答 $historyCount/$askTitoDexHistoryLimit',
+      AskTitoDexAvailability.disabled =>
+        '在线能力已关闭 · 问答 $historyCount/$askTitoDexHistoryLimit',
+      AskTitoDexAvailability.unavailable =>
+        '当前仅本地 · 问答 $historyCount/$askTitoDexHistoryLimit',
     };
 
     return StickerCard(
@@ -303,6 +344,8 @@ class _ConnectionStatusCard extends StatelessWidget {
             context,
             status: status,
             enabledCount: enabledCount,
+            capabilityCount: capabilityCount,
+            historyCount: historyCount,
             onRefresh: onRefresh,
           ),
           child: Padding(
@@ -355,6 +398,8 @@ Future<void> _showConnectionDetails(
   BuildContext context, {
   required AskTitoDexWorkerStatus status,
   required int enabledCount,
+  required int capabilityCount,
+  required int historyCount,
   required VoidCallback onRefresh,
 }) async {
   final workerOnline = status.availability == AskTitoDexAvailability.online;
@@ -362,41 +407,49 @@ Future<void> _showConnectionDetails(
     context: context,
     builder: (dialogContext) => AlertDialog(
       key: const Key('ask-titodex-connection-dialog'),
-      title: Text('连接状态 · $enabledCount/4'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _CapabilityDetail(label: 'Journey Worker', enabled: workerOnline),
-          _CapabilityDetail(
-            label: 'Qwen',
-            enabled: workerOnline && status.qwenConfigured,
-          ),
-          _CapabilityDetail(
-            label: 'AI Search',
-            enabled: workerOnline && status.aiSearchEnabled,
-          ),
-          _CapabilityDetail(
-            label: status.webSearchProviders.isEmpty
-                ? '联网搜索'
-                : '联网搜索（${status.webSearchProviders.map(_webSearchProviderLabel).join(' / ')}）',
-            enabled: workerOnline && status.webSearchEnabled,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            switch (status.availability) {
-              AskTitoDexAvailability.online => AppZh.askTitoDexStatusOnlineHint,
-              AskTitoDexAvailability.disabled =>
-                AppZh.askTitoDexStatusDisabledHint,
-              AskTitoDexAvailability.unavailable =>
-                AppZh.askTitoDexStatusUnavailableHint,
-              AskTitoDexAvailability.checking => AppZh.askTitoDexWorkerChecking,
-            },
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.mutedInk,
-              height: 1.35,
+      title: Text(
+        '连接状态 · $enabledCount/$capabilityCount\n问答记录 · $historyCount/$askTitoDexHistoryLimit',
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final capability in _connectionCapabilities(status))
+              _CapabilityDetail(
+                label: capability.$1,
+                enabled: workerOnline && capability.$2,
+              ),
+            if (status.experimentalAnswers) ...[
+              const SizedBox(height: 6),
+              Text(
+                '当前为宽范围试用：仍只接受宝可梦主题和固定来源域名，但证据不足时会降为低置信度回答，不再直接丢弃。',
+                key: const Key('ask-titodex-experimental-policy'),
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.deepBlue,
+                  height: 1.35,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+            const SizedBox(height: 8),
+            Text(
+              switch (status.availability) {
+                AskTitoDexAvailability.online =>
+                  AppZh.askTitoDexStatusOnlineHint,
+                AskTitoDexAvailability.disabled =>
+                  AppZh.askTitoDexStatusDisabledHint,
+                AskTitoDexAvailability.unavailable =>
+                  AppZh.askTitoDexStatusUnavailableHint,
+                AskTitoDexAvailability.checking =>
+                  AppZh.askTitoDexWorkerChecking,
+              },
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+                height: 1.35,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton.icon(
@@ -418,6 +471,19 @@ Future<void> _showConnectionDetails(
     ),
   );
 }
+
+List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
+  ('Journey Worker', status.availability == AskTitoDexAvailability.online),
+  ('Qwen · 回答整理/核对', status.qwenConfigured),
+  ('AI Search · R2 索引', status.aiSearchEnabled),
+  ('TitoDex Bundle · 结构化校验', status.dexBundleEnabled),
+  ('限定资料检索', status.curatedSourcesEnabled),
+  for (final provider in status.sourceProviders)
+    ('资料源 · ${_sourceKindLabel(provider)}', status.curatedSourcesEnabled),
+  for (final provider in status.webSearchProviders)
+    ('联网 · ${_webSearchProviderLabel(provider)}', status.webSearchEnabled),
+  if (status.webSearchProviders.isEmpty) ('联网搜索', false),
+];
 
 class _CapabilityDetail extends StatelessWidget {
   const _CapabilityDetail({required this.label, required this.enabled});
@@ -608,9 +674,15 @@ class _ConversationEmptyState extends StatelessWidget {
 }
 
 class _QuestionBubble extends StatelessWidget {
-  const _QuestionBubble({required this.question});
+  const _QuestionBubble({
+    required this.question,
+    this.game,
+    this.showGame = false,
+  });
 
   final String question;
+  final String? game;
+  final bool showGame;
 
   @override
   Widget build(BuildContext context) {
@@ -633,10 +705,24 @@ class _QuestionBubble extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-            child: Text(
-              question,
-              key: const Key('ask-titodex-question-bubble'),
-              style: SecondaryTypography.onGradient.body14,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (showGame && game != null) ...[
+                  Text(
+                    _assistantGameLabel(game!),
+                    style: SecondaryTypography.onGradient.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                ],
+                Text(
+                  question,
+                  key: const Key('ask-titodex-question-bubble'),
+                  style: SecondaryTypography.onGradient.body14,
+                ),
+              ],
             ),
           ),
         ),
@@ -749,9 +835,16 @@ class _StatusPill extends StatelessWidget {
 }
 
 class _AnswerCard extends StatelessWidget {
-  const _AnswerCard({required this.result, required this.onRetry});
+  const _AnswerCard({
+    required this.question,
+    required this.result,
+    required this.entityResolver,
+    required this.onRetry,
+  });
 
+  final String question;
   final AskTitoDexResult result;
+  final AskTitoDexEntityResolver entityResolver;
   final VoidCallback onRetry;
 
   @override
@@ -877,11 +970,142 @@ class _AnswerCard extends StatelessWidget {
               ),
             ),
           ],
+          if ((result.answer ?? '').isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _EntityLinkCards(
+              question: question,
+              answer: result.answer!,
+              resolver: entityResolver,
+            ),
+          ],
         ],
       ),
     );
   }
 }
+
+class _EntityLinkCards extends StatefulWidget {
+  const _EntityLinkCards({
+    required this.question,
+    required this.answer,
+    required this.resolver,
+  });
+
+  final String question;
+  final String answer;
+  final AskTitoDexEntityResolver resolver;
+
+  @override
+  State<_EntityLinkCards> createState() => _EntityLinkCardsState();
+}
+
+class _EntityLinkCardsState extends State<_EntityLinkCards> {
+  late Future<List<AskTitoDexEntityLink>> _links;
+
+  @override
+  void initState() {
+    super.initState();
+    _links = widget.resolver.resolve(
+      question: widget.question,
+      answer: widget.answer,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _EntityLinkCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.question != widget.question ||
+        oldWidget.answer != widget.answer ||
+        oldWidget.resolver != widget.resolver) {
+      _links = widget.resolver.resolve(
+        question: widget.question,
+        answer: widget.answer,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<AskTitoDexEntityLink>>(
+      future: _links,
+      builder: (context, snapshot) {
+        final links = snapshot.data ?? const <AskTitoDexEntityLink>[];
+        if (links.isEmpty) return const SizedBox.shrink();
+        return Column(
+          key: const Key('ask-titodex-entity-links'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '在 TitoDex 里继续查看',
+              style: SecondaryTypography.onCard.small12.copyWith(
+                color: TitoColors.mutedInk,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: [
+                for (final link in links)
+                  ActionChip(
+                    key: ValueKey('ask-entity-${link.kind.name}-${link.id}'),
+                    avatar: Icon(_entityIcon(link.kind), size: 17),
+                    label: Text(
+                      '${link.nameZh} · ${_entityKindLabel(link.kind)}',
+                    ),
+                    onPressed: () => context.push(link.route),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+IconData _entityIcon(AskTitoDexEntityKind kind) => switch (kind) {
+  AskTitoDexEntityKind.pokemon => Icons.catching_pokemon_rounded,
+  AskTitoDexEntityKind.item => Icons.backpack_rounded,
+  AskTitoDexEntityKind.move => Icons.auto_awesome_rounded,
+  AskTitoDexEntityKind.ability => Icons.bolt_rounded,
+};
+
+String _entityKindLabel(AskTitoDexEntityKind kind) => switch (kind) {
+  AskTitoDexEntityKind.pokemon => '图鉴',
+  AskTitoDexEntityKind.item => '道具',
+  AskTitoDexEntityKind.move => '招式',
+  AskTitoDexEntityKind.ability => '特性',
+};
+
+String _assistantGameLabel(String value) => switch (value) {
+  'diamond' => '钻石 · DP',
+  'pearl' => '珍珠 · DP',
+  'platinum' => '白金 · Pt',
+  'heartgold' => '心金 · HGSS',
+  'soulsilver' => '魂银 · HGSS',
+  'black' => '黑 · BW',
+  'white' => '白 · BW',
+  'black-2' => '黑2 · B2W2',
+  'white-2' => '白2 · B2W2',
+  'x' => 'X · XY',
+  'y' => 'Y · XY',
+  'omega-ruby' => '欧米伽红宝石 · ORAS',
+  'alpha-sapphire' => '阿尔法蓝宝石 · ORAS',
+  'sun' => '太阳 · SM',
+  'moon' => '月亮 · SM',
+  'ultra-sun' => '究极之日 · USUM',
+  'ultra-moon' => '究极之月 · USUM',
+  'sword' => '剑 · SWSH',
+  'shield' => '盾 · SWSH',
+  'brilliant-diamond' => '晶灿钻石 · BDSP',
+  'shining-pearl' => '明亮珍珠 · BDSP',
+  'legends-arceus' => '传说 阿尔宙斯 · PLA',
+  'scarlet' => '朱 · SV',
+  'violet' => '紫 · SV',
+  _ => value,
+};
 
 String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
   AskTitoDexAnswerMode.localAudited => AppZh.askTitoDexRouteLocal,
@@ -891,6 +1115,7 @@ String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
     AppZh.askTitoDexRouteCuratedDeterministic,
   AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
   AskTitoDexAnswerMode.deepseekNativeSearch => 'DeepSeek 原生联网回答',
+  AskTitoDexAnswerMode.multiSourceQwen => 'Qwen × DeepSeek 交叉核对',
   AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
 };
 

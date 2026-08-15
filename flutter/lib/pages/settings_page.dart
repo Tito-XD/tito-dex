@@ -159,8 +159,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _toggleAskTitoDex(bool enabled) async {
+    await askTitoDexSettings.setEnabled(enabled);
+  }
+
+  Future<void> _toggleJourneyAssistant(bool enabled) async {
     if (!enabled) {
-      await askTitoDexSettings.setEnabled(false);
+      await askTitoDexSettings.setExtensionEnabled(false);
       return;
     }
     final accepted =
@@ -170,7 +174,9 @@ class _SettingsPageState extends State<SettingsPage> {
               barrierDismissible: false,
               builder: (dialogContext) => AlertDialog(
                 title: const Text(AppZh.askTitoDexNoticeTitle),
-                content: const Text(AppZh.askTitoDexNoticeBody),
+                content: const SingleChildScrollView(
+                  child: Text(AppZh.askTitoDexNoticeBody),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -185,8 +191,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ) ==
             true;
     if (!accepted) return;
-    await askTitoDexSettings.acknowledgeNotice();
-    await askTitoDexSettings.setEnabled(true);
+    if (askTitoDexSettings.noticeAcknowledged) {
+      await askTitoDexSettings.setExtensionEnabled(true);
+    } else {
+      await askTitoDexSettings.enableWithConsent();
+    }
   }
 
   Future<void> _pickDefaultGameEdition() async {
@@ -604,50 +613,54 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 8),
                   _SettingsToggleRow(
+                    key: const Key('journey-assistant-master-toggle'),
                     icon: Icons.auto_awesome_outlined,
                     plateColor: TitoColors.softYellow,
                     label: AppZh.extensionEnabled,
                     hint: AppZh.extensionBuiltInHint,
                     value: askTitoDexSettings.extensionEnabled,
-                    onChanged: askTitoDexSettings.setExtensionEnabled,
+                    onChanged: _toggleJourneyAssistant,
                   ),
-                  _SettingsToggleRow(
-                    icon: Icons.cloud_outlined,
-                    plateColor: TitoColors.skyBlue,
-                    label: AppZh.settingsAskTitoDex,
-                    hint: AppZh.askTitoDexNoticeBody,
-                    value: askTitoDexSettings.enabled,
-                    onChanged: _toggleAskTitoDex,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppZh.extensionSearchDisplay,
-                    style: SecondaryTypography.onCard.body14,
-                  ),
-                  DropdownButton<SearchAssistantDisplayMode>(
-                    key: const Key('extension-search-display-mode'),
-                    isExpanded: true,
-                    value: askTitoDexSettings.searchDisplayMode,
-                    items: const [
-                      DropdownMenuItem(
-                        value: SearchAssistantDisplayMode.prominent,
-                        child: Text(AppZh.extensionSearchProminent),
-                      ),
-                      DropdownMenuItem(
-                        value: SearchAssistantDisplayMode.compact,
-                        child: Text(AppZh.extensionSearchCompact),
-                      ),
-                      DropdownMenuItem(
-                        value: SearchAssistantDisplayMode.hidden,
-                        child: Text(AppZh.extensionSearchHidden),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        askTitoDexSettings.setSearchDisplayMode(value);
-                      }
-                    },
-                  ),
+                  if (askTitoDexSettings.extensionEnabled) ...[
+                    _SettingsToggleRow(
+                      key: const Key('journey-assistant-online-toggle'),
+                      icon: Icons.cloud_outlined,
+                      plateColor: TitoColors.skyBlue,
+                      label: AppZh.settingsAskTitoDex,
+                      hint: AppZh.settingsAskTitoDexHint,
+                      value: askTitoDexSettings.enabled,
+                      onChanged: _toggleAskTitoDex,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      AppZh.extensionSearchDisplay,
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                    DropdownButton<SearchAssistantDisplayMode>(
+                      key: const Key('extension-search-display-mode'),
+                      isExpanded: true,
+                      value: askTitoDexSettings.searchDisplayMode,
+                      items: const [
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.prominent,
+                          child: Text(AppZh.extensionSearchProminent),
+                        ),
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.compact,
+                          child: Text(AppZh.extensionSearchCompact),
+                        ),
+                        DropdownMenuItem(
+                          value: SearchAssistantDisplayMode.hidden,
+                          child: Text(AppZh.extensionSearchHidden),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          askTitoDexSettings.setSearchDisplayMode(value);
+                        }
+                      },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1220,6 +1233,7 @@ class _SettingsGroup extends StatelessWidget {
 /// a [StickerSwitch]. Matches the mock's `.row` pattern.
 class _SettingsToggleRow extends StatelessWidget {
   const _SettingsToggleRow({
+    super.key,
     required this.icon,
     required this.plateColor,
     required this.label,

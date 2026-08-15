@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.15) · Lite `0.8.15+162` · Offline `0.8.15-offline+163`.
+> **Latest release:** [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · Lite `0.8.16+164` · Offline `0.8.16-offline+165`.
 >
-> **Current `main`:** v0.8.15 release baseline with a chat-first Journey Assistant, selected-game context isolation, reviewed multi-game retrieval, BGE-M3 AI Search, Tavily allowlist search and bounded Workers AI Qwen; DeepSeek native search remains explicitly disabled. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.16 release baseline with persistent Ask TitoDex history, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,16 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.16
+
+- Make the entire assistant an explicit first-use opt-in. Settings discloses network, AI/search and recent-context use before activation; upgraded installs do not inherit the old default-on entry state, and disabled Journey/Search pages reserve no assistant space.
+- Stop verified HGSS location from selecting a local blocker unless the question itself contains matching blocker/location language; unresolved and clarification results now continue online.
+- Keep the newest 50 Q&A pairs on-device, delete the oldest pair on overflow, show the count in connection status, and send only the latest six same-game pairs as bounded follow-up context.
+- Add answer cards that deep-link recognized Pokémon, items, moves, and abilities into their existing TitoDex pages and prefilled reference searches.
+- Expand transient Tavily/DeepSeek sources to official, encyclopedia, walkthrough, strategy, and player-guide sites while retaining a server-owned domain list and Pokémon-only scope.
+- Run Tavily/fixed-source research and DeepSeek V4 Flash native search concurrently. When both succeed, Qwen separately checks whether the second route corroborates the primary answer without a version/fact conflict and labels the dual-source path only after that check. Trial mode accepts a sourced answer at low confidence when the second verifier lacks citation snippets; it never writes transient text to R2 or AI Search.
+- Replace the fixed 4/4 indicator with a complete dynamic list for Worker, Qwen, AI Search, Dex bundle, fixed sources, Tavily, and DeepSeek.
 
 ## Completed in v0.8.15
 
@@ -94,7 +104,7 @@
 2. Run the release checklist on a physical RG device and Android 15 phone: Offline first unpack, background notification, cancellation, task removal and service timeout.
 3. Refresh upstream form media periodically. Six Koraidon/Miraidon ride-mode static gaps remain intentionally honest until a verified distinct source exists.
 4. Keep encounter overlays, item/form audits and Chinese catalogs current through versioned bundle releases.
-5. Expand “Ask TitoDex” beyond the first three HGSS chains only through revision-locked, independently reviewed original facts; keep DeepSeek private and explicitly gated.
+5. Promote useful trial answers into AI Search only through revision-locked, independently reviewed original facts; keep transient web text out of R2 and APK data.
 
 ## Product boundaries
 

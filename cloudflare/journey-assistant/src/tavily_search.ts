@@ -1,4 +1,5 @@
 import type { CuratedSource, ScopeDecision } from './curated_web';
+import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
 
 const TAVILY_SEARCH_ENDPOINT = 'https://api.tavily.com/search';
 const TAVILY_TIMEOUT_MS = 3_500;
@@ -6,22 +7,14 @@ const MAX_TAVILY_RESPONSE_BYTES = 64 * 1024;
 const MAX_QUERY_CHARS = 180;
 const MAX_RESULT_TEXT_CHARS = 1_500;
 const MAX_TOTAL_TEXT_CHARS = 5_000;
-const MAX_RESULTS = 4;
+const MAX_RESULTS = 6;
 
 /**
  * Fixed server-side allowlist. Neither the App nor model output can add a
  * hostname. 52Poké may appear only as a transient Tavily snippet; TitoDex does
  * not directly fetch, index, persist, or package its page text here.
  */
-export const TAVILY_ALLOWED_DOMAINS = [
-  'www.pokemon.com',
-  'bulbapedia.bulbagarden.net',
-  'www.serebii.net',
-  'strategywiki.org',
-  'pokeapi.co',
-  'pokemondb.net',
-  'wiki.52poke.com',
-] as const;
+export const TAVILY_ALLOWED_DOMAINS = POKEMON_WEB_ALLOWED_DOMAINS;
 
 type TavilyResult = {
   title: string;

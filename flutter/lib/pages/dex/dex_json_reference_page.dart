@@ -20,10 +20,12 @@ class DexJsonReferencePage extends StatelessWidget {
     super.key,
     required this.title,
     required this.cdnFilename,
+    this.initialQuery,
   });
 
   final String title;
   final String cdnFilename;
+  final String? initialQuery;
 
   DexReferenceKind get _kind => referenceKindForFilename(cdnFilename);
 
@@ -60,6 +62,7 @@ class DexJsonReferencePage extends StatelessWidget {
       gridMode: _kind == DexReferenceKind.item,
       detailSheet: (context, entry) =>
           showJsonReferenceDetailSheet(context, entry: entry, kind: _kind),
+      initialQuery: initialQuery,
     );
   }
 }
