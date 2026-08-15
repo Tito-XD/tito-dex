@@ -141,8 +141,7 @@ jobs:
             cd dist/release
             sha256sum \
               "TitoDex-$VERSION-lite-rg-arm64.apk" \
-              "TitoDex-$VERSION-offline-rg-arm64.apk" \
-              "TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
+              "TitoDex-$VERSION-offline-rg-arm64.apk"
           ) | tee dist/release/SHA256SUMS.txt
 
       - name: Create annotated tag and draft release
@@ -178,11 +177,12 @@ jobs:
 
           - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线数据包；versionCode \`$LITE_BUILD_NUMBER\`。
           - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置已验证的紧凑离线数据；versionCode \`$OFFLINE_BUILD_NUMBER\`。
-          - \`TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk\`：可选旅程助手资料扩展；versionCode \`$EXTENSION_BUILD_NUMBER\`，也可在 App 内按需安装。
+
+          Journey Assistant 已内建于主 App，不需要另装附加 APK。旧 1.0.0 包只保留读取兼容。
 
           ### 验证
 
-          主应用两个 APK 均为 arm64-v8a；三个 APK 已核对版本、版本码、包名、压缩包完整性与同一发布签名，Offline 版本额外验证内置数据清单和归档摘要。
+          主应用两个 APK 均为 arm64-v8a，已核对版本、版本码、包名、压缩包完整性与同一发布签名；Offline 版本额外验证内置数据清单和归档摘要。CI 仍构建旧协议兼容包并交叉核对签名，但不再把它作为用户下载项发布。
           EOF
           {
             printf '\n### SHA-256\n\n```text\n'
@@ -192,7 +192,6 @@ jobs:
           gh release create "$tag" \
             "dist/release/TitoDex-$VERSION-lite-rg-arm64.apk" \
             "dist/release/TitoDex-$VERSION-offline-rg-arm64.apk" \
-            "dist/release/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk" \
             --verify-tag \
             --draft \
             --title "$RELEASE_TITLE" \

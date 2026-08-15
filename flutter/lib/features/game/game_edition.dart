@@ -81,6 +81,43 @@ class GameEdition {
     _ => journeyGameKey,
   };
 
+  /// Exact game key accepted by the Journey Assistant contract.
+  ///
+  /// Paired releases deliberately return null while the merged edition is
+  /// selected: choosing a representative side would silently change encounter
+  /// and progression facts. Single-version releases can be exact without an
+  /// explicit flavor selection.
+  String? get assistantGameKey => switch (selectedFlavor) {
+    'diamond' => 'diamond',
+    'pearl' => 'pearl',
+    'heartgold' => 'heartgold',
+    'soulsilver' => 'soulsilver',
+    'black' => 'black',
+    'white' => 'white',
+    'black-2' => 'black-2',
+    'white-2' => 'white-2',
+    'x' => 'x',
+    'y' => 'y',
+    'omega-ruby' => 'omega-ruby',
+    'alpha-sapphire' => 'alpha-sapphire',
+    'sun' => 'sun',
+    'moon' => 'moon',
+    'ultra-sun' => 'ultra-sun',
+    'ultra-moon' => 'ultra-moon',
+    'sword' => 'sword',
+    'shield' => 'shield',
+    'brilliant-diamond' => 'brilliant-diamond',
+    'shining-pearl' => 'shining-pearl',
+    'legends-arceus' => 'legends-arceus',
+    'scarlet' => 'scarlet',
+    'violet' => 'violet',
+    _ => switch (slug) {
+      'pt' => 'platinum',
+      'pla' => 'legends-arceus',
+      _ => null,
+    },
+  };
+
   /// A copy with the preferred sub-version selected (or null for merged).
   GameEdition withFlavor(String? flavor) {
     if (flavor == selectedFlavor) {
@@ -497,6 +534,55 @@ GameEdition? gameEditionForSaveGame(String? saveGame) {
 }
 
 String gameEditionLabelZh(GameEdition edition) => edition.selectedLabelZh;
+
+/// Stable short code for compact Assistant context UI.
+String assistantEditionCode(GameEdition edition) => switch (edition.slug) {
+  'rgb' => 'RGB',
+  'yellow' => 'Y',
+  'gs' => 'GS',
+  'crystal' => 'C',
+  'rs' => 'RS',
+  'emerald' => 'E',
+  'frlg' => 'FRLG',
+  'dp' => 'DP',
+  'pt' => 'Pt',
+  'hgss' => 'HGSS',
+  'bw' => 'BW',
+  'bw2' => 'BW2',
+  'xy' => 'XY',
+  'oras' => 'ORAS',
+  'sm' => 'SM',
+  'usum' => 'USUM',
+  'lgpe' => 'LGPE',
+  'swsh' => 'SWSH',
+  'bdsp' => 'BDSP',
+  'pla' => 'PLA',
+  'sv' => 'SV',
+  'lza' => 'LZA',
+  'champions' => 'Champions',
+  _ => edition.slug.toUpperCase(),
+};
+
+/// Human-readable current-version label, e.g. `魂银 · HGSS`.
+String assistantEditionDisplayLabel(GameEdition edition) =>
+    '${edition.selectedLabelZh} · ${assistantEditionCode(edition)}';
+
+/// Whether save-derived progression belongs to the selected edition.
+///
+/// A merged selection accepts either side of the same paired release. If both
+/// sides are exact, they must agree; a SoulSilver save is not valid context for
+/// a manually selected HeartGold journey even though both use the HGSS parser.
+bool isSaveEditionCompatible({
+  required GameEdition selected,
+  required GameEdition save,
+}) {
+  if (selected.slug != save.slug) return false;
+  final selectedFlavor = selected.selectedFlavor;
+  final saveFlavor = save.selectedFlavor;
+  return selectedFlavor == null ||
+      saveFlavor == null ||
+      selectedFlavor == saveFlavor;
+}
 
 String gameEditionLabelForVersionGroup(String versionGroupKey) {
   for (final edition in GameEdition.all) {

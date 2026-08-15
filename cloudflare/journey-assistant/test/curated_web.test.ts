@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  deterministicCuratedScopeDecision,
   researchCuratedWeb,
   type CuratedWebModelRunner,
 } from '../src/curated_web';
@@ -44,6 +45,9 @@ describe('curated key-free web research', () => {
       { ...request, question: '帮我写一段网站代码' },
       runModel,
       fetcher,
+      () => new Date('2026-08-15T00:00:00Z'),
+      undefined,
+      { tavilyApiKey: 'x'.repeat(32) },
     );
     expect(result).toBeNull();
     expect(fetcher).not.toHaveBeenCalled();
@@ -312,6 +316,184 @@ describe('curated key-free web research', () => {
     });
     const fetcher = vi.fn<typeof fetch>(async () => new Response('unavailable', { status: 503 }));
     expect(await researchCuratedWeb(request, runModel, fetcher)).toBeNull();
+  });
+
+  it('uses Tavily only after fixed sources fail, then composes and verifies citations', async () => {
+    const violetRequest: AssistantRequest = {
+      ...request,
+      question: '紫里在哪里可以抓利欧路？',
+      context: {
+        ...request.context,
+        game: 'violet',
+        generation: 9,
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    };
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      if (phase === 'curated-web-compose') {
+        return {
+          supported: true,
+          answer: '在《宝可梦 紫》中，利欧路可在南第4区找到。',
+          usedSourceIds: ['tavily-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        return {
+          supported: true,
+          answer: '在《宝可梦 紫》中，利欧路可在南第4区找到。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const hosts: string[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      hosts.push(url.hostname);
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      expect(body.query).toContain('Pokémon Violet');
+      return json({
+        results: [{
+          title: 'Riolu - Bulbapedia',
+          url: 'https://bulbapedia.bulbagarden.net/wiki/Riolu_(Pok%C3%A9mon)',
+          content: 'In Pokémon Scarlet and Violet, Riolu can be found in South Province Area Four.',
+          score: 0.92,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      violetRequest,
+      runModel,
+      fetcher,
+      () => new Date('2026-08-15T00:00:00Z'),
+      undefined,
+      { tavilyApiKey: 'x'.repeat(32) },
+    );
+
+    expect(hosts.at(-1)).toBe('api.tavily.com');
+    expect(hosts.slice(0, -1)).not.toContain('api.tavily.com');
+    expect(hosts.filter((host) => host === 'api.tavily.com')).toHaveLength(1);
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered',
+      onlineComposed: true,
+      sourceKinds: ['tavily'],
+      sources: [{ title: 'Riolu - Bulbapedia', accessedAt: '2026-08-15' }],
+    });
+    expect(result?.answer).toContain('在《宝可梦 紫》中');
+    expect(result?.answer).toContain('CC BY-NC-SA 2.5，已改写');
+    expect(result?.answer).toContain('https://bulbapedia.bulbagarden.net/');
+  });
+
+  it('deterministically scopes a broad Pokémon question before the exact-game Tavily query', async () => {
+    const broadRequest: AssistantRequest = {
+      ...request,
+      question: '我刚开始玩紫，有哪些亮点和注意点？',
+      context: {
+        ...request.context,
+        game: 'violet',
+        generation: 9,
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    };
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      if (phase === 'curated-web-compose') {
+        return {
+          supported: true,
+          answer: '可以自由选择三条主线的推进顺序，出发前留意区域等级差。',
+          usedSourceIds: ['tavily-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        return {
+          supported: true,
+          answer: '可以自由选择三条主线的推进顺序，出发前留意区域等级差。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      expect(body.query).toContain('Pokémon Violet');
+      return json({
+        results: [{
+          title: 'Pokémon Scarlet and Violet - Serebii',
+          url: 'https://www.serebii.net/scarletviolet/',
+          content: 'Pokémon Scarlet and Violet have three story paths that players may pursue in their chosen order.',
+          score: 0.88,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      broadRequest,
+      runModel,
+      fetcher,
+      () => new Date('2026-08-15T00:00:00Z'),
+      undefined,
+      { tavilyApiKey: 'x'.repeat(32) },
+    );
+
+    expect(phases).toEqual([
+      'curated-web-compose',
+      'curated-web-verify',
+    ]);
+    expect(fetcher.mock.calls.filter((call) =>
+      new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
+        'api.tavily.com')).toHaveLength(1);
+    expect(result).toMatchObject({ status: 'answered', sourceKinds: ['tavily'] });
+  });
+
+  it('recognizes broad newcomer and Paradox wording without a model classifier', () => {
+    const violetContext: AssistantRequest['context'] = {
+      ...request.context,
+      game: 'violet',
+      generation: 9,
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+    expect(deterministicCuratedScopeDecision({
+      question: '我刚开始玩紫，这个游戏有哪些亮点？',
+      context: violetContext,
+    })).toMatchObject({
+      allowed: true,
+      queryZh: '宝可梦 紫 新手 开放世界 三条主线 太晶化 亮点',
+      queryEn: 'beginner guide open world three story paths Terastal highlights official',
+      pokeApiKind: '',
+    });
+    expect(deterministicCuratedScopeDecision({
+      question: '紫里的悖谬宝可梦是什么？',
+      context: violetContext,
+    })).toMatchObject({
+      allowed: true,
+      queryZh: '宝可梦 紫 悖谬宝可梦 未来种 第零区',
+      queryEn: 'Paradox Pokémon Bulbapedia definition future Pokémon Area Zero Violet',
+      pokeApiKind: '',
+    });
   });
 
   it('does not let a catalog entity bypass the non-game and injection guard', async () => {
