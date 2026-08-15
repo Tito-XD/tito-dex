@@ -40,6 +40,7 @@ describe('curated key-free web research', () => {
       if (phase === 'curated-web-compose') {
         expect(messages[0].content).toContain('bundle 用来核对实体、版本和数值');
         expect(messages[0].content).toContain('冲突');
+        expect(messages[0].content).toContain('有条件的实用建议');
         return {
           supported: true,
           answer: '利欧路速度与攻击更突出，但防御端较薄；网页攻略也建议培养时优先保证生存。',
