@@ -46,7 +46,7 @@ describe('curated key-free web research', () => {
           usedSourceIds: [
             'dex-bundle-v19',
             'pokeapi-pokemon-species-447',
-            'tavily-1',
+            'tavily-en-1',
           ],
         };
       }
@@ -67,17 +67,25 @@ describe('curated key-free web research', () => {
         resolve(json({ id: 447, name: 'riolu', names: [] }));
       };
     });
-    const fetcher = vi.fn<typeof fetch>(async (input) => {
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       const url = new URL(input instanceof Request ? input.url : input.toString());
       if (url.hostname === 'pokeapi.co') return pendingPokeApi;
       if (url.hostname !== 'api.tavily.com') return json({}, 503);
-      tavilyStartedBeforePokeApiFinished = !pokeApiFinished;
+      tavilyStartedBeforePokeApiFinished ||= !pokeApiFinished;
       releasePokeApi();
+      const body = JSON.parse(String(init?.body)) as { query: string };
+      const english = !body.query.includes('利欧路');
       return json({
         results: [{
-          title: 'Riolu training guide - Pokémon Database',
-          url: 'https://pokemondb.net/pokedex/riolu',
-          content: 'Riolu has comparatively low defensive stats, so training plans should account for survivability.',
+          title: english
+            ? 'Riolu training guide - Pokémon Database'
+            : '利欧路 - 神奇宝贝百科',
+          url: english
+            ? 'https://pokemondb.net/pokedex/riolu'
+            : 'https://wiki.52poke.com/wiki/%E5%88%A9%E6%AC%A7%E8%B7%AF',
+          content: english
+            ? 'Riolu has comparatively low defensive stats, so training plans should account for survivability.'
+            : '利欧路是格斗属性的宝可梦，可通过提升亲密度后在白天升级进化。',
           score: 0.9,
         }],
       });
@@ -107,6 +115,9 @@ describe('curated key-free web research', () => {
     expect(fetcher.mock.calls.some((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
         'api.tavily.com')).toBe(true);
+    expect(fetcher.mock.calls.filter((call) =>
+      new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
+        'api.tavily.com')).toHaveLength(2);
     expect(tavilyStartedBeforePokeApiFinished).toBe(true);
     expect(result).toMatchObject({
       status: 'answered',
@@ -119,6 +130,49 @@ describe('curated key-free web research', () => {
     ]));
     expect(result?.answer).toContain('TitoDex 图鉴包 + 联网参考');
     expect(result?.answer).toContain('https://pokemondb.net/');
+  });
+
+  it('rejects broad advice that ignores available independent web evidence', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      return {
+        supported: true,
+        answer: '利欧路是高防御坦克，适合所有对战。',
+        usedSourceIds: ['dex-bundle-v19'],
+      };
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      return json({
+        results: [{
+          title: 'Riolu - Pokémon Database',
+          url: 'https://pokemondb.net/pokedex/riolu',
+          content: 'Riolu has low defensive stats and evolves into Lucario through friendship during daytime.',
+          score: 0.9,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      { ...request, question: '利欧路值不值得培养？' },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-15T00:00:00Z'),
+      undefined,
+      {
+        localSources: [{
+          id: 'dex-bundle-v19',
+          title: 'TitoDex Dex bundle v19 · 结构化事实',
+          text: '{"defense":40}',
+        }],
+        tavilyApiKey: 'x'.repeat(32),
+      },
+    );
+
+    expect(result).toBeNull();
+    expect(phases).toEqual(['curated-web-compose']);
   });
 
   it('rejects out-of-scope questions before any source request', async () => {
@@ -507,7 +561,7 @@ describe('curated key-free web research', () => {
         return {
           supported: true,
           answer: '可以自由选择三条主线的推进顺序，出发前留意区域等级差。',
-          usedSourceIds: ['tavily-1'],
+          usedSourceIds: ['tavily-en-1'],
         };
       }
       if (phase === 'curated-web-verify') {
@@ -548,7 +602,7 @@ describe('curated key-free web research', () => {
     ]);
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
-        'api.tavily.com')).toHaveLength(1);
+        'api.tavily.com')).toHaveLength(2);
     expect(result).toMatchObject({ status: 'answered', sourceKinds: ['tavily'] });
   });
 
