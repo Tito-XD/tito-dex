@@ -25,7 +25,9 @@ class AskTitoDexWorkerStatus {
     required this.availability,
     this.qwenConfigured = false,
     this.aiSearchEnabled = false,
+    this.dexBundleEnabled = false,
     this.curatedSourcesEnabled = false,
+    this.experimentalAnswers = false,
     this.sourceProviders = const [],
     bool webSearchEnabled = false,
     this.webSearchProviders = const [],
@@ -49,7 +51,9 @@ class AskTitoDexWorkerStatus {
   final AskTitoDexAvailability availability;
   final bool qwenConfigured;
   final bool aiSearchEnabled;
+  final bool dexBundleEnabled;
   final bool curatedSourcesEnabled;
+  final bool experimentalAnswers;
   final List<String> sourceProviders;
   final bool webSearchEnabled;
   final List<String> webSearchProviders;
@@ -74,7 +78,11 @@ bool _isJourneyWorkerAskEndpoint(String value) {
 }
 
 abstract class AskTitoDexOnlineClient {
-  Future<AskTitoDexResult> ask(String question, AskTitoDexContext context);
+  Future<AskTitoDexResult> ask(
+    String question,
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  });
 
   Future<AskTitoDexWorkerStatus> checkStatus();
 }
@@ -83,7 +91,7 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
   HttpAskTitoDexOnlineClient({
     http.Client? client,
     String endpoint = AskTitoDexConfig.workerUrl,
-    this.timeout = const Duration(seconds: 20),
+    this.timeout = const Duration(seconds: 35),
     Future<String> Function()? deviceKeyProvider,
   }) : _client = client ?? http.Client(),
        endpoint = endpoint.trim(),
@@ -146,7 +154,9 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
       availability: AskTitoDexAvailability.online,
       qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
       aiSearchEnabled: capabilities['aiSearch'] == true,
+      dexBundleEnabled: capabilities['dexBundle'] == true,
       curatedSourcesEnabled: capabilities['curatedSources'] == true,
+      experimentalAnswers: capabilities['experimentalAnswers'] == true,
       sourceProviders: providers,
       webSearchEnabled: capabilities['webSearch'] == true || legacyBraveSearch,
       webSearchProviders: webSearchProviders.isNotEmpty
@@ -161,8 +171,9 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
   @override
   Future<AskTitoDexResult> ask(
     String question,
-    AskTitoDexContext context,
-  ) async {
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  }) async {
     if (!isConfigured) {
       throw const AskTitoDexOnlineException('worker_not_configured');
     }
@@ -177,6 +188,7 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
           body: jsonEncode({
             'question': question,
             'context': context.toRequestJson(),
+            if (history.isNotEmpty) 'history': history,
           }),
         )
         .timeout(timeout);
@@ -241,6 +253,7 @@ class AskTitoDexService {
   Future<AskTitoDexResult> ask(
     String question,
     AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
   }) async {
     onProgress?.call(AskTitoDexProgress.checkingLocal);
@@ -252,7 +265,7 @@ class AskTitoDexService {
     }
     onProgress?.call(AskTitoDexProgress.contactingWorker);
     try {
-      final online = await _online.ask(question, context);
+      final online = await _online.ask(question, context, history: history);
       return online.withRuntimeTrace(onlineAttempted: true);
     } on TimeoutException {
       return local.withRuntimeTrace(

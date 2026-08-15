@@ -16,6 +16,7 @@ enum AskTitoDexAnswerMode {
   curatedSourcesDeterministic('curated_sources_deterministic'),
   curatedSourcesQwen('curated_sources_qwen'),
   deepseekNativeSearch('deepseek_native_search'),
+  multiSourceQwen('multi_source_qwen'),
   noMatch('no_match');
 
   const AskTitoDexAnswerMode(this.wireValue);
@@ -330,9 +331,33 @@ class AskTitoDexResult {
       modelUsed: json['modelUsed'] as bool? ?? onlineComposed,
       aiSearchUsed: json['aiSearchUsed'] as bool? ?? false,
       sourceKinds: _strings(json['sourceKinds']),
-      onlineAttempted: true,
+      onlineAttempted: json['onlineAttempted'] as bool? ?? true,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'status': switch (status) {
+      AskTitoDexStatus.answered => 'answered',
+      AskTitoDexStatus.needsClarification => 'needs_clarification',
+      AskTitoDexStatus.noMatch => 'no_match',
+      AskTitoDexStatus.failed => 'failed',
+    },
+    'answer': answer,
+    'contextUsed': contextUsed,
+    'matchedHintIds': matchedHintIds,
+    'verifiedFacts': verifiedFacts,
+    'unknowns': unknowns,
+    'confidence': confidence,
+    'sources': sources.map((source) => source.toJson()).toList(),
+    'followUp': followUp,
+    'errorCode': errorCode,
+    'onlineComposed': onlineComposed,
+    'answerMode': answerMode.wireValue,
+    'modelUsed': modelUsed,
+    'aiSearchUsed': aiSearchUsed,
+    'sourceKinds': sourceKinds,
+    'onlineAttempted': onlineAttempted,
+  };
 
   static List<String> _strings(Object? value) =>
       (value as List<dynamic>? ?? const []).whereType<String>().toList();
@@ -575,6 +600,9 @@ class ProgressionHintRepository {
     )) {
       score += 2;
     }
+    // A verified save location may disambiguate a textual match, but must not
+    // turn an unrelated question into a local blocker answer by itself.
+    if (score == 0) return 0;
     if (context.includeLocation &&
         context.locationId != null &&
         hint.locations.contains(context.locationId)) {

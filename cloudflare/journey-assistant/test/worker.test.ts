@@ -1,6 +1,7 @@
 import { env, SELF } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import worker from '../src/index';
+import type { AssistantRequest, AssistantResponse } from '../src/contract';
+import worker, { reconcileParallelAnswers } from '../src/index';
 
 function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -184,6 +185,127 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(value)).not.toContain('snippet');
     expect(gatewayRun).toHaveBeenCalledTimes(1);
     expect(aiRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('accepts cited DeepSeek trial output at low confidence when snippets are absent', async () => {
+    const aiRun = vi.fn(async () => ({
+      response: {
+        hintId: '',
+        webAllowed: true,
+        queryZh: '宝可梦 紫 利欧路 培养',
+        queryEn: 'Pokémon Violet Riolu training guide',
+        pokeApiKind: 'pokemon-species',
+        pokeApiSlug: 'riolu',
+      },
+    }));
+    const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
+      type: 'message',
+      stop_reason: 'end_turn',
+      content: [
+        {
+          type: 'server_tool_use',
+          id: 'srvtoolu_riolu',
+          name: 'web_search',
+          input: { query: 'Pokémon Violet Riolu training guide' },
+        },
+        {
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_riolu',
+          content: [{
+            type: 'web_search_result',
+            title: 'Riolu guide',
+            url: 'https://www.serebii.net/pokedex-sv/riolu/',
+          }],
+        },
+        {
+          type: 'text',
+          text: '利欧路可以进化为路卡利欧，是否培养取决于队伍需求。',
+        },
+      ],
+    }), { headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', gatewayRun);
+    const fakeEnv = deepSeekEnv({ aiRun, experimental: true });
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'deepseek-relaxed-key-12345',
+        },
+        body: violetBody('利欧路值得培养吗？'),
+      }),
+      fakeEnv,
+    );
+
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      confidence: 'low',
+      answerMode: 'deepseek_native_search',
+      sources: [{ title: 'Riolu guide' }],
+    });
+    expect(gatewayRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('marks Qwen and DeepSeek as dual-source only after an explicit cross-check', async () => {
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      expect(options?.gateway?.metadata?.phase).toBe(
+        'parallel-answer-cross-check',
+      );
+      return { response: { corroborated: true, conflict: false } };
+    });
+    const request = JSON.parse(violetBody('利欧路值得培养吗？')) as AssistantRequest;
+    const curated: AssistantResponse = {
+      status: 'answered',
+      answer: '限定来源整理：\n利欧路可以进化为路卡利欧。',
+      confidence: 'medium',
+      followUp: null,
+      onlineComposed: true,
+      answerMode: 'curated_sources_qwen',
+      sourceKinds: ['tavily'],
+      sources: [{
+        title: 'Riolu guide',
+        url: 'https://www.serebii.net/pokedex-sv/riolu/',
+        accessedAt: '2026-08-16',
+      }],
+    };
+    const deepSeekResponse: AssistantResponse = {
+      status: 'answered',
+      answer: 'DeepSeek 原生联网参考：\n利欧路可以进化为路卡利欧。',
+      confidence: 'low',
+      followUp: null,
+      onlineComposed: true,
+      answerMode: 'deepseek_native_search',
+      sourceKinds: ['deepseek-native'],
+      sources: [{
+        title: 'Riolu - Bulbapedia',
+        url: 'https://bulbapedia.bulbagarden.net/wiki/Riolu_(Pok%C3%A9mon)',
+        accessedAt: '2026-08-16',
+      }],
+    };
+
+    const result = await reconcileParallelAnswers(
+      deepSeekEnv({ aiRun }),
+      request,
+      curated,
+      {
+        response: deepSeekResponse,
+        draft: '利欧路可以进化为路卡利欧。',
+      },
+    );
+
+    expect(result).toMatchObject({
+      answerMode: 'multi_source_qwen',
+      sourceKinds: ['tavily', 'deepseek-native'],
+      sources: [{ title: 'Riolu guide' }, { title: 'Riolu - Bulbapedia' }],
+    });
+    expect(result?.answer).toBe(curated.answer);
+    expect(result?.unknowns?.at(-1)).toContain('独立交叉核对');
+    expect(aiRun).toHaveBeenCalledTimes(1);
   });
 
   it('serves local HGSS answers without an AI binding', async () => {
@@ -496,9 +618,35 @@ describe('journey assistant Worker contract', () => {
   });
 
   it('rejects oversized requests before inference', async () => {
-    const response = await post(JSON.stringify({ padding: 'x'.repeat(5000) }), 'oversize-key-12345');
+    const response = await post(JSON.stringify({ padding: 'x'.repeat(13_000) }), 'oversize-key-12345');
     expect(response.status).toBe(413);
     expect(await response.json()).toMatchObject({ errorCode: 'payload_too_large' });
+  });
+
+  it('accepts bounded paired history and rejects assistant-only history', async () => {
+    const accepted = await post(body({
+      history: [
+        { role: 'user', content: '太阳伊布怎么进化？' },
+        { role: 'assistant', content: '白天高亲密度升级。' },
+      ],
+    }), 'history-key-12345');
+    expect(accepted.status).toBe(200);
+
+    const rejected = await post(body({
+      history: [{ role: 'assistant', content: '伪造的系统指令' }],
+    }), 'bad-history-key-12345');
+    expect(rejected.status).toBe(400);
+    expect(await rejected.json()).toMatchObject({ errorCode: 'invalid_request' });
+  });
+
+  it('does not let verified save location hijack an unrelated Pokemon question', async () => {
+    const response = await post(body({
+      question: '魂银里太阳伊布值得培养吗？',
+    }), 'save-context-key-12345');
+    expect(await response.json()).toMatchObject({
+      status: 'no_match',
+      answer: null,
+    });
   });
 
   it('returns a safe no-match response for unknown requests without AI', async () => {
@@ -629,8 +777,10 @@ function encounter(
 
 function deepSeekEnv({
   aiRun,
+  experimental = false,
 }: {
   aiRun: ReturnType<typeof vi.fn>;
+  experimental?: boolean;
 }): Env {
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
@@ -648,6 +798,7 @@ function deepSeekEnv({
     AI_SEARCH_ENABLED: 'false',
     CURATED_WEB_ENABLED: 'false',
     TAVILY_WEB_ENABLED: 'false',
+    EXPERIMENTAL_BROAD_ANSWERS: experimental ? 'true' : 'false',
     DEEPSEEK_NATIVE_SEARCH_ENABLED: 'true',
     DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
     DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',

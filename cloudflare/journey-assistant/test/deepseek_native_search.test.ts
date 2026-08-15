@@ -145,7 +145,7 @@ describe('DeepSeek native search gateway request', () => {
       'cf-aig-authorization': 'Bearer test-gateway-run-token-123456',
       'cf-aig-skip-cache': 'true',
       'cf-aig-collect-log': 'false',
-      'cf-aig-request-timeout': '10000',
+      'cf-aig-request-timeout': '18000',
       'cf-aig-max-attempts': '1',
       'cf-aig-byok-alias': 'TitoDex',
     });
@@ -196,6 +196,16 @@ describe('DeepSeek native search gateway request', () => {
       status: 'unavailable', nativeSearchUsed: false, reason: 'timeout',
     });
     expect(timeout.call).toHaveBeenCalledTimes(1);
+    const timeoutSignal = gatewayFetch(
+      new DOMException('Timed out', 'TimeoutError'),
+    );
+    await expect(
+      runDeepSeekNativeSearch(config, request, timeoutSignal.fetcher),
+    ).resolves.toEqual({
+      status: 'unavailable',
+      nativeSearchUsed: false,
+      reason: 'timeout',
+    });
 
     for (const [status, reason] of [[401, 'unauthorized'], [429, 'quota_exhausted'], [500, 'provider_unavailable']] as const) {
       const failed = gatewayFetch(json({ error: 'redacted' }, status));
@@ -244,12 +254,73 @@ describe('DeepSeek native search gateway request', () => {
     const secondInit = call.mock.calls[1][1] as RequestInit;
     const secondBody = JSON.parse(secondInit.body as string) as Record<string, unknown>;
     expect(secondBody.tool_choice).toEqual({ type: 'auto' });
+    expect(secondBody).toHaveProperty('tools');
+    expect(secondBody.system).toContain('搜索已经完成');
     expect(secondBody.messages).toEqual([
       expect.objectContaining({ role: 'user' }),
       { role: 'assistant', content: pausedContent },
     ]);
     const thirdBody = JSON.parse((call.mock.calls[2][1] as RequestInit).body as string) as Record<string, unknown>;
     expect(thirdBody.tool_choice).toEqual({ type: 'auto' });
+    expect(thirdBody).toHaveProperty('tools');
+  });
+
+  it('continues a tool-only pause until the linked search result arrives', async () => {
+    const call = vi.fn()
+      .mockResolvedValueOnce(json({
+        type: 'message',
+        stop_reason: 'pause_turn',
+        content: [{
+          type: 'server_tool_use',
+          id: 'srvtoolu_delayed',
+          name: 'web_search',
+          input: { query: 'Pokémon Violet Riolu encounter location' },
+        }],
+      }))
+      .mockResolvedValueOnce(json({
+        type: 'message',
+        stop_reason: 'pause_turn',
+        content: [{
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_delayed',
+          content: [{
+            type: 'web_search_result',
+            title: 'Riolu - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Riolu_(Pok%C3%A9mon)#Game_locations',
+          }],
+        }],
+      }))
+      .mockResolvedValueOnce(json({
+        type: 'message',
+        stop_reason: 'end_turn',
+        content: [{
+          type: 'text',
+          text: '在《宝可梦 紫》中，利欧路可在南第4区等地遇见。',
+        }],
+      }));
+
+    const result = await runDeepSeekNativeSearch(
+      config,
+      request,
+      call as unknown as typeof fetch,
+    );
+
+    expect(result).toMatchObject({
+      status: 'answered',
+      nativeSearchUsed: true,
+    });
+    expect(call).toHaveBeenCalledTimes(3);
+    const secondBody = JSON.parse(
+      (call.mock.calls[1][1] as RequestInit).body as string,
+    ) as Record<string, unknown>;
+    expect(secondBody.tool_choice).toEqual({ type: 'auto' });
+    expect(secondBody).toHaveProperty('tools');
+    const thirdBody = JSON.parse(
+      (call.mock.calls[2][1] as RequestInit).body as string,
+    ) as Record<string, unknown>;
+    expect(thirdBody.tool_choice).toEqual({ type: 'auto' });
+    expect(thirdBody).toHaveProperty('tools');
+    expect(thirdBody.system).toContain('搜索已经完成');
   });
 
   it('rejects oversized and malformed responses', async () => {
@@ -282,6 +353,21 @@ describe('DeepSeek native search gateway request', () => {
 });
 
 describe('DeepSeek native Anthropic response parsing', () => {
+  it('accepts sourced paused text only behind the explicit trial flag', () => {
+    const paused = searchedMessage({ stop_reason: 'pause_turn' });
+
+    expect(parseDeepSeekNativeResponse(paused)).toEqual({
+      status: 'unavailable',
+      nativeSearchUsed: true,
+      reason: 'incomplete_response',
+    });
+    expect(parseDeepSeekNativeResponse(paused, true)).toMatchObject({
+      status: 'answered',
+      nativeSearchUsed: true,
+      answer: '在《宝可梦 紫》中，利欧路可在南第4区等地遇见。',
+    });
+  });
+
   it('requires a linked real result, returns only post-search text, and preserves citations', () => {
     expect(parseDeepSeekNativeResponse(searchedMessage())).toEqual({
       status: 'answered',

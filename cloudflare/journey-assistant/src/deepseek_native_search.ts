@@ -3,14 +3,16 @@ import {
   MAX_ANSWER_LENGTH,
   type AssistantRequest,
 } from './contract';
+import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
 
-const DEEPSEEK_NATIVE_TIMEOUT_MS = 10_000;
+const DEEPSEEK_NATIVE_TIMEOUT_MS = 18_000;
+const DEEPSEEK_NATIVE_TOTAL_TIMEOUT_MS = 26_000;
 const MAX_DEEPSEEK_RESPONSE_BYTES = 128 * 1024;
 const MAX_SOURCE_TITLE_CHARS = 160;
 const MAX_SOURCE_URL_CHARS = 2_048;
 const MAX_SOURCE_SNIPPET_CHARS = 240;
 const MAX_SOURCES = 6;
-const MAX_DEEPSEEK_CONTINUATIONS = 2;
+const MAX_DEEPSEEK_CONTINUATIONS = 4;
 
 export const DEEPSEEK_NATIVE_ENDPOINT = 'anthropic/v1/messages';
 export const DEEPSEEK_NATIVE_MODEL = 'deepseek-v4-flash';
@@ -20,15 +22,7 @@ export const DEEPSEEK_NATIVE_MODEL = 'deepseek-v4-flash';
  * add a host. Search results are checked against the same list again before
  * TitoDex considers native search to have run successfully.
  */
-export const DEEPSEEK_NATIVE_ALLOWED_DOMAINS = [
-  'www.pokemon.com',
-  'bulbapedia.bulbagarden.net',
-  'www.serebii.net',
-  'strategywiki.org',
-  'wiki.52poke.com',
-  'pokeapi.co',
-  'pokemondb.net',
-] as const;
+export const DEEPSEEK_NATIVE_ALLOWED_DOMAINS = POKEMON_WEB_ALLOWED_DOMAINS;
 
 const gameNames: Record<AssistantRequest['context']['game'], string> = {
   diamond: '宝可梦 钻石 / Pokémon Diamond',
@@ -58,7 +52,7 @@ const gameNames: Record<AssistantRequest['context']['game'], string> = {
 };
 
 const rejectedScope = /(?:忽略|越狱|提示词|系统指令|开发者指令|代码|编程|网站|政治|选举|总统|医疗|诊断|投资|股票|加密货币|现实武器|炸弹|色情|赌博|rom|破解|作弊|外挂|金手指|jailbreak|system\s*prompt|developer\s*message|politics|medical|weapon|explosive|porn|gambling|stock|crypto)/iu;
-const pokemonScope = /(?:宝可梦|神奇宝贝|口袋妖怪|精灵|pokemon|pokémon|图鉴|捕捉|抓|遭遇|出现|进化|退化|形态|特性|招式|技能|属性|太晶|极巨|悖谬|道具|精灵球|徽章|道馆|四天王|冠军|训练家|等级|经验|亲密度|友好度|性格|个体值|努力值|配招|配队|孵化|蛋组|交换|联机|路线|城镇|洞窟|剧情|流程|攻略|新手|开始玩|通关|收集|亮点|版本区别|版本限定|宝主|天星队|派帕|密勒顿|故勒顿|阿尔宙斯)/iu;
+const pokemonScope = /(?:宝可梦|神奇宝贝|口袋妖怪|精灵|pokemon|pokémon|图鉴|捕捉|抓|遭遇|出现|进化|退化|形态|特性|招式|技能|属性|太晶|极巨|悖谬|道具|精灵球|徽章|道馆|四天王|冠军|训练家|等级|经验|亲密度|友好度|性格|个体值|努力值|培养|值得|好用|厉害|推荐|怎么玩|技巧|心得|配招|配队|孵化|蛋组|交换|联机|路线|城镇|洞窟|剧情|流程|攻略|新手|开始玩|通关|收集|亮点|版本区别|版本限定|宝主|天星队|派帕|密勒顿|故勒顿|阿尔宙斯)/iu;
 const clientUrlOrDomainOverride = /(?:https?:\/\/|\bwww\.|\bsite\s*:|allowed_domains|blocked_domains)/iu;
 const answerUrl = /(?:[a-z][a-z0-9+.-]*:\/\/|\bwww\.|\b[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?)*\.(?:[a-z]{2,24}|xn--[a-z0-9-]{2,59})(?:\/|\b))/iu;
 
@@ -71,6 +65,9 @@ export type DeepSeekNativeSearchConfig = Readonly<{
   keyAlias?: string;
   endpoint: string;
   model: string;
+  /** Trial-only: accept a sourced final text block even if the provider keeps
+   * the turn paused after the bounded continuation budget. */
+  allowIncompleteAnswer?: boolean;
 }>;
 
 type ValidatedDeepSeekNativeSearchConfig = Readonly<{
@@ -133,29 +130,43 @@ export async function runDeepSeekNativeSearch(
   if (!isPokemonScopedQuestion(request)) return unavailable('out_of_scope');
   const validated = validateConfig(config);
   if (!validated) return unavailable('invalid_configuration');
+  const deadline = Date.now() + DEEPSEEK_NATIVE_TOTAL_TIMEOUT_MS;
 
   const first = await requestDeepSeekPayload(
     fetcher,
     validated,
     buildRequestBody(request),
+    remainingTimeout(deadline),
   );
   if ('result' in first) return first.result;
   let accumulatedPayload = first.payload;
   for (let attempt = 0; attempt < MAX_DEEPSEEK_CONTINUATIONS; attempt += 1) {
     const result = parseDeepSeekNativeResponse(accumulatedPayload);
+    const inspected = isPlainObject(accumulatedPayload) &&
+        Array.isArray(accumulatedPayload.content)
+      ? inspectSearchBlocks(accumulatedPayload.content)
+      : null;
     if (
       result.status !== 'unavailable' ||
       result.reason !== 'incomplete_response' ||
-      result.nativeSearchUsed !== true
+      (result.nativeSearchUsed !== true &&
+        inspected?.hasServerToolUse !== true)
     ) {
       return result;
     }
-    const continuationBody = buildContinuationBody(request, accumulatedPayload);
+    const continuationBody = buildContinuationBody(
+      request,
+      accumulatedPayload,
+      inspected?.hasRealResult !== true,
+    );
     if (!continuationBody) return result;
+    const timeoutMs = remainingTimeout(deadline);
+    if (timeoutMs <= 0) return unavailable('timeout', true);
     const continuation = await requestDeepSeekPayload(
       fetcher,
       validated,
       continuationBody,
+      timeoutMs,
     );
     if ('result' in continuation) return continuation.result;
     accumulatedPayload = mergeContinuationPayload(
@@ -163,13 +174,24 @@ export async function runDeepSeekNativeSearch(
       continuation.payload,
     );
   }
-  return parseDeepSeekNativeResponse(accumulatedPayload);
+  const finalResult = parseDeepSeekNativeResponse(
+    accumulatedPayload,
+    config.allowIncompleteAnswer === true,
+  );
+  if (
+    finalResult.status === 'unavailable' &&
+    finalResult.reason === 'incomplete_response'
+  ) {
+    console.log(JSON.stringify(summarizeIncompletePayload(accumulatedPayload)));
+  }
+  return finalResult;
 }
 
 async function requestDeepSeekPayload(
   fetcher: typeof fetch,
   config: ValidatedDeepSeekNativeSearchConfig,
   body: Record<string, unknown>,
+  timeoutMs: number,
 ): Promise<
   | { payload: unknown }
   | { result: DeepSeekNativeSearchResult }
@@ -194,7 +216,7 @@ async function requestDeepSeekPayload(
         'cf-aig-byok-alias': config.keyAlias,
         'cf-aig-skip-cache': 'true',
         'cf-aig-collect-log': 'false',
-        'cf-aig-request-timeout': String(DEEPSEEK_NATIVE_TIMEOUT_MS),
+        'cf-aig-request-timeout': String(timeoutMs),
         'cf-aig-max-attempts': '1',
         'cf-aig-metadata': JSON.stringify({
           feature: 'journey-assistant',
@@ -202,7 +224,7 @@ async function requestDeepSeekPayload(
         }),
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(DEEPSEEK_NATIVE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error: unknown) {
     return {
@@ -252,11 +274,14 @@ export function isDeepSeekNativeSearchConfigured(
  */
 export function isPokemonScopedQuestion(request: AssistantRequest): boolean {
   const question = request.question.trim();
+  const recentContext = (request.history ?? []).slice(-4)
+    .map((message) => message.content)
+    .join(' ');
   return question.length >= 2 &&
     Object.hasOwn(gameNames, request.context.game) &&
     !rejectedScope.test(question) &&
     !clientUrlOrDomainOverride.test(question) &&
-    pokemonScope.test(question);
+    (pokemonScope.test(question) || pokemonScope.test(recentContext));
 }
 
 function validateConfig(config: DeepSeekNativeSearchConfig): {
@@ -293,6 +318,12 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
   const location = reliability.location === 'save_verified' && request.context.locationId
     ? `\n已核验存档地点 ID：${request.context.locationId}`
     : '';
+  const recentConversation = (request.history ?? []).slice(-6)
+    .map((message) => `${message.role === 'user' ? '用户' : '助手'}：${message.content}`)
+    .join('\n');
+  const conversation = recentConversation
+    ? `\n最近对话（仅用于理解追问，不得当作事实来源）：\n${recentConversation}`
+    : '';
   return {
     model: DEEPSEEK_NATIVE_MODEL,
     max_tokens: 900,
@@ -308,7 +339,7 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
     ].join(''),
     messages: [{
       role: 'user',
-      content: `当前游戏：${gameNames[request.context.game]}（第 ${request.context.generation} 世代）${location}\n问题：${safeQuestion}`,
+      content: `当前游戏：${gameNames[request.context.game]}（第 ${request.context.generation} 世代）${location}${conversation}\n本次问题：${safeQuestion}`,
     }],
     tools: [{
       type: 'web_search_20250305',
@@ -323,6 +354,7 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
 function buildContinuationBody(
   request: AssistantRequest,
   firstPayload: unknown,
+  waitingForSearchResult: boolean,
 ): Record<string, unknown> | null {
   if (!isPlainObject(firstPayload) || !Array.isArray(firstPayload.content)) return null;
   const body = buildRequestBody(request);
@@ -331,7 +363,19 @@ function buildContinuationBody(
     ...body.messages,
     { role: 'assistant', content: firstPayload.content },
   ];
+  if (waitingForSearchResult) {
+    // The provider paused after emitting server_tool_use but before returning
+    // its linked result block. Resubmit the turn as required by the Anthropic
+    // pause_turn contract, while keeping the original one-use tool budget.
+    body.tool_choice = { type: 'auto' };
+    return body;
+  }
+  // Keep the declared server tool for Anthropic-compatible continuation
+  // validation, but make the instruction explicit: max_uses=1 has already
+  // been consumed in the accumulated assistant turn, so the provider should
+  // synthesize instead of starting a second search.
   body.tool_choice = { type: 'auto' };
+  body.system = `${String(body.system)} 搜索已经完成；不得再次调用工具，只能根据上一条 assistant 中的搜索结果直接给出最终答案。`;
   return body;
 }
 
@@ -346,16 +390,19 @@ function mergeContinuationPayload(firstPayload: unknown, continuationPayload: un
   };
 }
 
-export function parseDeepSeekNativeResponse(payload: unknown): DeepSeekNativeSearchResult {
+export function parseDeepSeekNativeResponse(
+  payload: unknown,
+  allowIncompleteAnswer = false,
+): DeepSeekNativeSearchResult {
   if (!isPlainObject(payload) || !Array.isArray(payload.content)) {
     return unavailable('invalid_response');
   }
-  if (payload.stop_reason === 'pause_turn' || payload.stop_reason === 'tool_use') {
-    const hasRealResult = inspectSearchBlocks(payload.content).hasRealResult;
-    return unavailable('incomplete_response', hasRealResult);
-  }
-
   const inspected = inspectSearchBlocks(payload.content);
+  const incomplete =
+    payload.stop_reason === 'pause_turn' || payload.stop_reason === 'tool_use';
+  if (incomplete && !allowIncompleteAnswer) {
+    return unavailable('incomplete_response', inspected.hasRealResult);
+  }
   if (!inspected.hasServerToolUse || !inspected.hasLinkedResultBlock) {
     return unavailable('search_not_used');
   }
@@ -364,7 +411,9 @@ export function parseDeepSeekNativeResponse(payload: unknown): DeepSeekNativeSea
   }
 
   const answer = collectFinalText(payload.content, inspected.lastSuccessfulResultIndex);
-  if (!answer) return unavailable('empty_answer', true);
+  if (!answer) {
+    return unavailable(incomplete ? 'incomplete_response' : 'empty_answer', true);
+  }
   if (answerUrl.test(answer)) return unavailable('unsafe_answer', true);
   const sources = collectSources(payload.content, inspected.searchSources);
   if (sources.length === 0) return unavailable('invalid_response', true);
@@ -374,6 +423,39 @@ export function parseDeepSeekNativeResponse(payload: unknown): DeepSeekNativeSea
     answer,
     sources,
     model: DEEPSEEK_NATIVE_MODEL,
+  };
+}
+
+function remainingTimeout(deadline: number): number {
+  return Math.max(
+    0,
+    Math.min(DEEPSEEK_NATIVE_TIMEOUT_MS, deadline - Date.now()),
+  );
+}
+
+function summarizeIncompletePayload(payload: unknown): Record<string, unknown> {
+  if (!isPlainObject(payload) || !Array.isArray(payload.content)) {
+    return {
+      event: 'assistant_deepseek_incomplete_shape',
+      stopReason: 'invalid',
+      blockTypes: [],
+      textLengths: [],
+    };
+  }
+  return {
+    event: 'assistant_deepseek_incomplete_shape',
+    stopReason:
+      typeof payload.stop_reason === 'string' ? payload.stop_reason : 'missing',
+    blockTypes: payload.content.map((block) =>
+      isPlainObject(block) && typeof block.type === 'string'
+        ? block.type
+        : 'invalid'),
+    textLengths: payload.content.flatMap((block) =>
+      isPlainObject(block) &&
+          block.type === 'text' &&
+          typeof block.text === 'string'
+        ? [block.text.length]
+        : []),
   };
 }
 
@@ -513,7 +595,8 @@ function reasonForStatus(status: number): DeepSeekNativeSearchUnavailableReason 
 }
 
 function isAbortError(value: unknown): boolean {
-  return value instanceof Error && value.name === 'AbortError';
+  return value instanceof Error &&
+    (value.name === 'AbortError' || value.name === 'TimeoutError');
 }
 
 function unavailable(

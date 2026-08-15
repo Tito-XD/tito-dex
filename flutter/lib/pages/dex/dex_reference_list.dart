@@ -46,6 +46,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
     this.leadingBuilder,
     this.categoryFilter,
     this.gridMode = false,
+    this.initialQuery,
   });
 
   final String title;
@@ -58,6 +59,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
   final Widget? Function(T entry)? leadingBuilder;
   final DexReferenceCategoryFilter<T>? categoryFilter;
   final bool gridMode;
+  final String? initialQuery;
 
   @override
   State<DexReferenceListPage<T>> createState() =>
@@ -65,7 +67,7 @@ class DexReferenceListPage<T> extends StatefulWidget {
 }
 
 class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
-  final _queryController = TextEditingController();
+  late final TextEditingController _queryController;
   List<T> _entries = const [];
   String? _selectedCategory;
   bool _loading = true;
@@ -74,6 +76,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   @override
   void initState() {
     super.initState();
+    _queryController = TextEditingController(text: widget.initialQuery);
     _load();
     _queryController.addListener(() => setState(() {}));
   }

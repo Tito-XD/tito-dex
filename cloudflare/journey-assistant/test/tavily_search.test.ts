@@ -32,7 +32,7 @@ describe('bounded Tavily allowlist search', () => {
       expect(body).toMatchObject({
         search_depth: 'basic',
         chunks_per_source: 2,
-        max_results: 4,
+        max_results: 6,
         include_answer: false,
         include_raw_content: false,
         auto_parameters: false,
