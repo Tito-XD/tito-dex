@@ -21,13 +21,17 @@
       "namespace": "tito-dex"
     }
   ],
-  // Read-only at runtime: the Worker exposes only the fixed extension catalog
-  // and immutable APK object paths. App clients never receive R2 credentials
-  // or a direct R2 URL.
+  // Read-only at runtime. App clients never receive R2 credentials or a direct
+  // R2 URL. DEX_CONTENT is used only for bounded exact-version fact lookup;
+  // this Worker never mutates the Dex bundle or its production manifest.
   "r2_buckets": [
     {
       "binding": "JOURNEY_CONTENT",
       "bucket_name": "titodex-journey-content"
+    },
+    {
+      "binding": "DEX_CONTENT",
+      "bucket_name": "titodex-dex"
     }
   ],
   "ratelimits": [

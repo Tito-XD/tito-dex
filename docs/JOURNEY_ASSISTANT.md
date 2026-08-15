@@ -12,6 +12,8 @@
   → 主 APK 内建审核资料：地点、阻塞对象、别名的确定性模糊匹配
       → 唯一命中：完全本地回答
       → 未命中 / 并列：可选 Worker
+          → 宝可梦／道具／招式／特性问题先从现有 Dex R2 bundle 读取结构化事实
+          → 精确版本遭遇、携带物与招式表直接回答；开放式问题只给 Qwen 有界实体证据
           → AI Search（BGE-M3 hybrid/RRF）只召回候选 hintId
           → 只接受本地审核白名单中的 hintId
           → 默认 Workers AI 只做候选分类/段落排序
@@ -95,6 +97,7 @@ Journey 直接提供问答入口；Search 为通用/非存档入口提供“大�
 ## Cloudflare 选型
 
 - **AI Search + BGE-M3：需要，但保持可选。** BGE-M3 运行在 Cloudflare 托管侧，不塞进 Worker bundle，也不在设备下载模型。它支持中文/多语言 embedding；hybrid + RRF 同时利用别名关键词和语义近似。
+- **Dex R2 结构化事实：模型前置。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题直接确定性组装；开放式培养或攻略问题只把当前实体的最多 6,000 字符结构化证据交给 Qwen，先于任何联网请求。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
 - **Workers AI Qwen：公共默认。** 唯一本地命中不会调用模型；只有未命中/并列才可能消耗 Workers AI 免费额度，额度或模型失败后返回本地确定性澄清/no_match。
 - **免 Key 限定来源：审核库未命中时可选。** `CURATED_WEB_ENABLED=true` 时仅查询 PokéAPI、StrategyWiki、Wikidata；不需要新 Cloudflare 资源或第三方 key。现有每设备 20 次/分钟限流继续生效，不另设每天 5 次上限。范围分类、来源请求或生成任何一步失败都保留原本的本地 `no_match`。
 - **Tavily 限定搜索：可选的最后一层。** 仅当审核资料、AI Search 和三个固定来源都未能回答时请求一次。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。basic search、4 条上限、短超时、响应字节上限、无重试；额度/网络/验证失败继续本地回退。
@@ -108,8 +111,9 @@ AI Search 只信五个自定义 metadata 字段：`hint_id` text、`audited` boo
 账户侧资源已创建；源码只记录资源名，不记录 Account ID、密钥或生产 URL：
 
 1. `JOURNEY_CONTENT` → R2 bucket `titodex-journey-content`，只由 Worker 读取；App 不直连 R2。
-2. `JOURNEY_SEARCH_NAMESPACE` → AI Search namespace `tito-dex`；Worker 仅在 `AI_SEARCH_ENABLED=true` 时调用 `.get("titodex-journey-search")` 获取实例。`ai_search` 单实例 binding 只能访问 `default` namespace，因此这里必须使用 `ai_search_namespaces`。实例 embedding 选择 `@cf/baai/bge-m3`，启用 hybrid，并配置上述五个 metadata 字段。
-3. `AI` → Workers AI；Gateway ID 固定为 `titodex-journey-assistant`，Worker 通过 `env.AI.gateway(...)` 使用，App 不直连 Gateway。
+2. `DEX_CONTENT` → 现有版本化 Dex R2 bucket，只由 Worker 对根 manifest、数值物种详情及固定 `items.json`／`moves.json`／`dex_catalog.json` 路径做有界读取；不会修改或公开 CDN manifest／对象。
+3. `JOURNEY_SEARCH_NAMESPACE` → AI Search namespace `tito-dex`；Worker 仅在 `AI_SEARCH_ENABLED=true` 时调用 `.get("titodex-journey-search")` 获取实例。`ai_search` 单实例 binding 只能访问 `default` namespace，因此这里必须使用 `ai_search_namespaces`。实例 embedding 选择 `@cf/baai/bge-m3`，启用 hybrid，并配置上述五个 metadata 字段。
+4. `AI` → Workers AI；Gateway ID 固定为 `titodex-journey-assistant`，Worker 通过 `env.AI.gateway(...)` 使用，App 不直连 Gateway。
 
 `CURATED_WEB_ENABLED` 是纯 Worker 开关，不是 binding。当前 App 的响应契约已能
 显示通用 `answered`、来源名称与本次实际执行路径。限定来源查询逻辑本身只更新
@@ -139,6 +143,18 @@ extensions/journey-assistant/objects/<immutable-digest-name>.apk  # 仅旧兼容
 
 AI Search 数据源只包含 `journey-search/`，不能索引 `extensions/`。当前主 App 只需 `/v1/ask`；旧 catalog 与固定 `objects/*.apk` 路径暂留兼容，但内建助手不会调用它们。
 
+现有 Dex bundle 不复制到 `journey-search/`：精确实体、版本遭遇、携带物和招式表
+直接从 `DEX_CONTENT` 读取并确定性组装，优先于联网搜索，也不会消耗 Qwen；开放式
+问题只抽取当前实体所需的小型证据对象。后续若为口语别名增加派生 AI Search
+文档，索引只负责返回候选宝可梦／道具／招式与版本；Worker 仍必须
+回读当前 R2 详情对象并重新校验，不能把向量 chunk 文本当作事实答案。这样可复用
+已有 bundle，又不会产生两套容易漂移的图鉴数据。
+
+许可边界仍然生效：中文 flavor prose 不进入模型或 embedding；携带物中来自
+52Poké 的批次只用于带来源说明的确定性回答，不送给 Qwen／AI Search。攻略回答可
+把 PokeAPI／版本 overlay 的结构化字段作为背景，但“某道具能推进剧情”只有在审核
+Journey requirement 明确关联时才能成立，不能从“野生宝可梦会携带它”自行推断。
+
 生成待上传的审核检索文档：
 
 ```bash
@@ -163,4 +179,4 @@ cd ../../cloudflare/journey-assistant && npm ci && npm run check && npm test && 
 
 Tavily 与 DeepSeek 原生搜索适配器及回退测试都已准备；当前检入配置启用 Tavily、关闭 DeepSeek。真实 Secret 只存在于 Cloudflare 加密配置中。
 
-当前 Worker 已在本地白名单、版本契约、限定来源与 smoke test 通过后更新；AI Search、免密钥限定来源与 Tavily 开启，DeepSeek 保持关闭，公共默认使用 Workers AI，live v19 图鉴 CDN 不变。生产 URL、Account ID 与密钥不写入源码或文档。官方参考：[AI Search BGE-M3 支持](https://developers.cloudflare.com/ai-search/configuration/models/supported-models/) · [metadata filtering](https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/) · [R2 data source](https://developers.cloudflare.com/ai-search/configuration/data-source/r2/) · [Tavily Search API](https://docs.tavily.com/documentation/api-reference/endpoint/search) · [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/) · [Worker binding 限制](https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/) · [custom providers](https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/) · [Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) · [DeepSeek Anthropic API](https://api-docs.deepseek.com/guides/anthropic_api)。
+当前 Worker 已在本地白名单、版本契约、限定来源与 smoke test 通过后更新；AI Search、免密钥限定来源与 Tavily 开启，DeepSeek 保持关闭，公共默认使用 Workers AI。Dex bundle 只读接入不修改 live v19 图鉴 CDN manifest 或对象。生产 URL、Account ID 与密钥不写入源码或文档。官方参考：[AI Search BGE-M3 支持](https://developers.cloudflare.com/ai-search/configuration/models/supported-models/) · [metadata filtering](https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/) · [R2 data source](https://developers.cloudflare.com/ai-search/configuration/data-source/r2/) · [Tavily Search API](https://docs.tavily.com/documentation/api-reference/endpoint/search) · [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/) · [Worker binding 限制](https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/) · [custom providers](https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/) · [Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) · [DeepSeek Anthropic API](https://api-docs.deepseek.com/guides/anthropic_api)。
