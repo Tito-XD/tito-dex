@@ -32,27 +32,56 @@ function json(value: unknown, status = 200): Response {
 }
 
 describe('curated key-free web research', () => {
-  it('uses bounded local Dex-bundle evidence before any web request', async () => {
+  it('combines bounded Dex-bundle evidence with allowlisted web for broad advice', async () => {
     const phases: string[] = [];
     const runModel: CuratedWebModelRunner = async (phase, messages) => {
       phases.push(phase);
       expect(messages.map((message) => message.content).join('\n')).not.toContain('heldItems');
       if (phase === 'curated-web-compose') {
+        expect(messages[0].content).toContain('bundle 用来核对实体、版本和数值');
+        expect(messages[0].content).toContain('冲突');
         return {
           supported: true,
-          answer: '利欧路速度与攻击更突出，但防御端较薄，培养时应留意其弱点。',
-          usedSourceIds: ['dex-bundle-v19'],
+          answer: '利欧路速度与攻击更突出，但防御端较薄；网页攻略也建议培养时优先保证生存。',
+          usedSourceIds: [
+            'dex-bundle-v19',
+            'pokeapi-pokemon-species-447',
+            'tavily-1',
+          ],
         };
       }
       if (phase === 'curated-web-verify') {
         return {
           supported: true,
-          answer: '利欧路速度与攻击更突出，但防御端较薄，培养时应留意其弱点。',
+          answer: '利欧路速度与攻击更突出，但防御端较薄；网页攻略也建议培养时优先保证生存。',
         };
       }
       throw new Error(`unexpected_phase_${phase}`);
     };
-    const fetcher = vi.fn<typeof fetch>();
+    let releasePokeApi!: () => void;
+    let tavilyStartedBeforePokeApiFinished = false;
+    let pokeApiFinished = false;
+    const pendingPokeApi = new Promise<Response>((resolve) => {
+      releasePokeApi = () => {
+        pokeApiFinished = true;
+        resolve(json({ id: 447, name: 'riolu', names: [] }));
+      };
+    });
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === 'pokeapi.co') return pendingPokeApi;
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      tavilyStartedBeforePokeApiFinished = !pokeApiFinished;
+      releasePokeApi();
+      return json({
+        results: [{
+          title: 'Riolu training guide - Pokémon Database',
+          url: 'https://pokemondb.net/pokedex/riolu',
+          content: 'Riolu has comparatively low defensive stats, so training plans should account for survivability.',
+          score: 0.9,
+        }],
+      });
+    });
     const result = await researchCuratedWeb(
       { ...request, question: '利欧路值不值得培养？' },
       runModel,
@@ -71,17 +100,25 @@ describe('curated key-free web research', () => {
             },
           }),
         }],
+        tavilyApiKey: 'x'.repeat(32),
       },
     );
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
-    expect(fetcher).not.toHaveBeenCalled();
+    expect(fetcher.mock.calls.some((call) =>
+      new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
+        'api.tavily.com')).toBe(true);
+    expect(tavilyStartedBeforePokeApiFinished).toBe(true);
     expect(result).toMatchObject({
       status: 'answered',
-      sources: [],
+      sourceKinds: ['pokeapi', 'tavily'],
       verifiedFacts: ['TitoDex Dex bundle v19 · 结构化事实'],
     });
-    expect(result?.answer).toContain('TitoDex 图鉴包整理');
-    expect(result?.answer).not.toContain('http');
+    expect(result?.sources).toEqual(expect.arrayContaining([
+      expect.objectContaining({ title: 'PokéAPI · 447' }),
+      expect.objectContaining({ title: 'Riolu training guide - Pokémon Database' }),
+    ]));
+    expect(result?.answer).toContain('TitoDex 图鉴包 + 联网参考');
+    expect(result?.answer).toContain('https://pokemondb.net/');
   });
 
   it('rejects out-of-scope questions before any source request', async () => {
