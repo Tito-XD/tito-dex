@@ -107,6 +107,10 @@ function scoreHint(hint: ProgressionHint, request: AssistantRequest): number {
   if (hint.subject.aliases.some((alias) => question.includes(normalize(alias)))) score += 5;
   if (hint.locationAliases.some((alias) => question.includes(normalize(alias)))) score += 3;
   if (hint.destinationAliases.some((alias) => question.includes(normalize(alias)))) score += 2;
+  // Save location is supporting context, never a question by itself. Without
+  // lexical evidence, every unrelated question asked on Route 36 used to be
+  // hijacked by the Sudowoodo rule and never reached online retrieval.
+  if (score === 0) return 0;
   if (
     reliability.location === 'save_verified' &&
     request.context.locationId &&

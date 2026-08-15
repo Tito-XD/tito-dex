@@ -206,8 +206,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   path: 'moves',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
-                    child: const TitoPageContainer(
-                      child: MoveEncyclopediaPage(),
+                    child: TitoPageContainer(
+                      child: MoveEncyclopediaPage(
+                        initialQuery: state.uri.queryParameters['q'],
+                      ),
                     ),
                   ),
                 ),
@@ -215,8 +217,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   path: 'abilities',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
-                    child: const TitoPageContainer(
-                      child: AbilityEncyclopediaPage(),
+                    child: TitoPageContainer(
+                      child: AbilityEncyclopediaPage(
+                        initialQuery: state.uri.queryParameters['q'],
+                      ),
                     ),
                   ),
                 ),
@@ -346,6 +350,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                               map['cdnFilename'] ??
                               shortcutReference?.referenceFilename ??
                               'natures.json',
+                          initialQuery: state.uri.queryParameters['q'],
                         ),
                       ),
                     );

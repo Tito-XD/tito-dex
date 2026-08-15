@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   deterministicCuratedScopeDecision,
   researchCuratedWeb,
+  sanitizeUnsupportedBroadClaims,
   type CuratedWebModelRunner,
 } from '../src/curated_web';
 import type { AssistantRequest } from '../src/contract';
@@ -32,6 +33,32 @@ function json(value: unknown, status = 200): Response {
 }
 
 describe('curated key-free web research', () => {
+  it('removes unsupported matchup, high-stat, and tank claims using Dex facts', () => {
+    const answer = '太阳伊布的特攻和速度很高。尤其在面对幽灵、恶和虫系宝可梦时有优势。它拥有很高的防御，是坦克。';
+    const sources = [{
+      id: 'dex-bundle-v19',
+      title: 'TitoDex Dex bundle v19 · 结构化事实',
+      text: JSON.stringify({
+        species: {
+          baseStats: {
+            hp: 65,
+            attack: 65,
+            defense: 60,
+            specialAttack: 130,
+            specialDefense: 95,
+            speed: 110,
+          },
+        },
+      }),
+    }];
+
+    expect(sanitizeUnsupportedBroadClaims(
+      answer,
+      '魂银里太阳伊布值不值得培养？',
+      sources,
+    )).toBe('太阳伊布的特攻和速度很高。');
+  });
+
   it('combines bounded Dex-bundle evidence with allowlisted web for broad advice', async () => {
     const phases: string[] = [];
     const runModel: CuratedWebModelRunner = async (phase, messages) => {

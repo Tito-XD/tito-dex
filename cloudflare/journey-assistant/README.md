@@ -16,8 +16,9 @@ The request path is deliberately fail-safe:
    recommendation questions retrieve fixed sources plus bounded English and
    Chinese Tavily result pools in parallel, then use bundle fields to
    cross-check entities, versions, and numbers before Qwen composition and a
-   second verification pass. At least two independent evidence groups are
-   required whenever available. Evolution conditions and
+   second verification pass. Strict mode requires two independent evidence
+   groups whenever available; the explicit v0.8.16 trial may return one
+   allowlisted evidence group at low confidence. Evolution conditions and
    standalone move values retain the existing exact-version source path.
 3. Only a remaining local miss or tie may use the optional AI Search binding.
 4. AI Search returns candidate `hintId` values; its chunk text is never used as
@@ -29,16 +30,16 @@ The request path is deliberately fail-safe:
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
    and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
    the bounded results.
-7. Only when those fixed sources cannot support an answer, an explicitly
-   enabled Tavily adapter may make one `basic` search over a server-owned
-   Pokémon domain allowlist. Its snippets still pass through the same Qwen
-   support check and second verifier. No client/model URL or domain is accepted.
-8. If the public Tavily + Qwen path still cannot support an answer, an
-   explicitly enabled DeepSeek V4 Flash custom provider may try one native
-   server-side web search. TitoDex accepts it only when the response contains
-   linked search-result blocks on the same domain allowlist and a second Qwen
-   check supports the answer from bounded citation text. Any provider, quota,
-   shape, or verification failure preserves the deterministic no-match result.
+7. For broad advice, fixed sources and bounded English/Chinese Tavily `basic`
+   searches run in parallel over a server-owned Pokémon domain allowlist.
+   Narrow questions use one mixed search only after fixed sources are
+   insufficient. Snippets still pass through Qwen composition and verification.
+8. DeepSeek V4 Flash native search runs concurrently with that curated route.
+   TitoDex requires linked search-result blocks, revalidates every URL against
+   the same allowlist, and uses citation text for a Qwen support pass when the
+   provider supplies it. In explicit trial mode a linked, allowlisted result
+   without citation text can be returned at low confidence with a warning.
+   Any provider, quota, shape, or scope failure preserves deterministic fallback.
 
 ## Key-free curated source fallback
 
@@ -72,21 +73,23 @@ original deterministic `no_match` response. Live answers never write to R2.
 
 ## Optional Tavily allowlist search
 
-Tavily is a final retrieval adapter, not an answer provider. It is never called
-until local audited hints, exact Dex-bundle encounter facts, AI Search
-candidates, and the fixed PokéAPI/StrategyWiki/Wikidata pass have all failed to
-answer.
+Tavily is a retrieval adapter, not an answer provider. It is never called while
+a local audited hint or exact Dex-bundle fact already answers the question.
+Broad advice runs fixed sources and the two bounded Tavily language pools in
+parallel; narrow questions use one mixed-language request only when fixed
+sources are insufficient.
 
 - Install `TAVILY_API_KEY` as a Worker secret; never place it in
   `wrangler.jsonc`, source, an APK, documentation examples, or logs.
 - After the secret exists, set `TAVILY_WEB_ENABLED=true` in the private
   deployment configuration. Both conditions are required.
-- Each question makes at most one Tavily request with `search_depth=basic`, no
-  Tavily-generated answer, no raw page content, four results maximum, a short
-  timeout, a bounded response, and no retry.
-- The fixed allowlist is Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
-  PokéAPI, Pokémon Database, and the 52Poké wiki. Returned URLs are revalidated
-  against the same exact hostnames before snippets can reach Qwen.
+- Each request uses `search_depth=basic`, no Tavily-generated answer, no raw
+  page content, six results maximum, a short timeout, a bounded response, and
+  no retry. Broad advice makes at most two concurrent language requests.
+- The fixed allowlist includes Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
+  PokéAPI, Pokémon Database, 52Poké wiki, Smogon, Marriland, GameFAQs, Game8,
+  IGN, Nintendo Life, and Eurogamer. Returned URLs are revalidated against the
+  same exact hostnames before snippets can reach Qwen.
 - Tavily snippets are transient and are never stored, indexed, or packaged.
   52Poké remains excluded from direct page fetching; without separate
   permission its content also remains excluded from R2/AI Search and APK data.
@@ -116,7 +119,8 @@ secret.
 Every `/v1/ask` response also carries a privacy-safe trace:
 
 - `answerMode`: local audited, online audited, AI Search audited, curated
-  sources + Qwen, DeepSeek native search, or no match;
+  sources + Qwen, DeepSeek native search, Qwen × DeepSeek corroborated, or no
+  match;
 - `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
   what the deployment has configured;
 - `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `tavily`, or
@@ -200,9 +204,11 @@ References:
 ## Optional DeepSeek / custom provider setup
 
 DeepSeek is not AI Search's generation model and is never an unlimited public
-fallback. Qwen remains the public classifier/composer/verifier. The optional
-native-search route is tried only after the local/audited/fixed-source and
-Tavily + Qwen paths cannot support an answer.
+fallback. Qwen remains the public classifier/composer/verifier. After the
+local/audited/Dex-bundle route misses, the optional native-search request runs
+concurrently with fixed-source/Tavily + Qwen research so one slow provider does
+not consume the App's whole timeout; the verified Qwen route wins when both
+succeed.
 
 Native V4 Flash setup:
 
@@ -220,8 +226,8 @@ Native V4 Flash setup:
    allowlisted `web_search_tool_result`, followed by bounded citations; a plain
    model-memory answer does not count as web search.
 4. Deploy with `DEEPSEEK_NATIVE_SEARCH_ENABLED=true` only after BYOK is
-   present, then require the live smoke below to prove real search before an
-   App release. The checked-in configuration remains disabled; every
+   present, then require a live smoke to prove real search before an App
+   release. The v0.8.16 trial configuration enables it alongside Tavily; every
    provider/search failure still falls through to the deterministic result.
 
 The alias is mandatory. TitoDex does not fall back to a `default` BYOK alias if
@@ -230,19 +236,22 @@ request also needs encrypted Worker secrets for the account identity and a
 minimal Gateway Run token; their values must never enter source, an APK,
 documentation examples, or logs.
 
-The native request uses Anthropic Messages with `web_search_20250305`, one use,
-the same server-owned Pokémon domain allowlist, ten-second timeout, one attempt,
-no cache or prompt logging, and a 128 KiB response cap. TitoDex rejects model
+The native request uses Anthropic Messages with `web_search_20250305`, one
+search use, the same server-owned Pokémon domain allowlist, up to four bounded
+pause-turn continuations, an 18-second per-request timeout and a 26-second
+whole-chain deadline, no cache or prompt logging, and a 128 KiB response cap. TitoDex rejects model
 text containing its own URL/domain, exposes only revalidated source URLs, and
 asks Workers AI to support-check the draft against bounded citation snippets.
 Failure falls back without changing the deterministic result.
 
-The current live smoke showed that this provider response did not reliably
-honour its requested domain/use limits and did not return bounded citation text
-for the support verifier. TitoDex therefore keeps the DeepSeek native-search
-flag off. Tavily + Qwen remains the enabled allowlisted web-search route; the
-DeepSeek adapter and encrypted configuration are retained for a later provider
-compatibility retest.
+The provider has executed the requested search in a live smoke, but its current
+response shape does not always include bounded `cited_text` for the Qwen
+support verifier. TitoDex therefore revalidates every returned source URL
+against its server-owned allowlist. When citation text exists, Qwen verifies
+the draft; when it does not, the explicit
+`EXPERIMENTAL_BROAD_ANSWERS=true` trial may return the sourced result at low
+confidence with an in-App warning. Disabling that flag restores the strict
+evidence gate without changing deterministic fallback.
 
 The older provider-native JSON generation path remains separately gated by
 `AI_EXTERNAL_PROVIDER_ENABLED=true` and `AI_PROVIDER=deepseek`; its example
