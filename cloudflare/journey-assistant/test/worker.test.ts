@@ -35,8 +35,14 @@ describe('journey assistant Worker contract', () => {
   });
 
   beforeEach(async () => {
-    const listed = await env.JOURNEY_CONTENT.list();
-    await Promise.all(listed.objects.map((object) => env.JOURNEY_CONTENT.delete(object.key)));
+    const [journeyObjects, dexObjects] = await Promise.all([
+      env.JOURNEY_CONTENT.list(),
+      env.DEX_CONTENT.list(),
+    ]);
+    await Promise.all([
+      ...journeyObjects.objects.map((object) => env.JOURNEY_CONTENT.delete(object.key)),
+      ...dexObjects.objects.map((object) => env.DEX_CONTENT.delete(object.key)),
+    ]);
   });
 
   it('reports sanitized configured capabilities without secrets or URLs', async () => {
@@ -196,6 +202,172 @@ describe('journey assistant Worker contract', () => {
     expect(value.modelUsed).toBe(false);
     expect(value.aiSearchUsed).toBe(false);
     expect(response.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('answers exact-version encounter questions from the bounded Dex R2 bundle first', async () => {
+    await seedDexBundle({
+      violet: [
+        encounter('south-province-area-two', '南第２区', 16, 20, ['wild']),
+        encounter('south-province-area-four', '南第４区', 16, 16, ['fixed'], {
+          isFixedEncounter: true,
+        }),
+        encounter('tera-raid-paldea', '帕底亚太晶结晶', 35, 35, ['raid'], {
+          isRaid: true,
+        }),
+      ],
+    });
+    const response = await post(violetBody('紫里在哪里可以抓利欧路？'), 'dex-riolu-key-12345');
+    expect(response.status).toBe(200);
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: false,
+      aiSearchUsed: false,
+      matchedHintIds: ['dex-bundle-encounter-violet-447'],
+      confidence: 'high',
+    });
+    expect(value.answer).toContain('TitoDex v19');
+    expect(value.answer).toContain('南第2区');
+    expect(value.answer).toContain('Lv.16–20');
+    expect(value.answer).toContain('帕底亚太晶结晶');
+    expect(JSON.stringify(value)).not.toContain('https://');
+  });
+
+  it('never leaks encounters from the paired game when the exact version has no rows', async () => {
+    await seedDexBundle({
+      scarlet: [encounter('scarlet-only-area', '朱版限定地点', 20, 22, ['wild'])],
+    });
+    const response = await post(violetBody('紫里在哪里可以抓利欧路？'), 'dex-isolation-key-123');
+    expect(response.status).toBe(200);
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'no_match', answerMode: 'no_match' });
+    expect(JSON.stringify(value)).not.toContain('朱版限定地点');
+  });
+
+  it('rejects unsafe prefixes and does not treat a generic evolution chain as versioned fact', async () => {
+    await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+      bundleVersion: 19,
+      cdnPrefix: '../private',
+      complete: true,
+      exactVersionLocations: true,
+    }));
+    await env.DEX_CONTENT.put('v5/details/447.json', JSON.stringify({
+      summary: { id: 447 },
+      obtainLocationsByVersion: {
+        violet: [encounter('should-not-load', '不应读取', 1, 1, ['wild'])],
+      },
+    }));
+    const unsafe = await post(violetBody('紫里在哪里可以抓利欧路？'), 'dex-prefix-key-1234');
+    expect(await unsafe.json()).toMatchObject({ status: 'no_match' });
+
+    await seedDexBundle(
+      { violet: [encounter('south-province-area-two', '南第２区', 16, 20, ['wild'])] },
+      {
+        evolutionChain: {
+          id: 447,
+          nameZh: '利欧路',
+          children: [{
+            id: 448,
+            nameZh: '路卡利欧',
+            children: [],
+            triggers: [{ trigger: 'level-up', minHappiness: 160, timeOfDay: 'day' }],
+          }],
+        },
+      },
+    );
+    const evolution = await post(violetBody('利欧路怎么进化？'), 'dex-intent-key-1234');
+    const value = await evolution.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'no_match', answerMode: 'no_match' });
+    expect(JSON.stringify(value)).not.toContain('亲密度至少 160');
+  });
+
+  it('uses exact-version held-item rates and keeps their provenance warning', async () => {
+    await seedDexBundle({}, {
+      heldItems: [{
+        slug: 'light-ball',
+        rarityByVersion: { violet: 5, scarlet: 7 },
+        maxRarity: 7,
+      }],
+    });
+    await env.DEX_CONTENT.put('v5/items.json', JSON.stringify({
+      213: {
+        id: 213,
+        slug: 'light-ball',
+        nameZh: '电气球',
+        categoryZh: '携带道具',
+        cost: 1000,
+      },
+    }));
+    const response = await post(violetBody('利欧路会携带什么道具？'), 'dex-held-key-123456');
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'answered', modelUsed: false });
+    expect(value.answer).toContain('电气球：5%');
+    expect(value.answer).not.toContain('7%');
+    expect(JSON.stringify(value)).toContain('52Poké');
+  });
+
+  it('uses the selected game version-group for move learning', async () => {
+    await seedDexBundle({}, {
+      moveSets: {
+        'scarlet-violet': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 40 }],
+          machine: [{ moveId: 14, method: 'machine' }],
+          egg: [],
+          tutor: [],
+        },
+        'heartgold-soulsilver': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 30 }],
+          machine: [],
+          egg: [],
+          tutor: [],
+        },
+      },
+    });
+    const response = await post(violetBody('利欧路几级学会剑舞？'), 'dex-move-key-123456');
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'answered', modelUsed: false });
+    expect(value.answer).toContain('Lv.40');
+    expect(value.answer).toContain('招式学习器');
+    expect(value.answer).not.toContain('Lv.30');
+  });
+
+  it('answers item and species profile facts from bundle catalogs without Qwen', async () => {
+    await seedDexBundle({}, {
+      summary: { id: 447, nameZh: '利欧路', types: ['fighting'] },
+      weaknesses: ['妖精', '超能力', '飞行'],
+      baseStats: {
+        hp: 40,
+        attack: 70,
+        defense: 40,
+        specialAttack: 35,
+        specialDefense: 40,
+        speed: 60,
+      },
+      abilities: [{ nameZh: '精神力', isHidden: false }],
+    });
+    await env.DEX_CONTENT.put('v5/items.json', JSON.stringify({
+      107: {
+        id: 107,
+        slug: 'shiny-stone',
+        nameZh: '光之石',
+        categoryZh: '进化道具',
+        cost: 3000,
+        effectZh: '能让某些特定宝可梦进化。',
+      },
+    }));
+    const profile = await post(violetBody('利欧路的属性弱点种族值和特性？'), 'dex-profile-key-123');
+    const profileValue = await profile.json() as Record<string, unknown>;
+    expect(profileValue).toMatchObject({ status: 'answered', modelUsed: false });
+    expect(profileValue.answer).toContain('格斗');
+    expect(profileValue.answer).toContain('HP 40');
+    expect(profileValue.answer).toContain('精神力');
+
+    const item = await post(violetBody('光之石有什么作用？'), 'dex-item-key-123456');
+    const itemValue = await item.json() as Record<string, unknown>;
+    expect(itemValue).toMatchObject({ status: 'answered', modelUsed: false });
+    expect(itemValue.answer).toContain('进化道具');
+    expect(itemValue.answer).toContain('某些特定宝可梦进化');
   });
 
   it('rejects unexpected save or identity fields', async () => {
@@ -394,6 +566,66 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ errorCode: 'not_found' });
   });
 });
+
+function violetBody(question: string): string {
+  return JSON.stringify({
+    question,
+    context: {
+      game: 'violet',
+      generation: 9,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    },
+  });
+}
+
+async function seedDexBundle(
+  obtainLocationsByVersion: Record<string, Record<string, unknown>[]>,
+  detailExtras: Record<string, unknown> = {},
+): Promise<void> {
+  await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+    bundleVersion: 19,
+    cdnPrefix: 'v5',
+    complete: true,
+    exactVersionLocations: true,
+  }));
+  await env.DEX_CONTENT.put('v5/details/447.json', JSON.stringify({
+    summary: { id: 447, nameZh: '利欧路' },
+    obtainLocationsByVersion,
+    ...detailExtras,
+  }));
+}
+
+function encounter(
+  areaSlug: string,
+  areaLabelZh: string,
+  minLevel: number,
+  maxLevel: number,
+  methods: string[],
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    areaSlug,
+    areaLabelZh,
+    minLevel,
+    maxLevel,
+    methods,
+    conditions: [],
+    isAlpha: false,
+    isTitan: false,
+    isRaid: false,
+    isFixedEncounter: false,
+    ...overrides,
+  };
+}
 
 function deepSeekEnv({
   aiRun,

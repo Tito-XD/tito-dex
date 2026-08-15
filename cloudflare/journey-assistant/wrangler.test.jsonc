@@ -22,6 +22,10 @@
     {
       "binding": "JOURNEY_CONTENT",
       "bucket_name": "titodex-journey-content-test"
+    },
+    {
+      "binding": "DEX_CONTENT",
+      "bucket_name": "titodex-dex-test"
     }
   ],
   "ratelimits": [

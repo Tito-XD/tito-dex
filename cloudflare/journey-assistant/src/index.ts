@@ -13,6 +13,7 @@ import { getJourneySearch, retrieveAuditedHintIds } from './retrieval';
 import {
   deterministicCuratedScopeDecision,
   researchCuratedWeb,
+  type CuratedSource,
 } from './curated_web';
 import {
   DEEPSEEK_NATIVE_ENDPOINT,
@@ -22,6 +23,7 @@ import {
   type DeepSeekNativeSearchConfig,
   type DeepSeekNativeSearchResult,
 } from './deepseek_native_search';
+import { answerFromDexBundle, buildDexBundleSources } from './dex_bundle_retrieval';
 
 const MODEL_TIMEOUT_MS = 10_000;
 const CURATED_MODEL_TIMEOUT_MS = 6_000;
@@ -75,6 +77,7 @@ export default {
           worker: true,
           publicModel: env.AI ? 'workers-ai-qwen' : 'unavailable',
           aiSearch: env.AI_SEARCH_ENABLED === 'true' && Boolean(env.JOURNEY_SEARCH_NAMESPACE),
+          dexBundle: Boolean(env.DEX_CONTENT),
           curatedSources: env.CURATED_WEB_ENABLED === 'true',
           sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
           webSearch: webSearchProviders.length > 0,
@@ -130,6 +133,17 @@ export default {
       } : undefined,
     );
     let curatedSourcesUsed = false;
+    let dexBundleSources: CuratedSource[] = [];
+    if (response.status === 'no_match' && env.DEX_CONTENT) {
+      try {
+        const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
+        if (bundleAnswer) response = bundleAnswer;
+        else dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+      } catch {
+        // The versioned Dex bundle is an optional deterministic source. Any
+        // missing/invalid object falls through to the existing safe pipeline.
+      }
+    }
     if (
       response.status === 'no_match' &&
       env.CURATED_WEB_ENABLED === 'true' &&
@@ -146,6 +160,9 @@ export default {
           () => new Date(),
           curatedDecision,
           {
+            ...(dexBundleSources.length > 0
+              ? { localSources: dexBundleSources }
+              : {}),
             ...(isTavilyConfigured(env)
               ? { tavilyApiKey: getTavilyApiKey(env) }
               : {}),
