@@ -1,7 +1,9 @@
 export const MAX_QUESTION_LENGTH = 240;
-export const MAX_REQUEST_BYTES = 4096;
+export const MAX_REQUEST_BYTES = 12 * 1024;
 export const MAX_CONTEXT_IDS = 16;
 export const MAX_ANSWER_LENGTH = 1200;
+export const MAX_HISTORY_MESSAGES = 12;
+export const MAX_HISTORY_ASSISTANT_LENGTH = 600;
 
 const supportedGameGenerations = {
   diamond: 4,
@@ -59,6 +61,12 @@ export type ContextReliability = {
 export type AssistantRequest = {
   question: string;
   context: AssistantContext;
+  history?: AssistantHistoryMessage[];
+};
+
+export type AssistantHistoryMessage = {
+  role: 'user' | 'assistant';
+  content: string;
 };
 
 export type AssistantResponse = {
@@ -81,6 +89,7 @@ export type AssistantResponse = {
     | 'curated_sources_deterministic'
     | 'curated_sources_qwen'
     | 'deepseek_native_search'
+    | 'multi_source_qwen'
     | 'no_match';
   modelUsed?: boolean;
   aiSearchUsed?: boolean;
@@ -93,7 +102,8 @@ export type AssistantResponse = {
   )[];
 };
 
-const allowedRequestKeys = new Set(['question', 'context']);
+const allowedRequestKeys = new Set(['question', 'context', 'history']);
+const allowedHistoryKeys = new Set(['role', 'content']);
 const allowedContextKeys = new Set([
   'game',
   'generation',
@@ -133,6 +143,8 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   if (typeof value.question !== 'string') return null;
   const question = value.question.trim();
   if (question.length < 1 || question.length > MAX_QUESTION_LENGTH) return null;
+  const history = parseHistory(value.history);
+  if (!history) return null;
   if (!isPlainObject(value.context) || hasUnexpectedKeys(value.context, allowedContextKeys)) return null;
   const context = value.context;
   if (typeof context.game !== 'string' || !(context.game in supportedGameGenerations)) return null;
@@ -160,6 +172,7 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   if (reliability.milestones === 'unsupported' && context.milestoneIds.length !== 0) return null;
   return {
     question,
+    history,
     context: {
       game,
       generation,
@@ -172,6 +185,30 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
       contextReliability: reliability,
     },
   };
+}
+
+function parseHistory(value: unknown): AssistantHistoryMessage[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > MAX_HISTORY_MESSAGES) return null;
+  const result: AssistantHistoryMessage[] = [];
+  for (const message of value) {
+    if (!isPlainObject(message) || hasUnexpectedKeys(message, allowedHistoryKeys)) return null;
+    if (message.role !== 'user' && message.role !== 'assistant') return null;
+    if (typeof message.content !== 'string') return null;
+    const content = message.content.trim();
+    const limit = message.role === 'user'
+      ? MAX_QUESTION_LENGTH
+      : MAX_HISTORY_ASSISTANT_LENGTH;
+    if (content.length < 1 || content.length > limit) return null;
+    result.push({ role: message.role, content });
+  }
+  // A client may omit history or send complete user/assistant pairs only.
+  // This prevents a forged assistant-only message from becoming instructions.
+  if (result.length % 2 !== 0) return null;
+  for (let index = 0; index < result.length; index += 1) {
+    if (result[index].role !== (index % 2 === 0 ? 'user' : 'assistant')) return null;
+  }
+  return result;
 }
 
 export function effectiveContextReliability(context: AssistantContext): ContextReliability {

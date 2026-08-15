@@ -23,13 +23,53 @@ void main() {
   });
 
   test(
-    'extension preferences default to enabled and compact search display',
+    'assistant defaults off and requires current consent before enabling',
     () {
-      expect(askTitoDexSettings.extensionEnabled, isTrue);
+      expect(askTitoDexSettings.extensionEnabled, isFalse);
+      expect(askTitoDexSettings.enabled, isFalse);
+      expect(askTitoDexSettings.noticeAcknowledged, isFalse);
       expect(
         askTitoDexSettings.searchDisplayMode,
         SearchAssistantDisplayMode.compact,
       );
+    },
+  );
+
+  test(
+    'legacy enabled preferences do not cross the new consent boundary',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'titodex.extension.journey_assistant.enabled': true,
+        'titodex.ask_titodex.enabled': true,
+        'titodex.ask_titodex.notice_acknowledged_v2': true,
+      });
+
+      askTitoDexSettings.resetForTest();
+      await askTitoDexSettings.load();
+
+      expect(askTitoDexSettings.extensionEnabled, isFalse);
+      expect(askTitoDexSettings.enabled, isFalse);
+      expect(askTitoDexSettings.noticeAcknowledged, isFalse);
+    },
+  );
+
+  test(
+    'first consent enables the assistant and online fallback together',
+    () async {
+      await askTitoDexSettings.setExtensionEnabled(true);
+      await askTitoDexSettings.setEnabled(true);
+      expect(askTitoDexSettings.extensionEnabled, isFalse);
+      expect(askTitoDexSettings.enabled, isFalse);
+
+      await askTitoDexSettings.enableWithConsent();
+
+      expect(askTitoDexSettings.noticeAcknowledged, isTrue);
+      expect(askTitoDexSettings.extensionEnabled, isTrue);
+      expect(askTitoDexSettings.enabled, isTrue);
+
+      await askTitoDexSettings.setExtensionEnabled(false);
+      expect(askTitoDexSettings.extensionEnabled, isFalse);
+      expect(askTitoDexSettings.enabled, isFalse);
     },
   );
 
@@ -237,9 +277,59 @@ void main() {
     expect(find.text('下载并安装'), findsNothing);
   });
 
+  testWidgets('disabled assistant leaves no Journey or Search entry space', (
+    tester,
+  ) async {
+    var router = GoRouter(
+      initialLocation: '/journey',
+      routes: [
+        GoRoute(
+          path: '/journey',
+          builder: (_, _) => TitoPageContainer(
+            child: JourneyPage(
+              journey: _journey,
+              assistantFuture: Future.value(_snapshot),
+              askTitoDexEnabled: false,
+              onAskTitoDex: () {},
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+    expect(find.byKey(const Key('ask-titodex-entry')), findsNothing);
+    router.dispose();
+
+    router = GoRouter(
+      initialLocation: '/search',
+      routes: [
+        GoRoute(
+          path: '/search',
+          builder: (_, _) => TitoPageContainer(
+            child: SearchPage(
+              journey: _journey,
+              assistantDisplayMode: SearchAssistantDisplayMode.prominent,
+              onAskTitoDex: () {},
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+    expect(find.byKey(const Key('search-assistant-prominent')), findsNothing);
+    expect(find.byKey(const Key('search-assistant-compact')), findsNothing);
+    router.dispose();
+  });
+
   testWidgets('Search honors prominent, compact, and hidden display modes', (
     tester,
   ) async {
+    await askTitoDexSettings.enableWithConsent();
+
     Future<GoRouter> pump(SearchAssistantDisplayMode mode) async {
       final router = GoRouter(
         initialLocation: '/search',

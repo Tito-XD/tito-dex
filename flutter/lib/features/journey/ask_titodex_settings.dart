@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _enabledKey = 'titodex.ask_titodex.enabled';
-const _noticeAcknowledgedKey = 'titodex.ask_titodex.notice_acknowledged';
+const _noticeAcknowledgedKey = 'titodex.ask_titodex.notice_acknowledged_v3';
+const _consentVersionKey = 'titodex.ask_titodex.consent_version';
+const _currentConsentVersion = 1;
 const _anonymousDeviceKey = 'titodex.ask_titodex.anonymous_device_key';
 const _extensionEnabledKey = 'titodex.extension.journey_assistant.enabled';
 const _searchDisplayModeKey =
@@ -30,7 +32,7 @@ enum SearchAssistantDisplayMode {
 class AskTitoDexSettings extends ChangeNotifier {
   bool _enabled = false;
   bool _noticeAcknowledged = false;
-  bool _extensionEnabled = true;
+  bool _extensionEnabled = false;
   SearchAssistantDisplayMode _searchDisplayMode =
       SearchAssistantDisplayMode.compact;
   bool _loaded = false;
@@ -43,9 +45,22 @@ class AskTitoDexSettings extends ChangeNotifier {
 
   Future<void> load() async {
     final preferences = await SharedPreferences.getInstance();
-    _enabled = preferences.getBool(_enabledKey) ?? false;
-    _noticeAcknowledged = preferences.getBool(_noticeAcknowledgedKey) ?? false;
-    _extensionEnabled = preferences.getBool(_extensionEnabledKey) ?? true;
+    final hasCurrentConsent =
+        (preferences.getInt(_consentVersionKey) ?? 0) >=
+            _currentConsentVersion &&
+        (preferences.getBool(_noticeAcknowledgedKey) ?? false);
+    _noticeAcknowledged = hasCurrentConsent;
+    // Older builds briefly defaulted the built-in entry to enabled. Do not
+    // carry that state across the consent boundary: an upgraded install must
+    // explicitly accept the current disclosure before any entry or online
+    // capability is enabled.
+    _extensionEnabled =
+        hasCurrentConsent &&
+        (preferences.getBool(_extensionEnabledKey) ?? false);
+    _enabled =
+        hasCurrentConsent &&
+        _extensionEnabled &&
+        (preferences.getBool(_enabledKey) ?? false);
     _searchDisplayMode = SearchAssistantDisplayMode.fromStorage(
       preferences.getString(_searchDisplayModeKey),
     );
@@ -54,6 +69,7 @@ class AskTitoDexSettings extends ChangeNotifier {
   }
 
   Future<void> setEnabled(bool value) async {
+    if (value && (!_noticeAcknowledged || !_extensionEnabled)) return;
     _enabled = value;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(_enabledKey, value);
@@ -64,13 +80,33 @@ class AskTitoDexSettings extends ChangeNotifier {
     _noticeAcknowledged = true;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(_noticeAcknowledgedKey, true);
+    await preferences.setInt(_consentVersionKey, _currentConsentVersion);
+    notifyListeners();
+  }
+
+  /// Accepts the first-use disclosure and enables both the assistant entry
+  /// and its online fallback. This is the only first-use activation path.
+  Future<void> enableWithConsent() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_noticeAcknowledgedKey, true);
+    await preferences.setInt(_consentVersionKey, _currentConsentVersion);
+    await preferences.setBool(_extensionEnabledKey, true);
+    await preferences.setBool(_enabledKey, true);
+    _noticeAcknowledged = true;
+    _extensionEnabled = true;
+    _enabled = true;
     notifyListeners();
   }
 
   Future<void> setExtensionEnabled(bool value) async {
+    if (value && !_noticeAcknowledged) return;
     _extensionEnabled = value;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(_extensionEnabledKey, value);
+    if (!value) {
+      _enabled = false;
+      await preferences.setBool(_enabledKey, false);
+    }
     notifyListeners();
   }
 
@@ -98,7 +134,7 @@ class AskTitoDexSettings extends ChangeNotifier {
   void resetForTest() {
     _enabled = false;
     _noticeAcknowledged = false;
-    _extensionEnabled = true;
+    _extensionEnabled = false;
     _searchDisplayMode = SearchAssistantDisplayMode.compact;
     _loaded = false;
   }

@@ -52,9 +52,12 @@
     // The production secret is installed in Worker Secrets Store. Failures
     // remain optional and fall through to the deterministic answer.
     "TAVILY_WEB_ENABLED": "true",
+    // Trial-only broader answers: keep the Pokemon-only/source-domain boundary
+    // but downgrade failed second-pass verification instead of returning empty.
+    "EXPERIMENTAL_BROAD_ANSWERS": "true",
     // BYOK alias is selected explicitly below. Account identity and Gateway
     // Run authentication stay in Worker Secrets Store.
-    "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
+    "DEEPSEEK_NATIVE_SEARCH_ENABLED": "true",
     "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
     "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",

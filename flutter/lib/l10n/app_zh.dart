@@ -122,16 +122,17 @@ abstract final class AppZh {
   static const askTitoDexNeedsClarification = '请补充游戏版本或具体地点。';
   static const askTitoDexTimeout = '在线整理超时了。旅程和存档没有受到影响，可以重试。';
   static const askTitoDexNetworkFailed = '在线服务暂时不可用。旅程仍可离线使用，请稍后重试。';
-  static const askTitoDexNoticeTitle = '可选在线功能';
+  static const askTitoDexNoticeTitle = '开启问 TitoDex？';
   static const askTitoDexNoticeBody =
-      '问 TitoDex 默认关闭。启用后只会在本地资料无法直接判断时，发送你确认后的游戏版本、地点 ID、徽章 ID、里程碑 ID、语言和解析器版本，以及本次问题。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。';
-  static const askTitoDexNoticeAccept = '我知道了';
-  static const settingsAskTitoDex = '问 TitoDex / 旅程卡关助手';
-  static const settingsAskTitoDexHint = '默认关闭；已知问题优先离线回答，必要时才使用独立在线服务。';
+      '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Workers AI（Qwen）、限定来源联网检索与 DeepSeek 来整理答案。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及同一游戏最近最多 6 组问答用于理解追问。最近 50 组问答只保存在本机，超出会自动删除最早一组。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。';
+  static const askTitoDexNoticeAccept = '确认开启';
+  static const settingsAskTitoDex = '允许在线 AI 与检索';
+  static const settingsAskTitoDexHint =
+      '本地资料无法回答时才连接 Journey Worker；关闭后助手仍可使用内建离线答案。';
   static const extensionJourneyTitle = '旅程助手';
   static const extensionBuiltIn = '主 App 内建';
   static const extensionBuiltInHint =
-      '审核资料随主 App 提供，不需要另装 APK；关闭后会隐藏 Journey 与 Search 的问答入口。';
+      '默认关闭；确认后才启用。关闭时 Journey 与 Search 不显示入口，也不预留位置。';
   static const extensionNotInstalled = '未安装';
   static const extensionInstallHint = '按需从 TitoDex 扩展目录下载；Android 会显示系统安装确认。';
   static const extensionInstall = '下载并安装';
@@ -142,7 +143,7 @@ abstract final class AppZh {
   static const extensionInstallStarted = '已交给 Android，请在系统页面确认安装';
   static const extensionInstallFailed = '扩展安装未能开始，请稍后再试';
   static const extensionInstalled = '已安装';
-  static const extensionEnabled = '启用内建旅程助手';
+  static const extensionEnabled = '启用问 TitoDex 助手';
   static const extensionUninstall = '卸载扩展';
   static const extensionUninstallHint = '将打开 Android 系统卸载确认页面。';
   static const extensionOnlineTitle = '旅程助手与在线功能';

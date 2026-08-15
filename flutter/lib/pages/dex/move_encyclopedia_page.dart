@@ -10,7 +10,9 @@ import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
 class MoveEncyclopediaPage extends StatelessWidget {
-  const MoveEncyclopediaPage({super.key});
+  const MoveEncyclopediaPage({super.key, this.initialQuery});
+
+  final String? initialQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,7 @@ class MoveEncyclopediaPage extends StatelessWidget {
           '#${move.id} · ${typeNameZh(move.type)} · ${move.category}',
       detailSheet: showMoveDetailSheet,
       categoryFilter: moveTypeCategoryFilter,
+      initialQuery: initialQuery,
     );
   }
 }

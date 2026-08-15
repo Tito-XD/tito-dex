@@ -36,6 +36,7 @@ void main() {
     () async {
       expect(askTitoDexSettings.enabled, isFalse);
       expect(askTitoDexSettings.noticeAcknowledged, isFalse);
+      expect(askTitoDexSettings.extensionEnabled, isFalse);
 
       final first = await askTitoDexSettings.anonymousDeviceKey();
       final second = await askTitoDexSettings.anonymousDeviceKey();
@@ -156,13 +157,22 @@ void main() {
         deviceKeyProvider: () async => 'anonymous-test-key-123',
       );
 
-      await online.ask('怎么走？', _context);
+      await online.ask(
+        '那它呢？',
+        _context,
+        history: const [
+          {'role': 'user', 'content': '太阳伊布怎么进化？'},
+          {'role': 'assistant', 'content': '白天高亲密度升级。'},
+        ],
+      );
       expect(
         captured.headers['x-titodex-device-key'],
         'anonymous-test-key-123',
       );
       expect(captured.body, isNot(contains('Tito')));
       expect(captured.body, isNot(contains('rawSave')));
+      expect(captured.body, contains('太阳伊布怎么进化'));
+      expect(captured.body, contains('白天高亲密度升级'));
     },
   );
 
@@ -230,26 +240,36 @@ void main() {
     expect(status.sourceProviders, ['pokeapi', 'strategywiki', 'wikidata']);
   });
 
-  test(
-    'client preserves the actual DeepSeek native-search execution trace',
-    () {
-      final result = AskTitoDexResult.fromJson({
-        'status': 'answered',
-        'answer': '悖谬宝可梦说明',
-        'confidence': 'medium',
-        'followUp': null,
-        'onlineComposed': true,
-        'answerMode': 'deepseek_native_search',
-        'modelUsed': true,
-        'aiSearchUsed': false,
-        'sourceKinds': ['deepseek-native'],
-      });
+  test('client preserves DeepSeek and dual-source execution traces', () {
+    final result = AskTitoDexResult.fromJson({
+      'status': 'answered',
+      'answer': '悖谬宝可梦说明',
+      'confidence': 'medium',
+      'followUp': null,
+      'onlineComposed': true,
+      'answerMode': 'deepseek_native_search',
+      'modelUsed': true,
+      'aiSearchUsed': false,
+      'sourceKinds': ['deepseek-native'],
+    });
 
-      expect(result.answerMode, AskTitoDexAnswerMode.deepseekNativeSearch);
-      expect(result.modelUsed, isTrue);
-      expect(result.sourceKinds, ['deepseek-native']);
-    },
-  );
+    expect(result.answerMode, AskTitoDexAnswerMode.deepseekNativeSearch);
+    expect(result.modelUsed, isTrue);
+    expect(result.sourceKinds, ['deepseek-native']);
+
+    final dual = AskTitoDexResult.fromJson({
+      'status': 'answered',
+      'answer': '交叉核对说明',
+      'confidence': 'medium',
+      'followUp': null,
+      'onlineComposed': true,
+      'answerMode': 'multi_source_qwen',
+      'modelUsed': true,
+      'sourceKinds': ['tavily', 'deepseek-native'],
+    });
+    expect(dual.answerMode, AskTitoDexAnswerMode.multiSourceQwen);
+    expect(dual.sourceKinds, ['tavily', 'deepseek-native']);
+  });
 
   group('HGSS deterministic progression hints', () {
     final repository = ProgressionHintRepository(
@@ -326,9 +346,20 @@ void main() {
     );
 
     test(
+      'verified save location cannot answer an unrelated question alone',
+      () async {
+        final result = await repository.answer('魂银里太阳伊布值不值得培养？', _context);
+
+        expect(result.status, AskTitoDexStatus.noMatch);
+        expect(result.answer, isNull);
+        expect(result.matchedHintIds, isEmpty);
+      },
+    );
+
+    test(
       'online resource failure returns the local deterministic result',
       () async {
-        await askTitoDexSettings.setEnabled(true);
+        await askTitoDexSettings.enableWithConsent();
         final service = AskTitoDexService(
           hints: repository,
           online: _ThrowingOnlineClient(),
@@ -349,8 +380,7 @@ void main() {
   testWidgets(
     'loading scene uses the home companion and answer shows the actual online path',
     (tester) async {
-      await askTitoDexSettings.setEnabled(true);
-      await askTitoDexSettings.acknowledgeNotice();
+      await askTitoDexSettings.enableWithConsent();
       final service = _CompleterService();
       final router = GoRouter(
         initialLocation: '/journey/ask',
@@ -372,7 +402,7 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text('在线能力 · 3/4'), findsOneWidget);
+      expect(find.text('在线能力 · 7/9 · 问答 0/50'), findsOneWidget);
       expect(find.text('Journey Worker'), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -391,11 +421,11 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Journey Worker'), findsOneWidget);
-      expect(find.text('Qwen'), findsOneWidget);
-      expect(find.text('AI Search'), findsOneWidget);
+      expect(find.textContaining('Qwen ·'), findsOneWidget);
+      expect(find.textContaining('AI Search ·'), findsOneWidget);
       expect(find.text('联网搜索'), findsOneWidget);
-      expect(find.text('可用'), findsNWidgets(3));
-      expect(find.text('未连接'), findsOneWidget);
+      expect(find.text('可用'), findsNWidgets(7));
+      expect(find.text('未连接'), findsNWidgets(2));
       await tester.tap(find.text('知道了'));
       await tester.pumpAndSettle();
 
@@ -429,6 +459,7 @@ void main() {
       expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
+      expect(find.text('在线能力 · 7/9 · 问答 1/50'), findsOneWidget);
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -465,11 +496,11 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线能力 · 4/4'), findsOneWidget);
+    expect(find.text('在线能力 · 8/9 · 问答 0/50'), findsOneWidget);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
-    expect(find.text('联网搜索（Tavily）'), findsOneWidget);
-    expect(find.text('可用'), findsNWidgets(4));
+    expect(find.text('联网 · Tavily'), findsOneWidget);
+    expect(find.text('可用'), findsNWidgets(8));
   });
 
   testWidgets('manual Violet context never displays HGSS save badges', (
@@ -639,6 +670,7 @@ class _FakeService extends AskTitoDexService {
   Future<AskTitoDexResult> ask(
     String question,
     AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
   }) async => results.removeAt(0);
 }
@@ -669,6 +701,7 @@ class _CompleterService extends AskTitoDexService {
   Future<AskTitoDexResult> ask(
     String question,
     AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
   }) {
     onProgress?.call(AskTitoDexProgress.checkingLocal);
@@ -687,8 +720,9 @@ class _ThrowingOnlineClient implements AskTitoDexOnlineClient {
   @override
   Future<AskTitoDexResult> ask(
     String question,
-    AskTitoDexContext context,
-  ) async {
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  }) async {
     throw const AskTitoDexOnlineException('resource_unavailable');
   }
 }
