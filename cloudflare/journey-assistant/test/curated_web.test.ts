@@ -61,6 +61,7 @@ describe('curated key-free web research', () => {
     let releasePokeApi!: () => void;
     let tavilyStartedBeforePokeApiFinished = false;
     let pokeApiFinished = false;
+    const tavilyQueries: string[] = [];
     const pendingPokeApi = new Promise<Response>((resolve) => {
       releasePokeApi = () => {
         pokeApiFinished = true;
@@ -74,6 +75,7 @@ describe('curated key-free web research', () => {
       tavilyStartedBeforePokeApiFinished ||= !pokeApiFinished;
       releasePokeApi();
       const body = JSON.parse(String(init?.body)) as { query: string };
+      tavilyQueries.push(body.query);
       const english = !body.query.includes('利欧路');
       return json({
         results: [{
@@ -118,6 +120,10 @@ describe('curated key-free web research', () => {
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
         'api.tavily.com')).toHaveLength(2);
+    expect(tavilyQueries).toEqual(expect.arrayContaining([
+      expect.stringContaining('Riolu training guide viability evolution moveset'),
+      expect.stringContaining('利欧路值不值得培养'),
+    ]));
     expect(tavilyStartedBeforePokeApiFinished).toBe(true);
     expect(result).toMatchObject({
       status: 'answered',
