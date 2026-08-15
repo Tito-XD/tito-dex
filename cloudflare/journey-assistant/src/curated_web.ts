@@ -311,6 +311,10 @@ async function answerFromCuratedSources(
     console.log(JSON.stringify({
       event: 'assistant_curated_evidence_rejected',
       stage: 'compose',
+      reason: composedAnswerFailureReason(
+        composedValue,
+        new Set(sources.map((source) => source.id)),
+      ),
       sourceCount: sources.length,
     }));
     return null;
@@ -1226,6 +1230,25 @@ function validateComposedAnswer(
   const usedSourceIds = value.usedSourceIds as string[];
   if (new Set(usedSourceIds).size !== usedSourceIds.length) return null;
   return { answer: value.answer.trim(), usedSourceIds };
+}
+
+function composedAnswerFailureReason(
+  value: unknown,
+  allowedSourceIds: ReadonlySet<string>,
+): 'invalid_shape' | 'unsupported' | 'invalid_answer' | 'invalid_source_ids' |
+  'duplicate_source_ids' | 'unknown' {
+  if (!isPlainObject(value) || Object.keys(value).some((key) =>
+    !['supported', 'answer', 'usedSourceIds'].includes(key))) return 'invalid_shape';
+  if (value.supported !== true) return value.supported === false ? 'unsupported' : 'invalid_shape';
+  if (typeof value.answer !== 'string' || value.answer.trim().length < 1 ||
+      value.answer.length > MAX_ANSWER_LENGTH) return 'invalid_answer';
+  if (!Array.isArray(value.usedSourceIds) || value.usedSourceIds.length < 1 ||
+      value.usedSourceIds.length > 3 || !value.usedSourceIds.every((id) =>
+        typeof id === 'string' && allowedSourceIds.has(id))) return 'invalid_source_ids';
+  if (new Set(value.usedSourceIds).size !== value.usedSourceIds.length) {
+    return 'duplicate_source_ids';
+  }
+  return 'unknown';
 }
 
 async function readBounded(stream: ReadableStream<Uint8Array>, maxBytes: number): Promise<Uint8Array> {
