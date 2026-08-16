@@ -137,7 +137,7 @@ attribution text; publish corrected bundle metadata only under a new bundle
 version/object set rather than overwriting v19 objects.
 
 ### Latest release-line highlights
-- v0.8.16: makes the entire assistant a disclosed opt-in with no disabled-page placeholder; fixes save-location answer hijacking, broadens Dex-bundle and allowlisted Tavily/DeepSeek retrieval, keeps 50 local Q&A pairs with six-pair same-game follow-up context, exposes all active connections, and adds entity deep links.
+- v0.8.16: makes the entire assistant a disclosed opt-in with no disabled-page placeholder; fixes save-location answer hijacking, broadens Dex-bundle and allowlisted Tavily/DeepSeek retrieval, keeps 50 local Q&A pairs with six-pair same-game follow-up context, automatically follows the newest question and answer, exposes grouped active connections with full source Credits, and adds entity deep links.
 - v0.8.15: compacts Ask TitoDex into a chat-first layout with a 4/4 status popup and companion search motion; isolates selected-game save context; adds Tavily allowlist retrieval and audited Violet newcomer/Paradox answers while retaining Qwen evidence verification and deterministic fallback.
 - v0.8.14: makes Ask TitoDex observable with a connection card, per-answer route/model/source chips and companion waiting motion; expands reviewed multi-game retrieval and hardens bounded-source Qwen answers with exact-version move values, support gating and a second verification pass.
 - v0.8.13 rebuild (versionCodes 158/159): embeds Journey Assistant and its reviewed HGSS seed in the host, removes the second-APK feature gate, and retains legacy 1.0.0 read compatibility.

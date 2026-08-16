@@ -10,6 +10,7 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/features/companion/companion_repository.dart';
 import 'package:titodex/features/game/game_edition.dart';
+import 'package:titodex/features/journey/ask_titodex_history.dart';
 import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/features/journey/journey_assistant.dart';
@@ -473,6 +474,87 @@ void main() {
     },
   );
 
+  testWidgets('newest question and completed answer stay in view', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await askTitoDexSettings.enableWithConsent();
+    final service = _CompleterService();
+    final historyStore = _MemoryHistoryStore(
+      List.generate(
+        5,
+        (index) => AskTitoDexHistoryEntry(
+          game: 'soulsilver',
+          question: '之前的问题 ${index + 1}',
+          result: AskTitoDexResult(
+            status: AskTitoDexStatus.answered,
+            answer: '这是之前回答 ${index + 1}，用来确保对话区域可以独立滚动。',
+          ),
+          createdAt: DateTime.utc(2026, 8, 16, 0, index),
+        ),
+      ),
+    );
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: GameEdition.hgss.withFlavor('soulsilver'),
+              service: service,
+              historyStore: historyStore,
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    ScrollPosition answerPosition() => tester
+        .state<ScrollableState>(
+          find
+              .descendant(
+                of: find.byKey(const Key('ask-titodex-answer-scroll')),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        )
+        .position;
+
+    expect(answerPosition().maxScrollExtent, greaterThan(0));
+    answerPosition().jumpTo(0);
+    await tester.pump();
+
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '最新的问题',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 240));
+    expect(answerPosition().extentAfter, lessThanOrEqualTo(1));
+
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '这是最新的回答，完成后也应该自动停留在最下面。',
+        onlineComposed: true,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('这是最新的回答，完成后也应该自动停留在最下面。'), findsOneWidget);
+    expect(answerPosition().extentAfter, lessThanOrEqualTo(1));
+  });
+
   testWidgets('compact connection summary expands grouped provider details', (
     tester,
   ) async {
@@ -711,6 +793,31 @@ class _CompleterService extends AskTitoDexService {
   }
 
   void complete(AskTitoDexResult result) => _answer.complete(result);
+}
+
+class _MemoryHistoryStore implements AskTitoDexHistoryStore {
+  _MemoryHistoryStore(List<AskTitoDexHistoryEntry> entries)
+    : _entries = List.of(entries);
+
+  List<AskTitoDexHistoryEntry> _entries;
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> load() async =>
+      List.unmodifiable(_entries);
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> append(
+    AskTitoDexHistoryEntry entry,
+  ) async {
+    _entries = [..._entries, entry];
+    if (_entries.length > askTitoDexHistoryLimit) {
+      _entries = _entries.sublist(_entries.length - askTitoDexHistoryLimit);
+    }
+    return List.unmodifiable(_entries);
+  }
+
+  @override
+  Future<void> clear() async => _entries = [];
 }
 
 class _ThrowingOnlineClient implements AskTitoDexOnlineClient {
