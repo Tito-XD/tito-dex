@@ -9,7 +9,11 @@ import moveLabels from '../../../flutter/assets/l10n/zh/moves_labels.json';
 import itemLabels from '../../../flutter/assets/l10n/zh/items_labels.json';
 import abilityLabels from '../../../flutter/assets/l10n/zh/abilities_labels.json';
 import locationAreaLabels from '../../../flutter/assets/l10n/zh/location_area_labels.json';
-import { searchTavily, searchTavilyCorroborating } from './tavily_search';
+import {
+  searchTavily52Poke,
+  searchTavilyFallback,
+  searchTavilyFallbackCorroborating,
+} from './tavily_search';
 import {
   isGeneralPokemonFranchiseQuestion,
   isMegaEvolutionQuestion,
@@ -104,11 +108,10 @@ const gameNames: Record<AssistantRequest['context']['game'], { zh: string; en: s
 };
 
 /**
- * Bounded research over fixed, key-free sources and at most one Tavily
- * allowlist search. Broad advice runs those independent layers concurrently;
- * narrow factual questions retain the quota-saving fallback order. Live text
- * remains separate from audited R2 retrieval and never becomes a reviewed hint
- * automatically.
+ * Bounded research over fixed, key-free sources and a staged Tavily allowlist
+ * search. Chinese retrieval tries 52Poké first; only a missing or unsupported
+ * primary answer opens the remaining fixed domains. Live text remains separate
+ * from audited R2 retrieval and never becomes a reviewed hint automatically.
  */
 export async function researchCuratedWeb(
   request: AssistantRequest,
@@ -172,32 +175,41 @@ export async function researchCuratedWeb(
     request.context.game,
     fetcher,
   );
-  if (shouldCorroborateWithWeb && options.tavilyApiKey) {
-    const [fixedSources, tavilySources] = await Promise.all([
-      fixedSourcesPromise,
-      searchTavilyCorroborating(decision, searchScopeName, options.tavilyApiKey, fetcher),
-    ]);
-    logTavilyRetrieval(tavilySources);
-    return answerFromCuratedSources(
+  const [fixedSources, preferred52PokeSources] = options.tavilyApiKey
+    ? await Promise.all([
+        fixedSourcesPromise,
+        searchTavily52Poke(
+          decision,
+          searchScopeName,
+          options.tavilyApiKey,
+          fetcher,
+        ),
+      ])
+    : [await fixedSourcesPromise, []];
+  const bundleAndFixedSources = [...localSources, ...fixedSources].slice(0, 4);
+  if (options.tavilyApiKey) {
+    logTavilyRetrieval(preferred52PokeSources, '52poke-primary');
+    const preferredAnswer = await answerFromCuratedSources(
       request,
-      mergeResearchSources(localSources, fixedSources, tavilySources),
+      mergeResearchSources(
+        localSources,
+        fixedSources,
+        preferred52PokeSources,
+        true,
+      ),
       runModel,
       now,
       options.relaxedEvidence === true,
     );
-  }
-
-  const fixedSources = await fixedSourcesPromise;
-  const bundleAndFixedSources = [...localSources, ...fixedSources].slice(0, 4);
-  if (!shouldCorroborateWithWeb) {
-    const fixedAnswer = await answerFromCuratedSources(
+    if (preferredAnswer) return preferredAnswer;
+  } else if (!shouldCorroborateWithWeb) {
+    return answerFromCuratedSources(
       request,
       bundleAndFixedSources,
       runModel,
       now,
       options.relaxedEvidence === true,
     );
-    if (fixedAnswer) return fixedAnswer;
   }
 
   if (!options.tavilyApiKey) {
@@ -211,13 +223,20 @@ export async function researchCuratedWeb(
         )
       : null;
   }
-  const tavilySources = await searchTavily(
-    decision,
-    searchScopeName,
-    options.tavilyApiKey,
-    fetcher,
-  );
-  logTavilyRetrieval(tavilySources);
+  const tavilySources = shouldCorroborateWithWeb
+    ? await searchTavilyFallbackCorroborating(
+        decision,
+        searchScopeName,
+        options.tavilyApiKey,
+        fetcher,
+      )
+    : await searchTavilyFallback(
+        decision,
+        searchScopeName,
+        options.tavilyApiKey,
+        fetcher,
+      );
+  logTavilyRetrieval(tavilySources, 'fallback');
   return answerFromCuratedSources(
     request,
     mergeResearchSources(localSources, fixedSources, tavilySources),
@@ -231,20 +250,25 @@ function mergeResearchSources(
   localSources: CuratedSource[],
   fixedSources: CuratedSource[],
   tavilySources: CuratedSource[],
+  preferTavily = false,
 ): CuratedSource[] {
   // Reserve evidence space for every independent layer. Without this split,
   // three successful fixed sources could silently push Tavily out of the
   // five-source model budget and defeat cross-source corroboration.
   return [
     ...localSources.slice(0, 1),
-    ...fixedSources.slice(0, 2),
-    ...tavilySources.slice(0, 2),
+    ...(preferTavily ? tavilySources : fixedSources).slice(0, 2),
+    ...(preferTavily ? fixedSources : tavilySources).slice(0, 2),
   ];
 }
 
-function logTavilyRetrieval(tavilySources: CuratedSource[]): void {
+function logTavilyRetrieval(
+  tavilySources: CuratedSource[],
+  stage: '52poke-primary' | 'fallback',
+): void {
   console.log(JSON.stringify({
     event: 'assistant_tavily_retrieval',
+    stage,
     sourceCount: tavilySources.length,
     sourceHosts: Array.from(new Set(
       tavilySources.flatMap((source) => source.url

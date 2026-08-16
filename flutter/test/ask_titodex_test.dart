@@ -402,7 +402,7 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text('在线能力 · 7/9 · 问答 0/50'), findsOneWidget);
+      expect(find.text('在线能力 · 4/6 · 问答 0/50'), findsOneWidget);
       expect(find.text('Journey Worker'), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -423,8 +423,9 @@ void main() {
       expect(find.text('Journey Worker'), findsOneWidget);
       expect(find.textContaining('Qwen ·'), findsOneWidget);
       expect(find.textContaining('AI Search ·'), findsOneWidget);
+      expect(find.text('百科资料 · 多个限定来源'), findsOneWidget);
       expect(find.text('联网搜索'), findsOneWidget);
-      expect(find.text('可用'), findsNWidgets(7));
+      expect(find.text('可用'), findsNWidgets(4));
       expect(find.text('未连接'), findsNWidgets(2));
       await tester.tap(find.text('知道了'));
       await tester.pumpAndSettle();
@@ -459,7 +460,7 @@ void main() {
       expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
-      expect(find.text('在线能力 · 7/9 · 问答 1/50'), findsOneWidget);
+      expect(find.text('在线能力 · 4/6 · 问答 1/50'), findsOneWidget);
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -472,7 +473,7 @@ void main() {
     },
   );
 
-  testWidgets('compact connection summary expands 4/4 provider details', (
+  testWidgets('compact connection summary expands grouped provider details', (
     tester,
   ) async {
     await askTitoDexSettings.acknowledgeNotice();
@@ -496,11 +497,11 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线能力 · 8/9 · 问答 0/50'), findsOneWidget);
+    expect(find.text('在线能力 · 5/6 · 问答 0/50'), findsOneWidget);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
     expect(find.text('联网 · Tavily'), findsOneWidget);
-    expect(find.text('可用'), findsNWidgets(8));
+    expect(find.text('可用'), findsNWidgets(5));
   });
 
   testWidgets('manual Violet context never displays HGSS save badges', (
