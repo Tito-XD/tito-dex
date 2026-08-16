@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { AssistantRequest } from '../src/contract';
-import { answerSelectedGameMechanic } from '../src/game_mechanics';
+import {
+  answerKnownPokemonFranchiseFact,
+  answerSelectedGameMechanic,
+} from '../src/game_mechanics';
 
 const violetRequest: AssistantRequest = {
   question: '怎么 mega 进化路卡利欧',
@@ -45,5 +48,23 @@ describe('selected-game mechanic guard', () => {
       ...violetRequest,
       question: '利欧路怎么进化成路卡利欧',
     })).toBeNull();
+  });
+});
+
+describe('reviewed franchise facts', () => {
+  it('answers the Team Rocket quote without applying the selected game', () => {
+    const result = answerKnownPokemonFranchiseFact({
+      ...violetRequest,
+      question: '好讨厌的感觉是谁的台词？',
+    });
+
+    expect(result).toMatchObject({
+      status: 'answered',
+      confidence: 'high',
+      answerMode: 'local_audited',
+      contextUsed: { scope: 'pokemon_franchise' },
+    });
+    expect(result?.answer).toContain('武藏、小次郎和喵喵');
+    expect(result?.answer).toContain('不是其中某一个人的专属台词');
   });
 });

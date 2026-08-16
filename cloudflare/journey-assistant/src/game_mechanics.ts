@@ -84,3 +84,23 @@ export function answerSelectedGameMechanic(
     answerMode: 'local_audited',
   };
 }
+
+/** Small, explicitly reviewed franchise facts that should never need a model. */
+export function answerKnownPokemonFranchiseFact(
+  request: AssistantRequest,
+): AssistantResponse | null {
+  if (!/好讨厌的感觉(?:啊)?/u.test(request.question)) return null;
+  return {
+    status: 'answered',
+    answer: '“好讨厌的感觉（啊）”是宝可梦动画里火箭队三人组——武藏、小次郎和喵喵——被打飞时共同喊出的经典退场台词，不是其中某一个人的专属台词。',
+    contextUsed: { scope: 'pokemon_franchise' },
+    matchedHintIds: [],
+    verifiedFacts: ['宝可梦动画：火箭队三人组经典退场台词'],
+    unknowns: [],
+    confidence: 'high',
+    sources: [],
+    followUp: null,
+    onlineComposed: false,
+    answerMode: 'local_audited',
+  };
+}

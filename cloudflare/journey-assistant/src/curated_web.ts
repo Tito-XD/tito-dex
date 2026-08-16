@@ -269,13 +269,14 @@ async function answerFromCuratedSources(
 ): Promise<AssistantResponse | null> {
   if (sources.length === 0) return null;
   const generalFranchise = isGeneralPokemonFranchiseQuestion(request.question);
+  const allowRelaxedEvidence = relaxedEvidence && !generalFranchise;
   const broadResearch = needsBroaderResearch(request.question);
-  const evidenceGroupMinimum = relaxedEvidence
+  const evidenceGroupMinimum = allowRelaxedEvidence
     ? 1
     : broadResearch
     ? Math.min(2, evidenceGroupCount(sources))
     : 1;
-  if (broadResearch && !relaxedEvidence && !sources.some((source) => source.url)) return null;
+  if (broadResearch && !allowRelaxedEvidence && !sources.some((source) => source.url)) return null;
   const evidenceGroups = evidenceGroupsForPrompt(sources);
   const deterministicEvolution = deterministicEvolutionResponse(request, sources, now);
   if (deterministicEvolution) return deterministicEvolution;
@@ -363,7 +364,7 @@ async function answerFromCuratedSources(
     usedSources,
     runModel,
   );
-  if (!verifiedAnswer && !relaxedEvidence) {
+  if (!verifiedAnswer && !allowRelaxedEvidence) {
     console.log(JSON.stringify({
       event: 'assistant_curated_evidence_rejected',
       stage: 'verify',

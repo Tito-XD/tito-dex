@@ -24,7 +24,10 @@ import {
   type DeepSeekNativeSearchResult,
 } from './deepseek_native_search';
 import { answerFromDexBundle, buildDexBundleSources } from './dex_bundle_retrieval';
-import { answerSelectedGameMechanic } from './game_mechanics';
+import {
+  answerKnownPokemonFranchiseFact,
+  answerSelectedGameMechanic,
+} from './game_mechanics';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
 
 const MODEL_TIMEOUT_MS = 10_000;
@@ -134,7 +137,8 @@ export default {
     // model-free even when their wording overlaps a generic Journey alias.
     let response = await answerQuestion(parsed);
     if (response.status !== 'answered') {
-      response = answerSelectedGameMechanic(parsed) ?? response;
+      response = answerSelectedGameMechanic(parsed) ??
+        answerKnownPokemonFranchiseFact(parsed) ?? response;
     }
     let dexBundleSources: CuratedSource[] = [];
     if (response.status !== 'answered' && env.DEX_CONTENT) {
@@ -217,7 +221,8 @@ export default {
                   nativeResult,
                 );
                 const relaxedNativeAnswer =
-                  env.EXPERIMENTAL_BROAD_ANSWERS === 'true'
+                  env.EXPERIMENTAL_BROAD_ANSWERS === 'true' &&
+                    !isGeneralPokemonFranchiseQuestion(parsed.question)
                     ? nativeResult.answer
                     : null;
                 if (verifiedAnswer || relaxedNativeAnswer) {
