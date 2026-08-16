@@ -671,6 +671,91 @@ describe('curated key-free web research', () => {
       queryEn: 'Paradox Pokémon Bulbapedia definition future Pokémon Area Zero Violet',
       pokeApiKind: '',
     });
+    expect(deterministicCuratedScopeDecision({
+      question: '好讨厌的感觉是谁的台词？',
+      context: violetContext,
+    })).toMatchObject({
+      allowed: true,
+      queryZh: '宝可梦 动画 好讨厌的感觉是谁的台词？',
+      queryEn: 'Pokémon anime character quote Chinese dub',
+      pokeApiKind: '',
+    });
+  });
+
+  it('answers a Pokémon anime quote without forcing the selected Violet context', async () => {
+    const quoteRequest: AssistantRequest = {
+      ...request,
+      question: '好讨厌的感觉是谁的台词？',
+      context: {
+        ...request.context,
+        game: 'violet',
+        generation: 9,
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    };
+    const phases: string[] = [];
+    const queries: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      if (phase === 'curated-web-compose') {
+        expect(messages[0].content).toContain('宝可梦作品范围内');
+        expect(messages[1].content).toContain('"scope":"pokemon_franchise"');
+        expect(messages[1].content).not.toContain('"game":"violet"');
+        return {
+          supported: true,
+          answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
+          usedSourceIds: ['tavily-en-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        expect(messages[0].content).toContain('作品通用问题');
+        return {
+          supported: true,
+          answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(init?.body as string) as { query: string };
+      queries.push(body.query);
+      return json({
+        results: [{
+          title: '火箭队 - 神奇宝贝百科',
+          url: 'https://wiki.52poke.com/wiki/%E7%81%AB%E7%AE%AD%E9%98%9F%E4%B8%89%E4%BA%BA%E7%BB%84',
+          content: '武藏、小次郎和喵喵组成的火箭队三人组在被打飞时会说“好讨厌的感觉啊”。',
+          score: 0.91,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      quoteRequest,
+      runModel,
+      fetcher,
+      () => new Date('2026-08-16T00:00:00Z'),
+      undefined,
+      { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true },
+    );
+
+    expect(queries).toHaveLength(2);
+    expect(queries.every((query) => query.startsWith('Pokémon '))).toBe(true);
+    expect(queries.every((query) => !query.includes('Pokémon Violet'))).toBe(true);
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered',
+      contextUsed: { scope: 'pokemon_franchise' },
+      sourceKinds: ['tavily'],
+    });
+    expect(result?.answer).toContain('武藏、小次郎和喵喵');
   });
 
   it('does not let a catalog entity bypass the non-game and injection guard', async () => {

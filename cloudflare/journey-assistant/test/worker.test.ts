@@ -69,6 +69,38 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(value)).not.toContain('https://');
   });
 
+  it('answers an unsupported selected-game Mega request without model or web fallback', async () => {
+    const response = await post(body({
+      question: '怎么 mega 进化路卡利欧',
+      context: {
+        game: 'violet',
+        generation: 9,
+        badgeIds: [],
+        milestoneIds: [],
+        locale: 'zh-Hans',
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    }));
+    const value = await response.json() as AssistantResponse;
+
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: false,
+      aiSearchUsed: false,
+      sourceKinds: [],
+      contextUsed: { game: 'violet' },
+    });
+    expect(value.answer).toContain('《宝可梦 紫》没有 Mega 进化机制');
+    expect(value.answer).not.toContain('白天');
+  });
+
   it('reports DeepSeek native search only from fixed server configuration', async () => {
     const fakeEnv = deepSeekEnv({
       aiRun: vi.fn(),
