@@ -190,19 +190,21 @@ export async function researchCuratedWeb(
   const bundleAndFixedSources = [...localSources, ...fixedSources].slice(0, 4);
   if (options.tavilyApiKey) {
     logTavilyRetrieval(preferred52PokeSources, '52poke-primary');
-    const preferredAnswer = await answerFromCuratedSources(
-      request,
-      mergeResearchSources(
-        localSources,
-        fixedSources,
-        preferred52PokeSources,
-        true,
-      ),
-      runModel,
-      now,
-      options.relaxedEvidence === true,
-    );
-    if (preferredAnswer) return preferredAnswer;
+    if (preferred52PokeSources.length > 0) {
+      const preferredAnswer = await answerFromCuratedSources(
+        request,
+        mergeResearchSources(
+          localSources,
+          fixedSources,
+          preferred52PokeSources,
+          true,
+        ),
+        runModel,
+        now,
+        options.relaxedEvidence === true,
+      );
+      if (preferredAnswer) return preferredAnswer;
+    }
   } else if (!shouldCorroborateWithWeb) {
     return answerFromCuratedSources(
       request,
