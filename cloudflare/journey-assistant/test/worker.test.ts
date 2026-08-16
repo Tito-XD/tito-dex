@@ -101,6 +101,37 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).not.toContain('白天');
   });
 
+  it('answers the reviewed Team Rocket quote without selected-game context', async () => {
+    const response = await post(body({
+      question: '好讨厌的感觉是谁的台词？',
+      context: {
+        game: 'violet',
+        generation: 9,
+        badgeIds: [],
+        milestoneIds: [],
+        locale: 'zh-Hans',
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    }));
+    const value = await response.json() as AssistantResponse;
+
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: false,
+      aiSearchUsed: false,
+      contextUsed: { scope: 'pokemon_franchise' },
+    });
+    expect(value.answer).toContain('武藏、小次郎和喵喵');
+    expect(JSON.stringify(value.contextUsed)).not.toContain('violet');
+  });
+
   it('reports DeepSeek native search only from fixed server configuration', async () => {
     const fakeEnv = deepSeekEnv({
       aiRun: vi.fn(),
