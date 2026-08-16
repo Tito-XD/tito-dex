@@ -165,6 +165,7 @@ export async function researchCuratedWeb(
   const game = gameNames[request.context.game];
   const generalFranchise = isGeneralPokemonFranchiseQuestion(retrievalRequest.question);
   const searchScopeName = generalFranchise ? 'Pokémon' : game.en;
+  const chineseSearchScopeName = generalFranchise ? '宝可梦' : game.zh;
   const localEntity = findLocalPokeApiEntity(retrievalRequest.question);
   const fixedSourcesPromise = collectSources(
     decision.queryZh,
@@ -180,7 +181,7 @@ export async function researchCuratedWeb(
         fixedSourcesPromise,
         searchTavily52Poke(
           decision,
-          searchScopeName,
+          chineseSearchScopeName,
           options.tavilyApiKey,
           fetcher,
         ),
