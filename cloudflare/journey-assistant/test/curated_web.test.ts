@@ -540,7 +540,7 @@ describe('curated key-free web research', () => {
       hosts.push(url.hostname);
       if (url.hostname !== 'api.tavily.com') return json({}, 503);
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
-      expect(body.query).toContain('Pokémon Violet');
+      expect(body.query).toMatch(/(?:宝可梦 紫|Pokémon Violet)/u);
       return json({
         results: [{
           title: 'Riolu - Bulbapedia',
@@ -612,7 +612,7 @@ describe('curated key-free web research', () => {
       const url = new URL(input instanceof Request ? input.url : input.toString());
       if (url.hostname !== 'api.tavily.com') return json({}, 503);
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
-      expect(body.query).toContain('Pokémon Violet');
+      expect(body.query).toMatch(/(?:宝可梦 紫|Pokémon Violet)/u);
       return json({
         results: [{
           title: 'Pokémon Scarlet and Violet - Serebii',
@@ -749,7 +749,7 @@ describe('curated key-free web research', () => {
     );
 
     expect(queries).toHaveLength(1);
-    expect(queries.every((query) => query.startsWith('Pokémon '))).toBe(true);
+    expect(queries.every((query) => query.startsWith('宝可梦 '))).toBe(true);
     expect(queries.every((query) => !query.includes('Pokémon Violet'))).toBe(true);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
     expect(result).toMatchObject({

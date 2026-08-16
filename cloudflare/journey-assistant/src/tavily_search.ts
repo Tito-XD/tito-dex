@@ -52,10 +52,10 @@ export async function searchTavily(
     /(?:beginner guide|Paradox Pok[eé]mon|game mechanics version guide)/iu.test(
       decision.queryEn,
     );
-  const queryTerms = broadOverview || queryMode === 'english'
-    ? decision.queryEn
-    : queryMode === 'chinese'
-      ? decision.queryZh
+  const queryTerms = queryMode === 'chinese'
+    ? decision.queryZh
+    : broadOverview || queryMode === 'english'
+      ? decision.queryEn
       : `${decision.queryEn} ${decision.queryZh}`;
   const query = `${exactGameName} ${queryTerms}`
     .replace(/\s+/gu, ' ')
