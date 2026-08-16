@@ -141,13 +141,17 @@ describe('curated key-free web research', () => {
         tavilyApiKey: 'x'.repeat(32),
       },
     );
-    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(phases).toEqual([
+      'curated-web-compose',
+      'curated-web-compose',
+      'curated-web-verify',
+    ]);
     expect(fetcher.mock.calls.some((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
         'api.tavily.com')).toBe(true);
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
-        'api.tavily.com')).toHaveLength(2);
+        'api.tavily.com')).toHaveLength(3);
     expect(tavilyQueries).toEqual(expect.arrayContaining([
       expect.stringContaining('Riolu training guide viability evolution moveset'),
       expect.stringContaining('利欧路值不值得培养'),
@@ -556,9 +560,7 @@ describe('curated key-free web research', () => {
       { tavilyApiKey: 'x'.repeat(32) },
     );
 
-    expect(hosts.at(-1)).toBe('api.tavily.com');
-    expect(hosts.slice(0, -1)).not.toContain('api.tavily.com');
-    expect(hosts.filter((host) => host === 'api.tavily.com')).toHaveLength(1);
+    expect(hosts.filter((host) => host === 'api.tavily.com')).toHaveLength(2);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
     expect(result).toMatchObject({
       status: 'answered',
@@ -636,7 +638,7 @@ describe('curated key-free web research', () => {
     ]);
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
-        'api.tavily.com')).toHaveLength(2);
+        'api.tavily.com')).toHaveLength(3);
     expect(result).toMatchObject({ status: 'answered', sourceKinds: ['tavily'] });
   });
 
@@ -710,7 +712,7 @@ describe('curated key-free web research', () => {
         return {
           supported: true,
           answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
-          usedSourceIds: ['tavily-en-1'],
+          usedSourceIds: ['tavily-52poke-1'],
         };
       }
       if (phase === 'curated-web-verify') {
@@ -746,7 +748,7 @@ describe('curated key-free web research', () => {
       { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true },
     );
 
-    expect(queries).toHaveLength(2);
+    expect(queries).toHaveLength(1);
     expect(queries.every((query) => query.startsWith('Pokémon '))).toBe(true);
     expect(queries.every((query) => !query.includes('Pokémon Violet'))).toBe(true);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);

@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ScopeDecision } from '../src/curated_web';
 import {
   searchTavily,
+  searchTavily52Poke,
+  searchTavilyFallback,
+  TAVILY_52POKE_DOMAINS,
   TAVILY_ALLOWED_DOMAINS,
+  TAVILY_FALLBACK_DOMAINS,
 } from '../src/tavily_search';
 
 const decision: ScopeDecision = {
@@ -23,6 +27,55 @@ function json(value: unknown, status = 200, headers?: HeadersInit): Response {
 }
 
 describe('bounded Tavily allowlist search', () => {
+  it('tries 52Poké as an isolated Chinese source before the remaining allowlist', async () => {
+    const bodies: Record<string, unknown>[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      bodies.push(body);
+      if (bodies.length === 1) {
+        return json({
+          results: [
+            {
+              title: '利欧路 - 神奇宝贝百科',
+              url: 'https://wiki.52poke.com/wiki/%E5%88%A9%E6%AC%A7%E8%B7%AF',
+              content: '利欧路是格斗属性的宝可梦，在多个作品中有不同的出现地点。',
+              score: 0.92,
+            },
+            {
+              title: 'must be rejected in the 52Poké pass',
+              url: 'https://www.serebii.net/pokedex-sv/riolu/',
+              content: 'This otherwise allowed host is outside the isolated first-pass boundary.',
+              score: 0.9,
+            },
+          ],
+        });
+      }
+      return json({ results: [] });
+    });
+
+    const primary = await searchTavily52Poke(
+      decision,
+      'Pokémon Violet',
+      apiKey,
+      fetcher,
+    );
+    const fallback = await searchTavilyFallback(
+      decision,
+      'Pokémon Violet',
+      apiKey,
+      fetcher,
+    );
+
+    expect(bodies[0].include_domains).toEqual(TAVILY_52POKE_DOMAINS);
+    expect(bodies[0].query).toContain('紫版 利欧路 捕捉地点');
+    expect(primary).toHaveLength(1);
+    expect(primary[0].id).toBe('tavily-52poke-1');
+    expect(primary[0].url).toContain('wiki.52poke.com');
+    expect(bodies[1].include_domains).toEqual(TAVILY_FALLBACK_DOMAINS);
+    expect(TAVILY_FALLBACK_DOMAINS).not.toContain('wiki.52poke.com');
+    expect(fallback).toEqual([]);
+  });
+
   it('makes one basic search with only server-owned domains and accepts allowlisted results', async () => {
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
       expect(input.toString()).toBe('https://api.tavily.com/search');

@@ -15,6 +15,12 @@ const MAX_RESULTS = 6;
  * not directly fetch, index, persist, or package its page text here.
  */
 export const TAVILY_ALLOWED_DOMAINS = POKEMON_WEB_ALLOWED_DOMAINS;
+export const TAVILY_52POKE_DOMAINS = ['wiki.52poke.com'] as const;
+export const TAVILY_FALLBACK_DOMAINS = TAVILY_ALLOWED_DOMAINS.filter(
+  (domain) => domain !== 'wiki.52poke.com',
+);
+
+type TavilyDomainMode = 'all' | '52poke' | 'fallback';
 
 type TavilyResult = {
   title: string;
@@ -34,6 +40,7 @@ export async function searchTavily(
   fetcher: typeof fetch = fetch,
   queryMode: 'mixed' | 'english' | 'chinese' = 'mixed',
   idPrefix = 'tavily',
+  domainMode: TavilyDomainMode = 'all',
 ): Promise<CuratedSource[]> {
   const key = apiKey.trim();
   if (!/^[A-Za-z0-9._-]{16,256}$/.test(key)) return [];
@@ -55,6 +62,11 @@ export async function searchTavily(
     .trim()
     .slice(0, MAX_QUERY_CHARS);
   if (query.length < 2) return [];
+  const allowedDomains = domainMode === '52poke'
+    ? TAVILY_52POKE_DOMAINS
+    : domainMode === 'fallback'
+      ? TAVILY_FALLBACK_DOMAINS
+      : TAVILY_ALLOWED_DOMAINS;
 
   let response: Response;
   try {
@@ -75,7 +87,7 @@ export async function searchTavily(
         include_raw_content: false,
         include_images: false,
         include_favicon: false,
-        include_domains: TAVILY_ALLOWED_DOMAINS,
+        include_domains: allowedDomains,
         auto_parameters: false,
         exact_match: false,
         include_usage: false,
@@ -101,7 +113,7 @@ export async function searchTavily(
   const sources: CuratedSource[] = [];
   let totalTextChars = 0;
   for (const candidate of value.results.slice(0, MAX_RESULTS)) {
-    const result = validateResult(candidate);
+    const result = validateResult(candidate, allowedDomains);
     if (!result) continue;
     const remaining = MAX_TOTAL_TEXT_CHARS - totalTextChars;
     if (remaining <= 0) break;
@@ -116,6 +128,42 @@ export async function searchTavily(
     });
   }
   return sources;
+}
+
+/** First-pass Chinese retrieval. Its result boundary is 52Poké only. */
+export function searchTavily52Poke(
+  decision: ScopeDecision,
+  exactGameName: string,
+  apiKey: string,
+  fetcher: typeof fetch = fetch,
+): Promise<CuratedSource[]> {
+  return searchTavily(
+    decision,
+    exactGameName,
+    apiKey,
+    fetcher,
+    'chinese',
+    'tavily-52poke',
+    '52poke',
+  );
+}
+
+/** Second-pass mixed-language retrieval after 52Poké has no supported answer. */
+export function searchTavilyFallback(
+  decision: ScopeDecision,
+  exactGameName: string,
+  apiKey: string,
+  fetcher: typeof fetch = fetch,
+): Promise<CuratedSource[]> {
+  return searchTavily(
+    decision,
+    exactGameName,
+    apiKey,
+    fetcher,
+    'mixed',
+    'tavily',
+    'fallback',
+  );
 }
 
 /**
@@ -133,6 +181,43 @@ export async function searchTavilyCorroborating(
     searchTavily(decision, exactGameName, apiKey, fetcher, 'english', 'tavily-en'),
     searchTavily(decision, exactGameName, apiKey, fetcher, 'chinese', 'tavily-zh'),
   ]);
+  return mergeCorroboratingSources(english, chinese);
+}
+
+/** Two independent fallback pools, both excluding the already-tried 52Poké. */
+export async function searchTavilyFallbackCorroborating(
+  decision: ScopeDecision,
+  exactGameName: string,
+  apiKey: string,
+  fetcher: typeof fetch = fetch,
+): Promise<CuratedSource[]> {
+  const [english, chinese] = await Promise.all([
+    searchTavily(
+      decision,
+      exactGameName,
+      apiKey,
+      fetcher,
+      'english',
+      'tavily-en',
+      'fallback',
+    ),
+    searchTavily(
+      decision,
+      exactGameName,
+      apiKey,
+      fetcher,
+      'chinese',
+      'tavily-zh',
+      'fallback',
+    ),
+  ]);
+  return mergeCorroboratingSources(english, chinese);
+}
+
+function mergeCorroboratingSources(
+  english: CuratedSource[],
+  chinese: CuratedSource[],
+): CuratedSource[] {
   const seenUrls = new Set<string | undefined>();
   const deduplicated = [...english, ...chinese].filter((source) => {
     if (seenUrls.has(source.url)) return false;
@@ -154,7 +239,10 @@ export async function searchTavilyCorroborating(
   return [...selected, ...deferred].slice(0, MAX_RESULTS);
 }
 
-function validateResult(value: unknown): TavilyResult | null {
+function validateResult(
+  value: unknown,
+  allowedDomains: readonly string[],
+): TavilyResult | null {
   if (!isPlainObject(value) || typeof value.title !== 'string' ||
       typeof value.url !== 'string' || typeof value.content !== 'string' ||
       typeof value.score !== 'number' || !Number.isFinite(value.score) ||
@@ -172,7 +260,7 @@ function validateResult(value: unknown): TavilyResult | null {
   }
   if (url.protocol !== 'https:' || url.username || url.password ||
       (url.port && url.port !== '443') ||
-      !TAVILY_ALLOWED_DOMAINS.includes(url.hostname as (typeof TAVILY_ALLOWED_DOMAINS)[number])) {
+      !allowedDomains.includes(url.hostname)) {
     return null;
   }
   url.hash = '';

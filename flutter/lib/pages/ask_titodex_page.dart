@@ -477,9 +477,7 @@ List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
   ('Qwen · 回答整理/核对', status.qwenConfigured),
   ('AI Search · R2 索引', status.aiSearchEnabled),
   ('TitoDex Bundle · 结构化校验', status.dexBundleEnabled),
-  ('限定资料检索', status.curatedSourcesEnabled),
-  for (final provider in status.sourceProviders)
-    ('资料源 · ${_sourceKindLabel(provider)}', status.curatedSourcesEnabled),
+  ('百科资料 · 多个限定来源', status.curatedSourcesEnabled),
   for (final provider in status.webSearchProviders)
     ('联网 · ${_webSearchProviderLabel(provider)}', status.webSearchEnabled),
   if (status.webSearchProviders.isEmpty) ('联网搜索', false),

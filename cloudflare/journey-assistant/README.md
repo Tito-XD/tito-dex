@@ -13,8 +13,9 @@ The request path is deliberately fail-safe:
    held-item, versioned learnset, profile, item, and ability questions are
    validated and answered without a model. Open-ended questions receive only a
    bounded entity evidence object. Cultivation, strategy, route, and
-   recommendation questions retrieve fixed sources plus bounded English and
-   Chinese Tavily result pools in parallel, then use bundle fields to
+   recommendation questions try a bounded Chinese 52Poké result pool first;
+   if it cannot support the answer, they retrieve fixed sources plus bounded
+   English and Chinese fallback pools over the remaining domains, then use bundle fields to
    cross-check entities, versions, and numbers before Qwen composition and a
    second verification pass. Strict mode requires two independent evidence
    groups whenever available; the explicit v0.8.16 trial may return one
@@ -30,10 +31,12 @@ The request path is deliberately fail-safe:
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
    and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
    the bounded results.
-7. For broad advice, fixed sources and bounded English/Chinese Tavily `basic`
-   searches run in parallel over a server-owned Pokémon domain allowlist.
-   Narrow questions use one mixed search only after fixed sources are
-   insufficient. Snippets still pass through Qwen composition and verification.
+7. For Chinese questions, Tavily first runs one `basic` search whose request
+   and accepted-result boundary is only `wiki.52poke.com`. If that evidence is
+   empty or fails Qwen support verification, broad advice opens independent
+   English/Chinese searches over the remaining server-owned allowlist; narrow
+   questions open one mixed fallback search. Snippets still pass through Qwen
+   composition and verification, and final answers remain Simplified Chinese.
 8. DeepSeek V4 Flash native search runs concurrently with that curated route.
    TitoDex requires linked search-result blocks, revalidates every URL against
    the same allowlist, and uses citation text for a Qwen support pass when the
@@ -75,9 +78,11 @@ original deterministic `no_match` response. Live answers never write to R2.
 
 Tavily is a retrieval adapter, not an answer provider. It is never called while
 a local audited hint or exact Dex-bundle fact already answers the question.
-Broad advice runs fixed sources and the two bounded Tavily language pools in
-parallel; narrow questions use one mixed-language request only when fixed
-sources are insufficient.
+Chinese questions first run a 52Poké-only request alongside fixed-source
+collection. If the primary evidence cannot produce a supported answer, broad
+advice runs two bounded fallback language pools and narrow questions run one
+mixed fallback request. The fallback domain set excludes 52Poké because it was
+already attempted.
 
 - Install `TAVILY_API_KEY` as a Worker secret; never place it in
   `wrangler.jsonc`, source, an APK, documentation examples, or logs.
@@ -85,7 +90,8 @@ sources are insufficient.
   deployment configuration. Both conditions are required.
 - Each request uses `search_depth=basic`, no Tavily-generated answer, no raw
   page content, six results maximum, a short timeout, a bounded response, and
-  no retry. Broad advice makes at most two concurrent language requests.
+  no retry. A broad Chinese miss makes one 52Poké request followed by at most
+  two concurrent fallback-language requests.
 - The fixed allowlist includes Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
   PokéAPI, Pokémon Database, 52Poké wiki, Smogon, Marriland, GameFAQs, Game8,
   IGN, Nintendo Life, and Eurogamer. Returned URLs are revalidated against the
@@ -115,6 +121,11 @@ a successful custom-provider smoke test. Explicit `braveSearch: false` remains
 for older clients. Health never returns
 an Account ID, binding identifier, production origin, model credential, or
 secret.
+
+The App presents the encyclopedia/guide allowlist as one connection capability
+instead of counting every source as a separate service. The complete possible
+source list and rights notes live in Settings Credits; every answer still shows
+only the sources actually used.
 
 Every `/v1/ask` response also carries a privacy-safe trace:
 
