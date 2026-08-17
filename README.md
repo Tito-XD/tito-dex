@@ -8,8 +8,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16+164` | 宽范围问答、50 组本地会话与图鉴跳转卡片 |
-| Offline APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16-offline+165` | 内置紧凑 v14 图鉴数据与旅程助手 |
+| Lite APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16+166` | 宽范围问答、50 组本地会话与图鉴跳转卡片 |
+| Offline APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16-offline+167` | 内置紧凑 v14 图鉴数据与旅程助手 |
 | Journey Assistant | 主 App 内建 | 完整连接状态、固定对话框、伴侣等待动画与多源限定搜索 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.8.x 版本更新。

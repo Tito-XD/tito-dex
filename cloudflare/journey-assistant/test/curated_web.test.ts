@@ -141,13 +141,17 @@ describe('curated key-free web research', () => {
         tavilyApiKey: 'x'.repeat(32),
       },
     );
-    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(phases).toEqual([
+      'curated-web-compose',
+      'curated-web-compose',
+      'curated-web-verify',
+    ]);
     expect(fetcher.mock.calls.some((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
         'api.tavily.com')).toBe(true);
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
-        'api.tavily.com')).toHaveLength(2);
+        'api.tavily.com')).toHaveLength(3);
     expect(tavilyQueries).toEqual(expect.arrayContaining([
       expect.stringContaining('Riolu training guide viability evolution moveset'),
       expect.stringContaining('利欧路值不值得培养'),
@@ -536,7 +540,7 @@ describe('curated key-free web research', () => {
       hosts.push(url.hostname);
       if (url.hostname !== 'api.tavily.com') return json({}, 503);
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
-      expect(body.query).toContain('Pokémon Violet');
+      expect(body.query).toMatch(/(?:宝可梦 紫|Pokémon Violet)/u);
       return json({
         results: [{
           title: 'Riolu - Bulbapedia',
@@ -556,9 +560,7 @@ describe('curated key-free web research', () => {
       { tavilyApiKey: 'x'.repeat(32) },
     );
 
-    expect(hosts.at(-1)).toBe('api.tavily.com');
-    expect(hosts.slice(0, -1)).not.toContain('api.tavily.com');
-    expect(hosts.filter((host) => host === 'api.tavily.com')).toHaveLength(1);
+    expect(hosts.filter((host) => host === 'api.tavily.com')).toHaveLength(2);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
     expect(result).toMatchObject({
       status: 'answered',
@@ -610,7 +612,7 @@ describe('curated key-free web research', () => {
       const url = new URL(input instanceof Request ? input.url : input.toString());
       if (url.hostname !== 'api.tavily.com') return json({}, 503);
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
-      expect(body.query).toContain('Pokémon Violet');
+      expect(body.query).toMatch(/(?:宝可梦 紫|Pokémon Violet)/u);
       return json({
         results: [{
           title: 'Pokémon Scarlet and Violet - Serebii',
@@ -636,7 +638,7 @@ describe('curated key-free web research', () => {
     ]);
     expect(fetcher.mock.calls.filter((call) =>
       new URL(call[0] instanceof Request ? call[0].url : call[0].toString()).hostname ===
-        'api.tavily.com')).toHaveLength(2);
+        'api.tavily.com')).toHaveLength(3);
     expect(result).toMatchObject({ status: 'answered', sourceKinds: ['tavily'] });
   });
 
@@ -671,6 +673,91 @@ describe('curated key-free web research', () => {
       queryEn: 'Paradox Pokémon Bulbapedia definition future Pokémon Area Zero Violet',
       pokeApiKind: '',
     });
+    expect(deterministicCuratedScopeDecision({
+      question: '好讨厌的感觉是谁的台词？',
+      context: violetContext,
+    })).toMatchObject({
+      allowed: true,
+      queryZh: '宝可梦 动画 好讨厌的感觉是谁的台词？',
+      queryEn: 'Pokémon anime character quote Chinese dub',
+      pokeApiKind: '',
+    });
+  });
+
+  it('answers a Pokémon anime quote without forcing the selected Violet context', async () => {
+    const quoteRequest: AssistantRequest = {
+      ...request,
+      question: '好讨厌的感觉是谁的台词？',
+      context: {
+        ...request.context,
+        game: 'violet',
+        generation: 9,
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    };
+    const phases: string[] = [];
+    const queries: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      if (phase === 'curated-web-compose') {
+        expect(messages[0].content).toContain('宝可梦作品范围内');
+        expect(messages[1].content).toContain('"scope":"pokemon_franchise"');
+        expect(messages[1].content).not.toContain('"game":"violet"');
+        return {
+          supported: true,
+          answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
+          usedSourceIds: ['tavily-52poke-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        expect(messages[0].content).toContain('作品通用问题');
+        return {
+          supported: true,
+          answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(init?.body as string) as { query: string };
+      queries.push(body.query);
+      return json({
+        results: [{
+          title: '火箭队 - 神奇宝贝百科',
+          url: 'https://wiki.52poke.com/wiki/%E7%81%AB%E7%AE%AD%E9%98%9F%E4%B8%89%E4%BA%BA%E7%BB%84',
+          content: '武藏、小次郎和喵喵组成的火箭队三人组在被打飞时会说“好讨厌的感觉啊”。',
+          score: 0.91,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      quoteRequest,
+      runModel,
+      fetcher,
+      () => new Date('2026-08-16T00:00:00Z'),
+      undefined,
+      { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true },
+    );
+
+    expect(queries).toHaveLength(1);
+    expect(queries.every((query) => query.startsWith('宝可梦 '))).toBe(true);
+    expect(queries.every((query) => !query.includes('Pokémon Violet'))).toBe(true);
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered',
+      contextUsed: { scope: 'pokemon_franchise' },
+      sourceKinds: ['tavily'],
+    });
+    expect(result?.answer).toContain('武藏、小次郎和喵喵');
   });
 
   it('does not let a catalog entity bypass the non-game and injection guard', async () => {

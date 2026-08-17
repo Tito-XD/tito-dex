@@ -112,6 +112,7 @@ describe('DeepSeek native search scope', () => {
     expect(isPokemonScopedQuestion(request)).toBe(true);
     expect(isPokemonScopedQuestion({ ...request, question: '我想开始玩这个游戏，有哪些亮点？' })).toBe(true);
     expect(isPokemonScopedQuestion({ ...request, question: '悖谬宝可梦是什么？' })).toBe(true);
+    expect(isPokemonScopedQuestion({ ...request, question: '好讨厌的感觉是谁的台词？' })).toBe(true);
   });
 
   it('rejects unrelated, injection, and client domain-override questions', () => {
@@ -123,6 +124,23 @@ describe('DeepSeek native search scope', () => {
 });
 
 describe('DeepSeek native search gateway request', () => {
+  it('searches franchise quotations without leaking the selected game or save context', async () => {
+    const mock = gatewayFetch(json(searchedMessage()));
+    await runDeepSeekNativeSearch(
+      config,
+      { ...request, question: '好讨厌的感觉是谁的台词？' },
+      mock.fetcher,
+    );
+
+    const [, init] = mock.call.mock.calls[0] as [URL, RequestInit];
+    const body = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(body.system).toContain('宝可梦作品通用范围');
+    expect(JSON.stringify(body.messages)).toContain('检索范围：宝可梦作品');
+    expect(JSON.stringify(body.messages)).not.toContain('宝可梦 紫');
+    expect(JSON.stringify(body.messages)).not.toContain('当前游戏');
+    expect(JSON.stringify(body.messages)).not.toContain('存档地点');
+  });
+
   it('uses only the provider-native Gateway endpoint, fixed Anthropic path/model/tool, and privacy-safe controls', async () => {
     const mock = gatewayFetch(json(searchedMessage()));
 
