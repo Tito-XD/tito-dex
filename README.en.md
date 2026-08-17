@@ -8,8 +8,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16+164` | Broader answers, 50 local conversations, and entity links |
-| Offline APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16-offline+165` | Embeds compact v14 Dex data and Journey Assistant |
+| Lite APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16+166` | Broader answers, 50 local conversations, and entity links |
+| Offline APK | [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · App `0.8.16-offline+167` | Embeds compact v14 Dex data and Journey Assistant |
 | Journey Assistant | Built in | Full connection status, fixed chat composer, companion motion, and multi-source search |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.

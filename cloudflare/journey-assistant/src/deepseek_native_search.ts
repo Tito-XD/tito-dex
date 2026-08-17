@@ -4,6 +4,7 @@ import {
   type AssistantRequest,
 } from './contract';
 import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
+import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
 
 const DEEPSEEK_NATIVE_TIMEOUT_MS = 18_000;
 const DEEPSEEK_NATIVE_TOTAL_TIMEOUT_MS = 26_000;
@@ -281,7 +282,8 @@ export function isPokemonScopedQuestion(request: AssistantRequest): boolean {
     Object.hasOwn(gameNames, request.context.game) &&
     !rejectedScope.test(question) &&
     !clientUrlOrDomainOverride.test(question) &&
-    (pokemonScope.test(question) || pokemonScope.test(recentContext));
+    (pokemonScope.test(question) || pokemonScope.test(recentContext) ||
+      isGeneralPokemonFranchiseQuestion(question));
 }
 
 function validateConfig(config: DeepSeekNativeSearchConfig): {
@@ -309,6 +311,7 @@ function validateConfig(config: DeepSeekNativeSearchConfig): {
 }
 
 function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
+  const generalFranchise = isGeneralPokemonFranchiseQuestion(request.question);
   const reliability = effectiveContextReliability(request.context);
   const safeQuestion = request.question
     .replace(/[\u0000-\u001f\u007f]/gu, ' ')
@@ -331,7 +334,9 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
     temperature: 0.2,
     thinking: { type: 'disabled' },
     system: [
-      '你是 TitoDex 的宝可梦游戏助手。只回答用户当前所选版本内的宝可梦玩法问题。',
+      generalFranchise
+        ? '你是 TitoDex 的宝可梦助手。当前问题属于宝可梦作品通用范围（例如动画、角色、配音或台词），不得强行关联用户所选游戏或存档。'
+        : '你是 TitoDex 的宝可梦游戏助手。只回答用户当前所选版本内的宝可梦玩法问题。',
       '回答前必须调用一次 web_search，并且只能依据工具返回的限定来源。不得回答现实世界、政治、医疗、金融、编程或其他非宝可梦主题。',
       `搜索查询和引用都只能使用这些固定域名：${DEEPSEEK_NATIVE_ALLOWED_DOMAINS.join(', ')}；若搜索结果不在名单内，必须忽略并改查名单内来源。`,
       '使用简体中文，优先给出所选版本可执行的简洁步骤；不确定、版本不符或来源冲突时明确说明，不要猜测。',
@@ -339,7 +344,9 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
     ].join(''),
     messages: [{
       role: 'user',
-      content: `当前游戏：${gameNames[request.context.game]}（第 ${request.context.generation} 世代）${location}${conversation}\n本次问题：${safeQuestion}`,
+      content: generalFranchise
+        ? `检索范围：宝可梦作品通用信息${conversation}\n本次问题：${safeQuestion}`
+        : `当前游戏：${gameNames[request.context.game]}（第 ${request.context.generation} 世代）${location}${conversation}\n本次问题：${safeQuestion}`,
     }],
     tools: [{
       type: 'web_search_20250305',

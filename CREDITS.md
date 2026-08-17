@@ -12,6 +12,12 @@ TitoDex 会在构建阶段整理公开 API、社区资料与技术文档，并�
 - [PKHeX](https://github.com/kwsch/PKHeX)：固定提交导出的现代作品遭遇表，经 TitoDex 规范化后作为版本补全数据；PKHeX 与对应衍生覆盖数据依 GPL-3.0-or-later，App 不嵌入或执行 PKHeX。固定提交与细节见 [PKHEX_LICENSE.md](data/encounters/PKHEX_LICENSE.md)。
 - [Project Pokémon](https://projectpokemon.org/)：HGSS 存档结构、第四世代 Pokémon 数据结构与 HGSS 地图编号等技术参考。TitoDex 只读导入的偏移与解密实现依据这些公开技术文档交叉验证。
 
+### 问 TitoDex 的限定联网来源
+
+中文问题会先在 [52Poké Wiki／神奇宝贝百科](https://wiki.52poke.com/) 范围内检索；若没有得到可被引用片段直接支持的答案，才会回退到以下限定来源：[Pokémon 官方网站](https://www.pokemon.com/)、[Bulbapedia](https://bulbapedia.bulbagarden.net/)、[StrategyWiki](https://strategywiki.org/)、[Serebii](https://www.serebii.net/)、[PokéAPI](https://pokeapi.co/)、[Wikidata](https://www.wikidata.org/)、[Pokémon Database](https://pokemondb.net/)、[Smogon](https://www.smogon.com/)、[Marriland](https://marriland.com/)、[GameFAQs](https://gamefaqs.gamespot.com/)、[Game8](https://game8.co/)、[IGN](https://www.ign.com/)、[Nintendo Life](https://www.nintendolife.com/) 与 [Eurogamer](https://www.eurogamer.net/)。Tavily 与 DeepSeek 只充当受限检索／生成服务。
+
+这些网页的即时摘要只用于当次回答、交叉核验和显示逐条引用，不会自动写入 R2、AI Search、APK、本地图鉴包或训练资料。列入允许名单不表示 TitoDex 复制或重新许可整站内容；每个站点的文字、媒体和商标仍适用其自身条款及原权利状态。52Poké 的百科原创内容按其 CC BY-NC-SA 3.0 标注处理，其他来源只在实际命中时按回答中的链接与适用说明署名。
+
 ## 图像、动画与音频
 
 - [PokéAPI/sprites](https://github.com/PokeAPI/sprites)：游戏精灵、HOME／官方绘图、道具图标、叫声链接及部分动画的上游索引。仓库同时注明部分第五世代风格与 Showdown 动画由 Smogon／Pokémon Showdown 社区贡献；TitoDex 保留这些上游 Credits。
@@ -47,6 +53,7 @@ TitoDex compiles public APIs, community references, and technical documentation 
 - **Bulbapedia** — item grouping inspiration, selected location links, and fact-checking for the initial HGSS blocker-hint dataset (Sudowoodo/flower shop, Ilex Forest, Goldenrod Radio Tower/Card Key). TitoDex stores newly written summaries/steps with per-record provenance; original wiki content is licensed under CC BY-NC-SA 2.5.
 - **PKHeX** — normalized modern-game encounter overlays from a pinned commit; GPL-3.0-or-later. TitoDex neither embeds nor executes PKHeX.
 - **Project Pokémon** — HGSS save structure, Gen IV Pokémon structure, and HGSS map-index technical references.
+- **Ask TitoDex live-source allowlist** — Chinese questions try 52Poké Wiki first. If no directly supported answer is available, retrieval may fall back to Pokémon.com, Bulbapedia, StrategyWiki, Serebii, PokéAPI, Wikidata, Pokémon Database, Smogon, Marriland, GameFAQs, Game8, IGN, Nintendo Life, and Eurogamer. Tavily and DeepSeek are bounded retrieval/generation services rather than content licensors. Live snippets are used only for the current answer, verification, and per-answer citations; they are not automatically persisted to R2, AI Search, the APK, local bundles, or training data.
 - **PokéAPI/sprites and Pokémon Showdown / Smogon contributors** — upstream sprite, animation, cry, artwork, and item-icon sources. Rights and upstream contributor credits remain with their respective owners.
 - **PokéSprite** — the vendored Gen 8 type-icon set, pinned at `c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e`; MIT project license, with underlying Pokémon-media rights unchanged.
 - **SteamGridDB community sources and official Pokémon media** — selected game-icon sources. Exact retained source keys and URLs are in `flutter/assets/game_icons/SOURCES.json`; the original pipeline did not retain SteamGridDB uploader identities.

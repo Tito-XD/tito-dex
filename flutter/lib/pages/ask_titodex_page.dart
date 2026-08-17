@@ -78,7 +78,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final loaded = await _historyStore.load();
     if (!mounted) return;
     setState(() => _history = loaded);
-    _scrollToLatest();
+    _scrollToLatest(animate: false);
   }
 
   Future<void> _checkConnection() async {
@@ -111,6 +111,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _progress = AskTitoDexProgress.checkingLocal;
       _requestSeed += 1;
     });
+    _scrollToLatest();
     final result = await _service.ask(
       question,
       contextValue,
@@ -153,15 +154,32 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     }
   }
 
-  void _scrollToLatest() {
+  void _scrollToLatest({bool animate = true}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_answerScrollController.hasClients) return;
-      _answerScrollController.animateTo(
-        _answerScrollController.position.maxScrollExtent,
-        duration: MediaQuery.disableAnimationsOf(context)
-            ? Duration.zero
-            : const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
+      final duration = !animate || MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 220);
+      if (duration == Duration.zero) {
+        _answerScrollController.jumpTo(
+          _answerScrollController.position.maxScrollExtent,
+        );
+        return;
+      }
+      unawaited(
+        _answerScrollController
+            .animateTo(
+              _answerScrollController.position.maxScrollExtent,
+              duration: duration,
+              curve: Curves.easeOut,
+            )
+            .then((_) {
+              if (!mounted || !_answerScrollController.hasClients) return;
+              final position = _answerScrollController.position;
+              if ((position.maxScrollExtent - position.pixels).abs() > 0.5) {
+                position.jumpTo(position.maxScrollExtent);
+              }
+            }),
       );
     });
   }
@@ -477,9 +495,7 @@ List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
   ('Qwen · 回答整理/核对', status.qwenConfigured),
   ('AI Search · R2 索引', status.aiSearchEnabled),
   ('TitoDex Bundle · 结构化校验', status.dexBundleEnabled),
-  ('限定资料检索', status.curatedSourcesEnabled),
-  for (final provider in status.sourceProviders)
-    ('资料源 · ${_sourceKindLabel(provider)}', status.curatedSourcesEnabled),
+  ('百科资料 · 多个限定来源', status.curatedSourcesEnabled),
   for (final provider in status.webSearchProviders)
     ('联网 · ${_webSearchProviderLabel(provider)}', status.webSearchEnabled),
   if (status.webSearchProviders.isEmpty) ('联网搜索', false),
