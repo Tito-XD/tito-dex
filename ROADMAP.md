@@ -1,6 +1,6 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · Lite `0.8.16+164` · Offline `0.8.16-offline+165`.
+> **Latest release:** [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · Lite `0.8.16+166` · Offline `0.8.16-offline+167`.
 >
 > **Current `main`:** v0.8.16 release baseline with persistent Ask TitoDex history, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
