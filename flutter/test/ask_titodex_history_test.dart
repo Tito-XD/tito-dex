@@ -65,6 +65,32 @@ void main() {
   });
 
   test(
+    'manual history compression keeps only the newest requested entries',
+    () async {
+      const store = SharedPreferencesAskTitoDexHistoryStore();
+      for (var index = 0; index < 14; index += 1) {
+        await store.append(
+          AskTitoDexHistoryEntry(
+            game: 'violet',
+            question: '问题 $index',
+            result: AskTitoDexResult(
+              status: AskTitoDexStatus.answered,
+              answer: '回答 $index',
+            ),
+            createdAt: DateTime.utc(2026, 8, 16, 0, index),
+          ),
+        );
+      }
+
+      final compacted = await store.compact();
+      expect(compacted, hasLength(10));
+      expect(compacted.first.question, '问题 4');
+      expect(compacted.last.question, '问题 13');
+      expect(await store.load(), hasLength(10));
+    },
+  );
+
+  test(
     'entity links resolve Pokemon, item, move and ability from local labels',
     () async {
       final links = await DexAskTitoDexEntityResolver().resolve(
