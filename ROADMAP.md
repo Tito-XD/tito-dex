@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.16) · Lite `0.8.16+166` · Offline `0.8.16-offline+167`.
+> **Latest release:** [v0.8.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.17) · Lite `0.8.17+168` · Offline `0.8.17-offline+169`.
 >
-> **Current `main`:** v0.8.16 release baseline with persistent Ask TitoDex history, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.17 release baseline with modern Ask TitoDex conversation UI, segmented connection/history/game controls, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,13 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.17
+
+- Give Ask TitoDex a lighter conversation surface with companion motion, shimmer generation state, natural answer/evidence reveal, and reliable bottom-following scroll.
+- Merge online capability, local Q&A count, and selected game into one three-segment control; each segment independently opens connection details, history management, or the existing 23-edition picker.
+- Add confirmed local-history compression to the newest 10 entries and full clearing, while preserving the six-entry same-game request-context bound.
+- Collapse verification and citations into one expandable source row; keep Pokémon, item, move, and ability deep links as lightweight semantic ActionChips.
 
 ## Completed in v0.8.16
 
