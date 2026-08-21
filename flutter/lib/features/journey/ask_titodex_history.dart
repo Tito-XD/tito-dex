@@ -62,6 +62,12 @@ abstract class AskTitoDexHistoryStore {
 
   Future<List<AskTitoDexHistoryEntry>> append(AskTitoDexHistoryEntry entry);
 
+  /// Drops older local records and keeps only the newest [keep] entries.
+  ///
+  /// This is an explicit storage-management action. Request context remains
+  /// independently bounded by [askTitoDexContextEntryLimit].
+  Future<List<AskTitoDexHistoryEntry>> compact({int keep = 10});
+
   Future<void> clear();
 }
 
@@ -122,6 +128,24 @@ class SharedPreferencesAskTitoDexHistoryStore
       }),
     );
     return List.unmodifiable(trimmed);
+  }
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> compact({int keep = 10}) async {
+    final entries = await load();
+    final safeKeep = keep.clamp(1, askTitoDexHistoryLimit);
+    final compacted = entries.length > safeKeep
+        ? entries.sublist(entries.length - safeKeep)
+        : entries;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(
+      _historyStorageKey,
+      jsonEncode({
+        'version': 1,
+        'entries': compacted.map((value) => value.toJson()).toList(),
+      }),
+    );
+    return List.unmodifiable(compacted);
   }
 
   @override
