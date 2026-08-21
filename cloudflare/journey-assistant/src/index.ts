@@ -85,6 +85,7 @@ export default {
         schemaVersion: 2,
         capabilities: {
           worker: true,
+          streaming: true,
           publicModel: env.AI ? 'workers-ai-qwen' : 'unavailable',
           aiSearch: env.AI_SEARCH_ENABLED === 'true' && Boolean(env.JOURNEY_SEARCH_NAMESPACE),
           dexBundle: Boolean(env.DEX_CONTENT),
@@ -130,143 +131,199 @@ export default {
     const parsed = parseAssistantRequest(value);
     if (!parsed) return jsonError('invalid_request', 400);
 
-    const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
-    let curatedDecision: unknown;
-    // Resolve a unique reviewed hint and exact Dex-bundle facts before any
-    // retrieval or model call. This keeps common entity questions truly
-    // model-free even when their wording overlaps a generic Journey alias.
-    let response = await answerQuestion(parsed);
-    if (response.status !== 'answered') {
-      response = answerSelectedGameMechanic(parsed) ??
-        answerKnownPokemonFranchiseFact(parsed) ?? response;
-    }
-    let dexBundleSources: CuratedSource[] = [];
-    if (response.status !== 'answered' && env.DEX_CONTENT) {
-      try {
-        const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
-        if (bundleAnswer) response = bundleAnswer;
-        else dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
-      } catch {
-        // The versioned Dex bundle is an optional deterministic source. Any
-        // missing/invalid object falls through to the existing safe pipeline.
+    const buildResponse = async (): Promise<AssistantResponse> => {
+      const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
+      let curatedDecision: unknown;
+      // Resolve a unique reviewed hint and exact Dex-bundle facts before any
+      // retrieval or model call. This keeps common entity questions truly
+      // model-free even when their wording overlaps a generic Journey alias.
+      let response = await answerQuestion(parsed);
+      if (response.status !== 'answered') {
+        response = answerSelectedGameMechanic(parsed) ??
+          answerKnownPokemonFranchiseFact(parsed) ?? response;
       }
-    }
-    if (response.status !== 'answered' && env.AI) {
-      response = await answerQuestion(
-        parsed,
-        undefined,
-        async (hints, assistantRequest) => {
-        const route = await resolveQuestionRoute(env, hints, assistantRequest);
-        trace.modelUsed ||= route.modelUsed;
-        trace.aiSearchUsed = route.aiSearchUsed;
-        curatedDecision = route.curatedDecision;
-        return { hintId: route.hintId };
-        },
-      );
-    }
-    let curatedSourcesUsed = false;
-    if (response.status !== 'answered' && env.AI) {
-      // Curated/Tavily and DeepSeek native search run together. A failed
-      // support pass no longer makes the second path start after the App's
-      // request timeout; the more strongly verified result wins when both
-      // finish successfully.
-      const curatedPromise = env.CURATED_WEB_ENABLED === 'true'
-        ? researchCuratedWeb(
-            parsed,
-            (phase, messages, jsonSchema, maxTokens, temperature) => {
-              trace.modelUsed = true;
-              return runWorkersAi(env, phase, messages, jsonSchema, maxTokens, temperature);
-            },
-            fetch,
-            () => new Date(),
-            curatedDecision,
-            {
-              ...(dexBundleSources.length > 0
-                ? { localSources: dexBundleSources }
-                : {}),
-              ...(isTavilyConfigured(env)
-                ? { tavilyApiKey: getTavilyApiKey(env) }
-                : {}),
-              relaxedEvidence: env.EXPERIMENTAL_BROAD_ANSWERS === 'true',
-            },
-          ).catch(() => null)
-        : Promise.resolve(null);
-      const deepSeekPromise = isDeepSeekNativeConfigured(env)
-        ? (async (): Promise<DeepSeekNativeCandidate | null> => {
-            try {
-              const nativeResult = await runDeepSeekNativeSearch(
-                deepSeekNativeConfig(env),
-                parsed,
-                fetch,
-              );
-              if (
-                nativeResult.status === 'answered' ||
-                nativeResult.reason !== 'out_of_scope'
-              ) {
-                trace.modelUsed = true;
-              }
-              if (nativeResult.status === 'unavailable') {
-                console.log(
-                  JSON.stringify({
-                    event: 'assistant_provider_fallback',
-                    provider: 'deepseek-native',
-                    reason: nativeResult.reason,
-                  }),
-                );
-              }
-              if (nativeResult.status === 'answered') {
-                const verifiedAnswer = await verifyDeepSeekNativeAnswer(
-                  env,
-                  parsed,
-                  nativeResult,
-                );
-                const relaxedNativeAnswer =
-                  env.EXPERIMENTAL_BROAD_ANSWERS === 'true' &&
-                    !isGeneralPokemonFranchiseQuestion(parsed.question)
-                    ? nativeResult.answer
-                    : null;
-                if (verifiedAnswer || relaxedNativeAnswer) {
-                  return {
-                    response: buildDeepSeekNativeResponse(
-                      parsed,
-                      nativeResult,
-                      verifiedAnswer ?? relaxedNativeAnswer!,
-                      verifiedAnswer !== null,
-                    ),
-                    draft: nativeResult.answer,
-                  };
-                }
-              }
-            } catch {
-              // The public Qwen/Tavily and deterministic paths remain available.
-            }
-            return null;
-          })()
-        : Promise.resolve(null);
-      const [curatedResponse, deepSeekCandidate] = await Promise.all([
-        curatedPromise,
-        deepSeekPromise,
-      ]);
-      if (curatedResponse) {
-        response = deepSeekCandidate
-          ? await reconcileParallelAnswers(
-              env,
+      let dexBundleSources: CuratedSource[] = [];
+      if (response.status !== 'answered' && env.DEX_CONTENT) {
+        try {
+          const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
+          if (bundleAnswer) response = bundleAnswer;
+          else dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+        } catch {
+          // The versioned Dex bundle is an optional deterministic source. Any
+          // missing/invalid object falls through to the existing safe pipeline.
+        }
+      }
+      if (response.status !== 'answered' && env.AI) {
+        response = await answerQuestion(
+          parsed,
+          undefined,
+          async (hints, assistantRequest) => {
+          const route = await resolveQuestionRoute(env, hints, assistantRequest);
+          trace.modelUsed ||= route.modelUsed;
+          trace.aiSearchUsed = route.aiSearchUsed;
+          curatedDecision = route.curatedDecision;
+          return { hintId: route.hintId };
+          },
+        );
+      }
+      let curatedSourcesUsed = false;
+      if (response.status !== 'answered' && env.AI) {
+        // Curated/Tavily and DeepSeek native search run together. A failed
+        // support pass no longer makes the second path start after the App's
+        // request timeout; the more strongly verified result wins when both
+        // finish successfully.
+        const curatedPromise = env.CURATED_WEB_ENABLED === 'true'
+          ? researchCuratedWeb(
               parsed,
-              curatedResponse,
-              deepSeekCandidate,
-            ) ?? curatedResponse
-          : curatedResponse;
-        curatedSourcesUsed = true;
-      } else if (deepSeekCandidate) {
-        response = deepSeekCandidate.response;
-        curatedSourcesUsed = true;
+              (phase, messages, jsonSchema, maxTokens, temperature) => {
+                trace.modelUsed = true;
+                return runWorkersAi(env, phase, messages, jsonSchema, maxTokens, temperature);
+              },
+              fetch,
+              () => new Date(),
+              curatedDecision,
+              {
+                ...(dexBundleSources.length > 0
+                  ? { localSources: dexBundleSources }
+                  : {}),
+                ...(isTavilyConfigured(env)
+                  ? { tavilyApiKey: getTavilyApiKey(env) }
+                  : {}),
+                relaxedEvidence: env.EXPERIMENTAL_BROAD_ANSWERS === 'true',
+              },
+            ).catch(() => null)
+          : Promise.resolve(null);
+        const deepSeekPromise = isDeepSeekNativeConfigured(env)
+          ? (async (): Promise<DeepSeekNativeCandidate | null> => {
+              try {
+                const nativeResult = await runDeepSeekNativeSearch(
+                  deepSeekNativeConfig(env),
+                  parsed,
+                  fetch,
+                );
+                if (
+                  nativeResult.status === 'answered' ||
+                  nativeResult.reason !== 'out_of_scope'
+                ) {
+                  trace.modelUsed = true;
+                }
+                if (nativeResult.status === 'unavailable') {
+                  console.log(
+                    JSON.stringify({
+                      event: 'assistant_provider_fallback',
+                      provider: 'deepseek-native',
+                      reason: nativeResult.reason,
+                    }),
+                  );
+                }
+                if (nativeResult.status === 'answered') {
+                  const verifiedAnswer = await verifyDeepSeekNativeAnswer(
+                    env,
+                    parsed,
+                    nativeResult,
+                  );
+                  const relaxedNativeAnswer =
+                    env.EXPERIMENTAL_BROAD_ANSWERS === 'true' &&
+                      !isGeneralPokemonFranchiseQuestion(parsed.question)
+                      ? nativeResult.answer
+                      : null;
+                  if (verifiedAnswer || relaxedNativeAnswer) {
+                    return {
+                      response: buildDeepSeekNativeResponse(
+                        parsed,
+                        nativeResult,
+                        verifiedAnswer ?? relaxedNativeAnswer!,
+                        verifiedAnswer !== null,
+                      ),
+                      draft: nativeResult.answer,
+                    };
+                  }
+                }
+              } catch {
+                // The public Qwen/Tavily and deterministic paths remain available.
+              }
+              return null;
+            })()
+          : Promise.resolve(null);
+        const [curatedResponse, deepSeekCandidate] = await Promise.all([
+          curatedPromise,
+          deepSeekPromise,
+        ]);
+        if (curatedResponse) {
+          response = deepSeekCandidate
+            ? await reconcileParallelAnswers(
+                env,
+                parsed,
+                curatedResponse,
+                deepSeekCandidate,
+              ) ?? curatedResponse
+            : curatedResponse;
+          curatedSourcesUsed = true;
+        } else if (deepSeekCandidate) {
+          response = deepSeekCandidate.response;
+          curatedSourcesUsed = true;
+        }
       }
+      response = attachExecutionTrace(response, trace, curatedSourcesUsed);
+      console.log(JSON.stringify(buildLogRecord(response, parsed)));
+      return response;
+    };
+    if (request.headers.get('accept')?.includes('application/x-ndjson')) {
+      return streamAssistantResponse(buildResponse);
     }
-    response = attachExecutionTrace(response, trace, curatedSourcesUsed);
-    console.log(JSON.stringify(buildLogRecord(response, parsed)));
-    return json(response, 200);
+    return json(await buildResponse(), 200);
   },
 } satisfies ExportedHandler<Env>;
+
+function streamAssistantResponse(
+  buildResponse: () => Promise<AssistantResponse>,
+): Response {
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      const push = (value: unknown) => {
+        controller.enqueue(encoder.encode(`${JSON.stringify(value)}\n`));
+      };
+      push({ type: 'progress', stage: 'retrieving' });
+      void buildResponse()
+        .then((result) => {
+          push({ type: 'progress', stage: 'writing' });
+          if (result.answer) {
+            for (const delta of answerStreamChunks(result.answer)) {
+              push({ type: 'answer_delta', delta });
+            }
+          }
+          push({ type: 'result', result });
+          controller.close();
+        })
+        .catch(() => {
+          controller.error(new Error('assistant_stream_failed'));
+        });
+    },
+  });
+  return new Response(body, {
+    status: 200,
+    headers: {
+      ...JSON_HEADERS,
+      'content-type': 'application/x-ndjson; charset=utf-8',
+    },
+  });
+}
+
+function answerStreamChunks(answer: string): string[] {
+  const chunks: string[] = [];
+  let current = '';
+  for (const character of answer) {
+    current += character;
+    const naturalBreak = /[，。！？；：、\n]/u.test(character);
+    if ((current.length >= 16 && naturalBreak) || current.length >= 24) {
+      chunks.push(current);
+      current = '';
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
 
 async function serveExtensionContent(
   request: Request,

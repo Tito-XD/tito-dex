@@ -27,6 +27,10 @@ import '../widgets/secondary_page_scaffold.dart';
 
 typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 
+const _assistantPaper = Color(0xFFFFFBF2);
+const _assistantCanvas = Color(0xFFF5F6F3);
+const _assistantSkeleton = Color(0xFFDCE5E5);
+
 Future<bool> _openExternalSource(Uri uri) =>
     launchUrl(uri, mode: LaunchMode.externalApplication);
 
@@ -70,6 +74,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   int? _revealEntryId;
   String? _submittedQuestion;
   bool _loading = false;
+  String _streamedAnswer = '';
 
   @override
   void initState() {
@@ -196,6 +201,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _submittedQuestion = question;
       _progress = AskTitoDexProgress.checkingLocal;
       _requestSeed += 1;
+      _streamedAnswer = '';
     });
     // The pending answer skeleton is inserted in the same frame. Jumping after
     // that layout guarantees the new question and its full placeholder stay
@@ -210,6 +216,11 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       ),
       onProgress: (progress) {
         if (mounted) setState(() => _progress = progress);
+      },
+      onAnswerDelta: (delta) {
+        if (!mounted) return;
+        setState(() => _streamedAnswer += delta);
+        _scrollToLatest(animate: false);
       },
     );
     if (!mounted) return;
@@ -234,6 +245,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _history = saved;
       _revealEntryId = entry.createdAt.microsecondsSinceEpoch;
       _submittedQuestion = null;
+      _streamedAnswer = '';
       if (retryQuestion == null && result.status == AskTitoDexStatus.answered) {
         _questionController.clear();
       }
@@ -350,14 +362,22 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                 ),
                 SizedBox(height: spacing),
                 Expanded(
-                  child: SizedBox(
+                  child: Container(
                     key: const Key('ask-titodex-answer-viewport'),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: _assistantCanvas.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: TitoColors.deepBlue.withValues(alpha: 0.12),
+                      ),
+                    ),
                     child: Scrollbar(
                       controller: _answerScrollController,
                       child: ListView(
                         key: const Key('ask-titodex-answer-scroll'),
                         controller: _answerScrollController,
-                        padding: const EdgeInsets.fromLTRB(2, 8, 2, 10),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
                         children: [
                           if (_history.isEmpty &&
                               _submittedQuestion == null &&
@@ -400,7 +420,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                             _QuestionBubble(question: question),
                             if (_loading) ...[
                               const SizedBox(height: 8),
-                              _GeneratingAnswerCard(progress: _progress),
+                              _GeneratingAnswerCard(
+                                progress: _progress,
+                                streamedAnswer: _streamedAnswer,
+                              ),
                             ],
                           ],
                         ],
@@ -1010,14 +1033,14 @@ class _ConversationEmptyState extends StatelessWidget {
           Icon(
             Icons.chat_bubble_outline_rounded,
             size: 24,
-            color: TitoColors.card.withValues(alpha: 0.88),
+            color: TitoColors.skyBlue.withValues(alpha: 0.82),
           ),
           const SizedBox(height: 6),
           Text(
             '回答会显示在这里',
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.card.withValues(alpha: 0.82),
+              color: TitoColors.deepBlue.withValues(alpha: 0.72),
             ),
           ),
         ],
@@ -1117,7 +1140,6 @@ class _QuestionComposer extends StatelessWidget {
       key: const Key('ask-titodex-composer'),
       padding: const EdgeInsets.fromLTRB(8, 7, 7, 7),
       radius: DeviceLayout.rLg(context),
-      cornerAccent: TitoColors.skyBlue,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -1166,57 +1188,96 @@ class _QuestionComposer extends StatelessWidget {
 }
 
 class _GeneratingAnswerCard extends StatelessWidget {
-  const _GeneratingAnswerCard({required this.progress});
+  const _GeneratingAnswerCard({
+    required this.progress,
+    required this.streamedAnswer,
+  });
 
   final AskTitoDexProgress progress;
+  final String streamedAnswer;
 
   @override
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final stage = progress == AskTitoDexProgress.checkingLocal
-        ? '正在翻本地资料'
-        : '正在交叉核对资料与联网来源';
+    final stage = switch (progress) {
+      AskTitoDexProgress.checkingLocal => '正在翻本地资料',
+      AskTitoDexProgress.contactingWorker => '正在交叉核对资料与联网来源',
+      AskTitoDexProgress.revealingAnswer => '正在写入已核验回答',
+    };
+    final hasStreamedAnswer = streamedAnswer.isNotEmpty;
     return Semantics(
       liveRegion: true,
-      label: stage,
+      label: hasStreamedAnswer ? '$stage，$streamedAnswer' : stage,
       child: AssistantSurface(
         key: const Key('ask-titodex-generating-answer'),
-        color: TitoColors.card,
+        color: _assistantPaper,
+        padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
         radius: 18,
-        cornerAccent: TitoColors.skyBlue,
+        borderColor: TitoColors.deepBlue.withValues(alpha: 0.24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: reduceMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 220),
+                    child: Text(
+                      stage,
+                      key: ValueKey(stage),
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.deepBlue,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+                const AssistantSparkle(size: 15),
+                const SizedBox(width: 5),
+                const AssistantSparkle(size: 8, color: TitoColors.softYellow),
+              ],
+            ),
+            const SizedBox(height: 11),
             AnimatedSwitcher(
               duration: reduceMotion
                   ? Duration.zero
-                  : const Duration(milliseconds: 220),
-              child: Text(
-                stage,
-                key: ValueKey(stage),
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.deepBlue,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Shimmer.fromColors(
-              enabled: !reduceMotion,
-              baseColor: TitoColors.skyBlue.withValues(alpha: 0.42),
-              highlightColor: TitoColors.card,
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                  : const Duration(milliseconds: 180),
+              layoutBuilder: (currentChild, previousChildren) => Stack(
+                alignment: Alignment.topLeft,
                 children: [
-                  _AnswerSkeletonLine(fraction: 1),
-                  SizedBox(height: 8),
-                  _AnswerSkeletonLine(fraction: 0.86),
-                  SizedBox(height: 8),
-                  _AnswerSkeletonLine(fraction: 0.62),
-                  SizedBox(height: 14),
-                  _AnswerSkeletonEvidence(),
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
                 ],
               ),
+              child: hasStreamedAnswer
+                  ? Text(
+                      '$streamedAnswer▍',
+                      key: const Key('ask-titodex-streaming-answer'),
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        height: 1.45,
+                        color: TitoColors.ink,
+                      ),
+                    )
+                  : Shimmer.fromColors(
+                      key: const ValueKey('answer-skeleton'),
+                      enabled: !reduceMotion,
+                      baseColor: _assistantSkeleton,
+                      highlightColor: _assistantPaper,
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _AnswerSkeletonLine(fraction: 1),
+                          SizedBox(height: 7),
+                          _AnswerSkeletonLine(fraction: 0.84),
+                          SizedBox(height: 7),
+                          _AnswerSkeletonLine(fraction: 0.58),
+                          SizedBox(height: 12),
+                          _AnswerSkeletonEvidence(),
+                        ],
+                      ),
+                    ),
             ),
           ],
         ),
@@ -1237,9 +1298,9 @@ class _AnswerSkeletonLine extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: fraction,
         child: Container(
-          height: 10,
+          height: 8,
           decoration: BoxDecoration(
-            color: TitoColors.skyBlue,
+            color: _assistantSkeleton,
             borderRadius: BorderRadius.circular(999),
           ),
         ),
@@ -1254,9 +1315,9 @@ class _AnswerSkeletonEvidence extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 34,
+      height: 30,
       decoration: BoxDecoration(
-        color: TitoColors.skyBlue,
+        color: _assistantSkeleton,
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -1479,9 +1540,8 @@ class _AnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (result.status == AskTitoDexStatus.failed) {
       return AssistantSurface(
-        color: TitoColors.card,
+        color: _assistantPaper,
         radius: 18,
-        cornerAccent: TitoColors.coral,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -1511,9 +1571,8 @@ class _AnswerCard extends StatelessWidget {
           ? AppZh.askTitoDexOnlineSearchedNoMatch
           : null;
       return AssistantSurface(
-        color: TitoColors.card,
+        color: _assistantPaper,
         radius: 18,
-        cornerAccent: TitoColors.softYellow,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1541,9 +1600,8 @@ class _AnswerCard extends StatelessWidget {
     final sources = _uniqueSources(result.sources);
     return AssistantSurface(
       key: const Key('ask-titodex-answer-card'),
-      color: TitoColors.card,
+      color: _assistantPaper,
       radius: 18,
-      cornerAccent: TitoColors.skyBlue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2013,9 +2071,34 @@ class _EntityLinkCardsState extends State<_EntityLinkCards> {
                 for (final link in links)
                   ActionChip(
                     key: ValueKey('ask-entity-${link.kind.name}-${link.id}'),
-                    avatar: Icon(_entityIcon(link.kind), size: 17),
+                    visualDensity: const VisualDensity(
+                      horizontal: -3,
+                      vertical: -3,
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    backgroundColor: _entityChipColor(link.kind),
+                    side: BorderSide(
+                      color: TitoColors.deepBlue.withValues(alpha: 0.28),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    labelPadding: const EdgeInsets.only(left: 3, right: 4),
+                    avatar: Icon(
+                      _entityIcon(link.kind),
+                      size: 15,
+                      color: TitoColors.deepBlue,
+                    ),
                     label: Text(
                       '${link.nameZh} · ${_entityKindLabel(link.kind)}',
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.deepBlue,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     onPressed: () => context.push(link.route),
                   ),
@@ -2035,6 +2118,12 @@ IconData _entityIcon(AskTitoDexEntityKind kind) => switch (kind) {
   AskTitoDexEntityKind.ability => Icons.bolt_rounded,
 };
 
+Color _entityChipColor(AskTitoDexEntityKind kind) => switch (kind) {
+  AskTitoDexEntityKind.pokemon => TitoColors.skyBlue.withValues(alpha: 0.34),
+  AskTitoDexEntityKind.item => TitoColors.softYellow.withValues(alpha: 0.3),
+  AskTitoDexEntityKind.move => TitoColors.coral.withValues(alpha: 0.16),
+  AskTitoDexEntityKind.ability => TitoColors.mint.withValues(alpha: 0.24),
+};
 String _entityKindLabel(AskTitoDexEntityKind kind) => switch (kind) {
   AskTitoDexEntityKind.pokemon => '图鉴',
   AskTitoDexEntityKind.item => '道具',
