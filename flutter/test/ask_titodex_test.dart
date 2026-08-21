@@ -8,8 +8,10 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:titodex/features/companion/companion_repository.dart';
 import 'package:titodex/features/game/game_edition.dart';
+import 'package:titodex/features/journey/ask_titodex_entity_links.dart';
 import 'package:titodex/features/journey/ask_titodex_history.dart';
 import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
@@ -20,6 +22,7 @@ import 'package:titodex/models/journey.dart';
 import 'package:titodex/models/parsed_save.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
 import 'package:titodex/pages/journey_page.dart';
+import 'package:titodex/widgets/assistant_surface.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
 void main() {
@@ -383,6 +386,7 @@ void main() {
     (tester) async {
       await askTitoDexSettings.enableWithConsent();
       final service = _CompleterService();
+      Uri? openedSource;
       final router = GoRouter(
         initialLocation: '/journey/ask',
         routes: [
@@ -393,6 +397,10 @@ void main() {
                 journey: _journey,
                 edition: GameEdition.hgss.withFlavor('soulsilver'),
                 service: service,
+                sourceOpener: (uri) async {
+                  openedSource = uri;
+                  return true;
+                },
               ),
             ),
           ),
@@ -403,7 +411,9 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(routerConfig: router));
       await tester.pumpAndSettle();
 
-      expect(find.text('在线能力 · 4/6 · 问答 0/50'), findsOneWidget);
+      expect(find.text('在线 4/6'), findsOneWidget);
+      expect(find.text('问答 0/50'), findsOneWidget);
+      expect(find.text('魂银 · HGSS'), findsOneWidget);
       expect(find.text('Journey Worker'), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -411,6 +421,16 @@ void main() {
       );
       expect(
         find.byKey(const Key('ask-titodex-companion-idle')),
+        findsOneWidget,
+      );
+      final statusSurface = tester.widget<AssistantSurface>(
+        find.byKey(const Key('ask-titodex-connection-status')),
+      );
+      expect(statusSurface.cornerAccent, isNull);
+      expect(statusSurface.borderWidth, 1.5);
+      expect(find.byKey(const Key('ask-titodex-save-context')), findsOneWidget);
+      expect(
+        find.byKey(const Key('ask-titodex-companion-card')),
         findsOneWidget,
       );
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
@@ -445,6 +465,11 @@ void main() {
         find.byKey(const Key('ask-titodex-question-bubble')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const Key('ask-titodex-generating-answer')),
+        findsOneWidget,
+      );
+      expect(find.text('正在交叉核对资料与联网来源'), findsOneWidget);
 
       service.complete(
         const AskTitoDexResult(
@@ -453,16 +478,53 @@ void main() {
           onlineComposed: true,
           answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
           modelUsed: true,
-          sourceKinds: ['pokeapi'],
+          confidence: 'medium',
+          sourceKinds: ['pokeapi', 'tavily', 'pokeapi'],
+          sources: [
+            ProgressionSource(
+              title: 'PokeAPI · 路卡利欧',
+              url: 'https://pokeapi.co/api/v2/pokemon-species/448/',
+              accessedAt: '2026-08-17T00:00:00Z',
+            ),
+            ProgressionSource(
+              title: '重复的 PokeAPI 引用',
+              url: 'https://pokeapi.co/api/v2/pokemon-species/448/',
+              accessedAt: '2026-08-17T00:00:00Z',
+            ),
+            ProgressionSource(
+              title: '神奇宝贝百科 · 路卡利欧',
+              url:
+                  'https://wiki.52poke.com/wiki/%E8%B7%AF%E5%8D%A1%E5%88%A9%E6%AC%A7',
+              accessedAt: '2026-08-16T00:00:00Z',
+            ),
+            ProgressionSource(
+              title: 'StrategyWiki · Pokémon Scarlet and Violet',
+              url:
+                  'https://strategywiki.org/wiki/Pok%C3%A9mon_Scarlet_and_Violet',
+              accessedAt: '2026-08-15T00:00:00Z',
+            ),
+          ],
         ),
       );
       await tester.pumpAndSettle();
 
       expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
-      expect(find.text('PokeAPI'), findsOneWidget);
-      expect(find.text('在线能力 · 4/6 · 问答 1/50'), findsOneWidget);
+      expect(find.text('检索 2 路'), findsOneWidget);
+      expect(find.text('已核验 · 参考 3 个来源'), findsOneWidget);
+      expect(find.text('参考 3 个来源'), findsNothing);
+      expect(find.text('PokeAPI · 路卡利欧'), findsNothing);
+      expect(find.text('神奇宝贝百科 · 路卡利欧'), findsNothing);
+      expect(find.byKey(const Key('ask-titodex-answer-card')), findsOneWidget);
+      expect(find.byIcon(Icons.fact_check_outlined), findsNothing);
+      expect(find.text('在线 4/6'), findsOneWidget);
+      expect(find.text('问答 1/50'), findsOneWidget);
+      expect(find.text('魂银 · HGSS'), findsOneWidget);
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
+      expect(
+        find.byKey(const Key('ask-titodex-generating-answer')),
+        findsNothing,
+      );
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
         findsOneWidget,
@@ -471,8 +533,93 @@ void main() {
         find.byKey(const Key('ask-titodex-companion-idle')),
         findsOneWidget,
       );
+
+      await tester.tap(find.byKey(const Key('ask-titodex-source-summary')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('ask-titodex-source-sheet')), findsOneWidget);
+      expect(find.text('回答引用 · 3'), findsOneWidget);
+      expect(find.text('PokeAPI'), findsOneWidget);
+      expect(find.text('Tavily'), findsOneWidget);
+      expect(find.text('PokeAPI · 路卡利欧'), findsOneWidget);
+      expect(find.text('神奇宝贝百科 · 路卡利欧'), findsOneWidget);
+      expect(find.text('重复的 PokeAPI 引用'), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('ask-titodex-source-0')));
+      await tester.pump();
+      expect(
+        openedSource,
+        Uri.parse('https://pokeapi.co/api/v2/pokemon-species/448/'),
+      );
     },
   );
+
+  testWidgets('reduced motion keeps loading and answer transitions immediate', (
+    tester,
+  ) async {
+    final binding = TestWidgetsFlutterBinding.instance;
+    binding.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(binding.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    await askTitoDexSettings.enableWithConsent();
+    final service = _CompleterService();
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: GameEdition.hgss.withFlavor('soulsilver'),
+              service: service,
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '关闭动画后也要回答',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+
+    expect(
+      find.byKey(const Key('ask-titodex-generating-answer')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widgetList<Shimmer>(find.byType(Shimmer))
+          .every((shimmer) => !shimmer.enabled),
+      isTrue,
+    );
+
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '回答会直接完整显示。',
+        confidence: 'medium',
+        sources: [
+          ProgressionSource(
+            title: '测试引用',
+            url: 'https://example.com/pokemon',
+            accessedAt: '2026-08-21T00:00:00Z',
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('回答会直接完整显示。'), findsOneWidget);
+    expect(find.text('已核验 · 参考 1 个来源'), findsOneWidget);
+  });
 
   testWidgets('newest question and completed answer stay in view', (
     tester,
@@ -579,11 +726,34 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线能力 · 5/6 · 问答 0/50'), findsOneWidget);
+    expect(find.text('在线 5/6'), findsOneWidget);
+    expect(find.text('问答 0/50'), findsOneWidget);
+    expect(find.text('魂银 · HGSS'), findsOneWidget);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
     expect(find.text('联网 · Tavily'), findsOneWidget);
     expect(find.text('可用'), findsNWidgets(5));
+    await tester.tap(find.text('知道了'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('ask-titodex-history-summary')));
+    await tester.pumpAndSettle();
+    expect(find.text('问答记录 · 0/50'), findsOneWidget);
+    expect(find.text('还没有问答记录'), findsOneWidget);
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.byKey(const Key('ask-titodex-compact-history')),
+          )
+          .onPressed,
+      isNull,
+    );
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('ask-titodex-edition-summary')));
+    await tester.pumpAndSettle();
+    expect(find.text('选择游戏版本'), findsOneWidget);
   });
 
   testWidgets('manual Violet context never displays HGSS save badges', (
@@ -610,10 +780,103 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('当前游戏版本：紫 · SV'), findsOneWidget);
+    expect(find.textContaining('紫 · SV'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
     expect(find.text(AppZh.askTitoDexBadgeContext(3)), findsNothing);
     expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-badge-context')), findsNothing);
+  });
+
+  testWidgets('late context result cannot overwrite a newer selected game', (
+    tester,
+  ) async {
+    await askTitoDexSettings.acknowledgeNotice();
+    final service = _DelayedContextService();
+    var selected = GameEdition.hgss.withFlavor('soulsilver');
+    late void Function(GameEdition edition) changeEdition;
+
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => StatefulBuilder(
+            builder: (context, setState) {
+              changeEdition = (edition) => setState(() => selected = edition);
+              return TitoPageContainer(
+                child: AskTitoDexPage(
+                  journey: _journey,
+                  edition: selected,
+                  service: service,
+                ),
+              );
+            },
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pump();
+    expect(service.contextRequests, hasLength(1));
+
+    changeEdition(gameEditionFromSlug('sv')!.withFlavor('violet'));
+    await tester.pump();
+    expect(service.contextRequests, hasLength(2));
+
+    service.completeContext(1);
+    await tester.pump();
+    service.completeContext(0);
+    await tester.pumpAndSettle();
+
+    expect(find.text('紫 · SV'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
+    expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
+    expect(find.byKey(const Key('ask-titodex-badge-context')), findsNothing);
+  });
+
+  testWidgets('entity deep links keep ball and sparkle ActionChip icons', (
+    tester,
+  ) async {
+    await askTitoDexSettings.acknowledgeNotice();
+    final historyStore = _MemoryHistoryStore([
+      AskTitoDexHistoryEntry(
+        game: 'soulsilver',
+        question: '利欧路能学电光一闪吗？',
+        result: const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '可以继续查看对应图鉴与招式资料。',
+        ),
+        createdAt: DateTime.utc(2026, 8, 21, 8),
+      ),
+    ]);
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: GameEdition.hgss.withFlavor('soulsilver'),
+              service: _FakeService(const []),
+              historyStore: historyStore,
+              entityResolver: const _FixedEntityResolver(),
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('ask-titodex-entity-links')), findsOneWidget);
+    expect(find.byType(ActionChip), findsNWidgets(2));
+    expect(find.byIcon(Icons.catching_pokemon_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.auto_awesome_rounded), findsOneWidget);
   });
 
   testWidgets(
@@ -795,6 +1058,48 @@ class _CompleterService extends AskTitoDexService {
   void complete(AskTitoDexResult result) => _answer.complete(result);
 }
 
+class _FixedEntityResolver implements AskTitoDexEntityResolver {
+  const _FixedEntityResolver();
+
+  @override
+  Future<List<AskTitoDexEntityLink>> resolve({
+    required String question,
+    required String answer,
+  }) async => const [
+    AskTitoDexEntityLink(
+      kind: AskTitoDexEntityKind.pokemon,
+      id: 447,
+      nameZh: '利欧路',
+      nameEn: 'Riolu',
+      route: '/dex/447',
+    ),
+    AskTitoDexEntityLink(
+      kind: AskTitoDexEntityKind.move,
+      id: 98,
+      nameZh: '电光一闪',
+      nameEn: 'Quick Attack',
+      route: '/dex/moves?q=%E7%94%B5%E5%85%89%E4%B8%80%E9%97%AA',
+    ),
+  ];
+}
+
+class _DelayedContextService extends AskTitoDexService {
+  final List<(AskTitoDexContext, Completer<AskTitoDexContext>)>
+  contextRequests = [];
+
+  @override
+  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) {
+    final completer = Completer<AskTitoDexContext>();
+    contextRequests.add((context, completer));
+    return completer.future;
+  }
+
+  void completeContext(int index) {
+    final request = contextRequests[index];
+    request.$2.complete(request.$1);
+  }
+}
+
 class _MemoryHistoryStore implements AskTitoDexHistoryStore {
   _MemoryHistoryStore(List<AskTitoDexHistoryEntry> entries)
     : _entries = List.of(entries);
@@ -812,6 +1117,14 @@ class _MemoryHistoryStore implements AskTitoDexHistoryStore {
     _entries = [..._entries, entry];
     if (_entries.length > askTitoDexHistoryLimit) {
       _entries = _entries.sublist(_entries.length - askTitoDexHistoryLimit);
+    }
+    return List.unmodifiable(_entries);
+  }
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> compact({int keep = 10}) async {
+    if (_entries.length > keep) {
+      _entries = _entries.sublist(_entries.length - keep);
     }
     return List.unmodifiable(_entries);
   }

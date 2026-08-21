@@ -114,11 +114,22 @@ abstract final class AppZh {
   static const askTitoDexTraceNoModel = '本次未调用 Qwen';
   static const askTitoDexTraceModel = 'Qwen 已参与';
   static const askTitoDexTraceAiSearch = 'AI Search 已命中';
+  static String askTitoDexTraceSearchRoutes(int count) => '检索 $count 路';
   static const askTitoDexOnlineFallback = '在线链路失败，本次已回退到本地资料。';
   static const askTitoDexOnlineTimeoutFallback = '在线整理超时，本次已回退到本地资料。';
   static const askTitoDexOnlineSearchedNoMatch = '在线助手已查找，但没有足够可靠的答案。';
   static const askTitoDexUnknownWarning = '部分状态无法从当前存档解析，请按答案中的未知提示自行确认。';
   static const askTitoDexSources = '核验来源';
+  static String askTitoDexSourceSummary(int count) => '参考 $count 个来源';
+  static String askTitoDexEvidenceVerified(int count) => '已核验 · 参考 $count 个来源';
+  static String askTitoDexEvidenceLowConfidence(int count) =>
+      '低置信度 · 参考 $count 个来源';
+  static const askTitoDexEvidenceLocalVerified = '本地资料已核验';
+  static const askTitoDexEvidenceUnverified = '低置信度 · 尚无可展开引用';
+  static const askTitoDexSourceSheetTitle = '回答引用';
+  static const askTitoDexSourceSheetHint = '这些页面用于生成或核验本条回答，点击即可打开原始链接。';
+  static const askTitoDexSourceLinkUnavailable = '这个引用链接暂时无法打开。';
+  static const askTitoDexSourceLinkInvalid = '链接不可用';
   static const askTitoDexNeedsClarification = '请补充游戏版本或具体地点。';
   static const askTitoDexTimeout = '在线整理超时了。旅程和存档没有受到影响，可以重试。';
   static const askTitoDexNetworkFailed = '在线服务暂时不可用。旅程仍可离线使用，请稍后重试。';

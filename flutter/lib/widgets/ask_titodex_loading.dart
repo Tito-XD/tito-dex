@@ -13,8 +13,8 @@ import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'assistant_surface.dart';
 import 'fallback_sprite_image.dart';
-import 'sticker_card.dart';
 
 /// Keeps the selected home companion beside the conversation at all times.
 /// The orbit, bob, rotating copy and shimmer start only while a request runs.
@@ -150,14 +150,35 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
         return Semantics(
           liveRegion: widget.loading,
           label: widget.loading ? '$nameZh正在查找答案' : '$nameZh已准备好',
-          child: StickerCard(
+          child: AssistantSurface(
             key: const Key('ask-titodex-companion-card'),
-            variant: StickerVariant.sky,
-            padding: const EdgeInsets.fromLTRB(10, 7, 12, 7),
+            color: Color.alphaBlend(
+              TitoColors.skyBlue.withValues(alpha: 0.5),
+              TitoColors.card,
+            ),
+            padding: const EdgeInsets.fromLTRB(8, 7, 12, 7),
+            radius: 18,
+            cornerAccent: TitoColors.deepBlue.withValues(alpha: 0.28),
             child: Row(
               children: [
-                SizedBox.square(
-                  dimension: 68,
+                Container(
+                  width: 58,
+                  height: 58,
+                  decoration: BoxDecoration(
+                    color: TitoColors.card.withValues(alpha: 0.88),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: TitoColors.deepBlue.withValues(alpha: 0.38),
+                      width: 1.25,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1F18283B),
+                        offset: Offset(0, 3),
+                        blurRadius: 7,
+                      ),
+                    ],
+                  ),
                   child: AnimatedBuilder(
                     animation: _motion,
                     builder: (context, child) {
@@ -171,7 +192,7 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                           if (widget.loading)
                             CustomPaint(
                               key: const Key('ask-titodex-loading-card'),
-                              size: const Size.square(66),
+                              size: const Size.square(56),
                               painter: _BerryOrbitPainter(
                                 progress: _motion.value,
                                 still: _reduceMotion,
@@ -186,8 +207,8 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                     },
                     child: FallbackSpriteImage(
                       sources: sources,
-                      width: 52,
-                      height: 52,
+                      width: 46,
+                      height: 46,
                       filterQuality: FilterQuality.none,
                     ),
                   ),
@@ -232,6 +253,20 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                         color: TitoColors.deepBlue,
                                         height: 1.25,
                                       ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              SizedBox(
+                                height: 6,
+                                child: AnimatedBuilder(
+                                  animation: _motion,
+                                  builder: (context, _) => CustomPaint(
+                                    painter: _CompanionRoutePainter(
+                                      progress: _reduceMotion
+                                          ? 0.35
+                                          : _motion.value,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -303,4 +338,35 @@ class _BerryOrbitPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _BerryOrbitPainter oldDelegate) =>
       oldDelegate.progress != progress || oldDelegate.still != still;
+}
+
+class _CompanionRoutePainter extends CustomPainter {
+  const _CompanionRoutePainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final line = Paint()
+      ..color = TitoColors.deepBlue.withValues(alpha: 0.18)
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+    const dash = 7.0;
+    const gap = 5.0;
+    final y = size.height / 2;
+    for (var x = 0.0; x < size.width; x += dash + gap) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + dash, size.width), y),
+        line,
+      );
+    }
+    final position = Offset(size.width * progress.clamp(0.0, 1.0), y);
+    canvas.drawCircle(position, 3.6, Paint()..color = TitoColors.card);
+    canvas.drawCircle(position, 2.6, Paint()..color = TitoColors.coral);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CompanionRoutePainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
