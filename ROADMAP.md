@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.17) · Lite `0.8.17+168` · Offline `0.8.17-offline+169`.
+> **Latest release:** [v0.8.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.18) · Lite `0.8.18+170` · Offline `0.8.18-offline+171`.
 >
-> **Current `main`:** v0.8.17 release baseline with modern Ask TitoDex conversation UI, segmented connection/history/game controls, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.18 release baseline with polished Ask TitoDex surfaces, streamed verified answers, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,12 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.18
+
+- Remove the stray right-angle corner decorations from answer, loading and composer surfaces; present the selected companion as an unboxed sprite with subtle four-point sparkles.
+- Refine the light conversation paper, shimmer loading state and compact Pokémon/item/move/ability ActionChips while retaining their Poké Ball, backpack, sparkle and bolt semantics.
+- Stream bounded answer deltas only after the Worker has completed its existing evidence and fact verification; keep one-line JSON compatibility and deterministic local fallback.
 
 ## Completed in v0.8.17
 

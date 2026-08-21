@@ -6,8 +6,8 @@ import '../theme/tito_colors.dart';
 /// A lighter surface language reserved for the assistant conversation.
 ///
 /// It keeps TitoDex's cream/slate palette while replacing the global sticker
-/// border and solid drop shadow with hairline outlines, shallow depth and two
-/// restrained guide-corner marks. Flat mode still removes the shadow.
+/// border and solid drop shadow with hairline outlines and shallow depth.
+/// Flat mode still removes the shadow.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,
@@ -17,7 +17,6 @@ class AssistantSurface extends StatelessWidget {
     this.radius = 20,
     this.borderColor,
     this.borderWidth = 1.25,
-    this.cornerAccent,
     this.shadow = true,
   });
 
@@ -27,7 +26,6 @@ class AssistantSurface extends StatelessWidget {
   final double radius;
   final Color? borderColor;
   final double borderWidth;
-  final Color? cornerAccent;
   final bool shadow;
 
   @override
@@ -54,61 +52,70 @@ class AssistantSurface extends StatelessWidget {
         ),
         child: content,
       ),
-      child: Stack(
-        children: [
-          Padding(padding: padding, child: child),
-          if (cornerAccent case final accent?)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _AssistantCornerPainter(color: accent),
-                ),
-              ),
-            ),
-        ],
-      ),
+      child: Padding(padding: padding, child: child),
     );
   }
 }
 
-class _AssistantCornerPainter extends CustomPainter {
-  const _AssistantCornerPainter({required this.color});
+/// A small four-point glint used sparingly around assistant motion states.
+class AssistantSparkle extends StatelessWidget {
+  const AssistantSparkle({
+    super.key,
+    this.size = 14,
+    this.color = TitoColors.coral,
+  });
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: size,
+    child: CustomPaint(painter: _AssistantSparklePainter(color: color)),
+  );
+}
+
+class _AssistantSparklePainter extends CustomPainter {
+  const _AssistantSparklePainter({required this.color});
 
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (size.width < 44 || size.height < 32) return;
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-    const inset = 10.0;
-    const length = 13.0;
-    canvas.drawLine(
-      const Offset(inset, inset + length),
-      const Offset(inset, inset),
-      paint,
-    );
-    canvas.drawLine(
-      const Offset(inset, inset),
-      const Offset(inset + length, inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width - inset - length, size.height - inset),
-      Offset(size.width - inset, size.height - inset),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.width - inset, size.height - inset),
-      Offset(size.width - inset, size.height - inset - length),
-      paint,
-    );
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide / 2;
+    final waist = radius * 0.22;
+    final path = Path()
+      ..moveTo(center.dx, center.dy - radius)
+      ..quadraticBezierTo(
+        center.dx + waist,
+        center.dy - waist,
+        center.dx + radius,
+        center.dy,
+      )
+      ..quadraticBezierTo(
+        center.dx + waist,
+        center.dy + waist,
+        center.dx,
+        center.dy + radius,
+      )
+      ..quadraticBezierTo(
+        center.dx - waist,
+        center.dy + waist,
+        center.dx - radius,
+        center.dy,
+      )
+      ..quadraticBezierTo(
+        center.dx - waist,
+        center.dy - waist,
+        center.dx,
+        center.dy - radius,
+      )
+      ..close();
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(covariant _AssistantCornerPainter oldDelegate) =>
+  bool shouldRepaint(covariant _AssistantSparklePainter oldDelegate) =>
       oldDelegate.color != color;
 }

@@ -15,8 +15,9 @@ class AskTitoDexConfig {
 const _workerAskPath = '/v1/ask';
 const _workerHealthPath = '/health';
 const _maxHealthResponseBytes = 8192;
+const _maxAskStreamResponseBytes = 64 * 1024;
 
-enum AskTitoDexProgress { checkingLocal, contactingWorker }
+enum AskTitoDexProgress { checkingLocal, contactingWorker, revealingAnswer }
 
 enum AskTitoDexAvailability { checking, online, disabled, unavailable }
 
@@ -87,7 +88,37 @@ abstract class AskTitoDexOnlineClient {
   Future<AskTitoDexWorkerStatus> checkStatus();
 }
 
-class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
+class AskTitoDexOnlineStreamEvent {
+  const AskTitoDexOnlineStreamEvent._({
+    this.progress,
+    this.answerDelta,
+    this.result,
+  });
+
+  const AskTitoDexOnlineStreamEvent.progress(AskTitoDexProgress progress)
+    : this._(progress: progress);
+
+  const AskTitoDexOnlineStreamEvent.answerDelta(String delta)
+    : this._(answerDelta: delta);
+
+  const AskTitoDexOnlineStreamEvent.result(AskTitoDexResult result)
+    : this._(result: result);
+
+  final AskTitoDexProgress? progress;
+  final String? answerDelta;
+  final AskTitoDexResult? result;
+}
+
+abstract interface class AskTitoDexStreamingOnlineClient {
+  Stream<AskTitoDexOnlineStreamEvent> askStream(
+    String question,
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  });
+}
+
+class HttpAskTitoDexOnlineClient
+    implements AskTitoDexOnlineClient, AskTitoDexStreamingOnlineClient {
   HttpAskTitoDexOnlineClient({
     http.Client? client,
     String endpoint = AskTitoDexConfig.workerUrl,
@@ -204,6 +235,89 @@ class HttpAskTitoDexOnlineClient implements AskTitoDexOnlineClient {
     }
     return AskTitoDexResult.fromJson(body);
   }
+
+  @override
+  Stream<AskTitoDexOnlineStreamEvent> askStream(
+    String question,
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  }) async* {
+    if (!isConfigured) {
+      throw const AskTitoDexOnlineException('worker_not_configured');
+    }
+    final deviceKey = await _deviceKeyProvider();
+    final request = http.Request('POST', Uri.parse(endpoint))
+      ..headers.addAll({
+        'content-type': 'application/json',
+        'accept': 'application/x-ndjson, application/json',
+        'x-titodex-device-key': deviceKey,
+      })
+      ..body = jsonEncode({
+        'question': question,
+        'context': context.toRequestJson(),
+        if (history.isNotEmpty) 'history': history,
+      });
+    final response = await _client.send(request).timeout(timeout);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw AskTitoDexOnlineException('http_${response.statusCode}');
+    }
+
+    var totalBytes = 0;
+    var sawResult = false;
+    final lines = response.stream
+        .timeout(timeout)
+        .transform(utf8.decoder)
+        .transform(const LineSplitter());
+    await for (final line in lines) {
+      if (line.trim().isEmpty) continue;
+      totalBytes += utf8.encode(line).length + 1;
+      if (totalBytes > _maxAskStreamResponseBytes) {
+        throw const AskTitoDexOnlineException('stream_response_too_large');
+      }
+      final decoded = jsonDecode(line);
+      if (decoded is! Map) {
+        throw const AskTitoDexOnlineException('invalid_stream_event');
+      }
+      final body = Map<String, dynamic>.from(decoded);
+      switch (body['type']) {
+        case 'progress':
+          if (body['stage'] == 'writing') {
+            yield const AskTitoDexOnlineStreamEvent.progress(
+              AskTitoDexProgress.revealingAnswer,
+            );
+          }
+        case 'answer_delta':
+          final delta = body['delta'];
+          if (delta is! String || delta.isEmpty || delta.length > 80) {
+            throw const AskTitoDexOnlineException('invalid_stream_delta');
+          }
+          yield AskTitoDexOnlineStreamEvent.answerDelta(delta);
+        case 'result':
+          if (body['result'] is! Map) {
+            throw const AskTitoDexOnlineException('invalid_stream_result');
+          }
+          sawResult = true;
+          yield AskTitoDexOnlineStreamEvent.result(
+            AskTitoDexResult.fromJson(
+              Map<String, dynamic>.from(body['result'] as Map),
+            ),
+          );
+        default:
+          // Older Workers ignore the Accept header and return the original
+          // one-line JSON response. Treat it as the final event.
+          if (body['status'] is! String) {
+            throw const AskTitoDexOnlineException('invalid_stream_event');
+          }
+          sawResult = true;
+          yield AskTitoDexOnlineStreamEvent.result(
+            AskTitoDexResult.fromJson(body),
+          );
+      }
+    }
+    if (!sawResult) {
+      throw const AskTitoDexOnlineException('stream_missing_result');
+    }
+  }
 }
 
 class AskTitoDexOnlineException implements Exception {
@@ -255,17 +369,49 @@ class AskTitoDexService {
     AskTitoDexContext context, {
     List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
+    void Function(String delta)? onAnswerDelta,
   }) async {
     onProgress?.call(AskTitoDexProgress.checkingLocal);
     final local = await _hints.answer(question, context);
+    final client = _online;
     if (local.status == AskTitoDexStatus.answered ||
-        _online == null ||
+        client == null ||
         !askTitoDexSettings.enabled) {
       return local;
     }
     onProgress?.call(AskTitoDexProgress.contactingWorker);
     try {
-      final online = await _online.ask(question, context, history: history);
+      if (client is AskTitoDexStreamingOnlineClient) {
+        AskTitoDexResult? online;
+        final streamedAnswer = StringBuffer();
+        final streamingClient = client as AskTitoDexStreamingOnlineClient;
+        await for (final event in streamingClient.askStream(
+          question,
+          context,
+          history: history,
+        )) {
+          if (event.progress case final progress?) {
+            onProgress?.call(progress);
+          }
+          if (event.answerDelta case final delta?) {
+            if (streamedAnswer.length + delta.length > 1200) {
+              throw const AskTitoDexOnlineException('stream_answer_too_large');
+            }
+            streamedAnswer.write(delta);
+            onAnswerDelta?.call(delta);
+          }
+          if (event.result case final result?) online = result;
+        }
+        if (online == null) {
+          throw const AskTitoDexOnlineException('stream_missing_result');
+        }
+        final streamed = streamedAnswer.toString();
+        if (streamed.isNotEmpty && streamed != online.answer) {
+          throw const AskTitoDexOnlineException('stream_answer_mismatch');
+        }
+        return online.withRuntimeTrace(onlineAttempted: true);
+      }
+      final online = await client.ask(question, context, history: history);
       return online.withRuntimeTrace(onlineAttempted: true);
     } on TimeoutException {
       return local.withRuntimeTrace(
