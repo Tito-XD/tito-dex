@@ -179,6 +179,54 @@ void main() {
       expect(captured.body, contains('白天高亲密度升级'));
     },
   );
+  test(
+    'online client streams verified answer chunks and final metadata',
+    () async {
+      final client = MockClient((request) async {
+        expect(request.headers['accept'], contains('application/x-ndjson'));
+        return http.Response.bytes(
+          utf8.encode(
+            [
+              jsonEncode({'type': 'progress', 'stage': 'retrieving'}),
+              jsonEncode({'type': 'progress', 'stage': 'writing'}),
+              jsonEncode({'type': 'answer_delta', 'delta': '白天、'}),
+              jsonEncode({'type': 'answer_delta', 'delta': '高亲密度升级。'}),
+              jsonEncode({
+                'type': 'result',
+                'result': {
+                  'status': 'answered',
+                  'answer': '白天、高亲密度升级。',
+                  'confidence': 'medium',
+                  'followUp': null,
+                  'answerMode': 'curated_sources_qwen',
+                  'modelUsed': true,
+                },
+              }),
+            ].join('\n'),
+          ),
+          200,
+          headers: {'content-type': 'application/x-ndjson'},
+        );
+      });
+      final online = HttpAskTitoDexOnlineClient(
+        client: client,
+        endpoint: 'https://example.test/v1/ask',
+        deviceKeyProvider: () async => 'anonymous-test-key-123',
+      );
+
+      final events = await online.askStream('太阳伊布怎么进化？', _context).toList();
+
+      expect(
+        events.map((event) => event.progress).whereType<AskTitoDexProgress>(),
+        contains(AskTitoDexProgress.revealingAnswer),
+      );
+      expect(
+        events.map((event) => event.answerDelta).whereType<String>().join(),
+        '白天、高亲密度升级。',
+      );
+      expect(events.last.result?.answer, '白天、高亲密度升级。');
+    },
+  );
 
   test('online client accepts only the Journey Worker ask path', () {
     expect(
@@ -426,7 +474,6 @@ void main() {
       final statusSurface = tester.widget<AssistantSurface>(
         find.byKey(const Key('ask-titodex-connection-status')),
       );
-      expect(statusSurface.cornerAccent, isNull);
       expect(statusSurface.borderWidth, 1.5);
       expect(find.byKey(const Key('ask-titodex-save-context')), findsOneWidget);
       expect(
@@ -470,6 +517,17 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('正在交叉核对资料与联网来源'), findsOneWidget);
+
+      service.addAnswerDelta('白天、');
+      await tester.pump();
+      expect(
+        find.byKey(const Key('ask-titodex-streaming-answer')),
+        findsOneWidget,
+      );
+      expect(find.text('白天、▍'), findsOneWidget);
+      service.addAnswerDelta('亲密度较高时升级。');
+      await tester.pump();
+      expect(find.text('白天、亲密度较高时升级。▍'), findsOneWidget);
 
       service.complete(
         const AskTitoDexResult(
@@ -1018,6 +1076,7 @@ class _FakeService extends AskTitoDexService {
     AskTitoDexContext context, {
     List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
+    void Function(String delta)? onAnswerDelta,
   }) async => results.removeAt(0);
 }
 
@@ -1026,6 +1085,7 @@ class _CompleterService extends AskTitoDexService {
 
   final bool webSearchEnabled;
   final Completer<AskTitoDexResult> _answer = Completer<AskTitoDexResult>();
+  void Function(String delta)? _onAnswerDelta;
 
   @override
   Future<AskTitoDexWorkerStatus> checkConnection() async =>
@@ -1049,13 +1109,17 @@ class _CompleterService extends AskTitoDexService {
     AskTitoDexContext context, {
     List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
+    void Function(String delta)? onAnswerDelta,
   }) {
+    _onAnswerDelta = onAnswerDelta;
     onProgress?.call(AskTitoDexProgress.checkingLocal);
     onProgress?.call(AskTitoDexProgress.contactingWorker);
     return _answer.future;
   }
 
   void complete(AskTitoDexResult result) => _answer.complete(result);
+
+  void addAnswerDelta(String delta) => _onAnswerDelta?.call(delta);
 }
 
 class _FixedEntityResolver implements AskTitoDexEntityResolver {

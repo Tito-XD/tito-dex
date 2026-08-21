@@ -153,49 +153,33 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
           child: AssistantSurface(
             key: const Key('ask-titodex-companion-card'),
             color: Color.alphaBlend(
-              TitoColors.skyBlue.withValues(alpha: 0.5),
-              TitoColors.card,
+              TitoColors.skyBlue.withValues(alpha: 0.62),
+              const Color(0xFFFFFBF2),
             ),
-            padding: const EdgeInsets.fromLTRB(8, 7, 12, 7),
+            padding: const EdgeInsets.fromLTRB(10, 7, 13, 7),
             radius: 18,
-            cornerAccent: TitoColors.deepBlue.withValues(alpha: 0.28),
+            borderColor: TitoColors.deepBlue.withValues(alpha: 0.4),
             child: Row(
               children: [
-                Container(
-                  width: 58,
+                SizedBox(
+                  width: 66,
                   height: 58,
-                  decoration: BoxDecoration(
-                    color: TitoColors.card.withValues(alpha: 0.88),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: TitoColors.deepBlue.withValues(alpha: 0.38),
-                      width: 1.25,
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1F18283B),
-                        offset: Offset(0, 3),
-                        blurRadius: 7,
-                      ),
-                    ],
-                  ),
                   child: AnimatedBuilder(
                     animation: _motion,
                     builder: (context, child) {
                       final phase = _motion.value * math.pi * 2;
                       final bob = widget.loading && !_reduceMotion
-                          ? math.sin(phase) * 3
+                          ? math.sin(phase) * 2.4
                           : 0.0;
                       return Stack(
+                        clipBehavior: Clip.none,
                         alignment: Alignment.center,
                         children: [
                           if (widget.loading)
-                            CustomPaint(
+                            Positioned.fill(
                               key: const Key('ask-titodex-loading-card'),
-                              size: const Size.square(56),
-                              painter: _BerryOrbitPainter(
-                                progress: _motion.value,
-                                still: _reduceMotion,
+                              child: _CompanionSparkleCluster(
+                                progress: _reduceMotion ? 0.18 : _motion.value,
                               ),
                             ),
                           Transform.translate(
@@ -207,13 +191,13 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                     },
                     child: FallbackSpriteImage(
                       sources: sources,
-                      width: 46,
-                      height: 46,
+                      width: 52,
+                      height: 52,
                       filterQuality: FilterQuality.none,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 7),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: _reduceMotion
@@ -228,7 +212,7 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                               Shimmer.fromColors(
                                 enabled: !_reduceMotion,
                                 baseColor: TitoColors.deepBlue,
-                                highlightColor: TitoColors.card,
+                                highlightColor: const Color(0xFFFFFBF2),
                                 child: Text(
                                   widget.progress ==
                                           AskTitoDexProgress.checkingLocal
@@ -253,20 +237,6 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                         color: TitoColors.deepBlue,
                                         height: 1.25,
                                       ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              SizedBox(
-                                height: 6,
-                                child: AnimatedBuilder(
-                                  animation: _motion,
-                                  builder: (context, _) => CustomPaint(
-                                    painter: _CompanionRoutePainter(
-                                      progress: _reduceMotion
-                                          ? 0.35
-                                          : _motion.value,
-                                    ),
-                                  ),
                                 ),
                               ),
                             ],
@@ -302,71 +272,49 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
   }
 }
 
-class _BerryOrbitPainter extends CustomPainter {
-  const _BerryOrbitPainter({required this.progress, required this.still});
-
-  final double progress;
-  final bool still;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    const colors = [TitoColors.coral, TitoColors.softYellow, TitoColors.mint];
-    final orbit = size.shortestSide * 0.42;
-    for (var index = 0; index < colors.length; index += 1) {
-      final angle =
-          (still ? 0.12 : progress) * math.pi * 2 +
-          index * math.pi * 2 / colors.length;
-      final point = center + Offset(math.cos(angle), math.sin(angle)) * orbit;
-      canvas.drawCircle(
-        point,
-        5,
-        Paint()
-          ..color = TitoColors.ink
-          ..style = PaintingStyle.fill,
-      );
-      canvas.drawCircle(
-        point,
-        3.2,
-        Paint()
-          ..color = colors[index]
-          ..style = PaintingStyle.fill,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _BerryOrbitPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.still != still;
-}
-
-class _CompanionRoutePainter extends CustomPainter {
-  const _CompanionRoutePainter({required this.progress});
+class _CompanionSparkleCluster extends StatelessWidget {
+  const _CompanionSparkleCluster({required this.progress});
 
   final double progress;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final line = Paint()
-      ..color = TitoColors.deepBlue.withValues(alpha: 0.18)
-      ..strokeWidth = 1.2
-      ..strokeCap = StrokeCap.round;
-    const dash = 7.0;
-    const gap = 5.0;
-    final y = size.height / 2;
-    for (var x = 0.0; x < size.width; x += dash + gap) {
-      canvas.drawLine(
-        Offset(x, y),
-        Offset(math.min(x + dash, size.width), y),
-        line,
-      );
-    }
-    final position = Offset(size.width * progress.clamp(0.0, 1.0), y);
-    canvas.drawCircle(position, 3.6, Paint()..color = TitoColors.card);
-    canvas.drawCircle(position, 2.6, Paint()..color = TitoColors.coral);
+  Widget build(BuildContext context) {
+    final pulse = (0.72 + math.sin(progress * math.pi * 2) * 0.2).clamp(
+      0.5,
+      1.0,
+    );
+    final counterPulse = (0.72 + math.cos(progress * math.pi * 2) * 0.2).clamp(
+      0.5,
+      1.0,
+    );
+    return IgnorePointer(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: 2,
+            top: 5,
+            child: Opacity(
+              opacity: pulse,
+              child: Transform.scale(
+                scale: pulse,
+                child: const AssistantSparkle(size: 13),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 1,
+            bottom: 7,
+            child: Opacity(
+              opacity: counterPulse,
+              child: Transform.scale(
+                scale: counterPulse,
+                child: const AssistantSparkle(size: 9),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant _CompanionRoutePainter oldDelegate) =>
-      oldDelegate.progress != progress;
 }

@@ -388,6 +388,35 @@ describe('journey assistant Worker contract', () => {
     expect(value.aiSearchUsed).toBe(false);
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
+  it('streams only the completed verified answer with final metadata', async () => {
+    const response = await SELF.fetch('https://assistant.test/v1/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/x-ndjson',
+        'x-titodex-device-key': 'stream-answer-key-12345',
+      },
+      body: body(),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/x-ndjson');
+    const events = new TextDecoder().decode(await response.arrayBuffer())
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+    expect(events[0]).toEqual({ type: 'progress', stage: 'retrieving' });
+    expect(events.at(-1)?.type).toBe('result');
+    const result = events.at(-1)?.result as AssistantResponse;
+    const streamedAnswer = events
+      .filter((event) => event.type === 'answer_delta')
+      .map((event) => event.delta)
+      .join('');
+    expect(result.status).toBe('answered');
+    expect(streamedAnswer).toBe(result.answer);
+    expect(JSON.stringify(events)).not.toContain('stream-answer-key');
+  });
+
 
   it('answers exact-version encounter questions from the bounded Dex R2 bundle first', async () => {
     await seedDexBundle({
