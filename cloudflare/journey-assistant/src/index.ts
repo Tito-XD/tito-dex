@@ -34,7 +34,7 @@ const MODEL_TIMEOUT_MS = 10_000;
 const CURATED_MODEL_TIMEOUT_MS = 6_000;
 const SEARCH_TIMEOUT_MS = 2_500;
 const MAX_PROVIDER_RESPONSE_BYTES = 16_384;
-const MAX_DEEPSEEK_SOURCE_FOOTER_CHARS = 600;
+const MAX_DEEPSEEK_CITATION_CHARS = 600;
 const EXTENSION_CATALOG_PATH = '/v1/extensions/journey_assistant/catalog';
 const EXTENSION_OBJECT_PATH_PREFIX = '/v1/extensions/journey_assistant/objects/';
 const EXTENSION_CATALOG_KEY = 'extensions/journey-assistant/extension-catalog.json';
@@ -264,6 +264,7 @@ export default {
           curatedSourcesUsed = true;
         }
       }
+      response = normalizeResponseAnswer(response);
       response = attachExecutionTrace(response, trace, curatedSourcesUsed);
       console.log(JSON.stringify(buildLogRecord(response, parsed)));
       return response;
@@ -555,11 +556,29 @@ export async function reconcileParallelAnswers(
   };
 }
 
+const LEGACY_ANSWER_ENVELOPES = new Set([
+  '联网参考（未经 TitoDex 人工审核）：',
+  'DeepSeek 原生联网参考（未经 TitoDex 人工审核）：',
+  'TitoDex 图鉴包 + 联网参考（未经人工审核）：',
+  'TitoDex 图鉴包整理：',
+]);
+
 function stripAnswerEnvelope(answer: string): string {
-  const withoutSources = answer.split('\n\n来源：', 1)[0] ?? answer;
+  const sourceFooter = /\n{2,}(?:#{1,6}[ \t]*)?来源[：:][ \t]*(?:\n|$)/u.exec(answer);
+  const withoutSources = sourceFooter
+    ? answer.slice(0, sourceFooter.index)
+    : answer;
   const lines = withoutSources.split('\n');
-  if (lines.length > 1 && lines[0].endsWith('：')) lines.shift();
+  if (lines.length > 1 && LEGACY_ANSWER_ENVELOPES.has(lines[0].trim())) {
+    lines.shift();
+  }
   return lines.join('\n').trim().slice(0, MAX_ANSWER_LENGTH);
+}
+
+function normalizeResponseAnswer(response: AssistantResponse): AssistantResponse {
+  if (response.status !== 'answered' || !response.answer) return response;
+  const answer = stripAnswerEnvelope(response.answer);
+  return answer === response.answer ? response : { ...response, answer };
 }
 
 function mergeResponseSources(
@@ -653,19 +672,11 @@ function buildDeepSeekNativeResponse(
 ): AssistantResponse {
   const generalFranchise = isGeneralPokemonFranchiseQuestion(request.question);
   const citedSources = deepSeekCitedSources(result, false);
-  const sourceLines = citedSources.map((source, index) =>
-    deepSeekSourceLine(source, index));
-  const heading = 'DeepSeek 原生联网参考（未经 TitoDex 人工审核）：';
-  const footer = `\n\n来源：\n${sourceLines.join('\n')}`;
-  const answerBudget = Math.max(
-    1,
-    MAX_ANSWER_LENGTH - heading.length - footer.length - 1,
-  );
   const reliability = effectiveContextReliability(request.context);
   const accessedAt = new Date().toISOString().slice(0, 10);
   return {
     status: 'answered',
-    answer: `${heading}\n${verifiedAnswer.slice(0, answerBudget)}${footer}`,
+    answer: verifiedAnswer.slice(0, MAX_ANSWER_LENGTH),
     contextUsed: generalFranchise
       ? { scope: 'pokemon_franchise' }
       : {
@@ -698,14 +709,14 @@ function deepSeekCitedSources(
   requireSnippet: boolean,
 ) {
   const cited: Array<DeepSeekNativeAnswer['sources'][number]> = [];
-  let footerChars = 0;
+  let citationChars = 0;
   for (const source of result.sources) {
     if (requireSnippet && !source.snippet) continue;
     const lineLength = deepSeekSourceLine(source, cited.length).length + 1;
-    if (lineLength > MAX_DEEPSEEK_SOURCE_FOOTER_CHARS) continue;
-    if (footerChars + lineLength > MAX_DEEPSEEK_SOURCE_FOOTER_CHARS) break;
+    if (lineLength > MAX_DEEPSEEK_CITATION_CHARS) continue;
+    if (citationChars + lineLength > MAX_DEEPSEEK_CITATION_CHARS) break;
     cited.push(source);
-    footerChars += lineLength;
+    citationChars += lineLength;
   }
   return cited;
 }

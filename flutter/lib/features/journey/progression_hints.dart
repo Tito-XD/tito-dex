@@ -9,6 +9,33 @@ import '../game/game_edition.dart';
 
 enum AskTitoDexStatus { answered, needsClarification, noMatch, failed }
 
+final _askTitoDexSourceFooter = RegExp(
+  r'\n{2,}(?:#{1,6}[ \t]*)?来源[：:][ \t]*(?:\n|$)',
+  multiLine: true,
+);
+
+final _askTitoDexAnswerEnvelope = RegExp(
+  r'^(?:联网参考（未经 TitoDex 人工审核）|'
+  r'DeepSeek 原生联网参考（未经 TitoDex 人工审核）|'
+  r'TitoDex 图鉴包 \+ 联网参考（未经人工审核）|'
+  r'TitoDex 图鉴包整理)[：:][ \t]*\n',
+);
+
+/// Returns the user-facing answer body without the legacy inline citation
+/// footer. Sources already travel in [AskTitoDexResult.sources] and render in
+/// the dedicated expandable evidence sheet.
+///
+/// Keep the stored/network value untouched so old streaming Workers can still
+/// compare their deltas with the final result byte-for-byte. Call this helper
+/// only when displaying an answer or placing it in bounded follow-up context.
+String askTitoDexAnswerBody(String value) {
+  var body = value.replaceAll('\r\n', '\n').replaceAll('\r', '\n').trim();
+  final footer = _askTitoDexSourceFooter.firstMatch(body);
+  if (footer != null) body = body.substring(0, footer.start).trimRight();
+  body = body.replaceFirst(_askTitoDexAnswerEnvelope, '').trim();
+  return body;
+}
+
 enum AskTitoDexAnswerMode {
   localAudited('local_audited'),
   auditedOnline('audited_online'),

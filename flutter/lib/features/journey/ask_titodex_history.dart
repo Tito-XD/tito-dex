@@ -23,7 +23,7 @@ class AskTitoDexHistoryEntry {
 
   String? get assistantContent {
     final value = result.answer ?? result.followUp;
-    final trimmed = value?.trim();
+    final trimmed = value == null ? null : askTitoDexAnswerBody(value);
     return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 

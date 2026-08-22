@@ -532,7 +532,17 @@ void main() {
       service.complete(
         const AskTitoDexResult(
           status: AskTitoDexStatus.answered,
-          answer: '白天、亲密度较高时升级。',
+          answer: '''DeepSeek 原生联网参考（未经 TitoDex 人工审核）：
+## 升级习得
+
+**白天、亲密度较高时升级。**
+
+| 等级 | 招式 |
+| --- | --- |
+| 1 | 看穿 |
+
+来源：
+[1] PokeAPI · 路卡利欧：https://pokeapi.co/api/v2/pokemon-species/448/''',
           onlineComposed: true,
           answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
           modelUsed: true,
@@ -571,6 +581,14 @@ void main() {
       expect(find.text('检索 2 路'), findsOneWidget);
       expect(find.text('已核验 · 参考 3 个来源'), findsOneWidget);
       expect(find.text('参考 3 个来源'), findsNothing);
+      expect(find.text('升级习得'), findsOneWidget);
+      expect(find.text('## 升级习得'), findsNothing);
+      expect(find.text('等级'), findsOneWidget);
+      expect(find.text('招式'), findsOneWidget);
+      expect(find.text('看穿'), findsOneWidget);
+      expect(find.text('来源：'), findsNothing);
+      expect(find.textContaining('https://pokeapi.co/'), findsNothing);
+      expect(find.textContaining('DeepSeek 原生联网参考'), findsNothing);
       expect(find.text('PokeAPI · 路卡利欧'), findsNothing);
       expect(find.text('神奇宝贝百科 · 路卡利欧'), findsNothing);
       expect(find.byKey(const Key('ask-titodex-answer-card')), findsOneWidget);
