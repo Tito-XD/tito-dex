@@ -59,6 +59,12 @@ type ReferenceDataConfig = {
 
 type HeldItemLookup = Map<string, { id: number; name: string }>;
 
+export type DexBundleAnswerResult = {
+  response: AssistantResponse;
+  localSource: CuratedSource;
+  requiresOnlineVerification: boolean;
+};
+
 const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel>);
 const itemTargets = buildTargets(itemLabels as Record<string, SpeciesLabel>);
 const moveTargets = buildTargets(moveLabels as Record<string, SpeciesLabel>);
@@ -188,7 +194,7 @@ const typeLabels: Record<string, string> = {
 export async function answerFromDexBundle(
   request: AssistantRequest,
   bucket: R2Bucket | undefined,
-): Promise<AssistantResponse | null> {
+): Promise<DexBundleAnswerResult | null> {
   if (!bucket) return null;
   const species = findTarget(request.question, speciesTargets);
   const item = findTarget(request.question, itemTargets);
@@ -216,10 +222,18 @@ export async function answerFromDexBundle(
       ? await readGameplaySpeciesShard(bucket, manifest.cdnPrefix as string, species.id)
       : null;
     if (encounterIntent.test(request.question)) {
-      return answerEncounter(request, detail, species, bundleVersion, gameplayShard);
+      return bundleAnswerResult(
+        request,
+        answerEncounter(request, detail, species, bundleVersion, gameplayShard),
+        bundleVersion,
+      );
     }
     if (move && moveLearningIntent.test(request.question)) {
-      return answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard);
+      return bundleAnswerResult(
+        request,
+        answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard),
+        bundleVersion,
+      );
     }
     if (heldItemIntent.test(request.question)) {
       const itemLookup = bundleVersion >= 20
@@ -231,10 +245,18 @@ export async function answerFromDexBundle(
           `${manifest.cdnPrefix}/items.json`,
           MAX_ITEMS_BYTES,
         ));
-      return answerHeldItems(request, detail, species, item, itemLookup, bundleVersion);
+      return bundleAnswerResult(
+        request,
+        answerHeldItems(request, detail, species, item, itemLookup, bundleVersion),
+        bundleVersion,
+      );
     }
     if (speciesProfileIntent.test(request.question)) {
-      return answerSpeciesProfile(request, detail, species, bundleVersion);
+      return bundleAnswerResult(
+        request,
+        answerSpeciesProfile(request, detail, species, bundleVersion),
+        bundleVersion,
+      );
     }
   }
 
@@ -248,7 +270,11 @@ export async function answerFromDexBundle(
         `${manifest.cdnPrefix}/items.json`,
         MAX_ITEMS_BYTES,
       ), item.id);
-    return answerItemInfo(request, item, value, bundleVersion);
+    return bundleAnswerResult(
+      request,
+      answerItemInfo(request, item, value, bundleVersion),
+      bundleVersion,
+    );
   }
   if (ability && abilityInfoIntent.test(request.question)) {
     const value = bundleVersion >= 20
@@ -260,13 +286,21 @@ export async function answerFromDexBundle(
         `${manifest.cdnPrefix}/dex_catalog.json`,
         MAX_CATALOG_BYTES,
       ), 'abilities', ability.id);
-    return answerAbilityInfo(request, ability, value, bundleVersion);
+    return bundleAnswerResult(
+      request,
+      answerAbilityInfo(request, ability, value, bundleVersion),
+      bundleVersion,
+    );
   }
   if (move && moveInfoIntent.test(request.question) && bundleVersion >= 20 && referenceConfig) {
     const value = await readReferenceEntityShard(
       bucket, manifest.cdnPrefix as string, 'move', move, referenceConfig,
     );
-    return answerMoveInfo(request, move, value, bundleVersion);
+    return bundleAnswerResult(
+      request,
+      answerMoveInfo(request, move, value, bundleVersion),
+      bundleVersion,
+    );
   }
   return null;
 }
@@ -660,6 +694,32 @@ function answerMoveInfo(
     'medium',
     ['这是 bundle 的通用招式值；旧世代数值变化需再按版本核对。'],
   );
+}
+
+function bundleAnswerResult(
+  request: AssistantRequest,
+  response: AssistantResponse | null,
+  bundleVersion: number,
+): DexBundleAnswerResult | null {
+  if (!response || !response.answer) return null;
+  const source: CuratedSource = {
+    id: `dex-bundle-v${bundleVersion}`,
+    title: `TitoDex Dex bundle v${bundleVersion} · 本地结构化底稿`,
+    text: JSON.stringify({
+      exactGame: request.context.game,
+      answer: response.answer,
+      verifiedFacts: response.verifiedFacts ?? [],
+      unknowns: response.unknowns ?? [],
+    }).slice(0, 6_000),
+  };
+  return {
+    response,
+    localSource: source,
+    // V20 reference/gameplay projections declare online-verify provenance.
+    // They remain the deterministic offline fallback, but an online-capable
+    // request must continue through the allowlisted corroboration pipeline.
+    requiresOnlineVerification: bundleVersion >= 20,
+  };
 }
 
 function bundleResponse(

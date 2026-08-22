@@ -928,6 +928,152 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(value)).not.toContain('V20 分片不应被 V19 读取');
   });
 
+  it('uses a v20 deterministic hit as the baseline for allowlisted online verification', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        descriptionZh: '能让某些特定宝可梦进化。',
+        effectZh: '能让某些特定宝可梦进化。',
+      }),
+    ));
+    const aiRun = vi.fn(async (
+      _model: string,
+      input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-compose') {
+        expect(JSON.stringify(input)).toContain('TitoDex Dex bundle v20');
+        expect(JSON.stringify(input)).toContain('pokeapi-item-107');
+        return { response: {
+          supported: true,
+          answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
+          usedSourceIds: ['dex-bundle-v20', 'pokeapi-item-107'],
+        } };
+      }
+      if (phase === 'curated-web-verify') {
+        return { response: {
+          supported: true,
+          answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
+        } };
+      }
+      if (phase === 'curated-web-route') {
+        return { response: {
+          hintId: '',
+          webAllowed: true,
+          queryZh: '宝可梦 紫 光之石 作用',
+          queryEn: 'Pokemon Violet Shiny Stone effect',
+          pokeApiKind: 'item',
+          pokeApiSlug: 'shiny-stone',
+        } };
+      }
+      throw new Error(`unexpected model phase ${String(phase)}`);
+    });
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === 'pokeapi.co') {
+        return new Response(JSON.stringify({
+          id: 107,
+          name: 'shiny-stone',
+          names: [{ language: { name: 'zh-Hans' }, name: '光之石' }],
+          effect_entries: [{
+            language: { name: 'zh-Hans' },
+            short_effect: '能让某些特定宝可梦进化。',
+          }],
+          attributes: [],
+          category: { name: 'evolution' },
+        }), { headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('{}', { status: 503 });
+    }));
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'v20-online-verify-1234',
+        },
+        body: violetBody('光之石有什么作用？'),
+      }),
+      curatedDexEnv(aiRun),
+    );
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'curated_sources_qwen',
+      modelUsed: true,
+      sourceKinds: ['pokeapi'],
+    });
+    expect(value.answer).toContain('本地资料与 PokéAPI 核对');
+    expect(value.verifiedFacts).toContain('TitoDex Dex bundle v20 · 本地结构化底稿');
+    expect(value.unknowns).not.toContain(
+      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+    );
+  });
+
+  it('keeps the v20 local baseline when the online pass has no web evidence', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        descriptionZh: '本地结构化说明。',
+      }),
+    ));
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-compose') return { response: {
+        supported: true,
+        answer: '只根据本地资料改写的回答不算联网核验。',
+        usedSourceIds: ['dex-bundle-v20'],
+      } };
+      if (phase === 'curated-web-verify') return { response: {
+        supported: true,
+        answer: '只根据本地资料改写的回答不算联网核验。',
+      } };
+      if (phase === 'curated-web-route') return { response: {
+        hintId: '', webAllowed: true,
+        queryZh: '宝可梦 紫 光之石 作用',
+        queryEn: 'Pokemon Violet Shiny Stone effect',
+        pokeApiKind: 'item', pokeApiSlug: 'shiny-stone',
+      } };
+      throw new Error(`unexpected model phase ${String(phase)}`);
+    });
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () =>
+      new Response('{}', { status: 503 })));
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'v20-online-empty-1234',
+        },
+        body: violetBody('光之石有什么作用？'),
+      }),
+      curatedDexEnv(aiRun),
+    );
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: true,
+      sourceKinds: [],
+    });
+    expect(value.answer).toContain('本地结构化说明');
+    expect(value.answer).not.toContain('不算联网核验');
+    expect(value.unknowns).toContain(
+      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+    );
+  });
+
   it('rejects unexpected save or identity fields', async () => {
     const response = await post(body({ trainerName: '不要发送', rawSave: 'AA==' }), 'schema-key-123456');
     expect(response.status).toBe(400);
@@ -1605,6 +1751,32 @@ function deepSeekEnv({
     TAVILY_WEB_ENABLED: 'false',
     EXPERIMENTAL_BROAD_ANSWERS: experimental ? 'true' : 'false',
     DEEPSEEK_NATIVE_SEARCH_ENABLED: 'true',
+    DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
+    DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
+    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
+    AI_PROVIDER: 'workers-ai',
+    AI_PROVIDER_MODEL: 'deepseek-v4-flash',
+    AI_PROVIDER_ENDPOINT: 'chat/completions',
+    TAVILY_API_KEY: '',
+  } as unknown as Env;
+}
+
+function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
+  return {
+    JOURNEY_CONTENT: env.JOURNEY_CONTENT,
+    DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_RATE_LIMITER: {
+      limit: async () => ({ success: true }),
+    },
+    JOURNEY_SEARCH_NAMESPACE: undefined,
+    AI: { run: aiRun },
+    AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8',
+    AI_GATEWAY_ID: 'titodex-journey-assistant',
+    AI_SEARCH_ENABLED: 'false',
+    CURATED_WEB_ENABLED: 'true',
+    TAVILY_WEB_ENABLED: 'false',
+    EXPERIMENTAL_BROAD_ANSWERS: 'false',
+    DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false',
     DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
     DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
     AI_EXTERNAL_PROVIDER_ENABLED: 'false',

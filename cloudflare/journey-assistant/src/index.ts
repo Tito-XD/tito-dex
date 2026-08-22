@@ -149,9 +149,10 @@ export default {
     const buildResponse = async (): Promise<AssistantResponse> => {
       const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
       let curatedDecision: unknown;
-      // Resolve a unique reviewed hint and exact Dex-bundle facts before any
-      // retrieval or model call. This keeps common entity questions truly
-      // model-free even when their wording overlaps a generic Journey alias.
+      let bundleFallback: AssistantResponse | null = null;
+      // Resolve reviewed hints and exact Dex-bundle facts before retrieval.
+      // V19 remains deterministic; V20 facts marked online-verify become the
+      // bounded local baseline for the allowlisted corroboration pass below.
       let response = await answerQuestion(
         parsed,
         undefined,
@@ -165,9 +166,15 @@ export default {
       let dexBundleSources: CuratedSource[] = [];
       if (response.status !== 'answered' && env.DEX_CONTENT) {
         try {
-          const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
-          if (bundleAnswer) response = bundleAnswer;
-          else dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+          const bundleResult = await answerFromDexBundle(parsed, env.DEX_CONTENT);
+          if (bundleResult?.requiresOnlineVerification) {
+            bundleFallback = bundleResult.response;
+            dexBundleSources = [bundleResult.localSource];
+          } else if (bundleResult) {
+            response = bundleResult.response;
+          } else {
+            dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+          }
         } catch {
           // The versioned Dex bundle is an optional deterministic source. Any
           // missing/invalid object falls through to the existing safe pipeline.
@@ -275,7 +282,10 @@ export default {
           curatedPromise,
           deepSeekPromise,
         ]);
-        if (curatedResponse) {
+        const curatedHasRequiredOnlineEvidence = curatedResponse !== null && (
+          !bundleFallback || (curatedResponse.sources ?? []).length > 0
+        );
+        if (curatedResponse && curatedHasRequiredOnlineEvidence) {
           response = deepSeekCandidate
             ? await reconcileParallelAnswers(
                 env,
@@ -286,9 +296,29 @@ export default {
             : curatedResponse;
           curatedSourcesUsed = true;
         } else if (deepSeekCandidate) {
-          response = deepSeekCandidate.response;
-          curatedSourcesUsed = true;
+          const verifiedDeepSeekResponse = bundleFallback
+            ? await reconcileParallelAnswers(
+                env,
+                parsed,
+                bundleFallback,
+                deepSeekCandidate,
+              )
+            : deepSeekCandidate.response;
+          if (verifiedDeepSeekResponse) {
+            response = verifiedDeepSeekResponse;
+            curatedSourcesUsed = true;
+          }
         }
+      }
+      if (response.status !== 'answered' && bundleFallback) {
+        const verificationNote = '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。';
+        response = {
+          ...bundleFallback,
+          unknowns: Array.from(new Set([
+            ...(bundleFallback.unknowns ?? []),
+            verificationNote,
+          ])),
+        };
       }
       response = normalizeResponseAnswer(response);
       response = attachExecutionTrace(response, trace, curatedSourcesUsed);
