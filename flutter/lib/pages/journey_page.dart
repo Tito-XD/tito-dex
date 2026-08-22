@@ -21,6 +21,7 @@ class JourneyPage extends StatelessWidget {
     this.assistantFuture,
     this.askTitoDexEnabled = false,
     this.onAskTitoDex,
+    this.onManageJourneyPacks,
   });
 
   final CurrentJourney journey;
@@ -28,6 +29,7 @@ class JourneyPage extends StatelessWidget {
   final Future<JourneyAssistantSnapshot>? assistantFuture;
   final bool askTitoDexEnabled;
   final VoidCallback? onAskTitoDex;
+  final VoidCallback? onManageJourneyPacks;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +125,15 @@ class JourneyPage extends StatelessWidget {
                   onPressed: onAskTitoDex,
                   expanded: true,
                 ),
+                if (onManageJourneyPacks != null) ...[
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    key: const Key('journey-pack-manager-entry'),
+                    onPressed: onManageJourneyPacks,
+                    icon: const Icon(Icons.download_for_offline_outlined),
+                    label: const Text('管理 Journey 资料包'),
+                  ),
+                ],
               ],
             ),
           ),
