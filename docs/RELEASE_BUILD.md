@@ -97,10 +97,10 @@ Run the **Android Release APKs** workflow manually with:
 - `bundle_manifest_url` — the currently published root manifest; CI downloads its selected archive and verifies `bundleVersion>=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
 - `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-The latest published pair is v0.8.18 with Lite versionCode `170` and Offline
-versionCode `171`. A later release must use a product version newer than
-`0.8.18`, a Lite versionCode greater than `171`, and an even larger Offline
-versionCode. The v0.8.18 build reuses the previously verified v0.8.17 Offline
+The latest published pair is v0.8.19 with Lite versionCode `172` and Offline
+versionCode `173`. A later release must use a product version newer than
+`0.8.19`, a Lite versionCode greater than `173`, and an even larger Offline
+versionCode. The v0.8.19 build reuses the previously verified v0.8.18 Offline
 asset through `offline_seed_apk_url` because
 the compact v14 seed is intentionally unchanged;
 Do not seed a new Offline APK from the live v19 archive unless accepting the
