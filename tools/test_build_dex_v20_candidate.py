@@ -12,6 +12,7 @@ from build_dex_v20_candidate import (
     build_entity_index,
     tree_fingerprint,
 )
+from build_dex_v20_reference_shards import build_reference_shards
 from verify_dex_v20_candidate import verify_candidate
 
 
@@ -292,6 +293,7 @@ class DexV20FoundationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
             base, base_root_manifest = self._make_base(root)
+            source_commit = "a" * 40
             write_json(base / "reference_v20_audit.json", {"schemaVersion": 1})
             write_json(
                 base / "reference_v20_sources.json",
@@ -299,13 +301,19 @@ class DexV20FoundationTests(unittest.TestCase):
                     "sources": [
                         {
                             "sourceId": "pokeapi-api-data",
-                            "commit": "fixture-commit",
+                            "commit": source_commit,
                         }
                     ]
                 },
             )
             write_json(base / "move_version_matrix.json", {"moves": {}})
             write_json(base / "item_version_matrix.json", {"items": {}})
+            for filename in ("moves.json", "abilities.json", "items.json"):
+                records = json.loads((base / filename).read_text())
+                for record in records.values():
+                    record["provenance"] = {"sourceCommit": source_commit}
+                write_json(base / filename, records)
+            build_reference_shards(base)
             for name in (
                 "game_version_keys.json",
                 "obtain_methods.json",
@@ -338,7 +346,7 @@ class DexV20FoundationTests(unittest.TestCase):
                     / "bundle-manifest.v20.candidate.json"
                 ).read_text()
             )
-            self.assertEqual(manifest["referenceDataSourceCommit"], "fixture-commit")
+            self.assertEqual(manifest["referenceDataSourceCommit"], source_commit)
             self.assertEqual(manifest["schemaFeatures"]["moveDetails"], 2)
             self.assertEqual(
                 manifest["gameplayData"]["obtainMethods"],
@@ -349,6 +357,9 @@ class DexV20FoundationTests(unittest.TestCase):
                 "gameplay/species/{speciesId}.json",
             )
             self.assertEqual(pending["gameplayData"], manifest["gameplayData"])
+            self.assertEqual(
+                pending["referenceData"]["maximumShardBytes"], 64 * 1024
+            )
 
     def test_contract_schemas_are_strict(self) -> None:
         repo = Path(__file__).resolve().parents[1]

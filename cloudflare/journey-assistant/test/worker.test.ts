@@ -827,6 +827,107 @@ describe('journey assistant Worker contract', () => {
     expect(itemValue.answer).toContain('某些特定宝可梦进化');
   });
 
+  it('uses bounded v20 item, ability, and move reference shards', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        cost: 3000,
+        descriptionZh: '能让某些特定宝可梦进化。',
+        effectZh: '能让某些特定宝可梦进化。',
+      }),
+    ));
+    await env.DEX_CONTENT.put('v5/reference/abilities/1.json', JSON.stringify(
+      referenceShard('ability', 1, 'stench', '恶臭', {
+        generation: 3,
+        descriptionZh: '攻击时有时会使对手畏缩。',
+        shortEffect: '有时使对手畏缩。',
+      }),
+    ));
+    await env.DEX_CONTENT.put('v5/reference/moves/14.json', JSON.stringify(
+      referenceShard('move', 14, 'swords-dance', '剑舞', {
+        type: 'normal', typeZh: '一般', category: 'status', categoryZh: '变化',
+        pp: 20, priority: 0, generation: 1,
+        descriptionZh: '大幅提高自己的攻击。',
+      }),
+    ));
+
+    const item = await post(violetBody('光之石有什么作用？'), 'v20-ref-item-12345');
+    expect((await item.json() as AssistantResponse).answer).toContain('进化道具');
+    const ability = await post(violetBody('恶臭特性有什么效果？'), 'v20-ref-ability-123');
+    expect((await ability.json() as AssistantResponse).answer).toContain('使对手畏缩');
+    const move = await post(violetBody('剑舞招式的效果和 PP 是什么？'), 'v20-ref-move-12345');
+    const moveValue = await move.json() as AssistantResponse;
+    expect(moveValue.answer).toContain('PP：20');
+    expect(moveValue.answer).toContain('大幅提高自己的攻击');
+  });
+
+  it('uses the bounded v20 item slug index for held items and reports the audited license', async () => {
+    await seedDexBundle({}, {
+      heldItems: [{ slug: 'light-ball', rarityByVersion: { violet: 5 } }],
+    }, 20);
+    await seedV20ReferenceManifest();
+    const bucket = (await sha256Hex('light-ball')).slice(0, 2);
+    await env.DEX_CONTENT.put(`v5/reference/item-slug-index/${bucket}.json`, JSON.stringify({
+      schemaVersion: 1,
+      kind: 'item-slug-index',
+      bucket,
+      entries: { 'light-ball': { id: 213, nameZh: '电气球' } },
+    }));
+    const response = await post(violetBody('利欧路会携带什么道具？'), 'v20-held-index-1234');
+    const value = await response.json() as AssistantResponse;
+    expect(value.answer).toContain('电气球：5%');
+    expect(JSON.stringify(value)).toContain('CC BY-NC-SA 3.0');
+    expect(JSON.stringify(value)).not.toContain('CC BY-NC-SA 4.0');
+  });
+
+  it('feeds a bounded v20 move shard into composer evidence', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/moves/14.json', JSON.stringify(
+      referenceShard('move', 14, 'swords-dance', '剑舞', {
+        type: 'normal', typeZh: '一般', category: 'status', categoryZh: '变化',
+        pp: 20, priority: 0, generation: 1,
+        descriptionZh: '大幅提高自己的攻击。',
+      }),
+    ));
+    const request = JSON.parse(violetBody('剑舞招式的效果和 PP 是什么？')) as AssistantRequest;
+    const sources = await buildDexBundleSources(request, env.DEX_CONTENT);
+    expect(sources).toHaveLength(1);
+    expect(sources[0].text).toContain('"pp":20');
+    expect(sources[0].text).toContain('general bundle move values');
+  });
+
+  it('fails closed for missing, malformed, or oversized v20 reference shards', async () => {
+    for (const [name, bodyValue] of [
+      ['missing', null],
+      ['malformed', JSON.stringify({ ...referenceShard('item', 107, 'shiny-stone', '光之石'), unknown: true })],
+      ['oversized', JSON.stringify({ ...referenceShard('item', 107, 'shiny-stone', '光之石'), padding: 'x'.repeat(70 * 1024) })],
+    ] as const) {
+      const [objects] = await Promise.all([env.DEX_CONTENT.list()]);
+      await Promise.all(objects.objects.map((object) => env.DEX_CONTENT.delete(object.key)));
+      await seedDexBundle({}, {}, 20);
+      await seedV20ReferenceManifest();
+      if (bodyValue) await env.DEX_CONTENT.put('v5/reference/items/107.json', bodyValue);
+      const response = await post(violetBody('光之石有什么作用？'), `v20-ref-fail-${name}-1234`);
+      expect(await response.json()).toMatchObject({ status: 'no_match' });
+    }
+  });
+
+  it('does not consult reference shards for a v19 manifest', async () => {
+    await seedDexBundle({}, {}, 19);
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        descriptionZh: 'V20 分片不应被 V19 读取。',
+      }),
+    ));
+    const response = await post(violetBody('光之石有什么作用？'), 'v19-no-ref-shard-123');
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'no_match' });
+    expect(JSON.stringify(value)).not.toContain('V20 分片不应被 V19 读取');
+  });
+
   it('rejects unexpected save or identity fields', async () => {
     const response = await post(body({ trainerName: '不要发送', rawSave: 'AA==' }), 'schema-key-123456');
     expect(response.status).toBe(400);
@@ -1326,6 +1427,65 @@ async function seedDexBundle(
     obtainLocationsByVersion,
     ...detailExtras,
   }));
+}
+
+async function seedV20ReferenceManifest(): Promise<void> {
+  await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+    bundleVersion: 20,
+    cdnPrefix: 'v5',
+    complete: true,
+    exactVersionLocations: true,
+    referenceDataSourceCommit: 'a'.repeat(40),
+    referenceData: {
+      schemaVersion: 1,
+      maximumShardBytes: 64 * 1024,
+      moves: 'reference/moves/{id}.json',
+      abilities: 'reference/abilities/{id}.json',
+      items: 'reference/items/{id}.json',
+      itemSlugIndex: 'reference/item-slug-index/{bucket}.json',
+      audit: 'reference/reference_shards_audit.json',
+      counts: { moves: 937, abilities: 373, items: 2130, itemSlugIndexBuckets: 256 },
+    },
+  }));
+}
+
+function referenceShard(
+  kind: 'move' | 'ability' | 'item',
+  id: number,
+  slug: string,
+  nameZh: string,
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const common = {
+    schemaVersion: 1,
+    kind,
+    id,
+    stableId: kind === 'item' ? `item:${slug}` : `${kind}:${id}`,
+    sourceCommit: 'a'.repeat(40),
+    sourceStatus: 'pinned-pokeapi',
+    slug,
+    nameZh,
+    nameEn: kind === 'move' ? 'Swords Dance' : kind === 'ability' ? 'Stench' : 'Shiny Stone',
+  };
+  if (kind === 'move') return {
+    ...common,
+    type: null, typeZh: null, category: null, categoryZh: null,
+    power: null, accuracy: null, pp: null, priority: null,
+    target: null, targetZh: null, generation: null,
+    descriptionZh: null, shortEffect: null, availableVersionGroups: [],
+    ...overrides,
+  };
+  if (kind === 'ability') return {
+    ...common,
+    generation: null, descriptionZh: null, shortEffect: null,
+    ...overrides,
+  };
+  return {
+    ...common,
+    categoryZh: null, cost: null, descriptionZh: null, effectZh: null, flingPower: null,
+    availableVersionGroups: [], availableGenerations: [], pricesByVersionGroup: {},
+    ...overrides,
+  };
 }
 
 function gameplayEncounter(
