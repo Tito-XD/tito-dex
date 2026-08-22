@@ -14,7 +14,10 @@
         "abilities",
         "items",
         "machines",
-        "types"
+        "types",
+        "pokemon learnsets",
+        "global evolution chains",
+        "encounter pair verification"
       ]
     },
     {
