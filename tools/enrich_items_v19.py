@@ -29,6 +29,8 @@ from typing import Any
 
 import requests
 
+from wiki52poke_client import Wiki52PokeClient
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ITEMS = ROOT / "dist" / "dex-v18" / "staging" / "items.json"
 DEFAULT_OUTPUT = ROOT / "data" / "l10n" / "zh" / "items_v19_enrichment.json"
@@ -42,7 +44,6 @@ DEFAULT_POKEAPI_ENRICHMENT = (
 )
 
 POKEAPI_BASE = "https://pokeapi.co/api/v2/item"
-WIKI_API = "https://wiki.52poke.com/api.php"
 WIKI_FILE = "https://wiki.52poke.com/wiki/Special:FilePath"
 USER_AGENT = "TitoDex-maintainer/1.0 (+https://github.com/Tito-XD/tito-dex)"
 CDN_ITEM_SPRITES = "https://dex.tito.cafe/v5/item-sprites"
@@ -75,6 +76,7 @@ GAME_PRIORITY = {
 }
 
 _thread_local = threading.local()
+_wiki_client = Wiki52PokeClient(cache_dir=DEFAULT_CACHE / "revisions")
 
 
 def session() -> requests.Session:
@@ -86,18 +88,6 @@ def session() -> requests.Session:
         )
         _thread_local.session = cached
     return cached
-
-
-def get_json(url: str, *, params: dict[str, Any]) -> dict[str, Any] | None:
-    for attempt in range(4):
-        try:
-            response = session().get(url, params=params, timeout=30)
-            if response.status_code == 200:
-                return response.json()
-        except (requests.RequestException, ValueError):
-            pass
-        time.sleep(0.8 * (attempt + 1))
-    return None
 
 
 def normalize(text: str | None) -> str:
@@ -141,16 +131,11 @@ def fetch_wikitext(title: str, cache_dir: Path) -> str | None:
     cached = cache_path(cache_dir, title)
     if cached.is_file():
         return cached.read_text(encoding="utf-8")
-    params = {
-        "action": "parse",
-        "page": title,
-        "prop": "wikitext",
-        "format": "json",
-        "formatversion": 2,
-        "redirects": 1,
-    }
-    payload = get_json(WIKI_API, params=params)
-    text = payload.get("parse", {}).get("wikitext") if payload else None
+    try:
+        revision = _wiki_client.latest_revision(title)
+    except (requests.RequestException, RuntimeError, ValueError):
+        revision = None
+    text = revision.content if revision is not None else None
     if not text:
         return None
     cached.parent.mkdir(parents=True, exist_ok=True)
@@ -159,22 +144,10 @@ def fetch_wikitext(title: str, cache_dir: Path) -> str | None:
 
 
 def search_wiki_title(name_zh: str) -> list[str]:
-    payload = get_json(
-        WIKI_API,
-        params={
-            "action": "query",
-            "list": "search",
-            "srsearch": f'"{name_zh}" 道具',
-            "srlimit": 4,
-            "format": "json",
-        },
-    )
-    if not payload:
+    try:
+        titles = _wiki_client.search_titles(f'"{name_zh}" 道具', limit=4)
+    except (requests.RequestException, RuntimeError, ValueError):
         return []
-    titles = [
-        result.get("title", "")
-        for result in payload.get("query", {}).get("search", [])
-    ]
     return [title for title in titles if "道具" in title]
 
 
@@ -276,7 +249,10 @@ def download_best_sprite(
             "format": "json",
             "formatversion": 2,
         }
-        payload = get_json(WIKI_API, params=params)
+        try:
+            payload = _wiki_client.query(params)
+        except (requests.RequestException, RuntimeError, ValueError):
+            payload = None
         pages = payload.get("query", {}).get("pages", []) if payload else []
         info = (pages[0].get("imageinfo") or [None])[0] if pages else None
         if not info or info.get("mime") != "image/png" or not info.get("url"):
@@ -375,6 +351,14 @@ def main() -> int:
         help="Refresh only PokeAPI text without re-running the wiki/icon pass.",
     )
     parser.add_argument(
+        "--allow-wiki-manual",
+        action="store_true",
+        help=(
+            "Explicitly enable the legacy 52Poké manual-review pass. Do not use "
+            "for v20 bulk import or without permission matching source_registry.json."
+        ),
+    )
+    parser.add_argument(
         "--slugs",
         nargs="*",
         help="Optional focused run; default refreshes the complete item catalog.",
@@ -444,8 +428,17 @@ def main() -> int:
                 print(f"PokeAPI {done}/{len(futures)}", flush=True)
 
     wiki_results: dict[str, dict[str, Any]] = {}
-    wiki_targets = [] if args.skip_wiki else items
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+    wiki_targets = (
+        items if args.allow_wiki_manual and not args.skip_wiki else []
+    )
+    if not args.allow_wiki_manual and not args.skip_wiki:
+        print(
+            "52Poké pass disabled by source policy; reusing committed v19 data.",
+            flush=True,
+        )
+    # The legacy wiki pass is intentionally serial even when explicitly
+    # enabled; 52Poké's machine-reading rules do not permit parallel access.
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = {
             executor.submit(process_wiki_item, item, args.cache_dir, args.sprites_dir): item
             for item in wiki_targets
