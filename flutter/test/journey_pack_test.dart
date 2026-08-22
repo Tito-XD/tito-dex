@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:titodex/features/game/game_edition.dart';
+import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/journey_pack_client.dart';
 import 'package:titodex/features/journey/journey_pack_models.dart';
 import 'package:titodex/features/journey/journey_pack_repository.dart';
@@ -88,6 +89,7 @@ void main() {
       expect(
         () => JourneyPackCatalog.fromJson({
           'schemaVersion': 1,
+          'generatedAt': '2026-08-22T00:00:00Z',
           'packs': [
             base,
             {
@@ -112,6 +114,7 @@ void main() {
             utf8.encode(
               jsonEncode({
                 'schemaVersion': 1,
+                'generatedAt': '2026-08-22T00:00:00Z',
                 'packs': [fixture.descriptor.toJson()],
               }),
             ),
@@ -248,18 +251,56 @@ void main() {
         );
         final refs = await repository.referencesForGame('violet');
         final context = _context.copyWith(journeyPacks: refs);
-        final encoded = jsonEncode(context.toRequestJson());
+        final encoded = jsonEncode({
+          'question': '测试问题',
+          'context': context.toRequestJson(),
+          'journeyPacks': context.journeyPackRequestJson,
+        });
         expect(refs.single.id, 'sv-guide');
         expect(encoded, contains('journeyPacks'));
+        expect(context.toRequestJson(), isNot(contains('journeyPacks')));
         expect(encoded, isNot(contains('overviewZh')));
         expect(encoded, isNot(contains('save')));
-        final bounded =
-            _context
-                    .copyWith(journeyPacks: [refs.single, refs.single])
-                    .toRequestJson()['journeyPacks']
-                as List<dynamic>;
+        final bounded = _context
+            .copyWith(journeyPacks: [refs.single, refs.single])
+            .journeyPackRequestJson;
         expect(bounded, hasLength(1));
         repository.dispose();
+      },
+    );
+
+    test(
+      'online client sends the pack reference at the request root',
+      () async {
+        final fixture = _packFixture();
+        Map<String, dynamic>? requestBody;
+        final client = HttpAskTitoDexOnlineClient(
+          endpoint: 'https://journey.example.test/v1/ask',
+          deviceKeyProvider: () async => 'journey-pack-test-key',
+          client: MockClient((request) async {
+            requestBody = Map<String, dynamic>.from(
+              jsonDecode(request.body) as Map,
+            );
+            return http.Response(
+              jsonEncode({
+                'status': 'no_match',
+                'answer': null,
+                'confidence': 'low',
+                'followUp': null,
+              }),
+              200,
+              request: request,
+            );
+          }),
+        );
+        await client.ask(
+          '测试问题',
+          _context.copyWith(
+            journeyPacks: [fixture.descriptor.toRequestReference()],
+          ),
+        );
+        expect(requestBody?['journeyPacks'], hasLength(1));
+        expect(requestBody?['context'], isNot(contains('journeyPacks')));
       },
     );
 
@@ -281,7 +322,9 @@ void main() {
           workerAskUrl: 'https://journey.example.test/v1/ask',
           client: MockClient(
             (request) async => http.Response.bytes(
-              utf8.encode('{"schemaVersion":1,"packs":[]}'),
+              utf8.encode(
+                '{"schemaVersion":1,"generatedAt":"2026-08-22T00:00:00Z","packs":[]}',
+              ),
               200,
               request: request,
             ),
@@ -328,6 +371,7 @@ void main() {
               utf8.encode(
                 jsonEncode({
                   'schemaVersion': 1,
+                  'generatedAt': '2026-08-22T00:00:00Z',
                   'packs': [fixture.descriptor.toJson()],
                 }),
               ),
@@ -383,6 +427,7 @@ _PackFixture _packFixture({String version = '1.0.0'}) {
         'schemaVersion': 1,
         'id': 'sv-guide',
         'gameFamily': 'sv',
+        'games': ['scarlet', 'violet'],
         'version': version,
         'entries': [jsonDecode(_progressionJson('朱紫测试说明'))['entries'][0]],
       }),
@@ -424,19 +469,27 @@ String _progressionJson(String overview) => jsonEncode({
   'schemaVersion': 1,
   'entries': [
     {
-      'entryType': 'progression_hint',
       'id': 'sv-test-hint',
       'games': ['violet'],
+      'generation': 9,
       'locations': ['test-area'],
       'locationAliases': ['测试地点'],
       'destinationAliases': ['目的地'],
       'subject': {
+        'type': 'story_blocker',
         'id': 'test-subject',
+        'labelZh': '测试问题',
         'aliases': ['测试问题'],
       },
       'requirements': <Object>[],
       'steps': [
-        {'instructionZh': '继续前进。'},
+        {
+          'order': 1,
+          'action': 'continue_story',
+          'targetId': 'test-subject',
+          'locationId': 'test-area',
+          'instructionZh': '继续前进。',
+        },
       ],
       'overviewZh': overview,
       'sources': [
@@ -506,6 +559,7 @@ JourneyPackClient _catalogClient(_PackFixture fixture) => JourneyPackClient(
       utf8.encode(
         jsonEncode({
           'schemaVersion': 1,
+          'generatedAt': '2026-08-22T00:00:00Z',
           'packs': [fixture.descriptor.toJson()],
         }),
       ),

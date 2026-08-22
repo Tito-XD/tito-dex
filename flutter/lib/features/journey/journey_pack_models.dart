@@ -4,13 +4,39 @@ import 'dart:typed_data';
 const journeyPackMaxBytes = 4 * 1024 * 1024;
 const journeyPackSupportedBundleVersion = 20;
 
-final _packIdPattern = RegExp(r'^[a-z0-9][a-z0-9._-]{0,99}$');
-final _packVersionPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$');
+final _packIdPattern = RegExp(r'^[a-z0-9][a-z0-9._-]{0,79}$');
+final _packFamilyPattern = RegExp(r'^[a-z0-9][a-z0-9._-]{0,39}$');
+final _packVersionPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$');
 final _packContentPathPattern = RegExp(
   r'^/v1/journey-packs/objects/[a-z0-9._-]+/[A-Za-z0-9._-]+\.json$',
 );
 final _sha256Pattern = RegExp(r'^[a-f0-9]{64}$');
-final _gameKeyPattern = RegExp(r'^[a-z0-9][a-z0-9._-]{0,63}$');
+const _supportedGames = {
+  'diamond',
+  'pearl',
+  'platinum',
+  'heartgold',
+  'soulsilver',
+  'black',
+  'white',
+  'black-2',
+  'white-2',
+  'x',
+  'y',
+  'omega-ruby',
+  'alpha-sapphire',
+  'sun',
+  'moon',
+  'ultra-sun',
+  'ultra-moon',
+  'sword',
+  'shield',
+  'brilliant-diamond',
+  'shining-pearl',
+  'legends-arceus',
+  'scarlet',
+  'violet',
+};
 
 class JourneyPackCatalog {
   const JourneyPackCatalog({required this.generatedAt, required this.packs});
@@ -23,6 +49,9 @@ class JourneyPackCatalog {
       throw const FormatException('Unsupported Journey pack catalog');
     }
     final generatedAt = DateTime.tryParse(json['generatedAt'] as String? ?? '');
+    if (generatedAt == null) {
+      throw const FormatException('Invalid Journey pack catalog date');
+    }
     final packs = (json['packs'] as List<dynamic>)
         .whereType<Map>()
         .map(
@@ -93,22 +122,33 @@ class JourneyPackDescriptor {
         .whereType<String>()
         .toList(growable: false);
     if (!_packIdPattern.hasMatch(id) ||
-        !_packIdPattern.hasMatch(gameFamily) ||
+        id.contains('..') ||
+        !_packFamilyPattern.hasMatch(gameFamily) ||
+        gameFamily.contains('..') ||
         !_packVersionPattern.hasMatch(version) ||
+        version.contains('..') ||
         !_packContentPathPattern.hasMatch(contentPath) ||
-        contentPath.split('/').any((segment) => segment == '..') ||
-        sizeBytes <= 0 ||
+        contentPath != '/v1/journey-packs/objects/$id/$version.json' ||
+        sizeBytes < 2 ||
         sizeBytes > journeyPackMaxBytes ||
         !_sha256Pattern.hasMatch(sha256Hex) ||
-        entryCount < 0 ||
-        entryCount > 10000 ||
-        bundleVersionRequired <= 0 ||
+        entryCount < 1 ||
+        entryCount > 1000 ||
+        bundleVersionRequired < 20 ||
         titleZh.isEmpty ||
         titleZh.length > 80 ||
         games.isEmpty ||
-        games.length > 32 ||
         games.toSet().length != games.length ||
-        games.any((game) => !_gameKeyPattern.hasMatch(game))) {
+        games.any((game) => !_supportedGames.contains(game)) ||
+        (json['descriptionZh'] != null &&
+            (json['descriptionZh'] is! String ||
+                (json['descriptionZh'] as String).isEmpty ||
+                (json['descriptionZh'] as String).length > 180)) ||
+        (json['minAppVersion'] != null &&
+            (json['minAppVersion'] is! String ||
+                !RegExp(
+                  r'^\d+\.\d+\.\d+$',
+                ).hasMatch(json['minAppVersion'] as String)))) {
       throw const FormatException('Invalid Journey pack descriptor');
     }
     return JourneyPackDescriptor(
@@ -188,18 +228,27 @@ class JourneyPackDocument {
     final id = json['id'] as String? ?? '';
     final gameFamily = json['gameFamily'] as String? ?? '';
     final version = json['version']?.toString() ?? '';
+    final games = (json['games'] as List<dynamic>? ?? const [])
+        .whereType<String>()
+        .toList(growable: false);
     if (id != descriptor.id ||
         gameFamily != descriptor.gameFamily ||
         version != descriptor.version ||
+        games.length != descriptor.games.length ||
+        !_sameStrings(games, descriptor.games) ||
         entries.length != descriptor.entryCount) {
       throw const FormatException('Journey pack does not match catalog');
     }
     for (final entry in entries) {
       final entryType = entry['entryType'];
-      if (entryType != 'progression_hint' && entryType != 'fact') {
+      final legacyProgressionHint =
+          entryType == null && _looksLikeProgressionHint(entry);
+      if (!legacyProgressionHint &&
+          entryType != 'progression_hint' &&
+          entryType != 'fact') {
         throw const FormatException('Unsupported Journey pack entry');
       }
-      if (entryType == 'progression_hint') {
+      if (legacyProgressionHint || entryType == 'progression_hint') {
         final games = entry['games'];
         if (games is! List ||
             games.isEmpty ||
@@ -219,6 +268,27 @@ class JourneyPackDocument {
     );
   }
 }
+
+bool _sameStrings(List<String> left, List<String> right) {
+  if (left.length != right.length) return false;
+  for (var index = 0; index < left.length; index += 1) {
+    if (left[index] != right[index]) return false;
+  }
+  return true;
+}
+
+bool _looksLikeProgressionHint(Map<String, dynamic> entry) =>
+    entry['id'] is String &&
+    entry['games'] is List &&
+    entry['generation'] is num &&
+    entry['locations'] is List &&
+    entry['locationAliases'] is List &&
+    entry['destinationAliases'] is List &&
+    entry['subject'] is Map &&
+    entry['requirements'] is List &&
+    entry['steps'] is List &&
+    entry['overviewZh'] is String &&
+    entry['sources'] is List;
 
 class InstalledJourneyPack {
   const InstalledJourneyPack({
