@@ -228,6 +228,50 @@ void main() {
     },
   );
 
+  test(
+    'online client trims oldest history pairs to the Worker byte budget',
+    () async {
+      late http.Request captured;
+      final client = MockClient((request) async {
+        captured = request;
+        return http.Response(
+          jsonEncode({
+            'status': 'no_match',
+            'answer': null,
+            'confidence': 'low',
+            'followUp': null,
+          }),
+          200,
+        );
+      });
+      final online = HttpAskTitoDexOnlineClient(
+        client: client,
+        endpoint: 'https://example.test/v1/ask',
+        deviceKeyProvider: () async => 'anonymous-test-key-123',
+      );
+      final history = <Map<String, String>>[];
+      for (var index = 0; index < 6; index += 1) {
+        history.add({
+          'role': 'user',
+          'content': '${List.filled(237, '问').join()}用户$index',
+        });
+        history.add({
+          'role': 'assistant',
+          'content': '${List.filled(597, '答').join()}回复$index',
+        });
+      }
+
+      await online.ask('继续追问', _context, history: history);
+
+      expect(utf8.encode(captured.body).length, lessThanOrEqualTo(10 * 1024));
+      final payload = jsonDecode(captured.body) as Map<String, dynamic>;
+      final sent = payload['history'] as List<dynamic>;
+      expect(sent.length.isEven, isTrue);
+      expect(sent.length, lessThan(history.length));
+      expect((sent.last as Map<String, dynamic>)['content'], endsWith('回复5'));
+    },
+  );
+
   test('online client accepts only the Journey Worker ask path', () {
     expect(
       HttpAskTitoDexOnlineClient(

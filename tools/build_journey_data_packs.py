@@ -48,22 +48,27 @@ def build_packs(source: Path, output: Path) -> dict[str, Any]:
         if not isinstance(entry_id, str) or entry_id in seen_ids:
             raise ValueError("progression hint ids must be unique")
         seen_ids.add(entry_id)
-    dates = [
-        item.get("accessedAt", "")
-        for entry in entries
-        for item in entry.get("sources", [])
-        if isinstance(item, dict)
-    ]
-    source_as_of = max((item for item in dates if item), default="1970-01-01")
     output.mkdir(parents=True, exist_ok=True)
     descriptors: list[dict[str, Any]] = []
     object_plan: list[dict[str, Any]] = []
     assigned_ids: set[str] = set()
+    pack_source_dates: list[str] = []
     for family, meta in FAMILIES.items():
         games = list(meta["games"])
         selected = [entry for entry in entries if set(entry.get("games") or []) & set(games)]
         if not selected:
             continue
+        selected_dates = [
+            item.get("accessedAt", "")
+            for entry in selected
+            for item in entry.get("sources", [])
+            if isinstance(item, dict)
+        ]
+        source_as_of = max(
+            (item for item in selected_dates if item),
+            default="1970-01-01",
+        )
+        pack_source_dates.append(source_as_of)
         for entry in selected:
             if not set(entry["games"]).issubset(games):
                 raise ValueError(f"{entry['id']} crosses Journey pack families")
@@ -114,7 +119,7 @@ def build_packs(source: Path, output: Path) -> dict[str, Any]:
         raise ValueError(f"unassigned progression hints: {sorted(seen_ids - assigned_ids)}")
     catalog = {
         "schemaVersion": 1,
-        "generatedAt": f"{source_as_of}T00:00:00Z",
+        "generatedAt": f"{max(pack_source_dates, default='1970-01-01')}T00:00:00Z",
         "packs": descriptors,
     }
     catalog_body = _canonical_json(catalog)

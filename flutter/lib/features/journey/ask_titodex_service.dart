@@ -16,6 +16,44 @@ class AskTitoDexConfig {
 const _workerHealthPath = '/health';
 const _maxHealthResponseBytes = 8192;
 const _maxAskStreamResponseBytes = 64 * 1024;
+const _maxAskRequestBytes = 10 * 1024;
+
+String _encodeAskRequest(
+  String question,
+  AskTitoDexContext context,
+  List<Map<String, String>> history,
+) {
+  final boundedHistory = <Map<String, String>>[];
+  for (var index = 0; index + 1 < history.length; index += 2) {
+    final user = history[index];
+    final assistant = history[index + 1];
+    if (user['role'] == 'user' &&
+        assistant['role'] == 'assistant' &&
+        user['content']?.isNotEmpty == true &&
+        assistant['content']?.isNotEmpty == true) {
+      boundedHistory.add(user);
+      boundedHistory.add(assistant);
+    }
+  }
+  String encode() => jsonEncode({
+    'question': question,
+    'context': context.toRequestJson(),
+    if (boundedHistory.isNotEmpty) 'history': boundedHistory,
+    if (context.journeyPacks.isNotEmpty)
+      'journeyPacks': context.journeyPackRequestJson,
+  });
+
+  var body = encode();
+  while (utf8.encode(body).length > _maxAskRequestBytes &&
+      boundedHistory.length >= 2) {
+    boundedHistory.removeRange(0, 2);
+    body = encode();
+  }
+  if (utf8.encode(body).length > _maxAskRequestBytes) {
+    throw const AskTitoDexOnlineException('request_too_large');
+  }
+  return body;
+}
 
 enum AskTitoDexProgress { checkingLocal, contactingWorker, revealingAnswer }
 
@@ -209,13 +247,7 @@ class HttpAskTitoDexOnlineClient
             'content-type': 'application/json',
             'x-titodex-device-key': deviceKey,
           },
-          body: jsonEncode({
-            'question': question,
-            'context': context.toRequestJson(),
-            if (history.isNotEmpty) 'history': history,
-            if (context.journeyPacks.isNotEmpty)
-              'journeyPacks': context.journeyPackRequestJson,
-          }),
+          body: _encodeAskRequest(question, context, history),
         )
         .timeout(timeout);
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -247,13 +279,7 @@ class HttpAskTitoDexOnlineClient
         'accept': 'application/x-ndjson, application/json',
         'x-titodex-device-key': deviceKey,
       })
-      ..body = jsonEncode({
-        'question': question,
-        'context': context.toRequestJson(),
-        if (history.isNotEmpty) 'history': history,
-        if (context.journeyPacks.isNotEmpty)
-          'journeyPacks': context.journeyPackRequestJson,
-      });
+      ..body = _encodeAskRequest(question, context, history);
     final response = await _client.send(request).timeout(timeout);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw AskTitoDexOnlineException('http_${response.statusCode}');

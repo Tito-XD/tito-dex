@@ -29,6 +29,12 @@ class JourneyDataPackBuilderTest(unittest.TestCase):
                 self.assertEqual(pack["gameFamily"], descriptor["gameFamily"])
                 self.assertEqual(pack["version"], descriptor["version"])
                 self.assertEqual(len(pack["entries"]), descriptor["entryCount"])
+                expected_date = max(
+                    source_row["accessedAt"]
+                    for entry in pack["entries"]
+                    for source_row in entry["sources"]
+                )
+                self.assertEqual(pack["sourceAsOf"], expected_date)
             plan = json.loads((output / "journey-pack-upload-plan.json").read_text(encoding="utf-8"))
             self.assertTrue(plan["catalog"]["uploadLast"])
             self.assertEqual(plan["bucket"], "titodex-journey-content")
@@ -53,6 +59,24 @@ class JourneyDataPackBuilderTest(unittest.TestCase):
             (output / relative).write_bytes(b"{}\n")
             with self.assertRaisesRegex(ValueError, "size mismatch"):
                 verify_candidate_dir(output)
+
+    def test_verifier_binds_candidate_to_reviewed_source(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "candidate"
+            build_packs(ROOT / "data/journey/progression_hints.json", output)
+            source = json.loads(
+                (ROOT / "data/journey/progression_hints.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            source["entries"][0]["overviewZh"] = "未经审核的改写"
+            altered = Path(temporary) / "altered.json"
+            altered.write_text(
+                json.dumps(source, ensure_ascii=False),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "canonical reviewed source"):
+                verify_candidate_dir(output, canonical_source=altered)
 
 
 if __name__ == "__main__":

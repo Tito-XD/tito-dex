@@ -10,6 +10,7 @@ new output directory.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -57,6 +58,11 @@ GENERATION_BY_SLUG = {
     "generation-viii": 8,
     "generation-ix": 9,
 }
+VERSION_GROUP_ALIASES = {
+    "blue-japan": "red-blue",
+    "red-green-japan": "red-blue",
+    "legends-z-a": "legends-za",
+}
 MOVE_TARGET_ZH = {
     "specific-move": "指定招式",
     "selected-pokemon-me-first": "选定宝可梦",
@@ -94,6 +100,34 @@ def write_json(path: Path, payload: Any, *, compact: bool = False) -> None:
         + "\n",
         encoding="utf-8",
     )
+
+
+def normalize_item_version_matrix(payload: dict[str, Any]) -> dict[str, Any]:
+    """Map legacy matrix labels onto the 23 canonical v20 version groups."""
+    result = copy.deepcopy(payload)
+    for item_id, entry in (result.get("items") or {}).items():
+        if not isinstance(entry, dict):
+            raise ValueError(f"Invalid item version matrix row: {item_id}")
+        entry["versionGroups"] = sorted(
+            {
+                VERSION_GROUP_ALIASES.get(str(group), str(group))
+                for group in entry.get("versionGroups") or []
+            }
+        )
+        prices: dict[str, Any] = {}
+        raw_prices = entry.get("prices") or {}
+        # Prefer an already-canonical row. Legacy aliases are accepted only
+        # when the canonical matrix has no value for that group; this avoids
+        # silently replacing the maintained v20 figure on a collision.
+        for group, price in raw_prices.items():
+            if str(group) not in VERSION_GROUP_ALIASES:
+                prices[str(group)] = price
+        for group, price in raw_prices.items():
+            canonical = VERSION_GROUP_ALIASES.get(str(group))
+            if canonical is not None:
+                prices.setdefault(canonical, price)
+        entry["prices"] = prices
+    return result
 
 
 def clean_text(value: str | None) -> str:
@@ -770,7 +804,9 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     type_labels = read_json(ROOT / "data" / "l10n" / "zh" / "types.json")
     machine_by_id, machine_by_item = build_machine_indexes(api_root, item_labels)
     move_version_matrix = read_json(MOVE_VERSION_MATRIX)
-    item_version_matrix = read_json(ITEM_VERSION_MATRIX)
+    item_version_matrix = normalize_item_version_matrix(
+        read_json(ITEM_VERSION_MATRIX)
+    )
 
     old_moves = read_json(staging / "moves.json")
     api_moves = endpoint_by_id(api_root, "move")
@@ -875,7 +911,11 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         staging / "POKEAPI_API_DATA_ATTRIBUTION.txt",
     )
     shutil.copyfile(MOVE_VERSION_MATRIX, staging / "move_version_matrix.json")
-    shutil.copyfile(ITEM_VERSION_MATRIX, staging / "item_version_matrix.json")
+    write_json(
+        staging / "item_version_matrix.json",
+        item_version_matrix,
+        compact=True,
+    )
 
     catalog_path = staging / "dex_catalog.json"
     catalog = read_json(catalog_path)

@@ -115,6 +115,36 @@ class ReferenceV20Test(unittest.TestCase):
             result, "https://example.invalid/private-prefix/bundle-v20.tar.zst"
         )
 
+    def test_item_matrix_uses_canonical_v20_version_groups(self) -> None:
+        result = patcher.normalize_item_version_matrix(
+            {
+                "schemaVersion": 1,
+                "items": {
+                    "1": {
+                        "slug": "fixture",
+                        "versionGroups": [
+                            "blue-japan",
+                            "red-green-japan",
+                            "legends-z-a",
+                        ],
+                        "generations": [1, 9],
+                        "prices": {
+                            "legends-z-a": {"buy": 50000, "sell": 25000},
+                            "legends-za": {"buy": 50000, "sell": 12500},
+                        },
+                    }
+                },
+            }
+        )
+        self.assertEqual(
+            result["items"]["1"]["versionGroups"],
+            ["legends-za", "red-blue"],
+        )
+        self.assertEqual(
+            result["items"]["1"]["prices"],
+            {"legends-za": {"buy": 50000, "sell": 12500}},
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

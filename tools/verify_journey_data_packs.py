@@ -11,10 +11,27 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+ROOT = Path(__file__).resolve().parents[1]
 MAX_CATALOG_BYTES = 256 * 1024
 MAX_PACK_BYTES = 4 * 1024 * 1024
 MAX_PACK_ENTRIES = 1000
 EXPECTED_BUCKET = "titodex-journey-content"
+DEFAULT_CANONICAL_SOURCE = ROOT / "data" / "journey" / "progression_hints.json"
+
+FAMILY_GAMES = {
+    "dpp": ["diamond", "pearl", "platinum"],
+    "hgss": ["heartgold", "soulsilver"],
+    "bw": ["black", "white"],
+    "bw2": ["black-2", "white-2"],
+    "xy": ["x", "y"],
+    "oras": ["omega-ruby", "alpha-sapphire"],
+    "sm": ["sun", "moon"],
+    "usum": ["ultra-sun", "ultra-moon"],
+    "swsh": ["sword", "shield"],
+    "bdsp": ["brilliant-diamond", "shining-pearl"],
+    "pla": ["legends-arceus"],
+    "sv": ["scarlet", "violet"],
+}
 
 GAME_GENERATIONS = {
     "diamond": 4,
@@ -60,8 +77,25 @@ def canonical_json(value: Any) -> bytes:
     ).encode("utf-8")
 
 
-def verify_candidate_dir(root: Path) -> dict[str, Any]:
+def verify_candidate_dir(
+    root: Path,
+    *,
+    canonical_source: Path = DEFAULT_CANONICAL_SOURCE,
+) -> dict[str, Any]:
     root = root.resolve()
+    source = json.loads(canonical_source.read_text(encoding="utf-8"))
+    _exact_keys(source, {"schemaVersion", "datasetVersion", "entries"}, "canonical source")
+    if source["schemaVersion"] != 1 or not _integer(source["datasetVersion"], 1):
+        raise ValueError("unsupported canonical Journey source")
+    if not isinstance(source["entries"], list) or not source["entries"]:
+        raise ValueError("canonical Journey source is empty")
+    canonical_ids: set[str] = set()
+    all_supported_games = set(GAME_GENERATIONS)
+    for entry in source["entries"]:
+        _validate_entry(entry, all_supported_games)
+        if entry["id"] in canonical_ids:
+            raise ValueError("canonical Journey source has duplicate IDs")
+        canonical_ids.add(entry["id"])
     catalog_path = root / "catalog.json"
     plan_path = root / "journey-pack-upload-plan.json"
     if not catalog_path.is_file() or not plan_path.is_file():
@@ -84,6 +118,7 @@ def verify_candidate_dir(root: Path) -> dict[str, Any]:
     paths: set[str] = set()
     assigned_games: set[str] = set()
     verified_objects: list[dict[str, Any]] = []
+    verified_packs: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
     for descriptor in packs:
         _validate_descriptor(descriptor)
         pack_id = descriptor["id"]
@@ -109,6 +144,9 @@ def verify_candidate_dir(root: Path) -> dict[str, Any]:
             raise ValueError(f"pack hash mismatch for {pack_id}")
         pack = _load_canonical_json(body, f"pack {pack_id}")
         _validate_pack(pack, descriptor)
+        if descriptor["gameFamily"] in verified_packs:
+            raise ValueError("duplicate Journey game family")
+        verified_packs[descriptor["gameFamily"]] = (descriptor, pack)
         verified_objects.append(
             {
                 "sourcePath": relative,
@@ -119,6 +157,44 @@ def verify_candidate_dir(root: Path) -> dict[str, Any]:
                 "immutable": True,
             }
         )
+
+    expected_families: dict[str, list[dict[str, Any]]] = {}
+    expected_source_dates: list[str] = []
+    for family, games in FAMILY_GAMES.items():
+        game_set = set(games)
+        selected = [
+            entry
+            for entry in source["entries"]
+            if game_set.intersection(entry["games"])
+        ]
+        if not selected:
+            continue
+        if any(not set(entry["games"]).issubset(game_set) for entry in selected):
+            raise ValueError("canonical Journey hint crosses pack families")
+        expected_families[family] = selected
+    if set(verified_packs) != set(expected_families):
+        raise ValueError("catalog does not contain the complete canonical family set")
+    for family, selected in expected_families.items():
+        descriptor, pack = verified_packs[family]
+        expected_date = max(
+            source_row["accessedAt"]
+            for entry in selected
+            for source_row in entry["sources"]
+        )
+        expected_source_dates.append(expected_date)
+        if (
+            descriptor["id"] != f"journey-{family}"
+            or descriptor["games"] != FAMILY_GAMES[family]
+            or descriptor["version"] != str(source["datasetVersion"])
+            or pack.get("sourceAsOf") != expected_date
+            or pack["entries"] != selected
+        ):
+            raise ValueError(
+                f"Journey pack {family} differs from the canonical reviewed source"
+            )
+    expected_generated_at = f"{max(expected_source_dates)}T00:00:00Z"
+    if catalog["generatedAt"] != expected_generated_at:
+        raise ValueError("catalog generatedAt does not match per-pack source dates")
 
     plan_bytes = plan_path.read_bytes()
     plan = _load_canonical_json(plan_bytes, "upload plan")
@@ -142,6 +218,7 @@ def verify_candidate_dir(root: Path) -> dict[str, Any]:
         "plan": plan,
         "packCount": len(packs),
         "entryCount": sum(item["entryCount"] for item in packs),
+        "canonicalSource": canonical_source.name,
     }
 
 

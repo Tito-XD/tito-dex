@@ -288,6 +288,59 @@ class DexV20FoundationTests(unittest.TestCase):
             self.assertEqual(summary["entities"], 5)
             self.assertFalse(summary["publishableRootManifestPresent"])
 
+    def test_optional_reference_and_gameplay_files_are_discoverable(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            base, base_root_manifest = self._make_base(root)
+            write_json(base / "reference_v20_audit.json", {"schemaVersion": 1})
+            write_json(
+                base / "reference_v20_sources.json",
+                {
+                    "sources": [
+                        {
+                            "sourceId": "pokeapi-api-data",
+                            "commit": "fixture-commit",
+                        }
+                    ]
+                },
+            )
+            write_json(base / "move_version_matrix.json", {"moves": {}})
+            write_json(base / "item_version_matrix.json", {"items": {}})
+            for name in (
+                "game_version_keys.json",
+                "obtain_methods.json",
+                "learn_methods.json",
+                "evolution_methods.json",
+                "item_story_usage.json",
+                "version_coverage.json",
+                "gameplay_sources.json",
+                "gameplay_v20_audit.json",
+            ):
+                write_json(base / "gameplay" / name, {"schemaVersion": 1})
+            output = root / "candidate"
+            build_candidate(
+                base_staging=base,
+                base_root_manifest=base_root_manifest,
+                output=output,
+                generated_at=GENERATED_AT,
+                build_archive=False,
+            )
+            manifest = json.loads((output / "staging" / "manifest.json").read_text())
+            pending = json.loads(
+                (
+                    output
+                    / "release-manifest"
+                    / "bundle-manifest.v20.candidate.json"
+                ).read_text()
+            )
+            self.assertEqual(manifest["referenceDataSourceCommit"], "fixture-commit")
+            self.assertEqual(manifest["schemaFeatures"]["moveDetails"], 2)
+            self.assertEqual(
+                manifest["gameplayData"]["obtainMethods"],
+                "gameplay/obtain_methods.json",
+            )
+            self.assertEqual(pending["gameplayData"], manifest["gameplayData"])
+
     def test_contract_schemas_are_strict(self) -> None:
         repo = Path(__file__).resolve().parents[1]
         for name in (

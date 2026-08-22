@@ -694,6 +694,58 @@ def build_candidate(
     runtime_counts = entity_index["audit"]["runtimeCounts"]
     schema_features = dict(manifest.get("schemaFeatures") or {})
     schema_features.update({"stableEntityIndex": 1, "provenance": 1})
+    if (staging / "reference_v20_audit.json").is_file():
+        reference_sources = read_json(staging / "reference_v20_sources.json")
+        pokeapi_source = next(
+            source
+            for source in reference_sources["sources"]
+            if source.get("sourceId") == "pokeapi-api-data"
+        )
+        schema_features.update(
+            {
+                "referenceStableIds": 1,
+                "moveDetails": 2,
+                "abilityDetails": 2,
+                "itemDetails": 2,
+                "generationMechanics": 1,
+            }
+        )
+        manifest.update(
+            {
+                "referenceDataAudit": "reference_v20_audit.json",
+                "referenceDataSources": "reference_v20_sources.json",
+                "referenceDataSourceCommit": pokeapi_source["commit"],
+                "referenceDataReviewStatus": "candidate",
+                "moveVersionMatrix": "move_version_matrix.json",
+                "itemVersionMatrix": "item_version_matrix.json",
+            }
+        )
+    gameplay_root = staging / "gameplay"
+    if gameplay_root.is_dir():
+        gameplay_paths = {
+            "gameVersionKeys": "gameplay/game_version_keys.json",
+            "obtainMethods": "gameplay/obtain_methods.json",
+            "learnMethods": "gameplay/learn_methods.json",
+            "evolutionMethods": "gameplay/evolution_methods.json",
+            "itemStoryUsage": "gameplay/item_story_usage.json",
+            "versionCoverage": "gameplay/version_coverage.json",
+            "sources": "gameplay/gameplay_sources.json",
+            "audit": "gameplay/gameplay_v20_audit.json",
+        }
+        missing_gameplay = [
+            path for path in gameplay_paths.values() if not (staging / path).is_file()
+        ]
+        if missing_gameplay:
+            raise ValueError(f"incomplete v20 gameplay overlay: {missing_gameplay}")
+        schema_features.update(
+            {
+                "exactGameObtainMethods": 1,
+                "versionedLearnMethods": 1,
+                "versionedEvolutionMethods": 1,
+                "reviewedItemStoryUsage": 1,
+            }
+        )
+        manifest["gameplayData"] = {"schemaVersion": 1, **gameplay_paths}
     manifest.update(
         {
             "version": BUNDLE_VERSION,
@@ -749,6 +801,17 @@ def build_candidate(
             "generatedAt": generated_at,
         }
     )
+    for key in (
+        "referenceDataAudit",
+        "referenceDataSources",
+        "referenceDataSourceCommit",
+        "referenceDataReviewStatus",
+        "moveVersionMatrix",
+        "itemVersionMatrix",
+        "gameplayData",
+    ):
+        if key in manifest:
+            pending[key] = manifest[key]
     pending_path = output / "release-manifest" / "bundle-manifest.v20.candidate.json"
     write_json(pending_path, pending)
     if (output / "upload" / "bundle-manifest.json").exists():

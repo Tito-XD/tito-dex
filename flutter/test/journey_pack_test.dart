@@ -87,6 +87,33 @@ void main() {
         throwsFormatException,
       );
       expect(
+        () => JourneyPackDescriptor.fromJson({...base, 'version': 1}),
+        throwsFormatException,
+      );
+      expect(
+        () => JourneyPackDescriptor.fromJson({
+          ...base,
+          'sha256': List.filled(64, 'A').join(),
+        }),
+        throwsFormatException,
+      );
+      expect(
+        () => JourneyPackCatalog.fromJson({
+          'schemaVersion': 1,
+          'generatedAt': '2026-08-22T00:00:00Z',
+          'packs': ['bad'],
+        }),
+        throwsFormatException,
+      );
+      expect(
+        () => JourneyPackCatalog.fromJson({
+          'schemaVersion': 1,
+          'generatedAt': '2026-08-22',
+          'packs': const [],
+        }),
+        throwsFormatException,
+      );
+      expect(
         () => JourneyPackCatalog.fromJson({
           'schemaVersion': 1,
           'generatedAt': '2026-08-22T00:00:00Z',
