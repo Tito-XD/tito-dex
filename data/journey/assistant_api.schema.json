@@ -7,6 +7,47 @@
   "required": ["question", "context"],
   "properties": {
     "question": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "history": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["role", "content"],
+            "properties": {
+              "role": { "const": "user" },
+              "content": { "type": "string", "minLength": 1, "maxLength": 240 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["role", "content"],
+            "properties": {
+              "role": { "const": "assistant" },
+              "content": { "type": "string", "minLength": 1, "maxLength": 600 }
+            }
+          }
+        ]
+      }
+    },
+    "journeyPacks": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "gameFamily", "version", "sha256"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^(?!.*\\.\\.)[a-z0-9][a-z0-9._-]{0,79}$" },
+          "gameFamily": { "type": "string", "pattern": "^(?!.*\\.\\.)[a-z0-9][a-z0-9._-]{0,39}$" },
+          "version": { "type": "string", "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,79}$" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
     "context": {
       "type": "object",
       "additionalProperties": false,

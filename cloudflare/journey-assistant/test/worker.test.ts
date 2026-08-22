@@ -2,6 +2,7 @@ import { env, SELF } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
 import worker, { reconcileParallelAnswers } from '../src/index';
+import { progressionHints } from '../src/progression_hints';
 
 function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -28,6 +29,49 @@ async function post(payload: string, deviceKey = 'test-device-key-12345'): Promi
     },
     body: payload,
   });
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(value),
+  );
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function publishJourneyPackFixture(
+  pack: Record<string, unknown>,
+  overrides: Record<string, unknown> = {},
+): Promise<Record<string, unknown>> {
+  const body = JSON.stringify(pack);
+  const descriptor = {
+    id: pack.id,
+    gameFamily: pack.gameFamily,
+    games: pack.games,
+    version: pack.version,
+    contentPath: `/v1/journey-packs/objects/${String(pack.id)}/${String(pack.version)}.json`,
+    sizeBytes: new TextEncoder().encode(body).byteLength,
+    sha256: await sha256Hex(body),
+    titleZh: '测试旅程资料',
+    entryCount: Array.isArray(pack.entries) ? pack.entries.length : 1,
+    bundleVersionRequired: 20,
+    ...overrides,
+  };
+  await env.JOURNEY_CONTENT.put(
+    `journey-packs/objects/${String(pack.id)}/${String(pack.version)}.json`,
+    body,
+  );
+  await env.JOURNEY_CONTENT.put(
+    'journey-packs/catalog.json',
+    JSON.stringify({
+      schemaVersion: 1,
+      generatedAt: '2026-08-22T00:00:00Z',
+      packs: [descriptor],
+    }),
+  );
+  return descriptor;
 }
 
 describe('journey assistant Worker contract', () => {
@@ -824,6 +868,163 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
   });
 
+  it('loads a hash-pinned installed Journey pack without sending its body', async () => {
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '1',
+      sourceAsOf: '2026-08-22',
+      entries: [{
+        id: 'sv-test-blocker',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'test_blocker',
+          labelZh: '测试路障',
+          aliases: ['测试路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'test_blocker',
+          locationId: 'test-location',
+          instructionZh: '这是从已安装资料包读取的确定性步骤。',
+        }],
+        overviewZh: '测试路障来自按游戏下载的审核资料包。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    const descriptor = await publishJourneyPackFixture(pack);
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [{
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      version: '1',
+      sha256: descriptor.sha256,
+    }];
+
+    const response = await post(JSON.stringify(request), 'pack-answer-key-12345');
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['sv-test-blocker'],
+    });
+  });
+
+  it('ignores a Journey pack when its installed hash does not match R2', async () => {
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '1',
+      entries: [{
+        id: 'invalid-pack-hint',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'test_blocker',
+          labelZh: '测试路障',
+          aliases: ['测试路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'test_blocker',
+          locationId: 'test-location',
+          instructionZh: '不应读取损坏的对象。',
+        }],
+        overviewZh: '不应读取损坏的对象。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    await publishJourneyPackFixture(pack, { sha256: 'a'.repeat(64) });
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [{
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      version: '1',
+      sha256: 'a'.repeat(64),
+    }];
+
+    const response = await post(JSON.stringify(request), 'pack-hash-key-12345');
+
+    expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
+  });
+
+  it('rejects the complete Journey pack when it tries to replace an audited hint', async () => {
+    const divergent = structuredClone(progressionHints[0]) as Record<string, unknown>;
+    divergent.overviewZh = '这是一条不允许覆盖内置审核资料的改写。';
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-hgss-test',
+      gameFamily: 'hgss',
+      games: ['heartgold', 'soulsilver'],
+      version: '1',
+      entries: [divergent, {
+        id: 'hgss-new-pack-hint',
+        games: ['soulsilver'],
+        generation: 4,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'new_pack_blocker',
+          labelZh: '新资料包路障',
+          aliases: ['新资料包路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'new_pack_blocker',
+          locationId: 'test-location',
+          instructionZh: '这条新增内容也必须随整包一起拒绝。',
+        }],
+        overviewZh: '整包校验失败时不能局部接受新增提示。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    const descriptor = await publishJourneyPackFixture(pack);
+    const request = JSON.parse(body({
+      question: '新资料包路障怎么过？',
+      journeyPacks: [{
+        id: pack.id,
+        gameFamily: pack.gameFamily,
+        version: pack.version,
+        sha256: descriptor.sha256,
+      }],
+    })) as Record<string, unknown>;
+    const response = await post(JSON.stringify(request), 'pack-override-key-12345');
+    expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
+  });
+
   it('enforces the configured per-key cost guard', async () => {
     const deviceKey = 'rate-limit-key-unique-12345';
     const responses = await Promise.all(
@@ -855,6 +1056,89 @@ describe('journey assistant Worker contract', () => {
     expect([...new Uint8Array(await apk.arrayBuffer())]).toEqual([0x50, 0x4b, 0x03, 0x04]);
     expect(apk.headers.get('cache-control')).toContain('immutable');
     expect(apk.headers.get('content-type')).toBe('application/vnd.android.package-archive');
+  });
+
+  it('serves Journey pack catalogs and immutable JSON only through the Worker', async () => {
+    await publishJourneyPackFixture({
+      schemaVersion: 1,
+      id: 'journey-sv',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '5',
+      entries: [{
+        id: 'sv-catalog-fixture',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'reference_topic',
+          id: 'catalog_fixture',
+          labelZh: '目录测试',
+          aliases: ['目录测试'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'read_reference',
+          targetId: 'catalog_fixture',
+          locationId: 'unknown',
+          instructionZh: '目录允许后才能下载这份对象。',
+        }],
+        overviewZh: '目录允许后才能下载这份对象。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    });
+
+    const catalog = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/catalog',
+    );
+    expect(catalog.status).toBe(200);
+    expect(catalog.headers.get('cache-control')).toBe('no-store');
+    const object = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.json',
+    );
+    expect(object.status).toBe(200);
+    expect(object.headers.get('cache-control')).toContain('immutable');
+    expect(await object.json()).toMatchObject({ id: 'journey-sv', version: '5' });
+  });
+
+  it('does not serve an immutable Journey object before catalog publication', async () => {
+    await env.JOURNEY_CONTENT.put(
+      'journey-packs/objects/journey-sv/5.json',
+      '{"schemaVersion":1}',
+    );
+    const object = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.json',
+    );
+    expect(object.status).toBe(404);
+  });
+
+  it('accepts at most one exact-game Journey pack reference', async () => {
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [
+      { id: 'journey-sv', gameFamily: 'sv', version: '5', sha256: 'a'.repeat(64) },
+      { id: 'journey-hgss', gameFamily: 'hgss', version: '5', sha256: 'b'.repeat(64) },
+    ];
+    const response = await post(JSON.stringify(request), 'pack-count-key-12345');
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ errorCode: 'invalid_request' });
+  });
+
+  it('rejects Journey pack traversal and non-JSON objects', async () => {
+    const traversal = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/%2e%2e/private.json',
+    );
+    expect(traversal.status).toBe(404);
+    const apk = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.apk',
+    );
+    expect(apk.status).toBe(404);
   });
 
   it('rejects traversal and does not expose other R2 prefixes', async () => {

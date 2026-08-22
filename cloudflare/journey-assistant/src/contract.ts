@@ -62,6 +62,14 @@ export type AssistantRequest = {
   question: string;
   context: AssistantContext;
   history?: AssistantHistoryMessage[];
+  journeyPacks?: JourneyPackReference[];
+};
+
+export type JourneyPackReference = {
+  id: string;
+  gameFamily: string;
+  version: string;
+  sha256: string;
 };
 
 export type AssistantHistoryMessage = {
@@ -102,8 +110,9 @@ export type AssistantResponse = {
   )[];
 };
 
-const allowedRequestKeys = new Set(['question', 'context', 'history']);
+const allowedRequestKeys = new Set(['question', 'context', 'history', 'journeyPacks']);
 const allowedHistoryKeys = new Set(['role', 'content']);
+const allowedJourneyPackKeys = new Set(['id', 'gameFamily', 'version', 'sha256']);
 const allowedContextKeys = new Set([
   'game',
   'generation',
@@ -145,6 +154,8 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   if (question.length < 1 || question.length > MAX_QUESTION_LENGTH) return null;
   const history = parseHistory(value.history);
   if (!history) return null;
+  const journeyPacks = parseJourneyPacks(value.journeyPacks);
+  if (!journeyPacks) return null;
   if (!isPlainObject(value.context) || hasUnexpectedKeys(value.context, allowedContextKeys)) return null;
   const context = value.context;
   if (typeof context.game !== 'string' || !(context.game in supportedGameGenerations)) return null;
@@ -173,6 +184,7 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   return {
     question,
     history,
+    journeyPacks,
     context: {
       game,
       generation,
@@ -185,6 +197,40 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
       contextReliability: reliability,
     },
   };
+}
+
+function parseJourneyPacks(value: unknown): JourneyPackReference[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > 1) return null;
+  const result: JourneyPackReference[] = [];
+  const ids = new Set<string>();
+  for (const item of value) {
+    if (!isPlainObject(item) || hasUnexpectedKeys(item, allowedJourneyPackKeys)) {
+      return null;
+    }
+    if (
+      typeof item.id !== 'string' ||
+      !/^[a-z0-9][a-z0-9._-]{0,79}$/.test(item.id) ||
+      item.id.includes('..') ||
+      typeof item.gameFamily !== 'string' ||
+      !/^[a-z0-9][a-z0-9._-]{0,39}$/.test(item.gameFamily) ||
+      item.gameFamily.includes('..') ||
+      typeof item.version !== 'string' ||
+      !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(item.version) ||
+      item.version.includes('..') ||
+      typeof item.sha256 !== 'string' ||
+      !/^[a-f0-9]{64}$/.test(item.sha256) ||
+      ids.has(item.id)
+    ) return null;
+    ids.add(item.id);
+    result.push({
+      id: item.id,
+      gameFamily: item.gameFamily,
+      version: item.version,
+      sha256: item.sha256,
+    });
+  }
+  return result;
 }
 
 function parseHistory(value: unknown): AssistantHistoryMessage[] | null {

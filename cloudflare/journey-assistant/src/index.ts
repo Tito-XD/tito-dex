@@ -30,6 +30,14 @@ import {
 } from './game_mechanics';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
 import { recentConversationForQuestion } from './conversation_context';
+import {
+  descriptorForPath,
+  descriptorObjectKey,
+  loadJourneyPackCatalog,
+  loadJourneyPackHints,
+  MAX_JOURNEY_PACK_BYTES,
+  readJourneyPackBody,
+} from './journey_packs';
 
 const MODEL_TIMEOUT_MS = 10_000;
 const CURATED_MODEL_TIMEOUT_MS = 6_000;
@@ -41,6 +49,8 @@ const EXTENSION_OBJECT_PATH_PREFIX = '/v1/extensions/journey_assistant/objects/'
 const EXTENSION_CATALOG_KEY = 'extensions/journey-assistant/extension-catalog.json';
 const EXTENSION_OBJECT_KEY_PREFIX = 'extensions/journey-assistant/objects/';
 const IMMUTABLE_APK_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.apk$/;
+const JOURNEY_PACK_CATALOG_PATH = '/v1/journey-packs/catalog';
+const JOURNEY_PACK_OBJECT_PATH_PREFIX = '/v1/journey-packs/objects/';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -97,9 +107,12 @@ export default {
           webSearchProviders,
           braveSearch: false,
           externalProvider: env.AI_EXTERNAL_PROVIDER_ENABLED === 'true',
+          journeyPacks: Boolean(env.JOURNEY_CONTENT),
         },
       }, 200);
     }
+    const journeyPackContent = await serveJourneyPackContent(request, url, env);
+    if (journeyPackContent) return journeyPackContent;
     const extensionContent = await serveExtensionContent(request, url, env);
     if (extensionContent) return extensionContent;
     if (url.pathname !== '/v1/ask') return jsonError('not_found', 404);
@@ -131,6 +144,7 @@ export default {
     }
     const parsed = parseAssistantRequest(value);
     if (!parsed) return jsonError('invalid_request', 400);
+    const availableHints = await loadJourneyPackHints(parsed, env.JOURNEY_CONTENT);
 
     const buildResponse = async (): Promise<AssistantResponse> => {
       const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
@@ -138,7 +152,12 @@ export default {
       // Resolve a unique reviewed hint and exact Dex-bundle facts before any
       // retrieval or model call. This keeps common entity questions truly
       // model-free even when their wording overlaps a generic Journey alias.
-      let response = await answerQuestion(parsed);
+      let response = await answerQuestion(
+        parsed,
+        undefined,
+        undefined,
+        availableHints,
+      );
       if (response.status !== 'answered') {
         response = answerSelectedGameMechanic(parsed) ??
           answerKnownPokemonFranchiseFact(parsed) ?? response;
@@ -159,12 +178,13 @@ export default {
           parsed,
           undefined,
           async (hints, assistantRequest) => {
-          const route = await resolveQuestionRoute(env, hints, assistantRequest);
-          trace.modelUsed ||= route.modelUsed;
-          trace.aiSearchUsed = route.aiSearchUsed;
-          curatedDecision = route.curatedDecision;
-          return { hintId: route.hintId };
+            const route = await resolveQuestionRoute(env, hints, assistantRequest);
+            trace.modelUsed ||= route.modelUsed;
+            trace.aiSearchUsed = route.aiSearchUsed;
+            curatedDecision = route.curatedDecision;
+            return { hintId: route.hintId };
           },
+          availableHints,
         );
       }
       let curatedSourcesUsed = false;
@@ -330,6 +350,57 @@ function answerStreamChunks(answer: string): string[] {
   }
   if (current) chunks.push(current);
   return chunks;
+}
+
+async function serveJourneyPackContent(
+  request: Request,
+  url: URL,
+  env: Env,
+): Promise<Response | null> {
+  const isCatalog = url.pathname === JOURNEY_PACK_CATALOG_PATH;
+  const objectName = url.pathname.startsWith(JOURNEY_PACK_OBJECT_PATH_PREFIX)
+    ? url.pathname.slice(JOURNEY_PACK_OBJECT_PATH_PREFIX.length)
+    : null;
+  if (!isCatalog && objectName === null) return null;
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return jsonError('method_not_allowed', 405);
+  }
+  if (!env.JOURNEY_CONTENT) return jsonError('resource_unavailable', 503);
+  try {
+    const catalog = await loadJourneyPackCatalog(env.JOURNEY_CONTENT);
+    if (!catalog) return jsonError('not_found', 404);
+    const headers = new Headers();
+    headers.set('content-type', 'application/json; charset=utf-8');
+    headers.set('x-content-type-options', 'nosniff');
+    if (isCatalog) {
+      headers.set('cache-control', 'no-store');
+      headers.set('content-length', String(catalog.body.byteLength));
+      return new Response(request.method === 'HEAD' ? null : catalog.body, {
+        status: 200,
+        headers,
+      });
+    }
+    const contentPath = `${JOURNEY_PACK_OBJECT_PATH_PREFIX}${objectName ?? ''}`;
+    const descriptor = descriptorForPath(catalog.descriptors, contentPath);
+    if (!descriptor) return jsonError('not_found', 404);
+    headers.set('cache-control', 'public, max-age=31536000, immutable');
+    headers.set('content-length', String(descriptor.sizeBytes));
+    headers.set('etag', `"${descriptor.sha256}"`);
+    if (request.method === 'HEAD') {
+      const object = await env.JOURNEY_CONTENT.head(descriptorObjectKey(descriptor));
+      if (
+        !object ||
+        object.size !== descriptor.sizeBytes ||
+        object.size > MAX_JOURNEY_PACK_BYTES
+      ) return jsonError('not_found', 404);
+      return new Response(null, { status: 200, headers });
+    }
+    const body = await readJourneyPackBody(descriptor, env.JOURNEY_CONTENT);
+    if (!body) return jsonError('not_found', 404);
+    return new Response(body, { status: 200, headers });
+  } catch {
+    return jsonError('resource_unavailable', 503);
+  }
 }
 
 async function serveExtensionContent(
