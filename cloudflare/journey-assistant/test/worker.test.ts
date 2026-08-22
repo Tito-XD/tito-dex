@@ -251,16 +251,22 @@ describe('journey assistant Worker contract', () => {
   });
 
   it('accepts cited DeepSeek trial output at low confidence when snippets are absent', async () => {
-    const aiRun = vi.fn(async () => ({
-      response: {
-        hintId: '',
-        webAllowed: true,
-        queryZh: '宝可梦 紫 利欧路 培养',
-        queryEn: 'Pokémon Violet Riolu training guide',
-        pokeApiKind: 'pokemon-species',
-        pokeApiSlug: 'riolu',
-      },
-    }));
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
+      ? { response: { onTopic: true } }
+      : {
+          response: {
+            hintId: '',
+            webAllowed: true,
+            queryZh: '宝可梦 紫 利欧路 培养',
+            queryEn: 'Pokémon Violet Riolu training guide',
+            pokeApiKind: 'pokemon-species',
+            pokeApiSlug: 'riolu',
+          },
+        });
     const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
       type: 'message',
       stop_reason: 'end_turn',
@@ -309,6 +315,70 @@ describe('journey assistant Worker contract', () => {
       sources: [{ title: 'Riolu guide' }],
     });
     expect(gatewayRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects an off-topic Paradox answer even in the relaxed trial mode', async () => {
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
+      ? { response: { onTopic: false } }
+      : {
+          response: {
+            hintId: 'sv-violet-paradox-overview',
+            webAllowed: true,
+            queryZh: '宝可梦 紫 属性克制',
+            queryEn: 'Pokémon Violet type matchups',
+            pokeApiKind: '',
+            pokeApiSlug: '',
+          },
+        });
+    const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
+      type: 'message',
+      stop_reason: 'end_turn',
+      content: [
+        {
+          type: 'server_tool_use',
+          id: 'srvtoolu_wrong_paradox',
+          name: 'web_search',
+          input: { query: 'Pokémon Violet type matchups' },
+        },
+        {
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_wrong_paradox',
+          content: [{
+            type: 'web_search_result',
+            title: 'Paradox Pokémon - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Paradox_Pok%C3%A9mon',
+          }],
+        },
+        {
+          type: 'text',
+          text: '悖谬宝可梦是带有古代或未来特征的独立宝可梦。',
+        },
+      ],
+    }), { headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', gatewayRun);
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'deepseek-topic-key-12345',
+        },
+        body: violetBody('紫里属性克制关系怎么看？'),
+      }),
+      deepSeekEnv({ aiRun, experimental: true }),
+    );
+
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({ status: 'no_match', answer: null });
+    expect(value.answer ?? '').not.toContain('悖谬');
+    expect(aiRun.mock.calls.some((call) =>
+      (call[2] as AiOptions | undefined)?.gateway?.metadata?.phase ===
+        'deepseek-native-topic-check')).toBe(true);
   });
 
   it('marks Qwen and DeepSeek as dual-source only after an explicit cross-check', async () => {

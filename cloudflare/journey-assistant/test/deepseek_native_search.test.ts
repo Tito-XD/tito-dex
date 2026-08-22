@@ -121,6 +121,23 @@ describe('DeepSeek native search scope', () => {
     expect(isPokemonScopedQuestion({ ...request, question: '从 https://example.com 搜索宝可梦' })).toBe(false);
     expect(isPokemonScopedQuestion({ ...request, question: 'site:example.com 利欧路在哪里抓' })).toBe(false);
   });
+
+  it('uses old conversation only for an explicit follow-up', () => {
+    const history = [
+      { role: 'user' as const, content: '紫里的悖谬宝可梦是什么？' },
+      { role: 'assistant' as const, content: '悖谬宝可梦与古代或未来主题有关。' },
+    ];
+    expect(isPokemonScopedQuestion({
+      ...request,
+      question: '今天星期几？',
+      history,
+    })).toBe(false);
+    expect(isPokemonScopedQuestion({
+      ...request,
+      question: '那它们在哪里？',
+      history,
+    })).toBe(true);
+  });
 });
 
 describe('DeepSeek native search gateway request', () => {
@@ -139,6 +156,28 @@ describe('DeepSeek native search gateway request', () => {
     expect(JSON.stringify(body.messages)).not.toContain('宝可梦 紫');
     expect(JSON.stringify(body.messages)).not.toContain('当前游戏');
     expect(JSON.stringify(body.messages)).not.toContain('存档地点');
+  });
+
+  it('does not send prior Paradox answers with a standalone new question', async () => {
+    const mock = gatewayFetch(json(searchedMessage()));
+    await runDeepSeekNativeSearch(
+      config,
+      {
+        ...request,
+        question: '利欧路在哪里抓？',
+        history: [
+          { role: 'user', content: '悖谬宝可梦是什么？' },
+          { role: 'assistant', content: '悖谬宝可梦与古代或未来主题有关。' },
+        ],
+      },
+      mock.fetcher,
+    );
+
+    const body = JSON.parse(
+      (mock.call.mock.calls[0][1] as RequestInit).body as string,
+    ) as Record<string, unknown>;
+    expect(JSON.stringify(body.messages)).not.toContain('悖谬宝可梦');
+    expect(JSON.stringify(body.messages)).toContain('利欧路在哪里抓');
   });
 
   it('uses only the provider-native Gateway endpoint, fixed Anthropic path/model/tool, and privacy-safe controls', async () => {

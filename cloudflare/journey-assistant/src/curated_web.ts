@@ -18,6 +18,10 @@ import {
   isGeneralPokemonFranchiseQuestion,
   isMegaEvolutionQuestion,
 } from './pokemon_question_scope';
+import {
+  isExplicitFollowUpQuestion,
+  recentConversationForQuestion,
+} from './conversation_context';
 
 const SOURCE_TIMEOUT_MS = 4_000;
 const MAX_SOURCE_RESPONSE_BYTES = 32_768;
@@ -135,7 +139,7 @@ export async function researchCuratedWeb(
           game: request.context.game,
           generation: request.context.generation,
           question: request.question,
-          recentConversation: (request.history ?? []).slice(-6),
+          recentConversation: recentConversationForQuestion(request, 6),
           outputLanguages: ['zh-Hans', 'en'],
         }),
       },
@@ -327,7 +331,7 @@ async function answerFromCuratedSources(
               ? { scope: 'pokemon_franchise' }
               : { game: request.context.game, generation: request.context.generation }),
             question: request.question,
-            recentConversation: (request.history ?? []).slice(-6),
+            recentConversation: recentConversationForQuestion(request, 6),
             sources: sources.map((source) => ({
               id: source.id,
               title: source.title,
@@ -801,18 +805,22 @@ const allowedLocalIntent = /(?:进化|怎么|如何|在哪|哪里|哪儿|获得|
 const broadLocalIntent = /(?:新手|开始玩|刚开始|亮点|特色|注意点|注意事项|悖谬|版本区别|版本限定|太晶|宝主|天星队|三条主线|通关顺序|攻略|流程|开荒|之后|然后|接下来|下一步|心得|技巧)/u;
 
 function requestForRetrieval(request: AssistantRequest): AssistantRequest {
+  if (isExplicitFollowUpQuestion(request.question)) {
+    const previousUser = [...(request.history ?? [])]
+      .reverse()
+      .find((message) => message.role === 'user');
+    if (previousUser) {
+      return {
+        ...request,
+        question: `${previousUser.content}；追问：${request.question}`.slice(0, 240),
+      };
+    }
+  }
   const currentHasEnoughContext = findLocalPokeApiEntity(request.question) !== null ||
     allowedLocalIntent.test(request.question) || broadLocalIntent.test(request.question) ||
     isGeneralPokemonFranchiseQuestion(request.question);
   if (currentHasEnoughContext) return request;
-  const previousUser = [...(request.history ?? [])]
-    .reverse()
-    .find((message) => message.role === 'user');
-  if (!previousUser) return request;
-  return {
-    ...request,
-    question: `${previousUser.content}；追问：${request.question}`.slice(0, 240),
-  };
+  return request;
 }
 
 /**

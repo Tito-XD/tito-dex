@@ -104,7 +104,20 @@ function scoreHint(hint: ProgressionHint, request: AssistantRequest): number {
   const question = normalize(request.question);
   const reliability = effectiveContextReliability(request.context);
   let score = 0;
-  if (hint.subject.aliases.some((alias) => question.includes(normalize(alias)))) score += 5;
+  const subjectMatched = hint.subject.aliases.some((alias) =>
+    question.includes(normalize(alias))
+  );
+  if (hint.subject.type === 'reference_topic') {
+    // Reference summaries are not catch-all answers for their game/location.
+    // They require an explicit topic alias, and detail/action questions must
+    // continue to structured data or online retrieval instead.
+    if (!subjectMatched || referenceDetailIntent.test(request.question)) return 0;
+    score += 5;
+  } else if (subjectMatched) {
+    score += 5;
+  }
+  const hasBlockerIntent = blockerIntent.test(request.question);
+  if (!subjectMatched && !hasBlockerIntent) return 0;
   if (hint.locationAliases.some((alias) => question.includes(normalize(alias)))) score += 3;
   if (hint.destinationAliases.some((alias) => question.includes(normalize(alias)))) score += 2;
   // Save location is supporting context, never a question by itself. Without
@@ -118,6 +131,9 @@ function scoreHint(hint: ProgressionHint, request: AssistantRequest): number {
   ) score += 4;
   return score;
 }
+
+const referenceDetailIntent = /(?:哪里|哪儿|在哪|怎么抓|如何抓|捕捉|捕获|获得|拿到|出现|遭遇|招式|技能|道具|携带|掉落|进化|属性|特性|种族值|配招|队伍)/u;
+const blockerIntent = /(?:进不去|过不去|挡路|卡住|不开|怎么过|如何过|怎么进|如何进|怎么去|如何去|下一步|接下来)/u;
 
 function deterministicAnswer(hint: ProgressionHint, request: AssistantRequest): AssistantResponse {
   const reliability = effectiveContextReliability(request.context);

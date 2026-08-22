@@ -14,7 +14,11 @@ export type ProgressionHint = {
   locations: string[];
   locationAliases: string[];
   destinationAliases: string[];
-  subject: { id: string; aliases: string[] };
+  subject: {
+    type: 'overworld_blocker' | 'story_blocker' | 'reference_topic';
+    id: string;
+    aliases: string[];
+  };
   requirements: Requirement[];
   steps: { instructionZh: string }[];
   overviewZh: string;

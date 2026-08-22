@@ -123,6 +123,53 @@ describe('deterministic and model-guarded answers', () => {
     expect(compose).not.toHaveBeenCalled();
   });
 
+  it('does not turn Violet or Area Zero context into a Paradox definition', async () => {
+    const violetContext: AssistantRequest['context'] = {
+      game: 'violet',
+      generation: 9,
+      badgeIds: [],
+      milestoneIds: [],
+      locale: 'zh-Hans',
+      parserRevision: 0,
+      contextReliability: {
+        game: 'user_selected',
+        location: 'unknown',
+        badges: 'unknown',
+        milestones: 'unsupported',
+      },
+    };
+
+    for (const question of ['紫里属性克制关系怎么看？', '第零区有什么道具？']) {
+      const result = await answerQuestion({ question, context: violetContext });
+      expect(result).toMatchObject({ status: 'no_match', answer: null });
+      expect(result.matchedHintIds ?? []).not.toContain('sv-violet-paradox-overview');
+    }
+  });
+
+  it('keeps the explicit Paradox concept question as a local audited answer', async () => {
+    const result = await answerQuestion({
+      question: '紫里的悖谬宝可梦是什么？',
+      context: {
+        game: 'violet',
+        generation: 9,
+        badgeIds: [],
+        milestoneIds: [],
+        locale: 'zh-Hans',
+        parserRevision: 0,
+        contextReliability: {
+          game: 'user_selected',
+          location: 'unknown',
+          badges: 'unknown',
+          milestones: 'unsupported',
+        },
+      },
+    });
+    expect(result).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['sv-violet-paradox-overview'],
+    });
+  });
+
   it('never turns a badge count into a specific badge claim', async () => {
     const result = await answerQuestion({
       ...request,
