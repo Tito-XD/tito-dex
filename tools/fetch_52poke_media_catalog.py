@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch a per-species online media catalog from 52poke rendered pages.
+"""Legacy parser for the existing audited 52Poké media catalog.
 
 For each species, parses the rendered page for:
 - cry audio elements (``<audio data-mwtitle="NNNN_cry.opus">`` with webm
@@ -10,9 +10,10 @@ Static per-generation front/back sprites are intentionally NOT included:
 they are already deterministic from PokeAPI's sprites repo (front via the
 existing ``sprite_generation_catalog``, back via the same version folders).
 
-Writes ``data/l10n/zh/media_catalog_52poke.json``. Never bundled into the
-archive — the app fetches the catalog once and caches it, then loads media
-on demand (with the Settings resource manager for selective downloads).
+New network refreshes are disabled: TitoDex's current source registry excludes
+52Poké images/audio and the site's machine-reading rules disallow the old
+``action=parse`` implementation. v20 must inherit the already-audited v19
+catalog unchanged unless separate written permission changes that scope.
 """
 
 from __future__ import annotations
@@ -53,28 +54,11 @@ FORM_ART_RE = re.compile(r"File:((?:\d{3,4})[A-Za-z][A-Za-z0-9-]*\.png)")
 
 
 def fetch_rendered_html(session: requests.Session, query: str) -> str | None:
-    for title in candidate_titles(session, query):
-        params = {
-            "action": "parse",
-            "page": title,
-            "prop": "text",
-            "format": "json",
-            "formatversion": 2,
-            "redirects": 1,
-        }
-        for attempt in range(RETRIES):
-            try:
-                response = session.get(
-                    f"{WIKI_BASE}/api.php", params=params, timeout=40
-                )
-                if response.status_code != 200:
-                    break
-                return response.json()["parse"]["text"]
-            except (requests.RequestException, ValueError, KeyError):
-                if attempt == RETRIES - 1:
-                    break
-                time.sleep(2 * (attempt + 1))
-    return None
+    del session, query
+    raise RuntimeError(
+        "52Poké media refresh is disabled by data/journey/sources/"
+        "source_registry.json; reuse the audited v19 catalog"
+    )
 
 
 def parse_cries(html: str) -> list[dict[str, str]]:
@@ -137,6 +121,11 @@ def main() -> int:
     parser.add_argument("--delay", type=float, default=DEFAULT_DELAY)
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
+
+    parser.error(
+        "52Poké media refresh is disabled; v20 must reuse the audited v19 "
+        "media catalog unless separate written permission is recorded"
+    )
 
     labels = json.loads(args.labels.read_text(encoding="utf-8"))
     if args.ids:

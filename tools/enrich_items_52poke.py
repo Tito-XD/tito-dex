@@ -20,13 +20,12 @@ import argparse
 import json
 import re
 import sys
-import time
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
+from wiki52poke_client import Wiki52PokeClient
+
 ROOT = Path(__file__).resolve().parents[1]
-API = "https://wiki.52poke.com/api.php"
+_CLIENT: Wiki52PokeClient | None = None
 
 _LINK = re.compile(r"\[\[(?:[^\]|]*\|)?([^\]|]+)\]\]")   # [[a|b]] -> b, [[a]] -> a
 _TEMPLATE = re.compile(r"\{\{[^{}]*\}\}")
@@ -34,22 +33,24 @@ _ZH_HANS = re.compile(r"zh-hans:\s*([^;{}]+?)\s*;\s*zh-hant:")
 _USE_EFFECT = re.compile(r"==\s*使用效果\s*==\s*\n(.+?)(?:\n==|\Z)", re.S)
 
 
+def _client() -> Wiki52PokeClient:
+    global _CLIENT
+    if _CLIENT is None:
+        _CLIENT = Wiki52PokeClient(
+            cache_dir=ROOT / "tools" / ".wiki52poke-revisions" / "items"
+        )
+    return _CLIENT
+
+
 def fetch_wikitext(title: str, *, retries: int = 3) -> str | None:
-    params = {
-        "action": "parse", "page": title, "prop": "wikitext",
-        "format": "json", "redirects": 1,
-    }
-    url = f"{API}?{urllib.parse.urlencode(params)}"
+    """Read only the latest source revision through the shared serial client."""
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "TitoDex/1.0 (+bundle build)"})
-            with urllib.request.urlopen(req, timeout=40) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-            if "error" in data:
+            revision = _client().latest_revision(title, force=attempt > 0)
+            return revision.content if revision is not None else None
+        except Exception:  # noqa: BLE001 - best-effort legacy enrichment
+            if attempt == retries - 1:
                 return None
-            return data.get("parse", {}).get("wikitext", {}).get("*")
-        except Exception:  # noqa: BLE001
-            time.sleep(0.6 * (attempt + 1))
     return None
 
 
@@ -103,8 +104,6 @@ def main() -> None:
                 filled += 1
         if i % 10 == 0 or i == len(gaps):
             print(f"  {i}/{len(gaps)} (filled {filled})", flush=True)
-        time.sleep(0.2)
-
     args.items.write_text(
         json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

@@ -17,33 +17,26 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from enrich_items_52poke import extract_description, fetch_wikitext  # noqa: E402
+from enrich_items_52poke import _client, extract_description, fetch_wikitext  # noqa: E402
 
-API = "https://wiki.52poke.com/api.php"
 ITEM_SUFFIX = "（道具）"
 
 
 def search_item_page(name_en: str, *, retries: int = 3) -> str | None:
-    params = {"action": "query", "list": "search", "srsearch": name_en, "srlimit": 3, "format": "json"}
-    url = f"{API}?{urllib.parse.urlencode(params)}"
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "TitoDex/1.0 (+bundle build)"})
-            with urllib.request.urlopen(req, timeout=40) as resp:
-                hits = json.loads(resp.read().decode("utf-8"))["query"]["search"]
-            for hit in hits:
-                if hit["title"].endswith(ITEM_SUFFIX):
-                    return hit["title"]
-            return hits[0]["title"] if hits else None
-        except Exception:  # noqa: BLE001
-            time.sleep(0.6 * (attempt + 1))
+            titles = _client().search_titles(name_en, limit=3)
+            for title in titles:
+                if title.endswith(ITEM_SUFFIX):
+                    return title
+            return titles[0] if titles else None
+        except Exception:  # noqa: BLE001 - best-effort legacy enrichment
+            if attempt == retries - 1:
+                return None
     return None
 
 
@@ -76,8 +69,6 @@ def main() -> None:
                         desc_filled += 1
         if i % 10 == 0 or i == len(targets):
             print(f"  {i}/{len(targets)} (names {named}, descs {desc_filled})", flush=True)
-        time.sleep(0.2)
-
     args.items.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     no_name = sum(1 for it in items.values() if not it.get("nameZh") or it["nameZh"] == it.get("nameEn"))
     no_desc = sum(1 for it in items.values() if not it.get("descriptionZh"))

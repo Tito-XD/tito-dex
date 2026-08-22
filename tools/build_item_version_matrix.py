@@ -307,8 +307,9 @@ def fetch_pages(
                     data={
                         "action": "query",
                         "prop": "revisions",
-                        "rvprop": "content",
+                        "rvprop": "ids|timestamp|content",
                         "rvslots": "main",
+                        "rvlimit": "1",
                         "redirects": "1",
                         "format": "json",
                         "formatversion": "2",
@@ -369,7 +370,10 @@ def fetch_pages(
             f"({len(requested)}/{len(titles)} requested, {len(pages)} read)",
             flush=True,
         )
-        time.sleep(0.35)
+        # 52Poké requires the next request to start more than 500ms after
+        # the previous response completed. This builder is intentionally
+        # serial; do not parallelize these batches.
+        time.sleep(0.55)
     return pages
 
 
