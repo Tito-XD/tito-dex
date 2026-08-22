@@ -353,6 +353,10 @@ def build_move_record(
     description, description_language, description_version_group = latest_flavor(
         detail.get("flavor_text_entries", [])
     )
+    if not description and effect["shortEffect"]:
+        description = effect["shortEffect"]
+        description_language = effect["language"]
+        description_version_group = None
     meta = detail.get("meta") or {}
     machine_rows: list[dict[str, Any]] = []
     for machine_ref in detail.get("machines", []):
