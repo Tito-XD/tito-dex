@@ -23,7 +23,6 @@ const SOURCE_TIMEOUT_MS = 4_000;
 const MAX_SOURCE_RESPONSE_BYTES = 32_768;
 const MAX_SOURCE_TEXT_CHARS = 6_000;
 const USER_AGENT = 'TitoDex-Journey-Assistant/0.1 (+https://github.com/Tito-XD/tito-dex)';
-const ONLINE_LABEL = '联网参考（未经 TitoDex 人工审核）：';
 
 type ModelMessage = { role: 'system' | 'user'; content: string };
 
@@ -417,36 +416,13 @@ async function answerFromCuratedSources(
   if (hasUnsupportedVersionlessNumber(safeAnswer, request.question, usedSources)) {
     return null;
   }
-  const sourceLines = usedSources.map((source, index) => {
-    if (!source.url) return `[${index + 1}] ${source.title}（TitoDex 内部结构化资料）`;
-    const host = new URL(source.url).hostname;
-    const license = source.id.startsWith('strategywiki-')
-      ? '（CC BY-SA 4.0，已改写）'
-      : host === 'bulbapedia.bulbagarden.net'
-        ? '（CC BY-NC-SA 2.5，已改写）'
-        : host === 'wiki.52poke.com'
-          ? '（CC BY-NC-SA 3.0，已改写）'
-          : '';
-    return `[${index + 1}] ${source.title}${license}：${source.url}`;
-  });
-  const footer = `\n\n来源：\n${sourceLines.join('\n')}`;
   const hasOnlineSource = usedSources.some((source) => Boolean(source.url));
-  const hasLocalSource = usedSources.some((source) => !source.url);
-  const answerLabel = hasOnlineSource
-    ? hasLocalSource
-      ? 'TitoDex 图鉴包 + 联网参考（未经人工审核）：'
-      : ONLINE_LABEL
-    : 'TitoDex 图鉴包整理：';
-  const answerBudget = Math.max(
-    1,
-    MAX_ANSWER_LENGTH - answerLabel.length - footer.length - 2,
-  );
   const accessedAt = now().toISOString().slice(0, 10);
   const reliability = effectiveContextReliability(request.context);
   const sourceKinds = sourceKindsFor(usedSources);
   return {
     status: 'answered',
-    answer: `${answerLabel}\n${safeAnswer.slice(0, answerBudget)}${footer}`,
+    answer: safeAnswer.slice(0, MAX_ANSWER_LENGTH),
     contextUsed: generalFranchise
       ? { scope: 'pokemon_franchise' }
       : {
@@ -599,7 +575,7 @@ function deterministicMoveResponse(
       const reliability = effectiveContextReliability(request.context);
       return {
         status: 'answered',
-        answer: `${ONLINE_LABEL}\n${answer}\n\n来源：\n[1] ${source.title}：${source.url}`,
+        answer,
         contextUsed: {
           game: request.context.game,
           gameReliability: reliability.game,
@@ -675,7 +651,7 @@ function deterministicEvolutionResponse(
       const reliability = effectiveContextReliability(request.context);
       return {
         status: 'answered',
-        answer: `${ONLINE_LABEL}\n${answer}\n\n来源：\n[1] ${source.title}：${source.url}`,
+        answer,
         contextUsed: {
           game: request.context.game,
           gameReliability: reliability.game,

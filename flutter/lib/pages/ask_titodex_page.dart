@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1204,10 +1205,11 @@ class _GeneratingAnswerCard extends StatelessWidget {
       AskTitoDexProgress.contactingWorker => '正在交叉核对资料与联网来源',
       AskTitoDexProgress.revealingAnswer => '正在写入已核验回答',
     };
-    final hasStreamedAnswer = streamedAnswer.isNotEmpty;
+    final streamedBody = askTitoDexAnswerBody(streamedAnswer);
+    final hasStreamedAnswer = streamedBody.isNotEmpty;
     return Semantics(
       liveRegion: true,
-      label: hasStreamedAnswer ? '$stage，$streamedAnswer' : stage,
+      label: hasStreamedAnswer ? '$stage，$streamedBody' : stage,
       child: AssistantSurface(
         key: const Key('ask-titodex-generating-answer'),
         color: _assistantPaper,
@@ -1252,13 +1254,9 @@ class _GeneratingAnswerCard extends StatelessWidget {
                 ],
               ),
               child: hasStreamedAnswer
-                  ? Text(
-                      '$streamedAnswer▍',
+                  ? _AssistantMarkdown(
                       key: const Key('ask-titodex-streaming-answer'),
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        height: 1.45,
-                        color: TitoColors.ink,
-                      ),
+                      data: '$streamedBody▍',
                     )
                   : Shimmer.fromColors(
                       key: const ValueKey('answer-skeleton'),
@@ -1280,6 +1278,113 @@ class _GeneratingAnswerCard extends StatelessWidget {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AssistantMarkdown extends StatelessWidget {
+  const _AssistantMarkdown({super.key, required this.data});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = SecondaryTypography.onCard.body14.copyWith(
+      height: 1.45,
+      color: TitoColors.ink,
+    );
+    final compact = SecondaryTypography.onCard.small12.copyWith(
+      height: 1.35,
+      color: TitoColors.ink,
+    );
+    final heading = SecondaryTypography.onCard.h15.copyWith(
+      color: TitoColors.deepBlue,
+      fontWeight: FontWeight.w900,
+    );
+    final headingPadding = const EdgeInsets.only(top: 7, bottom: 4);
+    return MarkdownBody(
+      data: data,
+      selectable: true,
+      softLineBreak: true,
+      fitContent: true,
+      // Answer links are intentionally inert. Only the structured citation
+      // sheet may launch externally audited source URLs.
+      onTapLink: (_, _, _) {},
+      // Never let model-authored Markdown fetch arbitrary remote images.
+      imageBuilder: (_, _, _) => const SizedBox.shrink(),
+      styleSheet: MarkdownStyleSheet(
+        p: body,
+        pPadding: EdgeInsets.zero,
+        h1: heading.copyWith(fontSize: 17),
+        h1Padding: headingPadding,
+        h2: heading,
+        h2Padding: headingPadding,
+        h3: body.copyWith(
+          color: TitoColors.deepBlue,
+          fontWeight: FontWeight.w900,
+        ),
+        h3Padding: headingPadding,
+        h4: body.copyWith(fontWeight: FontWeight.w900),
+        h4Padding: headingPadding,
+        h5: body.copyWith(fontWeight: FontWeight.w900),
+        h5Padding: headingPadding,
+        h6: body.copyWith(fontWeight: FontWeight.w900),
+        h6Padding: headingPadding,
+        strong: body.copyWith(fontWeight: FontWeight.w900),
+        em: body.copyWith(fontStyle: FontStyle.italic),
+        a: body.copyWith(
+          color: TitoColors.deepBlue,
+          decoration: TextDecoration.none,
+        ),
+        code: compact.copyWith(
+          backgroundColor: TitoColors.skyBlue.withValues(alpha: 0.26),
+          fontFamily: 'monospace',
+        ),
+        blockSpacing: 8,
+        listIndent: 18,
+        listBullet: body.copyWith(fontWeight: FontWeight.w900),
+        listBulletPadding: const EdgeInsets.only(right: 6),
+        tableHead: compact.copyWith(
+          color: TitoColors.deepBlue,
+          fontWeight: FontWeight.w900,
+        ),
+        tableBody: compact,
+        tableHeadAlign: TextAlign.left,
+        tablePadding: const EdgeInsets.symmetric(vertical: 4),
+        tableBorder: TableBorder.all(
+          color: TitoColors.deepBlue.withValues(alpha: 0.25),
+        ),
+        tableColumnWidth: const IntrinsicColumnWidth(),
+        tableScrollbarThumbVisibility: true,
+        tableCellsPadding: const EdgeInsets.symmetric(
+          horizontal: 7,
+          vertical: 6,
+        ),
+        tableHeadCellsDecoration: BoxDecoration(
+          color: TitoColors.skyBlue.withValues(alpha: 0.22),
+        ),
+        blockquote: body.copyWith(color: TitoColors.mutedInk),
+        blockquotePadding: const EdgeInsets.fromLTRB(10, 6, 8, 6),
+        blockquoteDecoration: BoxDecoration(
+          color: TitoColors.skyBlue.withValues(alpha: 0.16),
+          border: Border(
+            left: BorderSide(
+              color: TitoColors.deepBlue.withValues(alpha: 0.45),
+              width: 3,
+            ),
+          ),
+        ),
+        codeblockPadding: const EdgeInsets.all(10),
+        codeblockDecoration: BoxDecoration(
+          color: TitoColors.skyBlue.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        horizontalRuleDecoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: TitoColors.deepBlue.withValues(alpha: 0.24)),
+          ),
         ),
       ),
     );
@@ -1598,6 +1703,7 @@ class _AnswerCard extends StatelessWidget {
     }
     final sourceKinds = result.sourceKinds.toSet().toList(growable: false);
     final sources = _uniqueSources(result.sources);
+    final answerBody = askTitoDexAnswerBody(result.answer ?? '');
     return AssistantSurface(
       key: const Key('ask-titodex-answer-card'),
       color: _assistantPaper,
@@ -1630,10 +1736,9 @@ class _AnswerCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          SelectableText(
-            result.answer ?? '',
+          _AssistantMarkdown(
             key: const Key('ask-titodex-answer'),
-            style: SecondaryTypography.onCard.body14.copyWith(height: 1.45),
+            data: answerBody,
           ),
           if (result.unknowns.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -1655,11 +1760,11 @@ class _AnswerCard extends StatelessWidget {
               sourceOpener: sourceOpener,
             ),
           ),
-          if ((result.answer ?? '').isNotEmpty) ...[
+          if (answerBody.isNotEmpty) ...[
             const SizedBox(height: 10),
             _EntityLinkCards(
               question: question,
-              answer: result.answer!,
+              answer: answerBody,
               resolver: entityResolver,
             ),
           ],

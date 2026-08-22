@@ -64,6 +64,35 @@ void main() {
     expect(messages.toString(), isNot(contains('魂银')));
   });
 
+  test('follow-up context strips legacy answer envelope and source footer', () {
+    final entry = AskTitoDexHistoryEntry(
+      game: 'violet',
+      question: '路卡利欧有哪些升级招式？',
+      result: const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '''DeepSeek 原生联网参考（未经 TitoDex 人工审核）：
+## 升级习得
+
+| 等级 | 招式 |
+| --- | --- |
+| 1 | 看穿 |
+
+来源：
+[1] Lucario learnset：https://example.com/lucario''',
+      ),
+      createdAt: DateTime.utc(2026, 8, 22),
+    );
+
+    expect(entry.assistantContent, startsWith('## 升级习得'));
+    expect(entry.assistantContent, isNot(contains('DeepSeek 原生联网参考')));
+    expect(entry.assistantContent, isNot(contains('来源：')));
+    expect(entry.assistantContent, isNot(contains('https://')));
+    expect(
+      askTitoDexRequestHistory([entry], game: 'violet').last['content'],
+      entry.assistantContent,
+    );
+  });
+
   test(
     'manual history compression keeps only the newest requested entries',
     () async {

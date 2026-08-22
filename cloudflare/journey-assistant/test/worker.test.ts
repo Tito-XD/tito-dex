@@ -305,6 +305,7 @@ describe('journey assistant Worker contract', () => {
       status: 'answered',
       confidence: 'low',
       answerMode: 'deepseek_native_search',
+      answer: '利欧路可以进化为路卡利欧，是否培养取决于队伍需求。',
       sources: [{ title: 'Riolu guide' }],
     });
     expect(gatewayRun).toHaveBeenCalledTimes(1);

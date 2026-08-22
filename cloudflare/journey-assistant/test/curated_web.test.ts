@@ -166,8 +166,9 @@ describe('curated key-free web research', () => {
       expect.objectContaining({ title: 'PokéAPI · 447' }),
       expect.objectContaining({ title: 'Riolu training guide - Pokémon Database' }),
     ]));
-    expect(result?.answer).toContain('TitoDex 图鉴包 + 联网参考');
-    expect(result?.answer).toContain('https://pokemondb.net/');
+    expect(result?.answer).toBe('网页攻略也建议培养时优先保证生存。');
+    expect(result?.answer).not.toContain('来源：');
+    expect(result?.answer).not.toContain('https://');
   });
 
   it('rejects broad advice that ignores available independent web evidence', async () => {
@@ -339,9 +340,9 @@ describe('curated key-free web research', () => {
         { title: 'StrategyWiki · Pokémon HeartGold and SoulSilver/Evolution', accessedAt: '2026-08-13' },
       ],
     });
-    expect(result?.answer).toContain('未经 TitoDex 人工审核');
-    expect(result?.answer).toContain('CC BY-SA 4.0，已改写');
     expect(result?.answer).toContain('太阳伊布是超能力属性');
+    expect(result?.answer).not.toContain('来源：');
+    expect(result?.answer).not.toContain('https://');
     expect(result?.answer?.length).toBeLessThanOrEqual(1200);
     expect(composeInstruction).toContain('trigger=level-up');
     expect(composeInstruction).toContain('不可猜测数值');
@@ -569,8 +570,11 @@ describe('curated key-free web research', () => {
       sources: [{ title: 'Riolu - Bulbapedia', accessedAt: '2026-08-15' }],
     });
     expect(result?.answer).toContain('在《宝可梦 紫》中');
-    expect(result?.answer).toContain('CC BY-NC-SA 2.5，已改写');
-    expect(result?.answer).toContain('https://bulbapedia.bulbagarden.net/');
+    expect(result?.answer).not.toContain('来源：');
+    expect(result?.answer).not.toContain('https://');
+    expect(result?.sources?.[0]?.url).toBe(
+      'https://bulbapedia.bulbagarden.net/wiki/Riolu_(Pok%C3%A9mon)',
+    );
   });
 
   it('deterministically scopes a broad Pokémon question before the exact-game Tavily query', async () => {
