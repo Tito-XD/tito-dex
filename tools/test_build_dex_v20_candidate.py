@@ -317,6 +317,11 @@ class DexV20FoundationTests(unittest.TestCase):
                 "gameplay_v20_audit.json",
             ):
                 write_json(base / "gameplay" / name, {"schemaVersion": 1})
+            for species_id in (1, 2):
+                write_json(
+                    base / "gameplay" / "species" / f"{species_id}.json",
+                    {"schemaVersion": 1, "speciesId": species_id},
+                )
             output = root / "candidate"
             build_candidate(
                 base_staging=base,
@@ -338,6 +343,10 @@ class DexV20FoundationTests(unittest.TestCase):
             self.assertEqual(
                 manifest["gameplayData"]["obtainMethods"],
                 "gameplay/obtain_methods.json",
+            )
+            self.assertEqual(
+                manifest["gameplayData"]["speciesShards"],
+                "gameplay/species/{speciesId}.json",
             )
             self.assertEqual(pending["gameplayData"], manifest["gameplayData"])
 

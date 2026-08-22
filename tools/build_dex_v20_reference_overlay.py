@@ -201,6 +201,19 @@ def build_provenance(*, generated_at: str, version_keys: dict[str, Any]) -> dict
         freshness_class="immutable",
         fallback="local-authoritative",
     )
+    species_shard = evidence(
+        source_ids=[
+            "pokeapi-api-data-v20",
+            "pkhex-encounters-v20",
+            "titodex-reference-generator-v20",
+        ],
+        method="normalized",
+        confidence="medium",
+        level="unscoped",
+        checked_at=generated_at,
+        freshness_class="versionSensitive",
+        fallback="online-verify",
+    )
     return {
         "schemaVersion": 1,
         "overlayId": "reference-gameplay-v20",
@@ -282,6 +295,7 @@ def build_provenance(*, generated_at: str, version_keys: dict[str, Any]) -> dict
             object_rule("gameplay/game_version_keys.json", 60, generated),
             object_rule("gameplay/gameplay_sources.json", 60, generated),
             object_rule("gameplay/gameplay_v20_audit.json", 60, generated),
+            object_rule("gameplay/species/*.json", 65, species_shard),
         ],
     }
 
@@ -340,7 +354,7 @@ def build_overlay(args: argparse.Namespace) -> dict[str, Any]:
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, destination)
                 copied.append(relative)
-        for source in sorted((candidate_staging / "gameplay").glob("*.json")):
+        for source in sorted((candidate_staging / "gameplay").rglob("*.json")):
             relative = source.relative_to(candidate_staging).as_posix()
             destination = output / relative
             destination.parent.mkdir(parents=True, exist_ok=True)

@@ -15,6 +15,7 @@ const MAX_DETAIL_BYTES = 4 * 1024 * 1024;
 const MAX_ITEMS_BYTES = 2 * 1024 * 1024;
 const MAX_MOVES_BYTES = 256 * 1024;
 const MAX_CATALOG_BYTES = 4 * 1024 * 1024;
+const MAX_GAMEPLAY_SHARD_BYTES = 1024 * 1024;
 const MAX_AREAS = 6;
 
 type SpeciesLabel = { en?: string; zh?: string };
@@ -39,6 +40,12 @@ type EvolutionEdge = {
   toId: number;
   toName: string;
   triggers: Record<string, unknown>[];
+};
+
+type GameplaySpeciesShard = {
+  obtain: Record<string, unknown>;
+  learn: Record<string, unknown>;
+  evolutions: Record<string, unknown>[];
 };
 
 const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel>);
@@ -191,11 +198,14 @@ export async function answerFromDexBundle(
     if (!detail || !isPlainObject(detail.summary) || detail.summary.id !== species.id) {
       return null;
     }
+    const gameplayShard = bundleVersion >= 20
+      ? await readGameplaySpeciesShard(bucket, manifest.cdnPrefix as string, species.id)
+      : null;
     if (encounterIntent.test(request.question)) {
-      return answerEncounter(request, detail, species, bundleVersion);
+      return answerEncounter(request, detail, species, bundleVersion, gameplayShard);
     }
     if (move && moveLearningIntent.test(request.question)) {
-      return answerMoveLearning(request, detail, species, move, bundleVersion);
+      return answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard);
     }
     if (heldItemIntent.test(request.question)) {
       const items = await readJsonObject(
@@ -247,7 +257,7 @@ export async function buildDexBundleSources(
   if (!species && !item && !move && !ability) return [];
   // Evolution conditions and standalone move values can differ by generation.
   // Preserve the existing exact-version PokéAPI path for those questions.
-  if (evolutionIntent.test(request.question) || (move && moveInfoIntent.test(request.question))) {
+  if (move && moveInfoIntent.test(request.question)) {
     return [];
   }
   const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
@@ -260,13 +270,19 @@ export async function buildDexBundleSources(
   };
 
   if (species) {
-    const detail = await readJsonObject(
-      bucket,
-      `${prefix}/details/${species.id}.json`,
-      MAX_DETAIL_BYTES,
-    );
+    const [detail, gameplayShard] = await Promise.all([
+      readJsonObject(bucket, `${prefix}/details/${species.id}.json`, MAX_DETAIL_BYTES),
+      bundleVersion >= 20
+        ? readGameplaySpeciesShard(bucket, prefix, species.id)
+        : Promise.resolve(null),
+    ]);
     if (detail && isPlainObject(detail.summary) && detail.summary.id === species.id) {
-      facts.species = compactSpeciesEvidence(detail, species, request.context.game);
+      facts.species = compactSpeciesEvidence(
+        detail,
+        species,
+        request.context.game,
+        gameplayShard,
+      );
     }
   }
   if (item) {
@@ -307,12 +323,22 @@ function answerEncounter(
   detail: Record<string, unknown>,
   target: EntityTarget,
   bundleVersion: number,
+  gameplayShard: GameplaySpeciesShard | null,
 ): AssistantResponse | null {
-  if (!isPlainObject(detail.obtainLocationsByVersion)) return null;
-  const rawEntries = detail.obtainLocationsByVersion[request.context.game];
+  const verifiedByExactVersion = gameplayShard && isPlainObject(gameplayShard.obtain.byExactVersion)
+    ? gameplayShard.obtain.byExactVersion
+    : null;
+  const shardEntries = verifiedByExactVersion?.[request.context.game];
+  const rawEntries = Array.isArray(shardEntries)
+    ? shardEntries
+    : isPlainObject(detail.obtainLocationsByVersion)
+      ? detail.obtainLocationsByVersion[request.context.game]
+      : null;
   if (!Array.isArray(rawEntries)) return null;
   const entries = rawEntries.flatMap((value) => {
-    const parsed = parseEncounter(value);
+    const parsed = Array.isArray(shardEntries)
+      ? parseGameplayEncounter(value)
+      : parseEncounter(value);
     return parsed ? [parsed] : [];
   });
   if (entries.length === 0) return null;
@@ -401,14 +427,25 @@ function answerMoveLearning(
   species: EntityTarget,
   move: EntityTarget,
   bundleVersion: number,
+  gameplayShard: GameplaySpeciesShard | null,
 ): AssistantResponse | null {
-  if (!isPlainObject(detail.moveSets)) return null;
-  const group = detail.moveSets[gameVersionGroups[request.context.game]];
+  const versionGroup = gameVersionGroups[request.context.game];
+  const shardGroups = gameplayShard && isPlainObject(gameplayShard.learn.byVersionGroup)
+    ? gameplayShard.learn.byVersionGroup
+    : null;
+  const shardGroup = shardGroups?.[versionGroup];
+  const group = isPlainObject(shardGroup)
+    ? shardGroup
+    : isPlainObject(detail.moveSets)
+      ? detail.moveSets[versionGroup]
+      : null;
   if (!isPlainObject(group)) return null;
   const methods: string[] = [];
   const levelRows = Array.isArray(group.levelUp) ? group.levelUp : [];
   const levels = levelRows.flatMap((value) =>
-    isPlainObject(value) && value.moveId === move.id && validLevel(value.level)
+    isPlainObject(value) && (
+      value.moveId === move.id || value.moveStableId === `move:${move.id}`
+    ) && validLevel(value.level)
       ? [value.level]
       : [],
   );
@@ -423,7 +460,9 @@ function answerMoveLearning(
   for (const [key, label] of methodGroups) {
     const values = group[key];
     if (Array.isArray(values) && values.some((value) =>
-      isPlainObject(value) && value.moveId === move.id,
+      value === `move:${move.id}` || (isPlainObject(value) && (
+        value.moveId === move.id || value.moveStableId === `move:${move.id}`
+      )),
     )) methods.push(label);
   }
   if (methods.length === 0) return null;
@@ -591,6 +630,7 @@ function compactSpeciesEvidence(
   detail: Record<string, unknown>,
   species: EntityTarget,
   game: AssistantRequest['context']['game'],
+  gameplayShard: GameplaySpeciesShard | null,
 ): Record<string, unknown> {
   const summary = isPlainObject(detail.summary) ? detail.summary : {};
   const evidence: Record<string, unknown> = {
@@ -623,11 +663,22 @@ function compactSpeciesEvidence(
         : [],
     ).slice(0, 6);
   }
-  if (isPlainObject(detail.obtainLocationsByVersion) &&
-      Array.isArray(detail.obtainLocationsByVersion[game])) {
-    evidence.encounters = (detail.obtainLocationsByVersion[game] as unknown[])
+  const verifiedByExactVersion = gameplayShard && isPlainObject(gameplayShard.obtain.byExactVersion)
+    ? gameplayShard.obtain.byExactVersion
+    : null;
+  const shardEncounters = verifiedByExactVersion?.[game];
+  const rawEncounters = Array.isArray(shardEncounters)
+    ? shardEncounters
+    : isPlainObject(detail.obtainLocationsByVersion) &&
+        Array.isArray(detail.obtainLocationsByVersion[game])
+      ? detail.obtainLocationsByVersion[game]
+      : null;
+  if (Array.isArray(rawEncounters)) {
+    evidence.encounters = rawEncounters
       .flatMap((value) => {
-        const encounter = parseEncounter(value);
+        const encounter = Array.isArray(shardEncounters)
+          ? parseGameplayEncounter(value)
+          : parseEncounter(value);
         return encounter ? [{
           area: normalizeFullWidth(encounter.areaLabelZh),
           methods: encounter.methods.slice(0, 4),
@@ -637,18 +688,42 @@ function compactSpeciesEvidence(
       })
       .slice(0, 12);
   }
-  if (isPlainObject(detail.moveSets) &&
-      isPlainObject(detail.moveSets[gameVersionGroups[game]])) {
-    const set = detail.moveSets[gameVersionGroups[game]] as Record<string, unknown>;
+  const versionGroup = gameVersionGroups[game];
+  const shardLearnGroups = gameplayShard && isPlainObject(gameplayShard.learn.byVersionGroup)
+    ? gameplayShard.learn.byVersionGroup
+    : null;
+  const usingShardMoveSet = isPlainObject(shardLearnGroups?.[versionGroup]);
+  const rawMoveSet = usingShardMoveSet
+    ? shardLearnGroups?.[versionGroup]
+    : isPlainObject(detail.moveSets) && isPlainObject(detail.moveSets[versionGroup])
+      ? detail.moveSets[versionGroup]
+      : null;
+  if (isPlainObject(rawMoveSet)) {
+    const set = rawMoveSet;
+    const compactRows = usingShardMoveSet ? compactGameplayMoveRows : compactMoveRows;
     evidence.moveSet = {
-      levelUp: compactMoveRows(set.levelUp, 24, true),
-      machine: compactMoveRows(set.machine, 24, false),
-      egg: compactMoveRows(set.egg, 16, false),
-      tutor: compactMoveRows(set.tutor, 16, false),
+      levelUp: compactRows(set.levelUp, 24, true),
+      machine: compactRows(set.machine, 24, false),
+      egg: compactRows(set.egg, 16, false),
+      tutor: compactRows(set.tutor, 16, false),
       truncated: true,
     };
   }
-  if (isPlainObject(detail.evolutionChain)) {
+  if (gameplayShard && gameplayShard.evolutions.length > 0) {
+    evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
+      const safeTriggers = Array.isArray(row.triggers)
+        ? row.triggers.filter(isPlainObject).slice(0, 6)
+        : [];
+      return {
+        fromStableId: row.fromPokemonStableId,
+        toStableId: row.toPokemonStableId,
+        conditionsZh: describeEvolutionTriggers(safeTriggers),
+        exactGameApplicability: isPlainObject(row.applicabilityByVersionGroup)
+          ? row.applicabilityByVersionGroup[versionGroup]
+          : 'unknown',
+      };
+    });
+  } else if (isPlainObject(detail.evolutionChain)) {
     evidence.adjacentEvolution = collectEvolutionEdges(detail.evolutionChain)
       .filter((edge) => edge.fromId === species.id || edge.toId === species.id)
       .slice(0, 6)
@@ -658,8 +733,33 @@ function compactSpeciesEvidence(
         conditions: describeEvolutionTriggers(edge.triggers),
       }));
   }
-  evidence.scopeNote = 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
+  evidence.scopeNote = gameplayShard
+    ? 'encounters and moveSet come from the bounded audited v20 species shard; evolution triggers are global and exact-game applicability remains explicit'
+    : 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
   return evidence;
+}
+
+function compactGameplayMoveRows(value: unknown, maximum: number, includeLevel: boolean): unknown[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    const stableId = typeof entry === 'string'
+      ? entry
+      : isPlainObject(entry) && typeof entry.moveStableId === 'string'
+        ? entry.moveStableId
+        : '';
+    const match = /^move:([1-9]\d{0,4})$/u.exec(stableId);
+    if (!match) return [];
+    const id = Number(match[1]);
+    const target = moveTargets.find((candidate) => candidate.id === id);
+    if (!target) return [];
+    return [{
+      id,
+      nameZh: target.nameZh,
+      ...(includeLevel && isPlainObject(entry) && validLevel(entry.level)
+        ? { level: entry.level }
+        : {}),
+    }];
+  }).slice(0, maximum);
 }
 
 function compactMoveRows(value: unknown, maximum: number, includeLevel: boolean): unknown[] {
@@ -812,6 +912,27 @@ function parseEncounter(value: unknown): EncounterEntry | null {
   };
 }
 
+function parseGameplayEncounter(value: unknown): EncounterEntry | null {
+  if (!isPlainObject(value) || !Array.isArray(value.encounterMethods) ||
+      typeof value.method !== 'string') return null;
+  const methods = Array.from(new Set([
+    ...value.encounterMethods,
+    value.method,
+  ].filter((entry): entry is string => typeof entry === 'string')));
+  return parseEncounter({
+    areaSlug: value.areaSlug,
+    areaLabelZh: value.areaLabelZh,
+    minLevel: value.minLevel,
+    maxLevel: value.maxLevel,
+    methods,
+    conditions: value.conditions,
+    isAlpha: value.isAlpha,
+    isTitan: value.isTitan,
+    isRaid: value.isRaid,
+    isFixedEncounter: value.isFixedEncounter,
+  });
+}
+
 function groupEncounters(entries: EncounterEntry[]): { label: string; details: string[] }[] {
   const sorted = [...entries].sort((left, right) =>
     encounterPriority(left) - encounterPriority(right) ||
@@ -890,6 +1011,195 @@ async function readJsonObject(
   } catch {
     return null;
   }
+}
+
+async function readGameplaySpeciesShard(
+  bucket: R2Bucket,
+  prefix: string,
+  speciesId: number,
+): Promise<GameplaySpeciesShard | null> {
+  const value = await readJsonObject(
+    bucket,
+    `${prefix}/gameplay/species/${speciesId}.json`,
+    MAX_GAMEPLAY_SHARD_BYTES,
+  );
+  return validGameplaySpeciesShard(value, speciesId);
+}
+
+function validGameplaySpeciesShard(
+  value: Record<string, unknown> | null,
+  speciesId: number,
+): GameplaySpeciesShard | null {
+  if (!value || !hasExactKeys(value, [
+    'schemaVersion', 'speciesId', 'pokemonStableId', 'provenance',
+    'obtain', 'learn', 'evolutions',
+  ]) || value.schemaVersion !== 1 || value.speciesId !== speciesId ||
+      value.pokemonStableId !== `pokemon:${speciesId}` ||
+      !isPlainObject(value.provenance) || !hasExactKeys(value.provenance, [
+        'generator', 'pokeapiCommit', 'pkhexCommit',
+      ]) || value.provenance.generator !== 'titodex-gameplay-shards-v1' ||
+      !validSourceCommit(value.provenance.pokeapiCommit) ||
+      !validSourceCommit(value.provenance.pkhexCommit) ||
+      !validGameplayObtain(
+        value.obtain,
+        speciesId,
+        value.provenance.pokeapiCommit as string,
+        value.provenance.pkhexCommit as string,
+      ) ||
+      !validGameplayLearn(value.learn, speciesId) ||
+      !validGameplayEvolutions(value.evolutions, speciesId)) {
+    return null;
+  }
+  return {
+    obtain: value.obtain,
+    learn: value.learn,
+    evolutions: value.evolutions,
+  };
+}
+
+function validGameplayObtain(
+  value: unknown,
+  speciesId: number,
+  pokeapiCommit: string,
+  pkhexCommit: string,
+): value is Record<string, unknown> {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'stableId', 'byExactVersion', 'verifiedRouteByVersionGroup',
+    'derivedFamilyRouteByVersionGroup',
+  ]) || value.stableId !== `pokemon:${speciesId}` ||
+      !isPlainObject(value.byExactVersion) || Object.keys(value.byExactVersion).length > 51 ||
+      !validRouteMap(value.verifiedRouteByVersionGroup, ['direct', 'notApplicable', 'unknown']) ||
+      !validRouteMap(value.derivedFamilyRouteByVersionGroup, [
+        'direct', 'evolution', 'egg', 'trade', 'notApplicable', 'unknown',
+      ])) return false;
+  for (const [version, rows] of Object.entries(value.byExactVersion)) {
+    if (!/^[a-z0-9-]{1,60}$/u.test(version) || !Array.isArray(rows) ||
+        rows.length < 1 || rows.length > 4096 ||
+        !rows.every((row) => validGameplayEncounterRow(
+          row,
+          version,
+          pokeapiCommit,
+          pkhexCommit,
+        ))) return false;
+  }
+  return true;
+}
+
+function validGameplayEncounterRow(
+  value: unknown,
+  exactVersion: string,
+  pokeapiCommit: string,
+  pkhexCommit: string,
+): boolean {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'method', 'exactVersion', 'versionGroup', 'areaSlug', 'areaLabelZh',
+    'minLevel', 'maxLevel', 'rateKind', 'rateValue', 'encounterMethods',
+    'conditions', 'formStableId', 'isAlpha', 'isTitan', 'isRaid',
+    'isFixedEncounter', 'source',
+  ]) || !['wild', 'fixed', 'raid'].includes(String(value.method)) ||
+      value.exactVersion !== exactVersion ||
+      typeof value.versionGroup !== 'string' || !/^[a-z0-9-]{1,80}$/u.test(value.versionGroup) ||
+      typeof value.areaSlug !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,119}$/u.test(value.areaSlug) ||
+      typeof value.areaLabelZh !== 'string' || !value.areaLabelZh || value.areaLabelZh.length > 160 ||
+      !validOptionalLevel(value.minLevel) || !validOptionalLevel(value.maxLevel) ||
+      typeof value.rateKind !== 'string' || value.rateKind.length > 60 ||
+      !(value.rateValue === null || (
+        typeof value.rateValue === 'number' && Number.isFinite(value.rateValue) &&
+        value.rateValue >= 0 && value.rateValue <= 1_000_000_000
+      )) || !validBoundedStrings(value.encounterMethods, 32, 160) ||
+      !validBoundedStrings(value.conditions, 32, 160) ||
+      !(value.formStableId === null || (
+        typeof value.formStableId === 'string' &&
+        /^pokemon-form:[a-z0-9-]{1,100}$/u.test(value.formStableId)
+      )) || !['isAlpha', 'isTitan', 'isRaid', 'isFixedEncounter'].every(
+        (key) => typeof value[key] === 'boolean',
+      ) || !isPlainObject(value.source) ||
+      !Object.keys(value.source).every((key) => ['sourceId', 'commit', 'license', 'overlay'].includes(key)) ||
+      typeof value.source.sourceId !== 'string' || !['pokeapi-api-data', 'pkhex-overlay'].includes(value.source.sourceId) ||
+      !validSourceCommit(value.source.commit) || value.source.commit !== (
+        value.source.sourceId === 'pokeapi-api-data' ? pokeapiCommit : pkhexCommit
+      )) return false;
+  return true;
+}
+
+function validGameplayLearn(value: unknown, speciesId: number): value is Record<string, unknown> {
+  if (!isPlainObject(value) || !hasExactKeys(value, ['stableId', 'sourceStatus', 'byVersionGroup']) ||
+      value.stableId !== `pokemon:${speciesId}` ||
+      !['covered', 'unknown'].includes(String(value.sourceStatus)) ||
+      !isPlainObject(value.byVersionGroup) || Object.keys(value.byVersionGroup).length > 32) return false;
+  for (const [group, buckets] of Object.entries(value.byVersionGroup)) {
+    if (!/^[a-z0-9-]{1,80}$/u.test(group) || !isPlainObject(buckets) ||
+        !['levelUp', 'machine', 'egg', 'tutor'].every((key) => Object.hasOwn(buckets, key)) ||
+        Object.keys(buckets).some((key) => !['levelUp', 'machine', 'egg', 'tutor', 'other'].includes(key))) {
+      return false;
+    }
+    let rowCount = 0;
+    for (const [bucket, rows] of Object.entries(buckets)) {
+      if (!Array.isArray(rows)) return false;
+      rowCount += rows.length;
+      if (rowCount > 4096 || !rows.every((row) => validGameplayLearnRow(row, bucket))) return false;
+    }
+  }
+  return true;
+}
+
+function validGameplayLearnRow(value: unknown, bucket: string): boolean {
+  if (['machine', 'egg', 'tutor'].includes(bucket)) {
+    return typeof value === 'string' && /^move:[1-9]\d{0,4}$/u.test(value);
+  }
+  return isPlainObject(value) && Object.keys(value).every((key) =>
+    ['moveStableId', 'level', 'method'].includes(key),
+  ) && typeof value.moveStableId === 'string' &&
+    /^move:[1-9]\d{0,4}$/u.test(value.moveStableId) &&
+    (value.level === undefined || validLevel(value.level)) &&
+    (bucket !== 'other' || (typeof value.method === 'string' && value.method.length <= 80));
+}
+
+function validGameplayEvolutions(value: unknown, speciesId: number): value is Record<string, unknown>[] {
+  if (!Array.isArray(value) || value.length > 64) return false;
+  return value.every((row) => {
+    if (!isPlainObject(row) || !hasExactKeys(row, [
+      'stableId', 'fromPokemonStableId', 'toPokemonStableId', 'triggers',
+      'applicabilityByVersionGroup', 'source',
+    ]) || typeof row.fromPokemonStableId !== 'string' ||
+        typeof row.toPokemonStableId !== 'string') return false;
+    const from = /^pokemon:([1-9]\d{0,4})$/u.exec(row.fromPokemonStableId);
+    const to = /^pokemon:([1-9]\d{0,4})$/u.exec(row.toPokemonStableId);
+    if (!from || !to || ![Number(from[1]), Number(to[1])].includes(speciesId) ||
+        row.stableId !== `evolution:${from[1]}:${to[1]}` ||
+        !Array.isArray(row.triggers) || row.triggers.length > 16 ||
+        !row.triggers.every((trigger) => isPlainObject(trigger) && Object.keys(trigger).length <= 40) ||
+        !validRouteMap(row.applicabilityByVersionGroup, ['unknown', 'notApplicable']) ||
+        !isPlainObject(row.source) || row.source.sourceId !== 'pokeapi-api-data') return false;
+    return true;
+  });
+}
+
+function validRouteMap(value: unknown, allowed: string[]): boolean {
+  return isPlainObject(value) && Object.keys(value).length >= 1 &&
+    Object.keys(value).length <= 32 && Object.entries(value).every(([group, route]) =>
+      /^[a-z0-9-]{1,80}$/u.test(group) && typeof route === 'string' && allowed.includes(route),
+    );
+}
+
+function validOptionalLevel(value: unknown): boolean {
+  return value === null || validLevel(value);
+}
+
+function validBoundedStrings(value: unknown, maximum: number, maxLength: number): boolean {
+  return Array.isArray(value) && value.length <= maximum && value.every((entry) =>
+    typeof entry === 'string' && entry.length <= maxLength,
+  );
+}
+
+function validSourceCommit(value: unknown): boolean {
+  return typeof value === 'string' && /^[0-9a-f]{40}$/u.test(value);
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
+  const expected = new Set(keys);
+  return Object.keys(value).length === expected.size &&
+    Object.keys(value).every((key) => expected.has(key));
 }
 
 async function readBounded(

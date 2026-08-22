@@ -19,6 +19,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from build_dex_v20_gameplay_shards import write_species_shards
 from patch_dex_bundle_v20_reference import (
     DEFAULT_OUTPUT,
     SOURCE_LOCK,
@@ -545,6 +546,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     overlay_encounters = load_overlay_encounters(keys, pkhex_source)
 
     direct_by_species: dict[str, Any] = {}
+    shard_encounters_by_species: dict[str, dict[str, list[dict[str, Any]]]] = {}
     catchable_by_exact: dict[str, set[int]] = defaultdict(set)
     direct_mode_counts: Counter[str] = Counter()
     unverified_encounters = 0
@@ -557,6 +559,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             chains.setdefault(int(chain["id"]), chain)
         pinned_pairs = pinned_encounter_pairs(api_root, species_id)
         by_version: dict[str, list[dict[str, Any]]] = {}
+        shard_by_version: dict[str, list[dict[str, Any]]] = {}
         for raw_version, entries in (detail.get("obtainLocationsByVersion") or {}).items():
             exact_version = keys.normalize(raw_version)
             group = keys.group_for(exact_version)
@@ -589,6 +592,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
                 resolved_entries.append(compact)
                 direct_mode_counts[compact["method"]] += 1
             if resolved_entries:
+                shard_by_version[exact_version] = resolved_entries
                 source_rows: dict[str, dict[str, Any]] = {}
                 for row in resolved_entries:
                     source = row["source"]
@@ -608,6 +612,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
             "stableId": f"pokemon:{species_id}",
             "byExactVersion": by_version,
         }
+        shard_encounters_by_species[str(species_id)] = dict(sorted(shard_by_version.items()))
 
     catchable_by_group: dict[str, set[int]] = {}
     for group, config in keys.groups.items():
@@ -678,6 +683,16 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         pokemon_by_slug=pokemon_by_slug,
     )
     story_links = build_story_item_links(read_json(args.progression_hints), items)
+    shard_report = write_species_shards(
+        staging / "gameplay" / "species",
+        species_ids=species_ids,
+        obtain_by_species=direct_by_species,
+        encounters_by_species=shard_encounters_by_species,
+        learn_by_species=learnsets,
+        transitions=transitions,
+        pokeapi_commit=pokeapi_source["commit"],
+        pkhex_commit=pkhex_source["commit"],
+    )
 
     coverage: dict[str, Any] = {}
     hint_games = {
@@ -805,6 +820,8 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         "learnMethodRows": dict(sorted(learn_method_counts.items())),
         "storyItemLinks": len(story_links["links"]),
         "storyItemUnresolved": story_links["unresolved"],
+        "speciesShards": shard_report["shardCount"],
+        "maximumSpeciesShardBytes": shard_report["maximumShardBytes"],
         "coverageStatusDistribution": dict(
             sorted(
                 Counter(
