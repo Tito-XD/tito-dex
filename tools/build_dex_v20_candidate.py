@@ -743,9 +743,25 @@ def build_candidate(
                 "versionedLearnMethods": 1,
                 "versionedEvolutionMethods": 1,
                 "reviewedItemStoryUsage": 1,
+                "boundedGameplaySpeciesShards": 1,
             }
         )
-        manifest["gameplayData"] = {"schemaVersion": 1, **gameplay_paths}
+        gameplay_shards = gameplay_root / "species"
+        expected_shards = {
+            f"{row['id']}.json" for row in read_json(staging / "summaries.json")
+        }
+        actual_shards = (
+            {path.name for path in gameplay_shards.glob("*.json") if path.is_file()}
+            if gameplay_shards.is_dir()
+            else set()
+        )
+        if actual_shards != expected_shards:
+            raise ValueError("incomplete v20 gameplay species shard set")
+        manifest["gameplayData"] = {
+            "schemaVersion": 1,
+            **gameplay_paths,
+            "speciesShards": "gameplay/species/{speciesId}.json",
+        }
     manifest.update(
         {
             "version": BUNDLE_VERSION,

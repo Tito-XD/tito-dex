@@ -9,6 +9,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from build_dex_v20_gameplay_shards import verify_shard_tree
+
 
 EXPECTED_POKEAPI_COMMIT = "cd40ffdf0f5c68fc81c39c2ebec256e128fe1966"
 EXPECTED_PKHEX_COMMIT = "5c9e949c9f0fa932a1b63511b32c2bee5ce75b4e"
@@ -47,6 +49,7 @@ def find_machine(
 
 def verify(staging: Path) -> dict[str, Any]:
     root = staging / "gameplay"
+    manifest = read_json(staging / "manifest.json")
     obtain = read_json(root / "obtain_methods.json")
     evolution = read_json(root / "evolution_methods.json")
     learn = read_json(root / "learn_methods.json")
@@ -55,6 +58,12 @@ def verify(staging: Path) -> dict[str, Any]:
     version_keys = read_json(root / "game_version_keys.json")
     source_lock = read_json(root / "gameplay_sources.json")
     audit = read_json(root / "gameplay_v20_audit.json")
+
+    assert manifest["schemaFeatures"]["boundedGameplaySpeciesShards"] == 1
+    assert (
+        manifest["gameplayData"]["speciesShards"]
+        == "gameplay/species/{speciesId}.json"
+    )
 
     groups = version_keys["canonicalGroups"]
     assert len(groups) == 23
@@ -181,6 +190,11 @@ def verify(staging: Path) -> dict[str, Any]:
     assert audit["unverifiedEncounterRowsDropped"] == sum(
         audit["unverifiedEncounterRowsByVersion"].values()
     )
+    shard_report = verify_shard_tree(
+        root / "species", expected_species_ids=list(range(1, 1026))
+    )
+    assert audit["speciesShards"] == shard_report["shardCount"]
+    assert audit["maximumSpeciesShardBytes"] == shard_report["maximumShardBytes"]
 
     return {
         "canonicalVersionGroups": 23,
@@ -192,6 +206,7 @@ def verify(staging: Path) -> dict[str, Any]:
         "unknownRoutesByVersionGroup": audit["unknownRoutesByVersionGroup"],
         "coverageStatusDistribution": audit["coverageStatusDistribution"],
         "goldens": ["HGSS", "BDSP", "SV"],
+        "speciesShards": shard_report,
     }
 
 

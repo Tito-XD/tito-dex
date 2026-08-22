@@ -1,6 +1,7 @@
 import { env, SELF } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
+import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
 import worker, { reconcileParallelAnswers } from '../src/index';
 import { progressionHints } from '../src/progression_hints';
 
@@ -661,6 +662,133 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).not.toContain('Lv.30');
   });
 
+  it('reads bounded v20 gameplay species shards and keeps only audited encounter and learn rows', async () => {
+    await seedDexBundle({
+      violet: [encounter('unverified-area', '未核验地点', 1, 1, ['wild'])],
+    }, {
+      moveSets: {
+        'scarlet-violet': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 30 }],
+          machine: [],
+          egg: [],
+          tutor: [],
+        },
+      },
+    }, 20);
+    await env.DEX_CONTENT.put(
+      'v5/gameplay/species/447.json',
+      JSON.stringify(gameplaySpeciesShard({
+        encounters: [gameplayEncounter('verified-area', '已核验地点', 16, 20)],
+        learnLevel: 40,
+      })),
+    );
+
+    const encounterResponse = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-encounter-123',
+    );
+    const encounterValue = await encounterResponse.json() as Record<string, unknown>;
+    expect(encounterValue.answer).toContain('已核验地点');
+    expect(encounterValue.answer).not.toContain('未核验地点');
+
+    const moveResponse = await post(
+      violetBody('利欧路几级学会剑舞？'),
+      'dex-shard-learn-123456',
+    );
+    const moveValue = await moveResponse.json() as Record<string, unknown>;
+    expect(moveValue.answer).toContain('Lv.40');
+    expect(moveValue.answer).not.toContain('Lv.30');
+  });
+
+  it('falls back to the existing detail path when a v20 gameplay shard is malformed or oversized', async () => {
+    await seedDexBundle({
+      violet: [encounter('fallback-area', '回退地点', 22, 24, ['wild'])],
+    }, {}, 20);
+    await env.DEX_CONTENT.put('v5/gameplay/species/447.json', JSON.stringify({
+      ...gameplaySpeciesShard({ encounters: [] }),
+      schemaVersion: 2,
+      padding: 'x'.repeat(2 * 1024 * 1024),
+    }));
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-fallback-123',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('回退地点');
+  });
+
+  it('falls back when a v20 gameplay species shard is missing', async () => {
+    await seedDexBundle({
+      violet: [encounter('missing-shard-fallback', '缺失分片回退', 25, 26, ['wild'])],
+    }, {}, 20);
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-missing-1234',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('缺失分片回退');
+  });
+
+  it('does not consult a gameplay shard for a v19 manifest', async () => {
+    await seedDexBundle({
+      violet: [encounter('v19-detail', 'V19 详情地点', 12, 13, ['wild'])],
+    });
+    await env.DEX_CONTENT.put(
+      'v5/gameplay/species/447.json',
+      JSON.stringify(gameplaySpeciesShard({
+        encounters: [gameplayEncounter('future-shard', '不应读取的 V20 分片', 90, 90)],
+      })),
+    );
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-v19-no-shard-1234',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('V19 详情地点');
+    expect(value.answer).not.toContain('不应读取的 V20 分片');
+  });
+
+  it('uses sanitized v20 shard facts in open-ended composer evidence', async () => {
+    await seedDexBundle({
+      violet: [encounter('unverified-evidence', '未核验 evidence', 1, 1, ['wild'])],
+    }, {
+      moveSets: {
+        'scarlet-violet': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 30 }],
+          machine: [],
+          egg: [],
+          tutor: [],
+        },
+      },
+    }, 20);
+    const shard = gameplaySpeciesShard({
+      encounters: [gameplayEncounter('verified-evidence', '分片核验地点', 16, 20)],
+      learnLevel: 40,
+    });
+    shard.evolutions = [{
+      stableId: 'evolution:447:448',
+      fromPokemonStableId: 'pokemon:447',
+      toPokemonStableId: 'pokemon:448',
+      triggers: [{ trigger: 'level-up', minHappiness: 160, internalNote: 'must-not-leak' }],
+      applicabilityByVersionGroup: { 'scarlet-violet': 'unknown' },
+      source: {
+        sourceId: 'pokeapi-api-data',
+        scope: 'global chain; exact-game applicability unknown',
+      },
+    }];
+    await env.DEX_CONTENT.put('v5/gameplay/species/447.json', JSON.stringify(shard));
+    const request = JSON.parse(violetBody('介绍一下利欧路在紫里的培养资料')) as AssistantRequest;
+    const sources = await buildDexBundleSources(request, env.DEX_CONTENT);
+    expect(sources).toHaveLength(1);
+    const evidence = JSON.parse(sources[0].text) as Record<string, unknown>;
+    const species = evidence.species as Record<string, unknown>;
+    expect(JSON.stringify(species)).toContain('分片核验地点');
+    expect(JSON.stringify(species)).not.toContain('未核验 evidence');
+    expect(JSON.stringify(species)).toContain('"level":40');
+    expect(JSON.stringify(species)).toContain('exactGameApplicability');
+    expect(JSON.stringify(species)).not.toContain('must-not-leak');
+  });
+
   it('answers item and species profile facts from bundle catalogs without Qwen', async () => {
     await seedDexBundle({}, {
       summary: { id: 447, nameZh: '利欧路', types: ['fighting'] },
@@ -1185,9 +1313,10 @@ function violetBody(question: string): string {
 async function seedDexBundle(
   obtainLocationsByVersion: Record<string, Record<string, unknown>[]>,
   detailExtras: Record<string, unknown> = {},
+  bundleVersion = 19,
 ): Promise<void> {
   await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
-    bundleVersion: 19,
+    bundleVersion,
     cdnPrefix: 'v5',
     complete: true,
     exactVersionLocations: true,
@@ -1197,6 +1326,75 @@ async function seedDexBundle(
     obtainLocationsByVersion,
     ...detailExtras,
   }));
+}
+
+function gameplayEncounter(
+  areaSlug: string,
+  areaLabelZh: string,
+  minLevel: number,
+  maxLevel: number,
+): Record<string, unknown> {
+  return {
+    method: 'wild',
+    exactVersion: 'violet',
+    versionGroup: 'scarlet-violet',
+    areaSlug,
+    areaLabelZh,
+    minLevel,
+    maxLevel,
+    rateKind: 'unknown',
+    rateValue: null,
+    encounterMethods: ['walk'],
+    conditions: [],
+    formStableId: null,
+    isAlpha: false,
+    isTitan: false,
+    isRaid: false,
+    isFixedEncounter: false,
+    source: {
+      sourceId: 'pokeapi-api-data',
+      commit: 'a'.repeat(40),
+      license: 'BSD-3-Clause',
+    },
+  };
+}
+
+function gameplaySpeciesShard({
+  encounters,
+  learnLevel = 40,
+}: {
+  encounters: Record<string, unknown>[];
+  learnLevel?: number;
+}): Record<string, unknown> {
+  return {
+    schemaVersion: 1,
+    speciesId: 447,
+    pokemonStableId: 'pokemon:447',
+    provenance: {
+      generator: 'titodex-gameplay-shards-v1',
+      pokeapiCommit: 'a'.repeat(40),
+      pkhexCommit: 'b'.repeat(40),
+    },
+    obtain: {
+      stableId: 'pokemon:447',
+      byExactVersion: encounters.length > 0 ? { violet: encounters } : {},
+      verifiedRouteByVersionGroup: { 'scarlet-violet': encounters.length > 0 ? 'direct' : 'unknown' },
+      derivedFamilyRouteByVersionGroup: { 'scarlet-violet': encounters.length > 0 ? 'direct' : 'unknown' },
+    },
+    learn: {
+      stableId: 'pokemon:447',
+      sourceStatus: 'covered',
+      byVersionGroup: {
+        'scarlet-violet': {
+          levelUp: [{ moveStableId: 'move:14', level: learnLevel }],
+          machine: ['move:14'],
+          egg: [],
+          tutor: [],
+        },
+      },
+    },
+    evolutions: [],
+  };
 }
 
 function encounter(
