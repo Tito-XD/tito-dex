@@ -121,6 +121,36 @@ python3 tools/verify_dex_v20_reference.py \
 保留语言／fallback 标记，不自动翻译或编造。正式发布仍需独立的 v20 workflow、生产
 版本前置检查、完整上传树审计和人工批准。
 
+第 2 批精确版本资料由 `build_dex_bundle_v20_gameplay.py` 生成在 `gameplay/`：固定来源
+能够逐物种／地点确认的野外、定点和团体战记录才标记为已覆盖；赠送、游戏内交换、
+传送、不可获得及逐版本进化条件没有允许来源时均保留 `unknown`。全局进化家族只作为
+非权威候选路线，不会冒充精确版本事实。招式学习方式链接稳定 move/item/machine ID；
+机器配方未包含于固定来源时同样保留 `unknown`。剧情道具关联只读取已经审核的
+`progression_hints.json` 的 `key_item` requirement，禁止从携带道具关系推断剧情用途。
+
+正式组合 v20 时优先生成可叠加 overlay，而不是分别生成会互相覆盖的完整候选：
+
+```bash
+python3 -m unittest tools.test_build_dex_bundle_v20_gameplay
+python3 tools/build_dex_v20_reference_overlay.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --api-data <pinned-api-data-checkout> \
+  --output dist/dex-v20-reference-overlay
+python3 tools/build_dex_v20_candidate.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --overlay dist/dex-v20-reference-overlay \
+  --output dist/dex-v20-candidate
+python3 tools/verify_dex_v20_gameplay.py \
+  dist/dex-v20-candidate/staging
+```
+
+overlay 只含相对 staging 的变化文件、两份上游 notice 和符合
+`bundle_overlay.schema.json` 的 `overlay-provenance.json`，明确排除 manifest、archive
+与生产根对象；可以与其他 v20 overlay 通过重复 `--overlay` 一次性组合。审计包含 23 个
+统一版本组、全部 exact version key、unknown 分布以及 HGSS／BDSP／SV 黄金样例。
+
 ## Offline 紧凑种子 v14
 
 v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件

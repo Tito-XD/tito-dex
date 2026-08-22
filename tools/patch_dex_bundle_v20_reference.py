@@ -870,6 +870,10 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     write_json(staging / "weather.json", weather, compact=True)
     write_json(staging / "terrains.json", terrains, compact=True)
     shutil.copyfile(args.source_lock, staging / "reference_v20_sources.json")
+    shutil.copyfile(
+        api_root / pokeapi_source.get("licenseFile", "LICENSE.txt"),
+        staging / "POKEAPI_API_DATA_ATTRIBUTION.txt",
+    )
     shutil.copyfile(MOVE_VERSION_MATRIX, staging / "move_version_matrix.json")
     shutil.copyfile(ITEM_VERSION_MATRIX, staging / "item_version_matrix.json")
 

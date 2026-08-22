@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "bundleVersion": 20,
+  "sources": [
+    {
+      "sourceId": "pkhex-overlay",
+      "name": "PKHeX encounter data (normalized TitoDex overlays)",
+      "repository": "https://github.com/kwsch/PKHeX",
+      "commit": "5c9e949c9f0fa932a1b63511b32c2bee5ce75b4e",
+      "license": "GPL-3.0-or-later",
+      "noticeFile": "data/encounters/PKHEX_LICENSE.md",
+      "scope": ["wild encounters", "fixed encounters", "raids", "outbreaks"]
+    },
+    {
+      "sourceId": "reviewed-progression-requirement",
+      "name": "TitoDex reviewed progression requirements",
+      "dataset": "data/journey/progression_hints.json",
+      "datasetVersion": 5,
+      "license": "project-authored facts with per-entry citations",
+      "scope": ["key item story usage"]
+    }
+  ],
+  "guardrails": [
+    "No 52Poke scraper or copied guide prose is used.",
+    "Gift, in-game trade, transfer and unavailable states stay unknown without an allowed exact-game source.",
+    "Held item relationships are never interpreted as story progression usage."
+  ]
+}

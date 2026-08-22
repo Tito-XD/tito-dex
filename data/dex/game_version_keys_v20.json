@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "canonicalGroups": [
+    {"key": "red-blue", "generation": 1, "exactVersions": ["red", "blue", "red-japan", "green-japan", "blue-japan"], "supportsBreeding": false},
+    {"key": "yellow", "generation": 1, "exactVersions": ["yellow"], "supportsBreeding": false},
+    {"key": "gold-silver", "generation": 2, "exactVersions": ["gold", "silver"], "supportsBreeding": true},
+    {"key": "crystal", "generation": 2, "exactVersions": ["crystal"], "supportsBreeding": true},
+    {"key": "ruby-sapphire", "generation": 3, "exactVersions": ["ruby", "sapphire"], "supportsBreeding": true},
+    {"key": "emerald", "generation": 3, "exactVersions": ["emerald"], "supportsBreeding": true},
+    {"key": "firered-leafgreen", "generation": 3, "exactVersions": ["firered", "leafgreen"], "supportsBreeding": true},
+    {"key": "diamond-pearl", "generation": 4, "exactVersions": ["diamond", "pearl"], "supportsBreeding": true},
+    {"key": "platinum", "generation": 4, "exactVersions": ["platinum"], "supportsBreeding": true},
+    {"key": "heartgold-soulsilver", "generation": 4, "exactVersions": ["heartgold", "soulsilver"], "supportsBreeding": true},
+    {"key": "black-white", "generation": 5, "exactVersions": ["black", "white"], "supportsBreeding": true},
+    {"key": "black-2-white-2", "generation": 5, "exactVersions": ["black-2", "white-2"], "supportsBreeding": true},
+    {"key": "x-y", "generation": 6, "exactVersions": ["x", "y"], "supportsBreeding": true},
+    {"key": "omega-ruby-alpha-sapphire", "generation": 6, "exactVersions": ["omega-ruby", "alpha-sapphire"], "supportsBreeding": true},
+    {"key": "sun-moon", "generation": 7, "exactVersions": ["sun", "moon"], "supportsBreeding": true},
+    {"key": "ultra-sun-ultra-moon", "generation": 7, "exactVersions": ["ultra-sun", "ultra-moon"], "supportsBreeding": true},
+    {"key": "lets-go-pikachu-lets-go-eevee", "generation": 7, "exactVersions": ["lets-go-pikachu", "lets-go-eevee"], "supportsBreeding": false},
+    {"key": "sword-shield", "generation": 8, "exactVersions": ["sword", "shield", "the-isle-of-armor-sword", "the-isle-of-armor-shield", "the-crown-tundra-sword", "the-crown-tundra-shield"], "supportsBreeding": true},
+    {"key": "brilliant-diamond-shining-pearl", "generation": 8, "exactVersions": ["brilliant-diamond", "shining-pearl"], "supportsBreeding": true},
+    {"key": "legends-arceus", "generation": 8, "exactVersions": ["legends-arceus"], "supportsBreeding": false},
+    {"key": "scarlet-violet", "generation": 9, "exactVersions": ["scarlet", "violet", "the-teal-mask-scarlet", "the-teal-mask-violet", "the-indigo-disk-scarlet", "the-indigo-disk-violet"], "supportsBreeding": true},
+    {"key": "legends-za", "generation": 9, "exactVersions": ["legends-za", "mega-dimension"], "supportsBreeding": false},
+    {"key": "champions", "generation": 9, "exactVersions": ["champions"], "supportsBreeding": false, "notApplicable": true}
+  ],
+  "aliases": {
+    "legends-z-a": "legends-za",
+    "legends-z-a-base": "legends-za",
+    "pokemon-legends-z-a": "legends-za",
+    "heartgold-soulsilver": "heartgold-soulsilver",
+    "brilliant-diamond-and-shining-pearl": "brilliant-diamond-shining-pearl"
+  }
+}
