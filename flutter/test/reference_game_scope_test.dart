@@ -3,6 +3,9 @@ import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/features/dex/reference_game_scope.dart';
 import 'package:titodex/features/dex/move_version_data.dart';
 import 'package:titodex/features/game/game_edition.dart';
+import 'package:titodex/l10n/app_zh.dart';
+import 'package:titodex/pages/dex/ability_encyclopedia_page.dart';
+import 'package:titodex/pages/dex/move_encyclopedia_page.dart';
 import 'package:titodex/widgets/dex_reference_detail.dart';
 
 void main() {
@@ -115,6 +118,51 @@ void main() {
         'slug': 'frostbite',
       }, gameEditionFromSlug('sv')!),
       isFalse,
+    );
+  });
+
+  test('direct move details distinguish unavailable from unknown scope', () {
+    const hiddenPower = CachedMove(
+      id: 237,
+      nameEn: 'hidden-power',
+      nameZh: '觉醒力量',
+      type: 'normal',
+      category: 'special',
+    );
+
+    expect(
+      moveScopeNotice(
+        hiddenPower,
+        gameEditionFromSlug('sv')!,
+        indexedVersionGroups: const {},
+        exactCoverageKnown: true,
+      ),
+      AppZh.dexReferenceUnavailableInGame,
+    );
+    expect(
+      moveScopeNotice(
+        hiddenPower,
+        gameEditionFromSlug('champions')!,
+        exactCoverageKnown: false,
+      ),
+      AppZh.dexReferenceScopeUnknown,
+    );
+  });
+
+  test('ability details keep general facts when game coverage is unknown', () {
+    const ability = CachedAbility(
+      id: 39,
+      nameEn: 'inner-focus',
+      nameZh: '精神力',
+      descriptionZh: '不会陷入畏缩。',
+    );
+    expect(
+      abilityScopeNotice(ability, gameEditionFromSlug('sv')!),
+      AppZh.dexReferenceScopeUnknown,
+    );
+    expect(
+      abilityScopeNotice(ability, gameEditionFromSlug('yellow')!),
+      AppZh.dexReferenceUnavailableInGame,
     );
   });
 }

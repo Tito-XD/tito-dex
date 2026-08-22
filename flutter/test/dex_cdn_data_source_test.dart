@@ -183,4 +183,16 @@ void main() {
 
     expect(source.fetchDetail(1), throwsA(isA<Exception>()));
   });
+
+  test('reference object unwraps a v20 entities container', () {
+    final entries = DexCdnDataSource.objectEntriesToList({
+      'schemaVersion': 1,
+      'entities': [
+        {'kind': 'move', 'id': 85, 'slug': 'thunderbolt', 'nameZh': '十万伏特'},
+      ],
+    });
+
+    expect(entries, hasLength(1));
+    expect(entries.single['id'], 85);
+  });
 }
