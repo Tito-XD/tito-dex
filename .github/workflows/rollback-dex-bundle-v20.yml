@@ -1,0 +1,86 @@
+name: Restore Dex Bundle v19 root manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_run_id:
+        description: Run ID that produced the preserved v19 rollback artifact
+        required: true
+        type: string
+      approved_v19_root_manifest_sha256:
+        description: SHA-256 of the exact preserved v19 root manifest
+        required: true
+        type: string
+      restore_v19:
+        description: Explicitly restore only the v19 root manifest
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: dex-bundle-v20-production
+  cancel-in-progress: false
+
+jobs:
+  restore-root-only:
+    if: inputs.restore_v19
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: dex-production
+    env:
+      TITODEX_DEX_CDN_BASE: ${{ secrets.TITODEX_DEX_CDN_BASE }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: titodex-root-manifest-v19-rollback
+          path: dist/dex-v20-release/rollback
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.release_run_id }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
+
+      - run: pip install -r tools/dex_bundle_requirements.txt
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
+
+      - working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Verify the preserved rollback artifact identity
+        env:
+          APPROVED_ROOT_SHA: ${{ inputs.approved_v19_root_manifest_sha256 }}
+        run: |
+          set -euo pipefail
+          actual="$(python3 -c 'import hashlib,pathlib; print(hashlib.sha256(pathlib.Path("dist/dex-v20-release/rollback/bundle-manifest-v19.json").read_bytes()).hexdigest())')"
+          test "$actual" = "$APPROVED_ROOT_SHA"
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase rollback
+
+      - name: Restore only the v19 root manifest
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release
+          --phase rollback --execute --restore-v19
+
+      - name: Verify the exact v19 root is publicly active again
+        run: >-
+          python3 tools/dex_v20_release_gate.py wait-live-target
+          --target-manifest dist/dex-v20-release/rollback/bundle-manifest-v19.json
+          --timeout 600 --interval 10
