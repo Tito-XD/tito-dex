@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.18) · Lite `0.8.18+170` · Offline `0.8.18-offline+171`.
+> **Latest release:** [v0.8.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.19) · Lite `0.8.19+172` · Offline `0.8.19-offline+173`.
 >
-> **Current `main`:** v0.8.18 release baseline with polished Ask TitoDex surfaces, streamed verified answers, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.19 release baseline with rich Ask TitoDex answer formatting, fully collapsed structured citations, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,12 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.19
+
+- Render streamed and completed Ask TitoDex answers as safe rich text, including headings, emphasis, lists and horizontally scrollable tables.
+- Keep citation URLs exclusively inside the existing expandable evidence sheet; clean legacy inline source footers from display and bounded follow-up context.
+- Return clean Worker answer bodies alongside structured sources while retaining local deterministic fallback and existing Pokémon/item/move/ability deep links.
 
 ## Completed in v0.8.18
 
