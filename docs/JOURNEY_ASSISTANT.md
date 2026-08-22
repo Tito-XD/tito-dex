@@ -29,7 +29,7 @@
 
 存档信息优先级高于用户选择。请求会分别标注：游戏是 `save_verified` 或 `user_selected`；地点是 `save_verified` 或 `unknown`；徽章是精确 ID、仅数量或未知；里程碑是已验证或当前解析器不支持。仅有徽章数量时绝不推断具体徽章，未解析关键道具/剧情 flag 时也不会用常识补全。
 
-当前在线审核记录共 17 个卡点，覆盖 HGSS、DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯与朱紫；其中 SM 与 USUM、DPPt 与 BDSP 都按精确版本分开建模。权威文件是 [`data/journey/progression_hints.json`](../data/journey/progression_hints.json)；主 APK 仍只内建三个 HGSS 离线链路，Worker 检索文档从完整权威文件生成。schema 与来源规则见同目录及根目录 [`CREDITS.md`](../CREDITS.md)。
+当前在线审核记录共 19 个卡点，覆盖 HGSS、DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯与朱紫；其中 SM 与 USUM、DPPt 与 BDSP 都按精确版本分开建模。权威文件是 [`data/journey/progression_hints.json`](../data/journey/progression_hints.json)；主 APK 仍只内建三个 HGSS 离线链路，Worker 检索文档从完整权威文件生成。schema 与来源规则见同目录及根目录 [`CREDITS.md`](../CREDITS.md)。
 
 ## 数据供应链闸门
 
@@ -178,7 +178,7 @@ python3 -m unittest \
   tools.test_progression_hints \
   tools.test_build_journey_search_documents
 cd flutter && flutter analyze --no-pub && flutter test --no-pub
-cmp data/journey/progression_hints.json flutter/assets/data/journey/progression_hints.json
+# tools.test_progression_hints 会确认 APK 内建 3 条是权威 19 条资料的逐条子集。
 # 旧兼容包维护时才运行：cd flutter/android && ./gradlew :journey-assistant-pack:check
 cd ../../cloudflare/journey-assistant && npm ci && npm run check && npm test && npm run dry-run
 ```
