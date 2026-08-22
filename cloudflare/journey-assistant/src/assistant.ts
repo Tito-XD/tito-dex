@@ -21,8 +21,9 @@ export async function answerQuestion(
   request: AssistantRequest,
   runAi?: AiRunner,
   resolveWithAi?: AiHintResolver,
+  availableHints: ProgressionHint[] = progressionHints,
 ): Promise<AssistantResponse> {
-  const gameHints = progressionHints
+  const gameHints = availableHints
     .filter((hint) => hint.games.includes(request.context.game));
   const candidates = gameHints
     .map((hint) => ({ hint, score: scoreHint(hint, request) }))

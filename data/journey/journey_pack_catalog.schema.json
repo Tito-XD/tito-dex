@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/journey/journey_pack_catalog.schema.json",
+  "title": "TitoDex Journey data-pack catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "packs"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "packs": { "type": "array", "maxItems": 24, "items": { "$ref": "#/$defs/pack" } }
+  },
+  "$defs": {
+    "game": {
+      "enum": [
+        "diamond", "pearl", "platinum", "heartgold", "soulsilver",
+        "black", "white", "black-2", "white-2", "x", "y",
+        "omega-ruby", "alpha-sapphire", "sun", "moon", "ultra-sun",
+        "ultra-moon", "sword", "shield", "brilliant-diamond",
+        "shining-pearl", "legends-arceus", "scarlet", "violet"
+      ]
+    },
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "gameFamily", "games", "version", "contentPath",
+        "sizeBytes", "sha256", "titleZh", "entryCount",
+        "bundleVersionRequired"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^(?!.*\\.\\.)[a-z0-9][a-z0-9._-]{0,79}$" },
+        "gameFamily": { "type": "string", "pattern": "^(?!.*\\.\\.)[a-z0-9][a-z0-9._-]{0,39}$" },
+        "games": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/game" } },
+        "version": { "type": "string", "pattern": "^(?!.*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,79}$" },
+        "contentPath": { "type": "string", "pattern": "^/v1/journey-packs/objects/(?![^/]*\\.\\.)[a-z0-9][a-z0-9._-]{0,79}/(?![^/]*\\.\\.)[A-Za-z0-9][A-Za-z0-9._-]{0,79}\\.json$" },
+        "sizeBytes": { "type": "integer", "minimum": 1, "maximum": 4194304 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "titleZh": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "descriptionZh": { "type": "string", "minLength": 1, "maxLength": 180 },
+        "entryCount": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "bundleVersionRequired": { "type": "integer", "minimum": 20 },
+        "minAppVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+      }
+    }
+  }
+}
