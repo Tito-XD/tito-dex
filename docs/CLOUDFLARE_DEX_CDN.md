@@ -95,6 +95,29 @@ Git 历史追溯，不作为下一次发布说明。需要重建 PKHeX overlay �
 `tools/generate_pkhex_encounter_overlays.py` 并固定、验证上游 commit；不能唯一确认的
 form 只保留物种并标记歧义。
 
+### v20 基础参考资料候选
+
+`patch_dex_bundle_v20_reference.py` 只读复制完整 v19 staging，并从
+`data/dex/reference_v20_sources.json` 固定的 PokéAPI/api-data 提交补齐招式、特性、
+道具与按世代机制资料，同时把 v19 APK 中已经审计的招式／道具版本矩阵纳入 bundle。
+它不会调用 52Poké、不会上传，也不会切换根 manifest；输出的根 manifest 明确带有
+`candidate=true`，文件名也保留 `.candidate.json`。
+
+```bash
+python3 -m unittest tools.test_patch_dex_bundle_v20_reference
+python3 tools/patch_dex_bundle_v20_reference.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --output dist/dex-v20-candidate
+python3 tools/verify_dex_v20_reference.py \
+  dist/dex-v20-candidate/staging
+```
+
+可用 `--api-data <checkout>` 复用已经下载的数据；脚本会验证 HEAD 与锁文件中的提交
+完全一致。候选内的 `reference_v20_audit.json` 记录真实覆盖率和未解析条目，中文缺失
+保留语言／fallback 标记，不自动翻译或编造。正式发布仍需独立的 v20 workflow、生产
+版本前置检查、完整上传树审计和人工批准。
+
 ## Offline 紧凑种子 v14
 
 v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件
