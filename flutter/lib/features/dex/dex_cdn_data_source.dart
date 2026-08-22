@@ -130,6 +130,15 @@ class DexCdnDataSource {
   static List<Map<String, dynamic>> objectEntriesToList(
     Map<String, dynamic> object,
   ) {
+    for (final containerKey in const ['entities', 'entries']) {
+      final nested = object[containerKey];
+      if (nested is List) {
+        return nested
+            .whereType<Map>()
+            .map((entry) => Map<String, dynamic>.from(entry))
+            .toList(growable: false);
+      }
+    }
     return object.entries
         .map((entry) {
           final value = entry.value;

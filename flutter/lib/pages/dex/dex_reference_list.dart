@@ -47,6 +47,12 @@ class DexReferenceListPage<T> extends StatefulWidget {
     this.categoryFilter,
     this.gridMode = false,
     this.initialQuery,
+    this.initialEntryId,
+    this.openInitialEntry = false,
+    this.entryId,
+    this.includeEntry,
+    this.scopeNotice,
+    this.scopedDetailSheet,
   });
 
   final String title;
@@ -60,6 +66,13 @@ class DexReferenceListPage<T> extends StatefulWidget {
   final DexReferenceCategoryFilter<T>? categoryFilter;
   final bool gridMode;
   final String? initialQuery;
+  final int? initialEntryId;
+  final bool openInitialEntry;
+  final int Function(T entry)? entryId;
+  final bool Function(T entry)? includeEntry;
+  final String? Function(T entry)? scopeNotice;
+  final void Function(BuildContext context, T entry, String? scopeNotice)?
+  scopedDetailSheet;
 
   @override
   State<DexReferenceListPage<T>> createState() =>
@@ -72,6 +85,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   String? _selectedCategory;
   bool _loading = true;
   String? _error;
+  bool _initialEntryOpened = false;
 
   @override
   void initState() {
@@ -101,6 +115,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         _entries = entries;
         _loading = false;
       });
+      _openInitialEntryIfRequested();
     } catch (error) {
       if (!mounted) {
         return;
@@ -114,7 +129,12 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
 
   List<T> get _visible {
     final query = _queryController.text.trim().toLowerCase();
-    var list = _entries;
+    var list = _entries
+        .where((entry) {
+          if (_isInitialEntry(entry)) return true;
+          return widget.includeEntry?.call(entry) ?? true;
+        })
+        .toList(growable: false);
     // Category filter.
     final catFilter = widget.categoryFilter;
     final cat = _selectedCategory;
@@ -128,6 +148,32 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
           .toList(growable: false);
     }
     return list;
+  }
+
+  bool _isInitialEntry(T entry) {
+    final initialId = widget.initialEntryId;
+    final entryId = widget.entryId;
+    return initialId != null && entryId != null && entryId(entry) == initialId;
+  }
+
+  void _openInitialEntryIfRequested() {
+    if (!widget.openInitialEntry || _initialEntryOpened) return;
+    final target = _entries.where(_isInitialEntry).firstOrNull;
+    if (target == null) return;
+    _initialEntryOpened = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _openDetail(context, target);
+    });
+  }
+
+  void _openDetail(BuildContext context, T entry) {
+    final notice = widget.scopeNotice?.call(entry);
+    final scoped = widget.scopedDetailSheet;
+    if (scoped != null) {
+      scoped(context, entry, notice);
+      return;
+    }
+    widget.detailSheet(context, entry);
   }
 
   Widget _buildItemGrid(List<T> items) {
@@ -144,12 +190,16 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
       itemCount: items.length,
       itemBuilder: (ctx, index) {
         final entry = items[index];
+        final initialScopeNotice = _isInitialEntry(entry)
+            ? widget.scopeNotice?.call(entry)
+            : null;
         return TitoListReveal(
           delay: TitoListReveal.staggerDelay(index),
           child: _GridItemCard(
             label: widget.primaryLabel(entry),
             leading: widget.leadingBuilder?.call(entry),
-            onTap: () => widget.detailSheet(ctx, entry),
+            scopeNotice: initialScopeNotice,
+            onTap: () => _openDetail(ctx, entry),
           ),
         );
       },
@@ -212,7 +262,9 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
         else if (visible.isEmpty)
           StickerCard(
             child: Text(
-              AppZh.dexReferenceEmpty,
+              widget.initialEntryId != null
+                  ? AppZh.dexReferenceDataMissing
+                  : AppZh.dexReferenceEmpty,
               style: SecondaryTypography.onCard.body14,
             ),
           )
@@ -226,10 +278,13 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final entry = visible[index];
+              final initialScopeNotice = _isInitialEntry(entry)
+                  ? widget.scopeNotice?.call(entry)
+                  : null;
               return TitoListReveal(
                 delay: TitoListReveal.staggerDelay(index),
                 child: HandheldFocusDecorator(
-                  onActivate: () => widget.detailSheet(context, entry),
+                  onActivate: () => _openDetail(context, entry),
                   borderRadius: BorderRadius.circular(
                     DeviceLayout.rMd(context),
                   ),
@@ -241,7 +296,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () => widget.detailSheet(context, entry),
+                        onTap: () => _openDetail(context, entry),
                         borderRadius: BorderRadius.circular(
                           DeviceLayout.rMd(context),
                         ),
@@ -274,6 +329,22 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                                       style: SecondaryTypography.onCard.small12
                                           .copyWith(color: TitoColors.mutedInk),
                                     ),
+                                    if (initialScopeNotice != null) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        initialScopeNotice,
+                                        key: const Key(
+                                          'dex-reference-scope-notice',
+                                        ),
+                                        style: SecondaryTypography
+                                            .onCard
+                                            .small12
+                                            .copyWith(
+                                              color: TitoColors.coral,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -296,7 +367,11 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
   }
 }
 
-void showMoveDetailSheet(BuildContext context, CachedMove move) {
+void showMoveDetailSheet(
+  BuildContext context,
+  CachedMove move, {
+  String? scopeNotice,
+}) {
   showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -310,6 +385,10 @@ void showMoveDetailSheet(BuildContext context, CachedMove move) {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (scopeNotice != null) ...[
+                  ReferenceScopeNotice(message: scopeNotice),
+                  const SizedBox(height: 12),
+                ],
                 Text(
                   move.nameZh,
                   style: SecondaryTypography.onCard.h15.copyWith(
@@ -383,7 +462,11 @@ void showMoveDetailSheet(BuildContext context, CachedMove move) {
   );
 }
 
-void showAbilityDetailSheet(BuildContext context, CachedAbility ability) {
+void showAbilityDetailSheet(
+  BuildContext context,
+  CachedAbility ability, {
+  String? scopeNotice,
+}) {
   showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
@@ -396,6 +479,10 @@ void showAbilityDetailSheet(BuildContext context, CachedAbility ability) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (scopeNotice != null) ...[
+                ReferenceScopeNotice(message: scopeNotice),
+                const SizedBox(height: 12),
+              ],
               Text(
                 ability.nameZh,
                 style: SecondaryTypography.onCard.h15.copyWith(
@@ -466,9 +553,15 @@ bool filterCachedAbility(CachedAbility ability, String query) {
 }
 
 class _GridItemCard extends StatelessWidget {
-  const _GridItemCard({required this.label, this.leading, required this.onTap});
+  const _GridItemCard({
+    required this.label,
+    this.leading,
+    this.scopeNotice,
+    required this.onTap,
+  });
   final String label;
   final Widget? leading;
+  final String? scopeNotice;
   final VoidCallback onTap;
 
   @override
@@ -497,6 +590,21 @@ class _GridItemCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (scopeNotice != null) ...[
+                const SizedBox(height: 3),
+                Text(
+                  scopeNotice!,
+                  key: const Key('dex-reference-scope-notice'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.coral,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
             ],
           ),
         ),

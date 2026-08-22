@@ -209,6 +209,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: MoveEncyclopediaPage(
                         initialQuery: state.uri.queryParameters['q'],
+                        initialEntryId: int.tryParse(
+                          state.uri.queryParameters['id'] ?? '',
+                        ),
+                        openInitialEntry:
+                            state.uri.queryParameters['open'] == '1',
                       ),
                     ),
                   ),
@@ -220,6 +225,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: AbilityEncyclopediaPage(
                         initialQuery: state.uri.queryParameters['q'],
+                        initialEntryId: int.tryParse(
+                          state.uri.queryParameters['id'] ?? '',
+                        ),
+                        openInitialEntry:
+                            state.uri.queryParameters['open'] == '1',
                       ),
                     ),
                   ),
@@ -351,6 +361,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                               shortcutReference?.referenceFilename ??
                               'natures.json',
                           initialQuery: state.uri.queryParameters['q'],
+                          initialEntryId: int.tryParse(
+                            state.uri.queryParameters['id'] ?? '',
+                          ),
+                          openInitialEntry:
+                              state.uri.queryParameters['open'] == '1',
                         ),
                       ),
                     );

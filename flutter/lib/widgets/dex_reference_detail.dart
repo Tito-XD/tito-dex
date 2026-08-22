@@ -212,6 +212,7 @@ void showJsonReferenceDetailSheet(
   BuildContext context, {
   required Map<String, dynamic> entry,
   required DexReferenceKind kind,
+  String? scopeNotice,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -227,12 +228,55 @@ void showJsonReferenceDetailSheet(
             16 + MediaQuery.viewInsetsOf(context).bottom,
           ),
           child: SingleChildScrollView(
-            child: DexReferenceDetailBody(entry: entry, kind: kind),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (scopeNotice != null) ...[
+                  ReferenceScopeNotice(message: scopeNotice),
+                  const SizedBox(height: 12),
+                ],
+                DexReferenceDetailBody(entry: entry, kind: kind),
+              ],
+            ),
           ),
         ),
       );
     },
   );
+}
+
+class ReferenceScopeNotice extends StatelessWidget {
+  const ReferenceScopeNotice({super.key, required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final unavailable = message == AppZh.dexReferenceUnavailableInGame;
+    return StickerCard(
+      key: const Key('dex-reference-detail-scope-notice'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      variant: unavailable ? StickerVariant.cream : StickerVariant.softYellow,
+      child: Row(
+        children: [
+          Icon(
+            unavailable ? Icons.block_rounded : Icons.info_outline_rounded,
+            size: 18,
+            color: TitoColors.ink,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: SecondaryTypography.onCard.small12.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class DexReferenceDetailBody extends StatelessWidget {
@@ -439,7 +483,9 @@ class ItemReferenceDetail extends StatelessWidget {
         ],
         if (gameLabel != null) ...[
           Text(
-            availability == 'unknown'
+            availability == 'unavailable'
+                ? '$gameLabel · ${AppZh.dexReferenceUnavailableInGame}'
+                : availability == 'unknown'
                 ? '$gameLabel · 可用性与价格资料待补齐'
                 : priceLabel == null
                 ? '$gameLabel · 可获得，非普通商店售价'
