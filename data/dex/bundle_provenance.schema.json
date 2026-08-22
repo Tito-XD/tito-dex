@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/dex/bundle_provenance.schema.json",
+  "title": "TitoDex bundle provenance contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "bundleVersion",
+    "generatedAt",
+    "sources",
+    "objects"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "bundleVersion": { "type": "integer", "minimum": 20 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/source" }
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/objectRule" }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "kind",
+        "revision",
+        "license",
+        "attributionRequired",
+        "noticePaths"
+      ],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["upstream", "derived", "manual", "bundle"]
+        },
+        "revision": { "type": "string", "minLength": 1 },
+        "retrievedAt": { "type": "string", "format": "date-time" },
+        "license": { "type": "string", "minLength": 1 },
+        "attributionRequired": { "type": "boolean" },
+        "noticePaths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "enum": [
+            "exactGame",
+            "versionGroup",
+            "generation",
+            "franchiseStable",
+            "unscoped"
+          ]
+        },
+        "gameSlugs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "versionGroups": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "generations": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1, "maximum": 99 },
+          "uniqueItems": true
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "level": { "const": "exactGame" } } },
+          "then": { "required": ["gameSlugs"], "properties": { "gameSlugs": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "level": { "const": "versionGroup" } } },
+          "then": { "required": ["versionGroups"], "properties": { "versionGroups": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "level": { "const": "generation" } } },
+          "then": { "required": ["generations"], "properties": { "generations": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "status", "checkedAt", "fallbackPolicy"],
+      "properties": {
+        "class": {
+          "enum": [
+            "immutable",
+            "historical",
+            "stable",
+            "versionSensitive",
+            "live"
+          ]
+        },
+        "status": { "enum": ["current", "dated", "inherited", "unknown"] },
+        "sourceAsOf": { "type": "string", "format": "date-time" },
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "maxAgeDays": { "type": ["integer", "null"], "minimum": 0 },
+        "fallbackPolicy": {
+          "enum": [
+            "local-authoritative",
+            "local-evidence",
+            "online-verify",
+            "offline-warning"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": { "enum": ["current", "dated", "inherited"] }
+            }
+          },
+          "then": { "required": ["sourceAsOf"] }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceIds",
+        "method",
+        "confidence",
+        "scope",
+        "freshness"
+      ],
+      "properties": {
+        "sourceIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "method": {
+          "enum": ["copied", "normalized", "derived", "reviewed", "generated"]
+        },
+        "confidence": { "enum": ["high", "medium", "low", "unknown"] },
+        "scope": { "$ref": "#/$defs/scope" },
+        "freshness": { "$ref": "#/$defs/freshness" }
+      }
+    },
+    "fieldRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointerPattern", "metadata"],
+      "properties": {
+        "pointerPattern": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "metadata": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "objectRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pathPattern", "priority", "metadata", "fields"],
+      "properties": {
+        "pathPattern": { "type": "string", "minLength": 1 },
+        "priority": { "type": "integer", "minimum": 0 },
+        "metadata": { "$ref": "#/$defs/evidence" },
+        "fields": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/fieldRule" }
+        }
+      }
+    }
+  }
+}
