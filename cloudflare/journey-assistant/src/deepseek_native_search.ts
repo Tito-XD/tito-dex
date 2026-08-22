@@ -5,6 +5,10 @@ import {
 } from './contract';
 import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
+import {
+  isExplicitFollowUpQuestion,
+  recentConversationForQuestion,
+} from './conversation_context';
 
 const DEEPSEEK_NATIVE_TIMEOUT_MS = 18_000;
 const DEEPSEEK_NATIVE_TOTAL_TIMEOUT_MS = 26_000;
@@ -275,14 +279,15 @@ export function isDeepSeekNativeSearchConfigured(
  */
 export function isPokemonScopedQuestion(request: AssistantRequest): boolean {
   const question = request.question.trim();
-  const recentContext = (request.history ?? []).slice(-4)
+  const recentContext = recentConversationForQuestion(request, 4)
     .map((message) => message.content)
     .join(' ');
   return question.length >= 2 &&
     Object.hasOwn(gameNames, request.context.game) &&
     !rejectedScope.test(question) &&
     !clientUrlOrDomainOverride.test(question) &&
-    (pokemonScope.test(question) || pokemonScope.test(recentContext) ||
+    (pokemonScope.test(question) ||
+      (isExplicitFollowUpQuestion(question) && pokemonScope.test(recentContext)) ||
       isGeneralPokemonFranchiseQuestion(question));
 }
 
@@ -321,7 +326,7 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
   const location = reliability.location === 'save_verified' && request.context.locationId
     ? `\n已核验存档地点 ID：${request.context.locationId}`
     : '';
-  const recentConversation = (request.history ?? []).slice(-6)
+  const recentConversation = recentConversationForQuestion(request, 6)
     .map((message) => `${message.role === 'user' ? '用户' : '助手'}：${message.content}`)
     .join('\n');
   const conversation = recentConversation

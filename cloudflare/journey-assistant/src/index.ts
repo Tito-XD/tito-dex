@@ -29,6 +29,7 @@ import {
   answerSelectedGameMechanic,
 } from './game_mechanics';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
+import { recentConversationForQuestion } from './conversation_context';
 
 const MODEL_TIMEOUT_MS = 10_000;
 const CURATED_MODEL_TIMEOUT_MS = 6_000;
@@ -224,7 +225,12 @@ export default {
                   );
                   const relaxedNativeAnswer =
                     env.EXPERIMENTAL_BROAD_ANSWERS === 'true' &&
-                      !isGeneralPokemonFranchiseQuestion(parsed.question)
+                      !isGeneralPokemonFranchiseQuestion(parsed.question) &&
+                      await verifyRelaxedAnswerTopic(
+                        env,
+                        parsed,
+                        nativeResult.answer,
+                      )
                       ? nativeResult.answer
                       : null;
                   if (verifiedAnswer || relaxedNativeAnswer) {
@@ -386,7 +392,10 @@ async function resolveQuestionRoute(
   modelUsed: boolean;
   curatedDecision?: unknown;
 }> {
-  const hasLocalEvidence = hints.some((hint) => hasHintLexicalEvidence(hint, request.question));
+  const evidenceCandidates = hints.filter((hint) =>
+    hasHintLexicalEvidence(hint, request.question)
+  );
+  const hasLocalEvidence = evidenceCandidates.length > 0;
   const deterministicCuratedDecision = deterministicCuratedScopeDecision(request);
   if (!hasLocalEvidence && deterministicCuratedDecision) {
     return {
@@ -396,7 +405,7 @@ async function resolveQuestionRoute(
       curatedDecision: deterministicCuratedDecision,
     };
   }
-  let candidates = hasLocalEvidence ? hints : [];
+  let candidates = evidenceCandidates;
   let aiSearchUsed = false;
   const search = getJourneySearch(
     env.AI_SEARCH_ENABLED,
@@ -405,7 +414,7 @@ async function resolveQuestionRoute(
   if (search && hasLocalEvidence) {
     try {
       const retrievedIds = await withTimeout(
-        retrieveAuditedHintIds(search, hints, request),
+        retrieveAuditedHintIds(search, candidates, request),
         SEARCH_TIMEOUT_MS,
       );
       const retrieved = new Set(retrievedIds);
@@ -593,6 +602,45 @@ function mergeResponseSources(
   }).slice(0, 8);
 }
 
+async function verifyRelaxedAnswerTopic(
+  env: Env,
+  request: AssistantRequest,
+  answer: string,
+): Promise<boolean> {
+  let value: unknown;
+  try {
+    value = await runWorkersAi(
+      env,
+      'deepseek-native-topic-check',
+      [
+        {
+          role: 'system',
+          content: '/no_think\n你只检查 answer 是否直接回应本次 question 的主体和意图。不得核验或补写事实。若 answer 转而解释旧对话主题、只回答同一游戏里的相邻概念，或把地点／捕捉／招式／道具／培养等不同意图混为一谈，onTopic=false。只有明显省略主语的追问才可参考 recentConversation。只输出 JSON。',
+        },
+        {
+          role: 'user',
+          content: JSON.stringify({
+            question: request.question,
+            recentConversation: recentConversationForQuestion(request, 6),
+            answer: answer.slice(0, MAX_ANSWER_LENGTH),
+          }),
+        },
+      ],
+      {
+        type: 'object',
+        additionalProperties: false,
+        required: ['onTopic'],
+        properties: { onTopic: { type: 'boolean' } },
+      },
+      40,
+      0,
+    );
+  } catch {
+    return false;
+  }
+  return isPlainObject(value) && value.onTopic === true;
+}
+
 async function verifyDeepSeekNativeAnswer(
   env: Env,
   request: AssistantRequest,
@@ -621,7 +669,7 @@ async function verifyDeepSeekNativeAnswer(
           role: 'user',
           content: JSON.stringify({
             question: request.question,
-            recentConversation: (request.history ?? []).slice(-6),
+            recentConversation: recentConversationForQuestion(request, 6),
             context: generalFranchise
               ? { scope: 'pokemon_franchise' }
               : modelSafeContext(request),
@@ -755,7 +803,7 @@ async function resolveRouteWithModel(
       role: 'user',
       content: JSON.stringify({
         question: request.question,
-        recentConversation: (request.history ?? []).slice(-6),
+        recentConversation: recentConversationForQuestion(request, 6),
         context: modelSafeContext(request),
         candidates: hints.map((hint) => ({
           id: hint.id,
@@ -791,12 +839,41 @@ async function resolveRouteWithModel(
 
 const GENERIC_EVIDENCE = new Set([
   '怎么', '道路', '进不', '挡路', '宝可', '游戏', '主线', '地点', '道具', '获得',
+  '紫里', '朱里', '里的', '这个', '那个',
 ]);
+
+const blockerIntent = /(?:进不去|过不去|挡路|卡住|不开|怎么过|如何过|怎么进|如何进|怎么去|如何去|下一步|接下来)/u;
+const referenceDetailIntent = /(?:哪里|哪儿|在哪|怎么抓|如何抓|捕捉|捕获|获得|拿到|出现|遭遇|招式|技能|道具|携带|掉落|进化|属性|特性|种族值|配招|队伍)/u;
 
 function hasHintLexicalEvidence(hint: ProgressionHint, question: string): boolean {
   const normalizedQuestion = normalizeEvidence(question);
   if (normalizedQuestion.length < 2) return false;
-  const aliases = [hint.subject.id, ...hint.subject.aliases, ...hint.locationAliases, ...hint.destinationAliases];
+  if (hint.subject.type === 'reference_topic') {
+    if (referenceDetailIntent.test(question)) return false;
+    return matchesFullAlias(hint.subject.aliases, normalizedQuestion);
+  }
+
+  if (matchesAliasOrSpecificFragment(hint.subject.aliases, normalizedQuestion)) {
+    return true;
+  }
+  if (!blockerIntent.test(question)) return false;
+  return matchesFullAlias(
+    [...hint.locationAliases, ...hint.destinationAliases],
+    normalizedQuestion,
+  );
+}
+
+function matchesFullAlias(aliases: string[], normalizedQuestion: string): boolean {
+  return aliases.some((alias) => {
+    const normalizedAlias = normalizeEvidence(alias);
+    return normalizedAlias.length >= 2 && normalizedQuestion.includes(normalizedAlias);
+  });
+}
+
+function matchesAliasOrSpecificFragment(
+  aliases: string[],
+  normalizedQuestion: string,
+): boolean {
   for (const alias of aliases) {
     const normalizedAlias = normalizeEvidence(alias);
     if (normalizedAlias.length < 2) continue;
