@@ -19,9 +19,9 @@ iOS support is merged into **`main`** for v0.7.0. The original platform branch s
 `pod install`, `flutter analyze`, 215 Flutter tests, and
 `flutter build ios --no-codesign --release` succeeded under Xcode 27 beta
 (27.6 MB Runner.app). Pods and generated files were cleaned afterward.
-Current v0.8.18 Dart tests are covered by the shared Flutter suite, but the
+Current v0.8.19 Dart tests are covered by the shared Flutter suite, but the
 iOS no-codesign build has not been rerun for this release line; do not present
-v0.8.18 as device/TestFlight verified until that gate is repeated.
+v0.8.19 as device/TestFlight verified until that gate is repeated.
 
 ## iOS shell & layout adaptation (merged for v0.7.0)
 

@@ -8,8 +8,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.18) · App `0.8.18+170` | Streamed verified answers, polished chat UI, and local history management |
-| Offline APK | [v0.8.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.18) · App `0.8.18-offline+171` | Embeds compact v14 Dex data and Journey Assistant |
+| Lite APK | [v0.8.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.19) · App `0.8.19+172` | Rich answer formatting, fully collapsed citations, and local history management |
+| Offline APK | [v0.8.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.19) · App `0.8.19-offline+173` | Embeds compact v14 Dex data and Journey Assistant |
 | Journey Assistant | Built in | Connection details, 50 local Q&A pairs, companion motion, and multi-source search |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -22,7 +22,7 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Ask TitoDex** — the entire assistant is off by default. Its first Settings activation discloses network access, AI retrieval, and bounded context; Journey and Search reserve no entry space before consent. Once enabled, the selected version, compatible save context, and reviewed local facts still run first, and save location alone can no longer hijack an unrelated question. Unresolved questions can use BGE-M3 AI Search, the Dex bundle, fixed public sources, Tavily, and DeepSeek native search; when both live routes succeed, Qwen performs an additional conflict/corroboration check. The modern conversation page stores the latest 50 Q&A pairs locally and sends at most six same-game pairs for follow-ups. Three compact controls separately open connection details, local history management (compact or clear with confirmation), and the 23-edition picker. Verified answers progressively reveal after the evidence pass; verification and citations share one expandable row, while Pokémon, item, move, and ability links retain their lightweight semantic chips. Raw saves and trainer/party data are never uploaded.
+- **Ask TitoDex** — the entire assistant is off by default. Its first Settings activation discloses network access, AI retrieval, and bounded context; Journey and Search reserve no entry space before consent. Once enabled, the selected version, compatible save context, and reviewed local facts still run first, and save location alone can no longer hijack an unrelated question. Unresolved questions can use BGE-M3 AI Search, the Dex bundle, fixed public sources, Tavily, and DeepSeek native search; when both live routes succeed, Qwen performs an additional conflict/corroboration check. The modern conversation page stores the latest 50 Q&A pairs locally and sends at most six same-game pairs for follow-ups. Three compact controls separately open connection details, local history management (compact or clear with confirmation), and the 23-edition picker. Verified answers progressively reveal after the evidence pass with headings, emphasis, lists, and scrollable tables; citation URLs stay inside one expandable evidence row, while Pokémon, item, move, and ability links retain their lightweight semantic chips. Raw saves and trainer/party data are never uploaded.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
@@ -58,7 +58,7 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.8.18-lite-rg-arm64.apk`** or **`TitoDex-0.8.18-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.8.18 upgrades directly from v0.8.13–v0.8.17; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.8.19-lite-rg-arm64.apk`** or **`TitoDex-0.8.19-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.8.19 upgrades directly from v0.8.13–v0.8.18; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
 
