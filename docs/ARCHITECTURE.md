@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.8.19 · Lite `0.8.19+172` · Offline `0.8.19-offline+173` · rich chat-first Journey Assistant with streamed answers, structured collapsed citations, local history management and bundle-grounded multi-source retrieval · live bundle v19 / compact seed v14.
+> Current release: v0.8.20 · Lite `0.8.20+174` · Offline `0.8.20-offline+175` · downloadable per-game Journey packs, stable entity deep links and bundle-grounded multi-source retrieval · live manifest data / compact seed v14.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
