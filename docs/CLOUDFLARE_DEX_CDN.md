@@ -83,7 +83,9 @@ v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重�
 审计与 workflow，并以精确生产版本作为上传前置条件。通用校验入口：
 
 v20 的本地候选基础设施、overlay provenance、稳定实体索引和 manifest-last 隔离布局见
-[DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。它只构建并验证候选，不包含上传或生产切换能力。
+[DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。候选 builder 本身永远不上传；另有默认 dry-run
+的 v20 专用受保护 workflow，把对象上传、回读收据、根 manifest 切换和 v19 恢复拆成
+独立授权动作。
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt

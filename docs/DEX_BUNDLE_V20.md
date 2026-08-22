@@ -20,7 +20,9 @@ dist/dex-v20-candidate/
 ```
 
 候选目录故意不生成 `upload/bundle-manifest.json`，待发布 manifest 也不含生产 URL。
-这能防止通用上传脚本误把尚未验收的数据切成线上版本。
+这能防止通用上传脚本误把尚未验收的数据切成线上版本。正式 release 目录只能由
+`dex_v20_release_gate.py` 在三重验证通过后生成，并继续把 objects、待切换根 manifest
+和 v19 rollback manifest 物理分开。
 
 ## 来源、范围和新鲜度
 
@@ -113,13 +115,46 @@ provenance 和 archive。
 仅需快速检查脚本或 fixture 时可加 `--no-archive`；该输出不能通过完整候选验证，也不能
 用于发布。
 
-## 未来发布顺序（本阶段不执行）
+## 受保护发布闸门（默认只演练）
 
-1. 在受保护任务中再次确认线上仍为精确 v19。
-2. 构建并验证完整 v20 candidate，保存 v19 根 manifest 作为回滚材料。
-3. 仅上传并复核候选中的版本化 `/v5/` objects；不得修改 v19 archive 或旧回滚前缀。
-4. 受保护任务从 pending manifest 补入批准的 archive URL 与 `publishedAt`。
-5. 最后且仅最后把该文件写成根 `bundle-manifest.json`。
-6. 验收失败时恢复保存的 v19 根 manifest；不删除任何 v20 objects。
+`.github/workflows/release-dex-bundle-v20.yml` 是 v20 专用入口。所有布尔输入默认
+`false`；默认运行只下载、构建、验证和保存候选，不上传对象、不部署 Worker，也不切换
+根 manifest。开始运行前，维护者从本地批准的 v19 根 manifest 计算 SHA-256，并把该
+摘要填入 dispatch 输入：
 
-候选验收与 manifest 切换是两个独立授权动作。本工具只实现前者。
+```bash
+shasum -a 256 "$TITODEX_V19_MANIFEST"
+```
+
+闸门不只判断 `bundleVersion=19`，还会执行以下绑定：
+
+1. 线上根 manifest 的原始 SHA-256 必须等于上述批准摘要；
+2. 线上与本地批准 manifest 的 archive SHA-256／大小必须完全一致；
+3. 下载 archive 的字节摘要／大小必须匹配，并与解包后的 v19 staging tree 逐文件绑定；
+4. v20 `build-report.json` 的 base root SHA 和 base tree SHA 必须指向同一份 v19；
+5. foundation、reference、gameplay 三个完整 verifier 全部通过后，才生成 release 目录。
+
+生产地址仅从运行时 secret `TITODEX_DEX_CDN_BASE` 读取；Cloudflare 凭据继续使用现有
+`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`，或现有 R2 access-key secret。
+bucket 从 `cloudflare/dex-cdn/wrangler.toml` 的既有 `DEX_BUCKET` binding 解析。任何
+secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或命令输出。
+
+发布分成两个独立批准动作：
+
+- `upload_objects=true`：进入受保护的 `dex-production` environment，只上传 release
+  plan 列出的 `/v5/` objects；逐对象确认上传成功，S3 路径逐对象 HEAD，所有路径再对
+  archive、manifest、索引、审计文件和至少 64 个确定性样本做直接内容回读与 SHA-256
+  比较，输出绑定 release-plan SHA 的 object receipt。根 manifest 此时仍不会上传。
+- `publish_manifest=true`：必须与前项同时显式开启，并再次通过受保护 environment。
+  切换前重新读取线上根 manifest，要求它仍是完全相同的已批准 v19；只有 object
+  receipt 完整时，才单独写入根 `bundle-manifest.json`，随后验证线上返回的整份文件
+  SHA 与批准的 v20 manifest 完全一致。
+
+本地上传器 `upload_dex_v20_release.py` 同样默认 dry-run。即使传入 `--execute`，objects、
+manifest 与 rollback 仍是三个互斥 phase；manifest 额外要求 `--publish-manifest` 和有效
+receipt，rollback 额外要求 `--restore-v19`。没有 `all` 模式。
+
+每次准备任务会把精确的 v19 根 manifest 另存为 90 天 rollback artifact。切换失败时，
+使用 `.github/workflows/rollback-dex-bundle-v20.yml`，填写原 release run ID 与同一份 v19
+manifest SHA，并显式设置 `restore_v19=true`。它只恢复根 manifest、执行内容回读和线上
+确认；不会删除已上传的 v20 objects，不会删除、覆盖或访问 `/v4/`。

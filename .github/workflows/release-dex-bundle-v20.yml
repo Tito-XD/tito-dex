@@ -1,0 +1,241 @@
+name: Verify and optionally publish Dex Bundle v20
+
+on:
+  workflow_dispatch:
+    inputs:
+      approved_v19_root_manifest_sha256:
+        description: SHA-256 of the locally approved, exact production v19 root manifest
+        required: true
+        type: string
+      upload_objects:
+        description: Upload and read back the prepared v5 object set (false = dry-run only)
+        required: true
+        default: false
+        type: boolean
+      publish_manifest:
+        description: Switch the root manifest after the object receipt exists (second approval)
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dex-bundle-v20-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      TITODEX_DEX_CDN_BASE: ${{ secrets.TITODEX_DEX_CDN_BASE }}
+    steps:
+      - name: Reject an incomplete approval combination
+        env:
+          APPROVED_ROOT_SHA: ${{ inputs.approved_v19_root_manifest_sha256 }}
+          UPLOAD_OBJECTS: ${{ inputs.upload_objects }}
+          PUBLISH_MANIFEST: ${{ inputs.publish_manifest }}
+        run: |
+          set -euo pipefail
+          test -n "$TITODEX_DEX_CDN_BASE"
+          test "${#APPROVED_ROOT_SHA}" -eq 64
+          if [ "$PUBLISH_MANIFEST" = "true" ] && [ "$UPLOAD_OBJECTS" != "true" ]; then
+            echo "publish_manifest requires upload_objects in the same protected run" >&2
+            exit 1
+          fi
+
+      - name: Check out selected release ref
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
+
+      - name: Install data-build dependencies
+        run: pip install -r tools/dex_bundle_requirements.txt
+
+      - name: Run v20 release-gate unit tests
+        run: |
+          python3 tools/test_dex_v20_release_gate.py
+          python3 tools/test_upload_dex_v20_release.py
+
+      - name: Fetch the exact approved v19 base and preserve rollback material
+        env:
+          APPROVED_ROOT_SHA: ${{ inputs.approved_v19_root_manifest_sha256 }}
+        run: >-
+          python3 tools/dex_v20_release_gate.py fetch-base
+          --output dist/dex-v19-approved-base
+          --approved-root-sha256 "$APPROVED_ROOT_SHA"
+
+      - name: Record one candidate timestamp
+        run: echo "V20_GENERATED_AT=$(date -u +%Y-%m-%dT%H:%M:%S+00:00)" >> "$GITHUB_ENV"
+
+      - name: Build the pinned reference and gameplay overlay
+        run: >-
+          python3 tools/build_dex_v20_reference_overlay.py
+          --base-staging dist/dex-v19-approved-base/staging
+          --base-root-manifest dist/dex-v19-approved-base/base-root-manifest.json
+          --output dist/dex-v20-reference-overlay
+          --generated-at "$V20_GENERATED_AT"
+
+      - name: Build the complete v20 candidate
+        run: >-
+          python3 tools/build_dex_v20_candidate.py
+          --base-staging dist/dex-v19-approved-base/staging
+          --base-root-manifest dist/dex-v19-approved-base/base-root-manifest.json
+          --overlay dist/dex-v20-reference-overlay
+          --output dist/dex-v20-candidate
+          --generated-at "$V20_GENERATED_AT"
+
+      - name: Run the three mandatory candidate verifiers and prepare an isolated release
+        run: >-
+          python3 tools/dex_v20_release_gate.py prepare
+          --candidate dist/dex-v20-candidate
+          --base-root-manifest dist/dex-v19-approved-base/base-root-manifest.json
+          --base-archive dist/dex-v19-approved-base/base-v19.tar.zst
+          --base-staging dist/dex-v19-approved-base/staging
+          --output dist/dex-v20-release
+          --published-at "$V20_GENERATED_AT"
+
+      - name: Prove every remote phase remains dry-run by default
+        run: |
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase objects
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase manifest
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase rollback
+
+      - name: Store verified v20 release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v20-release-candidate
+          path: dist/dex-v20-release
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Store the exact v19 rollback manifest separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: titodex-root-manifest-v19-rollback
+          path: dist/dex-v20-release/rollback/bundle-manifest-v19.json
+          if-no-files-found: error
+          retention-days: 90
+
+  upload-v5-objects:
+    if: inputs.upload_objects
+    needs: build-and-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: dex-production
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: titodex-dex-v20-release-candidate
+          path: dist/dex-v20-release
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
+
+      - run: pip install -r tools/dex_bundle_requirements.txt
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
+
+      - name: Install the existing Wrangler runtime
+        working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Upload v5 objects and perform deterministic direct readback
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release
+          --phase objects --execute
+          --readback-sample 64
+          --receipt dist/dex-v20-upload-receipt.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: titodex-dex-v20-object-receipt
+          path: dist/dex-v20-upload-receipt.json
+          if-no-files-found: error
+          retention-days: 90
+
+  publish-root-manifest:
+    if: inputs.publish_manifest && inputs.upload_objects
+    needs:
+      - build-and-verify
+      - upload-v5-objects
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: dex-production
+    env:
+      TITODEX_DEX_CDN_BASE: ${{ secrets.TITODEX_DEX_CDN_BASE }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: titodex-dex-v20-release-candidate
+          path: dist/dex-v20-release
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: titodex-dex-v20-object-receipt
+          path: dist
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/dex_bundle_requirements.txt
+
+      - run: pip install -r tools/dex_bundle_requirements.txt
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
+
+      - working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Reconfirm exact v19 production root immediately before cutover
+        env:
+          APPROVED_ROOT_SHA: ${{ inputs.approved_v19_root_manifest_sha256 }}
+        run: >-
+          python3 tools/dex_v20_release_gate.py assert-live-base
+          --approved-manifest dist/dex-v20-release/rollback/bundle-manifest-v19.json
+          --approved-sha256 "$APPROVED_ROOT_SHA"
+
+      - name: Switch only the root manifest after protected approval
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: >-
+          python3 tools/upload_dex_v20_release.py dist/dex-v20-release
+          --phase manifest --execute --publish-manifest
+          --receipt dist/dex-v20-upload-receipt.json
+
+      - name: Verify the exact approved v20 root is publicly active
+        run: >-
+          python3 tools/dex_v20_release_gate.py wait-live-target
+          --target-manifest dist/dex-v20-release/manifest/bundle-manifest.json
+          --timeout 600 --interval 10
