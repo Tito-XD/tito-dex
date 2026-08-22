@@ -216,11 +216,6 @@ class AskTitoDexContext {
       'milestoneIds': sendsMilestones ? milestoneIds : const <String>[],
       'locale': locale,
       'parserRevision': parserRevision,
-      if (journeyPacks.isNotEmpty)
-        'journeyPacks': journeyPacks
-            .take(1)
-            .map((reference) => reference.toJson())
-            .toList(growable: false),
       'contextReliability': {
         'game': gameReliability,
         'location': sendsLocation && locationReliability == 'save_verified'
@@ -233,6 +228,11 @@ class AskTitoDexContext {
       },
     };
   }
+
+  List<Map<String, String>> get journeyPackRequestJson => journeyPacks
+      .take(1)
+      .map((reference) => reference.toJson())
+      .toList(growable: false);
 
   /// Context for the separately installed extension. Reliability is explicit:
   /// recognizing a save format does not imply every progression field was

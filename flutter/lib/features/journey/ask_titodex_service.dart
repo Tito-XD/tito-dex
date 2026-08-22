@@ -213,6 +213,8 @@ class HttpAskTitoDexOnlineClient
             'question': question,
             'context': context.toRequestJson(),
             if (history.isNotEmpty) 'history': history,
+            if (context.journeyPacks.isNotEmpty)
+              'journeyPacks': context.journeyPackRequestJson,
           }),
         )
         .timeout(timeout);
@@ -249,6 +251,8 @@ class HttpAskTitoDexOnlineClient
         'question': question,
         'context': context.toRequestJson(),
         if (history.isNotEmpty) 'history': history,
+        if (context.journeyPacks.isNotEmpty)
+          'journeyPacks': context.journeyPackRequestJson,
       });
     final response = await _client.send(request).timeout(timeout);
     if (response.statusCode < 200 || response.statusCode >= 300) {
