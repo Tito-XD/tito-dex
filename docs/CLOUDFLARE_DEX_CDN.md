@@ -82,6 +82,9 @@ v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重�
 当前生产 v19 已完成发布。未来版本必须以线上 v19 为只读基线，新建版本专用 patch、
 审计与 workflow，并以精确生产版本作为上传前置条件。通用校验入口：
 
+v20 的本地候选基础设施、overlay provenance、稳定实体索引和 manifest-last 隔离布局见
+[DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。它只构建并验证候选，不包含上传或生产切换能力。
+
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 python3 tools/audit_encounter_coverage.py <staging> --strict

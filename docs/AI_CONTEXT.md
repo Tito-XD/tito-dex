@@ -336,6 +336,7 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technology choice, structure and platform boundaries |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
 | [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md) | R2 / Worker / bundle layout |
+| [DEX_BUNDLE_V20.md](./DEX_BUNDLE_V20.md) | v19-read-only v20 candidate, provenance and stable entity-index contract |
 | [PERMISSIONS.md](./PERMISSIONS.md) | GitHub Actions secrets |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Visual, typography, layout and interaction rules |
 | [PARSER_PROPOSAL.md](./PARSER_PROPOSAL.md) | Save parser design |
