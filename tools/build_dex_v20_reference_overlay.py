@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import build_dex_bundle_v20_gameplay as gameplay
+import build_dex_v20_reference_shards as reference_shards
 import patch_dex_bundle_v20_reference as reference
 
 
@@ -214,6 +215,19 @@ def build_provenance(*, generated_at: str, version_keys: dict[str, Any]) -> dict
         freshness_class="versionSensitive",
         fallback="online-verify",
     )
+    reference_shard = evidence(
+        source_ids=[
+            "pokeapi-api-data-v20",
+            "titodex-v19-matrices-v20",
+            "titodex-reference-generator-v20",
+        ],
+        method="generated",
+        confidence="medium",
+        level="unscoped",
+        checked_at=generated_at,
+        freshness_class="versionSensitive",
+        fallback="online-verify",
+    )
     return {
         "schemaVersion": 1,
         "overlayId": "reference-gameplay-v20",
@@ -287,6 +301,11 @@ def build_provenance(*, generated_at: str, version_keys: dict[str, Any]) -> dict
             object_rule("terrains.json", 50, mechanics),
             object_rule("reference_v20_sources.json", 55, generated),
             object_rule("reference_v20_audit.json", 55, generated),
+            object_rule("reference/moves/*.json", 58, reference_shard),
+            object_rule("reference/abilities/*.json", 58, reference_shard),
+            object_rule("reference/items/*.json", 58, reference_shard),
+            object_rule("reference/item-slug-index/*.json", 58, reference_shard),
+            object_rule("reference/reference_shards_audit.json", 58, generated),
             object_rule("gameplay/obtain_methods.json", 60, obtain),
             object_rule("gameplay/evolution_methods.json", 60, versioned),
             object_rule("gameplay/learn_methods.json", 60, versioned),
@@ -341,6 +360,7 @@ def build_overlay(args: argparse.Namespace) -> dict[str, Any]:
                 progression_hints=args.progression_hints,
             )
         )
+        reference_shards.build_reference_shards(candidate_root / "staging")
 
         if output.exists():
             shutil.rmtree(output)
@@ -355,6 +375,12 @@ def build_overlay(args: argparse.Namespace) -> dict[str, Any]:
                 shutil.copy2(source, destination)
                 copied.append(relative)
         for source in sorted((candidate_staging / "gameplay").rglob("*.json")):
+            relative = source.relative_to(candidate_staging).as_posix()
+            destination = output / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+            copied.append(relative)
+        for source in sorted((candidate_staging / "reference").rglob("*.json")):
             relative = source.relative_to(candidate_staging).as_posix()
             destination = output / relative
             destination.parent.mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from build_dex_v20_reference_shards import MAX_SHARD_BYTES, verify_reference_shards
+
 
 EXPECTED_SOURCE_COMMIT = "cd40ffdf0f5c68fc81c39c2ebec256e128fe1966"
 
@@ -30,6 +32,7 @@ def verify(root: Path) -> dict[str, Any]:
     terrains = read_json(root / "terrains.json")
     move_version_matrix = read_json(root / "move_version_matrix.json")
     item_version_matrix = read_json(root / "item_version_matrix.json")
+    shard_audit = verify_reference_shards(root)
 
     assert manifest["version"] == 20
     assert manifest["complete"] is True
@@ -39,8 +42,33 @@ def verify(root: Path) -> dict[str, Any]:
     assert manifest["schemaFeatures"]["abilityDetails"] == 2
     assert manifest["schemaFeatures"]["itemDetails"] == 2
     assert manifest["schemaFeatures"]["generationMechanics"] == 1
+    assert manifest["schemaFeatures"]["boundedReferenceEntityShards"] == 1
     assert manifest["moveVersionMatrix"] == "move_version_matrix.json"
     assert manifest["itemVersionMatrix"] == "item_version_matrix.json"
+    assert manifest["referenceData"] == {
+        "schemaVersion": 1,
+        "maximumShardBytes": MAX_SHARD_BYTES,
+        "moves": "reference/moves/{id}.json",
+        "abilities": "reference/abilities/{id}.json",
+        "items": "reference/items/{id}.json",
+        "itemSlugIndex": "reference/item-slug-index/{bucket}.json",
+        "audit": "reference/reference_shards_audit.json",
+        "counts": {
+            "moves": len(moves),
+            "abilities": len(abilities),
+            "items": len(items),
+            "itemSlugIndexBuckets": 256,
+        },
+    }
+    assert shard_audit["sourceCommit"] == EXPECTED_SOURCE_COMMIT
+    assert shard_audit["collections"]["moves"]["maximumObjectBytes"] < 8 * 1024
+    assert shard_audit["collections"]["abilities"]["maximumObjectBytes"] < 8 * 1024
+    assert shard_audit["collections"]["items"]["maximumObjectBytes"] < 8 * 1024
+    assert shard_audit["collections"]["moves"]["sourceStatusCounts"]["retained-v19"] == 0
+    assert shard_audit["collections"]["abilities"]["sourceStatusCounts"]["retained-v19"] == 0
+    assert shard_audit["collections"]["items"]["sourceStatusCounts"]["retained-v19"] == len(
+        audit["items"]["unresolvedSourceSlugs"]
+    )
     pinned = next(
         source for source in sources["sources"] if source["sourceId"] == "pokeapi-api-data"
     )

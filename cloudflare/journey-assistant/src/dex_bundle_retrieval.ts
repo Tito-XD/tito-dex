@@ -15,6 +15,7 @@ const MAX_DETAIL_BYTES = 4 * 1024 * 1024;
 const MAX_ITEMS_BYTES = 2 * 1024 * 1024;
 const MAX_MOVES_BYTES = 256 * 1024;
 const MAX_CATALOG_BYTES = 4 * 1024 * 1024;
+const MAX_REFERENCE_SHARD_BYTES = 64 * 1024;
 const MAX_GAMEPLAY_SHARD_BYTES = 1024 * 1024;
 const MAX_AREAS = 6;
 
@@ -47,6 +48,16 @@ type GameplaySpeciesShard = {
   learn: Record<string, unknown>;
   evolutions: Record<string, unknown>[];
 };
+
+type ReferenceDataConfig = {
+  moves: string;
+  abilities: string;
+  items: string;
+  itemSlugIndex: string;
+  sourceCommit: string;
+};
+
+type HeldItemLookup = Map<string, { id: number; name: string }>;
 
 const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel>);
 const itemTargets = buildTargets(itemLabels as Record<string, SpeciesLabel>);
@@ -189,6 +200,9 @@ export async function answerFromDexBundle(
   if (!validBundleManifest(manifest)) return null;
 
   const bundleVersion = manifest.bundleVersion as number;
+  const referenceConfig = bundleVersion >= 20
+    ? validReferenceDataConfig(manifest.referenceData, manifest.referenceDataSourceCommit)
+    : null;
   if (species) {
     const detail = await readJsonObject(
       bucket,
@@ -208,12 +222,16 @@ export async function answerFromDexBundle(
       return answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard);
     }
     if (heldItemIntent.test(request.question)) {
-      const items = await readJsonObject(
-        bucket,
-        `${manifest.cdnPrefix}/items.json`,
-        MAX_ITEMS_BYTES,
-      );
-      return answerHeldItems(request, detail, species, item, items, bundleVersion);
+      const itemLookup = bundleVersion >= 20
+        ? referenceConfig
+          ? await readHeldItemLookup(bucket, manifest.cdnPrefix as string, detail, referenceConfig)
+          : null
+        : itemLookupFromAggregate(await readJsonObject(
+          bucket,
+          `${manifest.cdnPrefix}/items.json`,
+          MAX_ITEMS_BYTES,
+        ));
+      return answerHeldItems(request, detail, species, item, itemLookup, bundleVersion);
     }
     if (speciesProfileIntent.test(request.question)) {
       return answerSpeciesProfile(request, detail, species, bundleVersion);
@@ -221,20 +239,34 @@ export async function answerFromDexBundle(
   }
 
   if (item && itemInfoIntent.test(request.question)) {
-    const items = await readJsonObject(
-      bucket,
-      `${manifest.cdnPrefix}/items.json`,
-      MAX_ITEMS_BYTES,
-    );
-    return answerItemInfo(request, item, items, bundleVersion);
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, manifest.cdnPrefix as string, 'item', item, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(
+        bucket,
+        `${manifest.cdnPrefix}/items.json`,
+        MAX_ITEMS_BYTES,
+      ), item.id);
+    return answerItemInfo(request, item, value, bundleVersion);
   }
   if (ability && abilityInfoIntent.test(request.question)) {
-    const catalog = await readJsonObject(
-      bucket,
-      `${manifest.cdnPrefix}/dex_catalog.json`,
-      MAX_CATALOG_BYTES,
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, manifest.cdnPrefix as string, 'ability', ability, referenceConfig)
+        : null
+      : recordFromCatalog(await readJsonObject(
+        bucket,
+        `${manifest.cdnPrefix}/dex_catalog.json`,
+        MAX_CATALOG_BYTES,
+      ), 'abilities', ability.id);
+    return answerAbilityInfo(request, ability, value, bundleVersion);
+  }
+  if (move && moveInfoIntent.test(request.question) && bundleVersion >= 20 && referenceConfig) {
+    const value = await readReferenceEntityShard(
+      bucket, manifest.cdnPrefix as string, 'move', move, referenceConfig,
     );
-    return answerAbilityInfo(request, ability, catalog, bundleVersion);
+    return answerMoveInfo(request, move, value, bundleVersion);
   }
   return null;
 }
@@ -255,15 +287,17 @@ export async function buildDexBundleSources(
   const move = findTarget(request.question, moveTargets);
   const ability = findTarget(request.question, abilityTargets);
   if (!species && !item && !move && !ability) return [];
-  // Evolution conditions and standalone move values can differ by generation.
-  // Preserve the existing exact-version PokéAPI path for those questions.
-  if (move && moveInfoIntent.test(request.question)) {
-    return [];
-  }
   const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
   if (!validBundleManifest(manifest)) return [];
   const bundleVersion = manifest.bundleVersion as number;
   const prefix = manifest.cdnPrefix as string;
+  // V19 has only a general aggregate move table. Preserve the exact-version
+  // PokéAPI path there; V20's bounded reference shard may be used as explicit
+  // general evidence with the existing version warning.
+  if (move && moveInfoIntent.test(request.question) && bundleVersion < 20) return [];
+  const referenceConfig = bundleVersion >= 20
+    ? validReferenceDataConfig(manifest.referenceData, manifest.referenceDataSourceCommit)
+    : null;
   const facts: Record<string, unknown> = {
     sourceBundleVersion: bundleVersion,
     exactGame: request.context.game,
@@ -286,9 +320,12 @@ export async function buildDexBundleSources(
     }
   }
   if (item) {
-    const items = await readJsonObject(bucket, `${prefix}/items.json`, MAX_ITEMS_BYTES);
-    if (items && isPlainObject(items[String(item.id)])) {
-      const value = items[String(item.id)] as Record<string, unknown>;
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, prefix, 'item', item, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(bucket, `${prefix}/items.json`, MAX_ITEMS_BYTES), item.id);
+    if (value) {
       facts.item = {
         id: item.id,
         nameZh: item.nameZh,
@@ -302,13 +339,28 @@ export async function buildDexBundleSources(
     }
   }
   if (move) {
-    const moves = await readJsonObject(bucket, `${prefix}/moves.json`, MAX_MOVES_BYTES);
-    if (moves && isPlainObject(moves[String(move.id)])) {
-      facts.move = compactMoveEvidence(moves[String(move.id)] as Record<string, unknown>, move);
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, prefix, 'move', move, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(bucket, `${prefix}/moves.json`, MAX_MOVES_BYTES), move.id);
+    if (value) {
+      facts.move = compactMoveEvidence(value, move);
     }
   }
   if (ability) {
-    facts.ability = { id: ability.id, nameZh: ability.nameZh };
+    const value = bundleVersion >= 20 && referenceConfig
+      ? await readReferenceEntityShard(bucket, prefix, 'ability', ability, referenceConfig)
+      : null;
+    facts.ability = value
+      ? {
+        id: ability.id,
+        nameZh: ability.nameZh,
+        ...(typeof value.descriptionZh === 'string'
+          ? { descriptionZh: cleanText(value.descriptionZh, 240) }
+          : {}),
+      }
+      : { id: ability.id, nameZh: ability.nameZh };
   }
   if (Object.keys(facts).length <= 2) return [];
   return [{
@@ -385,16 +437,10 @@ function answerHeldItems(
   detail: Record<string, unknown>,
   species: EntityTarget,
   requestedItem: EntityTarget | null,
-  items: Record<string, unknown> | null,
+  itemBySlug: HeldItemLookup | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!Array.isArray(detail.heldItems) || !items) return null;
-  const itemBySlug = new Map<string, { id: number; name: string }>();
-  for (const [id, value] of Object.entries(items)) {
-    if (!isPlainObject(value) || typeof value.slug !== 'string' ||
-        typeof value.nameZh !== 'string' || !/^\d{1,5}$/.test(id)) continue;
-    itemBySlug.set(value.slug, { id: Number(id), name: cleanText(value.nameZh, 80) });
-  }
+  if (!Array.isArray(detail.heldItems) || !itemBySlug) return null;
   const rows = detail.heldItems.flatMap((value) => {
     if (!isPlainObject(value) || typeof value.slug !== 'string' ||
         !isPlainObject(value.rarityByVersion)) return [];
@@ -417,7 +463,7 @@ function answerHeldItems(
     `held-items-${request.context.game}-${species.id}`,
     [`species:${species.id}`, `game:${request.context.game}`, 'field:heldItems'],
     'high',
-    ['携带物批次包含 PokeAPI 与 52Poké 数据；52Poké 部分按 CC BY-NC-SA 4.0 署名使用。'],
+    ['携带物批次包含 PokeAPI 与 52Poké 数据；52Poké 部分按 CC BY-NC-SA 3.0 署名使用。'],
   );
 }
 
@@ -537,11 +583,10 @@ function answerSpeciesProfile(
 function answerItemInfo(
   request: AssistantRequest,
   item: EntityTarget,
-  items: Record<string, unknown> | null,
+  value: Record<string, unknown> | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!items || !isPlainObject(items[String(item.id)])) return null;
-  const value = items[String(item.id)] as Record<string, unknown>;
+  if (!value) return null;
   if (value.id !== item.id || typeof value.nameZh !== 'string') return null;
   const details: string[] = [];
   if (typeof value.categoryZh === 'string') details.push(`分类：${cleanText(value.categoryZh, 80)}`);
@@ -569,12 +614,10 @@ function answerItemInfo(
 function answerAbilityInfo(
   request: AssistantRequest,
   ability: EntityTarget,
-  catalog: Record<string, unknown> | null,
+  value: Record<string, unknown> | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!catalog || !isPlainObject(catalog.abilities) ||
-      !isPlainObject(catalog.abilities[String(ability.id)])) return null;
-  const value = catalog.abilities[String(ability.id)] as Record<string, unknown>;
+  if (!value || (value.id !== undefined && value.id !== ability.id)) return null;
   const description = typeof value.descriptionZh === 'string'
     ? cleanText(value.descriptionZh, 240)
     : '';
@@ -587,6 +630,35 @@ function answerAbilityInfo(
     [`ability:${ability.id}`],
     'medium',
     ['这是 bundle 的通用特性说明；旧世代效果变化需再按版本核对。'],
+  );
+}
+
+function answerMoveInfo(
+  request: AssistantRequest,
+  move: EntityTarget,
+  value: Record<string, unknown> | null,
+  bundleVersion: number,
+): AssistantResponse | null {
+  if (!value) return null;
+  const details: string[] = [];
+  if (typeof value.typeZh === 'string') details.push(`属性：${cleanText(value.typeZh, 40)}`);
+  if (typeof value.categoryZh === 'string') details.push(`分类：${cleanText(value.categoryZh, 40)}`);
+  if (typeof value.power === 'number') details.push(`威力：${value.power}`);
+  if (typeof value.accuracy === 'number') details.push(`命中：${value.accuracy}`);
+  if (typeof value.pp === 'number') details.push(`PP：${value.pp}`);
+  const description = typeof value.descriptionZh === 'string'
+    ? cleanText(value.descriptionZh, 240)
+    : '';
+  if (description) details.push(`说明：${description}`);
+  if (details.length === 0) return null;
+  return bundleResponse(
+    request,
+    `TitoDex v${bundleVersion} 的${move.nameZh}招式资料：\n${details.map((line) => `- ${line}`).join('\n')}`,
+    bundleVersion,
+    `move-${move.id}`,
+    [`move:${move.id}`],
+    'medium',
+    ['这是 bundle 的通用招式值；旧世代数值变化需再按版本核对。'],
   );
 }
 
@@ -990,6 +1062,224 @@ function formatLevel(minimum?: number, maximum?: number): string {
   if (minimum === maximum || maximum === undefined) return `Lv.${minimum}`;
   if (minimum === undefined) return `最高 Lv.${maximum}`;
   return `Lv.${minimum}–${maximum}`;
+}
+
+function validReferenceDataConfig(
+  value: unknown,
+  sourceCommit: unknown,
+): ReferenceDataConfig | null {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'schemaVersion', 'maximumShardBytes', 'moves', 'abilities', 'items',
+    'itemSlugIndex', 'audit', 'counts',
+  ]) || value.schemaVersion !== 1 || value.maximumShardBytes !== MAX_REFERENCE_SHARD_BYTES ||
+      value.moves !== 'reference/moves/{id}.json' ||
+      value.abilities !== 'reference/abilities/{id}.json' ||
+      value.items !== 'reference/items/{id}.json' ||
+      value.itemSlugIndex !== 'reference/item-slug-index/{bucket}.json' ||
+      value.audit !== 'reference/reference_shards_audit.json' ||
+      !isPlainObject(value.counts) || !hasExactKeys(value.counts, [
+        'moves', 'abilities', 'items', 'itemSlugIndexBuckets',
+      ]) || !validCount(value.counts.moves, 1, 10_000) ||
+      !validCount(value.counts.abilities, 1, 10_000) ||
+      !validCount(value.counts.items, 1, 20_000) ||
+      value.counts.itemSlugIndexBuckets !== 256 || !validSourceCommit(sourceCommit)) {
+    return null;
+  }
+  return {
+    moves: value.moves,
+    abilities: value.abilities,
+    items: value.items,
+    itemSlugIndex: value.itemSlugIndex,
+    sourceCommit: sourceCommit as string,
+  };
+}
+
+function validCount(value: unknown, minimum: number, maximum: number): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= minimum && value <= maximum;
+}
+
+async function readReferenceEntityShard(
+  bucket: R2Bucket,
+  prefix: string,
+  kind: 'move' | 'ability' | 'item',
+  target: EntityTarget,
+  config: ReferenceDataConfig,
+): Promise<Record<string, unknown> | null> {
+  const pattern = kind === 'move' ? config.moves : kind === 'ability' ? config.abilities : config.items;
+  const value = await readJsonObject(
+    bucket,
+    `${prefix}/${pattern.replace('{id}', String(target.id))}`,
+    MAX_REFERENCE_SHARD_BYTES,
+  );
+  return validReferenceEntityShard(value, kind, target, config.sourceCommit) ? value : null;
+}
+
+function validReferenceEntityShard(
+  value: Record<string, unknown> | null,
+  kind: 'move' | 'ability' | 'item',
+  target: EntityTarget,
+  sourceCommit: string,
+): boolean {
+  if (!value || value.schemaVersion !== 1 || value.kind !== kind || value.id !== target.id ||
+      value.sourceCommit !== sourceCommit || !validSourceCommit(value.sourceCommit) ||
+      typeof value.slug !== 'string' || !/^[a-z0-9][a-z0-9-]{0,159}$/u.test(value.slug) ||
+      typeof value.nameZh !== 'string' || !validReferenceText(value.nameZh, 120) ||
+      normalize(value.nameZh) !== normalize(target.nameZh) ||
+      !validNullableText(value.nameEn, 120)) return false;
+  if (kind === 'move') {
+    return hasExactKeys(value, [
+      'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+      'type', 'typeZh', 'category', 'categoryZh', 'power', 'accuracy', 'pp', 'priority',
+      'target', 'targetZh', 'generation', 'descriptionZh', 'shortEffect', 'availableVersionGroups',
+    ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `move:${target.id}` &&
+      [value.type, value.typeZh, value.category, value.categoryZh].every((entry) => validNullableText(entry, 40)) &&
+      [value.target, value.targetZh].every((entry) => validNullableText(entry, 80)) &&
+      [value.power, value.accuracy, value.pp].every((entry) => validNullableInteger(entry, 0, 100_000)) &&
+      validNullableInteger(value.priority, -20, 20) && validNullableInteger(value.generation, 1, 99) &&
+      validNullableText(value.descriptionZh, 1_200) && validNullableText(value.shortEffect, 1_200) &&
+      validReferenceStringArray(value.availableVersionGroups, 64, 120);
+  }
+  if (kind === 'ability') {
+    return hasExactKeys(value, [
+      'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+      'generation', 'descriptionZh', 'shortEffect',
+    ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `ability:${target.id}` &&
+      validNullableInteger(value.generation, 1, 99) &&
+      validNullableText(value.descriptionZh, 1_200) && validNullableText(value.shortEffect, 1_200);
+  }
+  return hasExactKeys(value, [
+    'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+    'categoryZh', 'cost', 'descriptionZh', 'effectZh', 'flingPower', 'availableVersionGroups',
+    'availableGenerations', 'pricesByVersionGroup',
+  ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `item:${value.slug}` &&
+    validNullableText(value.categoryZh, 80) && validNullableInteger(value.cost, 0, 1_000_000_000) &&
+    validNullableText(value.descriptionZh, 1_200) && validNullableText(value.effectZh, 1_200) &&
+    validNullableInteger(value.flingPower, 0, 100_000) &&
+    validReferenceStringArray(value.availableVersionGroups, 64, 120) &&
+    Array.isArray(value.availableGenerations) && value.availableGenerations.length <= 32 &&
+    value.availableGenerations.every((entry) => validCount(entry, 1, 99)) &&
+    validReferencePrices(value.pricesByVersionGroup);
+}
+
+function validReferenceSourceStatus(value: unknown): boolean {
+  return value === 'pinned-pokeapi' || value === 'retained-v19';
+}
+
+function validReferenceText(value: unknown, maximum: number): value is string {
+  return typeof value === 'string' && value.length > 0 && value.length <= maximum;
+}
+
+function validNullableText(value: unknown, maximum: number): boolean {
+  return value === null || validReferenceText(value, maximum);
+}
+
+function validNullableInteger(value: unknown, minimum: number, maximum: number): boolean {
+  return value === null || validCount(value, minimum, maximum);
+}
+
+function validReferenceStringArray(value: unknown, maximum: number, maximumLength: number): boolean {
+  return Array.isArray(value) && value.length <= maximum && value.every((entry) =>
+    typeof entry === 'string' && entry.length > 0 && entry.length <= maximumLength,
+  );
+}
+
+function validReferencePrices(value: unknown): boolean {
+  if (!isPlainObject(value) || Object.keys(value).length > 64) return false;
+  return Object.entries(value).every(([group, row]) =>
+    /^[a-z0-9-]{1,80}$/u.test(group) && isPlainObject(row) &&
+    Object.keys(row).length > 0 && Object.keys(row).every((key) => key === 'buy' || key === 'sell') &&
+    Object.values(row).every((entry) => validCount(entry, 0, 1_000_000_000)),
+  );
+}
+
+function recordFromAggregate(
+  aggregate: Record<string, unknown> | null,
+  id: number,
+): Record<string, unknown> | null {
+  return aggregate && isPlainObject(aggregate[String(id)])
+    ? aggregate[String(id)] as Record<string, unknown>
+    : null;
+}
+
+function recordFromCatalog(
+  catalog: Record<string, unknown> | null,
+  collection: string,
+  id: number,
+): Record<string, unknown> | null {
+  return catalog && isPlainObject(catalog[collection]) &&
+    isPlainObject((catalog[collection] as Record<string, unknown>)[String(id)])
+    ? (catalog[collection] as Record<string, unknown>)[String(id)] as Record<string, unknown>
+    : null;
+}
+
+function itemLookupFromAggregate(items: Record<string, unknown> | null): HeldItemLookup | null {
+  if (!items) return null;
+  const result: HeldItemLookup = new Map();
+  for (const [id, value] of Object.entries(items)) {
+    if (!isPlainObject(value) || typeof value.slug !== 'string' ||
+        typeof value.nameZh !== 'string' || !/^\d{1,5}$/.test(id)) continue;
+    result.set(value.slug, { id: Number(id), name: cleanText(value.nameZh, 80) });
+  }
+  return result;
+}
+
+async function readHeldItemLookup(
+  bucket: R2Bucket,
+  prefix: string,
+  detail: Record<string, unknown>,
+  config: ReferenceDataConfig,
+): Promise<HeldItemLookup | null> {
+  if (!Array.isArray(detail.heldItems)) return null;
+  const slugs = Array.from(new Set(detail.heldItems.flatMap((row) =>
+    isPlainObject(row) && typeof row.slug === 'string' &&
+    /^[a-z0-9][a-z0-9-]{0,159}$/u.test(row.slug) ? [row.slug] : [],
+  ))).slice(0, 8);
+  if (slugs.length === 0) return null;
+  const buckets = new Map<string, string[]>();
+  for (const slug of slugs) {
+    const key = await itemSlugBucket(slug);
+    buckets.set(key, [...(buckets.get(key) ?? []), slug]);
+  }
+  const result: HeldItemLookup = new Map();
+  await Promise.all([...buckets.entries()].map(async ([bucketKey, requested]) => {
+    const value = await readJsonObject(
+      bucket,
+      `${prefix}/${config.itemSlugIndex.replace('{bucket}', bucketKey)}`,
+      MAX_REFERENCE_SHARD_BYTES,
+    );
+    if (!validItemSlugIndex(value, bucketKey)) return;
+    for (const slug of requested) {
+      const row = value.entries[slug];
+      if (isPlainObject(row)) {
+        const target = itemTargets.find((candidate) => candidate.id === row.id);
+        if (target && normalize(target.nameZh) === normalize(row.nameZh as string)) {
+          result.set(slug, { id: target.id, name: target.nameZh });
+        }
+      }
+    }
+  }));
+  return result.size > 0 ? result : null;
+}
+
+async function itemSlugBucket(slug: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(slug));
+  return Array.from(new Uint8Array(digest).slice(0, 1), (value) =>
+    value.toString(16).padStart(2, '0'),
+  ).join('');
+}
+
+function validItemSlugIndex(
+  value: Record<string, unknown> | null,
+  bucket: string,
+): value is Record<string, unknown> & { entries: Record<string, unknown> } {
+  return value !== null && hasExactKeys(value, ['schemaVersion', 'kind', 'bucket', 'entries']) &&
+    value.schemaVersion === 1 && value.kind === 'item-slug-index' && value.bucket === bucket &&
+    isPlainObject(value.entries) && Object.keys(value.entries).length <= 64 &&
+    Object.entries(value.entries).every(([slug, row]) =>
+      /^[a-z0-9][a-z0-9-]{0,159}$/u.test(slug) && isPlainObject(row) &&
+      hasExactKeys(row, ['id', 'nameZh']) && validCount(row.id, 1, 100_000) &&
+      validReferenceText(row.nameZh, 120),
+    );
 }
 
 async function readJsonObject(

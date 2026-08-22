@@ -23,6 +23,11 @@ from typing import Any, Iterable
 
 import zstandard
 
+from build_dex_v20_reference_shards import (
+    MAX_SHARD_BYTES as MAX_REFERENCE_SHARD_BYTES,
+    verify_reference_shards,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 BUNDLE_VERSION = 20
@@ -708,8 +713,10 @@ def build_candidate(
                 "abilityDetails": 2,
                 "itemDetails": 2,
                 "generationMechanics": 1,
+                "boundedReferenceEntityShards": 1,
             }
         )
+        shard_audit = verify_reference_shards(staging)
         manifest.update(
             {
                 "referenceDataAudit": "reference_v20_audit.json",
@@ -718,6 +725,21 @@ def build_candidate(
                 "referenceDataReviewStatus": "candidate",
                 "moveVersionMatrix": "move_version_matrix.json",
                 "itemVersionMatrix": "item_version_matrix.json",
+                "referenceData": {
+                    "schemaVersion": 1,
+                    "maximumShardBytes": MAX_REFERENCE_SHARD_BYTES,
+                    "moves": "reference/moves/{id}.json",
+                    "abilities": "reference/abilities/{id}.json",
+                    "items": "reference/items/{id}.json",
+                    "itemSlugIndex": "reference/item-slug-index/{bucket}.json",
+                    "audit": "reference/reference_shards_audit.json",
+                    "counts": {
+                        "moves": shard_audit["collections"]["moves"]["count"],
+                        "abilities": shard_audit["collections"]["abilities"]["count"],
+                        "items": shard_audit["collections"]["items"]["count"],
+                        "itemSlugIndexBuckets": shard_audit["collections"]["itemSlugIndex"]["count"],
+                    },
+                },
             }
         )
     gameplay_root = staging / "gameplay"
@@ -824,6 +846,7 @@ def build_candidate(
         "referenceDataReviewStatus",
         "moveVersionMatrix",
         "itemVersionMatrix",
+        "referenceData",
         "gameplayData",
     ):
         if key in manifest:
