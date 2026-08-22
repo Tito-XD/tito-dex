@@ -4,15 +4,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'ask_titodex_settings.dart';
+import 'journey_pack_models.dart';
+import 'journey_worker_config.dart';
+import 'journey_pack_repository.dart';
 import 'progression_hints.dart';
 
 class AskTitoDexConfig {
-  static const workerUrl = String.fromEnvironment(
-    'TITODEX_JOURNEY_ASSISTANT_URL',
-  );
+  static const workerUrl = JourneyWorkerConfig.askUrl;
 }
 
-const _workerAskPath = '/v1/ask';
 const _workerHealthPath = '/health';
 const _maxHealthResponseBytes = 8192;
 const _maxAskStreamResponseBytes = 64 * 1024;
@@ -68,14 +68,7 @@ class AskTitoDexWorkerStatus {
 }
 
 bool _isJourneyWorkerAskEndpoint(String value) {
-  final uri = Uri.tryParse(value);
-  return uri != null &&
-      uri.scheme == 'https' &&
-      uri.hasAuthority &&
-      uri.userInfo.isEmpty &&
-      uri.path == _workerAskPath &&
-      !uri.hasQuery &&
-      !uri.hasFragment;
+  return JourneyWorkerConfig.askUri(value) != null;
 }
 
 abstract class AskTitoDexOnlineClient {
@@ -330,7 +323,9 @@ class AskTitoDexService {
   AskTitoDexService({
     ProgressionHintRepository? hints,
     AskTitoDexOnlineClient? online,
+    JourneyPackRepository? packs,
   }) : _hints = hints ?? progressionHintRepository,
+       _packs = packs ?? journeyPackRepository,
        _online =
            online ??
            (_isJourneyWorkerAskEndpoint(AskTitoDexConfig.workerUrl)
@@ -338,6 +333,7 @@ class AskTitoDexService {
                : null);
 
   final ProgressionHintRepository _hints;
+  final JourneyPackRepository _packs;
   final AskTitoDexOnlineClient? _online;
 
   Future<AskTitoDexWorkerStatus> checkConnection() async {
@@ -359,10 +355,16 @@ class AskTitoDexService {
     }
   }
 
-  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async =>
-      context.copyWith(
-        locationId: await _hints.resolveLocationId(context.locationLabel),
-      );
+  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async {
+    final values = await Future.wait<Object?>([
+      _hints.resolveLocationId(context.locationLabel),
+      _packs.referencesForGame(context.game),
+    ]);
+    return context.copyWith(
+      locationId: values[0] as String?,
+      journeyPacks: values[1] as List<JourneyPackReference>,
+    );
+  }
 
   Future<AskTitoDexResult> ask(
     String question,

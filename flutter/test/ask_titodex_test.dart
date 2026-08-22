@@ -969,6 +969,7 @@ void main() {
                   journey: _journey,
                   askTitoDexEnabled: enabled,
                   onAskTitoDex: () {},
+                  onManageJourneyPacks: () {},
                   assistantFuture: Future.value(_snapshot),
                 ),
               ),
@@ -983,6 +984,7 @@ void main() {
 
       await pump(false);
       expect(find.byKey(const Key('ask-titodex-entry')), findsNothing);
+      expect(find.byKey(const Key('journey-pack-manager-entry')), findsNothing);
       await pump(true);
       await tester.scrollUntilVisible(
         find.byKey(const Key('ask-titodex-entry')),
@@ -990,6 +992,18 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       expect(find.byKey(const Key('ask-titodex-entry')), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.byKey(
+          const Key('journey-pack-manager-entry'),
+          skipOffstage: false,
+        ),
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        find.byKey(const Key('journey-pack-manager-entry')),
+        findsOneWidget,
+      );
     },
   );
 
