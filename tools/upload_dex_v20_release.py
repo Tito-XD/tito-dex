@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -29,6 +30,7 @@ BUCKET_BINDING = "DEX_BUCKET"
 MINIMUM_READBACK_SAMPLE = 32
 DEFAULT_UPLOAD_WORKERS = 8
 MAXIMUM_UPLOAD_WORKERS = 16
+UPLOAD_READBACK_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
 
 
 def require(condition: bool, message: str) -> None:
@@ -324,9 +326,16 @@ def _resume_or_upload_object(
     if remote_size is not None:
         require(remote_size == source.stat().st_size, f"R2 object size mismatch: {key}")
 
-    _safe_get(backend, key, downloaded)
-    require(_remote_object_matches(source, downloaded), f"R2 object SHA mismatch: {key}")
-    return "uploaded"
+    # A newly replaced large R2 object can briefly return the previous bytes to
+    # an immediate Wrangler read even though the put completed successfully.
+    # Retry the complete SHA readback; never weaken it to a size-only check.
+    for delay in UPLOAD_READBACK_RETRY_DELAYS_SECONDS:
+        if delay:
+            time.sleep(delay)
+        downloaded.unlink(missing_ok=True)
+        if _safe_try_get(backend, key, downloaded) and _remote_object_matches(source, downloaded):
+            return "uploaded"
+    raise ValueError(f"R2 object SHA mismatch after readback retries: {key}")
 
 
 def upload_objects(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import upload_dex_v20_release as upload
@@ -83,6 +84,26 @@ class MemoryBackend:
         return len(self.objects[key])
 
 
+class OneStaleReadBackend(MemoryBackend):
+    def __init__(self) -> None:
+        super().__init__()
+        self.stale_after_put: dict[str, bytes] = {}
+
+    def put(self, key: str, source: Path, content_type: str) -> None:
+        previous = self.objects.get(key)
+        super().put(key, source, content_type)
+        if previous is not None:
+            self.stale_after_put[key] = previous
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        stale = self.stale_after_put.pop(key, None)
+        if stale is not None:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(stale)
+            return True
+        return super().try_get(key, destination)
+
+
 class UploadDexV20ReleaseTests(unittest.TestCase):
     def test_binding_is_loaded_from_existing_wrangler_config(self) -> None:
         bucket = upload.load_bucket_from_binding(upload.DEFAULT_WRANGLER_DIR)
@@ -147,6 +168,27 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
             self.assertIn(corrupt_key, backend.put_keys)
             for key, source in objects:
                 self.assertEqual(backend.objects[key], source.read_bytes())
+
+    def test_uploaded_object_retries_a_stale_immediate_read(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            release = make_release(root)
+            receipt = root / "receipt.json"
+            backend = OneStaleReadBackend()
+            key, _ = upload._plan_objects(release)[1][0]
+            backend.objects[key] = b"previous release bytes"
+
+            with patch.object(upload, "UPLOAD_READBACK_RETRY_DELAYS_SECONDS", (0.0, 0.0)):
+                result = upload.upload_objects(
+                    release=release,
+                    backend=backend,
+                    sample_size=32,
+                    receipt=receipt,
+                    workers=4,
+                )
+
+            self.assertEqual(result["newlyUploadedObjects"], 40)
+            self.assertEqual(result["fullyShaVerifiedObjects"], 40)
 
     def test_manifest_rejects_missing_or_wrong_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
