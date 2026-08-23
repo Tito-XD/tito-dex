@@ -13,7 +13,7 @@ on:
         default: false
         type: boolean
       publish_manifest:
-        description: Switch the root manifest after the object receipt exists (second approval)
+        description: Switch the root manifest after the verified object receipt exists
         required: true
         default: false
         type: boolean
@@ -35,7 +35,7 @@ jobs:
       V20_EXPECTED_ARCHIVE_SHA256: "e7c8e059ed9ee0a8d5e77a9a8ac0a13516f66c848597276f989d5800051530d5"
       V20_EXPECTED_ROOT_MANIFEST_SHA256: "cbefb7e1e6851e5fe1038e175be60ee310057f825d73f863899211f8be1878b1"
     steps:
-      - name: Reject an incomplete approval combination
+      - name: Reject an incomplete phase combination
         env:
           APPROVED_ROOT_SHA: ${{ inputs.approved_v19_root_manifest_sha256 }}
           UPLOAD_OBJECTS: ${{ inputs.upload_objects }}
@@ -149,7 +149,17 @@ jobs:
 
       - run: pip install -r tools/dex_bundle_requirements.txt
 
-      - name: Resume v5 objects through persistent R2 API sessions
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
+
+      - name: Install the repository-locked Wrangler runtime
+        working-directory: cloudflare/dex-cdn
+        run: npm ci
+
+      - name: Resume v5 objects with Wrangler archive verification
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -208,7 +218,7 @@ jobs:
           --approved-manifest dist/dex-v20-release/rollback/bundle-manifest-v19.json
           --approved-sha256 "$APPROVED_ROOT_SHA"
 
-      - name: Switch only the root manifest after protected approval
+      - name: Switch only the root manifest after the verified object receipt
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

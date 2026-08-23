@@ -124,6 +124,31 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
         self.assertNotIn(environment["CLOUDFLARE_API_TOKEN"], backend.base_url)
         self.assertTrue(backend._url("v5/a b?.json").endswith("/v5/a%20b%3F.json"))
 
+    def test_archive_routes_through_wrangler_backend(self) -> None:
+        environment = {
+            "CLOUDFLARE_ACCOUNT_ID": "0" * 32,
+            "CLOUDFLARE_API_TOKEN": "test-token-never-log",
+        }
+        with patch.dict(os.environ, environment, clear=False):
+            backend = upload.CloudflareApiBackend(
+                bucket="test-bucket",
+                wrangler_dir=upload.DEFAULT_WRANGLER_DIR,
+            )
+        archive_backend = MemoryBackend()
+        backend._archive_backend = archive_backend
+
+        with tempfile.TemporaryDirectory() as raw:
+            source = Path(raw) / upload.ARCHIVE_NAME
+            destination = Path(raw) / "readback.tar.zst"
+            source.write_bytes(b"frozen-archive")
+            key = f"{upload.CDN_PREFIX}/{upload.ARCHIVE_NAME}"
+
+            backend.put(key, source, "application/zstd")
+            self.assertTrue(backend.try_get(key, destination))
+
+            self.assertEqual(archive_backend.put_keys, [key])
+            self.assertEqual(destination.read_bytes(), b"frozen-archive")
+
     def test_dry_run_never_mutates_backend(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             release = make_release(Path(raw))
