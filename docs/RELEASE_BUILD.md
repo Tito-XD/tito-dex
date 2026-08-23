@@ -103,7 +103,7 @@ versionCode greater than `175`, and an even larger Offline versionCode. The
 v0.8.20 Offline build should reuse the previously verified v0.8.19 Offline
 asset through `offline_seed_apk_url` because
 the compact v14 seed is intentionally unchanged;
-Do not seed a new Offline APK from the live v19 archive unless accepting the
+Do not seed a new Offline APK from the live v20 archive unless accepting the
 larger package is an explicit release decision.
 
 The workflow analyzes and tests once, then builds the signed Lite and Offline
