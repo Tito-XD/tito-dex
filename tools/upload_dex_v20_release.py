@@ -8,6 +8,7 @@ v19 rollback manifest each require different explicit command-line approvals.
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
 import json
 import mimetypes
@@ -26,6 +27,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_WRANGLER_DIR = ROOT / "cloudflare" / "dex-cdn"
 BUCKET_BINDING = "DEX_BUCKET"
 MINIMUM_READBACK_SAMPLE = 32
+DEFAULT_UPLOAD_WORKERS = 8
+MAXIMUM_UPLOAD_WORKERS = 16
 
 
 def require(condition: bool, message: str) -> None:
@@ -134,6 +137,8 @@ class Backend(Protocol):
 
     def get(self, key: str, destination: Path) -> None: ...
 
+    def try_get(self, key: str, destination: Path) -> bool: ...
+
     def head_size(self, key: str) -> int | None: ...
 
 
@@ -156,6 +161,15 @@ class WranglerBackend:
         )
         if result.returncode != 0:
             raise RuntimeError("Wrangler R2 operation failed; sensitive output was suppressed")
+
+    def _try_run(self, args: list[str]) -> bool:
+        result = subprocess.run(
+            [*self.prefix, *args],
+            cwd=self.wrangler_dir,
+            capture_output=True,
+            text=True,
+        )
+        return result.returncode == 0
 
     def put(self, key: str, source: Path, content_type: str) -> None:
         self._run(
@@ -182,6 +196,22 @@ class WranglerBackend:
                 "--remote",
             ]
         )
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        ok = self._try_run(
+            [
+                "r2",
+                "object",
+                "get",
+                f"{self.bucket}/{key}",
+                f"--file={destination.resolve()}",
+                "--remote",
+            ]
+        )
+        if not ok:
+            destination.unlink(missing_ok=True)
+        return ok
 
     def head_size(self, key: str) -> int | None:
         return None
@@ -212,6 +242,20 @@ class S3Backend:
     def get(self, key: str, destination: Path) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         self.client.download_file(self.bucket, key, str(destination))
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        from botocore.exceptions import ClientError
+
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self.client.download_file(self.bucket, key, str(destination))
+        except ClientError as error:
+            destination.unlink(missing_ok=True)
+            code = str(error.response.get("Error", {}).get("Code") or "")
+            if code in {"404", "NoSuchKey", "NotFound"}:
+                return False
+            raise
+        return True
 
     def head_size(self, key: str) -> int | None:
         return int(self.client.head_object(Bucket=self.bucket, Key=key)["ContentLength"])
@@ -246,6 +290,13 @@ def _safe_get(backend: Backend, key: str, destination: Path) -> None:
         raise RuntimeError(f"remote object readback failed: {key}") from None
 
 
+def _safe_try_get(backend: Backend, key: str, destination: Path) -> bool:
+    try:
+        return backend.try_get(key, destination)
+    except Exception:
+        raise RuntimeError(f"remote object resume probe failed: {key}") from None
+
+
 def _safe_head_size(backend: Backend, key: str) -> int | None:
     try:
         return backend.head_size(key)
@@ -253,26 +304,68 @@ def _safe_head_size(backend: Backend, key: str) -> int | None:
         raise RuntimeError(f"remote object metadata readback failed: {key}") from None
 
 
+def _remote_object_matches(source: Path, downloaded: Path) -> bool:
+    return (
+        downloaded.is_file()
+        and downloaded.stat().st_size == source.stat().st_size
+        and sha256_file(downloaded) == sha256_file(source)
+    )
+
+
+def _resume_or_upload_object(
+    *, backend: Backend, key: str, source: Path, downloaded: Path
+) -> str:
+    if _safe_try_get(backend, key, downloaded) and _remote_object_matches(source, downloaded):
+        return "resumed"
+
+    downloaded.unlink(missing_ok=True)
+    _safe_put(backend, key, source, _content_type(source))
+    remote_size = _safe_head_size(backend, key)
+    if remote_size is not None:
+        require(remote_size == source.stat().st_size, f"R2 object size mismatch: {key}")
+
+    _safe_get(backend, key, downloaded)
+    require(_remote_object_matches(source, downloaded), f"R2 object SHA mismatch: {key}")
+    return "uploaded"
+
+
 def upload_objects(
-    *, release: Path, backend: Backend, sample_size: int, receipt: Path
+    *,
+    release: Path,
+    backend: Backend,
+    sample_size: int,
+    receipt: Path,
+    workers: int = DEFAULT_UPLOAD_WORKERS,
 ) -> dict[str, Any]:
     plan, objects = _plan_objects(release)
-    for index, (key, source) in enumerate(objects, start=1):
-        _safe_put(backend, key, source, _content_type(source))
-        remote_size = _safe_head_size(backend, key)
-        if remote_size is not None:
-            require(remote_size == source.stat().st_size, f"R2 object size mismatch: {key}")
-        if index % 100 == 0 or index == len(objects):
-            print(f"uploaded and acknowledged {index}/{len(objects)} objects", flush=True)
-
-    sample = deterministic_readback_sample(objects, sample_size)
+    require(1 <= workers <= MAXIMUM_UPLOAD_WORKERS, f"workers must be between 1 and {MAXIMUM_UPLOAD_WORKERS}")
+    resumed = 0
+    uploaded = 0
     with tempfile.TemporaryDirectory() as raw:
         temporary = Path(raw)
-        for index, (key, source) in enumerate(sample, start=1):
-            downloaded = temporary / str(index)
-            _safe_get(backend, key, downloaded)
-            require(downloaded.stat().st_size == source.stat().st_size, f"readback size mismatch: {key}")
-            require(sha256_file(downloaded) == sha256_file(source), f"readback SHA mismatch: {key}")
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = {
+                executor.submit(
+                    _resume_or_upload_object,
+                    backend=backend,
+                    key=key,
+                    source=source,
+                    downloaded=temporary / f"{index:06d}",
+                ): key
+                for index, (key, source) in enumerate(objects)
+            }
+            for completed, future in enumerate(as_completed(futures), start=1):
+                outcome = future.result()
+                resumed += outcome == "resumed"
+                uploaded += outcome == "uploaded"
+                if completed % 100 == 0 or completed == len(objects):
+                    print(
+                        f"verified {completed}/{len(objects)} objects "
+                        f"(resumed {resumed}, uploaded {uploaded})",
+                        flush=True,
+                    )
+
+    sample = deterministic_readback_sample(objects, sample_size)
 
     payload = {
         "schemaVersion": 1,
@@ -280,8 +373,12 @@ def upload_objects(
         "targetBundleVersion": TARGET_VERSION,
         "releasePlanSha256": sha256_file(release / "release-plan.json"),
         "uploadedObjects": len(objects),
-        "headVerifiedObjects": len(objects) if isinstance(backend, S3Backend) else 0,
-        "readbackVerifiedObjects": len(sample),
+        "newlyUploadedObjects": uploaded,
+        "resumedObjects": resumed,
+        "fullyShaVerifiedObjects": len(objects),
+        "headVerifiedObjects": uploaded if isinstance(backend, S3Backend) else 0,
+        "readbackVerifiedObjects": len(objects),
+        "postUploadSampleSize": len(sample),
         "readbackKeys": [key for key, _ in sample],
         "manifestUploaded": False,
     }
@@ -299,6 +396,10 @@ def _validate_receipt(release: Path, receipt: Path) -> None:
         "upload receipt belongs to a different release plan",
     )
     require(payload.get("uploadedObjects") == len(objects), "not all release objects were uploaded")
+    require(
+        payload.get("fullyShaVerifiedObjects") == len(objects),
+        "not all release objects passed full SHA readback",
+    )
     require(
         int(payload.get("readbackVerifiedObjects") or 0) >= MINIMUM_READBACK_SAMPLE,
         "upload receipt lacks the minimum direct readback sample",
@@ -380,6 +481,7 @@ def main() -> int:
     parser.add_argument("--restore-v19", action="store_true", help="Required in addition to --execute for rollback")
     parser.add_argument("--receipt", type=Path)
     parser.add_argument("--readback-sample", type=int, default=64)
+    parser.add_argument("--workers", type=int, default=DEFAULT_UPLOAD_WORKERS)
     parser.add_argument("--wrangler-dir", type=Path, default=DEFAULT_WRANGLER_DIR)
     args = parser.parse_args()
 
@@ -395,6 +497,7 @@ def main() -> int:
                 backend=backend,
                 sample_size=args.readback_sample,
                 receipt=args.receipt,
+                workers=args.workers,
             )
         elif args.phase == "manifest":
             require(args.publish_manifest, "manifest cutover requires --publish-manifest")
