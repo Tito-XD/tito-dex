@@ -199,11 +199,27 @@ class DexV20ReleaseGateTests(unittest.TestCase):
                     output=root / "release",
                     cdn_base_env="TEST_CDN",
                     published_at="2026-08-23T00:00:00+00:00",
+                    expected_archive_sha256=gate.sha256_file(archive),
                 )
             self.assertFalse((root / "release/objects/bundle-manifest.json").exists())
             self.assertTrue((root / "release/manifest/bundle-manifest.json").is_file())
             self.assertFalse((root / "release/objects/v4").exists())
             self.assertFalse(result["manifestPublished"])
+
+            with mock.patch.object(
+                gate, "verify_release_inputs", return_value={"ok": True}
+            ), mock.patch.dict(os.environ, {"TEST_CDN": "https://example.invalid"}):
+                with self.assertRaisesRegex(ValueError, "frozen release identity"):
+                    gate.prepare_release(
+                        candidate=candidate,
+                        base_root_manifest=base_root,
+                        base_archive=base_archive,
+                        base_staging=staging,
+                        output=root / "rejected-release",
+                        cdn_base_env="TEST_CDN",
+                        published_at="2026-08-23T00:00:00+00:00",
+                        expected_archive_sha256="0" * 64,
+                    )
 
 
 if __name__ == "__main__":
