@@ -145,6 +145,10 @@ secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或�
   plan 列出的 `/v5/` objects；逐对象确认上传成功，S3 路径逐对象 HEAD，所有路径再对
   archive、manifest、索引、审计文件和至少 64 个确定性样本做直接内容回读与 SHA-256
   比较，输出绑定 release-plan SHA 的 object receipt。根 manifest 此时仍不会上传。
+  上传任务支持安全断点续传：并发回读每个远端对象并比较完整 SHA-256，已匹配对象直接
+  计入 receipt，缺失或不一致对象才重新上传并立即完整回读。任务被取消或超时后可以用
+  同一份 V19 指纹重新触发，不会从头重传已确认对象；上传 job 的超时只作为 180 分钟
+  的异常兜底，不能代替逐对象校验。
 - `publish_manifest=true`：必须与前项同时显式开启，并再次通过受保护 environment。
   切换前重新读取线上根 manifest，要求它仍是完全相同的已批准 v19；只有 object
   receipt 完整时，才单独写入根 `bundle-manifest.json`，随后验证线上返回的整份文件

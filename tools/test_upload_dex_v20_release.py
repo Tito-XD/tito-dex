@@ -63,13 +63,21 @@ def make_release(root: Path, count: int = 40) -> Path:
 class MemoryBackend:
     def __init__(self) -> None:
         self.objects: dict[str, bytes] = {}
+        self.put_keys: list[str] = []
 
     def put(self, key: str, source: Path, content_type: str) -> None:
+        self.put_keys.append(key)
         self.objects[key] = source.read_bytes()
 
     def get(self, key: str, destination: Path) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(self.objects[key])
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        if key not in self.objects:
+            return False
+        self.get(key, destination)
+        return True
 
     def head_size(self, key: str) -> int | None:
         return len(self.objects[key])
@@ -101,7 +109,10 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
                 receipt=receipt,
             )
             self.assertEqual(result["uploadedObjects"], 40)
-            self.assertEqual(result["readbackVerifiedObjects"], 32)
+            self.assertEqual(result["newlyUploadedObjects"], 40)
+            self.assertEqual(result["resumedObjects"], 0)
+            self.assertEqual(result["fullyShaVerifiedObjects"], 40)
+            self.assertEqual(result["readbackVerifiedObjects"], 40)
             self.assertNotIn("bundle-manifest.json", backend.objects)
 
             cutover = upload.upload_root_manifest(
@@ -109,6 +120,33 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
             )
             self.assertTrue(cutover["manifestUploaded"])
             self.assertIn("bundle-manifest.json", backend.objects)
+
+    def test_resume_skips_matching_objects_and_replaces_corrupt_ones(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            release = make_release(root)
+            receipt = root / "receipt.json"
+            backend = MemoryBackend()
+            objects = upload._plan_objects(release)[1]
+            for key, source in objects[:10]:
+                backend.objects[key] = source.read_bytes()
+            corrupt_key, _ = objects[10]
+            backend.objects[corrupt_key] = b"corrupt"
+
+            result = upload.upload_objects(
+                release=release,
+                backend=backend,
+                sample_size=32,
+                receipt=receipt,
+                workers=4,
+            )
+
+            self.assertEqual(result["resumedObjects"], 10)
+            self.assertEqual(result["newlyUploadedObjects"], 30)
+            self.assertEqual(len(backend.put_keys), 30)
+            self.assertIn(corrupt_key, backend.put_keys)
+            for key, source in objects:
+                self.assertEqual(backend.objects[key], source.read_bytes())
 
     def test_manifest_rejects_missing_or_wrong_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -125,6 +163,26 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
                 },
             )
             with self.assertRaisesRegex(ValueError, "different release plan"):
+                upload.upload_root_manifest(
+                    release=release, receipt=receipt, backend=MemoryBackend()
+                )
+
+    def test_manifest_rejects_incomplete_full_sha_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            release = make_release(root)
+            receipt = root / "receipt.json"
+            write_json(
+                receipt,
+                {
+                    "targetBundleVersion": 20,
+                    "releasePlanSha256": upload.sha256_file(release / "release-plan.json"),
+                    "uploadedObjects": 40,
+                    "fullyShaVerifiedObjects": 39,
+                    "readbackVerifiedObjects": 39,
+                },
+            )
+            with self.assertRaisesRegex(ValueError, "full SHA readback"):
                 upload.upload_root_manifest(
                     release=release, receipt=receipt, backend=MemoryBackend()
                 )

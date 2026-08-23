@@ -128,7 +128,7 @@ jobs:
     if: inputs.upload_objects
     needs: build-and-verify
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     environment: dex-production
     steps:
       - uses: actions/checkout@v6
@@ -165,6 +165,7 @@ jobs:
         run: >-
           python3 tools/upload_dex_v20_release.py dist/dex-v20-release
           --phase objects --execute
+          --workers 8
           --readback-sample 64
           --receipt dist/dex-v20-upload-receipt.json
 
