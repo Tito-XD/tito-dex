@@ -6,7 +6,7 @@ import json
 import os
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from pathlib import Path
 
 import upload_dex_v20_release as upload
@@ -138,6 +138,81 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
         self.assertIsInstance(backend, upload.CloudflareApiBackend)
         self.assertNotIn(environment["CLOUDFLARE_API_TOKEN"], backend.base_url)
         self.assertTrue(backend._url("v5/a b?.json").endswith("/v5/a%20b%3F.json"))
+
+    def test_cloudflare_api_gate_spaces_requests_and_shares_cooldowns(self) -> None:
+        clock = [100.0]
+        sleeps: list[float] = []
+
+        def fake_sleep(seconds: float) -> None:
+            sleeps.append(seconds)
+            clock[0] += seconds
+
+        with (
+            patch.object(upload.time, "monotonic", side_effect=lambda: clock[0]),
+            patch.object(upload.time, "sleep", side_effect=fake_sleep),
+        ):
+            gate = upload.CloudflareApiRateGate(interval_seconds=0.32)
+            gate.wait()
+            gate.wait()
+            gate.defer(5.0)
+            gate.wait()
+
+        self.assertEqual(len(sleeps), 2)
+        self.assertAlmostEqual(sleeps[0], 0.32)
+        self.assertAlmostEqual(sleeps[1], 5.0)
+        self.assertLessEqual(
+            300.0 / upload.CLOUDFLARE_API_REQUEST_INTERVAL_SECONDS,
+            1000.0,
+        )
+
+    def test_cloudflare_429_defers_every_worker_without_logging_response(self) -> None:
+        environment = {
+            "CLOUDFLARE_ACCOUNT_ID": "0" * 32,
+            "CLOUDFLARE_API_TOKEN": "test-token-never-log",
+        }
+        with patch.dict(os.environ, environment, clear=False):
+            backend = upload.CloudflareApiBackend(
+                bucket="test-bucket",
+                wrangler_dir=upload.DEFAULT_WRANGLER_DIR,
+            )
+        gate = Mock()
+        backend._rate_gate = gate
+        response = Mock(status_code=429, headers={"Retry-After": "17"})
+
+        with self.assertRaisesRegex(RuntimeError, "HTTP 429"):
+            backend._require_success(response, "readback")
+
+        gate.defer.assert_called_once_with(17.0)
+
+    def test_idempotent_put_and_mandatory_get_retry_transient_failures(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            source = root / "source.json"
+            destination = root / "readback.json"
+            source.write_bytes(b"frozen bytes")
+            backend = Mock()
+            backend.put.side_effect = [TimeoutError(), None]
+            get_attempts = 0
+
+            def flaky_get(key: str, path: Path) -> None:
+                nonlocal get_attempts
+                get_attempts += 1
+                path.write_bytes(b"partial bytes")
+                if get_attempts == 1:
+                    raise TimeoutError()
+                path.write_bytes(b"frozen bytes")
+
+            backend.get.side_effect = flaky_get
+            with (
+                patch.object(upload, "REMOTE_WRITE_RETRY_DELAYS_SECONDS", (0.0, 0.0)),
+                patch.object(upload, "REMOTE_READ_RETRY_DELAYS_SECONDS", (0.0, 0.0)),
+            ):
+                upload._safe_put(backend, "v5/data.json", source, "application/json")
+                upload._safe_get(backend, "v5/data.json", destination)
+
+            self.assertEqual(backend.put.call_count, 2)
+            self.assertEqual(backend.get.call_count, 2)
+            self.assertEqual(destination.read_bytes(), b"frozen bytes")
 
     def test_archive_routes_through_wrangler_backend(self) -> None:
         environment = {

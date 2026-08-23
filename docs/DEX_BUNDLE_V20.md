@@ -155,6 +155,11 @@ secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或�
   普通 loose objects 在单个 Python 进程中为各并发 worker 复用持久 HTTPS 会话；冻结的
   bundle-v20.tar.zst 则始终通过仓库锁定的 Wrangler 实现上传与回读，避免通用 HTTP
   客户端改变大对象的字节语义。不新增凭据，也不降低任何对象的完整 SHA-256 核验要求。
+  Cloudflare 账号 REST API 的 1,200 次／5 分钟额度是跨线程累计的；上传器把普通对象的
+  请求起始速率限制在 1,000 次／5 分钟以内，并为 Wrangler、manifest 与控制面调用保留
+  余量。收到 `429` 时所有 worker 共享 `Retry-After` 冷却，幂等 PUT、强制 GET 与 resume
+  probe 均有限重试但仍须通过完整 SHA。完整断点核验通常需约 25–30 分钟；不能以取消、
+  降低校验数量或并发撞限来代替等待。
 - `publish_manifest=true`：必须与前项同时显式开启，并再次通过受保护 environment。
   切换前重新读取线上根 manifest，要求它仍是完全相同的已批准 v19；只有 object
   receipt 完整时，才单独写入根 `bundle-manifest.json`，随后验证线上返回的整份文件
