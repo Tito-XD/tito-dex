@@ -151,17 +151,7 @@ jobs:
 
       - run: pip install -r tools/dex_bundle_requirements.txt
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
-
-      - name: Install the existing Wrangler runtime
-        working-directory: cloudflare/dex-cdn
-        run: npm ci
-
-      - name: Upload v5 objects and perform deterministic direct readback
+      - name: Resume v5 objects through persistent R2 API sessions
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -211,15 +201,6 @@ jobs:
           cache-dependency-path: tools/dex_bundle_requirements.txt
 
       - run: pip install -r tools/dex_bundle_requirements.txt
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: cloudflare/dex-cdn/package-lock.json
-
-      - working-directory: cloudflare/dex-cdn
-        run: npm ci
 
       - name: Reconfirm exact v19 production root immediately before cutover
         env:
