@@ -42,6 +42,7 @@ MINIMUM_READBACK_SAMPLE = 32
 DEFAULT_UPLOAD_WORKERS = 8
 MAXIMUM_UPLOAD_WORKERS = 16
 UPLOAD_READBACK_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
+REMOTE_READ_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
 
 
 def require(condition: bool, message: str) -> None:
@@ -408,10 +409,21 @@ def _safe_get(backend: Backend, key: str, destination: Path) -> None:
 
 
 def _safe_try_get(backend: Backend, key: str, destination: Path) -> bool:
-    try:
-        return backend.try_get(key, destination)
-    except Exception:
-        raise RuntimeError(f"remote object resume probe failed: {key}") from None
+    for delay in REMOTE_READ_RETRY_DELAYS_SECONDS:
+        if delay:
+            time.sleep(delay)
+        destination.unlink(missing_ok=True)
+        try:
+            exists = backend.try_get(key, destination)
+            if not exists:
+                destination.unlink(missing_ok=True)
+            return exists
+        except Exception:
+            # R2 can transiently reject one of thousands of concurrent resume
+            # probes. Retry the read itself, but never treat a failed probe as
+            # a match and never weaken the eventual full SHA comparison.
+            destination.unlink(missing_ok=True)
+    raise RuntimeError(f"remote object resume probe failed: {key}") from None
 
 
 def _safe_head_size(backend: Backend, key: str) -> int | None:
