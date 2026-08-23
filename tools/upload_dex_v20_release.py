@@ -17,9 +17,13 @@ import re
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import quote
+
+import requests
 
 from dex_v20_release_gate import BASE_VERSION, CDN_PREFIX, TARGET_VERSION, read_json, sha256_file
 
@@ -219,6 +223,86 @@ class WranglerBackend:
         return None
 
 
+class CloudflareApiBackend:
+    """Use Cloudflare's R2 object API with one persistent session per worker."""
+
+    def __init__(self, *, bucket: str) -> None:
+        account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
+        api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
+        require(bool(account_id), "CLOUDFLARE_ACCOUNT_ID is required for the R2 object API")
+        require(bool(api_token), "CLOUDFLARE_API_TOKEN is required for the R2 object API")
+        self.base_url = (
+            "https://api.cloudflare.com/client/v4/accounts/"
+            f"{quote(account_id, safe='')}/r2/buckets/{quote(bucket, safe='')}/objects"
+        )
+        self._api_token = api_token
+        self._local = threading.local()
+
+    def _session(self) -> requests.Session:
+        session = getattr(self._local, "session", None)
+        if session is None:
+            session = requests.Session()
+            session.headers.update(
+                {
+                    "Authorization": f"Bearer {self._api_token}",
+                    "User-Agent": "titodex-dex-v20-release/1",
+                }
+            )
+            self._local.session = session
+        return session
+
+    def _url(self, key: str) -> str:
+        return f"{self.base_url}/{quote(key, safe='/')}"
+
+    @staticmethod
+    def _require_success(response: requests.Response, operation: str) -> None:
+        if not 200 <= response.status_code < 300:
+            raise RuntimeError(
+                f"Cloudflare R2 {operation} failed with HTTP {response.status_code}"
+            )
+
+    def put(self, key: str, source: Path, content_type: str) -> None:
+        with source.open("rb") as stream:
+            response = self._session().put(
+                self._url(key),
+                data=stream,
+                headers={
+                    "Content-Type": content_type,
+                    "Content-Length": str(source.stat().st_size),
+                    "cf-r2-data-catalog-check": "true",
+                },
+                timeout=(15, 600),
+            )
+        try:
+            self._require_success(response, "upload")
+        finally:
+            response.close()
+
+    def _download(self, key: str, destination: Path, *, missing_ok: bool) -> bool:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with self._session().get(
+            self._url(key), stream=True, timeout=(15, 300)
+        ) as response:
+            if response.status_code == 404 and missing_ok:
+                destination.unlink(missing_ok=True)
+                return False
+            self._require_success(response, "readback")
+            with destination.open("wb") as stream:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        stream.write(chunk)
+        return True
+
+    def get(self, key: str, destination: Path) -> None:
+        self._download(key, destination, missing_ok=False)
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        return self._download(key, destination, missing_ok=True)
+
+    def head_size(self, key: str) -> int | None:
+        return None
+
+
 class S3Backend:
     def __init__(self, *, bucket: str) -> None:
         import boto3
@@ -271,7 +355,7 @@ def build_backend(*, wrangler_dir: Path) -> Backend:
         bool(os.environ.get("CLOUDFLARE_API_TOKEN")),
         "CLOUDFLARE_API_TOKEN or R2 access keys are required for execution",
     )
-    return WranglerBackend(wrangler_dir=wrangler_dir, bucket=bucket)
+    return CloudflareApiBackend(bucket=bucket)
 
 
 def _content_type(path: Path) -> str:

@@ -151,6 +151,9 @@ secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或�
   的异常兜底，不能代替逐对象校验。同一源码提交的候选时间戳固定为提交时间，因此重跑
   会生成逐字节相同的 archive；大对象覆盖后若第一次回读仍短暂看到旧字节，上传器会以
   有界退避重试完整 SHA-256，最终不一致仍会拒绝发布。
+  使用仓库 API Token 时，它通过与 Wrangler 相同的 Cloudflare R2 对象 API 工作，但在
+  单个 Python 进程中为各并发 worker 复用持久 HTTPS 会话；不新增凭据，也不降低完整
+  SHA-256 核验要求。
 - `publish_manifest=true`：必须与前项同时显式开启，并再次通过受保护 environment。
   切换前重新读取线上根 manifest，要求它仍是完全相同的已批准 v19；只有 object
   receipt 完整时，才单独写入根 `bundle-manifest.json`，随后验证线上返回的整份文件

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -108,6 +109,20 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
     def test_binding_is_loaded_from_existing_wrangler_config(self) -> None:
         bucket = upload.load_bucket_from_binding(upload.DEFAULT_WRANGLER_DIR)
         self.assertTrue(bucket)
+
+    def test_api_token_uses_persistent_cloudflare_object_backend(self) -> None:
+        environment = {
+            "CLOUDFLARE_ACCOUNT_ID": "0" * 32,
+            "CLOUDFLARE_API_TOKEN": "test-token-never-log",
+            "R2_ACCESS_KEY_ID": "",
+            "R2_SECRET_ACCESS_KEY": "",
+        }
+        with patch.dict(os.environ, environment, clear=False):
+            backend = upload.build_backend(wrangler_dir=upload.DEFAULT_WRANGLER_DIR)
+
+        self.assertIsInstance(backend, upload.CloudflareApiBackend)
+        self.assertNotIn(environment["CLOUDFLARE_API_TOKEN"], backend.base_url)
+        self.assertTrue(backend._url("v5/a b?.json").endswith("/v5/a%20b%3F.json"))
 
     def test_dry_run_never_mutates_backend(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
