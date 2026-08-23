@@ -43,6 +43,12 @@ DEFAULT_UPLOAD_WORKERS = 8
 MAXIMUM_UPLOAD_WORKERS = 16
 UPLOAD_READBACK_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
 REMOTE_READ_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
+REMOTE_WRITE_RETRY_DELAYS_SECONDS = (0.0, 2.0, 5.0, 10.0, 20.0, 30.0)
+# Cloudflare's account API allows 1,200 calls per five minutes cumulatively.
+# Stay below 1,000 calls per five minutes so the manifest job and occasional
+# dashboard/API activity retain headroom.
+CLOUDFLARE_API_REQUEST_INTERVAL_SECONDS = 0.32
+CLOUDFLARE_API_DEFAULT_RETRY_AFTER_SECONDS = 300.0
 
 
 def require(condition: bool, message: str) -> None:
@@ -156,6 +162,34 @@ class Backend(Protocol):
     def head_size(self, key: str) -> int | None: ...
 
 
+class CloudflareApiRateGate:
+    """Serialize account API starts and share a server-requested cooldown."""
+
+    def __init__(self, interval_seconds: float) -> None:
+        self.interval_seconds = interval_seconds
+        self._lock = threading.Lock()
+        self._next_request_at = 0.0
+        self._blocked_until = 0.0
+
+    def wait(self) -> None:
+        while True:
+            with self._lock:
+                now = time.monotonic()
+                earliest = max(self._next_request_at, self._blocked_until)
+                if now >= earliest:
+                    self._next_request_at = now + self.interval_seconds
+                    return
+                delay = earliest - now
+            time.sleep(delay)
+
+    def defer(self, seconds: float) -> None:
+        with self._lock:
+            self._blocked_until = max(
+                self._blocked_until,
+                time.monotonic() + max(0.0, seconds),
+            )
+
+
 class WranglerBackend:
     def __init__(self, *, wrangler_dir: Path, bucket: str) -> None:
         self.wrangler_dir = wrangler_dir
@@ -248,6 +282,9 @@ class CloudflareApiBackend:
         self._bucket = bucket
         self._wrangler_dir = wrangler_dir
         self._archive_backend: Backend | None = None
+        self._rate_gate = CloudflareApiRateGate(
+            CLOUDFLARE_API_REQUEST_INTERVAL_SECONDS
+        )
 
     def _session(self) -> requests.Session:
         session = getattr(self._local, "session", None)
@@ -278,8 +315,14 @@ class CloudflareApiBackend:
             self._archive_backend = backend
         return backend
 
-    @staticmethod
-    def _require_success(response: requests.Response, operation: str) -> None:
+    def _require_success(self, response: requests.Response, operation: str) -> None:
+        if response.status_code == 429:
+            value = str(response.headers.get("Retry-After") or "").strip()
+            try:
+                retry_after = float(value)
+            except ValueError:
+                retry_after = CLOUDFLARE_API_DEFAULT_RETRY_AFTER_SECONDS
+            self._rate_gate.defer(retry_after)
         if not 200 <= response.status_code < 300:
             raise RuntimeError(
                 f"Cloudflare R2 {operation} failed with HTTP {response.status_code}"
@@ -290,6 +333,7 @@ class CloudflareApiBackend:
             self._wrangler().put(key, source, content_type)
             return
         with source.open("rb") as stream:
+            self._rate_gate.wait()
             response = self._session().put(
                 self._url(key),
                 data=stream,
@@ -307,6 +351,7 @@ class CloudflareApiBackend:
 
     def _download(self, key: str, destination: Path, *, missing_ok: bool) -> bool:
         destination.parent.mkdir(parents=True, exist_ok=True)
+        self._rate_gate.wait()
         with self._session().get(
             self._url(key), stream=True, timeout=(15, 300)
         ) as response:
@@ -395,17 +440,30 @@ def _content_type(path: Path) -> str:
 
 
 def _safe_put(backend: Backend, key: str, source: Path, content_type: str) -> None:
-    try:
-        backend.put(key, source, content_type)
-    except Exception:
-        raise RuntimeError(f"remote object upload failed: {key}") from None
+    for delay in REMOTE_WRITE_RETRY_DELAYS_SECONDS:
+        if delay:
+            time.sleep(delay)
+        try:
+            backend.put(key, source, content_type)
+            return
+        except Exception:
+            # PUT is idempotent here: every retry uses the same frozen key and
+            # bytes. A shared 429 cooldown is enforced inside the API backend.
+            pass
+    raise RuntimeError(f"remote object upload failed: {key}") from None
 
 
 def _safe_get(backend: Backend, key: str, destination: Path) -> None:
-    try:
-        backend.get(key, destination)
-    except Exception:
-        raise RuntimeError(f"remote object readback failed: {key}") from None
+    for delay in REMOTE_READ_RETRY_DELAYS_SECONDS:
+        if delay:
+            time.sleep(delay)
+        destination.unlink(missing_ok=True)
+        try:
+            backend.get(key, destination)
+            return
+        except Exception:
+            destination.unlink(missing_ok=True)
+    raise RuntimeError(f"remote object readback failed: {key}") from None
 
 
 def _safe_try_get(backend: Backend, key: str, destination: Path) -> bool:
