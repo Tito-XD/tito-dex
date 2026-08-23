@@ -105,6 +105,21 @@ class OneStaleReadBackend(MemoryBackend):
         return super().try_get(key, destination)
 
 
+class TransientReadBackend(MemoryBackend):
+    def __init__(self, failures: int) -> None:
+        super().__init__()
+        self.failures = failures
+        self.try_get_calls = 0
+
+    def try_get(self, key: str, destination: Path) -> bool:
+        self.try_get_calls += 1
+        if self.try_get_calls <= self.failures:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(b"partial transient response")
+            raise RuntimeError("simulated transient read failure")
+        return super().try_get(key, destination)
+
+
 class UploadDexV20ReleaseTests(unittest.TestCase):
     def test_binding_is_loaded_from_existing_wrangler_config(self) -> None:
         bucket = upload.load_bucket_from_binding(upload.DEFAULT_WRANGLER_DIR)
@@ -229,6 +244,53 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
 
             self.assertEqual(result["newlyUploadedObjects"], 40)
             self.assertEqual(result["fullyShaVerifiedObjects"], 40)
+
+    def test_resume_retries_transient_reads_without_weakening_sha_check(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            release = make_release(root)
+            key, source = upload._plan_objects(release)[1][0]
+            destination = root / "readback.json"
+            backend = TransientReadBackend(failures=2)
+            backend.objects[key] = source.read_bytes()
+
+            with patch.object(upload, "REMOTE_READ_RETRY_DELAYS_SECONDS", (0.0, 0.0, 0.0)):
+                outcome = upload._resume_or_upload_object(
+                    backend=backend,
+                    key=key,
+                    source=source,
+                    downloaded=destination,
+                )
+
+            self.assertEqual(outcome, "resumed")
+            self.assertEqual(backend.try_get_calls, 3)
+            self.assertEqual(backend.put_keys, [])
+            self.assertEqual(destination.read_bytes(), source.read_bytes())
+
+    def test_resume_fails_closed_after_all_transient_read_retries(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            destination = Path(raw) / "partial.json"
+            backend = TransientReadBackend(failures=2)
+
+            with patch.object(upload, "REMOTE_READ_RETRY_DELAYS_SECONDS", (0.0, 0.0)):
+                with self.assertRaisesRegex(RuntimeError, "resume probe failed"):
+                    upload._safe_try_get(backend, "v5/data/000.json", destination)
+
+            self.assertEqual(backend.try_get_calls, 2)
+            self.assertFalse(destination.exists())
+
+    def test_missing_object_probe_returns_without_retrying(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            destination = Path(raw) / "missing.json"
+            backend = TransientReadBackend(failures=0)
+
+            with patch.object(upload, "REMOTE_READ_RETRY_DELAYS_SECONDS", (0.0, 0.0, 0.0)):
+                self.assertFalse(
+                    upload._safe_try_get(backend, "v5/data/missing.json", destination)
+                )
+
+            self.assertEqual(backend.try_get_calls, 1)
+            self.assertFalse(destination.exists())
 
     def test_manifest_rejects_missing_or_wrong_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
