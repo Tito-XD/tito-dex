@@ -25,7 +25,14 @@ from urllib.parse import quote
 
 import requests
 
-from dex_v20_release_gate import BASE_VERSION, CDN_PREFIX, TARGET_VERSION, read_json, sha256_file
+from dex_v20_release_gate import (
+    ARCHIVE_NAME,
+    BASE_VERSION,
+    CDN_PREFIX,
+    TARGET_VERSION,
+    read_json,
+    sha256_file,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -226,7 +233,7 @@ class WranglerBackend:
 class CloudflareApiBackend:
     """Use Cloudflare's R2 object API with one persistent session per worker."""
 
-    def __init__(self, *, bucket: str) -> None:
+    def __init__(self, *, bucket: str, wrangler_dir: Path) -> None:
         account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
         api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
         require(bool(account_id), "CLOUDFLARE_ACCOUNT_ID is required for the R2 object API")
@@ -237,6 +244,9 @@ class CloudflareApiBackend:
         )
         self._api_token = api_token
         self._local = threading.local()
+        self._bucket = bucket
+        self._wrangler_dir = wrangler_dir
+        self._archive_backend: Backend | None = None
 
     def _session(self) -> requests.Session:
         session = getattr(self._local, "session", None)
@@ -255,6 +265,19 @@ class CloudflareApiBackend:
         return f"{self.base_url}/{quote(key, safe='/')}"
 
     @staticmethod
+    def _uses_wrangler(key: str) -> bool:
+        return key == f"{CDN_PREFIX}/{ARCHIVE_NAME}"
+
+    def _wrangler(self) -> Backend:
+        backend = self._archive_backend
+        if backend is None:
+            backend = WranglerBackend(
+                wrangler_dir=self._wrangler_dir, bucket=self._bucket
+            )
+            self._archive_backend = backend
+        return backend
+
+    @staticmethod
     def _require_success(response: requests.Response, operation: str) -> None:
         if not 200 <= response.status_code < 300:
             raise RuntimeError(
@@ -262,6 +285,9 @@ class CloudflareApiBackend:
             )
 
     def put(self, key: str, source: Path, content_type: str) -> None:
+        if self._uses_wrangler(key):
+            self._wrangler().put(key, source, content_type)
+            return
         with source.open("rb") as stream:
             response = self._session().put(
                 self._url(key),
@@ -294,9 +320,14 @@ class CloudflareApiBackend:
         return True
 
     def get(self, key: str, destination: Path) -> None:
+        if self._uses_wrangler(key):
+            self._wrangler().get(key, destination)
+            return
         self._download(key, destination, missing_ok=False)
 
     def try_get(self, key: str, destination: Path) -> bool:
+        if self._uses_wrangler(key):
+            return self._wrangler().try_get(key, destination)
         return self._download(key, destination, missing_ok=True)
 
     def head_size(self, key: str) -> int | None:
@@ -355,7 +386,7 @@ def build_backend(*, wrangler_dir: Path) -> Backend:
         bool(os.environ.get("CLOUDFLARE_API_TOKEN")),
         "CLOUDFLARE_API_TOKEN or R2 access keys are required for execution",
     )
-    return CloudflareApiBackend(bucket=bucket)
+    return CloudflareApiBackend(bucket=bucket, wrangler_dir=wrangler_dir)
 
 
 def _content_type(path: Path) -> str:

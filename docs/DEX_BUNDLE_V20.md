@@ -139,7 +139,7 @@ shasum -a 256 "$TITODEX_V19_MANIFEST"
 bucket 从 `cloudflare/dex-cdn/wrangler.toml` 的既有 `DEX_BUCKET` binding 解析。任何
 secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或命令输出。
 
-发布分成两个独立批准动作：
+发布分成两个串行保护阶段；环境保留分支策略，但不再设置人工 reviewer gate：
 
 - `upload_objects=true`：进入受保护的 `dex-production` environment，只上传 release
   plan 列出的 `/v5/` objects；逐对象确认上传成功，S3 路径逐对象 HEAD，所有路径再对
@@ -152,9 +152,9 @@ secret、Account ID、生产地址或 bucket URL 都不写入源码、文档或�
   前强制匹配已审核的 generatedAt、archive SHA 与根 manifest SHA；只修改发布流程不会
   再改变候选字节。大对象覆盖后若第一次回读仍短暂看到旧字节，上传器会以
   有界退避重试完整 SHA-256，最终不一致仍会拒绝发布。
-  使用仓库 API Token 时，它通过与 Wrangler 相同的 Cloudflare R2 对象 API 工作，但在
-  单个 Python 进程中为各并发 worker 复用持久 HTTPS 会话；不新增凭据，也不降低完整
-  SHA-256 核验要求。
+  普通 loose objects 在单个 Python 进程中为各并发 worker 复用持久 HTTPS 会话；冻结的
+  bundle-v20.tar.zst 则始终通过仓库锁定的 Wrangler 实现上传与回读，避免通用 HTTP
+  客户端改变大对象的字节语义。不新增凭据，也不降低任何对象的完整 SHA-256 核验要求。
 - `publish_manifest=true`：必须与前项同时显式开启，并再次通过受保护 environment。
   切换前重新读取线上根 manifest，要求它仍是完全相同的已批准 v19；只有 object
   receipt 完整时，才单独写入根 `bundle-manifest.json`，随后验证线上返回的整份文件
