@@ -263,6 +263,8 @@ def prepare_release(
     output: Path,
     cdn_base_env: str,
     published_at: str | None,
+    expected_archive_sha256: str | None = None,
+    expected_root_manifest_sha256: str | None = None,
 ) -> dict[str, Any]:
     verification = verify_release_inputs(
         candidate=candidate,
@@ -294,8 +296,14 @@ def prepare_release(
     require(pending.get("baseBundleVersion") == BASE_VERSION, "pending manifest lacks v19 lineage")
     archive = objects_root / CDN_PREFIX / ARCHIVE_NAME
     require(archive.is_file(), "v20 archive is absent from the immutable-object stage")
-    require(sha256_file(archive) == pending.get("archiveSha256"), "v20 archive SHA mismatch")
+    archive_sha256 = sha256_file(archive)
+    require(archive_sha256 == pending.get("archiveSha256"), "v20 archive SHA mismatch")
     require(archive.stat().st_size == pending.get("archiveSizeBytes"), "v20 archive size mismatch")
+    if expected_archive_sha256 is not None:
+        require(
+            archive_sha256 == expected_archive_sha256,
+            "v20 archive differs from the frozen release identity",
+        )
 
     production_base = _production_base(cdn_base_env)
     manifest = dict(pending)
@@ -332,6 +340,11 @@ def prepare_release(
         "v4Touched": False,
         "verifiers": ["foundation", "reference", "gameplay"],
     }
+    if expected_root_manifest_sha256 is not None:
+        require(
+            plan["targetRootManifestSha256"] == expected_root_manifest_sha256,
+            "v20 root manifest differs from the frozen release identity",
+        )
     write_json(output / "release-plan.json", plan)
     return {
         "baseBundleVersion": BASE_VERSION,
@@ -429,7 +442,9 @@ def main() -> int:
     prepare.add_argument("--base-staging", type=Path, required=True)
     prepare.add_argument("--output", type=Path, required=True)
     prepare.add_argument("--cdn-base-env", default="TITODEX_DEX_CDN_BASE")
-    prepare.add_argument("--published-at")
+    prepare.add_argument("--published-at", required=True)
+    prepare.add_argument("--expected-archive-sha256", required=True)
+    prepare.add_argument("--expected-root-manifest-sha256", required=True)
 
     live = subparsers.add_parser("assert-live-base")
     live.add_argument("--approved-manifest", type=Path, required=True)
@@ -465,6 +480,8 @@ def main() -> int:
             output=args.output,
             cdn_base_env=args.cdn_base_env,
             published_at=args.published_at,
+            expected_archive_sha256=args.expected_archive_sha256,
+            expected_root_manifest_sha256=args.expected_root_manifest_sha256,
         )
     elif args.command == "assert-live-base":
         result = assert_live_base(
