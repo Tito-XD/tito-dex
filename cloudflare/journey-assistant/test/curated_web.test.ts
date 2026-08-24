@@ -5,6 +5,7 @@ import {
   sanitizeUnsupportedBroadClaims,
   type CuratedWebModelRunner,
 } from '../src/curated_web';
+import { generatedAnswerGuardFailure } from '../src/answer_quality_guards';
 import type { AssistantRequest } from '../src/contract';
 
 const request: AssistantRequest = {
@@ -33,6 +34,12 @@ function json(value: unknown, status = 200): Response {
 }
 
 describe('curated key-free web research', () => {
+  it('preserves Markdown list boundaries while filtering broad claims', () => {
+    const answer = '- 波导弹：用于稳定输出。\n- 剑舞：用于强化后推进。';
+    expect(sanitizeUnsupportedBroadClaims(answer, '路卡利欧配招推荐', []))
+      .toBe(answer);
+  });
+
   it('removes unsupported matchup, high-stat, and tank claims using Dex facts', () => {
     const answer = '太阳伊布的特攻和速度很高。尤其在面对幽灵、恶和虫系宝可梦时有优势。它拥有很高的防御，是坦克。';
     const sources = [{
@@ -801,5 +808,475 @@ describe('curated key-free web research', () => {
       'www.wikidata.org',
     ]));
     expect(hosts).not.toContain('example.com');
+  });
+});
+describe('generated answer quality guards', () => {
+  const moveNames = [
+    '剑舞',
+    '近身战',
+    '神速',
+    '冰冻拳',
+    '雷电拳',
+    '子弹拳',
+    '咬碎',
+  ];
+
+  it('rejects more than six move candidates only for advice intents', () => {
+    const sevenMoves = moveNames.map((move) => `- ${move}：候选用途`).join('\n');
+
+    expect(generatedAnswerGuardFailure({
+      answer: sevenMoves,
+      question: '路卡利欧配招推荐',
+      knownMoveNames: moveNames,
+    })).toBe('excessive_move_candidates');
+    expect(generatedAnswerGuardFailure({
+      answer: moveNames.slice(0, 6).join('、'),
+      question: '路卡利欧适合怎么培养？',
+      knownMoveNames: moveNames,
+    })).toBeNull();
+    expect(generatedAnswerGuardFailure({
+      answer: sevenMoves,
+      question: '请列出资料中出现过的招式名称',
+      knownMoveNames: moveNames,
+    })).toBeNull();
+  });
+
+  it('rejects opposite-edition facts unless the user asks for them or a comparison', () => {
+    expect(generatedAnswerGuardFailure({
+      answer: '在橘子学院推进剧情后，可以遇到故勒顿。',
+      question: '紫里前期先做什么？',
+      game: 'violet',
+    })).toBe('selected_game_conflict');
+    expect(generatedAnswerGuardFailure({
+      answer: '在葡萄学院推进剧情后，会继续密勒顿的故事。',
+      question: '朱里前期先做什么？',
+      game: 'scarlet',
+    })).toBe('selected_game_conflict');
+    expect(generatedAnswerGuardFailure({
+      answer: '《朱》对应橘子学院，《紫》对应葡萄学院。',
+      question: '朱紫两个版本的学院有什么区别？',
+      game: 'violet',
+    })).toBeNull();
+    expect(generatedAnswerGuardFailure({
+      answer: '故勒顿是《朱》的封面传说宝可梦。',
+      question: '故勒顿在紫里能抓吗？',
+      game: 'violet',
+    })).toBeNull();
+  });
+
+  it('rejects internal source IDs and fields instead of rewriting them', () => {
+    for (const answer of [
+      '依据 tavily-52poke-1，这个地点可以捕捉。',
+      '结构化事实来自 dex-bundle-v20。',
+      '来源是 TitoDex Dex bundle v20。',
+      'versionScope.exactGame 显示当前版本可用。',
+      'usedSourceIds 包含 pokeapi-move-14。',
+    ]) {
+      expect(generatedAnswerGuardFailure({
+        answer,
+        question: '这个说法可靠吗？',
+      })).toBe('internal_source_reference');
+    }
+  });
+
+  it('does not ask a model for move advice without a selected-game moveSet', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      if (phase === 'curated-web-scope') {
+        return {
+          allowed: true,
+          queryZh: '路卡利欧 配招 推荐',
+          queryEn: 'Lucario moveset recommendation',
+          pokeApiKind: 'pokemon-species',
+          pokeApiSlug: '448',
+        };
+      }
+      if (phase === 'curated-web-compose') {
+        expect(messages[0].content).toContain('最多选择 6 个');
+        expect(messages[0].content).toContain('不得出现《朱》专属');
+        expect(messages[0].content).toContain('内部来源标识');
+        return {
+          supported: true,
+          answer: moveNames.map((move) => `- ${move}：候选用途`).join('\n'),
+          usedSourceIds: ['guide-1'],
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async () => json({}, 503));
+
+    const result = await researchCuratedWeb(
+      {
+        ...request,
+        question: '路卡利欧配招推荐',
+        context: {
+          ...request.context,
+          game: 'violet',
+          generation: 9,
+        },
+      },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        localSources: [{
+          id: 'guide-1',
+          title: '白名单攻略',
+          url: 'https://pokemondb.net/pokedex/lucario',
+          text: '攻略列出候选招式，但没有要求复制完整招式表。',
+        }],
+      },
+    );
+
+    expect(result).toBeNull();
+    expect(phases).toEqual([]);
+    expect(phases).not.toContain('curated-web-verify');
+  });
+
+  it('composes move advice as bounded current-game choices before Markdown', async () => {
+    const phases: string[] = [];
+    const expectedAnswer = [
+      '- 波导弹：用于稳定输出，适合希望直接进攻时选择。',
+      '- 剑舞：用于强化后推进，适合物攻路线。',
+    ].join('\n');
+    const runModel: CuratedWebModelRunner = async (phase, messages, schema) => {
+      phases.push(phase);
+      if (phase === 'curated-web-move-compose') {
+        expect(messages[0].content).toContain('name 必须原样取自 allowedMoveNames');
+        expect(messages[0].content).toContain('不得写属性');
+        expect(JSON.stringify(schema)).toContain('波导弹');
+        return {
+          supported: true,
+          moves: [
+            { name: '波导弹', rationale: '用于稳定输出，适合希望直接进攻时选择。' },
+            { name: '剑舞', rationale: '用于强化后推进，适合物攻路线。' },
+          ],
+          usedSourceIds: ['tavily-52poke-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        const prompt = messages.map((message) => message.content).join('\n');
+        expect(prompt).toContain('每项必须继续单独写成');
+        expect(prompt).toContain('波导弹');
+        expect(prompt).toContain('剑舞');
+        return { supported: true, answer: expectedAnswer };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      return json({
+        results: [{
+          title: '朱紫 路卡利欧推荐配招 - 神奇宝贝百科',
+          url: 'https://wiki.52poke.com/wiki/%E8%B7%AF%E5%8D%A1%E5%88%A9%E6%AC%A7',
+          content: '推荐招式包括波导弹、剑舞；攻略资料讨论波导弹用于稳定输出，并给出剑舞强化路线。',
+          score: 0.95,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      {
+        ...request,
+        question: '紫里路卡利欧适合学哪些招式？',
+        context: { ...request.context, game: 'violet', generation: 9 },
+      },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        tavilyApiKey: 'x'.repeat(32),
+        localSources: [{
+          id: 'dex-bundle-v20',
+          title: 'TitoDex Dex bundle v20 · 结构化事实',
+          text: JSON.stringify({
+            species: {
+              moveSet: {
+                levelUp: [],
+                machine: [
+                  { id: 396, nameZh: '波导弹' },
+                  { id: 14, nameZh: '剑舞' },
+                ],
+                egg: [],
+                tutor: [],
+                truncated: true,
+              },
+            },
+          }),
+        }],
+      },
+    );
+
+    expect(phases).toEqual(['curated-web-move-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered',
+      answer: expectedAnswer,
+    });
+  });
+
+  it('recovers candidate-only advice from a moveset page and current-game names', async () => {
+    const expectedAnswer = [
+      '- 波导弹：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+      '- 剑舞：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+    ].join('\n');
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      if (phase === 'curated-web-move-compose') {
+        return { supported: false, moves: [], usedSourceIds: [] };
+      }
+      if (phase === 'curated-web-verify') {
+        return { supported: true, answer: '波导弹被核验为候选。' };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(String(init?.body)) as { include_domains: string[] };
+      if (body.include_domains.length === 1 &&
+          body.include_domains[0] === 'wiki.52poke.com') {
+        return json({ results: [] });
+      }
+      return json({
+        results: [{
+          title: 'Lucario Best Build and Moveset | Pokémon Violet',
+          url: 'https://game8.co/games/pokemon-violet/archives/401366',
+          content: 'Moveset | ・ Aura Sphere  ・ Swords Dance. A teammate may offer a Helping Hand.',
+          score: 0.95,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      {
+        ...request,
+        question: '紫里路卡利欧适合学哪些招式？',
+        context: { ...request.context, game: 'violet', generation: 9 },
+      },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        tavilyApiKey: 'x'.repeat(32),
+        localSources: [{
+          id: 'dex-bundle-v20',
+          title: 'TitoDex Dex bundle v20 · 结构化事实',
+          text: JSON.stringify({
+            species: {
+              moveSet: {
+                machine: [
+                  { nameZh: '剑舞' },
+                  { nameZh: '波导弹' },
+                ],
+                learnable: [
+                  { nameZh: '剑舞', nameEn: 'Swords Dance' },
+                  { nameZh: '波导弹', nameEn: 'Aura Sphere' },
+                  { nameZh: '帮助', nameEn: 'Helping Hand' },
+                ],
+                truncated: true,
+              },
+            },
+          }),
+        }],
+      },
+    );
+
+    expect(phases).toEqual(['curated-web-move-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({ status: 'answered', answer: expectedAnswer });
+    expect(result?.sources).toEqual([
+      expect.objectContaining({ title: 'Lucario Best Build and Moveset | Pokémon Violet' }),
+    ]);
+  });
+
+  it('does not treat an English move name as a substring of a guide heading', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      if (phase === 'curated-web-move-compose') {
+        return { supported: false, moves: [], usedSourceIds: [] };
+      }
+      if (phase === 'curated-web-verify') {
+        return {
+          supported: true,
+          answer: [
+            '- 双倍奉还：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+            '- 睡觉：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+            '- 帮助：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+            '- 守住：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+            '- 报恩：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+            '- 近身战：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+          ].join('\n'),
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(String(init?.body)) as { include_domains: string[] };
+      if (body.include_domains.length === 1 &&
+          body.include_domains[0] === 'wiki.52poke.com') {
+        return json({ results: [] });
+      }
+      return json({
+        results: [{
+          title: 'Lucario Best Build and Moveset',
+          url: 'https://game8.co/games/Pokemon-Scarlet-Violet/archives/401366',
+          content: '朱紫配招可以帮助队伍守住优势，也会提到报恩机制。 A teammate may offer a Helping Hand. Counters for Lucario. Recommended Moveset: Close Combat. This helps the rest of the team.',
+          score: 0.95,
+        }],
+      });
+    });
+
+    const result = await researchCuratedWeb(
+      {
+        ...request,
+        question: '紫里路卡利欧适合学哪些招式？',
+        context: { ...request.context, game: 'violet', generation: 9 },
+      },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        tavilyApiKey: 'x'.repeat(32),
+        localSources: [{
+          id: 'dex-bundle-v20',
+          title: 'TitoDex Dex bundle v20 · 结构化事实',
+          text: JSON.stringify({
+            species: {
+              moveSet: {
+                learnable: [
+                  { nameZh: '双倍奉还', nameEn: 'Counter' },
+                  { nameZh: '睡觉', nameEn: 'Rest' },
+                  { nameZh: '帮助', nameEn: 'Helping Hand' },
+                  { nameZh: '守住', nameEn: 'Protect' },
+                  { nameZh: '报恩', nameEn: 'Return' },
+                  { nameZh: '近身战', nameEn: 'Close Combat' },
+                ],
+                truncated: true,
+              },
+            },
+          }),
+        }],
+      },
+    );
+
+    expect(phases).toEqual(['curated-web-move-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered',
+      answer: '- 近身战：选择时需结合队伍缺口；攻略只支持它是候选，未说明更细取舍。',
+      followUp: '目前只核验到少量明确候选；可以补充“通关／对战／物攻／特攻”方向，我再继续缩小。',
+    });
+  });
+
+  it('rejects a strategy guide from a different game version', async () => {
+    const runModel = vi.fn<CuratedWebModelRunner>(async () => {
+      throw new Error('cross-version guide must be rejected before model composition');
+    });
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(String(init?.body)) as { include_domains: string[] };
+      if (body.include_domains.length === 1 &&
+          body.include_domains[0] === 'wiki.52poke.com') {
+        return json({ results: [] });
+      }
+      return json({ results: [{
+        title: 'Lucario - Moveset & Best Build for Ranked Battle | Pokemon Sword and Shield',
+        url: 'https://game8.co/games/pokemon-sword-shield/archives/274568',
+        content: 'Recommended Moveset: Aura Sphere, Vacuum Wave, Counter, Swords Dance.',
+        score: 0.95,
+      }] });
+    });
+
+    const result = await researchCuratedWeb(
+      {
+        ...request,
+        question: '紫里路卡利欧通关适合学哪些招式？',
+        context: { ...request.context, game: 'violet', generation: 9 },
+      },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        tavilyApiKey: 'x'.repeat(32),
+        localSources: [{
+          id: 'dex-bundle-v20',
+          title: 'TitoDex Dex bundle v20 · 结构化事实',
+          text: JSON.stringify({
+            species: {
+              moveSet: {
+                learnable: [
+                  { nameZh: '波导弹', nameEn: 'Aura Sphere' },
+                  { nameZh: '剑舞', nameEn: 'Swords Dance' },
+                ],
+                truncated: true,
+              },
+            },
+          }),
+        }],
+      },
+    );
+
+    expect(result).toBeNull();
+    expect(runModel).not.toHaveBeenCalled();
+  });
+
+  it('rejects an internal source marker introduced by the verifier', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      if (phase === 'curated-web-scope') {
+        return {
+          allowed: true,
+          queryZh: '利欧路 基本信息',
+          queryEn: 'Riolu basic information',
+          pokeApiKind: 'pokemon-species',
+          pokeApiSlug: '447',
+        };
+      }
+      if (phase === 'curated-web-compose') {
+        return {
+          supported: true,
+          answer: '利欧路是格斗属性的宝可梦。',
+          usedSourceIds: ['guide-1'],
+        };
+      }
+      if (phase === 'curated-web-verify') {
+        return {
+          supported: true,
+          answer: '利欧路是格斗属性的宝可梦，依据 dex-bundle-v20。',
+        };
+      }
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const fetcher = vi.fn<typeof fetch>(async () => json({}, 503));
+
+    const result = await researchCuratedWeb(
+      { ...request, question: '利欧路是什么宝可梦？' },
+      runModel,
+      fetcher,
+      () => new Date('2026-08-24T00:00:00Z'),
+      undefined,
+      {
+        localSources: [{
+          id: 'guide-1',
+          title: '白名单百科',
+          url: 'https://pokemondb.net/pokedex/riolu',
+          text: 'Riolu is a Fighting-type Pokémon.',
+        }],
+      },
+    );
+
+    expect(result).toBeNull();
+    expect(phases.at(-1)).toBe('curated-web-verify');
   });
 });

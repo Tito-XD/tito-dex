@@ -1,4 +1,4 @@
-# TitoDex 图鉴 CDN：v19 生产 / v14 Offline 紧凑种子
+# TitoDex 图鉴 CDN：v20 生产 / v20 Offline 完整种子
 
 > **受众：** Cloudflare / R2 运维与发布维护者。不要把生产 CDN 直链复制到 App 文案或 GitHub Release 说明。
 
@@ -6,16 +6,17 @@
 
 | CDN 前缀 | bundleVersion | 物种 | 状态 |
 | --- | ---: | ---: | --- |
-| `/v5/` | **19** | 1025 | **当前生产**：逐形态媒体审计 + 2130/2130 道具说明与图标 |
+| `/v5/` | **20** | 1025 | **当前生产**：v19 完整基座 + 招式／特性／道具投影与 1025 个玩法分片 |
+| `/v5/` | 19 | 1025 | 历史：逐形态媒体审计 + 2130/2130 道具说明与图标 |
 | `/v5/` | 18 | 1025 | 历史：在线媒体目录元数据 |
 | `/v5/` | 17 | 1025 | 历史：2130 项全量道具目录 |
-| `/v5/` | 14 | 1025 | 历史且仍作 Offline APK 种子：紧凑 archive |
+| `/v5/` | 14 | 1025 | 历史：紧凑 archive；v0.9.0 起不再作为 Offline APK 种子 |
 | `/v5/` | 13 | 1025 | 历史：各形态独立 `evolutionChain` |
 | `/v4/` | 6 | 1025 | 保留不动，供旧客户端和回滚 |
 | `/v3/` | 5 | 1025 | 更早回滚 |
 | `/v2/` | 4 | 493 | 遗留客户端 |
 
-> **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（直至 v19）都是在
+> **bundleVersion 与 CDN 前缀是解耦的。** v7 之后的每一版（直至当前 v20）都是在
 > **同一个 `/v5/` 前缀上原地增量**发布的，没有新开前缀。不可变约束针对的是
 > **单个对象**：同一个 key 不得覆盖成不同内容，而新增 key、以及在两阶段流程里
 > 最后切换根 manifest 是允许的。看到 `/v5/` 就以为 bundleVersion 是 7，会误判成
@@ -29,7 +30,7 @@ App 访问 JSON 时按 `v5 → v4 → v3 → v2` 回退。根 `bundle-manifest.j
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=19
+TITODEX_DEX_BUNDLE_VERSION=20
 ```
 
 > `TITODEX_DEX_BUNDLE_VERSION` 只是 `DexCdnConfig` 里的编译期默认值；版本协商实际
@@ -42,7 +43,7 @@ TITODEX_DEX_BUNDLE_VERSION=19
 - `summaries.json`、`dex_catalog.json` 与 detail 内嵌 summary 的可检索字段必须一致；地点反向索引位于根级 `location_index.json`，不并入冷启动目录。
 - encounter 条目保留物种／形态身份、等级、概率、方式、条件以及 Alpha、Titan、Totem、Raid、固定遭遇和太晶属性等标记；不能唯一确认的形态必须显式标记歧义。
 - 现代地点来自 PokeAPI 与固定 PKHeX 提交的规范化 overlay；来源、许可和形态规则见 [DEX_FORMS.md](DEX_FORMS.md)。
-- 默认图与有可靠来源的差异形态媒体进入 archive；缺少来源的世代或形态不伪造图片。当前媒体与道具完整性由 v19 审计文件记录。
+- 默认图与有可靠来源的差异形态媒体进入 archive；缺少来源的世代或形态不伪造图片。媒体与道具完整性继续由 v19 审计文件记录，v20 在其上增加已固定来源的参考与玩法投影。
 - 根 manifest 必须包含版本、前缀、数量、完整性、schema feature、archive URL/SHA/大小与遭遇覆盖信息；客户端以根 manifest 协商升级。
 
 ## R2 结构
@@ -67,8 +68,9 @@ titodex-dex/
     ├── config/app_config.json
     ├── game_icons/*.png
     ├── type_icons/*.png
-    ├── bundle-v14.tar.zst      # Offline APK 仍复用的紧凑种子
-    └── bundle-v19.tar.zst      # 当前生产 archive；旧 archive 保留作回滚
+    ├── bundle-v14.tar.zst      # 历史紧凑 archive
+    ├── bundle-v19.tar.zst      # v20 的只读完整基座；保留作回滚
+    └── bundle-v20.tar.zst      # 当前生产 archive；v0.9.0 Offline 直接嵌入
 ```
 
 `bundle.tar.zst` 解压后的根直接对应 App 文档目录 `dex_offline/`，不包含 `v5/`
@@ -79,13 +81,10 @@ v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重�
 
 ## 构建与审计
 
-当前生产 v19 已完成发布。未来版本必须以线上 v19 为只读基线，新建版本专用 patch、
-审计与 workflow，并以精确生产版本作为上传前置条件。通用校验入口：
-
-v20 的本地候选基础设施、overlay provenance、稳定实体索引和 manifest-last 隔离布局见
-[DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。候选 builder 本身永远不上传；另有默认 dry-run
-的 v20 专用受保护 workflow，把对象上传、回读收据、根 manifest 切换和 v19 恢复拆成
-独立授权动作。
+当前生产 v20 已完成发布并通过全部 4748 个对象的 SHA-256 回读。未来版本必须以
+线上 v20 为只读基线，新建版本专用 patch、审计与 workflow，并以精确生产版本作为
+上传前置条件。v20 的构建、overlay provenance、稳定实体索引、受保护发布与 v19
+回滚记录见 [DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。通用校验入口：
 
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
@@ -153,7 +152,7 @@ overlay 只含相对 staging 的变化文件、两份上游 notice 和符合
 与生产根对象；可以与其他 v20 overlay 通过重复 `--overlay` 一次性组合。审计包含 23 个
 统一版本组、全部 exact version key、unknown 分布以及 HGSS／BDSP／SV 黄金样例。
 
-## Offline 紧凑种子 v14
+## 历史 Offline 紧凑种子 v14
 
 v14 只改变 archive 的媒体布局，不改任何图鉴 JSON、进化链或图片内容。脚本逐文件
 比较 `artwork/<path>` 与 `sprites/<path>` 的大小和 SHA-256；1,340 对必须全部字节一致，
@@ -169,15 +168,15 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
 发布时实测：删除 `53,285,462` raw duplicate bytes；v13 archive
 `106,743,740` bytes → v14 `54,746,615` bytes，压缩包减少 `51,997,125` bytes
 （48.7%）。解包后仍有 1,025 detail、1,340 sprite、421 道具图标，
-`artwork/` 为 0。v14 已不再是线上根 manifest 指向的最新版，但其不可变 archive
-继续由 Offline APK 复用；安装后的数据更新仍由线上 v19 manifest 决定。
+`artwork/` 为 0。v14 已不再是线上根 manifest 指向的最新版；v0.9.0 起 Offline APK
+直接嵌入当前 v20，v14 只保留作历史复现与回滚资料。
 
 ## 两阶段发布与回滚
 
 `.github/workflows/upload-dex-bundle.yml` 是已经完成使命的 v19 专用 workflow：它要求
 线上 bundleVersion 仍为 v18，从已验证的 v18 archive 恢复只读基座，只 stage 变化
-对象，最后切换根 manifest。生产现已为 v19，因此不得再次使用该 workflow 发布；
-下一版需复制其安全结构并把输入、路径、测试和精确生产前置版本一起升级。
+对象，最后切换根 manifest。生产现已为 v20，因此不得再次使用该 workflow 发布；
+未来 v21 需复制版本专用安全结构并把输入、路径、测试和精确生产前置版本一起升级。
 更早的一次性 workflow 已从工作树移除，可从 Git 历史追溯；本地底层工具
 `tools/publish_dex_bundle_incremental.py` 仍须遵守相同前置检查。
 v19 当时使用的底层两阶段命令（历史复现）：
@@ -233,13 +232,13 @@ npm run dry-run
 `stage_l10n_upload.py` 与 `sync-l10n-catalog.yml` 只更新当前 `/v5/l10n`、maps 和 config；
 不得覆写 `/v4/`。l10n 同步不改变 bundleVersion 或 archive SHA。若需要让根 manifest 的
 `l10nVersion` 生效，必须读取当前根 manifest、只合并允许字段，并仍保持 archive 指针不变。
-当前命令还必须显式传 `--expected-bundle-version 19`；线上版本不一致、SHA 缺失或拉取失败
+当前命令必须显式传 `--expected-bundle-version 20`；线上版本不一致、SHA 缺失或拉取失败
 都会中止上传。发布下一版 bundle 时同步更新 workflow 中的精确前置版本，不允许退回宽松的
 `>=` 判断。
 
 ## 发布验收
 
-- 根 manifest：v19、v5、1025、complete、archive SHA 正确。
+- 根 manifest：v20、v5、1025、complete、archive SHA 正确。
 - `/v5/manifest.json`、摘要、1025 详情、1025 默认清晰图、选择性形态小图、archive 可读。
 - archive 与上传树资源审计通过；没有批量 `artwork/forms`。
 - 现代精确版本覆盖和金样本通过；所有地点有可显示中文标签。

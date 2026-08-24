@@ -159,9 +159,10 @@ class _BackTitleButton extends StatelessWidget {
           label: '$title · ${AppZh.navHome}',
           child: LiquidGlassSurface(
             tint: TitoColors.deepBlue,
-            opacity: 0.46,
+            opacity: 0.88,
             radius: radius,
-            blurSigma: 14,
+            blurSigma: 6,
+            blurBackdrop: true,
             boxShadow: SolidPlasticShadows.glassSmall,
             child: Material(
               color: Colors.transparent,

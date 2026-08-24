@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
 
@@ -36,8 +37,9 @@ class LiquidGlassSurface extends StatelessWidget {
     this.tint = TitoColors.card,
     this.padding = EdgeInsets.zero,
     this.radius = TitoRadii.lg,
-    this.opacity = 0.72,
-    this.blurSigma = 16,
+    this.opacity = 0.9,
+    this.blurSigma = 6,
+    this.blurBackdrop = false,
     this.borderColor,
     this.borderWidth = TitoBorders.glass,
     this.boxShadow,
@@ -50,6 +52,13 @@ class LiquidGlassSurface extends StatelessWidget {
   final double radius;
   final double opacity;
   final double blurSigma;
+
+  /// Real backdrop sampling is reserved for compact, high-value chrome.
+  ///
+  /// Normal cards use the static optical layers below. This keeps scrolling
+  /// lists cheap on RG handhelds while a title control can still opt in to a
+  /// small Telegram-like depth cue.
+  final bool blurBackdrop;
   final Color? borderColor;
   final double borderWidth;
   final List<BoxShadow>? boxShadow;
@@ -65,14 +74,72 @@ class LiquidGlassSurface extends StatelessWidget {
             ? Colors.white.withValues(alpha: 0.38)
             : Colors.white.withValues(alpha: 0.78));
     final top = Color.alphaBlend(
-      Colors.white.withValues(alpha: darkTint ? 0.14 : 0.34),
+      Colors.white.withValues(alpha: darkTint ? 0.16 : 0.24),
       tint,
     ).withValues(alpha: opacity);
-    final middle = tint.withValues(alpha: opacity * 0.94);
-    final bottom = Color.alphaBlend(
-      TitoColors.deepBlue.withValues(alpha: darkTint ? 0.12 : 0.06),
+    final middle = Color.alphaBlend(
+      TitoColors.glassCyan.withValues(alpha: darkTint ? 0.025 : 0.045),
       tint,
-    ).withValues(alpha: opacity * 0.88);
+    ).withValues(alpha: opacity * 0.98);
+    final bottom = Color.alphaBlend(
+      TitoColors.deepBlue.withValues(alpha: darkTint ? 0.16 : 0.075),
+      tint,
+    ).withValues(alpha: opacity * 0.95);
+
+    final staticFill = DecoratedBox(
+      key: const ValueKey('solid-plastic-static-fill'),
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        border: Border.all(color: outline, width: borderWidth),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0, 0.42, 1],
+          colors: [top, middle, bottom],
+        ),
+      ),
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          Padding(padding: padding, child: child),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: _PlasticOpticsPainter(
+                  radius: radius,
+                  darkTint: darkTint,
+                ),
+              ),
+            ),
+          ),
+          if (showSpecular)
+            const Positioned(
+              left: 1,
+              right: 1,
+              top: 1,
+              child: IgnorePointer(child: _SpecularRim()),
+            ),
+        ],
+      ),
+    );
+
+    final useBackdrop =
+        blurBackdrop &&
+        blurSigma > 0 &&
+        !MediaQuery.disableAnimationsOf(context);
+    final effectiveBlurSigma = DeviceLayout.useHandheldChrome(context)
+        ? blurSigma.clamp(0.0, 3.5)
+        : blurSigma;
+    final surface = useBackdrop
+        ? BackdropFilter.grouped(
+            key: const ValueKey('solid-plastic-backdrop'),
+            filter: ui.ImageFilter.blur(
+              sigmaX: effectiveBlurSigma,
+              sigmaY: effectiveBlurSigma,
+            ),
+            child: staticFill,
+          )
+        : staticFill;
 
     return DecoratedBox(
       key: const ValueKey('solid-plastic-shadow'),
@@ -80,37 +147,7 @@ class LiquidGlassSurface extends StatelessWidget {
         borderRadius: borderRadius,
         boxShadow: boxShadow,
       ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: BackdropFilter.grouped(
-          filter: ui.ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              borderRadius: borderRadius,
-              border: Border.all(color: outline, width: borderWidth),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: const [0, 0.46, 1],
-                colors: [top, middle, bottom],
-              ),
-            ),
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: [
-                Padding(padding: padding, child: child),
-                if (showSpecular)
-                  const Positioned(
-                    left: 1,
-                    right: 1,
-                    top: 1,
-                    child: IgnorePointer(child: _SpecularRim()),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: ClipRRect(borderRadius: borderRadius, child: surface),
     );
   }
 }
@@ -123,7 +160,7 @@ class LiquidGlassRoundButton extends StatelessWidget {
     required this.onTap,
     required this.child,
     this.tint = TitoColors.card,
-    this.opacity = 0.72,
+    this.opacity = 0.9,
   });
 
   final double size;
@@ -148,7 +185,8 @@ class LiquidGlassRoundButton extends StatelessWidget {
             tint: tint,
             opacity: opacity,
             radius: radius,
-            blurSigma: 14,
+            blurSigma: 5.5,
+            blurBackdrop: true,
             boxShadow: SolidPlasticShadows.glassSmall,
             child: Material(
               color: Colors.transparent,
@@ -165,6 +203,69 @@ class LiquidGlassRoundButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Two cheap static paint passes simulate moulded plastic: a broad diagonal
+/// reflection and a light-to-dark inner rim. Neither pass samples the pixels
+/// behind the card, so long lists stay close to opaque-card rendering cost.
+class _PlasticOpticsPainter extends CustomPainter {
+  const _PlasticOpticsPainter({required this.radius, required this.darkTint});
+
+  final double radius;
+  final bool darkTint;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) {
+      return;
+    }
+    final bounds = Offset.zero & size;
+    final sheen = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width * 0.72, 0)
+      ..lineTo(size.width * 0.42, size.height * 0.43)
+      ..lineTo(0, size.height * 0.65)
+      ..close();
+    canvas.drawPath(
+      sheen,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: darkTint ? 0.08 : 0.14),
+            Colors.white.withValues(alpha: 0),
+          ],
+        ).createShader(bounds),
+    );
+
+    final inset = 1.35;
+    final innerRect = bounds.deflate(inset);
+    if (innerRect.isEmpty) {
+      return;
+    }
+    final innerRadius = (radius - inset).clamp(0.0, radius);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(innerRect, Radius.circular(innerRadius)),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0, 0.48, 1],
+          colors: [
+            Colors.white.withValues(alpha: darkTint ? 0.22 : 0.46),
+            Colors.white.withValues(alpha: 0.04),
+            TitoColors.deepBlue.withValues(alpha: darkTint ? 0.3 : 0.17),
+          ],
+        ).createShader(bounds),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _PlasticOpticsPainter oldDelegate) =>
+      oldDelegate.radius != radius || oldDelegate.darkTint != darkTint;
 }
 
 class _SpecularRim extends StatelessWidget {
@@ -212,21 +313,21 @@ class _LiquidLightFieldPainter extends CustomPainter {
       center: Offset(size.width * 0.08, size.height * 0.16),
       radius: size.shortestSide * 0.74,
       color: TitoColors.glassCyan,
-      alpha: 0.34,
+      alpha: 0.18,
     );
     _drawGlow(
       canvas,
       center: Offset(size.width * 0.94, size.height * 0.38),
       radius: size.shortestSide * 0.58,
       color: TitoColors.glassLavender,
-      alpha: 0.24,
+      alpha: 0.14,
     );
     _drawGlow(
       canvas,
       center: Offset(size.width * 0.28, size.height * 0.96),
       radius: size.shortestSide * 0.7,
       color: TitoColors.glassMint,
-      alpha: 0.2,
+      alpha: 0.12,
     );
   }
 

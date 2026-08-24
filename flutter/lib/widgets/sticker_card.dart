@@ -50,11 +50,11 @@ class StickerCard extends StatelessWidget {
     }
     if (appVisualStyle.usesSolidPlastic) {
       final (tint, opacity) = switch (variant) {
-        StickerVariant.cream => (TitoColors.card, 0.68),
-        StickerVariant.deep => (TitoColors.deepBlue, 0.86),
-        StickerVariant.sky => (TitoColors.skyBlue, 0.64),
-        StickerVariant.mint => (TitoColors.mint, 0.68),
-        StickerVariant.softYellow => (TitoColors.softYellow, 0.72),
+        StickerVariant.cream => (TitoColors.card, 0.92),
+        StickerVariant.deep => (TitoColors.deepBlue, 0.95),
+        StickerVariant.sky => (TitoColors.skyBlue, 0.9),
+        StickerVariant.mint => (TitoColors.mint, 0.92),
+        StickerVariant.softYellow => (TitoColors.softYellow, 0.93),
       };
       return ListenableBuilder(
         listenable: retroStyle,
@@ -62,7 +62,6 @@ class StickerCard extends StatelessWidget {
           tint: tint,
           opacity: opacity,
           radius: radius,
-          blurSigma: 14,
           padding: padding,
           boxShadow: retroStyle.enabled ? SolidPlasticShadows.sticker : null,
           child: inner!,

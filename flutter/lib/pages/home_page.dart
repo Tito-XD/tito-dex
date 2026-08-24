@@ -115,7 +115,14 @@ Widget _withDexHero(_QuickAction action, Widget child) {
   if (heroTag == null) {
     return child;
   }
-  return Hero(tag: heroTag, transitionOnUserGestures: false, child: child);
+  return Hero(
+    tag: heroTag,
+    transitionOnUserGestures: false,
+    createRectTween: titoDexRectTween,
+    curve: titoDexForwardCurve,
+    reverseCurve: titoDexReverseCurve,
+    child: child,
+  );
 }
 
 List<_QuickAction> _quickActions() {

@@ -130,7 +130,7 @@ class _GameBadgeButton extends StatelessWidget {
         semanticLabel: '$semanticLabel · ${edition.labelZh}',
         onTap: onTap,
         tint: asset != null ? TitoColors.card : accent,
-        opacity: asset != null ? 0.7 : 0.82,
+        opacity: asset != null ? 0.92 : 0.95,
         child: content,
       );
     }

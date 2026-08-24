@@ -97,11 +97,13 @@ describe('journey assistant Worker contract', () => {
     const value = await response.json() as Record<string, unknown>;
     expect(value).toMatchObject({
       ok: true,
-      schemaVersion: 2,
+      schemaVersion: 3,
       capabilities: {
         worker: true,
         publicModel: 'unavailable',
         aiSearch: false,
+        semanticStreaming: true,
+        providerTokenStreaming: false,
         curatedSources: false,
         sourceProviders: ['pokeapi', 'strategywiki', 'wikidata'],
         webSearch: false,
@@ -144,6 +146,26 @@ describe('journey assistant Worker contract', () => {
     });
     expect(value.answer).toContain('《宝可梦 紫》没有 Mega 进化机制');
     expect(value.answer).not.toContain('白天');
+  });
+
+  it('gives only final move-advice misses a contextual next step', async () => {
+    const moveAdviceResponse = await post(
+      violetBody('紫里利欧路适合学哪些招式？'),
+      'move-no-match-follow-up-12345',
+    );
+    const moveAdvice = await moveAdviceResponse.json() as AssistantResponse;
+    expect(moveAdvice).toMatchObject({ status: 'no_match', answer: null });
+    expect(moveAdvice.followUp).toBe(
+      '我还没找到同时满足当前版本可学习性和攻略来源核验的配招资料。可以补充“通关／对战／物攻／特攻”方向，或改问某个具体招式。',
+    );
+
+    const unrelatedResponse = await post(
+      violetBody('紫里哪里可以买到一个完全不存在的测试道具？'),
+      'other-no-match-follow-up-12345',
+    );
+    const unrelated = await unrelatedResponse.json() as AssistantResponse;
+    expect(unrelated).toMatchObject({ status: 'no_match', answer: null });
+    expect(unrelated.followUp).not.toBe(moveAdvice.followUp);
   });
 
   it('answers the reviewed Team Rocket quote without selected-game context', async () => {
@@ -362,6 +384,131 @@ describe('journey assistant Worker contract', () => {
     expect(gatewayRun).toHaveBeenCalledTimes(1);
   });
 
+  it('guards DeepSeek final bodies while allowing explicit edition questions', async () => {
+    await seedDeepSeekMoveAdviceFixture();
+    let currentAnswer = '';
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-route') {
+        return {
+          response: {
+            hintId: '',
+            webAllowed: true,
+            queryZh: '宝可梦 朱紫 版本资料',
+            queryEn: 'Pokémon Scarlet Violet version guide',
+            pokeApiKind: '',
+            pokeApiSlug: '',
+          },
+        };
+      }
+      if (phase === 'deepseek-native-verify') {
+        return {
+          response: {
+            supported: true,
+            answer: currentAnswer,
+          },
+        };
+      }
+      throw new Error(`unexpected_phase_${String(phase)}`);
+    });
+    const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
+      type: 'message',
+      stop_reason: 'end_turn',
+      content: [
+        {
+          type: 'server_tool_use',
+          id: 'srvtoolu_guarded_version',
+          name: 'web_search',
+          input: { query: 'Pokémon Scarlet Violet version guide' },
+        },
+        {
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_guarded_version',
+          content: [{
+            type: 'web_search_result',
+            title: 'Scarlet and Violet - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Scarlet_and_Violet',
+          }],
+        },
+        {
+          type: 'text',
+          text: currentAnswer,
+          citations: [{
+            type: 'web_search_result_location',
+            title: 'Scarlet and Violet - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Scarlet_and_Violet',
+            cited_text: currentAnswer,
+          }],
+        },
+      ],
+    }), { headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', gatewayRun);
+    const fakeEnv = deepSeekEnv({ aiRun });
+
+    const cases = [
+      {
+        question: '紫里未来主题的神秘宝可梦是什么？',
+        answer: '依据 dex-bundle-v20，未来主题宝可梦来自第零区。',
+        accepted: false,
+      },
+      {
+        question: '宝可梦紫里前期先做什么？',
+        answer: '先去橘子学院，再跟随故勒顿推进剧情。',
+        accepted: false,
+      },
+      {
+        question: '宝可梦朱紫两个版本的学院和封面传说有什么区别？',
+        answer: '《朱》是橘子学院与故勒顿，《紫》是葡萄学院与密勒顿。',
+        accepted: true,
+      },
+      {
+        question: '故勒顿在紫里能获得吗？',
+        answer: '故勒顿属于《朱》的封面传说宝可梦。',
+        accepted: true,
+      },
+      {
+        question: '紫里利欧路适合学哪些招式？',
+        answer: '- 波导弹：特殊格斗系，威力 120，用于稳定输出。\n- 真空波：物理格斗系，威力 40，用于先手收割。',
+        accepted: false,
+      },
+      {
+        question: '紫里利欧路适合学哪些招式？',
+        answer: '- 波导弹：作为稳定的本系输出。\n- 剑舞：选择物攻路线时用来强化。',
+        accepted: true,
+      },
+    ] as const;
+
+    for (const [index, testCase] of cases.entries()) {
+      currentAnswer = testCase.answer;
+      const response = await worker.fetch(
+        new Request('https://assistant.test/v1/ask', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-titodex-device-key': `deepseek-guard-key-${index}-12345`,
+          },
+          body: violetBody(testCase.question),
+        }),
+        fakeEnv,
+      );
+      const value = await response.json() as AssistantResponse;
+      if (testCase.accepted) {
+        expect(value).toMatchObject({
+          status: 'answered',
+          answerMode: 'deepseek_native_search',
+          answer: testCase.answer,
+        });
+      } else {
+        expect(value).toMatchObject({ status: 'no_match', answer: null });
+        expect(JSON.stringify(value)).not.toContain(testCase.answer);
+      }
+    }
+  });
+
   it('rejects an off-topic Paradox answer even in the relaxed trial mode', async () => {
     const aiRun = vi.fn(async (
       _model: string,
@@ -504,7 +651,7 @@ describe('journey assistant Worker contract', () => {
     expect(value.aiSearchUsed).toBe(false);
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
-  it('streams only the completed verified answer with final metadata', async () => {
+  it('streams only verified semantic blocks with ordered observable stages', async () => {
     const response = await SELF.fetch('https://assistant.test/v1/ask', {
       method: 'POST',
       headers: {
@@ -521,18 +668,97 @@ describe('journey assistant Worker contract', () => {
       .trim()
       .split('\n')
       .map((line) => JSON.parse(line) as Record<string, unknown>);
-    expect(events[0]).toEqual({ type: 'progress', stage: 'retrieving' });
+    const turnId = events[0].turnId;
+    expect(typeof turnId).toBe('string');
+    expect(events.filter((event) => event.type === 'progress').map((event) =>
+      event.stage)).toEqual(['retrieving', 'resolving', 'verifying', 'writing']);
+    expect(events.every((event) => event.turnId === turnId)).toBe(true);
     expect(events.at(-1)?.type).toBe('result');
+
     const result = events.at(-1)?.result as AssistantResponse;
-    const streamedAnswer = events
-      .filter((event) => event.type === 'answer_delta')
-      .map((event) => event.delta)
-      .join('');
     expect(result.status).toBe('answered');
-    expect(streamedAnswer).toBe(result.answer);
+    expect(result.answerBlocks?.length).toBeGreaterThan(0);
+    expect(events.some((event) => event.type === 'answer_plan')).toBe(true);
+    expect(events.some((event) => event.type === 'answer_delta')).toBe(false);
+    for (const block of result.answerBlocks ?? []) {
+      const streamedBlock = events
+        .filter((event) => event.type === 'block_delta' && event.blockId === block.id)
+        .map((event) => event.delta)
+        .join('');
+      expect(streamedBlock).toBe(block.text);
+    }
+    expect(result.answerBlocks?.map((block) => block.text).join('\n\n'))
+      .toBe(result.answer);
     expect(JSON.stringify(events)).not.toContain('stream-answer-key');
   });
 
+
+  it('asks for clarification instead of letting a model guess a fuzzy entity', async () => {
+    await seedFuzzySpeciesCatalog();
+    const response = await SELF.fetch('https://assistant.test/v1/ask', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/x-ndjson',
+        'x-titodex-device-key': 'fuzzy-entity-key-12345',
+      },
+      body: violetBody('蓝黑色、像小狗的格斗系宝可梦值得练吗？'),
+    });
+    const events = new TextDecoder().decode(await response.arrayBuffer())
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+    const clarification = events.find((event) => event.type === 'clarification');
+    const result = events.at(-1)?.result as AssistantResponse;
+
+    expect(events.filter((event) => event.type === 'progress').map((event) =>
+      event.stage)).toEqual(['retrieving', 'resolving']);
+    expect(events.some((event) => event.stage === 'writing')).toBe(false);
+    expect(clarification).toMatchObject({
+      type: 'clarification',
+      candidates: [
+        { id: 'pokemon-447', label: '利欧路', kind: 'pokemon' },
+        { id: 'pokemon-448', label: '路卡利欧', kind: 'pokemon' },
+      ],
+    });
+    expect(result).toMatchObject({
+      status: 'needs_clarification',
+      answer: null,
+      modelUsed: false,
+      clarificationCandidates: [
+        { id: 'pokemon-447', label: '利欧路', kind: 'pokemon' },
+        { id: 'pokemon-448', label: '路卡利欧', kind: 'pokemon' },
+      ],
+    });
+    expect(result.followUp).toContain('点选一个图鉴候选');
+    expect(events.some((event) => event.type === 'answer_plan')).toBe(false);
+  });
+  it('does not treat category searches as a single ambiguous entity', async () => {
+    for (const question of [
+      '红色宝可梦有哪些？',
+      '什么宝可梦会剑舞？',
+    ]) {
+      const response = await post(
+        violetBody(question),
+        'category-query-key-12345',
+      );
+      expect(await response.json()).not.toMatchObject({
+        status: 'needs_clarification',
+      });
+    }
+    const followUp = JSON.parse(violetBody('那它怎么进化？')) as Record<string, unknown>;
+    followUp.history = [
+      { role: 'user', content: '利欧路值得培养吗？' },
+      { role: 'assistant', content: '利欧路可以进化为路卡利欧。' },
+    ];
+    const followUpResponse = await post(
+      JSON.stringify(followUp),
+      'entity-follow-up-key-12345',
+    );
+    expect(await followUpResponse.json()).not.toMatchObject({
+      status: 'needs_clarification',
+    });
+  });
 
   it('answers exact-version encounter questions from the bounded Dex R2 bundle first', async () => {
     await seedDexBundle({
@@ -562,6 +788,20 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).toContain('Lv.16–20');
     expect(value.answer).toContain('帕底亚太晶结晶');
     expect(JSON.stringify(value)).not.toContain('https://');
+
+    const clarifiedResponse = await post(
+      violetBody('已确认对象是“利欧路”。原问题：蓝黑色的小狗在哪里抓？'),
+      'dex-riolu-clarified-key-12345',
+    );
+    expect(clarifiedResponse.status).toBe(200);
+    const clarifiedValue = await clarifiedResponse.json() as Record<string, unknown>;
+    expect(clarifiedValue).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: false,
+      matchedHintIds: ['dex-bundle-encounter-violet-447'],
+    });
+    expect(clarifiedValue.answer).toContain('南第2区');
   });
 
   it('never leaks encounters from the paired game when the exact version has no rows', async () => {
@@ -785,6 +1025,7 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(species)).toContain('分片核验地点');
     expect(JSON.stringify(species)).not.toContain('未核验 evidence');
     expect(JSON.stringify(species)).toContain('"level":40');
+    expect(JSON.stringify(species)).toContain('"nameEn":"Swords Dance"');
     expect(JSON.stringify(species)).toContain('exactGameApplicability');
     expect(JSON.stringify(species)).not.toContain('must-not-leak');
   });
@@ -1557,6 +1798,60 @@ function violetBody(question: string): string {
   });
 }
 
+async function seedFuzzySpeciesCatalog(): Promise<void> {
+  await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+    bundleVersion: 20,
+    cdnPrefix: 'v5',
+    complete: true,
+    exactVersionLocations: true,
+  }));
+  await env.DEX_CONTENT.put('v5/dex_catalog.json', JSON.stringify({
+    version: 1,
+    summaries: [
+      {
+        id: 447,
+        nameZh: '利欧路',
+        types: ['fighting'],
+        colorSlug: 'blue',
+        shapeSlug: 'upright',
+        heightDm: 7,
+        generation: 4,
+        pokedexNumbers: { paldea: 163 },
+      },
+      {
+        id: 448,
+        nameZh: '路卡利欧',
+        types: ['fighting', 'steel'],
+        colorSlug: 'blue',
+        shapeSlug: 'upright',
+        heightDm: 12,
+        generation: 4,
+        pokedexNumbers: { paldea: 164 },
+      },
+      {
+        id: 214,
+        nameZh: '赫拉克罗斯',
+        types: ['bug', 'fighting'],
+        colorSlug: 'blue',
+        shapeSlug: 'armor',
+        heightDm: 15,
+        generation: 2,
+        pokedexNumbers: { paldea: 262 },
+      },
+      {
+        id: 228,
+        nameZh: '戴鲁比',
+        types: ['dark', 'fire'],
+        colorSlug: 'black',
+        shapeSlug: 'quadruped',
+        heightDm: 6,
+        generation: 2,
+        pokedexNumbers: { paldea: 229 },
+      },
+    ],
+  }));
+}
+
 async function seedDexBundle(
   obtainLocationsByVersion: Record<string, Record<string, unknown>[]>,
   detailExtras: Record<string, unknown> = {},
@@ -1735,6 +2030,7 @@ function deepSeekEnv({
 }): Env {
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
+    DEX_CONTENT: env.DEX_CONTENT,
     QUESTION_RATE_LIMITER: {
       limit: async () => ({ success: true }),
     },
@@ -1759,6 +2055,34 @@ function deepSeekEnv({
     AI_PROVIDER_ENDPOINT: 'chat/completions',
     TAVILY_API_KEY: '',
   } as unknown as Env;
+}
+
+async function seedDeepSeekMoveAdviceFixture(): Promise<void> {
+  await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+    bundleVersion: 19,
+    cdnPrefix: 'v5',
+    complete: true,
+    exactVersionLocations: true,
+  }));
+  await env.DEX_CONTENT.put('v5/details/447.json', JSON.stringify({
+    summary: {
+      id: 447,
+      nameZh: '利欧路',
+      types: ['fighting'],
+    },
+    moveSets: {
+      'scarlet-violet': {
+        levelUp: [],
+        machine: [
+          { moveId: 14 },
+          { moveId: 396 },
+          { moveId: 410 },
+        ],
+        egg: [],
+        tutor: [],
+      },
+    },
+  }));
 }
 
 function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {

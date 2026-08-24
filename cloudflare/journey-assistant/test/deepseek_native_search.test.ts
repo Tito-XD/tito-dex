@@ -180,6 +180,22 @@ describe('DeepSeek native search gateway request', () => {
     expect(JSON.stringify(body.messages)).toContain('利欧路在哪里抓');
   });
 
+  it('requires bounded Markdown move advice without unverified move fields', async () => {
+    const mock = gatewayFetch(json(searchedMessage()));
+    await runDeepSeekNativeSearch(
+      config,
+      { ...request, question: '紫里路卡利欧适合学哪些招式？' },
+      mock.fetcher,
+    );
+
+    const body = JSON.parse(
+      (mock.call.mock.calls[0][1] as RequestInit).body as string,
+    ) as Record<string, unknown>;
+    expect(body.system).toContain('- 招式名：用途或选择条件');
+    expect(body.system).toContain('最多选 6 个');
+    expect(body.system).toContain('不得写招式属性');
+  });
+
   it('uses only the provider-native Gateway endpoint, fixed Anthropic path/model/tool, and privacy-safe controls', async () => {
     const mock = gatewayFetch(json(searchedMessage()));
 

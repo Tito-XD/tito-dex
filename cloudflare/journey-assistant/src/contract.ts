@@ -5,6 +5,33 @@ export const MAX_ANSWER_LENGTH = 1200;
 export const MAX_HISTORY_MESSAGES = 12;
 export const MAX_HISTORY_ASSISTANT_LENGTH = 600;
 
+export const MAX_ANSWER_BLOCKS = 16;
+export const MAX_CLARIFICATION_CANDIDATES = 6;
+
+export type AnswerBlockKind =
+  | 'summary'
+  | 'paragraph'
+  | 'bullets'
+  | 'table'
+  | 'warning'
+  | 'clarification';
+
+export type AssistantAnswerBlock = {
+  id: string;
+  kind: AnswerBlockKind;
+  /** Canonical Markdown/plain-text representation of this complete block. */
+  text: string;
+  title?: string;
+  items?: string[];
+  rows?: string[][];
+};
+
+export type ClarificationCandidate = {
+  id: string;
+  label: string;
+  kind?: 'pokemon' | 'move' | 'item' | 'ability' | 'journey_hint';
+};
+
 const supportedGameGenerations = {
   diamond: 4,
   pearl: 4,
@@ -87,6 +114,9 @@ export type AssistantResponse = {
   confidence: 'high' | 'medium' | 'low';
   sources?: { title: string; url: string; accessedAt: string }[];
   followUp: string | null;
+  /** Semantic rendering data. `answer` remains the compatibility authority. */
+  answerBlocks?: AssistantAnswerBlock[];
+  clarificationCandidates?: ClarificationCandidate[];
   errorCode?: string;
   onlineComposed?: boolean;
   /** Privacy-safe execution trace for the client UI. No prompts or queries. */

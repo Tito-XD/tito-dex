@@ -119,7 +119,7 @@ void main() {
     expect(tester.getSize(find.byKey(childKey)), const Size(120, 80));
   });
 
-  testWidgets('Solid Plastic card uses the translucent shared surface', (
+  testWidgets('Solid Plastic card uses the static moulded shared surface', (
     tester,
   ) async {
     await appVisualStyle.setStyle(AppVisualStyle.solidPlastic);
@@ -133,6 +133,7 @@ void main() {
     );
 
     expect(find.byKey(const ValueKey('solid-plastic-shadow')), findsOneWidget);
+    expect(find.byType(BackdropFilter), findsNothing);
   });
 
   testWidgets(

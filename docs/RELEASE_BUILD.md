@@ -2,10 +2,12 @@
 
 **Audience:** maintainers packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
 
-A valid **arm64-v8a Lite** APK is about **20–23 MB** on disk; the compact v14
-Offline APK is roughly **80 MB**. If a Lite build is only **~7 MB**, the file is
-truncated or corrupt (missing `libflutter.so` tail / broken ZIP central
-directory) — **do not ship it**.
+A valid **arm64-v8a Lite** APK is about **20–23 MB** on disk. The v0.9.0
+Offline APK embeds the complete verified v20 archive and is therefore
+materially larger than the historical compact-v14 package; validate it against
+the selected manifest rather than an old fixed-size expectation. If a Lite
+build is only **~7 MB**, the file is truncated or corrupt (missing
+`libflutter.so` tail / broken ZIP central directory) — **do not ship it**.
 
 ---
 
@@ -94,17 +96,16 @@ Run the **Android Release APKs** workflow manually with:
 - `version` — product version without `v`
 - `lite_build_number` — Lite Android versionCode
 - `offline_build_number` — a larger Offline versionCode
-- `bundle_manifest_url` — the currently published root manifest; CI downloads its selected archive and verifies `bundleVersion>=7`, 1025 species, `/v5/`, completeness, and SHA-256 before embedding it
+- `bundle_manifest_url` — the currently published root manifest; the v0.9.0 workflow requires `bundleVersion==20`, 1025 species, `/v5/`, completeness, and a matching archive SHA-256 before embedding it
 - `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-The v0.8.20 release pair uses Lite versionCode `174` and Offline versionCode
-`175`. A later release must use a product version newer than `0.8.20`, a Lite
-versionCode greater than `175`, and an even larger Offline versionCode. The
-v0.8.20 Offline build should reuse the previously verified v0.8.19 Offline
-asset through `offline_seed_apk_url` because
-the compact v14 seed is intentionally unchanged;
-Do not seed a new Offline APK from the live v20 archive unless accepting the
-larger package is an explicit release decision.
+The v0.9.0 release pair uses Lite versionCode `177` and Offline versionCode
+`178`. A later release must use a product version newer than `0.9.0`, a Lite
+versionCode greater than `178`, and an even larger Offline versionCode. v0.9.0
+is the explicit large-package cutover: leave `offline_seed_apk_url` empty so CI
+downloads and verifies the current published v20 archive through
+`bundle_manifest_url`. This gives fresh Offline installs the complete v20
+reference/gameplay data instead of the older compact v14 seed.
 
 The workflow analyzes and tests once, then builds the signed Lite and Offline
 APKs in parallel. Each artifact is named
@@ -140,7 +141,7 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 ## Post-build checklist
 
 - [ ] `unzip -t releases/TitoDex-*-rg-arm64.apk` → **No errors**
-- [ ] Lite file size **≥ 15 MB** (expect **19–26 MB**); Offline is about **80 MB** with the v14 compact archive (older v13 packages are much larger)
+- [ ] Lite file size **≥ 15 MB** (expect **19–26 MB**); Offline is materially larger because it embeds v20, so verify the archive size and SHA-256 against the selected manifest instead of assuming the historical ~80 MB v14 size
 - [ ] `lib/arm64-v8a/libflutter.so` present (~11 MB)
 - [ ] `lib/arm64-v8a/libapp.so` present (~7–8 MB)
 - [ ] `lib/arm64-v8a/libzstandard_android.so` present

@@ -6,18 +6,20 @@ offline=false
 expected_package=""
 expected_version_name=""
 expected_version_code=""
+expected_bundle_version=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --offline) offline=true; shift ;;
     --expected-package) expected_package="${2:?missing package id}"; shift 2 ;;
     --expected-version-name) expected_version_name="${2:?missing version name}"; shift 2 ;;
     --expected-version-code) expected_version_code="${2:?missing version code}"; shift 2 ;;
+    --expected-bundle-version) expected_bundle_version="${2:?missing bundle version}"; shift 2 ;;
     --*) echo "ERROR: unknown option: $1" >&2; exit 2 ;;
     *) APK="$1"; shift ;;
   esac
 done
 
-APK="${APK:?Usage: verify_release_apk.sh [--offline] [--expected-package ID] [--expected-version-name NAME] [--expected-version-code CODE] path/to/APK}"
+APK="${APK:?Usage: verify_release_apk.sh [--offline] [--expected-package ID] [--expected-version-name NAME] [--expected-version-code CODE] [--expected-bundle-version VERSION] path/to/APK}"
 
 if [[ ! -f "$APK" ]]; then
   echo "ERROR: file not found: $APK" >&2
@@ -42,8 +44,8 @@ if ! "$offline" && (( size_bytes > 35000000 )); then
   exit 1
 fi
 
-# The compact v14 seed keeps the Offline APK near 80 MB. Keep headroom for
-# future verified metadata without allowing a universal/debug build through.
+# The complete v20 archive keeps the Offline APK below this release guard while
+# leaving headroom for verified metadata without allowing a universal/debug build.
 if "$offline" && (( size_bytes > 145000000 )); then
   echo "ERROR: offline APK larger than expected (>145 MB)." >&2
   exit 1
@@ -145,11 +147,14 @@ if "$offline"; then
   trap 'rm -rf "$tmp_dir"' EXIT
   unzip -p "$APK" assets/flutter_assets/assets/dex/bundle-manifest.json > "$tmp_dir/bundle-manifest.json"
   unzip -p "$APK" assets/flutter_assets/assets/dex/bundle.tar.zst > "$tmp_dir/bundle.tar.zst"
-  python3 - "$tmp_dir/bundle-manifest.json" <<'PY'
+  python3 - "$tmp_dir/bundle-manifest.json" "$expected_bundle_version" <<'PY'
 import json
 import sys
 
 manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+expected_bundle_version = sys.argv[2]
+if expected_bundle_version:
+    assert str(manifest.get("bundleVersion")) == expected_bundle_version, manifest
 assert manifest.get("bundleVersion") >= 7, manifest
 assert manifest.get("pokemonCount") == 1025, manifest
 assert manifest.get("complete") is True, manifest

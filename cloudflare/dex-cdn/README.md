@@ -2,7 +2,7 @@
 
 Proxy R2 bucket `titodex-dex` at **`https://dex.tito.cafe`** with CORS + cache headers.
 
-**Worker name:** `tito-dex` · **Live bundle:** v19 on `/v5/` · **Health:** `/cdn-health`
+**Worker name:** `tito-dex` · **Live bundle:** v20 on `/v5/` · **Health:** `/cdn-health`
 
 ## Auto-deploy (recommended)
 
