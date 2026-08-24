@@ -50,6 +50,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            // The Material experiment must coexist with the signed TitoDex
+            // release on one device. Namespace stays unchanged so native
+            // activity/service classes and MethodChannels need no fork.
+            applicationIdSuffix = ".materialdebug"
+            versionNameSuffix = "-material-debug"
+        }
         release {
             if (keystorePropertiesFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
