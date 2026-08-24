@@ -4,10 +4,9 @@ import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
 
-/// Retro press physics for interactive stickers: the signature solid drop
-/// shadow, and on touch-down the sticker sinks ~3px while the shadow
-/// squashes — releasing springs it back. All of it disappears when the
-/// Retro style toggle is off, leaving the flat look untouched.
+/// Press physics for floating surfaces: on touch-down the surface sinks ~3px
+/// while its shadow tightens, then springs back on release. The depth setting
+/// can disable both shadow and translation without changing the glass tint.
 ///
 /// Uses a [Listener] so the child's own InkWell/GestureDetector keeps
 /// receiving its taps unchanged. v0.6.7: quick taps hold the sunk pose for

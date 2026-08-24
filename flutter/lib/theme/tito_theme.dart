@@ -60,7 +60,7 @@ ThemeData buildTitoTheme() {
     useMaterial3: true,
     brightness: Brightness.light,
     fontFamily: fontFamily,
-    scaffoldBackgroundColor: TitoColors.slateBlue,
+    scaffoldBackgroundColor: TitoColors.glassBackgroundBottom,
     splashFactory: InkRipple.splashFactory,
     highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
     textTheme: textTheme,
@@ -73,7 +73,7 @@ ThemeData buildTitoTheme() {
       // colorScheme.surface — cream, which flashed behind the blue-gradient
       // pages. Slate blue matches scaffoldBackgroundColor/TitoPageContainer.
       TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
-        fallbackColor: TitoColors.slateBlue,
+        fallbackColor: TitoColors.glassBackgroundMid,
       ),
       // iOS matches Android's non-gesture look (zoom + slateBlue backdrop)
       // instead of the Cupertino slide — the default cream surface flashed
@@ -81,7 +81,7 @@ ThemeData buildTitoTheme() {
       // transitions. Trades away edge-swipe-back; the app has its own back
       // hierarchy.
       TargetPlatform.iOS: ZoomPageTransitionsBuilder(
-        backgroundColor: TitoColors.slateBlue,
+        backgroundColor: TitoColors.glassBackgroundMid,
       ),
     },
   );
@@ -90,12 +90,18 @@ ThemeData buildTitoTheme() {
     // Android's Material route transition, including predictive-back progress.
     // Other platforms keep Flutter's own platform defaults.
     pageTransitionsTheme: androidTransitions,
-    bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: TitoColors.card,
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: TitoColors.card.withValues(alpha: 0.9),
+      elevation: 0,
       modalBarrierColor: Color(0x73221F26),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
-        side: BorderSide(color: TitoColors.ink, width: 2),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(TitoRadii.lg),
+        ),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.72),
+          width: TitoBorders.glass,
+        ),
       ),
       dragHandleColor: TitoColors.mutedInk,
     ),
@@ -129,7 +135,10 @@ ThemeData buildTitoTheme() {
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        side: const BorderSide(color: TitoColors.ink, width: 2),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.4),
+          width: TitoBorders.glass,
+        ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -139,9 +148,9 @@ ThemeData buildTitoTheme() {
         textStyle: textTheme.labelLarge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
-          side: const BorderSide(
-            color: TitoColors.ink,
-            width: TitoBorders.card,
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.42),
+            width: TitoBorders.glass,
           ),
         ),
       ),
@@ -150,7 +159,10 @@ ThemeData buildTitoTheme() {
       style: OutlinedButton.styleFrom(
         foregroundColor: TitoColors.deepBlue,
         textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
-        side: const BorderSide(color: TitoColors.ink, width: 2),
+        side: BorderSide(
+          color: TitoColors.deepBlue.withValues(alpha: 0.42),
+          width: TitoBorders.glass,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(TitoRadii.md),
         ),
@@ -164,7 +176,7 @@ ThemeData buildTitoTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: TitoColors.card,
+      fillColor: TitoColors.card.withValues(alpha: 0.76),
       labelStyle: textTheme.bodySmall?.copyWith(
         color: TitoColors.mutedInk,
         fontWeight: FontWeight.w700,
@@ -180,15 +192,21 @@ ThemeData buildTitoTheme() {
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+        borderSide: BorderSide(
+          color: TitoColors.deepBlue.withValues(alpha: 0.3),
+          width: TitoBorders.glass,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+        borderSide: BorderSide(
+          color: TitoColors.deepBlue.withValues(alpha: 0.3),
+          width: TitoBorders.glass,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.coral, width: 2),
+        borderSide: const BorderSide(color: TitoColors.coral, width: 1.6),
       ),
     ),
   );

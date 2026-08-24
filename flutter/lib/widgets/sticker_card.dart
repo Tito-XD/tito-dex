@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 enum StickerVariant { cream, deep, sky, mint, softYellow }
 
@@ -21,28 +22,28 @@ class StickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rLg(context);
-    final colors = switch (variant) {
-      StickerVariant.cream => (TitoColors.card, TitoColors.ink),
-      StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
-      StickerVariant.sky => (TitoColors.skyBlue, TitoColors.ink),
-      StickerVariant.mint => (TitoColors.mint, TitoColors.ink),
-      StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
+    final (tint, opacity) = switch (variant) {
+      StickerVariant.cream => (TitoColors.card, 0.68),
+      StickerVariant.deep => (TitoColors.deepBlue, 0.86),
+      StickerVariant.sky => (TitoColors.skyBlue, 0.64),
+      StickerVariant.mint => (TitoColors.mint, 0.68),
+      StickerVariant.softYellow => (TitoColors.softYellow, 0.72),
     };
 
-    // Retro style: the signature solid drop shadow on every card; flat mode
-    // lets the bold ink border carry the sticker look on its own.
+    // Keep the existing live depth preference, but render every semantic card
+    // through one translucent material instead of duplicating surface logic.
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, inner) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.$1,
-          borderRadius: BorderRadius.circular(radius),
-          border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-          boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
-        ),
-        child: inner,
+      builder: (context, inner) => LiquidGlassSurface(
+        tint: tint,
+        opacity: opacity,
+        radius: radius,
+        blurSigma: 14,
+        padding: padding,
+        boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
+        child: inner!,
       ),
-      child: Padding(padding: padding, child: child),
+      child: child,
     );
   }
 }

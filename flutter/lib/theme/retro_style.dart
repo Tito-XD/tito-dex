@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Retro sticker feel (Settings → 界面风格): the signature solid offset
-/// shadows plus press-down physics that read as physical handheld keys.
-/// Default on; off gives the pure flat sticker look.
+/// Surface depth preference (Settings → 界面风格): floating shadows and
+/// press-down physics. The legacy type and storage key stay stable so existing
+/// installs keep their choice when moving to the Liquid Glass experiment.
 class RetroStyle extends ChangeNotifier {
   static const _enabledKey = 'style.retro';
 

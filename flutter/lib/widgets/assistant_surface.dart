@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 /// A lighter surface language reserved for the assistant conversation.
 ///
-/// It keeps TitoDex's cream/slate palette while replacing the global sticker
-/// border and solid drop shadow with hairline outlines and shallow depth.
-/// Flat mode still removes the shadow.
+/// Conversation panels use a slightly quieter glass recipe than dashboard
+/// cards so long answers remain easy to scan. Flat mode removes their depth.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,
@@ -34,25 +34,20 @@ class AssistantSurface extends StatelessWidget {
     final outline = borderColor ?? TitoColors.ink.withValues(alpha: 0.28);
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, content) => Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: borderRadius,
-          border: Border.all(color: outline, width: borderWidth),
-          boxShadow: shadow && retroStyle.enabled
-              ? const [
-                  BoxShadow(
-                    color: Color(0x2418283B),
-                    offset: Offset(0, 5),
-                    blurRadius: 12,
-                  ),
-                ]
-              : null,
-        ),
-        child: content,
+      builder: (context, content) => LiquidGlassSurface(
+        tint: color,
+        opacity: 0.74,
+        radius: borderRadius.topLeft.x,
+        blurSigma: 12,
+        borderColor: outline,
+        borderWidth: borderWidth,
+        padding: padding,
+        boxShadow: shadow && retroStyle.enabled
+            ? TitoShadows.stickerSmall
+            : null,
+        child: content!,
       ),
-      child: Padding(padding: padding, child: child),
+      child: child,
     );
   }
 }

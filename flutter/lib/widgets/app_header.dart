@@ -8,8 +8,8 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import 'handheld_input.dart';
 import 'handheld_status_icons.dart';
+import 'liquid_glass.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
@@ -47,10 +47,7 @@ class AppHeader extends StatelessWidget {
                     fontSize: DeviceLayout.headerTitleSize(context),
                     letterSpacing: -0.5,
                     shadows: const [
-                      Shadow(
-                        color: Color(0x4018283B),
-                        offset: Offset(0, 2),
-                      ),
+                      Shadow(color: Color(0x4018283B), offset: Offset(0, 2)),
                     ],
                   ),
                 ),
@@ -103,35 +100,28 @@ class _GameBadgeButton extends StatelessWidget {
     final darkAccent = accent.computeLuminance() < 0.4;
 
     final content = asset != null
-        ? Image.asset(
-            asset,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                _letterContent(size, accent, darkAccent),
+        ? Padding(
+            padding: const EdgeInsets.all(3),
+            child: ClipOval(
+              child: Image.asset(
+                asset,
+                width: size - 6,
+                height: size - 6,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    _letterContent(size, accent, darkAccent),
+              ),
+            ),
           )
         : _letterContent(size, accent, darkAccent);
 
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: onTap != null,
-        label: '$semanticLabel · ${edition.labelZh}',
-        child: Material(
-          color: asset != null ? TitoColors.card : accent,
-          shape: const CircleBorder(
-            side: BorderSide(color: TitoColors.ink, width: 2),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(width: size, height: size, child: content),
-          ),
-        ),
-      ),
+    return LiquidGlassRoundButton(
+      size: size,
+      semanticLabel: '$semanticLabel · ${edition.labelZh}',
+      onTap: onTap,
+      tint: asset != null ? TitoColors.card : accent,
+      opacity: asset != null ? 0.7 : 0.82,
+      child: content,
     );
   }
 
@@ -172,33 +162,11 @@ class _HeaderIconButton extends StatelessWidget {
     final size = DeviceLayout.headerIconSize(context);
     final iconSize = size * 0.62;
 
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: true,
-        label: label,
-        child: Material(
-          color: TitoColors.card,
-          shape: const CircleBorder(
-            side: BorderSide(color: TitoColors.ink, width: 2),
-          ),
-          elevation: 0,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(
-                icon,
-                color: TitoColors.deepBlue,
-                size: iconSize,
-              ),
-            ),
-          ),
-        ),
-      ),
+    return LiquidGlassRoundButton(
+      size: size,
+      semanticLabel: label,
+      onTap: onTap,
+      child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
     );
   }
 }

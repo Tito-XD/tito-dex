@@ -1373,7 +1373,7 @@ class _CurrentGameSection extends StatelessWidget {
   }
 }
 
-/// Settings → 界面风格: Retro sticker feel plus the list reveal animations.
+/// Settings → 界面风格: glass depth plus the list reveal animations.
 class _InterfaceSection extends StatelessWidget {
   const _InterfaceSection();
 

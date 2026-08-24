@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 import '../widgets/handheld_input.dart';
+import '../widgets/liquid_glass.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/sticker_pressable.dart';
 
-/// Sticker-style primary action — deep blue pill per design reference.
+/// Deep-blue glass primary action.
 class TitoPrimaryButton extends StatelessWidget {
   const TitoPrimaryButton({
     super.key,
@@ -30,47 +31,49 @@ class TitoPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final button = StickerPressable(
       borderRadius: BorderRadius.circular(TitoRadii.md),
-      child: Material(
-      color: TitoColors.deepBlue,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        splashColor: TitoColors.skyBlue.withValues(alpha: 0.3),
-        highlightColor: TitoColors.skyBlue.withValues(alpha: 0.15),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: dense ? 12 : (compact ? 16 : 24),
-            vertical: dense ? 8 : (compact ? 10 : 14),
-          ),
-          decoration: BoxDecoration(
+      child: LiquidGlassSurface(
+        tint: TitoColors.deepBlue,
+        opacity: onPressed == null ? 0.58 : 0.9,
+        radius: TitoRadii.md,
+        blurSigma: 12,
+        borderColor: Colors.white.withValues(alpha: 0.42),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
             borderRadius: BorderRadius.circular(TitoRadii.md),
-            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-          ),
-          child: Row(
-            mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-                style: TitoTypography.style(
-                  color: TitoColors.card,
-                  fontWeight: FontWeight.w800,
-                  fontSize: dense ? 12 : (compact ? 14 : 16),
-                ),
+            splashColor: TitoColors.skyBlue.withValues(alpha: 0.3),
+            highlightColor: TitoColors.skyBlue.withValues(alpha: 0.15),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: dense ? 12 : (compact ? 16 : 24),
+                vertical: dense ? 8 : (compact ? 10 : 14),
               ),
-              if (showArrow) ...[
-                SizedBox(width: dense ? 4 : (compact ? 6 : 8)),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: TitoColors.card,
-                  size: dense ? 16 : (compact ? 18 : 22),
-                ),
-              ],
-            ],
+              child: Row(
+                mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    label,
+                    style: TitoTypography.style(
+                      color: TitoColors.card,
+                      fontWeight: FontWeight.w800,
+                      fontSize: dense ? 12 : (compact ? 14 : 16),
+                    ),
+                  ),
+                  if (showArrow) ...[
+                    SizedBox(width: dense ? 4 : (compact ? 6 : 8)),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: TitoColors.card,
+                      size: dense ? 16 : (compact ? 18 : 22),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
-      ),
       ),
     );
 
@@ -81,7 +84,7 @@ class TitoPrimaryButton extends StatelessWidget {
   }
 }
 
-/// Cream quick-action tile for home dashboard grid.
+/// Tinted glass quick-action tile for the home dashboard grid.
 class TitoQuickTile extends StatelessWidget {
   const TitoQuickTile({
     super.key,
@@ -111,8 +114,7 @@ class TitoQuickTile extends StatelessWidget {
   /// icon — no plate, no frame. Overrides [icon]/[iconPlateColor] when set.
   final String? iconAsset;
 
-  /// Pastel tint for the tile card itself (pairs with [iconAsset]'s main
-  /// color); defaults to the standard cream card.
+  /// Pastel tint refracted through the tile's glass material.
   final Color? backgroundColor;
 
   @override
@@ -121,76 +123,69 @@ class TitoQuickTile extends StatelessWidget {
       onActivate: onTap,
       child: StickerPressable(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        child: Material(
-        color: backgroundColor ?? TitoColors.card,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
-          splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
-          child: Ink(
-            decoration: BoxDecoration(
+        child: LiquidGlassSurface(
+          tint: backgroundColor ?? TitoColors.card,
+          opacity: 0.72,
+          radius: TitoRadii.md,
+          blurSigma: 12,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.card,
-              ),
-            ),
-            // Icon and label scale off the tile's own height, never off
-            // inherited scale scopes: the portrait grid and the square bar
-            // stay visually identical, and the Hero flight to the Dex page
-            // re-inflates this subtree in the overlay without the icon or
-            // label snapping to a different size mid-transition.
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final side = constraints.maxHeight.isFinite
-                    ? (constraints.maxWidth.isFinite
-                          ? math.min(
-                              constraints.maxWidth,
-                              constraints.maxHeight,
-                            )
-                          : constraints.maxHeight)
-                    : 88.0;
-                final iconSize = side * 0.38;
-                final plateColor = iconPlateColor;
-                final asset = iconAsset;
-                final fontSize = (side * 0.18).clamp(10.0, 24.0).toDouble();
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (asset != null)
-                      Image.asset(
-                        asset,
-                        width: side * 0.52,
-                        height: side * 0.52,
-                        fit: BoxFit.contain,
-                      )
-                    else if (plateColor != null)
-                      StickerIconPlate(
-                        icon: icon,
-                        color: plateColor,
-                        size: side * 0.52,
-                      )
-                    else
-                      Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-                    SizedBox(height: side * 0.04),
-                    Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TitoTypography.style(
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.w800,
-                        color: TitoColors.deepBlue,
+              splashColor: Colors.white.withValues(alpha: 0.34),
+              // Icon and label scale off the tile's own height, never off
+              // inherited scale scopes, including during the Dex Hero flight.
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final side = constraints.maxHeight.isFinite
+                      ? (constraints.maxWidth.isFinite
+                            ? math.min(
+                                constraints.maxWidth,
+                                constraints.maxHeight,
+                              )
+                            : constraints.maxHeight)
+                      : 88.0;
+                  final iconSize = side * 0.38;
+                  final plateColor = iconPlateColor;
+                  final asset = iconAsset;
+                  final fontSize = (side * 0.18).clamp(10.0, 24.0).toDouble();
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (asset != null)
+                        Image.asset(
+                          asset,
+                          width: side * 0.52,
+                          height: side * 0.52,
+                          fit: BoxFit.contain,
+                        )
+                      else if (plateColor != null)
+                        StickerIconPlate(
+                          icon: icon,
+                          color: plateColor,
+                          size: side * 0.52,
+                        )
+                      else
+                        Icon(icon, color: TitoColors.deepBlue, size: iconSize),
+                      SizedBox(height: side * 0.04),
+                      Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TitoTypography.style(
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.w800,
+                          color: TitoColors.deepBlue,
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
 
@@ -236,57 +231,57 @@ class TitoPolaroidQuickTile extends StatelessWidget {
       child: StickerPressable(
         borderRadius: radius,
         child: Material(
-        color: TitoColors.card,
-        borderRadius: radius,
-        child: InkWell(
-          onTap: onTap,
+          color: TitoColors.card,
           borderRadius: radius,
-          splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
-          child: Ink(
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.card,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            splashColor: TitoColors.skyBlue.withValues(alpha: 0.35),
+            child: Ink(
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(
+                  color: TitoColors.ink,
+                  width: TitoBorders.card,
+                ),
               ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                compact ? 8 : 10,
-                compact ? 8 : 10,
-                compact ? 8 : 10,
-                compact ? 6 : 8,
-              ),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: frameColor,
-                        borderRadius: BorderRadius.circular(TitoRadii.sm),
-                        border: Border.all(color: TitoColors.ink, width: 2),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  compact ? 8 : 10,
+                  compact ? 8 : 10,
+                  compact ? 8 : 10,
+                  compact ? 6 : 8,
+                ),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: frameColor,
+                          borderRadius: BorderRadius.circular(TitoRadii.sm),
+                          border: Border.all(color: TitoColors.ink, width: 2),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(icon, color: iconColor, size: iconSize),
                       ),
-                      alignment: Alignment.center,
-                      child: Icon(icon, color: iconColor, size: iconSize),
                     ),
-                  ),
-                  SizedBox(height: compact ? 4 : 6),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.tito.quickTileLabel.copyWith(
-                      color: TitoColors.ink,
-                      fontSize: compact ? 10 : 12,
+                    SizedBox(height: compact ? 4 : 6),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.tito.quickTileLabel.copyWith(
+                        color: TitoColors.ink,
+                        fontSize: compact ? 10 : 12,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
 

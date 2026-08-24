@@ -1,20 +1,45 @@
 import 'package:flutter/material.dart';
 
-/// Signature sticker shadows — solid offset drops with no blur, the
-/// "physical key" look. Applied globally when Retro style is on.
+/// Depth tokens used by the experimental glass surfaces. The existing Retro
+/// style preference still controls whether cards float and press down, but the
+/// hard sticker drop is softened into a light-through-glass shadow.
 abstract final class TitoShadows {
   static const List<BoxShadow> sticker = [
-    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
+    BoxShadow(
+      color: Color(0x3013263D),
+      blurRadius: 22,
+      spreadRadius: -5,
+      offset: Offset(0, 10),
+    ),
   ];
 
   /// Squashed variant while a pressable sticker is held down.
   static const List<BoxShadow> stickerPressed = [
-    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 1)),
+    BoxShadow(
+      color: Color(0x2413263D),
+      blurRadius: 10,
+      spreadRadius: -4,
+      offset: Offset(0, 3),
+    ),
   ];
 
   /// Smaller drop for chips, sprites, and bubbles.
   static const List<BoxShadow> stickerSmall = [
-    BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
+    BoxShadow(
+      color: Color(0x2413263D),
+      blurRadius: 14,
+      spreadRadius: -4,
+      offset: Offset(0, 6),
+    ),
+  ];
+
+  static const List<BoxShadow> glassSmall = [
+    BoxShadow(
+      color: Color(0x2613263D),
+      blurRadius: 16,
+      spreadRadius: -4,
+      offset: Offset(0, 7),
+    ),
   ];
 }
 
@@ -32,6 +57,15 @@ abstract final class TitoColors {
   static const mint = Color(0xFF7EC8A8);
   static const hpGreen = Color(0xFF6BC4A6);
   static const expGold = Color(0xFFF7D977);
+
+  // Experimental Liquid Glass light field. Content colours above stay intact
+  // so gameplay semantics and contrast inside tinted surfaces remain stable.
+  static const glassBackgroundTop = Color(0xFF314D70);
+  static const glassBackgroundMid = Color(0xFF567B99);
+  static const glassBackgroundBottom = Color(0xFF7898AA);
+  static const glassCyan = Color(0xFF78D8E8);
+  static const glassLavender = Color(0xFFC1A7EF);
+  static const glassMint = Color(0xFF8EE0C1);
 }
 
 abstract final class TitoRadii {
@@ -45,6 +79,7 @@ abstract final class TitoRadii {
 /// chunky on phone density — cards/buttons use [card], small circular
 /// elements (avatars, companion sticker) use [element].
 abstract final class TitoBorders {
-  static const card = 2.5;
-  static const element = 2.0;
+  static const card = 1.35;
+  static const element = 1.2;
+  static const glass = 1.1;
 }

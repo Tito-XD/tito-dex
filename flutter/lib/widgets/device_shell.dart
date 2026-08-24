@@ -3,12 +3,10 @@ import 'package:flutter/services.dart';
 
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 class DeviceShell extends StatelessWidget {
-  const DeviceShell({
-    super.key,
-    required this.child,
-  });
+  const DeviceShell({super.key, required this.child});
 
   final Widget child;
 
@@ -21,7 +19,7 @@ class DeviceShell extends StatelessWidget {
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: TitoColors.deepBlue,
+        systemNavigationBarColor: TitoColors.glassBackgroundTop,
         systemNavigationBarIconBrightness: Brightness.light,
       ),
       child: MediaQuery(
@@ -29,8 +27,8 @@ class DeviceShell extends StatelessWidget {
         child: handheldChrome
             ? _HandheldNativeShell(child: child)
             : (DeviceLayout.isNativeTarget
-                ? _RegularNativeShell(child: child)
-                : _PreviewShell(child: child)),
+                  ? _RegularNativeShell(child: child)
+                  : _PreviewShell(child: child)),
       ),
     );
   }
@@ -47,34 +45,16 @@ class _HandheldNativeShell extends StatelessWidget {
     final padding = MediaQuery.paddingOf(context);
     final size = MediaQuery.sizeOf(context);
 
-    return ColoredBox(
-      color: TitoColors.deepBlue,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            // Match TitoPageContainer's page gradient: predictive-back corner
-            // reveals then blend into the pages instead of flashing skyBlue.
-            colors: [
-              Color(0xFF5D728A),
-              Color(0xFF7B91A6),
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: padding.left,
-            right: padding.right,
-          ),
-          // RG immersive shell strips top/bottom safe padding — without an
-          // explicit height, route ListViews see unbounded max height and
-          // behave like an infinitely growing scroll surface.
-          child: SizedBox(
-            height: size.height,
-            width: size.width - padding.left - padding.right,
-            child: child,
-          ),
+    return LiquidGlassBackground(
+      child: Padding(
+        padding: EdgeInsets.only(left: padding.left, right: padding.right),
+        // RG immersive shell strips top/bottom safe padding — without an
+        // explicit height, route ListViews see unbounded max height and
+        // behave like an infinitely growing scroll surface.
+        child: SizedBox(
+          height: size.height,
+          width: size.width - padding.left - padding.right,
+          child: child,
         ),
       ),
     );
@@ -96,22 +76,7 @@ class _RegularNativeShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: TitoColors.deepBlue,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF5D728A),
-              Color(0xFF7B91A6),
-            ],
-          ),
-        ),
-        child: child,
-      ),
-    );
+    return LiquidGlassBackground(child: child);
   }
 }
 
@@ -152,21 +117,7 @@ class _PreviewShell extends StatelessWidget {
                   child: Column(
                     children: [
                       const _StatusStrip(),
-                      Expanded(
-                        child: DecoratedBox(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                TitoColors.skyBlue,
-                                TitoColors.slateBlue,
-                              ],
-                            ),
-                          ),
-                          child: child,
-                        ),
-                      ),
+                      Expanded(child: LiquidGlassBackground(child: child)),
                     ],
                   ),
                 ),
@@ -187,7 +138,7 @@ class _StatusStrip extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: TitoColors.deepBlue,
+      color: TitoColors.glassBackgroundTop.withValues(alpha: 0.9),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -199,13 +150,7 @@ class _StatusStrip extends StatelessWidget {
               fontSize: 13,
             ),
           ),
-          Row(
-            children: [
-              _StatusDot(),
-              SizedBox(width: 6),
-              _BatteryIcon(),
-            ],
-          ),
+          Row(children: [_StatusDot(), SizedBox(width: 6), _BatteryIcon()]),
         ],
       ),
     );

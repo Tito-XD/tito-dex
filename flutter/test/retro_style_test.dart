@@ -32,20 +32,20 @@ void main() {
     expect(restored.enabled, isFalse);
   });
 
-  testWidgets('StickerCard carries the signature shadow only in retro mode',
-      (tester) async {
+  testWidgets('StickerCard carries the signature shadow only in retro mode', (
+    tester,
+  ) async {
     BoxDecoration cardDecoration() {
       final box = tester.widget<DecoratedBox>(
-        find.descendant(
-          of: find.byType(StickerCard),
-          matching: find.byType(DecoratedBox),
-        ),
+        find.byKey(const ValueKey('liquid-glass-shadow')),
       );
       return box.decoration as BoxDecoration;
     }
 
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: StickerCard(child: Text('x')))),
+      const MaterialApp(
+        home: Scaffold(body: StickerCard(child: Text('x'))),
+      ),
     );
     expect(cardDecoration().boxShadow, TitoShadows.sticker);
 
@@ -54,8 +54,9 @@ void main() {
     expect(cardDecoration().boxShadow, isNull);
   });
 
-  testWidgets('StickerPressable sinks and squashes its shadow while pressed',
-      (tester) async {
+  testWidgets('StickerPressable sinks and squashes its shadow while pressed', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -71,8 +72,7 @@ void main() {
 
     AnimatedContainer container() =>
         tester.widget<AnimatedContainer>(find.byType(AnimatedContainer));
-    double sunkY() =>
-        (container().transform as Matrix4).getTranslation().y;
+    double sunkY() => (container().transform as Matrix4).getTranslation().y;
     BoxDecoration decoration() => container().decoration as BoxDecoration;
 
     expect(sunkY(), 0);
@@ -93,8 +93,9 @@ void main() {
     expect(decoration().boxShadow, TitoShadows.sticker);
   });
 
-  testWidgets('flat mode strips the shadow and the press physics',
-      (tester) async {
+  testWidgets('flat mode strips the shadow and the press physics', (
+    tester,
+  ) async {
     await retroStyle.setEnabled(false);
     await tester.pumpWidget(
       MaterialApp(
@@ -125,33 +126,37 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
   });
 
-  testWidgets('display-only pressable keeps the static shadow without sinking',
-      (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: StickerPressable(
-              borderRadius: BorderRadius.circular(12),
-              interactive: false,
-              child: const SizedBox(width: 120, height: 80),
+  testWidgets(
+    'display-only pressable keeps the static shadow without sinking',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: StickerPressable(
+                borderRadius: BorderRadius.circular(12),
+                interactive: false,
+                child: const SizedBox(width: 120, height: 80),
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    AnimatedContainer container() =>
-        tester.widget<AnimatedContainer>(find.byType(AnimatedContainer));
+      AnimatedContainer container() =>
+          tester.widget<AnimatedContainer>(find.byType(AnimatedContainer));
 
-    expect((container().decoration as BoxDecoration).boxShadow,
-        TitoShadows.sticker);
-    expect(
-      find.descendant(
-        of: find.byType(StickerPressable),
-        matching: find.byType(Listener),
-      ),
-      findsNothing,
-    );
-  });
+      expect(
+        (container().decoration as BoxDecoration).boxShadow,
+        TitoShadows.sticker,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(StickerPressable),
+          matching: find.byType(Listener),
+        ),
+        findsNothing,
+      );
+    },
+  );
 }

@@ -7,6 +7,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
+import 'liquid_glass.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
 class SecondaryPageScaffold extends StatelessWidget {
@@ -153,38 +154,49 @@ class _BackTitleButton extends StatelessWidget {
       child: Semantics(
         button: true,
         label: '$title · ${AppZh.navHome}',
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(radius),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.arrow_back_rounded,
-                    color: TitoColors.card,
-                    size: iconSize,
-                  ),
-                  SizedBox(width: iconSize * 0.15),
-                  Expanded(
-                    child: Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onGradient.title.copyWith(
-                        letterSpacing: -0.5,
-                        shadows: const [
-                          Shadow(
-                            color: Color(0x4018283B),
-                            offset: Offset(0, 2),
-                          ),
-                        ],
+        child: LiquidGlassSurface(
+          tint: TitoColors.deepBlue,
+          opacity: 0.46,
+          radius: radius,
+          blurSigma: 14,
+          boxShadow: TitoShadows.glassSmall,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(radius),
+              splashColor: Colors.white.withValues(alpha: 0.16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_back_rounded,
+                      color: TitoColors.card,
+                      size: iconSize,
+                    ),
+                    SizedBox(width: iconSize * 0.22),
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onGradient.title.copyWith(
+                          letterSpacing: -0.5,
+                          shadows: const [
+                            Shadow(
+                              color: Color(0x4018283B),
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -212,28 +224,11 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
     // so the gear reads at one size on every title bar.
     final iconSize = size * 0.62;
 
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: true,
-        label: label,
-        child: Material(
-          color: TitoColors.card,
-          shape: const CircleBorder(
-            side: BorderSide(color: TitoColors.ink, width: 2),
-          ),
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-            ),
-          ),
-        ),
-      ),
+    return LiquidGlassRoundButton(
+      size: size,
+      semanticLabel: label,
+      onTap: onTap,
+      child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
     );
   }
 }
