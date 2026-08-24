@@ -16,13 +16,14 @@ import argparse
 import json
 import re
 import time
-import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
 from opencc import OpenCC
+
+from wiki52poke_client import Wiki52PokeClient
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LABELS = ROOT / "flutter" / "assets" / "l10n" / "zh" / "species_labels.json"
@@ -33,6 +34,8 @@ WIKI_BASE = "https://wiki.52poke.com"
 USER_AGENT = "TitoDex-maintainer/1.0 (+https://github.com/Tito-XD/tito-dex)"
 DEFAULT_DELAY = 1.2
 RETRIES = 3
+
+_WIKI_CLIENT: Wiki52PokeClient | None = None
 
 ZH_HANS_CONVERTER = OpenCC("t2s")
 
@@ -132,23 +135,20 @@ def flavors_from_wikitext(wikitext: str) -> dict[str, str]:
 
 
 def opensearch_titles(session: requests.Session, query: str) -> list[str]:
-    params = {
-        "action": "opensearch",
-        "search": query,
-        "limit": 3,
-        "namespace": 0,
-        "format": "json",
-    }
-    response = session.get(
-        f"{WIKI_BASE}/api.php?{urllib.parse.urlencode(params)}", timeout=30
-    )
-    if response.status_code != 200:
-        return []
+    del session  # Shared client enforces one global serial request stream.
     try:
-        titles = response.json()[1]
-    except (ValueError, IndexError):
+        return _wiki_client().search_titles(query, limit=3)
+    except (requests.RequestException, RuntimeError, ValueError):
         return []
-    return titles
+
+
+def _wiki_client() -> Wiki52PokeClient:
+    global _WIKI_CLIENT
+    if _WIKI_CLIENT is None:
+        _WIKI_CLIENT = Wiki52PokeClient(
+            cache_dir=ROOT / "tools" / ".wiki52poke-revisions" / "species"
+        )
+    return _WIKI_CLIENT
 
 
 def candidate_titles(session: requests.Session, query: str) -> list[str]:
@@ -166,32 +166,15 @@ def candidate_titles(session: requests.Session, query: str) -> list[str]:
 
 
 def fetch_wikitext(session: requests.Session, title: str) -> str | None:
-    params = {
-        "action": "parse",
-        "page": title,
-        "prop": "wikitext",
-        "format": "json",
-        "formatversion": 2,
-        "redirects": 1,
-    }
-    url = f"{WIKI_BASE}/api.php?{urllib.parse.urlencode(params)}"
-    response = None
+    del session  # Kept in the public signature for the existing callers.
     for attempt in range(RETRIES):
         try:
-            response = session.get(url, timeout=30)
-            break
-        except requests.RequestException:
+            revision = _wiki_client().latest_revision(title, force=attempt > 0)
+            return revision.content if revision is not None else None
+        except (requests.RequestException, RuntimeError, ValueError):
             if attempt == RETRIES - 1:
                 return None
-            time.sleep(2 * (attempt + 1))
-    if response is None:
-        return None
-    if response.status_code != 200:
-        return None
-    try:
-        return response.json()["parse"]["wikitext"]
-    except (ValueError, KeyError):
-        return None
+    return None
 
 
 def fetch_dedex_wikitext(session: requests.Session, query: str) -> str | None:

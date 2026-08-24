@@ -6,6 +6,8 @@ import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
 import '../extensions/journey_assistant_extension.dart';
 import '../game/game_edition.dart';
+import 'journey_pack_models.dart';
+import 'journey_pack_repository.dart';
 
 enum AskTitoDexStatus { answered, needsClarification, noMatch, failed }
 
@@ -88,6 +90,7 @@ class AskTitoDexContext {
     this.includeLocation = true,
     this.includeBadges = true,
     this.locale = 'zh-Hans',
+    this.journeyPacks = const [],
   });
 
   final String? game;
@@ -105,6 +108,7 @@ class AskTitoDexContext {
   final bool includeLocation;
   final bool includeBadges;
   final String locale;
+  final List<JourneyPackReference> journeyPacks;
 
   bool get hasVerifiedLocationContext =>
       includeLocation &&
@@ -174,6 +178,7 @@ class AskTitoDexContext {
     bool? includeLocation,
     bool? includeBadges,
     String? locationId,
+    List<JourneyPackReference>? journeyPacks,
   }) => AskTitoDexContext(
     game: game,
     generation: generation,
@@ -190,6 +195,7 @@ class AskTitoDexContext {
     includeLocation: includeLocation ?? this.includeLocation,
     includeBadges: includeBadges ?? this.includeBadges,
     locale: locale,
+    journeyPacks: journeyPacks ?? this.journeyPacks,
   );
 
   Map<String, dynamic> toRequestJson() {
@@ -222,6 +228,11 @@ class AskTitoDexContext {
       },
     };
   }
+
+  List<Map<String, String>> get journeyPackRequestJson => journeyPacks
+      .take(1)
+      .map((reference) => reference.toJson())
+      .toList(growable: false);
 
   /// Context for the separately installed extension. Reliability is explicit:
   /// recognizing a save format does not imply every progression field was
@@ -523,45 +534,63 @@ class BundledProgressionHintDataSource implements ProgressionHintDataSource {
   Future<String?> loadJson() => rootBundle.loadString(assetPath);
 }
 
+class DownloadedJourneyPackProgressionHintDataSource
+    implements ProgressionHintDataSource {
+  const DownloadedJourneyPackProgressionHintDataSource(this.repository);
+
+  final JourneyPackRepository repository;
+
+  @override
+  Future<String?> loadJson() => repository.progressionHintsJson();
+}
+
 class ProgressionHintRepository {
   ProgressionHintRepository({
     ProgressionHintDataSource? extensionDataSource,
     ProgressionHintDataSource? bundledDataSource,
+    ProgressionHintDataSource? downloadedPackDataSource,
   }) : _extensionDataSource =
            extensionDataSource ??
            InstalledExtensionProgressionHintDataSource(
              journeyAssistantExtension,
            ),
        _bundledDataSource =
-           bundledDataSource ?? const BundledProgressionHintDataSource();
+           bundledDataSource ?? const BundledProgressionHintDataSource(),
+       _downloadedPackDataSource =
+           downloadedPackDataSource ??
+           DownloadedJourneyPackProgressionHintDataSource(
+             journeyPackRepository,
+           );
 
   final ProgressionHintDataSource _extensionDataSource;
   final ProgressionHintDataSource _bundledDataSource;
+  final ProgressionHintDataSource _downloadedPackDataSource;
   List<ProgressionHint>? _cached;
 
   Future<List<ProgressionHint>> load() async {
     final cached = _cached;
     if (cached != null) return cached;
-    // Keep already-installed content APKs compatible, but the assistant no
-    // longer depends on Android package discovery. The reviewed HGSS seed is
-    // always available from the host APK when no extension data can be read.
-    final source =
+    // Keep the same-signer content APK as the legacy base. A verified
+    // downloaded game pack can add or replace individual ids, while any
+    // missing/corrupt pack safely falls back to that base and the bundled HGSS
+    // seed.
+    final baseSource =
         await _extensionDataSource.loadJson() ??
         await _bundledDataSource.loadJson();
-    if (source == null) return const [];
-    final json = jsonDecode(source) as Map<String, dynamic>;
-    if (json['schemaVersion'] != 1) {
-      throw const FormatException('Unsupported progression hints schema.');
+    final downloadedSource = await _downloadedPackDataSource.loadJson();
+    final byId = <String, ProgressionHint>{};
+    for (final source in [baseSource, downloadedSource]) {
+      if (source == null) continue;
+      for (final hint in _parseProgressionHints(source)) {
+        byId[hint.id] = hint;
+      }
     }
-    final loaded = (json['entries'] as List<dynamic>)
-        .map(
-          (item) =>
-              ProgressionHint.fromJson(Map<String, dynamic>.from(item as Map)),
-        )
-        .toList(growable: false);
+    final loaded = byId.values.toList(growable: false);
     _cached = loaded;
     return loaded;
   }
+
+  void invalidate() => _cached = null;
 
   Future<String?> resolveLocationId(String? label) async {
     final normalized = _normalize(label ?? '');
@@ -690,6 +719,26 @@ class ProgressionHintRepository {
       confidence: 'high',
       sources: hint.sources,
     );
+  }
+}
+
+List<ProgressionHint> _parseProgressionHints(String source) {
+  try {
+    final decoded = jsonDecode(source);
+    if (decoded is! Map || decoded['entries'] is! List) return const [];
+    return (decoded['entries'] as List<dynamic>)
+        .whereType<Map>()
+        .map((entry) {
+          try {
+            return ProgressionHint.fromJson(Map<String, dynamic>.from(entry));
+          } on Object {
+            return null;
+          }
+        })
+        .whereType<ProgressionHint>()
+        .toList(growable: false);
+  } on Object {
+    return const [];
   }
 }
 

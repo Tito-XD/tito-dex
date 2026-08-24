@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Tito-XD/tito-dex/data/dex/entity_index.schema.json",
+  "title": "TitoDex stable entity index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "bundleVersion",
+    "generatedAt",
+    "entities",
+    "audit"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "bundleVersion": { "type": "integer", "minimum": 20 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "audit": { "$ref": "#/$defs/audit" }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stableId",
+        "kind",
+        "id",
+        "slug",
+        "nameZh",
+        "nameEn",
+        "ref"
+      ],
+      "properties": {
+        "stableId": {
+          "type": "string",
+          "pattern": "^(pokemon|move|ability|item):[a-z0-9][a-z0-9-]*$"
+        },
+        "kind": { "enum": ["pokemon", "move", "ability", "item"] },
+        "id": { "type": "integer", "minimum": 1 },
+        "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "nameZh": { "type": "string", "minLength": 1 },
+        "nameEn": { "type": "string", "minLength": 1 },
+        "aliasesZh": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "aliasesEn": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "pointer"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "pointer": { "type": "string", "pattern": "^/" }
+          }
+        }
+      }
+    },
+    "labelIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["labelId", "nameZh", "nameEn"],
+      "properties": {
+        "labelId": { "type": "string", "minLength": 1 },
+        "nameZh": { "type": "string" },
+        "nameEn": { "type": "string" }
+      }
+    },
+    "nameCollision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "language", "name", "stableIds"],
+      "properties": {
+        "kind": { "enum": ["pokemon", "move", "ability", "item"] },
+        "language": { "enum": ["zh", "en"] },
+        "name": { "type": "string", "minLength": 1 },
+        "stableIds": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeCounts",
+        "labelCounts",
+        "phantomLabels",
+        "runtimeWithoutLabel",
+        "labelNameConflicts",
+        "duplicateNames"
+      ],
+      "properties": {
+        "runtimeCounts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "labelCounts": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "phantomLabels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/labelIssue" }
+          }
+        },
+        "runtimeWithoutLabel": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
+        },
+        "labelNameConflicts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
+        },
+        "duplicateNames": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nameCollision" }
+        }
+      }
+    }
+  }
+}

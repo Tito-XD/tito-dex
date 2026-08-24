@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "reviewStatus": "candidate",
+  "sourceId": "titodex-reviewed-mechanics",
+  "statuses": {
+    "burn": {
+      "kind": "major",
+      "descriptionZh": "每回合损失生命值，并降低物理招式造成的伤害；个别特性或招式会改变这一效果。",
+      "generationRules": [
+        {"fromGeneration": 1, "toGeneration": 1, "residualDamageDenominator": 16, "physicalAttackMultiplier": 0.5},
+        {"fromGeneration": 2, "toGeneration": 6, "residualDamageDenominator": 8, "physicalAttackMultiplier": 0.5},
+        {"fromGeneration": 7, "residualDamageDenominator": 16, "physicalAttackMultiplier": 0.5}
+      ]
+    },
+    "freeze": {
+      "kind": "major",
+      "descriptionZh": "通常无法行动；可通过自然解冻、特定招式或外部效果解除。",
+      "generationRules": [
+        {"fromGeneration": 1, "toGeneration": 1, "naturalThaw": false},
+        {"fromGeneration": 2, "naturalThaw": true, "naturalThawChancePercent": 20}
+      ]
+    },
+    "paralysis": {
+      "kind": "major",
+      "descriptionZh": "有概率无法行动，并降低速度。",
+      "generationRules": [
+        {"fromGeneration": 1, "toGeneration": 6, "speedMultiplier": 0.25, "fullParalysisChancePercent": 25},
+        {"fromGeneration": 7, "speedMultiplier": 0.5, "fullParalysisChancePercent": 25}
+      ]
+    },
+    "poison": {
+      "kind": "major",
+      "descriptionZh": "每回合损失固定比例的生命值。",
+      "generationRules": [
+        {"fromGeneration": 1, "residualDamageDenominator": 8}
+      ]
+    },
+    "bad-poison": {
+      "kind": "major",
+      "descriptionZh": "每回合受到逐渐增加的中毒伤害；换下后计数通常会重置。",
+      "generationRules": [
+        {"fromGeneration": 1, "damageFormula": "turnCounter/16 max HP"}
+      ]
+    },
+    "sleep": {
+      "kind": "major",
+      "descriptionZh": "睡眠期间通常无法使用招式；睡眠回合数和换下后的计数规则随世代变化。",
+      "generationRules": [
+        {"fromGeneration": 1, "toGeneration": 1, "turnRange": [1, 7]},
+        {"fromGeneration": 2, "toGeneration": 4, "turnRange": [1, 6]},
+        {"fromGeneration": 5, "turnRange": [1, 3]}
+      ]
+    },
+    "confusion": {
+      "kind": "volatile",
+      "descriptionZh": "每回合可能攻击自己，持续回合数和自伤威力随世代变化。",
+      "generationRules": [
+        {"fromGeneration": 1, "toGeneration": 6, "selfHitChancePercent": 50, "selfHitPower": 40},
+        {"fromGeneration": 7, "selfHitChancePercent": 33.333333, "selfHitPower": 40}
+      ]
+    },
+    "flinch": {"kind": "volatile", "descriptionZh": "若目标本回合尚未行动，会失去该回合的行动机会。"},
+    "trap": {"kind": "volatile", "descriptionZh": "限制目标替换或逃走；具体持续时间和伤害由施加效果决定。"},
+    "bound": {"kind": "volatile", "descriptionZh": "在数回合内限制替换并造成持续伤害；持续时间与伤害随世代和道具变化。"},
+    "leech-seed": {"kind": "volatile", "descriptionZh": "回合结束时从目标吸取生命值并回复场上施加方阵营的宝可梦。"},
+    "curse": {"kind": "volatile", "descriptionZh": "幽灵属性使用者会消耗自身生命值，使目标每回合损失生命；其他属性使用时效果不同。"},
+    "nightmare": {"kind": "volatile", "descriptionZh": "目标处于睡眠时每回合损失生命，醒来后解除。"},
+    "infatuation": {"kind": "volatile", "descriptionZh": "每回合可能因着迷而无法行动，适用条件受性别与特性影响。"},
+    "torment": {"kind": "volatile", "descriptionZh": "目标不能连续两个回合选择同一个招式。"},
+    "disable": {"kind": "volatile", "descriptionZh": "暂时禁止目标使用其最近使用的招式。"},
+    "encore": {"kind": "volatile", "descriptionZh": "迫使目标在数回合内重复使用最近选择的招式。"},
+    "perish-song": {"kind": "volatile", "descriptionZh": "倒计时结束时仍在场上的受影响宝可梦会陷入濒死；换下可解除计数。"},
+    "yawn": {"kind": "volatile", "descriptionZh": "若未被阻止，目标会在下一回合结束时进入睡眠。"},
+    "taunt": {"kind": "volatile", "descriptionZh": "目标暂时只能选择会造成伤害的招式。"},
+    "embargo": {"kind": "volatile", "descriptionZh": "暂时使目标无法使用携带道具；该效果仅在部分世代可用。", "availableGenerations": [4, 5, 6, 7]},
+    "heal-block": {"kind": "volatile", "descriptionZh": "暂时阻止目标通过大部分招式回复生命；该效果仅在部分世代可用。", "availableGenerations": [4, 5, 6, 7]}
+  },
+  "weather": {
+    "sun": {
+      "descriptionZh": "增强火属性招式并削弱水属性招式，还会影响多种招式、特性与回复效果。",
+      "introducedGeneration": 2,
+      "effects": {"fireMoveMultiplier": 1.5, "waterMoveMultiplier": 0.5}
+    },
+    "rain": {
+      "descriptionZh": "增强水属性招式并削弱火属性招式，还会影响多种招式、特性与命中率。",
+      "introducedGeneration": 2,
+      "effects": {"waterMoveMultiplier": 1.5, "fireMoveMultiplier": 0.5}
+    },
+    "sandstorm": {
+      "descriptionZh": "回合结束时伤害多数非岩石、地面或钢属性宝可梦，并提升岩石属性宝可梦的特防。",
+      "introducedGeneration": 2,
+      "generationRules": [
+        {"fromGeneration": 2, "toGeneration": 3, "residualDamageDenominator": 8},
+        {"fromGeneration": 4, "residualDamageDenominator": 16, "rockSpecialDefenseMultiplier": 1.5}
+      ]
+    },
+    "hail": {
+      "descriptionZh": "回合结束时伤害多数非冰属性宝可梦；在第九世代的主系列对战中由下雪取代。",
+      "introducedGeneration": 3,
+      "availableGenerations": [3, 4, 5, 6, 7, 8],
+      "effects": {"residualDamageDenominator": 16}
+    },
+    "snow": {
+      "descriptionZh": "提升冰属性宝可梦的防御，并影响多种冰雪相关招式与特性。",
+      "introducedGeneration": 9,
+      "effects": {"iceDefenseMultiplier": 1.5}
+    },
+    "fog": {
+      "descriptionZh": "降低大多数招式的命中率；主要作为特定游戏中的场地天气出现。",
+      "introducedGeneration": 4,
+      "effects": {"accuracyMultiplier": 0.6}
+    },
+    "strong-winds": {
+      "descriptionZh": "削弱飞行属性原本的弱点伤害；由特定效果维持。",
+      "introducedGeneration": 6
+    },
+    "heavy-rain": {
+      "descriptionZh": "强化水属性招式并使火属性攻击招式失败；由特定效果维持。",
+      "introducedGeneration": 6
+    },
+    "harsh-sunlight": {
+      "descriptionZh": "强化火属性招式并使水属性攻击招式失败；由特定效果维持。",
+      "introducedGeneration": 6
+    },
+    "strong-winds-primal": {
+      "descriptionZh": "与乱流使用同一核心规则；保留此独立键用于兼容旧 bundle 的显示名称。",
+      "introducedGeneration": 6,
+      "aliasOf": "strong-winds"
+    }
+  },
+  "terrains": {
+    "electric": {
+      "descriptionZh": "地面上的宝可梦不会陷入睡眠，电属性招式威力提高。",
+      "introducedGeneration": 6,
+      "generationRules": [
+        {"fromGeneration": 6, "toGeneration": 7, "moveMultiplier": 1.5},
+        {"fromGeneration": 8, "moveMultiplier": 1.3}
+      ]
+    },
+    "grassy": {
+      "descriptionZh": "地面上的宝可梦每回合回复生命，草属性招式威力提高，并削弱部分地面招式。",
+      "introducedGeneration": 6,
+      "generationRules": [
+        {"fromGeneration": 6, "toGeneration": 7, "moveMultiplier": 1.5, "healingDenominator": 16},
+        {"fromGeneration": 8, "moveMultiplier": 1.3, "healingDenominator": 16}
+      ]
+    },
+    "psychic": {
+      "descriptionZh": "地面上的宝可梦不会受到对手先制招式影响，超能力属性招式威力提高。",
+      "introducedGeneration": 7,
+      "generationRules": [
+        {"fromGeneration": 7, "toGeneration": 7, "moveMultiplier": 1.5},
+        {"fromGeneration": 8, "moveMultiplier": 1.3}
+      ]
+    },
+    "misty": {
+      "descriptionZh": "地面上的宝可梦不会陷入主要异常状态，受到的龙属性招式伤害减半。",
+      "introducedGeneration": 6,
+      "effects": {"dragonDamageMultiplier": 0.5}
+    }
+  }
+}

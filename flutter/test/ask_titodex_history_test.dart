@@ -119,31 +119,92 @@ void main() {
     },
   );
 
-  test(
-    'entity links resolve Pokemon, item, move and ability from local labels',
-    () async {
-      final links = await DexAskTitoDexEntityResolver().resolve(
-        question: '紫里哪里抓利欧路？讲究围巾和近身战适合吗？',
-        answer: '利欧路也可能讨论精神力特性。',
-      );
+  test('entity links resolve stable ids from the runtime catalog', () async {
+    final resolver = DexAskTitoDexEntityResolver(
+      catalogLoader: () async => const [
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.pokemon,
+          id: 447,
+          nameZh: '利欧路',
+          nameEn: 'Riolu',
+          slug: 'riolu',
+        ),
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.item,
+          id: 287,
+          nameZh: '讲究围巾',
+          nameEn: 'Choice Scarf',
+          slug: 'choice-scarf',
+        ),
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.move,
+          id: 370,
+          nameZh: '近身战',
+          nameEn: 'Close Combat',
+          slug: 'close-combat',
+        ),
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.ability,
+          id: 39,
+          nameZh: '精神力',
+          nameEn: 'Inner Focus',
+          slug: 'inner-focus',
+        ),
+      ],
+    );
+    final links = await resolver.resolve(
+      question: '紫里哪里抓利欧路？讲究围巾和近身战适合吗？',
+      answer: '利欧路也可能讨论精神力特性。',
+    );
 
-      expect(
-        links.map((link) => link.kind),
-        containsAll([
-          AskTitoDexEntityKind.pokemon,
-          AskTitoDexEntityKind.item,
-          AskTitoDexEntityKind.move,
-          AskTitoDexEntityKind.ability,
-        ]),
-      );
-      expect(
-        links.singleWhere((link) => link.nameZh == '利欧路').route,
-        '/dex/447',
-      );
-      expect(
-        links.singleWhere((link) => link.nameZh == '讲究围巾').route,
-        contains('kind=items'),
-      );
-    },
-  );
+    expect(
+      links.map((link) => link.kind),
+      containsAll([
+        AskTitoDexEntityKind.pokemon,
+        AskTitoDexEntityKind.item,
+        AskTitoDexEntityKind.move,
+        AskTitoDexEntityKind.ability,
+      ]),
+    );
+    expect(links.singleWhere((link) => link.nameZh == '利欧路').route, '/dex/447');
+    expect(
+      links.singleWhere((link) => link.nameZh == '讲究围巾').route,
+      '/search/reference/json?kind=items&id=287&open=1&q=%E8%AE%B2%E7%A9%B6%E5%9B%B4%E5%B7%BE',
+    );
+    expect(
+      links.singleWhere((link) => link.nameZh == '近身战').slug,
+      'close-combat',
+    );
+  });
+
+  test('ambiguous translated names do not create a misleading chip', () async {
+    final resolver = DexAskTitoDexEntityResolver(
+      catalogLoader: () async => const [
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.item,
+          id: 1,
+          nameZh: '重复名称',
+          nameEn: 'First Item',
+          slug: 'first-item',
+        ),
+        AskTitoDexEntityRecord(
+          kind: AskTitoDexEntityKind.item,
+          id: 2,
+          nameZh: '重复名称',
+          nameEn: 'Second Item',
+          slug: 'second-item',
+        ),
+      ],
+    );
+
+    expect(
+      await resolver.resolve(question: '重复名称有什么用？', answer: '暂无。'),
+      isEmpty,
+    );
+    final explicit = await resolver.resolve(
+      question: 'First Item 有什么用？',
+      answer: '暂无。',
+    );
+    expect(explicit.single.id, 1);
+  });
 }

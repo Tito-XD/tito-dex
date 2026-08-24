@@ -82,6 +82,11 @@ v14 起 `sprites/` 是离线默认图的唯一规范副本，archive 不再重�
 当前生产 v19 已完成发布。未来版本必须以线上 v19 为只读基线，新建版本专用 patch、
 审计与 workflow，并以精确生产版本作为上传前置条件。通用校验入口：
 
+v20 的本地候选基础设施、overlay provenance、稳定实体索引和 manifest-last 隔离布局见
+[DEX_BUNDLE_V20.md](DEX_BUNDLE_V20.md)。候选 builder 本身永远不上传；另有默认 dry-run
+的 v20 专用受保护 workflow，把对象上传、回读收据、根 manifest 切换和 v19 恢复拆成
+独立授权动作。
+
 ```bash
 pip install -r tools/dex_bundle_requirements.txt
 python3 tools/audit_encounter_coverage.py <staging> --strict
@@ -94,6 +99,59 @@ v19 的版本专用构建与审计脚本仍保留在 `tools/`；v7–v18 的演�
 Git 历史追溯，不作为下一次发布说明。需要重建 PKHeX overlay 时使用
 `tools/generate_pkhex_encounter_overlays.py` 并固定、验证上游 commit；不能唯一确认的
 form 只保留物种并标记歧义。
+
+### v20 基础参考资料候选
+
+`patch_dex_bundle_v20_reference.py` 只读复制完整 v19 staging，并从
+`data/dex/reference_v20_sources.json` 固定的 PokéAPI/api-data 提交补齐招式、特性、
+道具与按世代机制资料，同时把 v19 APK 中已经审计的招式／道具版本矩阵纳入 bundle。
+它不会调用 52Poké、不会上传，也不会切换根 manifest；输出的根 manifest 明确带有
+`candidate=true`，文件名也保留 `.candidate.json`。
+
+```bash
+python3 -m unittest tools.test_patch_dex_bundle_v20_reference
+python3 tools/patch_dex_bundle_v20_reference.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --output dist/dex-v20-candidate
+python3 tools/verify_dex_v20_reference.py \
+  dist/dex-v20-candidate/staging
+```
+
+可用 `--api-data <checkout>` 复用已经下载的数据；脚本会验证 HEAD 与锁文件中的提交
+完全一致。候选内的 `reference_v20_audit.json` 记录真实覆盖率和未解析条目，中文缺失
+保留语言／fallback 标记，不自动翻译或编造。正式发布仍需独立的 v20 workflow、生产
+版本前置检查、完整上传树审计和人工批准。
+
+第 2 批精确版本资料由 `build_dex_bundle_v20_gameplay.py` 生成在 `gameplay/`：固定来源
+能够逐物种／地点确认的野外、定点和团体战记录才标记为已覆盖；赠送、游戏内交换、
+传送、不可获得及逐版本进化条件没有允许来源时均保留 `unknown`。全局进化家族只作为
+非权威候选路线，不会冒充精确版本事实。招式学习方式链接稳定 move/item/machine ID；
+机器配方未包含于固定来源时同样保留 `unknown`。剧情道具关联只读取已经审核的
+`progression_hints.json` 的 `key_item` requirement，禁止从携带道具关系推断剧情用途。
+
+正式组合 v20 时优先生成可叠加 overlay，而不是分别生成会互相覆盖的完整候选：
+
+```bash
+python3 -m unittest tools.test_build_dex_bundle_v20_gameplay
+python3 tools/build_dex_v20_reference_overlay.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --api-data <pinned-api-data-checkout> \
+  --output dist/dex-v20-reference-overlay
+python3 tools/build_dex_v20_candidate.py \
+  --base-staging <immutable-v19-staging> \
+  --base-root-manifest <immutable-v19-root-manifest> \
+  --overlay dist/dex-v20-reference-overlay \
+  --output dist/dex-v20-candidate
+python3 tools/verify_dex_v20_gameplay.py \
+  dist/dex-v20-candidate/staging
+```
+
+overlay 只含相对 staging 的变化文件、两份上游 notice 和符合
+`bundle_overlay.schema.json` 的 `overlay-provenance.json`，明确排除 manifest、archive
+与生产根对象；可以与其他 v20 overlay 通过重复 `--overlay` 一次性组合。审计包含 23 个
+统一版本组、全部 exact version key、unknown 分布以及 HGSS／BDSP／SV 黄金样例。
 
 ## Offline 紧凑种子 v14
 

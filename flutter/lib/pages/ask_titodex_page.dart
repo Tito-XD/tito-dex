@@ -339,6 +339,9 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                   onRefresh: _checkConnection,
                   onShowHistory: _showHistoryManager,
                   onChangeEdition: _pickEdition,
+                  onManagePacks: askTitoDexSettings.extensionEnabled
+                      ? () => context.push('/journey/packs')
+                      : null,
                   onRemoveLocation: contextValue == null
                       ? null
                       : () => setState(
@@ -457,6 +460,7 @@ class _ConnectionStatusCard extends StatelessWidget {
     required this.onRefresh,
     required this.onShowHistory,
     required this.onChangeEdition,
+    this.onManagePacks,
     required this.onRemoveLocation,
     required this.onRemoveBadges,
   });
@@ -468,6 +472,7 @@ class _ConnectionStatusCard extends StatelessWidget {
   final VoidCallback onRefresh;
   final VoidCallback onShowHistory;
   final VoidCallback onChangeEdition;
+  final VoidCallback? onManagePacks;
   final VoidCallback? onRemoveLocation;
   final VoidCallback? onRemoveBadges;
 
@@ -580,6 +585,24 @@ class _ConnectionStatusCard extends StatelessWidget {
                       textKey: const Key('ask-titodex-current-edition'),
                       semanticsLabel: '当前游戏版本 $editionLabel，点击切换',
                       onTap: onChangeEdition,
+                      trailing: onManagePacks == null
+                          ? null
+                          : IconButton(
+                              key: const Key('ask-titodex-packs-entry'),
+                              tooltip: '管理 Journey 资料包',
+                              onPressed: onManagePacks,
+                              constraints: const BoxConstraints.tightFor(
+                                width: 28,
+                                height: 32,
+                              ),
+                              padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(
+                                Icons.download_for_offline_outlined,
+                                color: TitoColors.deepBlue,
+                                size: 18,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -642,6 +665,7 @@ class _StatusSegment extends StatelessWidget {
     required this.semanticsLabel,
     required this.onTap,
     this.textKey,
+    this.trailing,
   });
 
   final Widget leading;
@@ -649,6 +673,7 @@ class _StatusSegment extends StatelessWidget {
   final String semanticsLabel;
   final VoidCallback onTap;
   final Key? textKey;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -680,6 +705,7 @@ class _StatusSegment extends StatelessWidget {
                   ),
                 ),
               ),
+              if (trailing case final trailing?) trailing,
             ],
           ),
         ),

@@ -29,6 +29,15 @@ import {
   answerSelectedGameMechanic,
 } from './game_mechanics';
 import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
+import { recentConversationForQuestion } from './conversation_context';
+import {
+  descriptorForPath,
+  descriptorObjectKey,
+  loadJourneyPackCatalog,
+  loadJourneyPackHints,
+  MAX_JOURNEY_PACK_BYTES,
+  readJourneyPackBody,
+} from './journey_packs';
 
 const MODEL_TIMEOUT_MS = 10_000;
 const CURATED_MODEL_TIMEOUT_MS = 6_000;
@@ -40,6 +49,8 @@ const EXTENSION_OBJECT_PATH_PREFIX = '/v1/extensions/journey_assistant/objects/'
 const EXTENSION_CATALOG_KEY = 'extensions/journey-assistant/extension-catalog.json';
 const EXTENSION_OBJECT_KEY_PREFIX = 'extensions/journey-assistant/objects/';
 const IMMUTABLE_APK_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.apk$/;
+const JOURNEY_PACK_CATALOG_PATH = '/v1/journey-packs/catalog';
+const JOURNEY_PACK_OBJECT_PATH_PREFIX = '/v1/journey-packs/objects/';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -96,9 +107,12 @@ export default {
           webSearchProviders,
           braveSearch: false,
           externalProvider: env.AI_EXTERNAL_PROVIDER_ENABLED === 'true',
+          journeyPacks: Boolean(env.JOURNEY_CONTENT),
         },
       }, 200);
     }
+    const journeyPackContent = await serveJourneyPackContent(request, url, env);
+    if (journeyPackContent) return journeyPackContent;
     const extensionContent = await serveExtensionContent(request, url, env);
     if (extensionContent) return extensionContent;
     if (url.pathname !== '/v1/ask') return jsonError('not_found', 404);
@@ -130,14 +144,21 @@ export default {
     }
     const parsed = parseAssistantRequest(value);
     if (!parsed) return jsonError('invalid_request', 400);
+    const availableHints = await loadJourneyPackHints(parsed, env.JOURNEY_CONTENT);
 
     const buildResponse = async (): Promise<AssistantResponse> => {
       const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
       let curatedDecision: unknown;
-      // Resolve a unique reviewed hint and exact Dex-bundle facts before any
-      // retrieval or model call. This keeps common entity questions truly
-      // model-free even when their wording overlaps a generic Journey alias.
-      let response = await answerQuestion(parsed);
+      let bundleFallback: AssistantResponse | null = null;
+      // Resolve reviewed hints and exact Dex-bundle facts before retrieval.
+      // V19 remains deterministic; V20 facts marked online-verify become the
+      // bounded local baseline for the allowlisted corroboration pass below.
+      let response = await answerQuestion(
+        parsed,
+        undefined,
+        undefined,
+        availableHints,
+      );
       if (response.status !== 'answered') {
         response = answerSelectedGameMechanic(parsed) ??
           answerKnownPokemonFranchiseFact(parsed) ?? response;
@@ -145,9 +166,15 @@ export default {
       let dexBundleSources: CuratedSource[] = [];
       if (response.status !== 'answered' && env.DEX_CONTENT) {
         try {
-          const bundleAnswer = await answerFromDexBundle(parsed, env.DEX_CONTENT);
-          if (bundleAnswer) response = bundleAnswer;
-          else dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+          const bundleResult = await answerFromDexBundle(parsed, env.DEX_CONTENT);
+          if (bundleResult?.requiresOnlineVerification) {
+            bundleFallback = bundleResult.response;
+            dexBundleSources = [bundleResult.localSource];
+          } else if (bundleResult) {
+            response = bundleResult.response;
+          } else {
+            dexBundleSources = await buildDexBundleSources(parsed, env.DEX_CONTENT);
+          }
         } catch {
           // The versioned Dex bundle is an optional deterministic source. Any
           // missing/invalid object falls through to the existing safe pipeline.
@@ -158,12 +185,13 @@ export default {
           parsed,
           undefined,
           async (hints, assistantRequest) => {
-          const route = await resolveQuestionRoute(env, hints, assistantRequest);
-          trace.modelUsed ||= route.modelUsed;
-          trace.aiSearchUsed = route.aiSearchUsed;
-          curatedDecision = route.curatedDecision;
-          return { hintId: route.hintId };
+            const route = await resolveQuestionRoute(env, hints, assistantRequest);
+            trace.modelUsed ||= route.modelUsed;
+            trace.aiSearchUsed = route.aiSearchUsed;
+            curatedDecision = route.curatedDecision;
+            return { hintId: route.hintId };
           },
+          availableHints,
         );
       }
       let curatedSourcesUsed = false;
@@ -224,7 +252,12 @@ export default {
                   );
                   const relaxedNativeAnswer =
                     env.EXPERIMENTAL_BROAD_ANSWERS === 'true' &&
-                      !isGeneralPokemonFranchiseQuestion(parsed.question)
+                      !isGeneralPokemonFranchiseQuestion(parsed.question) &&
+                      await verifyRelaxedAnswerTopic(
+                        env,
+                        parsed,
+                        nativeResult.answer,
+                      )
                       ? nativeResult.answer
                       : null;
                   if (verifiedAnswer || relaxedNativeAnswer) {
@@ -249,7 +282,10 @@ export default {
           curatedPromise,
           deepSeekPromise,
         ]);
-        if (curatedResponse) {
+        const curatedHasRequiredOnlineEvidence = curatedResponse !== null && (
+          !bundleFallback || (curatedResponse.sources ?? []).length > 0
+        );
+        if (curatedResponse && curatedHasRequiredOnlineEvidence) {
           response = deepSeekCandidate
             ? await reconcileParallelAnswers(
                 env,
@@ -260,9 +296,29 @@ export default {
             : curatedResponse;
           curatedSourcesUsed = true;
         } else if (deepSeekCandidate) {
-          response = deepSeekCandidate.response;
-          curatedSourcesUsed = true;
+          const verifiedDeepSeekResponse = bundleFallback
+            ? await reconcileParallelAnswers(
+                env,
+                parsed,
+                bundleFallback,
+                deepSeekCandidate,
+              )
+            : deepSeekCandidate.response;
+          if (verifiedDeepSeekResponse) {
+            response = verifiedDeepSeekResponse;
+            curatedSourcesUsed = true;
+          }
         }
+      }
+      if (response.status !== 'answered' && bundleFallback) {
+        const verificationNote = '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。';
+        response = {
+          ...bundleFallback,
+          unknowns: Array.from(new Set([
+            ...(bundleFallback.unknowns ?? []),
+            verificationNote,
+          ])),
+        };
       }
       response = normalizeResponseAnswer(response);
       response = attachExecutionTrace(response, trace, curatedSourcesUsed);
@@ -326,6 +382,57 @@ function answerStreamChunks(answer: string): string[] {
   return chunks;
 }
 
+async function serveJourneyPackContent(
+  request: Request,
+  url: URL,
+  env: Env,
+): Promise<Response | null> {
+  const isCatalog = url.pathname === JOURNEY_PACK_CATALOG_PATH;
+  const objectName = url.pathname.startsWith(JOURNEY_PACK_OBJECT_PATH_PREFIX)
+    ? url.pathname.slice(JOURNEY_PACK_OBJECT_PATH_PREFIX.length)
+    : null;
+  if (!isCatalog && objectName === null) return null;
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return jsonError('method_not_allowed', 405);
+  }
+  if (!env.JOURNEY_CONTENT) return jsonError('resource_unavailable', 503);
+  try {
+    const catalog = await loadJourneyPackCatalog(env.JOURNEY_CONTENT);
+    if (!catalog) return jsonError('not_found', 404);
+    const headers = new Headers();
+    headers.set('content-type', 'application/json; charset=utf-8');
+    headers.set('x-content-type-options', 'nosniff');
+    if (isCatalog) {
+      headers.set('cache-control', 'no-store');
+      headers.set('content-length', String(catalog.body.byteLength));
+      return new Response(request.method === 'HEAD' ? null : catalog.body, {
+        status: 200,
+        headers,
+      });
+    }
+    const contentPath = `${JOURNEY_PACK_OBJECT_PATH_PREFIX}${objectName ?? ''}`;
+    const descriptor = descriptorForPath(catalog.descriptors, contentPath);
+    if (!descriptor) return jsonError('not_found', 404);
+    headers.set('cache-control', 'public, max-age=31536000, immutable');
+    headers.set('content-length', String(descriptor.sizeBytes));
+    headers.set('etag', `"${descriptor.sha256}"`);
+    if (request.method === 'HEAD') {
+      const object = await env.JOURNEY_CONTENT.head(descriptorObjectKey(descriptor));
+      if (
+        !object ||
+        object.size !== descriptor.sizeBytes ||
+        object.size > MAX_JOURNEY_PACK_BYTES
+      ) return jsonError('not_found', 404);
+      return new Response(null, { status: 200, headers });
+    }
+    const body = await readJourneyPackBody(descriptor, env.JOURNEY_CONTENT);
+    if (!body) return jsonError('not_found', 404);
+    return new Response(body, { status: 200, headers });
+  } catch {
+    return jsonError('resource_unavailable', 503);
+  }
+}
+
 async function serveExtensionContent(
   request: Request,
   url: URL,
@@ -386,7 +493,10 @@ async function resolveQuestionRoute(
   modelUsed: boolean;
   curatedDecision?: unknown;
 }> {
-  const hasLocalEvidence = hints.some((hint) => hasHintLexicalEvidence(hint, request.question));
+  const evidenceCandidates = hints.filter((hint) =>
+    hasHintLexicalEvidence(hint, request.question)
+  );
+  const hasLocalEvidence = evidenceCandidates.length > 0;
   const deterministicCuratedDecision = deterministicCuratedScopeDecision(request);
   if (!hasLocalEvidence && deterministicCuratedDecision) {
     return {
@@ -396,7 +506,7 @@ async function resolveQuestionRoute(
       curatedDecision: deterministicCuratedDecision,
     };
   }
-  let candidates = hasLocalEvidence ? hints : [];
+  let candidates = evidenceCandidates;
   let aiSearchUsed = false;
   const search = getJourneySearch(
     env.AI_SEARCH_ENABLED,
@@ -405,7 +515,7 @@ async function resolveQuestionRoute(
   if (search && hasLocalEvidence) {
     try {
       const retrievedIds = await withTimeout(
-        retrieveAuditedHintIds(search, hints, request),
+        retrieveAuditedHintIds(search, candidates, request),
         SEARCH_TIMEOUT_MS,
       );
       const retrieved = new Set(retrievedIds);
@@ -593,6 +703,45 @@ function mergeResponseSources(
   }).slice(0, 8);
 }
 
+async function verifyRelaxedAnswerTopic(
+  env: Env,
+  request: AssistantRequest,
+  answer: string,
+): Promise<boolean> {
+  let value: unknown;
+  try {
+    value = await runWorkersAi(
+      env,
+      'deepseek-native-topic-check',
+      [
+        {
+          role: 'system',
+          content: '/no_think\n你只检查 answer 是否直接回应本次 question 的主体和意图。不得核验或补写事实。若 answer 转而解释旧对话主题、只回答同一游戏里的相邻概念，或把地点／捕捉／招式／道具／培养等不同意图混为一谈，onTopic=false。只有明显省略主语的追问才可参考 recentConversation。只输出 JSON。',
+        },
+        {
+          role: 'user',
+          content: JSON.stringify({
+            question: request.question,
+            recentConversation: recentConversationForQuestion(request, 6),
+            answer: answer.slice(0, MAX_ANSWER_LENGTH),
+          }),
+        },
+      ],
+      {
+        type: 'object',
+        additionalProperties: false,
+        required: ['onTopic'],
+        properties: { onTopic: { type: 'boolean' } },
+      },
+      40,
+      0,
+    );
+  } catch {
+    return false;
+  }
+  return isPlainObject(value) && value.onTopic === true;
+}
+
 async function verifyDeepSeekNativeAnswer(
   env: Env,
   request: AssistantRequest,
@@ -621,7 +770,7 @@ async function verifyDeepSeekNativeAnswer(
           role: 'user',
           content: JSON.stringify({
             question: request.question,
-            recentConversation: (request.history ?? []).slice(-6),
+            recentConversation: recentConversationForQuestion(request, 6),
             context: generalFranchise
               ? { scope: 'pokemon_franchise' }
               : modelSafeContext(request),
@@ -755,7 +904,7 @@ async function resolveRouteWithModel(
       role: 'user',
       content: JSON.stringify({
         question: request.question,
-        recentConversation: (request.history ?? []).slice(-6),
+        recentConversation: recentConversationForQuestion(request, 6),
         context: modelSafeContext(request),
         candidates: hints.map((hint) => ({
           id: hint.id,
@@ -791,12 +940,41 @@ async function resolveRouteWithModel(
 
 const GENERIC_EVIDENCE = new Set([
   '怎么', '道路', '进不', '挡路', '宝可', '游戏', '主线', '地点', '道具', '获得',
+  '紫里', '朱里', '里的', '这个', '那个',
 ]);
+
+const blockerIntent = /(?:进不去|过不去|挡路|卡住|不开|怎么过|如何过|怎么进|如何进|怎么去|如何去|下一步|接下来)/u;
+const referenceDetailIntent = /(?:哪里|哪儿|在哪|怎么抓|如何抓|捕捉|捕获|获得|拿到|出现|遭遇|招式|技能|道具|携带|掉落|进化|属性|特性|种族值|配招|队伍)/u;
 
 function hasHintLexicalEvidence(hint: ProgressionHint, question: string): boolean {
   const normalizedQuestion = normalizeEvidence(question);
   if (normalizedQuestion.length < 2) return false;
-  const aliases = [hint.subject.id, ...hint.subject.aliases, ...hint.locationAliases, ...hint.destinationAliases];
+  if (hint.subject.type === 'reference_topic') {
+    if (referenceDetailIntent.test(question)) return false;
+    return matchesFullAlias(hint.subject.aliases, normalizedQuestion);
+  }
+
+  if (matchesAliasOrSpecificFragment(hint.subject.aliases, normalizedQuestion)) {
+    return true;
+  }
+  if (!blockerIntent.test(question)) return false;
+  return matchesFullAlias(
+    [...hint.locationAliases, ...hint.destinationAliases],
+    normalizedQuestion,
+  );
+}
+
+function matchesFullAlias(aliases: string[], normalizedQuestion: string): boolean {
+  return aliases.some((alias) => {
+    const normalizedAlias = normalizeEvidence(alias);
+    return normalizedAlias.length >= 2 && normalizedQuestion.includes(normalizedAlias);
+  });
+}
+
+function matchesAliasOrSpecificFragment(
+  aliases: string[],
+  normalizedQuestion: string,
+): boolean {
   for (const alias of aliases) {
     const normalizedAlias = normalizeEvidence(alias);
     if (normalizedAlias.length < 2) continue;

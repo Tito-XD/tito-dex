@@ -15,6 +15,8 @@ const MAX_DETAIL_BYTES = 4 * 1024 * 1024;
 const MAX_ITEMS_BYTES = 2 * 1024 * 1024;
 const MAX_MOVES_BYTES = 256 * 1024;
 const MAX_CATALOG_BYTES = 4 * 1024 * 1024;
+const MAX_REFERENCE_SHARD_BYTES = 64 * 1024;
+const MAX_GAMEPLAY_SHARD_BYTES = 1024 * 1024;
 const MAX_AREAS = 6;
 
 type SpeciesLabel = { en?: string; zh?: string };
@@ -39,6 +41,28 @@ type EvolutionEdge = {
   toId: number;
   toName: string;
   triggers: Record<string, unknown>[];
+};
+
+type GameplaySpeciesShard = {
+  obtain: Record<string, unknown>;
+  learn: Record<string, unknown>;
+  evolutions: Record<string, unknown>[];
+};
+
+type ReferenceDataConfig = {
+  moves: string;
+  abilities: string;
+  items: string;
+  itemSlugIndex: string;
+  sourceCommit: string;
+};
+
+type HeldItemLookup = Map<string, { id: number; name: string }>;
+
+export type DexBundleAnswerResult = {
+  response: AssistantResponse;
+  localSource: CuratedSource;
+  requiresOnlineVerification: boolean;
 };
 
 const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel>);
@@ -170,7 +194,7 @@ const typeLabels: Record<string, string> = {
 export async function answerFromDexBundle(
   request: AssistantRequest,
   bucket: R2Bucket | undefined,
-): Promise<AssistantResponse | null> {
+): Promise<DexBundleAnswerResult | null> {
   if (!bucket) return null;
   const species = findTarget(request.question, speciesTargets);
   const item = findTarget(request.question, itemTargets);
@@ -182,6 +206,9 @@ export async function answerFromDexBundle(
   if (!validBundleManifest(manifest)) return null;
 
   const bundleVersion = manifest.bundleVersion as number;
+  const referenceConfig = bundleVersion >= 20
+    ? validReferenceDataConfig(manifest.referenceData, manifest.referenceDataSourceCommit)
+    : null;
   if (species) {
     const detail = await readJsonObject(
       bucket,
@@ -191,40 +218,89 @@ export async function answerFromDexBundle(
     if (!detail || !isPlainObject(detail.summary) || detail.summary.id !== species.id) {
       return null;
     }
+    const gameplayShard = bundleVersion >= 20
+      ? await readGameplaySpeciesShard(bucket, manifest.cdnPrefix as string, species.id)
+      : null;
     if (encounterIntent.test(request.question)) {
-      return answerEncounter(request, detail, species, bundleVersion);
+      return bundleAnswerResult(
+        request,
+        answerEncounter(request, detail, species, bundleVersion, gameplayShard),
+        bundleVersion,
+      );
     }
     if (move && moveLearningIntent.test(request.question)) {
-      return answerMoveLearning(request, detail, species, move, bundleVersion);
+      return bundleAnswerResult(
+        request,
+        answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard),
+        bundleVersion,
+      );
     }
     if (heldItemIntent.test(request.question)) {
-      const items = await readJsonObject(
-        bucket,
-        `${manifest.cdnPrefix}/items.json`,
-        MAX_ITEMS_BYTES,
+      const itemLookup = bundleVersion >= 20
+        ? referenceConfig
+          ? await readHeldItemLookup(bucket, manifest.cdnPrefix as string, detail, referenceConfig)
+          : null
+        : itemLookupFromAggregate(await readJsonObject(
+          bucket,
+          `${manifest.cdnPrefix}/items.json`,
+          MAX_ITEMS_BYTES,
+        ));
+      return bundleAnswerResult(
+        request,
+        answerHeldItems(request, detail, species, item, itemLookup, bundleVersion),
+        bundleVersion,
       );
-      return answerHeldItems(request, detail, species, item, items, bundleVersion);
     }
     if (speciesProfileIntent.test(request.question)) {
-      return answerSpeciesProfile(request, detail, species, bundleVersion);
+      return bundleAnswerResult(
+        request,
+        answerSpeciesProfile(request, detail, species, bundleVersion),
+        bundleVersion,
+      );
     }
   }
 
   if (item && itemInfoIntent.test(request.question)) {
-    const items = await readJsonObject(
-      bucket,
-      `${manifest.cdnPrefix}/items.json`,
-      MAX_ITEMS_BYTES,
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, manifest.cdnPrefix as string, 'item', item, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(
+        bucket,
+        `${manifest.cdnPrefix}/items.json`,
+        MAX_ITEMS_BYTES,
+      ), item.id);
+    return bundleAnswerResult(
+      request,
+      answerItemInfo(request, item, value, bundleVersion),
+      bundleVersion,
     );
-    return answerItemInfo(request, item, items, bundleVersion);
   }
   if (ability && abilityInfoIntent.test(request.question)) {
-    const catalog = await readJsonObject(
-      bucket,
-      `${manifest.cdnPrefix}/dex_catalog.json`,
-      MAX_CATALOG_BYTES,
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, manifest.cdnPrefix as string, 'ability', ability, referenceConfig)
+        : null
+      : recordFromCatalog(await readJsonObject(
+        bucket,
+        `${manifest.cdnPrefix}/dex_catalog.json`,
+        MAX_CATALOG_BYTES,
+      ), 'abilities', ability.id);
+    return bundleAnswerResult(
+      request,
+      answerAbilityInfo(request, ability, value, bundleVersion),
+      bundleVersion,
     );
-    return answerAbilityInfo(request, ability, catalog, bundleVersion);
+  }
+  if (move && moveInfoIntent.test(request.question) && bundleVersion >= 20 && referenceConfig) {
+    const value = await readReferenceEntityShard(
+      bucket, manifest.cdnPrefix as string, 'move', move, referenceConfig,
+    );
+    return bundleAnswerResult(
+      request,
+      answerMoveInfo(request, move, value, bundleVersion),
+      bundleVersion,
+    );
   }
   return null;
 }
@@ -245,34 +321,45 @@ export async function buildDexBundleSources(
   const move = findTarget(request.question, moveTargets);
   const ability = findTarget(request.question, abilityTargets);
   if (!species && !item && !move && !ability) return [];
-  // Evolution conditions and standalone move values can differ by generation.
-  // Preserve the existing exact-version PokéAPI path for those questions.
-  if (evolutionIntent.test(request.question) || (move && moveInfoIntent.test(request.question))) {
-    return [];
-  }
   const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
   if (!validBundleManifest(manifest)) return [];
   const bundleVersion = manifest.bundleVersion as number;
   const prefix = manifest.cdnPrefix as string;
+  // V19 has only a general aggregate move table. Preserve the exact-version
+  // PokéAPI path there; V20's bounded reference shard may be used as explicit
+  // general evidence with the existing version warning.
+  if (move && moveInfoIntent.test(request.question) && bundleVersion < 20) return [];
+  const referenceConfig = bundleVersion >= 20
+    ? validReferenceDataConfig(manifest.referenceData, manifest.referenceDataSourceCommit)
+    : null;
   const facts: Record<string, unknown> = {
     sourceBundleVersion: bundleVersion,
     exactGame: request.context.game,
   };
 
   if (species) {
-    const detail = await readJsonObject(
-      bucket,
-      `${prefix}/details/${species.id}.json`,
-      MAX_DETAIL_BYTES,
-    );
+    const [detail, gameplayShard] = await Promise.all([
+      readJsonObject(bucket, `${prefix}/details/${species.id}.json`, MAX_DETAIL_BYTES),
+      bundleVersion >= 20
+        ? readGameplaySpeciesShard(bucket, prefix, species.id)
+        : Promise.resolve(null),
+    ]);
     if (detail && isPlainObject(detail.summary) && detail.summary.id === species.id) {
-      facts.species = compactSpeciesEvidence(detail, species, request.context.game);
+      facts.species = compactSpeciesEvidence(
+        detail,
+        species,
+        request.context.game,
+        gameplayShard,
+      );
     }
   }
   if (item) {
-    const items = await readJsonObject(bucket, `${prefix}/items.json`, MAX_ITEMS_BYTES);
-    if (items && isPlainObject(items[String(item.id)])) {
-      const value = items[String(item.id)] as Record<string, unknown>;
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, prefix, 'item', item, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(bucket, `${prefix}/items.json`, MAX_ITEMS_BYTES), item.id);
+    if (value) {
       facts.item = {
         id: item.id,
         nameZh: item.nameZh,
@@ -286,13 +373,28 @@ export async function buildDexBundleSources(
     }
   }
   if (move) {
-    const moves = await readJsonObject(bucket, `${prefix}/moves.json`, MAX_MOVES_BYTES);
-    if (moves && isPlainObject(moves[String(move.id)])) {
-      facts.move = compactMoveEvidence(moves[String(move.id)] as Record<string, unknown>, move);
+    const value = bundleVersion >= 20
+      ? referenceConfig
+        ? await readReferenceEntityShard(bucket, prefix, 'move', move, referenceConfig)
+        : null
+      : recordFromAggregate(await readJsonObject(bucket, `${prefix}/moves.json`, MAX_MOVES_BYTES), move.id);
+    if (value) {
+      facts.move = compactMoveEvidence(value, move);
     }
   }
   if (ability) {
-    facts.ability = { id: ability.id, nameZh: ability.nameZh };
+    const value = bundleVersion >= 20 && referenceConfig
+      ? await readReferenceEntityShard(bucket, prefix, 'ability', ability, referenceConfig)
+      : null;
+    facts.ability = value
+      ? {
+        id: ability.id,
+        nameZh: ability.nameZh,
+        ...(typeof value.descriptionZh === 'string'
+          ? { descriptionZh: cleanText(value.descriptionZh, 240) }
+          : {}),
+      }
+      : { id: ability.id, nameZh: ability.nameZh };
   }
   if (Object.keys(facts).length <= 2) return [];
   return [{
@@ -307,12 +409,22 @@ function answerEncounter(
   detail: Record<string, unknown>,
   target: EntityTarget,
   bundleVersion: number,
+  gameplayShard: GameplaySpeciesShard | null,
 ): AssistantResponse | null {
-  if (!isPlainObject(detail.obtainLocationsByVersion)) return null;
-  const rawEntries = detail.obtainLocationsByVersion[request.context.game];
+  const verifiedByExactVersion = gameplayShard && isPlainObject(gameplayShard.obtain.byExactVersion)
+    ? gameplayShard.obtain.byExactVersion
+    : null;
+  const shardEntries = verifiedByExactVersion?.[request.context.game];
+  const rawEntries = Array.isArray(shardEntries)
+    ? shardEntries
+    : isPlainObject(detail.obtainLocationsByVersion)
+      ? detail.obtainLocationsByVersion[request.context.game]
+      : null;
   if (!Array.isArray(rawEntries)) return null;
   const entries = rawEntries.flatMap((value) => {
-    const parsed = parseEncounter(value);
+    const parsed = Array.isArray(shardEntries)
+      ? parseGameplayEncounter(value)
+      : parseEncounter(value);
     return parsed ? [parsed] : [];
   });
   if (entries.length === 0) return null;
@@ -359,16 +471,10 @@ function answerHeldItems(
   detail: Record<string, unknown>,
   species: EntityTarget,
   requestedItem: EntityTarget | null,
-  items: Record<string, unknown> | null,
+  itemBySlug: HeldItemLookup | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!Array.isArray(detail.heldItems) || !items) return null;
-  const itemBySlug = new Map<string, { id: number; name: string }>();
-  for (const [id, value] of Object.entries(items)) {
-    if (!isPlainObject(value) || typeof value.slug !== 'string' ||
-        typeof value.nameZh !== 'string' || !/^\d{1,5}$/.test(id)) continue;
-    itemBySlug.set(value.slug, { id: Number(id), name: cleanText(value.nameZh, 80) });
-  }
+  if (!Array.isArray(detail.heldItems) || !itemBySlug) return null;
   const rows = detail.heldItems.flatMap((value) => {
     if (!isPlainObject(value) || typeof value.slug !== 'string' ||
         !isPlainObject(value.rarityByVersion)) return [];
@@ -391,7 +497,7 @@ function answerHeldItems(
     `held-items-${request.context.game}-${species.id}`,
     [`species:${species.id}`, `game:${request.context.game}`, 'field:heldItems'],
     'high',
-    ['携带物批次包含 PokeAPI 与 52Poké 数据；52Poké 部分按 CC BY-NC-SA 4.0 署名使用。'],
+    ['携带物批次包含 PokeAPI 与 52Poké 数据；52Poké 部分按 CC BY-NC-SA 3.0 署名使用。'],
   );
 }
 
@@ -401,14 +507,25 @@ function answerMoveLearning(
   species: EntityTarget,
   move: EntityTarget,
   bundleVersion: number,
+  gameplayShard: GameplaySpeciesShard | null,
 ): AssistantResponse | null {
-  if (!isPlainObject(detail.moveSets)) return null;
-  const group = detail.moveSets[gameVersionGroups[request.context.game]];
+  const versionGroup = gameVersionGroups[request.context.game];
+  const shardGroups = gameplayShard && isPlainObject(gameplayShard.learn.byVersionGroup)
+    ? gameplayShard.learn.byVersionGroup
+    : null;
+  const shardGroup = shardGroups?.[versionGroup];
+  const group = isPlainObject(shardGroup)
+    ? shardGroup
+    : isPlainObject(detail.moveSets)
+      ? detail.moveSets[versionGroup]
+      : null;
   if (!isPlainObject(group)) return null;
   const methods: string[] = [];
   const levelRows = Array.isArray(group.levelUp) ? group.levelUp : [];
   const levels = levelRows.flatMap((value) =>
-    isPlainObject(value) && value.moveId === move.id && validLevel(value.level)
+    isPlainObject(value) && (
+      value.moveId === move.id || value.moveStableId === `move:${move.id}`
+    ) && validLevel(value.level)
       ? [value.level]
       : [],
   );
@@ -423,7 +540,9 @@ function answerMoveLearning(
   for (const [key, label] of methodGroups) {
     const values = group[key];
     if (Array.isArray(values) && values.some((value) =>
-      isPlainObject(value) && value.moveId === move.id,
+      value === `move:${move.id}` || (isPlainObject(value) && (
+        value.moveId === move.id || value.moveStableId === `move:${move.id}`
+      )),
     )) methods.push(label);
   }
   if (methods.length === 0) return null;
@@ -498,11 +617,10 @@ function answerSpeciesProfile(
 function answerItemInfo(
   request: AssistantRequest,
   item: EntityTarget,
-  items: Record<string, unknown> | null,
+  value: Record<string, unknown> | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!items || !isPlainObject(items[String(item.id)])) return null;
-  const value = items[String(item.id)] as Record<string, unknown>;
+  if (!value) return null;
   if (value.id !== item.id || typeof value.nameZh !== 'string') return null;
   const details: string[] = [];
   if (typeof value.categoryZh === 'string') details.push(`分类：${cleanText(value.categoryZh, 80)}`);
@@ -530,12 +648,10 @@ function answerItemInfo(
 function answerAbilityInfo(
   request: AssistantRequest,
   ability: EntityTarget,
-  catalog: Record<string, unknown> | null,
+  value: Record<string, unknown> | null,
   bundleVersion: number,
 ): AssistantResponse | null {
-  if (!catalog || !isPlainObject(catalog.abilities) ||
-      !isPlainObject(catalog.abilities[String(ability.id)])) return null;
-  const value = catalog.abilities[String(ability.id)] as Record<string, unknown>;
+  if (!value || (value.id !== undefined && value.id !== ability.id)) return null;
   const description = typeof value.descriptionZh === 'string'
     ? cleanText(value.descriptionZh, 240)
     : '';
@@ -549,6 +665,61 @@ function answerAbilityInfo(
     'medium',
     ['这是 bundle 的通用特性说明；旧世代效果变化需再按版本核对。'],
   );
+}
+
+function answerMoveInfo(
+  request: AssistantRequest,
+  move: EntityTarget,
+  value: Record<string, unknown> | null,
+  bundleVersion: number,
+): AssistantResponse | null {
+  if (!value) return null;
+  const details: string[] = [];
+  if (typeof value.typeZh === 'string') details.push(`属性：${cleanText(value.typeZh, 40)}`);
+  if (typeof value.categoryZh === 'string') details.push(`分类：${cleanText(value.categoryZh, 40)}`);
+  if (typeof value.power === 'number') details.push(`威力：${value.power}`);
+  if (typeof value.accuracy === 'number') details.push(`命中：${value.accuracy}`);
+  if (typeof value.pp === 'number') details.push(`PP：${value.pp}`);
+  const description = typeof value.descriptionZh === 'string'
+    ? cleanText(value.descriptionZh, 240)
+    : '';
+  if (description) details.push(`说明：${description}`);
+  if (details.length === 0) return null;
+  return bundleResponse(
+    request,
+    `TitoDex v${bundleVersion} 的${move.nameZh}招式资料：\n${details.map((line) => `- ${line}`).join('\n')}`,
+    bundleVersion,
+    `move-${move.id}`,
+    [`move:${move.id}`],
+    'medium',
+    ['这是 bundle 的通用招式值；旧世代数值变化需再按版本核对。'],
+  );
+}
+
+function bundleAnswerResult(
+  request: AssistantRequest,
+  response: AssistantResponse | null,
+  bundleVersion: number,
+): DexBundleAnswerResult | null {
+  if (!response || !response.answer) return null;
+  const source: CuratedSource = {
+    id: `dex-bundle-v${bundleVersion}`,
+    title: `TitoDex Dex bundle v${bundleVersion} · 本地结构化底稿`,
+    text: JSON.stringify({
+      exactGame: request.context.game,
+      answer: response.answer,
+      verifiedFacts: response.verifiedFacts ?? [],
+      unknowns: response.unknowns ?? [],
+    }).slice(0, 6_000),
+  };
+  return {
+    response,
+    localSource: source,
+    // V20 reference/gameplay projections declare online-verify provenance.
+    // They remain the deterministic offline fallback, but an online-capable
+    // request must continue through the allowlisted corroboration pipeline.
+    requiresOnlineVerification: bundleVersion >= 20,
+  };
 }
 
 function bundleResponse(
@@ -591,6 +762,7 @@ function compactSpeciesEvidence(
   detail: Record<string, unknown>,
   species: EntityTarget,
   game: AssistantRequest['context']['game'],
+  gameplayShard: GameplaySpeciesShard | null,
 ): Record<string, unknown> {
   const summary = isPlainObject(detail.summary) ? detail.summary : {};
   const evidence: Record<string, unknown> = {
@@ -623,11 +795,22 @@ function compactSpeciesEvidence(
         : [],
     ).slice(0, 6);
   }
-  if (isPlainObject(detail.obtainLocationsByVersion) &&
-      Array.isArray(detail.obtainLocationsByVersion[game])) {
-    evidence.encounters = (detail.obtainLocationsByVersion[game] as unknown[])
+  const verifiedByExactVersion = gameplayShard && isPlainObject(gameplayShard.obtain.byExactVersion)
+    ? gameplayShard.obtain.byExactVersion
+    : null;
+  const shardEncounters = verifiedByExactVersion?.[game];
+  const rawEncounters = Array.isArray(shardEncounters)
+    ? shardEncounters
+    : isPlainObject(detail.obtainLocationsByVersion) &&
+        Array.isArray(detail.obtainLocationsByVersion[game])
+      ? detail.obtainLocationsByVersion[game]
+      : null;
+  if (Array.isArray(rawEncounters)) {
+    evidence.encounters = rawEncounters
       .flatMap((value) => {
-        const encounter = parseEncounter(value);
+        const encounter = Array.isArray(shardEncounters)
+          ? parseGameplayEncounter(value)
+          : parseEncounter(value);
         return encounter ? [{
           area: normalizeFullWidth(encounter.areaLabelZh),
           methods: encounter.methods.slice(0, 4),
@@ -637,18 +820,42 @@ function compactSpeciesEvidence(
       })
       .slice(0, 12);
   }
-  if (isPlainObject(detail.moveSets) &&
-      isPlainObject(detail.moveSets[gameVersionGroups[game]])) {
-    const set = detail.moveSets[gameVersionGroups[game]] as Record<string, unknown>;
+  const versionGroup = gameVersionGroups[game];
+  const shardLearnGroups = gameplayShard && isPlainObject(gameplayShard.learn.byVersionGroup)
+    ? gameplayShard.learn.byVersionGroup
+    : null;
+  const usingShardMoveSet = isPlainObject(shardLearnGroups?.[versionGroup]);
+  const rawMoveSet = usingShardMoveSet
+    ? shardLearnGroups?.[versionGroup]
+    : isPlainObject(detail.moveSets) && isPlainObject(detail.moveSets[versionGroup])
+      ? detail.moveSets[versionGroup]
+      : null;
+  if (isPlainObject(rawMoveSet)) {
+    const set = rawMoveSet;
+    const compactRows = usingShardMoveSet ? compactGameplayMoveRows : compactMoveRows;
     evidence.moveSet = {
-      levelUp: compactMoveRows(set.levelUp, 24, true),
-      machine: compactMoveRows(set.machine, 24, false),
-      egg: compactMoveRows(set.egg, 16, false),
-      tutor: compactMoveRows(set.tutor, 16, false),
+      levelUp: compactRows(set.levelUp, 24, true),
+      machine: compactRows(set.machine, 24, false),
+      egg: compactRows(set.egg, 16, false),
+      tutor: compactRows(set.tutor, 16, false),
       truncated: true,
     };
   }
-  if (isPlainObject(detail.evolutionChain)) {
+  if (gameplayShard && gameplayShard.evolutions.length > 0) {
+    evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
+      const safeTriggers = Array.isArray(row.triggers)
+        ? row.triggers.filter(isPlainObject).slice(0, 6)
+        : [];
+      return {
+        fromStableId: row.fromPokemonStableId,
+        toStableId: row.toPokemonStableId,
+        conditionsZh: describeEvolutionTriggers(safeTriggers),
+        exactGameApplicability: isPlainObject(row.applicabilityByVersionGroup)
+          ? row.applicabilityByVersionGroup[versionGroup]
+          : 'unknown',
+      };
+    });
+  } else if (isPlainObject(detail.evolutionChain)) {
     evidence.adjacentEvolution = collectEvolutionEdges(detail.evolutionChain)
       .filter((edge) => edge.fromId === species.id || edge.toId === species.id)
       .slice(0, 6)
@@ -658,8 +865,33 @@ function compactSpeciesEvidence(
         conditions: describeEvolutionTriggers(edge.triggers),
       }));
   }
-  evidence.scopeNote = 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
+  evidence.scopeNote = gameplayShard
+    ? 'encounters and moveSet come from the bounded audited v20 species shard; evolution triggers are global and exact-game applicability remains explicit'
+    : 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
   return evidence;
+}
+
+function compactGameplayMoveRows(value: unknown, maximum: number, includeLevel: boolean): unknown[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    const stableId = typeof entry === 'string'
+      ? entry
+      : isPlainObject(entry) && typeof entry.moveStableId === 'string'
+        ? entry.moveStableId
+        : '';
+    const match = /^move:([1-9]\d{0,4})$/u.exec(stableId);
+    if (!match) return [];
+    const id = Number(match[1]);
+    const target = moveTargets.find((candidate) => candidate.id === id);
+    if (!target) return [];
+    return [{
+      id,
+      nameZh: target.nameZh,
+      ...(includeLevel && isPlainObject(entry) && validLevel(entry.level)
+        ? { level: entry.level }
+        : {}),
+    }];
+  }).slice(0, maximum);
 }
 
 function compactMoveRows(value: unknown, maximum: number, includeLevel: boolean): unknown[] {
@@ -812,6 +1044,27 @@ function parseEncounter(value: unknown): EncounterEntry | null {
   };
 }
 
+function parseGameplayEncounter(value: unknown): EncounterEntry | null {
+  if (!isPlainObject(value) || !Array.isArray(value.encounterMethods) ||
+      typeof value.method !== 'string') return null;
+  const methods = Array.from(new Set([
+    ...value.encounterMethods,
+    value.method,
+  ].filter((entry): entry is string => typeof entry === 'string')));
+  return parseEncounter({
+    areaSlug: value.areaSlug,
+    areaLabelZh: value.areaLabelZh,
+    minLevel: value.minLevel,
+    maxLevel: value.maxLevel,
+    methods,
+    conditions: value.conditions,
+    isAlpha: value.isAlpha,
+    isTitan: value.isTitan,
+    isRaid: value.isRaid,
+    isFixedEncounter: value.isFixedEncounter,
+  });
+}
+
 function groupEncounters(entries: EncounterEntry[]): { label: string; details: string[] }[] {
   const sorted = [...entries].sort((left, right) =>
     encounterPriority(left) - encounterPriority(right) ||
@@ -871,6 +1124,224 @@ function formatLevel(minimum?: number, maximum?: number): string {
   return `Lv.${minimum}–${maximum}`;
 }
 
+function validReferenceDataConfig(
+  value: unknown,
+  sourceCommit: unknown,
+): ReferenceDataConfig | null {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'schemaVersion', 'maximumShardBytes', 'moves', 'abilities', 'items',
+    'itemSlugIndex', 'audit', 'counts',
+  ]) || value.schemaVersion !== 1 || value.maximumShardBytes !== MAX_REFERENCE_SHARD_BYTES ||
+      value.moves !== 'reference/moves/{id}.json' ||
+      value.abilities !== 'reference/abilities/{id}.json' ||
+      value.items !== 'reference/items/{id}.json' ||
+      value.itemSlugIndex !== 'reference/item-slug-index/{bucket}.json' ||
+      value.audit !== 'reference/reference_shards_audit.json' ||
+      !isPlainObject(value.counts) || !hasExactKeys(value.counts, [
+        'moves', 'abilities', 'items', 'itemSlugIndexBuckets',
+      ]) || !validCount(value.counts.moves, 1, 10_000) ||
+      !validCount(value.counts.abilities, 1, 10_000) ||
+      !validCount(value.counts.items, 1, 20_000) ||
+      value.counts.itemSlugIndexBuckets !== 256 || !validSourceCommit(sourceCommit)) {
+    return null;
+  }
+  return {
+    moves: value.moves,
+    abilities: value.abilities,
+    items: value.items,
+    itemSlugIndex: value.itemSlugIndex,
+    sourceCommit: sourceCommit as string,
+  };
+}
+
+function validCount(value: unknown, minimum: number, maximum: number): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= minimum && value <= maximum;
+}
+
+async function readReferenceEntityShard(
+  bucket: R2Bucket,
+  prefix: string,
+  kind: 'move' | 'ability' | 'item',
+  target: EntityTarget,
+  config: ReferenceDataConfig,
+): Promise<Record<string, unknown> | null> {
+  const pattern = kind === 'move' ? config.moves : kind === 'ability' ? config.abilities : config.items;
+  const value = await readJsonObject(
+    bucket,
+    `${prefix}/${pattern.replace('{id}', String(target.id))}`,
+    MAX_REFERENCE_SHARD_BYTES,
+  );
+  return validReferenceEntityShard(value, kind, target, config.sourceCommit) ? value : null;
+}
+
+function validReferenceEntityShard(
+  value: Record<string, unknown> | null,
+  kind: 'move' | 'ability' | 'item',
+  target: EntityTarget,
+  sourceCommit: string,
+): boolean {
+  if (!value || value.schemaVersion !== 1 || value.kind !== kind || value.id !== target.id ||
+      value.sourceCommit !== sourceCommit || !validSourceCommit(value.sourceCommit) ||
+      typeof value.slug !== 'string' || !/^[a-z0-9][a-z0-9-]{0,159}$/u.test(value.slug) ||
+      typeof value.nameZh !== 'string' || !validReferenceText(value.nameZh, 120) ||
+      normalize(value.nameZh) !== normalize(target.nameZh) ||
+      !validNullableText(value.nameEn, 120)) return false;
+  if (kind === 'move') {
+    return hasExactKeys(value, [
+      'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+      'type', 'typeZh', 'category', 'categoryZh', 'power', 'accuracy', 'pp', 'priority',
+      'target', 'targetZh', 'generation', 'descriptionZh', 'shortEffect', 'availableVersionGroups',
+    ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `move:${target.id}` &&
+      [value.type, value.typeZh, value.category, value.categoryZh].every((entry) => validNullableText(entry, 40)) &&
+      [value.target, value.targetZh].every((entry) => validNullableText(entry, 80)) &&
+      [value.power, value.accuracy, value.pp].every((entry) => validNullableInteger(entry, 0, 100_000)) &&
+      validNullableInteger(value.priority, -20, 20) && validNullableInteger(value.generation, 1, 99) &&
+      validNullableText(value.descriptionZh, 1_200) && validNullableText(value.shortEffect, 1_200) &&
+      validReferenceStringArray(value.availableVersionGroups, 64, 120);
+  }
+  if (kind === 'ability') {
+    return hasExactKeys(value, [
+      'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+      'generation', 'descriptionZh', 'shortEffect',
+    ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `ability:${target.id}` &&
+      validNullableInteger(value.generation, 1, 99) &&
+      validNullableText(value.descriptionZh, 1_200) && validNullableText(value.shortEffect, 1_200);
+  }
+  return hasExactKeys(value, [
+    'schemaVersion', 'kind', 'id', 'stableId', 'sourceCommit', 'sourceStatus', 'slug', 'nameZh', 'nameEn',
+    'categoryZh', 'cost', 'descriptionZh', 'effectZh', 'flingPower', 'availableVersionGroups',
+    'availableGenerations', 'pricesByVersionGroup',
+  ]) && validReferenceSourceStatus(value.sourceStatus) && value.stableId === `item:${value.slug}` &&
+    validNullableText(value.categoryZh, 80) && validNullableInteger(value.cost, 0, 1_000_000_000) &&
+    validNullableText(value.descriptionZh, 1_200) && validNullableText(value.effectZh, 1_200) &&
+    validNullableInteger(value.flingPower, 0, 100_000) &&
+    validReferenceStringArray(value.availableVersionGroups, 64, 120) &&
+    Array.isArray(value.availableGenerations) && value.availableGenerations.length <= 32 &&
+    value.availableGenerations.every((entry) => validCount(entry, 1, 99)) &&
+    validReferencePrices(value.pricesByVersionGroup);
+}
+
+function validReferenceSourceStatus(value: unknown): boolean {
+  return value === 'pinned-pokeapi' || value === 'retained-v19';
+}
+
+function validReferenceText(value: unknown, maximum: number): value is string {
+  return typeof value === 'string' && value.length > 0 && value.length <= maximum;
+}
+
+function validNullableText(value: unknown, maximum: number): boolean {
+  return value === null || validReferenceText(value, maximum);
+}
+
+function validNullableInteger(value: unknown, minimum: number, maximum: number): boolean {
+  return value === null || validCount(value, minimum, maximum);
+}
+
+function validReferenceStringArray(value: unknown, maximum: number, maximumLength: number): boolean {
+  return Array.isArray(value) && value.length <= maximum && value.every((entry) =>
+    typeof entry === 'string' && entry.length > 0 && entry.length <= maximumLength,
+  );
+}
+
+function validReferencePrices(value: unknown): boolean {
+  if (!isPlainObject(value) || Object.keys(value).length > 64) return false;
+  return Object.entries(value).every(([group, row]) =>
+    /^[a-z0-9-]{1,80}$/u.test(group) && isPlainObject(row) &&
+    Object.keys(row).length > 0 && Object.keys(row).every((key) => key === 'buy' || key === 'sell') &&
+    Object.values(row).every((entry) => validCount(entry, 0, 1_000_000_000)),
+  );
+}
+
+function recordFromAggregate(
+  aggregate: Record<string, unknown> | null,
+  id: number,
+): Record<string, unknown> | null {
+  return aggregate && isPlainObject(aggregate[String(id)])
+    ? aggregate[String(id)] as Record<string, unknown>
+    : null;
+}
+
+function recordFromCatalog(
+  catalog: Record<string, unknown> | null,
+  collection: string,
+  id: number,
+): Record<string, unknown> | null {
+  return catalog && isPlainObject(catalog[collection]) &&
+    isPlainObject((catalog[collection] as Record<string, unknown>)[String(id)])
+    ? (catalog[collection] as Record<string, unknown>)[String(id)] as Record<string, unknown>
+    : null;
+}
+
+function itemLookupFromAggregate(items: Record<string, unknown> | null): HeldItemLookup | null {
+  if (!items) return null;
+  const result: HeldItemLookup = new Map();
+  for (const [id, value] of Object.entries(items)) {
+    if (!isPlainObject(value) || typeof value.slug !== 'string' ||
+        typeof value.nameZh !== 'string' || !/^\d{1,5}$/.test(id)) continue;
+    result.set(value.slug, { id: Number(id), name: cleanText(value.nameZh, 80) });
+  }
+  return result;
+}
+
+async function readHeldItemLookup(
+  bucket: R2Bucket,
+  prefix: string,
+  detail: Record<string, unknown>,
+  config: ReferenceDataConfig,
+): Promise<HeldItemLookup | null> {
+  if (!Array.isArray(detail.heldItems)) return null;
+  const slugs = Array.from(new Set(detail.heldItems.flatMap((row) =>
+    isPlainObject(row) && typeof row.slug === 'string' &&
+    /^[a-z0-9][a-z0-9-]{0,159}$/u.test(row.slug) ? [row.slug] : [],
+  ))).slice(0, 8);
+  if (slugs.length === 0) return null;
+  const buckets = new Map<string, string[]>();
+  for (const slug of slugs) {
+    const key = await itemSlugBucket(slug);
+    buckets.set(key, [...(buckets.get(key) ?? []), slug]);
+  }
+  const result: HeldItemLookup = new Map();
+  await Promise.all([...buckets.entries()].map(async ([bucketKey, requested]) => {
+    const value = await readJsonObject(
+      bucket,
+      `${prefix}/${config.itemSlugIndex.replace('{bucket}', bucketKey)}`,
+      MAX_REFERENCE_SHARD_BYTES,
+    );
+    if (!validItemSlugIndex(value, bucketKey)) return;
+    for (const slug of requested) {
+      const row = value.entries[slug];
+      if (isPlainObject(row)) {
+        const target = itemTargets.find((candidate) => candidate.id === row.id);
+        if (target && normalize(target.nameZh) === normalize(row.nameZh as string)) {
+          result.set(slug, { id: target.id, name: target.nameZh });
+        }
+      }
+    }
+  }));
+  return result.size > 0 ? result : null;
+}
+
+async function itemSlugBucket(slug: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(slug));
+  return Array.from(new Uint8Array(digest).slice(0, 1), (value) =>
+    value.toString(16).padStart(2, '0'),
+  ).join('');
+}
+
+function validItemSlugIndex(
+  value: Record<string, unknown> | null,
+  bucket: string,
+): value is Record<string, unknown> & { entries: Record<string, unknown> } {
+  return value !== null && hasExactKeys(value, ['schemaVersion', 'kind', 'bucket', 'entries']) &&
+    value.schemaVersion === 1 && value.kind === 'item-slug-index' && value.bucket === bucket &&
+    isPlainObject(value.entries) && Object.keys(value.entries).length <= 64 &&
+    Object.entries(value.entries).every(([slug, row]) =>
+      /^[a-z0-9][a-z0-9-]{0,159}$/u.test(slug) && isPlainObject(row) &&
+      hasExactKeys(row, ['id', 'nameZh']) && validCount(row.id, 1, 100_000) &&
+      validReferenceText(row.nameZh, 120),
+    );
+}
+
 async function readJsonObject(
   bucket: R2Bucket,
   key: string,
@@ -890,6 +1361,195 @@ async function readJsonObject(
   } catch {
     return null;
   }
+}
+
+async function readGameplaySpeciesShard(
+  bucket: R2Bucket,
+  prefix: string,
+  speciesId: number,
+): Promise<GameplaySpeciesShard | null> {
+  const value = await readJsonObject(
+    bucket,
+    `${prefix}/gameplay/species/${speciesId}.json`,
+    MAX_GAMEPLAY_SHARD_BYTES,
+  );
+  return validGameplaySpeciesShard(value, speciesId);
+}
+
+function validGameplaySpeciesShard(
+  value: Record<string, unknown> | null,
+  speciesId: number,
+): GameplaySpeciesShard | null {
+  if (!value || !hasExactKeys(value, [
+    'schemaVersion', 'speciesId', 'pokemonStableId', 'provenance',
+    'obtain', 'learn', 'evolutions',
+  ]) || value.schemaVersion !== 1 || value.speciesId !== speciesId ||
+      value.pokemonStableId !== `pokemon:${speciesId}` ||
+      !isPlainObject(value.provenance) || !hasExactKeys(value.provenance, [
+        'generator', 'pokeapiCommit', 'pkhexCommit',
+      ]) || value.provenance.generator !== 'titodex-gameplay-shards-v1' ||
+      !validSourceCommit(value.provenance.pokeapiCommit) ||
+      !validSourceCommit(value.provenance.pkhexCommit) ||
+      !validGameplayObtain(
+        value.obtain,
+        speciesId,
+        value.provenance.pokeapiCommit as string,
+        value.provenance.pkhexCommit as string,
+      ) ||
+      !validGameplayLearn(value.learn, speciesId) ||
+      !validGameplayEvolutions(value.evolutions, speciesId)) {
+    return null;
+  }
+  return {
+    obtain: value.obtain,
+    learn: value.learn,
+    evolutions: value.evolutions,
+  };
+}
+
+function validGameplayObtain(
+  value: unknown,
+  speciesId: number,
+  pokeapiCommit: string,
+  pkhexCommit: string,
+): value is Record<string, unknown> {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'stableId', 'byExactVersion', 'verifiedRouteByVersionGroup',
+    'derivedFamilyRouteByVersionGroup',
+  ]) || value.stableId !== `pokemon:${speciesId}` ||
+      !isPlainObject(value.byExactVersion) || Object.keys(value.byExactVersion).length > 51 ||
+      !validRouteMap(value.verifiedRouteByVersionGroup, ['direct', 'notApplicable', 'unknown']) ||
+      !validRouteMap(value.derivedFamilyRouteByVersionGroup, [
+        'direct', 'evolution', 'egg', 'trade', 'notApplicable', 'unknown',
+      ])) return false;
+  for (const [version, rows] of Object.entries(value.byExactVersion)) {
+    if (!/^[a-z0-9-]{1,60}$/u.test(version) || !Array.isArray(rows) ||
+        rows.length < 1 || rows.length > 4096 ||
+        !rows.every((row) => validGameplayEncounterRow(
+          row,
+          version,
+          pokeapiCommit,
+          pkhexCommit,
+        ))) return false;
+  }
+  return true;
+}
+
+function validGameplayEncounterRow(
+  value: unknown,
+  exactVersion: string,
+  pokeapiCommit: string,
+  pkhexCommit: string,
+): boolean {
+  if (!isPlainObject(value) || !hasExactKeys(value, [
+    'method', 'exactVersion', 'versionGroup', 'areaSlug', 'areaLabelZh',
+    'minLevel', 'maxLevel', 'rateKind', 'rateValue', 'encounterMethods',
+    'conditions', 'formStableId', 'isAlpha', 'isTitan', 'isRaid',
+    'isFixedEncounter', 'source',
+  ]) || !['wild', 'fixed', 'raid'].includes(String(value.method)) ||
+      value.exactVersion !== exactVersion ||
+      typeof value.versionGroup !== 'string' || !/^[a-z0-9-]{1,80}$/u.test(value.versionGroup) ||
+      typeof value.areaSlug !== 'string' || !/^[a-z0-9][a-z0-9._-]{0,119}$/u.test(value.areaSlug) ||
+      typeof value.areaLabelZh !== 'string' || !value.areaLabelZh || value.areaLabelZh.length > 160 ||
+      !validOptionalLevel(value.minLevel) || !validOptionalLevel(value.maxLevel) ||
+      typeof value.rateKind !== 'string' || value.rateKind.length > 60 ||
+      !(value.rateValue === null || (
+        typeof value.rateValue === 'number' && Number.isFinite(value.rateValue) &&
+        value.rateValue >= 0 && value.rateValue <= 1_000_000_000
+      )) || !validBoundedStrings(value.encounterMethods, 32, 160) ||
+      !validBoundedStrings(value.conditions, 32, 160) ||
+      !(value.formStableId === null || (
+        typeof value.formStableId === 'string' &&
+        /^pokemon-form:[a-z0-9-]{1,100}$/u.test(value.formStableId)
+      )) || !['isAlpha', 'isTitan', 'isRaid', 'isFixedEncounter'].every(
+        (key) => typeof value[key] === 'boolean',
+      ) || !isPlainObject(value.source) ||
+      !Object.keys(value.source).every((key) => ['sourceId', 'commit', 'license', 'overlay'].includes(key)) ||
+      typeof value.source.sourceId !== 'string' || !['pokeapi-api-data', 'pkhex-overlay'].includes(value.source.sourceId) ||
+      !validSourceCommit(value.source.commit) || value.source.commit !== (
+        value.source.sourceId === 'pokeapi-api-data' ? pokeapiCommit : pkhexCommit
+      )) return false;
+  return true;
+}
+
+function validGameplayLearn(value: unknown, speciesId: number): value is Record<string, unknown> {
+  if (!isPlainObject(value) || !hasExactKeys(value, ['stableId', 'sourceStatus', 'byVersionGroup']) ||
+      value.stableId !== `pokemon:${speciesId}` ||
+      !['covered', 'unknown'].includes(String(value.sourceStatus)) ||
+      !isPlainObject(value.byVersionGroup) || Object.keys(value.byVersionGroup).length > 32) return false;
+  for (const [group, buckets] of Object.entries(value.byVersionGroup)) {
+    if (!/^[a-z0-9-]{1,80}$/u.test(group) || !isPlainObject(buckets) ||
+        !['levelUp', 'machine', 'egg', 'tutor'].every((key) => Object.hasOwn(buckets, key)) ||
+        Object.keys(buckets).some((key) => !['levelUp', 'machine', 'egg', 'tutor', 'other'].includes(key))) {
+      return false;
+    }
+    let rowCount = 0;
+    for (const [bucket, rows] of Object.entries(buckets)) {
+      if (!Array.isArray(rows)) return false;
+      rowCount += rows.length;
+      if (rowCount > 4096 || !rows.every((row) => validGameplayLearnRow(row, bucket))) return false;
+    }
+  }
+  return true;
+}
+
+function validGameplayLearnRow(value: unknown, bucket: string): boolean {
+  if (['machine', 'egg', 'tutor'].includes(bucket)) {
+    return typeof value === 'string' && /^move:[1-9]\d{0,4}$/u.test(value);
+  }
+  return isPlainObject(value) && Object.keys(value).every((key) =>
+    ['moveStableId', 'level', 'method'].includes(key),
+  ) && typeof value.moveStableId === 'string' &&
+    /^move:[1-9]\d{0,4}$/u.test(value.moveStableId) &&
+    (value.level === undefined || validLevel(value.level)) &&
+    (bucket !== 'other' || (typeof value.method === 'string' && value.method.length <= 80));
+}
+
+function validGameplayEvolutions(value: unknown, speciesId: number): value is Record<string, unknown>[] {
+  if (!Array.isArray(value) || value.length > 64) return false;
+  return value.every((row) => {
+    if (!isPlainObject(row) || !hasExactKeys(row, [
+      'stableId', 'fromPokemonStableId', 'toPokemonStableId', 'triggers',
+      'applicabilityByVersionGroup', 'source',
+    ]) || typeof row.fromPokemonStableId !== 'string' ||
+        typeof row.toPokemonStableId !== 'string') return false;
+    const from = /^pokemon:([1-9]\d{0,4})$/u.exec(row.fromPokemonStableId);
+    const to = /^pokemon:([1-9]\d{0,4})$/u.exec(row.toPokemonStableId);
+    if (!from || !to || ![Number(from[1]), Number(to[1])].includes(speciesId) ||
+        row.stableId !== `evolution:${from[1]}:${to[1]}` ||
+        !Array.isArray(row.triggers) || row.triggers.length > 16 ||
+        !row.triggers.every((trigger) => isPlainObject(trigger) && Object.keys(trigger).length <= 40) ||
+        !validRouteMap(row.applicabilityByVersionGroup, ['unknown', 'notApplicable']) ||
+        !isPlainObject(row.source) || row.source.sourceId !== 'pokeapi-api-data') return false;
+    return true;
+  });
+}
+
+function validRouteMap(value: unknown, allowed: string[]): boolean {
+  return isPlainObject(value) && Object.keys(value).length >= 1 &&
+    Object.keys(value).length <= 32 && Object.entries(value).every(([group, route]) =>
+      /^[a-z0-9-]{1,80}$/u.test(group) && typeof route === 'string' && allowed.includes(route),
+    );
+}
+
+function validOptionalLevel(value: unknown): boolean {
+  return value === null || validLevel(value);
+}
+
+function validBoundedStrings(value: unknown, maximum: number, maxLength: number): boolean {
+  return Array.isArray(value) && value.length <= maximum && value.every((entry) =>
+    typeof entry === 'string' && entry.length <= maxLength,
+  );
+}
+
+function validSourceCommit(value: unknown): boolean {
+  return typeof value === 'string' && /^[0-9a-f]{40}$/u.test(value);
+}
+
+function hasExactKeys(value: Record<string, unknown>, keys: string[]): boolean {
+  const expected = new Set(keys);
+  return Object.keys(value).length === expected.size &&
+    Object.keys(value).every((key) => expected.has(key));
 }
 
 async function readBounded(

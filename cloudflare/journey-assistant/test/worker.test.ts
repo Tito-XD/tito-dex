@@ -1,7 +1,9 @@
 import { env, SELF } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
+import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
 import worker, { reconcileParallelAnswers } from '../src/index';
+import { progressionHints } from '../src/progression_hints';
 
 function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -28,6 +30,49 @@ async function post(payload: string, deviceKey = 'test-device-key-12345'): Promi
     },
     body: payload,
   });
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(value),
+  );
+  return [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function publishJourneyPackFixture(
+  pack: Record<string, unknown>,
+  overrides: Record<string, unknown> = {},
+): Promise<Record<string, unknown>> {
+  const body = JSON.stringify(pack);
+  const descriptor = {
+    id: pack.id,
+    gameFamily: pack.gameFamily,
+    games: pack.games,
+    version: pack.version,
+    contentPath: `/v1/journey-packs/objects/${String(pack.id)}/${String(pack.version)}.json`,
+    sizeBytes: new TextEncoder().encode(body).byteLength,
+    sha256: await sha256Hex(body),
+    titleZh: '测试旅程资料',
+    entryCount: Array.isArray(pack.entries) ? pack.entries.length : 1,
+    bundleVersionRequired: 20,
+    ...overrides,
+  };
+  await env.JOURNEY_CONTENT.put(
+    `journey-packs/objects/${String(pack.id)}/${String(pack.version)}.json`,
+    body,
+  );
+  await env.JOURNEY_CONTENT.put(
+    'journey-packs/catalog.json',
+    JSON.stringify({
+      schemaVersion: 1,
+      generatedAt: '2026-08-22T00:00:00Z',
+      packs: [descriptor],
+    }),
+  );
+  return descriptor;
 }
 
 describe('journey assistant Worker contract', () => {
@@ -251,16 +296,22 @@ describe('journey assistant Worker contract', () => {
   });
 
   it('accepts cited DeepSeek trial output at low confidence when snippets are absent', async () => {
-    const aiRun = vi.fn(async () => ({
-      response: {
-        hintId: '',
-        webAllowed: true,
-        queryZh: '宝可梦 紫 利欧路 培养',
-        queryEn: 'Pokémon Violet Riolu training guide',
-        pokeApiKind: 'pokemon-species',
-        pokeApiSlug: 'riolu',
-      },
-    }));
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
+      ? { response: { onTopic: true } }
+      : {
+          response: {
+            hintId: '',
+            webAllowed: true,
+            queryZh: '宝可梦 紫 利欧路 培养',
+            queryEn: 'Pokémon Violet Riolu training guide',
+            pokeApiKind: 'pokemon-species',
+            pokeApiSlug: 'riolu',
+          },
+        });
     const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
       type: 'message',
       stop_reason: 'end_turn',
@@ -309,6 +360,70 @@ describe('journey assistant Worker contract', () => {
       sources: [{ title: 'Riolu guide' }],
     });
     expect(gatewayRun).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects an off-topic Paradox answer even in the relaxed trial mode', async () => {
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
+      ? { response: { onTopic: false } }
+      : {
+          response: {
+            hintId: 'sv-violet-paradox-overview',
+            webAllowed: true,
+            queryZh: '宝可梦 紫 属性克制',
+            queryEn: 'Pokémon Violet type matchups',
+            pokeApiKind: '',
+            pokeApiSlug: '',
+          },
+        });
+    const gatewayRun = vi.fn(async () => new Response(JSON.stringify({
+      type: 'message',
+      stop_reason: 'end_turn',
+      content: [
+        {
+          type: 'server_tool_use',
+          id: 'srvtoolu_wrong_paradox',
+          name: 'web_search',
+          input: { query: 'Pokémon Violet type matchups' },
+        },
+        {
+          type: 'web_search_tool_result',
+          tool_use_id: 'srvtoolu_wrong_paradox',
+          content: [{
+            type: 'web_search_result',
+            title: 'Paradox Pokémon - Bulbapedia',
+            url: 'https://bulbapedia.bulbagarden.net/wiki/Paradox_Pok%C3%A9mon',
+          }],
+        },
+        {
+          type: 'text',
+          text: '悖谬宝可梦是带有古代或未来特征的独立宝可梦。',
+        },
+      ],
+    }), { headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', gatewayRun);
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'deepseek-topic-key-12345',
+        },
+        body: violetBody('紫里属性克制关系怎么看？'),
+      }),
+      deepSeekEnv({ aiRun, experimental: true }),
+    );
+
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({ status: 'no_match', answer: null });
+    expect(value.answer ?? '').not.toContain('悖谬');
+    expect(aiRun.mock.calls.some((call) =>
+      (call[2] as AiOptions | undefined)?.gateway?.metadata?.phase ===
+        'deepseek-native-topic-check')).toBe(true);
   });
 
   it('marks Qwen and DeepSeek as dual-source only after an explicit cross-check', async () => {
@@ -547,6 +662,133 @@ describe('journey assistant Worker contract', () => {
     expect(value.answer).not.toContain('Lv.30');
   });
 
+  it('reads bounded v20 gameplay species shards and keeps only audited encounter and learn rows', async () => {
+    await seedDexBundle({
+      violet: [encounter('unverified-area', '未核验地点', 1, 1, ['wild'])],
+    }, {
+      moveSets: {
+        'scarlet-violet': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 30 }],
+          machine: [],
+          egg: [],
+          tutor: [],
+        },
+      },
+    }, 20);
+    await env.DEX_CONTENT.put(
+      'v5/gameplay/species/447.json',
+      JSON.stringify(gameplaySpeciesShard({
+        encounters: [gameplayEncounter('verified-area', '已核验地点', 16, 20)],
+        learnLevel: 40,
+      })),
+    );
+
+    const encounterResponse = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-encounter-123',
+    );
+    const encounterValue = await encounterResponse.json() as Record<string, unknown>;
+    expect(encounterValue.answer).toContain('已核验地点');
+    expect(encounterValue.answer).not.toContain('未核验地点');
+
+    const moveResponse = await post(
+      violetBody('利欧路几级学会剑舞？'),
+      'dex-shard-learn-123456',
+    );
+    const moveValue = await moveResponse.json() as Record<string, unknown>;
+    expect(moveValue.answer).toContain('Lv.40');
+    expect(moveValue.answer).not.toContain('Lv.30');
+  });
+
+  it('falls back to the existing detail path when a v20 gameplay shard is malformed or oversized', async () => {
+    await seedDexBundle({
+      violet: [encounter('fallback-area', '回退地点', 22, 24, ['wild'])],
+    }, {}, 20);
+    await env.DEX_CONTENT.put('v5/gameplay/species/447.json', JSON.stringify({
+      ...gameplaySpeciesShard({ encounters: [] }),
+      schemaVersion: 2,
+      padding: 'x'.repeat(2 * 1024 * 1024),
+    }));
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-fallback-123',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('回退地点');
+  });
+
+  it('falls back when a v20 gameplay species shard is missing', async () => {
+    await seedDexBundle({
+      violet: [encounter('missing-shard-fallback', '缺失分片回退', 25, 26, ['wild'])],
+    }, {}, 20);
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-shard-missing-1234',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('缺失分片回退');
+  });
+
+  it('does not consult a gameplay shard for a v19 manifest', async () => {
+    await seedDexBundle({
+      violet: [encounter('v19-detail', 'V19 详情地点', 12, 13, ['wild'])],
+    });
+    await env.DEX_CONTENT.put(
+      'v5/gameplay/species/447.json',
+      JSON.stringify(gameplaySpeciesShard({
+        encounters: [gameplayEncounter('future-shard', '不应读取的 V20 分片', 90, 90)],
+      })),
+    );
+    const response = await post(
+      violetBody('紫里在哪里可以抓利欧路？'),
+      'dex-v19-no-shard-1234',
+    );
+    const value = await response.json() as Record<string, unknown>;
+    expect(value.answer).toContain('V19 详情地点');
+    expect(value.answer).not.toContain('不应读取的 V20 分片');
+  });
+
+  it('uses sanitized v20 shard facts in open-ended composer evidence', async () => {
+    await seedDexBundle({
+      violet: [encounter('unverified-evidence', '未核验 evidence', 1, 1, ['wild'])],
+    }, {
+      moveSets: {
+        'scarlet-violet': {
+          levelUp: [{ moveId: 14, method: 'level-up', level: 30 }],
+          machine: [],
+          egg: [],
+          tutor: [],
+        },
+      },
+    }, 20);
+    const shard = gameplaySpeciesShard({
+      encounters: [gameplayEncounter('verified-evidence', '分片核验地点', 16, 20)],
+      learnLevel: 40,
+    });
+    shard.evolutions = [{
+      stableId: 'evolution:447:448',
+      fromPokemonStableId: 'pokemon:447',
+      toPokemonStableId: 'pokemon:448',
+      triggers: [{ trigger: 'level-up', minHappiness: 160, internalNote: 'must-not-leak' }],
+      applicabilityByVersionGroup: { 'scarlet-violet': 'unknown' },
+      source: {
+        sourceId: 'pokeapi-api-data',
+        scope: 'global chain; exact-game applicability unknown',
+      },
+    }];
+    await env.DEX_CONTENT.put('v5/gameplay/species/447.json', JSON.stringify(shard));
+    const request = JSON.parse(violetBody('介绍一下利欧路在紫里的培养资料')) as AssistantRequest;
+    const sources = await buildDexBundleSources(request, env.DEX_CONTENT);
+    expect(sources).toHaveLength(1);
+    const evidence = JSON.parse(sources[0].text) as Record<string, unknown>;
+    const species = evidence.species as Record<string, unknown>;
+    expect(JSON.stringify(species)).toContain('分片核验地点');
+    expect(JSON.stringify(species)).not.toContain('未核验 evidence');
+    expect(JSON.stringify(species)).toContain('"level":40');
+    expect(JSON.stringify(species)).toContain('exactGameApplicability');
+    expect(JSON.stringify(species)).not.toContain('must-not-leak');
+  });
+
   it('answers item and species profile facts from bundle catalogs without Qwen', async () => {
     await seedDexBundle({}, {
       summary: { id: 447, nameZh: '利欧路', types: ['fighting'] },
@@ -583,6 +825,253 @@ describe('journey assistant Worker contract', () => {
     expect(itemValue).toMatchObject({ status: 'answered', modelUsed: false });
     expect(itemValue.answer).toContain('进化道具');
     expect(itemValue.answer).toContain('某些特定宝可梦进化');
+  });
+
+  it('uses bounded v20 item, ability, and move reference shards', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        cost: 3000,
+        descriptionZh: '能让某些特定宝可梦进化。',
+        effectZh: '能让某些特定宝可梦进化。',
+      }),
+    ));
+    await env.DEX_CONTENT.put('v5/reference/abilities/1.json', JSON.stringify(
+      referenceShard('ability', 1, 'stench', '恶臭', {
+        generation: 3,
+        descriptionZh: '攻击时有时会使对手畏缩。',
+        shortEffect: '有时使对手畏缩。',
+      }),
+    ));
+    await env.DEX_CONTENT.put('v5/reference/moves/14.json', JSON.stringify(
+      referenceShard('move', 14, 'swords-dance', '剑舞', {
+        type: 'normal', typeZh: '一般', category: 'status', categoryZh: '变化',
+        pp: 20, priority: 0, generation: 1,
+        descriptionZh: '大幅提高自己的攻击。',
+      }),
+    ));
+
+    const item = await post(violetBody('光之石有什么作用？'), 'v20-ref-item-12345');
+    expect((await item.json() as AssistantResponse).answer).toContain('进化道具');
+    const ability = await post(violetBody('恶臭特性有什么效果？'), 'v20-ref-ability-123');
+    expect((await ability.json() as AssistantResponse).answer).toContain('使对手畏缩');
+    const move = await post(violetBody('剑舞招式的效果和 PP 是什么？'), 'v20-ref-move-12345');
+    const moveValue = await move.json() as AssistantResponse;
+    expect(moveValue.answer).toContain('PP：20');
+    expect(moveValue.answer).toContain('大幅提高自己的攻击');
+  });
+
+  it('uses the bounded v20 item slug index for held items and reports the audited license', async () => {
+    await seedDexBundle({}, {
+      heldItems: [{ slug: 'light-ball', rarityByVersion: { violet: 5 } }],
+    }, 20);
+    await seedV20ReferenceManifest();
+    const bucket = (await sha256Hex('light-ball')).slice(0, 2);
+    await env.DEX_CONTENT.put(`v5/reference/item-slug-index/${bucket}.json`, JSON.stringify({
+      schemaVersion: 1,
+      kind: 'item-slug-index',
+      bucket,
+      entries: { 'light-ball': { id: 213, nameZh: '电气球' } },
+    }));
+    const response = await post(violetBody('利欧路会携带什么道具？'), 'v20-held-index-1234');
+    const value = await response.json() as AssistantResponse;
+    expect(value.answer).toContain('电气球：5%');
+    expect(JSON.stringify(value)).toContain('CC BY-NC-SA 3.0');
+    expect(JSON.stringify(value)).not.toContain('CC BY-NC-SA 4.0');
+  });
+
+  it('feeds a bounded v20 move shard into composer evidence', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/moves/14.json', JSON.stringify(
+      referenceShard('move', 14, 'swords-dance', '剑舞', {
+        type: 'normal', typeZh: '一般', category: 'status', categoryZh: '变化',
+        pp: 20, priority: 0, generation: 1,
+        descriptionZh: '大幅提高自己的攻击。',
+      }),
+    ));
+    const request = JSON.parse(violetBody('剑舞招式的效果和 PP 是什么？')) as AssistantRequest;
+    const sources = await buildDexBundleSources(request, env.DEX_CONTENT);
+    expect(sources).toHaveLength(1);
+    expect(sources[0].text).toContain('"pp":20');
+    expect(sources[0].text).toContain('general bundle move values');
+  });
+
+  it('fails closed for missing, malformed, or oversized v20 reference shards', async () => {
+    for (const [name, bodyValue] of [
+      ['missing', null],
+      ['malformed', JSON.stringify({ ...referenceShard('item', 107, 'shiny-stone', '光之石'), unknown: true })],
+      ['oversized', JSON.stringify({ ...referenceShard('item', 107, 'shiny-stone', '光之石'), padding: 'x'.repeat(70 * 1024) })],
+    ] as const) {
+      const [objects] = await Promise.all([env.DEX_CONTENT.list()]);
+      await Promise.all(objects.objects.map((object) => env.DEX_CONTENT.delete(object.key)));
+      await seedDexBundle({}, {}, 20);
+      await seedV20ReferenceManifest();
+      if (bodyValue) await env.DEX_CONTENT.put('v5/reference/items/107.json', bodyValue);
+      const response = await post(violetBody('光之石有什么作用？'), `v20-ref-fail-${name}-1234`);
+      expect(await response.json()).toMatchObject({ status: 'no_match' });
+    }
+  });
+
+  it('does not consult reference shards for a v19 manifest', async () => {
+    await seedDexBundle({}, {}, 19);
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        descriptionZh: 'V20 分片不应被 V19 读取。',
+      }),
+    ));
+    const response = await post(violetBody('光之石有什么作用？'), 'v19-no-ref-shard-123');
+    const value = await response.json() as Record<string, unknown>;
+    expect(value).toMatchObject({ status: 'no_match' });
+    expect(JSON.stringify(value)).not.toContain('V20 分片不应被 V19 读取');
+  });
+
+  it('uses a v20 deterministic hit as the baseline for allowlisted online verification', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        descriptionZh: '能让某些特定宝可梦进化。',
+        effectZh: '能让某些特定宝可梦进化。',
+      }),
+    ));
+    const aiRun = vi.fn(async (
+      _model: string,
+      input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-compose') {
+        expect(JSON.stringify(input)).toContain('TitoDex Dex bundle v20');
+        expect(JSON.stringify(input)).toContain('pokeapi-item-107');
+        return { response: {
+          supported: true,
+          answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
+          usedSourceIds: ['dex-bundle-v20', 'pokeapi-item-107'],
+        } };
+      }
+      if (phase === 'curated-web-verify') {
+        return { response: {
+          supported: true,
+          answer: '经本地资料与 PokéAPI 核对，光之石是进化道具，可让特定宝可梦进化。',
+        } };
+      }
+      if (phase === 'curated-web-route') {
+        return { response: {
+          hintId: '',
+          webAllowed: true,
+          queryZh: '宝可梦 紫 光之石 作用',
+          queryEn: 'Pokemon Violet Shiny Stone effect',
+          pokeApiKind: 'item',
+          pokeApiSlug: 'shiny-stone',
+        } };
+      }
+      throw new Error(`unexpected model phase ${String(phase)}`);
+    });
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === 'pokeapi.co') {
+        return new Response(JSON.stringify({
+          id: 107,
+          name: 'shiny-stone',
+          names: [{ language: { name: 'zh-Hans' }, name: '光之石' }],
+          effect_entries: [{
+            language: { name: 'zh-Hans' },
+            short_effect: '能让某些特定宝可梦进化。',
+          }],
+          attributes: [],
+          category: { name: 'evolution' },
+        }), { headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('{}', { status: 503 });
+    }));
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'v20-online-verify-1234',
+        },
+        body: violetBody('光之石有什么作用？'),
+      }),
+      curatedDexEnv(aiRun),
+    );
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'curated_sources_qwen',
+      modelUsed: true,
+      sourceKinds: ['pokeapi'],
+    });
+    expect(value.answer).toContain('本地资料与 PokéAPI 核对');
+    expect(value.verifiedFacts).toContain('TitoDex Dex bundle v20 · 本地结构化底稿');
+    expect(value.unknowns).not.toContain(
+      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+    );
+  });
+
+  it('keeps the v20 local baseline when the online pass has no web evidence', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/107.json', JSON.stringify(
+      referenceShard('item', 107, 'shiny-stone', '光之石', {
+        categoryZh: '进化道具',
+        descriptionZh: '本地结构化说明。',
+      }),
+    ));
+    const aiRun = vi.fn(async (
+      _model: string,
+      _input: Record<string, unknown>,
+      options?: AiOptions,
+    ) => {
+      const phase = options?.gateway?.metadata?.phase;
+      if (phase === 'curated-web-compose') return { response: {
+        supported: true,
+        answer: '只根据本地资料改写的回答不算联网核验。',
+        usedSourceIds: ['dex-bundle-v20'],
+      } };
+      if (phase === 'curated-web-verify') return { response: {
+        supported: true,
+        answer: '只根据本地资料改写的回答不算联网核验。',
+      } };
+      if (phase === 'curated-web-route') return { response: {
+        hintId: '', webAllowed: true,
+        queryZh: '宝可梦 紫 光之石 作用',
+        queryEn: 'Pokemon Violet Shiny Stone effect',
+        pokeApiKind: 'item', pokeApiSlug: 'shiny-stone',
+      } };
+      throw new Error(`unexpected model phase ${String(phase)}`);
+    });
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () =>
+      new Response('{}', { status: 503 })));
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/v1/ask', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-titodex-device-key': 'v20-online-empty-1234',
+        },
+        body: violetBody('光之石有什么作用？'),
+      }),
+      curatedDexEnv(aiRun),
+    );
+    const value = await response.json() as AssistantResponse;
+    expect(value).toMatchObject({
+      status: 'answered',
+      answerMode: 'local_audited',
+      modelUsed: true,
+      sourceKinds: [],
+    });
+    expect(value.answer).toContain('本地结构化说明');
+    expect(value.answer).not.toContain('不算联网核验');
+    expect(value.unknowns).toContain(
+      '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
+    );
   });
 
   it('rejects unexpected save or identity fields', async () => {
@@ -754,6 +1243,163 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
   });
 
+  it('loads a hash-pinned installed Journey pack without sending its body', async () => {
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '1',
+      sourceAsOf: '2026-08-22',
+      entries: [{
+        id: 'sv-test-blocker',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'test_blocker',
+          labelZh: '测试路障',
+          aliases: ['测试路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'test_blocker',
+          locationId: 'test-location',
+          instructionZh: '这是从已安装资料包读取的确定性步骤。',
+        }],
+        overviewZh: '测试路障来自按游戏下载的审核资料包。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    const descriptor = await publishJourneyPackFixture(pack);
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [{
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      version: '1',
+      sha256: descriptor.sha256,
+    }];
+
+    const response = await post(JSON.stringify(request), 'pack-answer-key-12345');
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      status: 'answered',
+      matchedHintIds: ['sv-test-blocker'],
+    });
+  });
+
+  it('ignores a Journey pack when its installed hash does not match R2', async () => {
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '1',
+      entries: [{
+        id: 'invalid-pack-hint',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'test_blocker',
+          labelZh: '测试路障',
+          aliases: ['测试路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'test_blocker',
+          locationId: 'test-location',
+          instructionZh: '不应读取损坏的对象。',
+        }],
+        overviewZh: '不应读取损坏的对象。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    await publishJourneyPackFixture(pack, { sha256: 'a'.repeat(64) });
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [{
+      id: 'journey-sv-test',
+      gameFamily: 'sv',
+      version: '1',
+      sha256: 'a'.repeat(64),
+    }];
+
+    const response = await post(JSON.stringify(request), 'pack-hash-key-12345');
+
+    expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
+  });
+
+  it('rejects the complete Journey pack when it tries to replace an audited hint', async () => {
+    const divergent = structuredClone(progressionHints[0]) as Record<string, unknown>;
+    divergent.overviewZh = '这是一条不允许覆盖内置审核资料的改写。';
+    const pack = {
+      schemaVersion: 1,
+      id: 'journey-hgss-test',
+      gameFamily: 'hgss',
+      games: ['heartgold', 'soulsilver'],
+      version: '1',
+      entries: [divergent, {
+        id: 'hgss-new-pack-hint',
+        games: ['soulsilver'],
+        generation: 4,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'story_blocker',
+          id: 'new_pack_blocker',
+          labelZh: '新资料包路障',
+          aliases: ['新资料包路障'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'continue_story',
+          targetId: 'new_pack_blocker',
+          locationId: 'test-location',
+          instructionZh: '这条新增内容也必须随整包一起拒绝。',
+        }],
+        overviewZh: '整包校验失败时不能局部接受新增提示。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    };
+    const descriptor = await publishJourneyPackFixture(pack);
+    const request = JSON.parse(body({
+      question: '新资料包路障怎么过？',
+      journeyPacks: [{
+        id: pack.id,
+        gameFamily: pack.gameFamily,
+        version: pack.version,
+        sha256: descriptor.sha256,
+      }],
+    })) as Record<string, unknown>;
+    const response = await post(JSON.stringify(request), 'pack-override-key-12345');
+    expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
+  });
+
   it('enforces the configured per-key cost guard', async () => {
     const deviceKey = 'rate-limit-key-unique-12345';
     const responses = await Promise.all(
@@ -785,6 +1431,89 @@ describe('journey assistant Worker contract', () => {
     expect([...new Uint8Array(await apk.arrayBuffer())]).toEqual([0x50, 0x4b, 0x03, 0x04]);
     expect(apk.headers.get('cache-control')).toContain('immutable');
     expect(apk.headers.get('content-type')).toBe('application/vnd.android.package-archive');
+  });
+
+  it('serves Journey pack catalogs and immutable JSON only through the Worker', async () => {
+    await publishJourneyPackFixture({
+      schemaVersion: 1,
+      id: 'journey-sv',
+      gameFamily: 'sv',
+      games: ['scarlet', 'violet'],
+      version: '5',
+      entries: [{
+        id: 'sv-catalog-fixture',
+        games: ['violet'],
+        generation: 9,
+        locations: [],
+        locationAliases: [],
+        destinationAliases: [],
+        subject: {
+          type: 'reference_topic',
+          id: 'catalog_fixture',
+          labelZh: '目录测试',
+          aliases: ['目录测试'],
+        },
+        requirements: [],
+        steps: [{
+          order: 1,
+          action: 'read_reference',
+          targetId: 'catalog_fixture',
+          locationId: 'unknown',
+          instructionZh: '目录允许后才能下载这份对象。',
+        }],
+        overviewZh: '目录允许后才能下载这份对象。',
+        sources: [{
+          title: 'TitoDex test fixture',
+          url: 'https://example.test/revision/1',
+          accessedAt: '2026-08-22',
+        }],
+      }],
+    });
+
+    const catalog = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/catalog',
+    );
+    expect(catalog.status).toBe(200);
+    expect(catalog.headers.get('cache-control')).toBe('no-store');
+    const object = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.json',
+    );
+    expect(object.status).toBe(200);
+    expect(object.headers.get('cache-control')).toContain('immutable');
+    expect(await object.json()).toMatchObject({ id: 'journey-sv', version: '5' });
+  });
+
+  it('does not serve an immutable Journey object before catalog publication', async () => {
+    await env.JOURNEY_CONTENT.put(
+      'journey-packs/objects/journey-sv/5.json',
+      '{"schemaVersion":1}',
+    );
+    const object = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.json',
+    );
+    expect(object.status).toBe(404);
+  });
+
+  it('accepts at most one exact-game Journey pack reference', async () => {
+    const request = JSON.parse(violetBody('测试路障怎么过？')) as Record<string, unknown>;
+    request.journeyPacks = [
+      { id: 'journey-sv', gameFamily: 'sv', version: '5', sha256: 'a'.repeat(64) },
+      { id: 'journey-hgss', gameFamily: 'hgss', version: '5', sha256: 'b'.repeat(64) },
+    ];
+    const response = await post(JSON.stringify(request), 'pack-count-key-12345');
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ errorCode: 'invalid_request' });
+  });
+
+  it('rejects Journey pack traversal and non-JSON objects', async () => {
+    const traversal = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/%2e%2e/private.json',
+    );
+    expect(traversal.status).toBe(404);
+    const apk = await SELF.fetch(
+      'https://assistant.test/v1/journey-packs/objects/journey-sv/5.apk',
+    );
+    expect(apk.status).toBe(404);
   });
 
   it('rejects traversal and does not expose other R2 prefixes', async () => {
@@ -831,9 +1560,10 @@ function violetBody(question: string): string {
 async function seedDexBundle(
   obtainLocationsByVersion: Record<string, Record<string, unknown>[]>,
   detailExtras: Record<string, unknown> = {},
+  bundleVersion = 19,
 ): Promise<void> {
   await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
-    bundleVersion: 19,
+    bundleVersion,
     cdnPrefix: 'v5',
     complete: true,
     exactVersionLocations: true,
@@ -843,6 +1573,134 @@ async function seedDexBundle(
     obtainLocationsByVersion,
     ...detailExtras,
   }));
+}
+
+async function seedV20ReferenceManifest(): Promise<void> {
+  await env.DEX_CONTENT.put('bundle-manifest.json', JSON.stringify({
+    bundleVersion: 20,
+    cdnPrefix: 'v5',
+    complete: true,
+    exactVersionLocations: true,
+    referenceDataSourceCommit: 'a'.repeat(40),
+    referenceData: {
+      schemaVersion: 1,
+      maximumShardBytes: 64 * 1024,
+      moves: 'reference/moves/{id}.json',
+      abilities: 'reference/abilities/{id}.json',
+      items: 'reference/items/{id}.json',
+      itemSlugIndex: 'reference/item-slug-index/{bucket}.json',
+      audit: 'reference/reference_shards_audit.json',
+      counts: { moves: 937, abilities: 373, items: 2130, itemSlugIndexBuckets: 256 },
+    },
+  }));
+}
+
+function referenceShard(
+  kind: 'move' | 'ability' | 'item',
+  id: number,
+  slug: string,
+  nameZh: string,
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const common = {
+    schemaVersion: 1,
+    kind,
+    id,
+    stableId: kind === 'item' ? `item:${slug}` : `${kind}:${id}`,
+    sourceCommit: 'a'.repeat(40),
+    sourceStatus: 'pinned-pokeapi',
+    slug,
+    nameZh,
+    nameEn: kind === 'move' ? 'Swords Dance' : kind === 'ability' ? 'Stench' : 'Shiny Stone',
+  };
+  if (kind === 'move') return {
+    ...common,
+    type: null, typeZh: null, category: null, categoryZh: null,
+    power: null, accuracy: null, pp: null, priority: null,
+    target: null, targetZh: null, generation: null,
+    descriptionZh: null, shortEffect: null, availableVersionGroups: [],
+    ...overrides,
+  };
+  if (kind === 'ability') return {
+    ...common,
+    generation: null, descriptionZh: null, shortEffect: null,
+    ...overrides,
+  };
+  return {
+    ...common,
+    categoryZh: null, cost: null, descriptionZh: null, effectZh: null, flingPower: null,
+    availableVersionGroups: [], availableGenerations: [], pricesByVersionGroup: {},
+    ...overrides,
+  };
+}
+
+function gameplayEncounter(
+  areaSlug: string,
+  areaLabelZh: string,
+  minLevel: number,
+  maxLevel: number,
+): Record<string, unknown> {
+  return {
+    method: 'wild',
+    exactVersion: 'violet',
+    versionGroup: 'scarlet-violet',
+    areaSlug,
+    areaLabelZh,
+    minLevel,
+    maxLevel,
+    rateKind: 'unknown',
+    rateValue: null,
+    encounterMethods: ['walk'],
+    conditions: [],
+    formStableId: null,
+    isAlpha: false,
+    isTitan: false,
+    isRaid: false,
+    isFixedEncounter: false,
+    source: {
+      sourceId: 'pokeapi-api-data',
+      commit: 'a'.repeat(40),
+      license: 'BSD-3-Clause',
+    },
+  };
+}
+
+function gameplaySpeciesShard({
+  encounters,
+  learnLevel = 40,
+}: {
+  encounters: Record<string, unknown>[];
+  learnLevel?: number;
+}): Record<string, unknown> {
+  return {
+    schemaVersion: 1,
+    speciesId: 447,
+    pokemonStableId: 'pokemon:447',
+    provenance: {
+      generator: 'titodex-gameplay-shards-v1',
+      pokeapiCommit: 'a'.repeat(40),
+      pkhexCommit: 'b'.repeat(40),
+    },
+    obtain: {
+      stableId: 'pokemon:447',
+      byExactVersion: encounters.length > 0 ? { violet: encounters } : {},
+      verifiedRouteByVersionGroup: { 'scarlet-violet': encounters.length > 0 ? 'direct' : 'unknown' },
+      derivedFamilyRouteByVersionGroup: { 'scarlet-violet': encounters.length > 0 ? 'direct' : 'unknown' },
+    },
+    learn: {
+      stableId: 'pokemon:447',
+      sourceStatus: 'covered',
+      byVersionGroup: {
+        'scarlet-violet': {
+          levelUp: [{ moveStableId: 'move:14', level: learnLevel }],
+          machine: ['move:14'],
+          egg: [],
+          tutor: [],
+        },
+      },
+    },
+    evolutions: [],
+  };
 }
 
 function encounter(
@@ -893,6 +1751,32 @@ function deepSeekEnv({
     TAVILY_WEB_ENABLED: 'false',
     EXPERIMENTAL_BROAD_ANSWERS: experimental ? 'true' : 'false',
     DEEPSEEK_NATIVE_SEARCH_ENABLED: 'true',
+    DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
+    DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
+    AI_EXTERNAL_PROVIDER_ENABLED: 'false',
+    AI_PROVIDER: 'workers-ai',
+    AI_PROVIDER_MODEL: 'deepseek-v4-flash',
+    AI_PROVIDER_ENDPOINT: 'chat/completions',
+    TAVILY_API_KEY: '',
+  } as unknown as Env;
+}
+
+function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
+  return {
+    JOURNEY_CONTENT: env.JOURNEY_CONTENT,
+    DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_RATE_LIMITER: {
+      limit: async () => ({ success: true }),
+    },
+    JOURNEY_SEARCH_NAMESPACE: undefined,
+    AI: { run: aiRun },
+    AI_MODEL: '@cf/qwen/qwen3-30b-a3b-fp8',
+    AI_GATEWAY_ID: 'titodex-journey-assistant',
+    AI_SEARCH_ENABLED: 'false',
+    CURATED_WEB_ENABLED: 'true',
+    TAVILY_WEB_ENABLED: 'false',
+    EXPERIMENTAL_BROAD_ANSWERS: 'false',
+    DEEPSEEK_NATIVE_SEARCH_ENABLED: 'false',
     DEEPSEEK_NATIVE_PROVIDER: 'custom-deepseek-anthropic',
     DEEPSEEK_NATIVE_KEY_ALIAS: 'TitoDex',
     AI_EXTERNAL_PROVIDER_ENABLED: 'false',

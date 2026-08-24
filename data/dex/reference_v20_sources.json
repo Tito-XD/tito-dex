@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "bundleVersion": 20,
+  "sources": [
+    {
+      "sourceId": "pokeapi-api-data",
+      "name": "PokéAPI api-data",
+      "repository": "https://github.com/PokeAPI/api-data",
+      "commit": "cd40ffdf0f5c68fc81c39c2ebec256e128fe1966",
+      "license": "BSD-3-Clause",
+      "licenseFile": "LICENSE.txt",
+      "usage": [
+        "moves",
+        "abilities",
+        "items",
+        "machines",
+        "types",
+        "pokemon learnsets",
+        "global evolution chains",
+        "encounter pair verification"
+      ]
+    },
+    {
+      "sourceId": "titodex-reviewed-mechanics",
+      "name": "TitoDex reviewed mechanics",
+      "license": "project-authored",
+      "usage": [
+        "status conditions",
+        "weather",
+        "terrain"
+      ],
+      "reviewStatus": "candidate"
+    },
+    {
+      "sourceId": "titodex-v19-version-matrices",
+      "name": "TitoDex v19 audited version matrices",
+      "license": "mixed; retained per-record source metadata",
+      "usage": [
+        "move version-group availability",
+        "item version-group availability",
+        "item version-group prices"
+      ],
+      "inheritance": "read-only v19 APK assets; no new network fetch"
+    }
+  ]
+}

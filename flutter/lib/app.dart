@@ -37,6 +37,7 @@ import 'pages/companion_position_page.dart';
 import 'pages/pokemon_detail_page.dart';
 import 'pages/home_page.dart';
 import 'pages/journey_page.dart';
+import 'pages/journey_pack_manager_page.dart';
 import 'pages/ask_titodex_page.dart';
 import 'pages/media_resource_page.dart';
 import 'pages/companion/blind_spot_page.dart';
@@ -169,6 +170,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
                       onLaunchEmulator: () => _onContinue(context),
                       askTitoDexEnabled: askTitoDexSettings.extensionEnabled,
                       onAskTitoDex: () => context.push('/journey/ask'),
+                      onManageJourneyPacks: () =>
+                          context.push('/journey/packs'),
                     ),
                   ),
                 ),
@@ -183,6 +186,19 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: AskTitoDexPage(
                         journey: _journey,
+                        edition: gameEditionRepository.edition,
+                      ),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'packs',
+                  redirect: (context, state) =>
+                      askTitoDexSettings.extensionEnabled ? null : '/journey',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: JourneyPackManagerPage(
                         edition: gameEditionRepository.edition,
                       ),
                     ),
@@ -209,6 +225,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: MoveEncyclopediaPage(
                         initialQuery: state.uri.queryParameters['q'],
+                        initialEntryId: int.tryParse(
+                          state.uri.queryParameters['id'] ?? '',
+                        ),
+                        openInitialEntry:
+                            state.uri.queryParameters['open'] == '1',
                       ),
                     ),
                   ),
@@ -220,6 +241,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     child: TitoPageContainer(
                       child: AbilityEncyclopediaPage(
                         initialQuery: state.uri.queryParameters['q'],
+                        initialEntryId: int.tryParse(
+                          state.uri.queryParameters['id'] ?? '',
+                        ),
+                        openInitialEntry:
+                            state.uri.queryParameters['open'] == '1',
                       ),
                     ),
                   ),
@@ -351,6 +377,11 @@ class _TitoDexAppState extends State<TitoDexApp> {
                               shortcutReference?.referenceFilename ??
                               'natures.json',
                           initialQuery: state.uri.queryParameters['q'],
+                          initialEntryId: int.tryParse(
+                            state.uri.queryParameters['id'] ?? '',
+                          ),
+                          openInitialEntry:
+                              state.uri.queryParameters['open'] == '1',
                         ),
                       ),
                     );

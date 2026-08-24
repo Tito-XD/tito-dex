@@ -4,11 +4,11 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.8.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.19) |
-| **`main` / lite source** | `0.8.19+172` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.8.19-offline+173` — APK-bundled verified compact v14 archive; updates to live v19 |
+| **Latest release** | [v0.8.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.20) |
+| **`main` / lite source** | `0.8.20+174` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.8.20-offline+175` — APK-bundled verified compact v14 archive; updates from the live manifest |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
-| **Offline dex bundle** | **v19** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
+| **Offline dex bundle** | **v20** live on CDN; Offline APK embeds compact **v14** — 1025 species, 803 form records, complete item text/icons, audited form media, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
 | **Primary target** | Android RG handheld (arm64-v8a, SDK 36) |
 
@@ -44,12 +44,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.8.19)
+## Current feature status (latest release line: v0.8.20)
 
-> v0.8.19 uses Lite versionCode 172 and Offline versionCode 173. Lite downloads live bundle v19 when requested; Offline reuses the verified compact v14 archive and can update to the newer live data. It upgrades directly from v0.8.13–v0.8.18. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.8.20 uses Lite versionCode 174 and Offline versionCode 175. Lite downloads the current live bundle when requested; Offline reuses the verified compact v14 archive and can update from the live manifest. It upgrades directly from v0.8.13–v0.8.19. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Journey & save
-- **Current v0.8.19:** Journey Assistant and three HGSS blocker chains are built into the host APK, but the entire feature defaults off. First activation happens only in Settings after a disclosure covering network access, AI/search and bounded recent conversation context; upgraded installs do not inherit the earlier default-on entry state. While disabled, Journey and Search build no assistant entry or spacer. After consent, local deterministic facts still run first. The App keeps the newest 50 Q&A pairs locally, sends at most six same-game pairs for follow-ups, and presents online status, local history and selected game as three independent compact controls. History management can explicitly compact local storage to the newest 10 entries or clear it after confirmation; the game control opens the existing 23-edition picker and rebuilds isolated Assistant context. Answers use a refined light conversation surface without stray corner marks, an unboxed companion with four-point sparkles, smoother shimmer motion, and bottom-following scroll; verified answers progressively reveal only after the Worker evidence pass completes; verification plus citations collapse into one expandable row, while recognized Pokémon, items, moves and abilities retain their Poké Ball/backpack/sparkle/bolt ActionChips into existing pages. The encyclopedia/guide allowlist remains one connection capability while Worker/Qwen/AI Search/Dex bundle/Tavily/DeepSeek stay individually observable. The complete possible-source list lives in Settings Credits. A save location alone no longer selects an unrelated blocker, and selected-game changes physically clear incompatible save context. On a local miss the Worker can combine exact-version Dex-bundle facts, BGE-M3 reviewed retrieval, fixed PokeAPI/StrategyWiki/Wikidata evidence, Tavily and DeepSeek V4 Flash allowlisted search, with Workers AI Qwen as the public composer/verifier. Chinese Tavily retrieval first attempts 52Poké alone; only a missing or unsupported primary answer falls back to the remaining allowlisted encyclopedias and guide sites, and final output stays Simplified Chinese. When both live routes succeed, a separate Qwen pass labels them as dual-source only if the DeepSeek result materially corroborates the primary evidence chain without a version/fact conflict. The explicit broad-answer trial can return sourced low-confidence material when a second evidence pass is incomplete for selected-game gameplay, but general franchise questions require verified citation support; Pokémon-only scope, fixed domains, bounded payloads, and deterministic failure fallback remain enforced. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
+- **Current v0.8.20:** Journey Assistant and three HGSS blocker chains are built into the host APK, but the entire feature defaults off. First activation happens only in Settings after a disclosure covering network access, AI/search and bounded recent conversation context; upgraded installs do not inherit the earlier default-on entry state. While disabled, Journey and Search build no assistant entry or spacer. After consent, local deterministic facts still run first, and Journey can manage one signed, catalog-pinned optional data pack for the selected game; failed or cancelled replacement keeps the prior pack. The App keeps the newest 50 Q&A pairs locally, sends at most six same-game pairs for follow-ups, and presents online status, local history and selected game as three independent compact controls. History management can explicitly compact local storage to the newest 10 entries or clear it after confirmation; the game control opens the existing 23-edition picker and rebuilds isolated Assistant context. Answers use a refined light conversation surface without stray corner marks, an unboxed companion with four-point sparkles, smoother shimmer motion, and bottom-following scroll; verified answers progressively reveal only after the Worker evidence pass completes; verification plus citations collapse into one expandable row. Recognized Pokémon, items, moves and abilities resolve against installed runtime data and stable IDs before their Poké Ball/backpack/sparkle/bolt ActionChips open existing details; ambiguous labels do not create a guessed target. The encyclopedia/guide allowlist remains one connection capability while Worker/Qwen/AI Search/Dex bundle/Tavily/DeepSeek stay individually observable. The complete possible-source list lives in Settings Credits. A save location alone no longer selects an unrelated blocker, and selected-game changes physically clear incompatible save context. On a local miss—or a V20 Dex fact whose provenance requires online verification—the Worker can combine exact-version Dex-bundle facts, BGE-M3 reviewed retrieval, fixed PokeAPI/StrategyWiki/Wikidata evidence, Tavily and DeepSeek V4 Flash allowlisted search, with Workers AI Qwen as the public composer/verifier. A V20 deterministic answer remains the offline fallback; it is replaced only when the allowlisted pass returns real online evidence. Chinese Tavily retrieval first attempts 52Poké alone; only a missing or unsupported primary answer falls back to the remaining allowlisted encyclopedias and guide sites, and final output stays Simplified Chinese. When both live routes succeed, a separate Qwen pass labels them as dual-source only if the DeepSeek result materially corroborates the primary evidence chain without a version/fact conflict. The explicit broad-answer trial can return sourced low-confidence material when a second evidence pass is incomplete for selected-game gameplay, but general franchise questions require verified citation support; Pokémon-only scope, fixed domains, bounded payloads, and deterministic failure fallback remain enforced. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
@@ -77,6 +77,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 ### Items (reference hub → 道具)
 - **Full item catalog (bundle v19):** 2130 items across 16 `categoryZh` groups with 2130/2130 Chinese descriptions and 2130/2130 local icons. Shared artwork is explicit: 300 Dynamax Crystals, 100 TRs, 230 type-mapped TMs, 25 TM materials, and other intentional template groups are not counted as unique art. Only `bw-grass-tablecloth` remains an explicitly labelled generic-template fallback. The audit now assigns explicit or inherited-pipeline provenance to every record; no item remains unclassified.
 - **Form media catalog (bundle v19):** 1025 species and 803 forms (554 alternates) are audited independently by static, shiny static, animated, shiny animated, and cry availability. Alternate coverage is 548 / 497 / 386 / 386 / 554; 143 have form-specific cries. Six Koraidon/Miraidon ride modes have no separate upstream static artwork and remain named gaps rather than borrowing another mode. `data/dex/form_media_audit.json` is the machine-readable source of truth.
+- **Bundle v20 live:** a byte-preserving v19 base plus pinned reference/gameplay overlays. It keeps 1025 species and adds complete serving projections for 937 moves, 373 abilities and 2130 items, 1025 bounded per-species gameplay shards, and 256 bounded held-item slug-index buckets. App catalogs remain the aggregate source of truth; the Worker reads only strict per-entity/per-species projections. All 4748 objects passed complete SHA-256 readback before the guarded v19-bound root-manifest cutover and public CDN verification; see [DEX_BUNDLE_V20.md](./DEX_BUNDLE_V20.md).
 - PokeAPI media uses one pinned `PokeAPI/sprites` commit and a generated exact-file manifest; 52poke art uses MediaWiki `imageinfo` plus successful original-file requests. The app maps catalog records directly to `formKey`, separates normal/shiny and static/animated candidates, caches selected art, and never gives same-ID cosmetic forms the default animation. Cry matching is explicit rather than suffix substring guessing.
 - Data source priority: PokeAPI (lowercase `zh-hans`) for names and in-game descriptions, then 52poke for gaps and newer original-resolution bag icons. 52poke original wiki content is CC BY-NC-SA 3.0; official game media found through its file pages retains its underlying rights and must not be blanket-labelled as CC content. Item icons are bundled rather than hotlinked; cries/animations/HOME art remain online and cached on demand.
 - Icons: `item-sprites/*.png` ship both as loose `/v5/` CDN objects (online, CDN-first) **and inside `bundle.tar.zst`** (offline). Offline the app rewrites the CDN `spriteUrl` to the local bundle file (`dex_offline/item-sprites/<slug>.png`).
@@ -132,11 +133,11 @@ The Pokémon Company, or their affiliates.
 **Attribution correction (2026-08-10):** source metadata now uses 52poke's
 official CC BY-NC-SA 3.0 site license, PokeAPI/PokeAPI api-data BSD-3-Clause,
 and treats PokeAPI/sprites/official media as rights-varying instead of applying
-an unsupported blanket Creative Commons claim. Live bundle v19 is immutable and still carries historical
-attribution text; publish corrected bundle metadata only under a new bundle
-version/object set rather than overwriting v19 objects.
+an unsupported blanket Creative Commons claim. The preserved v19 object set still carries historical
+attribution text; live v20 adds corrected metadata without overwriting v19 objects.
 
 ### Latest release-line highlights
+- v0.8.20: adds catalog-pinned per-game Journey data downloads with atomic replacement, resolves answer entities from installed runtime data and stable IDs, opens move/ability/item details directly, and keeps V20 structured facts eligible for allowlisted online verification while retaining deterministic offline fallback.
 - v0.8.19: renders streamed and completed assistant Markdown as safe headings, emphasis, lists and horizontally scrollable tables; keeps citation URLs exclusively in the expandable evidence sheet; cleans legacy inline source footers from display and follow-up context; and makes the Worker return clean answer bodies alongside structured sources.
 - v0.8.18: removes stray right-angle decorations, frees the companion sprite from its box, refines the paper/shimmer/action-chip styling, and progressively streams bounded verified answer deltas while preserving legacy JSON responses and deterministic local fallback.
 - v0.8.17: gives Ask TitoDex a lighter modern conversation surface with companion/shimmer/reveal motion and compact expandable citations; replaces stacked status cards with three independent connection/history/game controls, adds confirmed local history compression/clearing and in-page edition switching, and preserves Poké Ball/backpack/sparkle/bolt entity ActionChips.
@@ -198,20 +199,23 @@ media/companion-position sub-routes.
 | `/v2/` | v4 | 493 (legacy) |
 | `/v3/` | v5 | 1025 (rollback / older clients) |
 | `/v4/` | v6 | 1025 + forms + exact-version modern encounters (rollback) |
-| `/v5/` | **v19** | current — v13 form evolution + v14 compact archive + v15 zh flavor + v16 held items + v17 full items + v18 online-media catalog + v19 audited form media and complete item text/icons |
+| `/v5/` | **v20** | current — v19 audited form media and complete item text/icons + v20 reference/gameplay projections and bounded Worker shards |
 
 Bundle v19 was built with `tools/patch_dex_bundle_v19_items.py`,
 `tools/audit_item_media_v19.py`, `tools/verify_dex_v19_items.py`, and the
 version-specific `.github/workflows/upload-dex-bundle.yml`. That workflow
 requires live v18 as its base and must not be used to republish now that live
-production is v19. A future bundle needs a new version-specific workflow with
-v19 as the explicit read-only production precondition; stage changed `/v5/`
-objects first and switch the root manifest last.
+production is v20. The v20 path
+`.github/workflows/release-dex-bundle-v20.yml` published the current bundle: it
+bound the approved live v19 manifest/archive/staging to a frozen candidate,
+fully read back every versioned `/v5/` object, then switched and publicly
+verified the root manifest in a separate protected phase. Its rollback workflow
+restores only the saved v19 root manifest and never deletes objects or touches `/v4/`.
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.
 - **Bundle version and CDN prefix are decoupled.** Every release since v7 patched in place over the same `/v5/` prefix; immutability applies to individual object keys, not the prefix. Reading `/v5/` as "bundleVersion 7" wrongly implies a new `/v6/` is needed.
-- v14 compact-media seed: `python3 tools/patch_dex_bundle_v14_compact_media.py`. It byte-compares all 1,340 `artwork/` files against their `sprites/` peers before removing only the duplicate archive copies; loose online artwork remains in R2. Offline APKs still reuse its verified 54,746,615-byte archive while installed copies can update to live v19.
+- v14 compact-media seed: `python3 tools/patch_dex_bundle_v14_compact_media.py`. It byte-compares all 1,340 `artwork/` files against their `sprites/` peers before removing only the duplicate archive copies; loose online artwork remains in R2. Offline APKs still reuse its verified 54,746,615-byte archive while installed copies can update to live v20.
 - Body style / colour / growth rate / habitat Chinese labels are canonical in `data/l10n/zh/dex_axes.json`; Flutter's fallback map is generated from it. New bundle builds persist labels beside slugs, while v19 remains compatible through the APK fallback.
 - Release order: upload and verify every immutable `/v5/` object, then update root `bundle-manifest.json` last. Never overwrite or delete `/v4/`. Clients only upgrade when `remote.bundleVersion > local.version`.
 - Worker state uses a dedicated `MANIFEST_KV` namespace for hot manifest cache and last health/dispatch records; never bind the unrelated `FODI_CACHE`.
@@ -288,7 +292,7 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 `flutter analyze --no-pub`, full `flutter test --no-pub`, Python tool tests,
 Journey Assistant Worker typecheck/Vitest/dry-run, bundled-data byte equality,
 legacy companion Gradle checks, and physical-device host update tests.
-Published v0.8.19 artifacts are verified through the Android release workflows;
+Published v0.8.20 artifacts are verified through the Android release workflows;
 the optional extension is additionally checked for the same V2 signer as the host.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).
@@ -336,6 +340,7 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technology choice, structure and platform boundaries |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
 | [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md) | R2 / Worker / bundle layout |
+| [DEX_BUNDLE_V20.md](./DEX_BUNDLE_V20.md) | v19-read-only v20 candidate, provenance and stable entity-index contract |
 | [PERMISSIONS.md](./PERMISSIONS.md) | GitHub Actions secrets |
 | [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) | Visual, typography, layout and interaction rules |
 | [PARSER_PROPOSAL.md](./PARSER_PROPOSAL.md) | Save parser design |

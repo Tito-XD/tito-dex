@@ -1,6 +1,6 @@
 # 问 TitoDex / 旅程卡关助手
 
-> 状态：v0.8.19 172/173 保留首次明确同意后才开启的边界，并将连接、问答记录与游戏版本收成三个独立入口；本机最近 50 组问答可手动压缩或清空，同游戏最近 6 组用于追问。回答采用浅色对话底板、无外框 Companion、柔和生成动效，并以安全富文本排版标题、强调、列表与可横向滚动表格；引用 URL 只在聚合来源面板内按需展开，实体仍以精灵球／背包／星星／闪电 Chip 跳转。多个百科／攻略站继续合并为一项连接能力，Tavily 与 DeepSeek V4 Flash 保持并行宽范围试用；中文 Tavily 检索先尝试 52Poké，证据为空或未通过核验时再回退其他限定来源。助手与 HGSS 审核种子仍直接内建，旧 Journey Assistant 1.0.0 只保留读取兼容。
+> 状态：v0.8.20 174/175 保留首次明确同意后才开启的边界，并加入按游戏安装、更新或移除的可选旅程资料包；失败或取消替换时保留旧包。连接、问答记录与游戏版本仍是三个独立入口；本机最近 50 组问答可手动压缩或清空，同游戏最近 6 组用于追问。回答采用浅色对话底板、无外框 Companion、柔和生成动效和安全富文本；引用 URL 只在聚合来源面板内按需展开，实体通过稳定资料 ID 以精灵球／背包／星星／闪电 Chip 直达已有详情。多个百科／攻略站继续合并为一项连接能力，Tavily 与 DeepSeek V4 Flash 保持并行宽范围试用；中文 Tavily 检索先尝试 52Poké，证据为空或未通过核验时再回退其他限定来源。助手与 HGSS 审核种子仍直接内建，旧 Journey Assistant 1.0.0 只保留读取兼容。
 
 “问 TitoDex”是可选的存档优先卡关助手。主 APK 内建上下文能力和三个 HGSS 审核链路，但整个功能默认关闭；用户必须先在设置中确认联网、AI 检索和最近对话上下文说明，Journey／Search 才会出现入口。关闭时不预留入口位置，也不发起健康检查或问答请求。开启后仍然本地优先，并可再单独关闭在线回答。在线审核库增加了 DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯和朱紫的少量关键卡点，但仍不是完整流程攻略，也不会把“能识别版本”误写成“已经解析所有剧情进度”。
 
@@ -10,7 +10,7 @@
 已解析存档 / 用户所选版本
   → 明确标注字段可靠性
   → 主 APK 内建审核资料：地点、阻塞对象、别名的确定性模糊匹配
-      → 唯一命中：完全本地回答
+      → 唯一命中审核 hint：完全本地回答
       → 未命中 / 并列：可选 Worker
           → 宝可梦／道具／招式／特性问题先从现有 Dex R2 bundle 读取结构化事实
           → 精确版本遭遇、携带物与招式表直接回答
@@ -29,7 +29,7 @@
 
 存档信息优先级高于用户选择。请求会分别标注：游戏是 `save_verified` 或 `user_selected`；地点是 `save_verified` 或 `unknown`；徽章是精确 ID、仅数量或未知；里程碑是已验证或当前解析器不支持。仅有徽章数量时绝不推断具体徽章，未解析关键道具/剧情 flag 时也不会用常识补全。
 
-当前在线审核记录共 17 个卡点，覆盖 HGSS、DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯与朱紫；其中 SM 与 USUM、DPPt 与 BDSP 都按精确版本分开建模。权威文件是 [`data/journey/progression_hints.json`](../data/journey/progression_hints.json)；主 APK 仍只内建三个 HGSS 离线链路，Worker 检索文档从完整权威文件生成。schema 与来源规则见同目录及根目录 [`CREDITS.md`](../CREDITS.md)。
+当前在线审核记录共 19 个卡点，覆盖 HGSS、DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯与朱紫；其中 SM 与 USUM、DPPt 与 BDSP 都按精确版本分开建模。权威文件是 [`data/journey/progression_hints.json`](../data/journey/progression_hints.json)；主 APK 仍只内建三个 HGSS 离线链路，Worker 检索文档从完整权威文件生成。schema 与来源规则见同目录及根目录 [`CREDITS.md`](../CREDITS.md)。
 
 ## 数据供应链闸门
 
@@ -104,8 +104,8 @@ release gate，并要求审核事实与 hint ID 完全一致。
 ## Cloudflare 选型
 
 - **AI Search + BGE-M3：需要，但保持可选。** BGE-M3 运行在 Cloudflare 托管侧，不塞进 Worker bundle，也不在设备下载模型。它支持中文/多语言 embedding；hybrid + RRF 同时利用别名关键词和语义近似。
-- **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题可直接确定性组装；开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 Qwen，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
-- **Workers AI Qwen：公共默认。** 唯一本地命中不会调用模型；只有未命中/并列才可能消耗 Workers AI 免费额度，额度或模型失败后返回本地确定性澄清/no_match。
+- **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题会先确定性组装；V20 中标为 `online-verify` 的命中继续作为本地底稿进入限定来源交叉核验，只有取得真实网页证据才替换底稿，联网为空、超时或模型失败则返回本地底稿并明确标注。开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 Qwen，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
+- **Workers AI Qwen：公共默认。** 唯一命中的本地审核 hint 不调用模型；V20 `online-verify` 事实、未命中／并列和开放式问题才可能消耗 Workers AI 免费额度。额度或模型失败后返回本地确定性底稿、澄清或 `no_match`。
 - **免 Key 限定来源：审核库未命中时可选。** `CURATED_WEB_ENABLED=true` 时仅查询 PokéAPI、StrategyWiki、Wikidata；不需要新 Cloudflare 资源或第三方 key。现有每设备 20 次/分钟限流继续生效，不另设每天 5 次上限。范围分类、来源请求或生成任何一步失败都保留原本的本地 `no_match`。
 - **Tavily 限定搜索：可选的联网证据层。** 中文问题先发起一组仅允许 52Poké 的查询，并再次校验返回 host；若没有得到可支持答案的证据，开放式培养／攻略／路线／推荐问题才会对其余允许站点发起中英文两组回退查询，窄问题则发起一组混合语言回退。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。每组 basic search 最多 6 条、短超时、响应字节上限、无重试；额度/网络失败继续其他路径，最终始终输出简体中文。
 - **DeepSeek V4 Flash 原生搜索：宽范围试用，与 Tavily 并行。** Worker 固定调用 `custom-deepseek-anthropic` 的 `anthropic/v1/messages` 与 `deepseek-v4-flash`，并显式选择 BYOK 别名 `TitoDex`，缺失时不会回退到 `default`。密钥只保存在 BYOK/Secrets Store，Gateway 身份与 Run token 只保存在加密 Worker Secrets。已确认原生搜索会实际执行，但当前响应常不含 `cited_text`；因此 Worker 会重新校验每个来源域名，有片段时交给 Qwen 复核，没有片段时在 `EXPERIMENTAL_BROAD_ANSWERS=true` 下明确标为低置信度试用答案。若 Tavily／固定来源的主回答也成功，会额外调用一次 Qwen，只判断 DeepSeek 是否对核心事实形成独立印证且没有地点、数值或版本冲突；只有通过才显示 `Qwen × DeepSeek 交叉核对`，正文仍保留主证据链。任何失败仍可由 Tavily + Qwen 或本地确定性结果接管。
@@ -136,7 +136,8 @@ Qwen、AI Search 与限定来源的配置状态。通用 `webSearch` 和
 Dex bundle、合并后的“多个百科来源”和两条联网路径，并显示本机问答数量；完整可能来源及权利说明统一放在 Settings Credits。这个
 状态只代表部署配置和 Worker 当前可达，不伪称模型额度或第三方来源一定成功；每条
 回答另外显示本次实际走过的 `answerMode`、`modelUsed`、`aiSearchUsed` 与
-`sourceKinds`。因此本地唯一命中会显示“本次未调用 Qwen”，太阳伊布等本地审核库
+`sourceKinds`。因此唯一命中的本地审核 hint 会显示“本次未调用 Qwen”；V20
+`online-verify` 底稿会在取得真实在线证据后显示相应来源，太阳伊布等本地审核库
 未覆盖的问题若成功使用即时来源，会显示“限定来源 · Qwen 整理”及真实来源；在线
 超时／失败则明确显示已回退本地，不再静默伪装成普通 no-match。
 
@@ -178,7 +179,7 @@ python3 -m unittest \
   tools.test_progression_hints \
   tools.test_build_journey_search_documents
 cd flutter && flutter analyze --no-pub && flutter test --no-pub
-cmp data/journey/progression_hints.json flutter/assets/data/journey/progression_hints.json
+# tools.test_progression_hints 会确认 APK 内建 3 条是权威 19 条资料的逐条子集。
 # 旧兼容包维护时才运行：cd flutter/android && ./gradlew :journey-assistant-pack:check
 cd ../../cloudflare/journey-assistant && npm ci && npm run check && npm test && npm run dry-run
 ```

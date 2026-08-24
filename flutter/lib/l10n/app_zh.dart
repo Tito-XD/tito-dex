@@ -396,6 +396,9 @@ abstract final class AppZh {
   static const dexReferenceAbilities = '特性图鉴';
   static const dexReferenceSearchHint = '搜索名称或编号…';
   static const dexReferenceEmpty = '没有匹配的资料条目。';
+  static const dexReferenceDataMissing = '当前数据包中没有这条资料，请更新资料后重试。';
+  static const dexReferenceUnavailableInGame = '当前版本不可用';
+  static const dexReferenceScopeUnknown = '当前版本的资料范围尚未确认';
   static const dexReferenceNoDescription = '暂无特性说明。';
   static const dexReferenceFindPokemon = '搜索拥有此资料的宝可梦';
   static String dexReferenceMoveMeta(

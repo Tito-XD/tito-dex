@@ -5,6 +5,7 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/dex/item_game_data.dart';
 import '../../features/dex/reference_game_scope.dart';
 import '../../features/game/game_edition_repository.dart';
+import '../../l10n/app_zh.dart';
 import '../../theme/tito_colors.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/dex_reference_detail.dart';
@@ -21,11 +22,15 @@ class DexJsonReferencePage extends StatelessWidget {
     required this.title,
     required this.cdnFilename,
     this.initialQuery,
+    this.initialEntryId,
+    this.openInitialEntry = false,
   });
 
   final String title;
   final String cdnFilename;
   final String? initialQuery;
+  final int? initialEntryId;
+  final bool openInitialEntry;
 
   DexReferenceKind get _kind => referenceKindForFilename(cdnFilename);
 
@@ -38,21 +43,32 @@ class DexJsonReferencePage extends StatelessWidget {
       subtitle: edition.labelZh,
       loadEntries: () async {
         final entries = await dexRepository.getReferenceEntries(cdnFilename);
-        if (_kind != DexReferenceKind.item) {
-          return entries
-              .where(
-                (entry) =>
-                    jsonReferenceAvailableInEdition(_kind, entry, edition),
-              )
-              .toList(growable: false);
-        }
+        if (_kind != DexReferenceKind.item) return entries;
         final scoped = <Map<String, dynamic>>[];
         for (final entry in entries) {
           final view = await itemGameDataRepository.viewFor(entry, edition);
-          if (view.availability == ItemGameAvailability.unavailable) continue;
           scoped.add(itemGameDataRepository.applyView(entry, view, edition));
         }
         return scoped;
+      },
+      includeEntry: (entry) {
+        if (_kind != DexReferenceKind.item) {
+          return jsonReferenceAvailableInEdition(_kind, entry, edition);
+        }
+        return entry['_gameAvailability'] !=
+            ItemGameAvailability.unavailable.name;
+      },
+      scopeNotice: (entry) {
+        if (_kind != DexReferenceKind.item) {
+          return jsonReferenceAvailableInEdition(_kind, entry, edition)
+              ? null
+              : AppZh.dexReferenceUnavailableInGame;
+        }
+        return switch (entry['_gameAvailability']) {
+          'unavailable' => AppZh.dexReferenceUnavailableInGame,
+          'unknown' => AppZh.dexReferenceScopeUnknown,
+          _ => null,
+        };
       },
       filterEntry: _filterReferenceEntry,
       primaryLabel: referencePrimaryLabel,
@@ -62,9 +78,24 @@ class DexJsonReferencePage extends StatelessWidget {
       gridMode: _kind == DexReferenceKind.item,
       detailSheet: (context, entry) =>
           showJsonReferenceDetailSheet(context, entry: entry, kind: _kind),
+      scopedDetailSheet: (context, entry, notice) =>
+          showJsonReferenceDetailSheet(
+            context,
+            entry: entry,
+            kind: _kind,
+            scopeNotice: notice,
+          ),
       initialQuery: initialQuery,
+      initialEntryId: initialEntryId,
+      openInitialEntry: openInitialEntry,
+      entryId: _entryId,
     );
   }
+}
+
+int _entryId(Map<String, dynamic> entry) {
+  final value = entry['id'];
+  return value is num ? value.toInt() : int.tryParse('$value') ?? -1;
 }
 
 bool _filterReferenceEntry(Map<String, dynamic> entry, String query) {

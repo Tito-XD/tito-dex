@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.19) · Lite `0.8.19+172` · Offline `0.8.19-offline+173`.
+> **Latest release:** [v0.8.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.20) · Lite `0.8.20+174` · Offline `0.8.20-offline+175`.
 >
-> **Current `main`:** v0.8.19 release baseline with rich Ask TitoDex answer formatting, fully collapsed structured citations, persistent history management, entity links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.8.20 release baseline with downloadable per-game Journey data packs, stable entity deep links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -19,6 +19,12 @@
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.8.20
+
+- Add optional per-game Journey data packs that can be installed, updated, or removed from Journey only after the assistant has been enabled; failed validation or interrupted replacement retains the previously installed pack.
+- Resolve answer entities from the installed runtime data and stable IDs, then open Pokémon, move, ability, and item details directly; ambiguous translated names no longer manufacture a misleading chip.
+- Keep V20-ready structured Dex evidence bounded and provenance-aware so local facts remain useful for offline fallback while eligible questions can continue through allowlisted online verification.
 
 ## Completed in v0.8.19
 
