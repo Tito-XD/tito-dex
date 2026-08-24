@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 
-/// A lighter surface language reserved for the assistant conversation.
-///
-/// It keeps TitoDex's cream/slate palette while replacing the global sticker
-/// border and solid drop shadow with hairline outlines and shallow depth.
-/// Flat mode still removes the shadow.
+/// Material 3 surface used by the assistant conversation.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,
     required this.child,
-    this.color = TitoColors.card,
+    this.color,
     this.padding = const EdgeInsets.all(14),
     this.radius = 20,
     this.borderColor,
@@ -21,7 +17,7 @@ class AssistantSurface extends StatelessWidget {
   });
 
   final Widget child;
-  final Color color;
+  final Color? color;
   final EdgeInsets padding;
   final double radius;
   final Color? borderColor;
@@ -30,25 +26,21 @@ class AssistantSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final borderRadius = BorderRadius.circular(radius);
-    final outline = borderColor ?? TitoColors.ink.withValues(alpha: 0.28);
+    final outline = borderColor ?? scheme.outlineVariant;
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, content) => Container(
+      builder: (context, content) => Material(
+        type: MaterialType.card,
+        color: color ?? scheme.surfaceContainerLow,
+        elevation: shadow && retroStyle.enabled ? 1 : 0,
+        shadowColor: scheme.shadow,
+        surfaceTintColor: scheme.surfaceTint,
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: color,
+        shape: RoundedRectangleBorder(
           borderRadius: borderRadius,
-          border: Border.all(color: outline, width: borderWidth),
-          boxShadow: shadow && retroStyle.enabled
-              ? const [
-                  BoxShadow(
-                    color: Color(0x2418283B),
-                    offset: Offset(0, 5),
-                    blurRadius: 12,
-                  ),
-                ]
-              : null,
+          side: BorderSide(color: outline, width: borderWidth),
         ),
         child: content,
       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Retro sticker feel (Settings → 界面风格): the signature solid offset
-/// shadows plus press-down physics that read as physical handheld keys.
-/// Default on; off gives the pure flat sticker look.
+/// Persisted surface-depth preference.
+///
+/// The Material experiment keeps the historical storage key for upgrade
+/// compatibility: enabled selects elevated cards, disabled selects outlined
+/// cards. Native Material state layers remain active in both modes.
 class RetroStyle extends ChangeNotifier {
   static const _enabledKey = 'style.retro';
 
