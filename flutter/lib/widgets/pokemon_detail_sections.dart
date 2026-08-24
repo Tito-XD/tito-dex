@@ -321,6 +321,89 @@ class _FormPickerTile extends StatelessWidget {
   );
 }
 
+/// Lightweight first-frame destination for the Dex card shared element.
+/// It uses only [PokemonSummary], so detail loading never delays the Hero
+/// target or replaces the route transition with a blank placeholder.
+class PokemonDetailTransitionHeader extends StatelessWidget {
+  const PokemonDetailTransitionHeader({super.key, required this.summary});
+
+  final PokemonSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final square = DeviceLayout.useSquareDashboard(context);
+    final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
+    final accent = typeTileColor(primaryType);
+    final plateSize = square ? 84.0 : 92.0;
+
+    return PokemonCardTransitionHero(
+      summary: summary,
+      child: StickerCard(
+        key: const ValueKey('pokemon-detail-transition-header'),
+        variant: StickerVariant.deep,
+        padding: EdgeInsets.symmetric(
+          horizontal: square ? 10 : 12,
+          vertical: square ? 8 : 10,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: plateSize,
+              height: plateSize,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: const Alignment(-0.6, -0.8),
+                  end: const Alignment(0.6, 0.8),
+                  colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
+                ),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                border: Border.all(
+                  color: TitoColors.ink,
+                  width: TitoBorders.element,
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Center(
+                child: DexSpriteImage(
+                  source: summary.displaySpritePath,
+                  width: plateSize - 14,
+                  height: plateSize - 14,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    summary.nameZh,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onGradient.h15.copyWith(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 26 * -0.03,
+                      height: 1.05,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TypeChipRow(
+                    types: summary.types.map(typeNameZh).toList(),
+                    typeKeys: summary.types,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class PokemonDetailHeader extends StatelessWidget {
   const PokemonDetailHeader({
     super.key,
@@ -349,61 +432,52 @@ class PokemonDetailHeader extends StatelessWidget {
       final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
       final accent = typeTileColor(primaryType);
       final plateSize = square ? 84.0 : 92.0;
-      return StickerCard(
+      final headerPadding = EdgeInsets.symmetric(
+        horizontal: square ? 10 : 12,
+        vertical: square ? 8 : 10,
+      );
+      final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
+        color: TitoColors.card.withValues(alpha: 0.92),
+        fontWeight: FontWeight.w800,
+      );
+      final routeAnimation =
+          ModalRoute.of(context)?.animation ??
+          const AlwaysStoppedAnimation<double>(1);
+      final baseHeader = StickerCard(
         variant: StickerVariant.deep,
-        padding: EdgeInsets.symmetric(
-          horizontal: square ? 10 : 12,
-          vertical: square ? 8 : 10,
-        ),
+        padding: headerPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Align(
               alignment: Alignment.centerRight,
-              child: Text(
-                dexLabel,
-                style: SecondaryTypography.onGradient.small12.copyWith(
-                  color: TitoColors.card.withValues(alpha: 0.92),
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              child: Text(dexLabel, style: metaStyle),
             ),
             const SizedBox(height: 6),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                GestureDetector(
-                  key: const ValueKey('pokemon-detail-artwork'),
-                  onTap: () =>
-                      showPokemonArtworkViewer(context, summary: summary),
-                  child: Container(
-                    width: plateSize,
-                    height: plateSize,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: const Alignment(-0.6, -0.8),
-                        end: const Alignment(0.6, 0.8),
-                        colors: [
-                          Color.lerp(accent, Colors.white, 0.35)!,
-                          accent,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(TitoRadii.sm),
-                      border: Border.all(
-                        color: TitoColors.ink,
-                        width: TitoBorders.element,
-                      ),
+                Container(
+                  width: plateSize,
+                  height: plateSize,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: const Alignment(-0.6, -0.8),
+                      end: const Alignment(0.6, 0.8),
+                      colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Center(
-                      child: Hero(
-                        tag: pokemonArtworkHeroTag(summary),
-                        child: DexSpriteImage(
-                          source: summary.displaySpritePath,
-                          width: plateSize - 14,
-                          height: plateSize - 14,
-                        ),
-                      ),
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    border: Border.all(
+                      color: TitoColors.ink,
+                      width: TitoBorders.element,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Center(
+                    child: DexSpriteImage(
+                      source: summary.displaySpritePath,
+                      width: plateSize - 14,
+                      height: plateSize - 14,
                     ),
                   ),
                 ),
@@ -450,6 +524,58 @@ class PokemonDetailHeader extends StatelessWidget {
           ],
         ),
       );
+      return Stack(
+        children: [
+          PokemonCardTransitionHero(summary: summary, child: baseHeader),
+          Positioned.fill(
+            child: AnimatedBuilder(
+              animation: routeAnimation,
+              builder: (context, child) {
+                final routeSettled =
+                    routeAnimation.status == AnimationStatus.completed &&
+                    routeAnimation.value >= 0.999;
+                return routeSettled ? child! : const SizedBox.shrink();
+              },
+              child: Padding(
+                padding: headerPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Opacity(
+                        opacity: 0,
+                        child: Text(dexLabel, style: metaStyle),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    GestureDetector(
+                      key: const ValueKey('pokemon-detail-artwork'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () =>
+                          showPokemonArtworkViewer(context, summary: summary),
+                      child: SizedBox.square(
+                        dimension: plateSize,
+                        child: Center(
+                          child: Hero(
+                            tag: pokemonArtworkHeroTag(summary),
+                            transitionOnUserGestures: true,
+                            child: DexSpriteImage(
+                              source: summary.displaySpritePath,
+                              width: plateSize - 14,
+                              height: plateSize - 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
     }
 
     return StickerCard(
@@ -494,6 +620,7 @@ class PokemonDetailHeader extends StatelessWidget {
                     showPokemonArtworkViewer(context, summary: summary),
                 child: Hero(
                   tag: pokemonArtworkHeroTag(summary),
+                  transitionOnUserGestures: true,
                   child: DexSpriteImage(
                     source: summary.displaySpritePath,
                     width: square ? 72 : (compactLayout ? 84 : 108),
@@ -575,7 +702,9 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
   @override
   void initState() {
     super.initState();
-    final page = widget.initialPage.clamp(0, widget.entries.length - 1);
+    final page = widget.entries.isEmpty
+        ? 0
+        : widget.initialPage.clamp(0, widget.entries.length - 1);
     _index = page;
     _controller = PageController(initialPage: page);
   }

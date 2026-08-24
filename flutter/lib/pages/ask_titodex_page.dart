@@ -19,6 +19,7 @@ import '../features/journey/progression_hints.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -32,8 +33,10 @@ typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 const _assistantPaper = Color(0xFFFFFBF2);
 const _assistantCanvas = Color(0xFFF5F6F3);
 const _assistantSkeleton = Color(0xFFDCE5E5);
-const _semanticRevealDelay = Duration(milliseconds: 36);
-const _semanticRevealStepLimit = 40;
+const _semanticRevealFrame = Duration(milliseconds: 24);
+const _semanticRevealStepLimit = 72;
+const _semanticCursorHold = Duration(milliseconds: 96);
+const _progressStageMinimum = Duration(milliseconds: 150);
 const _askTitoDexQuestionLimit = 240;
 
 String buildAskTitoDexClarificationQuestion({
@@ -116,6 +119,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   late final AskTitoDexHistoryStore _historyStore;
   late final AskTitoDexEntityResolver _entityResolver;
   late final Future<void> _historyReady;
+  late final Completer<void> _historyReadyCompleter;
   late GameEdition _edition;
   AskTitoDexContext? _context;
   List<AskTitoDexHistoryEntry> _history = const [];
@@ -124,7 +128,6 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   AskTitoDexProgress _progress = AskTitoDexProgress.checkingLocal;
   var _requestSeed = 0;
   var _contextRequestId = 0;
-  int? _revealEntryId;
   int? _activeEntryId;
   String? _submittedQuestion;
   bool _loading = false;
@@ -132,6 +135,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   AskTitoDexClarification? _streamedClarification;
   AskTitoDexResult? _activeResult;
   var _semanticRevealSteps = 0;
+  Future<void> _semanticRevealQueue = Future<void>.value();
+  Timer? _progressTimer;
+  var _initializationStarted = false;
+  DateTime _progressChangedAt = DateTime.fromMillisecondsSinceEpoch(0);
   var _followingLatest = true;
 
   @override
@@ -143,14 +150,47 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     _historyStore = widget.historyStore ?? askTitoDexHistoryStore;
     _entityResolver = widget.entityResolver ?? askTitoDexEntityResolver;
     _edition = widget.edition;
-    _historyReady = _loadHistory();
+    _historyReadyCompleter = Completer<void>();
+    _historyReady = _historyReadyCompleter.future;
     askTitoDexSettings.addListener(_handleSettingsChanged);
-    unawaited(companionRepository.load());
-    _prepareContext();
-    _checkConnection();
+    unawaited(_startInitialTasksAfterRoute());
   }
 
-  void _handleSettingsChanged() => _checkConnection();
+  void _handleSettingsChanged() {
+    if (_initializationStarted) unawaited(_checkConnection());
+  }
+
+  Future<void> _startInitialTasksAfterRoute() async {
+    final canStart = await waitForIncomingRouteSettled(context);
+    if (!canStart || !mounted) {
+      if (!_historyReadyCompleter.isCompleted) {
+        _historyReadyCompleter.complete();
+      }
+      return;
+    }
+    _startInitialTasks();
+  }
+
+  void _startInitialTasks() {
+    if (!mounted || _initializationStarted) return;
+    _initializationStarted = true;
+    unawaited(companionRepository.load());
+    unawaited(_prepareContext());
+    unawaited(_checkConnection());
+    unawaited(_loadInitialHistory());
+  }
+
+  Future<void> _loadInitialHistory() async {
+    try {
+      await _loadHistory();
+    } on Object {
+      // A damaged optional conversation cache must not keep Ask TitoDex locked.
+    } finally {
+      if (!_historyReadyCompleter.isCompleted) {
+        _historyReadyCompleter.complete();
+      }
+    }
+  }
 
   @override
   void didUpdateWidget(covariant AskTitoDexPage oldWidget) {
@@ -158,6 +198,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (oldWidget.edition.slug != widget.edition.slug ||
         oldWidget.edition.selectedFlavor != widget.edition.selectedFlavor) {
       _requestSeed += 1;
+      _progressTimer?.cancel();
       _edition = widget.edition;
       _context = null;
       _loading = false;
@@ -166,7 +207,9 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _streamedClarification = null;
       _activeEntryId = null;
       _activeResult = null;
-      unawaited(_prepareContext());
+      if (_initializationStarted) {
+        unawaited(_prepareContext());
+      }
     }
   }
 
@@ -207,6 +250,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (!mounted || _loading) return;
     setState(() {
       _requestSeed += 1;
+      _progressTimer?.cancel();
       _edition = picked;
       _context = null;
       _submittedQuestion = null;
@@ -270,6 +314,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final requestId = _requestSeed + 1;
     final editionToken = _editionToken(_edition);
     FocusScope.of(context).unfocus();
+    _progressTimer?.cancel();
     setState(() {
       _loading = true;
       _submittedQuestion = question;
@@ -278,10 +323,12 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _streamedBlocks = const [];
       _streamedClarification = null;
       _semanticRevealSteps = 0;
+      _semanticRevealQueue = Future<void>.value();
       _activeResult = null;
       _activeEntryId = null;
       _followingLatest = true;
     });
+    _progressChangedAt = DateTime.now();
     // The pending answer skeleton is inserted in the same frame. Jumping after
     // that layout guarantees the new question and its full placeholder stay
     // visible instead of animating toward the pre-skeleton scroll extent.
@@ -294,46 +341,15 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
         game: contextValue.game ?? '',
       ),
       onProgress: (progress) {
-        if (_isActiveRequest(requestId, editionToken)) {
-          setState(() => _progress = progress);
-        }
+        _queueProgress(progress, requestId, editionToken);
       },
-      onStreamEvent: (event) async {
-        if (!_isActiveRequest(requestId, editionToken)) return;
-        if (event.semanticReset) {
-          setState(() {
-            _streamedBlocks = const [];
-            _streamedClarification = null;
-            _semanticRevealSteps = 0;
-          });
-          _scrollToLatest(animate: false);
-          return;
-        }
-        if (event.answerBlock case final block?) {
-          final blocks = [..._streamedBlocks];
-          final index = blocks.indexWhere((value) => value.id == block.id);
-          final previousLength = index < 0 ? 0 : blocks[index].text.length;
-          final textGrew = block.text.length > previousLength;
-          if (index < 0) {
-            blocks.add(block);
-          } else {
-            blocks[index] = block;
-          }
-          setState(() => _streamedBlocks = List.unmodifiable(blocks));
-          _scrollToLatest(animate: false);
-          final reduceMotion = MediaQuery.disableAnimationsOf(context);
-          if (textGrew &&
-              !reduceMotion &&
-              _semanticRevealSteps < _semanticRevealStepLimit) {
-            _semanticRevealSteps += 1;
-            await Future<void>.delayed(_semanticRevealDelay);
-          }
-        }
-        if (event.clarification case final clarification?) {
-          setState(() => _streamedClarification = clarification);
-        }
-      },
+      onStreamEvent: (event) =>
+          _enqueueSemanticEvent(event, requestId, editionToken),
     );
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    await _semanticRevealQueue;
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    await _revealVerifiedResult(result, requestId, editionToken);
     if (!_isActiveRequest(requestId, editionToken)) return;
     final entry = AskTitoDexHistoryEntry(
       game: contextValue.game ?? 'unknown',
@@ -354,7 +370,6 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     setState(() {
       _loading = false;
       _history = saved;
-      _revealEntryId = entry.createdAt.microsecondsSinceEpoch;
       _activeEntryId = entry.createdAt.microsecondsSinceEpoch;
       _activeResult = result;
       if (retryQuestion == null && result.status == AskTitoDexStatus.answered) {
@@ -365,6 +380,219 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (result.errorCode?.contains('_fallback') == true) {
       unawaited(_checkConnection());
     }
+  }
+
+  Future<void> _enqueueSemanticEvent(
+    AskTitoDexOnlineStreamEvent event,
+    int requestId,
+    String editionToken,
+  ) {
+    final next = _semanticRevealQueue.then(
+      (_) => _applySemanticEvent(event, requestId, editionToken),
+    );
+    _semanticRevealQueue = next;
+    return next;
+  }
+
+  Future<void> _applySemanticEvent(
+    AskTitoDexOnlineStreamEvent event,
+    int requestId,
+    String editionToken,
+  ) async {
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    if (event.semanticReset) {
+      setState(() {
+        _streamedBlocks = const [];
+        _streamedClarification = null;
+        _semanticRevealSteps = 0;
+      });
+      _scrollToLatest(animate: false);
+      return;
+    }
+    if (event.answerBlock case final block?) {
+      await _revealBlock(block, requestId, editionToken);
+    }
+    if (event.clarification case final clarification?) {
+      if (_isActiveRequest(requestId, editionToken)) {
+        setState(() => _streamedClarification = clarification);
+      }
+    }
+  }
+
+  void _queueProgress(
+    AskTitoDexProgress progress,
+    int requestId,
+    String editionToken,
+  ) {
+    if (!_isActiveRequest(requestId, editionToken) || progress == _progress) {
+      return;
+    }
+    _progressTimer?.cancel();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _showProgressNow(progress, requestId, editionToken);
+      return;
+    }
+    final elapsed = DateTime.now().difference(_progressChangedAt);
+    final delay = _progressStageMinimum - elapsed;
+    if (delay <= Duration.zero) {
+      _showProgressNow(progress, requestId, editionToken);
+      return;
+    }
+    _progressTimer = Timer(
+      delay,
+      () => _showProgressNow(progress, requestId, editionToken),
+    );
+  }
+
+  void _showProgressNow(
+    AskTitoDexProgress progress,
+    int requestId,
+    String editionToken,
+  ) {
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    _progressTimer?.cancel();
+    _progressTimer = null;
+    if (_progress != progress) {
+      setState(() => _progress = progress);
+      _progressChangedAt = DateTime.now();
+    }
+  }
+
+  Future<void> _revealVerifiedResult(
+    AskTitoDexResult result,
+    int requestId,
+    String editionToken,
+  ) async {
+    if (result.status != AskTitoDexStatus.answered) return;
+    final answer = askTitoDexAnswerBody(result.answer ?? '');
+    final targetBlocks = result.answerBlocks.isNotEmpty
+        ? result.answerBlocks
+        : synthesizeAskTitoDexAnswerBlocks(answer);
+    if (targetBlocks.isEmpty) return;
+    final mustResetStream =
+        _streamedBlocks.isNotEmpty &&
+        ((result.errorCode?.contains('_fallback') ?? false) ||
+            !_streamedBlocksAreCompatibleWith(targetBlocks));
+    if (mustResetStream) {
+      setState(() {
+        _streamedBlocks = const [];
+        _streamedClarification = null;
+        _semanticRevealSteps = 0;
+      });
+      _scrollToLatest(animate: false);
+    }
+    _showProgressNow(
+      AskTitoDexProgress.revealingAnswer,
+      requestId,
+      editionToken,
+    );
+    for (final block in targetBlocks) {
+      await _revealBlock(block, requestId, editionToken);
+      if (!_isActiveRequest(requestId, editionToken)) return;
+    }
+    if (_isActiveRequest(requestId, editionToken)) {
+      setState(() => _streamedBlocks = List.unmodifiable(targetBlocks));
+    }
+  }
+
+  bool _streamedBlocksAreCompatibleWith(
+    List<AskTitoDexAnswerBlock> authoritative,
+  ) {
+    if (_streamedBlocks.length > authoritative.length) return false;
+    for (var index = 0; index < _streamedBlocks.length; index += 1) {
+      final streamed = _streamedBlocks[index];
+      final finalBlock = authoritative[index];
+      if (streamed.id != finalBlock.id ||
+          streamed.kind != finalBlock.kind ||
+          streamed.title != finalBlock.title ||
+          !finalBlock.text.startsWith(streamed.text)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<void> _revealBlock(
+    AskTitoDexAnswerBlock target,
+    int requestId,
+    String editionToken,
+  ) async {
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    final index = _streamedBlocks.indexWhere((block) => block.id == target.id);
+    final current = index < 0 ? null : _streamedBlocks[index];
+    final currentText = current?.text ?? '';
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (current != null &&
+        (current.kind != target.kind ||
+            current.title != target.title ||
+            !target.text.startsWith(currentText))) {
+      _replaceStreamBlock(target);
+      return;
+    }
+    if (index < 0) {
+      _replaceStreamBlock(
+        target.copyWith(
+          text: '',
+          isComplete: target.text.isEmpty && target.isComplete,
+        ),
+      );
+    }
+    final suffix = target.text.substring(currentText.length);
+    if (suffix.isNotEmpty &&
+        !reduceMotion &&
+        _semanticRevealSteps < _semanticRevealStepLimit) {
+      final runes = suffix.runes.toList(growable: false);
+      final remainingBudget = _semanticRevealStepLimit - _semanticRevealSteps;
+      var steps = runes.length < 18 ? runes.length : 18;
+      if (steps > remainingBudget) steps = remainingBudget;
+      final runesPerStep = (runes.length / steps).ceil();
+      final visible = StringBuffer(currentText);
+      var offset = 0;
+      while (offset < runes.length &&
+          _isActiveRequest(requestId, editionToken)) {
+        final end = offset + runesPerStep < runes.length
+            ? offset + runesPerStep
+            : runes.length;
+        visible.writeAll(runes.sublist(offset, end).map(String.fromCharCode));
+        _semanticRevealSteps += 1;
+        _replaceStreamBlock(
+          target.copyWith(text: visible.toString(), isComplete: false),
+        );
+        offset = end;
+        await Future<void>.delayed(_semanticRevealFrame);
+      }
+    } else if (suffix.isNotEmpty) {
+      _replaceStreamBlock(target.copyWith(isComplete: false));
+    }
+    if (!_isActiveRequest(requestId, editionToken)) return;
+    final visible = _streamedBlocks.firstWhere(
+      (block) => block.id == target.id,
+      orElse: () => target,
+    );
+    if (visible.text != target.text) {
+      _replaceStreamBlock(target.copyWith(isComplete: false));
+    }
+    if (target.isComplete) {
+      if (!reduceMotion && !visible.isComplete) {
+        await Future<void>.delayed(_semanticCursorHold);
+      }
+      if (_isActiveRequest(requestId, editionToken)) {
+        _replaceStreamBlock(target);
+      }
+    }
+  }
+
+  void _replaceStreamBlock(AskTitoDexAnswerBlock block) {
+    if (!mounted) return;
+    final blocks = [..._streamedBlocks];
+    final index = blocks.indexWhere((value) => value.id == block.id);
+    if (index < 0) {
+      blocks.add(block);
+    } else {
+      blocks[index] = block;
+    }
+    setState(() => _streamedBlocks = List.unmodifiable(blocks));
+    _scrollToLatest(animate: false);
   }
 
   void _submitClarification(
@@ -392,10 +620,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   bool _handleAnswerScrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification &&
         notification.dragDetails != null) {
-      _followingLatest = notification.metrics.extentAfter <= 72;
+      _followingLatest = notification.metrics.extentBefore <= 72;
     } else if (notification is OverscrollNotification &&
         notification.dragDetails != null) {
-      _followingLatest = notification.metrics.extentAfter <= 72;
+      _followingLatest = notification.metrics.extentBefore <= 72;
     }
     return false;
   }
@@ -411,31 +639,14 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       final duration = !animate || MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
           : const Duration(milliseconds: 220);
+      final target = _answerScrollController.position.minScrollExtent;
       if (duration == Duration.zero) {
-        _answerScrollController.jumpTo(
-          _answerScrollController.position.maxScrollExtent,
-        );
-        // A lazy ListView may only discover the pending skeleton's full height
-        // after the first jump lays it out. Correct once on the next frame.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted ||
-              !_answerScrollController.hasClients ||
-              (!force && !_followingLatest)) {
-            return;
-          }
-          _answerScrollController.jumpTo(
-            _answerScrollController.position.maxScrollExtent,
-          );
-        });
+        _answerScrollController.jumpTo(target);
         return;
       }
       unawaited(
         _answerScrollController
-            .animateTo(
-              _answerScrollController.position.maxScrollExtent,
-              duration: duration,
-              curve: Curves.easeOut,
-            )
+            .animateTo(target, duration: duration, curve: Curves.easeOut)
             .then((_) {
               if (!mounted ||
                   !_answerScrollController.hasClients ||
@@ -443,8 +654,8 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                 return;
               }
               final position = _answerScrollController.position;
-              if ((position.maxScrollExtent - position.pixels).abs() > 0.5) {
-                position.jumpTo(position.maxScrollExtent);
+              if ((position.minScrollExtent - position.pixels).abs() > 0.5) {
+                position.jumpTo(position.minScrollExtent);
               }
             }),
       );
@@ -454,9 +665,66 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   @override
   void dispose() {
     askTitoDexSettings.removeListener(_handleSettingsChanged);
+    if (!_historyReadyCompleter.isCompleted) {
+      _historyReadyCompleter.complete();
+    }
+    _progressTimer?.cancel();
     _questionController.dispose();
     _answerScrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildHistoryTurn(AskTitoDexHistoryEntry entry, String? currentGame) {
+    final entryId = entry.createdAt.microsecondsSinceEpoch;
+    return Column(
+      key: ValueKey('ask-turn-$entryId'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _QuestionBubble(
+          question: entry.question,
+          game: entry.game,
+          showGame: entry.game != currentGame,
+        ),
+        const SizedBox(height: 8),
+        _AnswerCard(
+          key: ValueKey('ask-answer-$entryId'),
+          question: entry.question,
+          result: entry.result,
+          entityResolver: _entityResolver,
+          sourceOpener: widget.sourceOpener ?? _openExternalSource,
+          animateEvidence: false,
+          onRetry: () => _submit(entry.question),
+          onClarificationSelected: (candidate) =>
+              _submitClarification(entry.question, candidate),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
+  Widget _buildLiveTurn(String question) {
+    return Column(
+      key: ValueKey('ask-live-turn-container-$_requestSeed'),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _QuestionBubble(question: question),
+        const SizedBox(height: 8),
+        _LiveAnswerCard(
+          key: ValueKey('ask-live-turn-$_requestSeed'),
+          question: question,
+          progress: _progress,
+          streamedBlocks: _streamedBlocks,
+          clarification: _streamedClarification,
+          result: _activeResult,
+          entityResolver: _entityResolver,
+          sourceOpener: widget.sourceOpener ?? _openExternalSource,
+          onRetry: () => _submit(question),
+          onClarificationSelected: (candidate) =>
+              _submitClarification(question, candidate),
+          onContentSettled: _scrollToLatest,
+        ),
+      ],
+    );
   }
 
   @override
@@ -464,6 +732,18 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final contextValue = _context;
     final pagePadding = DeviceLayout.pagePadding(context);
     final spacing = DeviceLayout.isCompact(context) ? 6.0 : 8.0;
+    final historyTurns = _history
+        .where(
+          (entry) => entry.createdAt.microsecondsSinceEpoch != _activeEntryId,
+        )
+        .toList(growable: false);
+    final showEmptyConversation =
+        _history.isEmpty && _submittedQuestion == null && !_loading;
+    final hasLiveTurn = _submittedQuestion != null;
+    final conversationItemCount =
+        historyTurns.length +
+        (showEmptyConversation ? 1 : 0) +
+        (hasLiveTurn ? 1 : 0);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -536,78 +816,31 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                       onNotification: _handleAnswerScrollNotification,
                       child: Scrollbar(
                         controller: _answerScrollController,
-                        child: ListView(
+                        child: ListView.builder(
                           key: const Key('ask-titodex-answer-scroll'),
                           controller: _answerScrollController,
+                          reverse: true,
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-                          children: [
-                            if (_history.isEmpty &&
-                                _submittedQuestion == null &&
-                                !_loading)
-                              const _ConversationEmptyState(),
-                            for (final entry in _history)
-                              if (entry.createdAt.microsecondsSinceEpoch !=
-                                  _activeEntryId) ...[
-                                _QuestionBubble(
-                                  question: entry.question,
-                                  game: entry.game,
-                                  showGame: entry.game != contextValue?.game,
-                                ),
-                                const SizedBox(height: 8),
-                                _AnswerReveal(
-                                  key: ValueKey(
-                                    'ask-answer-${entry.createdAt.microsecondsSinceEpoch}',
-                                  ),
-                                  animate:
-                                      entry.createdAt.microsecondsSinceEpoch ==
-                                      _revealEntryId,
-                                  onComplete:
-                                      entry.createdAt.microsecondsSinceEpoch ==
-                                          _revealEntryId
-                                      ? _scrollToLatest
-                                      : null,
-                                  child: _AnswerCard(
-                                    question: entry.question,
-                                    result: entry.result,
-                                    entityResolver: _entityResolver,
-                                    sourceOpener:
-                                        widget.sourceOpener ??
-                                        _openExternalSource,
-                                    animateEvidence:
-                                        entry
-                                            .createdAt
-                                            .microsecondsSinceEpoch ==
-                                        _revealEntryId,
-                                    onRetry: () => _submit(entry.question),
-                                    onClarificationSelected: (candidate) =>
-                                        _submitClarification(
-                                          entry.question,
-                                          candidate,
-                                        ),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                              ],
-                            if (_submittedQuestion case final question?) ...[
-                              _QuestionBubble(question: question),
-                              const SizedBox(height: 8),
-                              _LiveAnswerCard(
-                                key: ValueKey('ask-live-turn-$_requestSeed'),
-                                question: question,
-                                progress: _progress,
-                                streamedBlocks: _streamedBlocks,
-                                clarification: _streamedClarification,
-                                result: _activeResult,
-                                entityResolver: _entityResolver,
-                                sourceOpener:
-                                    widget.sourceOpener ?? _openExternalSource,
-                                onRetry: () => _submit(question),
-                                onClarificationSelected: (candidate) =>
-                                    _submitClarification(question, candidate),
-                                onContentSettled: _scrollToLatest,
-                              ),
-                            ],
-                          ],
+                          itemCount: conversationItemCount,
+                          itemBuilder: (context, index) {
+                            if (showEmptyConversation) {
+                              return const _ConversationEmptyState();
+                            }
+                            if (hasLiveTurn && index == 0) {
+                              return _buildLiveTurn(_submittedQuestion!);
+                            }
+                            final historyOffset = index - (hasLiveTurn ? 1 : 0);
+                            final historyIndex =
+                                historyTurns.length - 1 - historyOffset;
+                            if (historyIndex < 0 ||
+                                historyIndex >= historyTurns.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return _buildHistoryTurn(
+                              historyTurns[historyIndex],
+                              contextValue?.game,
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -1393,7 +1626,7 @@ class _QuestionComposer extends StatelessWidget {
   }
 }
 
-class _LiveAnswerCard extends StatelessWidget {
+class _LiveAnswerCard extends StatefulWidget {
   const _LiveAnswerCard({
     super.key,
     required this.question,
@@ -1420,9 +1653,65 @@ class _LiveAnswerCard extends StatelessWidget {
   final VoidCallback onContentSettled;
 
   @override
+  State<_LiveAnswerCard> createState() => _LiveAnswerCardState();
+}
+
+class _LiveAnswerCardState extends State<_LiveAnswerCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _settle;
+
+  @override
+  void initState() {
+    super.initState();
+    _settle = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 340),
+      value: 1,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _LiveAnswerCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.result == null && widget.result != null) {
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _settle.value = 1;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) widget.onContentSettled();
+        });
+      } else {
+        _settle.forward(from: 0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _settle.dispose();
+    super.dispose();
+  }
+
+  Widget _stageTransition(Widget child, Animation<double> animation) {
+    final eased = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+    );
+    return FadeTransition(
+      opacity: eased,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.14),
+          end: Offset.zero,
+        ).animate(eased),
+        child: child,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final stage = switch (progress) {
+    final stage = switch (widget.progress) {
       AskTitoDexProgress.checkingLocal => '正在翻本地资料',
       AskTitoDexProgress.contactingWorker => '正在交叉核对资料与联网来源',
       AskTitoDexProgress.retrievingSources => '正在从资料库和联网来源找线索',
@@ -1430,8 +1719,8 @@ class _LiveAnswerCard extends StatelessWidget {
       AskTitoDexProgress.verifyingAnswer => '正在交叉核对资料与联网来源',
       AskTitoDexProgress.revealingAnswer => '正在写入已核验回答',
     };
-    final hasSemanticAnswer = streamedBlocks.isNotEmpty;
-    final streamedSemanticBody = streamedBlocks
+    final hasSemanticAnswer = widget.streamedBlocks.isNotEmpty;
+    final streamedSemanticBody = widget.streamedBlocks
         .map((block) {
           final title = block.title?.trim() ?? '';
           final text = block.text.trim();
@@ -1448,7 +1737,7 @@ class _LiveAnswerCard extends StatelessWidget {
         .where((value) => value.isNotEmpty)
         .join('；');
     final liveAnswerBody = streamedSemanticBody;
-    final completed = result;
+    final completed = widget.result;
     return Semantics(
       key: const Key('ask-titodex-live-answer-semantics'),
       liveRegion: completed == null,
@@ -1457,102 +1746,188 @@ class _LiveAnswerCard extends StatelessWidget {
                 ? '$stage，$liveAnswerBody'
                 : stage
           : '回答完成',
-      child: AssistantSurface(
-        key: const Key('ask-titodex-active-answer-surface'),
-        color: _assistantPaper,
-        padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
-        radius: 18,
-        borderColor: TitoColors.deepBlue.withValues(alpha: 0.24),
-        child: _MotionAwareAnimatedSize(
-          onEnd: onContentSettled,
-          child: completed == null
-              ? Column(
-                  key: const Key('ask-titodex-generating-answer'),
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AnimatedSwitcher(
-                            duration: reduceMotion
-                                ? Duration.zero
-                                : const Duration(milliseconds: 220),
-                            child: Text(
-                              stage,
-                              key: ValueKey(stage),
-                              style: SecondaryTypography.onCard.small12
-                                  .copyWith(
-                                    color: TitoColors.deepBlue,
-                                    fontWeight: FontWeight.w900,
-                                  ),
+      child: AnimatedBuilder(
+        animation: _settle,
+        builder: (context, child) {
+          final value = Curves.easeOutBack.transform(_settle.value);
+          return Transform.translate(
+            key: const Key('ask-titodex-answer-settle'),
+            offset: Offset(0, 3 * (1 - value)),
+            child: Transform.scale(
+              scale: 0.988 + (0.012 * value),
+              alignment: Alignment.topCenter,
+              child: child,
+            ),
+          );
+        },
+        child: AssistantSurface(
+          key: const Key('ask-titodex-active-answer-surface'),
+          color: _assistantPaper,
+          padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
+          radius: 18,
+          borderColor: TitoColors.deepBlue.withValues(alpha: 0.24),
+          child: _MotionAwareAnimatedSize(
+            onEnd: widget.onContentSettled,
+            child: completed == null
+                ? Column(
+                    key: const Key('ask-titodex-live-answer-content'),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox.shrink(
+                        key: Key('ask-titodex-generating-answer'),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AnimatedSwitcher(
+                              duration: reduceMotion
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 260),
+                              transitionBuilder: _stageTransition,
+                              child: Text(
+                                stage,
+                                key: ValueKey(
+                                  'ask-progress-${widget.progress.name}',
+                                ),
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(
+                                      color: TitoColors.deepBlue,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                              ),
                             ),
                           ),
-                        ),
-                        const AssistantSparkle(size: 15),
-                        const SizedBox(width: 5),
-                        const AssistantSparkle(
-                          size: 8,
-                          color: TitoColors.softYellow,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 11),
-                    AnimatedSwitcher(
-                      duration: reduceMotion
-                          ? Duration.zero
-                          : const Duration(milliseconds: 180),
-                      layoutBuilder: (currentChild, previousChildren) => Stack(
-                        alignment: Alignment.topLeft,
-                        children: [
-                          ...previousChildren,
-                          if (currentChild != null) currentChild,
+                          const AssistantSparkle(size: 15),
+                          const SizedBox(width: 5),
+                          const AssistantSparkle(
+                            size: 8,
+                            color: TitoColors.softYellow,
+                          ),
                         ],
                       ),
-                      child: hasSemanticAnswer
-                          ? _AnswerBlocksView(
-                              key: const Key('ask-titodex-streaming-answer'),
-                              blocks: streamedBlocks,
-                              animateBlocks: true,
-                            )
-                          : clarification != null
-                          ? _StreamingClarification(
-                              clarification: clarification!,
-                              onSelected: onClarificationSelected,
-                            )
-                          : Shimmer.fromColors(
-                              key: const ValueKey('answer-skeleton'),
-                              enabled: !reduceMotion,
-                              baseColor: _assistantSkeleton,
-                              highlightColor: _assistantPaper,
-                              child: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                      const SizedBox(height: 11),
+                      AnimatedSwitcher(
+                        duration: reduceMotion
+                            ? Duration.zero
+                            : const Duration(milliseconds: 180),
+                        layoutBuilder: (currentChild, previousChildren) =>
+                            Stack(
+                              alignment: Alignment.topLeft,
+                              children: [
+                                ...previousChildren,
+                                if (currentChild != null) currentChild,
+                              ],
+                            ),
+                        child: hasSemanticAnswer
+                            ? _AnswerBlocksView(
+                                key: const Key('ask-titodex-streaming-answer'),
+                                blocks: widget.streamedBlocks,
+                                animateBlocks: true,
+                              )
+                            : widget.clarification != null
+                            ? _StreamingClarification(
+                                clarification: widget.clarification!,
+                                onSelected: widget.onClarificationSelected,
+                              )
+                            : Shimmer.fromColors(
+                                key: const ValueKey('answer-skeleton'),
+                                enabled: !reduceMotion,
+                                baseColor: _assistantSkeleton,
+                                highlightColor: _assistantPaper,
+                                child: const Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    _AnswerSkeletonLine(fraction: 1),
+                                    SizedBox(height: 7),
+                                    _AnswerSkeletonLine(fraction: 0.84),
+                                    SizedBox(height: 7),
+                                    _AnswerSkeletonLine(fraction: 0.58),
+                                    SizedBox(height: 12),
+                                    _AnswerSkeletonEvidence(),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    key: const Key('ask-titodex-live-answer-content'),
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox.shrink(
+                        key: Key('ask-titodex-answer-card'),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AnimatedSwitcher(
+                              duration: reduceMotion
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 260),
+                              transitionBuilder: _stageTransition,
+                              child: Row(
+                                key: const Key('ask-titodex-completion-check'),
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  _AnswerSkeletonLine(fraction: 1),
-                                  SizedBox(height: 7),
-                                  _AnswerSkeletonLine(fraction: 0.84),
-                                  SizedBox(height: 7),
-                                  _AnswerSkeletonLine(fraction: 0.58),
-                                  SizedBox(height: 12),
-                                  _AnswerSkeletonEvidence(),
+                                  const Icon(
+                                    Icons.check_circle_rounded,
+                                    size: 17,
+                                    color: TitoColors.mint,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '回答已核验',
+                                    style: SecondaryTypography.onCard.small12
+                                        .copyWith(
+                                          color: TitoColors.deepBlue,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
                                 ],
                               ),
                             ),
-                    ),
-                  ],
-                )
-              : KeyedSubtree(
-                  key: const Key('ask-titodex-answer-card'),
-                  child: _AnswerCardContent(
-                    question: question,
-                    result: completed,
-                    entityResolver: entityResolver,
-                    sourceOpener: sourceOpener,
-                    animateEvidence: true,
-                    onRetry: onRetry,
-                    onClarificationSelected: onClarificationSelected,
-                    onContentSettled: onContentSettled,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 11),
+                      if (hasSemanticAnswer)
+                        _AnswerBlocksView(
+                          key: const Key('ask-titodex-streaming-answer'),
+                          blocks: widget.streamedBlocks,
+                        )
+                      else
+                        _AnswerCardContent(
+                          question: widget.question,
+                          result: completed,
+                          entityResolver: widget.entityResolver,
+                          sourceOpener: widget.sourceOpener,
+                          animateEvidence: true,
+                          animateEntityLinks: true,
+                          onRetry: widget.onRetry,
+                          onClarificationSelected:
+                              widget.onClarificationSelected,
+                          onContentSettled: widget.onContentSettled,
+                        ),
+                      if (hasSemanticAnswer) ...[
+                        const SizedBox(height: 12),
+                        _AnswerCardContent(
+                          question: widget.question,
+                          result: completed,
+                          entityResolver: widget.entityResolver,
+                          sourceOpener: widget.sourceOpener,
+                          animateEvidence: true,
+                          animateEntityLinks: true,
+                          answerAlreadyVisible: true,
+                          onRetry: widget.onRetry,
+                          onClarificationSelected:
+                              widget.onClarificationSelected,
+                          onContentSettled: widget.onContentSettled,
+                        ),
+                      ],
+                    ],
                   ),
-                ),
+          ),
         ),
       ),
     );
@@ -2222,97 +2597,9 @@ class _AnswerSkeletonEvidence extends StatelessWidget {
   }
 }
 
-class _AnswerReveal extends StatefulWidget {
-  const _AnswerReveal({
-    super.key,
-    required this.animate,
-    required this.child,
-    this.onComplete,
-  });
-
-  final bool animate;
-  final Widget child;
-  final VoidCallback? onComplete;
-
-  @override
-  State<_AnswerReveal> createState() => _AnswerRevealState();
-}
-
-class _AnswerRevealState extends State<_AnswerReveal>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _size;
-  late final Animation<double> _opacity;
-  late final Animation<Offset> _slide;
-  var _prepared = false;
-  var _notified = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller =
-        AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 460),
-        )..addStatusListener((status) {
-          if (status == AnimationStatus.completed) _notifyComplete();
-        });
-    _size = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0, 0.86, curve: Curves.easeOutCubic),
-    );
-    _opacity = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.08, 1, curve: Curves.easeOut),
-    );
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.045),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_prepared) return;
-    _prepared = true;
-    if (!widget.animate || MediaQuery.disableAnimationsOf(context)) {
-      _controller.value = 1;
-      if (widget.animate) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _notifyComplete());
-      }
-    } else {
-      _controller.forward();
-    }
-  }
-
-  void _notifyComplete() {
-    if (_notified || !mounted) return;
-    _notified = true;
-    widget.onComplete?.call();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizeTransition(
-      sizeFactor: _size,
-      alignment: Alignment.topCenter,
-      child: FadeTransition(
-        opacity: _opacity,
-        child: SlideTransition(position: _slide, child: widget.child),
-      ),
-    );
-  }
-}
-
 class _EvidenceReveal extends StatefulWidget {
   const _EvidenceReveal({
+    super.key,
     required this.animate,
     required this.child,
     this.onComplete,
@@ -2432,6 +2719,7 @@ class _StatusPill extends StatelessWidget {
 
 class _AnswerCard extends StatelessWidget {
   const _AnswerCard({
+    super.key,
     required this.question,
     required this.result,
     required this.entityResolver,
@@ -2477,6 +2765,8 @@ class _AnswerCardContent extends StatelessWidget {
     required this.animateEvidence,
     required this.onRetry,
     required this.onClarificationSelected,
+    this.animateEntityLinks = false,
+    this.answerAlreadyVisible = false,
     this.onContentSettled,
   });
 
@@ -2485,6 +2775,8 @@ class _AnswerCardContent extends StatelessWidget {
   final AskTitoDexEntityResolver entityResolver;
   final AskTitoDexSourceOpener sourceOpener;
   final bool animateEvidence;
+  final bool animateEntityLinks;
+  final bool answerAlreadyVisible;
   final VoidCallback onRetry;
   final ValueChanged<AskTitoDexClarificationCandidate> onClarificationSelected;
   final VoidCallback? onContentSettled;
@@ -2586,17 +2878,19 @@ class _AnswerCardContent extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 12),
-        if (result.answerBlocks.isNotEmpty)
-          _AnswerBlocksView(
-            key: const Key('ask-titodex-answer'),
-            blocks: result.answerBlocks,
-          )
-        else
-          _AssistantMarkdown(
-            key: const Key('ask-titodex-answer'),
-            data: answerBody,
-          ),
+        if (!answerAlreadyVisible) ...[
+          const SizedBox(height: 12),
+          if (result.answerBlocks.isNotEmpty)
+            _AnswerBlocksView(
+              key: const Key('ask-titodex-answer'),
+              blocks: result.answerBlocks,
+            )
+          else
+            _AssistantMarkdown(
+              key: const Key('ask-titodex-answer'),
+              data: answerBody,
+            ),
+        ],
         if (result.unknowns.isNotEmpty) ...[
           const SizedBox(height: 10),
           Text(
@@ -2609,6 +2903,7 @@ class _AnswerCardContent extends StatelessWidget {
         ],
         const SizedBox(height: 12),
         _EvidenceReveal(
+          key: const Key('ask-titodex-evidence-reveal'),
           animate: animateEvidence,
           onComplete: onContentSettled,
           child: _AnswerEvidenceSummary(
@@ -2624,6 +2919,7 @@ class _AnswerCardContent extends StatelessWidget {
             question: question,
             answer: answerBody,
             resolver: entityResolver,
+            animate: animateEntityLinks,
           ),
         ],
       ],
@@ -2972,11 +3268,13 @@ class _EntityLinkCards extends StatefulWidget {
     required this.question,
     required this.answer,
     required this.resolver,
+    this.animate = false,
   });
 
   final String question;
   final String answer;
   final AskTitoDexEntityResolver resolver;
+  final bool animate;
 
   @override
   State<_EntityLinkCards> createState() => _EntityLinkCardsState();
@@ -3030,45 +3328,124 @@ class _EntityLinkCardsState extends State<_EntityLinkCards> {
               spacing: 7,
               runSpacing: 7,
               children: [
-                for (final link in links)
-                  ActionChip(
-                    key: ValueKey('ask-entity-${link.kind.name}-${link.id}'),
-                    visualDensity: const VisualDensity(
-                      horizontal: -3,
-                      vertical: -3,
+                for (var index = 0; index < links.length; index += 1)
+                  _StaggeredEntityChip(
+                    key: ValueKey(
+                      'ask-entity-reveal-${links[index].kind.name}-${links[index].id}',
                     ),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor: _entityChipColor(link.kind),
-                    side: BorderSide(
-                      color: TitoColors.deepBlue.withValues(alpha: 0.28),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 3,
-                    ),
-                    labelPadding: const EdgeInsets.only(left: 3, right: 4),
-                    avatar: Icon(
-                      _entityIcon(link.kind),
-                      size: 15,
-                      color: TitoColors.deepBlue,
-                    ),
-                    label: Text(
-                      '${link.nameZh} · ${_entityKindLabel(link.kind)}',
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        color: TitoColors.deepBlue,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    onPressed: () => context.push(link.route),
+                    animate: widget.animate,
+                    index: index,
+                    child: _EntityActionChip(link: links[index]),
                   ),
               ],
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _EntityActionChip extends StatelessWidget {
+  const _EntityActionChip({required this.link});
+
+  final AskTitoDexEntityLink link;
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      key: ValueKey('ask-entity-${link.kind.name}-${link.id}'),
+      visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      backgroundColor: _entityChipColor(link.kind),
+      side: BorderSide(color: TitoColors.deepBlue.withValues(alpha: 0.28)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      labelPadding: const EdgeInsets.only(left: 3, right: 4),
+      avatar: Icon(
+        _entityIcon(link.kind),
+        size: 15,
+        color: TitoColors.deepBlue,
+      ),
+      label: Text(
+        '${link.nameZh} · ${_entityKindLabel(link.kind)}',
+        style: SecondaryTypography.onCard.small12.copyWith(
+          color: TitoColors.deepBlue,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      onPressed: () => context.push(link.route),
+    );
+  }
+}
+
+class _StaggeredEntityChip extends StatefulWidget {
+  const _StaggeredEntityChip({
+    super.key,
+    required this.animate,
+    required this.index,
+    required this.child,
+  });
+
+  final bool animate;
+  final int index;
+  final Widget child;
+
+  @override
+  State<_StaggeredEntityChip> createState() => _StaggeredEntityChipState();
+}
+
+class _StaggeredEntityChipState extends State<_StaggeredEntityChip>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _curve;
+  var _prepared = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_prepared) return;
+    _prepared = true;
+    if (!widget.animate || MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = 1;
+      return;
+    }
+    final boundedIndex = widget.index < 4 ? widget.index : 4;
+    Future<void>.delayed(Duration(milliseconds: 250 + (boundedIndex * 55)), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _curve,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.12),
+          end: Offset.zero,
+        ).animate(_curve),
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.96, end: 1).animate(_curve),
+          child: widget.child,
+        ),
+      ),
     );
   }
 }

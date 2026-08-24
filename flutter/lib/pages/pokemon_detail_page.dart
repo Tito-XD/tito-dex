@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,9 +13,11 @@ import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/game_catalog.dart';
 import '../l10n/app_zh.dart';
+import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
@@ -34,11 +38,18 @@ class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({
     super.key,
     required this.pokemonId,
+    this.transitionSummary,
+    this.initialDetail,
     this.initialFormKey,
     this.initialObtainVersion,
   });
 
   final int pokemonId;
+  final PokemonSummary? transitionSummary;
+
+  /// Optional already-decoded detail. A prefetched local bundle entry can land
+  /// immediately without replacing the shared-element target mid-flight.
+  final PokemonDetail? initialDetail;
 
   /// Deep-link targets from `/dex/:id?form=&version=`; validated against the
   /// loaded detail before applying, so a stale link degrades to the default.
@@ -53,6 +64,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   PokemonDetail? _detail;
   List<PokemonAbility> _abilities = const [];
   (String, String)? _errorCopy;
+  late bool _sharedElementRouteSettled;
+  bool _sharedElementSettleRequested = false;
   bool _loading = true;
   int _currentTabIndex = 0;
   GameEdition _gameEdition = defaultGameEdition;
@@ -68,9 +81,33 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   @override
   void initState() {
     super.initState();
+    _sharedElementRouteSettled = widget.transitionSummary == null;
     gameEditionRepository.addListener(_onGlobalEditionChanged);
-    _loadDefaultMoveVersion();
-    _loadDetail();
+    if (widget.transitionSummary == null) {
+      _loadDefaultMoveVersion();
+    } else {
+      unawaited(_runAfterIncomingRoute(_loadDefaultMoveVersion));
+    }
+    if (widget.transitionSummary == null) {
+      _loadDetail();
+    } else {
+      unawaited(_runAfterIncomingRoute(_loadDetail));
+    }
+    if (!_sharedElementRouteSettled) {
+      unawaited(_settleSharedElementAfterIncomingRoute());
+    }
+  }
+
+  Future<void> _settleSharedElementAfterIncomingRoute() async {
+    if (_sharedElementSettleRequested) {
+      return;
+    }
+    _sharedElementSettleRequested = true;
+    final routeSettled = await waitForIncomingRouteSettled(context);
+    if (!mounted || !routeSettled || _sharedElementRouteSettled) {
+      return;
+    }
+    setState(() => _sharedElementRouteSettled = true);
   }
 
   @override
@@ -92,6 +129,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       _obtainGameEdition = edition;
       _selectedObtainVersion = null;
     });
+  }
+
+  Future<void> _runAfterIncomingRoute(Future<void> Function() work) async {
+    if (!await waitForIncomingRouteSettled(context) || !mounted) return;
+    await work();
   }
 
   Future<void> _loadDefaultMoveVersion() async {
@@ -116,10 +158,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       _errorCopy = null;
     });
     try {
-      final detail = await dexRepository.getDetail(widget.pokemonId);
-      final abilities = await dexRepository.abilitiesForPokemon(
-        widget.pokemonId,
-      );
+      final prefetched = widget.initialDetail;
+      final detail =
+          prefetched ?? await dexRepository.getDetail(widget.pokemonId);
+      final abilities = prefetched == null
+          ? await dexRepository.abilitiesForPokemon(widget.pokemonId)
+          : prefetched.abilities;
       if (!mounted) {
         return;
       }
@@ -160,6 +204,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final errorCopy = _errorCopy;
     final padding = DeviceLayout.pagePadding(context);
     final bodyPadding = EdgeInsets.fromLTRB(padding.left, 8, padding.right, 12);
+    final transitionHeader = widget.transitionSummary == null
+        ? null
+        : PokemonDetailTransitionHeader(summary: widget.transitionSummary!);
+    final keepSharedElementTarget =
+        transitionHeader != null && !_sharedElementRouteSettled;
 
     // This page owns the only warm-white bottom bar in the app — match
     // the system nav bar to it instead of the global deep blue (v0.6.7).
@@ -183,66 +232,95 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             ),
           ),
           Expanded(
-            child: TitoSkeletonGate(
-              loading: _loading,
-              skeleton: ListView(
-                padding: bodyPadding,
-                children: const [
-                  TitoDetailHeaderSkeleton(),
-                  SizedBox(height: 12),
-                  TitoCardSkeleton(height: 140),
-                  SizedBox(height: 12),
-                  TitoCardSkeleton(height: 88),
-                ],
-              ),
-              child: errorCopy != null
-                  ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
-                  : displayDetail == null
-                  ? const SizedBox.shrink()
-                  : ListView(
+            child: keepSharedElementTarget
+                ? ListView(
+                    key: const ValueKey('pokemon-detail-shared-element-stage'),
+                    padding: bodyPadding,
+                    children: [transitionHeader],
+                  )
+                : TitoSkeletonGate(
+                    loading: _loading,
+                    skeleton: ListView(
                       padding: bodyPadding,
                       children: [
-                        PokemonDetailHeader(
-                          detail: displayDetail,
-                          compact: true,
-                          showSettingsAction: false,
-                        ),
-                        if (displayDetail.hasMultipleForms) ...[
-                          const SizedBox(height: 12),
-                          PokemonFormSelector(
-                            forms: displayDetail.forms,
-                            selectedKey:
-                                _selectedFormKey ??
-                                displayDetail.defaultForm!.key,
-                            onSelected: (form) {
-                              setState(() {
-                                _selectedFormKey = form.key;
-                                _prepareObtainSupport(_detail!.forForm(form));
-                                _abilities =
-                                    form.abilities.isEmpty &&
-                                        (form.isDefault || form.isCosmetic)
-                                    ? _detail!.abilities
-                                    : form.abilities;
-                              });
-                            },
-                          ),
-                        ],
+                        if (transitionHeader != null)
+                          transitionHeader
+                        else
+                          const TitoDetailHeaderSkeleton(),
                         const SizedBox(height: 12),
-                        // Keyed tab-body swap without a custom transition.
-                        TitoAnimatedSizeSwitcher(
-                          switchKey: ValueKey<int>(_currentTabIndex),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: _tabSections(
-                              displayDetail,
-                              _currentTabIndex,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 72),
+                        const TitoCardSkeleton(height: 140),
+                        const SizedBox(height: 12),
+                        const TitoCardSkeleton(height: 88),
                       ],
                     ),
-            ),
+                    placeholder: transitionHeader == null
+                        ? const SizedBox.shrink()
+                        : ListView(
+                            padding: bodyPadding,
+                            children: [transitionHeader],
+                          ),
+                    child: errorCopy != null
+                        ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                        : displayDetail == null
+                        ? const SizedBox.shrink()
+                        : ListView(
+                            padding: bodyPadding,
+                            children: [
+                              PokemonDetailHeader(
+                                detail: displayDetail,
+                                compact: true,
+                                showSettingsAction: false,
+                              ),
+                              _DetailArrival(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (displayDetail.hasMultipleForms) ...[
+                                      const SizedBox(height: 12),
+                                      PokemonFormSelector(
+                                        forms: displayDetail.forms,
+                                        selectedKey:
+                                            _selectedFormKey ??
+                                            displayDetail.defaultForm!.key,
+                                        onSelected: (form) {
+                                          setState(() {
+                                            _selectedFormKey = form.key;
+                                            _prepareObtainSupport(
+                                              _detail!.forForm(form),
+                                            );
+                                            _abilities =
+                                                form.abilities.isEmpty &&
+                                                    (form.isDefault ||
+                                                        form.isCosmetic)
+                                                ? _detail!.abilities
+                                                : form.abilities;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                    const SizedBox(height: 12),
+                                    // Keyed tab-body swap without a custom transition.
+                                    TitoAnimatedSizeSwitcher(
+                                      switchKey: ValueKey<int>(
+                                        _currentTabIndex,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: _tabSections(
+                                          displayDetail,
+                                          _currentTabIndex,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 72),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
           ),
           _DetailBottomTabs(
             currentIndex: _currentTabIndex,
@@ -759,7 +837,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       const SizedBox(height: 12),
       // Keyed move-method panel swap without a custom transition.
       TitoAnimatedSizeSwitcher(
-        switchKey: ValueKey<_MoveMethodFilter>(effectiveFilter),
+        switchKey: ValueKey<int>(effectiveFilter.index),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: _movePanelsForFilter(effectiveFilter, moveSet),
@@ -810,6 +888,37 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 }
 
+class _DetailSelectionMotion extends StatelessWidget {
+  const _DetailSelectionMotion({
+    required this.motionKey,
+    required this.selected,
+    required this.builder,
+  });
+
+  final Key motionKey;
+  final bool selected;
+  final Widget Function(BuildContext context, double selection) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: selected ? 1 : 0),
+      duration: TitoMotion.duration(context, TitoMotion.fast),
+      curve: Curves.easeOutCubic,
+      builder: (context, selection, _) {
+        return Transform.translate(
+          key: motionKey,
+          offset: Offset(0, -1.5 * selection),
+          child: Transform.scale(
+            scale: 1 + 0.015 * selection,
+            child: builder(context, selection),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _MoveMethodFilterBar extends StatelessWidget {
   const _MoveMethodFilterBar({
     required this.selected,
@@ -852,41 +961,51 @@ class _MoveMethodFilterBar extends StatelessWidget {
               final isEmpty = emptyMethods.contains(entry);
               final isSelected = selected == entry;
               final radius = BorderRadius.circular(TitoRadii.sm);
-              return HandheldFocusDecorator(
-                onActivate: () => onSelected(entry),
-                child: StickerPressable(
-                  borderRadius: radius,
-                  child: Material(
-                    color: isSelected
-                        ? TitoColors.coral
-                        : isEmpty
-                        ? TitoColors.card.withValues(alpha: 0.55)
-                        : TitoColors.card,
+              final restingColor = isEmpty
+                  ? TitoColors.card.withValues(alpha: 0.55)
+                  : TitoColors.card;
+              final restingTextColor = isEmpty
+                  ? TitoColors.mutedInk
+                  : TitoColors.ink;
+              return _DetailSelectionMotion(
+                motionKey: ValueKey('move-filter-motion-${entry.index}'),
+                selected: isSelected,
+                builder: (context, selection) => HandheldFocusDecorator(
+                  onActivate: () => onSelected(entry),
+                  child: StickerPressable(
                     borderRadius: radius,
-                    child: InkWell(
-                      onTap: () => onSelected(entry),
+                    child: Material(
+                      color: Color.lerp(
+                        restingColor,
+                        TitoColors.coral,
+                        selection,
+                      ),
                       borderRadius: radius,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 7),
-                        decoration: BoxDecoration(
-                          borderRadius: radius,
-                          border: Border.all(
-                            color: isEmpty
-                                ? TitoColors.ink.withValues(alpha: 0.4)
-                                : TitoColors.ink,
-                            width: TitoBorders.element,
+                      child: InkWell(
+                        onTap: () => onSelected(entry),
+                        borderRadius: radius,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 7),
+                          decoration: BoxDecoration(
+                            borderRadius: radius,
+                            border: Border.all(
+                              color: isEmpty
+                                  ? TitoColors.ink.withValues(alpha: 0.4)
+                                  : TitoColors.ink,
+                              width: TitoBorders.element,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          _labels[entry]!,
-                          textAlign: TextAlign.center,
-                          style: SecondaryTypography.onCard.small12.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: isSelected
-                                ? const Color(0xFF4A1B0C)
-                                : isEmpty
-                                ? TitoColors.mutedInk
-                                : null,
+                          child: Text(
+                            _labels[entry]!,
+                            textAlign: TextAlign.center,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: Color.lerp(
+                                restingTextColor,
+                                const Color(0xFF4A1B0C),
+                                selection,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -898,6 +1017,33 @@ class _MoveMethodFilterBar extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _DetailArrival extends StatelessWidget {
+  const _DetailArrival({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduceMotion = TitoMotion.disabled(context);
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: reduceMotion ? 1 : 0, end: 1),
+      duration: TitoMotion.duration(context, TitoMotion.standard),
+      curve: Curves.easeOutCubic,
+      builder: (context, progress, child) {
+        return Opacity(
+          key: const ValueKey('pokemon-detail-content-arrival'),
+          opacity: progress,
+          child: Transform.translate(
+            offset: Offset(0, 6 * (1 - progress)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
@@ -982,33 +1128,44 @@ class _DetailBottomTabs extends StatelessWidget {
                 padding: EdgeInsets.only(
                   right: index == _labels.length - 1 ? 0 : 8,
                 ),
-                child: HandheldFocusDecorator(
-                  onActivate: () => onSelected(index),
-                  child: StickerPressable(
-                    borderRadius: radius,
-                    child: Material(
-                      color: selected ? TitoColors.coral : TitoColors.card,
+                child: _DetailSelectionMotion(
+                  motionKey: ValueKey('detail-tab-motion-$index'),
+                  selected: selected,
+                  builder: (context, selection) => HandheldFocusDecorator(
+                    onActivate: () => onSelected(index),
+                    child: StickerPressable(
                       borderRadius: radius,
-                      child: InkWell(
+                      child: Material(
+                        color: Color.lerp(
+                          TitoColors.card,
+                          TitoColors.coral,
+                          selection,
+                        ),
                         borderRadius: radius,
-                        onTap: () => onSelected(index),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: radius,
-                            border: Border.all(
-                              color: TitoColors.ink,
-                              width: TitoBorders.element,
+                        child: InkWell(
+                          borderRadius: radius,
+                          onTap: () => onSelected(index),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: radius,
+                              border: Border.all(
+                                color: TitoColors.ink,
+                                width: TitoBorders.element,
+                              ),
                             ),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 9),
-                          child: Text(
-                            _labels[index],
-                            textAlign: TextAlign.center,
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: selected
-                                  ? const Color(0xFF4A1B0C)
-                                  : TitoColors.mutedInk,
+                            padding: const EdgeInsets.symmetric(vertical: 9),
+                            child: Text(
+                              _labels[index],
+                              textAlign: TextAlign.center,
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: Color.lerp(
+                                      TitoColors.mutedInk,
+                                      const Color(0xFF4A1B0C),
+                                      selection,
+                                    ),
+                                  ),
                             ),
                           ),
                         ),

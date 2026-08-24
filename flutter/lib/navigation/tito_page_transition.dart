@@ -19,8 +19,8 @@ enum TitoSideSlideDirection { fromLeft, fromRight }
 /// Dex uses one compact container-transform timeline. Geometry, clipping,
 /// surface and content reveal all derive from the route progress instead of
 /// stacking a full Material page transition on top of the Hero flight.
-const titoDexTransitionDuration = Duration(milliseconds: 260);
-const titoDexReverseTransitionDuration = Duration(milliseconds: 220);
+const titoDexTransitionDuration = Duration(milliseconds: 340);
+const titoDexReverseTransitionDuration = Duration(milliseconds: 300);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
@@ -79,7 +79,7 @@ Page<T> titoDexPage<T>({
         ? child
         : Hero(
             tag: heroTag,
-            transitionOnUserGestures: false,
+            transitionOnUserGestures: true,
             createRectTween: titoDexRectTween,
             curve: titoDexForwardCurve,
             reverseCurve: titoDexReverseCurve,
@@ -142,14 +142,6 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   @override
   bool get fullscreenDialog => false;
 
-  // The dex route's Hero expand/collapse animation conflicts with Android's
-  // predictive-back gesture (the reveal animation replays and the two systems
-  // fight over the transition).  Disable the gesture for dex so the shell
-  // only responds to the explicit back button / Hero collapse.
-  @override
-  bool get popGestureEnabled =>
-      _page.kind == _TitoMaterialPageKind.dex ? false : super.popGestureEnabled;
-
   /// Minimum controller value while a predictive-back drag is in progress.
   ///
   /// The framework drives the controller to exactly 0.0 when the finger
@@ -197,15 +189,12 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     // list follows on the same route progress with a short rise, rather than
     // receiving Android's second zoom/fade transition on top of the flight.
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final containerProgress = CurvedAnimation(
-      parent: animation,
-      curve: titoDexForwardCurve,
-      reverseCurve: titoDexReverseCurve,
-    );
-    final Animation<double> contentReveal = popGestureInProgress
-        ? kAlwaysCompleteAnimation
-        : reduceMotion
-        ? containerProgress
+    final Animation<double> contentReveal = reduceMotion
+        ? CurvedAnimation(
+            parent: animation,
+            curve: titoDexForwardCurve,
+            reverseCurve: Curves.easeInExpo,
+          )
         : CurvedAnimation(
             parent: animation,
             curve: const Interval(0.46, 0.86, curve: Curves.easeOutCubic),
@@ -240,7 +229,15 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
         pageWithOverlay,
       );
     }
-    return pageWithOverlay;
+    return PredictiveBackPageTransitionsBuilder(
+      fallbackColor: Theme.of(context).scaffoldBackgroundColor,
+    ).buildTransitions(
+      this,
+      context,
+      animation,
+      secondaryAnimation,
+      pageWithOverlay,
+    );
   }
 
   @override
@@ -373,26 +370,34 @@ Widget _homeActionFlightShuttle(
   final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
   final pageSize = (pageContext.findRenderObject()! as RenderBox).size;
   final flightVisual = _DexFlightVisual.resolve(flightContext);
+  final timelineAnimation = animation is CurvedAnimation
+      ? animation.parent
+      : animation;
 
   return AnimatedBuilder(
     animation: animation,
     builder: (context, _) {
       final progress = animation.value.clamp(0.0, 1.0);
+      final timelineProgress = timelineAnimation.value.clamp(0.0, 1.0);
       final radius = flightVisual.startRadius * (1 - progress);
       final borderWidth = flightVisual.borderWidth * (1 - progress);
       final shadowProgress = 1 - Curves.easeOutCubic.transform(progress);
-      final cardOpacity =
-          1 -
-          const Interval(
-            0,
-            0.22,
-            curve: Curves.easeOutCubic,
-          ).transform(progress);
-      final pageOpacity = const Interval(
-        0.34,
-        0.78,
-        curve: Curves.easeOutCubic,
-      ).transform(progress);
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      final cardOpacity = reduceMotion
+          ? (timelineProgress < 0.5 ? 1.0 : 0.0)
+          : 1 -
+                const Interval(
+                  0,
+                  0.62,
+                  curve: Curves.easeOutCubic,
+                ).transform(timelineProgress);
+      final pageOpacity = reduceMotion
+          ? (timelineProgress < 0.5 ? 0.0 : 1.0)
+          : const Interval(
+              0.24,
+              0.82,
+              curve: Curves.easeOutCubic,
+            ).transform(timelineProgress);
       final borderRadius = BorderRadius.circular(radius);
 
       return DecoratedBox(
@@ -431,6 +436,7 @@ Widget _homeActionFlightShuttle(
                     child: SizedBox.fromSize(
                       size: cardSize,
                       child: Opacity(
+                        key: const ValueKey('tito-dex-flight-source'),
                         opacity: cardOpacity,
                         child: cardHero.child,
                       ),
@@ -443,6 +449,7 @@ Widget _homeActionFlightShuttle(
                     child: SizedBox.fromSize(
                       size: pageSize,
                       child: Opacity(
+                        key: const ValueKey('tito-dex-flight-target'),
                         opacity: pageOpacity,
                         child: pageHero.child,
                       ),

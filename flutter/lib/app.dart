@@ -57,6 +57,7 @@ import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
 import 'widgets/offline_data_prompt.dart';
+import 'widgets/pokemon_card.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
 import 'widgets/tito_progress_dialog.dart';
@@ -269,21 +270,30 @@ class _TitoDexAppState extends State<TitoDexApp> {
                 ),
                 GoRoute(
                   path: ':id',
-                  pageBuilder: (context, state) => titoMaterialPage(
-                    key: state.pageKey,
-                    child: TitoPageContainer(
-                      child: PokemonDetailPage(
-                        pokemonId:
-                            int.tryParse(state.pathParameters['id'] ?? '') ?? 1,
-                        // Route split agreed with the search branch: bare
-                        // `form`/`version` on /dex/:id are ours; list-filter
-                        // params live on /dex.
-                        initialFormKey: state.uri.queryParameters['form'],
-                        initialObtainVersion:
-                            state.uri.queryParameters['version'],
+                  pageBuilder: (context, state) {
+                    final pokemonId =
+                        int.tryParse(state.pathParameters['id'] ?? '') ?? 1;
+                    final transition = state.extra is PokemonDetailTransition
+                        ? state.extra! as PokemonDetailTransition
+                        : null;
+                    return titoMaterialPage(
+                      key: state.pageKey,
+                      child: TitoPageContainer(
+                        child: PokemonDetailPage(
+                          pokemonId: pokemonId,
+                          transitionSummary: transition?.summary.id == pokemonId
+                              ? transition!.summary
+                              : null,
+                          // Route split agreed with the search branch: bare
+                          // `form`/`version` on /dex/:id are ours; list-filter
+                          // params live on /dex.
+                          initialFormKey: state.uri.queryParameters['form'],
+                          initialObtainVersion:
+                              state.uri.queryParameters['version'],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ],
             ),

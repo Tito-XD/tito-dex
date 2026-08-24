@@ -18,7 +18,7 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
   });
 
-  testWidgets('Dex expands in 260ms and collapses in 220ms', (tester) async {
+  testWidgets('Dex expands in 340ms and collapses in 300ms', (tester) async {
     final page = titoDexPage<void>(
       key: const ValueKey<String>('dex-page'),
       heroTag: TitoHomeActionHero.dex,
@@ -36,13 +36,13 @@ void main() {
     final route = ModalRoute.of(tester.element(find.byType(Placeholder)))!;
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexReverseTransitionDuration);
-    expect(titoDexTransitionDuration, const Duration(milliseconds: 260));
-    expect(titoDexReverseTransitionDuration, const Duration(milliseconds: 220));
+    expect(titoDexTransitionDuration, const Duration(milliseconds: 340));
+    expect(titoDexReverseTransitionDuration, const Duration(milliseconds: 300));
     expect(route.opaque, isTrue);
-    // The container flight owns both directions, so predictive back stays off.
+    // This harness has no previous route, so PageRoute correctly cannot pop.
     expect(route.popGestureEnabled, isFalse);
     final hero = tester.widget<Hero>(find.byType(Hero));
-    expect(hero.transitionOnUserGestures, isFalse);
+    expect(hero.transitionOnUserGestures, isTrue);
     expect(hero.createRectTween, same(titoDexRectTween));
     expect(hero.curve, titoDexForwardCurve);
     expect(hero.reverseCurve, titoDexReverseCurve);
@@ -90,18 +90,29 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey<String>('open-card')));
     await tester.pump();
+    await tester.pump();
     var fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
     expect(fade.opacity.value, lessThan(0.1));
     expect(tester.getTopLeft(home), initialPosition);
 
+    await tester.pump();
     await tester.pump(const Duration(milliseconds: 90));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
     expect(fade.opacity.value, lessThan(0.1));
-    await tester.pump(const Duration(milliseconds: 60));
+    final sourceLayer = tester.widget<Opacity>(
+      find.byKey(const ValueKey<String>('tito-dex-flight-source')),
+    );
+    final targetLayer = tester.widget<Opacity>(
+      find.byKey(const ValueKey<String>('tito-dex-flight-target')),
+    );
+    expect(sourceLayer.opacity, greaterThan(0));
+    expect(targetLayer.opacity, greaterThan(0));
+
+    await tester.pump(const Duration(milliseconds: 90));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
@@ -109,12 +120,11 @@ void main() {
     expect(fade.opacity.value, lessThan(1));
     await tester.pumpAndSettle();
 
-    // Dex routes intentionally disable predictive back so the Hero
-    // expand/collapse animation owns the transition without gesture conflict.
+    // With Home underneath and the route settled, Android can scrub back.
     final dexRoute = ModalRoute.of(
       tester.element(find.byKey(const ValueKey<String>('close-page'))),
     )!;
-    expect(dexRoute.popGestureEnabled, isFalse);
+    expect(dexRoute.popGestureEnabled, isTrue);
 
     await tester.tap(find.byKey(const ValueKey<String>('close-page')));
     await tester.pump();
@@ -136,6 +146,7 @@ void main() {
     await tester.pumpWidget(const _DexFadeHarness(disableAnimations: true));
 
     await tester.tap(find.byKey(const ValueKey<String>('open-card')));
+    await tester.pump();
     await tester.pump();
     var fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
@@ -332,6 +343,7 @@ class _DexFadeHarness extends StatefulWidget {
 
 class _DexFadeHarnessState extends State<_DexFadeHarness> {
   bool _open = false;
+  final HeroController _heroController = HeroController();
 
   @override
   Widget build(BuildContext context) {
@@ -346,6 +358,7 @@ class _DexFadeHarnessState extends State<_DexFadeHarness> {
         );
       },
       home: Navigator(
+        observers: [_heroController],
         pages: [
           titoHomePage<void>(
             key: const ValueKey<String>('home'),
@@ -356,7 +369,7 @@ class _DexFadeHarnessState extends State<_DexFadeHarness> {
                 child: Center(
                   child: Hero(
                     tag: TitoHomeActionHero.dex,
-                    transitionOnUserGestures: false,
+                    transitionOnUserGestures: true,
                     child: SizedBox(
                       key: const ValueKey<String>('open-card'),
                       width: 120,

@@ -17,6 +17,7 @@ import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../theme/device_layout.dart';
 import '../widgets/companion_tools_panel.dart';
@@ -209,7 +210,7 @@ class _SearchPageState extends State<SearchPage> {
             onSelected: (index) => setState(() => _hubSegment = index),
           ),
           const SizedBox(height: 12),
-          // Keyed content swap without a custom transition.
+          // Numeric keys let the shared fade-through follow segment direction.
           TitoAnimatedSizeSwitcher(
             switchKey: ValueKey<int>(_hubSegment),
             child: Column(
@@ -227,20 +228,21 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Key get _searchResultsSwitchKey {
-    final query = _controller.text.trim();
+    final query = _controller.text.trim().toLowerCase();
     if (query.isEmpty) {
       return const ValueKey<String>('search-idle');
     }
     if (_searching) {
-      return const ValueKey<String>('search-loading');
+      return ValueKey<String>('search-loading-$query');
     }
     if (_error != null) {
-      return ValueKey<String>('search-error-${_error.hashCode}');
+      return ValueKey<String>('search-error-$query-${_error.hashCode}');
     }
     if (_results.isEmpty) {
-      return const ValueKey<String>('search-empty');
+      return ValueKey<String>('search-empty-$query');
     }
-    return ValueKey<String>('search-results-${_results.length}');
+    final resultIdentity = Object.hashAll(_results.map((entry) => entry.id));
+    return ValueKey<String>('search-results-$query-$resultIdentity');
   }
 
   List<Widget> _searchSegment(BuildContext context) {
@@ -420,7 +422,8 @@ class _SearchPageState extends State<SearchPage> {
         final entry = _results[index];
         final status = dexRepository.statusFor(entry.id, _progress);
         return TitoListReveal(
-          key: ValueKey<int>(entry.id),
+          key: ValueKey<String>('search-result-$query-${entry.id}'),
+          replayKey: query,
           delay: TitoListReveal.staggerDelay(index),
           child: _SearchResultRow(
             entry: entry,
@@ -617,30 +620,51 @@ class _SearchHubSegmentBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final duration = TitoMotion.duration(context, TitoMotion.fast);
     return Row(
       children: List.generate(_labels.length, (index) {
         final isSelected = index == selected;
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(left: index == 0 ? 0 : 4),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => onSelected(index),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                child: Ink(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? TitoColors.softYellow : TitoColors.card,
-                    borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(color: TitoColors.ink, width: 2),
-                  ),
-                  child: Text(
-                    _labels[index],
-                    textAlign: TextAlign.center,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w800,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(end: isSelected ? 1 : 0),
+              duration: duration,
+              curve: Curves.easeOutCubic,
+              builder: (context, selection, child) {
+                return Transform.translate(
+                  key: ValueKey<String>('search-segment-motion-$index'),
+                  offset: Offset(0, -selection),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => onSelected(index),
+                      borderRadius: BorderRadius.circular(TitoRadii.sm),
+                      child: Ink(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Color.lerp(
+                            TitoColors.card,
+                            TitoColors.softYellow,
+                            selection,
+                          ),
+                          borderRadius: BorderRadius.circular(TitoRadii.sm),
+                          border: Border.all(color: TitoColors.ink, width: 2),
+                        ),
+                        child: child,
+                      ),
                     ),
+                  ),
+                );
+              },
+              child: Semantics(
+                selected: isSelected,
+                button: true,
+                child: Text(
+                  _labels[index],
+                  textAlign: TextAlign.center,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),

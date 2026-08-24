@@ -587,7 +587,7 @@ void main() {
 
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsOneWidget);
       expect(find.textContaining('火球鼠'), findsWidgets);
-      expect(find.text('正在连接 Journey Assistant'), findsOneWidget);
+      expect(find.text('先翻本地审核笔记'), findsOneWidget);
       expect(
         find.byKey(const Key('ask-titodex-question-bubble')),
         findsOneWidget,
@@ -596,6 +596,10 @@ void main() {
         find.byKey(const Key('ask-titodex-generating-answer')),
         findsOneWidget,
       );
+      expect(find.text('正在翻本地资料'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 160));
+      expect(find.text('正在连接 Journey Assistant'), findsOneWidget);
       expect(find.text('正在交叉核对资料与联网来源'), findsOneWidget);
 
       service.complete(
@@ -821,7 +825,7 @@ void main() {
         .position;
 
     expect(answerPosition().maxScrollExtent, greaterThan(0));
-    answerPosition().jumpTo(0);
+    answerPosition().jumpTo(answerPosition().maxScrollExtent);
     await tester.pump();
 
     await tester.enterText(
@@ -832,7 +836,7 @@ void main() {
     await tester.pump();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 240));
-    expect(answerPosition().extentAfter, lessThanOrEqualTo(1));
+    expect(answerPosition().extentBefore, lessThanOrEqualTo(1));
 
     service.complete(
       const AskTitoDexResult(
@@ -844,7 +848,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('这是最新的回答，完成后也应该自动停留在最下面。'), findsOneWidget);
-    expect(answerPosition().extentAfter, lessThanOrEqualTo(1));
+    expect(answerPosition().extentBefore, lessThanOrEqualTo(1));
   });
 
   testWidgets('compact connection summary expands grouped provider details', (

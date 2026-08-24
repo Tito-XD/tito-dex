@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_zh.dart';
+import '../../widgets/tito_animated_size_switcher.dart';
 import 'dex_browse_scope.dart';
 import 'dex_game_scope.dart';
 
@@ -49,21 +50,30 @@ class _DexBrowseScopePickerState extends State<_DexBrowseScopePicker> {
                       icon: const Icon(Icons.arrow_back_rounded),
                     ),
                   Expanded(
-                    child: Text(
-                      switch (_level) {
-                        _PickerLevel.root => AppZh.dexPickBrowseScope,
-                        _PickerLevel.region => AppZh.dexBrowseByRegion,
-                        _PickerLevel.generation => AppZh.dexBrowseByGeneration,
-                      },
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
+                    child: TitoAnimatedSizeSwitcher(
+                      switchKey: ValueKey<int>(_level.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        switch (_level) {
+                          _PickerLevel.root => AppZh.dexPickBrowseScope,
+                          _PickerLevel.region => AppZh.dexBrowseByRegion,
+                          _PickerLevel.generation =>
+                            AppZh.dexBrowseByGeneration,
+                        },
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            Expanded(child: _body()),
+            Expanded(
+              child: TitoAnimatedSizeSwitcher(
+                switchKey: ValueKey<int>(_level.index),
+                child: _body(),
+              ),
+            ),
           ],
         ),
       ),

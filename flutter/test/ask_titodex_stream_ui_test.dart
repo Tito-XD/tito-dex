@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/features/game/game_edition.dart';
 import 'package:titodex/features/journey/ask_titodex_answer_blocks.dart';
+import 'package:titodex/features/journey/ask_titodex_entity_links.dart';
+import 'package:titodex/features/journey/ask_titodex_history.dart';
 import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/features/journey/progression_hints.dart';
@@ -87,20 +89,30 @@ void main() {
         .then((_) => pacingFinished = true);
     await tester.pump();
 
-    expect(
-      find.byKey(const Key('ask-titodex-streaming-answer')),
-      findsOneWidget,
-    );
-    expect(find.text('利欧路可以在南第4区遇到。▍'), findsOneWidget);
+    expect(find.byKey(const Key('ask-titodex-streaming-answer')), findsOne);
+    final firstFrame = _visibleCursorText(tester);
+    expect(firstFrame, startsWith('利'));
+    expect(firstFrame, endsWith('▍'));
+    expect(firstFrame.length, lessThan('利欧路可以在南第4区遇到。▍'.length));
     final liveAnswerSemantics = tester.widget<Semantics>(
       find.byKey(const Key('ask-titodex-live-answer-semantics')),
     );
     expect(liveAnswerSemantics.properties.liveRegion, isTrue);
-    expect(liveAnswerSemantics.properties.label, contains('利欧路可以在南第4区遇到。'));
+    expect(
+      liveAnswerSemantics.properties.label,
+      contains(firstFrame.replaceAll('▍', '')),
+    );
     expect(pacingFinished, isFalse);
-    await tester.pump(const Duration(milliseconds: 36));
+    await tester.pump(const Duration(milliseconds: 48));
+    await tester.pump();
+    final secondFrame = _visibleCursorText(tester);
+    expect(secondFrame.length, greaterThan(firstFrame.length));
+    expect(secondFrame, endsWith('▍'));
+    expect(secondFrame.length, lessThan('利欧路可以在南第4区遇到。▍'.length));
+    await _pumpUntil(tester, () => pacingFinished);
     await pacing;
     expect(pacingFinished, isTrue);
+    expect(_visibleCursorText(tester), '利欧路可以在南第4区遇到。▍');
 
     const blocks = [
       AskTitoDexAnswerBlock(
@@ -172,17 +184,20 @@ void main() {
     await tester.tap(find.byKey(const Key('ask-titodex-submit')));
     await tester.pump();
 
-    final reveal = service.emitBlock(
-      const AskTitoDexAnswerBlock(
-        id: 'stale-summary',
-        turnId: 'turn-reset-ui',
-        kind: AskTitoDexAnswerBlockKind.summary,
-        text: '不完整的旧语义内容。',
-        isComplete: false,
-      ),
-    );
+    var revealFinished = false;
+    final reveal = service
+        .emitBlock(
+          const AskTitoDexAnswerBlock(
+            id: 'stale-summary',
+            turnId: 'turn-reset-ui',
+            kind: AskTitoDexAnswerBlockKind.summary,
+            text: '不完整的旧语义内容。',
+            isComplete: false,
+          ),
+        )
+        .then((_) => revealFinished = true);
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 36));
+    await _pumpUntil(tester, () => revealFinished);
     await reveal;
     expect(find.text('不完整的旧语义内容。▍'), findsOneWidget);
 
@@ -200,6 +215,62 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('最终权威答案。', findRichText: true), findsOneWidget);
   });
+
+  testWidgets(
+    'invalid streamed content is cleared before local fallback reveal',
+    (tester) async {
+      const invalidText = '错误的悖谬宝可梦定义。';
+      const fallbackText = '本地核验回答。';
+      final service = _SemanticStreamService();
+      await _pumpAskPage(tester, service);
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '利欧路在哪里抓？',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+
+      var invalidRevealFinished = false;
+      final invalidReveal = service
+          .emitBlock(
+            const AskTitoDexAnswerBlock(
+              id: 'invalid-remote',
+              kind: AskTitoDexAnswerBlockKind.summary,
+              text: invalidText,
+            ),
+          )
+          .then((_) => invalidRevealFinished = true);
+      await tester.pump();
+      await _pumpUntil(tester, () => invalidRevealFinished);
+      await invalidReveal;
+      expect(find.text(invalidText, findRichText: true), findsOne);
+
+      service.complete(
+        const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: fallbackText,
+          errorCode: 'invalid_ai_contract_fallback',
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text(invalidText, findRichText: true), findsNothing);
+      final fallbackFirstFrame = _visibleCursorText(tester);
+      expect(fallbackFirstFrame, startsWith(fallbackText.substring(0, 1)));
+      expect(fallbackFirstFrame, endsWith('▍'));
+
+      await _pumpUntil(
+        tester,
+        () => find
+            .byKey(const Key('ask-titodex-completion-check'))
+            .evaluate()
+            .isNotEmpty,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(invalidText, findRichText: true), findsNothing);
+      expect(find.text(fallbackText, findRichText: true), findsOne);
+    },
+  );
 
   testWidgets('reduced motion skips semantic reveal pacing', (tester) async {
     final binding = TestWidgetsFlutterBinding.instance;
@@ -259,17 +330,20 @@ void main() {
         24,
         (index) => '第${index + 1}条已经核验的路线说明。',
       ).join('\n\n');
-      final firstReveal = service.emitBlock(
-        AskTitoDexAnswerBlock(
-          id: 'route',
-          turnId: 'turn-scroll-race',
-          kind: AskTitoDexAnswerBlockKind.paragraph,
-          text: firstText,
-          isComplete: false,
-        ),
-      );
+      var firstRevealFinished = false;
+      final firstReveal = service
+          .emitBlock(
+            AskTitoDexAnswerBlock(
+              id: 'route',
+              turnId: 'turn-scroll-race',
+              kind: AskTitoDexAnswerBlockKind.paragraph,
+              text: firstText,
+              isComplete: false,
+            ),
+          )
+          .then((_) => firstRevealFinished = true);
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 36));
+      await _pumpUntil(tester, () => firstRevealFinished);
       await firstReveal;
       await tester.pump();
 
@@ -283,20 +357,6 @@ void main() {
       expect(position.maxScrollExtent, greaterThan(72));
       position.jumpTo(position.maxScrollExtent);
       await tester.pump();
-
-      final grownText =
-          '$firstText\n\n${List.generate(8, (index) => '新增的第${index + 1}条核验说明。').join('\n\n')}';
-      final secondReveal = service.emitBlock(
-        AskTitoDexAnswerBlock(
-          id: 'route',
-          turnId: 'turn-scroll-race',
-          kind: AskTitoDexAnswerBlockKind.paragraph,
-          text: grownText,
-          isComplete: false,
-        ),
-      );
-
-      position.jumpTo(0);
       ScrollUpdateNotification(
         metrics: position,
         context: tester.element(
@@ -306,16 +366,31 @@ void main() {
           globalPosition: Offset.zero,
           delta: Offset(0, 180),
         ),
-        scrollDelta: -180,
+        scrollDelta: 180,
       ).dispatch(
         tester.element(find.byKey(const Key('ask-titodex-answer-scroll'))),
       );
-      expect(position.extentAfter, greaterThan(72));
+      expect(position.extentBefore, greaterThan(72));
+
+      final grownText =
+          '$firstText\n\n${List.generate(8, (index) => '新增的第${index + 1}条核验说明。').join('\n\n')}';
+      var secondRevealFinished = false;
+      final secondReveal = service
+          .emitBlock(
+            AskTitoDexAnswerBlock(
+              id: 'route',
+              turnId: 'turn-scroll-race',
+              kind: AskTitoDexAnswerBlockKind.paragraph,
+              text: grownText,
+              isComplete: false,
+            ),
+          )
+          .then((_) => secondRevealFinished = true);
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 36));
+      await _pumpUntil(tester, () => secondRevealFinished);
       await secondReveal;
 
-      expect(position.extentAfter, greaterThan(72));
+      expect(position.extentBefore, greaterThan(72));
       service.complete(
         AskTitoDexResult(status: AskTitoDexStatus.answered, answer: grownText),
       );
@@ -440,6 +515,268 @@ void main() {
   );
 
   testWidgets(
+    'local answer synthesizes blocks, settles in place, then reveals evidence and chips',
+    (tester) async {
+      const answer = '本地核验回答会逐字显示，并把光标留在真正的末尾。';
+      const resolver = _FixedEntityResolver([
+        AskTitoDexEntityLink(
+          kind: AskTitoDexEntityKind.pokemon,
+          id: 447,
+          nameZh: '利欧路',
+          nameEn: 'Riolu',
+          route: '/dex/447',
+        ),
+        AskTitoDexEntityLink(
+          kind: AskTitoDexEntityKind.move,
+          id: 98,
+          nameZh: '电光一闪',
+          nameEn: 'Quick Attack',
+          route: '/dex/moves?q=quick-attack',
+        ),
+      ]);
+      final service = _SemanticStreamService();
+      await _pumpAskPage(tester, service, entityResolver: resolver);
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '本地资料能回答什么？',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+      final activeSurface = tester.element(
+        find.byKey(const Key('ask-titodex-active-answer-surface')),
+      );
+
+      service.complete(
+        const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: answer,
+          confidence: 'high',
+          sources: [
+            ProgressionSource(
+              title: 'TitoDex 本地审核资料',
+              url: 'https://example.com/titodex-local',
+              accessedAt: '2026-08-24T00:00:00Z',
+            ),
+          ],
+        ),
+      );
+      await tester.pump();
+
+      final partial = _visibleCursorText(tester);
+      expect(partial, startsWith(answer.substring(0, 1)));
+      expect(partial, endsWith('▍'));
+      expect(partial.length, lessThan(answer.length + 1));
+      expect(find.byKey(const ValueKey('ask-answer-block-local-01')), findsOne);
+
+      await _pumpUntil(
+        tester,
+        () => find
+            .byKey(const Key('ask-titodex-completion-check'))
+            .evaluate()
+            .isNotEmpty,
+      );
+      expect(
+        tester.element(
+          find.byKey(const Key('ask-titodex-active-answer-surface')),
+        ),
+        same(activeSurface),
+      );
+      final settling = tester.widget<Transform>(
+        find.byKey(const Key('ask-titodex-answer-settle')),
+      );
+      expect(settling.transform.getTranslation().y, greaterThan(0));
+
+      await tester.pump();
+      final evidence = find.byKey(const Key('ask-titodex-evidence-reveal'));
+      final evidenceSize = tester.widget<SizeTransition>(
+        find.descendant(of: evidence, matching: find.byType(SizeTransition)),
+      );
+      expect(evidenceSize.sizeFactor.value, 0);
+      final firstChip = find.byKey(
+        const ValueKey('ask-entity-reveal-pokemon-447'),
+      );
+      final secondChip = find.byKey(
+        const ValueKey('ask-entity-reveal-move-98'),
+      );
+      expect(firstChip, findsOne);
+      expect(secondChip, findsOne);
+      expect(_chipOpacity(tester, firstChip), 0);
+      expect(_chipOpacity(tester, secondChip), 0);
+
+      await tester.pump(const Duration(milliseconds: 170));
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(evidenceSize.sizeFactor.value, greaterThan(0));
+      expect(_chipOpacity(tester, firstChip), 0);
+      await tester.pump(const Duration(milliseconds: 20));
+      await tester.pump(const Duration(milliseconds: 35));
+      expect(_chipOpacity(tester, firstChip), greaterThan(0));
+      expect(_chipOpacity(tester, secondChip), 0);
+
+      await tester.pumpAndSettle();
+      expect(find.text(answer, findRichText: true), findsOne);
+      expect(find.text('$answer▍', findRichText: true), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'first frame defers heavy work and 50 long turns stay lazy at newest',
+    (tester) async {
+      tester.view.physicalSize = const Size(420, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final service = _SemanticStreamService();
+      final historyStore = _CountingHistoryStore(
+        List.generate(
+          50,
+          (index) => AskTitoDexHistoryEntry(
+            game: 'soulsilver',
+            question: '历史问题 ${index + 1}',
+            result: AskTitoDexResult(
+              status: AskTitoDexStatus.answered,
+              answer:
+                  '历史回答 ${index + 1}。'
+                  '${List.filled(20, '这是一段用于验证惰性构建的较长内容。').join()}',
+            ),
+            createdAt: DateTime.utc(2026, 8, 24, 0, index),
+          ),
+        ),
+      );
+      final router = GoRouter(
+        initialLocation: '/journey/ask',
+        routes: [
+          GoRoute(
+            path: '/journey/ask',
+            builder: (_, _) => TitoPageContainer(
+              child: AskTitoDexPage(
+                journey: _journey,
+                edition: GameEdition.hgss.withFlavor('soulsilver'),
+                service: service,
+                historyStore: historyStore,
+              ),
+            ),
+          ),
+          GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      expect(historyStore.loadCalls, 0);
+      expect(service.contextBuilds, 0);
+      expect(service.connectionChecks, 0);
+      expect(find.byKey(const Key('ask-titodex-answer-viewport')), findsOne);
+
+      await tester.pumpAndSettle();
+      expect(historyStore.loadCalls, 1);
+      expect(service.contextBuilds, 1);
+      expect(service.connectionChecks, 1);
+      expect(find.textContaining('历史回答 50'), findsOne);
+
+      final builtAnswers = find.byWidgetPredicate((widget) {
+        final key = widget.key;
+        return key is ValueKey<String> && key.value.startsWith('ask-answer-');
+      });
+      expect(builtAnswers.evaluate().length, greaterThan(0));
+      expect(builtAnswers.evaluate().length, lessThan(50));
+      final scrollable = find
+          .descendant(
+            of: find.byKey(const Key('ask-titodex-answer-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      final position = tester.state<ScrollableState>(scrollable).position;
+      expect(position.maxScrollExtent, greaterThan(0));
+      expect(position.extentBefore, lessThanOrEqualTo(1));
+    },
+  );
+
+  testWidgets('reduced motion still starts deferred initialization', (
+    tester,
+  ) async {
+    final binding = TestWidgetsFlutterBinding.instance;
+    binding.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(binding.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final service = _SemanticStreamService();
+    final historyStore = _CountingHistoryStore();
+    final router = GoRouter(
+      initialLocation: '/journey/ask',
+      routes: [
+        GoRoute(
+          path: '/journey/ask',
+          builder: (_, _) => TitoPageContainer(
+            child: AskTitoDexPage(
+              journey: _journey,
+              edition: GameEdition.hgss.withFlavor('soulsilver'),
+              service: service,
+              historyStore: historyStore,
+            ),
+          ),
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    expect(historyStore.loadCalls, 0);
+    expect(service.contextBuilds, 0);
+    await tester.pumpAndSettle();
+    expect(historyStore.loadCalls, 1);
+    expect(service.contextBuilds, 1);
+    expect(service.connectionChecks, 1);
+  });
+
+  testWidgets('a new question does not replay the previous answer', (
+    tester,
+  ) async {
+    const firstAnswer = '第一条回答完成后应该保持静止。';
+    final service = _SemanticStreamService();
+    await _pumpAskPage(tester, service);
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '第一问',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: firstAnswer,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '第二问',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+
+    expect(find.text(firstAnswer, findRichText: true), findsOne);
+    expect(find.text('$firstAnswer▍', findRichText: true), findsNothing);
+    expect(find.byKey(const Key('ask-titodex-generating-answer')), findsOne);
+    final staticEvidence = tester.widget<SizeTransition>(
+      find
+          .descendant(
+            of: find.byKey(const Key('ask-titodex-evidence-reveal')),
+            matching: find.byType(SizeTransition),
+          )
+          .first,
+    );
+    expect(staticEvidence.sizeFactor.value, 1);
+
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.noMatch,
+        followUp: '第二问测试结束。',
+      ),
+    );
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets(
     'an answer from an old edition is discarded after edition changes',
     (tester) async {
       tester.view.physicalSize = const Size(420, 900);
@@ -499,10 +836,47 @@ void main() {
   );
 }
 
+String _visibleCursorText(WidgetTester tester) {
+  final values = <String>[
+    ...tester
+        .widgetList<Text>(find.byType(Text))
+        .map((widget) => widget.data ?? widget.textSpan?.toPlainText() ?? ''),
+    ...tester
+        .widgetList<SelectableText>(find.byType(SelectableText))
+        .map((widget) => widget.data ?? widget.textSpan?.toPlainText() ?? ''),
+    ...tester
+        .widgetList<RichText>(find.byType(RichText))
+        .map((widget) => widget.text.toPlainText()),
+  ].where((value) => value.contains('▍')).toList(growable: false);
+  expect(values, isNotEmpty);
+  return values.last;
+}
+
+double _chipOpacity(WidgetTester tester, Finder chip) {
+  final fade = tester.widget<FadeTransition>(
+    find.descendant(of: chip, matching: find.byType(FadeTransition)).first,
+  );
+  return fade.opacity.value;
+}
+
+Future<void> _pumpUntil(
+  WidgetTester tester,
+  bool Function() condition, {
+  Duration step = const Duration(milliseconds: 24),
+  int maxPumps = 80,
+}) async {
+  for (var index = 0; index < maxPumps && !condition(); index += 1) {
+    await tester.pump(step);
+  }
+  expect(condition(), isTrue, reason: 'bounded async UI work did not finish');
+}
+
 Future<void> _pumpAskPage(
   WidgetTester tester,
-  _SemanticStreamService service,
-) async {
+  _SemanticStreamService service, {
+  AskTitoDexHistoryStore? historyStore,
+  AskTitoDexEntityResolver? entityResolver,
+}) async {
   tester.view.physicalSize = const Size(420, 900);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -516,6 +890,8 @@ Future<void> _pumpAskPage(
             journey: _journey,
             edition: GameEdition.hgss.withFlavor('soulsilver'),
             service: service,
+            historyStore: historyStore,
+            entityResolver: entityResolver,
           ),
         ),
       ),
@@ -531,14 +907,22 @@ class _SemanticStreamService extends AskTitoDexService {
   final List<Completer<AskTitoDexResult>> _answers = [];
   final List<String> questions = [];
   AskTitoDexStreamEventCallback? _onStreamEvent;
+  int connectionChecks = 0;
+  int contextBuilds = 0;
 
   @override
-  Future<AskTitoDexWorkerStatus> checkConnection() async =>
-      const AskTitoDexWorkerStatus(availability: AskTitoDexAvailability.online);
+  Future<AskTitoDexWorkerStatus> checkConnection() async {
+    connectionChecks += 1;
+    return const AskTitoDexWorkerStatus(
+      availability: AskTitoDexAvailability.online,
+    );
+  }
 
   @override
-  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async =>
-      context;
+  Future<AskTitoDexContext> buildContext(AskTitoDexContext context) async {
+    contextBuilds += 1;
+    return context;
+  }
 
   @override
   Future<AskTitoDexResult> ask(
@@ -568,6 +952,56 @@ class _SemanticStreamService extends AskTitoDexService {
 
   void complete(AskTitoDexResult result) =>
       _answers.removeAt(0).complete(result);
+}
+
+class _FixedEntityResolver implements AskTitoDexEntityResolver {
+  const _FixedEntityResolver(this.links);
+
+  final List<AskTitoDexEntityLink> links;
+
+  @override
+  Future<List<AskTitoDexEntityLink>> resolve({
+    required String question,
+    required String answer,
+  }) async => links;
+}
+
+class _CountingHistoryStore implements AskTitoDexHistoryStore {
+  _CountingHistoryStore([List<AskTitoDexHistoryEntry> entries = const []])
+    : _entries = List.of(entries);
+
+  List<AskTitoDexHistoryEntry> _entries;
+  int loadCalls = 0;
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> load() async {
+    loadCalls += 1;
+    return List.unmodifiable(_entries);
+  }
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> append(
+    AskTitoDexHistoryEntry entry,
+  ) async {
+    _entries = [..._entries, entry];
+    if (_entries.length > askTitoDexHistoryLimit) {
+      _entries = _entries.sublist(_entries.length - askTitoDexHistoryLimit);
+    }
+    return List.unmodifiable(_entries);
+  }
+
+  @override
+  Future<List<AskTitoDexHistoryEntry>> compact({int keep = 10}) async {
+    if (_entries.length > keep) {
+      _entries = _entries.sublist(_entries.length - keep);
+    }
+    return List.unmodifiable(_entries);
+  }
+
+  @override
+  Future<void> clear() async {
+    _entries = [];
+  }
 }
 
 const _journey = CurrentJourney(
