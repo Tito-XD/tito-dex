@@ -51,6 +51,18 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
     '{name}正在询问资料库与联网来源…',
     '{name}正在确认答案真的适合当前版本…',
   ];
+  static const _resolvingMessageTemplates = <String>[
+    '{name}正在把你的问法对上游戏里的对象…',
+    '{name}正在确认版本，免得把不同世代混在一起…',
+  ];
+  static const _verifyingMessageTemplates = <String>[
+    '{name}正在让结构化资料和百科彼此作证…',
+    '{name}正在检查地点、数值和版本是否一致…',
+  ];
+  static const _revealingMessageTemplates = <String>[
+    '{name}正在把核验过的线索整理成好读的回答…',
+    '{name}正在收好引用，再把答案交给你…',
+  ];
 
   late final AnimationController _motion;
   late List<String> _localMessages;
@@ -119,6 +131,42 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
     super.dispose();
   }
 
+  List<String> _messagesForProgress(AskTitoDexProgress progress) =>
+      switch (progress) {
+        AskTitoDexProgress.checkingLocal => _localMessages,
+        AskTitoDexProgress.contactingWorker ||
+        AskTitoDexProgress.retrievingSources => _workerMessages,
+        AskTitoDexProgress.resolvingQuestion => _resolvingMessageTemplates,
+        AskTitoDexProgress.verifyingAnswer => _verifyingMessageTemplates,
+        AskTitoDexProgress.revealingAnswer => _revealingMessageTemplates,
+      };
+
+  String _titleForProgress(AskTitoDexProgress progress) => switch (progress) {
+    AskTitoDexProgress.checkingLocal => '先翻本地审核笔记',
+    AskTitoDexProgress.contactingWorker => '正在连接 Journey Assistant',
+    AskTitoDexProgress.retrievingSources => '正在汇集限定来源',
+    AskTitoDexProgress.resolvingQuestion => '正在确认问题与版本',
+    AskTitoDexProgress.verifyingAnswer => '正在交叉核验答案',
+    AskTitoDexProgress.revealingAnswer => '正在整理已核验回答',
+  };
+
+  Widget _stageTransition(Widget child, Animation<double> animation) {
+    final eased = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+    );
+    return FadeTransition(
+      opacity: eased,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.12),
+          end: Offset.zero,
+        ).animate(eased),
+        child: child,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -131,13 +179,12 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
             companionSpeciesIds[hgssDefaultCompanion]!;
         final nameZh =
             choice?.nameZh ?? localizeSpecies(widget.journey.companion);
-        final messages = widget.progress == AskTitoDexProgress.checkingLocal
-            ? _localMessages
-            : _workerMessages;
+        final messages = _messagesForProgress(widget.progress);
         final message = messages[_messageIndex % messages.length].replaceAll(
           '{name}',
           nameZh,
         );
+        final stageTitle = _titleForProgress(widget.progress);
         final bundled = bundledCompanionGifAsset(speciesId);
         final sources = <String>[
           if (choice?.animationSourceUrl case final source?) source,
@@ -203,23 +250,28 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                     duration: _reduceMotion
                         ? Duration.zero
                         : const Duration(milliseconds: 220),
+                    transitionBuilder: _stageTransition,
                     child: widget.loading
                         ? Column(
                             key: const ValueKey('loading'),
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Shimmer.fromColors(
-                                enabled: !_reduceMotion,
-                                baseColor: TitoColors.deepBlue,
-                                highlightColor: const Color(0xFFFFFBF2),
-                                child: Text(
-                                  widget.progress ==
-                                          AskTitoDexProgress.checkingLocal
-                                      ? '先翻本地审核笔记'
-                                      : '正在连接 Journey Assistant',
-                                  key: const Key('ask-titodex-loading-stage'),
-                                  style: SecondaryTypography.onCard.h15,
+                              AnimatedSwitcher(
+                                key: const Key('ask-titodex-loading-stage'),
+                                duration: _reduceMotion
+                                    ? Duration.zero
+                                    : const Duration(milliseconds: 260),
+                                transitionBuilder: _stageTransition,
+                                child: Shimmer.fromColors(
+                                  key: ValueKey(widget.progress),
+                                  enabled: !_reduceMotion,
+                                  baseColor: TitoColors.deepBlue,
+                                  highlightColor: const Color(0xFFFFFBF2),
+                                  child: Text(
+                                    stageTitle,
+                                    style: SecondaryTypography.onCard.h15,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 3),
@@ -227,6 +279,7 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                 duration: _reduceMotion
                                     ? Duration.zero
                                     : const Duration(milliseconds: 260),
+                                transitionBuilder: _stageTransition,
                                 child: Text(
                                   message,
                                   key: ValueKey(message),

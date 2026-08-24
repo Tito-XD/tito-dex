@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,10 +20,11 @@ import '../features/parser/hgss_format.dart';
 import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
-import '../navigation/back_navigation.dart';
+import '../navigation/tito_route_work.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_motion.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/dex_species_filter_sheet.dart';
@@ -42,10 +42,14 @@ class DexPage extends StatefulWidget {
     super.key,
     required this.journey,
     this.onManualDexMarkChanged,
+    this.bootstrapOverride,
   });
 
   final CurrentJourney journey;
   final ValueChanged<CurrentJourney>? onManualDexMarkChanged;
+
+  @visibleForTesting
+  final Future<void> Function()? bootstrapOverride;
 
   @override
   State<DexPage> createState() => _DexPageState();
@@ -56,17 +60,13 @@ enum _DexMode { national, journey }
 class _DexPageState extends State<DexPage> {
   static const _chunkSize = 18;
 
-  /// True until the dex tab has been opened once this session; subsequent
-  /// visits (incl. popping detail back to list) reuse the settled layout.
-  static var _hasPlayedReveal = false;
-
-  late final DateTime _openedAt;
   late final ScrollController _scrollController;
   final DexBrowseScrollMemory _scrollMemory = DexBrowseScrollMemory();
-  var _revealAnimationsEnabled = false;
   double? _pendingRestoreOffset;
   bool _restoreScheduled = false;
   bool _applyingScrollRestore = false;
+  bool _bootstrapRequested = false;
+  bool _bootstrapPending = true;
 
   int _loadedThrough = 0;
   bool _loadingChunk = false;
@@ -101,9 +101,6 @@ class _DexPageState extends State<DexPage> {
   @override
   void initState() {
     super.initState();
-    _revealAnimationsEnabled = !_hasPlayedReveal;
-    _hasPlayedReveal = true;
-    _openedAt = DateTime.now();
     // Browse-session restoration is the single source of truth. Leaving
     // PageStorage enabled here creates a second writer whose teardown timing
     // can race the explicit session restoration below.
@@ -112,22 +109,36 @@ class _DexPageState extends State<DexPage> {
     _openedWithReferenceFilter = dexFilterController.hasActiveFilter;
     gameEditionRepository.addListener(_onEditionChanged);
     dexFilterController.addListener(_onReferenceFilterChanged);
-    _bootstrap();
-    if (_revealAnimationsEnabled) {
-      Future<void>.delayed(const Duration(milliseconds: 1000), () {
-        if (mounted) {
-          setState(() => _revealAnimationsEnabled = false);
-        }
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_bootstrapAfterIncomingRoute());
+    });
+  }
+
+  Future<void> _bootstrapAfterIncomingRoute() async {
+    if (_bootstrapRequested) {
+      return;
     }
+    _bootstrapRequested = true;
+    final canStart = await waitForIncomingRouteSettled(context);
+    if (!canStart || !mounted) {
+      return;
+    }
+    final override = widget.bootstrapOverride;
+    if (override == null) {
+      await _bootstrap();
+    } else {
+      await override();
+    }
+    if (!mounted) {
+      return;
+    }
+    setState(() => _bootstrapPending = false);
   }
 
   @override
   void deactivate() {
-    // Stop any in-flight reveal animations as soon as the page is pushed to
-    // the background (e.g. opening a detail page), so returning to the list
-    // does not replay the floating-card effect.
-    _revealAnimationsEnabled = false;
+    // Reveal memory is keyed by route + result set, so returning from detail
+    // keeps the list settled while a genuine filter change can replay it.
     _saveBrowseSession();
     super.deactivate();
   }
@@ -530,22 +541,22 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
-  /// Cards reveal only after the shell expansion + content fade have fully
-  /// landed (~320ms route transition). Starting them earlier overlapped the
-  /// route fade with the per-card reveals, which read as a flash-in.
+  String get _revealReplayKey => [
+    _mode.name,
+    _browseScope.storageValue,
+    _encounterFilter.name,
+    dexFilterFingerprint(dexFilterController.currentFilter),
+  ].join('|');
+
+  /// TitoListReveal waits for route completion itself. Only row stagger belongs
+  /// here, avoiding a second route-length delay after the shell has landed.
   Duration _cardRevealDelay(int index, int columns) {
-    final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    final shellWaitMs = math.max(0, 300 - elapsedMs);
     final row = index ~/ columns;
-    final staggerMs = math.min(row, 7) * 42;
-    return Duration(milliseconds: shellWaitMs + staggerMs);
+    final staggerMs = row.clamp(0, 7).toInt() * 42;
+    return Duration(milliseconds: staggerMs);
   }
 
-  /// Header text/tool bars reveal right behind the landing shell fade.
-  Duration _headerRevealDelay() {
-    final elapsedMs = DateTime.now().difference(_openedAt).inMilliseconds;
-    return Duration(milliseconds: math.max(0, 240 - elapsedMs));
-  }
+  Duration _headerRevealDelay() => Duration.zero;
 
   Future<void> _setMode(_DexMode mode) async {
     if (_mode == mode && mode == _DexMode.national) {
@@ -832,11 +843,13 @@ class _DexPageState extends State<DexPage> {
     final visible = _visibleEntries;
     final columns = DeviceLayout.dexGridColumns(context);
     final aspectRatio = DeviceLayout.dexCardAspectRatio(context);
-    final loading = dexFilterController.hasActiveFilter
-        ? _loadingReferenceFilter
-        : _mode == _DexMode.national
-        ? (_loadingChunk || _loadingRegion)
-        : _loadingJourney;
+    final loading =
+        _bootstrapPending ||
+        (dexFilterController.hasActiveFilter
+            ? _loadingReferenceFilter
+            : _mode == _DexMode.national
+            ? (_loadingChunk || _loadingRegion)
+            : _loadingJourney);
     final padding = DeviceLayout.pagePadding(context);
 
     return Stack(
@@ -875,164 +888,178 @@ class _DexPageState extends State<DexPage> {
                         padding.right,
                         8,
                       ),
-                      // The header block fades in on the same clock as the grid
-                      // cards below, so the text no longer pops in ahead of them.
+                      // Edition is fixed page chrome. Async scope/filter content
+                      // reveals below it after the route has settled.
                       sliver: SliverToBoxAdapter(
-                        child: TitoListReveal(
-                          key: const ValueKey('dex-header-reveal'),
-                          enabled: _revealAnimationsEnabled,
-                          delay: _headerRevealDelay(),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              SecondaryPageSubtitle(
-                                text: gameEditionRepository.edition.labelZh,
-                              ),
-                              SizedBox(height: squareGap(context)),
-                              // Square handheld: keep the top area short — at most one
-                              // info line (region progress when 城都/关东 is active).
-                              if (_scopeProgressLine != null) ...[
-                                Text(
-                                  _scopeProgressLine!,
-                                  style: SecondaryTypography.onPage(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SecondaryPageSubtitle(
+                              text: gameEditionRepository.edition.labelZh,
+                            ),
+                            const SizedBox(height: 12),
+                            TitoListReveal(
+                              key: const ValueKey('dex-header-reveal'),
+                              delay: _headerRevealDelay(),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Square handheld: keep the top area short — at most one
+                                  // info line (region progress when 城都/关东 is active).
+                                  if (_scopeProgressLine != null) ...[
+                                    Text(
+                                      _scopeProgressLine!,
+                                      style: SecondaryTypography.onPage(
+                                        context,
+                                      ).body14,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: squareGap(context)),
+                                  ] else if (!DeviceLayout.useSquareDashboard(
                                     context,
-                                  ).body14,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: squareGap(context)),
-                              ] else if (!DeviceLayout.useSquareDashboard(
-                                context,
-                              )) ...[
-                                Text(
-                                  AppZh.dexScopeNote,
-                                  style: SecondaryTypography.onPage(
-                                    context,
-                                  ).body14,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: squareGap(context)),
-                              ],
-                              if (dexFilterController.hasActiveFilter) ...[
-                                DexFilterBanner(
-                                  filter: dexFilterController.currentFilter,
-                                  loading: _loadingReferenceFilter,
-                                  onClear: dexFilterController.clearFilter,
-                                ),
-                                SizedBox(height: squareGap(context)),
-                              ],
-                              _DexScopeBar(
-                                mode: _mode,
-                                browseScope: _browseScope,
-                                scopeStats: _scopeStats,
-                                journeyCount: _journeyIds.length,
-                                availabilityLoading: _loadingEvolutionOrTrade,
-                                onModeSelected: _setMode,
-                                onNationalRegionPicker: _onNationalTabTap,
-                              ),
-                              // Keyed encounter-filter swap without a custom transition.
-                              TitoAnimatedSizeSwitcher(
-                                switchKey: ValueKey<bool>(
-                                  _mode == _DexMode.national,
-                                ),
-                                child: _mode == _DexMode.national
-                                    ? Column(
+                                  )) ...[
+                                    Text(
+                                      AppZh.dexScopeNote,
+                                      style: SecondaryTypography.onPage(
+                                        context,
+                                      ).body14,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    SizedBox(height: squareGap(context)),
+                                  ],
+                                  if (dexFilterController.hasActiveFilter) ...[
+                                    DexFilterBanner(
+                                      filter: dexFilterController.currentFilter,
+                                      loading: _loadingReferenceFilter,
+                                      onClear: dexFilterController.clearFilter,
+                                    ),
+                                    SizedBox(height: squareGap(context)),
+                                  ],
+                                  _DexScopeBar(
+                                    mode: _mode,
+                                    browseScope: _browseScope,
+                                    scopeStats: _scopeStats,
+                                    journeyCount: _journeyIds.length,
+                                    availabilityLoading:
+                                        _loadingEvolutionOrTrade,
+                                    onModeSelected: _setMode,
+                                    onNationalRegionPicker: _onNationalTabTap,
+                                  ),
+                                  // Keyed encounter-filter swap without a custom transition.
+                                  TitoAnimatedSizeSwitcher(
+                                    switchKey: ValueKey<bool>(
+                                      _mode == _DexMode.national,
+                                    ),
+                                    child: _mode == _DexMode.national
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              SizedBox(
+                                                height: squareGap(context),
+                                              ),
+                                              _DexEncounterFilterBar(
+                                                filter: _encounterFilter,
+                                                availabilityLoading:
+                                                    _loadingEvolutionOrTrade,
+                                                onSelected: (filter) {
+                                                  if (filter ==
+                                                          DexEncounterFilter
+                                                              .evolutionOrTrade &&
+                                                      _loadingEvolutionOrTrade) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                          AppZh
+                                                              .dexEvolutionOrTradeLoading,
+                                                        ),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+                                                  setState(
+                                                    () => _encounterFilter =
+                                                        filter,
+                                                  );
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: squareGap(context),
+                                              ),
+                                              _DexSpeciesFilterButton(
+                                                filter: dexFilterController
+                                                    .currentFilter,
+                                                onTap: _openSpeciesFilter,
+                                              ),
+                                            ],
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                  SizedBox(height: squareGap(context)),
+                                  if (_error != null)
+                                    StickerCard(
+                                      child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
-                                          SizedBox(height: squareGap(context)),
-                                          _DexEncounterFilterBar(
-                                            filter: _encounterFilter,
-                                            availabilityLoading:
-                                                _loadingEvolutionOrTrade,
-                                            onSelected: (filter) {
-                                              if (filter ==
-                                                      DexEncounterFilter
-                                                          .evolutionOrTrade &&
-                                                  _loadingEvolutionOrTrade) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      AppZh
-                                                          .dexEvolutionOrTradeLoading,
-                                                    ),
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              setState(
-                                                () => _encounterFilter = filter,
-                                              );
-                                            },
+                                          Text(
+                                            AppZh.dexLoadFailed,
+                                            style: SecondaryTypography
+                                                .onCard
+                                                .body14
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                ),
                                           ),
-                                          SizedBox(height: squareGap(context)),
-                                          _DexSpeciesFilterButton(
-                                            filter: dexFilterController
-                                                .currentFilter,
-                                            onTap: _openSpeciesFilter,
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            _error!,
+                                            style: SecondaryTypography
+                                                .onCard
+                                                .small12
+                                                .copyWith(
+                                                  color: TitoColors.mutedInk,
+                                                  height: 1.45,
+                                                ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          FilledButton(
+                                            onPressed: () {
+                                              setState(() => _error = null);
+                                              if (_mode == _DexMode.national) {
+                                                _loadMore();
+                                              } else {
+                                                _setMode(_DexMode.journey);
+                                              }
+                                            },
+                                            child: const Text(AppZh.dexRetry),
                                           ),
                                         ],
-                                      )
-                                    : const SizedBox.shrink(),
-                              ),
-                              SizedBox(height: squareGap(context)),
-                              if (_error != null)
-                                StickerCard(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Text(
-                                        AppZh.dexLoadFailed,
+                                      ),
+                                    )
+                                  else if (visible.isEmpty && loading)
+                                    TitoDexGridSkeleton(
+                                      crossAxisCount: columns,
+                                      childAspectRatio: aspectRatio,
+                                    )
+                                  else if (visible.isEmpty)
+                                    StickerCard(
+                                      child: Text(
+                                        _emptyMessageForMode(),
                                         style: SecondaryTypography.onCard.body14
                                             .copyWith(
-                                              fontWeight: FontWeight.w800,
+                                              fontWeight: FontWeight.w700,
                                             ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        _error!,
-                                        style: SecondaryTypography
-                                            .onCard
-                                            .small12
-                                            .copyWith(
-                                              color: TitoColors.mutedInk,
-                                              height: 1.45,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      FilledButton(
-                                        onPressed: () {
-                                          setState(() => _error = null);
-                                          if (_mode == _DexMode.national) {
-                                            _loadMore();
-                                          } else {
-                                            _setMode(_DexMode.journey);
-                                          }
-                                        },
-                                        child: const Text(AppZh.dexRetry),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              else if (visible.isEmpty && loading)
-                                TitoDexGridSkeleton(
-                                  crossAxisCount: columns,
-                                  childAspectRatio: aspectRatio,
-                                )
-                              else if (visible.isEmpty)
-                                StickerCard(
-                                  child: Text(
-                                    _emptyMessageForMode(),
-                                    style: SecondaryTypography.onCard.body14
-                                        .copyWith(fontWeight: FontWeight.w700),
-                                  ),
-                                ),
-                            ],
-                          ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1065,7 +1092,7 @@ class _DexPageState extends State<DexPage> {
                               key: ValueKey<String>(
                                 'dex-grid-entry-${entry.id}',
                               ),
-                              enabled: _revealAnimationsEnabled,
+                              replayKey: _revealReplayKey,
                               delay: _cardRevealDelay(index, columns),
                               child: PokemonMiniCard(
                                 summary: entry,
@@ -1073,7 +1100,12 @@ class _DexPageState extends State<DexPage> {
                                 compact: DeviceLayout.isCompact(context),
                                 onTap: () {
                                   _saveBrowseSession();
-                                  context.push('/dex/${entry.id}');
+                                  context.push(
+                                    '/dex/${entry.id}',
+                                    extra: PokemonDetailTransition(
+                                      summary: entry,
+                                    ),
+                                  );
                                 },
                                 onLongPress: _isSaveLinked
                                     ? null
@@ -1199,46 +1231,10 @@ class _DexTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backIcon = DeviceLayout.backIconSize(context);
-    final scheme = Theme.of(context).colorScheme;
-    final shellColor = appVisualStyle.usesFlatUi
-        ? scheme.primary
-        : TitoColors.card;
-
     return Row(
       children: [
-        Expanded(
-          child: HandheldFocusDecorator(
-            onActivate: () => TitoBackNavigation.navigateBack(context, '/dex'),
-            child: TextButton.icon(
-              onPressed: () => TitoBackNavigation.navigateBack(context, '/dex'),
-              style: TextButton.styleFrom(
-                foregroundColor: shellColor,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                alignment: Alignment.centerLeft,
-              ),
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                size: backIcon,
-                color: shellColor,
-              ),
-              // Title is just 「图鉴」 — the game name moved to the shared
-              // subtitle line so the two action buttons stop squeezing it.
-              label: Text(
-                AppZh.navDex,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SecondaryTypography.onPage(context).title.copyWith(
-                  letterSpacing: -0.5,
-                  shadows: const [
-                    Shadow(color: Color(0x4018283B), offset: Offset(0, 2)),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        const Expanded(
+          child: SecondaryPageAppBar(title: AppZh.navDex, showSettings: false),
         ),
         _DexTopBarAction(
           icon: Icons.search_rounded,
@@ -1453,72 +1449,89 @@ class _DexModeTab extends StatelessWidget {
     final square = DeviceLayout.useSquareDashboard(context);
     final openPicker = showRegionPicker && regionPickerActive && selected;
 
-    return HandheldFocusDecorator(
-      onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
-      borderRadius: BorderRadius.circular(radius),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: openPicker ? onRegionPickerTap : onTap,
-          canRequestFocus: false,
-          borderRadius: BorderRadius.circular(radius),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: selected ? TitoColors.softYellow : TitoColors.card,
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: selected ? 1 : 0),
+      duration: TitoMotion.duration(context, TitoMotion.fast),
+      curve: Curves.easeOutCubic,
+      builder: (context, selection, _) {
+        return Transform.translate(
+          key: ValueKey<String>('dex-mode-tab-motion-$title'),
+          offset: Offset(0, -1.5 * selection),
+          child: Transform.scale(
+            scale: 1 + 0.015 * selection,
+            child: HandheldFocusDecorator(
+              onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
               borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: square ? 5 : 8,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: openPicker ? onRegionPickerTap : onTap,
+                  canRequestFocus: false,
+                  borderRadius: BorderRadius.circular(radius),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: Color.lerp(
+                        TitoColors.card,
+                        TitoColors.softYellow,
+                        selection,
                       ),
+                      borderRadius: BorderRadius.circular(radius),
+                      border: Border.all(color: TitoColors.ink, width: 2),
                     ),
-                    if (openPicker)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 2),
-                        child: Icon(
-                          Icons.arrow_drop_down_rounded,
-                          size: 18,
-                          color: TitoColors.ink,
-                        ),
-                      ),
-                    Text(
-                      '$count',
-                      style: SecondaryTypography.onCard.meta14.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: square ? 5 : 8,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: SecondaryTypography.onCard.meta14.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: TitoColors.mutedInk,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: SecondaryTypography.onCard.body14
+                                    .copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            if (openPicker)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 2),
+                                child: Icon(
+                                  Icons.arrow_drop_down_rounded,
+                                  size: 18,
+                                  color: TitoColors.ink,
+                                ),
+                              ),
+                            Text(
+                              '$count',
+                              style: SecondaryTypography.onCard.meta14.copyWith(
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SecondaryTypography.onCard.meta14.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: TitoColors.mutedInk,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -1536,36 +1549,57 @@ class _DexFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(999),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          canRequestFocus: false,
-          borderRadius: BorderRadius.circular(999),
-          child: Ink(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            decoration: BoxDecoration(
-              color: selected ? TitoColors.softYellow : TitoColors.card,
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: selected ? 1 : 0),
+      duration: TitoMotion.duration(context, TitoMotion.fast),
+      curve: Curves.easeOutCubic,
+      builder: (context, selection, _) {
+        return Transform.translate(
+          key: ValueKey<String>('dex-filter-chip-motion-$label'),
+          offset: Offset(0, -1.5 * selection),
+          child: Transform.scale(
+            scale: 1 + 0.02 * selection,
+            child: HandheldFocusDecorator(
+              onActivate: onTap,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            child: Text(
-              label,
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
-                height: 1.2,
-                fontSize: 12,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  canRequestFocus: false,
+                  borderRadius: BorderRadius.circular(999),
+                  child: Ink(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Color.lerp(
+                        TitoColors.card,
+                        TitoColors.softYellow,
+                        selection,
+                      ),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: TitoColors.ink, width: 2),
+                    ),
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

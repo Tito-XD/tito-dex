@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -10,35 +11,96 @@ import 'dex_sprite_image.dart';
 String pokemonArtworkHeroTag(PokemonSummary summary) =>
     'pokemon-artwork-${summary.id}-${summary.spriteResourceId ?? summary.id}';
 
+const pokemonArtworkViewerTransitionDuration = Duration(milliseconds: 360);
+const pokemonArtworkViewerReverseTransitionDuration = Duration(
+  milliseconds: 300,
+);
+
 Future<void> showPokemonArtworkViewer(
   BuildContext context, {
   required PokemonSummary summary,
 }) {
-  return showGeneralDialog<void>(
-    context: context,
-    // Dex detail pages live inside the ShellRoute navigator. Keeping the
-    // viewer on that same stack makes it the real top route for Android
-    // predictive back and handheld B/Escape; the default root navigator could
-    // pop the detail underneath while leaving this overlay visible.
-    useRootNavigator: false,
-    barrierColor: Colors.black.withValues(alpha: 0.88),
-    barrierDismissible: false,
-    transitionDuration: const Duration(milliseconds: 260),
-    pageBuilder: (context, animation, secondaryAnimation) {
-      // Do not block the route with `PopScope(canPop: false)`: predictive back
-      // must know at gesture start that this overlay can be dismissed.
-      return _PokemonArtworkViewer(summary: summary);
-    },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      return FadeTransition(opacity: animation, child: child);
-    },
-  );
+  // Keep the viewer on the ShellRoute Navigator and use a PageRoute, not a
+  // dialog route. Flutter's HeroController only pairs shared elements between
+  // PageRoutes, so a PopupRoute made the old artwork Hero inert.
+  return Navigator.of(
+    context,
+  ).push<void>(_PokemonArtworkPageRoute(summary: summary));
+}
+
+class _PokemonArtworkPageRoute extends PageRoute<void> {
+  _PokemonArtworkPageRoute({required this.summary});
+
+  static const _kBackGestureRunway = 0.02;
+
+  final PokemonSummary summary;
+
+  @override
+  void handleUpdateBackGestureProgress({required double progress}) {
+    super.handleUpdateBackGestureProgress(
+      progress: math.max(_kBackGestureRunway, progress),
+    );
+  }
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  bool get fullscreenDialog => false;
+
+  @override
+  Color? get barrierColor => Colors.black.withValues(alpha: 0.88);
+
+  @override
+  bool get barrierDismissible => false;
+
+  @override
+  String? get barrierLabel => '关闭宝可梦大图';
+
+  @override
+  Duration get transitionDuration => pokemonArtworkViewerTransitionDuration;
+
+  @override
+  Duration get reverseTransitionDuration =>
+      pokemonArtworkViewerReverseTransitionDuration;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return Semantics(
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: _PokemonArtworkViewer(summary: summary, routeAnimation: animation),
+    );
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return PredictiveBackPageTransitionsBuilder(
+      fallbackColor: Colors.black,
+    ).buildTransitions(this, context, animation, secondaryAnimation, child);
+  }
 }
 
 class _PokemonArtworkViewer extends StatefulWidget {
-  const _PokemonArtworkViewer({required this.summary});
+  const _PokemonArtworkViewer({
+    required this.summary,
+    required this.routeAnimation,
+  });
 
   final PokemonSummary summary;
+  final Animation<double> routeAnimation;
 
   @override
   State<_PokemonArtworkViewer> createState() => _PokemonArtworkViewerState();
@@ -186,133 +248,215 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   Widget build(BuildContext context) {
     final summary = widget.summary;
     final displaySource = _displaySource;
-    final heroTag = pokemonArtworkHeroTag(summary);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final chromeOpacity = CurvedAnimation(
+      parent: widget.routeAnimation,
+      curve: reduceMotion
+          ? const Interval(0, 0.01)
+          : const Interval(0.48, 0.88, curve: Curves.easeOutCubic),
+      reverseCurve: reduceMotion
+          ? const Interval(0, 0.01)
+          : const Interval(0.35, 0.78, curve: Curves.easeInCubic),
+    );
+    final chromePosition = Tween<Offset>(
+      begin: reduceMotion ? Offset.zero : const Offset(0, 0.018),
+      end: Offset.zero,
+    ).animate(chromeOpacity);
+    final highResolutionOpacity = CurvedAnimation(
+      parent: widget.routeAnimation,
+      curve: reduceMotion
+          ? const Interval(0, 0.01)
+          : const Interval(0.72, 1, curve: Curves.easeOutCubic),
+      reverseCurve: reduceMotion
+          ? const Interval(0, 0.01)
+          : const Interval(0.62, 0.92, curve: Curves.easeInCubic),
+    );
 
-    return Dialog.fullscreen(
+    return Material(
       key: const ValueKey('pokemon-artwork-viewer'),
-      backgroundColor: Colors.transparent,
+      type: MaterialType.transparency,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      summary.nameZh,
-                      style: const TextStyle(
-                        color: TitoColors.card,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
+            SlideTransition(
+              position: chromePosition,
+              child: FadeTransition(
+                key: const ValueKey('artwork-viewer-chrome'),
+                opacity: chromeOpacity,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          summary.nameZh,
+                          style: const TextStyle(
+                            color: TitoColors.card,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
-                    ),
+                      TextButton.icon(
+                        onPressed: () => setState(() => _shiny = !_shiny),
+                        style: TextButton.styleFrom(
+                          foregroundColor: _shiny
+                              ? TitoColors.softYellow
+                              : TitoColors.card.withValues(alpha: 0.8),
+                        ),
+                        icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                        label: const Text(
+                          '闪光',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: TitoColors.card,
+                        ),
+                        tooltip: '关闭',
+                      ),
+                    ],
                   ),
-                  TextButton.icon(
-                    onPressed: () => setState(() => _shiny = !_shiny),
-                    style: TextButton.styleFrom(
-                      foregroundColor: _shiny
-                          ? TitoColors.softYellow
-                          : TitoColors.card.withValues(alpha: 0.8),
-                    ),
-                    icon: const Icon(Icons.auto_awesome_rounded, size: 16),
-                    label: const Text(
-                      '闪光',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: TitoColors.card,
-                    ),
-                    tooltip: '关闭',
-                  ),
-                ],
+                ),
               ),
             ),
             Expanded(
               flex: 1,
               child: Center(
-                child: displaySource == null
-                    ? const Icon(
-                        Icons.image_not_supported_outlined,
-                        color: TitoColors.card,
-                        size: 48,
-                      )
-                    : InteractiveViewer(
-                        minScale: 0.8,
-                        maxScale: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Hero(
-                            tag: heroTag,
-                            child: _ArtworkImage(
-                              key: ValueKey('$_shiny-$displaySource'),
-                              source: displaySource,
-                            ),
-                          ),
-                        ),
-                      ),
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _ArtworkHeroStage(
+                      summary: summary,
+                      displaySource: displaySource,
+                      highResolutionOpacity: highResolutionOpacity,
+                      variantKey: '$_shiny-$_showAnimated-$_showBack',
+                    ),
+                  ),
+                ),
               ),
             ),
             if (_options.isNotEmpty)
               Expanded(
                 flex: 1,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                  children: [
-                    for (final entry in _grouped.entries) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4, bottom: 6),
-                        child: Text(
-                          generationRomanLabel(entry.key),
-                          style: const TextStyle(
-                            color: TitoColors.softYellow,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
+                child: SlideTransition(
+                  position: chromePosition,
+                  child: FadeTransition(
+                    key: const ValueKey('artwork-viewer-editions'),
+                    opacity: chromeOpacity,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                      children: [
+                        for (final entry in _grouped.entries) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, bottom: 6),
+                            child: Text(
+                              generationRomanLabel(entry.key),
+                              style: const TextStyle(
+                                color: TitoColors.softYellow,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 92,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: entry.value.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 8),
-                          itemBuilder: (context, index) {
-                            final option = entry.value[index];
-                            final selectedStatic =
-                                !_showAnimated && _selectedOption == option;
-                            final selectedAnimated =
-                                _showAnimated && _selectedOption == option;
-                            final showingBack =
-                                _showBack && _selectedOption == option;
-                            return _SpritePickerTile(
-                              option: option,
-                              selected: selectedStatic,
-                              animatedSelected: selectedAnimated,
-                              showingBack: showingBack,
-                              onSelectStatic: () =>
-                                  _selectOption(option, animated: false),
-                              onSelectAnimated: option.animatedUrl == null
-                                  ? null
-                                  : () => _selectOption(option, animated: true),
-                              onToggleBack: option.backSpriteUrl == null
-                                  ? null
-                                  : () => _toggleBackForOption(option),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ],
+                          SizedBox(
+                            height: 92,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: entry.value.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 8),
+                              itemBuilder: (context, index) {
+                                final option = entry.value[index];
+                                final selectedStatic =
+                                    !_showAnimated && _selectedOption == option;
+                                final selectedAnimated =
+                                    _showAnimated && _selectedOption == option;
+                                final showingBack =
+                                    _showBack && _selectedOption == option;
+                                return _SpritePickerTile(
+                                  option: option,
+                                  selected: selectedStatic,
+                                  animatedSelected: selectedAnimated,
+                                  showingBack: showingBack,
+                                  onSelectStatic: () =>
+                                      _selectOption(option, animated: false),
+                                  onSelectAnimated: option.animatedUrl == null
+                                      ? null
+                                      : () => _selectOption(
+                                          option,
+                                          animated: true,
+                                        ),
+                                  onToggleBack: option.backSpriteUrl == null
+                                      ? null
+                                      : () => _toggleBackForOption(option),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ArtworkHeroStage extends StatelessWidget {
+  const _ArtworkHeroStage({
+    required this.summary,
+    required this.displaySource,
+    required this.highResolutionOpacity,
+    required this.variantKey,
+  });
+
+  final PokemonSummary summary;
+  final String? displaySource;
+  final Animation<double> highResolutionOpacity;
+  final String variantKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final viewport = MediaQuery.sizeOf(context);
+    final dimension = math.min(viewport.width - 32, viewport.height * 0.42);
+    return SizedBox.square(
+      dimension: dimension.clamp(160.0, 460.0),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Hero(
+            key: const ValueKey('artwork-stable-hero'),
+            tag: pokemonArtworkHeroTag(summary),
+            transitionOnUserGestures: true,
+            child: Material(
+              type: MaterialType.transparency,
+              child: DexSpriteImage(
+                source: summary.displaySpritePath,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          if (displaySource != null)
+            FadeTransition(
+              key: const ValueKey('artwork-high-res-reveal'),
+              opacity: highResolutionOpacity,
+              child: _ArtworkImage(
+                key: ValueKey('$variantKey-$displaySource'),
+                source: displaySource!,
+              ),
+            ),
+        ],
       ),
     );
   }

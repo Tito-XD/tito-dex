@@ -13,6 +13,117 @@ import 'sticker_card.dart';
 import 'sticker_pressable.dart';
 import 'type_badge.dart';
 
+String pokemonCardHeroTag(PokemonSummary summary) =>
+    'pokemon-card-${summary.id}-${summary.spriteResourceId ?? summary.id}';
+
+/// Typed GoRouter payload used by the Dex grid so the detail route can build
+/// its shared-element destination before the full detail JSON has loaded.
+class PokemonDetailTransition {
+  const PokemonDetailTransition({required this.summary});
+
+  final PokemonSummary summary;
+}
+
+class PokemonCardTransitionHero extends StatelessWidget {
+  const PokemonCardTransitionHero({
+    super.key,
+    required this.summary,
+    required this.child,
+  });
+
+  final PokemonSummary summary;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: pokemonCardHeroTag(summary),
+      transitionOnUserGestures: true,
+      createRectTween: (begin, end) => RectTween(begin: begin, end: end),
+      flightShuttleBuilder: _pokemonCardFlightShuttle,
+      child: child,
+    );
+  }
+}
+
+Widget _pokemonCardFlightShuttle(
+  BuildContext flightContext,
+  Animation<double> animation,
+  HeroFlightDirection flightDirection,
+  BuildContext fromHeroContext,
+  BuildContext toHeroContext,
+) {
+  final cardContext = flightDirection == HeroFlightDirection.push
+      ? fromHeroContext
+      : toHeroContext;
+  final detailContext = flightDirection == HeroFlightDirection.push
+      ? toHeroContext
+      : fromHeroContext;
+  final cardHero = cardContext.widget as Hero;
+  final detailHero = detailContext.widget as Hero;
+  final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
+  final detailSize = (detailContext.findRenderObject()! as RenderBox).size;
+  final reduceMotion = MediaQuery.disableAnimationsOf(flightContext);
+  final timelineAnimation = animation is CurvedAnimation
+      ? animation.parent
+      : animation;
+
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (context, _) {
+      final progress = animation.value.clamp(0.0, 1.0);
+      final timelineProgress = timelineAnimation.value.clamp(0.0, 1.0);
+      final cardOpacity = reduceMotion
+          ? (timelineProgress < 0.5 ? 1.0 : 0.0)
+          : 1 -
+                const Interval(
+                  0.34,
+                  0.82,
+                  curve: Curves.easeOutCubic,
+                ).transform(timelineProgress);
+      final detailOpacity = reduceMotion
+          ? (timelineProgress < 0.5 ? 0.0 : 1.0)
+          : const Interval(
+              0.18,
+              0.70,
+              curve: Curves.easeOutCubic,
+            ).transform(timelineProgress);
+      final radius = 18.0 - 6.0 * progress;
+
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            FittedBox(
+              fit: BoxFit.fill,
+              child: SizedBox.fromSize(
+                size: cardSize,
+                child: Opacity(
+                  key: const ValueKey('pokemon-card-flight-source'),
+                  opacity: cardOpacity,
+                  child: cardHero.child,
+                ),
+              ),
+            ),
+            FittedBox(
+              fit: BoxFit.fill,
+              child: SizedBox.fromSize(
+                size: detailSize,
+                child: Opacity(
+                  key: const ValueKey('pokemon-card-flight-target'),
+                  opacity: detailOpacity,
+                  child: detailHero.child,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 class PokemonMiniCard extends StatelessWidget {
   const PokemonMiniCard({
     super.key,
@@ -49,61 +160,65 @@ class PokemonMiniCard extends StatelessWidget {
         // StickerCard below paints the retro shadow — sink physics only.
         ownShadow: false,
         child: GestureDetector(
+          key: ValueKey<String>('pokemon-card-tap-${summary.id}'),
           onTap: activate,
           onLongPress: onLongPress,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              StickerCard(
-                variant: variant,
-                padding: EdgeInsets.fromLTRB(
-                  padding,
-                  padding,
-                  padding,
-                  padding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Flexible sprite area — absorbs any extra tile height so the
-                    // card always fills its grid cell without overflowing.
-                    Expanded(
-                      child: DexSpriteImage(
-                        source: summary.displaySpritePath,
-                        height: null,
-                        fit: BoxFit.contain,
+              PokemonCardTransitionHero(
+                summary: summary,
+                child: StickerCard(
+                  variant: variant,
+                  padding: EdgeInsets.fromLTRB(
+                    padding,
+                    padding,
+                    padding,
+                    padding,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Flexible sprite area — absorbs any extra tile height so the
+                      // card always fills its grid cell without overflowing.
+                      Expanded(
+                        child: DexSpriteImage(
+                          source: summary.displaySpritePath,
+                          height: null,
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: compact ? 2 : 4),
-                    Text(
-                      '#${summary.id.toString().padLeft(3, '0')}',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: TitoTypography.style(
-                        fontSize: compact ? 10 : 12,
-                        fontWeight: FontWeight.w700,
-                        color: TitoColors.mutedInk,
-                        height: 1.1,
+                      SizedBox(height: compact ? 2 : 4),
+                      Text(
+                        '#${summary.id.toString().padLeft(3, '0')}',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: TitoTypography.style(
+                          fontSize: compact ? 10 : 12,
+                          fontWeight: FontWeight.w700,
+                          color: TitoColors.mutedInk,
+                          height: 1.1,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      summary.nameZh,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TitoTypography.style(
-                        fontSize: compact ? 12 : 14,
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
+                      const SizedBox(height: 1),
+                      Text(
+                        summary.nameZh,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TitoTypography.style(
+                          fontSize: compact ? 12 : 14,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: compact ? 3 : 4),
-                    TitoTypeBadgeRow(
-                      typesEn: summary.types,
-                      size: TypeBadgeSize.small,
-                    ),
-                  ],
+                      SizedBox(height: compact ? 3 : 4),
+                      TitoTypeBadgeRow(
+                        typesEn: summary.types,
+                        size: TypeBadgeSize.small,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               if (status == DexEncounterStatus.caught)

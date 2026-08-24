@@ -6,6 +6,7 @@ import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import 'dex_shape_icon.dart';
 
 /// Swatch for each Pokédex colour.
@@ -119,9 +120,8 @@ class _SheetBodyState extends State<_SheetBody> {
                     _ShapeChip(
                       slug: slug,
                       selected: _shape == slug,
-                      onTap: () => setState(
-                        () => _shape = _shape == slug ? null : slug,
-                      ),
+                      onTap: () =>
+                          setState(() => _shape = _shape == slug ? null : slug),
                     ),
                 ],
               ),
@@ -217,6 +217,37 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
+class _SelectionMotion extends StatelessWidget {
+  const _SelectionMotion({
+    required this.motionKey,
+    required this.selected,
+    required this.builder,
+  });
+
+  final Key motionKey;
+  final bool selected;
+  final Widget Function(BuildContext context, double selection) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: selected ? 1 : 0),
+      duration: TitoMotion.duration(context, TitoMotion.fast),
+      curve: Curves.easeOutCubic,
+      builder: (context, selection, _) {
+        return Transform.translate(
+          key: motionKey,
+          offset: Offset(0, -1.5 * selection),
+          child: Transform.scale(
+            scale: 1 + 0.035 * selection,
+            child: builder(context, selection),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ShapeChip extends StatelessWidget {
   const _ShapeChip({
     required this.slug,
@@ -231,30 +262,42 @@ class _ShapeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = dexShapeLabelZh(slug) ?? slug;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: selected ? TitoColors.softYellow : TitoColors.card,
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: _SelectionMotion(
+        motionKey: ValueKey<String>('dex-shape-motion-$slug'),
+        selected: selected,
+        builder: (context, selection) => Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: TitoColors.ink, width: 2),
-          ),
-          padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DexShapeIcon(slug: slug, size: 22),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
+            child: Ink(
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                  TitoColors.card,
+                  TitoColors.softYellow,
+                  selection,
                 ),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: TitoColors.ink, width: 2),
               ),
-            ],
+              padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DexShapeIcon(slug: slug, size: 22),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -275,30 +318,42 @@ class _SizeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: selected ? TitoColors.softYellow : TitoColors.card,
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: _SelectionMotion(
+        motionKey: ValueKey<String>('dex-size-motion-${bucket.slug}'),
+        selected: selected,
+        builder: (context, selection) => Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: TitoColors.ink, width: 2),
-          ),
-          padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DexSizeIcon(bucket: bucket, size: 22),
-              const SizedBox(width: 6),
-              Text(
-                bucket.labelZh,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  fontWeight: FontWeight.w800,
+            child: Ink(
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                  TitoColors.card,
+                  TitoColors.softYellow,
+                  selection,
                 ),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: TitoColors.ink, width: 2),
               ),
-            ],
+              padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DexSizeIcon(bucket: bucket, size: 22),
+                  const SizedBox(width: 6),
+                  Text(
+                    bucket.labelZh,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -329,29 +384,36 @@ class _Swatch extends StatelessWidget {
       button: true,
       child: Tooltip(
         message: dexColorLabelZh(slug) ?? slug,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: TitoColors.ink,
-                  width: selected ? 4 : 2,
+        child: _SelectionMotion(
+          motionKey: ValueKey<String>('dex-color-motion-$slug'),
+          selected: selected,
+          builder: (context, selection) => Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: TitoColors.ink, width: 2.5),
+                ),
+                child: ExcludeSemantics(
+                  child: Opacity(
+                    opacity: selection,
+                    child: Transform.scale(
+                      scale: 0.72 + 0.28 * selection,
+                      child: Icon(
+                        Icons.check_rounded,
+                        size: size * 0.5,
+                        color: _onSwatch(color),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              child: selected
-                  ? Icon(
-                      Icons.check_rounded,
-                      size: size * 0.5,
-                      color: _onSwatch(color),
-                    )
-                  : null,
             ),
           ),
         ),

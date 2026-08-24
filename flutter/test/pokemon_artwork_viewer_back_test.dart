@@ -32,10 +32,16 @@ void main() {
                 body: Column(
                   children: [
                     const Text('detail-still-here'),
-                    FilledButton(
-                      onPressed: () =>
-                          showPokemonArtworkViewer(context, summary: _summary),
-                      child: const Text('open-artwork'),
+                    Hero(
+                      tag: pokemonArtworkHeroTag(_summary),
+                      transitionOnUserGestures: true,
+                      child: FilledButton(
+                        onPressed: () => showPokemonArtworkViewer(
+                          context,
+                          summary: _summary,
+                        ),
+                        child: const Text('open-artwork'),
+                      ),
                     ),
                   ],
                 ),
@@ -48,18 +54,40 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('open-artwork'));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
 
     expect(
       find.byKey(const ValueKey('pokemon-artwork-viewer')),
       findsOneWidget,
     );
+    final viewerRoute = ModalRoute.of(
+      tester.element(find.byKey(const ValueKey('pokemon-artwork-viewer'))),
+    )!;
+    expect(viewerRoute, isA<PageRoute<void>>());
+    expect(viewerRoute, isNot(isA<PopupRoute<void>>()));
+    expect(
+      viewerRoute.transitionDuration,
+      pokemonArtworkViewerTransitionDuration,
+    );
+
+    await tester.pump(const Duration(milliseconds: 120));
+    final chrome = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey('artwork-viewer-chrome')),
+    );
+    final highResolution = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey('artwork-high-res-reveal')),
+    );
+    expect(chrome.opacity.value, 0);
+    expect(highResolution.opacity.value, 0);
+    expect(find.byKey(const ValueKey('artwork-stable-hero')), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(viewerRoute.popGestureEnabled, isTrue);
 
     await tester.binding.handlePopRoute();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('pokemon-artwork-viewer')), findsNothing);
     expect(find.text('detail-still-here'), findsOneWidget);

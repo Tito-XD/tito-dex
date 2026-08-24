@@ -150,6 +150,64 @@ class AskTitoDexAnswerPlan {
   final List<AskTitoDexAnswerBlock> blocks;
 }
 
+/// Builds a bounded semantic presentation for trusted answers that did not
+/// arrive through the optional semantic stream (local deterministic answers,
+/// legacy JSON Workers, and deterministic fallbacks).
+///
+/// The returned blocks are a UI projection only. The authoritative answer and
+/// its verification metadata remain on `AskTitoDexResult`.
+List<AskTitoDexAnswerBlock> synthesizeAskTitoDexAnswerBlocks(String answer) {
+  final normalized = answer
+      .replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n')
+      .trim();
+  if (normalized.isEmpty) return const [];
+  final groups = normalized
+      .split(RegExp(r'\n{2,}'))
+      .map((group) => group.trim())
+      .where((group) => group.isNotEmpty)
+      .toList(growable: true);
+  if (groups.length > askTitoDexMaxAnswerBlocks) {
+    groups[askTitoDexMaxAnswerBlocks - 1] = groups
+        .sublist(askTitoDexMaxAnswerBlocks - 1)
+        .join('\n\n');
+    groups.removeRange(askTitoDexMaxAnswerBlocks, groups.length);
+  }
+  return List<AskTitoDexAnswerBlock>.unmodifiable([
+    for (var index = 0; index < groups.length; index += 1)
+      _synthesizedBlock(groups[index], index),
+  ]);
+}
+
+AskTitoDexAnswerBlock _synthesizedBlock(String text, int index) {
+  final lines = text.split('\n');
+  final heading = RegExp(r'^#{1,6}\s+(.+)$').firstMatch(lines.first.trim());
+  final title = heading?.group(1)?.trim();
+  final body = title == null ? text : lines.skip(1).join('\n').trim();
+  final bulletPattern = RegExp(r'^\s*(?:[-*+]\s+|\d+[.)、]\s*)\S');
+  final tableDivider = RegExp(
+    r'^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$',
+  );
+  final kind =
+      lines.length >= 2 &&
+          lines.first.contains('|') &&
+          tableDivider.hasMatch(lines[1])
+      ? AskTitoDexAnswerBlockKind.table
+      : lines.isNotEmpty && lines.every(bulletPattern.hasMatch)
+      ? AskTitoDexAnswerBlockKind.bullets
+      : RegExp(r'^(?:>\s*)?(?:注意|警告|提醒|未知|无法|未能|请注意|请确认)[：:]').hasMatch(body)
+      ? AskTitoDexAnswerBlockKind.warning
+      : index == 0
+      ? AskTitoDexAnswerBlockKind.summary
+      : AskTitoDexAnswerBlockKind.paragraph;
+  return AskTitoDexAnswerBlock(
+    id: 'local-${(index + 1).toString().padLeft(2, '0')}',
+    kind: kind,
+    title: title,
+    text: text,
+  );
+}
+
 class AskTitoDexClarificationCandidate {
   const AskTitoDexClarificationCandidate({
     required this.id,

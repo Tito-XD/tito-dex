@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,6 +8,7 @@ import '../../features/dex/dex_filter.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/type_chart.dart';
 import '../../l10n/app_zh.dart';
+import '../../navigation/tito_route_work.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
@@ -80,44 +84,87 @@ class DexReferenceListPage<T> extends StatefulWidget {
 }
 
 class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
+  static const _searchDebounce = Duration(milliseconds: 200);
+  static const _initialBatchSize = 36;
+  static const _batchSize = 36;
+  static const _loadMoreThreshold = 320.0;
+
   late final TextEditingController _queryController;
+  late String _appliedQuery;
+
   List<T> _entries = const [];
+  List<T> _visibleEntries = const [];
+  Map<String?, int> _categoryCounts = const {};
   String? _selectedCategory;
+  Timer? _queryDebounce;
   bool _loading = true;
+  bool _initialLoadScheduled = false;
+  bool _batchScheduled = false;
   String? _error;
   bool _initialEntryOpened = false;
+  int _loadGeneration = 0;
+  int _materializedCount = 0;
+
+  String get _resultReplayKey =>
+      '$_appliedQuery\u0000${_selectedCategory ?? 'all'}';
+
+  Object _entryRevealIdentity(T entry) =>
+      widget.entryId?.call(entry) ?? widget.primaryLabel(entry);
 
   @override
   void initState() {
     super.initState();
     _queryController = TextEditingController(text: widget.initialQuery);
-    _load();
-    _queryController.addListener(() => setState(() {}));
+    _appliedQuery = _queryController.text.trim().toLowerCase();
+    _queryController.addListener(_onQueryChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialLoadScheduled) {
+      return;
+    }
+    _initialLoadScheduled = true;
+    unawaited(_loadWhenRouteSettled());
+  }
+
+  Future<void> _loadWhenRouteSettled() async {
+    if (!await waitForIncomingRouteSettled(context) || !mounted) {
+      return;
+    }
+    await _load();
   }
 
   @override
   void dispose() {
+    _loadGeneration += 1;
+    _queryDebounce?.cancel();
+    _queryController.removeListener(_onQueryChanged);
     _queryController.dispose();
     super.dispose();
   }
 
   Future<void> _load() async {
+    final generation = ++_loadGeneration;
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
       final entries = await widget.loadEntries();
-      if (!mounted) {
+      if (!mounted || generation != _loadGeneration) {
         return;
       }
       setState(() {
         _entries = entries;
         _loading = false;
+        _rebuildCategoryCounts();
+        _rebuildVisibleEntries();
       });
       _openInitialEntryIfRequested();
     } catch (error) {
-      if (!mounted) {
+      if (!mounted || generation != _loadGeneration) {
         return;
       }
       setState(() {
@@ -127,27 +174,102 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
     }
   }
 
-  List<T> get _visible {
-    final query = _queryController.text.trim().toLowerCase();
-    var list = _entries
-        .where((entry) {
-          if (_isInitialEntry(entry)) return true;
-          return widget.includeEntry?.call(entry) ?? true;
-        })
-        .toList(growable: false);
-    // Category filter.
-    final catFilter = widget.categoryFilter;
-    final cat = _selectedCategory;
-    if (catFilter != null && cat != null) {
-      list = list.where((e) => catFilter.filter(e, cat)).toList();
+  void _onQueryChanged() {
+    _queryDebounce?.cancel();
+    _queryDebounce = Timer(_searchDebounce, () {
+      if (!mounted) {
+        return;
+      }
+      final query = _queryController.text.trim().toLowerCase();
+      if (query == _appliedQuery) {
+        return;
+      }
+      setState(() {
+        _appliedQuery = query;
+        _rebuildVisibleEntries();
+      });
+    });
+  }
+
+  void _selectCategory(String? category) {
+    if (category == _selectedCategory) {
+      return;
     }
-    // Text search.
-    if (query.isNotEmpty) {
-      list = list
-          .where((entry) => widget.filterEntry(entry, query))
-          .toList(growable: false);
+    setState(() {
+      _selectedCategory = category;
+      _rebuildVisibleEntries();
+    });
+  }
+
+  void _rebuildCategoryCounts() {
+    final filter = widget.categoryFilter;
+    if (filter == null) {
+      _categoryCounts = const {};
+      return;
     }
-    return list;
+    final counts = <String?, int>{null: _entries.length};
+    for (final entry in _entries) {
+      final label = filter.label(entry);
+      counts[label] = (counts[label] ?? 0) + 1;
+    }
+    _categoryCounts = Map<String?, int>.unmodifiable(counts);
+  }
+
+  void _rebuildVisibleEntries() {
+    final categoryFilter = widget.categoryFilter;
+    final category = _selectedCategory;
+    final filtered = <T>[];
+    for (final entry in _entries) {
+      if (!_isInitialEntry(entry) &&
+          !(widget.includeEntry?.call(entry) ?? true)) {
+        continue;
+      }
+      if (categoryFilter != null &&
+          category != null &&
+          !categoryFilter.filter(entry, category)) {
+        continue;
+      }
+      if (_appliedQuery.isNotEmpty &&
+          !widget.filterEntry(entry, _appliedQuery)) {
+        continue;
+      }
+      filtered.add(entry);
+    }
+    _visibleEntries = List<T>.unmodifiable(filtered);
+    _materializedCount = math.min(_initialBatchSize, _visibleEntries.length);
+  }
+
+  List<T> get _visible => _visibleEntries;
+
+  bool get _hasMore => !_loading && _materializedCount < _visibleEntries.length;
+
+  void _materializeNextBatch() {
+    if (!_hasMore) {
+      return;
+    }
+    setState(() {
+      _materializedCount = math.min(
+        _materializedCount + _batchSize,
+        _visibleEntries.length,
+      );
+    });
+  }
+
+  bool _handleScroll(ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical ||
+        notification.metrics.extentAfter > _loadMoreThreshold ||
+        !_hasMore ||
+        _batchScheduled) {
+      return false;
+    }
+    _batchScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _batchScheduled = false;
+      if (mounted) {
+        _materializeNextBatch();
+      }
+    });
+    return false;
   }
 
   bool _isInitialEntry(T entry) {
@@ -194,6 +316,8 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
             ? widget.scopeNotice?.call(entry)
             : null;
         return TitoListReveal(
+          key: ValueKey<Object>(_entryRevealIdentity(entry)),
+          replayKey: _resultReplayKey,
           delay: TitoListReveal.staggerDelay(index),
           child: _GridItemCard(
             label: widget.primaryLabel(entry),
@@ -208,161 +332,190 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final visible = _visible;
+    final allVisible = _visible;
+    final visible = allVisible.take(_materializedCount).toList(growable: false);
 
-    return SecondaryPageScaffold(
-      title: widget.title,
-      subtitle: widget.subtitle,
-      children: [
-        StickerCard(
-          child: TextField(
-            controller: _queryController,
-            decoration: InputDecoration(
-              hintText: AppZh.dexReferenceSearchHint,
-              prefixIcon: const Icon(Icons.search_rounded),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(TitoRadii.md),
-                borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+    return NotificationListener<ScrollNotification>(
+      onNotification: _handleScroll,
+      child: SecondaryPageScaffold(
+        title: widget.title,
+        subtitle: widget.subtitle,
+        children: [
+          StickerCard(
+            child: TextField(
+              controller: _queryController,
+              decoration: InputDecoration(
+                hintText: AppZh.dexReferenceSearchHint,
+                prefixIcon: const Icon(Icons.search_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        if (widget.categoryFilter != null)
-          _CategoryFilterChips<T>(
-            options: widget.categoryFilter!.options,
-            label: widget.categoryFilter!.label,
-            entries: _entries,
-            selected: _selectedCategory,
-            onSelected: (cat) => setState(() => _selectedCategory = cat),
-          ),
-        if (_loading)
-          const TitoLoadingPanel(message: AppZh.referenceLoading, compact: true)
-        else if (_error != null)
-          StickerCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppZh.dexLoadFailed,
-                  style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(_error!, style: SecondaryTypography.onCard.small12),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: _load,
-                  child: const Text(AppZh.dexRetry),
-                ),
-              ],
+          const SizedBox(height: 12),
+          if (widget.categoryFilter != null)
+            _CategoryFilterChips(
+              options: widget.categoryFilter!.options,
+              counts: _categoryCounts,
+              selected: _selectedCategory,
+              onSelected: _selectCategory,
             ),
-          )
-        else if (visible.isEmpty)
-          StickerCard(
-            child: Text(
-              widget.initialEntryId != null
-                  ? AppZh.dexReferenceDataMissing
-                  : AppZh.dexReferenceEmpty,
-              style: SecondaryTypography.onCard.body14,
-            ),
-          )
-        else if (widget.gridMode)
-          _buildItemGrid(visible)
-        else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: visible.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final entry = visible[index];
-              final initialScopeNotice = _isInitialEntry(entry)
-                  ? widget.scopeNotice?.call(entry)
-                  : null;
-              return TitoListReveal(
-                delay: TitoListReveal.staggerDelay(index),
-                child: HandheldFocusDecorator(
-                  onActivate: () => _openDetail(context, entry),
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rMd(context),
+          if (_loading)
+            const TitoLoadingPanel(
+              message: AppZh.referenceLoading,
+              compact: true,
+            )
+          else if (_error != null)
+            StickerCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppZh.dexLoadFailed,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                  child: StickerPressable(
+                  const SizedBox(height: 8),
+                  Text(_error!, style: SecondaryTypography.onCard.small12),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: _load,
+                    child: const Text(AppZh.dexRetry),
+                  ),
+                ],
+              ),
+            )
+          else if (visible.isEmpty)
+            StickerCard(
+              child: Text(
+                widget.initialEntryId != null
+                    ? AppZh.dexReferenceDataMissing
+                    : AppZh.dexReferenceEmpty,
+                style: SecondaryTypography.onCard.body14,
+              ),
+            )
+          else if (widget.gridMode)
+            _buildItemGrid(visible)
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: visible.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final entry = visible[index];
+                final initialScopeNotice = _isInitialEntry(entry)
+                    ? widget.scopeNotice?.call(entry)
+                    : null;
+                return TitoListReveal(
+                  key: ValueKey<Object>(_entryRevealIdentity(entry)),
+                  replayKey: _resultReplayKey,
+                  delay: TitoListReveal.staggerDelay(index),
+                  child: HandheldFocusDecorator(
+                    onActivate: () => _openDetail(context, entry),
                     borderRadius: BorderRadius.circular(
                       DeviceLayout.rMd(context),
                     ),
-                    ownShadow: false,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => _openDetail(context, entry),
-                        borderRadius: BorderRadius.circular(
-                          DeviceLayout.rMd(context),
-                        ),
-                        child: StickerCard(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+                    child: StickerPressable(
+                      borderRadius: BorderRadius.circular(
+                        DeviceLayout.rMd(context),
+                      ),
+                      ownShadow: false,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _openDetail(context, entry),
+                          borderRadius: BorderRadius.circular(
+                            DeviceLayout.rMd(context),
                           ),
-                          child: Row(
-                            children: [
-                              if (widget.leadingBuilder != null) ...[
-                                widget.leadingBuilder!(entry) ??
-                                    const SizedBox(width: 4),
-                                const SizedBox(width: 10),
-                              ],
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.primaryLabel(entry),
-                                      style: SecondaryTypography.onCard.body14
-                                          .copyWith(
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      widget.secondaryLabel(entry),
-                                      style: SecondaryTypography.onCard.small12
-                                          .copyWith(color: TitoColors.mutedInk),
-                                    ),
-                                    if (initialScopeNotice != null) ...[
+                          child: StickerCard(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                if (widget.leadingBuilder != null) ...[
+                                  widget.leadingBuilder!(entry) ??
+                                      const SizedBox(width: 4),
+                                  const SizedBox(width: 10),
+                                ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.primaryLabel(entry),
+                                        style: SecondaryTypography.onCard.body14
+                                            .copyWith(
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        initialScopeNotice,
-                                        key: const Key(
-                                          'dex-reference-scope-notice',
-                                        ),
+                                        widget.secondaryLabel(entry),
                                         style: SecondaryTypography
                                             .onCard
                                             .small12
                                             .copyWith(
-                                              color: TitoColors.coral,
-                                              fontWeight: FontWeight.w800,
+                                              color: TitoColors.mutedInk,
                                             ),
                                       ),
+                                      if (initialScopeNotice != null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          initialScopeNotice,
+                                          key: const Key(
+                                            'dex-reference-scope-notice',
+                                          ),
+                                          style: SecondaryTypography
+                                              .onCard
+                                              .small12
+                                              .copyWith(
+                                                color: TitoColors.coral,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                      ],
                                     ],
-                                  ],
+                                  ),
                                 ),
-                              ),
-                              const Icon(
-                                Icons.chevron_right_rounded,
-                                color: TitoColors.mutedInk,
-                              ),
-                            ],
+                                const Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: TitoColors.mutedInk,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
+                );
+              },
+            ),
+          if (_hasMore)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Center(
+                child: TextButton(
+                  key: const Key('dex-reference-load-more'),
+                  onPressed: _materializeNextBatch,
+                  child: Text(
+                    '继续显示 · ${visible.length}/${allVisible.length}',
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
-              );
-            },
-          ),
-      ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -613,18 +766,16 @@ class _GridItemCard extends StatelessWidget {
   }
 }
 
-class _CategoryFilterChips<T> extends StatelessWidget {
+class _CategoryFilterChips extends StatelessWidget {
   const _CategoryFilterChips({
     required this.options,
-    required this.label,
-    required this.entries,
+    required this.counts,
     required this.selected,
     required this.onSelected,
   });
 
   final List<String?> options;
-  final String Function(T entry) label;
-  final List<T> entries;
+  final Map<String?, int> counts;
   final String? selected;
   final ValueChanged<String?> onSelected;
 
@@ -641,9 +792,7 @@ class _CategoryFilterChips<T> extends StatelessWidget {
         itemBuilder: (context, index) {
           final cat = options[index];
           final sel = selected == cat;
-          final count = cat == null
-              ? entries.length
-              : entries.where((e) => label(e) == cat).length;
+          final count = counts[cat] ?? 0;
           return FilterChip(
             selected: sel,
             label: Text(

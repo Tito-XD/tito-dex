@@ -117,7 +117,7 @@ Widget _withDexHero(_QuickAction action, Widget child) {
   }
   return Hero(
     tag: heroTag,
-    transitionOnUserGestures: false,
+    transitionOnUserGestures: true,
     createRectTween: titoDexRectTween,
     curve: titoDexForwardCurve,
     reverseCurve: titoDexReverseCurve,
