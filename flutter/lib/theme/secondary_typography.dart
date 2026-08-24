@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_visual_style.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 
@@ -23,8 +24,17 @@ import 'tito_typography.dart';
 ///
 /// Sizes are not scaled by [DeviceLayout.handheldUiScale] when using these tokens directly.
 abstract final class SecondaryTypography {
-  static const onGradient = _SecondaryOnGradient();
+  static const onGradient = SecondaryPageTypography();
   static const onCard = _SecondaryOnCard();
+
+  /// Text directly on the current app shell. Material pages use on-surface
+  /// ink; the classic gradient keeps its light foreground.
+  static SecondaryPageTypography onPage(BuildContext context) =>
+      SecondaryPageTypography(
+        color: appVisualStyle.usesMaterial
+            ? Theme.of(context).colorScheme.onSurface
+            : TitoColors.card,
+      );
 
   /// Handheld secondary-page size remap: 10→12, 11→14, 12→14, 13→15.
   static TextStyle remap(TextStyle style) {
@@ -47,47 +57,49 @@ abstract final class SecondaryTypography {
 }
 
 /// Text on the blue gradient shell (cream / white ink).
-final class _SecondaryOnGradient {
-  const _SecondaryOnGradient();
+final class SecondaryPageTypography {
+  const SecondaryPageTypography({this.color = TitoColors.card});
+
+  final Color color;
 
   /// Page header title — 22.5px white on gradient.
   TextStyle get title => TitoTypography.style(
     fontSize: 22.5,
     fontWeight: FontWeight.w800,
-    color: TitoColors.card,
+    color: color,
     letterSpacing: -0.3,
   );
 
   TextStyle get h15 => TitoTypography.style(
     fontSize: 15,
     fontWeight: FontWeight.w800,
-    color: TitoColors.card,
+    color: color,
     letterSpacing: 15 * -0.02,
   );
 
   TextStyle get body14 => TitoTypography.style(
     fontSize: 14,
     fontWeight: FontWeight.w600,
-    color: TitoColors.card,
+    color: color,
     height: 1.4,
   );
 
   TextStyle get small12 => TitoTypography.style(
     fontSize: 12,
     fontWeight: FontWeight.w600,
-    color: TitoColors.card,
+    color: color,
   );
 
   TextStyle get meta14 => TitoTypography.style(
     fontSize: 14,
     fontWeight: FontWeight.w600,
-    color: TitoColors.card,
+    color: color,
   );
 
   TextStyle get team12 => TitoTypography.style(
     fontSize: 12,
     fontWeight: FontWeight.w800,
-    color: TitoColors.card,
+    color: color,
   );
 }
 

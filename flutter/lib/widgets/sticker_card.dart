@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
@@ -22,6 +23,28 @@ class StickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rLg(context);
     final scheme = Theme.of(context).colorScheme;
+    if (!appVisualStyle.usesMaterial) {
+      final colors = switch (variant) {
+        StickerVariant.cream => (TitoColors.card, TitoColors.ink),
+        StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
+        StickerVariant.sky => (TitoColors.skyBlue, TitoColors.ink),
+        StickerVariant.mint => (TitoColors.mint, TitoColors.ink),
+        StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
+      };
+      return ListenableBuilder(
+        listenable: retroStyle,
+        builder: (context, inner) => DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.$1,
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
+            boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
+          ),
+          child: inner,
+        ),
+        child: Padding(padding: padding, child: child),
+      );
+    }
     final colors = switch (variant) {
       StickerVariant.cream => (scheme.surfaceContainerLow, scheme.onSurface),
       StickerVariant.deep => (scheme.primary, scheme.onPrimary),

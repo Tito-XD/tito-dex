@@ -5,6 +5,7 @@ import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
@@ -37,7 +38,9 @@ class AppHeader extends StatelessWidget {
       child: SizedBox(
         height: barHeight,
         child: Material(
-          color: scheme.surface,
+          color: appVisualStyle.usesMaterial
+              ? scheme.surface
+              : Colors.transparent,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -47,7 +50,9 @@ class AppHeader extends StatelessWidget {
                   child: Text(
                     AppZh.displayTitleForTrainer(trainerName ?? ''),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: scheme.onSurface,
+                      color: appVisualStyle.usesMaterial
+                          ? scheme.onSurface
+                          : TitoColors.card,
                       fontSize: DeviceLayout.headerTitleSize(context),
                       letterSpacing: -0.3,
                     ),
@@ -125,8 +130,16 @@ class _GameBadgeButton extends StatelessWidget {
         button: onTap != null,
         label: '$semanticLabel · ${edition.labelZh}',
         child: Material(
-          color: asset != null ? scheme.primaryContainer : accent,
-          shape: const CircleBorder(),
+          color: asset != null
+              ? (appVisualStyle.usesMaterial
+                    ? scheme.primaryContainer
+                    : TitoColors.card)
+              : accent,
+          shape: CircleBorder(
+            side: appVisualStyle.usesMaterial
+                ? BorderSide.none
+                : const BorderSide(color: TitoColors.ink, width: 2),
+          ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
@@ -179,14 +192,22 @@ class _HeaderIconButton extends StatelessWidget {
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(size / 2),
-      child: IconButton.filledTonal(
+      child: IconButton(
         tooltip: label,
         onPressed: onTap,
         padding: EdgeInsets.zero,
         constraints: BoxConstraints.tightFor(width: size, height: size),
         style: IconButton.styleFrom(
-          backgroundColor: scheme.secondaryContainer,
-          foregroundColor: scheme.onSecondaryContainer,
+          backgroundColor: appVisualStyle.usesMaterial
+              ? scheme.secondaryContainer
+              : TitoColors.card,
+          foregroundColor: appVisualStyle.usesMaterial
+              ? scheme.onSecondaryContainer
+              : TitoColors.deepBlue,
+          side: appVisualStyle.usesMaterial
+              ? BorderSide.none
+              : const BorderSide(color: TitoColors.ink, width: 2),
+          shape: const CircleBorder(),
         ),
         icon: Icon(icon, size: iconSize),
       ),

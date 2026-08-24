@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
+import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
@@ -73,7 +75,9 @@ class SecondaryPageSubtitle extends StatelessWidget {
     return Text(
       text,
       style: SecondaryTypography.onCard.body14.copyWith(
-        color: scheme.onSurfaceVariant,
+        color: appVisualStyle.usesMaterial
+            ? scheme.onSurfaceVariant
+            : TitoColors.card,
       ),
     );
   }
@@ -162,7 +166,9 @@ class _BackTitleButton extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.arrow_back_rounded,
-                    color: scheme.primary,
+                    color: appVisualStyle.usesMaterial
+                        ? scheme.primary
+                        : TitoColors.card,
                     size: iconSize,
                   ),
                   SizedBox(width: iconSize * 0.15),
@@ -172,7 +178,9 @@ class _BackTitleButton extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onGradient.title.copyWith(
-                        color: scheme.onSurface,
+                        color: appVisualStyle.usesMaterial
+                            ? scheme.onSurface
+                            : TitoColors.card,
                         letterSpacing: -0.5,
                       ),
                     ),
