@@ -7,8 +7,174 @@ import 'tito_typography.dart';
 ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.flatUi]) =>
     switch (style) {
       AppVisualStyle.classic => _buildClassicTheme(),
+      AppVisualStyle.solidPlastic => _buildSolidPlasticTheme(),
       AppVisualStyle.flatUi => _buildFlatUiTheme(),
     };
+
+/// Translucent, light-reactive treatment from the Liquid Glass experiment,
+/// now exposed as the built-in Solid Plastic theme.
+ThemeData _buildSolidPlasticTheme() {
+  const fontFamily = TitoTypography.fontFamily;
+  final scheme = ColorScheme.fromSeed(
+    seedColor: TitoColors.deepBlue,
+    brightness: Brightness.light,
+    primary: TitoColors.deepBlue,
+    secondary: TitoColors.coral,
+    surface: TitoColors.card,
+  );
+
+  TextStyle baseStyle({
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w600,
+    Color color = TitoColors.ink,
+    double? height,
+    double? letterSpacing,
+  }) => TextStyle(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+  );
+
+  TextStyle headingStyle({
+    required double fontSize,
+    FontWeight fontWeight = FontWeight.w800,
+  }) => baseStyle(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: fontSize * -0.02,
+  );
+
+  final textTheme = TextTheme(
+    displayLarge: headingStyle(fontSize: 32),
+    displayMedium: headingStyle(fontSize: 28),
+    displaySmall: headingStyle(fontSize: 24),
+    headlineLarge: headingStyle(fontSize: 24),
+    headlineMedium: headingStyle(fontSize: 22),
+    headlineSmall: headingStyle(fontSize: 20),
+    titleLarge: headingStyle(fontSize: 20),
+    titleMedium: headingStyle(fontSize: 18),
+    titleSmall: headingStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    bodyLarge: baseStyle(fontSize: 16),
+    bodyMedium: baseStyle(fontSize: 14),
+    bodySmall: baseStyle(fontSize: 12, color: TitoColors.mutedInk),
+    labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w800),
+    labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    labelSmall: baseStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      color: TitoColors.mutedInk,
+    ),
+  );
+  final mediumShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.md),
+    side: BorderSide(
+      color: TitoColors.deepBlue.withValues(alpha: 0.30),
+      width: TitoBorders.glass,
+    ),
+  );
+
+  return ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: scheme,
+    fontFamily: fontFamily,
+    textTheme: textTheme,
+    scaffoldBackgroundColor: TitoColors.glassBackgroundBottom,
+    splashFactory: InkRipple.splashFactory,
+    highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
+          fallbackColor: TitoColors.glassBackgroundMid,
+        ),
+        TargetPlatform.iOS: ZoomPageTransitionsBuilder(
+          backgroundColor: TitoColors.glassBackgroundMid,
+        ),
+      },
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: TitoColors.card,
+      titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
+    ),
+    cardTheme: CardThemeData(
+      color: TitoColors.card.withValues(alpha: 0.76),
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: mediumShape,
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: TitoColors.card.withValues(alpha: 0.92),
+      modalBarrierColor: const Color(0x73221F26),
+      showDragHandle: true,
+      dragHandleColor: TitoColors.mutedInk,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(TitoRadii.xl),
+        ),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.72),
+          width: TitoBorders.glass,
+        ),
+      ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      contentTextStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.card),
+      backgroundColor: TitoColors.deepBlue,
+      behavior: SnackBarBehavior.floating,
+      shape: mediumShape,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: TitoColors.deepBlue,
+        foregroundColor: TitoColors.card,
+        textStyle: textTheme.labelLarge,
+        shape: mediumShape,
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge,
+        side: BorderSide(
+          color: TitoColors.deepBlue.withValues(alpha: 0.42),
+          width: TitoBorders.glass,
+        ),
+        shape: mediumShape,
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge,
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: TitoColors.card.withValues(alpha: 0.76),
+      labelStyle: textTheme.bodySmall,
+      hintStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.mutedInk),
+      helperStyle: textTheme.bodySmall,
+      errorStyle: textTheme.bodySmall?.copyWith(color: TitoColors.coral),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: mediumShape.side,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: mediumShape.side,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.coral, width: 1.6),
+      ),
+    ),
+  );
+}
 
 /// Flat UI theme: restrained native controls with TitoDex's own surfaces.
 ThemeData _buildFlatUiTheme() {

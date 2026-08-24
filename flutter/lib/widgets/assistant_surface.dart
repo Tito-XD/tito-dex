@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 /// Flat UI surface used by the assistant conversation.
 class AssistantSurface extends StatelessWidget {
@@ -29,6 +31,25 @@ class AssistantSurface extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final borderRadius = BorderRadius.circular(radius);
     final outline = borderColor ?? scheme.outlineVariant;
+    if (appVisualStyle.usesSolidPlastic) {
+      return ListenableBuilder(
+        listenable: retroStyle,
+        builder: (context, content) => LiquidGlassSurface(
+          tint: color ?? TitoColors.card,
+          opacity: 0.74,
+          radius: radius,
+          blurSigma: 12,
+          borderColor: borderColor ?? TitoColors.ink.withValues(alpha: 0.28),
+          borderWidth: borderWidth,
+          padding: padding,
+          boxShadow: shadow && retroStyle.enabled
+              ? SolidPlasticShadows.stickerSmall
+              : null,
+          child: content!,
+        ),
+        child: child,
+      );
+    }
     return ListenableBuilder(
       listenable: retroStyle,
       builder: (context, content) => Material(

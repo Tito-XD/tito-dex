@@ -22,16 +22,18 @@ extension TitoThemeFamilyLabel on TitoThemeFamily {
 
 /// App-wide visual language. This is deliberately independent from motion
 /// and surface-depth preferences so a theme switch does not reset either.
-enum AppVisualStyle { classic, flatUi }
+enum AppVisualStyle { classic, solidPlastic, flatUi }
 
 extension AppVisualStyleLabel on AppVisualStyle {
   String get storageValue => switch (this) {
     AppVisualStyle.classic => 'classic',
+    AppVisualStyle.solidPlastic => 'solid_plastic',
     AppVisualStyle.flatUi => 'flat_ui',
   };
 
   TitoThemeFamily get family => switch (this) {
     AppVisualStyle.classic => TitoThemeFamily.trainerJournal,
+    AppVisualStyle.solidPlastic => TitoThemeFamily.solidPlastic,
     AppVisualStyle.flatUi => TitoThemeFamily.flatUi,
   };
 
@@ -48,6 +50,8 @@ class AppVisualStylePreference extends ChangeNotifier {
   bool _loaded = false;
 
   AppVisualStyle get style => _style;
+  bool get usesTrainerJournal => _style == AppVisualStyle.classic;
+  bool get usesSolidPlastic => _style == AppVisualStyle.solidPlastic;
   bool get usesFlatUi => _style == AppVisualStyle.flatUi;
 
   Future<void> load() async {

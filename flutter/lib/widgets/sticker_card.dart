@@ -4,6 +4,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 enum StickerVariant { cream, deep, sky, mint, softYellow }
 
@@ -23,7 +24,7 @@ class StickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rLg(context);
     final scheme = Theme.of(context).colorScheme;
-    if (!appVisualStyle.usesFlatUi) {
+    if (appVisualStyle.usesTrainerJournal) {
       final colors = switch (variant) {
         StickerVariant.cream => (TitoColors.card, TitoColors.ink),
         StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
@@ -38,11 +39,35 @@ class StickerCard extends StatelessWidget {
             color: colors.$1,
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-            boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
+            boxShadow: retroStyle.enabled
+                ? TrainerJournalShadows.sticker
+                : null,
           ),
           child: inner,
         ),
         child: Padding(padding: padding, child: child),
+      );
+    }
+    if (appVisualStyle.usesSolidPlastic) {
+      final (tint, opacity) = switch (variant) {
+        StickerVariant.cream => (TitoColors.card, 0.68),
+        StickerVariant.deep => (TitoColors.deepBlue, 0.86),
+        StickerVariant.sky => (TitoColors.skyBlue, 0.64),
+        StickerVariant.mint => (TitoColors.mint, 0.68),
+        StickerVariant.softYellow => (TitoColors.softYellow, 0.72),
+      };
+      return ListenableBuilder(
+        listenable: retroStyle,
+        builder: (context, inner) => LiquidGlassSurface(
+          tint: tint,
+          opacity: opacity,
+          radius: radius,
+          blurSigma: 14,
+          padding: padding,
+          boxShadow: retroStyle.enabled ? SolidPlasticShadows.sticker : null,
+          child: inner!,
+        ),
+        child: child,
       );
     }
     final colors = switch (variant) {

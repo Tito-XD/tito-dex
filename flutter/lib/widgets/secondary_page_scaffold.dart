@@ -8,6 +8,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
+import 'liquid_glass.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
 class SecondaryPageScaffold extends StatelessWidget {
@@ -149,6 +150,62 @@ class _BackTitleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
     final scheme = Theme.of(context).colorScheme;
+    if (appVisualStyle.usesSolidPlastic) {
+      return HandheldFocusDecorator(
+        onActivate: onTap,
+        borderRadius: BorderRadius.circular(radius),
+        child: Semantics(
+          button: true,
+          label: '$title · ${AppZh.navHome}',
+          child: LiquidGlassSurface(
+            tint: TitoColors.deepBlue,
+            opacity: 0.46,
+            radius: radius,
+            blurSigma: 14,
+            boxShadow: SolidPlasticShadows.glassSmall,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(radius),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.arrow_back_rounded,
+                        color: TitoColors.card,
+                        size: iconSize,
+                      ),
+                      SizedBox(width: iconSize * 0.22),
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: SecondaryTypography.onGradient.title.copyWith(
+                            letterSpacing: -0.5,
+                            shadows: const [
+                              Shadow(
+                                color: Color(0x4018283B),
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(radius),
@@ -213,6 +270,15 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
     // so the gear reads at one size on every title bar.
     final iconSize = size * 0.62;
     final scheme = Theme.of(context).colorScheme;
+
+    if (appVisualStyle.usesSolidPlastic) {
+      return LiquidGlassRoundButton(
+        size: size,
+        semanticLabel: label,
+        onTap: onTap,
+        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
+      );
+    }
 
     return HandheldFocusDecorator(
       onActivate: onTap,

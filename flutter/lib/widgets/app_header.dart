@@ -11,6 +11,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
 import 'handheld_status_icons.dart';
+import 'liquid_glass.dart';
 
 class AppHeader extends StatelessWidget {
   const AppHeader({
@@ -123,6 +124,17 @@ class _GameBadgeButton extends StatelessWidget {
           )
         : _letterContent(size, accent, darkAccent);
 
+    if (appVisualStyle.usesSolidPlastic) {
+      return LiquidGlassRoundButton(
+        size: size,
+        semanticLabel: '$semanticLabel · ${edition.labelZh}',
+        onTap: onTap,
+        tint: asset != null ? TitoColors.card : accent,
+        opacity: asset != null ? 0.7 : 0.82,
+        child: content,
+      );
+    }
+
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(size / 2),
@@ -188,6 +200,15 @@ class _HeaderIconButton extends StatelessWidget {
     final size = DeviceLayout.headerIconSize(context);
     final iconSize = size * 0.62;
     final scheme = Theme.of(context).colorScheme;
+
+    if (appVisualStyle.usesSolidPlastic) {
+      return LiquidGlassRoundButton(
+        size: size,
+        semanticLabel: label,
+        onTap: onTap,
+        child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
+      );
+    }
 
     return HandheldFocusDecorator(
       onActivate: onTap,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 /// Opaque Material surface matching [DeviceShell] so route transitions never
 /// flash through a transparent or mismatched background.
@@ -14,6 +15,14 @@ class TitoPageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final flatUi = appVisualStyle.usesFlatUi;
+    if (appVisualStyle.usesSolidPlastic) {
+      return Scaffold(
+        backgroundColor: TitoColors.glassBackgroundBottom,
+        body: BackdropGroup(
+          child: LiquidGlassBackground(child: SafeArea(child: child)),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: flatUi ? scheme.surface : TitoColors.slateBlue,
       // Edge-to-edge shell: the surface paints behind the system bars so

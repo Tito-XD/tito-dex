@@ -30,12 +30,30 @@ void main() {
     expect(restored.style, AppVisualStyle.classic);
   });
 
+  test('Solid Plastic persists as a built-in visual style', () async {
+    SharedPreferences.setMockInitialValues({});
+    final preference = AppVisualStylePreference();
+    await preference.load();
+
+    await preference.setStyle(AppVisualStyle.solidPlastic);
+
+    final restored = AppVisualStylePreference();
+    await restored.load();
+    expect(restored.style, AppVisualStyle.solidPlastic);
+    expect(restored.usesSolidPlastic, isTrue);
+  });
+
   test('built-in styles produce distinct app-wide surfaces', () {
     final flatUi = buildTitoTheme(AppVisualStyle.flatUi);
     final classic = buildTitoTheme(AppVisualStyle.classic);
+    final solidPlastic = buildTitoTheme(AppVisualStyle.solidPlastic);
 
     expect(flatUi.scaffoldBackgroundColor, TitoColors.flatSurface);
     expect(classic.scaffoldBackgroundColor, TitoColors.slateBlue);
+    expect(
+      solidPlastic.scaffoldBackgroundColor,
+      TitoColors.glassBackgroundBottom,
+    );
     expect(flatUi.colorScheme.surface, isNot(classic.colorScheme.surface));
   });
 
