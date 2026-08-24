@@ -17,7 +17,7 @@ class SystemUiCoordinator extends StatefulWidget {
 
 class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
   Size? _lastSize;
-  bool? _lastUsesMaterial;
+  bool? _lastUsesFlatUi;
 
   @override
   void didChangeDependencies() {
@@ -33,23 +33,23 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
 
   void _applyForContext(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final material = appVisualStyle.usesMaterial;
-    if (_lastSize == size && _lastUsesMaterial == material) {
+    final flatUi = appVisualStyle.usesFlatUi;
+    if (_lastSize == size && _lastUsesFlatUi == flatUi) {
       return;
     }
     _lastSize = size;
-    _lastUsesMaterial = material;
+    _lastUsesFlatUi = flatUi;
     _applySystemUi(
       size,
-      material: material,
-      materialSurface: Theme.of(context).colorScheme.surface,
+      flatUi: flatUi,
+      flatSurface: Theme.of(context).colorScheme.surface,
     );
   }
 
   void _applySystemUi(
     Size size, {
-    required bool material,
-    required Color materialSurface,
+    required bool flatUi,
+    required Color flatSurface,
   }) {
     if (!DeviceLayout.isNativeTarget) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -72,12 +72,10 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: material ? Brightness.dark : Brightness.light,
-        statusBarBrightness: material ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: material
-            ? materialSurface
-            : TitoColors.deepBlue,
-        systemNavigationBarIconBrightness: material
+        statusBarIconBrightness: flatUi ? Brightness.dark : Brightness.light,
+        statusBarBrightness: flatUi ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: flatUi ? flatSurface : TitoColors.deepBlue,
+        systemNavigationBarIconBrightness: flatUi
             ? Brightness.dark
             : Brightness.light,
       ),

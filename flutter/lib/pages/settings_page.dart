@@ -1589,7 +1589,11 @@ class _InterfaceSection extends StatelessWidget {
                             for (final style in AppVisualStyle.values)
                               ButtonSegment<AppVisualStyle>(
                                 value: style,
-                                label: Text(style.labelZh),
+                                label: Text(
+                                  style.labelFor(
+                                    View.of(context).platformDispatcher.locale,
+                                  ),
+                                ),
                               ),
                           ],
                           selected: {appVisualStyle.style},

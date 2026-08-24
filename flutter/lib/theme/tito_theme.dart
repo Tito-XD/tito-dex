@@ -4,20 +4,20 @@ import 'app_visual_style.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 
-ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.material]) =>
+ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.flatUi]) =>
     switch (style) {
       AppVisualStyle.classic => _buildClassicTheme(),
-      AppVisualStyle.material => _buildMaterialTheme(),
+      AppVisualStyle.flatUi => _buildFlatUiTheme(),
     };
 
-/// Native Material 3 theme used by the experimental built-in style.
-ThemeData _buildMaterialTheme() {
+/// Flat UI theme: restrained native controls with TitoDex's own surfaces.
+ThemeData _buildFlatUiTheme() {
   const fontFamily = TitoTypography.fontFamily;
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: TitoColors.materialSeed,
+    seedColor: TitoColors.flatSeed,
     brightness: Brightness.light,
     secondary: TitoColors.coral,
-    surface: TitoColors.materialSurface,
+    surface: TitoColors.flatSurface,
   );
 
   TextStyle baseStyle({
@@ -71,10 +71,10 @@ ThemeData _buildMaterialTheme() {
   const pageTransitions = PageTransitionsTheme(
     builders: {
       TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
-        fallbackColor: TitoColors.materialSurface,
+        fallbackColor: TitoColors.flatSurface,
       ),
       TargetPlatform.iOS: ZoomPageTransitionsBuilder(
-        backgroundColor: TitoColors.materialSurface,
+        backgroundColor: TitoColors.flatSurface,
       ),
     },
   );

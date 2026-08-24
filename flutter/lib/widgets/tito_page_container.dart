@@ -13,12 +13,12 @@ class TitoPageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final material = appVisualStyle.usesMaterial;
+    final flatUi = appVisualStyle.usesFlatUi;
     return Scaffold(
-      backgroundColor: material ? scheme.surface : TitoColors.slateBlue,
+      backgroundColor: flatUi ? scheme.surface : TitoColors.slateBlue,
       // Edge-to-edge shell: the surface paints behind the system bars so
       // predictive back retracts the whole screen; content remains safe.
-      body: material
+      body: flatUi
           ? ColoredBox(
               color: scheme.surface,
               child: SafeArea(child: child),

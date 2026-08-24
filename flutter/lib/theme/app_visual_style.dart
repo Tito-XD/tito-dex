@@ -1,33 +1,54 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Stable naming registry shared by the current app and future localization.
+enum TitoThemeFamily { trainerJournal, solidPlastic, flatUi }
+
+extension TitoThemeFamilyLabel on TitoThemeFamily {
+  String labelFor(Locale locale) {
+    final chinese = locale.languageCode.toLowerCase() == 'zh';
+    return switch ((this, chinese)) {
+      (TitoThemeFamily.trainerJournal, true) => '训练家手帐',
+      (TitoThemeFamily.trainerJournal, false) => "Trainer's Journal",
+      (TitoThemeFamily.solidPlastic, true) => '固态塑料',
+      (TitoThemeFamily.solidPlastic, false) => 'Solid Plastic',
+      (TitoThemeFamily.flatUi, true) => '扁平贴纸',
+      (TitoThemeFamily.flatUi, false) => 'Flat UI',
+    };
+  }
+}
+
 /// App-wide visual language. This is deliberately independent from motion
 /// and surface-depth preferences so a theme switch does not reset either.
-enum AppVisualStyle { classic, material }
+enum AppVisualStyle { classic, flatUi }
 
 extension AppVisualStyleLabel on AppVisualStyle {
   String get storageValue => switch (this) {
     AppVisualStyle.classic => 'classic',
-    AppVisualStyle.material => 'material',
+    AppVisualStyle.flatUi => 'flat_ui',
   };
 
-  String get labelZh => switch (this) {
-    AppVisualStyle.classic => 'TitoDex 经典',
-    AppVisualStyle.material => 'Material 3',
+  TitoThemeFamily get family => switch (this) {
+    AppVisualStyle.classic => TitoThemeFamily.trainerJournal,
+    AppVisualStyle.flatUi => TitoThemeFamily.flatUi,
   };
+
+  String labelFor(Locale locale) => family.labelFor(locale);
 }
 
 class AppVisualStylePreference extends ChangeNotifier {
   static const _styleKey = 'style.visual';
 
-  // This experimental branch opens in Material while keeping Classic one tap
-  // away. A future mainline merge can change this default without migrating
-  // users who have already made an explicit choice.
-  AppVisualStyle _style = AppVisualStyle.material;
+  // This experimental branch opens in Flat UI while keeping Trainer's Journal
+  // one tap away. A future mainline merge can change this default without
+  // migrating users who have already made an explicit choice.
+  AppVisualStyle _style = AppVisualStyle.flatUi;
   bool _loaded = false;
 
   AppVisualStyle get style => _style;
-  bool get usesMaterial => _style == AppVisualStyle.material;
+  bool get usesFlatUi => _style == AppVisualStyle.flatUi;
 
   Future<void> load() async {
     if (_loaded) {
@@ -35,10 +56,14 @@ class AppVisualStylePreference extends ChangeNotifier {
     }
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_styleKey);
-    _style = AppVisualStyle.values.firstWhere(
-      (candidate) => candidate.storageValue == saved,
-      orElse: () => AppVisualStyle.material,
-    );
+    // `material` was written by the first preview APK. Keep it as a one-way
+    // compatibility alias after the visual language was named Flat UI.
+    _style = saved == 'material'
+        ? AppVisualStyle.flatUi
+        : AppVisualStyle.values.firstWhere(
+            (candidate) => candidate.storageValue == saved,
+            orElse: () => AppVisualStyle.flatUi,
+          );
     _loaded = true;
     notifyListeners();
   }

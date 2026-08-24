@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Persisted surface-depth preference.
 ///
-/// The Material experiment keeps the historical storage key for upgrade
+/// The Flat UI experiment keeps the historical storage key for upgrade
 /// compatibility: enabled selects elevated cards, disabled selects outlined
 /// cards. Native Material state layers remain active in both modes.
 class RetroStyle extends ChangeNotifier {

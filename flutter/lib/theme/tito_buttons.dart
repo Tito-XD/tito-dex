@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../widgets/handheld_input.dart';
 import 'tito_colors.dart';
 
-/// Material 3 filled action with the compact sizing required by RG screens.
+/// Flat UI filled action with the compact sizing required by RG screens.
 class TitoPrimaryButton extends StatelessWidget {
   const TitoPrimaryButton({
     super.key,
@@ -55,7 +55,7 @@ class TitoPrimaryButton extends StatelessWidget {
   }
 }
 
-/// Material 3 card action used by the home dashboard grid.
+/// Flat UI card action used by the home dashboard grid.
 class TitoQuickTile extends StatelessWidget {
   const TitoQuickTile({
     super.key,
@@ -154,7 +154,7 @@ class TitoQuickTile extends StatelessWidget {
   }
 }
 
-/// Material 3 tonal tile retained for square dashboard call sites.
+/// Flat UI tonal tile retained for square dashboard call sites.
 class TitoPolaroidQuickTile extends StatelessWidget {
   const TitoPolaroidQuickTile({
     super.key,

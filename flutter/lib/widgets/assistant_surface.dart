@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 
-/// Material 3 surface used by the assistant conversation.
+/// Flat UI surface used by the assistant conversation.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,

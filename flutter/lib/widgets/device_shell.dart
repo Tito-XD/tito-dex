@@ -15,22 +15,22 @@ class DeviceShell extends StatelessWidget {
     final mq = MediaQuery.of(context);
     final handheldChrome = DeviceLayout.useHandheldChrome(context);
     final scheme = Theme.of(context).colorScheme;
-    final material = appVisualStyle.usesMaterial;
+    final flatUi = appVisualStyle.usesFlatUi;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: (material ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
+      value: (flatUi ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
           .copyWith(
             statusBarColor: Colors.transparent,
-            statusBarIconBrightness: material
+            statusBarIconBrightness: flatUi
                 ? Brightness.dark
                 : Brightness.light,
-            systemNavigationBarColor: material
+            systemNavigationBarColor: flatUi
                 ? scheme.surface
                 : TitoColors.deepBlue,
-            systemNavigationBarIconBrightness: material
+            systemNavigationBarIconBrightness: flatUi
                 ? Brightness.dark
                 : Brightness.light,
-            systemNavigationBarDividerColor: material
+            systemNavigationBarDividerColor: flatUi
                 ? scheme.surface
                 : TitoColors.deepBlue,
           ),
@@ -99,7 +99,7 @@ class _ThemeBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (appVisualStyle.usesMaterial) {
+    if (appVisualStyle.usesFlatUi) {
       return ColoredBox(
         color: Theme.of(context).colorScheme.surface,
         child: child,
