@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
 class DeviceShell extends StatelessWidget {
   const DeviceShell({super.key, required this.child});
@@ -16,6 +17,7 @@ class DeviceShell extends StatelessWidget {
     final handheldChrome = DeviceLayout.useHandheldChrome(context);
     final scheme = Theme.of(context).colorScheme;
     final flatUi = appVisualStyle.usesFlatUi;
+    final solidPlastic = appVisualStyle.usesSolidPlastic;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: (flatUi ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
@@ -26,12 +28,16 @@ class DeviceShell extends StatelessWidget {
                 : Brightness.light,
             systemNavigationBarColor: flatUi
                 ? scheme.surface
+                : solidPlastic
+                ? TitoColors.glassBackgroundTop
                 : TitoColors.deepBlue,
             systemNavigationBarIconBrightness: flatUi
                 ? Brightness.dark
                 : Brightness.light,
             systemNavigationBarDividerColor: flatUi
                 ? scheme.surface
+                : solidPlastic
+                ? TitoColors.glassBackgroundTop
                 : TitoColors.deepBlue,
           ),
       child: MediaQuery(
@@ -99,6 +105,9 @@ class _ThemeBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (appVisualStyle.usesSolidPlastic) {
+      return LiquidGlassBackground(child: child);
+    }
     if (appVisualStyle.usesFlatUi) {
       return ColoredBox(
         color: Theme.of(context).colorScheme.surface,

@@ -17,7 +17,7 @@ class SystemUiCoordinator extends StatefulWidget {
 
 class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
   Size? _lastSize;
-  bool? _lastUsesFlatUi;
+  AppVisualStyle? _lastStyle;
 
   @override
   void didChangeDependencies() {
@@ -33,24 +33,25 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
 
   void _applyForContext(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final flatUi = appVisualStyle.usesFlatUi;
-    if (_lastSize == size && _lastUsesFlatUi == flatUi) {
+    final style = appVisualStyle.style;
+    if (_lastSize == size && _lastStyle == style) {
       return;
     }
     _lastSize = size;
-    _lastUsesFlatUi = flatUi;
+    _lastStyle = style;
     _applySystemUi(
       size,
-      flatUi: flatUi,
+      style: style,
       flatSurface: Theme.of(context).colorScheme.surface,
     );
   }
 
   void _applySystemUi(
     Size size, {
-    required bool flatUi,
+    required AppVisualStyle style,
     required Color flatSurface,
   }) {
+    final flatUi = style == AppVisualStyle.flatUi;
     if (!DeviceLayout.isNativeTarget) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       return;
@@ -74,7 +75,11 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: flatUi ? Brightness.dark : Brightness.light,
         statusBarBrightness: flatUi ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: flatUi ? flatSurface : TitoColors.deepBlue,
+        systemNavigationBarColor: flatUi
+            ? flatSurface
+            : style == AppVisualStyle.solidPlastic
+            ? TitoColors.glassBackgroundTop
+            : TitoColors.deepBlue,
         systemNavigationBarIconBrightness: flatUi
             ? Brightness.dark
             : Brightness.light,

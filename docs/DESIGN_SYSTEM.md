@@ -30,7 +30,7 @@ lands.
 | Identity | 中文 | English | Implementation |
 | --- | --- | --- | --- |
 | Default sticker language | 训练家手帐 | Trainer's Journal | Base app / built-in classic option |
-| Glass-inspired experiment | 固态塑料 | Solid Plastic | `codex/liquid-glass-ui`; name reserved for a future built-in option |
+| Glass-inspired experiment | 固态塑料 | Solid Plastic | Built-in option, adapted from `codex/liquid-glass-ui` |
 | Flat native experiment | 扁平贴纸 | Flat UI | `codex/material-ui-native`; built-in option beside 训练家手帐 |
 
 The deliberately playful names describe the perceived texture. In particular,
@@ -98,7 +98,7 @@ Suggested tokens:
 Settings → 界面风格 → **Retro 贴纸手感** (default on) drives the whole
 package through `retroStyle`:
 
-- `TitoShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
+- `TrainerJournalShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
   (0/3px) on chips/sprites/bubbles, `.stickerPressed` (0/1px) while held.
 - `StickerPressable` wraps interactive stickers: touch-down sinks the
   sticker 3px in ~80ms and squashes the shadow; release springs back.

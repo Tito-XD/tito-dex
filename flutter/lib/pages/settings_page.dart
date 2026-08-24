@@ -616,7 +616,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _SettingsGroup(
             title: AppZh.settingsDexOffline,
             child: StickerCard(
-              variant: StickerVariant.mint,
+              variant: StickerVariant.cream,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -1018,7 +1018,7 @@ class _SettingsPageState extends State<SettingsPage> {
           _SettingsGroup(
             title: AppZh.settingsDexOffline,
             child: StickerCard(
-              variant: StickerVariant.mint,
+              variant: StickerVariant.cream,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1093,7 +1093,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 12),
           StickerCard(
-            variant: StickerVariant.mint,
+            variant: StickerVariant.cream,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1546,7 +1546,7 @@ class _CurrentGameSection extends StatelessWidget {
   }
 }
 
-/// Settings → 界面风格: Material surface depth plus list animations.
+/// Settings → 界面风格: built-in themes, surface depth, and list animations.
 class _InterfaceSection extends StatelessWidget {
   const _InterfaceSection();
 
@@ -1593,6 +1593,9 @@ class _InterfaceSection extends StatelessWidget {
                                   style.labelFor(
                                     View.of(context).platformDispatcher.locale,
                                   ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                           ],
