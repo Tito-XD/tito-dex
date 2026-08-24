@@ -20,6 +20,24 @@ Keywords:
 - companion-like
 - soft but sturdy
 
+## Theme and skin names
+
+Theme names are localized labels, not technology claims. Never show a
+Chinese/English slash pair in the UI: Chinese locales use the Chinese column;
+all other locales currently use the English column until broader localization
+lands.
+
+| Identity | 中文 | English | Implementation |
+| --- | --- | --- | --- |
+| Default sticker language | 训练家手帐 | Trainer's Journal | Base app / built-in classic option |
+| Glass-inspired experiment | 固态塑料 | Solid Plastic | Built-in option, adapted from `codex/liquid-glass-ui` |
+| Flat native experiment | 扁平贴纸 | Flat UI | `codex/material-ui-native`; built-in option beside 训练家手帐 |
+
+The deliberately playful names describe the perceived texture. In particular,
+“Solid Plastic” replaces the earlier Liquid Glass working label, while “Flat
+UI” replaces Material 3 as the user-facing name. Internal Flutter `Material`
+classes may still be used as implementation primitives.
+
 ## Color Direction
 
 Use a blue-gray, cream, and deep-navy base with warm accent colors.
@@ -80,7 +98,7 @@ Suggested tokens:
 Settings → 界面风格 → **Retro 贴纸手感** (default on) drives the whole
 package through `retroStyle`:
 
-- `TitoShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
+- `TrainerJournalShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
   (0/3px) on chips/sprites/bubbles, `.stickerPressed` (0/1px) while held.
 - `StickerPressable` wraps interactive stickers: touch-down sinks the
   sticker 3px in ~80ms and squashes the shadow; release springs back.

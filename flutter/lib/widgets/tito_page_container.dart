@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import 'liquid_glass.dart';
 
-/// Opaque page backdrop matching [DeviceShell] so route transitions never flash
-/// through a transparent or mismatched surface.
+/// Opaque Material surface matching [DeviceShell] so route transitions never
+/// flash through a transparent or mismatched background.
 class TitoPageContainer extends StatelessWidget {
   const TitoPageContainer({super.key, required this.child});
 
@@ -11,25 +13,35 @@ class TitoPageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: TitoColors.slateBlue,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            // v0.6.7 header refresh (picked in the gradient template v3):
-            // #5D728A → slateBlue, a 60% melt from deepBlue into slate. The
-            // cream title now sits on the dark end instead of the palest
-            // end (was skyBlue→slate, 1.64:1 contrast).
-            colors: [Color(0xFF5D728A), Color(0xFF7B91A6)],
-          ),
+    final scheme = Theme.of(context).colorScheme;
+    final flatUi = appVisualStyle.usesFlatUi;
+    if (appVisualStyle.usesSolidPlastic) {
+      return Scaffold(
+        backgroundColor: TitoColors.glassBackgroundBottom,
+        body: BackdropGroup(
+          child: LiquidGlassBackground(child: SafeArea(child: child)),
         ),
-        // Edge-to-edge shell: the gradient paints behind the system bars so
-        // predictive back retracts the whole screen; the SafeArea keeps page
-        // content where the old shell-level SafeArea put it.
-        child: SafeArea(child: child),
-      ),
+      );
+    }
+    return Scaffold(
+      backgroundColor: flatUi ? scheme.surface : TitoColors.slateBlue,
+      // Edge-to-edge shell: the surface paints behind the system bars so
+      // predictive back retracts the whole screen; content remains safe.
+      body: flatUi
+          ? ColoredBox(
+              color: scheme.surface,
+              child: SafeArea(child: child),
+            )
+          : DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF5D728A), TitoColors.slateBlue],
+                ),
+              ),
+              child: SafeArea(child: child),
+            ),
     );
   }
 }
