@@ -12,6 +12,7 @@ import { buildLogRecord } from './logging';
 import { getJourneySearch, retrieveAuditedHintIds } from './retrieval';
 import {
   deterministicCuratedScopeDecision,
+  knownMoveNames,
   researchCuratedWeb,
   type CuratedSource,
 } from './curated_web';
@@ -23,7 +24,14 @@ import {
   type DeepSeekNativeSearchConfig,
   type DeepSeekNativeSearchResult,
 } from './deepseek_native_search';
-import { answerFromDexBundle, buildDexBundleSources } from './dex_bundle_retrieval';
+import {
+  answerFromDexBundle,
+  buildDexBundleSources,
+  questionMentionsKnownEntity,
+  resolveDexBundleClarificationCandidates,
+} from './dex_bundle_retrieval';
+import { attachSemanticAnswer, semanticBlockDeltas } from './semantic_stream';
+import { generatedAnswerGuardFailure } from './answer_quality_guards';
 import {
   answerKnownPokemonFranchiseFact,
   answerSelectedGameMechanic,
@@ -51,6 +59,10 @@ const EXTENSION_OBJECT_KEY_PREFIX = 'extensions/journey-assistant/objects/';
 const IMMUTABLE_APK_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.apk$/;
 const JOURNEY_PACK_CATALOG_PATH = '/v1/journey-packs/catalog';
 const JOURNEY_PACK_OBJECT_PATH_PREFIX = '/v1/journey-packs/objects/';
+const MOVE_ADVICE_QUESTION_PATTERN =
+  /(?:配招|(?:招式|技能).{0,16}(?:适合|推荐|选择|哪些|什么|怎么|搭配|好用)|(?:适合|推荐|选择|哪些|什么|怎么|搭配).{0,16}(?:招式|技能))/u;
+const MOVE_ADVICE_NO_MATCH_FOLLOW_UP =
+  '我还没找到同时满足当前版本可学习性和攻略来源核验的配招资料。可以补充“通关／对战／物攻／特攻”方向，或改问某个具体招式。';
 
 const JSON_HEADERS = {
   'content-type': 'application/json; charset=utf-8',
@@ -66,6 +78,12 @@ type ModelMessage = { role: 'system' | 'user'; content: string };
 type RequestTrace = {
   modelUsed: boolean;
   aiSearchUsed: boolean;
+};
+
+type ResponseStage = 'retrieving' | 'resolving' | 'verifying' | 'writing';
+
+type ResponseBuildObserver = {
+  stage(stage: Exclude<ResponseStage, 'retrieving' | 'writing'>): void;
 };
 
 type DeepSeekNativeAnswer = Extract<
@@ -93,10 +111,12 @@ export default {
       ];
       return json({
         ok: true,
-        schemaVersion: 2,
+        schemaVersion: 3,
         capabilities: {
           worker: true,
           streaming: true,
+          semanticStreaming: true,
+          providerTokenStreaming: false,
           publicModel: env.AI ? 'workers-ai-qwen' : 'unavailable',
           aiSearch: env.AI_SEARCH_ENABLED === 'true' && Boolean(env.JOURNEY_SEARCH_NAMESPACE),
           dexBundle: Boolean(env.DEX_CONTENT),
@@ -144,9 +164,11 @@ export default {
     }
     const parsed = parseAssistantRequest(value);
     if (!parsed) return jsonError('invalid_request', 400);
-    const availableHints = await loadJourneyPackHints(parsed, env.JOURNEY_CONTENT);
-
-    const buildResponse = async (): Promise<AssistantResponse> => {
+    const buildResponse = async (
+      observer?: ResponseBuildObserver,
+    ): Promise<AssistantResponse> => {
+      const availableHints = await loadJourneyPackHints(parsed, env.JOURNEY_CONTENT);
+      observer?.stage('resolving');
       const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
       let curatedDecision: unknown;
       let bundleFallback: AssistantResponse | null = null;
@@ -159,12 +181,34 @@ export default {
         undefined,
         availableHints,
       );
-      if (response.status !== 'answered') {
+      let clarificationLocked = response.status === 'needs_clarification' &&
+        (response.clarificationCandidates?.length ?? 0) > 0;
+      if (
+        response.status !== 'answered' &&
+        !requestMentionsKnownEntity(parsed) &&
+        isAmbiguousEntityDescription(parsed.question)
+      ) {
+        const candidates = await resolveDexBundleClarificationCandidates(
+          parsed,
+          env.DEX_CONTENT,
+        ).catch(() => []);
+        response = {
+          status: 'needs_clarification',
+          answer: null,
+          confidence: 'low',
+          followUp: candidates.length > 0
+            ? '这个描述可能对应多只宝可梦。请点选一个图鉴候选，我再继续回答。'
+            : '这个描述可能对应多只宝可梦。请再补充名称、属性、颜色或地区。',
+          clarificationCandidates: candidates,
+        };
+        clarificationLocked = true;
+      }
+      if (response.status !== 'answered' && !clarificationLocked) {
         response = answerSelectedGameMechanic(parsed) ??
           answerKnownPokemonFranchiseFact(parsed) ?? response;
       }
       let dexBundleSources: CuratedSource[] = [];
-      if (response.status !== 'answered' && env.DEX_CONTENT) {
+      if (response.status !== 'answered' && !clarificationLocked && env.DEX_CONTENT) {
         try {
           const bundleResult = await answerFromDexBundle(parsed, env.DEX_CONTENT);
           if (bundleResult?.requiresOnlineVerification) {
@@ -180,7 +224,7 @@ export default {
           // missing/invalid object falls through to the existing safe pipeline.
         }
       }
-      if (response.status !== 'answered' && env.AI) {
+      if (response.status !== 'answered' && !clarificationLocked && env.AI) {
         response = await answerQuestion(
           parsed,
           undefined,
@@ -194,8 +238,11 @@ export default {
           availableHints,
         );
       }
+      clarificationLocked ||= response.status === 'needs_clarification' &&
+        (response.clarificationCandidates?.length ?? 0) > 0;
       let curatedSourcesUsed = false;
-      if (response.status !== 'answered' && env.AI) {
+      if (response.status !== 'answered' && !clarificationLocked && env.AI) {
+        observer?.stage('verifying');
         // Curated/Tavily and DeepSeek native search run together. A failed
         // support pass no longer makes the second path start after the App's
         // request timeout; the more strongly verified result wins when both
@@ -260,16 +307,46 @@ export default {
                       )
                       ? nativeResult.answer
                       : null;
-                  if (verifiedAnswer || relaxedNativeAnswer) {
-                    return {
-                      response: buildDeepSeekNativeResponse(
-                        parsed,
-                        nativeResult,
-                        verifiedAnswer ?? relaxedNativeAnswer!,
-                        verifiedAnswer !== null,
-                      ),
-                      draft: nativeResult.answer,
-                    };
+                  const acceptedNativeAnswer = verifiedAnswer ?? relaxedNativeAnswer;
+                  if (acceptedNativeAnswer) {
+                    const selectedGame =
+                      !isGeneralPokemonFranchiseQuestion(parsed.question) &&
+                        (parsed.context.game === 'scarlet' ||
+                          parsed.context.game === 'violet')
+                        ? parsed.context.game
+                        : undefined;
+                    const guardFailure = generatedAnswerGuardFailure({
+                      answer: acceptedNativeAnswer,
+                      question: parsed.question,
+                      ...(selectedGame ? { game: selectedGame } : {}),
+                      knownMoveNames,
+                      structuredSources: [
+                        ...dexBundleSources,
+                        ...nativeResult.sources.map((source, index) => ({
+                          id: `deepseek-citation-${index + 1}`,
+                          title: source.title,
+                          url: source.url,
+                          text: source.snippet ?? '',
+                        })),
+                      ],
+                    });
+                    if (guardFailure) {
+                      console.log(JSON.stringify({
+                        event: 'assistant_provider_fallback',
+                        provider: 'deepseek-native',
+                        reason: guardFailure,
+                      }));
+                    } else {
+                      return {
+                        response: buildDeepSeekNativeResponse(
+                          parsed,
+                          nativeResult,
+                          acceptedNativeAnswer,
+                          verifiedAnswer !== null,
+                        ),
+                        draft: nativeResult.answer,
+                      };
+                    }
                   }
                 }
               } catch {
@@ -310,7 +387,7 @@ export default {
           }
         }
       }
-      if (response.status !== 'answered' && bundleFallback) {
+      if (response.status !== 'answered' && !clarificationLocked && bundleFallback) {
         const verificationNote = '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。';
         response = {
           ...bundleFallback,
@@ -320,8 +397,11 @@ export default {
           ])),
         };
       }
+      response = contextualizeFinalNoMatch(response, parsed.question);
       response = normalizeResponseAnswer(response);
+      if (response.status === 'answered') observer?.stage('verifying');
       response = attachExecutionTrace(response, trace, curatedSourcesUsed);
+      response = attachSemanticAnswer(response);
       console.log(JSON.stringify(buildLogRecord(response, parsed)));
       return response;
     };
@@ -333,24 +413,71 @@ export default {
 } satisfies ExportedHandler<Env>;
 
 function streamAssistantResponse(
-  buildResponse: () => Promise<AssistantResponse>,
+  buildResponse: (observer: ResponseBuildObserver) => Promise<AssistantResponse>,
 ): Response {
   const encoder = new TextEncoder();
+  const turnId = crypto.randomUUID();
+  const stages: ResponseStage[] = [
+    'retrieving', 'resolving', 'verifying', 'writing',
+  ];
   const body = new ReadableStream<Uint8Array>({
     start(controller) {
       const push = (value: unknown) => {
         controller.enqueue(encoder.encode(`${JSON.stringify(value)}\n`));
       };
-      push({ type: 'progress', stage: 'retrieving' });
-      void buildResponse()
+      let currentStage = -1;
+      const advance = (stage: ResponseStage) => {
+        const target = stages.indexOf(stage);
+        if (target <= currentStage) return;
+        for (let index = currentStage + 1; index <= target; index += 1) {
+          push({ type: 'progress', stage: stages[index], turnId });
+        }
+        currentStage = target;
+      };
+
+      advance('retrieving');
+      void buildResponse({ stage: advance })
         .then((result) => {
-          push({ type: 'progress', stage: 'writing' });
-          if (result.answer) {
-            for (const delta of answerStreamChunks(result.answer)) {
-              push({ type: 'answer_delta', delta });
+          if (result.status === 'answered') advance('writing');
+          const blocks = result.answerBlocks ?? [];
+          if (blocks.length > 0) {
+            push({
+              type: 'answer_plan',
+              turnId,
+              blocks: blocks.map((block) => ({
+                blockId: block.id,
+                kind: block.kind,
+                ...(block.title ? { title: block.title } : {}),
+              })),
+            });
+            for (const block of blocks) {
+              push({
+                type: 'block_start',
+                turnId,
+                blockId: block.id,
+                kind: block.kind,
+                ...(block.title ? { title: block.title } : {}),
+              });
+              for (const delta of semanticBlockDeltas(block)) {
+                push({
+                  type: 'block_delta',
+                  turnId,
+                  blockId: block.id,
+                  delta,
+                });
+              }
+              push({ type: 'block_end', turnId, blockId: block.id });
             }
           }
-          push({ type: 'result', result });
+          if (result.status === 'needs_clarification') {
+            push({
+              type: 'clarification',
+              turnId,
+              prompt: result.followUp ?? '请补充更明确的信息。',
+              candidates: result.clarificationCandidates ?? [],
+            });
+          }
+          push({ type: 'result', turnId, result });
           controller.close();
         })
         .catch(() => {
@@ -366,20 +493,19 @@ function streamAssistantResponse(
     },
   });
 }
+function requestMentionsKnownEntity(request: AssistantRequest): boolean {
+  if (questionMentionsKnownEntity(request.question)) return true;
+  return recentConversationForQuestion(request, 6).some((message) =>
+    message.role === 'user' && questionMentionsKnownEntity(message.content)
+  );
+}
 
-function answerStreamChunks(answer: string): string[] {
-  const chunks: string[] = [];
-  let current = '';
-  for (const character of answer) {
-    current += character;
-    const naturalBreak = /[，。！？；：、\n]/u.test(character);
-    if ((current.length >= 16 && naturalBreak) || current.length >= 24) {
-      chunks.push(current);
-      current = '';
-    }
-  }
-  if (current) chunks.push(current);
-  return chunks;
+
+function isAmbiguousEntityDescription(question: string): boolean {
+  const normalized = question.trim();
+  const singularDescriptor = /(?:像|长得|看起来|小狗|小猫|那只|这只|它)/u;
+  const followUpIntent = /(?:值得练|培养|怎么进化|如何进化|配招|哪里抓|在哪抓|怎么抓|如何抓|怎么获得|如何获得|什么招式|什么特性)/u;
+  return singularDescriptor.test(normalized) && followUpIntent.test(normalized);
 }
 
 async function serveJourneyPackContent(
@@ -689,6 +815,19 @@ function normalizeResponseAnswer(response: AssistantResponse): AssistantResponse
   if (response.status !== 'answered' || !response.answer) return response;
   const answer = stripAnswerEnvelope(response.answer);
   return answer === response.answer ? response : { ...response, answer };
+}
+
+function contextualizeFinalNoMatch(
+  response: AssistantResponse,
+  question: string,
+): AssistantResponse {
+  if (
+    response.status !== 'no_match' ||
+    !MOVE_ADVICE_QUESTION_PATTERN.test(question)
+  ) {
+    return response;
+  }
+  return { ...response, followUp: MOVE_ADVICE_NO_MATCH_FOLLOW_UP };
 }
 
 function mergeResponseSources(

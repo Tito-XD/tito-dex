@@ -148,13 +148,13 @@ Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会
 
 ## 图鉴包构建与上传
 
-与 Worker 部署 **分开**进行。当前生产是 bundle v19（仍使用 `/v5/`），
-Offline APK 继续复用不可变的紧凑 v14 archive。
+与 Worker 部署 **分开**进行。当前生产是 bundle v20（仍使用 `/v5/`），
+v0.9.0 Offline APK 直接嵌入经过完整校验的 v20 archive。
 
-`.github/workflows/upload-dex-bundle.yml` 是已经完成发布的 **v19 专用**
-workflow，前置条件是线上仍为 v18；生产已经切到 v19 后不得再次用它发布。
-下一版数据包必须新增版本专用 patch/workflow，以线上 v19 为只读基线并把
-`expected_production_version` 锁定为 19。先用 `publish=false` 构建和审计，确认候选后
+`.github/workflows/upload-dex-bundle.yml` 是历史 **v19 专用** workflow；
+`.github/workflows/release-dex-bundle-v20.yml` 已从只读 v19 基线发布当前 v20。
+未来 v21 必须新增版本专用 patch/workflow，以线上 v20 为只读基线并把
+精确生产前置版本锁定为 20。先用非发布模式构建和审计，确认候选后
 再按 objects → manifest 两阶段发布。完整要求见
 [`docs/CLOUDFLARE_DEX_CDN.md`](../../docs/CLOUDFLARE_DEX_CDN.md)。
 
@@ -165,7 +165,7 @@ workflow，前置条件是线上仍为 v18；生产已经切到 v19 后不得再
 | `upload/v2/` | `v2/` | bundle **v4**，493 物种（遗留） |
 | `upload/v3/` | `v3/` | bundle **v5**，1025 物种（回滚 / 旧客户端，不修改） |
 | `upload/v4/` | `v4/` | bundle **v6**，完整形态与精确版本地点（回滚） |
-| `upload/v5/` | `v5/` | bundle **v7–v19** 的增量对象；当前生产 v19 |
+| `upload/v5/` | `v5/` | bundle **v7–v20** 的增量对象；当前生产 v20 |
 | `upload/bundle-manifest.json` | 根 | 最后写入，指向已完整验证的当前 archive |
 
 `bundleVersion` 与前缀解耦；不要因为下一版数据包而自动新建 `/v6/`。
@@ -198,7 +198,7 @@ Worker + R2 资源就绪后：
 ```bash
 TITODEX_DEX_CDN_BASE=https://dex.tito.cafe
 TITODEX_DEX_BUNDLE_URL=https://dex.tito.cafe/v5/bundle.tar.zst
-TITODEX_DEX_BUNDLE_VERSION=19
+TITODEX_DEX_BUNDLE_VERSION=20
 ```
 
 根 manifest 才是版本协商和 archive SHA-256 的权威来源；App 源码中的较旧编译期

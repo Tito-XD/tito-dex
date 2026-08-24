@@ -101,14 +101,14 @@ ThemeData _buildSolidPlasticTheme() {
       titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
     ),
     cardTheme: CardThemeData(
-      color: TitoColors.card.withValues(alpha: 0.76),
+      color: TitoColors.card.withValues(alpha: 0.93),
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: mediumShape,
     ),
     bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: TitoColors.card.withValues(alpha: 0.92),
+      backgroundColor: TitoColors.card.withValues(alpha: 0.97),
       modalBarrierColor: const Color(0x73221F26),
       showDragHandle: true,
       dragHandleColor: TitoColors.mutedInk,
@@ -155,7 +155,7 @@ ThemeData _buildSolidPlasticTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: TitoColors.card.withValues(alpha: 0.76),
+      fillColor: TitoColors.card.withValues(alpha: 0.92),
       labelStyle: textTheme.bodySmall,
       hintStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.mutedInk),
       helperStyle: textTheme.bodySmall,

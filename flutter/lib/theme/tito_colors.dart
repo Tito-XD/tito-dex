@@ -53,41 +53,47 @@ abstract final class TrainerJournalShadows {
   ];
 }
 
-/// Softer depth for translucent Solid Plastic surfaces.
+/// Concentrated moulded depth for Solid Plastic surfaces.
 abstract final class SolidPlasticShadows {
   static const List<BoxShadow> sticker = [
     BoxShadow(
-      color: Color(0x3013263D),
-      blurRadius: 22,
-      spreadRadius: -5,
-      offset: Offset(0, 10),
+      color: Color(0x3313263D),
+      blurRadius: 16,
+      spreadRadius: -3,
+      offset: Offset(0, 8),
+    ),
+    BoxShadow(
+      color: Color(0x1813263D),
+      blurRadius: 3,
+      spreadRadius: -1,
+      offset: Offset(0, 2),
     ),
   ];
 
   static const List<BoxShadow> stickerSmall = [
     BoxShadow(
-      color: Color(0x2413263D),
-      blurRadius: 14,
-      spreadRadius: -4,
-      offset: Offset(0, 6),
+      color: Color(0x2A13263D),
+      blurRadius: 11,
+      spreadRadius: -3,
+      offset: Offset(0, 5),
     ),
   ];
 
   static const List<BoxShadow> stickerPressed = [
     BoxShadow(
       color: Color(0x2413263D),
-      blurRadius: 10,
-      spreadRadius: -4,
-      offset: Offset(0, 3),
+      blurRadius: 7,
+      spreadRadius: -3,
+      offset: Offset(0, 2),
     ),
   ];
 
   static const List<BoxShadow> glassSmall = [
     BoxShadow(
-      color: Color(0x2613263D),
-      blurRadius: 16,
-      spreadRadius: -4,
-      offset: Offset(0, 7),
+      color: Color(0x2A13263D),
+      blurRadius: 10,
+      spreadRadius: -3,
+      offset: Offset(0, 4),
     ),
   ];
 }
@@ -115,12 +121,15 @@ abstract final class TitoColors {
   static const hpGreen = Color(0xFF6BC4A6);
   static const expGold = Color(0xFFF7D977);
 
-  static const glassBackgroundTop = Color(0xFF314D70);
-  static const glassBackgroundMid = Color(0xFF567B99);
-  static const glassBackgroundBottom = Color(0xFF7898AA);
-  static const glassCyan = Color(0xFF78D8E8);
-  static const glassLavender = Color(0xFFC1A7EF);
-  static const glassMint = Color(0xFF8EE0C1);
+  // Solid Plastic keeps a cool hardware shell underneath the optical layers.
+  // The accents are deliberately milky instead of neon so translucent edges
+  // read as moulded plastic rather than a fully transparent glass sheet.
+  static const glassBackgroundTop = Color(0xFF344D6B);
+  static const glassBackgroundMid = Color(0xFF58768F);
+  static const glassBackgroundBottom = Color(0xFF758FA2);
+  static const glassCyan = Color(0xFFB9DFE7);
+  static const glassLavender = Color(0xFFD7CDEA);
+  static const glassMint = Color(0xFFBFE2D4);
 }
 
 abstract final class TitoRadii {

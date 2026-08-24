@@ -18,7 +18,7 @@ void main() {
     expect(find.byType(Hero), findsOneWidget);
   });
 
-  testWidgets('Dex expands in 320ms and collapses in 280ms', (tester) async {
+  testWidgets('Dex expands in 260ms and collapses in 220ms', (tester) async {
     final page = titoDexPage<void>(
       key: const ValueKey<String>('dex-page'),
       heroTag: TitoHomeActionHero.dex,
@@ -36,17 +36,16 @@ void main() {
     final route = ModalRoute.of(tester.element(find.byType(Placeholder)))!;
     expect(route.transitionDuration, titoDexTransitionDuration);
     expect(route.reverseTransitionDuration, titoDexReverseTransitionDuration);
-    expect(titoDexTransitionDuration, const Duration(milliseconds: 320));
-    expect(titoDexReverseTransitionDuration, const Duration(milliseconds: 280));
+    expect(titoDexTransitionDuration, const Duration(milliseconds: 260));
+    expect(titoDexReverseTransitionDuration, const Duration(milliseconds: 220));
     expect(route.opaque, isTrue);
-    // Single-page stack: the gesture is disabled only because dex isFirst.
-    // With home underneath (covered in the fade harness below), the dex route
-    // must allow Android's predictive back gesture.
+    // The container flight owns both directions, so predictive back stays off.
     expect(route.popGestureEnabled, isFalse);
-    expect(
-      tester.widget<Hero>(find.byType(Hero)).transitionOnUserGestures,
-      isFalse,
-    );
+    final hero = tester.widget<Hero>(find.byType(Hero));
+    expect(hero.transitionOnUserGestures, isFalse);
+    expect(hero.createRectTween, same(titoDexRectTween));
+    expect(hero.curve, titoDexForwardCurve);
+    expect(hero.reverseCurve, titoDexReverseCurve);
 
     // Predictive-back drags keep a runway above 0 so a full-edge commit
     // always plays the framework fade instead of vanishing instantly.
@@ -55,7 +54,34 @@ void main() {
     route.handleUpdateBackGestureProgress(progress: 1.0);
   });
 
-  testWidgets('Dex shell expands before its list cards fade in', (
+  testWidgets('direct Dex links fall back cleanly without a source Hero', (
+    tester,
+  ) async {
+    final page = titoDexPage<void>(
+      key: const ValueKey<String>('direct-dex-page'),
+      child: const ColoredBox(color: Colors.blueGrey),
+      content: const Text(
+        'Direct Dex content',
+        key: ValueKey<String>('direct-dex-content'),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Navigator(pages: [page], onDidRemovePage: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Hero), findsNothing);
+    expect(
+      find.byKey(const ValueKey<String>('direct-dex-content')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Dex shell and list share one compact reveal timeline', (
     tester,
   ) async {
     await tester.pumpWidget(const _DexFadeHarness());
@@ -70,12 +96,12 @@ void main() {
     expect(fade.opacity.value, lessThan(0.1));
     expect(tester.getTopLeft(home), initialPosition);
 
-    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 90));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
     expect(fade.opacity.value, lessThan(0.1));
-    await tester.pump(const Duration(milliseconds: 130));
+    await tester.pump(const Duration(milliseconds: 60));
     fade = tester.widget<FadeTransition>(
       find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
     );
@@ -91,9 +117,54 @@ void main() {
     expect(dexRoute.popGestureEnabled, isFalse);
 
     await tester.tap(find.byKey(const ValueKey<String>('close-page')));
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 25));
+    fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, greaterThan(0));
+    expect(fade.opacity.value, lessThan(0.9));
+    await tester.pump(const Duration(milliseconds: 205));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey<String>('open-card')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reduced motion removes the Dex content rise without a flash', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const _DexFadeHarness(disableAnimations: true));
+
+    await tester.tap(find.byKey(const ValueKey<String>('open-card')));
+    await tester.pump();
+    var fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    final slide = tester.widget<SlideTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-slide')),
+    );
+    expect(fade.opacity.value, 0);
+    expect(slide.position.value, Offset.zero);
+
+    await tester.pump(const Duration(milliseconds: 130));
+    fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, greaterThan(0));
+    expect(fade.opacity.value, lessThan(1));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byKey(const ValueKey<String>('close-page')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 110));
+    fade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey<String>('tito-dex-content-reveal')),
+    );
+    expect(fade.opacity.value, greaterThan(0));
+    expect(fade.opacity.value, lessThan(0.1));
+    await tester.pump(const Duration(milliseconds: 120));
+    await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 
@@ -251,7 +322,9 @@ class _TrackedDexListState extends State<_TrackedDexList> {
 }
 
 class _DexFadeHarness extends StatefulWidget {
-  const _DexFadeHarness();
+  const _DexFadeHarness({this.disableAnimations = false});
+
+  final bool disableAnimations;
 
   @override
   State<_DexFadeHarness> createState() => _DexFadeHarnessState();
@@ -263,6 +336,15 @@ class _DexFadeHarnessState extends State<_DexFadeHarness> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: (context, child) {
+        if (!widget.disableAnimations) {
+          return child!;
+        }
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(disableAnimations: true),
+          child: child!,
+        );
+      },
       home: Navigator(
         pages: [
           titoHomePage<void>(

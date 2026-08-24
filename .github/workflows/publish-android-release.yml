@@ -109,6 +109,7 @@ jobs:
             "$lite"
           tools/verify_release_apk.sh --offline \
             --expected-package com.tito.titodex \
+            --expected-bundle-version 20 \
             --expected-version-name "$VERSION-offline" \
             --expected-version-code "$OFFLINE_BUILD_NUMBER" \
             "$offline"
@@ -176,13 +177,13 @@ jobs:
           ### 下载
 
           - \`TitoDex-$VERSION-lite-rg-arm64.apk\`：推荐版本，按需下载离线数据包；versionCode \`$LITE_BUILD_NUMBER\`。
-          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置已验证的紧凑离线数据；versionCode \`$OFFLINE_BUILD_NUMBER\`。
+          - \`TitoDex-$VERSION-offline-rg-arm64.apk\`：内置完整校验的 v20 离线资料；versionCode \`$OFFLINE_BUILD_NUMBER\`。
 
           Journey Assistant 已内建于主 App，不需要另装附加 APK。旧 1.0.0 包只保留读取兼容。
 
           ### 验证
 
-          主应用两个 APK 均为 arm64-v8a，已核对版本、版本码、包名、压缩包完整性与同一发布签名；Offline 版本额外验证内置数据清单和归档摘要。CI 仍构建旧协议兼容包并交叉核对签名，但不再把它作为用户下载项发布。
+          主应用两个 APK 均为 arm64-v8a，已核对版本、版本码、包名、压缩包完整性与同一发布签名；Offline 版本额外验证内置数据清单和归档摘要。CI 额外交叉核对历史内容包的发布签名，但不把它作为用户下载项发布。
           EOF
           {
             printf '\n### SHA-256\n\n```text\n'

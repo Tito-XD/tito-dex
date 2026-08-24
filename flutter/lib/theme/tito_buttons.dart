@@ -73,9 +73,8 @@ class TitoPrimaryButton extends StatelessWidget {
       final surface = appVisualStyle.usesSolidPlastic
           ? LiquidGlassSurface(
               tint: TitoColors.deepBlue,
-              opacity: onPressed == null ? 0.58 : 0.9,
+              opacity: onPressed == null ? 0.78 : 0.95,
               radius: TitoRadii.md,
-              blurSigma: 12,
               borderColor: Colors.white.withValues(alpha: 0.42),
               child: content,
             )
@@ -217,9 +216,8 @@ class TitoQuickTile extends StatelessWidget {
       final surface = appVisualStyle.usesSolidPlastic
           ? LiquidGlassSurface(
               tint: backgroundColor ?? TitoColors.card,
-              opacity: 0.72,
+              opacity: 0.92,
               radius: TitoRadii.md,
-              blurSigma: 12,
               child: content,
             )
           : Material(

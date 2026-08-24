@@ -4,6 +4,7 @@ import {
   searchTavily,
   searchTavily52Poke,
   searchTavilyFallback,
+  searchTavilyFallbackCorroborating,
   TAVILY_52POKE_DOMAINS,
   TAVILY_ALLOWED_DOMAINS,
   TAVILY_FALLBACK_DOMAINS,
@@ -84,12 +85,12 @@ describe('bounded Tavily allowlist search', () => {
       const body = JSON.parse(init?.body as string) as Record<string, unknown>;
       expect(body).toMatchObject({
         search_depth: 'basic',
-        chunks_per_source: 2,
         max_results: 6,
         include_answer: false,
         include_raw_content: false,
         auto_parameters: false,
       });
+      expect(body).not.toHaveProperty('chunks_per_source');
       expect(body.query).toContain('Pokémon Violet');
       expect(body.include_domains).toEqual(TAVILY_ALLOWED_DOMAINS);
       expect(JSON.stringify(body)).not.toContain('example.com');
@@ -112,6 +113,64 @@ describe('bounded Tavily allowlist search', () => {
       url: 'https://bulbapedia.bulbagarden.net/wiki/Riolu_(Pok%C3%A9mon)#Game_locations'.replace('#Game_locations', ''),
       text: 'In Pokémon Scarlet and Violet, Riolu appears in South Province Area Four.',
     }]);
+  });
+
+  it('uses advanced relevant chunks only for bounded strategy research', async () => {
+    const strategyContent = 'Lucario moveset table. '.repeat(110);
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      expect(body).toMatchObject({
+        search_depth: 'advanced',
+        chunks_per_source: 3,
+        include_answer: false,
+        include_raw_content: false,
+      });
+      return json({ results: [{
+        title: 'Lucario Movesets and Best Builds',
+        url: 'https://game8.co/games/Pokemon-Scarlet-Violet/archives/401366',
+        content: strategyContent,
+        score: 0.95,
+      }] });
+    });
+
+    const result = await searchTavily({
+      ...decision,
+      queryZh: '紫里路卡利欧适合学哪些招式',
+      queryEn: 'Lucario training guide viability evolution moveset',
+    }, 'Pokémon Violet', apiKey, fetcher);
+
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(result[0].text).toBe(strategyContent.trim());
+  });
+
+  it('uses complementary move-advice queries and merges snippets from one guide', async () => {
+    const queries: string[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      const query = String(body.query);
+      queries.push(query);
+      return json({ results: [{
+        title: 'Lucario Movesets and Best Builds',
+        url: 'https://game8.co/games/Pokemon-Scarlet-Violet/archives/401366',
+        content: query.includes('competitive ranked battle')
+          ? 'Competitive moveset: Close Combat, Bullet Punch, Extreme Speed.'
+          : 'Story moveset: Extreme Speed, Close Combat, Dragon Pulse, Swords Dance.',
+        score: 0.95,
+      }] });
+    });
+
+    const result = await searchTavilyFallbackCorroborating({
+      ...decision,
+      queryZh: '紫里路卡利欧适合学哪些招式',
+      queryEn: 'Lucario best moveset build recommended moves',
+    }, 'Pokémon Violet', apiKey, fetcher);
+
+    expect(queries).toHaveLength(2);
+    expect(queries.some((query) => query.includes('competitive ranked battle'))).toBe(true);
+    expect(queries.some((query) => query.includes('通关 配招 推荐 招式表'))).toBe(true);
+    expect(result).toHaveLength(1);
+    expect(result[0].text).toContain('Competitive moveset');
+    expect(result[0].text).toContain('Story moveset');
   });
 
   it('drops arbitrary and credentialed result URLs', async () => {

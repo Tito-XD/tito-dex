@@ -5,8 +5,10 @@ import abilityLabels from '../../../flutter/assets/l10n/zh/abilities_labels.json
 import {
   effectiveContextReliability,
   MAX_ANSWER_LENGTH,
+  MAX_CLARIFICATION_CANDIDATES,
   type AssistantRequest,
   type AssistantResponse,
+  type ClarificationCandidate,
 } from './contract';
 import type { CuratedSource } from './curated_web';
 
@@ -69,6 +71,83 @@ const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel
 const itemTargets = buildTargets(itemLabels as Record<string, SpeciesLabel>);
 const moveTargets = buildTargets(moveLabels as Record<string, SpeciesLabel>);
 const abilityTargets = buildTargets(abilityLabels as Record<string, SpeciesLabel>);
+
+const fuzzySpeciesGroups: readonly { pattern: RegExp; ids: ReadonlySet<number> }[] = [
+  {
+    pattern: /(?:小狗|狗|犬|狼|豺|狐狸|狐)/u,
+    ids: new Set([
+      37, 38, 58, 59, 133, 196, 197, 209, 210, 228, 229, 261, 262,
+      309, 310, 447, 448, 506, 507, 508, 653, 654, 655, 744, 745, 827,
+      828, 835, 836, 888, 889, 926, 927, 942, 943,
+    ]),
+  },
+  {
+    pattern: /(?:小猫|猫|狮|虎|豹)/u,
+    ids: new Set([
+      52, 53, 196, 197, 300, 301, 431, 432, 509, 510, 667, 668, 725,
+      726, 727, 807, 863, 906, 907, 908,
+    ]),
+  },
+];
+
+const fuzzyColorPatterns: readonly [string, RegExp][] = [
+  ['black', /(?:黑|黑色)/u],
+  ['blue', /(?:蓝|蓝色|青蓝)/u],
+  ['brown', /(?:棕|褐|棕色|褐色)/u],
+  ['gray', /(?:灰|银灰|灰色)/u],
+  ['green', /(?:绿|绿色)/u],
+  ['pink', /(?:粉|粉色)/u],
+  ['purple', /(?:紫|紫色)/u],
+  ['red', /(?:红|红色)/u],
+  ['white', /(?:白|白色)/u],
+  ['yellow', /(?:黄|黄色)/u],
+];
+
+const fuzzyTypePatterns: readonly [string, RegExp][] = [
+  ['normal', /(?:一般|普通)(?:系|属性)/u],
+  ['fire', /火(?:系|属性)/u],
+  ['water', /水(?:系|属性)/u],
+  ['electric', /电(?:系|属性)/u],
+  ['grass', /草(?:系|属性)/u],
+  ['ice', /冰(?:系|属性)/u],
+  ['fighting', /格斗(?:系|属性)/u],
+  ['poison', /毒(?:系|属性)/u],
+  ['ground', /地面(?:系|属性)/u],
+  ['flying', /飞行(?:系|属性)/u],
+  ['psychic', /(?:超能力|超能)(?:系|属性)/u],
+  ['bug', /虫(?:系|属性)/u],
+  ['rock', /岩石(?:系|属性)/u],
+  ['ghost', /幽灵(?:系|属性)/u],
+  ['dragon', /龙(?:系|属性)/u],
+  ['dark', /恶(?:系|属性)/u],
+  ['steel', /钢(?:系|属性)/u],
+  ['fairy', /妖精(?:系|属性)/u],
+];
+
+const regionalDexKeys: Partial<Record<AssistantRequest['context']['game'], readonly string[]>> = {
+  diamond: ['original-sinnoh', 'extended-sinnoh'],
+  pearl: ['original-sinnoh', 'extended-sinnoh'],
+  platinum: ['extended-sinnoh', 'original-sinnoh'],
+  heartgold: ['updated-johto', 'original-johto'],
+  soulsilver: ['updated-johto', 'original-johto'],
+  black: ['original-unova', 'updated-unova'],
+  white: ['original-unova', 'updated-unova'],
+  'black-2': ['updated-unova', 'original-unova'],
+  'white-2': ['updated-unova', 'original-unova'],
+  x: ['kalos-central', 'kalos-coastal', 'kalos-mountain'],
+  y: ['kalos-central', 'kalos-coastal', 'kalos-mountain'],
+  sun: ['original-alola'],
+  moon: ['original-alola'],
+  'ultra-sun': ['updated-alola'],
+  'ultra-moon': ['updated-alola'],
+  sword: ['galar', 'isle-of-armor', 'crown-tundra'],
+  shield: ['galar', 'isle-of-armor', 'crown-tundra'],
+  'brilliant-diamond': ['original-sinnoh', 'extended-sinnoh'],
+  'shining-pearl': ['original-sinnoh', 'extended-sinnoh'],
+  'legends-arceus': ['hisui'],
+  scarlet: ['paldea', 'kitakami', 'blueberry'],
+  violet: ['paldea', 'kitakami', 'blueberry'],
+};
 
 const encounterIntent = /(?:哪里|哪儿|在哪|何处|怎么抓|如何抓|怎么捉|如何捉|可以抓|能抓|捕捉|捕获|抓到|捉到|遇到|出没|分布|栖息)/u;
 const evolutionIntent = /(?:进化|退化|进化链)/u;
@@ -306,6 +385,123 @@ export async function answerFromDexBundle(
 }
 
 /**
+ * Resolve fuzzy visual/type descriptions to bounded, stable species choices.
+ * This never selects an entity for the user: catalog metadata only narrows the
+ * list rendered as explicit confirmation chips in the App.
+ */
+export async function resolveDexBundleClarificationCandidates(
+  request: AssistantRequest,
+  bucket: R2Bucket | undefined,
+): Promise<ClarificationCandidate[]> {
+  if (!bucket) return [];
+  const question = request.question.trim();
+  const groupMatches = fuzzySpeciesGroups.filter(({ pattern }) => pattern.test(question));
+  const allowedGroupIds = groupMatches.length === 0
+    ? null
+    : new Set(groupMatches.flatMap(({ ids }) => [...ids]));
+  const colors = fuzzyColorPatterns.flatMap(([color, pattern]) =>
+    pattern.test(question) ? [color] : []
+  );
+  const types = fuzzyTypePatterns.flatMap(([type, pattern]) =>
+    pattern.test(question) ? [type] : []
+  );
+  const shapeSlugs = fuzzyShapeSlugs(question);
+  const asksSmall = /(?:小只|小个|很小|小小|小狗|小猫)/u.test(question);
+  const asksLarge = /(?:巨大|很大|大只|大个)/u.test(question);
+  if (
+    allowedGroupIds === null &&
+    colors.length === 0 &&
+    types.length === 0 &&
+    shapeSlugs.length === 0 &&
+    !asksSmall &&
+    !asksLarge
+  ) {
+    return [];
+  }
+
+  const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
+  if (!validBundleManifest(manifest)) return [];
+  const catalog = await readJsonObject(
+    bucket,
+    `${manifest.cdnPrefix}/dex_catalog.json`,
+    MAX_CATALOG_BYTES,
+  );
+  if (!catalog || !Array.isArray(catalog.summaries) || catalog.summaries.length > 2_000) {
+    return [];
+  }
+  const regionalKeys = regionalDexKeys[request.context.game] ?? [];
+  const ranked = catalog.summaries.flatMap((value) => {
+    if (!isPlainObject(value) ||
+        !Number.isInteger(value.id) ||
+        (value.id as number) < 1 ||
+        (value.id as number) > 10_000 ||
+        typeof value.nameZh !== 'string' ||
+        value.nameZh.trim().length === 0 ||
+        value.nameZh.length > 80 ||
+        !Array.isArray(value.types) ||
+        value.types.some((type) => typeof type !== 'string')) {
+      return [];
+    }
+    const id = value.id as number;
+    const candidateTypes = value.types as string[];
+    const generation = Number.isInteger(value.generation)
+      ? value.generation as number
+      : null;
+    if (generation !== null && generation > request.context.generation) return [];
+    if (allowedGroupIds && !allowedGroupIds.has(id)) return [];
+    if (types.length > 0 && !types.every((type) => candidateTypes.includes(type))) return [];
+    if (colors.length > 0 &&
+        (typeof value.colorSlug !== 'string' || !colors.includes(value.colorSlug))) {
+      return [];
+    }
+    if (shapeSlugs.length > 0 &&
+        (typeof value.shapeSlug !== 'string' || !shapeSlugs.includes(value.shapeSlug))) {
+      return [];
+    }
+
+    const height = typeof value.heightDm === 'number' && Number.isFinite(value.heightDm)
+      ? value.heightDm
+      : null;
+    const pokedexNumbers = isPlainObject(value.pokedexNumbers)
+      ? value.pokedexNumbers
+      : null;
+    const regional = pokedexNumbers !== null && regionalKeys.some((key) =>
+      Number.isInteger(pokedexNumbers[key])
+    );
+    let score = 0;
+    if (allowedGroupIds) score += 12;
+    score += types.length * 8;
+    if (colors.length > 0) score += 6;
+    if (shapeSlugs.length > 0) score += 5;
+    if (regional) score += 3;
+    if (asksSmall && height !== null && height <= 10) score += 3;
+    if (asksLarge && height !== null && height >= 20) score += 3;
+    return [{
+      id,
+      nameZh: value.nameZh.trim(),
+      score,
+      height: height ?? Number.POSITIVE_INFINITY,
+    }];
+  }).sort((left, right) =>
+    right.score - left.score || left.height - right.height || left.id - right.id
+  );
+
+  return ranked.slice(0, MAX_CLARIFICATION_CANDIDATES).map((candidate) => ({
+    id: `pokemon-${candidate.id}`,
+    label: candidate.nameZh,
+    kind: 'pokemon',
+  }));
+}
+
+function fuzzyShapeSlugs(question: string): string[] {
+  if (/(?:鱼|鲨)/u.test(question)) return ['fish'];
+  if (/(?:蛇|鳗|细长|长条)/u.test(question)) return ['squiggle'];
+  if (/(?:鸟|鹰|雕|鸽|有翅膀)/u.test(question)) return ['wings'];
+  if (/(?:虫|昆虫)/u.test(question)) return ['bug-wings', 'armor', 'legs'];
+  return [];
+}
+
+/**
  * Build a small, internally generated evidence object for open-ended Qwen
  * composition. It deliberately excludes flavor prose and held-item rows (the
  * latter include a separately licensed 52Poké batch); those remain available
@@ -350,6 +546,8 @@ export async function buildDexBundleSources(
         species,
         request.context.game,
         gameplayShard,
+        /(?:配招|(?:招式|技能).{0,16}(?:适合|推荐|选择|哪些|什么|怎么|搭配|好用))/u
+          .test(request.question),
       );
     }
   }
@@ -451,6 +649,11 @@ function answerEncounter(
     `encounter-${request.context.game}-${target.id}`,
     [`species:${target.id}`, `game:${request.context.game}`],
   );
+}
+
+export function questionMentionsKnownEntity(question: string): boolean {
+  return [speciesTargets, moveTargets, itemTargets, abilityTargets]
+    .some((targets) => findTarget(question, targets) !== null);
 }
 
 function findTarget(question: string, targets: EntityTarget[]): EntityTarget | null {
@@ -763,6 +966,7 @@ function compactSpeciesEvidence(
   species: EntityTarget,
   game: AssistantRequest['context']['game'],
   gameplayShard: GameplaySpeciesShard | null,
+  moveAdvice = false,
 ): Record<string, unknown> {
   const summary = isPlainObject(detail.summary) ? detail.summary : {};
   const evidence: Record<string, unknown> = {
@@ -833,13 +1037,18 @@ function compactSpeciesEvidence(
   if (isPlainObject(rawMoveSet)) {
     const set = rawMoveSet;
     const compactRows = usingShardMoveSet ? compactGameplayMoveRows : compactMoveRows;
-    evidence.moveSet = {
-      levelUp: compactRows(set.levelUp, 24, true),
-      machine: compactRows(set.machine, 24, false),
-      egg: compactRows(set.egg, 16, false),
-      tutor: compactRows(set.tutor, 16, false),
-      truncated: true,
-    };
+    evidence.moveSet = moveAdvice
+      ? {
+          learnable: compactMoveAdviceRows(set, compactRows),
+          truncated: true,
+        }
+      : {
+          levelUp: compactRows(set.levelUp, 24, true),
+          machine: compactRows(set.machine, 24, false),
+          egg: compactRows(set.egg, 16, false),
+          tutor: compactRows(set.tutor, 16, false),
+          truncated: true,
+        };
   }
   if (gameplayShard && gameplayShard.evolutions.length > 0) {
     evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
@@ -884,9 +1093,11 @@ function compactGameplayMoveRows(value: unknown, maximum: number, includeLevel: 
     const id = Number(match[1]);
     const target = moveTargets.find((candidate) => candidate.id === id);
     if (!target) return [];
+    const nameEn = target.aliases.find((alias) => !/[\u3400-\u9fff]/u.test(alias));
     return [{
       id,
       nameZh: target.nameZh,
+      ...(nameEn ? { nameEn } : {}),
       ...(includeLevel && isPlainObject(entry) && validLevel(entry.level)
         ? { level: entry.level }
         : {}),
@@ -900,12 +1111,34 @@ function compactMoveRows(value: unknown, maximum: number, includeLevel: boolean)
     if (!isPlainObject(entry) || !Number.isInteger(entry.moveId)) return [];
     const target = moveTargets.find((candidate) => candidate.id === entry.moveId);
     if (!target) return [];
+    const nameEn = target.aliases.find((alias) => !/[\u3400-\u9fff]/u.test(alias));
     return [{
       id: target.id,
       nameZh: target.nameZh,
+      ...(nameEn ? { nameEn } : {}),
       ...(includeLevel && validLevel(entry.level) ? { level: entry.level } : {}),
     }];
   }).slice(0, maximum);
+}
+
+function compactMoveAdviceRows(
+  set: Record<string, unknown>,
+  compactRows: (value: unknown, maximum: number, includeLevel: boolean) => unknown[],
+): Record<string, string>[] {
+  const seen = new Set<string>();
+  return ['levelUp', 'egg', 'tutor', 'machine'].flatMap((method) =>
+    compactRows(set[method], 256, method === 'levelUp'))
+    .flatMap((row) => {
+      if (!isPlainObject(row) || typeof row.nameZh !== 'string') return [];
+      const normalized = normalize(row.nameZh);
+      if (!normalized || seen.has(normalized)) return [];
+      seen.add(normalized);
+      return [{
+        nameZh: row.nameZh,
+        ...(typeof row.nameEn === 'string' ? { nameEn: row.nameEn } : {}),
+      }];
+    })
+    .slice(0, 80);
 }
 
 function compactMoveEvidence(

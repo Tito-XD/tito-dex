@@ -2,11 +2,13 @@ import type { CuratedSource, ScopeDecision } from './curated_web';
 import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
 
 const TAVILY_SEARCH_ENDPOINT = 'https://api.tavily.com/search';
-const TAVILY_TIMEOUT_MS = 3_500;
+const TAVILY_TIMEOUT_MS = 5_000;
 const MAX_TAVILY_RESPONSE_BYTES = 64 * 1024;
 const MAX_QUERY_CHARS = 180;
 const MAX_RESULT_TEXT_CHARS = 1_500;
 const MAX_TOTAL_TEXT_CHARS = 5_000;
+const MAX_STRATEGY_RESULT_TEXT_CHARS = 3_000;
+const MAX_STRATEGY_TOTAL_TEXT_CHARS = 8_000;
 const MAX_RESULTS = 6;
 
 /**
@@ -62,6 +64,9 @@ export async function searchTavily(
     .trim()
     .slice(0, MAX_QUERY_CHARS);
   if (query.length < 2) return [];
+  const advancedResearch =
+    /(?:training guide|moveset|viability|配招|培养|攻略|队伍|搭配|打法|推荐|值不值得)/iu
+      .test(`${decision.queryEn} ${decision.queryZh}`);
   const allowedDomains = domainMode === '52poke'
     ? TAVILY_52POKE_DOMAINS
     : domainMode === 'fallback'
@@ -79,8 +84,8 @@ export async function searchTavily(
       },
       body: JSON.stringify({
         query,
-        search_depth: 'basic',
-        chunks_per_source: 2,
+        search_depth: advancedResearch ? 'advanced' : 'basic',
+        ...(advancedResearch ? { chunks_per_source: 3 } : {}),
         max_results: MAX_RESULTS,
         topic: 'general',
         include_answer: false,
@@ -112,12 +117,18 @@ export async function searchTavily(
 
   const sources: CuratedSource[] = [];
   let totalTextChars = 0;
+  const maxResultTextChars = advancedResearch
+    ? MAX_STRATEGY_RESULT_TEXT_CHARS
+    : MAX_RESULT_TEXT_CHARS;
+  const maxTotalTextChars = advancedResearch
+    ? MAX_STRATEGY_TOTAL_TEXT_CHARS
+    : MAX_TOTAL_TEXT_CHARS;
   for (const candidate of value.results.slice(0, MAX_RESULTS)) {
     const result = validateResult(candidate, allowedDomains);
     if (!result) continue;
-    const remaining = MAX_TOTAL_TEXT_CHARS - totalTextChars;
+    const remaining = maxTotalTextChars - totalTextChars;
     if (remaining <= 0) break;
-    const text = result.content.slice(0, Math.min(MAX_RESULT_TEXT_CHARS, remaining));
+    const text = result.content.slice(0, Math.min(maxResultTextChars, remaining));
     if (text.length < 20) continue;
     totalTextChars += text.length;
     sources.push({
@@ -191,9 +202,25 @@ export async function searchTavilyFallbackCorroborating(
   apiKey: string,
   fetcher: typeof fetch = fetch,
 ): Promise<CuratedSource[]> {
+  const moveAdvice = /(?:moveset|best moves|配招|推荐.{0,12}招式)/iu.test(
+    `${decision.queryEn} ${decision.queryZh}`,
+  );
+  const englishDecision = moveAdvice
+    ? {
+        ...decision,
+        queryEn: `${decision.queryEn} competitive ranked battle exact move list`
+          .slice(0, 100),
+      }
+    : decision;
+  const chineseDecision = moveAdvice
+    ? {
+        ...decision,
+        queryZh: `${decision.queryZh} 通关 配招 推荐 招式表`.slice(0, 100),
+      }
+    : decision;
   const [english, chinese] = await Promise.all([
     searchTavily(
-      decision,
+      englishDecision,
       exactGameName,
       apiKey,
       fetcher,
@@ -202,7 +229,7 @@ export async function searchTavilyFallbackCorroborating(
       'fallback',
     ),
     searchTavily(
-      decision,
+      chineseDecision,
       exactGameName,
       apiKey,
       fetcher,
@@ -218,12 +245,22 @@ function mergeCorroboratingSources(
   english: CuratedSource[],
   chinese: CuratedSource[],
 ): CuratedSource[] {
-  const seenUrls = new Set<string | undefined>();
-  const deduplicated = [...english, ...chinese].filter((source) => {
-    if (seenUrls.has(source.url)) return false;
-    seenUrls.add(source.url);
-    return true;
-  });
+  const byUrl = new Map<string, CuratedSource>();
+  for (const source of [...english, ...chinese]) {
+    const key = source.url ?? source.id;
+    const existing = byUrl.get(key);
+    if (!existing) {
+      byUrl.set(key, { ...source });
+      continue;
+    }
+    if (!existing.text.includes(source.text)) {
+      existing.text = `${existing.text}\n${source.text}`.slice(
+        0,
+        MAX_STRATEGY_RESULT_TEXT_CHARS,
+      );
+    }
+  }
+  const deduplicated = [...byUrl.values()];
   const selected: CuratedSource[] = [];
   const deferred: CuratedSource[] = [];
   const hosts = new Set<string>();

@@ -130,6 +130,6 @@ export CLOUDFLARE_ACCOUNT_ID=...
 历史 `dist/dex-v7` 示例当作当前可发布数据。
 
 Or: download the current production root manifest first, then run
-`python3 tools/stage_l10n_upload.py --remote-manifest <manifest> --expected-bundle-version 19`.
+`python3 tools/stage_l10n_upload.py --remote-manifest <manifest> --expected-bundle-version 20`.
 The exact expected version is deliberate: change it only together with a verified production
 bundle release, never to make a stale-manifest failure pass.

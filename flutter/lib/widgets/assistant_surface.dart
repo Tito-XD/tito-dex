@@ -36,9 +36,8 @@ class AssistantSurface extends StatelessWidget {
         listenable: retroStyle,
         builder: (context, content) => LiquidGlassSurface(
           tint: color ?? TitoColors.card,
-          opacity: 0.74,
+          opacity: 0.92,
           radius: radius,
-          blurSigma: 12,
           borderColor: borderColor ?? TitoColors.ink.withValues(alpha: 0.28),
           borderWidth: borderWidth,
           padding: padding,

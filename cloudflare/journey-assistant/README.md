@@ -140,11 +140,10 @@ Every `/v1/ask` response also carries a privacy-safe trace:
 Clients may opt into progressive rendering with
 `Accept: application/x-ndjson`. The Worker emits a retrieval progress event,
 then waits for the same deterministic/model/source verification used by the
-JSON route. Only after that check completes does it emit bounded
-`answer_delta` chunks followed by a full `result` event. It never exposes raw,
-unverified provider tokens. Clients that omit the header continue to receive
-the original single JSON response, and new App clients accept that legacy
-shape as a backward-compatible final event.
+JSON route. Only after that check completes does it emit a bounded semantic
+plan and verified answer blocks, followed by the authoritative `result` event.
+It never exposes raw, unverified provider tokens. Clients that omit the header
+continue to receive the single JSON response.
 
 No prompt, generated query, source excerpt, location ID, or user text is added
 to the trace or Worker log.

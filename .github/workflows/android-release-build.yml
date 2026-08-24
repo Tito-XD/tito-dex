@@ -161,7 +161,7 @@ jobs:
           python3 - <<'PY'
           import json
           manifest = json.load(open("assets/dex/bundle-manifest.json", encoding="utf-8"))
-          assert manifest["bundleVersion"] >= 7, manifest
+          assert manifest["bundleVersion"] == 20, manifest
           assert manifest["pokemonCount"] == 1025, manifest
           assert manifest["complete"] is True, manifest
           assert manifest["cdnPrefix"] == "v5", manifest
@@ -243,7 +243,8 @@ jobs:
           mkdir -p ../dist
           cp build/app/outputs/flutter-apk/app-release.apk "../dist/$ARTIFACT_NAME"
           if [[ "$VARIANT" == "offline" ]]; then
-            ../tools/verify_release_apk.sh --offline "../dist/$ARTIFACT_NAME"
+            ../tools/verify_release_apk.sh --offline --expected-bundle-version 20 \
+              "../dist/$ARTIFACT_NAME"
           else
             ../tools/verify_release_apk.sh "../dist/$ARTIFACT_NAME"
           fi

@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.8.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.20) · Lite `0.8.20+174` · Offline `0.8.20-offline+175`.
+> **Latest release:** [v0.9.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.0) · Lite `0.9.0+177` · Offline `0.9.0-offline+178`.
 >
-> **Current `main`:** v0.8.20 release baseline with downloadable per-game Journey data packs, stable entity deep links, bundle-grounded retrieval, BGE-M3 AI Search, Tavily and DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.0 release baseline with three persistent themes, theme-aware motion, verified semantic Journey answers, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,19 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v19; compact v14 Offline seed |
+| Offline data | Live bundle v20; v0.9.0 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.9.0
+
+- Ship Trainer's Journal, Solid Plastic, and Flat UI as persistent built-in themes while retaining Trainer's Journal as the production first-install default.
+- Refine theme-aware Dex/navigation motion, predictive back behavior, reduced-motion fallbacks, and the restrained Solid Plastic optical surface.
+- Replace legacy answer deltas with verified semantic answer blocks, staged progress, clarification choices, stable in-place reveal, and stale-request/game-context protection.
+- Tighten multi-source answer quality, current-game version isolation, fuzzy entity matching, move/advice validation, citation aggregation, and deterministic fallback.
+- Embed the complete verified v20 reference/gameplay archive in the Offline APK; Lite continues to install the same current bundle on demand.
 
 ## Completed in v0.8.20
 

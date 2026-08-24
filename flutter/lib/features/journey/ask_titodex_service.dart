@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'ask_titodex_answer_blocks.dart';
 import 'ask_titodex_settings.dart';
+import 'ask_titodex_stream_protocol.dart';
 import 'journey_pack_models.dart';
 import 'journey_worker_config.dart';
 import 'journey_pack_repository.dart';
@@ -55,7 +57,22 @@ String _encodeAskRequest(
   return body;
 }
 
-enum AskTitoDexProgress { checkingLocal, contactingWorker, revealingAnswer }
+enum AskTitoDexProgress {
+  checkingLocal,
+  contactingWorker,
+  retrievingSources,
+  resolvingQuestion,
+  verifyingAnswer,
+  revealingAnswer,
+}
+
+AskTitoDexProgress _progressForStreamStage(AskTitoDexStreamStage stage) =>
+    switch (stage) {
+      AskTitoDexStreamStage.retrieving => AskTitoDexProgress.retrievingSources,
+      AskTitoDexStreamStage.resolving => AskTitoDexProgress.resolvingQuestion,
+      AskTitoDexStreamStage.verifying => AskTitoDexProgress.verifyingAnswer,
+      AskTitoDexStreamStage.writing => AskTitoDexProgress.revealingAnswer,
+    };
 
 enum AskTitoDexAvailability { checking, online, disabled, unavailable }
 
@@ -122,23 +139,55 @@ abstract class AskTitoDexOnlineClient {
 class AskTitoDexOnlineStreamEvent {
   const AskTitoDexOnlineStreamEvent._({
     this.progress,
-    this.answerDelta,
+    this.stage,
+    this.turnId,
+    this.semanticReset = false,
+    this.answerPlan,
+    this.answerBlock,
+    this.clarification,
     this.result,
   });
 
-  const AskTitoDexOnlineStreamEvent.progress(AskTitoDexProgress progress)
-    : this._(progress: progress);
+  const AskTitoDexOnlineStreamEvent.progress(
+    AskTitoDexProgress progress, {
+    AskTitoDexStreamStage? stage,
+    String? turnId,
+  }) : this._(progress: progress, stage: stage, turnId: turnId);
 
-  const AskTitoDexOnlineStreamEvent.answerDelta(String delta)
-    : this._(answerDelta: delta);
+  factory AskTitoDexOnlineStreamEvent.answerPlan(AskTitoDexAnswerPlan plan) =>
+      AskTitoDexOnlineStreamEvent._(answerPlan: plan, turnId: plan.turnId);
 
-  const AskTitoDexOnlineStreamEvent.result(AskTitoDexResult result)
-    : this._(result: result);
+  factory AskTitoDexOnlineStreamEvent.answerBlock(
+    AskTitoDexAnswerBlock block,
+  ) => AskTitoDexOnlineStreamEvent._(answerBlock: block, turnId: block.turnId);
+
+  factory AskTitoDexOnlineStreamEvent.clarification(
+    AskTitoDexClarification clarification,
+  ) => AskTitoDexOnlineStreamEvent._(
+    clarification: clarification,
+    turnId: clarification.turnId,
+  );
+
+  const AskTitoDexOnlineStreamEvent.semanticReset({String? turnId})
+    : this._(turnId: turnId, semanticReset: true);
+
+  const AskTitoDexOnlineStreamEvent.result(
+    AskTitoDexResult result, {
+    String? turnId,
+  }) : this._(result: result, turnId: turnId);
 
   final AskTitoDexProgress? progress;
-  final String? answerDelta;
+  final AskTitoDexStreamStage? stage;
+  final String? turnId;
+  final bool semanticReset;
+  final AskTitoDexAnswerPlan? answerPlan;
+  final AskTitoDexAnswerBlock? answerBlock;
+  final AskTitoDexClarification? clarification;
   final AskTitoDexResult? result;
 }
+
+typedef AskTitoDexStreamEventCallback =
+    FutureOr<void> Function(AskTitoDexOnlineStreamEvent event);
 
 abstract interface class AskTitoDexStreamingOnlineClient {
   Stream<AskTitoDexOnlineStreamEvent> askStream(
@@ -287,6 +336,7 @@ class HttpAskTitoDexOnlineClient
 
     var totalBytes = 0;
     var sawResult = false;
+    final semanticDecoder = AskTitoDexSemanticStreamDecoder();
     final lines = response.stream
         .timeout(timeout)
         .transform(utf8.decoder)
@@ -302,32 +352,64 @@ class HttpAskTitoDexOnlineClient
         throw const AskTitoDexOnlineException('invalid_stream_event');
       }
       final body = Map<String, dynamic>.from(decoded);
+      final semanticWasDisabled = semanticDecoder.isDisabled;
+      final semantic = semanticDecoder.decode(body);
+      if (!semanticWasDisabled && semanticDecoder.isDisabled) {
+        yield AskTitoDexOnlineStreamEvent.semanticReset(
+          turnId: isAskTitoDexStableId(body['turnId'])
+              ? body['turnId'] as String
+              : null,
+        );
+      }
       switch (body['type']) {
         case 'progress':
-          if (body['stage'] == 'writing') {
-            yield const AskTitoDexOnlineStreamEvent.progress(
-              AskTitoDexProgress.revealingAnswer,
+          final stage = semantic?.stage;
+          if (stage != null) {
+            yield AskTitoDexOnlineStreamEvent.progress(
+              _progressForStreamStage(stage),
+              stage: stage,
+              turnId: semantic?.turnId,
             );
           }
-        case 'answer_delta':
-          final delta = body['delta'];
-          if (delta is! String || delta.isEmpty || delta.length > 80) {
-            throw const AskTitoDexOnlineException('invalid_stream_delta');
+        case 'answer_plan':
+          final plan = semantic?.answerPlan;
+          if (plan != null) {
+            yield AskTitoDexOnlineStreamEvent.answerPlan(plan);
           }
-          yield AskTitoDexOnlineStreamEvent.answerDelta(delta);
+        case 'block_start':
+        case 'block_delta':
+        case 'block_end':
+          final block = semantic?.answerBlock;
+          if (block != null) {
+            yield AskTitoDexOnlineStreamEvent.answerBlock(block);
+          }
+        case 'clarification':
+          final clarification = semantic?.clarification;
+          if (clarification != null) {
+            yield AskTitoDexOnlineStreamEvent.clarification(clarification);
+          }
         case 'result':
           if (body['result'] is! Map) {
             throw const AskTitoDexOnlineException('invalid_stream_result');
           }
+          final result = AskTitoDexResult.fromJson(
+            Map<String, dynamic>.from(body['result'] as Map),
+          );
+          if (!semanticDecoder.validateFinal(
+            turnId: body['turnId'],
+            blocks: result.answerBlocks,
+          )) {
+            throw const AskTitoDexOnlineException('semantic_stream_mismatch');
+          }
           sawResult = true;
           yield AskTitoDexOnlineStreamEvent.result(
-            AskTitoDexResult.fromJson(
-              Map<String, dynamic>.from(body['result'] as Map),
-            ),
+            result,
+            turnId: isAskTitoDexStableId(body['turnId'])
+                ? body['turnId'] as String
+                : null,
           );
         default:
-          // Older Workers ignore the Accept header and return the original
-          // one-line JSON response. Treat it as the final event.
+          // A Worker may still return the original one-line JSON response.
           if (body['status'] is! String) {
             throw const AskTitoDexOnlineException('invalid_stream_event');
           }
@@ -401,7 +483,7 @@ class AskTitoDexService {
     AskTitoDexContext context, {
     List<Map<String, String>> history = const [],
     void Function(AskTitoDexProgress progress)? onProgress,
-    void Function(String delta)? onAnswerDelta,
+    AskTitoDexStreamEventCallback? onStreamEvent,
   }) async {
     onProgress?.call(AskTitoDexProgress.checkingLocal);
     final local = await _hints.answer(question, context);
@@ -415,31 +497,104 @@ class AskTitoDexService {
     try {
       if (client is AskTitoDexStreamingOnlineClient) {
         AskTitoDexResult? online;
-        final streamedAnswer = StringBuffer();
+        List<String>? plannedBlockIds;
+        final streamedBlocks = <String, AskTitoDexAnswerBlock>{};
+        AskTitoDexClarification? streamedClarification;
         final streamingClient = client as AskTitoDexStreamingOnlineClient;
         await for (final event in streamingClient.askStream(
           question,
           context,
           history: history,
         )) {
+          await onStreamEvent?.call(event);
+          if (event.semanticReset) {
+            plannedBlockIds = null;
+            streamedBlocks.clear();
+            streamedClarification = null;
+          }
+          if (event.answerPlan case final plan?) {
+            if (plannedBlockIds != null) {
+              throw const AskTitoDexOnlineException('duplicate_answer_plan');
+            }
+            plannedBlockIds = plan.blocks
+                .map((block) => block.id)
+                .toList(growable: false);
+          }
+          if (event.answerBlock case final block?) {
+            final blockIds = plannedBlockIds;
+            final previous = streamedBlocks[block.id];
+            if (blockIds == null ||
+                !blockIds.contains(block.id) ||
+                previous?.isComplete == true ||
+                (previous != null &&
+                    (block.kind != previous.kind ||
+                        block.title != previous.title ||
+                        !block.text.startsWith(previous.text)))) {
+              throw const AskTitoDexOnlineException('invalid_stream_block');
+            }
+            streamedBlocks[block.id] = block;
+          }
+          if (event.clarification case final clarification?) {
+            if (streamedClarification != null) {
+              throw const AskTitoDexOnlineException(
+                'duplicate_stream_clarification',
+              );
+            }
+            streamedClarification = clarification;
+          }
           if (event.progress case final progress?) {
             onProgress?.call(progress);
-          }
-          if (event.answerDelta case final delta?) {
-            if (streamedAnswer.length + delta.length > 1200) {
-              throw const AskTitoDexOnlineException('stream_answer_too_large');
-            }
-            streamedAnswer.write(delta);
-            onAnswerDelta?.call(delta);
           }
           if (event.result case final result?) online = result;
         }
         if (online == null) {
           throw const AskTitoDexOnlineException('stream_missing_result');
         }
-        final streamed = streamedAnswer.toString();
-        if (streamed.isNotEmpty && streamed != online.answer) {
-          throw const AskTitoDexOnlineException('stream_answer_mismatch');
+        if (online.answerBlocks.isNotEmpty &&
+            online.answerBlocks.map((block) => block.text).join('\n\n') !=
+                online.answer) {
+          throw const AskTitoDexOnlineException('semantic_answer_mismatch');
+        }
+        final blockIds = plannedBlockIds;
+        if (blockIds != null) {
+          if (blockIds.length != online.answerBlocks.length ||
+              streamedBlocks.length != blockIds.length) {
+            throw const AskTitoDexOnlineException('stream_blocks_mismatch');
+          }
+          for (var index = 0; index < blockIds.length; index += 1) {
+            final streamedBlock = streamedBlocks[blockIds[index]];
+            final finalBlock = online.answerBlocks[index];
+            if (streamedBlock == null ||
+                !streamedBlock.isComplete ||
+                streamedBlock.id != finalBlock.id ||
+                streamedBlock.kind != finalBlock.kind ||
+                streamedBlock.title != finalBlock.title ||
+                streamedBlock.text != finalBlock.text) {
+              throw const AskTitoDexOnlineException('stream_blocks_mismatch');
+            }
+          }
+        }
+        final clarification = streamedClarification;
+        if (clarification != null) {
+          final candidates = online.clarificationCandidates;
+          if (online.status != AskTitoDexStatus.needsClarification ||
+              online.followUp != clarification.prompt ||
+              candidates.length != clarification.candidates.length) {
+            throw const AskTitoDexOnlineException(
+              'stream_clarification_mismatch',
+            );
+          }
+          for (var index = 0; index < candidates.length; index += 1) {
+            final streamedCandidate = clarification.candidates[index];
+            final finalCandidate = candidates[index];
+            if (streamedCandidate.id != finalCandidate.id ||
+                streamedCandidate.label != finalCandidate.label ||
+                streamedCandidate.kind != finalCandidate.kind) {
+              throw const AskTitoDexOnlineException(
+                'stream_clarification_mismatch',
+              );
+            }
+          }
         }
         return online.withRuntimeTrace(onlineAttempted: true);
       }

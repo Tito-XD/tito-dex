@@ -6,6 +6,7 @@ import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
 import '../extensions/journey_assistant_extension.dart';
 import '../game/game_edition.dart';
+import 'ask_titodex_answer_blocks.dart';
 import 'journey_pack_models.dart';
 import 'journey_pack_repository.dart';
 
@@ -290,6 +291,8 @@ class AskTitoDexResult {
     this.modelUsed = false,
     this.aiSearchUsed = false,
     this.sourceKinds = const [],
+    this.answerBlocks = const [],
+    this.clarificationCandidates = const [],
     this.onlineAttempted = false,
   });
 
@@ -308,6 +311,8 @@ class AskTitoDexResult {
   final bool modelUsed;
   final bool aiSearchUsed;
   final List<String> sourceKinds;
+  final List<AskTitoDexAnswerBlock> answerBlocks;
+  final List<AskTitoDexClarificationCandidate> clarificationCandidates;
   final bool onlineAttempted;
 
   AskTitoDexResult withRuntimeTrace({
@@ -329,6 +334,8 @@ class AskTitoDexResult {
     modelUsed: modelUsed,
     aiSearchUsed: aiSearchUsed,
     sourceKinds: sourceKinds,
+    answerBlocks: answerBlocks,
+    clarificationCandidates: clarificationCandidates,
     onlineAttempted: onlineAttempted ?? this.onlineAttempted,
   );
 
@@ -369,6 +376,10 @@ class AskTitoDexResult {
       modelUsed: json['modelUsed'] as bool? ?? onlineComposed,
       aiSearchUsed: json['aiSearchUsed'] as bool? ?? false,
       sourceKinds: _strings(json['sourceKinds']),
+      answerBlocks: _answerBlocks(json['answerBlocks']),
+      clarificationCandidates: _clarificationCandidates(
+        json['clarificationCandidates'],
+      ),
       onlineAttempted: json['onlineAttempted'] as bool? ?? true,
     );
   }
@@ -394,8 +405,52 @@ class AskTitoDexResult {
     'modelUsed': modelUsed,
     'aiSearchUsed': aiSearchUsed,
     'sourceKinds': sourceKinds,
+    if (answerBlocks.isNotEmpty)
+      'answerBlocks': answerBlocks.map((block) => block.toJson()).toList(),
+    if (clarificationCandidates.isNotEmpty)
+      'clarificationCandidates': clarificationCandidates
+          .map((candidate) => candidate.toJson())
+          .toList(),
     'onlineAttempted': onlineAttempted,
   };
+
+  static List<AskTitoDexAnswerBlock> _answerBlocks(Object? value) {
+    if (value == null) return const [];
+    if (value is! List || value.length > askTitoDexMaxAnswerBlocks) {
+      return const [];
+    }
+    final blocks = <AskTitoDexAnswerBlock>[];
+    final ids = <String>{};
+    for (final entry in value) {
+      if (entry is! Map) return const [];
+      final block = AskTitoDexAnswerBlock.tryFromJson(
+        Map<String, dynamic>.from(entry),
+      );
+      if (block == null || !ids.add(block.id)) return const [];
+      blocks.add(block);
+    }
+    return List.unmodifiable(blocks);
+  }
+
+  static List<AskTitoDexClarificationCandidate> _clarificationCandidates(
+    Object? value,
+  ) {
+    if (value == null) return const [];
+    if (value is! List || value.length > askTitoDexMaxClarificationCandidates) {
+      return const [];
+    }
+    final candidates = <AskTitoDexClarificationCandidate>[];
+    final ids = <String>{};
+    for (final entry in value) {
+      if (entry is! Map) return const [];
+      final candidate = AskTitoDexClarificationCandidate.tryFromJson(
+        Map<String, dynamic>.from(entry),
+      );
+      if (candidate == null || !ids.add(candidate.id)) return const [];
+      candidates.add(candidate);
+    }
+    return List.unmodifiable(candidates);
+  }
 
   static List<String> _strings(Object? value) =>
       (value as List<dynamic>? ?? const []).whereType<String>().toList();

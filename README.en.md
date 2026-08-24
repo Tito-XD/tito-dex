@@ -8,18 +8,19 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.8.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.20) · App `0.8.20+174` | Downloadable journey data, stable entity links, and bounded multi-source search |
-| Offline APK | [v0.8.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.8.20) · App `0.8.20-offline+175` | Embeds compact v14 Dex data and Journey Assistant |
+| Lite APK | [v0.9.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.0) · App `0.9.0+177` | Three themes, modern journey answers, and on-demand v20 data |
+| Offline APK | [v0.9.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.0) · App `0.9.0-offline+178` | Embeds the complete verified v20 reference and gameplay bundle |
 | Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
-Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species · 803 form records · audited static, animated, shiny, and cry media · complete item descriptions and icons.
+Dex data: live and Offline bundles **v20** · 1025 species · 803 form records · verified move, ability, item, and gameplay projections · audited static, animated, shiny, and cry media.
 
 > **Unofficial project notice:** TitoDex is a non-commercial tool intended only for learning and personal gameplay assistance. It is not affiliated with, authorized by, sponsored by, or endorsed by Nintendo, Creatures, GAME FREAK, The Pokémon Company, or their affiliates. Names, characters, images, audio, and trademarks belong to their respective owners. See [CREDITS.md](CREDITS.md) for full sources, licenses, and media credits.
 
 ## Highlights
 
+- **Three built-in themes** — Trainer's Journal, Solid Plastic, and Flat UI persist across launches; production installs still default to Trainer's Journal. Navigation and content reveals adapt to each theme and respect reduced-motion settings.
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
 - **Ask TitoDex** — the entire assistant is off by default. Its first Settings activation discloses network access, AI retrieval, and bounded context; Journey and Search reserve no entry space before consent. Once enabled, optional journey data can be installed, updated, or removed per game, while interrupted or invalid downloads leave the previous usable pack intact. The selected version, compatible save context, and reviewed local facts still run first, and save location alone can no longer hijack an unrelated question. Unresolved questions can use BGE-M3 AI Search, the Dex bundle, fixed public sources, Tavily, and DeepSeek native search; when both live routes succeed, Qwen performs an additional conflict/corroboration check. The modern conversation page stores the latest 50 Q&A pairs locally and sends at most six same-game pairs for follow-ups. Three compact controls separately open connection details, local history management, and the 23-edition picker. Verified answers progressively reveal after the evidence pass with headings, emphasis, lists, and scrollable tables; citation URLs stay inside one expandable evidence row, while stable Pokémon, item, move, and ability links open their existing TitoDex details. Raw saves and trainer/party data are never uploaded.
@@ -51,16 +52,16 @@ Dex data: live bundle **v19** / Offline APK compact seed **v14** · 1025 species
 | Routing | `go_router` — Home, Team, Journey, Dex, Search, Settings |
 | Persistence | `shared_preferences` + offline `dex_offline/` |
 | Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |
-| Dex data | Pre-built bundle v19 with v5 → v4 → v3 → v2 fallback and APK asset fallbacks |
+| Dex data | Pre-built bundle v20 with v5 → v4 → v3 → v2 fallback and APK asset fallbacks |
 | UI language | Simplified Chinese |
 
 Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.8.20-lite-rg-arm64.apk`** or **`TitoDex-0.8.20-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.8.20 upgrades directly from v0.8.13–v0.8.19; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.0-lite-rg-arm64.apk`** or **`TitoDex-0.9.0-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.0 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
-The Lite APK downloads the offline data pack from Settings when requested. The Offline APK includes the same core data and prepares its bundled seed on first launch.
+The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
 ## Development
 

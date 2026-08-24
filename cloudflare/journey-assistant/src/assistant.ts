@@ -1,9 +1,11 @@
 import type { AssistantRequest, AssistantResponse } from './contract';
 import {
   effectiveContextReliability,
+  MAX_CLARIFICATION_CANDIDATES,
   validateModelHintSelection,
   validateModelSectionOrder,
 } from './contract';
+import type { ClarificationCandidate } from './contract';
 import { progressionHints, type ProgressionHint } from './progression_hints';
 
 export type AiRunner = (
@@ -67,6 +69,7 @@ export async function answerQuestion(
       answer: null,
       confidence: 'low',
       followUp: '我找到多个可能的阻塞点。请补充你所在地点或挡路的角色／物体。',
+      clarificationCandidates: hintClarificationCandidates(candidates),
     };
   }
 
@@ -99,6 +102,21 @@ export async function answerQuestion(
       : 'upstream_failed';
     return { ...deterministic, errorCode };
   }
+}
+
+function hintClarificationCandidates(
+  candidates: { hint: ProgressionHint; score: number }[],
+): ClarificationCandidate[] {
+  const seen = new Set<string>();
+  return candidates.flatMap(({ hint }) => {
+    if (seen.has(hint.id)) return [];
+    seen.add(hint.id);
+    return [{
+      id: hint.id,
+      label: hint.subject.aliases[0] ?? hint.subject.id,
+      kind: 'journey_hint' as const,
+    }];
+  }).slice(0, MAX_CLARIFICATION_CANDIDATES);
 }
 
 function scoreHint(hint: ProgressionHint, request: AssistantRequest): number {

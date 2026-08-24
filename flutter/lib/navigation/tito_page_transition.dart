@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 
 /// Tag for the single home action that expands into its first-level page.
@@ -15,12 +16,22 @@ abstract final class TitoHomeActionHero {
 
 enum TitoSideSlideDirection { fromLeft, fromRight }
 
-/// Android's current forward transition is 450 ms. Dex keeps a modest Hero
-/// expansion but lands faster, while the reverse collapse stays snappy.
-const titoDexTransitionDuration = Duration(milliseconds: 320);
-const titoDexReverseTransitionDuration = Duration(milliseconds: 280);
+/// Dex uses one compact container-transform timeline. Geometry, clipping,
+/// surface and content reveal all derive from the route progress instead of
+/// stacking a full Material page transition on top of the Hero flight.
+const titoDexTransitionDuration = Duration(milliseconds: 260);
+const titoDexReverseTransitionDuration = Duration(milliseconds: 220);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
+
+const Curve titoDexForwardCurve = Curves.easeOutQuint;
+const Curve titoDexReverseCurve = Curves.easeInQuint;
+
+/// A direct bounds interpolation keeps the home tile attached to the page it
+/// becomes. The Hero curve supplies the easing; the rect itself never arcs
+/// sideways on wide handheld layouts.
+Tween<Rect?> titoDexRectTween(Rect? begin, Rect? end) =>
+    RectTween(begin: begin, end: end);
 
 /// A Material page lets Android provide the standard route transition. It
 /// still goes through the controlled route so every page shares the same
@@ -59,6 +70,7 @@ Page<T> titoDexPage<T>({
   return _TitoControlledMaterialPage<T>(
     key: key,
     kind: _TitoMaterialPageKind.dex,
+    usesContainerTransform: heroTag != null,
     // Keep Dex content in [overlay] for the route's entire lifetime. Nested
     // pushes do not retain the home-card `extra`, so moving content into the
     // normal child when [heroTag] becomes null would reparent and recreate the
@@ -68,6 +80,9 @@ Page<T> titoDexPage<T>({
         : Hero(
             tag: heroTag,
             transitionOnUserGestures: false,
+            createRectTween: titoDexRectTween,
+            curve: titoDexForwardCurve,
+            reverseCurve: titoDexReverseCurve,
             flightShuttleBuilder: _homeActionFlightShuttle,
             child: child,
           ),
@@ -94,12 +109,14 @@ class _TitoControlledMaterialPage<T> extends Page<T> {
     required this.kind,
     required this.child,
     this.overlay,
+    this.usesContainerTransform = false,
     super.key,
   });
 
   final _TitoMaterialPageKind kind;
   final Widget child;
   final Widget? overlay;
+  final bool usesContainerTransform;
 
   @override
   Route<T> createRoute(BuildContext context) {
@@ -176,43 +193,54 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
         child,
       );
     }
-    // Include the dex content inside the transitioned child so Android's
-    // predictive-back gesture moves the entire page (shell + content) together.
-    // During the Hero expansion the content sits at opacity 0 behind the Hero
-    // overlay and only fades in once the shell has landed.
-    //
-    // During a pop gesture the content must NOT fade ahead of the page: the
-    // gesture drives the route animation towards 0 (and commit restarts it
-    // from 1.0), which made the content blink out and back. Force full
-    // opacity for the whole gesture; the framework's commit fade handles the
-    // exit for shell and content as one surface.
+    // The Hero owns the page shell and is the only large moving surface. The
+    // list follows on the same route progress with a short rise, rather than
+    // receiving Android's second zoom/fade transition on top of the flight.
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final containerProgress = CurvedAnimation(
+      parent: animation,
+      curve: titoDexForwardCurve,
+      reverseCurve: titoDexReverseCurve,
+    );
+    final Animation<double> contentReveal = popGestureInProgress
+        ? kAlwaysCompleteAnimation
+        : reduceMotion
+        ? containerProgress
+        : CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.46, 0.86, curve: Curves.easeOutCubic),
+            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
+          );
+    final Animation<Offset> contentPosition = reduceMotion
+        ? const AlwaysStoppedAnimation<Offset>(Offset.zero)
+        : Tween<Offset>(
+            begin: const Offset(0, 0.012),
+            end: Offset.zero,
+          ).animate(contentReveal);
     final pageWithOverlay = Stack(
       fit: StackFit.expand,
       children: [
         child,
-        FadeTransition(
-          key: const ValueKey<String>('tito-dex-content-reveal'),
-          opacity: popGestureInProgress
-              ? kAlwaysCompleteAnimation
-              : CurvedAnimation(
-                  parent: animation,
-                  curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
-                  reverseCurve: const Interval(
-                    0.55,
-                    1,
-                    curve: Curves.easeInCubic,
-                  ),
-                ),
-          child: _page.overlay!,
+        SlideTransition(
+          key: const ValueKey<String>('tito-dex-content-slide'),
+          position: contentPosition,
+          child: FadeTransition(
+            key: const ValueKey<String>('tito-dex-content-reveal'),
+            opacity: contentReveal,
+            child: _page.overlay!,
+          ),
         ),
       ],
     );
-    return super.buildTransitions(
-      context,
-      animation,
-      secondaryAnimation,
-      pageWithOverlay,
-    );
+    if (!_page.usesContainerTransform) {
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        pageWithOverlay,
+      );
+    }
+    return pageWithOverlay;
   }
 
   @override
@@ -344,89 +372,197 @@ Widget _homeActionFlightShuttle(
   final pageHero = pageContext.widget as Hero;
   final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
   final pageSize = (pageContext.findRenderObject()! as RenderBox).size;
-
-  final Animation<double> cardOpacity;
-  final Animation<double> pageOpacity;
-  if (flightDirection == HeroFlightDirection.push) {
-    // Swap to the already-empty destination shell in the first moments of
-    // the flight. The home card therefore never paints across a full screen.
-    cardOpacity = animation.drive(
-      TweenSequence<double>([
-        TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 1),
-        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 11),
-      ]),
-    );
-    pageOpacity = animation.drive(
-      TweenSequence<double>([
-        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 1),
-        TweenSequenceItem(tween: ConstantTween<double>(1), weight: 11),
-      ]),
-    );
-  } else {
-    cardOpacity = animation.drive(
-      TweenSequence<double>([
-        TweenSequenceItem(tween: Tween<double>(begin: 1, end: 0), weight: 4),
-        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 1),
-      ]),
-    );
-    pageOpacity = animation.drive(
-      TweenSequence<double>([
-        TweenSequenceItem(tween: ConstantTween<double>(0), weight: 4),
-        TweenSequenceItem(tween: Tween<double>(begin: 0, end: 1), weight: 1),
-      ]),
-    );
-  }
+  final flightVisual = _DexFlightVisual.resolve(flightContext);
 
   return AnimatedBuilder(
     animation: animation,
     builder: (context, _) {
-      final progress = animation.value;
-      final radius = 14 * (1 - progress);
-      final borderWidth = TitoBorders.card * (1 - progress);
+      final progress = animation.value.clamp(0.0, 1.0);
+      final radius = flightVisual.startRadius * (1 - progress);
+      final borderWidth = flightVisual.borderWidth * (1 - progress);
+      final shadowProgress = 1 - Curves.easeOutCubic.transform(progress);
+      final cardOpacity =
+          1 -
+          const Interval(
+            0,
+            0.22,
+            curve: Curves.easeOutCubic,
+          ).transform(progress);
+      final pageOpacity = const Interval(
+        0.34,
+        0.78,
+        curve: Curves.easeOutCubic,
+      ).transform(progress);
+      final borderRadius = BorderRadius.circular(radius);
 
-      return Material(
-        animationDuration: Duration.zero,
-        clipBehavior: Clip.antiAlias,
-        // Paint the flight surface itself: card cream at rest, dex deep blue
-        // when expanded. The pop flight previously left both Hero layers
-        // near-invisible for most of the collapse, exposing a transparent
-        // frame — a solid lerped backdrop keeps enter and exit symmetric.
-        color: Color.lerp(TitoColors.card, TitoColors.deepBlue, progress),
-        elevation: 2 * (1 - progress),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radius),
-          side: BorderSide(color: TitoColors.ink, width: borderWidth),
-        ),
-        child: Stack(
-          fit: StackFit.passthrough,
-          children: [
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              alignment: Alignment.topLeft,
-              child: SizedBox.fromSize(
-                size: cardSize,
-                child: FadeTransition(
-                  opacity: cardOpacity,
-                  child: cardHero.child,
-                ),
+      return DecoratedBox(
+        key: const ValueKey<String>('tito-dex-flight-surface'),
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          boxShadow: [
+            BoxShadow(
+              color: flightVisual.shadowColor.withValues(
+                alpha: flightVisual.shadowOpacity * shadowProgress,
               ),
-            ),
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              alignment: Alignment.topLeft,
-              child: SizedBox.fromSize(
-                size: pageSize,
-                child: FadeTransition(
-                  opacity: pageOpacity,
-                  child: pageHero.child,
-                ),
-              ),
+              blurRadius: flightVisual.shadowBlur * shadowProgress,
+              spreadRadius: flightVisual.shadowSpread * shadowProgress,
+              offset: flightVisual.shadowOffset * shadowProgress,
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: flightVisual.surfaceGradient,
+              border: Border.all(
+                color: flightVisual.outlineColor.withValues(
+                  alpha: flightVisual.outlineColor.a * (1 - progress),
+                ),
+                width: borderWidth,
+              ),
+            ),
+            child: Stack(
+              fit: StackFit.passthrough,
+              children: [
+                Positioned.fill(
+                  child: FittedBox(
+                    fit: BoxFit.fill,
+                    child: SizedBox.fromSize(
+                      size: cardSize,
+                      child: Opacity(
+                        opacity: cardOpacity,
+                        child: cardHero.child,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: FittedBox(
+                    fit: BoxFit.fill,
+                    child: SizedBox.fromSize(
+                      size: pageSize,
+                      child: Opacity(
+                        opacity: pageOpacity,
+                        child: pageHero.child,
+                      ),
+                    ),
+                  ),
+                ),
+                if (flightVisual.specularColor != null)
+                  Positioned(
+                    top: 1,
+                    left: 12,
+                    right: 12,
+                    child: IgnorePointer(
+                      child: Opacity(
+                        opacity: (1 - progress) * 0.92,
+                        child: Container(
+                          height: 1.4,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                flightVisual.specularColor!,
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       );
     },
   );
+}
+
+class _DexFlightVisual {
+  const _DexFlightVisual({
+    required this.surfaceGradient,
+    required this.outlineColor,
+    required this.borderWidth,
+    required this.startRadius,
+    required this.shadowColor,
+    required this.shadowOpacity,
+    required this.shadowBlur,
+    required this.shadowSpread,
+    required this.shadowOffset,
+    this.specularColor,
+  });
+
+  final Gradient surfaceGradient;
+  final Color outlineColor;
+  final double borderWidth;
+  final double startRadius;
+  final Color shadowColor;
+  final double shadowOpacity;
+  final double shadowBlur;
+  final double shadowSpread;
+  final Offset shadowOffset;
+  final Color? specularColor;
+
+  static _DexFlightVisual resolve(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return switch (appVisualStyle.style) {
+      AppVisualStyle.classic => const _DexFlightVisual(
+        surfaceGradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF5D728A), TitoColors.slateBlue],
+        ),
+        outlineColor: TitoColors.ink,
+        borderWidth: TitoBorders.card,
+        startRadius: TitoRadii.md,
+        shadowColor: TitoColors.deepBlue,
+        shadowOpacity: 0.24,
+        shadowBlur: 0,
+        shadowSpread: 0,
+        shadowOffset: Offset(0, 5),
+      ),
+      AppVisualStyle.solidPlastic => _DexFlightVisual(
+        surfaceGradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0, 0.52, 1],
+          colors: [
+            TitoColors.glassBackgroundTop,
+            TitoColors.glassBackgroundMid,
+            TitoColors.glassBackgroundBottom,
+          ],
+        ),
+        outlineColor: Colors.white.withValues(alpha: 0.72),
+        borderWidth: TitoBorders.glass,
+        startRadius: TitoRadii.md,
+        shadowColor: TitoColors.deepBlue,
+        shadowOpacity: 0.22,
+        shadowBlur: 18,
+        shadowSpread: -4,
+        shadowOffset: const Offset(0, 8),
+        specularColor: Colors.white.withValues(alpha: 0.82),
+      ),
+      AppVisualStyle.flatUi => _DexFlightVisual(
+        surfaceGradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [scheme.surfaceContainerHigh, scheme.surface],
+        ),
+        outlineColor: scheme.outlineVariant,
+        borderWidth: TitoBorders.element,
+        startRadius: TitoRadii.md,
+        shadowColor: scheme.shadow,
+        shadowOpacity: 0.16,
+        shadowBlur: 8,
+        shadowSpread: -2,
+        shadowOffset: const Offset(0, 3),
+      ),
+    };
+  }
 }
 
 /// Bottom sheets retain Flutter Material's standard Android sheet behavior.
