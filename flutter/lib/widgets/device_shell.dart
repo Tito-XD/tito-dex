@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
@@ -14,15 +15,25 @@ class DeviceShell extends StatelessWidget {
     final mq = MediaQuery.of(context);
     final handheldChrome = DeviceLayout.useHandheldChrome(context);
     final scheme = Theme.of(context).colorScheme;
+    final material = appVisualStyle.usesMaterial;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: scheme.surface,
-        systemNavigationBarIconBrightness: Brightness.dark,
-        systemNavigationBarDividerColor: scheme.surface,
-      ),
+      value: (material ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
+          .copyWith(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: material
+                ? Brightness.dark
+                : Brightness.light,
+            systemNavigationBarColor: material
+                ? scheme.surface
+                : TitoColors.deepBlue,
+            systemNavigationBarIconBrightness: material
+                ? Brightness.dark
+                : Brightness.light,
+            systemNavigationBarDividerColor: material
+                ? scheme.surface
+                : TitoColors.deepBlue,
+          ),
       child: MediaQuery(
         data: mq.copyWith(textScaler: DeviceLayout.clampedTextScaler(context)),
         child: handheldChrome
@@ -45,10 +56,8 @@ class _HandheldNativeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final padding = MediaQuery.paddingOf(context);
     final size = MediaQuery.sizeOf(context);
-    final scheme = Theme.of(context).colorScheme;
 
-    return ColoredBox(
-      color: scheme.surface,
+    return _ThemeBackdrop(
       child: Padding(
         padding: EdgeInsets.only(left: padding.left, right: padding.right),
         // RG immersive shell strips top/bottom safe padding — without an
@@ -79,9 +88,35 @@ class _RegularNativeShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _ThemeBackdrop(child: child);
+  }
+}
+
+class _ThemeBackdrop extends StatelessWidget {
+  const _ThemeBackdrop({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (appVisualStyle.usesMaterial) {
+      return ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: child,
+      );
+    }
     return ColoredBox(
-      color: Theme.of(context).colorScheme.surface,
-      child: child,
+      color: TitoColors.deepBlue,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF5D728A), TitoColors.slateBlue],
+          ),
+        ),
+        child: child,
+      ),
     );
   }
 }

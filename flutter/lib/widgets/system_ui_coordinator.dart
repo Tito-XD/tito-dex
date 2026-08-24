@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
@@ -16,6 +17,7 @@ class SystemUiCoordinator extends StatefulWidget {
 
 class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
   Size? _lastSize;
+  bool? _lastUsesMaterial;
 
   @override
   void didChangeDependencies() {
@@ -31,14 +33,24 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
 
   void _applyForContext(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    if (_lastSize == size) {
+    final material = appVisualStyle.usesMaterial;
+    if (_lastSize == size && _lastUsesMaterial == material) {
       return;
     }
     _lastSize = size;
-    _applySystemUi(size);
+    _lastUsesMaterial = material;
+    _applySystemUi(
+      size,
+      material: material,
+      materialSurface: Theme.of(context).colorScheme.surface,
+    );
   }
 
-  void _applySystemUi(Size size) {
+  void _applySystemUi(
+    Size size, {
+    required bool material,
+    required Color materialSurface,
+  }) {
     if (!DeviceLayout.isNativeTarget) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       return;
@@ -58,14 +70,16 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
     }
 
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        // iOS reads statusBarBrightness (background brightness): dark
-        // background → white status bar text over the deepBlue shell.
-        statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor: TitoColors.deepBlue,
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: material ? Brightness.dark : Brightness.light,
+        statusBarBrightness: material ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: material
+            ? materialSurface
+            : TitoColors.deepBlue,
+        systemNavigationBarIconBrightness: material
+            ? Brightness.dark
+            : Brightness.light,
       ),
     );
   }

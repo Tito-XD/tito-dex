@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
+import 'app_visual_style.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
 
-/// Material 3 theme used by the native-Material experiment branch.
-///
-/// Product pages keep their compact RG-aware layout, while controls, shape,
-/// elevation, state layers and neutral surfaces come from Material 3.
-ThemeData buildTitoTheme() {
+ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.material]) =>
+    switch (style) {
+      AppVisualStyle.classic => _buildClassicTheme(),
+      AppVisualStyle.material => _buildMaterialTheme(),
+    };
+
+/// Native Material 3 theme used by the experimental built-in style.
+ThemeData _buildMaterialTheme() {
   const fontFamily = TitoTypography.fontFamily;
   final colorScheme = ColorScheme.fromSeed(
     seedColor: TitoColors.materialSeed,
@@ -222,6 +226,166 @@ ThemeData buildTitoTheme() {
       color: colorScheme.outlineVariant,
       thickness: 1,
       space: 1,
+    ),
+  );
+}
+
+/// The established TitoDex palette, retained as a first-class built-in theme.
+/// Shared pages choose their gradient/card shell from [appVisualStyle], while
+/// stock Material controls inherit this matching classic color scheme.
+ThemeData _buildClassicTheme() {
+  const fontFamily = TitoTypography.fontFamily;
+
+  TextStyle baseStyle({
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w600,
+    Color color = TitoColors.ink,
+    double? height,
+    double? letterSpacing,
+  }) => TextStyle(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+  );
+
+  TextStyle headingStyle({
+    required double fontSize,
+    FontWeight fontWeight = FontWeight.w800,
+  }) => baseStyle(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: fontSize * -0.02,
+  );
+
+  final textTheme = TextTheme(
+    displayLarge: headingStyle(fontSize: 32),
+    displayMedium: headingStyle(fontSize: 28),
+    displaySmall: headingStyle(fontSize: 24),
+    headlineLarge: headingStyle(fontSize: 24),
+    headlineMedium: headingStyle(fontSize: 22),
+    headlineSmall: headingStyle(fontSize: 20),
+    titleLarge: headingStyle(fontSize: 20),
+    titleMedium: headingStyle(fontSize: 18),
+    titleSmall: headingStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    bodyLarge: baseStyle(fontSize: 16),
+    bodyMedium: baseStyle(fontSize: 14),
+    bodySmall: baseStyle(fontSize: 12, color: TitoColors.mutedInk),
+    labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w800),
+    labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    labelSmall: baseStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      color: TitoColors.mutedInk,
+    ),
+  );
+  final scheme = ColorScheme.fromSeed(
+    seedColor: TitoColors.deepBlue,
+    primary: TitoColors.deepBlue,
+    secondary: TitoColors.coral,
+    surface: TitoColors.card,
+  );
+  final mediumShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.md),
+    side: const BorderSide(color: TitoColors.ink, width: 2),
+  );
+
+  return ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: scheme,
+    fontFamily: fontFamily,
+    textTheme: textTheme,
+    scaffoldBackgroundColor: TitoColors.slateBlue,
+    splashFactory: InkRipple.splashFactory,
+    highlightColor: TitoColors.skyBlue.withValues(alpha: 0.2),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
+          fallbackColor: TitoColors.slateBlue,
+        ),
+        TargetPlatform.iOS: ZoomPageTransitionsBuilder(
+          backgroundColor: TitoColors.slateBlue,
+        ),
+      },
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: TitoColors.card,
+      modalBarrierColor: Color(0x73221F26),
+      showDragHandle: true,
+      dragHandleColor: TitoColors.mutedInk,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
+        side: BorderSide(color: TitoColors.ink, width: 2),
+      ),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: TitoColors.card,
+      titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
+    ),
+    cardTheme: CardThemeData(
+      color: TitoColors.card,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: mediumShape,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      contentTextStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.card),
+      backgroundColor: TitoColors.deepBlue,
+      behavior: SnackBarBehavior.floating,
+      shape: mediumShape,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: TitoColors.deepBlue,
+        foregroundColor: TitoColors.card,
+        textStyle: textTheme.labelLarge,
+        shape: mediumShape,
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge,
+        side: const BorderSide(color: TitoColors.ink, width: 2),
+        shape: mediumShape,
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: TitoColors.deepBlue,
+        textStyle: textTheme.labelLarge,
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: TitoColors.card,
+      labelStyle: textTheme.bodySmall?.copyWith(
+        color: TitoColors.mutedInk,
+        fontWeight: FontWeight.w700,
+      ),
+      hintStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.mutedInk),
+      helperStyle: textTheme.bodySmall,
+      errorStyle: textTheme.bodySmall?.copyWith(
+        color: TitoColors.coral,
+        fontWeight: FontWeight.w700,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        borderSide: const BorderSide(color: TitoColors.coral, width: 2),
+      ),
     ),
   );
 }

@@ -27,6 +27,7 @@ import '../features/trainer/trainer_avatar_service.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/motion_preferences.dart';
 import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
@@ -39,6 +40,38 @@ import '../widgets/settings_expandable_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
+
+bool shouldPrioritizeOfflineData(DexCacheStatus? status) {
+  final manifest = status?.manifest;
+  return manifest != null && !manifest.complete && manifest.pokemonCount <= 0;
+}
+
+enum SettingsSection {
+  overview,
+  profile,
+  assistant,
+  companion,
+  appearance,
+  data,
+  about,
+}
+
+extension SettingsSectionCopy on SettingsSection {
+  String get title => switch (this) {
+    SettingsSection.overview => AppZh.navSettings,
+    SettingsSection.profile => AppZh.settingsCategoryProfile,
+    SettingsSection.assistant => AppZh.settingsCategoryAssistant,
+    SettingsSection.companion => AppZh.settingsCategoryCompanion,
+    SettingsSection.appearance => AppZh.settingsCategoryAppearance,
+    SettingsSection.data => AppZh.settingsCategoryData,
+    SettingsSection.about => AppZh.settingsCategoryAbout,
+  };
+
+  String get route => switch (this) {
+    SettingsSection.overview => '/settings',
+    _ => '/settings/$name',
+  };
+}
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({
@@ -58,6 +91,7 @@ class SettingsPage extends StatefulWidget {
     required this.onPickEmulator,
     required this.onClearEmulator,
     this.onChangeGameEdition,
+    this.section = SettingsSection.overview,
   });
 
   final CurrentJourney journey;
@@ -74,6 +108,7 @@ class SettingsPage extends StatefulWidget {
   final VoidCallback onImportJourney;
   final VoidCallback onPickEmulator;
   final VoidCallback onClearEmulator;
+  final SettingsSection section;
 
   /// Opens the game edition picker (same flow as the home header badge).
   final Future<void> Function(BuildContext context)? onChangeGameEdition;
@@ -570,6 +605,100 @@ class _SettingsPageState extends State<SettingsPage> {
     ).showSnackBar(const SnackBar(content: Text(AppZh.snackTrainerSaved)));
   }
 
+  Widget _buildOverview(BuildContext context) {
+    final progress = _dexCacheStatus?.progress;
+    final displayProgress = dexProgressDisplayFraction(progress);
+    return SecondaryPageScaffold(
+      title: AppZh.navSettings,
+      showSettings: false,
+      children: [
+        if (shouldPrioritizeOfflineData(_dexCacheStatus)) ...[
+          _SettingsGroup(
+            title: AppZh.settingsDexOffline,
+            child: StickerCard(
+              variant: StickerVariant.mint,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppZh.settingsDexCdnDownloadHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  if (_dexDownloading && progress != null) ...[
+                    const SizedBox(height: 12),
+                    TitoProgressBar(value: displayProgress, height: 10),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${AppZh.settingsDexOfflineProgress(progress.phase, progress.current, progress.total)} · ${(displayProgress * 100).round()}%',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  if (_dexDownloading)
+                    OutlinedButton(
+                      onPressed: dexOfflineService.requestCancelDownload,
+                      child: const Text(AppZh.settingsDexCancelDownload),
+                    )
+                  else
+                    FilledButton.icon(
+                      onPressed: _downloadDexCdnBundle,
+                      icon: const Icon(Icons.download_rounded),
+                      label: const Text(AppZh.settingsDexCdnDownload),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        _CurrentGameSection(
+          onChangeGameEdition: widget.onChangeGameEdition == null
+              ? null
+              : () => widget.onChangeGameEdition!(context).then((_) {
+                  if (mounted) {
+                    setState(() {});
+                  }
+                }),
+        ),
+        const SizedBox(height: 16),
+        _SettingsNavigationList(
+          entries: const [
+            _SettingsNavigationEntry(
+              section: SettingsSection.profile,
+              icon: Icons.badge_outlined,
+              hint: AppZh.settingsCategoryProfileHint,
+            ),
+            _SettingsNavigationEntry(
+              section: SettingsSection.assistant,
+              icon: Icons.auto_awesome_outlined,
+              hint: AppZh.settingsCategoryAssistantHint,
+            ),
+            _SettingsNavigationEntry(
+              section: SettingsSection.companion,
+              icon: Icons.cruelty_free_outlined,
+              hint: AppZh.settingsCategoryCompanionHint,
+            ),
+            _SettingsNavigationEntry(
+              section: SettingsSection.appearance,
+              icon: Icons.palette_outlined,
+              hint: AppZh.settingsCategoryAppearanceHint,
+            ),
+            _SettingsNavigationEntry(
+              section: SettingsSection.data,
+              icon: Icons.storage_outlined,
+              hint: AppZh.settingsCategoryDataHint,
+            ),
+            _SettingsNavigationEntry(
+              section: SettingsSection.about,
+              icon: Icons.info_outline_rounded,
+              hint: AppZh.settingsCategoryAboutHint,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final saveName = widget.journey.saveTrainerName;
@@ -585,625 +714,669 @@ class _SettingsPageState extends State<SettingsPage> {
     final dexDisplayProgress = dexProgressDisplayFraction(dexProgress);
     final saveLinked = gameEditionRepository.edition.isSaveLinked;
 
+    if (widget.section == SettingsSection.overview) {
+      return _buildOverview(context);
+    }
+
     return SecondaryPageScaffold(
-      title: AppZh.navSettings,
+      title: widget.section.title,
+      showSettings: false,
       children: [
-        _CurrentGameSection(
-          onChangeGameEdition: widget.onChangeGameEdition == null
-              ? null
-              : () => widget.onChangeGameEdition!(context).then((_) {
-                  if (mounted) {
-                    setState(() {});
-                  }
-                }),
-        ),
-        const SizedBox(height: 16),
-        _SettingsGroup(
-          title: AppZh.extensionOnlineTitle,
-          child: StickerCard(
-            variant: StickerVariant.softYellow,
-            child: ListenableBuilder(
-              listenable: askTitoDexSettings,
-              builder: (context, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    '${AppZh.extensionJourneyTitle} · ${AppZh.extensionBuiltIn}',
-                    style: SecondaryTypography.onCard.h15,
-                  ),
-                  const SizedBox(height: 8),
-                  _SettingsToggleRow(
-                    key: const Key('journey-assistant-master-toggle'),
-                    icon: Icons.auto_awesome_outlined,
-                    plateColor: TitoColors.softYellow,
-                    label: AppZh.extensionEnabled,
-                    hint: AppZh.extensionBuiltInHint,
-                    value: askTitoDexSettings.extensionEnabled,
-                    onChanged: _toggleJourneyAssistant,
-                  ),
-                  if (askTitoDexSettings.extensionEnabled) ...[
-                    _SettingsToggleRow(
-                      key: const Key('journey-assistant-online-toggle'),
-                      icon: Icons.cloud_outlined,
-                      plateColor: TitoColors.skyBlue,
-                      label: AppZh.settingsAskTitoDex,
-                      hint: AppZh.settingsAskTitoDexHint,
-                      value: askTitoDexSettings.enabled,
-                      onChanged: _toggleAskTitoDex,
-                    ),
-                    const SizedBox(height: 4),
+        if (widget.section == SettingsSection.profile) ...[
+          _CurrentGameSection(
+            onChangeGameEdition: widget.onChangeGameEdition == null
+                ? null
+                : () => widget.onChangeGameEdition!(context).then((_) {
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  }),
+          ),
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.assistant) ...[
+          _SettingsGroup(
+            title: AppZh.extensionOnlineTitle,
+            child: StickerCard(
+              variant: StickerVariant.softYellow,
+              child: ListenableBuilder(
+                listenable: askTitoDexSettings,
+                builder: (context, _) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Text(
-                      AppZh.extensionSearchDisplay,
-                      style: SecondaryTypography.onCard.body14,
+                      '${AppZh.extensionJourneyTitle} · ${AppZh.extensionBuiltIn}',
+                      style: SecondaryTypography.onCard.h15,
                     ),
-                    DropdownButton<SearchAssistantDisplayMode>(
-                      key: const Key('extension-search-display-mode'),
-                      isExpanded: true,
-                      value: askTitoDexSettings.searchDisplayMode,
-                      items: const [
-                        DropdownMenuItem(
-                          value: SearchAssistantDisplayMode.prominent,
-                          child: Text(AppZh.extensionSearchProminent),
-                        ),
-                        DropdownMenuItem(
-                          value: SearchAssistantDisplayMode.compact,
-                          child: Text(AppZh.extensionSearchCompact),
-                        ),
-                        DropdownMenuItem(
-                          value: SearchAssistantDisplayMode.hidden,
-                          child: Text(AppZh.extensionSearchHidden),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          askTitoDexSettings.setSearchDisplayMode(value);
-                        }
-                      },
+                    const SizedBox(height: 8),
+                    _SettingsToggleRow(
+                      key: const Key('journey-assistant-master-toggle'),
+                      icon: Icons.auto_awesome_outlined,
+                      plateColor: TitoColors.softYellow,
+                      label: AppZh.extensionEnabled,
+                      hint: AppZh.extensionBuiltInHint,
+                      value: askTitoDexSettings.extensionEnabled,
+                      onChanged: _toggleJourneyAssistant,
                     ),
+                    if (askTitoDexSettings.extensionEnabled) ...[
+                      _SettingsToggleRow(
+                        key: const Key('journey-assistant-online-toggle'),
+                        icon: Icons.cloud_outlined,
+                        plateColor: TitoColors.skyBlue,
+                        label: AppZh.settingsAskTitoDex,
+                        hint: AppZh.settingsAskTitoDexHint,
+                        value: askTitoDexSettings.enabled,
+                        onChanged: _toggleAskTitoDex,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        AppZh.extensionSearchDisplay,
+                        style: SecondaryTypography.onCard.body14,
+                      ),
+                      DropdownButton<SearchAssistantDisplayMode>(
+                        key: const Key('extension-search-display-mode'),
+                        isExpanded: true,
+                        value: askTitoDexSettings.searchDisplayMode,
+                        items: const [
+                          DropdownMenuItem(
+                            value: SearchAssistantDisplayMode.prominent,
+                            child: Text(AppZh.extensionSearchProminent),
+                          ),
+                          DropdownMenuItem(
+                            value: SearchAssistantDisplayMode.compact,
+                            child: Text(AppZh.extensionSearchCompact),
+                          ),
+                          DropdownMenuItem(
+                            value: SearchAssistantDisplayMode.hidden,
+                            child: Text(AppZh.extensionSearchHidden),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            askTitoDexSettings.setSearchDisplayMode(value);
+                          }
+                        },
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        _SettingsGroup(
-          title: AppZh.settingsGroupTrainer,
-          child: StickerCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    _SettingsAvatarPreview(journey: widget.journey),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _avatarChanging ? null : _changeAvatar,
-                        child: const Text(AppZh.settingsChangeAvatar),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _trainerController,
-                  spellCheckConfiguration:
-                      const SpellCheckConfiguration.disabled(),
-                  decoration: InputDecoration(
-                    labelText: AppZh.settingsDisplayName,
-                    hintText: AppZh.settingsDisplayNameHint,
-                    helperText:
-                        saveName != null && saveName != _trainerController.text
-                        ? AppZh.settingsSaveDecodeHint(saveName)
-                        : AppZh.settingsSaveTrainerHint,
-                    border: const OutlineInputBorder(),
-                  ),
-                  onChanged: (_) => setState(() => _trainerDirty = true),
-                ),
-                const SizedBox(height: 8),
-                FilledButton(
-                  onPressed: _trainerDirty ? _saveTrainerName : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: TitoColors.coral,
-                    foregroundColor: TitoColors.ink,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(TitoRadii.md),
-                      side: const BorderSide(
-                        color: TitoColors.ink,
-                        width: TitoBorders.card,
-                      ),
-                    ),
-                  ),
-                  child: const Text(AppZh.settingsSaveTrainerName),
-                ),
-                if (saveLinked) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    AppZh.settingsJourneyReadOnly,
-                    style: SecondaryTypography.onCard.h15,
-                  ),
-                  const SizedBox(height: 10),
-                  _Row(
-                    label: AppZh.settingsLocation,
-                    value: localizeLocation(widget.journey.location),
-                  ),
-                  if (widget.journey.saveTrainerId != null)
-                    _Row(
-                      label: AppZh.settingsTrainerId,
-                      value: widget.journey.saveTrainerId!.toString().padLeft(
-                        5,
-                        '0',
-                      ),
-                    ),
-                  if (widget.journey.saveTrainerSecretId != null)
-                    _Row(
-                      label: AppZh.settingsTrainerSecretId,
-                      value: widget.journey.saveTrainerSecretId!
-                          .toString()
-                          .padLeft(5, '0'),
-                    ),
-                  if (widget.journey.saveTrainerGender != null)
-                    _Row(
-                      label: AppZh.settingsTrainerGender,
-                      value: widget.journey.saveTrainerGender!,
-                    ),
-                  if (widget.journey.saveLanguage != null)
-                    _Row(
-                      label: AppZh.settingsSaveLanguage,
-                      value: widget.journey.saveLanguage!,
-                    ),
-                  if (widget.journey.saveMoney != null)
-                    _Row(
-                      label: AppZh.settingsSaveMoney,
-                      value: '₽ ${widget.journey.saveMoney}',
-                    ),
-                  if (widget.journey.saveMotherMoney != null)
-                    _Row(
-                      label: AppZh.settingsMotherMoney,
-                      value: '₽ ${widget.journey.saveMotherMoney}',
-                    ),
-                  if (widget.journey.saveStarterSpeciesId != null)
-                    _Row(
-                      label: AppZh.settingsStarter,
-                      value: localizeSpecies(
-                        speciesNameFor(widget.journey.saveStarterSpeciesId!),
-                      ),
-                    ),
-                  if (widget.journey.saveDexSeenIds.isNotEmpty ||
-                      widget.journey.saveDexCaughtIds.isNotEmpty)
-                    _Row(
-                      label: AppZh.settingsDexProgress,
-                      value:
-                          '已见 ${widget.journey.saveDexSeenIds.length} · 已捕 ${widget.journey.saveDexCaughtIds.length}',
-                    ),
-                  if (widget.journey.saveMapCoordinates.length == 3)
-                    _Row(
-                      label: AppZh.settingsMapCoordinates,
-                      value: widget.journey.saveMapCoordinates.join(' / '),
-                    ),
-                  _Row(
-                    label: AppZh.settingsPlayTime,
-                    value: widget.journey.playTime,
-                  ),
-                  _Row(
-                    label: AppZh.settingsBadges,
-                    value: widget.journey.badgeProgressLabel,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        _CompanionSection(journey: widget.journey),
-        const SizedBox(height: 16),
-        const _InterfaceSection(),
-        const SizedBox(height: 16),
-        const _AppShortcutsSection(),
-        const SizedBox(height: 16),
-        if (saveLinked)
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.profile) ...[
           _SettingsGroup(
-            title: AppZh.settingsGroupSaveSync,
+            title: AppZh.settingsGroupTrainer,
             child: StickerCard(
-              variant: StickerVariant.cream,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    AppZh.settingsSaveFileHint,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    selectedFileUri != null
-                        ? AppZh.settingsSelectedSaveFile(
-                            selectedFileName ?? selectedFileUri,
-                          )
-                        : AppZh.settingsSaveFileUnset,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      color: !hasSaveFile
-                          ? TitoColors.mutedInk
-                          : TitoColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: widget.onPickSaveFile,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: TitoColors.deepBlue,
-                      foregroundColor: TitoColors.card,
-                    ),
-                    child: const Text(AppZh.settingsPickSaveFile),
-                  ),
-                  if (hasSaveFile) ...[
-                    const SizedBox(height: 8),
-                    OutlinedButton(
-                      onPressed: widget.onClearSaveFile,
-                      child: const Text(AppZh.settingsClearSaveFile),
-                    ),
-                  ],
-                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      const StickerIconPlate(
-                        icon: Icons.refresh_rounded,
-                        color: TitoColors.skyBlue,
-                      ),
-                      const SizedBox(width: 10),
+                      _SettingsAvatarPreview(journey: widget.journey),
+                      const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          AppZh.settingsAutoLoadOnStartup,
-                          style: SecondaryTypography.onCard.body14,
+                        child: OutlinedButton(
+                          onPressed: _avatarChanging ? null : _changeAvatar,
+                          child: const Text(AppZh.settingsChangeAvatar),
                         ),
-                      ),
-                      StickerSwitch(
-                        value: config.autoLoadOnStartup,
-                        onChanged: widget.onToggleAutoLoad,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    lastSynced != null
-                        ? AppZh.settingsLastSynced(lastSynced)
-                        : AppZh.settingsLastSyncedNone,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _trainerController,
+                    spellCheckConfiguration:
+                        const SpellCheckConfiguration.disabled(),
+                    decoration: InputDecoration(
+                      labelText: AppZh.settingsDisplayName,
+                      hintText: AppZh.settingsDisplayNameHint,
+                      helperText:
+                          saveName != null &&
+                              saveName != _trainerController.text
+                          ? AppZh.settingsSaveDecodeHint(saveName)
+                          : AppZh.settingsSaveTrainerHint,
+                      border: const OutlineInputBorder(),
                     ),
+                    onChanged: (_) => setState(() => _trainerDirty = true),
                   ),
                   const SizedBox(height: 8),
-                  OutlinedButton(
-                    onPressed: hasSaveFile ? widget.onSyncNow : null,
-                    child: const Text(AppZh.settingsSyncNow),
+                  FilledButton(
+                    onPressed: _trainerDirty ? _saveTrainerName : null,
+                    child: const Text(AppZh.settingsSaveTrainerName),
                   ),
+                  if (saveLinked) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      AppZh.settingsJourneyReadOnly,
+                      style: SecondaryTypography.onCard.h15,
+                    ),
+                    const SizedBox(height: 10),
+                    _Row(
+                      label: AppZh.settingsLocation,
+                      value: localizeLocation(widget.journey.location),
+                    ),
+                    if (widget.journey.saveTrainerId != null)
+                      _Row(
+                        label: AppZh.settingsTrainerId,
+                        value: widget.journey.saveTrainerId!.toString().padLeft(
+                          5,
+                          '0',
+                        ),
+                      ),
+                    if (widget.journey.saveTrainerSecretId != null)
+                      _Row(
+                        label: AppZh.settingsTrainerSecretId,
+                        value: widget.journey.saveTrainerSecretId!
+                            .toString()
+                            .padLeft(5, '0'),
+                      ),
+                    if (widget.journey.saveTrainerGender != null)
+                      _Row(
+                        label: AppZh.settingsTrainerGender,
+                        value: widget.journey.saveTrainerGender!,
+                      ),
+                    if (widget.journey.saveLanguage != null)
+                      _Row(
+                        label: AppZh.settingsSaveLanguage,
+                        value: widget.journey.saveLanguage!,
+                      ),
+                    if (widget.journey.saveMoney != null)
+                      _Row(
+                        label: AppZh.settingsSaveMoney,
+                        value: '₽ ${widget.journey.saveMoney}',
+                      ),
+                    if (widget.journey.saveMotherMoney != null)
+                      _Row(
+                        label: AppZh.settingsMotherMoney,
+                        value: '₽ ${widget.journey.saveMotherMoney}',
+                      ),
+                    if (widget.journey.saveStarterSpeciesId != null)
+                      _Row(
+                        label: AppZh.settingsStarter,
+                        value: localizeSpecies(
+                          speciesNameFor(widget.journey.saveStarterSpeciesId!),
+                        ),
+                      ),
+                    if (widget.journey.saveDexSeenIds.isNotEmpty ||
+                        widget.journey.saveDexCaughtIds.isNotEmpty)
+                      _Row(
+                        label: AppZh.settingsDexProgress,
+                        value:
+                            '已见 ${widget.journey.saveDexSeenIds.length} · 已捕 ${widget.journey.saveDexCaughtIds.length}',
+                      ),
+                    if (widget.journey.saveMapCoordinates.length == 3)
+                      _Row(
+                        label: AppZh.settingsMapCoordinates,
+                        value: widget.journey.saveMapCoordinates.join(' / '),
+                      ),
+                    _Row(
+                      label: AppZh.settingsPlayTime,
+                      value: widget.journey.playTime,
+                    ),
+                    _Row(
+                      label: AppZh.settingsBadges,
+                      value: widget.journey.badgeProgressLabel,
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
-        const SizedBox(height: 16),
-        _SettingsGroup(
-          title: AppZh.settingsDexOffline,
-          child: StickerCard(
-            variant: StickerVariant.mint,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  AppZh.settingsDexOfflineHint,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  dexManifest != null && dexManifest.complete
-                      ? AppZh.settingsDexOfflineReady(
-                          dexManifest.pokemonCount,
-                          dexManifest.moveCount,
-                          formatCacheSize(dexCache?.sizeBytes ?? 0),
-                          dexManifest.downloadedAt?.split('T').first ?? '',
-                        )
-                      : dexManifest != null && dexManifest.pokemonCount > 0
-                      ? AppZh.settingsDexOfflinePartial(
-                          dexManifest.pokemonCount,
-                        )
-                      : AppZh.settingsDexOfflineUnset,
-                  style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                if (_dexDownloading && dexProgress != null) ...[
-                  const SizedBox(height: 12),
-                  TitoProgressBar(value: dexDisplayProgress, height: 10),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${AppZh.settingsDexOfflineProgress(dexProgress.phase, dexProgress.current, dexProgress.total)} · ${(dexDisplayProgress * 100).round()}%',
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                    ),
-                  ),
-                  if (dexProgress.label != null) ...[
-                    const SizedBox(height: 4),
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.companion) ...[
+          _CompanionSection(journey: widget.journey),
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.appearance) ...[
+          const _InterfaceSection(),
+          const SizedBox(height: 16),
+          const _AppShortcutsSection(),
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.data) ...[
+          if (saveLinked)
+            _SettingsGroup(
+              title: AppZh.settingsGroupSaveSync,
+              child: StickerCard(
+                variant: StickerVariant.cream,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                     Text(
-                      dexProgress.label!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      AppZh.settingsSaveFileHint,
                       style: SecondaryTypography.onCard.small12.copyWith(
                         color: TitoColors.mutedInk,
                       ),
                     ),
-                  ],
-                ],
-                const SizedBox(height: 12),
-                Text(
-                  AppZh.settingsDexCdnDownloadHint,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (_dexDownloading)
-                  OutlinedButton(
-                    onPressed: dexOfflineService.requestCancelDownload,
-                    child: const Text(AppZh.settingsDexCancelDownload),
-                  )
-                else
-                  FilledButton(
-                    onPressed: _downloadDexCdnBundle,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: TitoColors.coral,
-                      foregroundColor: TitoColors.ink,
+                    const SizedBox(height: 12),
+                    Text(
+                      selectedFileUri != null
+                          ? AppZh.settingsSelectedSaveFile(
+                              selectedFileName ?? selectedFileUri,
+                            )
+                          : AppZh.settingsSaveFileUnset,
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        color: !hasSaveFile
+                            ? TitoColors.mutedInk
+                            : TitoColors.ink,
+                      ),
                     ),
-                    child: const Text(AppZh.settingsDexCdnDownload),
-                  ),
-              ],
+                    const SizedBox(height: 12),
+                    FilledButton(
+                      onPressed: widget.onPickSaveFile,
+                      child: const Text(AppZh.settingsPickSaveFile),
+                    ),
+                    if (hasSaveFile) ...[
+                      const SizedBox(height: 8),
+                      OutlinedButton(
+                        onPressed: widget.onClearSaveFile,
+                        child: const Text(AppZh.settingsClearSaveFile),
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const StickerIconPlate(
+                          icon: Icons.refresh_rounded,
+                          color: TitoColors.skyBlue,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            AppZh.settingsAutoLoadOnStartup,
+                            style: SecondaryTypography.onCard.body14,
+                          ),
+                        ),
+                        StickerSwitch(
+                          value: config.autoLoadOnStartup,
+                          onChanged: widget.onToggleAutoLoad,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      lastSynced != null
+                          ? AppZh.settingsLastSynced(lastSynced)
+                          : AppZh.settingsLastSyncedNone,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: hasSaveFile ? widget.onSyncNow : null,
+                      child: const Text(AppZh.settingsSyncNow),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        StickerCard(
-          variant: StickerVariant.mint,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                AppZh.settingsDexAdvancedOptions,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                _defaultGameEdition.labelZh,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                AppZh.settingsDexDefaultGameVersion,
-                style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                AppZh.settingsDexDefaultGameVersionHint,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: _dexDownloading ? null : _pickDefaultGameEdition,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(58),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  alignment: Alignment.centerLeft,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _defaultGameEdition.labelZh,
-                        maxLines: 2,
+          if (saveLinked) const SizedBox(height: 16),
+          _SettingsGroup(
+            title: AppZh.settingsDexOffline,
+            child: StickerCard(
+              variant: StickerVariant.mint,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppZh.settingsDexOfflineHint,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    dexManifest != null && dexManifest.complete
+                        ? AppZh.settingsDexOfflineReady(
+                            dexManifest.pokemonCount,
+                            dexManifest.moveCount,
+                            formatCacheSize(dexCache?.sizeBytes ?? 0),
+                            dexManifest.downloadedAt?.split('T').first ?? '',
+                          )
+                        : dexManifest != null && dexManifest.pokemonCount > 0
+                        ? AppZh.settingsDexOfflinePartial(
+                            dexManifest.pokemonCount,
+                          )
+                        : AppZh.settingsDexOfflineUnset,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (_dexDownloading && dexProgress != null) ...[
+                    const SizedBox(height: 12),
+                    TitoProgressBar(value: dexDisplayProgress, height: 10),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${AppZh.settingsDexOfflineProgress(dexProgress.phase, dexProgress.current, dexProgress.total)} · ${(dexDisplayProgress * 100).round()}%',
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                    if (dexProgress.label != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        dexProgress.label!,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.expand_more_rounded),
+                    ],
                   ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _dexDownloading ? null : _downloadDexOffline,
-                child: Text(
-                  dexManifest != null &&
-                          dexManifest.pokemonCount > 0 &&
-                          !dexManifest.complete
-                      ? AppZh.settingsDexOfflineResume
-                      : AppZh.settingsDexOfflineDownloadPokeApi,
-                ),
-              ),
-              if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        AppZh.settingsDexOfflinePrefer,
-                        style: SecondaryTypography.onCard.body14,
-                      ),
+                  const SizedBox(height: 12),
+                  Text(
+                    AppZh.settingsDexCdnDownloadHint,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
                     ),
-                    StickerSwitch(
-                      value: dexManifest.preferOffline,
-                      onChanged: _dexDownloading ? null : _setDexPreferOffline,
-                    ),
-                  ],
-                ),
-                OutlinedButton(
-                  onPressed: (_dexDownloading || _dexVerifying)
-                      ? null
-                      : _verifyDexOffline,
-                  child: Text(
-                    _dexVerifying
-                        ? AppZh.settingsDexVerifyRunning
-                        : AppZh.settingsDexVerify,
                   ),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: _dexDownloading ? null : _clearDexOffline,
-                  child: const Text(AppZh.settingsDexOfflineClear),
-                ),
-              ],
-            ],
+                  const SizedBox(height: 12),
+                  if (_dexDownloading)
+                    OutlinedButton(
+                      onPressed: dexOfflineService.requestCancelDownload,
+                      child: const Text(AppZh.settingsDexCancelDownload),
+                    )
+                  else
+                    FilledButton(
+                      onPressed: _downloadDexCdnBundle,
+                      child: const Text(AppZh.settingsDexCdnDownload),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        _SettingsGroup(
-          title: AppZh.settingsEmulator,
-          child: StickerCard(
-            variant: StickerVariant.sky,
+          const SizedBox(height: 12),
+          StickerCard(
+            variant: StickerVariant.mint,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  AppZh.settingsEmulatorHint,
+                  AppZh.settingsDexAdvancedOptions,
+                  style: SecondaryTypography.onCard.body14.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _defaultGameEdition.labelZh,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.mutedInk,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  emulator != null
-                      ? AppZh.settingsEmulatorSelected(emulator.appName)
-                      : AppZh.settingsEmulatorUnset,
+                  AppZh.settingsDexDefaultGameVersion,
                   style: SecondaryTypography.onCard.body14.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: widget.onPickEmulator,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: TitoColors.coral,
-                    foregroundColor: TitoColors.ink,
+                const SizedBox(height: 4),
+                Text(
+                  AppZh.settingsDexDefaultGameVersionHint,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
                   ),
-                  child: const Text(AppZh.settingsPickEmulator),
                 ),
-                if (emulator != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: _dexDownloading ? null : _pickDefaultGameEdition,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(58),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _defaultGameEdition.labelZh,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: SecondaryTypography.onCard.body14.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.expand_more_rounded),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: _dexDownloading ? null : _downloadDexOffline,
+                  child: Text(
+                    dexManifest != null &&
+                            dexManifest.pokemonCount > 0 &&
+                            !dexManifest.complete
+                        ? AppZh.settingsDexOfflineResume
+                        : AppZh.settingsDexOfflineDownloadPokeApi,
+                  ),
+                ),
+                if (dexManifest != null && dexManifest.pokemonCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppZh.settingsDexOfflinePrefer,
+                          style: SecondaryTypography.onCard.body14,
+                        ),
+                      ),
+                      StickerSwitch(
+                        value: dexManifest.preferOffline,
+                        onChanged: _dexDownloading
+                            ? null
+                            : _setDexPreferOffline,
+                      ),
+                    ],
+                  ),
+                  OutlinedButton(
+                    onPressed: (_dexDownloading || _dexVerifying)
+                        ? null
+                        : _verifyDexOffline,
+                    child: Text(
+                      _dexVerifying
+                          ? AppZh.settingsDexVerifyRunning
+                          : AppZh.settingsDexVerify,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   OutlinedButton(
-                    onPressed: widget.onClearEmulator,
-                    child: const Text(AppZh.settingsClearEmulator),
+                    onPressed: _dexDownloading ? null : _clearDexOffline,
+                    child: const Text(AppZh.settingsDexOfflineClear),
                   ),
                 ],
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.info_outline_rounded,
-                color: TitoColors.deepBlue,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  AppZh.settingsUnofficialNotice,
-                  style: SecondaryTypography.onCard.small12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        SettingsExpandableSection(
-          title: AppZh.settingsAttributionTitle,
-          subtitle: AppZh.settingsAttributionHint,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SelectableText(
-                AppZh.settingsAttributionBody,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: () => showLicensePage(
-                  context: context,
-                  applicationName: 'TitoDex',
-                  applicationLegalese: AppZh.settingsUnofficialNotice,
-                ),
-                icon: const Icon(Icons.description_outlined),
-                label: const Text(AppZh.settingsOpenSourceLicenses),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        SettingsExpandableSection(
-          title: AppZh.settingsGroupAdvanced,
-          subtitle: AppZh.settingsGroupAdvancedHint,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
+          const SizedBox(height: 16),
+          _SettingsGroup(
+            title: AppZh.settingsEmulator,
+            child: StickerCard(
+              variant: StickerVariant.sky,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: widget.onImportFixture,
-                      child: const Text(AppZh.settingsImportSave),
+                  Text(
+                    AppZh.settingsEmulatorHint,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: widget.onExportJourney,
-                      child: const Text(AppZh.settingsExportJourney),
+                  const SizedBox(height: 12),
+                  Text(
+                    emulator != null
+                        ? AppZh.settingsEmulatorSelected(emulator.appName)
+                        : AppZh.settingsEmulatorUnset,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: widget.onPickEmulator,
+                    child: const Text(AppZh.settingsPickEmulator),
+                  ),
+                  if (emulator != null) ...[
+                    const SizedBox(height: 8),
+                    OutlinedButton(
+                      onPressed: widget.onClearEmulator,
+                      child: const Text(AppZh.settingsClearEmulator),
+                    ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: widget.onImportJourney,
-                      child: const Text(AppZh.settingsImportJourney),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: widget.onResetMock,
-                      child: const Text(AppZh.settingsResetMock),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+        ],
+        if (widget.section == SettingsSection.about) ...[
+          StickerCard(
+            variant: StickerVariant.cream,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: TitoColors.deepBlue,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    AppZh.settingsUnofficialNotice,
+                    style: SecondaryTypography.onCard.small12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SettingsExpandableSection(
+            title: AppZh.settingsAttributionTitle,
+            subtitle: AppZh.settingsAttributionHint,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SelectableText(
+                  AppZh.settingsAttributionBody,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => showLicensePage(
+                    context: context,
+                    applicationName: 'TitoDex',
+                    applicationLegalese: AppZh.settingsUnofficialNotice,
+                  ),
+                  icon: const Icon(Icons.description_outlined),
+                  label: const Text(AppZh.settingsOpenSourceLicenses),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          SettingsExpandableSection(
+            title: AppZh.settingsGroupAdvanced,
+            subtitle: AppZh.settingsGroupAdvancedHint,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onImportFixture,
+                        child: const Text(AppZh.settingsImportSave),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onExportJourney,
+                        child: const Text(AppZh.settingsExportJourney),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onImportJourney,
+                        child: const Text(AppZh.settingsImportJourney),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: widget.onResetMock,
+                        child: const Text(AppZh.settingsResetMock),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
+    );
+  }
+}
+
+class _SettingsNavigationEntry {
+  const _SettingsNavigationEntry({
+    required this.section,
+    required this.icon,
+    required this.hint,
+  });
+
+  final SettingsSection section;
+  final IconData icon;
+  final String hint;
+}
+
+class _SettingsNavigationList extends StatelessWidget {
+  const _SettingsNavigationList({required this.entries});
+
+  final List<_SettingsNavigationEntry> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return StickerCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          for (var index = 0; index < entries.length; index++) ...[
+            ListTile(
+              key: ValueKey('settings-category-${entries[index].section.name}'),
+              leading: Icon(entries[index].icon, color: scheme.primary),
+              title: Text(entries[index].section.title),
+              subtitle: Text(entries[index].hint),
+              trailing: Icon(
+                Icons.chevron_right_rounded,
+                color: scheme.onSurfaceVariant,
+              ),
+              onTap: () => context.push(entries[index].section.route),
+            ),
+            if (index != entries.length - 1)
+              Divider(height: 1, indent: 56, color: scheme.outlineVariant),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -1251,6 +1424,7 @@ class _SettingsToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -1266,7 +1440,7 @@ class _SettingsToggleRow extends StatelessWidget {
                 Text(
                   hint,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: scheme.onSurfaceVariant,
                     height: 1.3,
                   ),
                 ),
@@ -1289,6 +1463,7 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -1297,7 +1472,7 @@ class _Row extends StatelessWidget {
           Text(
             label,
             style: SecondaryTypography.onCard.team12.copyWith(
-              color: TitoColors.mutedInk,
+              color: scheme.onSurfaceVariant,
             ),
           ),
           Flexible(
@@ -1357,8 +1532,6 @@ class _CurrentGameSection extends StatelessWidget {
             FilledButton(
               onPressed: onChangeGameEdition,
               style: FilledButton.styleFrom(
-                backgroundColor: TitoColors.deepBlue,
-                foregroundColor: TitoColors.card,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 10,
@@ -1380,7 +1553,11 @@ class _InterfaceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([motionPreferences, retroStyle]),
+      listenable: Listenable.merge([
+        appVisualStyle,
+        motionPreferences,
+        retroStyle,
+      ]),
       builder: (context, _) {
         return _SettingsGroup(
           title: AppZh.settingsGroupInterface,
@@ -1389,6 +1566,43 @@ class _InterfaceSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppZh.settingsVisualTheme,
+                        style: SecondaryTypography.onCard.body14,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        AppZh.settingsVisualThemeHint,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: SegmentedButton<AppVisualStyle>(
+                          key: const Key('settings-visual-theme'),
+                          segments: [
+                            for (final style in AppVisualStyle.values)
+                              ButtonSegment<AppVisualStyle>(
+                                value: style,
+                                label: Text(style.labelZh),
+                              ),
+                          ],
+                          selected: {appVisualStyle.style},
+                          showSelectedIcon: false,
+                          onSelectionChanged: (selection) {
+                            appVisualStyle.setStyle(selection.single);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const StickerRowDivider(),
                 _SettingsToggleRow(
                   icon: Icons.auto_awesome_rounded,
                   plateColor: TitoColors.mint,
@@ -1422,7 +1636,7 @@ class _AppShortcutsSection extends StatelessWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: TitoColors.card,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       builder: (sheetContext) => FractionallySizedBox(
         heightFactor: 0.86,
         child: SafeArea(
