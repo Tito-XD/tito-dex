@@ -111,6 +111,10 @@ void main() {
     );
     expect(sourceLayer.opacity, greaterThan(0));
     expect(targetLayer.opacity, greaterThan(0));
+    final sourceFit = tester.widget<FittedBox>(
+      find.byKey(const ValueKey<String>('tito-dex-flight-source-fit')),
+    );
+    expect(sourceFit.fit, BoxFit.scaleDown);
 
     await tester.pump(const Duration(milliseconds: 90));
     fade = tester.widget<FadeTransition>(

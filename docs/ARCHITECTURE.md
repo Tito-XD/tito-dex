@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.9.0 · Lite `0.9.0+177` · Offline `0.9.0-offline+178` · three persistent themes, refined navigation motion and verified semantic Journey answers · live bundle v20 embedded by Offline.
+> Current release: v0.9.1 · Lite `0.9.1+179` · Offline `0.9.1-offline+180` · three persistent themes, refined sprite/list/assistant motion and verified semantic Journey answers · live bundle v20 embedded by Offline.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 

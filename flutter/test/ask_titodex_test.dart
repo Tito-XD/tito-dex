@@ -555,7 +555,12 @@ void main() {
         find.byKey(const Key('ask-titodex-connection-status')),
       );
       expect(statusSurface.borderWidth, 1.5);
+      expect(statusSurface.radius, 999);
       expect(find.byKey(const Key('ask-titodex-save-context')), findsOneWidget);
+      expect(
+        find.byKey(const Key('ask-titodex-save-context-size')),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
         findsOneWidget,

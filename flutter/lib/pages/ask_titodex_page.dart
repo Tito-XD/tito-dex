@@ -23,6 +23,7 @@ import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import '../widgets/assistant_surface.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/retro_forms.dart';
@@ -922,12 +923,13 @@ class _ConnectionStatusCard extends StatelessWidget {
       AskTitoDexAvailability.disabled => '已关闭',
       AskTitoDexAvailability.unavailable => '仅本地',
     };
-    final radius = showSaveContext ? DeviceLayout.rLg(context) : 999.0;
-
     return AssistantSurface(
       key: const Key('ask-titodex-connection-status'),
       padding: EdgeInsets.zero,
-      radius: radius,
+      // The bar remains one capsule whether save context has arrived or not.
+      // Previously the async badge row changed 999px into the handheld 8px
+      // radius, producing a conspicuous shape snap.
+      radius: 999,
       color: Color.alphaBlend(
         TitoColors.skyBlue.withValues(alpha: 0.18),
         TitoColors.card,
@@ -1019,48 +1021,72 @@ class _ConnectionStatusCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (showSaveContext) ...[
-              Divider(
-                height: 1,
-                thickness: 1,
-                indent: 11,
-                endIndent: 11,
-                color: TitoColors.deepBlue.withValues(alpha: 0.12),
-              ),
-              Padding(
-                key: const Key('ask-titodex-save-context'),
-                padding: const EdgeInsets.fromLTRB(11, 6, 11, 7),
-                child: Wrap(
-                  spacing: 5,
-                  runSpacing: 4,
-                  children: [
-                    if (showLocation)
-                      _ContextChip(
-                        key: const Key('ask-titodex-location-context'),
-                        icon: Icons.place_outlined,
-                        label: localizeLocation(value.locationLabel!),
-                        onDeleted: onRemoveLocation,
-                      ),
-                    if (showVerifiedBadges)
-                      _ContextChip(
-                        key: const Key('ask-titodex-badge-context'),
-                        icon: Icons.military_tech,
-                        label: AppZh.askTitoDexBadgeContext(
-                          value.badgeIds.length,
-                        ),
-                        onDeleted: onRemoveBadges,
-                      ),
-                    if (showBadgeCount)
-                      _ContextChip(
-                        key: const Key('ask-titodex-badge-context'),
-                        icon: Icons.military_tech,
-                        label: '存档徽章 ${value.badgeCount} 枚（仅计数）',
-                        onDeleted: onRemoveBadges,
-                      ),
-                  ],
-                ),
-              ),
-            ],
+            Builder(
+              key: const Key('ask-titodex-save-context-size'),
+              builder: (context) {
+                final saveContextChild = showSaveContext
+                    ? Column(
+                        key: const ValueKey('save-context-visible'),
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Divider(
+                            height: 1,
+                            thickness: 1,
+                            indent: 11,
+                            endIndent: 11,
+                            color: TitoColors.deepBlue.withValues(alpha: 0.12),
+                          ),
+                          Padding(
+                            key: const Key('ask-titodex-save-context'),
+                            padding: const EdgeInsets.fromLTRB(11, 6, 11, 7),
+                            child: Wrap(
+                              spacing: 5,
+                              runSpacing: 4,
+                              children: [
+                                if (showLocation)
+                                  _ContextChip(
+                                    key: const Key(
+                                      'ask-titodex-location-context',
+                                    ),
+                                    icon: Icons.place_outlined,
+                                    label: localizeLocation(
+                                      value.locationLabel!,
+                                    ),
+                                    onDeleted: onRemoveLocation,
+                                  ),
+                                if (showVerifiedBadges)
+                                  _ContextChip(
+                                    key: const Key('ask-titodex-badge-context'),
+                                    icon: Icons.military_tech,
+                                    label: AppZh.askTitoDexBadgeContext(
+                                      value.badgeIds.length,
+                                    ),
+                                    onDeleted: onRemoveBadges,
+                                  ),
+                                if (showBadgeCount)
+                                  _ContextChip(
+                                    key: const Key('ask-titodex-badge-context'),
+                                    icon: Icons.military_tech,
+                                    label: '存档徽章 ${value.badgeCount} 枚（仅计数）',
+                                    onDeleted: onRemoveBadges,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(key: ValueKey('save-context-hidden'));
+                if (TitoMotion.disabled(context)) {
+                  return saveContextChild;
+                }
+                return AnimatedSize(
+                  duration: TitoMotion.standard,
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: saveContextChild,
+                );
+              },
+            ),
           ],
         ),
       ),

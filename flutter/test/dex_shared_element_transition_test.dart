@@ -6,6 +6,7 @@ import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/navigation/tito_page_transition.dart';
 import 'package:titodex/pages/pokemon_detail_page.dart';
+import 'package:titodex/widgets/dex_sprite_image.dart';
 import 'package:titodex/widgets/pokemon_card.dart';
 import 'package:titodex/widgets/pokemon_detail_sections.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
@@ -168,7 +169,7 @@ void main() {
       expect(
         find.descendant(
           of: returningHeaderLayer,
-          matching: find.text(_summary.nameZh),
+          matching: find.byType(DexSpriteImage),
         ),
         findsOneWidget,
       );

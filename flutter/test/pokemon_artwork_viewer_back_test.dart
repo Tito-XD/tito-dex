@@ -84,6 +84,10 @@ void main() {
     expect(highResolution.opacity.value, 0);
     expect(find.byKey(const ValueKey('artwork-stable-hero')), findsOneWidget);
     await tester.pumpAndSettle();
+    final stableHeroFade = tester.widget<FadeTransition>(
+      find.byKey(const ValueKey('artwork-stable-hero-fade')),
+    );
+    expect(stableHeroFade.opacity.value, 0);
     expect(viewerRoute.popGestureEnabled, isTrue);
 
     await tester.binding.handlePopRoute();
