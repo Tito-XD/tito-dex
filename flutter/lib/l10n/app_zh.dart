@@ -628,8 +628,8 @@ abstract final class AppZh {
   static const companionMediaFailedHint = '部分资源载入失败，将使用静态图或稍后重试。';
   static const settingsGroupAdvancedHint = '内置存档导入、旅程 JSON 导入/导出与重置';
   static const settingsGroupInterface = '界面风格';
-  static const settingsRetroStyle = 'Retro 贴纸质感';
-  static const settingsRetroStyleHint = '实心下沉影加按压回弹的实体按键手感；关闭后为纯扁平贴纸。';
+  static const settingsRetroStyle = 'Material 表面层次';
+  static const settingsRetroStyleHint = '开启后卡片使用轻量高度；关闭后改为描边表面，按钮仍保留原生状态反馈。';
   static const settingsListAnimations = '列表渐入动画';
   static const settingsListAnimationsHint = '图鉴、搜索、常用资料等列表的渐入小动画；关闭后内容会立即显示。';
   static const settingsAppShortcuts = '桌面快捷入口';

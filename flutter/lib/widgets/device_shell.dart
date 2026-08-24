@@ -5,10 +5,7 @@ import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
 class DeviceShell extends StatelessWidget {
-  const DeviceShell({
-    super.key,
-    required this.child,
-  });
+  const DeviceShell({super.key, required this.child});
 
   final Widget child;
 
@@ -16,21 +13,23 @@ class DeviceShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final handheldChrome = DeviceLayout.useHandheldChrome(context);
+    final scheme = Theme.of(context).colorScheme;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
+      value: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: TitoColors.deepBlue,
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: scheme.surface,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarDividerColor: scheme.surface,
       ),
       child: MediaQuery(
         data: mq.copyWith(textScaler: DeviceLayout.clampedTextScaler(context)),
         child: handheldChrome
             ? _HandheldNativeShell(child: child)
             : (DeviceLayout.isNativeTarget
-                ? _RegularNativeShell(child: child)
-                : _PreviewShell(child: child)),
+                  ? _RegularNativeShell(child: child)
+                  : _PreviewShell(child: child)),
       ),
     );
   }
@@ -46,35 +45,19 @@ class _HandheldNativeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final padding = MediaQuery.paddingOf(context);
     final size = MediaQuery.sizeOf(context);
+    final scheme = Theme.of(context).colorScheme;
 
     return ColoredBox(
-      color: TitoColors.deepBlue,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            // Match TitoPageContainer's page gradient: predictive-back corner
-            // reveals then blend into the pages instead of flashing skyBlue.
-            colors: [
-              Color(0xFF5D728A),
-              Color(0xFF7B91A6),
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: padding.left,
-            right: padding.right,
-          ),
-          // RG immersive shell strips top/bottom safe padding — without an
-          // explicit height, route ListViews see unbounded max height and
-          // behave like an infinitely growing scroll surface.
-          child: SizedBox(
-            height: size.height,
-            width: size.width - padding.left - padding.right,
-            child: child,
-          ),
+      color: scheme.surface,
+      child: Padding(
+        padding: EdgeInsets.only(left: padding.left, right: padding.right),
+        // RG immersive shell strips top/bottom safe padding — without an
+        // explicit height, route ListViews see unbounded max height and
+        // behave like an infinitely growing scroll surface.
+        child: SizedBox(
+          height: size.height,
+          width: size.width - padding.left - padding.right,
+          child: child,
         ),
       ),
     );
@@ -97,20 +80,8 @@ class _RegularNativeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: TitoColors.deepBlue,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF5D728A),
-              Color(0xFF7B91A6),
-            ],
-          ),
-        ),
-        child: child,
-      ),
+      color: Theme.of(context).colorScheme.surface,
+      child: child,
     );
   }
 }
@@ -123,52 +94,29 @@ class _PreviewShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return ColoredBox(
-      color: TitoColors.deepBlue,
+      color: scheme.surfaceContainer,
       child: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: TitoColors.slateBlue,
+              child: Material(
+                color: scheme.surface,
+                elevation: 3,
+                surfaceTintColor: scheme.surfaceTint,
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(TitoRadii.xl),
-                  border: Border.all(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x4D18283B),
-                      blurRadius: 24,
-                      offset: Offset(0, 12),
-                    ),
-                  ],
+                  side: BorderSide(color: scheme.outlineVariant),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(TitoRadii.xl - 3),
-                  child: Column(
-                    children: [
-                      const _StatusStrip(),
-                      Expanded(
-                        child: DecoratedBox(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                TitoColors.skyBlue,
-                                TitoColors.slateBlue,
-                              ],
-                            ),
-                          ),
-                          child: child,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    const _StatusStrip(),
+                    Expanded(child: child),
+                  ],
                 ),
               ),
             ),
@@ -184,27 +132,24 @@ class _StatusStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: TitoColors.deepBlue,
-      child: const Row(
+      color: scheme.surfaceContainerHigh,
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             'TitoDex',
             style: TextStyle(
-              color: TitoColors.skyBlue,
-              fontWeight: FontWeight.w800,
+              color: scheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
               fontSize: 13,
             ),
           ),
-          Row(
-            children: [
-              _StatusDot(),
-              SizedBox(width: 6),
-              _BatteryIcon(),
-            ],
+          const Row(
+            children: [_StatusDot(), SizedBox(width: 6), _BatteryIcon()],
           ),
         ],
       ),
@@ -217,14 +162,11 @@ class _StatusDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 6,
       height: 6,
-      decoration: BoxDecoration(
-        color: TitoColors.softYellow,
-        shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.skyBlue, width: 1),
-      ),
+      decoration: BoxDecoration(color: scheme.primary, shape: BoxShape.circle),
     );
   }
 }
@@ -234,11 +176,12 @@ class _BatteryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 18,
       height: 10,
       decoration: BoxDecoration(
-        border: Border.all(color: TitoColors.skyBlue, width: 2),
+        border: Border.all(color: scheme.onSurfaceVariant, width: 1.5),
         borderRadius: BorderRadius.circular(2),
       ),
       alignment: Alignment.centerLeft,
@@ -246,7 +189,7 @@ class _BatteryIcon extends StatelessWidget {
       child: Container(
         width: 11,
         decoration: BoxDecoration(
-          color: TitoColors.mint,
+          color: scheme.primary,
           borderRadius: BorderRadius.circular(1),
         ),
       ),

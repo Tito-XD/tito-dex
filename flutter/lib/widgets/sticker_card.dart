@@ -21,24 +21,34 @@ class StickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rLg(context);
+    final scheme = Theme.of(context).colorScheme;
     final colors = switch (variant) {
-      StickerVariant.cream => (TitoColors.card, TitoColors.ink),
-      StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
-      StickerVariant.sky => (TitoColors.skyBlue, TitoColors.ink),
+      StickerVariant.cream => (scheme.surfaceContainerLow, scheme.onSurface),
+      StickerVariant.deep => (scheme.primary, scheme.onPrimary),
+      StickerVariant.sky => (
+        scheme.primaryContainer,
+        scheme.onPrimaryContainer,
+      ),
       StickerVariant.mint => (TitoColors.mint, TitoColors.ink),
       StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
     };
 
-    // Retro style: the signature solid drop shadow on every card; flat mode
-    // lets the bold ink border carry the sticker look on its own.
+    // Keep the existing preference contract: enabled selects an elevated
+    // Material card; disabled selects the outlined Material 3 variant.
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, inner) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.$1,
+      builder: (context, inner) => Material(
+        type: MaterialType.card,
+        color: colors.$1,
+        elevation: retroStyle.enabled ? 1 : 0,
+        shadowColor: scheme.shadow,
+        surfaceTintColor: scheme.surfaceTint,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),
-          border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-          boxShadow: retroStyle.enabled ? TitoShadows.sticker : null,
+          side: retroStyle.enabled
+              ? BorderSide.none
+              : BorderSide(color: scheme.outlineVariant),
         ),
         child: inner,
       ),

@@ -5,7 +5,6 @@ import '../l10n/app_zh.dart';
 import '../navigation/back_navigation.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
 
 /// Standard shell for N3 secondary routes with shared top navigation.
@@ -62,10 +61,7 @@ class SecondaryPageScaffold extends StatelessWidget {
   }
 }
 
-/// On-gradient subtitle line shared by secondary pages (settings, dex,
-/// quick damage, …). Cream at 92% reads clearly against the v0.6.7
-/// deep-blue gradient top (was skyBlue on skyBlue, ~1:1 contrast).
-/// Extracted so a future color tweak lands in exactly one place.
+/// Material on-surface subtitle shared by secondary pages.
 class SecondaryPageSubtitle extends StatelessWidget {
   const SecondaryPageSubtitle({super.key, required this.text});
 
@@ -73,10 +69,11 @@ class SecondaryPageSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
-      style: SecondaryTypography.onGradient.body14.copyWith(
-        color: TitoColors.card.withValues(alpha: 0.92),
+      style: SecondaryTypography.onCard.body14.copyWith(
+        color: scheme.onSurfaceVariant,
       ),
     );
   }
@@ -147,6 +144,7 @@ class _BackTitleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
+    final scheme = Theme.of(context).colorScheme;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(radius),
@@ -164,7 +162,7 @@ class _BackTitleButton extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.arrow_back_rounded,
-                    color: TitoColors.card,
+                    color: scheme.primary,
                     size: iconSize,
                   ),
                   SizedBox(width: iconSize * 0.15),
@@ -174,13 +172,8 @@ class _BackTitleButton extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onGradient.title.copyWith(
+                        color: scheme.onSurface,
                         letterSpacing: -0.5,
-                        shadows: const [
-                          Shadow(
-                            color: Color(0x4018283B),
-                            offset: Offset(0, 2),
-                          ),
-                        ],
                       ),
                     ),
                   ),
@@ -211,28 +204,21 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
     // Same glyph ratio as the home header's settings button (app_header.dart)
     // so the gear reads at one size on every title bar.
     final iconSize = size * 0.62;
+    final scheme = Theme.of(context).colorScheme;
 
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(size / 2),
-      child: Semantics(
-        button: true,
-        label: label,
-        child: Material(
-          color: TitoColors.card,
-          shape: const CircleBorder(
-            side: BorderSide(color: TitoColors.ink, width: 2),
-          ),
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(icon, color: TitoColors.deepBlue, size: iconSize),
-            ),
-          ),
+      child: IconButton.filledTonal(
+        tooltip: label,
+        onPressed: onTap,
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints.tightFor(width: size, height: size),
+        style: IconButton.styleFrom(
+          backgroundColor: scheme.secondaryContainer,
+          foregroundColor: scheme.onSecondaryContainer,
         ),
+        icon: Icon(icon, size: iconSize),
       ),
     );
   }
