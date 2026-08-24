@@ -388,7 +388,7 @@ Widget _homeActionFlightShuttle(
           : 1 -
                 const Interval(
                   0,
-                  0.62,
+                  0.42,
                   curve: Curves.easeOutCubic,
                 ).transform(timelineProgress);
       final pageOpacity = reduceMotion
@@ -432,7 +432,12 @@ Widget _homeActionFlightShuttle(
               children: [
                 Positioned.fill(
                   child: FittedBox(
-                    fit: BoxFit.fill,
+                    key: const ValueKey('tito-dex-flight-source-fit'),
+                    // The quick-action artwork is intentionally pixel-like.
+                    // Keep it at its natural size while the surrounding
+                    // surface expands instead of stretching the icon to the
+                    // full-screen destination bounds.
+                    fit: BoxFit.scaleDown,
                     child: SizedBox.fromSize(
                       size: cardSize,
                       child: Opacity(

@@ -24,8 +24,8 @@ class TitoListReveal extends StatefulWidget {
   /// lists don't keep animating forever.
   static Duration staggerDelay(
     int index, {
-    int stepMs = 30,
-    int maxSteps = 10,
+    int stepMs = 22,
+    int maxSteps = 7,
     int baseMs = 0,
   }) {
     final step = index < maxSteps ? index : maxSteps;
@@ -273,11 +273,17 @@ class _TitoListRevealState extends State<TitoListReveal>
       child: widget.child,
       builder: (context, child) {
         final progress = _progress.value.clamp(0.0, 1.0);
+        final fadeProgress = Curves.easeOut.transform(progress);
+        final travelProgress = Curves.easeOutCubic.transform(progress);
         return Opacity(
-          opacity: progress,
+          opacity: fadeProgress,
           child: Transform.translate(
-            offset: Offset(0, TitoMotion.listTravel * (1 - progress)),
-            child: child,
+            offset: Offset(0, TitoMotion.listTravel * (1 - travelProgress)),
+            child: Transform.scale(
+              scale: 0.985 + 0.015 * travelProgress,
+              alignment: Alignment.topCenter,
+              child: child,
+            ),
           ),
         );
       },

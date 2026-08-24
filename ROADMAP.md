@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.0) · Lite `0.9.0+177` · Offline `0.9.0-offline+178`.
+> **Latest release:** [v0.9.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.1) · Lite `0.9.1+179` · Offline `0.9.1-offline+180`.
 >
-> **Current `main`:** v0.9.0 release baseline with three persistent themes, theme-aware motion, verified semantic Journey answers, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.1 release baseline with refined sprite Hero transitions, stable artwork switching, smoother list entry and assistant status/loading motion, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,18 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v20; v0.9.0 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.1 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.9.1
+
+- Keep the Home Pokédex quick-action artwork at its natural proportion while the route surface expands.
+- Transition only the Pokémon sprite from each Dex card into the detail header, and hide the stale base sprite once a selected form or edition artwork has resolved.
+- Return rotating Ask TitoDex waiting copy to a non-overlapping fade, keep the save-aware status surface permanently pill-shaped, and animate newly available badge context without a shape snap.
+- Shorten and soften secondary-list entry with a smaller rise, bounded stagger, and restrained scale settle while preserving reduced-motion behavior.
 
 ## Completed in v0.9.0
 

@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.0](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.0) |
-| **`main` / lite source** | `0.9.0+177` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.0-offline+178` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.1](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.1) |
+| **`main` / lite source** | `0.9.1+179` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.1-offline+180` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
@@ -44,11 +44,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.0)
+## Current feature status (latest release line: v0.9.1)
 
-> v0.9.0 uses Lite versionCode 177 and Offline versionCode 178. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.9.1 uses Lite versionCode 179 and Offline versionCode 180. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Journey & save
+- **Current v0.9.1:** keeps the three persistent themes and modern Ask TitoDex semantics from v0.9.0, while correcting visible motion edges: the Home Dex icon no longer stretches into the page, card-to-detail transitions move the creature sprite itself, selected form or edition artwork replaces the stable viewer sprite, secondary lists use a shorter bounded settle, rotating assistant copy crossfades without overlap, and the save-aware status surface stays pill-shaped while badge context arrives.
 - **Current v0.9.0:** ships three persistent built-in themes with Trainer's Journal as the first-install default, theme-aware navigation motion, restrained Solid Plastic optics, and a modern Ask TitoDex surface. The latest App and Worker use verified semantic blocks rather than legacy answer deltas: progress is shown while sources are retrieved and checked, then summary, prose, bullets, tables, warnings, or clarification choices reveal in place. Request IDs, exact-game context and semantic reset prevent stale or cross-version answers from reappearing.
 - **v0.8.20 baseline retained in v0.9.0:** Journey Assistant and three HGSS blocker chains are built into the host APK, but the entire feature defaults off. First activation happens only in Settings after a disclosure covering network access, AI/search and bounded recent conversation context; upgraded installs do not inherit the earlier default-on entry state. While disabled, Journey and Search build no assistant entry or spacer. After consent, local deterministic facts still run first, and Journey can manage one signed, catalog-pinned optional data pack for the selected game; failed or cancelled replacement keeps the prior pack. The App keeps the newest 50 Q&A pairs locally, sends at most six same-game pairs for follow-ups, and presents online status, local history and selected game as three independent compact controls. History management can explicitly compact local storage to the newest 10 entries or clear it after confirmation; the game control opens the existing 23-edition picker and rebuilds isolated Assistant context. Answers use a refined light conversation surface without stray corner marks, an unboxed companion with four-point sparkles, smoother shimmer motion, and bottom-following scroll; verified answers progressively reveal only after the Worker evidence pass completes; verification plus citations collapse into one expandable row. Recognized Pokémon, items, moves and abilities resolve against installed runtime data and stable IDs before their Poké Ball/backpack/sparkle/bolt ActionChips open existing details; ambiguous labels do not create a guessed target. The encyclopedia/guide allowlist remains one connection capability while Worker/Qwen/AI Search/Dex bundle/Tavily/DeepSeek stay individually observable. The complete possible-source list lives in Settings Credits. A save location alone no longer selects an unrelated blocker, and selected-game changes physically clear incompatible save context. On a local miss—or a V20 Dex fact whose provenance requires online verification—the Worker can combine exact-version Dex-bundle facts, BGE-M3 reviewed retrieval, fixed PokeAPI/StrategyWiki/Wikidata evidence, Tavily and DeepSeek V4 Flash allowlisted search, with Workers AI Qwen as the public composer/verifier. A V20 deterministic answer remains the offline fallback; it is replaced only when the allowlisted pass returns real online evidence. Chinese Tavily retrieval first attempts 52Poké alone; only a missing or unsupported primary answer falls back to the remaining allowlisted encyclopedias and guide sites, and final output stays Simplified Chinese. When both live routes succeed, a separate Qwen pass labels them as dual-source only if the DeepSeek result materially corroborates the primary evidence chain without a version/fact conflict. The explicit broad-answer trial can return sourced low-confidence material when a second evidence pass is incomplete for selected-game gameplay, but general franchise questions require verified citation support; Pokémon-only scope, fixed domains, bounded payloads, and deterministic failure fallback remain enforced. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
@@ -138,6 +139,7 @@ an unsupported blanket Creative Commons claim. The preserved v19 object set stil
 attribution text; live v20 adds corrected metadata without overwriting v19 objects.
 
 ### Latest release-line highlights
+- v0.9.1: keeps pixel artwork proportional during the Home-to-Dex expansion, moves the actual creature sprite between list and detail, removes stale artwork beneath selected forms, smooths secondary-list settling, crossfades assistant waiting copy without overlap, and keeps the save-aware status bar pill-shaped.
 - v0.8.20: adds catalog-pinned per-game Journey data downloads with atomic replacement, resolves answer entities from installed runtime data and stable IDs, opens move/ability/item details directly, and keeps V20 structured facts eligible for allowlisted online verification while retaining deterministic offline fallback.
 - v0.8.19: renders streamed and completed assistant Markdown as safe headings, emphasis, lists and horizontally scrollable tables; keeps citation URLs exclusively in the expandable evidence sheet; cleans legacy inline source footers from display and follow-up context; and makes the Worker return clean answer bodies alongside structured sources.
 - v0.8.18: removes stray right-angle decorations, frees the companion sprite from its box, refines the paper/shimmer/action-chip styling, and progressively streams bounded verified answer deltas while preserving legacy JSON responses and deterministic local fallback.
@@ -293,7 +295,7 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 `flutter analyze --no-pub`, full `flutter test --no-pub`, Python tool tests,
 Journey Assistant Worker typecheck/Vitest/dry-run, bundled-data byte equality,
 legacy companion Gradle checks, and physical-device host update tests.
-Published v0.9.0 artifacts are verified through the Android release workflows;
+Published v0.9.1 artifacts are verified through the Android release workflows;
 the optional extension is additionally checked for the same V2 signer as the host.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).

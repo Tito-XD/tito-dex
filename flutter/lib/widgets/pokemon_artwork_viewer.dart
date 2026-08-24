@@ -430,20 +430,27 @@ class _ArtworkHeroStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewport = MediaQuery.sizeOf(context);
     final dimension = math.min(viewport.width - 32, viewport.height * 0.42);
+    final stableHeroOpacity = displaySource == null
+        ? const AlwaysStoppedAnimation<double>(1)
+        : ReverseAnimation(highResolutionOpacity);
     return SizedBox.square(
       dimension: dimension.clamp(160.0, 460.0),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Hero(
-            key: const ValueKey('artwork-stable-hero'),
-            tag: pokemonArtworkHeroTag(summary),
-            transitionOnUserGestures: true,
-            child: Material(
-              type: MaterialType.transparency,
-              child: DexSpriteImage(
-                source: summary.displaySpritePath,
-                fit: BoxFit.contain,
+          FadeTransition(
+            key: const ValueKey('artwork-stable-hero-fade'),
+            opacity: stableHeroOpacity,
+            child: Hero(
+              key: const ValueKey('artwork-stable-hero'),
+              tag: pokemonArtworkHeroTag(summary),
+              transitionOnUserGestures: true,
+              child: Material(
+                type: MaterialType.transparency,
+                child: DexSpriteImage(
+                  source: summary.displaySpritePath,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),

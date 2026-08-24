@@ -167,6 +167,27 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
     );
   }
 
+  Widget _textFadeTransition(Widget child, Animation<double> animation) {
+    // AnimatedSwitcher drives the outgoing child from 1 → 0 and the incoming
+    // child from 0 → 1. Restrict both to the upper half of their animation so
+    // the old line disappears before the new line becomes visible; this keeps
+    // rotating copy readable without the previous sliding text overlap.
+    final opacity = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.5, 1, curve: Curves.easeOutCubic),
+      reverseCurve: const Interval(0.5, 1, curve: Curves.easeInCubic),
+    );
+    return FadeTransition(opacity: opacity, child: child);
+  }
+
+  Widget _topLeftSwitcherLayout(
+    Widget? currentChild,
+    List<Widget> previousChildren,
+  ) => Stack(
+    alignment: Alignment.topLeft,
+    children: [...previousChildren, if (currentChild != null) currentChild],
+  );
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -262,7 +283,8 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                 duration: _reduceMotion
                                     ? Duration.zero
                                     : const Duration(milliseconds: 260),
-                                transitionBuilder: _stageTransition,
+                                transitionBuilder: _textFadeTransition,
+                                layoutBuilder: _topLeftSwitcherLayout,
                                 child: Shimmer.fromColors(
                                   key: ValueKey(widget.progress),
                                   enabled: !_reduceMotion,
@@ -276,10 +298,12 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                               ),
                               const SizedBox(height: 3),
                               AnimatedSwitcher(
+                                key: const Key('ask-titodex-loading-message'),
                                 duration: _reduceMotion
                                     ? Duration.zero
                                     : const Duration(milliseconds: 260),
-                                transitionBuilder: _stageTransition,
+                                transitionBuilder: _textFadeTransition,
+                                layoutBuilder: _topLeftSwitcherLayout,
                                 child: Text(
                                   message,
                                   key: ValueKey(message),

@@ -63,62 +63,36 @@ Widget _pokemonCardFlightShuttle(
   final detailHero = detailContext.widget as Hero;
   final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
   final detailSize = (detailContext.findRenderObject()! as RenderBox).size;
-  final reduceMotion = MediaQuery.disableAnimationsOf(flightContext);
-  final timelineAnimation = animation is CurvedAnimation
-      ? animation.parent
-      : animation;
-
   return AnimatedBuilder(
     animation: animation,
     builder: (context, _) {
       final progress = animation.value.clamp(0.0, 1.0);
-      final timelineProgress = timelineAnimation.value.clamp(0.0, 1.0);
-      final cardOpacity = reduceMotion
-          ? (timelineProgress < 0.5 ? 1.0 : 0.0)
-          : 1 -
-                const Interval(
-                  0.34,
-                  0.82,
-                  curve: Curves.easeOutCubic,
-                ).transform(timelineProgress);
-      final detailOpacity = reduceMotion
-          ? (timelineProgress < 0.5 ? 0.0 : 1.0)
-          : const Interval(
-              0.18,
-              0.70,
-              curve: Curves.easeOutCubic,
-            ).transform(timelineProgress);
-      final radius = 18.0 - 6.0 * progress;
-
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            FittedBox(
-              fit: BoxFit.fill,
-              child: SizedBox.fromSize(
-                size: cardSize,
-                child: Opacity(
-                  key: const ValueKey('pokemon-card-flight-source'),
-                  opacity: cardOpacity,
-                  child: cardHero.child,
-                ),
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox.fromSize(
+              size: cardSize,
+              child: Opacity(
+                key: const ValueKey('pokemon-card-flight-source'),
+                opacity: 1 - progress,
+                child: cardHero.child,
               ),
             ),
-            FittedBox(
-              fit: BoxFit.fill,
-              child: SizedBox.fromSize(
-                size: detailSize,
-                child: Opacity(
-                  key: const ValueKey('pokemon-card-flight-target'),
-                  opacity: detailOpacity,
-                  child: detailHero.child,
-                ),
+          ),
+          FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox.fromSize(
+              size: detailSize,
+              child: Opacity(
+                key: const ValueKey('pokemon-card-flight-target'),
+                opacity: progress,
+                child: detailHero.child,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     },
   );
@@ -166,59 +140,60 @@ class PokemonMiniCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              PokemonCardTransitionHero(
-                summary: summary,
-                child: StickerCard(
-                  variant: variant,
-                  padding: EdgeInsets.fromLTRB(
-                    padding,
-                    padding,
-                    padding,
-                    padding,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Flexible sprite area — absorbs any extra tile height so the
-                      // card always fills its grid cell without overflowing.
-                      Expanded(
+              StickerCard(
+                variant: variant,
+                padding: EdgeInsets.fromLTRB(
+                  padding,
+                  padding,
+                  padding,
+                  padding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // The sprite alone is the shared element. Expanding the
+                    // complete card made the artwork disappear inside a broad
+                    // surface morph and never read as a creature transition.
+                    Expanded(
+                      child: PokemonCardTransitionHero(
+                        summary: summary,
                         child: DexSpriteImage(
                           source: summary.displaySpritePath,
                           height: null,
                           fit: BoxFit.contain,
                         ),
                       ),
-                      SizedBox(height: compact ? 2 : 4),
-                      Text(
-                        '#${summary.id.toString().padLeft(3, '0')}',
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        style: TitoTypography.style(
-                          fontSize: compact ? 10 : 12,
-                          fontWeight: FontWeight.w700,
-                          color: TitoColors.mutedInk,
-                          height: 1.1,
-                        ),
+                    ),
+                    SizedBox(height: compact ? 2 : 4),
+                    Text(
+                      '#${summary.id.toString().padLeft(3, '0')}',
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      style: TitoTypography.style(
+                        fontSize: compact ? 10 : 12,
+                        fontWeight: FontWeight.w700,
+                        color: TitoColors.mutedInk,
+                        height: 1.1,
                       ),
-                      const SizedBox(height: 1),
-                      Text(
-                        summary.nameZh,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TitoTypography.style(
-                          fontSize: compact ? 12 : 14,
-                          fontWeight: FontWeight.w800,
-                          height: 1.2,
-                        ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      summary.nameZh,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TitoTypography.style(
+                        fontSize: compact ? 12 : 14,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
                       ),
-                      SizedBox(height: compact ? 3 : 4),
-                      TitoTypeBadgeRow(
-                        typesEn: summary.types,
-                        size: TypeBadgeSize.small,
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: compact ? 3 : 4),
+                    TitoTypeBadgeRow(
+                      typesEn: summary.types,
+                      size: TypeBadgeSize.small,
+                    ),
+                  ],
                 ),
               ),
               if (status == DexEncounterStatus.caught)
