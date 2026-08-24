@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 
@@ -16,6 +17,7 @@ class SystemUiCoordinator extends StatefulWidget {
 
 class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
   Size? _lastSize;
+  AppVisualStyle? _lastStyle;
 
   @override
   void didChangeDependencies() {
@@ -31,14 +33,25 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
 
   void _applyForContext(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    if (_lastSize == size) {
+    final style = appVisualStyle.style;
+    if (_lastSize == size && _lastStyle == style) {
       return;
     }
     _lastSize = size;
-    _applySystemUi(size);
+    _lastStyle = style;
+    _applySystemUi(
+      size,
+      style: style,
+      flatSurface: Theme.of(context).colorScheme.surface,
+    );
   }
 
-  void _applySystemUi(Size size) {
+  void _applySystemUi(
+    Size size, {
+    required AppVisualStyle style,
+    required Color flatSurface,
+  }) {
+    final flatUi = style == AppVisualStyle.flatUi;
     if (!DeviceLayout.isNativeTarget) {
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       return;
@@ -58,14 +71,18 @@ class _SystemUiCoordinatorState extends State<SystemUiCoordinator> {
     }
 
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        // iOS reads statusBarBrightness (background brightness): dark
-        // background → white status bar text over the deepBlue shell.
-        statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor: TitoColors.deepBlue,
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: flatUi ? Brightness.dark : Brightness.light,
+        statusBarBrightness: flatUi ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: flatUi
+            ? flatSurface
+            : style == AppVisualStyle.solidPlastic
+            ? TitoColors.glassBackgroundTop
+            : TitoColors.deepBlue,
+        systemNavigationBarIconBrightness: flatUi
+            ? Brightness.dark
+            : Brightness.light,
       ),
     );
   }

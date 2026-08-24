@@ -6,6 +6,7 @@ import 'config/app_config.dart';
 import 'features/app_shortcuts/app_shortcuts.dart';
 import 'features/companion/companion_repository.dart';
 import 'features/extensions/journey_assistant_extension.dart';
+import 'theme/app_visual_style.dart';
 import 'theme/motion_preferences.dart';
 import 'theme/retro_style.dart';
 import 'features/game/game_catalog.dart';
@@ -394,26 +395,20 @@ class _TitoDexAppState extends State<TitoDexApp> {
               pageBuilder: (context, state) => titoMaterialPage(
                 key: state.pageKey,
                 child: TitoPageContainer(
-                  child: SettingsPage(
-                    journey: _journey,
-                    saveConfig: _saveConfig,
-                    emulatorChoice: _emulatorChoice,
-                    onImportFixture: _importBundledSave,
-                    onResetMock: _resetMock,
-                    onSaveJourney: _persist,
-                    onPickSaveFile: () => _pickSaveFile(context),
-                    onClearSaveFile: () => _clearSaveFile(context),
-                    onToggleAutoLoad: _setAutoLoadOnStartup,
-                    onSyncNow: () => _syncSaveFile(context, force: true),
-                    onExportJourney: _exportJourney,
-                    onImportJourney: _importJourneyJson,
-                    onPickEmulator: () => _pickEmulatorFromSettings(context),
-                    onClearEmulator: () => _clearEmulator(context),
-                    onChangeGameEdition: _onGameBadgeTap,
-                  ),
+                  child: _settingsPage(context, SettingsSection.overview),
                 ),
               ),
               routes: [
+                for (final section in SettingsSection.values.skip(1))
+                  GoRoute(
+                    path: section.name,
+                    pageBuilder: (context, state) => titoMaterialPage(
+                      key: state.pageKey,
+                      child: TitoPageContainer(
+                        child: _settingsPage(context, section),
+                      ),
+                    ),
+                  ),
                 GoRoute(
                   path: 'companion-position',
                   pageBuilder: (context, state) => titoMaterialPage(
@@ -440,6 +435,26 @@ class _TitoDexAppState extends State<TitoDexApp> {
     _bootstrap();
   }
 
+  SettingsPage _settingsPage(BuildContext context, SettingsSection section) =>
+      SettingsPage(
+        section: section,
+        journey: _journey,
+        saveConfig: _saveConfig,
+        emulatorChoice: _emulatorChoice,
+        onImportFixture: _importBundledSave,
+        onResetMock: _resetMock,
+        onSaveJourney: _persist,
+        onPickSaveFile: () => _pickSaveFile(context),
+        onClearSaveFile: () => _clearSaveFile(context),
+        onToggleAutoLoad: _setAutoLoadOnStartup,
+        onSyncNow: () => _syncSaveFile(context, force: true),
+        onExportJourney: _exportJourney,
+        onImportJourney: _importJourneyJson,
+        onPickEmulator: () => _pickEmulatorFromSettings(context),
+        onClearEmulator: () => _clearEmulator(context),
+        onChangeGameEdition: _onGameBadgeTap,
+      );
+
   void _openShortcutRoute(String route) {
     if (!AppShortcutOption.all.any((option) => option.route == route)) {
       return;
@@ -456,6 +471,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     await askTitoDexSettings.load();
     await journeyAssistantExtension.refresh();
     await companionRepository.load();
+    await appVisualStyle.load();
     await motionPreferences.load();
     await retroStyle.load();
     await appShortcutPreferences.load();
@@ -899,20 +915,23 @@ class _TitoDexAppState extends State<TitoDexApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: AppZh.displayTitleForTrainer(_journey.trainerName),
-      theme: buildTitoTheme(),
-      builder: (context, child) {
-        return SystemUiCoordinator(
-          child: DefaultTextStyle(
-            style: TitoTypography.style().copyWith(
-              decoration: TextDecoration.none,
+    return ListenableBuilder(
+      listenable: appVisualStyle,
+      builder: (context, _) => MaterialApp.router(
+        title: AppZh.displayTitleForTrainer(_journey.trainerName),
+        theme: buildTitoTheme(appVisualStyle.style),
+        builder: (context, child) {
+          return SystemUiCoordinator(
+            child: DefaultTextStyle(
+              style: TitoTypography.style().copyWith(
+                decoration: TextDecoration.none,
+              ),
+              child: child ?? const SizedBox.shrink(),
             ),
-            child: child ?? const SizedBox.shrink(),
-          ),
-        );
-      },
-      routerConfig: _router,
+          );
+        },
+        routerConfig: _router,
+      ),
     );
   }
 }

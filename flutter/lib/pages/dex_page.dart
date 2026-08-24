@@ -22,6 +22,7 @@ import '../theme/error_text.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../navigation/back_navigation.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -893,7 +894,9 @@ class _DexPageState extends State<DexPage> {
                               if (_scopeProgressLine != null) ...[
                                 Text(
                                   _scopeProgressLine!,
-                                  style: SecondaryTypography.onGradient.body14,
+                                  style: SecondaryTypography.onPage(
+                                    context,
+                                  ).body14,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -903,7 +906,9 @@ class _DexPageState extends State<DexPage> {
                               )) ...[
                                 Text(
                                   AppZh.dexScopeNote,
-                                  style: SecondaryTypography.onGradient.body14,
+                                  style: SecondaryTypography.onPage(
+                                    context,
+                                  ).body14,
                                   maxLines: 3,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1103,12 +1108,7 @@ class _DexPageState extends State<DexPage> {
                               _filteredTotalCount,
                             ),
                             textAlign: TextAlign.center,
-                            style: SecondaryTypography.onGradient.body14
-                                .copyWith(
-                                  color: TitoColors.card.withValues(
-                                    alpha: 0.92,
-                                  ),
-                                ),
+                            style: SecondaryTypography.onPage(context).body14,
                           ),
                         ),
                       ),
@@ -1200,6 +1200,10 @@ class _DexTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final backIcon = DeviceLayout.backIconSize(context);
+    final scheme = Theme.of(context).colorScheme;
+    final shellColor = appVisualStyle.usesFlatUi
+        ? scheme.primary
+        : TitoColors.card;
 
     return Row(
       children: [
@@ -1209,7 +1213,7 @@ class _DexTopBar extends StatelessWidget {
             child: TextButton.icon(
               onPressed: () => TitoBackNavigation.navigateBack(context, '/dex'),
               style: TextButton.styleFrom(
-                foregroundColor: TitoColors.card,
+                foregroundColor: shellColor,
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1218,7 +1222,7 @@ class _DexTopBar extends StatelessWidget {
               icon: Icon(
                 Icons.arrow_back_rounded,
                 size: backIcon,
-                color: TitoColors.card,
+                color: shellColor,
               ),
               // Title is just 「图鉴」 — the game name moved to the shared
               // subtitle line so the two action buttons stop squeezing it.
@@ -1226,7 +1230,7 @@ class _DexTopBar extends StatelessWidget {
                 AppZh.navDex,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: SecondaryTypography.onGradient.title.copyWith(
+                style: SecondaryTypography.onPage(context).title.copyWith(
                   letterSpacing: -0.5,
                   shadows: const [
                     Shadow(color: Color(0x4018283B), offset: Offset(0, 2)),
@@ -1270,6 +1274,10 @@ class _DexTopBarAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(DeviceLayout.rMd(context));
+    final scheme = Theme.of(context).colorScheme;
+    final shellColor = appVisualStyle.usesFlatUi
+        ? scheme.primary
+        : TitoColors.card;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,
@@ -1287,17 +1295,17 @@ class _DexTopBarAction extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: radius,
-                border: Border.all(color: TitoColors.card, width: 2),
+                border: Border.all(color: shellColor, width: 2),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: TitoColors.card, size: 16),
+                  Icon(icon, color: shellColor, size: 16),
                   const SizedBox(width: 4),
                   Text(
                     label,
-                    style: SecondaryTypography.onGradient.small12.copyWith(
-                      color: TitoColors.card,
+                    style: SecondaryTypography.onPage(context).small12.copyWith(
+                      color: shellColor,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
