@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/theme/app_visual_style.dart';
@@ -7,13 +9,13 @@ import 'package:titodex/theme/tito_theme.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('Material is the default style for the experiment branch', () async {
+  test('Flat UI is the default style for the experiment branch', () async {
     SharedPreferences.setMockInitialValues({});
     final preference = AppVisualStylePreference();
 
     await preference.load();
 
-    expect(preference.style, AppVisualStyle.material);
+    expect(preference.style, AppVisualStyle.flatUi);
   });
 
   test('selected visual style persists independently', () async {
@@ -29,11 +31,32 @@ void main() {
   });
 
   test('built-in styles produce distinct app-wide surfaces', () {
-    final material = buildTitoTheme(AppVisualStyle.material);
+    final flatUi = buildTitoTheme(AppVisualStyle.flatUi);
     final classic = buildTitoTheme(AppVisualStyle.classic);
 
-    expect(material.scaffoldBackgroundColor, TitoColors.materialSurface);
+    expect(flatUi.scaffoldBackgroundColor, TitoColors.flatSurface);
     expect(classic.scaffoldBackgroundColor, TitoColors.slateBlue);
-    expect(material.colorScheme.surface, isNot(classic.colorScheme.surface));
+    expect(flatUi.colorScheme.surface, isNot(classic.colorScheme.surface));
+  });
+
+  test('first preview Material storage value migrates to Flat UI', () async {
+    SharedPreferences.setMockInitialValues({'style.visual': 'material'});
+    final preference = AppVisualStylePreference();
+
+    await preference.load();
+
+    expect(preference.style, AppVisualStyle.flatUi);
+  });
+
+  test('theme family labels follow the active locale', () {
+    const zh = Locale('zh', 'CN');
+    const en = Locale('en', 'US');
+
+    expect(TitoThemeFamily.trainerJournal.labelFor(zh), '训练家手帐');
+    expect(TitoThemeFamily.trainerJournal.labelFor(en), "Trainer's Journal");
+    expect(TitoThemeFamily.solidPlastic.labelFor(zh), '固态塑料');
+    expect(TitoThemeFamily.solidPlastic.labelFor(en), 'Solid Plastic');
+    expect(TitoThemeFamily.flatUi.labelFor(zh), '扁平贴纸');
+    expect(TitoThemeFamily.flatUi.labelFor(en), 'Flat UI');
   });
 }

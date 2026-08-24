@@ -51,11 +51,11 @@ android {
 
     buildTypes {
         debug {
-            // The Material experiment must coexist with the signed TitoDex
+            // The Flat UI experiment must coexist with the signed TitoDex
             // release on one device. Namespace stays unchanged so native
             // activity/service classes and MethodChannels need no fork.
-            applicationIdSuffix = ".materialdebug"
-            versionNameSuffix = "-material-debug"
+            applicationIdSuffix = ".flatui"
+            versionNameSuffix = "-flat-ui-debug"
         }
         release {
             if (keystorePropertiesFile.exists()) {

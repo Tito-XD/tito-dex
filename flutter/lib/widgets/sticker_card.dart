@@ -23,7 +23,7 @@ class StickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rLg(context);
     final scheme = Theme.of(context).colorScheme;
-    if (!appVisualStyle.usesMaterial) {
+    if (!appVisualStyle.usesFlatUi) {
       final colors = switch (variant) {
         StickerVariant.cream => (TitoColors.card, TitoColors.ink),
         StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
@@ -56,8 +56,8 @@ class StickerCard extends StatelessWidget {
       StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
     };
 
-    // Keep the existing preference contract: enabled selects an elevated
-    // Material card; disabled selects the outlined Material 3 variant.
+    // Keep the existing preference contract: enabled selects a lightly raised
+    // Flat UI card; disabled selects its outlined variant.
     return ListenableBuilder(
       listenable: retroStyle,
       builder: (context, inner) => Material(

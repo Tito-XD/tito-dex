@@ -38,7 +38,7 @@ class AppHeader extends StatelessWidget {
       child: SizedBox(
         height: barHeight,
         child: Material(
-          color: appVisualStyle.usesMaterial
+          color: appVisualStyle.usesFlatUi
               ? scheme.surface
               : Colors.transparent,
           child: Row(
@@ -50,7 +50,7 @@ class AppHeader extends StatelessWidget {
                   child: Text(
                     AppZh.displayTitleForTrainer(trainerName ?? ''),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: appVisualStyle.usesMaterial
+                      color: appVisualStyle.usesFlatUi
                           ? scheme.onSurface
                           : TitoColors.card,
                       fontSize: DeviceLayout.headerTitleSize(context),
@@ -131,12 +131,12 @@ class _GameBadgeButton extends StatelessWidget {
         label: '$semanticLabel · ${edition.labelZh}',
         child: Material(
           color: asset != null
-              ? (appVisualStyle.usesMaterial
+              ? (appVisualStyle.usesFlatUi
                     ? scheme.primaryContainer
                     : TitoColors.card)
               : accent,
           shape: CircleBorder(
-            side: appVisualStyle.usesMaterial
+            side: appVisualStyle.usesFlatUi
                 ? BorderSide.none
                 : const BorderSide(color: TitoColors.ink, width: 2),
           ),
@@ -198,13 +198,13 @@ class _HeaderIconButton extends StatelessWidget {
         padding: EdgeInsets.zero,
         constraints: BoxConstraints.tightFor(width: size, height: size),
         style: IconButton.styleFrom(
-          backgroundColor: appVisualStyle.usesMaterial
+          backgroundColor: appVisualStyle.usesFlatUi
               ? scheme.secondaryContainer
               : TitoColors.card,
-          foregroundColor: appVisualStyle.usesMaterial
+          foregroundColor: appVisualStyle.usesFlatUi
               ? scheme.onSecondaryContainer
               : TitoColors.deepBlue,
-          side: appVisualStyle.usesMaterial
+          side: appVisualStyle.usesFlatUi
               ? BorderSide.none
               : const BorderSide(color: TitoColors.ink, width: 2),
           shape: const CircleBorder(),

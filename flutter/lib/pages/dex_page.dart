@@ -1201,7 +1201,7 @@ class _DexTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final backIcon = DeviceLayout.backIconSize(context);
     final scheme = Theme.of(context).colorScheme;
-    final shellColor = appVisualStyle.usesMaterial
+    final shellColor = appVisualStyle.usesFlatUi
         ? scheme.primary
         : TitoColors.card;
 
@@ -1275,7 +1275,7 @@ class _DexTopBarAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(DeviceLayout.rMd(context));
     final scheme = Theme.of(context).colorScheme;
-    final shellColor = appVisualStyle.usesMaterial
+    final shellColor = appVisualStyle.usesFlatUi
         ? scheme.primary
         : TitoColors.card;
     return HandheldFocusDecorator(

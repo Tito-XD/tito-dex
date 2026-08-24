@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Compatibility elevation tokens for the Material 3 experiment.
+/// Compatibility elevation tokens for the Flat UI experiment.
 ///
 /// Existing widgets still reference the historical sticker token names, but
 /// the branch maps them to soft Material elevation so feature code does not
@@ -37,13 +37,13 @@ abstract final class TitoShadows {
 }
 
 abstract final class TitoColors {
-  /// Material 3 seed and neutral surfaces for this experimental branch.
-  static const materialSeed = Color(0xFF415F91);
-  static const materialSurface = Color(0xFFF9F9FF);
-  static const materialSurfaceContainer = Color(0xFFECEEF6);
-  static const materialSurfaceContainerHigh = Color(0xFFE3E6EF);
-  static const materialOnSurface = Color(0xFF1A1C20);
-  static const materialOutline = Color(0xFF74777F);
+  /// Flat UI seed and neutral surfaces for this experimental branch.
+  static const flatSeed = Color(0xFF415F91);
+  static const flatSurface = Color(0xFFF9F9FF);
+  static const flatSurfaceContainer = Color(0xFFECEEF6);
+  static const flatSurfaceContainerHigh = Color(0xFFE3E6EF);
+  static const flatOnSurface = Color(0xFF1A1C20);
+  static const flatOutline = Color(0xFF74777F);
 
   static const deepBlue = Color(0xFF2F4361);
   static const slateBlue = Color(0xFF7B91A6);

@@ -31,7 +31,7 @@ abstract final class SecondaryTypography {
   /// ink; the classic gradient keeps its light foreground.
   static SecondaryPageTypography onPage(BuildContext context) =>
       SecondaryPageTypography(
-        color: appVisualStyle.usesMaterial
+        color: appVisualStyle.usesFlatUi
             ? Theme.of(context).colorScheme.onSurface
             : TitoColors.card,
       );

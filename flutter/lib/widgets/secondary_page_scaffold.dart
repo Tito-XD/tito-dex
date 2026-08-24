@@ -75,7 +75,7 @@ class SecondaryPageSubtitle extends StatelessWidget {
     return Text(
       text,
       style: SecondaryTypography.onCard.body14.copyWith(
-        color: appVisualStyle.usesMaterial
+        color: appVisualStyle.usesFlatUi
             ? scheme.onSurfaceVariant
             : TitoColors.card,
       ),
@@ -166,7 +166,7 @@ class _BackTitleButton extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.arrow_back_rounded,
-                    color: appVisualStyle.usesMaterial
+                    color: appVisualStyle.usesFlatUi
                         ? scheme.primary
                         : TitoColors.card,
                     size: iconSize,
@@ -178,7 +178,7 @@ class _BackTitleButton extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: SecondaryTypography.onGradient.title.copyWith(
-                        color: appVisualStyle.usesMaterial
+                        color: appVisualStyle.usesFlatUi
                             ? scheme.onSurface
                             : TitoColors.card,
                         letterSpacing: -0.5,
