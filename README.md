@@ -8,8 +8,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.2) · App `0.9.2+181` | 丝滑图鉴详情转场、可靠手势返回与轻快队伍页，v20 按需下载 |
-| Offline APK | [v0.9.2](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.2) · App `0.9.2-offline+182` | 同步交互优化并内置完整 v20 图鉴与玩法资料 |
+| Lite APK | [v0.9.3](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.3) · App `0.9.3+183` | 连续 Sprite 转场、稳定资料首屏与更细腻的问答状态栏，v20 按需下载 |
+| Offline APK | [v0.9.3](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.3) · App `0.9.3-offline+184` | 同步交互优化并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 按游戏管理可选资料包、50 组本地问答与伴侣等待动画 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.9.x 版本更新。
@@ -59,7 +59,7 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.2-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.2-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.2 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.3-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.3-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.3 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。
