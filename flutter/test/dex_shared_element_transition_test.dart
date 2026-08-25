@@ -98,7 +98,9 @@ void main() {
       await _pumpUntilRouteInserted(tester, find.byType(PokemonDetailPage));
       expect(find.byType(PokemonDetailPage), findsOneWidget);
       expect(
-        find.byKey(const ValueKey<String>('tito-dex-detail-fade')),
+        find.byKey(
+          const ValueKey<String>('tito-dex-detail-predictive-surface'),
+        ),
         findsOneWidget,
       );
       expect(
@@ -114,7 +116,7 @@ void main() {
 
       await tester.pump(const Duration(milliseconds: 120));
       expect(
-        find.byKey(const ValueKey('pokemon-card-flight-sprite')),
+        find.byKey(const ValueKey('pokemon-detail-canvas-flight')),
         findsOneWidget,
       );
       expect(
@@ -174,15 +176,7 @@ void main() {
         }),
       );
       await tester.pump();
-      expect(
-        tester
-            .widget<FadeTransition>(
-              find.byKey(const ValueKey<String>('tito-dex-detail-fade')),
-            )
-            .opacity
-            .value,
-        inExclusiveRange(0, 1),
-      );
+      expect(detailRoute.animation!.value, inExclusiveRange(0, 1));
       await _sendBackGestureMethod(
         tester,
         const MethodCall('updateBackGestureProgress', <String, dynamic>{
@@ -202,7 +196,7 @@ void main() {
         findsNothing,
       );
       final returningHeaderLayer = find.byKey(
-        const ValueKey('pokemon-card-flight-sprite'),
+        const ValueKey('pokemon-detail-canvas-flight'),
       );
       expect(returningHeaderLayer, findsOneWidget);
       expect(
@@ -210,7 +204,7 @@ void main() {
           of: returningHeaderLayer,
           matching: find.byType(DexSpriteImage),
         ),
-        findsOneWidget,
+        findsWidgets,
       );
       await tester.pumpAndSettle();
       expect(find.byType(PokemonMiniCard), findsOneWidget);

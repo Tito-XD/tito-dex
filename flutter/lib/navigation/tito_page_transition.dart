@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
@@ -24,8 +23,8 @@ const titoDexTransitionDuration = Duration(milliseconds: 340);
 const titoDexReverseTransitionDuration = Duration(milliseconds: 300);
 const titoDexDetailTransitionDuration = Duration(milliseconds: 360);
 const titoDexDetailReverseTransitionDuration = Duration(milliseconds: 300);
-const titoSideSlideTransitionDuration = Duration(milliseconds: 320);
-const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 280);
+const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
+const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
 const Curve titoDexForwardCurve = Curves.easeOutQuint;
 const Curve titoDexReverseCurve = Curves.easeInQuint;
@@ -195,65 +194,33 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Widget child,
   ) {
     if (_page.kind == _TitoMaterialPageKind.dexDetail) {
-      final reduceMotion = MediaQuery.disableAnimationsOf(context);
-      final surfaceProgress = reduceMotion
-          ? const AlwaysStoppedAnimation<double>(1)
-          : CurvedAnimation(
-              parent: animation,
-              curve: const Interval(0, 0.72, curve: Curves.easeOutCubic),
-              reverseCurve: Curves.easeInCubic,
-            );
-      final scaleProgress = reduceMotion
-          ? const AlwaysStoppedAnimation<double>(1)
-          : Tween<double>(begin: 0.992, end: 1).animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutCubic,
-                reverseCurve: Curves.easeInCubic,
-              ),
-            );
-      return _TitoPredictiveBackGestureDetector(
-        route: this,
-        child: FadeTransition(
-          key: const ValueKey<String>('tito-dex-detail-fade'),
-          opacity: surfaceProgress,
-          child: ScaleTransition(
-            key: const ValueKey<String>('tito-dex-detail-settle'),
-            scale: scaleProgress,
-            alignment: Alignment.topCenter,
-            child: child,
-          ),
+      // Keep the detail route on Flutter's Android predictive-back surface.
+      // The Pokemon Hero owns the local sprite -> header geometry; the route
+      // surface still needs a full, visible system back gesture instead of the
+      // former 0.8% settle scale that made the page appear almost static.
+      return PredictiveBackPageTransitionsBuilder(
+        fallbackColor: Theme.of(context).scaffoldBackgroundColor,
+      ).buildTransitions(
+        this,
+        context,
+        animation,
+        secondaryAnimation,
+        KeyedSubtree(
+          key: const ValueKey<String>('tito-dex-detail-predictive-surface'),
+          child: child,
         ),
       );
     }
     if (_page.kind == _TitoMaterialPageKind.plain) {
-      final reduceMotion = MediaQuery.disableAnimationsOf(context);
-      final settle = reduceMotion
-          ? const AlwaysStoppedAnimation<double>(1)
-          : Tween<double>(begin: 0.996, end: 1).animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutCubic,
-                reverseCurve: Curves.easeInCubic,
-              ),
-            );
-      // Keep the incoming route fully opaque from its first frame. The stock
-      // Material transition fades/scales the whole Scaffold and leaves the
-      // Search hub visibly ghosted underneath list loading panels. A tiny
-      // surface settle retains depth without exposing the previous page.
-      return _TitoPredictiveBackGestureDetector(
-        route: this,
-        child: ColoredBox(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: ClipRect(
-            child: ScaleTransition(
-              key: const ValueKey<String>('tito-secondary-page-settle'),
-              scale: settle,
-              alignment: Alignment.topCenter,
-              child: child,
-            ),
-          ),
-        ),
+      // Ordinary pages must retain the platform Material transition. Opaque
+      // Scaffolds prevent loading-state ghosting; replacing this with a tiny
+      // custom scale also replaced Android predictive back and was the v0.9.3
+      // regression where forward/back movement was barely perceptible.
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        child,
       );
     }
     if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
@@ -341,74 +308,6 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   }
 }
 
-/// Keeps Android predictive-back input for a custom route without wrapping the
-/// page in Flutter's stock shared-element surface transform. The route's own
-/// animation is scrubbed directly, so the Dex list underneath never gets
-/// replaced by the framework fallback surface during the gesture.
-class _TitoPredictiveBackGestureDetector extends StatefulWidget {
-  const _TitoPredictiveBackGestureDetector({
-    required this.route,
-    required this.child,
-  });
-
-  final PageRoute<dynamic> route;
-  final Widget child;
-
-  @override
-  State<_TitoPredictiveBackGestureDetector> createState() =>
-      _TitoPredictiveBackGestureDetectorState();
-}
-
-class _TitoPredictiveBackGestureDetectorState
-    extends State<_TitoPredictiveBackGestureDetector>
-    with WidgetsBindingObserver {
-  bool get _enabled => widget.route.isCurrent && widget.route.popGestureEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
-    if (backEvent.isButtonEvent || !_enabled) return false;
-    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
-    return true;
-  }
-
-  @override
-  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
-    if (!widget.route.popGestureInProgress) return;
-    widget.route.handleUpdateBackGestureProgress(
-      progress: 1 - backEvent.progress,
-    );
-  }
-
-  @override
-  void handleCancelBackGesture() {
-    if (widget.route.popGestureInProgress) {
-      widget.route.handleCancelBackGesture();
-    }
-  }
-
-  @override
-  void handleCommitBackGesture() {
-    if (widget.route.popGestureInProgress) {
-      widget.route.handleCommitBackGesture();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
-}
-
 class _TitoSideSlidePage<T> extends Page<T> {
   const _TitoSideSlidePage({
     required this.direction,
@@ -477,8 +376,8 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
     Widget child,
   ) {
     final begin = switch (_page.direction) {
-      TitoSideSlideDirection.fromLeft => const Offset(-0.032, 0),
-      TitoSideSlideDirection.fromRight => const Offset(0.032, 0),
+      TitoSideSlideDirection.fromLeft => const Offset(-1, 0),
+      TitoSideSlideDirection.fromRight => const Offset(1, 0),
     };
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -498,8 +397,8 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
   ) {
     final curve = CurvedAnimation(
       parent: animation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
+      curve: Curves.easeInOutCubicEmphasized,
+      reverseCurve: Curves.easeInOutCubicEmphasized,
     );
     return Tween<Offset>(begin: begin, end: Offset.zero).animate(curve);
   }
