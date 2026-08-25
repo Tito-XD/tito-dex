@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · Lite `0.9.5+187` · Offline `0.9.5-offline+188`.
+> **Latest release:** [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · Lite `0.9.5+189` · Offline `0.9.5-offline+190`.
 >
-> **Current `main`:** v0.9.1 release baseline with refined sprite Hero transitions, stable artwork switching, smoother list entry and assistant status/loading motion, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.5 rebuild with matte Solid Plastic, sprite-only Dex entry, unified Material predictive back, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,7 +14,7 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v20; v0.9.1 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.5 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |

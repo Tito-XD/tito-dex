@@ -7,7 +7,6 @@ import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/navigation/tito_page_transition.dart';
 import 'package:titodex/pages/pokemon_detail_page.dart';
-import 'package:titodex/widgets/dex_sprite_image.dart';
 import 'package:titodex/widgets/pokemon_card.dart';
 import 'package:titodex/widgets/pokemon_detail_sections.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
@@ -108,7 +107,15 @@ void main() {
         find.byKey(
           const ValueKey<String>('tito-dex-detail-predictive-surface'),
         ),
-        findsOneWidget,
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('tito-dex-detail-fade')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('tito-dex-detail-settle')),
+        findsNothing,
       );
       expect(
         find.byKey(const ValueKey<String>('tito-side-slide-transition')),
@@ -154,6 +161,20 @@ void main() {
       )!;
       expect(detailRoute.popGestureEnabled, isTrue);
       expect(detailRoute.transitionDuration, titoDexDetailTransitionDuration);
+      final detailHeroes = find
+          .descendant(
+            of: find.byType(PokemonDetailHeader),
+            matching: find.byType(Hero),
+          )
+          .evaluate()
+          .map((element) => element.widget)
+          .whereType<Hero>()
+          .where((hero) => hero.tag == pokemonCardHeroTag(_summary));
+      expect(detailHeroes, isNotEmpty);
+      expect(
+        detailHeroes.every((hero) => !hero.transitionOnUserGestures),
+        isTrue,
+      );
 
       await tester.tap(find.byKey(const ValueKey('pokemon-detail-artwork')));
       await tester.pump();
@@ -174,6 +195,8 @@ void main() {
       expect(find.byType(PokemonDetailHeader), findsOneWidget);
       expect(tester.takeException(), isNull);
 
+      // A partial predictive-back gesture can cancel cleanly without leaving
+      // either the route or sprite at an intermediate value.
       await _sendBackGestureMethod(
         tester,
         const MethodCall('startBackGesture', <String, dynamic>{
@@ -192,12 +215,28 @@ void main() {
       );
       await tester.pump();
       expect(detailRoute.animation!.value, inExclusiveRange(0, 1));
-      // The gesture surface slides the opaque page off the swipe edge 1:1 —
-      // no scale, no translucency — so the grid can never bleed through.
-      final backSlide = tester.widget<Transform>(
+      expect(
         find.byKey(const ValueKey('tito-dex-detail-back-slide')),
+        findsNothing,
       );
-      expect(backSlide.transform.getTranslation().x, greaterThan(0));
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('cancelBackGesture'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PokemonDetailHeader), findsOneWidget);
+      expect(detailRoute.animation!.value, 1);
+
+      // Repeating the gesture immediately after cancellation must commit via
+      // the standard route without starting an interactive Hero flight.
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('startBackGesture', <String, dynamic>{
+          'touchOffset': <double>[5, 300],
+          'progress': 0.0,
+          'swipeEdge': 0,
+        }),
+      );
       await _sendBackGestureMethod(
         tester,
         const MethodCall('updateBackGestureProgress', <String, dynamic>{
@@ -211,17 +250,9 @@ void main() {
         tester,
         const MethodCall('commitBackGesture'),
       );
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(
-        find.byKey(const ValueKey('pokemon-detail-artwork')),
-        findsNothing,
-      );
-      // The sprite rides back alone: the only on-stage DexSpriteImage is
-      // the Hero shuttle's — both endpoint heroes are offstage mid-flight
-      // and the loaded header's artwork overlay hides once the pop begins.
-      expect(find.byType(DexSpriteImage), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.byType(PokemonMiniCard), findsOneWidget);
+      expect(find.byType(PokemonDetailHeader), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

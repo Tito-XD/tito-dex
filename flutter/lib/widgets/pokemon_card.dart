@@ -66,7 +66,11 @@ class PokemonCardTransitionHero extends StatelessWidget {
   Widget build(BuildContext context) {
     return Hero(
       tag: pokemonCardHeroTag(summary),
-      transitionOnUserGestures: true,
+      // Android predictive back owns the interactive pop. Letting this Hero
+      // scrub the same route controller could strand the sprite mid-flight
+      // when a quick gesture interrupted entry. Forward navigation and normal
+      // button pops still use the shared element; edge gestures stay generic.
+      transitionOnUserGestures: false,
       // A direct bounds interpolation keeps the creature on a straight line
       // between the grid slot and the header plate; the default arc tween
       // drifts sideways on wide handheld layouts.
