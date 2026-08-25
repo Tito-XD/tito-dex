@@ -1830,12 +1830,6 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
                               ),
                             ),
                           ),
-                          const AssistantSparkle(size: 15),
-                          const SizedBox(width: 5),
-                          const AssistantSparkle(
-                            size: 8,
-                            color: TitoColors.softYellow,
-                          ),
                         ],
                       ),
                       const SizedBox(height: 11),

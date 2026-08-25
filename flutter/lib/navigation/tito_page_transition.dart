@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
@@ -137,6 +138,51 @@ class _TitoControlledMaterialPage<T> extends Page<T> {
   }
 }
 
+/// Dex list content layer with its reveal. It lives inside the page content
+/// (see [_TitoControlledMaterialPageRoute.buildContent]) so the grid's Hero
+/// widgets stay under [ModalRoute.subtreeContext] and keep working; the fade
+/// and short rise still follow the route animation exactly as before.
+class _TitoDexContentReveal extends StatelessWidget {
+  const _TitoDexContentReveal({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final routeAnimation = ModalRoute.of(context)?.animation;
+    if (routeAnimation == null) {
+      return child;
+    }
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Animation<double> reveal = reduceMotion
+        ? CurvedAnimation(
+            parent: routeAnimation,
+            curve: titoDexForwardCurve,
+            reverseCurve: Curves.easeInExpo,
+          )
+        : CurvedAnimation(
+            parent: routeAnimation,
+            curve: const Interval(0.46, 0.86, curve: Curves.easeOutCubic),
+            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
+          );
+    final Animation<Offset> position = reduceMotion
+        ? const AlwaysStoppedAnimation<Offset>(Offset.zero)
+        : Tween<Offset>(
+            begin: const Offset(0, 0.012),
+            end: Offset.zero,
+          ).animate(reveal);
+    return SlideTransition(
+      key: const ValueKey<String>('tito-dex-content-slide'),
+      position: position,
+      child: FadeTransition(
+        key: const ValueKey<String>('tito-dex-content-reveal'),
+        opacity: reveal,
+        child: child,
+      ),
+    );
+  }
+}
+
 class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
   _TitoControlledMaterialPageRoute({
@@ -147,7 +193,26 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
       settings as _TitoControlledMaterialPage<T>;
 
   @override
-  Widget buildContent(BuildContext context) => _page.child;
+  Widget buildContent(BuildContext context) {
+    final overlay = _page.overlay;
+    if (_page.kind != _TitoMaterialPageKind.dex || overlay == null) {
+      return _page.child;
+    }
+    // The overlay (the live Dex list) must be composed INSIDE the page
+    // content: HeroController only discovers Heroes under
+    // ModalRoute.subtreeContext, which is exactly the buildContent subtree —
+    // layers added in buildTransitions sit above it and are invisible to
+    // shared-element flights. Keeping the grid in buildTransitions made
+    // every dex card -> detail flight silently abort on device (the v0.9.x
+    // "canvas expand never flies" bug).
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        _page.child,
+        _TitoDexContentReveal(child: overlay),
+      ],
+    );
+  }
 
   @override
   bool get maintainState => true;
@@ -194,20 +259,56 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Widget child,
   ) {
     if (_page.kind == _TitoMaterialPageKind.dexDetail) {
-      // Keep the detail route on Flutter's Android predictive-back surface.
-      // The Pokemon Hero owns the local sprite -> header geometry; the route
-      // surface still needs a full, visible system back gesture instead of the
-      // former 0.8% settle scale that made the page appear almost static.
-      return PredictiveBackPageTransitionsBuilder(
-        fallbackColor: Theme.of(context).scaffoldBackgroundColor,
-      ).buildTransitions(
-        this,
-        context,
-        animation,
-        secondaryAnimation,
-        KeyedSubtree(
+      // The Pokemon Hero owns the local sprite -> header geometry. The page
+      // surface only fades and settles in place: stacking Android's stock
+      // FadeForwards slide (what PredictiveBackPageTransitionsBuilder falls
+      // back to outside a gesture) on top of the flight double-exposed the
+      // incoming page over the stationary grid — the v0.9.3 "canvas expand"
+      // regression. Predictive-back input still scrubs the route directly;
+      // while a drag is active the surface scales down with rounding corners
+      // so the gesture stays visible instead of the old 0.8% settle scale.
+      // The fade starts late on purpose: the sprite visibly travels to the
+      // header first, then the skeleton page materialises around the flight.
+      // On pop the page clears in the first half so the canvas collapse and
+      // the creature's ride back into the grid stay readable instead of
+      // dissolving into a whole-page crossfade.
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      final surfaceProgress = reduceMotion
+          ? const AlwaysStoppedAnimation<double>(1)
+          : CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.16, 0.78, curve: Curves.easeOutCubic),
+              reverseCurve: const Interval(0.5, 1, curve: Curves.easeInCubic),
+            );
+      final scaleProgress = reduceMotion
+          ? const AlwaysStoppedAnimation<double>(1)
+          : Tween<double>(begin: 0.992, end: 1).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic,
+              ),
+            );
+      return _TitoBackGestureRouteSurface(
+        route: this,
+        gestureSurfaceBuilder: (context, startBackEvent) =>
+            _TitoDexDetailBackSurface(
+              animation: animation,
+              startBackEvent: startBackEvent,
+              child: child,
+            ),
+        child: KeyedSubtree(
           key: const ValueKey<String>('tito-dex-detail-predictive-surface'),
-          child: child,
+          child: FadeTransition(
+            key: const ValueKey<String>('tito-dex-detail-fade'),
+            opacity: surfaceProgress,
+            child: ScaleTransition(
+              key: const ValueKey<String>('tito-dex-detail-settle'),
+              scale: scaleProgress,
+              alignment: Alignment.topCenter,
+              child: child,
+            ),
+          ),
         ),
       );
     }
@@ -231,59 +332,20 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
         child,
       );
     }
-    // The Hero owns the page shell and is the only large moving surface. The
-    // list follows on the same route progress with a short rise, rather than
-    // receiving Android's second zoom/fade transition on top of the flight.
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Animation<double> contentReveal = reduceMotion
-        ? CurvedAnimation(
-            parent: animation,
-            curve: titoDexForwardCurve,
-            reverseCurve: Curves.easeInExpo,
-          )
-        : CurvedAnimation(
-            parent: animation,
-            curve: const Interval(0.46, 0.86, curve: Curves.easeOutCubic),
-            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
-          );
-    final Animation<Offset> contentPosition = reduceMotion
-        ? const AlwaysStoppedAnimation<Offset>(Offset.zero)
-        : Tween<Offset>(
-            begin: const Offset(0, 0.012),
-            end: Offset.zero,
-          ).animate(contentReveal);
-    final pageWithOverlay = Stack(
-      fit: StackFit.expand,
-      children: [
-        child,
-        SlideTransition(
-          key: const ValueKey<String>('tito-dex-content-slide'),
-          position: contentPosition,
-          child: FadeTransition(
-            key: const ValueKey<String>('tito-dex-content-reveal'),
-            opacity: contentReveal,
-            child: _page.overlay!,
-          ),
-        ),
-      ],
-    );
+    // The list layer and its reveal are composed in buildContent (see the
+    // note there) so the grid Heroes stay discoverable; only the page-level
+    // container transform remains here.
     if (!_page.usesContainerTransform) {
       return super.buildTransitions(
         context,
         animation,
         secondaryAnimation,
-        pageWithOverlay,
+        child,
       );
     }
     return PredictiveBackPageTransitionsBuilder(
       fallbackColor: Theme.of(context).scaffoldBackgroundColor,
-    ).buildTransitions(
-      this,
-      context,
-      animation,
-      secondaryAnimation,
-      pageWithOverlay,
-    );
+    ).buildTransitions(this, context, animation, secondaryAnimation, child);
   }
 
   @override
@@ -305,6 +367,158 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
       return false;
     }
     return super.canTransitionTo(nextRoute);
+  }
+}
+
+/// Forwards Android predictive-back events to a custom route and swaps the
+/// route surface while a drag (or its commit/cancel follow-through) is active.
+/// Mirrors the framework's private _PredictiveBackGestureDetector so routes
+/// with their own forward motion keep system back-gesture input.
+class _TitoBackGestureRouteSurface extends StatefulWidget {
+  const _TitoBackGestureRouteSurface({
+    required this.route,
+    required this.gestureSurfaceBuilder,
+    required this.child,
+  });
+
+  final PageRoute<dynamic> route;
+  final Widget Function(BuildContext context, PredictiveBackEvent? startEvent)
+  gestureSurfaceBuilder;
+  final Widget child;
+
+  @override
+  State<_TitoBackGestureRouteSurface> createState() =>
+      _TitoBackGestureRouteSurfaceState();
+}
+
+class _TitoBackGestureRouteSurfaceState
+    extends State<_TitoBackGestureRouteSurface>
+    with WidgetsBindingObserver {
+  bool _gestureActive = false;
+  bool _settlingFromCancel = false;
+  PredictiveBackEvent? _startBackEvent;
+
+  bool get _enabled => widget.route.isCurrent && widget.route.popGestureEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    widget.route.animation?.addStatusListener(_handleAnimationStatus);
+  }
+
+  @override
+  void dispose() {
+    widget.route.animation?.removeStatusListener(_handleAnimationStatus);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _handleAnimationStatus(AnimationStatus status) {
+    if (_settlingFromCancel && status == AnimationStatus.completed && mounted) {
+      setState(() {
+        _settlingFromCancel = false;
+        _gestureActive = false;
+        _startBackEvent = null;
+      });
+    }
+  }
+
+  @override
+  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
+    if (backEvent.isButtonEvent || !_enabled) {
+      return false;
+    }
+    setState(() {
+      _gestureActive = true;
+      _startBackEvent = backEvent;
+    });
+    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
+    return true;
+  }
+
+  @override
+  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
+    if (!_gestureActive) {
+      return;
+    }
+    widget.route.handleUpdateBackGestureProgress(
+      progress: 1 - backEvent.progress,
+    );
+  }
+
+  @override
+  void handleCancelBackGesture() {
+    if (!_gestureActive) {
+      return;
+    }
+    widget.route.handleCancelBackGesture();
+    // Keep the gesture surface while the route settles back to full, then
+    // return to the normal surface from [_handleAnimationStatus].
+    _settlingFromCancel = true;
+  }
+
+  @override
+  void handleCommitBackGesture() {
+    if (!_gestureActive) {
+      return;
+    }
+    widget.route.handleCommitBackGesture();
+    // Keep the gesture surface: the route pops and disposes this widget.
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_gestureActive) {
+      return widget.gestureSurfaceBuilder(context, _startBackEvent);
+    }
+    return widget.child;
+  }
+}
+
+/// Predictive-back drag surface for the Dex detail route: the page visibly
+/// shrinks with rounding corners and a slight bias toward the swipe edge,
+/// scrubbed directly by the gesture-driven route animation. The final fade
+/// only kicks in near the end so the drag itself never washes the page out.
+class _TitoDexDetailBackSurface extends StatelessWidget {
+  const _TitoDexDetailBackSurface({
+    required this.animation,
+    required this.startBackEvent,
+    required this.child,
+  });
+
+  final Animation<double> animation;
+  final PredictiveBackEvent? startBackEvent;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return child;
+    }
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final settle = animation.value.clamp(0.0, 1.0);
+        final eased = Curves.easeOutCubic.transform(1 - settle);
+        final fromRight = startBackEvent?.swipeEdge == SwipeEdge.right;
+        final exitFade = settle < 0.35 ? settle / 0.35 : 1.0;
+        return Opacity(
+          opacity: (1 - 0.18 * eased) * exitFade,
+          child: Transform.translate(
+            offset: Offset((fromRight ? -1.0 : 1.0) * 28 * eased, 10 * eased),
+            child: Transform.scale(
+              scale: 1 - 0.12 * eased,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(26 * eased),
+                child: child,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -379,12 +593,17 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
       TitoSideSlideDirection.fromLeft => const Offset(-1, 0),
       TitoSideSlideDirection.fromRight => const Offset(1, 0),
     };
-    return ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: ClipRect(
-        child: SlideTransition(
-          key: const ValueKey<String>('tito-side-slide-transition'),
-          position: _buttonSlidePosition(animation, begin),
+    // The page carries its own opaque surface. A full-screen ColoredBox *behind*
+    // the SlideTransition (the v0.9.2 layout) flashed the scaffold background
+    // over Home the instant the route was inserted, before any slide was
+    // visible — read as a white-screen-then-animation. Sizing the backdrop to
+    // the moving page makes the slide carry the surface instead.
+    return ClipRect(
+      child: SlideTransition(
+        key: const ValueKey<String>('tito-side-slide-transition'),
+        position: _buttonSlidePosition(animation, begin),
+        child: ColoredBox(
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: child,
         ),
       ),

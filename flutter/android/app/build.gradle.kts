@@ -30,12 +30,16 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.tito.titodex"
+        // Preview/side-by-side installs: override the package, launcher label
+        // and version suffix from the build environment without forking the
+        // repo (e.g. TITODEX_APPLICATION_ID=com.tito.titodex.preview).
+        applicationId = System.getenv("TITODEX_APPLICATION_ID") ?: "com.tito.titodex"
         // minSdk 24 keeps native .so Stored (uncompressed) — required for RG sideload.
         minSdk = maxOf(24, flutter.minSdkVersion)
         targetSdk = 36
         versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionName = flutter.versionName + (System.getenv("TITODEX_VERSION_NAME_SUFFIX") ?: "")
+        manifestPlaceholders["appLabel"] = System.getenv("TITODEX_APP_LABEL") ?: "TitoDex"
     }
 
     signingConfigs {
