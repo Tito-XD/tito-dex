@@ -77,17 +77,16 @@ void main() {
     final chrome = tester.widget<FadeTransition>(
       find.byKey(const ValueKey('artwork-viewer-chrome')),
     );
-    final highResolution = tester.widget<FadeTransition>(
-      find.byKey(const ValueKey('artwork-high-res-reveal')),
-    );
     expect(chrome.opacity.value, 0);
-    expect(highResolution.opacity.value, 0);
+    // The test URL intentionally cannot resolve. Failed high-resolution art
+    // must not replace or hide the shared-element sprite.
+    expect(find.byKey(const ValueKey('artwork-high-res-reveal')), findsNothing);
     expect(find.byKey(const ValueKey('artwork-stable-hero')), findsOneWidget);
     await tester.pumpAndSettle();
-    final stableHeroFade = tester.widget<FadeTransition>(
+    final stableHeroFade = tester.widget<Opacity>(
       find.byKey(const ValueKey('artwork-stable-hero-fade')),
     );
-    expect(stableHeroFade.opacity.value, 0);
+    expect(stableHeroFade.opacity, 1);
     expect(viewerRoute.popGestureEnabled, isTrue);
 
     await tester.binding.handlePopRoute();

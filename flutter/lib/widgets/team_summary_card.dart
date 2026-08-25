@@ -86,54 +86,60 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
       builder: (context, _) {
         return StickerCard(
           variant: StickerVariant.cream,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppZh.teamSummaryTitle,
-                style: SecondaryTypography.onCard.h15,
-              ),
-              const SizedBox(height: 8),
-              if (widget.party.isEmpty)
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 112),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  AppZh.teamEmptySlot,
-                  style: body14.copyWith(color: TitoColors.mutedInk),
-                )
-              else if (_loading && _data == null)
-                const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else if (_data != null) ...[
-                Text(AppZh.teamSummaryAvgLevel(_data!.avgLevel), style: body14),
-                const SizedBox(height: 4),
-                Text(AppZh.teamSummaryBstSum(_data!.bstSum), style: body14),
-                const SizedBox(height: 4),
-                Text(
-                  AppZh.teamSummaryTypeCoverage(_data!.typeCoverage),
-                  style: body14,
+                  AppZh.teamSummaryTitle,
+                  style: SecondaryTypography.onCard.h15,
                 ),
-                if (_data!.weaknessLine.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                if (widget.party.isEmpty)
+                  Text(
+                    AppZh.teamEmptySlot,
+                    style: body14.copyWith(color: TitoColors.mutedInk),
+                  )
+                else if (_loading && _data == null)
+                  const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                else if (_data != null) ...[
+                  Text(
+                    AppZh.teamSummaryAvgLevel(_data!.avgLevel),
+                    style: body14,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(AppZh.teamSummaryBstSum(_data!.bstSum), style: body14),
                   const SizedBox(height: 4),
                   Text(
-                    _data!.weaknessLine,
-                    style: body14.copyWith(color: TitoColors.mutedInk),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    AppZh.teamSummaryTypeCoverage(_data!.typeCoverage),
+                    style: body14,
                   ),
-                ],
-                if (_data!.sharedWeaknessLine.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    _data!.sharedWeaknessLine,
-                    style: body14.copyWith(color: TitoColors.mutedInk),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  if (_data!.weaknessLine.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _data!.weaknessLine,
+                      style: body14.copyWith(color: TitoColors.mutedInk),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (_data!.sharedWeaknessLine.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _data!.sharedWeaknessLine,
+                      style: body14.copyWith(color: TitoColors.mutedInk),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ],
-            ],
+            ),
           ),
         );
       },

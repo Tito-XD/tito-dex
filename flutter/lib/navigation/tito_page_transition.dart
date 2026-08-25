@@ -24,8 +24,8 @@ const titoDexTransitionDuration = Duration(milliseconds: 340);
 const titoDexReverseTransitionDuration = Duration(milliseconds: 300);
 const titoDexDetailTransitionDuration = Duration(milliseconds: 360);
 const titoDexDetailReverseTransitionDuration = Duration(milliseconds: 300);
-const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
-const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
+const titoSideSlideTransitionDuration = Duration(milliseconds: 320);
+const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 280);
 
 const Curve titoDexForwardCurve = Curves.easeOutQuint;
 const Curve titoDexReverseCurve = Curves.easeInQuint;
@@ -222,6 +222,36 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
             scale: scaleProgress,
             alignment: Alignment.topCenter,
             child: child,
+          ),
+        ),
+      );
+    }
+    if (_page.kind == _TitoMaterialPageKind.plain) {
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      final settle = reduceMotion
+          ? const AlwaysStoppedAnimation<double>(1)
+          : Tween<double>(begin: 0.996, end: 1).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic,
+              ),
+            );
+      // Keep the incoming route fully opaque from its first frame. The stock
+      // Material transition fades/scales the whole Scaffold and leaves the
+      // Search hub visibly ghosted underneath list loading panels. A tiny
+      // surface settle retains depth without exposing the previous page.
+      return _TitoPredictiveBackGestureDetector(
+        route: this,
+        child: ColoredBox(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: ClipRect(
+            child: ScaleTransition(
+              key: const ValueKey<String>('tito-secondary-page-settle'),
+              scale: settle,
+              alignment: Alignment.topCenter,
+              child: child,
+            ),
           ),
         ),
       );
@@ -447,13 +477,18 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
     Widget child,
   ) {
     final begin = switch (_page.direction) {
-      TitoSideSlideDirection.fromLeft => const Offset(-1, 0),
-      TitoSideSlideDirection.fromRight => const Offset(1, 0),
+      TitoSideSlideDirection.fromLeft => const Offset(-0.032, 0),
+      TitoSideSlideDirection.fromRight => const Offset(0.032, 0),
     };
-    return SlideTransition(
-      key: const ValueKey<String>('tito-side-slide-transition'),
-      position: _buttonSlidePosition(animation, begin),
-      child: child,
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: ClipRect(
+        child: SlideTransition(
+          key: const ValueKey<String>('tito-side-slide-transition'),
+          position: _buttonSlidePosition(animation, begin),
+          child: child,
+        ),
+      ),
     );
   }
 
@@ -463,7 +498,7 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
   ) {
     final curve = CurvedAnimation(
       parent: animation,
-      curve: Curves.easeInOutCubicEmphasized,
+      curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
     return Tween<Offset>(begin: begin, end: Offset.zero).animate(curve);

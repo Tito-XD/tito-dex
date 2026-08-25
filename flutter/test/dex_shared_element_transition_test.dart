@@ -113,14 +113,10 @@ void main() {
       expect(find.byType(PokemonDetailTransitionHeader), findsOneWidget);
 
       await tester.pump(const Duration(milliseconds: 120));
-      final sourceLayer = tester.widget<Opacity>(
-        find.byKey(const ValueKey('pokemon-card-flight-source')),
+      expect(
+        find.byKey(const ValueKey('pokemon-card-flight-sprite')),
+        findsOneWidget,
       );
-      final targetLayer = tester.widget<Opacity>(
-        find.byKey(const ValueKey('pokemon-card-flight-target')),
-      );
-      expect(sourceLayer.opacity, greaterThan(0));
-      expect(targetLayer.opacity, greaterThan(0));
       expect(
         find.byKey(const ValueKey('pokemon-detail-shared-element-stage')),
         findsOneWidget,
@@ -206,13 +202,9 @@ void main() {
         findsNothing,
       );
       final returningHeaderLayer = find.byKey(
-        const ValueKey('pokemon-card-flight-target'),
+        const ValueKey('pokemon-card-flight-sprite'),
       );
       expect(returningHeaderLayer, findsOneWidget);
-      expect(
-        tester.widget<Opacity>(returningHeaderLayer).opacity,
-        greaterThan(0),
-      );
       expect(
         find.descendant(
           of: returningHeaderLayer,

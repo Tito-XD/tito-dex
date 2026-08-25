@@ -19,9 +19,13 @@ String pokemonCardHeroTag(PokemonSummary summary) =>
 /// Typed GoRouter payload used by the Dex grid so the detail route can build
 /// its shared-element destination before the full detail JSON has loaded.
 class PokemonDetailTransition {
-  const PokemonDetailTransition({required this.summary});
+  const PokemonDetailTransition({required this.summary, this.detailFuture});
 
   final PokemonSummary summary;
+
+  /// Starts the local bundle read before navigation. The detail route can let
+  /// the Hero fly first while the same Future continues in the background.
+  final Future<PokemonDetail>? detailFuture;
 }
 
 class PokemonCardTransitionHero extends StatelessWidget {
@@ -53,48 +57,18 @@ Widget _pokemonCardFlightShuttle(
   BuildContext fromHeroContext,
   BuildContext toHeroContext,
 ) {
-  final cardContext = flightDirection == HeroFlightDirection.push
-      ? fromHeroContext
-      : toHeroContext;
   final detailContext = flightDirection == HeroFlightDirection.push
       ? toHeroContext
       : fromHeroContext;
-  final cardHero = cardContext.widget as Hero;
   final detailHero = detailContext.widget as Hero;
-  final cardSize = (cardContext.findRenderObject()! as RenderBox).size;
   final detailSize = (detailContext.findRenderObject()! as RenderBox).size;
-  return AnimatedBuilder(
-    animation: animation,
-    builder: (context, _) {
-      final progress = animation.value.clamp(0.0, 1.0);
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox.fromSize(
-              size: cardSize,
-              child: Opacity(
-                key: const ValueKey('pokemon-card-flight-source'),
-                opacity: 1 - progress,
-                child: cardHero.child,
-              ),
-            ),
-          ),
-          FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox.fromSize(
-              size: detailSize,
-              child: Opacity(
-                key: const ValueKey('pokemon-card-flight-target'),
-                opacity: progress,
-                child: detailHero.child,
-              ),
-            ),
-          ),
-        ],
-      );
-    },
+  // Both endpoints render the same sprite source. Keep one destination child
+  // alive for the entire flight so the eye reads a continuous creature moving
+  // and scaling, rather than two sprites cross-fading over the route.
+  return FittedBox(
+    key: const ValueKey('pokemon-card-flight-sprite'),
+    fit: BoxFit.contain,
+    child: SizedBox.fromSize(size: detailSize, child: detailHero.child),
   );
 }
 

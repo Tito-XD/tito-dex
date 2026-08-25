@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/parser/gen4_exp.dart';
 import '../features/dex/dex_models.dart';
+import '../features/dex/sprite_generation_catalog.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -110,7 +111,9 @@ class _PartyTeamRow extends StatelessWidget {
             children: [
               if (speciesId != null)
                 TitoSpriteSticker(
-                  source: summary?.displaySpritePath,
+                  source:
+                      summary?.displaySpritePath ??
+                      defaultSpriteUrlFor(speciesId),
                   size: 46,
                   radius: 13,
                 )
