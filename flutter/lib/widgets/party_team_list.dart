@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/parser/gen4_exp.dart';
-import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
@@ -10,7 +10,6 @@ import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
 import 'sticker_pressable.dart';
-import 'tito_list_reveal.dart';
 import 'tito_progress_bar.dart';
 import 'tito_sprite_sticker.dart';
 
@@ -19,6 +18,7 @@ class PartyTeamList extends StatelessWidget {
   const PartyTeamList({
     super.key,
     required this.party,
+    this.detailsFuture,
     this.showEmptySlots = false,
     this.onMemberTap,
     this.onEmptySlotTap,
@@ -27,6 +27,7 @@ class PartyTeamList extends StatelessWidget {
   });
 
   final List<PartyMember> party;
+  final Future<Map<int, PokemonDetail>>? detailsFuture;
   final bool showEmptySlots;
   final ValueChanged<int>? onMemberTap;
   final VoidCallback? onEmptySlotTap;
@@ -40,34 +41,43 @@ class PartyTeamList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final slots = showEmptySlots ? 6 : party.length;
-    return Column(
-      children: [
-        for (var index = 0; index < slots; index++) ...[
-          if (index > 0) const SizedBox(height: 10),
-          TitoListReveal(
-            delay: TitoListReveal.staggerDelay(index, stepMs: 40),
-            child: index == expandedIndex && editorBuilder != null
-                ? editorBuilder!(context, index)
-                : index < party.length
-                ? _PartyTeamRow(
-                    member: party[index],
-                    slot: index + 1,
-                    onTap: onMemberTap == null
-                        ? null
-                        : () => onMemberTap!(index),
-                  )
-                : _EmptyTeamRow(onTap: onEmptySlotTap),
-          ),
-        ],
-      ],
+    return FutureBuilder<Map<int, PokemonDetail>>(
+      future: detailsFuture,
+      builder: (context, snapshot) {
+        final details = snapshot.data ?? const <int, PokemonDetail>{};
+        return Column(
+          children: [
+            for (var index = 0; index < slots; index++) ...[
+              if (index > 0) const SizedBox(height: 10),
+              if (index == expandedIndex && editorBuilder != null)
+                editorBuilder!(context, index)
+              else if (index < party.length)
+                _PartyTeamRow(
+                  member: party[index],
+                  summary: details[party[index].speciesId]?.summary,
+                  slot: index + 1,
+                  onTap: onMemberTap == null ? null : () => onMemberTap!(index),
+                )
+              else
+                _EmptyTeamRow(onTap: onEmptySlotTap),
+            ],
+          ],
+        );
+      },
     );
   }
 }
 
 class _PartyTeamRow extends StatelessWidget {
-  const _PartyTeamRow({required this.member, required this.slot, this.onTap});
+  const _PartyTeamRow({
+    required this.member,
+    required this.summary,
+    required this.slot,
+    this.onTap,
+  });
 
   final PartyMember member;
+  final PokemonSummary? summary;
   final int slot;
   final VoidCallback? onTap;
 
@@ -99,15 +109,10 @@ class _PartyTeamRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (speciesId != null)
-                FutureBuilder(
-                  future: dexRepository.getSummary(speciesId),
-                  builder: (context, snapshot) {
-                    return TitoSpriteSticker(
-                      source: snapshot.data?.displaySpritePath,
-                      size: 46,
-                      radius: 13,
-                    );
-                  },
+                TitoSpriteSticker(
+                  source: summary?.displaySpritePath,
+                  size: 46,
+                  radius: 13,
                 )
               else
                 const TitoSpriteSticker(source: null, size: 46, radius: 13),

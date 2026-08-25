@@ -80,6 +80,7 @@ void main() {
     addTearDown(router.dispose);
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump();
 
     await tester.tap(find.text('火球鼠').first);
     await tester.pump(const Duration(milliseconds: 300));

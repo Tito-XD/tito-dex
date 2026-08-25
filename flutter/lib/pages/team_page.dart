@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -12,9 +14,11 @@ import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
+import '../navigation/tito_route_work.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_motion.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../widgets/party_team_list.dart';
@@ -23,6 +27,8 @@ import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_sprite_sticker.dart';
+import '../widgets/tito_list_reveal.dart';
+import '../widgets/tito_skeleton.dart';
 import '../widgets/team_summary_card.dart';
 import 'dex/dex_reference_list.dart';
 
@@ -45,6 +51,11 @@ class _TeamPageState extends State<TeamPage> {
 
   late List<PartyMember> _party;
   String? _dismissedDiffSig;
+  bool _routeSettleScheduled = false;
+  bool _contentReady = false;
+  bool _richContentReady = false;
+  Timer? _richContentTimer;
+  Future<Map<int, PokemonDetail>>? _partyDetailsFuture;
 
   /// Fingerprint of the current manual-party vs save-party divergence — the
   /// dismissal only holds while the divergence stays the same.
@@ -64,7 +75,65 @@ class _TeamPageState extends State<TeamPage> {
   void initState() {
     super.initState();
     _party = List<PartyMember>.from(widget.journey.party);
-    _loadDiffBannerDismissal();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_routeSettleScheduled) return;
+    _routeSettleScheduled = true;
+    unawaited(_prepareContentAfterRoute());
+  }
+
+  Future<void> _prepareContentAfterRoute() async {
+    if (!await waitForIncomingRouteSettled(context) || !mounted) return;
+    setState(() => _contentReady = true);
+    unawaited(_loadDiffBannerDismissal());
+    final delay = TitoMotion.duration(
+      context,
+      TitoMotion.listReveal + const Duration(milliseconds: 40),
+    );
+    if (delay == Duration.zero) {
+      _enableRichContent();
+      return;
+    }
+    _richContentTimer = Timer(delay, _enableRichContent);
+  }
+
+  void _enableRichContent() {
+    if (!mounted || _richContentReady) return;
+    setState(() {
+      _richContentReady = true;
+      _partyDetailsFuture = _loadPartyDetails(_party);
+    });
+  }
+
+  Future<Map<int, PokemonDetail>> _loadPartyDetails(
+    List<PartyMember> party,
+  ) async {
+    final ids = party
+        .map((member) => member.speciesId)
+        .whereType<int>()
+        .toSet()
+        .toList(growable: false);
+    final entries = await Future.wait(
+      ids.map((id) async {
+        try {
+          return MapEntry(id, await dexRepository.getDetail(id));
+        } catch (_) {
+          return null;
+        }
+      }),
+    );
+    return Map<int, PokemonDetail>.unmodifiable(
+      Map.fromEntries(entries.whereType<MapEntry<int, PokemonDetail>>()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _richContentTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadDiffBannerDismissal() async {
@@ -87,11 +156,19 @@ class _TeamPageState extends State<TeamPage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.journey != widget.journey) {
       _party = List<PartyMember>.from(widget.journey.party);
+      if (_richContentReady) {
+        _partyDetailsFuture = _loadPartyDetails(_party);
+      }
     }
   }
 
   void _saveParty(List<PartyMember> party, {bool userOverride = true}) {
-    setState(() => _party = party);
+    setState(() {
+      _party = party;
+      if (_richContentReady) {
+        _partyDetailsFuture = _loadPartyDetails(party);
+      }
+    });
     widget.onSaveJourney(
       widget.journey.copyWith(
         party: party,
@@ -280,38 +357,65 @@ class _TeamPageState extends State<TeamPage> {
           ),
         ),
         const SizedBox(height: 14),
-        TeamSummaryCard(party: _party),
-        const SizedBox(height: 14),
-        PartyTeamList(
-          party: _party,
-          showEmptySlots: true,
-          onMemberTap: _toggleEditor,
-          onEmptySlotTap: _party.length < 6 ? _addMember : null,
-          expandedIndex: _editingIndex,
-          editorBuilder: (context, index) => _InlineTeamEditor(
-            key: ValueKey('team-editor-$index'),
-            member: _party[index],
-            index: index,
-            canSwapPrev: index > 0,
-            canSwapNext: index < _party.length - 1,
-            onSave: _handleEditorSave,
-            onDelete: _handleEditorDelete,
-            onSwap: _handleEditorSwap,
-            onClose: () => setState(() => _editingIndex = null),
-          ),
-        ),
-        const SizedBox(height: 14),
-        _TeamAssistCard(party: _party),
-        const SizedBox(height: 14),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Text(
-            AppZh.teamNote,
-            style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w700,
+        if (!_contentReady) ...[
+          const SizedBox(height: 14),
+          const TitoCardSkeleton(height: 156),
+        ] else ...[
+          const SizedBox(height: 14),
+          TitoListReveal(
+            key: const ValueKey('team-content-reveal'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_richContentReady)
+                  TeamSummaryCard(
+                    party: _party,
+                    detailsFuture: _partyDetailsFuture!,
+                  )
+                else
+                  const TitoCardSkeleton(height: 44),
+                const SizedBox(height: 14),
+                PartyTeamList(
+                  party: _party,
+                  detailsFuture: _partyDetailsFuture,
+                  showEmptySlots: true,
+                  onMemberTap: _toggleEditor,
+                  onEmptySlotTap: _party.length < 6 ? _addMember : null,
+                  expandedIndex: _editingIndex,
+                  editorBuilder: (context, index) => _InlineTeamEditor(
+                    key: ValueKey('team-editor-$index'),
+                    member: _party[index],
+                    index: index,
+                    canSwapPrev: index > 0,
+                    canSwapNext: index < _party.length - 1,
+                    onSave: _handleEditorSave,
+                    onDelete: _handleEditorDelete,
+                    onSwap: _handleEditorSwap,
+                    onClose: () => setState(() => _editingIndex = null),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                if (_richContentReady)
+                  _TeamAssistCard(
+                    party: _party,
+                    detailsFuture: _partyDetailsFuture!,
+                  )
+                else
+                  const TitoCardSkeleton(height: 72),
+                const SizedBox(height: 14),
+                StickerCard(
+                  variant: StickerVariant.cream,
+                  child: Text(
+                    AppZh.teamNote,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -686,9 +790,10 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
 }
 
 class _TeamAssistCard extends StatefulWidget {
-  const _TeamAssistCard({required this.party});
+  const _TeamAssistCard({required this.party, required this.detailsFuture});
 
   final List<PartyMember> party;
+  final Future<Map<int, PokemonDetail>> detailsFuture;
 
   @override
   State<_TeamAssistCard> createState() => _TeamAssistCardState();
@@ -706,10 +811,14 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
   @override
   void didUpdateWidget(covariant _TeamAssistCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.party != widget.party) _future = _load();
+    if (oldWidget.party != widget.party ||
+        oldWidget.detailsFuture != widget.detailsFuture) {
+      _future = _load();
+    }
   }
 
   Future<List<_TeamAssistEntry>> _load() async {
+    final details = await widget.detailsFuture;
     final moves = {
       for (final move in await dexRepository.getAllMoves()) move.id: move,
     };
@@ -735,13 +844,8 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
     }
     final result = <_TeamAssistEntry>[];
     for (final member in widget.party) {
-      PokemonDetail? detail;
       final id = member.speciesId;
-      if (id != null) {
-        try {
-          detail = await dexRepository.getDetail(id);
-        } catch (_) {}
-      }
+      final detail = id == null ? null : details[id];
       final node = id == null
           ? null
           : _findEvolutionNode(detail?.evolutionChain, id);
@@ -948,10 +1052,8 @@ class _TeamAssistEntry {
         '携带 ${heldItemName ?? '道具 #${member.heldItemId}'}',
       if (stats.isNotEmpty)
         '能力 ${stats.entries.map((entry) => '${entry.key}${entry.value}').join(' / ')}',
-      if (member.ivs.length == 6)
-        'IV（HP/攻/防/速/特攻/特防）${member.ivs.join('/')}',
-      if (member.evs.length == 6)
-        'EV（HP/攻/防/速/特攻/特防）${member.evs.join('/')}',
+      if (member.ivs.length == 6) 'IV（HP/攻/防/速/特攻/特防）${member.ivs.join('/')}',
+      if (member.evs.length == 6) 'EV（HP/攻/防/速/特攻/特防）${member.evs.join('/')}',
     ];
   }
 

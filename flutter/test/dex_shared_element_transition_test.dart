@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -74,7 +75,7 @@ void main() {
             path: '/dex/:id',
             pageBuilder: (context, state) {
               final transition = state.extra! as PokemonDetailTransition;
-              return titoMaterialPage<void>(
+              return titoDexDetailPage<void>(
                 key: state.pageKey,
                 child: TitoPageContainer(
                   child: PokemonDetailPage(
@@ -96,6 +97,14 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('pokemon-card-tap-1')));
       await _pumpUntilRouteInserted(tester, find.byType(PokemonDetailPage));
       expect(find.byType(PokemonDetailPage), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('tito-dex-detail-fade')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('tito-side-slide-transition')),
+        findsNothing,
+      );
 
       expect(
         find.byKey(const ValueKey('pokemon-detail-shared-element-stage')),
@@ -131,6 +140,7 @@ void main() {
         tester.element(find.byType(PokemonDetailHeader)),
       )!;
       expect(detailRoute.popGestureEnabled, isTrue);
+      expect(detailRoute.transitionDuration, titoDexDetailTransitionDuration);
 
       await tester.tap(find.byKey(const ValueKey('pokemon-detail-artwork')));
       await tester.pump();
@@ -151,8 +161,45 @@ void main() {
       expect(find.byType(PokemonDetailHeader), findsOneWidget);
       expect(tester.takeException(), isNull);
 
-      router.pop();
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('startBackGesture', <String, dynamic>{
+          'touchOffset': <double>[5, 300],
+          'progress': 0.0,
+          'swipeEdge': 0,
+        }),
+      );
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('updateBackGestureProgress', <String, dynamic>{
+          'touchOffset': <double>[180, 300],
+          'progress': 0.55,
+          'swipeEdge': 0,
+        }),
+      );
       await tester.pump();
+      expect(
+        tester
+            .widget<FadeTransition>(
+              find.byKey(const ValueKey<String>('tito-dex-detail-fade')),
+            )
+            .opacity
+            .value,
+        inExclusiveRange(0, 1),
+      );
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('updateBackGestureProgress', <String, dynamic>{
+          'touchOffset': <double>[360, 300],
+          'progress': 1.0,
+          'swipeEdge': 0,
+        }),
+      );
+      expect(detailRoute.animation!.value, greaterThan(0));
+      await _sendBackGestureMethod(
+        tester,
+        const MethodCall('commitBackGesture'),
+      );
       await tester.pump(const Duration(milliseconds: 100));
       expect(
         find.byKey(const ValueKey('pokemon-detail-artwork')),
@@ -209,7 +256,7 @@ void main() {
           path: '/dex/:id',
           pageBuilder: (context, state) {
             final transition = state.extra! as PokemonDetailTransition;
-            return titoMaterialPage<void>(
+            return titoDexDetailPage<void>(
               key: state.pageKey,
               child: TitoPageContainer(
                 child: PokemonDetailPage(
@@ -262,4 +309,16 @@ void main() {
     expect(translationY('move-filter-motion-1'), -1.5);
     expect(tester.takeException(), isNull);
   });
+}
+
+Future<void> _sendBackGestureMethod(
+  WidgetTester tester,
+  MethodCall call,
+) async {
+  final message = const StandardMethodCodec().encodeMethodCall(call);
+  await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+    'flutter/backgesture',
+    message,
+    (_) {},
+  );
 }

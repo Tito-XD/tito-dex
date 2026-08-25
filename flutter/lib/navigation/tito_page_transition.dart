@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
@@ -21,6 +22,8 @@ enum TitoSideSlideDirection { fromLeft, fromRight }
 /// stacking a full Material page transition on top of the Hero flight.
 const titoDexTransitionDuration = Duration(milliseconds: 340);
 const titoDexReverseTransitionDuration = Duration(milliseconds: 300);
+const titoDexDetailTransitionDuration = Duration(milliseconds: 360);
+const titoDexDetailReverseTransitionDuration = Duration(milliseconds: 300);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
 
@@ -40,6 +43,17 @@ Page<T> titoMaterialPage<T>({required LocalKey key, required Widget child}) {
   return _TitoControlledMaterialPage<T>(
     key: key,
     kind: _TitoMaterialPageKind.plain,
+    child: child,
+  );
+}
+
+/// Dex card -> detail keeps the list stationary and lets the Pokémon sprite
+/// own the spatial movement. The page surface only fades and settles in place,
+/// so Android's default full-screen side slide cannot overpower the Hero.
+Page<T> titoDexDetailPage<T>({required LocalKey key, required Widget child}) {
+  return _TitoControlledMaterialPage<T>(
+    key: key,
+    kind: _TitoMaterialPageKind.dexDetail,
     child: child,
   );
 }
@@ -102,7 +116,7 @@ Page<T> titoSideSlidePage<T>({
   return _TitoSideSlidePage<T>(key: key, direction: direction, child: child);
 }
 
-enum _TitoMaterialPageKind { home, dex, plain }
+enum _TitoMaterialPageKind { home, dex, dexDetail, plain }
 
 class _TitoControlledMaterialPage<T> extends Page<T> {
   const _TitoControlledMaterialPage({
@@ -160,15 +174,18 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   }
 
   @override
-  Duration get transitionDuration => _page.kind == _TitoMaterialPageKind.dex
-      ? titoDexTransitionDuration
-      : super.transitionDuration;
+  Duration get transitionDuration => switch (_page.kind) {
+    _TitoMaterialPageKind.dex => titoDexTransitionDuration,
+    _TitoMaterialPageKind.dexDetail => titoDexDetailTransitionDuration,
+    _ => super.transitionDuration,
+  };
 
   @override
-  Duration get reverseTransitionDuration =>
-      _page.kind == _TitoMaterialPageKind.dex
-      ? titoDexReverseTransitionDuration
-      : super.reverseTransitionDuration;
+  Duration get reverseTransitionDuration => switch (_page.kind) {
+    _TitoMaterialPageKind.dex => titoDexReverseTransitionDuration,
+    _TitoMaterialPageKind.dexDetail => titoDexDetailReverseTransitionDuration,
+    _ => super.reverseTransitionDuration,
+  };
 
   @override
   Widget buildTransitions(
@@ -177,6 +194,38 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
+    if (_page.kind == _TitoMaterialPageKind.dexDetail) {
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      final surfaceProgress = reduceMotion
+          ? const AlwaysStoppedAnimation<double>(1)
+          : CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0, 0.72, curve: Curves.easeOutCubic),
+              reverseCurve: Curves.easeInCubic,
+            );
+      final scaleProgress = reduceMotion
+          ? const AlwaysStoppedAnimation<double>(1)
+          : Tween<double>(begin: 0.992, end: 1).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+                reverseCurve: Curves.easeInCubic,
+              ),
+            );
+      return _TitoPredictiveBackGestureDetector(
+        route: this,
+        child: FadeTransition(
+          key: const ValueKey<String>('tito-dex-detail-fade'),
+          opacity: surfaceProgress,
+          child: ScaleTransition(
+            key: const ValueKey<String>('tito-dex-detail-settle'),
+            scale: scaleProgress,
+            alignment: Alignment.topCenter,
+            child: child,
+          ),
+        ),
+      );
+    }
     if (_page.kind != _TitoMaterialPageKind.dex || _page.overlay == null) {
       return super.buildTransitions(
         context,
@@ -254,11 +303,80 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     // which read as a one-frame twitch of the grid. Mirrors the home opt-out.
     if (_page.kind == _TitoMaterialPageKind.dex &&
         nextRoute is _TitoControlledMaterialPageRoute &&
-        nextRoute._page.kind == _TitoMaterialPageKind.plain) {
+        (nextRoute._page.kind == _TitoMaterialPageKind.plain ||
+            nextRoute._page.kind == _TitoMaterialPageKind.dexDetail)) {
       return false;
     }
     return super.canTransitionTo(nextRoute);
   }
+}
+
+/// Keeps Android predictive-back input for a custom route without wrapping the
+/// page in Flutter's stock shared-element surface transform. The route's own
+/// animation is scrubbed directly, so the Dex list underneath never gets
+/// replaced by the framework fallback surface during the gesture.
+class _TitoPredictiveBackGestureDetector extends StatefulWidget {
+  const _TitoPredictiveBackGestureDetector({
+    required this.route,
+    required this.child,
+  });
+
+  final PageRoute<dynamic> route;
+  final Widget child;
+
+  @override
+  State<_TitoPredictiveBackGestureDetector> createState() =>
+      _TitoPredictiveBackGestureDetectorState();
+}
+
+class _TitoPredictiveBackGestureDetectorState
+    extends State<_TitoPredictiveBackGestureDetector>
+    with WidgetsBindingObserver {
+  bool get _enabled => widget.route.isCurrent && widget.route.popGestureEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
+    if (backEvent.isButtonEvent || !_enabled) return false;
+    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
+    return true;
+  }
+
+  @override
+  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
+    if (!widget.route.popGestureInProgress) return;
+    widget.route.handleUpdateBackGestureProgress(
+      progress: 1 - backEvent.progress,
+    );
+  }
+
+  @override
+  void handleCancelBackGesture() {
+    if (widget.route.popGestureInProgress) {
+      widget.route.handleCancelBackGesture();
+    }
+  }
+
+  @override
+  void handleCommitBackGesture() {
+    if (widget.route.popGestureInProgress) {
+      widget.route.handleCommitBackGesture();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _TitoSideSlidePage<T> extends Page<T> {
