@@ -1,6 +1,6 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.4](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.4) · Lite `0.9.4+185` · Offline `0.9.4-offline+186`.
+> **Latest release:** [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · Lite `0.9.5+187` · Offline `0.9.5-offline+188`.
 >
 > **Current `main`:** v0.9.1 release baseline with refined sprite Hero transitions, stable artwork switching, smoother list entry and assistant status/loading motion, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 

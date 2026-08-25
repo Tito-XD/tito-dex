@@ -43,7 +43,6 @@ class LiquidGlassSurface extends StatelessWidget {
     this.borderColor,
     this.borderWidth = TitoBorders.glass,
     this.boxShadow,
-    this.showSpecular = true,
   });
 
   final Widget child;
@@ -62,7 +61,6 @@ class LiquidGlassSurface extends StatelessWidget {
   final Color? borderColor;
   final double borderWidth;
   final List<BoxShadow>? boxShadow;
-  final bool showSpecular;
 
   @override
   Widget build(BuildContext context) {
@@ -112,13 +110,6 @@ class LiquidGlassSurface extends StatelessWidget {
               ),
             ),
           ),
-          if (showSpecular)
-            const Positioned(
-              left: 1,
-              right: 1,
-              top: 1,
-              child: IgnorePointer(child: _SpecularRim()),
-            ),
         ],
       ),
     );
@@ -205,9 +196,11 @@ class LiquidGlassRoundButton extends StatelessWidget {
   }
 }
 
-/// Two cheap static paint passes simulate moulded plastic: a broad diagonal
-/// reflection and a light-to-dark inner rim. Neither pass samples the pixels
-/// behind the card, so long lists stay close to opaque-card rendering cost.
+/// One cheap static paint pass gives moulded matte plastic its edge depth: a
+/// light-to-dark inner rim. It does not sample the pixels behind the card, so
+/// long lists stay close to opaque-card rendering cost. The earlier glossy
+/// treatments (diagonal sheen + top specular line) were removed — solid
+/// plastic reads matte now, with no reflection streaks.
 class _PlasticOpticsPainter extends CustomPainter {
   const _PlasticOpticsPainter({required this.radius, required this.darkTint});
 
@@ -220,25 +213,6 @@ class _PlasticOpticsPainter extends CustomPainter {
       return;
     }
     final bounds = Offset.zero & size;
-    final sheen = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width * 0.72, 0)
-      ..lineTo(size.width * 0.42, size.height * 0.43)
-      ..lineTo(0, size.height * 0.65)
-      ..close();
-    canvas.drawPath(
-      sheen,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withValues(alpha: darkTint ? 0.08 : 0.14),
-            Colors.white.withValues(alpha: 0),
-          ],
-        ).createShader(bounds),
-    );
-
     final inset = 1.35;
     final innerRect = bounds.deflate(inset);
     if (innerRect.isEmpty) {
@@ -255,9 +229,9 @@ class _PlasticOpticsPainter extends CustomPainter {
           end: Alignment.bottomRight,
           stops: const [0, 0.48, 1],
           colors: [
-            Colors.white.withValues(alpha: darkTint ? 0.22 : 0.46),
-            Colors.white.withValues(alpha: 0.04),
-            TitoColors.deepBlue.withValues(alpha: darkTint ? 0.3 : 0.17),
+            Colors.white.withValues(alpha: darkTint ? 0.12 : 0.26),
+            Colors.white.withValues(alpha: 0.03),
+            TitoColors.deepBlue.withValues(alpha: darkTint ? 0.26 : 0.15),
           ],
         ).createShader(bounds),
     );
@@ -266,28 +240,6 @@ class _PlasticOpticsPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _PlasticOpticsPainter oldDelegate) =>
       oldDelegate.radius != radius || oldDelegate.darkTint != darkTint;
-}
-
-class _SpecularRim extends StatelessWidget {
-  const _SpecularRim();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 1.4,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withValues(alpha: 0.04),
-            Colors.white.withValues(alpha: 0.82),
-            Colors.white.withValues(alpha: 0.06),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _LiquidLightFieldPainter extends CustomPainter {
