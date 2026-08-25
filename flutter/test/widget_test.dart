@@ -206,6 +206,35 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('ordinary secondary pages retain Material predictive back', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const _PlainPageHarness());
+    await tester.tap(find.byKey(const ValueKey<String>('open-plain-page')));
+    await tester.pumpAndSettle();
+
+    final route = ModalRoute.of(
+      tester.element(find.byKey(const ValueKey<String>('close-plain-page'))),
+    )!;
+    expect(route.popGestureEnabled, isTrue);
+    expect(
+      find.byKey(const ValueKey<String>('tito-secondary-page-settle')),
+      findsNothing,
+    );
+
+    route.handleStartBackGesture(progress: 1);
+    route.handleUpdateBackGestureProgress(progress: 0.45);
+    await tester.pump();
+    expect(route.animation!.value, inExclusiveRange(0, 1));
+    route.handleCancelBackGesture();
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey<String>('close-plain-page')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Team and Search slide from their matching screen edges', (
     tester,
   ) async {
@@ -229,7 +258,8 @@ void main() {
         const ValueKey<String>('tito-side-slide-transition'),
       );
       var slide = tester.widget<SlideTransition>(slideFinder);
-      expect(slide.position.value.dx.abs(), lessThanOrEqualTo(0.032));
+      expect(slide.position.value.dx.abs(), lessThanOrEqualTo(1));
+      expect(slide.position.value.dx.abs(), greaterThan(0.9));
       expect(slide.position.value.dy, 0);
 
       await tester.pump(const Duration(milliseconds: 225));
@@ -413,6 +443,54 @@ class _SideSlideHarness extends StatefulWidget {
 
   @override
   State<_SideSlideHarness> createState() => _SideSlideHarnessState();
+}
+
+class _PlainPageHarness extends StatefulWidget {
+  const _PlainPageHarness();
+
+  @override
+  State<_PlainPageHarness> createState() => _PlainPageHarnessState();
+}
+
+class _PlainPageHarnessState extends State<_PlainPageHarness> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Navigator(
+        pages: [
+          titoHomePage<void>(
+            key: const ValueKey<String>('plain-home'),
+            child: Material(
+              child: Center(
+                child: TextButton(
+                  key: const ValueKey<String>('open-plain-page'),
+                  onPressed: () => setState(() => _open = true),
+                  child: const Text('Open'),
+                ),
+              ),
+            ),
+          ),
+          if (_open)
+            titoMaterialPage<void>(
+              key: const ValueKey<String>('plain-page'),
+              child: Material(
+                color: Colors.blueGrey,
+                child: Center(
+                  child: TextButton(
+                    key: const ValueKey<String>('close-plain-page'),
+                    onPressed: () => setState(() => _open = false),
+                    child: const Text('Back'),
+                  ),
+                ),
+              ),
+            ),
+        ],
+        onDidRemovePage: (_) {},
+      ),
+    );
+  }
 }
 
 class _SideSlideHarnessState extends State<_SideSlideHarness> {

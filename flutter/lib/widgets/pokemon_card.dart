@@ -1,10 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/type_chart.dart';
 import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
@@ -44,7 +48,16 @@ class PokemonCardTransitionHero extends StatelessWidget {
       tag: pokemonCardHeroTag(summary),
       transitionOnUserGestures: true,
       createRectTween: (begin, end) => RectTween(begin: begin, end: end),
-      flightShuttleBuilder: _pokemonCardFlightShuttle,
+      flightShuttleBuilder:
+          (context, animation, direction, fromContext, toContext) =>
+              _pokemonCardFlightShuttle(
+                context,
+                animation,
+                direction,
+                fromContext,
+                toContext,
+                summary,
+              ),
       child: child,
     );
   }
@@ -56,19 +69,195 @@ Widget _pokemonCardFlightShuttle(
   HeroFlightDirection flightDirection,
   BuildContext fromHeroContext,
   BuildContext toHeroContext,
+  PokemonSummary summary,
 ) {
   final detailContext = flightDirection == HeroFlightDirection.push
       ? toHeroContext
       : fromHeroContext;
   final detailHero = detailContext.widget as Hero;
   final detailSize = (detailContext.findRenderObject()! as RenderBox).size;
-  // Both endpoints render the same sprite source. Keep one destination child
-  // alive for the entire flight so the eye reads a continuous creature moving
-  // and scaling, rather than two sprites cross-fading over the route.
-  return FittedBox(
-    key: const ValueKey('pokemon-card-flight-sprite'),
-    fit: BoxFit.contain,
-    child: SizedBox.fromSize(size: detailSize, child: detailHero.child),
+  final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
+  final accent = typeTileColor(primaryType);
+
+  // The Hero rect grows from the grid Sprite into the complete detail-header
+  // canvas. The artwork is always laid out in an explicit square, so it never
+  // stretches to the increasingly wide destination bounds. Surface, plate,
+  // title and exact destination content arrive on separate beats.
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (context, _) {
+      final progress = animation.value.clamp(0.0, 1.0);
+      final geometryProgress = Curves.easeInOutCubicEmphasized.transform(
+        progress,
+      );
+      final canvasProgress = const Interval(
+        0.04,
+        0.7,
+        curve: Curves.easeOutCubic,
+      ).transform(progress);
+      final plateProgress = const Interval(
+        0.16,
+        0.72,
+        curve: Curves.easeOutCubic,
+      ).transform(progress);
+      final copyProgress = const Interval(
+        0.46,
+        0.84,
+        curve: Curves.easeOutCubic,
+      ).transform(progress);
+      final exactTargetProgress = const Interval(
+        0.84,
+        1,
+        curve: Curves.easeOutCubic,
+      ).transform(progress);
+
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final size = constraints.biggest;
+          final shortest = size.shortestSide;
+          final targetPlate = (shortest - 20).clamp(70.0, 92.0);
+          final sourceSprite = (shortest * 0.9).clamp(1.0, 104.0);
+          final targetSprite = (targetPlate - 14).clamp(56.0, 78.0);
+          final spriteSize =
+              sourceSprite + (targetSprite - sourceSprite) * geometryProgress;
+          final startCenter = Offset(size.width / 2, size.height / 2);
+          final targetCenter = Offset(
+            math.min(size.width / 2, 12 + targetPlate / 2),
+            size.height / 2,
+          );
+          final spriteCenter = Offset.lerp(
+            startCenter,
+            targetCenter,
+            geometryProgress,
+          )!;
+          final plateRect = Rect.fromCenter(
+            center: targetCenter,
+            width: targetPlate,
+            height: targetPlate,
+          );
+          final customOpacity = 1 - exactTargetProgress;
+
+          return Material(
+            key: const ValueKey('pokemon-detail-canvas-flight'),
+            type: MaterialType.transparency,
+            child: Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.none,
+              children: [
+                Opacity(
+                  opacity: canvasProgress * customOpacity,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: TitoColors.deepBlue,
+                      borderRadius: BorderRadius.circular(
+                        TitoRadii.md * canvasProgress,
+                      ),
+                      border: Border.all(
+                        color: TitoColors.ink,
+                        width: TitoBorders.card * canvasProgress,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: TitoColors.ink.withValues(
+                            alpha: 0.2 * canvasProgress,
+                          ),
+                          offset: Offset(0, 4 * canvasProgress),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned.fromRect(
+                  rect: plateRect,
+                  child: Opacity(
+                    opacity: plateProgress * customOpacity,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: const Alignment(-0.6, -0.8),
+                          end: const Alignment(0.6, 0.8),
+                          colors: [
+                            Color.lerp(accent, Colors.white, 0.35)!,
+                            accent,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(TitoRadii.sm),
+                        border: Border.all(
+                          color: TitoColors.ink,
+                          width: TitoBorders.element,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: spriteCenter.dx - spriteSize / 2,
+                  top: spriteCenter.dy - spriteSize / 2,
+                  width: spriteSize,
+                  height: spriteSize,
+                  child: Opacity(
+                    opacity: customOpacity,
+                    child: DexSpriteImage(
+                      source: summary.displaySpritePath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 24 + targetPlate,
+                  right: 12,
+                  top: 0,
+                  bottom: 0,
+                  child: Opacity(
+                    opacity: copyProgress * customOpacity,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            summary.nameZh,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: SecondaryTypography.onGradient.h15.copyWith(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              height: 1.05,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TitoTypeBadgeRow(
+                            typesEn: summary.types,
+                            size: TypeBadgeSize.small,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Opacity(
+                    key: const ValueKey('pokemon-detail-flight-target'),
+                    opacity: exactTargetProgress,
+                    child: FittedBox(
+                      // Preserve the completed header's aspect ratio during
+                      // the handoff; BoxFit.fill would briefly stretch both
+                      // the Sprite and type pills near the end of the flight.
+                      fit: BoxFit.contain,
+                      child: SizedBox.fromSize(
+                        size: detailSize,
+                        child: detailHero.child,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
   );
 }
 

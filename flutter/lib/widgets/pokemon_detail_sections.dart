@@ -336,35 +336,35 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
     final accent = typeTileColor(primaryType);
     final plateSize = square ? 84.0 : 92.0;
 
-    return StickerCard(
-      key: const ValueKey('pokemon-detail-transition-header'),
-      variant: StickerVariant.deep,
-      padding: EdgeInsets.symmetric(
-        horizontal: square ? 10 : 12,
-        vertical: square ? 8 : 10,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: plateSize,
-            height: plateSize,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: const Alignment(-0.6, -0.8),
-                end: const Alignment(0.6, 0.8),
-                colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
+    return PokemonCardTransitionHero(
+      summary: summary,
+      child: StickerCard(
+        key: const ValueKey('pokemon-detail-transition-header'),
+        variant: StickerVariant.deep,
+        padding: EdgeInsets.symmetric(
+          horizontal: square ? 10 : 12,
+          vertical: square ? 8 : 10,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: plateSize,
+              height: plateSize,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: const Alignment(-0.6, -0.8),
+                  end: const Alignment(0.6, 0.8),
+                  colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
+                ),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                border: Border.all(
+                  color: TitoColors.ink,
+                  width: TitoBorders.element,
+                ),
               ),
-              borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.element,
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Center(
-              child: PokemonCardTransitionHero(
-                summary: summary,
+              clipBehavior: Clip.antiAlias,
+              child: Center(
                 child: DexSpriteImage(
                   source: summary.displaySpritePath,
                   width: plateSize - 14,
@@ -372,33 +372,33 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  summary.nameZh,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: SecondaryTypography.onGradient.h15.copyWith(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 26 * -0.03,
-                    height: 1.05,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    summary.nameZh,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SecondaryTypography.onGradient.h15.copyWith(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 26 * -0.03,
+                      height: 1.05,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                TypeChipRow(
-                  types: summary.types.map(typeNameZh).toList(),
-                  typeKeys: summary.types,
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  TypeChipRow(
+                    types: summary.types.map(typeNameZh).toList(),
+                    typeKeys: summary.types,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -474,13 +474,10 @@ class PokemonDetailHeader extends StatelessWidget {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
-                    child: PokemonCardTransitionHero(
-                      summary: summary,
-                      child: DexSpriteImage(
-                        source: summary.displaySpritePath,
-                        width: plateSize - 14,
-                        height: plateSize - 14,
-                      ),
+                    child: DexSpriteImage(
+                      source: summary.displaySpritePath,
+                      width: plateSize - 14,
+                      height: plateSize - 14,
                     ),
                   ),
                 ),
@@ -529,7 +526,7 @@ class PokemonDetailHeader extends StatelessWidget {
       );
       return Stack(
         children: [
-          baseHeader,
+          PokemonCardTransitionHero(summary: summary, child: baseHeader),
           Positioned.fill(
             child: AnimatedBuilder(
               animation: routeAnimation,
