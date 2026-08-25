@@ -272,6 +272,11 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                         ? Duration.zero
                         : const Duration(milliseconds: 220),
                     transitionBuilder: _stageTransition,
+                    // Keep the text block pinned to the companion's right
+                    // edge: the default switcher layout center-aligns its
+                    // children, so narrower idle/loading columns drifted
+                    // sideways whenever the copy length changed.
+                    layoutBuilder: _topLeftSwitcherLayout,
                     child: widget.loading
                         ? Column(
                             key: const ValueKey('loading'),

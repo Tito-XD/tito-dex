@@ -54,17 +54,24 @@ void main() {
         routes: [
           GoRoute(
             path: '/dex',
-            builder: (context, state) => Scaffold(
-              body: Center(
-                child: SizedBox(
-                  width: 128,
-                  height: 152,
-                  child: PokemonMiniCard(
-                    summary: _summary,
-                    status: DexEncounterStatus.unknown,
-                    onTap: () => context.push(
-                      '/dex/1',
-                      extra: const PokemonDetailTransition(summary: _summary),
+            // Mirror the real app: the grid lives in the dex page's `content`
+            // layer. The flight only works when that layer stays inside the
+            // route's buildContent (ModalRoute.subtreeContext).
+            pageBuilder: (context, state) => titoDexPage<void>(
+              key: state.pageKey,
+              child: const ColoredBox(color: Colors.blueGrey),
+              content: Scaffold(
+                body: Center(
+                  child: SizedBox(
+                    width: 128,
+                    height: 152,
+                    child: PokemonMiniCard(
+                      summary: _summary,
+                      status: DexEncounterStatus.unknown,
+                      onTap: () => context.push(
+                        '/dex/1',
+                        extra: const PokemonDetailTransition(summary: _summary),
+                      ),
                     ),
                   ),
                 ),

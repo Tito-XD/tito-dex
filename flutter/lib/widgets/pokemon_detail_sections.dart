@@ -324,6 +324,12 @@ class _FormPickerTile extends StatelessWidget {
 /// Lightweight first-frame destination for the Dex card shared element.
 /// It uses only [PokemonSummary], so detail loading never delays the Hero
 /// target or replaces the route transition with a blank placeholder.
+///
+/// The layout mirrors [PokemonDetailHeader]'s compact template line for
+/// line — dex-number row, EN subtitle included — so the skeleton and the
+/// loaded header are the exact same size and nothing flashes or shifts when
+/// the detail data arrives. The national number and EN name are already
+/// known from the summary, so they render immediately instead of popping in.
 class PokemonDetailTransitionHeader extends StatelessWidget {
   const PokemonDetailTransitionHeader({super.key, required this.summary});
 
@@ -334,126 +340,33 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
     final square = DeviceLayout.useSquareDashboard(context);
     final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
     final accent = typeTileColor(primaryType);
-    final plateSize = square ? 84.0 : 92.0;
+    final plateSize = titoDetailHeaderPlateSize(square);
+    final headerPadding = titoDetailHeaderPadding(square);
+    final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
+      color: TitoColors.card.withValues(alpha: 0.92),
+      fontWeight: FontWeight.w800,
+    );
 
     return PokemonCardTransitionHero(
       summary: summary,
       child: StickerCard(
         key: const ValueKey('pokemon-detail-transition-header'),
         variant: StickerVariant.deep,
-        padding: EdgeInsets.symmetric(
-          horizontal: square ? 10 : 12,
-          vertical: square ? 8 : 10,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: plateSize,
-              height: plateSize,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: const Alignment(-0.6, -0.8),
-                  end: const Alignment(0.6, 0.8),
-                  colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
-                ),
-                borderRadius: BorderRadius.circular(TitoRadii.sm),
-                border: Border.all(
-                  color: TitoColors.ink,
-                  width: TitoBorders.element,
-                ),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Center(
-                child: DexSpriteImage(
-                  source: summary.displaySpritePath,
-                  width: plateSize - 14,
-                  height: plateSize - 14,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    summary.nameZh,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onGradient.h15.copyWith(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 26 * -0.03,
-                      height: 1.05,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TypeChipRow(
-                    types: summary.types.map(typeNameZh).toList(),
-                    typeKeys: summary.types,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PokemonDetailHeader extends StatelessWidget {
-  const PokemonDetailHeader({
-    super.key,
-    required this.detail,
-    this.compact = false,
-    this.showSettingsAction = true,
-  });
-
-  final PokemonDetail detail;
-  final bool compact;
-  final bool showSettingsAction;
-
-  @override
-  Widget build(BuildContext context) {
-    final summary = detail.summary;
-    final compactLayout = compact || DeviceLayout.isCompact(context);
-    final square = DeviceLayout.useSquareDashboard(context);
-    final dexLabel = [
-      if (detail.johtoDexLabel != null) detail.johtoDexLabel,
-      detail.nationalDexLabel,
-    ].join(' · ');
-
-    if (compact) {
-      // v0.6.7 hero: type-tinted sprite plate on the left, oversized tight
-      // name, EN · genus subtitle, type pills (detail template).
-      final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
-      final accent = typeTileColor(primaryType);
-      final plateSize = square ? 84.0 : 92.0;
-      final headerPadding = EdgeInsets.symmetric(
-        horizontal: square ? 10 : 12,
-        vertical: square ? 8 : 10,
-      );
-      final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
-        color: TitoColors.card.withValues(alpha: 0.92),
-        fontWeight: FontWeight.w800,
-      );
-      final routeAnimation =
-          ModalRoute.of(context)?.animation ??
-          const AlwaysStoppedAnimation<double>(1);
-      final baseHeader = StickerCard(
-        variant: StickerVariant.deep,
         padding: headerPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(dexLabel, style: metaStyle),
+            SizedBox(
+              height: titoDetailHeaderLabelRowHeight,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  '#${summary.id.toString().padLeft(3, '0')}',
+                  style: metaStyle,
+                ),
+              ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: titoDetailHeaderLabelGap),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -481,7 +394,155 @@ class PokemonDetailHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: titoDetailHeaderPlateGap),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        summary.nameZh,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onGradient.h15.copyWith(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 26 * -0.03,
+                          height: 1.05,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        summary.nameEn,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onGradient.small12.copyWith(
+                          color: TitoColors.card.withValues(alpha: 0.92),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TypeChipRow(
+                        types: summary.types.map(typeNameZh).toList(),
+                        typeKeys: summary.types,
+                        tone: TypeChipTone.neutral,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PokemonDetailHeader extends StatelessWidget {
+  const PokemonDetailHeader({
+    super.key,
+    required this.detail,
+    this.compact = false,
+    this.showSettingsAction = true,
+    this.fillProgress = 1,
+  });
+
+  final PokemonDetail detail;
+  final bool compact;
+  final bool showSettingsAction;
+
+  /// 0→1 fill for the lines that only exist once detail data has loaded
+  /// (dex label, genus subtitle). Driven by the page so the value stays
+  /// stable when the Hero shuttle re-builds this widget during a pop flight.
+  final double fillProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = detail.summary;
+    final compactLayout = compact || DeviceLayout.isCompact(context);
+    final square = DeviceLayout.useSquareDashboard(context);
+    final dexLabel = [
+      if (detail.johtoDexLabel != null) detail.johtoDexLabel,
+      detail.nationalDexLabel,
+    ].join(' · ');
+
+    if (compact) {
+      // v0.6.7 hero: type-tinted sprite plate on the left, oversized tight
+      // name, EN · genus subtitle, type pills (detail template).
+      final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
+      final accent = typeTileColor(primaryType);
+      final plateSize = titoDetailHeaderPlateSize(square);
+      final headerPadding = titoDetailHeaderPadding(square);
+      final metaStyle = SecondaryTypography.onGradient.small12.copyWith(
+        color: TitoColors.card.withValues(alpha: 0.92),
+        fontWeight: FontWeight.w800,
+      );
+      final routeAnimation =
+          ModalRoute.of(context)?.animation ??
+          const AlwaysStoppedAnimation<double>(1);
+      final baseHeader = StickerCard(
+        variant: StickerVariant.deep,
+        padding: headerPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: titoDetailHeaderLabelRowHeight,
+              child: Align(
+                alignment: Alignment.centerRight,
+                // The national number was already visible in the transition
+                // header and is right-aligned, so it never moves; only the
+                // newly loaded regional prefix fills in.
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      if (detail.johtoDexLabel != null)
+                        TextSpan(
+                          text: '${detail.johtoDexLabel} · ',
+                          style: metaStyle.copyWith(
+                            color: TitoColors.card.withValues(
+                              alpha: 0.92 * fillProgress,
+                            ),
+                          ),
+                        ),
+                      TextSpan(text: detail.nationalDexLabel, style: metaStyle),
+                    ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            const SizedBox(height: titoDetailHeaderLabelGap),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: plateSize,
+                  height: plateSize,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: const Alignment(-0.6, -0.8),
+                      end: const Alignment(0.6, 0.8),
+                      colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
+                    ),
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    border: Border.all(
+                      color: TitoColors.ink,
+                      width: TitoBorders.element,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Center(
+                    child: DexSpriteImage(
+                      source: summary.displaySpritePath,
+                      width: plateSize - 14,
+                      height: plateSize - 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: titoDetailHeaderPlateGap),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,17 +559,37 @@ class PokemonDetailHeader extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 3),
-                      Text(
-                        [
-                          summary.nameEn,
-                          if (detail.genusZh.isNotEmpty) detail.genusZh,
-                        ].join(' · '),
+                      // The EN name was already visible in the transition
+                      // header and is left-aligned, so it stays put; only
+                      // the newly loaded genus suffix fills in.
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: summary.nameEn,
+                              style: SecondaryTypography.onGradient.small12
+                                  .copyWith(
+                                    color: TitoColors.card.withValues(
+                                      alpha: 0.92,
+                                    ),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                            if (detail.genusZh.isNotEmpty)
+                              TextSpan(
+                                text: ' · ${detail.genusZh}',
+                                style: SecondaryTypography.onGradient.small12
+                                    .copyWith(
+                                      color: TitoColors.card.withValues(
+                                        alpha: 0.92 * fillProgress,
+                                      ),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                          ],
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onGradient.small12.copyWith(
-                          color: TitoColors.card.withValues(alpha: 0.92),
-                          fontWeight: FontWeight.w700,
-                        ),
                       ),
                       const SizedBox(height: 8),
                       TypeChipRow(
@@ -541,14 +622,17 @@ class PokemonDetailHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Opacity(
-                        opacity: 0,
-                        child: Text(dexLabel, style: metaStyle),
+                    SizedBox(
+                      height: titoDetailHeaderLabelRowHeight,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Opacity(
+                          opacity: 0,
+                          child: Text(dexLabel, style: metaStyle),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: titoDetailHeaderLabelGap),
                     GestureDetector(
                       key: const ValueKey('pokemon-detail-artwork'),
                       behavior: HitTestBehavior.opaque,

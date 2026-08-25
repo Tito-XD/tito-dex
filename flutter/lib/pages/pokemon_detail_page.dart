@@ -243,40 +243,34 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 ? ListView(
                     key: const ValueKey('pokemon-detail-shared-element-stage'),
                     padding: bodyPadding,
-                    children: [
-                      transitionHeader,
-                      const SizedBox(height: 12),
-                      const TitoCardSkeleton(height: 140),
-                      const SizedBox(height: 12),
-                      const TitoCardSkeleton(height: 88),
-                    ],
+                    children: [transitionHeader],
                   )
                 : TitoSkeletonGate(
                     loading: _loading,
+                    // Shared-element entries skip the skeleton cards: the
+                    // geometry-aligned transition header stays put and the
+                    // real content fills in with its arrival animation, so
+                    // nothing flashes when the detail data lands. Deep links
+                    // (no transition summary) keep the full skeleton.
                     skeleton: ListView(
                       padding: bodyPadding,
                       children: [
                         if (transitionHeader != null)
                           transitionHeader
-                        else
+                        else ...[
                           const TitoDetailHeaderSkeleton(),
-                        const SizedBox(height: 12),
-                        const TitoCardSkeleton(height: 140),
-                        const SizedBox(height: 12),
-                        const TitoCardSkeleton(height: 88),
+                          const SizedBox(height: 12),
+                          const TitoCardSkeleton(height: 140),
+                          const SizedBox(height: 12),
+                          const TitoCardSkeleton(height: 88),
+                        ],
                       ],
                     ),
                     placeholder: transitionHeader == null
                         ? const SizedBox.shrink()
                         : ListView(
                             padding: bodyPadding,
-                            children: [
-                              transitionHeader,
-                              const SizedBox(height: 12),
-                              const TitoCardSkeleton(height: 140),
-                              const SizedBox(height: 12),
-                              const TitoCardSkeleton(height: 88),
-                            ],
+                            children: [transitionHeader],
                           ),
                     child: errorCopy != null
                         ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
@@ -285,10 +279,27 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                         : ListView(
                             padding: bodyPadding,
                             children: [
-                              PokemonDetailHeader(
-                                detail: displayDetail,
-                                compact: true,
-                                showSettingsAction: false,
+                              // The fill lines (dex label, genus subtitle)
+                              // fade in once when the loaded header first
+                              // appears; the progress is owned here so the
+                              // Hero shuttle's copy stays fully opaque.
+                              TweenAnimationBuilder<double>(
+                                tween: Tween<double>(
+                                  begin: TitoMotion.disabled(context) ? 1 : 0,
+                                  end: 1,
+                                ),
+                                duration: TitoMotion.duration(
+                                  context,
+                                  TitoMotion.standard,
+                                ),
+                                curve: Curves.easeOutCubic,
+                                builder: (context, fill, _) =>
+                                    PokemonDetailHeader(
+                                      detail: displayDetail,
+                                      compact: true,
+                                      showSettingsAction: false,
+                                      fillProgress: fill,
+                                    ),
                               ),
                               _DetailArrival(
                                 child: Column(
