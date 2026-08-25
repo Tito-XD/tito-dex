@@ -330,6 +330,12 @@ class _FormPickerTile extends StatelessWidget {
 /// loaded header are the exact same size and nothing flashes or shifts when
 /// the detail data arrives. The national number and EN name are already
 /// known from the summary, so they render immediately instead of popping in.
+///
+/// Only the sprite is a shared element: it flies from the grid slot to the
+/// plate while the card canvas, plate and copy wait out the flight at
+/// opacity zero, then fade in over the route's tail — the creature lands
+/// first, the skeleton card materialises around it. On pop the card clears
+/// in the first stretch and the sprite rides back alone.
 class PokemonDetailTransitionHeader extends StatelessWidget {
   const PokemonDetailTransitionHeader({super.key, required this.summary});
 
@@ -346,9 +352,21 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
       color: TitoColors.card.withValues(alpha: 0.92),
       fontWeight: FontWeight.w800,
     );
+    final routeAnimation =
+        ModalRoute.of(context)?.animation ??
+        const AlwaysStoppedAnimation<double>(1);
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final Animation<double> reveal = reduceMotion
+        ? routeAnimation
+        : CurvedAnimation(
+            parent: routeAnimation,
+            curve: const Interval(0.68, 0.96, curve: Curves.easeOutCubic),
+            reverseCurve: const Interval(0.68, 0.96, curve: Curves.easeInCubic),
+          );
 
-    return PokemonCardTransitionHero(
-      summary: summary,
+    return FadeTransition(
+      key: const ValueKey('pokemon-detail-header-reveal'),
+      opacity: reveal,
       child: StickerCard(
         key: const ValueKey('pokemon-detail-transition-header'),
         variant: StickerVariant.deep,
@@ -387,10 +405,13 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
-                    child: DexSpriteImage(
-                      source: summary.displaySpritePath,
-                      width: plateSize - 14,
-                      height: plateSize - 14,
+                    child: PokemonCardTransitionHero(
+                      summary: summary,
+                      child: DexSpriteImage(
+                        source: summary.displaySpritePath,
+                        width: plateSize - 14,
+                        height: plateSize - 14,
+                      ),
                     ),
                   ),
                 ),
@@ -453,8 +474,8 @@ class PokemonDetailHeader extends StatelessWidget {
   final bool showSettingsAction;
 
   /// 0→1 fill for the lines that only exist once detail data has loaded
-  /// (dex label, genus subtitle). Driven by the page so the value stays
-  /// stable when the Hero shuttle re-builds this widget during a pop flight.
+  /// (dex label, genus subtitle). Driven by the page so the value plays
+  /// exactly once when the loaded header first appears.
   final double fillProgress;
 
   @override
@@ -535,10 +556,13 @@ class PokemonDetailHeader extends StatelessWidget {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
-                    child: DexSpriteImage(
-                      source: summary.displaySpritePath,
-                      width: plateSize - 14,
-                      height: plateSize - 14,
+                    child: PokemonCardTransitionHero(
+                      summary: summary,
+                      child: DexSpriteImage(
+                        source: summary.displaySpritePath,
+                        width: plateSize - 14,
+                        height: plateSize - 14,
+                      ),
                     ),
                   ),
                 ),
@@ -607,7 +631,7 @@ class PokemonDetailHeader extends StatelessWidget {
       );
       return Stack(
         children: [
-          PokemonCardTransitionHero(summary: summary, child: baseHeader),
+          baseHeader,
           Positioned.fill(
             child: AnimatedBuilder(
               animation: routeAnimation,

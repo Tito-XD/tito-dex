@@ -1,14 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
-import '../features/dex/type_chart.dart';
 import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/device_layout.dart';
-import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
@@ -47,6 +43,15 @@ class PokemonDetailTransition {
   final Future<PokemonDetail>? detailFuture;
 }
 
+/// Sprite-only shared element between a Dex grid card and the detail
+/// header's sprite plate. Both sides wrap just the creature artwork, so the
+/// default flight IS the whole choreography: the sprite travels from its
+/// grid slot to the header position while the card canvas, plate and copy
+/// stay out of the flight and fade in only once the route settles (see
+/// [PokemonDetailTransitionHeader]). The earlier canvas-expand shuttle
+/// (which grew a hand-laid card around the sprite mid-flight) cross-faded
+/// against the real header fading in with the route — the "name card
+/// flashes on entry" report — and was deleted in favour of this.
 class PokemonCardTransitionHero extends StatelessWidget {
   const PokemonCardTransitionHero({
     super.key,
@@ -62,264 +67,13 @@ class PokemonCardTransitionHero extends StatelessWidget {
     return Hero(
       tag: pokemonCardHeroTag(summary),
       transitionOnUserGestures: true,
+      // A direct bounds interpolation keeps the creature on a straight line
+      // between the grid slot and the header plate; the default arc tween
+      // drifts sideways on wide handheld layouts.
       createRectTween: (begin, end) => RectTween(begin: begin, end: end),
-      flightShuttleBuilder:
-          (context, animation, direction, fromContext, toContext) =>
-              _pokemonCardFlightShuttle(
-                context,
-                animation,
-                direction,
-                fromContext,
-                toContext,
-                summary,
-              ),
       child: child,
     );
   }
-}
-
-Widget _pokemonCardFlightShuttle(
-  BuildContext flightContext,
-  Animation<double> animation,
-  HeroFlightDirection flightDirection,
-  BuildContext fromHeroContext,
-  BuildContext toHeroContext,
-  PokemonSummary summary,
-) {
-  final detailContext = flightDirection == HeroFlightDirection.push
-      ? toHeroContext
-      : fromHeroContext;
-  final sourceContext = flightDirection == HeroFlightDirection.push
-      ? fromHeroContext
-      : toHeroContext;
-  final detailHero = detailContext.widget as Hero;
-  final detailSize = (detailContext.findRenderObject()! as RenderBox).size;
-  final sourceSize = (sourceContext.findRenderObject()! as RenderBox).size;
-  final primaryType = summary.types.isNotEmpty ? summary.types.first : '';
-  final accent = typeTileColor(primaryType);
-  final square = DeviceLayout.useSquareDashboard(flightContext);
-  final plateSize = titoDetailHeaderPlateSize(square);
-  final headerPadding = titoDetailHeaderPadding(square);
-  final cardRadius = DeviceLayout.rLg(flightContext);
-
-  // The grid sprite's exact side: its slot paints the artwork BoxFit.contain
-  // and centered, so the visible creature is the slot's shortest edge. The
-  // flight must open on those exact pixels — any clamp or estimate pops the
-  // sprite on the first frame.
-  final gridSpriteSide = math
-      .min(sourceSize.width, sourceSize.height)
-      .clamp(1.0, double.infinity);
-
-  // Exact landing geometry inside the finished header card: the sprite plate
-  // sits in the row under the dex-number label, inset by the card padding.
-  // Both headers share these constants, so the final handoff is pixel-perfect.
-  final targetSprite = plateSize - 14;
-  final rowTop =
-      headerPadding.top +
-      titoDetailHeaderLabelRowHeight +
-      titoDetailHeaderLabelGap;
-  final targetCenter = Offset(
-    headerPadding.left + plateSize / 2,
-    rowTop + plateSize / 2,
-  );
-
-  // Beats (the Hero animation is already fastOutSlowIn-curved, and the flight
-  // rect tracks this same progress):
-  //  1. the creature travels to its plate alone and arrives early;
-  //  2. plate and card canvas materialise around the landed creature;
-  //  3. name/type copy fades in;
-  //  4. the completed header crossfades last.
-  // Reversed on pop the canvas collapses first and the creature then rides
-  // back into its grid slot.
-  return AnimatedBuilder(
-    animation: animation,
-    builder: (context, _) {
-      final progress = animation.value.clamp(0.0, 1.0);
-      final travelProgress = const Interval(
-        0,
-        0.55,
-        curve: Curves.easeOutCubic,
-      ).transform(progress);
-      final plateProgress = const Interval(
-        0.5,
-        0.8,
-        curve: Curves.easeOutCubic,
-      ).transform(progress);
-      final canvasProgress = const Interval(
-        0.55,
-        0.95,
-        curve: Curves.easeOutCubic,
-      ).transform(progress);
-      final copyProgress = const Interval(
-        0.7,
-        0.95,
-        curve: Curves.easeOutCubic,
-      ).transform(progress);
-      final exactTargetProgress = const Interval(0.9, 1).transform(progress);
-      final customOpacity = 1 - exactTargetProgress;
-
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final size = constraints.biggest;
-          final spriteSize =
-              gridSpriteSide + (targetSprite - gridSpriteSide) * travelProgress;
-          final spriteCenter = Offset.lerp(
-            Offset(size.width / 2, size.height / 2),
-            targetCenter,
-            travelProgress,
-          )!;
-          final plateRect = Rect.fromCenter(
-            center: targetCenter,
-            width: plateSize,
-            height: plateSize,
-          );
-
-          return Material(
-            key: const ValueKey('pokemon-detail-canvas-flight'),
-            type: MaterialType.transparency,
-            child: Stack(
-              fit: StackFit.expand,
-              clipBehavior: Clip.none,
-              children: [
-                // The card canvas fills the growing flight rect; it only
-                // appears once the creature has landed on its plate.
-                Opacity(
-                  opacity: canvasProgress * customOpacity,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: TitoColors.deepBlue,
-                      borderRadius: BorderRadius.circular(cardRadius),
-                      border: Border.all(
-                        color: TitoColors.ink,
-                        width: TitoBorders.card,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: TitoColors.ink.withValues(alpha: 0.2),
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned.fromRect(
-                  rect: plateRect,
-                  child: Opacity(
-                    opacity: plateProgress * customOpacity,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: const Alignment(-0.6, -0.8),
-                          end: const Alignment(0.6, 0.8),
-                          colors: [
-                            Color.lerp(accent, Colors.white, 0.35)!,
-                            accent,
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(TitoRadii.sm),
-                        border: Border.all(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: spriteCenter.dx - spriteSize / 2,
-                  top: spriteCenter.dy - spriteSize / 2,
-                  width: spriteSize,
-                  height: spriteSize,
-                  child: Opacity(
-                    opacity: customOpacity,
-                    child: DexSpriteImage(
-                      source: summary.displaySpritePath,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                // Name/type copy, laid out on the exact lines of the finished
-                // header so the handoff crossfade has nothing to correct.
-                Positioned(
-                  left:
-                      headerPadding.left + plateSize + titoDetailHeaderPlateGap,
-                  right: headerPadding.right,
-                  top: rowTop,
-                  bottom: headerPadding.bottom,
-                  child: Opacity(
-                    opacity: copyProgress * customOpacity,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      // The copy is laid out on the finished header's lines,
-                      // which are taller than the still-small flight rect
-                      // early on — let it overflow silently instead of
-                      // tripping RenderFlex while it is still invisible.
-                      child: OverflowBox(
-                        maxHeight: double.infinity,
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              summary.nameZh,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: SecondaryTypography.onGradient.h15
-                                  .copyWith(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 26 * -0.03,
-                                    height: 1.05,
-                                  ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              summary.nameEn,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: SecondaryTypography.onGradient.small12
-                                  .copyWith(
-                                    color: TitoColors.card.withValues(
-                                      alpha: 0.92,
-                                    ),
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            TypeChipRow(
-                              types: summary.types.map(typeNameZh).toList(),
-                              typeKeys: summary.types,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                  child: Opacity(
-                    key: const ValueKey('pokemon-detail-flight-target'),
-                    opacity: exactTargetProgress,
-                    child: FittedBox(
-                      // Preserve the completed header's aspect ratio during
-                      // the handoff; BoxFit.fill would briefly stretch both
-                      // the Sprite and type pills near the end of the flight.
-                      fit: BoxFit.contain,
-                      child: SizedBox.fromSize(
-                        size: detailSize,
-                        child: detailHero.child,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
 }
 
 class PokemonMiniCard extends StatelessWidget {
@@ -376,7 +130,7 @@ class PokemonMiniCard extends StatelessWidget {
                   children: [
                     // The sprite alone is the shared element. The card shell
                     // (number, name, types) stays anchored in the grid while
-                    // the canvas shuttle grows around the creature; offstaging
+                    // the creature flies to the detail header; offstaging
                     // the whole card punched a hole in the list and lost the
                     // exact sprite rect the flight must start from.
                     Expanded(

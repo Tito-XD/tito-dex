@@ -476,10 +476,13 @@ class _TitoBackGestureRouteSurfaceState
   }
 }
 
-/// Predictive-back drag surface for the Dex detail route: the page visibly
-/// shrinks with rounding corners and a slight bias toward the swipe edge,
-/// scrubbed directly by the gesture-driven route animation. The final fade
-/// only kicks in near the end so the drag itself never washes the page out.
+/// Predictive-back drag surface for the Dex detail route, Telegram-style:
+/// the page stays fully opaque and tracks the finger 1:1 off the swipe
+/// edge, progressively revealing the static dex grid underneath. The old
+/// scale-down + corner-rounding + translucency let the grid bleed through
+/// the page and double-exposed both layers, and the commit fade then
+/// cross-dissolved them a second time (the v0.9.4 ghosting report). With
+/// no opacity involved, a ghost is physically impossible.
 class _TitoDexDetailBackSurface extends StatelessWidget {
   const _TitoDexDetailBackSurface({
     required this.animation,
@@ -496,26 +499,17 @@ class _TitoDexDetailBackSurface extends StatelessWidget {
     if (MediaQuery.disableAnimationsOf(context)) {
       return child;
     }
+    final width = MediaQuery.sizeOf(context).width;
+    final fromRight = startBackEvent?.swipeEdge == SwipeEdge.right;
     return AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
         final settle = animation.value.clamp(0.0, 1.0);
-        final eased = Curves.easeOutCubic.transform(1 - settle);
-        final fromRight = startBackEvent?.swipeEdge == SwipeEdge.right;
-        final exitFade = settle < 0.35 ? settle / 0.35 : 1.0;
-        return Opacity(
-          opacity: (1 - 0.18 * eased) * exitFade,
-          child: Transform.translate(
-            offset: Offset((fromRight ? -1.0 : 1.0) * 28 * eased, 10 * eased),
-            child: Transform.scale(
-              scale: 1 - 0.12 * eased,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(26 * eased),
-                child: child,
-              ),
-            ),
-          ),
+        return Transform.translate(
+          key: const ValueKey<String>('tito-dex-detail-back-slide'),
+          offset: Offset((fromRight ? -1.0 : 1.0) * width * (1 - settle), 0),
+          child: child,
         );
       },
     );

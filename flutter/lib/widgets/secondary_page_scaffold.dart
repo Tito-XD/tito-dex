@@ -150,63 +150,9 @@ class _BackTitleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = DeviceLayout.rMd(context);
     final scheme = Theme.of(context).colorScheme;
-    if (appVisualStyle.usesSolidPlastic) {
-      return HandheldFocusDecorator(
-        onActivate: onTap,
-        borderRadius: BorderRadius.circular(radius),
-        child: Semantics(
-          button: true,
-          label: '$title · ${AppZh.navHome}',
-          child: LiquidGlassSurface(
-            tint: TitoColors.deepBlue,
-            opacity: 0.88,
-            radius: radius,
-            blurSigma: 6,
-            blurBackdrop: true,
-            boxShadow: SolidPlasticShadows.glassSmall,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(radius),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.arrow_back_rounded,
-                        color: TitoColors.card,
-                        size: iconSize,
-                      ),
-                      SizedBox(width: iconSize * 0.22),
-                      Expanded(
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: SecondaryTypography.onGradient.title.copyWith(
-                            letterSpacing: -0.5,
-                            shadows: const [
-                              Shadow(
-                                color: Color(0x4018283B),
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    // Solid Plastic intentionally shares this plain back-title row: the glossy
+    // title pill was removed so secondary headers stay matte like the rest of
+    // the theme's surfaces.
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: BorderRadius.circular(radius),

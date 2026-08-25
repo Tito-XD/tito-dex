@@ -122,14 +122,22 @@ void main() {
       expect(find.byType(PokemonDetailTransitionHeader), findsOneWidget);
 
       await tester.pump(const Duration(milliseconds: 120));
-      expect(
-        find.byKey(const ValueKey('pokemon-detail-canvas-flight')),
-        findsOneWidget,
+      // Mid-flight only the sprite travels; the header card waits at opacity
+      // zero and reveals itself over the route's tail.
+      var headerReveal = tester.widget<FadeTransition>(
+        find.byKey(const ValueKey('pokemon-detail-header-reveal')),
       );
+      expect(headerReveal.opacity.value, 0);
       expect(
         find.byKey(const ValueKey('pokemon-detail-shared-element-stage')),
         findsOneWidget,
       );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      headerReveal = tester.widget<FadeTransition>(
+        find.byKey(const ValueKey('pokemon-detail-header-reveal')),
+      );
+      expect(headerReveal.opacity.value, greaterThan(0));
 
       await tester.pumpAndSettle();
       expect(
@@ -184,6 +192,12 @@ void main() {
       );
       await tester.pump();
       expect(detailRoute.animation!.value, inExclusiveRange(0, 1));
+      // The gesture surface slides the opaque page off the swipe edge 1:1 —
+      // no scale, no translucency — so the grid can never bleed through.
+      final backSlide = tester.widget<Transform>(
+        find.byKey(const ValueKey('tito-dex-detail-back-slide')),
+      );
+      expect(backSlide.transform.getTranslation().x, greaterThan(0));
       await _sendBackGestureMethod(
         tester,
         const MethodCall('updateBackGestureProgress', <String, dynamic>{
@@ -202,17 +216,10 @@ void main() {
         find.byKey(const ValueKey('pokemon-detail-artwork')),
         findsNothing,
       );
-      final returningHeaderLayer = find.byKey(
-        const ValueKey('pokemon-detail-canvas-flight'),
-      );
-      expect(returningHeaderLayer, findsOneWidget);
-      expect(
-        find.descendant(
-          of: returningHeaderLayer,
-          matching: find.byType(DexSpriteImage),
-        ),
-        findsWidgets,
-      );
+      // The sprite rides back alone: the only on-stage DexSpriteImage is
+      // the Hero shuttle's — both endpoint heroes are offstage mid-flight
+      // and the loaded header's artwork overlay hides once the pop begins.
+      expect(find.byType(DexSpriteImage), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.byType(PokemonMiniCard), findsOneWidget);
       expect(tester.takeException(), isNull);
