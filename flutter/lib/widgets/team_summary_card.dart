@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/companion/battle_game_scope.dart';
 import '../features/companion/battle_tools_service.dart';
 import '../features/dex/battle_effectiveness.dart';
-import '../features/dex/dex_repository.dart';
+import '../features/dex/dex_models.dart';
 import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
@@ -12,9 +12,14 @@ import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
 
 class TeamSummaryCard extends StatefulWidget {
-  const TeamSummaryCard({super.key, required this.party});
+  const TeamSummaryCard({
+    super.key,
+    required this.party,
+    required this.detailsFuture,
+  });
 
   final List<PartyMember> party;
+  final Future<Map<int, PokemonDetail>> detailsFuture;
 
   @override
   State<TeamSummaryCard> createState() => _TeamSummaryCardState();
@@ -23,6 +28,7 @@ class TeamSummaryCard extends StatefulWidget {
 class _TeamSummaryCardState extends State<TeamSummaryCard> {
   _TeamSummaryData? _data;
   bool _loading = false;
+  int _loadGeneration = 0;
 
   @override
   void initState() {
@@ -33,12 +39,14 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
   @override
   void didUpdateWidget(TeamSummaryCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_partyListsEqual(oldWidget.party, widget.party)) {
+    if (!_partyListsEqual(oldWidget.party, widget.party) ||
+        oldWidget.detailsFuture != widget.detailsFuture) {
       _load();
     }
   }
 
   Future<void> _load() async {
+    final generation = ++_loadGeneration;
     if (widget.party.isEmpty) {
       setState(() => _data = null);
       return;
@@ -46,8 +54,9 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
 
     setState(() => _loading = true);
     try {
-      final data = await _computeSummary(widget.party);
-      if (!mounted) {
+      final details = await widget.detailsFuture;
+      final data = await _computeSummary(widget.party, details);
+      if (!mounted || generation != _loadGeneration) {
         return;
       }
       setState(() {
@@ -55,11 +64,17 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
         _loading = false;
       });
     } catch (_) {
-      if (!mounted) {
+      if (!mounted || generation != _loadGeneration) {
         return;
       }
       setState(() => _loading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _loadGeneration += 1;
+    super.dispose();
   }
 
   @override
@@ -142,15 +157,19 @@ class _TeamSummaryData {
   final String sharedWeaknessLine;
 }
 
-Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
+Future<_TeamSummaryData> _computeSummary(
+  List<PartyMember> party,
+  Map<int, PokemonDetail> details,
+) async {
   final levels = <int>[];
   var bstSum = 0;
   final types = <String>{};
   final weaknessCounts = <String, int>{};
   final memberTypes = <List<String>>[];
   final relations = await battleToolsService.loadTypeRelations();
-  final generation =
-      battleScopeForEdition(gameEditionRepository.edition).generation;
+  final generation = battleScopeForEdition(
+    gameEditionRepository.edition,
+  ).generation;
 
   for (final member in party) {
     final id = member.speciesId;
@@ -161,11 +180,12 @@ Future<_TeamSummaryData> _computeSummary(List<PartyMember> party) async {
       levels.add(member.level!);
     }
 
-    final summary = await dexRepository.getSummary(id);
+    final detail = details[id];
+    if (detail == null) continue;
+    final summary = detail.summary;
     types.addAll(summary.types);
     memberTypes.add(summary.types);
 
-    final detail = await dexRepository.getDetail(id);
     bstSum += detail.baseStats?.total ?? 0;
 
     final input = BattleEffectivenessInput(

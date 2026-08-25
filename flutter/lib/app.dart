@@ -276,7 +276,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
                     final transition = state.extra is PokemonDetailTransition
                         ? state.extra! as PokemonDetailTransition
                         : null;
-                    return titoMaterialPage(
+                    return titoDexDetailPage(
                       key: state.pageKey,
                       child: TitoPageContainer(
                         child: PokemonDetailPage(
