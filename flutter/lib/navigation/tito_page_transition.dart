@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 
@@ -47,9 +45,10 @@ Page<T> titoMaterialPage<T>({required LocalKey key, required Widget child}) {
   );
 }
 
-/// Dex card -> detail keeps the list stationary and lets the Pokémon sprite
-/// own the spatial movement. The page surface only fades and settles in place,
-/// so Android's default full-screen side slide cannot overpower the Hero.
+/// Dex card -> detail may still fly a matching Pokémon sprite independently,
+/// but the route surface uses the platform Material transition for its entire
+/// lifetime. Predictive back therefore behaves exactly like the rest of the
+/// app instead of competing with a second, Dex-only gesture controller.
 Page<T> titoDexDetailPage<T>({required LocalKey key, required Widget child}) {
   return _TitoControlledMaterialPage<T>(
     key: key,
@@ -259,57 +258,15 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     Widget child,
   ) {
     if (_page.kind == _TitoMaterialPageKind.dexDetail) {
-      // The Pokemon Hero owns the local sprite -> header geometry. The page
-      // surface only fades and settles in place: stacking Android's stock
-      // FadeForwards slide (what PredictiveBackPageTransitionsBuilder falls
-      // back to outside a gesture) on top of the flight double-exposed the
-      // incoming page over the stationary grid — the v0.9.3 "canvas expand"
-      // regression. Predictive-back input still scrubs the route directly;
-      // while a drag is active the surface scales down with rounding corners
-      // so the gesture stays visible instead of the old 0.8% settle scale.
-      // The fade starts late on purpose: the sprite visibly travels to the
-      // header first, then the skeleton page materialises around the flight.
-      // On pop the page clears in the first half so the canvas collapse and
-      // the creature's ride back into the grid stay readable instead of
-      // dissolving into a whole-page crossfade.
-      final reduceMotion = MediaQuery.disableAnimationsOf(context);
-      final surfaceProgress = reduceMotion
-          ? const AlwaysStoppedAnimation<double>(1)
-          : CurvedAnimation(
-              parent: animation,
-              curve: const Interval(0.16, 0.78, curve: Curves.easeOutCubic),
-              reverseCurve: const Interval(0.5, 1, curve: Curves.easeInCubic),
-            );
-      final scaleProgress = reduceMotion
-          ? const AlwaysStoppedAnimation<double>(1)
-          : Tween<double>(begin: 0.992, end: 1).animate(
-              CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutCubic,
-                reverseCurve: Curves.easeInCubic,
-              ),
-            );
-      return _TitoBackGestureRouteSurface(
-        route: this,
-        gestureSurfaceBuilder: (context, startBackEvent) =>
-            _TitoDexDetailBackSurface(
-              animation: animation,
-              startBackEvent: startBackEvent,
-              child: child,
-            ),
-        child: KeyedSubtree(
-          key: const ValueKey<String>('tito-dex-detail-predictive-surface'),
-          child: FadeTransition(
-            key: const ValueKey<String>('tito-dex-detail-fade'),
-            opacity: surfaceProgress,
-            child: ScaleTransition(
-              key: const ValueKey<String>('tito-dex-detail-settle'),
-              scale: scaleProgress,
-              alignment: Alignment.topCenter,
-              child: child,
-            ),
-          ),
-        ),
+      // Use the platform Material transition for the entire route lifetime.
+      // PredictiveBackPageTransitionsBuilder installs its gesture observer
+      // while idle, before Android sends the first edge event. A forward-only
+      // custom wrapper cannot safely swap that observer in after pop starts.
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        child,
       );
     }
     if (_page.kind == _TitoMaterialPageKind.plain) {
@@ -367,152 +324,6 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
       return false;
     }
     return super.canTransitionTo(nextRoute);
-  }
-}
-
-/// Forwards Android predictive-back events to a custom route and swaps the
-/// route surface while a drag (or its commit/cancel follow-through) is active.
-/// Mirrors the framework's private _PredictiveBackGestureDetector so routes
-/// with their own forward motion keep system back-gesture input.
-class _TitoBackGestureRouteSurface extends StatefulWidget {
-  const _TitoBackGestureRouteSurface({
-    required this.route,
-    required this.gestureSurfaceBuilder,
-    required this.child,
-  });
-
-  final PageRoute<dynamic> route;
-  final Widget Function(BuildContext context, PredictiveBackEvent? startEvent)
-  gestureSurfaceBuilder;
-  final Widget child;
-
-  @override
-  State<_TitoBackGestureRouteSurface> createState() =>
-      _TitoBackGestureRouteSurfaceState();
-}
-
-class _TitoBackGestureRouteSurfaceState
-    extends State<_TitoBackGestureRouteSurface>
-    with WidgetsBindingObserver {
-  bool _gestureActive = false;
-  bool _settlingFromCancel = false;
-  PredictiveBackEvent? _startBackEvent;
-
-  bool get _enabled => widget.route.isCurrent && widget.route.popGestureEnabled;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    widget.route.animation?.addStatusListener(_handleAnimationStatus);
-  }
-
-  @override
-  void dispose() {
-    widget.route.animation?.removeStatusListener(_handleAnimationStatus);
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  void _handleAnimationStatus(AnimationStatus status) {
-    if (_settlingFromCancel && status == AnimationStatus.completed && mounted) {
-      setState(() {
-        _settlingFromCancel = false;
-        _gestureActive = false;
-        _startBackEvent = null;
-      });
-    }
-  }
-
-  @override
-  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
-    if (backEvent.isButtonEvent || !_enabled) {
-      return false;
-    }
-    setState(() {
-      _gestureActive = true;
-      _startBackEvent = backEvent;
-    });
-    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
-    return true;
-  }
-
-  @override
-  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
-    if (!_gestureActive) {
-      return;
-    }
-    widget.route.handleUpdateBackGestureProgress(
-      progress: 1 - backEvent.progress,
-    );
-  }
-
-  @override
-  void handleCancelBackGesture() {
-    if (!_gestureActive) {
-      return;
-    }
-    widget.route.handleCancelBackGesture();
-    // Keep the gesture surface while the route settles back to full, then
-    // return to the normal surface from [_handleAnimationStatus].
-    _settlingFromCancel = true;
-  }
-
-  @override
-  void handleCommitBackGesture() {
-    if (!_gestureActive) {
-      return;
-    }
-    widget.route.handleCommitBackGesture();
-    // Keep the gesture surface: the route pops and disposes this widget.
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_gestureActive) {
-      return widget.gestureSurfaceBuilder(context, _startBackEvent);
-    }
-    return widget.child;
-  }
-}
-
-/// Predictive-back drag surface for the Dex detail route, Telegram-style:
-/// the page stays fully opaque and tracks the finger 1:1 off the swipe
-/// edge, progressively revealing the static dex grid underneath. The old
-/// scale-down + corner-rounding + translucency let the grid bleed through
-/// the page and double-exposed both layers, and the commit fade then
-/// cross-dissolved them a second time (the v0.9.4 ghosting report). With
-/// no opacity involved, a ghost is physically impossible.
-class _TitoDexDetailBackSurface extends StatelessWidget {
-  const _TitoDexDetailBackSurface({
-    required this.animation,
-    required this.startBackEvent,
-    required this.child,
-  });
-
-  final Animation<double> animation;
-  final PredictiveBackEvent? startBackEvent;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    if (MediaQuery.disableAnimationsOf(context)) {
-      return child;
-    }
-    final width = MediaQuery.sizeOf(context).width;
-    final fromRight = startBackEvent?.swipeEdge == SwipeEdge.right;
-    return AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (context, child) {
-        final settle = animation.value.clamp(0.0, 1.0);
-        return Transform.translate(
-          key: const ValueKey<String>('tito-dex-detail-back-slide'),
-          offset: Offset((fromRight ? -1.0 : 1.0) * width * (1 - settle), 0),
-          child: child,
-        );
-      },
-    );
   }
 }
 

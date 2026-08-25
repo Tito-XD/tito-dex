@@ -8,8 +8,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5+187` | Matte Solid Plastic, clean Dex transitions, and natural back motion with on-demand v20 data |
-| Offline APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5-offline+188` | The same theme and transition fixes with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5+189` | Matte Solid Plastic, stable Dex entry, and unified predictive back with on-demand v20 data |
+| Offline APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5-offline+190` | The same theme and transition fixes with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.

@@ -8,8 +8,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5+187` | 哑光固态塑料、干净图鉴转场与自然返回，v20 按需下载 |
-| Offline APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5-offline+188` | 同步主题与转场修正并内置完整 v20 图鉴与玩法资料 |
+| Lite APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5+189` | 哑光固态塑料、稳定图鉴进入与统一预测返回，v20 按需下载 |
+| Offline APK | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · App `0.9.5-offline+190` | 同步主题与转场修正并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 按游戏管理可选资料包、50 组本地问答与伴侣等待动画 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.9.x 版本更新。
