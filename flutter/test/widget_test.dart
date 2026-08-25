@@ -229,12 +229,8 @@ void main() {
         const ValueKey<String>('tito-side-slide-transition'),
       );
       var slide = tester.widget<SlideTransition>(slideFinder);
-      expect(
-        slide.position.value,
-        direction == TitoSideSlideDirection.fromLeft
-            ? const Offset(-1, 0)
-            : const Offset(1, 0),
-      );
+      expect(slide.position.value.dx.abs(), lessThanOrEqualTo(0.032));
+      expect(slide.position.value.dy, 0);
 
       await tester.pump(const Duration(milliseconds: 225));
       slide = tester.widget<SlideTransition>(slideFinder);

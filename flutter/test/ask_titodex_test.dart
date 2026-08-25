@@ -555,7 +555,15 @@ void main() {
         find.byKey(const Key('ask-titodex-connection-status')),
       );
       expect(statusSurface.borderWidth, 1.5);
-      expect(statusSurface.radius, 999);
+      expect(statusSurface.radius, 32);
+      final badgeChip = tester.widget<InputChip>(
+        find.descendant(
+          of: find.byKey(const Key('ask-titodex-badge-context')),
+          matching: find.byType(InputChip),
+        ),
+      );
+      final badgeShape = badgeChip.shape! as RoundedRectangleBorder;
+      expect(badgeShape.borderRadius, BorderRadius.circular(16));
       expect(find.byKey(const Key('ask-titodex-save-context')), findsOneWidget);
       expect(
         find.byKey(const Key('ask-titodex-save-context-size')),

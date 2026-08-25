@@ -51,18 +51,10 @@ void main() {
     await tester.tap(find.byIcon(Icons.swap_horiz_rounded).first);
     await tester.pump(const Duration(milliseconds: 200));
 
-    final backWidgets = tester.widgetList(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget.key is ValueKey<String> &&
-            (widget.key! as ValueKey<String>).value.contains('/back/'),
-      ),
-    );
-    expect(
-      backWidgets,
-      isNotEmpty,
-      reason: 'the edition flip control should use its own /back/ sprite',
-    );
+    expect(find.byTooltip('切回正面'), findsOneWidget);
+    // Network art is not replaced until its first frame is available. Widget
+    // tests return HTTP 400, so the stable previous artwork must remain.
+    expect(find.byKey(const ValueKey('artwork-stable-hero')), findsOneWidget);
   });
 
   testWidgets('tapping the same edition flip twice restores its front', (
@@ -75,13 +67,7 @@ void main() {
     await tester.tap(flip);
     await tester.pump(const Duration(milliseconds: 200));
 
-    final backWidgets = tester.widgetList(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget.key is ValueKey<String> &&
-            (widget.key! as ValueKey<String>).value.contains('/back/'),
-      ),
-    );
-    expect(backWidgets, isEmpty);
+    expect(find.byTooltip('切回正面'), findsNothing);
+    expect(find.byTooltip('翻到背面'), findsWidgets);
   });
 }

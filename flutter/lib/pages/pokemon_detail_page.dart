@@ -40,6 +40,7 @@ class PokemonDetailPage extends StatefulWidget {
     required this.pokemonId,
     this.transitionSummary,
     this.initialDetail,
+    this.initialDetailFuture,
     this.initialFormKey,
     this.initialObtainVersion,
   });
@@ -50,6 +51,10 @@ class PokemonDetailPage extends StatefulWidget {
   /// Optional already-decoded detail. A prefetched local bundle entry can land
   /// immediately without replacing the shared-element target mid-flight.
   final PokemonDetail? initialDetail;
+
+  /// A detail read started by the tapped Dex card. It overlaps route motion
+  /// without decoding the same bundle entry twice.
+  final Future<PokemonDetail>? initialDetailFuture;
 
   /// Deep-link targets from `/dex/:id?form=&version=`; validated against the
   /// loaded detail before applying, so a stale link degrades to the default.
@@ -160,7 +165,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     try {
       final prefetched = widget.initialDetail;
       final detail =
-          prefetched ?? await dexRepository.getDetail(widget.pokemonId);
+          prefetched ??
+          await (widget.initialDetailFuture ??
+              dexRepository.getDetail(widget.pokemonId));
       final abilities = prefetched == null
           ? await dexRepository.abilitiesForPokemon(widget.pokemonId)
           : prefetched.abilities;
@@ -236,7 +243,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                 ? ListView(
                     key: const ValueKey('pokemon-detail-shared-element-stage'),
                     padding: bodyPadding,
-                    children: [transitionHeader],
+                    children: [
+                      transitionHeader,
+                      const SizedBox(height: 12),
+                      const TitoCardSkeleton(height: 140),
+                      const SizedBox(height: 12),
+                      const TitoCardSkeleton(height: 88),
+                    ],
                   )
                 : TitoSkeletonGate(
                     loading: _loading,
@@ -257,7 +270,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                         ? const SizedBox.shrink()
                         : ListView(
                             padding: bodyPadding,
-                            children: [transitionHeader],
+                            children: [
+                              transitionHeader,
+                              const SizedBox(height: 12),
+                              const TitoCardSkeleton(height: 140),
+                              const SizedBox(height: 12),
+                              const TitoCardSkeleton(height: 88),
+                            ],
                           ),
                     child: errorCopy != null
                         ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)

@@ -126,11 +126,11 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
       return;
     }
     _initialLoadScheduled = true;
-    unawaited(_loadWhenRouteSettled());
+    unawaited(_loadWhenRoutePainted());
   }
 
-  Future<void> _loadWhenRouteSettled() async {
-    if (!await waitForIncomingRouteSettled(context) || !mounted) {
+  Future<void> _loadWhenRoutePainted() async {
+    if (!await waitForIncomingRoutePainted(context) || !mounted) {
       return;
     }
     await _load();

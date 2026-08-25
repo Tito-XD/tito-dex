@@ -44,6 +44,32 @@ void main() {
     expect(find.textContaining('魂银'), findsNothing);
   });
 
+  testWidgets('team rows are present on the first painted frame', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => Scaffold(
+            body: TeamPage(
+              journey: CurrentJourney.mock().copyWith(
+                party: const [PartyMember(species: 'Cyndaquil', level: 5)],
+              ),
+              onSaveJourney: (_) {},
+            ),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    expect(find.text('火球鼠'), findsOneWidget);
+    expect(find.text(AppZh.teamSummaryTitle), findsOneWidget);
+  });
+
   testWidgets('team editor saves a user override and removes a member', (
     tester,
   ) async {

@@ -2,6 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+/// Lets an incoming route paint one opaque shell before beginning repository
+/// work, without waiting for the full route animation. This keeps input smooth
+/// while allowing local bundle reads and decoding to overlap the short settle.
+Future<bool> waitForIncomingRoutePainted(BuildContext context) async {
+  await WidgetsBinding.instance.endOfFrame;
+  if (!context.mounted) return false;
+  // A dependency callback can subscribe during the first build. Waiting for
+  // the next frame keeps that already-composited shell observable before the
+  // repository Future starts, while still overlapping almost all route motion.
+  await WidgetsBinding.instance.endOfFrame;
+  if (!context.mounted) return false;
+  final route = ModalRoute.of(context);
+  return route == null ||
+      (identical(ModalRoute.of(context), route) && route.isCurrent);
+}
+
 /// Lets an incoming page paint its lightweight shell before repositories,
 /// decoding, sorting, or large list construction begin.
 ///

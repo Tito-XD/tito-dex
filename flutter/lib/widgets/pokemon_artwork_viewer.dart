@@ -413,7 +413,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   }
 }
 
-class _ArtworkHeroStage extends StatelessWidget {
+class _ArtworkHeroStage extends StatefulWidget {
   const _ArtworkHeroStage({
     required this.summary,
     required this.displaySource,
@@ -427,46 +427,137 @@ class _ArtworkHeroStage extends StatelessWidget {
   final String variantKey;
 
   @override
+  State<_ArtworkHeroStage> createState() => _ArtworkHeroStageState();
+}
+
+class _ArtworkHeroStageState extends State<_ArtworkHeroStage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _firstImageReveal;
+  String? _visibleSource;
+  String? _requestedSource;
+  int _requestGeneration = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _firstImageReveal = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _prepare(widget.displaySource);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ArtworkHeroStage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.displaySource != widget.displaySource) {
+      _prepare(widget.displaySource);
+    }
+  }
+
+  Future<void> _prepare(String? source) async {
+    if (source == null || source == _requestedSource) return;
+    _requestedSource = source;
+    final generation = ++_requestGeneration;
+    var failed = false;
+    try {
+      await precacheImage(
+        _artworkImageProvider(source),
+        context,
+        onError: (exception, stackTrace) => failed = true,
+      );
+    } catch (_) {
+      // Keep the last successful image (or the stable Hero) on read failure.
+      return;
+    }
+    if (failed || !mounted || generation != _requestGeneration) return;
+    final firstImage = _visibleSource == null;
+    setState(() => _visibleSource = source);
+    if (firstImage) {
+      _firstImageReveal.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _firstImageReveal.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewport = MediaQuery.sizeOf(context);
     final dimension = math.min(viewport.width - 32, viewport.height * 0.42);
-    final stableHeroOpacity = displaySource == null
-        ? const AlwaysStoppedAnimation<double>(1)
-        : ReverseAnimation(highResolutionOpacity);
     return SizedBox.square(
       dimension: dimension.clamp(160.0, 460.0),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          FadeTransition(
-            key: const ValueKey('artwork-stable-hero-fade'),
-            opacity: stableHeroOpacity,
-            child: Hero(
-              key: const ValueKey('artwork-stable-hero'),
-              tag: pokemonArtworkHeroTag(summary),
-              transitionOnUserGestures: true,
-              child: Material(
-                type: MaterialType.transparency,
-                child: DexSpriteImage(
-                  source: summary.displaySpritePath,
-                  fit: BoxFit.contain,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          widget.highResolutionOpacity,
+          _firstImageReveal,
+        ]),
+        builder: (context, _) {
+          final imageOpacity = _visibleSource == null
+              ? 0.0
+              : widget.highResolutionOpacity.value * _firstImageReveal.value;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Opacity(
+                key: const ValueKey('artwork-stable-hero-fade'),
+                opacity: 1 - imageOpacity,
+                child: Hero(
+                  key: const ValueKey('artwork-stable-hero'),
+                  tag: pokemonArtworkHeroTag(widget.summary),
+                  transitionOnUserGestures: true,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: DexSpriteImage(
+                      source: widget.summary.displaySpritePath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          if (displaySource != null)
-            FadeTransition(
-              key: const ValueKey('artwork-high-res-reveal'),
-              opacity: highResolutionOpacity,
-              child: _ArtworkImage(
-                key: ValueKey('$variantKey-$displaySource'),
-                source: displaySource!,
-              ),
-            ),
-        ],
+              if (_visibleSource != null)
+                Opacity(
+                  key: const ValueKey('artwork-high-res-reveal'),
+                  opacity: imageOpacity,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder: (currentChild, previousChildren) => Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ...previousChildren,
+                        if (currentChild != null) currentChild,
+                      ],
+                    ),
+                    child: _ArtworkImage(
+                      key: ValueKey('${widget.variantKey}-$_visibleSource'),
+                      source: _visibleSource!,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
+}
+
+ImageProvider<Object> _artworkImageProvider(String source) {
+  final uri = Uri.tryParse(source);
+  if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
+    return NetworkImage(source);
+  }
+  return FileImage(File(source));
 }
 
 class _SpritePickerTile extends StatelessWidget {
@@ -597,33 +688,7 @@ class _ArtworkImage extends StatelessWidget {
       size: 48,
     );
 
-    final uri = Uri.tryParse(source);
-    if (uri != null && uri.hasScheme && uri.scheme.startsWith('http')) {
-      return Image.network(
-        source,
-        fit: BoxFit.contain,
-        errorBuilder: missing,
-        loadingBuilder: (context, child, progress) {
-          if (progress == null) {
-            return child;
-          }
-          final total = progress.expectedTotalBytes;
-          return Center(
-            child: SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(
-                value: total == null || total == 0
-                    ? null
-                    : progress.cumulativeBytesLoaded / total,
-                strokeWidth: 3,
-                color: TitoColors.card,
-              ),
-            ),
-          );
-        },
-      );
-    }
-    return Image.file(File(source), fit: BoxFit.contain, errorBuilder: missing);
+    final provider = _artworkImageProvider(source);
+    return Image(image: provider, fit: BoxFit.contain, errorBuilder: missing);
   }
 }

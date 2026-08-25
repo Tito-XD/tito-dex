@@ -34,8 +34,10 @@ typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 const _assistantPaper = Color(0xFFFFFBF2);
 const _assistantCanvas = Color(0xFFF5F6F3);
 const _assistantSkeleton = Color(0xFFDCE5E5);
-const _semanticRevealFrame = Duration(milliseconds: 24);
-const _semanticRevealStepLimit = 72;
+const _assistantStatusRadius = 32.0;
+const _assistantContextChipRadius = 16.0;
+const _semanticRevealFrame = Duration(milliseconds: 20);
+const _semanticRevealStepLimit = 112;
 const _semanticCursorHold = Duration(milliseconds: 96);
 const _progressStageMinimum = Duration(milliseconds: 150);
 const _askTitoDexQuestionLimit = 240;
@@ -544,7 +546,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
         _semanticRevealSteps < _semanticRevealStepLimit) {
       final runes = suffix.runes.toList(growable: false);
       final remainingBudget = _semanticRevealStepLimit - _semanticRevealSteps;
-      var steps = runes.length < 18 ? runes.length : 18;
+      var steps = runes.length < 28 ? runes.length : 28;
       if (steps > remainingBudget) steps = remainingBudget;
       final runesPerStep = (runes.length / steps).ceil();
       final visible = StringBuffer(currentText);
@@ -926,10 +928,11 @@ class _ConnectionStatusCard extends StatelessWidget {
     return AssistantSurface(
       key: const Key('ask-titodex-connection-status'),
       padding: EdgeInsets.zero,
-      // The bar remains one capsule whether save context has arrived or not.
-      // Previously the async badge row changed 999px into the handheld 8px
-      // radius, producing a conspicuous shape snap.
-      radius: 999,
+      // Use one explicit continuous-corner family for both the expandable
+      // status surface and its context chips. An adaptive 999px stadium became
+      // visually over-rounded as the second row arrived, while InputChip kept
+      // its unrelated theme radius.
+      radius: _assistantStatusRadius,
       color: Color.alphaBlend(
         TitoColors.skyBlue.withValues(alpha: 0.18),
         TitoColors.card,
@@ -1119,7 +1122,7 @@ class _StatusSegment extends StatelessWidget {
       enabled: onTap != null,
       label: semanticsLabel,
       child: InkWell(
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(_assistantStatusRadius),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 7),
@@ -1469,6 +1472,10 @@ class _ContextChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InputChip(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_assistantContextChipRadius),
+      ),
+      clipBehavior: Clip.antiAlias,
       visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       backgroundColor: TitoColors.cardWarm,

@@ -1100,10 +1100,14 @@ class _DexPageState extends State<DexPage> {
                                 compact: DeviceLayout.isCompact(context),
                                 onTap: () {
                                   _saveBrowseSession();
+                                  final detailFuture = dexRepository.getDetail(
+                                    entry.id,
+                                  );
                                   context.push(
                                     '/dex/${entry.id}',
                                     extra: PokemonDetailTransition(
                                       summary: entry,
+                                      detailFuture: detailFuture,
                                     ),
                                   );
                                 },

@@ -284,6 +284,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                           transitionSummary: transition?.summary.id == pokemonId
                               ? transition!.summary
                               : null,
+                          initialDetailFuture:
+                              transition?.summary.id == pokemonId
+                              ? transition!.detailFuture
+                              : null,
                           // Route split agreed with the search branch: bare
                           // `form`/`version` on /dex/:id are ours; list-filter
                           // params live on /dex.
