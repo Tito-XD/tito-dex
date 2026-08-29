@@ -30,6 +30,7 @@ import 'l10n/app_zh.dart';
 import 'models/journey.dart';
 import 'navigation/back_navigation.dart';
 import 'navigation/tito_page_transition.dart';
+import 'navigation/tito_route_work.dart';
 import 'pages/dex/ability_encyclopedia_page.dart';
 import 'pages/dex/move_encyclopedia_page.dart';
 import 'pages/dex/location_dex_page.dart';
@@ -93,6 +94,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     AppConfig.instance.ensureLoaded();
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
+      observers: [TitoRouteFocusObserver()],
       refreshListenable: Listenable.merge([
         gameEditionRepository,
         _BootstrapGate.instance,
@@ -109,6 +111,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
       },
       routes: [
         ShellRoute(
+          observers: [TitoRouteFocusObserver()],
           builder: (context, state, child) {
             return PopScope(
               canPop: TitoBackNavigation.canPopRoute(context, state.uri.path),

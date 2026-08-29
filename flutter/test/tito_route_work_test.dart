@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/navigation/tito_route_work.dart';
 
 void main() {
+  _registerRouteFocusTests();
   testWidgets('route work starts only after the incoming transition settles', (
     tester,
   ) async {
@@ -113,4 +114,84 @@ class _DeferredProbeState extends State<_DeferredProbe> {
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: Center(child: Text('detail')));
+}
+
+void _registerRouteFocusTests() {
+  testWidgets('returning from a route does not restore text input focus', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final fieldFocus = FocusNode();
+    addTearDown(fieldFocus.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        navigatorObservers: [TitoRouteFocusObserver()],
+        home: Scaffold(
+          body: TextField(
+            key: const ValueKey('search-field'),
+            focusNode: fieldFocus,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('search-field')));
+    await tester.pump();
+    expect(fieldFocus.hasFocus, isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => const Scaffold(body: Text('detail')),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(fieldFocus.hasFocus, isFalse);
+    expect(tester.testTextInput.isVisible, isFalse);
+
+    navigatorKey.currentState!.pop();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('search-field')), findsOneWidget);
+    expect(fieldFocus.hasFocus, isFalse);
+    expect(tester.testTextInput.isVisible, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('search-field')));
+    await tester.pump();
+    expect(fieldFocus.hasFocus, isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
+
+  testWidgets('explicit autofocus on a new editor remains available', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final originalFocus = FocusNode();
+    final editorFocus = FocusNode();
+    addTearDown(originalFocus.dispose);
+    addTearDown(editorFocus.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        navigatorObservers: [TitoRouteFocusObserver()],
+        home: Scaffold(body: TextField(focusNode: originalFocus)),
+      ),
+    );
+    originalFocus.requestFocus();
+    await tester.pump();
+
+    navigatorKey.currentState!.push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) =>
+            Scaffold(body: TextField(autofocus: true, focusNode: editorFocus)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(originalFocus.hasFocus, isFalse);
+    expect(editorFocus.hasFocus, isTrue);
+    expect(tester.testTextInput.isVisible, isTrue);
+  });
 }
