@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 
@@ -24,6 +25,13 @@ const titoDexDetailTransitionDuration = Duration(milliseconds: 360);
 const titoDexDetailReverseTransitionDuration = Duration(milliseconds: 300);
 const titoSideSlideTransitionDuration = Duration(milliseconds: 450);
 const titoSideSlideReverseTransitionDuration = Duration(milliseconds: 350);
+
+/// Controller value the Dex commit rewinds to before playing the collapse
+/// (hand-tuned: starting from 85% skips the first, barely-visible stretch
+/// of the collapse and reads smoother on release). The predictive-back
+/// gesture test asserts against this constant, so tuning it here keeps the
+/// test in sync automatically.
+const titoDexCollapseRewindFrom = 0.85;
 
 const Curve titoDexForwardCurve = Curves.easeOutQuint;
 const Curve titoDexReverseCurve = Curves.easeInQuint;
@@ -92,7 +100,15 @@ Page<T> titoDexPage<T>({
         ? child
         : Hero(
             tag: heroTag,
-            transitionOnUserGestures: true,
+            // The shell must not join interactive back-gesture flights.
+            // The predictive-back commit rewinds the route controller to
+            // 1.0 (see the commit override below), and a flight is a pure
+            // function of that controller - an in-flight container
+            // transform would snap back to the full-page rect and replay
+            // the whole collapse after the finger releases. The drag shows
+            // the standard Material preview instead; the commit starts a
+            // fresh non-gesture flight that plays the collapse once.
+            transitionOnUserGestures: false,
             createRectTween: titoDexRectTween,
             curve: titoDexForwardCurve,
             reverseCurve: titoDexReverseCurve,
@@ -105,8 +121,11 @@ Page<T> titoDexPage<T>({
 
 /// Team and Search deliberately use simple full-screen slides. Their pages do
 /// not enter the Hero overlay, so stateful content is never laid out at card
-/// size. These two routes deliberately opt out of predictive-back progress:
-/// Team always enters and exits on the left, while Search does so on the right.
+/// size. Both routes take part in Android predictive back: the slide itself
+/// follows the gesture (Team continues to the left, Search to the right), but
+/// clamped to the first 20% of the exit animation - the page keeps at least
+/// 80% of itself on screen while dragging, and releasing plays the remaining
+/// slide from the release point instead of restarting it.
 Page<T> titoSideSlidePage<T>({
   required LocalKey key,
   required Widget child,
@@ -139,45 +158,78 @@ class _TitoControlledMaterialPage<T> extends Page<T> {
 
 /// Dex list content layer with its reveal. It lives inside the page content
 /// (see [_TitoControlledMaterialPageRoute.buildContent]) so the grid's Hero
-/// widgets stay under [ModalRoute.subtreeContext] and keep working; the fade
-/// and short rise still follow the route animation exactly as before.
-class _TitoDexContentReveal extends StatelessWidget {
+/// widgets stay under [ModalRoute.subtreeContext] and keep working.
+///
+/// While an interactive back gesture is scrubbing or canceling, the reveal
+/// holds fully visible: the standard Material predictive-back preview keeps
+/// the page content on screen, and any mid-drag fade would have to snap back
+/// when the commit rewinds the controller to 1.0. The reveal fades only while
+/// the controller is genuinely reversing - a programmatic pop or the
+/// post-commit container collapse - and rises on the forward interval as
+/// before.
+class _TitoDexContentReveal extends StatefulWidget {
   const _TitoDexContentReveal({required this.child});
 
   final Widget child;
 
   @override
+  State<_TitoDexContentReveal> createState() => _TitoDexContentRevealState();
+}
+
+class _TitoDexContentRevealState extends State<_TitoDexContentReveal> {
+  static const Curve _forwardInterval = Interval(
+    0.46,
+    0.86,
+    curve: Curves.easeOutCubic,
+  );
+  static const Curve _reverseInterval = Interval(
+    0.55,
+    1,
+    curve: Curves.easeInCubic,
+  );
+
+  @override
   Widget build(BuildContext context) {
-    final routeAnimation = ModalRoute.of(context)?.animation;
-    if (routeAnimation == null) {
-      return child;
+    final route = ModalRoute.of(context);
+    final routeAnimation = route?.animation;
+    if (route == null || routeAnimation == null) {
+      return widget.child;
     }
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    final Animation<double> reveal = reduceMotion
-        ? CurvedAnimation(
-            parent: routeAnimation,
-            curve: titoDexForwardCurve,
-            reverseCurve: Curves.easeInExpo,
-          )
-        : CurvedAnimation(
-            parent: routeAnimation,
-            curve: const Interval(0.46, 0.86, curve: Curves.easeOutCubic),
-            reverseCurve: const Interval(0.55, 1, curve: Curves.easeInCubic),
-          );
-    final Animation<Offset> position = reduceMotion
-        ? const AlwaysStoppedAnimation<Offset>(Offset.zero)
-        : Tween<Offset>(
-            begin: const Offset(0, 0.012),
-            end: Offset.zero,
-          ).animate(reveal);
-    return SlideTransition(
-      key: const ValueKey<String>('tito-dex-content-slide'),
-      position: position,
-      child: FadeTransition(
-        key: const ValueKey<String>('tito-dex-content-reveal'),
-        opacity: reveal,
-        child: child,
-      ),
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        routeAnimation,
+        route.navigator?.userGestureInProgressNotifier,
+      ]),
+      builder: (context, child) {
+        final double reveal;
+        if (route.popGestureInProgress &&
+            routeAnimation.status != AnimationStatus.reverse) {
+          // Gesture scrub or cancel-spring: hold the list fully visible.
+          reveal = 1.0;
+        } else if (routeAnimation.status == AnimationStatus.reverse) {
+          reveal = reduceMotion
+              ? Curves.easeInExpo.transform(routeAnimation.value)
+              : _reverseInterval.transform(routeAnimation.value);
+        } else {
+          reveal = reduceMotion
+              ? titoDexForwardCurve.transform(routeAnimation.value)
+              : _forwardInterval.transform(routeAnimation.value);
+        }
+        final Offset position = reduceMotion
+            ? Offset.zero
+            : Offset(0, 0.012 * (1 - reveal));
+        return SlideTransition(
+          key: const ValueKey<String>('tito-dex-content-slide'),
+          position: AlwaysStoppedAnimation<Offset>(position),
+          child: FadeTransition(
+            key: const ValueKey<String>('tito-dex-content-reveal'),
+            opacity: AlwaysStoppedAnimation<double>(reveal),
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
     );
   }
 }
@@ -224,9 +276,12 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
   /// The framework drives the controller to exactly 0.0 when the finger
   /// reaches the far edge. On commit, [TransitionRoute.didPop] then runs
   /// `reverse()` over zero distance and the "restart from 1.0" commit
-  /// animation is skipped — the page vanishes with no fade at all. Clamping
+  /// animation is skipped - the page vanishes with no fade at all. Clamping
   /// a tiny runway keeps the commit fade (and its full-length restart)
-  /// guaranteed to play, with no visible difference during the drag.
+  /// guaranteed to play, with no visible difference during the drag. For the
+  /// container-transform Dex route this also keeps `didPop`'s reverse()
+  /// animating at a full-edge commit so the commit override below rewinds
+  /// to 1.0 and the Hero collapse flies instead of the page vanishing.
   static const double _kBackGestureRunway = 0.02;
 
   @override
@@ -234,6 +289,35 @@ class _TitoControlledMaterialPageRoute<T> extends PageRoute<T>
     super.handleUpdateBackGestureProgress(
       progress: math.max(_kBackGestureRunway, progress),
     );
+  }
+
+  /// The container-transform Dex commit ends the gesture before popping so
+  /// the home-card collapse flies exactly like a button back.
+  ///
+  /// [HeroController] only starts pop flights from
+  /// [NavigatorObserver.didChangeTop] while no user gesture is in progress,
+  /// and the framework's default commit keeps the gesture alive through the
+  /// pop - so with the default commit the container transform never flies,
+  /// and the controller rewind to 1.0 replays the raw controller-driven
+  /// visuals instead (the v0.9.5 "return animation replays after release"
+  /// bug). Stopping the gesture first makes this pop indistinguishable from
+  /// the back button: `didChangeTop` starts the Hero flight, and rewinding
+  /// to 1.0 plays the complete collapse as the post-release animation. The
+  /// drag itself showed only the standard Material preview (the page Hero
+  /// opts out of interactive flights), so nothing replays mid-gesture.
+  @override
+  void handleCommitBackGesture() {
+    if (_page.kind == _TitoMaterialPageKind.dex &&
+        _page.usesContainerTransform &&
+        isCurrent) {
+      navigator?.didStopUserGesture();
+      navigator?.pop();
+      if (controller?.isAnimating ?? false) {
+        controller!.reverse(from: titoDexCollapseRewindFrom);
+      }
+      return;
+    }
+    super.handleCommitBackGesture();
   }
 
   @override
@@ -363,9 +447,6 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
   bool get fullscreenDialog => false;
 
   @override
-  bool get popGestureEnabled => false;
-
-  @override
   Color? get barrierColor => null;
 
   @override
@@ -373,6 +454,87 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
 
   @override
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
+
+  /// Largest fraction of the exit slide an interactive back drag may play.
+  ///
+  /// During a predictive-back drag the directed slide follows the finger,
+  /// but clamped: even a full-edge swipe only plays the first 20% of the
+  /// exit animation (the page keeps at least 80% of itself on screen).
+  /// Releasing then plays the remaining slide from the release point.
+  static const double _kBackGestureVisualCap = 0.20;
+
+  @override
+  void handleStartBackGesture({double progress = 0.0}) {
+    super.handleStartBackGesture(progress: _cappedProgress(progress));
+  }
+
+  @override
+  void handleUpdateBackGestureProgress({required double progress}) {
+    super.handleUpdateBackGestureProgress(progress: _cappedProgress(progress));
+  }
+
+  /// Maps a raw gesture-driven controller value (1.0 entered -> 0.0 fully
+  /// out) to the value that keeps the slide within [_kBackGestureVisualCap].
+  ///
+  /// The slide visual is `1 - easeInOutCubicEmphasized(controller)`, and
+  /// that curve is nearly flat near 1.0 - clamping the *controller* at 0.8
+  /// would cap the visible slide at only a few percent, not 20%. The cap
+  /// therefore has to be applied in visual space: bisect for the controller
+  /// value whose eased output is `1 - 0.20 * gesture` (the curve is
+  /// monotonically increasing, so the solution is unique). The mapping is
+  /// exact, so the commit hands off seamlessly - `didPop` reverses from the
+  /// mapped value and the same curve plays the remaining 80% of the slide
+  /// with no jump.
+  double _cappedProgress(double progress) {
+    final double gesture = (1.0 - progress).clamp(0.0, 1.0);
+    final double target = 1.0 - _kBackGestureVisualCap * gesture;
+    const Curve curve = Curves.easeInOutCubicEmphasized;
+    double lo = 0.0;
+    double hi = 1.0;
+    for (var i = 0; i < 24; i++) {
+      final double mid = (lo + hi) / 2;
+      if (curve.transform(mid) < target) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    return (lo + hi) / 2;
+  }
+
+  /// A side-slide commit continues the slide from wherever the finger
+  /// released instead of restarting it.
+  ///
+  /// The framework default ([TransitionRoute.handleCommitBackGesture]) pops
+  /// and then rewinds the controller to 1.0 so the standard Material
+  /// predictive-back settle can play over the full transition. That rewind is
+  /// correct for the standard scale-and-fade visual, whose commit tweens
+  /// remember the release state, but the side slide is a plain function of
+  /// the controller: rewinding would snap the page back to fully entered and
+  /// replay the entire slide-out. [TransitionRoute.didPop] already starts
+  /// `reverse()` from the gesture-driven value, so popping alone hands off
+  /// smoothly; only the user-gesture bookkeeping needs reproducing.
+  @override
+  void handleCommitBackGesture() {
+    if (isCurrent) {
+      navigator?.pop();
+    }
+    if (controller?.isAnimating ?? false) {
+      late final AnimationStatusListener stopGestureWhenSettled;
+      stopGestureWhenSettled = (AnimationStatus status) {
+        if (status == AnimationStatus.dismissed ||
+            status == AnimationStatus.completed) {
+          navigator?.didStopUserGesture();
+          controller!.removeStatusListener(stopGestureWhenSettled);
+        }
+      };
+      controller!.addStatusListener(stopGestureWhenSettled);
+    } else {
+      // The pop completed inline (the controller was already dismissed) -
+      // finish the gesture immediately.
+      navigator?.didStopUserGesture();
+    }
+  }
 
   @override
   Widget buildPage(
@@ -401,15 +563,18 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
     // The page carries its own opaque surface. A full-screen ColoredBox *behind*
     // the SlideTransition (the v0.9.2 layout) flashed the scaffold background
     // over Home the instant the route was inserted, before any slide was
-    // visible — read as a white-screen-then-animation. Sizing the backdrop to
+    // visible - read as a white-screen-then-animation. Sizing the backdrop to
     // the moving page makes the slide carry the surface instead.
-    return ClipRect(
-      child: SlideTransition(
-        key: const ValueKey<String>('tito-side-slide-transition'),
-        position: _buttonSlidePosition(animation, begin),
-        child: ColoredBox(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: child,
+    return _SideSlideBackGestureDetector(
+      route: this,
+      child: ClipRect(
+        child: SlideTransition(
+          key: const ValueKey<String>('tito-side-slide-transition'),
+          position: _buttonSlidePosition(animation, begin),
+          child: ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: child,
+          ),
         ),
       ),
     );
@@ -426,6 +591,80 @@ class _TitoSideSlidePageRoute<T> extends PageRoute<T> {
     );
     return Tween<Offset>(begin: begin, end: Offset.zero).animate(curve);
   }
+}
+
+/// Forwards Android predictive-back gesture events to a side-slide route.
+///
+/// The framework's equivalent (`_PredictiveBackGestureDetector` inside
+/// [PredictiveBackPageTransitionsBuilder]) is the only public installer of
+/// that plumbing, but it draws the standard scale/shift preview and the
+/// FadeForwards fallback itself; a route that wants its own transition to
+/// follow the gesture has to install its own observer. Mirrors the
+/// framework's gating: only the current route whose [ModalRoute
+/// .popGestureEnabled] is true accepts a touch (not button) gesture, and
+/// progress is inverted because the controller runs 1.0 -> 0.0 while the
+/// gesture runs 0.0 -> 1.0.
+class _SideSlideBackGestureDetector extends StatefulWidget {
+  const _SideSlideBackGestureDetector({
+    required this.route,
+    required this.child,
+  });
+
+  final PageRoute<dynamic> route;
+  final Widget child;
+
+  @override
+  State<_SideSlideBackGestureDetector> createState() =>
+      _SideSlideBackGestureDetectorState();
+}
+
+class _SideSlideBackGestureDetectorState
+    extends State<_SideSlideBackGestureDetector>
+    with WidgetsBindingObserver {
+  bool get _isEnabled =>
+      widget.route.isCurrent && widget.route.popGestureEnabled;
+
+  @override
+  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
+    final bool gestureInProgress = !backEvent.isButtonEvent && _isEnabled;
+    if (!gestureInProgress) {
+      return false;
+    }
+    widget.route.handleStartBackGesture(progress: 1 - backEvent.progress);
+    return true;
+  }
+
+  @override
+  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
+    widget.route.handleUpdateBackGestureProgress(
+      progress: 1 - backEvent.progress,
+    );
+  }
+
+  @override
+  void handleCancelBackGesture() {
+    widget.route.handleCancelBackGesture();
+  }
+
+  @override
+  void handleCommitBackGesture() {
+    widget.route.handleCommitBackGesture();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 Widget _homeActionFlightShuttle(

@@ -42,7 +42,11 @@ void main() {
     // This harness has no previous route, so PageRoute correctly cannot pop.
     expect(route.popGestureEnabled, isFalse);
     final hero = tester.widget<Hero>(find.byType(Hero));
-    expect(hero.transitionOnUserGestures, isTrue);
+    // The page shell must not join interactive gesture flights: the
+    // predictive-back commit rewinds the route controller to 1.0, which
+    // would replay an in-flight container transform after the finger
+    // releases. See the commit override in tito_page_transition.dart.
+    expect(hero.transitionOnUserGestures, isFalse);
     expect(hero.createRectTween, same(titoDexRectTween));
     expect(hero.curve, titoDexForwardCurve);
     expect(hero.reverseCurve, titoDexReverseCurve);
@@ -251,6 +255,7 @@ void main() {
         route.reverseTransitionDuration,
         titoSideSlideReverseTransitionDuration,
       );
+      // The entrance animation is still running, so no gesture yet.
       expect(route.popGestureEnabled, isFalse);
 
       expect(find.byType(Hero), findsNothing);
@@ -270,6 +275,10 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       await tester.pumpAndSettle();
+      // Once the slide settles, the route participates in predictive back.
+      // Locking this here guards against an accidental return to the old
+      // deliberate opt-out (`popGestureEnabled => false`).
+      expect(route.popGestureEnabled, isTrue);
 
       await tester.tap(find.byKey(const ValueKey<String>('close-side-page')));
       await tester.pump();
