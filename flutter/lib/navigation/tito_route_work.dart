@@ -57,3 +57,57 @@ Future<bool> waitForIncomingRouteSettled(BuildContext context) async {
       route.isCurrent &&
       (animation == null || animation.status == AnimationStatus.completed);
 }
+
+/// Prevents a covered text field from reclaiming focus when its route becomes
+/// visible again.
+///
+/// Navigator route focus scopes remember their last focused child. Without
+/// clearing that history, returning from a detail page can focus the search
+/// field again and immediately reopen the software keyboard. Only editable
+/// focus is cleared here so handheld/button focus is left to the existing
+/// traversal system. Explicit autofocus on a newly pushed editor still runs
+/// after the route is built.
+class TitoRouteFocusObserver extends NavigatorObserver {
+  void _clearTextInputFocus() {
+    final focus = FocusManager.instance.primaryFocus;
+    final focusContext = focus?.context;
+    if (focus == null || focusContext == null) return;
+
+    final editableFocused =
+        focusContext.widget is EditableText ||
+        focusContext.findAncestorWidgetOfExactType<EditableText>() != null;
+    if (!editableFocused) return;
+
+    focus.unfocus(disposition: UnfocusDisposition.scope);
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _clearTextInputFocus();
+    super.didPush(route, previousRoute);
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _clearTextInputFocus();
+    super.didPop(route, previousRoute);
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (route.isCurrent || (previousRoute?.isCurrent ?? false)) {
+      _clearTextInputFocus();
+    }
+    super.didRemove(route, previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    final replacedCurrentRoute =
+        newRoute?.isCurrent ?? oldRoute?.isCurrent ?? false;
+    if (replacedCurrentRoute) {
+      _clearTextInputFocus();
+    }
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+  }
+}
