@@ -52,91 +52,94 @@ class JourneyCard extends StatelessWidget {
           ownShadow: false,
           child: StickerCard(
             variant: StickerVariant.deep,
-            padding: padding,
+            padding: EdgeInsets.zero,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
                 onTap: onOpenDetail,
                 borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  // The square layout stretches this card to fill the column —
-                  // keep the text block vertically centered instead of top-stuck.
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppZh.journeyCardTitle.toUpperCase(),
-                                style: dense
-                                    ? denseStyle(
-                                        context.titoHome.onDeepOverline,
-                                      )
-                                    : context.titoHome.onDeepOverline,
-                              ),
-                              SizedBox(height: dense ? 5 : (compact ? 6 : 8)),
-                              Text(
-                                location,
-                                style: dense
-                                    ? denseStyle(context.titoHome.onDeepHeading)
-                                    : context.titoHome.onDeepHeading,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          Icons.chevron_right,
-                          color: TitoColors.card,
-                          size: dense
-                              ? DeviceLayout.dim(context, 28.0)
-                              : (compact ? 28 : 32),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
-                    // Normal RG panels have useful vertical room but a narrow
-                    // half-screen width. Keep badges on their own line and
-                    // time + assistant status below. The minimum 360px
-                    // dashboard falls back to one line.
-                    if (dense)
-                      _AssistantDenseMeta(
-                        journey: journey,
-                        future:
-                            assistantFuture ??
-                            journeyAssistantRepository.loadPreview(journey),
-                        style: denseStyle(
-                          context.titoHome.onDeepMetaLabel,
-                        ).copyWith(fontWeight: FontWeight.w800),
-                        expanded: expandedDenseMeta,
-                      )
-                    else
+                child: Padding(
+                  padding: padding,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    // The square layout stretches this card to fill the column —
+                    // keep the text block vertically centered instead of top-stuck.
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _Meta(
-                            label: AppZh.labelBadges,
-                            value: journey.badgeProgressLabel,
-                            dense: dense,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppZh.journeyCardTitle.toUpperCase(),
+                                  style: dense
+                                      ? denseStyle(
+                                          context.titoHome.onDeepOverline,
+                                        )
+                                      : context.titoHome.onDeepOverline,
+                                ),
+                                SizedBox(height: dense ? 5 : (compact ? 6 : 8)),
+                                Text(
+                                  location,
+                                  style: dense
+                                      ? denseStyle(context.titoHome.onDeepHeading)
+                                      : context.titoHome.onDeepHeading,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
-                          _Meta(
-                            label: AppZh.labelPlayTime,
-                            value: journey.playTime,
-                            dense: dense,
-                          ),
-                          _AssistantMeta(
-                            future:
-                                assistantFuture ??
-                                journeyAssistantRepository.loadPreview(journey),
+                          Icon(
+                            Icons.chevron_right,
+                            color: TitoColors.card,
+                            size: dense
+                                ? DeviceLayout.dim(context, 28.0)
+                                : (compact ? 28 : 32),
                           ),
                         ],
                       ),
-                  ],
+                      SizedBox(height: dense ? 6 : (compact ? 8 : 10)),
+                      // Normal RG panels have useful vertical room but a narrow
+                      // half-screen width. Keep badges on their own line and
+                      // time + assistant status below. The minimum 360px
+                      // dashboard falls back to one line.
+                      if (dense)
+                        _AssistantDenseMeta(
+                          journey: journey,
+                          future:
+                              assistantFuture ??
+                              journeyAssistantRepository.loadPreview(journey),
+                          style: denseStyle(
+                            context.titoHome.onDeepMetaLabel,
+                          ).copyWith(fontWeight: FontWeight.w800),
+                          expanded: expandedDenseMeta,
+                        )
+                      else
+                        Row(
+                          children: [
+                            _Meta(
+                              label: AppZh.labelBadges,
+                              value: journey.badgeProgressLabel,
+                              dense: dense,
+                            ),
+                            _Meta(
+                              label: AppZh.labelPlayTime,
+                              value: journey.playTime,
+                              dense: dense,
+                            ),
+                            _AssistantMeta(
+                              future:
+                                  assistantFuture ??
+                                  journeyAssistantRepository.loadPreview(journey),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
