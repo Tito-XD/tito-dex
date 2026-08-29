@@ -6,7 +6,7 @@
 
 - **Active code:** `flutter/` (Flutter + Dart, Chinese UI)
 - **Removed:** the pre-Flutter React mock (`src/`) was deleted in the 0.6.5 cleanup; its releases stay on GitHub as historical artifacts
-- **Latest release:** v0.9.5 · Lite `0.9.5+189`; Offline `0.9.5-offline+190`
+- **Latest release:** v0.9.6 · Lite `0.9.6+191`; Offline `0.9.6-offline+192`
 - **Offline data:** CDN bundle v20 live; Offline APK embeds the complete verified v20 reference/gameplay archive (`/v5/`; `/v4/` rollback)
 - **Tests:** `cd flutter && flutter test`
 
