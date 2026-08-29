@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) |
-| **`main` / lite source** | `0.9.5+189` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.5-offline+190` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) |
+| **`main` / lite source** | `0.9.6+191` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.6-offline+192` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
@@ -44,12 +44,13 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.5)
+## Current feature status (latest release line: v0.9.6)
 
-> v0.9.5 uses Lite versionCode 189 and Offline versionCode 190. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.9.6 uses Lite versionCode 191 and Offline versionCode 192. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Journey & save
-- **Current v0.9.5 rebuild:** keeps the matte Solid Plastic surface and sprite-only forward Hero, but removes the Dex-only predictive-back observer and full-page edge slide. Every Pokémon detail entry now stays inside Flutter's standard Material predictive-back wrapper; Sprite Heroes do not participate in interactive edge gestures, so Dex, Search and Ask TitoDex share one return behavior and cancel/commit cannot strand the page or artwork halfway.
+- **Current v0.9.6:** makes Team and Search side routes follow real Android predictive-back progress, spring back on cancel, and finish from the release point on commit. Home-to-Dex keeps the standard predictive preview and collapses its shared artwork only after a committed return; detail routes retain the stable Material predictive-back behavior from v0.9.5. Journey card ink now covers the full card. Separate root/shell route-focus observers clear only covered editable focus, preventing Search and other inputs from unexpectedly reopening the keyboard after a detail pop while preserving intentional editor autofocus.
+- **v0.9.5 rebuild:** keeps the matte Solid Plastic surface and sprite-only forward Hero, but removes the Dex-only predictive-back observer and full-page edge slide. Every Pokémon detail entry now stays inside Flutter's standard Material predictive-back wrapper; Sprite Heroes do not participate in interactive edge gestures, so Dex, Search and Ask TitoDex share one return behavior and cancel/commit cannot strand the page or artwork halfway.
 - **v0.9.4:** keeps the live Dex grid inside the route Hero subtree so the real card Sprite expands into an exactly aligned detail canvas on device, then hands off to the loaded header without a blank skeleton or geometry jump. Dex detail predictive back visibly shrinks, rounds and follows the swipe edge; Team/Search side routes carry their opaque background with the slide instead of flashing it before entry. Ask TitoDex pins changing companion copy to one leading edge and removes duplicate heading sparkles.
 - **v0.9.3:** keeps one Pokémon Sprite alive throughout the Dex card-to-detail Hero flight, prefetches detail data before navigation, and preserves the previous artwork until a new form image has decoded. Secondary reference pages paint opaque shells before bounded local reads; Team rows render on the first frame with immediate Sprite fallbacks. Ask TitoDex uses one continuous-corner status family and a finer semantic reveal cadence.
 - **v0.9.1:** keeps the three persistent themes and modern Ask TitoDex semantics from v0.9.0, while correcting visible motion edges: the Home Dex icon no longer stretches into the page, card-to-detail transitions move the creature sprite itself, selected form or edition artwork replaces the stable viewer sprite, secondary lists use a shorter bounded settle, rotating assistant copy crossfades without overlap, and the save-aware status surface stays pill-shaped while badge context arrives.
@@ -142,6 +143,7 @@ an unsupported blanket Creative Commons claim. The preserved v19 object set stil
 attribution text; live v20 adds corrected metadata without overwriting v19 objects.
 
 ### Latest release-line highlights
+- v0.9.6: makes Team/Search predictive back follow, cancel and commit from actual Android gesture progress; delays the Home-to-Dex shared-art collapse until commit; expands Journey ink across the full card; and prevents covered text fields from reclaiming focus after route return.
 - v0.9.5 rebuild: keeps matte Solid Plastic and sprite-only forward entry, removes the competing Dex-specific edge-slide controller, and routes all Pokémon details through the standard Material predictive-back transition without interactive Hero flights.
 - v0.9.4: keeps Dex grid Heroes discoverable on device, expands the exact card Sprite into a geometry-aligned detail header, restores expressive predictive back, removes the side-page background flash, and keeps rotating Ask TitoDex copy pinned without duplicate sparkles.
 - v0.9.3: turns the Dex Sprite into one continuous shared element, removes blank detail/artwork replacement frames, keeps reference and Team first paint stable, and unifies the expandable Ask TitoDex status pill with its save-context badges.
@@ -302,7 +304,7 @@ Every route owns a `Scaffold`, so Settings, Search and Dex sub-pages participate
 `flutter analyze --no-pub`, full `flutter test --no-pub`, Python tool tests,
 Journey Assistant Worker typecheck/Vitest/dry-run, bundled-data byte equality,
 legacy companion Gradle checks, and physical-device host update tests.
-Published v0.9.5 artifacts are verified through the Android release workflows;
+Published v0.9.6 artifacts are verified through the Android release workflows;
 the optional extension is additionally checked for the same V2 signer as the host.
 
 Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.txt`).

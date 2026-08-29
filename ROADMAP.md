@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.5](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.5) · Lite `0.9.5+189` · Offline `0.9.5-offline+190`.
+> **Latest release:** [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · Lite `0.9.6+191` · Offline `0.9.6-offline+192`.
 >
-> **Current `main`:** v0.9.5 rebuild with matte Solid Plastic, sprite-only Dex entry, unified Material predictive back, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.6 with responsive Team/Search predictive back, a restrained Home-to-Dex return, full-card Journey feedback, stable text focus, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,18 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v20; v0.9.5 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.6 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.9.6
+
+- Make Team and Search predictive back follow the Android gesture, retain a readable destination underneath, spring back naturally on cancel, and continue from the release point on commit.
+- Let Home-to-Dex return use the standard predictive preview and collapse the shared Pokédex artwork only after commit; Pokémon detail routes retain the stable Material predictive-back behavior from v0.9.5.
+- Extend Journey card ink feedback across the full card without changing its compact layout.
+- Clear covered editable focus at route boundaries so returning from Dex details or other secondary pages does not unexpectedly reopen the keyboard; intentional editors still autofocus normally.
 
 ## Completed in v0.9.1
 
