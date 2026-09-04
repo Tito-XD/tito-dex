@@ -2,6 +2,10 @@
 
 # TitoDex
 
+[TitoDex 网站](https://titodex.pages.dev) · [网页图鉴](https://titodex.pages.dev/pokedex) · [1025 MV 拼贴](https://titodex.pages.dev/1025)
+
+网站集中提供 App 项目与发布记录入口、网页速查和拼贴浏览；与本仓库的 Android App 分别维护。
+
 **TitoDex** 是一款温暖、离线优先的宝可梦**旅程助手**，面向 Android 掌机与手机。它把存档进度、队伍与旅程管理、全国图鉴 1–1025、中文资料和轻量对战工具装进一套紧凑、有掌机感的界面。
 
 它希望让你每次回到旧存档时都能马上接上旅程：知道停在哪里、队伍里有什么、下一步该抓谁或进化谁，并快速打开对应资料。TitoDex 不打算替代完整社区 Wiki 或竞技模拟器，而是专注于实际游玩时最常用的信息。
