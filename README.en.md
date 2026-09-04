@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · App `0.9.6+191` | Responsive page returns, full-card feedback, stable text focus, and on-demand v20 data |
-| Offline APK | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · App `0.9.6-offline+192` | The same interaction fixes with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7+193` | Optional 30th anniversary form logos in the artwork viewer, with on-demand v20 data |
+| Offline APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7-offline+194` | The same anniversary viewer with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -24,6 +24,7 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 
 ## Highlights
 
+- **30th anniversary logos** — open a Pokémon image to switch to anniversary artwork and choose its official logo variants. The catalog preserves 1324 entries: 1025 base graphics and 299 additional files. Verified forms match automatically; unknown forms remain explicitly unmatched and can be chosen manually. Images load online only on demand and never alter the original form, shiny selection, or Dex data.
 - **Three built-in themes** — Trainer's Journal, Solid Plastic, and Flat UI persist across launches; production installs still default to Trainer's Journal. Navigation and content reveals adapt to each theme and respect reduced-motion settings.
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
@@ -63,7 +64,7 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.6-lite-rg-arm64.apk`** or **`TitoDex-0.9.6-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.6 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.7-lite-rg-arm64.apk`** or **`TitoDex-0.9.7-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.7 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 

@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) |
-| **`main` / lite source** | `0.9.6+191` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.6-offline+192` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) |
+| **`main` / lite source** | `0.9.7+193` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.7-offline+194` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese (`flutter/lib/l10n/`) |
@@ -44,9 +44,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.6)
+## Current feature status (latest release line: v0.9.7)
 
-> v0.9.6 uses Lite versionCode 191 and Offline versionCode 192. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.9.7 uses Lite versionCode 193 and Offline versionCode 194. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive so its newer reference and gameplay data are available immediately. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Journey & save
 - **Current v0.9.6:** makes Team and Search side routes follow real Android predictive-back progress, spring back on cancel, and finish from the release point on commit. Home-to-Dex keeps the standard predictive preview and collapses its shared artwork only after a committed return; detail routes retain the stable Material predictive-back behavior from v0.9.5. Journey card ink now covers the full card. Separate root/shell route-focus observers clear only covered editable focus, preventing Search and other inputs from unexpectedly reopening the keyboard after a detail pop while preserving intentional editor autofocus.
@@ -65,6 +65,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - v0.8.10: HGSS rich sync adds party nicknames, held items, move PP/PP Ups, friendship, nature, shiny/gender/status, IV/EV and battle stats, plus Secret ID, money, trainer gender/language, starter, player coordinates and save milestones. Current/max HP offsets are corrected against the Gen IV party structure. The Team expansion and Journey/Settings read-only summaries expose the imported fields; PC boxes remain deferred until big-block selection is independently fixture-verified.
 
 ### Dex (national 1–1025)
+- **v0.9.7:** the artwork viewer offers opt-in 30th anniversary logos with all 1324 official catalog entries (1025 base files plus 299 additional files). Exact verified form slugs and official names drive automatic selection; ambiguous or unsupported forms remain explicitly unmatched and manually selectable. Images load only after opting in, with zoom/retry/source links; switching back preserves the original form and shiny state. The App repository and TitoDex 网页版 link to each other.
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
 - **23 game editions**, **11 regional dexes**, and persisted G1–G9 debut-generation browse scopes. Primary browse scope intersects with body/color/size/reference filters.
 - Offline: CDN pre-built bundle (Settings) or legacy PokeAPI batch.
