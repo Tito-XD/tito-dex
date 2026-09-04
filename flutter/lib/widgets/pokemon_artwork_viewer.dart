@@ -359,7 +359,11 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: PokemonAnniversaryArtwork(nationalId: summary.id),
+                  child: PokemonAnniversaryArtwork(
+                    nationalId: summary.id,
+                    nameEn: summary.nameEn,
+                    spriteResourceId: summary.spriteResourceId,
+                  ),
                 ),
               ),
             if (!_showAnniversary)
