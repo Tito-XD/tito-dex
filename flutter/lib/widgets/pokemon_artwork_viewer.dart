@@ -4,9 +4,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../features/dex/dex_models.dart';
+import '../features/dex/pokemon_anniversary_art.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
+import 'pokemon_anniversary_artwork.dart';
 
 String pokemonArtworkHeroTag(PokemonSummary summary) =>
     'pokemon-artwork-${summary.id}-${summary.spriteResourceId ?? summary.id}';
@@ -113,6 +115,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
   late bool _showAnimated;
   var _showBack = false;
   var _shiny = false;
+  var _showAnniversary = false;
 
   int get _spriteResourceId =>
       widget.summary.spriteResourceId ?? widget.summary.id;
@@ -298,19 +301,23 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                           ),
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: () => setState(() => _shiny = !_shiny),
-                        style: TextButton.styleFrom(
-                          foregroundColor: _shiny
-                              ? TitoColors.softYellow
-                              : TitoColors.card.withValues(alpha: 0.8),
+                      if (!_showAnniversary)
+                        TextButton.icon(
+                          onPressed: () => setState(() => _shiny = !_shiny),
+                          style: TextButton.styleFrom(
+                            foregroundColor: _shiny
+                                ? TitoColors.softYellow
+                                : TitoColors.card.withValues(alpha: 0.8),
+                          ),
+                          icon: const Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 16,
+                          ),
+                          label: const Text(
+                            '闪光',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
                         ),
-                        icon: const Icon(Icons.auto_awesome_rounded, size: 16),
-                        label: const Text(
-                          '闪光',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(
@@ -324,25 +331,57 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: InteractiveViewer(
-                  minScale: 0.8,
-                  maxScale: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _ArtworkHeroStage(
-                      summary: summary,
-                      displaySource: displaySource,
-                      highResolutionOpacity: highResolutionOpacity,
-                      variantKey: '$_shiny-$_showAnimated-$_showBack',
+            if (pokemonAnniversaryArtUrl(summary.id) != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('立绘'),
+                      selected: !_showAnniversary,
+                      onSelected: (_) =>
+                          setState(() => _showAnniversary = false),
+                    ),
+                    ChoiceChip(
+                      label: const Text('30周年 Logo'),
+                      selected: _showAnniversary,
+                      onSelected: (_) =>
+                          setState(() => _showAnniversary = true),
+                    ),
+                  ],
+                ),
+              ),
+            if (_showAnniversary)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: PokemonAnniversaryArtwork(nationalId: summary.id),
+                ),
+              ),
+            if (!_showAnniversary)
+              Expanded(
+                flex: 1,
+                child: Center(
+                  child: InteractiveViewer(
+                    minScale: 0.8,
+                    maxScale: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _ArtworkHeroStage(
+                        summary: summary,
+                        displaySource: displaySource,
+                        highResolutionOpacity: highResolutionOpacity,
+                        variantKey: '$_shiny-$_showAnimated-$_showBack',
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            if (_options.isNotEmpty)
+            if (!_showAnniversary && _options.isNotEmpty)
               Expanded(
                 flex: 1,
                 child: SlideTransition(
