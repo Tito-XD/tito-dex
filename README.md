@@ -12,8 +12,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · App `0.9.6+191` | 跟手页面返回、完整卡片反馈与稳定输入焦点，v20 按需下载 |
-| Offline APK | [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · App `0.9.6-offline+192` | 同步交互修正并内置完整 v20 图鉴与玩法资料 |
+| Lite APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7+193` | 点开立绘选择 30 周年形态 Logo，v20 按需下载 |
+| Offline APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7-offline+194` | 同步周年展示并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 按游戏管理可选资料包、50 组本地问答与伴侣等待动画 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.9.x 版本更新。
@@ -24,6 +24,7 @@
 
 ## 当前亮点
 
+- **30 周年 Logo**：点开宝可梦立绘后，可切换周年展示并选择该物种的官方形态 Logo。目录保留 1324 项（1025 张基础图与 299 个额外文件），优先匹配已核验形态，未知形态明确提示并支持手动选择；图片按需联网加载，不改变原形态、闪光状态或图鉴数据。
 - **三套内置主题**：训练家手帐、固态塑料与扁平贴纸可在设置中切换并持久保存；正式版首次启动仍使用训练家手帐。页面展开、返回和内容揭示会随主题调整，并尊重系统减少动态效果设置。
 - **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
 - **存档助手**：给出当前位置附近未捕获、队伍进化路线、成对版本可直遇缺口，以及进化／孵蛋／交换补全建议。
@@ -63,7 +64,7 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.6-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.6-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.6 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.7-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.7-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.7 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。

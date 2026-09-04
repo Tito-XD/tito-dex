@@ -99,11 +99,11 @@ Run the **Android Release APKs** workflow manually with:
 - `bundle_manifest_url` — the currently published root manifest; the current workflow requires `bundleVersion==20`, 1025 species, `/v5/`, completeness, and a matching archive SHA-256 before embedding it
 - `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-The v0.9.6 release pair uses Lite versionCode `191` and Offline versionCode
-`192`. Any later build must use a Lite versionCode greater than `192` and an even
+The v0.9.7 release pair uses Lite versionCode `193` and Offline versionCode
+`194`. Any later build must use a Lite versionCode greater than `194` and an even
 larger Offline versionCode; keep the same product version only for an explicitly
 authorized same-tag replacement. v0.9.0
-was the explicit large-package cutover; for v0.9.6, leave `offline_seed_apk_url` empty so CI
+was the explicit large-package cutover; for v0.9.7, leave `offline_seed_apk_url` empty so CI
 downloads and verifies the current published v20 archive through
 `bundle_manifest_url`. This gives fresh Offline installs the complete v20
 reference/gameplay data instead of the older compact v14 seed.
