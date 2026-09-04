@@ -2,6 +2,10 @@
 
 # TitoDex
 
+[TitoDex website](https://titodex.pages.dev) · [Web Pokédex](https://titodex.pages.dev/pokedex) · [1025 MV collages](https://titodex.pages.dev/1025)
+
+The website connects the app project and releases with browser-based reference tools and collage browsing. It is maintained separately from the Android app in this repository.
+
 **TitoDex** is a warm, offline-first Pokémon **journey companion** for Android handhelds and phones. It brings save progress, team and journey management, a 1–1025 Pokédex, Chinese reference data, and lightweight battle utilities into one compact, device-like interface.
 
 It is designed to make returning to a playthrough feel immediate: see where the journey paused, check the current team, and open the right reference tool without losing the character of a dedicated trainer device. TitoDex does not try to replace a full community wiki or competitive simulator.
