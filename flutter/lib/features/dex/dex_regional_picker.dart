@@ -104,7 +104,7 @@ class _DexBrowseScopePickerState extends State<_DexBrowseScopePicker> {
         for (final region in DexRegionalPokedex.values)
           ListTile(
             leading: const Icon(Icons.map_rounded),
-            title: Text('${region.labelZh}图鉴'),
+            title: Text(AppZh.dexRegionalDexTitle(region.label)),
             selected: widget.selected == DexBrowseScope.region(region),
             trailing: widget.selected == DexBrowseScope.region(region)
                 ? const Icon(Icons.check_rounded)

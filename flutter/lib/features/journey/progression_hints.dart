@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_locale.dart';
 import '../../models/journey.dart';
 import '../../models/parsed_save.dart';
 import '../extensions/journey_assistant_extension.dart';
@@ -172,6 +173,7 @@ class AskTitoDexContext {
           : 'unknown',
       includeLocation: exactHgss,
       includeBadges: exactHgss || hasVerifiedBadgeCount,
+      locale: AppLocale.instance.workerLocale,
     );
   }
 

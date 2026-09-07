@@ -230,12 +230,9 @@ abstract final class DeviceLayout {
     return at2xHandheld;
   }
 
-  static double radius(BuildContext context, double base) {
-    if (isNativeTarget || useSquareDashboard(context)) {
-      return base * 0.5;
-    }
-    return base;
-  }
+  /// Corner radii are fixed design tokens ([TitoRadii]) on every device. The
+  /// helpers stay for call-site compatibility but no longer halve on handheld.
+  static double radius(BuildContext context, double base) => base;
 
   static double rSm(BuildContext context) => radius(context, TitoRadii.sm);
   static double rMd(BuildContext context) => radius(context, TitoRadii.md);

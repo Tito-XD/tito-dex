@@ -9,12 +9,17 @@ import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../features/journey/ask_titodex_service.dart';
+import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'assistant_surface.dart';
 import 'fallback_sprite_image.dart';
+
+/// Trainer's Journal paper tone shared with the Ask TitoDex answer cards.
+const _assistantPaper = Color(0xFFFFFBF2);
 
 /// Keeps the selected home companion beside the conversation at all times.
 /// The orbit, bob, rotating copy and shimmer start only while a request runs.
@@ -38,35 +43,9 @@ class AskTitoDexLoadingCard extends StatefulWidget {
 
 class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
     with SingleTickerProviderStateMixin {
-  static const _localMessageTemplates = <String>[
-    '{name}正在树果口袋里翻找线索…',
-    '{name}沿着脚印追踪可靠答案…',
-    '{name}正在核对版本，免得跑错地图…',
-    '{name}把资料卡一张张摆整齐…',
-    '{name}对资料页使用了「看破」…',
-  ];
-  static const _workerMessageTemplates = <String>[
-    '{name}正在等洛托姆线路传回消息…',
-    '{name}在等索引或模型接手这道题…',
-    '{name}正在询问资料库与联网来源…',
-    '{name}正在确认答案真的适合当前版本…',
-  ];
-  static const _resolvingMessageTemplates = <String>[
-    '{name}正在把你的问法对上游戏里的对象…',
-    '{name}正在确认版本，免得把不同世代混在一起…',
-  ];
-  static const _verifyingMessageTemplates = <String>[
-    '{name}正在让结构化资料和百科彼此作证…',
-    '{name}正在检查地点、数值和版本是否一致…',
-  ];
-  static const _revealingMessageTemplates = <String>[
-    '{name}正在把核验过的线索整理成好读的回答…',
-    '{name}正在收好引用，再把答案交给你…',
-  ];
-
   late final AnimationController _motion;
-  late List<String> _localMessages;
-  late List<String> _workerMessages;
+  late List<int> _localOrder;
+  late List<int> _workerOrder;
   Timer? _messageTimer;
   var _messageIndex = 0;
   var _reduceMotion = false;
@@ -102,9 +81,9 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
   }
 
   void _shuffleMessages() {
-    _localMessages = List<String>.of(_localMessageTemplates)
+    _localOrder = List<int>.generate(5, (index) => index)
       ..shuffle(math.Random(widget.requestSeed));
-    _workerMessages = List<String>.of(_workerMessageTemplates)
+    _workerOrder = List<int>.generate(4, (index) => index)
       ..shuffle(math.Random(widget.requestSeed + 1));
   }
 
@@ -131,23 +110,35 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
     super.dispose();
   }
 
-  List<String> _messagesForProgress(AskTitoDexProgress progress) =>
-      switch (progress) {
-        AskTitoDexProgress.checkingLocal => _localMessages,
-        AskTitoDexProgress.contactingWorker ||
-        AskTitoDexProgress.retrievingSources => _workerMessages,
-        AskTitoDexProgress.resolvingQuestion => _resolvingMessageTemplates,
-        AskTitoDexProgress.verifyingAnswer => _verifyingMessageTemplates,
-        AskTitoDexProgress.revealingAnswer => _revealingMessageTemplates,
-      };
+  List<String> _messagesForProgress(AskTitoDexProgress progress, String name) {
+    final local = AppZh.askTitoDexLocalMessageTemplates(name);
+    final worker = AppZh.askTitoDexWorkerMessageTemplates(name);
+    return switch (progress) {
+      AskTitoDexProgress.checkingLocal => [
+        for (final index in _localOrder) local[index % local.length],
+      ],
+      AskTitoDexProgress.contactingWorker ||
+      AskTitoDexProgress.retrievingSources => [
+        for (final index in _workerOrder) worker[index % worker.length],
+      ],
+      AskTitoDexProgress.resolvingQuestion =>
+        AppZh.askTitoDexResolvingMessageTemplates(name),
+      AskTitoDexProgress.verifyingAnswer =>
+        AppZh.askTitoDexVerifyingMessageTemplates(name),
+      AskTitoDexProgress.revealingAnswer =>
+        AppZh.askTitoDexRevealingMessageTemplates(name),
+    };
+  }
 
   String _titleForProgress(AskTitoDexProgress progress) => switch (progress) {
-    AskTitoDexProgress.checkingLocal => '先翻本地审核笔记',
-    AskTitoDexProgress.contactingWorker => '正在连接 Journey Assistant',
-    AskTitoDexProgress.retrievingSources => '正在汇集限定来源',
-    AskTitoDexProgress.resolvingQuestion => '正在确认问题与版本',
-    AskTitoDexProgress.verifyingAnswer => '正在交叉核验答案',
-    AskTitoDexProgress.revealingAnswer => '正在整理已核验回答',
+    AskTitoDexProgress.checkingLocal => AppZh.askTitoDexStageCheckingLocal,
+    AskTitoDexProgress.contactingWorker => AppZh.askTitoDexStageContactingWorker,
+    AskTitoDexProgress.retrievingSources =>
+      AppZh.askTitoDexStageRetrievingSources,
+    AskTitoDexProgress.resolvingQuestion =>
+      AppZh.askTitoDexStageResolvingQuestion,
+    AskTitoDexProgress.verifyingAnswer => AppZh.askTitoDexStageVerifyingAnswer,
+    AskTitoDexProgress.revealingAnswer => AppZh.askTitoDexStageRevealingAnswer,
   };
 
   Widget _stageTransition(Widget child, Animation<double> animation) {
@@ -200,13 +191,14 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
             companionSpeciesIds[hgssDefaultCompanion]!;
         final nameZh =
             choice?.nameZh ?? localizeSpecies(widget.journey.companion);
-        final messages = _messagesForProgress(widget.progress);
-        final message = messages[_messageIndex % messages.length].replaceAll(
-          '{name}',
-          nameZh,
-        );
+        final messages = _messagesForProgress(widget.progress, nameZh);
+        final message = messages[_messageIndex % messages.length];
         final stageTitle = _titleForProgress(widget.progress);
         final bundled = bundledCompanionGifAsset(speciesId);
+        // The sky-tinted paper card is part of the Trainer's Journal look;
+        // other themes let AssistantSurface pick its own surface and outline.
+        final paperLook = appVisualStyle.usesTrainerJournal;
+        final scheme = Theme.of(context).colorScheme;
         final sources = <String>[
           if (choice?.animationSourceUrl case final source?) source,
           if (bundled != null) bundled,
@@ -217,16 +209,22 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
 
         return Semantics(
           liveRegion: widget.loading,
-          label: widget.loading ? '$nameZh正在查找答案' : '$nameZh已准备好',
+          label: widget.loading
+              ? AppZh.askTitoDexCompanionSearching(nameZh)
+              : AppZh.askTitoDexCompanionReady(nameZh),
           child: AssistantSurface(
             key: const Key('ask-titodex-companion-card'),
-            color: Color.alphaBlend(
-              TitoColors.skyBlue.withValues(alpha: 0.62),
-              const Color(0xFFFFFBF2),
-            ),
+            color: paperLook
+                ? Color.alphaBlend(
+                    TitoColors.skyBlue.withValues(alpha: 0.62),
+                    _assistantPaper,
+                  )
+                : null,
             padding: const EdgeInsets.fromLTRB(10, 7, 13, 7),
-            radius: 18,
-            borderColor: TitoColors.deepBlue.withValues(alpha: 0.4),
+            radius: TitoRadii.lg,
+            borderColor: paperLook
+                ? TitoColors.deepBlue.withValues(alpha: 0.4)
+                : null,
             child: Row(
               children: [
                 SizedBox(
@@ -293,8 +291,12 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                                 child: Shimmer.fromColors(
                                   key: ValueKey(widget.progress),
                                   enabled: !_reduceMotion,
-                                  baseColor: TitoColors.deepBlue,
-                                  highlightColor: const Color(0xFFFFFBF2),
+                                  baseColor: paperLook
+                                      ? TitoColors.deepBlue
+                                      : scheme.onSurface,
+                                  highlightColor: paperLook
+                                      ? _assistantPaper
+                                      : scheme.surface,
                                   child: Text(
                                     stageTitle,
                                     style: SecondaryTypography.onCard.h15,
@@ -329,13 +331,13 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '$nameZh在这里陪你',
+                                AppZh.askTitoDexCompanionIdle(nameZh),
                                 key: const Key('ask-titodex-companion-idle'),
                                 style: SecondaryTypography.onCard.h15,
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                '可以问路线、捕捉地点，也可以问刚开始玩什么最重要。',
+                                AppZh.askTitoDexCompanionIdleHint,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: SecondaryTypography.onCard.small12

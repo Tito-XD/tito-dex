@@ -8,6 +8,7 @@ library;
 
 export 'dex_axis_labels.g.dart';
 
+import '../../l10n/app_locale.dart';
 import 'dex_axis_labels.g.dart';
 import 'dex_models.dart';
 import 'type_chart.dart';
@@ -52,6 +53,17 @@ enum DexSizeBucket {
   final String labelZh;
   final int? minDm;
   final int? maxDm;
+
+  String get label => AppLocale.pick(
+    zh: labelZh,
+    en: switch (this) {
+      DexSizeBucket.tiny => 'Tiny',
+      DexSizeBucket.small => 'Small',
+      DexSizeBucket.medium => 'Medium',
+      DexSizeBucket.large => 'Large',
+      DexSizeBucket.huge => 'Huge',
+    },
+  );
 
   bool contains(int heightDm) =>
       (minDm == null || heightDm >= minDm!) &&
@@ -217,11 +229,80 @@ const kDexTagLabelsZh = <String, String>{
 bool dexSummaryHasShape(PokemonSummary summary, String slug) =>
     summary.shapeSlug == slug || dexPreGen6ShapeSlug(summary.id) == slug;
 
-String? dexShapeLabelZh(String slug) => kDexShapeLabelsZh[slug];
-String? dexColorLabelZh(String slug) => kDexColorLabelsZh[slug];
-String? dexTagLabelZh(String slug) => kDexTagLabelsZh[slug];
-String? dexGrowthRateLabelZh(String slug) => kDexGrowthRateLabelsZh[slug];
-String? dexHabitatLabelZh(String slug) => kDexHabitatLabelsZh[slug];
+const kDexShapeLabelsEn = <String, String>{
+  'ball': 'Ball',
+  'squiggle': 'Squiggle',
+  'fish': 'Fish',
+  'arms': 'Arms',
+  'blob': 'Blob',
+  'upright': 'Upright',
+  'legs': 'Legs',
+  'quadruped': 'Quadruped',
+  'wings': 'Wings',
+  'tentacles': 'Tentacles',
+  'heads': 'Heads',
+  'humanoid': 'Humanoid',
+  'bug-wings': 'Bug wings',
+  'armor': 'Armor',
+};
+
+const kDexColorLabelsEn = <String, String>{
+  'black': 'Black',
+  'blue': 'Blue',
+  'brown': 'Brown',
+  'gray': 'Gray',
+  'green': 'Green',
+  'pink': 'Pink',
+  'purple': 'Purple',
+  'red': 'Red',
+  'white': 'White',
+  'yellow': 'Yellow',
+};
+
+const kDexGrowthRateLabelsEn = <String, String>{
+  'slow': 'Slow',
+  'medium': 'Medium',
+  'fast': 'Fast',
+  'medium-slow': 'Medium Slow',
+  'slow-then-very-fast': 'Slow then very fast',
+  'fast-then-very-slow': 'Fast then very slow',
+};
+
+const kDexHabitatLabelsEn = <String, String>{
+  'cave': 'Cave',
+  'forest': 'Forest',
+  'grassland': 'Grassland',
+  'mountain': 'Mountain',
+  'rare': 'Rare',
+  'rough-terrain': 'Rough terrain',
+  'sea': 'Sea',
+  'urban': 'Urban',
+  'waters-edge': "Water's edge",
+};
+
+const kDexTagLabelsEn = <String, String>{
+  'legendary': 'Legendary',
+  'mythical': 'Mythical',
+  'baby': 'Baby',
+  'pseudo-legendary': 'Pseudo-legendary',
+};
+
+String? _axisLabel(
+  String slug,
+  Map<String, String> zh,
+  Map<String, String> en,
+) => AppLocale.instance.isEnglish ? en[slug] : zh[slug];
+
+String? dexShapeLabelZh(String slug) =>
+    _axisLabel(slug, kDexShapeLabelsZh, kDexShapeLabelsEn);
+String? dexColorLabelZh(String slug) =>
+    _axisLabel(slug, kDexColorLabelsZh, kDexColorLabelsEn);
+String? dexTagLabelZh(String slug) =>
+    _axisLabel(slug, kDexTagLabelsZh, kDexTagLabelsEn);
+String? dexGrowthRateLabelZh(String slug) =>
+    _axisLabel(slug, kDexGrowthRateLabelsZh, kDexGrowthRateLabelsEn);
+String? dexHabitatLabelZh(String slug) =>
+    _axisLabel(slug, kDexHabitatLabelsZh, kDexHabitatLabelsEn);
 
 /// Every spelling a player might reach for, mapped to one constraint.
 ///

@@ -10,6 +10,7 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
+import 'tito_skeleton.dart';
 
 class TeamSummaryCard extends StatefulWidget {
   const TeamSummaryCard({
@@ -102,10 +103,17 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
                     style: body14.copyWith(color: TitoColors.mutedInk),
                   )
                 else if (_loading && _data == null)
-                  const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                  // Three skeleton lines sized like the level / BST / coverage
+                  // rows below so the card keeps its shape while computing.
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TitoSkeletonBox(height: 14, width: 132),
+                      SizedBox(height: 6),
+                      TitoSkeletonBox(height: 14, width: 168),
+                      SizedBox(height: 6),
+                      TitoSkeletonBox(height: 14, width: 148),
+                    ],
                   )
                 else if (_data != null) ...[
                   Text(

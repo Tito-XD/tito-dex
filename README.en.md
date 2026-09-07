@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7+193` | Optional 30th anniversary form logos in the artwork viewer, with on-demand v20 data |
-| Offline APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7-offline+194` | The same anniversary viewer with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · App `0.9.15+196` | Unified Dex controls, consistent themes and system-following Chinese/English UI; on-demand v20 data |
+| Offline APK | [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · App `0.9.15-offline+197` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -23,6 +23,11 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 > **Unofficial project notice:** TitoDex is a non-commercial tool intended only for learning and personal gameplay assistance. It is not affiliated with, authorized by, sponsored by, or endorsed by Nintendo, Creatures, GAME FREAK, The Pokémon Company, or their affiliates. Names, characters, images, audio, and trademarks belong to their respective owners. See [CREDITS.md](CREDITS.md) for full sources, licenses, and media credits.
 
 ## Highlights
+
+- **Unified Dex filtering** — search, regional dex, debut generation, journey-only browsing, types, appearance, abilities, moves and egg groups share one sheet and can intersect; optional form display preserves form identity.
+- **Shared detail context** — form and merged reference-game selectors sit below the header and initially use the App game. General reference is available, menus identify DLC, and obtain/move sections follow the same selection without unsupported-category placeholders.
+- **Consistent themes** — each theme owns its corners, outlines, shadows, sheets and selection states. Ordinary images use pulsing skeletons; type-tinted detail artwork keeps a monochrome ball spinning in place. Long descriptions grow with their content.
+- **System language** — Chinese and English UI follow the OS or Android per-app language without an in-app switch. Available English entity names are used; untranslated reference prose retains its original language.
 
 - **30th anniversary logos** — open a Pokémon image to switch to anniversary artwork and choose its official logo variants. The catalog preserves 1324 entries: 1025 base graphics and 299 additional files. Verified forms match automatically; unknown forms remain explicitly unmatched and can be chosen manually. Images load online only on demand and never alter the original form, shiny selection, or Dex data.
 - **Three built-in themes** — Trainer's Journal, Solid Plastic, and Flat UI persist across launches; production installs still default to Trainer's Journal. Navigation and content reveals adapt to each theme and respect reduced-motion settings.
@@ -58,13 +63,13 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 | Persistence | `shared_preferences` + offline `dex_offline/` |
 | Save | Single document URI + Gen 1–7 metadata recognition; full HGSS party/map/dex parser |
 | Dex data | Pre-built bundle v20 with v5 → v4 → v3 → v2 fallback and APK asset fallbacks |
-| UI language | Simplified Chinese |
+| UI language | Simplified Chinese by default; English follows OS / Android per-app language, with source-language fallback for untranslated data |
 
 Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.7-lite-rg-arm64.apk`** or **`TitoDex-0.9.7-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.7 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.15-lite-rg-arm64.apk`** or **`TitoDex-0.9.15-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.15 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 

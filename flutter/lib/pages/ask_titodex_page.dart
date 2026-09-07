@@ -10,6 +10,7 @@ import '../features/companion/companion_repository.dart';
 import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
+import '../features/dex/dex_game_scope.dart';
 import '../features/journey/ask_titodex_answer_blocks.dart';
 import '../features/journey/ask_titodex_entity_links.dart';
 import '../features/journey/ask_titodex_history.dart';
@@ -20,7 +21,9 @@ import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../navigation/tito_route_work.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
+import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
@@ -28,14 +31,86 @@ import '../widgets/assistant_surface.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/tito_skeleton.dart';
 
 typedef AskTitoDexSourceOpener = Future<bool> Function(Uri uri);
 
+// Ask TitoDex "paper" tones. They are part of the Trainer's Journal look
+// only (D12); the other themes leave every surface to AssistantSurface and
+// the Material colour scheme.
 const _assistantPaper = Color(0xFFFFFBF2);
 const _assistantCanvas = Color(0xFFF5F6F3);
 const _assistantSkeleton = Color(0xFFDCE5E5);
 const _assistantStatusRadius = 32.0;
-const _assistantContextChipRadius = 16.0;
+const _assistantContextChipRadius = TitoRadii.lg;
+
+bool get _usesPaperLook => appVisualStyle.usesTrainerJournal;
+
+/// The conversation viewport behind the answer cards.
+BoxDecoration _answerViewportDecoration(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
+  final radius = BorderRadius.circular(TitoRadii.lg);
+  if (appVisualStyle.usesFlatUi) {
+    return BoxDecoration(
+      color: scheme.surfaceContainerLow,
+      borderRadius: radius,
+      border: Border.all(color: scheme.outlineVariant),
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.7),
+      borderRadius: radius,
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.85),
+        width: TitoBorders.glass,
+      ),
+    );
+  }
+  return BoxDecoration(
+    color: _assistantCanvas.withValues(alpha: 0.94),
+    borderRadius: radius,
+    border: Border.all(color: TitoColors.deepBlue.withValues(alpha: 0.12)),
+  );
+}
+
+/// Paper fill for answer cards — null lets [AssistantSurface] pick its
+/// theme default outside Trainer's Journal.
+Color? get _paperColor => _usesPaperLook ? _assistantPaper : null;
+
+/// Ink outline tint for paper surfaces, again Trainer's Journal only.
+Color? _paperOutline(double alpha) =>
+    _usesPaperLook ? TitoColors.deepBlue.withValues(alpha: alpha) : null;
+
+/// Fill and outline for the small "paper" tiles (history rows, source
+/// references) that sit on a themed sheet or card surface.
+({Color fill, Color outline, double outlineWidth}) _paperTileStyle(
+  BuildContext context, {
+  required Color paper,
+  required double outlineAlpha,
+}) {
+  final scheme = Theme.of(context).colorScheme;
+  if (appVisualStyle.usesFlatUi) {
+    return (
+      fill: scheme.surfaceContainerHigh,
+      outline: scheme.outlineVariant,
+      outlineWidth: TitoBorders.element,
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return (
+      fill: Colors.white.withValues(alpha: 0.8),
+      outline: Colors.white.withValues(alpha: 0.85),
+      outlineWidth: TitoBorders.glass,
+    );
+  }
+  return (
+    fill: paper,
+    outline: TitoColors.ink.withValues(alpha: outlineAlpha),
+    outlineWidth: TitoBorders.element,
+  );
+}
+
 const _semanticRevealFrame = Duration(milliseconds: 20);
 const _semanticRevealStepLimit = 112;
 const _semanticCursorHold = Duration(milliseconds: 96);
@@ -48,7 +123,7 @@ String buildAskTitoDexClarificationQuestion({
 }) {
   final original = originalQuestion.trim();
   final label = candidateLabel.trim();
-  final prefix = '已确认对象是“$label”。原问题：';
+  final prefix = AppZh.askTitoDexClarificationPrefix(label);
   final available = _askTitoDexQuestionLimit - prefix.length;
   if (available <= 0) {
     return _takeLeadingCodeUnits(prefix, _askTitoDexQuestionLimit);
@@ -270,6 +345,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) => _HistoryManagerSheet(entries: _history),
     );
     if (!mounted || action == null) return;
@@ -277,22 +353,26 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          action == _HistoryManagerAction.clear ? '清除全部问答？' : '压缩问答记录？',
+          action == _HistoryManagerAction.clear
+              ? AppZh.askTitoDexHistoryClearTitle
+              : AppZh.askTitoDexHistoryCompactTitle,
         ),
         content: Text(
           action == _HistoryManagerAction.clear
-              ? '这会删除当前设备上的全部问答记录，无法撤销。'
-              : '将只保留最近 10 条问答，较早记录会从当前设备删除。',
+              ? AppZh.askTitoDexHistoryClearBody
+              : AppZh.askTitoDexHistoryCompactBody,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('取消'),
+            child: Text(AppZh.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(
-              action == _HistoryManagerAction.clear ? '确认清除' : '确认压缩',
+              action == _HistoryManagerAction.clear
+                  ? AppZh.askTitoDexHistoryClearConfirm
+                  : AppZh.askTitoDexHistoryCompactConfirm,
             ),
           ),
         ],
@@ -757,7 +837,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
             pagePadding.right,
             0,
           ),
-          child: const SecondaryPageAppBar(title: AppZh.askTitoDexTitle),
+          child: SecondaryPageAppBar(title: AppZh.askTitoDexTitle),
         ),
         Expanded(
           child: Padding(
@@ -808,13 +888,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                   child: Container(
                     key: const Key('ask-titodex-answer-viewport'),
                     clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      color: _assistantCanvas.withValues(alpha: 0.94),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: TitoColors.deepBlue.withValues(alpha: 0.12),
-                      ),
-                    ),
+                    decoration: _answerViewportDecoration(context),
                     child: NotificationListener<ScrollNotification>(
                       onNotification: _handleAnswerScrollNotification,
                       child: Scrollbar(
@@ -920,10 +994,13 @@ class _ConnectionStatusCard extends StatelessWidget {
       AskTitoDexAvailability.unavailable => TitoColors.coral,
     };
     final statusLabel = switch (status.availability) {
-      AskTitoDexAvailability.checking => '检查 --',
-      AskTitoDexAvailability.online => '在线 $enabledCount/$capabilityCount',
-      AskTitoDexAvailability.disabled => '已关闭',
-      AskTitoDexAvailability.unavailable => '仅本地',
+      AskTitoDexAvailability.checking => AppZh.askTitoDexStatusChecking,
+      AskTitoDexAvailability.online => AppZh.askTitoDexStatusOnlineCount(
+        enabledCount,
+        capabilityCount,
+      ),
+      AskTitoDexAvailability.disabled => AppZh.askTitoDexStatusClosed,
+      AskTitoDexAvailability.unavailable => AppZh.askTitoDexStatusLocalOnly,
     };
     return AssistantSurface(
       key: const Key('ask-titodex-connection-status'),
@@ -933,12 +1010,14 @@ class _ConnectionStatusCard extends StatelessWidget {
       // visually over-rounded as the second row arrived, while InputChip kept
       // its unrelated theme radius.
       radius: _assistantStatusRadius,
-      color: Color.alphaBlend(
-        TitoColors.skyBlue.withValues(alpha: 0.18),
-        TitoColors.card,
-      ),
-      borderColor: TitoColors.deepBlue.withValues(alpha: 0.55),
-      borderWidth: 1.5,
+      color: _usesPaperLook
+          ? Color.alphaBlend(
+              TitoColors.skyBlue.withValues(alpha: 0.18),
+              TitoColors.card,
+            )
+          : null,
+      borderColor: _paperOutline(0.55),
+      borderWidth: TitoBorders.element,
       child: Material(
         color: Colors.transparent,
         child: Column(
@@ -960,7 +1039,9 @@ class _ConnectionStatusCard extends StatelessWidget {
                             AskTitoDexAvailability.checking,
                       ),
                       label: statusLabel,
-                      semanticsLabel: '连接状态：$statusLabel',
+                      semanticsLabel: AppZh.askTitoDexConnectionSemantics(
+                        statusLabel,
+                      ),
                       onTap: () => _showConnectionDetails(
                         context,
                         status: status,
@@ -981,9 +1062,14 @@ class _ConnectionStatusCard extends StatelessWidget {
                         color: TitoColors.deepBlue,
                         size: 18,
                       ),
-                      label: '问答 $historyCount/$askTitoDexHistoryLimit',
-                      semanticsLabel:
-                          '问答记录 $historyCount/$askTitoDexHistoryLimit，点击管理',
+                      label: AppZh.askTitoDexHistoryCount(
+                        historyCount,
+                        askTitoDexHistoryLimit,
+                      ),
+                      semanticsLabel: AppZh.askTitoDexHistoryCountSemantics(
+                        historyCount,
+                        askTitoDexHistoryLimit,
+                      ),
                       onTap: onShowHistory,
                     ),
                   ),
@@ -999,13 +1085,15 @@ class _ConnectionStatusCard extends StatelessWidget {
                       ),
                       label: editionLabel,
                       textKey: const Key('ask-titodex-current-edition'),
-                      semanticsLabel: '当前游戏版本 $editionLabel，点击切换',
+                      semanticsLabel: AppZh.askTitoDexEditionSemantics(
+                        editionLabel,
+                      ),
                       onTap: onChangeEdition,
                       trailing: onManagePacks == null
                           ? null
                           : IconButton(
                               key: const Key('ask-titodex-packs-entry'),
-                              tooltip: '管理 Journey 资料包',
+                              tooltip: AppZh.manageJourneyPacks,
                               onPressed: onManagePacks,
                               constraints: const BoxConstraints.tightFor(
                                 width: 28,
@@ -1070,7 +1158,9 @@ class _ConnectionStatusCard extends StatelessWidget {
                                   _ContextChip(
                                     key: const Key('ask-titodex-badge-context'),
                                     icon: Icons.military_tech,
-                                    label: '存档徽章 ${value.badgeCount} 枚（仅计数）',
+                                    label: AppZh.askTitoDexSaveBadgeCount(
+                                      value.badgeCount!,
+                                    ),
                                     onDeleted: onRemoveBadges,
                                   ),
                               ],
@@ -1179,7 +1269,10 @@ class _StatusDot extends StatelessWidget {
     decoration: BoxDecoration(
       color: color,
       shape: BoxShape.circle,
-      border: Border.all(color: TitoColors.deepBlue, width: 1.25),
+      border: Border.all(
+        color: TitoColors.deepBlue,
+        width: TitoBorders.element,
+      ),
     ),
     child: checking
         ? const Padding(
@@ -1204,7 +1297,12 @@ Future<void> _showConnectionDetails(
     builder: (dialogContext) => AlertDialog(
       key: const Key('ask-titodex-connection-dialog'),
       title: Text(
-        '连接状态 · $enabledCount/$capabilityCount\n问答记录 · $historyCount/$askTitoDexHistoryLimit',
+        AppZh.askTitoDexConnectionDialogTitle(
+          enabledCount,
+          capabilityCount,
+          historyCount,
+          askTitoDexHistoryLimit,
+        ),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -1218,7 +1316,7 @@ Future<void> _showConnectionDetails(
             if (status.experimentalAnswers) ...[
               const SizedBox(height: 6),
               Text(
-                '当前为宽范围试用：仍只接受宝可梦主题和固定来源域名，但证据不足时会降为低置信度回答，不再直接丢弃。',
+                AppZh.askTitoDexBroadTrialHint,
                 key: const Key('ask-titodex-experimental-policy'),
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.deepBlue,
@@ -1257,11 +1355,11 @@ Future<void> _showConnectionDetails(
                   onRefresh();
                 },
           icon: const Icon(Icons.refresh_rounded),
-          label: const Text(AppZh.askTitoDexWorkerRefresh),
+          label: Text(AppZh.askTitoDexWorkerRefresh),
         ),
         FilledButton(
           onPressed: () => Navigator.of(dialogContext).pop(),
-          child: const Text('知道了'),
+          child: Text(AppZh.gotIt),
         ),
       ],
     ),
@@ -1270,13 +1368,17 @@ Future<void> _showConnectionDetails(
 
 List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
   ('Journey Worker', status.availability == AskTitoDexAvailability.online),
-  ('Qwen · 回答整理/核对', status.qwenConfigured),
-  ('AI Search · R2 索引', status.aiSearchEnabled),
-  ('TitoDex Bundle · 结构化校验', status.dexBundleEnabled),
-  ('百科资料 · 多个限定来源', status.curatedSourcesEnabled),
+  (AppZh.askTitoDexCapQwen, status.qwenConfigured),
+  (AppZh.askTitoDexCapAiSearch, status.aiSearchEnabled),
+  (AppZh.askTitoDexCapBundle, status.dexBundleEnabled),
+  (AppZh.askTitoDexCapEncyclopedia, status.curatedSourcesEnabled),
   for (final provider in status.webSearchProviders)
-    ('联网 · ${_webSearchProviderLabel(provider)}', status.webSearchEnabled),
-  if (status.webSearchProviders.isEmpty) ('联网搜索', false),
+    (
+      AppZh.askTitoDexCapWebSearch(_webSearchProviderLabel(provider)),
+      status.webSearchEnabled,
+    ),
+  if (status.webSearchProviders.isEmpty)
+    (AppZh.askTitoDexCapWebSearchGeneric, false),
 ];
 
 class _CapabilityDetail extends StatelessWidget {
@@ -1301,7 +1403,7 @@ class _CapabilityDetail extends StatelessWidget {
             child: Text(label, style: SecondaryTypography.onCard.body14),
           ),
           Text(
-            enabled ? '可用' : '未连接',
+            enabled ? AppZh.askTitoDexCapAvailable : AppZh.askTitoDexCapDisconnected,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: enabled ? TitoColors.deepBlue : TitoColors.mutedInk,
               fontWeight: FontWeight.w800,
@@ -1330,26 +1432,31 @@ class _HistoryManagerSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+              padding: const EdgeInsets.fromLTRB(18, 0, 8, 12),
               child: Row(
                 children: [
-                  const Icon(Icons.forum_outlined, color: TitoColors.deepBlue),
+                  const Icon(Icons.forum_outlined),
                   const SizedBox(width: 9),
                   Expanded(
                     child: Text(
-                      '问答记录 · ${entries.length}/$askTitoDexHistoryLimit',
-                      style: SecondaryTypography.onCard.h15.copyWith(
-                        fontWeight: FontWeight.w900,
+                      AppZh.askTitoDexHistorySheetTitle(
+                        entries.length,
+                        askTitoDexHistoryLimit,
                       ),
+                      style: SecondaryTypography.onCard.h15,
                     ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded),
                   ),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Text(
-                '记录只保存在当前设备；连续追问只会带入当前游戏最近 $askTitoDexContextEntryLimit 条。',
+              child:                 Text(
+                AppZh.askTitoDexHistorySheetHint(askTitoDexContextEntryLimit),
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
                   height: 1.35,
@@ -1361,7 +1468,7 @@ class _HistoryManagerSheet extends StatelessWidget {
               child: newestFirst.isEmpty
                   ? Center(
                       child: Text(
-                        '还没有问答记录',
+                        AppZh.askTitoDexHistoryEmpty,
                         style: SecondaryTypography.onCard.body14.copyWith(
                           color: TitoColors.mutedInk,
                         ),
@@ -1374,12 +1481,18 @@ class _HistoryManagerSheet extends StatelessWidget {
                       separatorBuilder: (_, _) => const SizedBox(height: 6),
                       itemBuilder: (context, index) {
                         final entry = newestFirst[index];
+                        final tile = _paperTileStyle(
+                          context,
+                          paper: TitoColors.cardWarm,
+                          outlineAlpha: 0.2,
+                        );
                         return DecoratedBox(
                           decoration: BoxDecoration(
-                            color: TitoColors.cardWarm,
-                            borderRadius: BorderRadius.circular(12),
+                            color: tile.fill,
+                            borderRadius: BorderRadius.circular(TitoRadii.md),
                             border: Border.all(
-                              color: TitoColors.deepBlue.withValues(alpha: 0.2),
+                              color: tile.outline,
+                              width: tile.outlineWidth,
                             ),
                           ),
                           child: Padding(
@@ -1421,7 +1534,7 @@ class _HistoryManagerSheet extends StatelessWidget {
                             )
                           : null,
                       icon: const Icon(Icons.compress_rounded),
-                      label: const Text('压缩到 10 条'),
+                      label: Text(AppZh.askTitoDexHistoryCompactAction),
                     ),
                   ),
                   const SizedBox(width: 9),
@@ -1435,7 +1548,7 @@ class _HistoryManagerSheet extends StatelessWidget {
                               _HistoryManagerAction.clear,
                             ),
                       icon: const Icon(Icons.delete_outline_rounded),
-                      label: const Text('清除全部'),
+                      label: Text(AppZh.askTitoDexHistoryClearAction),
                     ),
                   ),
                 ],
@@ -1471,6 +1584,8 @@ class _ContextChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Colours come from chipTheme; only the corner family is pinned so the
+    // chips match the status surface they live in.
     return InputChip(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(_assistantContextChipRadius),
@@ -1478,15 +1593,8 @@ class _ContextChip extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      backgroundColor: TitoColors.cardWarm,
-      side: BorderSide(color: TitoColors.ink.withValues(alpha: 0.55), width: 1),
       avatar: Icon(icon, size: 14),
-      label: Text(
-        label,
-        style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+      label: Text(label),
       deleteIcon: const Icon(Icons.close_rounded, size: 14),
       onDeleted: onDeleted,
     );
@@ -1509,7 +1617,7 @@ class _ConversationEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '回答会显示在这里',
+            AppZh.askTitoDexAnswerPlaceholder,
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.deepBlue.withValues(alpha: 0.72),
@@ -1543,23 +1651,24 @@ class _QuestionBubble extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: TitoColors.softYellow,
+            // Speech-bubble tail: three token corners plus one tight corner.
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(14),
-              topRight: Radius.circular(14),
-              bottomLeft: Radius.circular(14),
+              topLeft: Radius.circular(TitoRadii.lg),
+              topRight: Radius.circular(TitoRadii.lg),
+              bottomLeft: Radius.circular(TitoRadii.lg),
               bottomRight: Radius.circular(4),
             ),
             border: Border.all(
               color: TitoColors.ink.withValues(alpha: 0.3),
-              width: 1.25,
+              width: TitoBorders.element,
             ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1F18283B),
-                offset: Offset(0, 4),
-                blurRadius: 9,
-              ),
-            ],
+            boxShadow: !retroStyle.enabled
+                ? null
+                : appVisualStyle.usesTrainerJournal
+                ? TrainerJournalShadows.stickerSmall
+                : appVisualStyle.usesSolidPlastic
+                ? SolidPlasticShadows.stickerSmall
+                : TitoShadows.stickerSmall,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
@@ -1745,12 +1854,17 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final stage = switch (widget.progress) {
-      AskTitoDexProgress.checkingLocal => '正在翻本地资料',
-      AskTitoDexProgress.contactingWorker => '正在交叉核对资料与联网来源',
-      AskTitoDexProgress.retrievingSources => '正在从资料库和联网来源找线索',
-      AskTitoDexProgress.resolvingQuestion => '正在确认版本与问题里的对象',
-      AskTitoDexProgress.verifyingAnswer => '正在交叉核对资料与联网来源',
-      AskTitoDexProgress.revealingAnswer => '正在写入已核验回答',
+      AskTitoDexProgress.checkingLocal => AppZh.askTitoDexProgressCheckingLocal,
+      AskTitoDexProgress.contactingWorker =>
+        AppZh.askTitoDexProgressContactingWorker,
+      AskTitoDexProgress.retrievingSources =>
+        AppZh.askTitoDexProgressRetrievingSources,
+      AskTitoDexProgress.resolvingQuestion =>
+        AppZh.askTitoDexProgressResolvingQuestion,
+      AskTitoDexProgress.verifyingAnswer =>
+        AppZh.askTitoDexProgressVerifyingAnswer,
+      AskTitoDexProgress.revealingAnswer =>
+        AppZh.askTitoDexProgressRevealingAnswer,
     };
     final hasSemanticAnswer = widget.streamedBlocks.isNotEmpty;
     final streamedSemanticBody = widget.streamedBlocks
@@ -1760,15 +1874,17 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
           final projectedText = text.isNotEmpty
               ? text
               : block.items.isNotEmpty
-              ? block.items.join('，')
-              : block.rows.map((row) => row.join('，')).join('；');
+              ? block.items.join(AppZh.askTitoDexLiveJoinComma)
+              : block.rows
+                    .map((row) => row.join(AppZh.askTitoDexLiveJoinComma))
+                    .join(AppZh.askTitoDexLiveJoinSemicolon);
           return [
             if (title.isNotEmpty) title,
             if (projectedText.isNotEmpty) projectedText,
-          ].join('，');
+          ].join(AppZh.askTitoDexLiveJoinComma);
         })
         .where((value) => value.isNotEmpty)
-        .join('；');
+        .join(AppZh.askTitoDexLiveJoinSemicolon);
     final liveAnswerBody = streamedSemanticBody;
     final completed = widget.result;
     return Semantics(
@@ -1776,9 +1892,9 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
       liveRegion: completed == null,
       label: completed == null
           ? liveAnswerBody.isNotEmpty
-                ? '$stage，$liveAnswerBody'
+                ? AppZh.askTitoDexLiveStageBody(stage, liveAnswerBody)
                 : stage
-          : '回答完成',
+          : AppZh.askTitoDexProgressDone,
       child: AnimatedBuilder(
         animation: _settle,
         builder: (context, child) {
@@ -1795,10 +1911,10 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
         },
         child: AssistantSurface(
           key: const Key('ask-titodex-active-answer-surface'),
-          color: _assistantPaper,
+          color: _paperColor,
           padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
-          radius: 18,
-          borderColor: TitoColors.deepBlue.withValues(alpha: 0.24),
+          radius: TitoRadii.lg,
+          borderColor: _paperOutline(0.24),
           child: _MotionAwareAnimatedSize(
             onEnd: widget.onContentSettled,
             child: completed == null
@@ -1859,8 +1975,14 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
                             : Shimmer.fromColors(
                                 key: const ValueKey('answer-skeleton'),
                                 enabled: !reduceMotion,
-                                baseColor: _assistantSkeleton,
-                                highlightColor: _assistantPaper,
+                                baseColor: _usesPaperLook
+                                    ? _assistantSkeleton
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHighest,
+                                highlightColor: _usesPaperLook
+                                    ? _assistantPaper
+                                    : Theme.of(context).colorScheme.surface,
                                 child: const Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
@@ -1904,7 +2026,7 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    '回答已核验',
+                                    AppZh.askTitoDexAnswerVerified,
                                     style: SecondaryTypography.onCard.small12
                                         .copyWith(
                                           color: TitoColors.deepBlue,
@@ -2053,7 +2175,7 @@ class _StreamingClarification extends StatelessWidget {
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: TitoColors.softYellow.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(TitoRadii.md),
         border: Border.all(
           color: TitoColors.softYellow.withValues(alpha: 0.56),
         ),
@@ -2237,7 +2359,7 @@ class _AnswerTextPanel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(11, 9, 11, 10),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(TitoRadii.md),
         border: Border.all(
           color: borderColor ?? TitoColors.deepBlue.withValues(alpha: 0.12),
         ),
@@ -2333,7 +2455,7 @@ class _AnswerTableBlock extends StatelessWidget {
           const SizedBox(height: 6),
         ],
         ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(TitoRadii.sm),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Table(
@@ -2574,7 +2696,7 @@ class _AssistantMarkdown extends StatelessWidget {
         codeblockPadding: const EdgeInsets.all(10),
         codeblockDecoration: BoxDecoration(
           color: TitoColors.skyBlue.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(TitoRadii.sm),
         ),
         horizontalRuleDecoration: BoxDecoration(
           border: Border(
@@ -2597,13 +2719,7 @@ class _AnswerSkeletonLine extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
         widthFactor: fraction,
-        child: Container(
-          height: 8,
-          decoration: BoxDecoration(
-            color: _assistantSkeleton,
-            borderRadius: BorderRadius.circular(999),
-          ),
-        ),
+        child: const TitoSkeletonBox(height: 8, radius: 999),
       ),
     );
   }
@@ -2614,13 +2730,7 @@ class _AnswerSkeletonEvidence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 30,
-      decoration: BoxDecoration(
-        color: _assistantSkeleton,
-        borderRadius: BorderRadius.circular(12),
-      ),
-    );
+    return const TitoSkeletonBox(height: 30, radius: TitoRadii.md);
   }
 }
 
@@ -2720,7 +2830,7 @@ class _StatusPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
           color: TitoColors.ink.withValues(alpha: 0.62),
-          width: 1,
+          width: TitoBorders.element,
         ),
       ),
       child: Row(
@@ -2768,8 +2878,8 @@ class _AnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AssistantSurface(
       key: const Key('ask-titodex-answer-card'),
-      color: _assistantPaper,
-      radius: 18,
+      color: _paperColor,
+      radius: TitoRadii.lg,
       child: _AnswerCardContent(
         question: question,
         result: result,
@@ -2824,7 +2934,7 @@ class _AnswerCardContent extends StatelessWidget {
           OutlinedButton(
             key: const Key('ask-titodex-retry'),
             onPressed: onRetry,
-            child: const Text(AppZh.retry),
+            child: Text(AppZh.retry),
           ),
         ],
       );
@@ -2860,7 +2970,7 @@ class _AnswerCardContent extends StatelessWidget {
           if (result.clarificationCandidates.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
-              '请选择你明确指的是哪一个：',
+              AppZh.askTitoDexClarificationPrompt,
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: TitoColors.mutedInk,
                 fontWeight: FontWeight.w800,
@@ -2894,7 +3004,7 @@ class _AnswerCardContent extends StatelessWidget {
               emphasized: result.modelUsed,
             ),
             if (result.aiSearchUsed)
-              const _AnswerMetaLabel(
+              _AnswerMetaLabel(
                 label: AppZh.askTitoDexTraceAiSearch,
                 emphasized: true,
               ),
@@ -3012,12 +3122,12 @@ class _AnswerEvidenceSummary extends StatelessWidget {
         : AppZh.askTitoDexEvidenceUnverified;
     return Semantics(
       button: hasSources,
-      label: hasSources ? '$label，查看详细引用' : label,
+      label: hasSources ? AppZh.askTitoDexViewCitations(label) : label,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           key: const Key('ask-titodex-source-summary'),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(TitoRadii.md),
           onTap: hasSources
               ? () => _showAnswerSources(
                   context,
@@ -3030,7 +3140,7 @@ class _AnswerEvidenceSummary extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               color: TitoColors.skyBlue.withValues(alpha: 0.28),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(TitoRadii.md),
               border: Border.all(color: TitoColors.ink.withValues(alpha: 0.45)),
             ),
             child: Row(
@@ -3054,7 +3164,7 @@ class _AnswerEvidenceSummary extends StatelessWidget {
                 ),
                 if (hasSources) ...[
                   Text(
-                    '查看',
+                    AppZh.viewAction,
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.mutedInk,
                       fontWeight: FontWeight.w800,
@@ -3082,7 +3192,7 @@ Future<void> _showAnswerSources(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    backgroundColor: TitoColors.cardWarm,
+    useSafeArea: true,
     builder: (sheetContext) => DraggableScrollableSheet(
       key: const Key('ask-titodex-source-sheet'),
       expand: false,
@@ -3178,15 +3288,20 @@ class _SourceReferenceTile extends StatelessWidget {
         ? AppZh.askTitoDexSourceLinkInvalid
         : _sourceHost(uri);
     final accessedAt = _sourceAccessDate(source.accessedAt);
+    final tile = _paperTileStyle(
+      context,
+      paper: TitoColors.card,
+      outlineAlpha: 0.38,
+    );
     return Material(
-      color: TitoColors.card,
-      borderRadius: BorderRadius.circular(12),
+      color: tile.fill,
+      borderRadius: BorderRadius.circular(TitoRadii.md),
       child: ListTile(
         key: ValueKey('ask-titodex-source-$index'),
         enabled: uri != null,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: TitoColors.ink.withValues(alpha: 0.38)),
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          side: BorderSide(color: tile.outline, width: tile.outlineWidth),
         ),
         leading: SizedBox(
           width: 30,
@@ -3210,7 +3325,9 @@ class _SourceReferenceTile extends StatelessWidget {
           children: [
             const SizedBox(height: 2),
             Text(
-              accessedAt == null ? host : '$host · 查阅 $accessedAt',
+              accessedAt == null
+                  ? host
+                  : AppZh.askTitoDexSourceAccessed(host, accessedAt),
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: TitoColors.mutedInk,
               ),
@@ -3244,7 +3361,7 @@ class _SourceReferenceTile extends StatelessWidget {
                 }
                 if (!opened && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(AppZh.askTitoDexSourceLinkUnavailable),
                     ),
                   );
@@ -3344,7 +3461,7 @@ class _EntityLinkCardsState extends State<_EntityLinkCards> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '在 TitoDex 里继续查看',
+              AppZh.askTitoDexContinueInApp,
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: TitoColors.mutedInk,
                 fontWeight: FontWeight.w900,
@@ -3384,23 +3501,8 @@ class _EntityActionChip extends StatelessWidget {
       key: ValueKey('ask-entity-${link.kind.name}-${link.id}'),
       visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      backgroundColor: _entityChipColor(link.kind),
-      side: BorderSide(color: TitoColors.deepBlue.withValues(alpha: 0.28)),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      labelPadding: const EdgeInsets.only(left: 3, right: 4),
-      avatar: Icon(
-        _entityIcon(link.kind),
-        size: 15,
-        color: TitoColors.deepBlue,
-      ),
-      label: Text(
-        '${link.nameZh} · ${_entityKindLabel(link.kind)}',
-        style: SecondaryTypography.onCard.small12.copyWith(
-          color: TitoColors.deepBlue,
-          fontWeight: FontWeight.w900,
-        ),
-      ),
+      avatar: Icon(_entityIcon(link.kind), size: 15),
+      label: Text('${link.nameZh} · ${_entityKindLabel(link.kind)}'),
       onPressed: () => context.push(link.route),
     );
   }
@@ -3484,46 +3586,14 @@ IconData _entityIcon(AskTitoDexEntityKind kind) => switch (kind) {
   AskTitoDexEntityKind.ability => Icons.bolt_rounded,
 };
 
-Color _entityChipColor(AskTitoDexEntityKind kind) => switch (kind) {
-  AskTitoDexEntityKind.pokemon => TitoColors.skyBlue.withValues(alpha: 0.34),
-  AskTitoDexEntityKind.item => TitoColors.softYellow.withValues(alpha: 0.3),
-  AskTitoDexEntityKind.move => TitoColors.coral.withValues(alpha: 0.16),
-  AskTitoDexEntityKind.ability => TitoColors.mint.withValues(alpha: 0.24),
-};
 String _entityKindLabel(AskTitoDexEntityKind kind) => switch (kind) {
-  AskTitoDexEntityKind.pokemon => '图鉴',
-  AskTitoDexEntityKind.item => '道具',
-  AskTitoDexEntityKind.move => '招式',
-  AskTitoDexEntityKind.ability => '特性',
+  AskTitoDexEntityKind.pokemon => AppZh.askTitoDexEntityPokemon,
+  AskTitoDexEntityKind.item => AppZh.askTitoDexEntityItem,
+  AskTitoDexEntityKind.move => AppZh.askTitoDexEntityMove,
+  AskTitoDexEntityKind.ability => AppZh.askTitoDexEntityAbility,
 };
 
-String _assistantGameLabel(String value) => switch (value) {
-  'diamond' => '钻石 · DP',
-  'pearl' => '珍珠 · DP',
-  'platinum' => '白金 · Pt',
-  'heartgold' => '心金 · HGSS',
-  'soulsilver' => '魂银 · HGSS',
-  'black' => '黑 · BW',
-  'white' => '白 · BW',
-  'black-2' => '黑2 · B2W2',
-  'white-2' => '白2 · B2W2',
-  'x' => 'X · XY',
-  'y' => 'Y · XY',
-  'omega-ruby' => '欧米伽红宝石 · ORAS',
-  'alpha-sapphire' => '阿尔法蓝宝石 · ORAS',
-  'sun' => '太阳 · SM',
-  'moon' => '月亮 · SM',
-  'ultra-sun' => '究极之日 · USUM',
-  'ultra-moon' => '究极之月 · USUM',
-  'sword' => '剑 · SWSH',
-  'shield' => '盾 · SWSH',
-  'brilliant-diamond' => '晶灿钻石 · BDSP',
-  'shining-pearl' => '明亮珍珠 · BDSP',
-  'legends-arceus' => '传说 阿尔宙斯 · PLA',
-  'scarlet' => '朱 · SV',
-  'violet' => '紫 · SV',
-  _ => value,
-};
+String _assistantGameLabel(String value) => flavorVersionLabelZh(value);
 
 String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
   AskTitoDexAnswerMode.localAudited => AppZh.askTitoDexRouteLocal,
@@ -3532,8 +3602,8 @@ String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
   AskTitoDexAnswerMode.curatedSourcesDeterministic =>
     AppZh.askTitoDexRouteCuratedDeterministic,
   AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
-  AskTitoDexAnswerMode.deepseekNativeSearch => 'DeepSeek 原生联网回答',
-  AskTitoDexAnswerMode.multiSourceQwen => 'Qwen × DeepSeek 交叉核对',
+  AskTitoDexAnswerMode.deepseekNativeSearch => AppZh.askTitoDexRouteDeepseekNative,
+  AskTitoDexAnswerMode.multiSourceQwen => AppZh.askTitoDexRouteMultiSource,
   AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
 };
 
@@ -3542,14 +3612,14 @@ String _sourceKindLabel(String value) => switch (value) {
   'strategywiki' => 'StrategyWiki',
   'wikidata' => 'Wikidata',
   'tavily' => 'Tavily',
-  'deepseek-native' => 'DeepSeek 联网',
+  'deepseek-native' => AppZh.askTitoDexSourceDeepseekWeb,
   'brave' => 'Brave Search',
   _ => value,
 };
 
 String _webSearchProviderLabel(String value) => switch (value) {
   'tavily' => 'Tavily',
-  'deepseek-native' => 'DeepSeek 原生',
+  'deepseek-native' => AppZh.askTitoDexSourceDeepseekNativeShort,
   'brave' => 'Brave',
   _ => value,
 };

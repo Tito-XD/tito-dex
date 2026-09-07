@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/pokemon_anniversary_art.dart';
 import '../features/dex/sprite_generation_catalog.dart';
+import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_anniversary_artwork.dart';
@@ -60,7 +61,7 @@ class _PokemonArtworkPageRoute extends PageRoute<void> {
   bool get barrierDismissible => false;
 
   @override
-  String? get barrierLabel => '关闭宝可梦大图';
+  String? get barrierLabel => AppZh.artworkCloseSemantics;
 
   @override
   Duration get transitionDuration => pokemonArtworkViewerTransitionDuration;
@@ -313,9 +314,9 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                             Icons.auto_awesome_rounded,
                             size: 16,
                           ),
-                          label: const Text(
-                            '闪光',
-                            style: TextStyle(fontWeight: FontWeight.w800),
+                          label: Text(
+                            AppZh.shinyLabel,
+                            style: const TextStyle(fontWeight: FontWeight.w800),
                           ),
                         ),
                       IconButton(
@@ -324,7 +325,7 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                           Icons.close_rounded,
                           color: TitoColors.card,
                         ),
-                        tooltip: '关闭',
+                        tooltip: AppZh.close,
                       ),
                     ],
                   ),
@@ -341,13 +342,13 @@ class _PokemonArtworkViewerState extends State<_PokemonArtworkViewer> {
                   spacing: 8,
                   children: [
                     ChoiceChip(
-                      label: const Text('立绘'),
+                      label: Text(AppZh.artworkStill),
                       selected: !_showAnniversary,
                       onSelected: (_) =>
                           setState(() => _showAnniversary = false),
                     ),
                     ChoiceChip(
-                      label: const Text('30周年 Logo'),
+                      label: Text(AppZh.artworkAnniversaryLogo),
                       selected: _showAnniversary,
                       onSelected: (_) =>
                           setState(() => _showAnniversary = true),
@@ -562,6 +563,9 @@ class _ArtworkHeroStageState extends State<_ArtworkHeroStage>
                     child: DexSpriteImage(
                       source: widget.summary.displaySpritePath,
                       fit: BoxFit.contain,
+                      // Full-screen viewer sits on a black barrier: the white
+                      // Poké Ball is the readable loader here, not a skeleton.
+                      showPokeball: true,
                     ),
                   ),
                 ),
@@ -635,14 +639,20 @@ class _SpritePickerTile extends StatelessWidget {
           Expanded(
             child: Material(
               color: TitoColors.ink.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
               child: InkWell(
                 onTap: onSelectStatic,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: borderColor, width: 2),
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    // Selection ring on the black viewer stage: the viewer is
+                    // deliberately theme-independent (D12), so only the
+                    // stroke width/radius follow the tokens.
+                    border: Border.all(
+                      color: borderColor,
+                      width: TitoBorders.element,
+                    ),
                   ),
                   padding: const EdgeInsets.all(4),
                   child: Stack(
@@ -659,7 +669,9 @@ class _SpritePickerTile extends StatelessWidget {
                           child: IconButton(
                             key: ValueKey('flip-${option.versionGroup}'),
                             onPressed: onToggleBack,
-                            tooltip: showingBack ? '切回正面' : '翻到背面',
+                            tooltip: showingBack
+                                ? AppZh.artworkFlipFront
+                                : AppZh.artworkFlipBack,
                             visualDensity: VisualDensity.compact,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints.tightFor(
@@ -710,7 +722,10 @@ class _SpritePickerTile extends StatelessWidget {
                     ? TitoColors.softYellow
                     : TitoColors.skyBlue,
               ),
-              child: const Text('动图', style: TextStyle(fontSize: 9)),
+              child: Text(
+                AppZh.artworkAnimated,
+                style: const TextStyle(fontSize: 9),
+              ),
             ),
         ],
       ),

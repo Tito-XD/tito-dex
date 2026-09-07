@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 
@@ -26,6 +27,29 @@ class TitoProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clamped = value.clamp(0.0, 1.0);
+    final scheme = Theme.of(context).colorScheme;
+    final Color track;
+    final Color fill;
+    final BoxBorder? border;
+    if (appVisualStyle.usesFlatUi) {
+      track = trackColor ?? scheme.surfaceContainerHighest;
+      fill = fillColor ?? scheme.primary;
+      border = null;
+    } else if (appVisualStyle.usesSolidPlastic) {
+      track = trackColor ?? Colors.white.withValues(alpha: 0.35);
+      fill = fillColor ?? TitoColors.deepBlue;
+      border = Border.all(
+        color: Colors.white.withValues(alpha: 0.78),
+        width: TitoBorders.glass,
+      );
+    } else {
+      track = trackColor ?? TitoColors.ink.withValues(alpha: 0.12);
+      fill = fillColor ?? TitoColors.deepBlue;
+      border = Border.all(
+        color: TitoColors.ink.withValues(alpha: 0.35),
+        width: TitoBorders.element,
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,12 +71,9 @@ class TitoProgressBar extends StatelessWidget {
             width: double.infinity,
             height: height,
             decoration: BoxDecoration(
-              color: trackColor ?? TitoColors.ink.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: TitoColors.ink.withValues(alpha: 0.35),
-                width: 1,
-              ),
+              color: track,
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
+              border: border,
             ),
             clipBehavior: Clip.antiAlias,
             child: clamped <= 0
@@ -62,8 +83,8 @@ class TitoProgressBar extends StatelessWidget {
                     widthFactor: clamped,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: fillColor ?? TitoColors.deepBlue,
-                        borderRadius: BorderRadius.circular(999),
+                        color: fill,
+                        borderRadius: BorderRadius.circular(TitoRadii.sm),
                       ),
                     ),
                   ),

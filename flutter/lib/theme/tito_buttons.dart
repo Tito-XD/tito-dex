@@ -385,7 +385,10 @@ class TitoPolaroidQuickTile extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: frameColor,
                             borderRadius: BorderRadius.circular(TitoRadii.sm),
-                            border: Border.all(color: TitoColors.ink, width: 2),
+                            border: Border.all(
+                              color: TitoColors.ink,
+                              width: TitoBorders.element,
+                            ),
                           ),
                           alignment: Alignment.center,
                           child: Icon(icon, color: iconColor, size: iconSize),

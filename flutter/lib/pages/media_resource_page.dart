@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../features/companion/companion_media.dart';
 import '../features/dex/online_media_catalog.dart';
+import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
 import '../widgets/secondary_page_scaffold.dart';
+import '../widgets/sticker_card.dart';
+import '../widgets/tito_loading_panel.dart';
 
 /// Settings resource manager: inspect/delete cached companion media and
 /// selectively download cries / animated GIFs for any species in the
@@ -51,7 +53,7 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _loadError = '媒体缓存读取失败，请重新读取';
+        _loadError = AppZh.mediaResourceLoadFailed;
       });
     }
   }
@@ -73,7 +75,11 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       return;
     }
     setState(() => _busy = false);
-    _snack(path == null ? '叫声下载失败' : '已缓存 ${entry.nameZh} 的叫声');
+    _snack(
+      path == null
+          ? AppZh.mediaResourceCryFailed
+          : AppZh.mediaResourceCryCached(entry.nameZh),
+    );
     _refresh();
   }
 
@@ -84,7 +90,11 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       return;
     }
     setState(() => _busy = false);
-    _snack(path == null ? '动图下载失败' : '已缓存 ${entry.nameZh} 的动图');
+    _snack(
+      path == null
+          ? AppZh.mediaResourceGifFailed
+          : AppZh.mediaResourceGifCached(entry.nameZh),
+    );
     _refresh();
   }
 
@@ -108,124 +118,151 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       return entry.nameZh.contains(q) || entry.id.toString() == q;
     }).toList()..sort((a, b) => a.id.compareTo(b.id));
 
-    const fieldBorder = OutlineInputBorder(
-      borderSide: BorderSide(color: Color(0x66FFF7E6)),
-    );
+    // Both sections sit on sticker cards so their ink text, list tiles and
+    // search field read the same way as every other secondary page — the
+    // page background differs per theme, the card surface does not.
     return SecondaryPageScaffold(
-      title: '媒体资源管理',
+      title: AppZh.mediaResourceTitle,
       children: [
-        Text('已缓存媒体', style: SecondaryTypography.onCard.h15),
-        const SizedBox(height: 8),
-        Text(
-          _cached.isEmpty
-              ? '暂无缓存'
-              : '共 ${_cached.length} 个文件 · ${_sizeLabel(totalBytes)}',
-          style: SecondaryTypography.onCard.body14,
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppZh.mediaResourceCachedTitle,
+                style: SecondaryTypography.onCard.h15,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _cached.isEmpty
+                    ? AppZh.mediaResourceCachedEmpty
+                    : AppZh.mediaResourceCachedSummary(
+                        _cached.length,
+                        _sizeLabel(totalBytes),
+                      ),
+                style: SecondaryTypography.onCard.body14,
+              ),
+              if (_cached.isNotEmpty) const SizedBox(height: 8),
+              for (final file in _cached)
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(
+                    file.name,
+                    style: SecondaryTypography.onCard.body14,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _sizeLabel(file.sizeBytes),
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                        ),
+                        onPressed: () async {
+                          await companionMediaCache.deleteCached(file.name);
+                          _refresh();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              if (_cached.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () async {
+                      for (final file in _cached) {
+                        await companionMediaCache.deleteCached(file.name);
+                      }
+                      _refresh();
+                    },
+                    child: Text(AppZh.mediaResourceClearAll),
+                  ),
+                ),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
-        for (final file in _cached)
-          ListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: Text(file.name, style: SecondaryTypography.onCard.body14),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+        const SizedBox(height: 16),
+        if (_loading)
+          TitoLoadingPanel(
+            message: AppZh.mediaResourceDownloadTitle,
+            compact: true,
+          )
+        else
+          StickerCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  _sizeLabel(file.sizeBytes),
-                  style: SecondaryTypography.onCard.small12,
+                  AppZh.mediaResourceDownloadTitle,
+                  style: SecondaryTypography.onCard.h15,
                 ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.delete_outline_rounded,
-                    size: 18,
-                    color: TitoColors.card,
+                const SizedBox(height: 8),
+                if (_loadError != null || _catalog.isEmpty) ...[
+                  Text(
+                    _loadError ?? AppZh.mediaResourceCatalogUnavailable,
+                    style: SecondaryTypography.onCard.body14,
                   ),
-                  onPressed: () async {
-                    await companionMediaCache.deleteCached(file.name);
-                    _refresh();
-                  },
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _refresh(reloadCatalog: true),
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: Text(AppZh.mediaResourceReload),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: AppZh.mediaResourceSearchHint,
+                    isDense: true,
+                  ),
+                  onChanged: (value) => setState(() => _query = value),
                 ),
-              ],
-            ),
-          ),
-        if (_cached.isNotEmpty)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () async {
-                for (final file in _cached) {
-                  await companionMediaCache.deleteCached(file.name);
-                }
-                _refresh();
-              },
-              child: const Text('全部清理'),
-            ),
-          ),
-        const Divider(height: 32, color: Color(0x33FFF7E6)),
-        Text('按宝可梦下载', style: SecondaryTypography.onCard.h15),
-        const SizedBox(height: 8),
-        if (_loading) ...[
-          const LinearProgressIndicator(),
-          const SizedBox(height: 8),
-        ] else if (_loadError != null || _catalog.isEmpty) ...[
-          Text(
-            _loadError ?? '媒体目录暂时不可用。请确认数据包已安装，或重新读取资源。',
-            style: SecondaryTypography.onCard.body14,
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              onPressed: () => _refresh(reloadCatalog: true),
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('重新读取'),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-        TextField(
-          style: const TextStyle(color: TitoColors.card),
-          decoration: InputDecoration(
-            hintText: '搜索宝可梦名称或编号',
-            hintStyle: TextStyle(
-              color: TitoColors.card.withValues(alpha: 0.55),
-            ),
-            isDense: true,
-            enabledBorder: fieldBorder,
-            focusedBorder: fieldBorder,
-          ),
-          onChanged: (value) => setState(() => _query = value),
-        ),
-        const SizedBox(height: 8),
-        if (!_loading &&
-            _catalog.isNotEmpty &&
-            _query.trim().isNotEmpty &&
-            matches.isEmpty)
-          Text('未找到匹配的宝可梦', style: SecondaryTypography.onCard.small12),
-        for (final entry in matches.take(40))
-          ListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              '#${entry.id} ${entry.nameZh}',
-              style: SecondaryTypography.onCard.body14,
-            ),
-            subtitle: Text(
-              '${entry.cries.length} 条叫声 · ${entry.forms.length} 张形态图',
-              style: SecondaryTypography.onCard.small12,
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                  onPressed: _busy ? null : () => _downloadCry(entry),
-                  child: const Text('叫声'),
-                ),
-                TextButton(
-                  onPressed: _busy ? null : () => _downloadGif(entry),
-                  child: const Text('动图'),
-                ),
+                const SizedBox(height: 8),
+                if (_catalog.isNotEmpty &&
+                    _query.trim().isNotEmpty &&
+                    matches.isEmpty)
+                  Text(
+                    AppZh.mediaResourceNoMatch,
+                    style: SecondaryTypography.onCard.small12,
+                  ),
+                for (final entry in matches.take(40))
+                  ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      '#${entry.id} ${entry.nameZh}',
+                      style: SecondaryTypography.onCard.body14,
+                    ),
+                    subtitle: Text(
+                      AppZh.mediaResourceEntryMeta(
+                        entry.cries.length,
+                        entry.forms.length,
+                      ),
+                      style: SecondaryTypography.onCard.small12,
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextButton(
+                          onPressed: _busy ? null : () => _downloadCry(entry),
+                          child: Text(AppZh.mediaResourceCry),
+                        ),
+                        TextButton(
+                          onPressed: _busy ? null : () => _downloadGif(entry),
+                          child: Text(AppZh.mediaResourceGif),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

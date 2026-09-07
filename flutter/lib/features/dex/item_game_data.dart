@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_locale.dart';
 import '../game/game_edition.dart';
 
 enum ItemGameAvailability { available, unavailable, unknown }
@@ -112,7 +113,7 @@ class ItemGameDataRepository {
       ..remove('cost')
       ..['_gameAvailability'] = view.availability.name
       ..['_gameVersionGroup'] = view.versionGroup
-      ..['_gameLabelZh'] = edition.labelZh
+      ..['_gameLabelZh'] = edition.label
       ..['_priceCurrency'] = view.currency;
     if (view.buy != null) result['_priceBuy'] = view.buy;
     if (view.sell != null) result['_priceSell'] = view.sell;
@@ -127,27 +128,54 @@ String itemReferenceVersionGroup(GameEdition edition) => switch (edition.slug) {
   _ => edition.dataVersionGroupKey,
 };
 
-String itemCurrencyLabelZh(String currency) => switch (currency) {
-  'poke-dollar' => '₽',
-  'coin' => '游戏币',
-  'volcanic-ash' => '火山灰',
-  'poke-coupon' => '宝可梦优惠券',
-  'berry-powder' => '树果粉',
-  'battle-point' => 'BP',
-  'sphere' => '玉',
-  'castle-point' => 'CP',
-  'watt' => 'W',
-  'athlete-point' => 'AP',
-  'dream-point' => '梦点',
-  'dream-world-berry' => '梦境树果',
-  'poke-mile' => '宝可里程',
-  'festival-coin' => '圆庆币',
-  'poke-bean' => '宝可豆',
-  'home-point' => 'HOME点数',
-  'merit-point' => 'FP',
-  'league-point' => 'LP',
-  'blueberry-point' => 'BP',
-  _ => currency,
-};
+String itemCurrencyLabelZh(String currency) {
+  final zh = switch (currency) {
+    'poke-dollar' => '₽',
+    'coin' => '游戏币',
+    'volcanic-ash' => '火山灰',
+    'poke-coupon' => '宝可梦优惠券',
+    'berry-powder' => '树果粉',
+    'battle-point' => 'BP',
+    'sphere' => '玉',
+    'castle-point' => 'CP',
+    'watt' => 'W',
+    'athlete-point' => 'AP',
+    'dream-point' => '梦点',
+    'dream-world-berry' => '梦境树果',
+    'poke-mile' => '宝可里程',
+    'festival-coin' => '圆庆币',
+    'poke-bean' => '宝可豆',
+    'home-point' => 'HOME点数',
+    'merit-point' => 'FP',
+    'league-point' => 'LP',
+    'blueberry-point' => 'BP',
+    _ => currency,
+  };
+  if (!AppLocale.instance.isEnglish) {
+    return zh;
+  }
+  return switch (currency) {
+    'poke-dollar' => '₽',
+    'coin' => 'Game Coins',
+    'volcanic-ash' => 'Volcanic Ash',
+    'poke-coupon' => 'Poké Coupons',
+    'berry-powder' => 'Berry Powder',
+    'battle-point' => 'BP',
+    'sphere' => 'Spheres',
+    'castle-point' => 'CP',
+    'watt' => 'W',
+    'athlete-point' => 'AP',
+    'dream-point' => 'Dream Points',
+    'dream-world-berry' => 'Dream World Berry',
+    'poke-mile' => 'Poké Miles',
+    'festival-coin' => 'Festival Coins',
+    'poke-bean' => 'Poké Beans',
+    'home-point' => 'HOME Points',
+    'merit-point' => 'FP',
+    'league-point' => 'LP',
+    'blueberry-point' => 'BP',
+    _ => currency,
+  };
+}
 
 final itemGameDataRepository = ItemGameDataRepository();

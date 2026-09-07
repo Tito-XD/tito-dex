@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_zh.dart';
-import '../theme/tito_colors.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/tito_typography.dart';
+import 'tito_pokeball_loading.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
 import 'tito_skeleton.dart';
@@ -18,6 +19,7 @@ class TitoLoadingPanel extends StatelessWidget {
     this.progress,
     this.compact = false,
     this.showSkeleton = true,
+    this.onLightSurface = true,
   });
 
   final String? message;
@@ -25,8 +27,14 @@ class TitoLoadingPanel extends StatelessWidget {
   final bool compact;
   final bool showSkeleton;
 
+  /// Draw the ink Poké Ball. Defaults to `true` because the panel always
+  /// sits on its own cream [StickerCard]; pass `false` only when the card
+  /// variant is deep / type-tinted. Flat UI always uses the dark variant.
+  final bool onLightSurface;
+
   @override
   Widget build(BuildContext context) {
+    final darkBall = onLightSurface || appVisualStyle.usesFlatUi;
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,16 +59,7 @@ class TitoLoadingPanel extends StatelessWidget {
           if (progress != null)
             TitoProgressBar(value: progress!.clamp(0.0, 1.0), height: 6)
           else
-            const Center(
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: TitoColors.deepBlue,
-                ),
-              ),
-            ),
+            Center(child: TitoPokeballLoading(onLight: darkBall)),
         ],
       ),
     );
@@ -96,7 +95,7 @@ class TitoBootstrapProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const TitoProgressBar(
+    return TitoProgressBar(
       value: 0.5,
       label: AppZh.bootstrapLoading,
       height: 6,

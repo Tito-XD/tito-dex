@@ -17,10 +17,11 @@ import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
 import 'companion_picker_sheet.dart';
 import 'fallback_sprite_image.dart';
 
@@ -571,20 +572,29 @@ class _QuoteBubble extends StatelessWidget {
           child: Container(
             constraints: BoxConstraints(maxWidth: maxWidth),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            // Hand-drawn speech bubble: the cream/ink look is intentional in
+            // every theme (D12); only the depth recipe follows the theme.
             decoration: BoxDecoration(
               color: TitoColors.card,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: TitoColors.ink, width: 2),
-              boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              border: Border.all(
+                color: TitoColors.ink,
+                width: TitoBorders.element,
+              ),
+              boxShadow: !retroStyle.enabled
+                  ? null
+                  : appVisualStyle.usesTrainerJournal
+                  ? TrainerJournalShadows.stickerSmall
+                  : appVisualStyle.usesSolidPlastic
+                  ? SolidPlasticShadows.stickerSmall
+                  : TitoShadows.stickerSmall,
             ),
             child: Text(
               quote ?? '',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: TitoTypography.style(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
+              style: SecondaryTypography.onCard.team12.copyWith(
                 color: TitoColors.deepBlue,
               ),
             ),
@@ -659,15 +669,23 @@ class CompanionStandbyOverlay extends StatelessWidget {
             companionSpeciesIds[hgssDefaultCompanion]!;
         final nameZh = choice?.nameZh ?? localizeSpecies(journey.companion);
 
+        // On the square dashboard the right column is the 2×3 party grid, so
+        // the untouched bottom-right default would sit on slot 6. Fall back
+        // to the left column there; an explicit user position still wins.
+        final usesDefaultPosition =
+            companionRepository.offsetX == CompanionRepository.defaultOffsetX &&
+            companionRepository.offsetY == CompanionRepository.defaultOffsetY;
+        final offsetX = square && usesDefaultPosition
+            ? -CompanionRepository.defaultOffsetX
+            : companionRepository.offsetX;
+
         return SafeArea(
           top: false,
           child: Align(
-            alignment: Alignment(
-              companionRepository.offsetX,
-              companionRepository.offsetY,
-            ),
+            alignment: Alignment(offsetX, companionRepository.offsetY),
             child: Padding(
               padding: EdgeInsets.only(
+                left: square ? 8 : 0,
                 right: square ? 8 : (compact ? 6 : 10),
                 bottom: DeviceLayout.companionOverlayBottom(context),
               ),

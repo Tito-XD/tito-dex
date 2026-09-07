@@ -5,7 +5,13 @@ import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import 'liquid_glass.dart';
 
-/// Flat UI surface used by the assistant conversation.
+/// Surface used by the assistant conversation (status pill, composer, answer
+/// cards).
+///
+/// Defaults follow the active visual style: Trainer's Journal keeps the warm
+/// assistant paper, Solid Plastic renders a milky glass sheet, Flat UI uses
+/// the Material low container. Explicit [color] / [borderColor] still win so
+/// callers can tint individual cards.
 class AssistantSurface extends StatelessWidget {
   const AssistantSurface({
     super.key,
@@ -14,9 +20,12 @@ class AssistantSurface extends StatelessWidget {
     this.padding = const EdgeInsets.all(14),
     this.radius = 20,
     this.borderColor,
-    this.borderWidth = 1.25,
+    this.borderWidth = TitoBorders.element,
     this.shadow = true,
   });
+
+  /// Warm assistant paper used by Trainer's Journal when no [color] is given.
+  static const paper = Color(0xFFFFFBF2);
 
   final Widget child;
   final Color? color;
@@ -30,16 +39,15 @@ class AssistantSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final borderRadius = BorderRadius.circular(radius);
-    final outline = borderColor ?? scheme.outlineVariant;
     if (appVisualStyle.usesSolidPlastic) {
       return ListenableBuilder(
         listenable: retroStyle,
         builder: (context, content) => LiquidGlassSurface(
-          tint: color ?? TitoColors.card,
-          opacity: 0.92,
+          tint: color ?? Colors.white,
+          opacity: color == null ? 0.82 : 0.92,
           radius: radius,
-          borderColor: borderColor ?? TitoColors.ink.withValues(alpha: 0.28),
-          borderWidth: borderWidth,
+          borderColor: borderColor,
+          borderWidth: borderColor == null ? TitoBorders.glass : borderWidth,
           padding: padding,
           boxShadow: shadow && retroStyle.enabled
               ? SolidPlasticShadows.stickerSmall
@@ -49,6 +57,37 @@ class AssistantSurface extends StatelessWidget {
         child: child,
       );
     }
+    if (appVisualStyle.usesTrainerJournal) {
+      // Hard offset shadow lives on the outer box; the Material keeps ink
+      // ripples and clipping for the content exactly as before.
+      return ListenableBuilder(
+        listenable: retroStyle,
+        builder: (context, content) => DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            boxShadow: shadow && retroStyle.enabled
+                ? TrainerJournalShadows.stickerSmall
+                : null,
+          ),
+          child: content,
+        ),
+        child: Material(
+          type: MaterialType.card,
+          color: color ?? paper,
+          elevation: 0,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: borderRadius,
+            side: BorderSide(
+              color: borderColor ?? TitoColors.deepBlue.withValues(alpha: 0.24),
+              width: borderWidth,
+            ),
+          ),
+          child: Padding(padding: padding, child: child),
+        ),
+      );
+    }
+    final outline = borderColor ?? scheme.outlineVariant;
     return ListenableBuilder(
       listenable: retroStyle,
       builder: (context, content) => Material(

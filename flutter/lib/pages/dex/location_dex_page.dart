@@ -9,7 +9,9 @@ import '../../features/dex/location_index.dart';
 import '../../features/dex/type_chart.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
+import '../../l10n/localized_names.dart';
 import '../../models/journey.dart';
+import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../widgets/secondary_page_scaffold.dart';
@@ -64,7 +66,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
     final progress = DexProgress.fromJourney(widget.journey);
     return SecondaryPageScaffold(
       title: AppZh.locationDexTitle,
-      subtitle: gameEditionRepository.edition.labelZh,
+      subtitle: gameEditionRepository.edition.label,
       children: [
         StickerCard(
           variant: StickerVariant.softYellow,
@@ -79,10 +81,10 @@ class _LocationDexPageState extends State<LocationDexPage> {
         StickerCard(
           child: TextField(
             controller: _queryController,
-            decoration: const InputDecoration(
+            // Field shape and stroke come from the theme's input decoration.
+            decoration: InputDecoration(
               prefixIcon: Icon(Icons.search_rounded),
               hintText: AppZh.locationDexSearchHint,
-              border: OutlineInputBorder(),
             ),
           ),
         ),
@@ -92,7 +94,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
           builder: (context, snapshot) {
             if (!snapshot.hasData &&
                 snapshot.connectionState != ConnectionState.done) {
-              return const TitoLoadingPanel(
+              return TitoLoadingPanel(
                 message: AppZh.referenceLoading,
                 compact: true,
               );
@@ -102,11 +104,11 @@ class _LocationDexPageState extends State<LocationDexPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(AppZh.locationDexLoadFailed),
+                    Text(AppZh.locationDexLoadFailed),
                     const SizedBox(height: 8),
                     FilledButton(
                       onPressed: () => setState(() => _future = _load()),
-                      child: const Text(AppZh.dexRetry),
+                      child: Text(AppZh.dexRetry),
                     ),
                   ],
                 ),
@@ -128,7 +130,7 @@ class _LocationDexPageState extends State<LocationDexPage> {
                 })
                 .toList(growable: false);
             if (areas.isEmpty) {
-              return const StickerCard(child: Text(AppZh.locationDexEmpty));
+              return StickerCard(child: Text(AppZh.locationDexEmpty));
             }
             return Column(
               children: [
@@ -171,8 +173,22 @@ class _LocationAreaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final caught = area.caughtCount(caughtIds);
+    final scheme = Theme.of(context).colorScheme;
+    // Two-line area tile (name + completion + chevron) — too tall for a
+    // Material chip, so it is drawn by hand with the element tokens: ink
+    // stroke in Trainer's Journal, plastic hairline, no stroke in Flat.
+    final Border? stroke = appVisualStyle.usesFlatUi
+        ? null
+        : appVisualStyle.usesSolidPlastic
+        ? Border.all(
+            color: Colors.white.withValues(alpha: 0.8),
+            width: TitoBorders.glass,
+          )
+        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
     return Material(
-      color: TitoColors.card,
+      color: appVisualStyle.usesFlatUi
+          ? scheme.surfaceContainerLow
+          : TitoColors.card,
       borderRadius: BorderRadius.circular(TitoRadii.sm),
       child: InkWell(
         borderRadius: BorderRadius.circular(TitoRadii.sm),
@@ -181,7 +197,7 @@ class _LocationAreaChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(color: TitoColors.ink, width: 1.5),
+            border: stroke,
           ),
           child: Row(
             children: [
@@ -227,8 +243,8 @@ class _LocationAreaChip extends StatelessWidget {
   Future<void> _showAreaSheet(BuildContext pageContext) {
     return showModalBottomSheet<void>(
       context: pageContext,
-      showDragHandle: true,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) {
         var missingOnly = area.entries.any(
           (entry) => !caughtIds.contains(entry.speciesId),
@@ -241,93 +257,98 @@ class _LocationAreaChip extends StatelessWidget {
                       !missingOnly || !caughtIds.contains(entry.speciesId),
                 )
                 .toList(growable: false);
-            return SafeArea(
-              child: DraggableScrollableSheet(
-                expand: false,
-                initialChildSize: 0.7,
-                minChildSize: 0.4,
-                maxChildSize: 0.94,
-                builder: (context, controller) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  area.labelZh,
-                                  style: SecondaryTypography.onCard.h15,
+            // Sheet surface, handle and shape come from the theme; the
+            // outer `useSafeArea` already keeps it clear of system bars.
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.7,
+              minChildSize: 0.4,
+              maxChildSize: 0.94,
+              builder: (context, controller) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                area.labelZh,
+                                style: SecondaryTypography.onCard.h15,
+                              ),
+                              Text(
+                                AppZh.locationDexCompletion(
+                                  area.caughtCount(caughtIds),
+                                  area.speciesCount,
                                 ),
-                                Text(
-                                  AppZh.locationDexCompletion(
-                                    area.caughtCount(caughtIds),
-                                    area.speciesCount,
-                                  ),
-                                  style: SecondaryTypography.onCard.small12,
+                                style: SecondaryTypography.onCard.small12,
+                              ),
+                            ],
+                          ),
+                        ),
+                        FilterChip(
+                          selected: missingOnly,
+                          label: Text(AppZh.locationDexUncaughtOnly),
+                          onSelected: (value) =>
+                              setSheetState(() => missingOnly = value),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: entries.isEmpty
+                        ? Center(
+                            child: Text(
+                              AppZh.locationDexAllCaught,
+                              style: SecondaryTypography.onCard.body14,
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: controller,
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+                            itemCount: entries.length,
+                            itemBuilder: (context, index) {
+                              final entry = entries[index];
+                              final caught = caughtIds.contains(
+                                entry.speciesId,
+                              );
+                              return ListTile(
+                                dense: true,
+                                leading: Icon(
+                                  caught
+                                      ? Icons.check_circle_rounded
+                                      : Icons.radio_button_unchecked_rounded,
+                                  color: caught
+                                      ? TitoColors.deepBlue
+                                      : TitoColors.mutedInk,
                                 ),
-                              ],
-                            ),
+                                title: Text(
+                                  summaries[entry.speciesId]?.displayName ??
+                                      '#${entry.speciesId}',
+                                ),
+                                subtitle: Text(_entryDetails(entry)),
+                                trailing: const Icon(
+                                  Icons.chevron_right_rounded,
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  final route = Uri(
+                                    path: '/dex/${entry.speciesId}',
+                                    queryParameters: entry.formKey == null
+                                        ? null
+                                        : {'form': entry.formKey!},
+                                  ).toString();
+                                  pageContext.push(route);
+                                },
+                              );
+                            },
                           ),
-                          FilterChip(
-                            selected: missingOnly,
-                            label: const Text('仅未捕获'),
-                            onSelected: (value) =>
-                                setSheetState(() => missingOnly = value),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    Expanded(
-                      child: entries.isEmpty
-                          ? const Center(child: Text('这里的宝可梦已经全部捕获'))
-                          : ListView.builder(
-                              controller: controller,
-                              padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
-                              itemCount: entries.length,
-                              itemBuilder: (context, index) {
-                                final entry = entries[index];
-                                final caught = caughtIds.contains(
-                                  entry.speciesId,
-                                );
-                                return ListTile(
-                                  dense: true,
-                                  leading: Icon(
-                                    caught
-                                        ? Icons.check_circle_rounded
-                                        : Icons.radio_button_unchecked_rounded,
-                                    color: caught
-                                        ? TitoColors.deepBlue
-                                        : TitoColors.mutedInk,
-                                  ),
-                                  title: Text(
-                                    summaries[entry.speciesId]?.nameZh ??
-                                        '#${entry.speciesId}',
-                                  ),
-                                  subtitle: Text(_entryDetails(entry)),
-                                  trailing: const Icon(
-                                    Icons.chevron_right_rounded,
-                                  ),
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    final route = Uri(
-                                      path: '/dex/${entry.speciesId}',
-                                      queryParameters: entry.formKey == null
-                                          ? null
-                                          : {'form': entry.formKey!},
-                                    ).toString();
-                                    pageContext.push(route);
-                                  },
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },
@@ -351,18 +372,19 @@ class _LocationAreaChip extends StatelessWidget {
         .toSet()
         .join(' · ');
     final rate = entry.rateKind == 'weight'
-        ? '权重 ${entry.rateValue ?? entry.maxChance}'
+        ? AppZh.encounterWeight(entry.rateValue ?? entry.maxChance)
         : entry.maxChance > 0
         ? '${entry.maxChance}%'
         : '';
     final tags = [
-      if (entry.formAmbiguous) '形态未区分',
-      if (entry.teraType != null) '太晶：${typeNameZh(entry.teraType!)}',
-      if (entry.isAlpha) '头目',
-      if (entry.isTitan) '霸主',
-      if (entry.isTotem) '图腾',
-      if (entry.isRaid) '团体战',
-      if (entry.isFixedEncounter) '固定出现',
+      if (entry.formAmbiguous) AppZh.encounterFormAmbiguous,
+      if (entry.teraType != null)
+        AppZh.encounterTera(typeNameZh(entry.teraType!)),
+      if (entry.isAlpha) AppZh.encounterAlpha,
+      if (entry.isTitan) AppZh.encounterTitan,
+      if (entry.isTotem) AppZh.encounterTotem,
+      if (entry.isRaid) AppZh.encounterRaid,
+      if (entry.isFixedEncounter) AppZh.encounterFixed,
     ].join(' · ');
     return [
       methods,

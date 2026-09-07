@@ -5,6 +5,7 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/dex/item_game_data.dart';
 import '../../features/dex/reference_game_scope.dart';
 import '../../features/game/game_edition_repository.dart';
+import '../../l10n/app_locale.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/tito_colors.dart';
 import '../../widgets/dex_sprite_image.dart';
@@ -40,7 +41,7 @@ class DexJsonReferencePage extends StatelessWidget {
     return DexReferenceListPage<Map<String, dynamic>>(
       key: ValueKey('$cdnFilename:${edition.slug}:${edition.selectedFlavor}'),
       title: title,
-      subtitle: edition.labelZh,
+      subtitle: edition.label,
       loadEntries: () async {
         final entries = await dexRepository.getReferenceEntries(cdnFilename);
         if (_kind != DexReferenceKind.item) return entries;
@@ -203,32 +204,49 @@ final _itemCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
   ],
   label: _itemCategoryLabel,
   filter: (entry, category) => _itemCategoryLabel(entry) == category,
+  displayLabel: AppZh.itemBrowseCategory,
 );
 
-final _natureCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
-  options: const [null, '中性', '攻击↑', '防御↑', '特攻↑', '特防↑', '速度↑'],
-  label: natureCategoryLabel,
-  filter: (entry, category) => natureCategoryLabel(entry) == category,
-);
-
-final _eggGroupCategoryFilter =
+DexReferenceCategoryFilter<Map<String, dynamic>> get _natureCategoryFilter =>
     DexReferenceCategoryFilter<Map<String, dynamic>>(
-      options: const [null, '常规组', '水中组', '特殊组'],
+      options: [
+        null,
+        AppZh.natureCatNeutral,
+        AppZh.natureCatStatUp(natureStatLabelZh('attack')),
+        AppZh.natureCatStatUp(natureStatLabelZh('defense')),
+        AppZh.natureCatStatUp(natureStatLabelZh('special-attack')),
+        AppZh.natureCatStatUp(natureStatLabelZh('special-defense')),
+        AppZh.natureCatStatUp(natureStatLabelZh('speed')),
+      ],
+      label: natureCategoryLabel,
+      filter: (entry, category) => natureCategoryLabel(entry) == category,
+    );
+
+DexReferenceCategoryFilter<Map<String, dynamic>> get _eggGroupCategoryFilter =>
+    DexReferenceCategoryFilter<Map<String, dynamic>>(
+      options: [
+        null,
+        AppZh.eggCatRegular,
+        AppZh.eggCatWater,
+        AppZh.eggCatSpecial,
+      ],
       label: eggGroupCategoryLabel,
       filter: (entry, category) => eggGroupCategoryLabel(entry) == category,
     );
 
-final _weatherCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
-  options: const [null, '常规天气', '强天气'],
-  label: weatherCategoryLabel,
-  filter: (entry, category) => weatherCategoryLabel(entry) == category,
-);
+DexReferenceCategoryFilter<Map<String, dynamic>> get _weatherCategoryFilter =>
+    DexReferenceCategoryFilter<Map<String, dynamic>>(
+      options: [null, AppZh.weatherCatRegular, AppZh.weatherCatHarsh],
+      label: weatherCategoryLabel,
+      filter: (entry, category) => weatherCategoryLabel(entry) == category,
+    );
 
-final _statusCategoryFilter = DexReferenceCategoryFilter<Map<String, dynamic>>(
-  options: const [null, '主要异常', '其他状态'],
-  label: statusCategoryLabel,
-  filter: (entry, category) => statusCategoryLabel(entry) == category,
-);
+DexReferenceCategoryFilter<Map<String, dynamic>> get _statusCategoryFilter =>
+    DexReferenceCategoryFilter<Map<String, dynamic>>(
+      options: [null, AppZh.statusCatMajor, AppZh.statusCatOther],
+      label: statusCategoryLabel,
+      filter: (entry, category) => statusCategoryLabel(entry) == category,
+    );
 
 DexReferenceCategoryFilter<Map<String, dynamic>>?
 referenceCategoryFilterForKind(DexReferenceKind kind) => switch (kind) {
@@ -242,21 +260,23 @@ referenceCategoryFilterForKind(DexReferenceKind kind) => switch (kind) {
 
 String natureCategoryLabel(Map<String, dynamic> entry) {
   final localized = entry['increasedStatZh'] as String?;
-  final stat = localized?.isNotEmpty == true
-      ? localized!
-      : natureStatLabelZh(entry['increasedStat'] as String?);
-  return stat.isEmpty ? '中性' : '$stat↑';
+  final stat = AppLocale.instance.isEnglish
+      ? natureStatLabelZh(entry['increasedStat'] as String?)
+      : (localized?.isNotEmpty == true
+            ? localized!
+            : natureStatLabelZh(entry['increasedStat'] as String?));
+  return stat.isEmpty ? AppZh.natureCatNeutral : AppZh.natureCatStatUp(stat);
 }
 
 String eggGroupCategoryLabel(Map<String, dynamic> entry) {
   final slug = entry['slug'] as String? ?? '';
   if (slug == 'ditto' || slug == 'no-eggs') {
-    return '特殊组';
+    return AppZh.eggCatSpecial;
   }
   if (slug == 'water1' || slug == 'water2' || slug == 'water3') {
-    return '水中组';
+    return AppZh.eggCatWater;
   }
-  return '常规组';
+  return AppZh.eggCatRegular;
 }
 
 String weatherCategoryLabel(Map<String, dynamic> entry) {
@@ -267,8 +287,8 @@ String weatherCategoryLabel(Map<String, dynamic> entry) {
         'harsh-sunlight',
         'strong-winds-primal',
       }.contains(slug)
-      ? '强天气'
-      : '常规天气';
+      ? AppZh.weatherCatHarsh
+      : AppZh.weatherCatRegular;
 }
 
 String statusCategoryLabel(Map<String, dynamic> entry) {
@@ -281,8 +301,8 @@ String statusCategoryLabel(Map<String, dynamic> entry) {
         'bad-poison',
         'sleep',
       }.contains(slug)
-      ? '主要异常'
-      : '其他状态';
+      ? AppZh.statusCatMajor
+      : AppZh.statusCatOther;
 }
 
 /// Resolve item category label: CDN `categoryZh` first, then PokeAPI slug map.
@@ -292,5 +312,5 @@ String _itemCategoryLabel(Map<String, dynamic> entry) {
   final slug = entry['category'] as String? ?? '';
   return itemCategoryLabelZh(slug).isNotEmpty
       ? itemCategoryLabelZh(slug)
-      : '道具';
+      : AppZh.itemGeneric;
 }

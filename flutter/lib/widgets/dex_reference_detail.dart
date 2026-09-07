@@ -5,8 +5,10 @@ import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/dex/item_game_data.dart';
 import '../features/dex/type_chart.dart';
+import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/sticker_card.dart';
@@ -72,22 +74,28 @@ String flavorLabelZh(String? slug) {
   if (slug == null || slug.isEmpty) {
     return '';
   }
+  if (AppLocale.instance.isEnglish) {
+    return '${slug[0].toUpperCase()}${slug.substring(1)}';
+  }
   return flavorLabelsZh[slug] ?? slug;
 }
 
-/// Format nature stat change line, e.g. `↑ 攻击 · ↓ 特攻`.
 String formatNatureStatLine({
   String? increasedStat,
   String? decreasedStat,
   String? increasedStatZh,
   String? decreasedStatZh,
 }) {
-  final increased = increasedStatZh?.isNotEmpty == true
-      ? increasedStatZh!
-      : natureStatLabelZh(increasedStat);
-  final decreased = decreasedStatZh?.isNotEmpty == true
-      ? decreasedStatZh!
-      : natureStatLabelZh(decreasedStat);
+  final increased = AppLocale.instance.isEnglish
+      ? natureStatLabelZh(increasedStat)
+      : (increasedStatZh?.isNotEmpty == true
+            ? increasedStatZh!
+            : natureStatLabelZh(increasedStat));
+  final decreased = AppLocale.instance.isEnglish
+      ? natureStatLabelZh(decreasedStat)
+      : (decreasedStatZh?.isNotEmpty == true
+            ? decreasedStatZh!
+            : natureStatLabelZh(decreasedStat));
   if (increased.isEmpty && decreased.isEmpty) {
     return AppZh.dexReferenceNatureNeutral;
   }
@@ -104,6 +112,16 @@ String formatNatureStatLine({
 String itemCategoryLabelZh(String? category) {
   if (category == null || category.isEmpty) {
     return '';
+  }
+  if (AppLocale.instance.isEnglish) {
+    if (itemCategoryLabelsZh.containsKey(category)) {
+      return category
+          .split('-')
+          .where((part) => part.isNotEmpty)
+          .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
+          .join(' ');
+    }
+    return AppZh.itemBrowseCategory(category);
   }
   return itemCategoryLabelsZh[category] ?? category;
 }
@@ -128,8 +146,10 @@ String? itemVersionPriceLabel(
   String amount(Object value) =>
       currency == '₽' ? '₽$value' : '$value $currency';
   final parts = [
-    if (buy != null) '${compact ? '买' : '购买'} ${amount(buy)}',
-    if (sell != null) '${compact ? '卖' : '出售'} ${amount(sell)}',
+    if (buy != null)
+      AppZh.itemPriceBuy(compact: compact, amount: amount(buy)),
+    if (sell != null)
+      AppZh.itemPriceSell(compact: compact, amount: amount(sell)),
   ];
   return parts.join(' · ');
 }
@@ -150,6 +170,18 @@ Map<String, double>? parseTypeModifiers(Map<String, dynamic> entry) {
 }
 
 String? referenceDescriptionZh(Map<String, dynamic> entry) {
+  if (AppLocale.instance.isEnglish) {
+    final en = entry['descriptionEn'] as String?;
+    if (en != null && en.isNotEmpty) {
+      return en;
+    }
+    final slug = entry['slug'] as String?;
+    if (slug == null) {
+      return null;
+    }
+    return referenceFallbackDescriptionsEn[slug] ??
+        referenceFallbackDescriptionsZh[slug];
+  }
   final direct = entry['descriptionZh'] as String?;
   if (direct != null && direct.isNotEmpty) {
     return direct;
@@ -216,8 +248,8 @@ void showJsonReferenceDetailSheet(
 }) {
   showModalBottomSheet<void>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       return SafeArea(
         child: Padding(
@@ -486,9 +518,9 @@ class ItemReferenceDetail extends StatelessWidget {
             availability == 'unavailable'
                 ? '$gameLabel · ${AppZh.dexReferenceUnavailableInGame}'
                 : availability == 'unknown'
-                ? '$gameLabel · 可用性与价格资料待补齐'
+                ? AppZh.referenceAvailabilityPending(gameLabel)
                 : priceLabel == null
-                ? '$gameLabel · 可获得，非普通商店售价'
+                ? AppZh.referenceAvailableNotShop(gameLabel)
                 : '$gameLabel · $priceLabel',
             style: SecondaryTypography.onCard.body14.copyWith(
               fontWeight: FontWeight.w700,
@@ -609,24 +641,11 @@ class MoveReferenceDetail extends StatelessWidget {
           const SizedBox(height: 12),
         ],
         if (category != null && category.isNotEmpty)
-          Row(
-            children: [
-              Icon(moveCategoryIcon(category), size: 18, color: TitoColors.ink),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  formatMoveStatLine(
-                    category: category,
-                    power: power,
-                    accuracy: accuracy,
-                    pp: pp,
-                  ),
-                  style: SecondaryTypography.onCard.body14.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+          MoveStatRow(
+            category: category,
+            power: power,
+            accuracy: accuracy,
+            pp: pp,
           ),
         if (description != null && description.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -732,12 +751,13 @@ class _TypeModifierChip extends StatelessWidget {
     final label = _modifierLabel(multiplier);
     final color = _modifierColor(multiplier);
 
+    // Type badge: stadium pill is allowed here; outline follows the theme.
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: typeTileColor(type),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        border: _referenceBadgeBorder(),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -748,7 +768,6 @@ class _TypeModifierChip extends StatelessWidget {
             typeNameZh(type),
             style: SecondaryTypography.onCard.small12.copyWith(
               fontWeight: FontWeight.w800,
-              fontSize: 10,
             ),
           ),
           const SizedBox(width: 4),
@@ -757,7 +776,6 @@ class _TypeModifierChip extends StatelessWidget {
             style: SecondaryTypography.onCard.small12.copyWith(
               fontWeight: FontWeight.w900,
               color: color,
-              fontSize: 10,
             ),
           ),
         ],
@@ -802,21 +820,43 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final flat = appVisualStyle.usesFlatUi;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: TitoColors.softYellow,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        color: flat
+            ? scheme.secondaryContainer
+            : appVisualStyle.usesSolidPlastic
+            ? TitoColors.softYellow.withValues(alpha: 0.9)
+            : TitoColors.softYellow,
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        border: _referenceBadgeBorder(),
       ),
       child: Text(
         label,
         style: SecondaryTypography.onCard.small12.copyWith(
           fontWeight: FontWeight.w800,
+          color: flat ? scheme.onSecondaryContainer : null,
         ),
       ),
     );
   }
+}
+
+/// Badge outline per theme: ink in Trainer's Journal, a milky hairline in
+/// Solid Plastic, and none in Flat UI.
+BoxBorder? _referenceBadgeBorder() {
+  if (appVisualStyle.usesTrainerJournal) {
+    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return Border.all(
+      color: Colors.white.withValues(alpha: 0.8),
+      width: TitoBorders.glass,
+    );
+  }
+  return null;
 }
 
 IconData moveCategoryIcon(String category) => switch (category) {
@@ -826,27 +866,58 @@ IconData moveCategoryIcon(String category) => switch (category) {
   _ => Icons.help_outline_rounded,
 };
 
-String moveCategoryLabelZh(String category) {
-  return moveCategoryLabelsZh[category] ?? category;
-}
+String moveCategoryLabelZh(String category) => AppZh.moveCategory(category);
 
-String formatMoveStatLine({
-  required String category,
-  int? power,
-  int? accuracy,
-  int? pp,
-}) {
-  final parts = <String>[moveCategoryLabelZh(category)];
-  if (power != null) {
-    parts.add('${AppZh.dexReferenceMovePowerSymbol} $power');
+/// Move category · power · accuracy · PP as one wrapping row. Power and
+/// accuracy use Material icons rather than emoji glyphs so they render the
+/// same on every handheld font stack.
+class MoveStatRow extends StatelessWidget {
+  const MoveStatRow({
+    super.key,
+    required this.category,
+    this.power,
+    this.accuracy,
+    this.pp,
+  });
+
+  final String category;
+  final int? power;
+  final int? accuracy;
+  final int? pp;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final foreground = appVisualStyle.usesFlatUi
+        ? scheme.onSurface
+        : TitoColors.ink;
+    final style = SecondaryTypography.onCard.body14.copyWith(
+      fontWeight: FontWeight.w700,
+      color: foreground,
+    );
+
+    Widget stat(IconData icon, String text) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: foreground),
+        const SizedBox(width: 4),
+        Text(text, style: style),
+      ],
+    );
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        stat(moveCategoryIcon(category), moveCategoryLabelZh(category)),
+        if (power != null) stat(Icons.flash_on_rounded, '$power'),
+        if (accuracy != null) stat(Icons.gps_fixed_rounded, '$accuracy'),
+        if (pp != null)
+          Text('${AppZh.dexReferenceMovePpSymbol} $pp', style: style),
+      ],
+    );
   }
-  if (accuracy != null) {
-    parts.add('${AppZh.dexReferenceMoveAccuracySymbol} $accuracy');
-  }
-  if (pp != null) {
-    parts.add('${AppZh.dexReferenceMovePpSymbol} $pp');
-  }
-  return parts.join(' · ');
 }
 
 /// Fallback descriptions when CDN JSON has no `descriptionZh`.
@@ -868,6 +939,31 @@ const referenceFallbackDescriptionsZh = <String, String>{
   'bad-poison': '剧毒：每回合损失递增的 HP。',
   'sleep': '睡眠：无法行动，持续若干回合。',
   'confusion': '混乱：有时对自身造成伤害。',
+};
+
+const referenceFallbackDescriptionsEn = <String, String>{
+  'sun': 'Harsh sunlight: Fire moves are boosted, Water moves are weakened.',
+  'rain': 'Rain: Water moves are boosted, Fire moves are weakened.',
+  'sandstorm':
+      'Sandstorm: Pokémon that are not Rock, Ground, or Steel take damage each turn.',
+  'hail': 'Hail: Pokémon that are not Ice take damage each turn.',
+  'snow': 'Snow: Ice-type Defense is boosted (modern rules).',
+  'fog': 'Fog: Accuracy is lowered in some generations.',
+  'electric':
+      'Electric Terrain: Electric moves are boosted, and Pokémon cannot fall asleep.',
+  'grassy':
+      'Grassy Terrain: Grass moves are boosted, and grounded Pokémon recover HP each turn.',
+  'psychic':
+      'Psychic Terrain: Psychic moves are boosted, and priority moves fail.',
+  'misty':
+      'Misty Terrain: Dragon moves are weakened, and status conditions cannot be inflicted.',
+  'burn': 'Burn: Attack is halved, and HP is lost each turn.',
+  'freeze': 'Freeze: Cannot act until it thaws.',
+  'paralysis': 'Paralysis: Speed is halved, and the Pokémon may be fully paralyzed.',
+  'poison': 'Poison: HP is lost each turn.',
+  'bad-poison': 'Badly poisoned: HP loss increases each turn.',
+  'sleep': 'Sleep: Cannot act for several turns.',
+  'confusion': 'Confusion: May hurt itself in confusion.',
 };
 
 /// Fallback attack-type modifiers keyed by weather/terrain slug.

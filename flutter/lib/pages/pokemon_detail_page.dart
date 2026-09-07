@@ -11,9 +11,10 @@ import '../features/dex/type_chart.dart';
 import '../features/dex/version_availability.dart';
 import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
-import '../features/game/game_catalog.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
 import '../navigation/tito_route_work.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -21,6 +22,7 @@ import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
+import '../widgets/dex_detail_controls.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/pokemon_obtain_sections.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -31,8 +33,6 @@ import '../widgets/tito_skeleton_gate.dart';
 import '../widgets/tito_animated_size_switcher.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
-
-const _combinedObtainVersions = '__combined_versions__';
 
 class PokemonDetailPage extends StatefulWidget {
   const PokemonDetailPage({
@@ -74,9 +74,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   bool _loading = true;
   int _currentTabIndex = 0;
   GameEdition _gameEdition = defaultGameEdition;
-  GameEdition _moveGameEdition = defaultGameEdition;
-  GameEdition _obtainGameEdition = defaultGameEdition;
-  String? _selectedObtainVersion;
+  bool _hasEditionOverride = false;
   _MoveMethodFilter _moveMethodFilter = _MoveMethodFilter.level;
   String? _selectedFormKey;
   Future<Map<String, HeldItemReference>> _heldItemReferencesFuture =
@@ -122,17 +120,16 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   void _onGlobalEditionChanged() {
-    final edition = gameEditionRepository.edition;
-    if (_gameEdition.slug == edition.slug &&
-        _moveGameEdition.slug == edition.slug &&
-        _obtainGameEdition.slug == edition.slug) {
-      return;
-    }
+    if (!mounted || _hasEditionOverride) return;
+    setState(
+      () => _gameEdition = gameEditionRepository.edition.withFlavor(null),
+    );
+  }
+
+  void _selectEdition(GameEdition edition) {
     setState(() {
-      _gameEdition = edition;
-      _moveGameEdition = edition;
-      _obtainGameEdition = edition;
-      _selectedObtainVersion = null;
+      _hasEditionOverride = true;
+      _gameEdition = edition.withFlavor(null);
     });
   }
 
@@ -143,18 +140,8 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   Future<void> _loadDefaultMoveVersion() async {
     final edition = await dexSettingsRepository.loadDefaultGameEdition();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _gameEdition = edition;
-      _moveGameEdition = edition;
-      _obtainGameEdition = edition;
-      // Races with _loadDetail; never wipe a deep-linked version selection.
-      if (widget.initialObtainVersion == null) {
-        _selectedObtainVersion = null;
-      }
-    });
+    if (!mounted || _hasEditionOverride) return;
+    setState(() => _gameEdition = edition.withFlavor(null));
   }
 
   Future<void> _loadDetail() async {
@@ -188,7 +175,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         _selectedFormKey = selectedFormKey;
         if (linkedVersion != null &&
             detail.obtainLocationsByVersion.containsKey(linkedVersion)) {
-          _selectedObtainVersion = linkedVersion;
+          final linkedEdition = GameEdition.all
+              .where((game) => game.flavorVersions.contains(linkedVersion))
+              .firstOrNull;
+          if (linkedEdition != null) {
+            _gameEdition = linkedEdition.withFlavor(null);
+            _hasEditionOverride = true;
+          }
         }
         _prepareObtainSupport(displayDetail);
         _loading = false;
@@ -217,12 +210,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final keepSharedElementTarget =
         transitionHeader != null && !_sharedElementRouteSettled;
 
-    // This page owns the only warm-white bottom bar in the app — match
-    // the system nav bar to it instead of the global deep blue (v0.6.7).
+    // Let the page theme continue through the tabs and system navigation area.
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        systemNavigationBarColor: TitoColors.card,
-        systemNavigationBarIconBrightness: Brightness.dark,
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness:
+            Theme.of(context).scaffoldBackgroundColor.computeLuminance() > .45
+            ? Brightness.dark
+            : Brightness.light,
       ),
       child: Column(
         children: [
@@ -233,7 +228,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               padding.right,
               0,
             ),
-            child: const SecondaryPageAppBar(
+            child: SecondaryPageAppBar(
               title: AppZh.navDex,
               showSettings: false,
             ),
@@ -306,30 +301,28 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    if (displayDetail.hasMultipleForms) ...[
-                                      const SizedBox(height: 12),
-                                      PokemonFormSelector(
-                                        forms: displayDetail.forms,
-                                        selectedKey:
-                                            _selectedFormKey ??
-                                            displayDetail.defaultForm!.key,
-                                        onSelected: (form) {
-                                          setState(() {
-                                            _selectedFormKey = form.key;
-                                            _prepareObtainSupport(
-                                              _detail!.forForm(form),
-                                            );
-                                            _abilities =
-                                                form.abilities.isEmpty &&
-                                                    (form.isDefault ||
-                                                        form.isCosmetic)
-                                                ? _detail!.abilities
-                                                : form.abilities;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                    const SizedBox(height: 12),
+                                    DexDetailControls(
+                                      speciesNameZh:
+                                          _detail?.summary.displayName ?? '',
+                                      forms: displayDetail.forms,
+                                      selectedFormKey: _selectedFormKey,
+                                      edition: _gameEdition,
+                                      onEditionChanged: _selectEdition,
+                                      onFormChanged: (form) {
+                                        setState(() {
+                                          _selectedFormKey = form.key;
+                                          _prepareObtainSupport(
+                                            _detail!.forForm(form),
+                                          );
+                                          _abilities =
+                                              form.abilities.isEmpty &&
+                                                  (form.isDefault ||
+                                                      form.isCosmetic)
+                                              ? _detail!.abilities
+                                              : form.abilities;
+                                        });
+                                      },
+                                    ),
                                     // Keyed tab-body swap without a custom transition.
                                     TitoAnimatedSizeSwitcher(
                                       switchKey: ValueKey<int>(
@@ -344,7 +337,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 72),
+                                    const SizedBox(
+                                      height:
+                                          _DetailBottomTabs.listBottomClearance,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -353,6 +349,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                   ),
           ),
           _DetailBottomTabs(
+            selectedColor: typeTileColor(
+              displayDetail?.summary.types.firstOrNull ?? 'normal',
+            ),
             currentIndex: _currentTabIndex,
             onSelected: (index) {
               if (_currentTabIndex != index) {
@@ -430,11 +429,18 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   /// Fallback annotation for non-default forms whose data is borrowed or
   /// incomplete — so "空白" and "游戏中不存在" stop looking identical.
-  Widget? _formDataQualityNote() {
+  Widget? _formDataQualityNote(BuildContext context) {
     final form = _selectedForm;
     if (form == null) {
       return null;
     }
+    // This note sits directly on the page background (not inside a card), so
+    // it reads with the theme-aware page ink; only the status labels keep an
+    // accent so "blank" and "not in this game" stay distinguishable.
+    final pageStyle = SecondaryTypography.onPage(context).small12;
+    final statusColor = appVisualStyle.usesFlatUi
+        ? Theme.of(context).colorScheme.tertiary
+        : TitoColors.softYellow;
     final statusLabels = pokemonFormStatusLabels(
       form,
       versionGroup: _gameEdition.dataVersionGroupKey,
@@ -462,26 +468,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         for (final label in statusLabels)
           Text(
             '· $label',
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              color: TitoColors.softYellow,
+            style: pageStyle.copyWith(
+              color: statusColor,
               fontWeight: FontWeight.w800,
             ),
           ),
         if (qualityCopy != null)
           Text(
             qualityCopy,
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              color: TitoColors.card,
-              fontWeight: FontWeight.w700,
-            ),
+            style: pageStyle.copyWith(fontWeight: FontWeight.w700),
           ),
         if (introduced != null)
           Text(
             introduced,
-            style: SecondaryTypography.onGradient.small12.copyWith(
-              color: TitoColors.card,
-              fontWeight: FontWeight.w700,
-            ),
+            style: pageStyle.copyWith(fontWeight: FontWeight.w700),
           ),
       ],
     );
@@ -497,42 +497,19 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<FlavorTextEntry> _flavorEntriesForEdition(PokemonDetail detail) {
-    // v0.4.0 §7.3: show all CDN flavor entries; carousel starts on global edition.
-    return detail.flavorEntries;
+    if (_gameEdition.isGeneral) return detail.flavorEntries;
+    final exact = _gameEdition.selectedFlavor;
+    return detail.flavorEntries
+        .where(
+          (entry) => exact != null
+              ? entry.version == exact
+              : entry.versionGroup == _gameEdition.dataVersionGroupKey ||
+                    _gameEdition.flavorVersions.contains(entry.version),
+        )
+        .toList();
   }
 
-  int _flavorInitialIndex(PokemonDetail detail) {
-    final entries = detail.flavorEntries;
-    if (entries.isEmpty) {
-      return 0;
-    }
-    int indexForVersion(String? versionGroup) => entries.indexWhere(
-      (entry) =>
-          entry.versionGroup == versionGroup ||
-          entry.gameEdition == _gameEdition.slug,
-    );
-    // Prefer the exact sub-version (e.g. 朱) when one has been selected.
-    if (_gameEdition.selectedFlavor != null) {
-      final flavorIndex = entries.indexWhere(
-        (entry) => entry.version == _gameEdition.selectedFlavor,
-      );
-      if (flavorIndex >= 0) {
-        return flavorIndex;
-      }
-    }
-    final primary = indexForVersion(_gameEdition.dataVersionGroupKey);
-    if (primary >= 0) {
-      return primary;
-    }
-    final fallback = gameEditionFromSlug(_gameEdition.fallbackSlug);
-    if (fallback != null) {
-      final fb = indexForVersion(fallback.dataVersionGroupKey);
-      if (fb >= 0) {
-        return fb;
-      }
-    }
-    return 0;
-  }
+  int _flavorInitialIndex(PokemonDetail detail) => 0;
 
   List<(String, List<ObtainLocationEntry>)> _allObtainGroups(
     PokemonDetail detail,
@@ -565,24 +542,17 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   List<Widget> _introSections(PokemonDetail detail) => [
     FlavorTextCarousel(
+      key: ValueKey(
+        'flavor-${_gameEdition.slug}-${_gameEdition.selectedFlavor}-$_selectedFormKey',
+      ),
       entries: _flavorEntriesForEdition(detail),
       initialPage: _flavorInitialIndex(detail),
       gameEdition: _gameEdition,
-      onPickEdition: () async {
-        final picked = await showGameEditionPicker(
-          context,
-          selected: _gameEdition,
-        );
-        if (picked != null && mounted) {
-          setState(() => _gameEdition = picked);
-          await dexSettingsRepository.saveDefaultGameEdition(picked);
-        }
-      },
     ),
     const SizedBox(height: 12),
     IntroMetaCard(detail: detail),
     const SizedBox(height: 12),
-    AbilitiesCard(abilities: _abilities),
+    AbilitiesCard(abilities: _abilitiesForEdition(detail)),
     const SizedBox(height: 12),
     StickerCard(
       child: Text(
@@ -595,8 +565,15 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     ),
   ];
 
+  List<PokemonAbility> _abilitiesForEdition(PokemonDetail detail) {
+    if (_gameEdition.isGeneral) return detail.abilities;
+    if (_gameEdition.generation < 3) return const [];
+    return detail.abilitiesByGame[_gameEdition.dataVersionGroupKey] ??
+        (detail.abilities.isNotEmpty ? detail.abilities : _abilities);
+  }
+
   List<Widget> _basicSections(PokemonDetail detail) {
-    final qualityNote = _formDataQualityNote();
+    final qualityNote = _formDataQualityNote(context);
     return [
       if (qualityNote != null) ...[qualityNote, const SizedBox(height: 8)],
       if (detail.baseStats != null) ...[
@@ -605,7 +582,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       ],
       InteractiveTypeEffectivenessCard(
         types: detail.summary.types,
-        abilities: _abilities,
+        abilities: _abilitiesForEdition(detail),
         generation: _gameEdition.generation,
         abilityPickerLabel: AppZh.dexAbilityFilter,
       ),
@@ -630,20 +607,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   }
 
   List<Widget> _obtainSections(PokemonDetail detail) {
-    // v0.6.7 fix: the obtain tab used to dump every version group and
-    // ignored the edition pickers entirely — now it follows its own
-    // selected edition, same pattern as the moves tab.
+    if (_gameEdition.isGeneral) return _generalObtainSections(detail);
     final obtainGroups = _allObtainGroups(detail);
-    final editionKey = _obtainGameEdition.dataVersionGroupKey;
+    final editionKey = _gameEdition.dataVersionGroupKey;
     final exactVersions =
-        encounterVersionsByVersionGroup[editionKey] ?? const [];
+        encounterVersionsByVersionGroup[editionKey] ?? const <String>[];
     final selectedVersion =
-        _selectedObtainVersion ??
-        (exactVersions.contains(_obtainGameEdition.selectedFlavor)
-            ? _obtainGameEdition.selectedFlavor
-            : exactVersions.length == 1
-            ? exactVersions.single
-            : null);
+        _gameEdition.selectedFlavor ??
+        (exactVersions.length == 1 ? exactVersions.single : null);
     final List<ObtainLocationEntry>? locations;
     if (selectedVersion != null) {
       locations = detail.obtainLocationsByVersion[selectedVersion];
@@ -655,70 +626,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     }
 
     final sections = <Widget>[
-      HandheldFocusDecorator(
-        onActivate: () => _pickObtainGameEdition(),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: _pickObtainGameEdition,
-            child: Text(
-              AppZh.dexObtainScope(gameEditionLabelZh(_obtainGameEdition)),
-              style: SecondaryTypography.onGradient.body14.copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: TitoColors.skyBlue,
-              ),
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 12),
-      if (exactVersions.length > 1) ...[
-        DropdownButtonFormField<String>(
-          key: ValueKey(
-            'obtain-version-$editionKey-'
-            '${selectedVersion ?? _combinedObtainVersions}',
-          ),
-          initialValue: selectedVersion ?? _combinedObtainVersions,
-          isExpanded: true,
-          decoration: InputDecoration(
-            labelText: AppZh.dexObtainExactVersion,
-            filled: true,
-            fillColor: TitoColors.card,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-            ),
-          ),
-          items: [
-            const DropdownMenuItem(
-              value: _combinedObtainVersions,
-              child: Text(AppZh.dexObtainCombinedVersions),
-            ),
-            ...exactVersions.map(
-              (version) => DropdownMenuItem(
-                value: version,
-                child: Text(flavorVersionLabelZh(version)),
-              ),
-            ),
-          ],
-          onChanged: (version) {
-            setState(() {
-              _selectedObtainVersion = version == _combinedObtainVersions
-                  ? null
-                  : version;
-            });
-          },
-        ),
-        const SizedBox(height: 12),
-      ],
       if (locations != null && locations.isNotEmpty)
         ObtainLocationsCard(
           locations: locations,
@@ -782,18 +689,34 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     return sections;
   }
 
-  Future<void> _pickObtainGameEdition() async {
-    final picked = await showGameEditionGridPicker(
-      context,
-      selected: _obtainGameEdition,
-    );
-    if (picked != null && mounted) {
-      setState(() {
-        _obtainGameEdition = picked;
-        _selectedObtainVersion = picked.selectedFlavor;
-      });
-      await dexSettingsRepository.saveDefaultGameEdition(picked);
-    }
+  List<Widget> _generalObtainSections(PokemonDetail detail) {
+    final chain = _filteredEvolutionChain(detail);
+    return [
+      if (chain != null)
+        StickerCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppZh.dexEvolution, style: SecondaryTypography.onCard.h15),
+              const SizedBox(height: 12),
+              EvolutionChainVerticalView(
+                root: chain,
+                highlightId: detail.summary.id,
+              ),
+            ],
+          ),
+        ),
+      const SizedBox(height: 12),
+      for (final group in _allObtainGroups(detail)) ...[
+        ObtainLocationsCard(
+          locations: group.$2,
+          gameLabel: gameEditionLabelForVersionGroup(group.$1),
+        ),
+        const SizedBox(height: 8),
+      ],
+      if (_allObtainGroups(detail).isEmpty)
+        StickerCard(child: Text(AppZh.dexNoObtainData)),
+    ];
   }
 
   static List<PokemonMove> _movesForMethod(
@@ -807,12 +730,36 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   };
 
   List<Widget> _movesSections(PokemonDetail detail) {
-    final moveSetKey = gameEditionMoveSetKey(_moveGameEdition);
-    final (moveSetSourceKey, moveSet) = detail.resolvedMoveSetForKey(
-      moveSetKey,
-    );
+    final moveSetKey = gameEditionMoveSetKey(_gameEdition);
+    final (moveSetSourceKey, moveSet) = _gameEdition.isGeneral
+        ? (
+            null,
+            PokemonMoveSet.combined(
+              detail.moveSets.isEmpty
+                  ? [detail.moveSet]
+                  : detail.moveSets.values,
+            ),
+          )
+        : detail.resolvedMoveSetForKey(moveSetKey);
     final moveSetBorrowed =
         moveSetSourceKey != null && moveSetSourceKey != moveSetKey;
+    final availableMethods = _MoveMethodFilterBar._order
+        .where((method) => _movesForMethod(method, moveSet).isNotEmpty)
+        .toList();
+    if (availableMethods.isEmpty) {
+      // Same empty-state card the 获取 tab shows, so a species with no move
+      // data for this edition never renders a blank panel.
+      return [
+        StickerCard(
+          child: Text(
+            AppZh.dexNoMoveData,
+            style: SecondaryTypography.onCard.body14.copyWith(
+              color: TitoColors.mutedInk,
+            ),
+          ),
+        ),
+      ];
+    }
 
     // Species without level-up moves (or without the currently selected
     // method) land on their first non-empty method instead of a blank panel.
@@ -829,42 +776,29 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     return [
       _MoveMethodFilterBar(
         selected: effectiveFilter,
-        emptyMethods: {
-          for (final entry in _MoveMethodFilterBar._order)
-            if (_movesForMethod(entry, moveSet).isEmpty) entry,
-        },
+        availableMethods: availableMethods,
         onSelected: (filter) => setState(() => _moveMethodFilter = filter),
       ),
-      const SizedBox(height: 12),
-      HandheldFocusDecorator(
-        onActivate: () => _pickMoveGameEdition(),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: _pickMoveGameEdition,
-            child: Text(
-              AppZh.dexMovesScope(gameEditionLabelZh(_moveGameEdition)),
-              style: SecondaryTypography.onGradient.body14.copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: TitoColors.skyBlue,
-              ),
-            ),
-          ),
+      if (_gameEdition.isGeneral &&
+          effectiveFilter == _MoveMethodFilter.level) ...[
+        const SizedBox(height: 8),
+        Text(
+          AppZh.dexMovesCrossVersionNote,
+          style: SecondaryTypography.onPage(context).small12,
         ),
-      ),
+      ],
       if (moveSetBorrowed) ...[
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Text(
           AppZh.dexDataFallbackNote(
             gameEditionLabelForVersionGroup(moveSetSourceKey),
           ),
-          style: SecondaryTypography.onGradient.small12.copyWith(
-            color: TitoColors.softYellow,
-            fontWeight: FontWeight.w700,
-          ),
+          style: SecondaryTypography.onPage(
+            context,
+          ).small12.copyWith(fontWeight: FontWeight.w700),
         ),
       ],
-      const SizedBox(height: 12),
+      const SizedBox(height: 8),
       // Keyed move-method panel swap without a custom transition.
       TitoAnimatedSizeSwitcher(
         switchKey: ValueKey<int>(effectiveFilter.index),
@@ -885,7 +819,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         MoveCategoryPanel(
           title: moveMethodLabelZh('level-up'),
           moves: moveSet.levelUp,
-          showLevel: true,
+          showLevel: !_gameEdition.isGeneral,
         ),
       ],
       _MoveMethodFilter.machine => [
@@ -904,17 +838,6 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
       ],
     };
-  }
-
-  Future<void> _pickMoveGameEdition() async {
-    final picked = await showGameEditionGridPicker(
-      context,
-      selected: _moveGameEdition,
-    );
-    if (picked != null && mounted) {
-      setState(() => _moveGameEdition = picked);
-      await dexSettingsRepository.saveDefaultGameEdition(picked);
-    }
   }
 }
 
@@ -953,14 +876,13 @@ class _MoveMethodFilterBar extends StatelessWidget {
   const _MoveMethodFilterBar({
     required this.selected,
     required this.onSelected,
-    this.emptyMethods = const {},
+    required this.availableMethods,
   });
 
   final _MoveMethodFilter selected;
   final ValueChanged<_MoveMethodFilter> onSelected;
 
-  /// Methods with no moves for the current game — rendered muted.
-  final Set<_MoveMethodFilter> emptyMethods;
+  final List<_MoveMethodFilter> availableMethods;
 
   static const _order = [
     _MoveMethodFilter.level,
@@ -969,7 +891,7 @@ class _MoveMethodFilterBar extends StatelessWidget {
     _MoveMethodFilter.tutor,
   ];
 
-  static const _labels = {
+  static Map<_MoveMethodFilter, String> get _labels => {
     _MoveMethodFilter.level: AppZh.dexMoveFilterLevel,
     _MoveMethodFilter.machine: AppZh.dexMoveFilterMachine,
     _MoveMethodFilter.egg: AppZh.dexMoveFilterEgg,
@@ -978,25 +900,15 @@ class _MoveMethodFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // v0.6.7: these were flat ink-bordered boxes that read as labels, not
-    // buttons — restyle as pressable sticker chips (same language as the
-    // bottom tabs): solid drop shadow, coral when active, muted when the
-    // method has no moves for the current game.
+    final palette = _SelectionChipPalette.of(context);
     return Row(
       children: [
-        for (final entry in _order) ...[
-          if (entry != _order.first) const SizedBox(width: 6),
+        for (final entry in availableMethods) ...[
+          if (entry != availableMethods.first) const SizedBox(width: 6),
           Expanded(
             child: () {
-              final isEmpty = emptyMethods.contains(entry);
               final isSelected = selected == entry;
               final radius = BorderRadius.circular(TitoRadii.sm);
-              final restingColor = isEmpty
-                  ? TitoColors.card.withValues(alpha: 0.55)
-                  : TitoColors.card;
-              final restingTextColor = isEmpty
-                  ? TitoColors.mutedInk
-                  : TitoColors.ink;
               return _DetailSelectionMotion(
                 motionKey: ValueKey('move-filter-motion-${entry.index}'),
                 selected: isSelected,
@@ -1006,8 +918,8 @@ class _MoveMethodFilterBar extends StatelessWidget {
                     borderRadius: radius,
                     child: Material(
                       color: Color.lerp(
-                        restingColor,
-                        TitoColors.coral,
+                        palette.resting,
+                        palette.selected,
                         selection,
                       ),
                       borderRadius: radius,
@@ -1018,12 +930,7 @@ class _MoveMethodFilterBar extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           decoration: BoxDecoration(
                             borderRadius: radius,
-                            border: Border.all(
-                              color: isEmpty
-                                  ? TitoColors.ink.withValues(alpha: 0.4)
-                                  : TitoColors.ink,
-                              width: TitoBorders.element,
-                            ),
+                            border: palette.border,
                           ),
                           child: Text(
                             _labels[entry]!,
@@ -1031,8 +938,8 @@ class _MoveMethodFilterBar extends StatelessWidget {
                             style: SecondaryTypography.onCard.small12.copyWith(
                               fontWeight: FontWeight.w800,
                               color: Color.lerp(
-                                restingTextColor,
-                                const Color(0xFF4A1B0C),
+                                palette.restingText,
+                                palette.selectedText,
                                 selection,
                               ),
                             ),
@@ -1047,6 +954,60 @@ class _MoveMethodFilterBar extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// Single-choice chip colours for the custom-drawn selection rows on this
+/// page (move-method filter). These keep their hand-rolled motion, so they
+/// cannot be Material chips, but they follow the same rules: soft-yellow
+/// selection with an ink element stroke in Trainer's Journal, a milky plastic
+/// hairline in Solid Plastic, and Material `secondaryContainer` with no ink
+/// stroke in Flat UI.
+class _SelectionChipPalette {
+  const _SelectionChipPalette({
+    required this.resting,
+    required this.selected,
+    required this.restingText,
+    required this.selectedText,
+    required this.border,
+  });
+
+  final Color resting;
+  final Color selected;
+  final Color restingText;
+  final Color selectedText;
+  final Border? border;
+
+  factory _SelectionChipPalette.of(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    if (appVisualStyle.usesFlatUi) {
+      return _SelectionChipPalette(
+        resting: scheme.surfaceContainerLow,
+        selected: scheme.secondaryContainer,
+        restingText: scheme.onSurface,
+        selectedText: scheme.onSecondaryContainer,
+        border: null,
+      );
+    }
+    if (appVisualStyle.usesSolidPlastic) {
+      return _SelectionChipPalette(
+        resting: TitoColors.card.withValues(alpha: 0.86),
+        selected: TitoColors.softYellow.withValues(alpha: 0.92),
+        restingText: TitoColors.ink,
+        selectedText: TitoColors.ink,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.8),
+          width: TitoBorders.glass,
+        ),
+      );
+    }
+    return _SelectionChipPalette(
+      resting: TitoColors.card,
+      selected: TitoColors.softYellow,
+      restingText: TitoColors.ink,
+      selectedText: TitoColors.ink,
+      border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
     );
   }
 }
@@ -1111,7 +1072,7 @@ class _ErrorBody extends StatelessWidget {
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: onRetry,
-                child: const Text(AppZh.dexRetry),
+                child: Text(AppZh.dexRetry),
               ),
             ],
           ),
@@ -1125,27 +1086,48 @@ class _DetailBottomTabs extends StatelessWidget {
   const _DetailBottomTabs({
     required this.currentIndex,
     required this.onSelected,
+    required this.selectedColor,
   });
 
   final int currentIndex;
   final ValueChanged<int> onSelected;
+  final Color selectedColor;
 
-  static const _labels = [
+  static List<String> get _labels => [
     AppZh.dexTabIntro,
     AppZh.dexTabBasic,
     AppZh.dexTabObtain,
     AppZh.dexTabMoves,
   ];
 
+  /// Bottom inset the detail list keeps free so its last card clears this bar
+  /// (bar padding + tab height + a breathing gap). Single source for the page.
+  static const double listBottomClearance = 72;
+
   @override
   Widget build(BuildContext context) {
-    // v0.6.7 sticker tabs (detail template): four mini sticker cards,
-    // active one goes coral; the press sinks like every other sticker.
+    final scheme = Theme.of(context).colorScheme;
+    // Type tint on the selected tab is intentional; only the stroke follows
+    // the theme (ink in Trainer's Journal, plastic hairline, none in Flat).
+    final selectedText = selectedColor.computeLuminance() > .45
+        ? TitoColors.ink
+        : TitoColors.card;
+    final Border? tabBorder = appVisualStyle.usesFlatUi
+        ? null
+        : appVisualStyle.usesSolidPlastic
+        ? Border.all(
+            color: Colors.white.withValues(alpha: 0.8),
+            width: TitoBorders.glass,
+          )
+        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
     return Container(
+      key: const ValueKey('detail-bottom-tabs'),
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-      decoration: const BoxDecoration(
-        color: TitoColors.card,
-        border: Border(top: BorderSide(color: TitoColors.ink, width: 2)),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        border: Border(
+          top: BorderSide(color: scheme.outline.withValues(alpha: .3)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -1166,9 +1148,10 @@ class _DetailBottomTabs extends StatelessWidget {
                     child: StickerPressable(
                       borderRadius: radius,
                       child: Material(
+                        key: ValueKey('detail-tab-surface-$index'),
                         color: Color.lerp(
-                          TitoColors.card,
-                          TitoColors.coral,
+                          scheme.surface,
+                          selectedColor,
                           selection,
                         ),
                         borderRadius: radius,
@@ -1178,10 +1161,7 @@ class _DetailBottomTabs extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: radius,
-                              border: Border.all(
-                                color: TitoColors.ink,
-                                width: TitoBorders.element,
-                              ),
+                              border: tabBorder,
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 9),
                             child: Text(
@@ -1191,8 +1171,8 @@ class _DetailBottomTabs extends StatelessWidget {
                                   .copyWith(
                                     fontWeight: FontWeight.w800,
                                     color: Color.lerp(
-                                      TitoColors.mutedInk,
-                                      const Color(0xFF4A1B0C),
+                                      scheme.onSurfaceVariant,
+                                      selectedText,
                                       selection,
                                     ),
                                   ),

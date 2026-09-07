@@ -3,7 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../features/dex/dex_models.dart';
 import '../features/dex/version_availability.dart';
+import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
@@ -13,8 +16,30 @@ import 'sticker_card.dart';
 import 'sticker_pressable.dart';
 import 'type_badge.dart';
 
+/// Stroke for the pills drawn in this file. Trainer's Journal keeps the ink
+/// element stroke (or an accent colour when the pill carries a warning),
+/// Solid Plastic uses its milky hairline, Flat UI drops the stroke.
+BorderSide _pillStroke({Color? accent}) {
+  if (appVisualStyle.usesFlatUi) {
+    return accent == null
+        ? BorderSide.none
+        : BorderSide(color: accent, width: TitoBorders.element);
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return BorderSide(
+      color: accent ?? Colors.white.withValues(alpha: 0.8),
+      width: accent == null ? TitoBorders.glass : TitoBorders.element,
+    );
+  }
+  return BorderSide(
+    color: accent ?? TitoColors.ink,
+    width: TitoBorders.element,
+  );
+}
+
 String pokemonCardHeroTag(PokemonSummary summary) =>
-    'pokemon-card-${summary.id}-${summary.spriteResourceId ?? summary.id}';
+    'pokemon-card-${summary.id}-${summary.spriteResourceId ?? summary.id}'
+    '${summary.formKey == null ? '' : '-${summary.formKey}'}';
 
 /// Shared Dex-detail header geometry. The grid→detail flight shuttle, the
 /// transition (skeleton) header and the loaded header all read these so the
@@ -137,6 +162,9 @@ class PokemonMiniCard extends StatelessWidget {
                     // the creature flies to the detail header; offstaging
                     // the whole card punched a hole in the list and lost the
                     // exact sprite rect the flight must start from.
+                    // Grid cards use the plain skeleton placeholder (no
+                    // pokéball spinner) so a loading grid reads as one calm
+                    // surface instead of a field of spinning dots.
                     Expanded(
                       child: PokemonCardTransitionHero(
                         summary: summary,
@@ -161,7 +189,7 @@ class PokemonMiniCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 1),
                     Text(
-                      summary.nameZh,
+                      summary.displayName,
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -234,8 +262,8 @@ class TypeChipRow extends StatelessWidget {
               TypeChipTone.immune => const Color(0xFFE6E0F0),
               TypeChipTone.neutral => TitoColors.skyBlue,
             },
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: TitoColors.ink, width: 2),
+            borderRadius: BorderRadius.circular(TitoRadii.sm),
+            border: Border.fromBorderSide(_pillStroke()),
           ),
           child: Text(types[index], style: context.tito.chip),
         );
@@ -273,8 +301,10 @@ class _EvolutionCard extends StatelessWidget {
                   height: compact ? 56 : 64,
                 ),
                 Text(
-                  node.nameZh,
+                  node.displayName,
                   textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: context.tito.cardBodyEmphasis,
                 ),
               ],
@@ -410,16 +440,18 @@ class _EvolutionTriggerLabel extends StatelessWidget {
     // A link-trade-only step can never be done alone on one cartridge —
     // mark the pill so the lock is visible at a glance.
     final tradeLocked = evolutionRequiresTrade(node);
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: TitoColors.card,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: tradeLocked ? TitoColors.coral : TitoColors.ink,
-            width: 1.5,
+          color: appVisualStyle.usesFlatUi
+              ? scheme.surfaceContainerLow
+              : TitoColors.card,
+          borderRadius: BorderRadius.circular(TitoRadii.sm),
+          border: Border.fromBorderSide(
+            _pillStroke(accent: tradeLocked ? TitoColors.coral : null),
           ),
         ),
         child: Row(
@@ -468,12 +500,15 @@ String? _evolutionStepLabel(EvolutionNode node) {
 String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
   final parts = <String>[];
   if (trigger.isTrade) {
-    parts.add('通讯交换');
+    parts.add(AppLocale.pick(zh: '通讯交换', en: 'Trade'));
     if (trigger.heldItem != null) {
       parts.add(_itemLabelZh(trigger.heldItem!));
     }
     if (trigger.tradeSpecies != null) {
-      parts.add('与${_speciesLabelZh(trigger.tradeSpecies!)}交换');
+      final species = _speciesLabelZh(trigger.tradeSpecies!);
+      parts.add(
+        AppLocale.pick(zh: '与$species交换', en: 'Trade with $species'),
+      );
     }
   } else if (trigger.item != null) {
     parts.add(_itemLabelZh(trigger.item!));
@@ -483,52 +518,72 @@ String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
     parts.add(_triggerLabel(trigger.trigger!));
   }
   if (trigger.minHappiness != null) {
-    parts.add('亲密度');
+    parts.add(AppLocale.pick(zh: '亲密度', en: 'Friendship'));
   }
   if (trigger.minBeauty != null) {
-    parts.add('美丽度');
+    parts.add(AppLocale.pick(zh: '美丽度', en: 'Beauty'));
   }
   if (trigger.minAffection != null) {
-    parts.add('友好度≥${trigger.minAffection}');
+    parts.add(
+      AppLocale.pick(
+        zh: '友好度≥${trigger.minAffection}',
+        en: 'Affection ≥${trigger.minAffection}',
+      ),
+    );
   }
   if (trigger.knownMove != null) {
-    parts.add('学会${_moveLabelZh(trigger.knownMove!)}');
+    final move = _moveLabelZh(trigger.knownMove!);
+    parts.add(AppLocale.pick(zh: '学会$move', en: 'Knows $move'));
   }
   if (trigger.knownMoveType != null) {
-    parts.add('学会${_typeLabelZh(trigger.knownMoveType!)}招式');
+    final type = _typeLabelZh(trigger.knownMoveType!);
+    parts.add(
+      AppLocale.pick(zh: '学会$type招式', en: 'Knows a $type move'),
+    );
   }
   if (trigger.location != null) {
-    parts.add('在${_evolutionLocationLabelZh(trigger.location!)}');
+    final location = _evolutionLocationLabelZh(trigger.location!);
+    parts.add(AppLocale.pick(zh: '在$location', en: 'At $location'));
   }
   if (trigger.partySpecies != null) {
-    parts.add('同行有${_speciesLabelZh(trigger.partySpecies!)}');
+    final species = _speciesLabelZh(trigger.partySpecies!);
+    parts.add(
+      AppLocale.pick(zh: '同行有$species', en: 'With $species in the party'),
+    );
   }
   if (trigger.partyType != null) {
-    parts.add('同行有${_typeLabelZh(trigger.partyType!)}属性');
+    final type = _typeLabelZh(trigger.partyType!);
+    parts.add(
+      AppLocale.pick(zh: '同行有$type属性', en: 'With a $type type in the party'),
+    );
   }
   if (trigger.gender != null) {
-    parts.add(trigger.gender == 1 ? '雌性' : '雄性');
+    parts.add(
+      trigger.gender == 1
+          ? AppLocale.pick(zh: '雌性', en: 'Female')
+          : AppLocale.pick(zh: '雄性', en: 'Male'),
+    );
   }
   if (trigger.relativePhysicalStats != null) {
     parts.add(switch (trigger.relativePhysicalStats!) {
-      -1 => '攻击＜防御',
-      0 => '攻击＝防御',
-      _ => '攻击＞防御',
+      -1 => AppLocale.pick(zh: '攻击＜防御', en: 'Attack < Defense'),
+      0 => AppLocale.pick(zh: '攻击＝防御', en: 'Attack = Defense'),
+      _ => AppLocale.pick(zh: '攻击＞防御', en: 'Attack > Defense'),
     });
   }
   final time = switch (trigger.timeOfDay) {
-    'day' => '白天',
-    'night' => '夜晚',
+    'day' => AppLocale.pick(zh: '白天', en: 'Day'),
+    'night' => AppLocale.pick(zh: '夜晚', en: 'Night'),
     _ => null,
   };
   if (time != null) {
     parts.add(time);
   }
   if (trigger.needsOverworldRain) {
-    parts.add('雨天');
+    parts.add(AppLocale.pick(zh: '雨天', en: 'Rain'));
   }
   if (trigger.turnUpsideDown) {
-    parts.add('倒置主机');
+    parts.add(AppLocale.pick(zh: '倒置主机', en: 'Hold the console upside down'));
   }
   if (parts.isEmpty && trigger.trigger != null) {
     parts.add(_triggerLabel(trigger.trigger!));
@@ -536,8 +591,11 @@ String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
   return parts.join(' · ');
 }
 
-String _moveLabelZh(String slug) =>
-    const {
+String _moveLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(slug);
+  }
+  return const {
       'ancient-power': '原始之力',
       'barb-barrage': '毒千针',
       'double-hit': '二连击',
@@ -551,16 +609,28 @@ String _moveLabelZh(String slug) =>
       'twin-beam': '双光束',
     }[slug] ??
     _humanizeSlug(slug);
+}
 
-String _speciesLabelZh(String slug) =>
-    const {'karrablast': '盖盖虫', 'shelmet': '小嘴蜗', 'remoraid': '铁炮鱼'}[slug] ??
-    _humanizeSlug(slug);
+String _speciesLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(slug);
+  }
+  return const {'karrablast': '盖盖虫', 'shelmet': '小嘴蜗', 'remoraid': '铁炮鱼'}[slug] ??
+      _humanizeSlug(slug);
+}
 
-String _typeLabelZh(String slug) =>
-    const {'dark': '恶', 'fairy': '妖精'}[slug] ?? _humanizeSlug(slug);
+String _typeLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(slug);
+  }
+  return const {'dark': '恶', 'fairy': '妖精'}[slug] ?? _humanizeSlug(slug);
+}
 
-String _evolutionLocationLabelZh(String slug) =>
-    const {
+String _evolutionLocationLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(slug);
+  }
+  return const {
       'blush-mountain': '火特力山',
       'chargestone-cave': '电气石洞穴',
       'eterna-forest': '百代森林',
@@ -579,6 +649,7 @@ String _evolutionLocationLabelZh(String slug) =>
       'vast-poni-canyon': '波尼大峡谷',
     }[slug] ??
     _humanizeSlug(slug);
+}
 
 String _humanizeSlug(String slug) => slug
     .split('-')
@@ -589,12 +660,18 @@ String _humanizeSlug(String slug) => slug
 /// PokeAPI item slug → the Chinese names [_triggerLabel] already carries.
 String _itemLabelZh(String slug) {
   if (slug.isEmpty) return slug;
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(slug);
+  }
   final capitalized = slug[0].toUpperCase() + slug.substring(1);
   return _triggerLabel(capitalized);
 }
 
 /// Map PokeAPI evolution trigger/item slugs to Chinese display labels.
 String _triggerLabel(String raw) {
+  if (AppLocale.instance.isEnglish) {
+    return _humanizeSlug(raw);
+  }
   return raw
       .replaceAll('level-up', '升级')
       .replaceAll('use-item', '使用道具')

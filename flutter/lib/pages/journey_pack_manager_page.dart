@@ -8,10 +8,13 @@ import '../features/game/game_edition_repository.dart';
 import '../features/journey/journey_pack_models.dart';
 import '../features/journey/journey_pack_repository.dart';
 import '../features/journey/progression_hints.dart';
+import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_loading_panel.dart';
+import '../widgets/tito_progress_bar.dart';
 
 class JourneyPackManagerPage extends StatefulWidget {
   const JourneyPackManagerPage({
@@ -78,7 +81,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
     if (!mounted) return;
     if (result == 'installed') {
       progressionHintRepository.invalidate();
-      _showMessage('资料包已安装，可以用于问 TitoDex。');
+      _showMessage(AppZh.journeyPackInstalled);
     } else if (result != 'cancelled') {
       _showMessage(_errorLabel(result));
     }
@@ -87,26 +90,35 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
   Future<void> _delete(String family) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除这份资料包？'),
-        content: const Text('只会删除下载的问答资料，不会删除存档或问答记录。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return AlertDialog(
+          title: Text(AppZh.journeyPackDeleteTitle),
+          content: Text(AppZh.journeyPackDeleteBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(AppZh.cancel),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.error,
+                foregroundColor: scheme.onError,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(AppZh.journeyPackDelete),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     final result = await _repository.delete(family);
     if (!mounted) return;
     if (result == 'deleted') progressionHintRepository.invalidate();
-    _showMessage(result == 'deleted' ? '资料包已删除。' : _errorLabel(result));
+    _showMessage(
+      result == 'deleted' ? AppZh.journeyPackDeleted : _errorLabel(result),
+    );
   }
 
   void _showMessage(String value) {
@@ -131,18 +143,21 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
         .toList(growable: false);
 
     return SecondaryPageScaffold(
-      title: 'Journey 资料包',
-      subtitle: '按游戏安装，需要时再下载',
+      title: AppZh.journeyPackTitle,
+      subtitle: AppZh.journeyPackSubtitle,
       children: [
         StickerCard(
           variant: StickerVariant.sky,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('当前游戏', style: SecondaryTypography.onCard.small12),
+              Text(
+                AppZh.settingsCurrentGame,
+                style: SecondaryTypography.onCard.small12,
+              ),
               const SizedBox(height: 4),
               Text(
-                _edition.selectedLabelZh,
+                _edition.selectedLabel,
                 key: const Key('journey-pack-current-game'),
                 style: SecondaryTypography.onCard.h15,
               ),
@@ -151,11 +166,11 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
                 key: const Key('journey-pack-change-game'),
                 onPressed: _pickEdition,
                 icon: const Icon(Icons.swap_horiz_rounded),
-                label: const Text('切换游戏版本'),
+                label: Text(AppZh.journeyPackSwitchGame),
               ),
               if (exactGame == null) ...[
                 const SizedBox(height: 8),
-                const Text('请先选择成对版本中的具体一款，再匹配对应资料包。'),
+                Text(AppZh.journeyPackPickExactGame),
               ],
             ],
           ),
@@ -163,7 +178,7 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
         const SizedBox(height: 12),
         StickerCard(
           child: Text(
-            '资料包只扩展问 TitoDex 的攻略上下文，保存在 App 私有目录。不会上传存档，也不会替换图鉴数据。',
+            AppZh.journeyPackPrivacyNote,
             style: SecondaryTypography.onCard.body14.copyWith(
               color: TitoColors.mutedInk,
             ),
@@ -174,10 +189,8 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
           children: [
             Expanded(
               child: Text(
-                '可用资料包',
-                style: SecondaryTypography.onCard.h15.copyWith(
-                  color: TitoColors.card,
-                ),
+                AppZh.journeyPackAvailable,
+                style: SecondaryTypography.onPage(context).h15,
               ),
             ),
             TextButton.icon(
@@ -185,26 +198,23 @@ class _JourneyPackManagerPageState extends State<JourneyPackManagerPage> {
                   ? null
                   : _repository.refreshCatalog,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('刷新'),
+              label: Text(AppZh.journeyPackRefresh),
             ),
           ],
         ),
         if (_repository.loadingCatalog && ordered.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Center(child: CircularProgressIndicator()),
-          )
+          const TitoLoadingPanel(compact: true)
         else if (!_repository.catalogConfigured)
-          const _PackEmptyCard(
+          _PackEmptyCard(
             key: Key('journey-pack-worker-unconfigured'),
-            text: 'Journey Assistant Worker 尚未配置，已安装的旧资料仍可继续使用。',
+            text: AppZh.journeyPackWorkerUnconfigured,
           )
         else if (ordered.isEmpty && orphaned.isEmpty)
           _PackEmptyCard(
             key: const Key('journey-pack-empty'),
             text: _repository.errorCode == null
-                ? '暂时没有可下载的资料包。'
-                : '目录暂时无法读取，已安装的旧资料不会受影响。',
+                ? AppZh.journeyPackCatalogEmpty
+                : AppZh.journeyPackCatalogUnavailable,
           ),
         for (final descriptor in ordered) ...[
           _JourneyPackCard(
@@ -282,7 +292,8 @@ class _JourneyPackCard extends StatelessWidget {
                   style: SecondaryTypography.onCard.h15,
                 ),
               ),
-              if (currentGame) const Chip(label: Text('当前游戏')),
+              if (currentGame)
+                Chip(label: Text(AppZh.settingsCurrentGame)),
             ],
           ),
           if (descriptor.descriptionZh case final description?) ...[
@@ -291,14 +302,18 @@ class _JourneyPackCard extends StatelessWidget {
           ],
           const SizedBox(height: 8),
           Text(
-            '${descriptor.entryCount} 条 · ${(descriptor.sizeBytes / 1024).toStringAsFixed(0)} KB · v${descriptor.version}',
+            AppZh.journeyPackMeta(
+              descriptor.entryCount,
+              (descriptor.sizeBytes / 1024).toStringAsFixed(0),
+              descriptor.version,
+            ),
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.mutedInk,
             ),
           ),
           if (busy) ...[
             const SizedBox(height: 10),
-            LinearProgressIndicator(value: progress),
+            TitoProgressBar(value: progress ?? 0, height: 6),
           ],
           const SizedBox(height: 10),
           Wrap(
@@ -310,7 +325,7 @@ class _JourneyPackCard extends StatelessWidget {
                   key: const Key('journey-pack-cancel'),
                   onPressed: onCancel,
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('取消下载'),
+                  label: Text(AppZh.settingsDexCancelDownload),
                 )
               else if (!installed && !incompatible)
                 FilledButton.icon(
@@ -319,18 +334,21 @@ class _JourneyPackCard extends StatelessWidget {
                   icon: Icon(
                     update ? Icons.system_update_alt : Icons.download_rounded,
                   ),
-                  label: Text(update ? '更新' : '安装'),
+                  label: Text(
+                    update ? AppZh.journeyPackUpdate : AppZh.journeyPackInstall,
+                  ),
                 ),
               if ((installed || update) && !busy)
                 OutlinedButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('删除'),
+                  label: Text(AppZh.journeyPackDelete),
                 ),
-              if (installed) const Chip(label: Text('已安装')),
-              if (incompatible) const Chip(label: Text('需要新版图鉴包')),
+              if (installed) Chip(label: Text(AppZh.extensionInstalled)),
+              if (incompatible)
+                Chip(label: Text(AppZh.journeyPackIncompatible)),
               if (availability == JourneyPackAvailability.corrupt)
-                const Chip(label: Text('本地文件损坏，请重新安装')),
+                Chip(label: Text(AppZh.journeyPackCorrupt)),
             ],
           ),
         ],
@@ -358,14 +376,14 @@ class _LegacyInstalledPackCard extends StatelessWidget {
           style: SecondaryTypography.onCard.h15,
         ),
         const SizedBox(height: 6),
-        const Text('已安装；当前目录未列出此版本，仍可安全使用。'),
+        Text(AppZh.journeyPackLegacyInstalled),
         const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
             onPressed: onDelete,
             icon: const Icon(Icons.delete_outline_rounded),
-            label: const Text('删除'),
+            label: Text(AppZh.journeyPackDelete),
           ),
         ),
       ],
@@ -374,12 +392,12 @@ class _LegacyInstalledPackCard extends StatelessWidget {
 }
 
 String _errorLabel(String code) => switch (code) {
-  'worker_not_configured' => 'Journey Assistant Worker 尚未配置。',
-  'network_timeout' => '连接超时，请稍后再试。',
+  'worker_not_configured' => AppZh.journeyPackErrorWorkerNotConfigured,
+  'network_timeout' => AppZh.journeyPackErrorTimeout,
   'pack_integrity_failed' ||
   'pack_size_mismatch' ||
-  'pack_invalid' => '资料包校验失败，原有资料没有被替换。',
-  'bundle_version_incompatible' => '需要先更新图鉴资料版本。',
-  'disabled' => '请先在设置中启用问 TitoDex 助手。',
-  _ => '操作没有完成，请稍后重试。',
+  'pack_invalid' => AppZh.journeyPackErrorInvalid,
+  'bundle_version_incompatible' => AppZh.journeyPackErrorBundleIncompatible,
+  'disabled' => AppZh.journeyPackErrorDisabled,
+  _ => AppZh.journeyPackErrorGeneric,
 };

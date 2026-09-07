@@ -4,6 +4,7 @@ import '../features/launcher/emulator_launcher.dart';
 import '../features/launcher/emulator_launcher_repository.dart';
 import '../l10n/app_zh.dart';
 import '../navigation/tito_page_transition.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 import 'tito_skeleton.dart';
@@ -135,7 +136,7 @@ class _EmulatorPickerMessage extends StatelessWidget {
       children: [
         Text(message, style: context.titoHome.cardBody),
         const SizedBox(height: 12),
-        FilledButton(onPressed: onRetry, child: const Text(AppZh.dexRetry)),
+        FilledButton(onPressed: onRetry, child: Text(AppZh.dexRetry)),
       ],
     );
   }
@@ -257,9 +258,32 @@ class _AppChoiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    // Rows sit on the themed sheet surface: Flat uses its container tone,
+    // Solid Plastic a milky plate, Trainer's Journal the cream card.
+    final (fill, outline) = appVisualStyle.usesFlatUi
+        ? (scheme.surfaceContainerHigh, BorderSide.none)
+        : appVisualStyle.usesSolidPlastic
+        ? (
+            Colors.white.withValues(alpha: 0.8),
+            BorderSide(
+              color: Colors.white.withValues(alpha: 0.85),
+              width: TitoBorders.glass,
+            ),
+          )
+        : (
+            TitoColors.card,
+            BorderSide(
+              color: TitoColors.ink.withValues(alpha: 0.35),
+              width: TitoBorders.element,
+            ),
+          );
     return Material(
-      color: TitoColors.card,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      color: fill,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.md),
+        side: outline,
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(TitoRadii.md),
         onTap: () => Navigator.pop(context, app),

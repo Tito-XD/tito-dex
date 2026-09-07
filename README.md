@@ -12,8 +12,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7+193` | 点开立绘选择 30 周年形态 Logo，v20 按需下载 |
-| Offline APK | [v0.9.7](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.7) · App `0.9.7-offline+194` | 同步周年展示并内置完整 v20 图鉴与玩法资料 |
+| Lite APK | [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · App `0.9.15+196` | 统一图鉴筛选与资料选择、三主题控件及中英文界面，v20 按需下载 |
+| Offline APK | [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · App `0.9.15-offline+197` | 同步新版界面并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 按游戏管理可选资料包、50 组本地问答与伴侣等待动画 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.9.x 版本更新。
@@ -23,6 +23,11 @@
 > **非官方声明：** TitoDex 是非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo、Creatures、GAME FREAK、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。相关名称、角色、图像、音频与商标归各自权利人所有。完整来源、许可与媒体 Credits 见 [CREDITS.md](CREDITS.md)。
 
 ## 当前亮点
+
+- **统一图鉴筛选**：搜索、地区图鉴、世代、旅程同行与属性／外观／特性／招式／蛋群条件集中在同一个面板，支持交叉筛选与形态展示。
+- **集中资料选择**：详情卡下方统一选择形态和合并游戏版本，默认采用 App 版本；可选通用资料，DLC 在菜单中说明，获取与招式跟随顶部选择，不支持的分类不留空位。
+- **主题内自洽**：三套主题分别统一圆角、描边、阴影、弹层与选中态；普通图片使用呼吸骨架，属性染色详情保留单色精灵球原地旋转，长图鉴描述随内容撑高。
+- **系统语言**：界面支持简体中文和英文，跟随系统或 Android 单独设置的 App 语言，无 App 内语言开关；名称优先使用现有英文资料，缺少翻译的正文仍保留原文。
 
 - **30 周年 Logo**：点开宝可梦立绘后，可切换周年展示并选择该物种的官方形态 Logo。目录保留 1324 项（1025 张基础图与 299 个额外文件），优先匹配已核验形态，未知形态明确提示并支持手动选择；图片按需联网加载，不改变原形态、闪光状态或图鉴数据。
 - **三套内置主题**：训练家手帐、固态塑料与扁平贴纸可在设置中切换并持久保存；正式版首次启动仍使用训练家手帐。页面展开、返回和内容揭示会随主题调整，并尊重系统减少动态效果设置。
@@ -58,13 +63,13 @@
 | 持久化 | `shared_preferences` + 本地 `dex_offline/` |
 | 存档 | 单文件 URI + Gen 1–7 元数据识别；HGSS 队伍／地图／图鉴解析 |
 | 图鉴数据 | 预构建 v20 数据包，带 v5 → v4 → v3 → v2 回退与 APK 内置兜底 |
-| UI 语言 | 简体中文 |
+| UI 语言 | 简体中文默认；英文跟随系统或 Android App 语言，资料缺少译文时保留原文 |
 
 详细说明：[架构](docs/ARCHITECTURE.md)
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.7-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.7-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.7 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.15-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.15-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.15 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
 - **Lite**：推荐，安装包更小，需要时可在设置中下载离线数据。
 - **Offline**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。

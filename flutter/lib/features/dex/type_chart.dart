@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_locale.dart';
 import 'ability_type_modifiers.dart';
 
 const typeNamesZh = <String, String>{
@@ -26,7 +27,15 @@ const typeNamesZh = <String, String>{
   'fairy': '妖精',
 };
 
-String typeNameZh(String type) => typeNamesZh[type] ?? type;
+String typeNameZh(String type) {
+  if (AppLocale.instance.isEnglish) {
+    if (type.isEmpty) {
+      return type;
+    }
+    return '${type[0].toUpperCase()}${type.substring(1)}';
+  }
+  return typeNamesZh[type] ?? type;
+}
 
 String? typeEnForZh(String labelZh) {
   for (final entry in typeNamesZh.entries) {

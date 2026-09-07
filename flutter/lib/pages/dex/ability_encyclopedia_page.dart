@@ -5,6 +5,7 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/dex/reference_game_scope.dart';
 import '../../features/game/game_edition.dart';
 import '../../features/game/game_edition_repository.dart';
+import '../../l10n/localized_names.dart';
 import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
@@ -26,13 +27,13 @@ class AbilityEncyclopediaPage extends StatelessWidget {
     return DexReferenceListPage<CachedAbility>(
       key: ValueKey('abilities:${edition.slug}:${edition.selectedFlavor}'),
       title: AppZh.dexReferenceAbilities,
-      subtitle: edition.labelZh,
+      subtitle: edition.label,
       loadEntries: dexRepository.getAllAbilities,
       includeEntry: (ability) =>
           cachedAbilityAvailableInEdition(ability, edition),
       scopeNotice: (ability) => abilityScopeNotice(ability, edition),
       filterEntry: filterCachedAbility,
-      primaryLabel: (ability) => ability.nameZh,
+      primaryLabel: (ability) => ability.displayName,
       secondaryLabel: (ability) => '#${ability.id} · ${ability.nameEn}',
       detailSheet: showAbilityDetailSheet,
       scopedDetailSheet: (context, ability, notice) =>
@@ -60,7 +61,12 @@ String? abilityScopeNotice(CachedAbility ability, GameEdition edition) {
 /// `pokemonIds` is already part of the cached ability index, so this adds no
 /// detail scans or network work.
 final abilityUsageCategoryFilter = DexReferenceCategoryFilter<CachedAbility>(
-  options: const [null, '专属', '少见', '常见'],
+  options: [
+    null,
+    AppZh.abilityUsageExclusive,
+    AppZh.abilityUsageRare,
+    AppZh.abilityUsageCommon,
+  ],
   label: abilityUsageCategoryLabel,
   filter: (ability, category) => abilityUsageCategoryLabel(ability) == category,
 );
@@ -68,10 +74,10 @@ final abilityUsageCategoryFilter = DexReferenceCategoryFilter<CachedAbility>(
 String abilityUsageCategoryLabel(CachedAbility ability) {
   final count = ability.pokemonIds.length;
   if (count <= 1) {
-    return '专属';
+    return AppZh.abilityUsageExclusive;
   }
   if (count <= 5) {
-    return '少见';
+    return AppZh.abilityUsageRare;
   }
-  return '常见';
+  return AppZh.abilityUsageCommon;
 }

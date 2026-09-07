@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/dex/type_chart.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
 
@@ -62,7 +63,11 @@ class TitoTypeBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: typeTileColor(typeEn),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: small ? 1.5 : 2),
+        // Flat UI keeps the type colour but drops the ink outline; the other
+        // themes use the small-element stroke for both badge sizes.
+        border: appVisualStyle.usesFlatUi
+            ? null
+            : Border.all(color: TitoColors.ink, width: TitoBorders.element),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

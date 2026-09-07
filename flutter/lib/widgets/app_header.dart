@@ -127,7 +127,7 @@ class _GameBadgeButton extends StatelessWidget {
     if (appVisualStyle.usesSolidPlastic) {
       return LiquidGlassRoundButton(
         size: size,
-        semanticLabel: '$semanticLabel · ${edition.labelZh}',
+        semanticLabel: '$semanticLabel · ${edition.label}',
         onTap: onTap,
         tint: asset != null ? TitoColors.card : accent,
         opacity: asset != null ? 0.92 : 0.95,
@@ -140,7 +140,7 @@ class _GameBadgeButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(size / 2),
       child: Semantics(
         button: onTap != null,
-        label: '$semanticLabel · ${edition.labelZh}',
+        label: '$semanticLabel · ${edition.label}',
         child: Material(
           color: asset != null
               ? (appVisualStyle.usesFlatUi
@@ -150,7 +150,10 @@ class _GameBadgeButton extends StatelessWidget {
           shape: CircleBorder(
             side: appVisualStyle.usesFlatUi
                 ? BorderSide.none
-                : const BorderSide(color: TitoColors.ink, width: 2),
+                : const BorderSide(
+                    color: TitoColors.ink,
+                    width: TitoBorders.card,
+                  ),
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -227,7 +230,10 @@ class _HeaderIconButton extends StatelessWidget {
               : TitoColors.deepBlue,
           side: appVisualStyle.usesFlatUi
               ? BorderSide.none
-              : const BorderSide(color: TitoColors.ink, width: 2),
+              : const BorderSide(
+                  color: TitoColors.ink,
+                  width: TitoBorders.card,
+                ),
           shape: const CircleBorder(),
         ),
         icon: Icon(icon, size: iconSize),

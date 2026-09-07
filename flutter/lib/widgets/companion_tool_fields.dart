@@ -3,14 +3,18 @@ import 'package:flutter/services.dart';
 
 import 'type_badge.dart';
 
+import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
 import '../features/companion/battle_math.dart';
 import '../features/dex/ability_type_modifiers.dart';
 import '../features/dex/battle_effectiveness.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/type_chart.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../widgets/handheld_input.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
 
@@ -103,14 +107,12 @@ class TypeChipPicker extends StatelessWidget {
           runSpacing: 6,
           children: typeGridOrder.map((type) {
             final active = selected.contains(type);
+            // Theme chipTheme supplies fill / selected / outline / radius.
             return FilterChip(
               selected: active,
               showCheckmark: false,
               label: Text(typeNameZh(type)),
               avatar: TypeIconImage(typeEn: type, size: 16),
-              selectedColor: typeTileColor(type),
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
               onSelected: (next) {
                 final updated = List<String>.from(selected);
                 if (next) {
@@ -180,13 +182,14 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
 
   String get _selectionLabel {
     if (widget.selected.isEmpty) {
-      return '未选择';
+      return AppZh.noneSelected;
     }
     return widget.selected.map(typeNameZh).join(' / ');
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -197,52 +200,72 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
           ),
         ),
         const SizedBox(height: 8),
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => setState(() => _expanded = !_expanded),
-            borderRadius: BorderRadius.circular(10),
-            child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: TitoColors.card,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: TitoColors.ink, width: 2),
-              ),
-              child: Row(
-                children: [
-                  if (widget.selected.isEmpty)
-                    Icon(
-                      Icons.category_rounded,
-                      size: 20,
-                      color: TitoColors.mutedInk,
-                    )
-                  else
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        for (final type in widget.selected) ...[
-                          TypeIconImage(typeEn: type, size: 20),
-                          const SizedBox(width: 4),
+        HandheldFocusDecorator(
+          onActivate: () => setState(() => _expanded = !_expanded),
+          borderRadius: BorderRadius.circular(TitoRadii.md),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              borderRadius: BorderRadius.circular(TitoRadii.md),
+              child: Ink(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: appVisualStyle.usesFlatUi
+                      ? scheme.surfaceContainerHighest
+                      : appVisualStyle.usesSolidPlastic
+                      ? Colors.white.withValues(alpha: 0.8)
+                      : TitoColors.card,
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
+                  border: _companionControlBorder(),
+                ),
+                child: Row(
+                  children: [
+                    if (widget.selected.isEmpty)
+                      Icon(
+                        Icons.category_rounded,
+                        size: 20,
+                        color: appVisualStyle.usesFlatUi
+                            ? scheme.onSurfaceVariant
+                            : TitoColors.mutedInk,
+                      )
+                    else
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (final type in widget.selected) ...[
+                            TypeIconImage(typeEn: type, size: 20),
+                            const SizedBox(width: 4),
+                          ],
                         ],
-                      ],
-                    ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _selectionLabel,
-                      style: SecondaryTypography.onCard.body14.copyWith(
-                        fontWeight: FontWeight.w800,
+                      ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _selectionLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: appVisualStyle.usesFlatUi
+                              ? scheme.onSurface
+                              : null,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(
-                    _expanded
-                        ? Icons.expand_less_rounded
-                        : Icons.expand_more_rounded,
-                    color: TitoColors.ink,
-                  ),
-                ],
+                    Icon(
+                      _expanded
+                          ? Icons.expand_less_rounded
+                          : Icons.expand_more_rounded,
+                      color: appVisualStyle.usesFlatUi
+                          ? scheme.onSurfaceVariant
+                          : TitoColors.ink,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -262,22 +285,23 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
             itemBuilder: (context, index) {
               final type = typeGridOrder[index];
               final active = widget.selected.contains(type);
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => _toggleType(type),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: typeTileColor(type),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: active ? TitoColors.ink : TitoColors.ink.withValues(alpha: 0.35),
-                        width: active ? 3 : 2,
+              return HandheldFocusDecorator(
+                onActivate: () => _toggleType(type),
+                borderRadius: BorderRadius.circular(TitoRadii.sm),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _toggleType(type),
+                    borderRadius: BorderRadius.circular(TitoRadii.sm),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: typeTileColor(type),
+                        borderRadius: BorderRadius.circular(TitoRadii.sm),
+                        border: _typeTileBorder(active),
                       ),
-                    ),
-                    child: Center(
-                      child: TypeIconImage(typeEn: type, size: 22),
+                      child: Center(
+                        child: TypeIconImage(typeEn: type, size: 22),
+                      ),
                     ),
                   ),
                 ),
@@ -288,6 +312,42 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
       ],
     );
   }
+}
+
+/// Outline for the collapsible picker header (field-like control).
+BoxBorder? _companionControlBorder() {
+  if (appVisualStyle.usesTrainerJournal) {
+    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return Border.all(
+      color: Colors.white.withValues(alpha: 0.85),
+      width: TitoBorders.glass,
+    );
+  }
+  return null;
+}
+
+/// Type grid tile outline: the selected tile always gets a full ink ring;
+/// idle tiles fade the ring (TJ), use a milky hairline (Plastic), or go
+/// borderless (Flat).
+BoxBorder? _typeTileBorder(bool active) {
+  if (active) {
+    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+  }
+  if (appVisualStyle.usesTrainerJournal) {
+    return Border.all(
+      color: TitoColors.ink.withValues(alpha: 0.35),
+      width: TitoBorders.element,
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return Border.all(
+      color: Colors.white.withValues(alpha: 0.7),
+      width: TitoBorders.glass,
+    );
+  }
+  return null;
 }
 
 class CompanionSectionCard extends StatelessWidget {
@@ -343,7 +403,7 @@ class NaturePicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '性格',
+          AppZh.natureLabel,
           style: SecondaryTypography.onCard.small12.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -353,10 +413,7 @@ class NaturePicker extends StatelessWidget {
           initialSelection: selected,
           dropdownMenuEntries: [
             for (final nature in battleNatures)
-              DropdownMenuEntry(
-                value: nature,
-                label: nature.labelZh,
-              ),
+              DropdownMenuEntry(value: nature, label: nature.label),
           ],
           onSelected: (value) {
             if (value != null) {
@@ -388,7 +445,7 @@ class StatPicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '能力',
+          AppZh.statLabel,
           style: SecondaryTypography.onCard.small12.copyWith(
             fontWeight: FontWeight.w800,
           ),
@@ -398,10 +455,7 @@ class StatPicker extends StatelessWidget {
           initialSelection: selected,
           dropdownMenuEntries: [
             for (final stat in BattleStat.values)
-              DropdownMenuEntry(
-                value: stat,
-                label: stat.labelZh,
-              ),
+              DropdownMenuEntry(value: stat, label: stat.label),
           ],
           onSelected: (value) {
             if (value != null) {
@@ -432,10 +486,7 @@ class MoveCategoryPicker extends StatelessWidget {
     return SegmentedButton<MoveCategory>(
       segments: [
         for (final category in MoveCategory.values)
-          ButtonSegment(
-            value: category,
-            label: Text(category.labelZh),
-          ),
+          ButtonSegment(value: category, label: Text(category.label)),
       ],
       selected: {selected},
       onSelectionChanged: (value) => onChanged(value.first),
@@ -444,10 +495,13 @@ class MoveCategoryPicker extends StatelessWidget {
 }
 
 String profileLine(String title, List<String> items) {
-  if (items.isEmpty) {
-    return '$title：无';
+  final body = items.isEmpty
+      ? AppZh.dexNone
+      : items.join(AppLocale.pick(zh: '、', en: ', '));
+  if (title.isEmpty) {
+    return body;
   }
-  return '$title：${items.join('、')}';
+  return AppLocale.pick(zh: '$title：$body', en: '$title: $body');
 }
 
 class DefensiveAbilityOption {
@@ -469,7 +523,7 @@ List<DefensiveAbilityOption> defensiveAbilityOptionsFrom(
       .map(
         (ability) => DefensiveAbilityOption(
           slug: abilitySlugFromNameEn(ability.nameEn),
-          labelZh: ability.nameZh,
+          labelZh: localizedName(nameEn: ability.nameEn, nameZh: ability.nameZh),
           isHidden: ability.isHidden,
         ),
       )
@@ -528,15 +582,10 @@ class PokemonSearchField extends StatelessWidget {
         TextField(
           controller: controller,
           onChanged: onQueryChanged,
+          // Fill / outline / focus come from the theme's field look.
           decoration: InputDecoration(
             hintText: hintText,
-            filled: true,
-            fillColor: TitoColors.card,
             prefixIcon: Icon(prefixIcon),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-            ),
           ),
         ),
         if (suggestions.isNotEmpty) ...[
@@ -560,10 +609,7 @@ class PokemonSearchField extends StatelessWidget {
 }
 
 class LinkedPokemonTypesRow extends StatelessWidget {
-  const LinkedPokemonTypesRow({
-    super.key,
-    required this.types,
-  });
+  const LinkedPokemonTypesRow({super.key, required this.types});
 
   final List<String> types;
 
@@ -693,12 +739,9 @@ class AbilityChipPicker extends StatelessWidget {
                 showCheckmark: false,
                 label: Text(
                   option.isHidden
-                      ? '${option.labelZh}（隐藏）'
+                      ? AppZh.companionHiddenAbilityOption(option.labelZh)
                       : option.labelZh,
                 ),
-                selectedColor: TitoColors.mint,
-                backgroundColor: TitoColors.card,
-                side: const BorderSide(color: TitoColors.ink, width: 2),
                 onSelected: (next) {
                   onChanged(next ? option.slug : null);
                 },
@@ -769,9 +812,6 @@ class ManualAbilityPicker extends StatelessWidget {
               selected: selectedSlug == entry.key,
               showCheckmark: false,
               label: Text(entry.value),
-              selectedColor: TitoColors.mint,
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
               onSelected: (next) => onChanged(next ? entry.key : null),
             );
           }).toList(),
@@ -812,10 +852,7 @@ class FieldConditionPicker extends StatelessWidget {
             return FilterChip(
               selected: selected == condition,
               showCheckmark: false,
-              label: Text(condition.labelZh),
-              selectedColor: TitoColors.softYellow,
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
+              label: Text(condition.label),
               onSelected: (_) => onChanged(condition),
             );
           }).toList(),
@@ -856,10 +893,7 @@ class TerrainConditionPicker extends StatelessWidget {
             return FilterChip(
               selected: selected == condition,
               showCheckmark: false,
-              label: Text(condition.labelZh),
-              selectedColor: TitoColors.softYellow,
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
+              label: Text(condition.label),
               onSelected: (_) => onChanged(condition),
             );
           }).toList(),
@@ -897,7 +931,8 @@ class TerastalPicker extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final effectiveType = teraType ??
+    final effectiveType =
+        teraType ??
         (fallbackTypes.isNotEmpty
             ? defaultTeraTypeFor(fallbackTypes, generation)
             : 'normal');
@@ -921,9 +956,6 @@ class TerastalPicker extends StatelessWidget {
             size: 16,
             color: terastallized ? TitoColors.ink : TitoColors.mutedInk,
           ),
-          selectedColor: TitoColors.softYellow,
-          backgroundColor: TitoColors.card,
-          side: const BorderSide(color: TitoColors.ink, width: 2),
           onSelected: (next) {
             onTerastallizedChanged(next);
             if (next && teraType == null) {
@@ -982,10 +1014,7 @@ class HeldItemPicker extends StatelessWidget {
             return FilterChip(
               selected: selected == item,
               showCheckmark: false,
-              label: Text(item.labelZh),
-              selectedColor: TitoColors.mint,
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
+              label: Text(item.label),
               onSelected: (_) => onChanged(item),
             );
           }).toList(),
@@ -1038,10 +1067,7 @@ class StatusConditionPicker extends StatelessWidget {
             return FilterChip(
               selected: selected == status,
               showCheckmark: false,
-              label: Text(status.labelZh),
-              selectedColor: TitoColors.softYellow,
-              backgroundColor: TitoColors.card,
-              side: const BorderSide(color: TitoColors.ink, width: 2),
+              label: Text(status.label),
               onSelected: (_) => onChanged(status),
             );
           }).toList(),

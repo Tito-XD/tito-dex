@@ -1,5 +1,6 @@
 import 'dart:ui' show Color;
 
+import '../../l10n/app_locale.dart';
 import '../dex/dex_game_scope.dart';
 
 /// Canonical game edition for home / dex / detail / battle tools (23 games).
@@ -18,6 +19,76 @@ class GameEdition {
 
   final String slug;
   final String labelZh;
+
+  /// An unscoped reference view, never an alias for a particular game.
+  bool get isGeneral => slug == 'general';
+
+  String get label => AppLocale.instance.isEnglish ? labelEn : labelZh;
+
+  String get labelEn => switch (slug) {
+    'general' => 'General',
+    'hgss' => 'HeartGold/SoulSilver (HGSS)',
+    'rgb' => 'Red/Green/Blue (RGB)',
+    'yellow' => 'Yellow (Y)',
+    'gs' => 'Gold/Silver (GS)',
+    'crystal' => 'Crystal (C)',
+    'rs' => 'Ruby/Sapphire (RS)',
+    'emerald' => 'Emerald (E)',
+    'frlg' => 'FireRed/LeafGreen (FRLG)',
+    'dp' => 'Diamond/Pearl (DP)',
+    'pt' => 'Platinum (Pt)',
+    'bw' => 'Black/White (BW)',
+    'bw2' => 'Black 2/White 2 (BW2)',
+    'xy' => 'X/Y (XY)',
+    'oras' => 'Omega Ruby/Alpha Sapphire (ORAS)',
+    'sm' => 'Sun/Moon (SM)',
+    'usum' => 'Ultra Sun/Ultra Moon (USUM)',
+    'lgpe' => "Let's Go Pikachu/Eevee (LGPE)",
+    'swsh' => 'Sword/Shield (SWSH)',
+    'bdsp' => 'Brilliant Diamond/Shining Pearl (BDSP)',
+    'pla' => 'Legends: Arceus (LA)',
+    'sv' => 'Scarlet/Violet (SV)',
+    'lza' => 'Legends Z-A (LZA)',
+    'champions' => 'Champions',
+    _ => labelZh,
+  };
+
+  String get referenceGameNameZh =>
+      labelZh.replaceFirst(RegExp(r'\s*\([^)]*\)$'), '');
+
+  String get referenceGameName => AppLocale.instance.isEnglish
+      ? labelEn.replaceFirst(RegExp(r'\s*\([^)]*\)$'), '')
+      : referenceGameNameZh;
+
+  String? get referenceExpansion => AppLocale.instance.isEnglish
+      ? switch (slug) {
+          'swsh' => 'Combined · DLC: Isle of Armor, Crown Tundra',
+          'sv' => 'Combined · DLC: Teal Mask, Indigo Disk',
+          'lza' => 'Combined · DLC: Mega Dimension',
+          _ => null,
+        }
+      : referenceExpansionZh;
+
+  String? get referenceExpansionZh => switch (slug) {
+    'swsh' => '合并版 · 含 DLC：铠之孤岛、冠之雪原',
+    'sv' => '合并版 · 含 DLC：碧之假面、蓝之圆盘',
+    'lza' => '合并版 · 含 DLC：超次元爆涌',
+    _ => null,
+  };
+
+  /// Full reference label; collapsed selectors use only the game name.
+  String get referenceLabelZh => referenceExpansionZh == null
+      ? referenceGameNameZh
+      : '$referenceGameNameZh（$referenceExpansionZh）';
+
+  static const general = GameEdition(
+    slug: 'general',
+    labelZh: '通用',
+    versionGroup: 'general',
+    hasPokeApiData: false,
+    fallbackSlug: 'general',
+    defaultRegionalPokedex: DexRegionalPokedex.national,
+  );
 
   /// PokeAPI version-group key; null for editions without API data (LZA, Champions).
   final String? versionGroup;
@@ -50,6 +121,9 @@ class GameEdition {
   /// Exact display name when the user selected one side of a paired release.
   String get selectedLabelZh =>
       selectedFlavor == null ? labelZh : flavorVersionLabelZh(selectedFlavor!);
+
+  String get selectedLabel =>
+      selectedFlavor == null ? label : flavorVersionLabelZh(selectedFlavor!);
 
   /// Journey/save key matching the selected side of a paired release.
   ///
@@ -166,6 +240,7 @@ class GameEdition {
   /// When a [selectedFlavor] is set, the matching per-flavor icon is used so
   /// X/Y, Sword/Shield, etc. show distinct art in the flavor picker.
   String? get iconAsset {
+    if (isGeneral) return 'assets/icons/titodex-app.png';
     final flavor = selectedFlavor;
     if (flavor != null) {
       return 'assets/game_icons/$flavor.png';
@@ -440,6 +515,7 @@ class GameEdition {
 const defaultGameEdition = GameEdition.hgss;
 
 GameEdition? gameEditionFromSlug(String? slug) {
+  if (slug == GameEdition.general.slug) return GameEdition.general;
   if (slug == null || slug.isEmpty) {
     return null;
   }
@@ -533,7 +609,7 @@ GameEdition? gameEditionForSaveGame(String? saveGame) {
   return flavor == null ? edition : edition.withFlavor(flavor);
 }
 
-String gameEditionLabelZh(GameEdition edition) => edition.selectedLabelZh;
+String gameEditionLabelZh(GameEdition edition) => edition.selectedLabel;
 
 /// Stable short code for compact Assistant context UI.
 String assistantEditionCode(GameEdition edition) => switch (edition.slug) {
@@ -565,7 +641,7 @@ String assistantEditionCode(GameEdition edition) => switch (edition.slug) {
 
 /// Human-readable current-version label, e.g. `魂银 · HGSS`.
 String assistantEditionDisplayLabel(GameEdition edition) =>
-    '${edition.selectedLabelZh} · ${assistantEditionCode(edition)}';
+    '${edition.selectedLabel} · ${assistantEditionCode(edition)}';
 
 /// Whether save-derived progression belongs to the selected edition.
 ///

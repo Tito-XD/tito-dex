@@ -1,6 +1,7 @@
 /// Unified type effectiveness for battle tools (generation, abilities, weather, Tera).
 library;
 
+import '../../l10n/app_locale.dart';
 import 'ability_type_modifiers.dart';
 import 'generation_type_chart.dart';
 import 'type_chart.dart';
@@ -67,6 +68,18 @@ extension BattleHeldItemLabel on BattleHeldItem {
         BattleHeldItem.expertBelt => '达人带',
         BattleHeldItem.typeBoost => '属性强化道具',
       };
+
+  String get label => AppLocale.pick(
+        zh: labelZh,
+        en: switch (this) {
+          BattleHeldItem.none => 'None',
+          BattleHeldItem.lifeOrb => 'Life Orb',
+          BattleHeldItem.choiceBand => 'Choice Band',
+          BattleHeldItem.choiceSpecs => 'Choice Specs',
+          BattleHeldItem.expertBelt => 'Expert Belt',
+          BattleHeldItem.typeBoost => 'Type-boosting item',
+        },
+      );
 }
 
 enum BattleStatusCondition {
@@ -81,6 +94,15 @@ extension BattleStatusConditionLabel on BattleStatusCondition {
         BattleStatusCondition.burn => '灼伤',
         BattleStatusCondition.paralysis => '麻痹',
       };
+
+  String get label => AppLocale.pick(
+        zh: labelZh,
+        en: switch (this) {
+          BattleStatusCondition.none => 'None',
+          BattleStatusCondition.burn => 'Burn',
+          BattleStatusCondition.paralysis => 'Paralysis',
+        },
+      );
 }
 
 enum FieldCondition { none, sun, rain, sandstorm, snow }
@@ -101,6 +123,17 @@ extension FieldConditionLabel on FieldCondition {
         FieldCondition.sandstorm => '沙暴',
         FieldCondition.snow => '下雪',
       };
+
+  String get label => AppLocale.pick(
+        zh: labelZh,
+        en: switch (this) {
+          FieldCondition.none => 'None',
+          FieldCondition.sun => 'Sun',
+          FieldCondition.rain => 'Rain',
+          FieldCondition.sandstorm => 'Sandstorm',
+          FieldCondition.snow => 'Snow',
+        },
+      );
 }
 
 enum TerrainCondition { none, electric, grassy, psychic, misty }
@@ -121,6 +154,17 @@ extension TerrainConditionLabel on TerrainCondition {
         TerrainCondition.psychic => '精神场地',
         TerrainCondition.misty => '薄雾场地',
       };
+
+  String get label => AppLocale.pick(
+        zh: labelZh,
+        en: switch (this) {
+          TerrainCondition.none => 'None',
+          TerrainCondition.electric => 'Electric Terrain',
+          TerrainCondition.grassy => 'Grassy Terrain',
+          TerrainCondition.psychic => 'Psychic Terrain',
+          TerrainCondition.misty => 'Misty Terrain',
+        },
+      );
 }
 
 class BattleEffectivenessInput {

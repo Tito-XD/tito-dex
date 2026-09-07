@@ -893,6 +893,10 @@ class _DexFlightVisual {
 }
 
 /// Bottom sheets retain Flutter Material's standard Android sheet behavior.
+///
+/// Background, outline and corner shape come from the active theme's
+/// `bottomSheetTheme`, so the sheet matches Trainer's Journal, Solid Plastic
+/// and Flat UI without per-call overrides.
 Future<T?> showTitoModalBottomSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -902,12 +906,7 @@ Future<T?> showTitoModalBottomSheet<T>({
     context: context,
     showDragHandle: true,
     isScrollControlled: isScrollControlled,
-    backgroundColor: TitoColors.card,
-    barrierColor: TitoColors.ink.withValues(alpha: 0.45),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
-      side: BorderSide(color: TitoColors.ink, width: 2),
-    ),
+    useSafeArea: true,
     // viewInsets keeps content above the system keyboard (iOS/phones — RG
     // handhelds never show one); SafeArea(top: false) clears the iPhone home
     // indicator. Sheets that already wrap themselves in SafeArea are fine:

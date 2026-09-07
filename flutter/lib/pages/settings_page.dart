@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,6 +25,7 @@ import '../features/dex/dex_sprite_codec.dart';
 import '../features/save/save_types.dart';
 import '../features/parser/hgss_format.dart';
 import '../features/trainer/trainer_avatar_service.dart';
+import '../l10n/app_locale.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
@@ -45,6 +47,10 @@ bool shouldPrioritizeOfflineData(DexCacheStatus? status) {
   final manifest = status?.manifest;
   return manifest != null && !manifest.complete && manifest.pokemonCount <= 0;
 }
+
+/// Mirrors `EmulatorLauncher.isLaunchSupported` without needing the launcher
+/// instance — the Settings card only decides whether to offer the picker.
+bool get _emulatorLaunchSupported => !kIsWeb && Platform.isAndroid;
 
 enum SettingsSection {
   overview,
@@ -208,18 +214,18 @@ class _SettingsPageState extends State<SettingsPage> {
               context: context,
               barrierDismissible: false,
               builder: (dialogContext) => AlertDialog(
-                title: const Text(AppZh.askTitoDexNoticeTitle),
-                content: const SingleChildScrollView(
+                title: Text(AppZh.askTitoDexNoticeTitle),
+                content: SingleChildScrollView(
                   child: Text(AppZh.askTitoDexNoticeBody),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(dialogContext).pop(false),
-                    child: const Text(AppZh.cancel),
+                    child: Text(AppZh.cancel),
                   ),
                   FilledButton(
                     onPressed: () => Navigator.of(dialogContext).pop(true),
-                    child: const Text(AppZh.askTitoDexNoticeAccept),
+                    child: Text(AppZh.askTitoDexNoticeAccept),
                   ),
                 ],
               ),
@@ -286,7 +292,7 @@ class _SettingsPageState extends State<SettingsPage> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexCdnFailed)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnFailed)));
     } finally {
       if (mounted) {
         setState(() => _dexDownloading = false);
@@ -323,7 +329,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+        SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
       );
     } finally {
       if (mounted) {
@@ -384,7 +390,7 @@ class _SettingsPageState extends State<SettingsPage> {
       _dexDownloadBackgrounded = false;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.snackDexBackgroundDownloadFailed)),
+          SnackBar(content: Text(AppZh.snackDexBackgroundDownloadFailed)),
         );
       }
       throw StateError('Android foreground download service did not start');
@@ -453,25 +459,25 @@ class _SettingsPageState extends State<SettingsPage> {
   void _showDexDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDownloadCancelled)),
+        SnackBar(content: Text(AppZh.snackDownloadCancelled)),
       );
       return;
     }
     if (lastProgress?.phase == 'done') {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexCdnDone)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnDone)));
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexCdnFailed)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexCdnFailed)));
     }
   }
 
   void _showDexOfflineDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDownloadCancelled)),
+        SnackBar(content: Text(AppZh.snackDownloadCancelled)),
       );
       return;
     }
@@ -479,14 +485,14 @@ class _SettingsPageState extends State<SettingsPage> {
     if (lastProgress?.phase == 'done') {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexOfflineDone)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineDone)));
     } else if (lastProgress?.phase == 'partial' && cachedCount > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
+        SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
       );
     }
   }
@@ -525,7 +531,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
+    ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineCleared)));
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
@@ -571,14 +577,14 @@ class _SettingsPageState extends State<SettingsPage> {
       );
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackAvatarUpdated)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackAvatarUpdated)));
     } catch (_) {
       if (!mounted) {
         return;
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.snackAvatarFailed)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackAvatarFailed)));
     } finally {
       if (mounted) {
         setState(() => _avatarChanging = false);
@@ -602,7 +608,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _trainerDirty = false);
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text(AppZh.snackTrainerSaved)));
+    ).showSnackBar(SnackBar(content: Text(AppZh.snackTrainerSaved)));
   }
 
   Widget _buildOverview(BuildContext context) {
@@ -637,13 +643,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (_dexDownloading)
                     OutlinedButton(
                       onPressed: dexOfflineService.requestCancelDownload,
-                      child: const Text(AppZh.settingsDexCancelDownload),
+                      child: Text(AppZh.settingsDexCancelDownload),
                     )
                   else
                     FilledButton.icon(
                       onPressed: _downloadDexCdnBundle,
                       icon: const Icon(Icons.download_rounded),
-                      label: const Text(AppZh.settingsDexCdnDownload),
+                      label: Text(AppZh.settingsDexCdnDownload),
                     ),
                 ],
               ),
@@ -662,7 +668,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         const SizedBox(height: 16),
         _SettingsNavigationList(
-          entries: const [
+          entries: [
             _SettingsNavigationEntry(
               section: SettingsSection.profile,
               icon: Icons.badge_outlined,
@@ -777,7 +783,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         key: const Key('extension-search-display-mode'),
                         isExpanded: true,
                         value: askTitoDexSettings.searchDisplayMode,
-                        items: const [
+                        items: [
                           DropdownMenuItem(
                             value: SearchAssistantDisplayMode.prominent,
                             child: Text(AppZh.extensionSearchProminent),
@@ -819,7 +825,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: _avatarChanging ? null : _changeAvatar,
-                          child: const Text(AppZh.settingsChangeAvatar),
+                          child: Text(AppZh.settingsChangeAvatar),
                         ),
                       ),
                     ],
@@ -844,7 +850,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 8),
                   FilledButton(
                     onPressed: _trainerDirty ? _saveTrainerName : null,
-                    child: const Text(AppZh.settingsSaveTrainerName),
+                    child: Text(AppZh.settingsSaveTrainerName),
                   ),
                   if (saveLinked) ...[
                     const SizedBox(height: 16),
@@ -903,8 +909,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         widget.journey.saveDexCaughtIds.isNotEmpty)
                       _Row(
                         label: AppZh.settingsDexProgress,
-                        value:
-                            '已见 ${widget.journey.saveDexSeenIds.length} · 已捕 ${widget.journey.saveDexCaughtIds.length}',
+                        value: AppZh.settingsDexSeenCaught(
+                          widget.journey.saveDexSeenIds.length,
+                          widget.journey.saveDexCaughtIds.length,
+                        ),
                       ),
                     if (widget.journey.saveMapCoordinates.length == 3)
                       _Row(
@@ -967,13 +975,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 12),
                     FilledButton(
                       onPressed: widget.onPickSaveFile,
-                      child: const Text(AppZh.settingsPickSaveFile),
+                      child: Text(AppZh.settingsPickSaveFile),
                     ),
                     if (hasSaveFile) ...[
                       const SizedBox(height: 8),
                       OutlinedButton(
                         onPressed: widget.onClearSaveFile,
-                        child: const Text(AppZh.settingsClearSaveFile),
+                        child: Text(AppZh.settingsClearSaveFile),
                       ),
                     ],
                     const SizedBox(height: 10),
@@ -1008,7 +1016,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     const SizedBox(height: 8),
                     OutlinedButton(
                       onPressed: hasSaveFile ? widget.onSyncNow : null,
-                      child: const Text(AppZh.settingsSyncNow),
+                      child: Text(AppZh.settingsSyncNow),
                     ),
                   ],
                 ),
@@ -1080,12 +1088,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (_dexDownloading)
                     OutlinedButton(
                       onPressed: dexOfflineService.requestCancelDownload,
-                      child: const Text(AppZh.settingsDexCancelDownload),
+                      child: Text(AppZh.settingsDexCancelDownload),
                     )
                   else
                     FilledButton(
                       onPressed: _downloadDexCdnBundle,
-                      child: const Text(AppZh.settingsDexCdnDownload),
+                      child: Text(AppZh.settingsDexCdnDownload),
                     ),
                 ],
               ),
@@ -1105,7 +1113,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _defaultGameEdition.labelZh,
+                  _defaultGameEdition.label,
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.mutedInk,
                   ),
@@ -1136,7 +1144,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          _defaultGameEdition.labelZh,
+                          _defaultGameEdition.label,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: SecondaryTypography.onCard.body14.copyWith(
@@ -1191,7 +1199,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: _dexDownloading ? null : _clearDexOffline,
-                    child: const Text(AppZh.settingsDexOfflineClear),
+                    child: Text(AppZh.settingsDexOfflineClear),
                   ),
                 ],
               ],
@@ -1221,15 +1229,29 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  // Emulator launch is Android-only: elsewhere the row stays
+                  // visible but disabled with the platform hint inline, instead
+                  // of a live button that opens a "not supported" sheet.
+                  if (!_emulatorLaunchSupported) ...[
+                    Text(
+                      AppZh.continueSheetDesktopHint,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   FilledButton(
-                    onPressed: widget.onPickEmulator,
-                    child: const Text(AppZh.settingsPickEmulator),
+                    onPressed: _emulatorLaunchSupported
+                        ? widget.onPickEmulator
+                        : null,
+                    child: Text(AppZh.settingsPickEmulator),
                   ),
                   if (emulator != null) ...[
                     const SizedBox(height: 8),
                     OutlinedButton(
                       onPressed: widget.onClearEmulator,
-                      child: const Text(AppZh.settingsClearEmulator),
+                      child: Text(AppZh.settingsClearEmulator),
                     ),
                   ],
                 ],
@@ -1280,7 +1302,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     applicationLegalese: AppZh.settingsUnofficialNotice,
                   ),
                   icon: const Icon(Icons.description_outlined),
-                  label: const Text(AppZh.settingsOpenSourceLicenses),
+                  label: Text(AppZh.settingsOpenSourceLicenses),
                 ),
               ],
             ),
@@ -1297,14 +1319,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: widget.onImportFixture,
-                        child: const Text(AppZh.settingsImportSave),
+                        child: Text(AppZh.settingsImportSave),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: widget.onExportJourney,
-                        child: const Text(AppZh.settingsExportJourney),
+                        child: Text(AppZh.settingsExportJourney),
                       ),
                     ),
                   ],
@@ -1315,14 +1337,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: widget.onImportJourney,
-                        child: const Text(AppZh.settingsImportJourney),
+                        child: Text(AppZh.settingsImportJourney),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: widget.onResetMock,
-                        child: const Text(AppZh.settingsResetMock),
+                        child: Text(AppZh.settingsResetMock),
                       ),
                     ),
                   ],
@@ -1373,7 +1395,7 @@ class _SettingsNavigationList extends StatelessWidget {
               onTap: () => context.push(entries[index].section.route),
             ),
             if (index != entries.length - 1)
-              Divider(height: 1, indent: 56, color: scheme.outlineVariant),
+              const Divider(height: 1, indent: 56),
           ],
         ],
       ),
@@ -1519,7 +1541,7 @@ class _CurrentGameSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  edition.labelZh,
+                  edition.label,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: SecondaryTypography.onCard.h15,
@@ -1537,7 +1559,7 @@ class _CurrentGameSection extends StatelessWidget {
                   vertical: 10,
                 ),
               ),
-              child: const Text(AppZh.settingsSwitchGame),
+              child: Text(AppZh.settingsSwitchGame),
             ),
           ],
         ],
@@ -1591,7 +1613,7 @@ class _InterfaceSection extends StatelessWidget {
                                 value: style,
                                 label: Text(
                                   style.labelFor(
-                                    View.of(context).platformDispatcher.locale,
+                                    AppLocale.instance.materialLocale,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -1643,7 +1665,7 @@ class _AppShortcutsSection extends StatelessWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      useSafeArea: true,
       builder: (sheetContext) => FractionallySizedBox(
         heightFactor: 0.86,
         child: SafeArea(
@@ -1667,7 +1689,7 @@ class _AppShortcutsSection extends StatelessWidget {
                           onPressed: () => appShortcutPreferences.setSelected(
                             AppShortcutOption.defaults,
                           ),
-                          child: const Text(AppZh.settingsAppShortcutsReset),
+                          child: Text(AppZh.settingsAppShortcutsReset),
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(sheetContext),
@@ -1691,7 +1713,7 @@ class _AppShortcutsSection extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 12, bottom: 2),
                             child: Text(
-                              section.labelZh,
+                              section.label,
                               style: SecondaryTypography.onCard.small12
                                   .copyWith(
                                     color: TitoColors.mutedInk,
@@ -1705,12 +1727,8 @@ class _AppShortcutsSection extends StatelessWidget {
                             CheckboxListTile(
                               key: ValueKey('app-shortcut-${option.id}'),
                               contentPadding: EdgeInsets.zero,
-                              dense: true,
                               controlAffinity: ListTileControlAffinity.leading,
-                              title: Text(
-                                option.labelZh,
-                                style: SecondaryTypography.onCard.body14,
-                              ),
+                              title: Text(option.label),
                               value: selected.any(
                                 (item) => item.id == option.id,
                               ),
@@ -1719,7 +1737,7 @@ class _AppShortcutsSection extends StatelessWidget {
                                     .toggle(option);
                                 if (!changed && context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
                                         AppZh.settingsAppShortcutsLimit,
                                       ),
@@ -1764,7 +1782,9 @@ class _AppShortcutsSection extends StatelessWidget {
                 Text(
                   selected.isEmpty
                       ? AppZh.settingsAppShortcutsNone
-                      : selected.map((item) => item.labelZh).join('、'),
+                      : selected
+                            .map((item) => item.label)
+                            .join(AppLocale.pick(zh: '、', en: ', ')),
                   style: SecondaryTypography.onCard.body14.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
@@ -1773,7 +1793,7 @@ class _AppShortcutsSection extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: () => _showCustomizer(context),
                   icon: const Icon(Icons.tune_rounded),
-                  label: const Text(AppZh.settingsAppShortcutsCustomize),
+                  label: Text(AppZh.settingsAppShortcutsCustomize),
                 ),
               ],
             ),
@@ -1896,9 +1916,9 @@ class _CompanionSection extends StatelessWidget {
                               Text(
                                 [
                                   if (choice?.animationLabel != null)
-                                    '动图：${choice!.animationLabel}',
+                                    '${AppZh.mediaResourceGif}: ${choice!.animationLabel}',
                                   if (choice?.cryLabel != null)
-                                    '叫声：${choice!.cryLabel}',
+                                    '${AppZh.mediaResourceCry}: ${choice!.cryLabel}',
                                 ].join(' · '),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -1919,16 +1939,6 @@ class _CompanionSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       FilledButton(
-                        onPressed: () =>
-                            context.push('/settings/companion-position'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: TitoColors.skyBlue,
-                          foregroundColor: TitoColors.ink,
-                        ),
-                        child: const Text(AppZh.companionSettingsPosition),
-                      ),
-                      const SizedBox(height: 8),
-                      FilledButton(
                         onPressed: () async {
                           final picked = await showCompanionPickerSheet(
                             context,
@@ -1943,17 +1953,19 @@ class _CompanionSection extends StatelessWidget {
                             );
                           }
                         },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: TitoColors.coral,
-                          foregroundColor: TitoColors.ink,
-                        ),
-                        child: const Text(AppZh.companionSettingsPick),
+                        child: Text(AppZh.companionSettingsPick),
+                      ),
+                      const SizedBox(height: 8),
+                      FilledButton.tonal(
+                        onPressed: () =>
+                            context.push('/settings/companion-position'),
+                        child: Text(AppZh.companionSettingsPosition),
                       ),
                       if (choice != null) ...[
                         const SizedBox(height: 8),
                         OutlinedButton(
                           onPressed: companionRepository.clear,
-                          child: const Text(AppZh.companionSettingsReset),
+                          child: Text(AppZh.companionSettingsReset),
                         ),
                       ],
                       const SizedBox(height: 8),
@@ -1961,7 +1973,7 @@ class _CompanionSection extends StatelessWidget {
                         onPressed: () =>
                             context.push('/settings/media-resources'),
                         icon: const Icon(Icons.folder_zip_outlined, size: 18),
-                        label: const Text('媒体资源管理'),
+                        label: Text(AppZh.mediaResourceTitle),
                       ),
                     ],
                   ),

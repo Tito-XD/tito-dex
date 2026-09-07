@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../theme/tito_colors.dart';
+import 'tito_pokeball_loading.dart';
+import 'tito_skeleton.dart';
 
 class DexSpriteImage extends StatelessWidget {
   const DexSpriteImage({
@@ -12,6 +13,7 @@ class DexSpriteImage extends StatelessWidget {
     this.height = 56,
     this.width,
     this.fit = BoxFit.contain,
+    this.showPokeball = false,
   });
 
   final String? source;
@@ -21,6 +23,11 @@ class DexSpriteImage extends StatelessWidget {
   final double? height;
   final double? width;
   final BoxFit fit;
+
+  /// Spin the pale Poké Ball while the frame decodes instead of pulsing a
+  /// skeleton box. The ball is drawn for type-tinted deep headers; leave this
+  /// off on cream / white cards where the skeleton placeholder belongs.
+  final bool showPokeball;
 
   @override
   Widget build(BuildContext context) {
@@ -50,32 +57,29 @@ class DexSpriteImage extends StatelessWidget {
         if (wasSynchronouslyLoaded || frame != null) {
           return child;
         }
-        return _placeholder(shimmer: true);
+        return _placeholder(loading: true);
       },
       errorBuilder: (_, __, ___) => _placeholder(),
     );
   }
 
-  Widget _placeholder({bool shimmer = false}) {
-    final box = Container(
+  Widget _placeholder({bool loading = false}) {
+    if (loading && showPokeball) {
+      return SizedBox(
+        height: height,
+        width: width,
+        child: Center(
+          child: TitoPokeballLoading(
+            size: ((height ?? 56) * .4).clamp(12.0, 28.0),
+          ),
+        ),
+      );
+    }
+    return TitoSkeletonBox(
       height: height,
       width: width,
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.1),
-          width: 2,
-        ),
-      ),
-    );
-    if (!shimmer) {
-      return box;
-    }
-    return Shimmer.fromColors(
-      baseColor: TitoColors.card.withValues(alpha: 0.3),
-      highlightColor: TitoColors.card.withValues(alpha: 0.7),
-      child: box,
+      radius: TitoRadii.sm,
+      shimmer: loading,
     );
   }
 }

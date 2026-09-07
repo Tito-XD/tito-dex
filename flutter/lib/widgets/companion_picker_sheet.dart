@@ -10,13 +10,16 @@ import '../features/dex/dex_repository.dart';
 import '../features/dex/online_media_catalog.dart';
 import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
 import '../navigation/tito_page_transition.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_pressable.dart';
+import 'tito_loading_panel.dart';
 
 /// Pick the standby companion from the full national dex. The selection is
 /// saved to [companionRepository]; only its animated sprite is fetched later,
@@ -187,11 +190,8 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
               spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
               decoration: InputDecoration(
                 hintText: AppZh.companionPickerSearchHint,
-                prefixIcon: const Icon(Icons.search_rounded),
+                prefixIcon: Icon(Icons.search_rounded),
                 isDense: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -201,7 +201,10 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
                 builder: (context, snapshot) {
                   final all = snapshot.data;
                   if (all == null) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Align(
+                      alignment: Alignment.topCenter,
+                      child: TitoLoadingPanel(onLightSurface: true),
+                    );
                   }
                   final entries = _filtered(all);
                   if (entries.isEmpty) {
@@ -377,15 +380,7 @@ class _CompanionMediaLoadingDialogState
         _gif == _MediaLoadState.failed || _cry == _MediaLoadState.failed;
 
     return AlertDialog(
-      backgroundColor: TitoColors.card,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        side: const BorderSide(color: TitoColors.ink, width: 2),
-      ),
-      title: Text(
-        AppZh.companionMediaTitle(widget.summary.nameZh),
-        style: SecondaryTypography.onCard.h15,
-      ),
+      title: Text(AppZh.companionMediaTitle(widget.summary.nameZh)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +405,7 @@ class _CompanionMediaLoadingDialogState
             _cancelled = true;
             Navigator.of(context).pop(false);
           },
-          child: const Text(AppZh.cancel),
+          child: Text(AppZh.cancel),
         ),
       ],
     );
@@ -425,14 +420,12 @@ class _MediaLoadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 16px inline status dot — the one place a bare spinner is allowed (D10).
     final indicator = switch (state) {
       _MediaLoadState.loading => const SizedBox(
         width: 16,
         height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          color: TitoColors.deepBlue,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2.5),
       ),
       _MediaLoadState.done => const Icon(
         Icons.check_circle_rounded,
@@ -464,11 +457,12 @@ class _CompanionPickTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tile = _pickerTileStyle(context, selected: false);
     return StickerPressable(
       borderRadius: BorderRadius.circular(TitoRadii.md),
       ownShadow: false,
       child: Material(
-        color: TitoColors.cream,
+        color: tile.fill,
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: InkWell(
           onTap: onTap,
@@ -476,10 +470,7 @@ class _CompanionPickTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: TitoColors.ink.withValues(alpha: 0.35),
-                width: 2,
-              ),
+              border: Border.all(color: tile.outline, width: tile.outlineWidth),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(
@@ -595,10 +586,16 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
         if (seen.add(cry.url))
           _LabeledMediaSource(url: cry.url, label: cry.labelZh),
       if (seen.add(cryUrlFor(speciesId)))
-        _LabeledMediaSource(url: cryUrlFor(speciesId), label: 'PokeAPI 最新叫声'),
+        _LabeledMediaSource(
+          url: cryUrlFor(speciesId),
+          label: AppZh.companionPickerCryLatest,
+        ),
       if (legacyCryUrlFor(speciesId) case final legacy?)
         if (seen.add(legacy))
-          _LabeledMediaSource(url: legacy, label: 'PokeAPI 旧版叫声'),
+          _LabeledMediaSource(
+            url: legacy,
+            label: AppZh.companionPickerCryLegacy,
+          ),
     ];
   }
 
@@ -723,7 +720,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                   children: [
                     Expanded(
                       child: Text(
-                        '选择形态与外观',
+                        AppZh.companionPickerFormAppearance,
                         style: SecondaryTypography.onCard.h15,
                       ),
                     ),
@@ -734,21 +731,14 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                               snapshot.connectionState == ConnectionState.done
                           ? (value) => setState(() => _isShiny = value)
                           : null,
-                      showCheckmark: false,
-                      selectedColor: TitoColors.softYellow,
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(
-                        color: TitoColors.ink,
-                        width: TitoBorders.element,
-                      ),
                       avatar: const Icon(Icons.auto_awesome_rounded, size: 16),
-                      label: const Text('闪光'),
+                      label: Text(AppZh.companionPickerShiny),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  previewSummary.nameZh,
+                  previewSummary.displayName,
                   style: SecondaryTypography.onCard.body14.copyWith(
                     color: TitoColors.mutedInk,
                   ),
@@ -756,10 +746,18 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 const SizedBox(height: 10),
                 if (snapshot.connectionState != ConnectionState.done)
                   const Expanded(
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: TitoLoadingPanel(
+                        onLightSurface: true,
+                        compact: true,
+                      ),
+                    ),
                   )
                 else if (!hasForms)
-                  const Expanded(child: Center(child: Text('该宝可梦没有其他形态')))
+                  Expanded(
+                    child: Center(child: Text(AppZh.companionPickerNoForms)),
+                  )
                 else
                   Flexible(
                     flex: 3,
@@ -804,19 +802,24 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: TitoColors.cream,
-                        borderRadius: BorderRadius.circular(TitoRadii.md),
-                        border: Border.all(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
-                        ),
-                      ),
-                      child: FallbackSpriteImage(sources: previewSources),
+                    Builder(
+                      builder: (context) {
+                        final tile = _pickerTileStyle(context, selected: false);
+                        return Container(
+                          width: 72,
+                          height: 72,
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: tile.fill,
+                            borderRadius: BorderRadius.circular(TitoRadii.md),
+                            border: Border.all(
+                              color: tile.outline,
+                              width: tile.outlineWidth,
+                            ),
+                          ),
+                          child: FallbackSpriteImage(sources: previewSources),
+                        );
+                      },
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -829,14 +832,14 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                             ),
                             initialValue: _selectedAnimationUrl ?? '',
                             isExpanded: true,
-                            decoration: const InputDecoration(
-                              labelText: '动图来源（按世代）',
+                            decoration: InputDecoration(
+                              labelText: AppZh.companionPickerGifSource,
                               isDense: true,
                             ),
                             items: [
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: '',
-                                child: Text('自动选择'),
+                                child: Text(AppZh.companionPickerGifAuto),
                               ),
                               for (final choice in animationChoices)
                                 DropdownMenuItem(
@@ -870,14 +873,14 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                                   ),
                                   initialValue: _selectedCryUrl ?? '',
                                   isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: '叫声版本 / 形态',
+                                  decoration: InputDecoration(
+                                    labelText: AppZh.companionPickerCrySource,
                                     isDense: true,
                                   ),
                                   items: [
-                                    const DropdownMenuItem(
+                                    DropdownMenuItem(
                                       value: '',
-                                      child: Text('自动匹配形态'),
+                                      child: Text(AppZh.companionPickerCryAuto),
                                     ),
                                     for (final choice in cryChoices)
                                       DropdownMenuItem(
@@ -906,7 +909,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                               IconButton(
                                 onPressed: () =>
                                     _previewCry(widget.summary.id, media),
-                                tooltip: '试听叫声',
+                                tooltip: AppZh.companionPickerPreviewCry,
                                 icon: const Icon(Icons.volume_up_rounded),
                               ),
                             ],
@@ -924,21 +927,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                     onPressed: snapshot.connectionState == ConnectionState.done
                         ? () => _confirm(selectedForm, media)
                         : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: TitoColors.coral,
-                      foregroundColor: TitoColors.card,
-                      disabledBackgroundColor: TitoColors.card.withValues(
-                        alpha: 0.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(TitoRadii.md),
-                        side: const BorderSide(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
-                        ),
-                      ),
-                    ),
-                    child: const Text('确定'),
+                    child: Text(AppZh.confirm),
                   ),
                 ),
               ],
@@ -955,6 +944,39 @@ class _LabeledMediaSource {
 
   final String url;
   final String label;
+}
+
+/// Per-theme fill/outline for the picker's grid tiles and preview slot. They
+/// sit on the sheet surface, so Flat uses container tones, Solid Plastic a
+/// milky plate and Trainer's Journal the cream sticker with an ink stroke.
+({Color fill, Color outline, double outlineWidth}) _pickerTileStyle(
+  BuildContext context, {
+  required bool selected,
+}) {
+  final scheme = Theme.of(context).colorScheme;
+  if (appVisualStyle.usesFlatUi) {
+    return (
+      fill: selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
+      outline: selected ? scheme.primary : scheme.outlineVariant,
+      outlineWidth: TitoBorders.element,
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return (
+      fill: selected
+          ? TitoColors.softYellow.withValues(alpha: 0.85)
+          : Colors.white.withValues(alpha: 0.8),
+      outline: Colors.white.withValues(alpha: 0.85),
+      outlineWidth: TitoBorders.glass,
+    );
+  }
+  return (
+    fill: selected
+        ? TitoColors.softYellow.withValues(alpha: 0.22)
+        : TitoColors.cream,
+    outline: selected ? TitoColors.softYellow : TitoColors.ink,
+    outlineWidth: TitoBorders.element,
+  );
 }
 
 class _CompanionFormTile extends StatelessWidget {
@@ -975,13 +997,12 @@ class _CompanionFormTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final summary = form.summaryFor(species);
+    final tile = _pickerTileStyle(context, selected: selected);
     return StickerPressable(
       borderRadius: BorderRadius.circular(TitoRadii.md),
       ownShadow: false,
       child: Material(
-        color: selected
-            ? TitoColors.softYellow.withValues(alpha: 0.22)
-            : TitoColors.cream,
+        color: tile.fill,
         borderRadius: BorderRadius.circular(TitoRadii.md),
         child: InkWell(
           onTap: onTap,
@@ -989,10 +1010,7 @@ class _CompanionFormTile extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(
-                color: selected ? TitoColors.softYellow : TitoColors.ink,
-                width: TitoBorders.element,
-              ),
+              border: Border.all(color: tile.outline, width: tile.outlineWidth),
             ),
             padding: const EdgeInsets.all(6),
             child: Column(

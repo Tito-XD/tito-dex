@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.9.2 · Lite `0.9.2+181` · Offline `0.9.2-offline+182` · shared-element Dex details, reliable predictive back, deferred Team data and verified semantic Journey answers · live bundle v20 embedded by Offline.
+> Current release: v0.9.15 · Lite `0.9.15+196` · Offline `0.9.15-offline+197` · unified Dex context/filtering, theme-specific shared controls and system-following Chinese/English UI · live bundle v20 embedded by Offline.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 

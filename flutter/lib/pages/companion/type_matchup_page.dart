@@ -83,6 +83,14 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
     }
   }
 
+  void _retryLoadRelations() {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    _loadRelations();
+  }
+
   Future<void> _searchDefender(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
@@ -212,21 +220,32 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
           type: MaterialType.transparency,
           child: SecondaryPageScaffold(
             title: AppZh.companionToolTypeMatchup,
-            subtitle: edition.labelZh,
+            subtitle: edition.label,
             children: [
               if (_loading)
-                const TitoLoadingPanel(
+                TitoLoadingPanel(
                   message: AppZh.companionLoading,
                   compact: true,
                 )
               else if (_error != null)
                 StickerCard(
-                  child: Text(
-                    _error!,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                      height: 1.45,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _error!,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: _retryLoadRelations,
+                        icon: const Icon(Icons.refresh_rounded, size: 18),
+                        label: Text(AppZh.dexRetry),
+                      ),
+                    ],
                   ),
                 )
               else if (relations != null) ...[
@@ -306,7 +325,9 @@ class _TypeMatchupPageState extends State<TypeMatchupPage> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Text(
-                              '世代修正：${normalized.map(typeNameZh).join('/')}',
+                              AppZh.generationCorrection(
+                                normalized.map(typeNameZh).join('/'),
+                              ),
                               style: SecondaryTypography.onCard.small12
                                   .copyWith(color: TitoColors.mutedInk),
                             ),

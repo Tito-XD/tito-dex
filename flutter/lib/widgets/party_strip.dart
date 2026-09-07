@@ -10,6 +10,7 @@ import '../features/dex/sprite_generation_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
@@ -17,6 +18,41 @@ import '../theme/tito_typography.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
+
+/// Inset party cell / empty cell surface, branched per visual style the same
+/// way `sticker_card.dart` does: Trainer's Journal keeps the translucent
+/// cream + ink outline, Solid Plastic swaps to milky glass, Flat UI uses the
+/// Material container tone with no outline.
+BoxDecoration _partyCellDecoration(BuildContext context, {bool empty = false}) {
+  final radius = BorderRadius.circular(TitoRadii.sm);
+  if (appVisualStyle.usesFlatUi) {
+    final scheme = Theme.of(context).colorScheme;
+    return BoxDecoration(
+      color: empty
+          ? scheme.surfaceContainerHigh
+          : scheme.surfaceContainerHighest,
+      borderRadius: radius,
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return BoxDecoration(
+      color: Colors.white.withValues(alpha: empty ? 0.18 : 0.35),
+      borderRadius: radius,
+      border: Border.all(
+        color: Colors.white.withValues(alpha: empty ? 0.5 : 0.78),
+        width: TitoBorders.glass,
+      ),
+    );
+  }
+  return BoxDecoration(
+    color: TitoColors.card.withValues(alpha: empty ? 0.28 : 0.52),
+    borderRadius: radius,
+    border: Border.all(
+      color: empty ? TitoColors.ink.withValues(alpha: 0.45) : TitoColors.ink,
+      width: TitoBorders.element,
+    ),
+  );
+}
 
 class PartyStrip extends StatelessWidget {
   const PartyStrip({
@@ -197,7 +233,7 @@ class _PartyTextPlaceholder extends StatelessWidget {
             height: 6,
             decoration: BoxDecoration(
               color: lineColor,
-              borderRadius: BorderRadius.circular(99),
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
             ),
           ),
         ),
@@ -208,7 +244,7 @@ class _PartyTextPlaceholder extends StatelessWidget {
             height: 5,
             decoration: BoxDecoration(
               color: lineColor,
-              borderRadius: BorderRadius.circular(99),
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
             ),
           ),
         ),
@@ -284,11 +320,7 @@ class _PartyGridCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = member.nickname ?? localizeSpecies(member.species);
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.52),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.ink, width: 2),
-      ),
+      decoration: _partyCellDecoration(context),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final nameStyle = context.titoHome.captionStrong;
@@ -337,14 +369,7 @@ class _EmptyPartyGridCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.28),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.45),
-          width: 2,
-        ),
-      ),
+      decoration: _partyCellDecoration(context, empty: true),
       child: const Center(child: _EmptyPartySlot()),
     );
   }
@@ -399,20 +424,43 @@ class _PartyLevelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Badge text scales with the sprite it rides on; no home token is this
+    // small, so the size stays derived from the sprite.
     final fontSize = (spriteSize * 0.24).clamp(7.5, 10.0);
+    final Color background;
+    final Color foreground;
+    final BoxBorder? border;
+    if (appVisualStyle.usesFlatUi) {
+      final scheme = Theme.of(context).colorScheme;
+      background = scheme.tertiaryContainer;
+      foreground = scheme.onTertiaryContainer;
+      border = null;
+    } else if (appVisualStyle.usesSolidPlastic) {
+      background = TitoColors.softYellow.withValues(alpha: 0.92);
+      foreground = TitoColors.ink;
+      border = Border.all(
+        color: Colors.white.withValues(alpha: 0.78),
+        width: TitoBorders.glass,
+      );
+    } else {
+      background = TitoColors.softYellow;
+      foreground = TitoColors.ink;
+      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
+    }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
       decoration: BoxDecoration(
-        color: TitoColors.softYellow,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        color: background,
+        // Level badges are the one stadium-shaped element by design.
+        borderRadius: const BorderRadius.all(Radius.circular(999)),
+        border: border,
       ),
       child: Text(
         '${AppZh.level}$level',
         style: TitoTypography.style(
           fontSize: fontSize,
           fontWeight: FontWeight.w800,
-          color: TitoColors.ink,
+          color: foreground,
         ),
       ),
     );
@@ -505,17 +553,42 @@ class _PartyMemberAvatar extends StatelessWidget {
       builder: (context, child) => Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          color: TitoColors.cream,
-          shape: BoxShape.circle,
-          border: Border.all(color: TitoColors.ink, width: 2),
-          boxShadow: retroStyle.enabled ? TitoShadows.stickerSmall : null,
-        ),
+        decoration: _framedAvatarDecoration(context),
         clipBehavior: Clip.antiAlias,
         alignment: Alignment.center,
         child: child,
       ),
       child: sprite,
+    );
+  }
+
+  /// Circular sticker frame with the per-theme small-element shadow.
+  BoxDecoration _framedAvatarDecoration(BuildContext context) {
+    final depth = retroStyle.enabled;
+    if (appVisualStyle.usesFlatUi) {
+      final scheme = Theme.of(context).colorScheme;
+      return BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        shape: BoxShape.circle,
+        boxShadow: depth ? TitoShadows.stickerSmall : null,
+      );
+    }
+    if (appVisualStyle.usesSolidPlastic) {
+      return BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.7),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.78),
+          width: TitoBorders.glass,
+        ),
+        boxShadow: depth ? SolidPlasticShadows.stickerSmall : null,
+      );
+    }
+    return BoxDecoration(
+      color: TitoColors.cream,
+      shape: BoxShape.circle,
+      border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+      boxShadow: depth ? TrainerJournalShadows.stickerSmall : null,
     );
   }
 

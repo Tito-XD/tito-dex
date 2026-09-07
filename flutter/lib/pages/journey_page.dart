@@ -127,11 +127,17 @@ class JourneyPage extends StatelessWidget {
                 ),
                 if (onManageJourneyPacks != null) ...[
                   const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    key: const Key('journey-pack-manager-entry'),
-                    onPressed: onManageJourneyPacks,
-                    icon: const Icon(Icons.download_for_offline_outlined),
-                    label: const Text('管理 Journey 资料包'),
+                  // Full width and the same 48px height as the primary CTA
+                  // above so the two stacked actions read as one group.
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      key: const Key('journey-pack-manager-entry'),
+                      onPressed: onManageJourneyPacks,
+                      icon: const Icon(Icons.download_for_offline_outlined),
+                      label: Text(AppZh.manageJourneyPacks),
+                    ),
                   ),
                 ],
               ],
@@ -198,8 +204,10 @@ class JourneyPage extends StatelessWidget {
                   journey.saveDexCaughtIds.isNotEmpty)
                 _StatRow(
                   label: AppZh.settingsDexProgress,
-                  value:
-                      '已见 ${journey.saveDexSeenIds.length} · 已捕 ${journey.saveDexCaughtIds.length}',
+                  value: AppZh.settingsDexSeenCaught(
+                    journey.saveDexSeenIds.length,
+                    journey.saveDexCaughtIds.length,
+                  ),
                 ),
               if (journey.saveMapCoordinates.length == 3)
                 _StatRow(
@@ -280,7 +288,7 @@ class _SummaryMeta extends StatelessWidget {
       decoration: BoxDecoration(
         color: TitoColors.deepBlue.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.skyBlue, width: 1.2),
+        border: Border.all(color: TitoColors.skyBlue, width: TitoBorders.glass),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
