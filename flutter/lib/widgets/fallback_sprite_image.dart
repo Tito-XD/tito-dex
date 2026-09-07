@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../theme/tito_colors.dart';
+import 'tito_skeleton.dart';
 
 /// Renders the first loadable source from [sources] (network / asset / file),
 /// advancing to the next candidate on load error. Used for animated sprites
@@ -26,8 +27,7 @@ class FallbackSpriteImage extends StatefulWidget {
   /// Upscale filtering — pass [FilterQuality.none] for crisp pixel art.
   final FilterQuality filterQuality;
 
-  /// Show a small progress ring while a network source downloads
-  /// (with real byte progress when the server reports content length).
+  /// Show a pulsing skeleton box while a network source downloads.
   final bool showLoadingProgress;
 
   @override
@@ -97,12 +97,7 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
                 if (progress == null) {
                   return child;
                 }
-                final total = progress.expectedTotalBytes;
-                return _loadingRing(
-                  total == null || total == 0
-                      ? null
-                      : progress.cumulativeBytesLoaded / total,
-                );
+                return _loadingBox();
               }
             : null,
       );
@@ -119,34 +114,21 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
   }
 
   Widget _placeholder() {
-    return Container(
+    return TitoSkeletonBox(
       width: widget.width,
       height: widget.height,
-      decoration: BoxDecoration(
-        color: TitoColors.card.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-      ),
+      radius: TitoRadii.sm,
     );
   }
 
-  Widget _loadingRing(double? value) {
-    final side = widget.width ?? widget.height ?? 40.0;
-    final ring = (side * 0.42).clamp(14.0, 26.0);
-    return SizedBox(
+  /// Image slots show a pulsing skeleton, not a spinner (D10). Byte progress
+  /// is intentionally not drawn: sprites are tiny and the ring only flickered.
+  Widget _loadingBox() {
+    return TitoSkeletonBox(
       width: widget.width,
       height: widget.height,
-      child: Center(
-        child: SizedBox(
-          width: ring,
-          height: ring,
-          child: CircularProgressIndicator(
-            value: value,
-            strokeWidth: 2.5,
-            color: TitoColors.deepBlue,
-            backgroundColor: TitoColors.deepBlue.withValues(alpha: 0.15),
-          ),
-        ),
-      ),
+      radius: TitoRadii.sm,
+      shimmer: true,
     );
   }
 }

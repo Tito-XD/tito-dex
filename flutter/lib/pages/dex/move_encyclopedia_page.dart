@@ -7,6 +7,7 @@ import '../../features/dex/reference_game_scope.dart';
 import '../../features/dex/move_version_data.dart';
 import '../../features/game/game_edition.dart';
 import '../../features/game/game_edition_repository.dart';
+import '../../l10n/localized_names.dart';
 import '../../l10n/app_zh.dart';
 import 'dex_reference_list.dart';
 
@@ -30,7 +31,7 @@ class MoveEncyclopediaPage extends StatelessWidget {
     return DexReferenceListPage<CachedMove>(
       key: ValueKey('moves:${edition.slug}:${edition.selectedFlavor}'),
       title: AppZh.dexReferenceMoves,
-      subtitle: edition.labelZh,
+      subtitle: edition.label,
       loadEntries: () async {
         final results = await (
           dexRepository.getAllMoves(),
@@ -58,7 +59,7 @@ class MoveEncyclopediaPage extends StatelessWidget {
         exactCoverageKnown: exactCoverageKnown,
       ),
       filterEntry: filterCachedMove,
-      primaryLabel: (move) => move.nameZh,
+      primaryLabel: (move) => move.displayName,
       secondaryLabel: (move) =>
           '#${move.id} · ${typeNameZh(move.type)} · ${move.category}',
       detailSheet: showMoveDetailSheet,

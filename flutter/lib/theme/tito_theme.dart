@@ -75,6 +75,27 @@ ThemeData _buildSolidPlasticTheme() {
       width: TitoBorders.glass,
     ),
   );
+  // Mirrors the default light-tint outline painted by `LiquidGlassSurface`
+  // so stock Material surfaces (sheets, dialogs, menus) match glass cards.
+  final glassSide = BorderSide(
+    color: Colors.white.withValues(alpha: 0.78),
+    width: TitoBorders.glass,
+  );
+  final smallShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.sm),
+  );
+  final menuShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.md),
+    side: glassSide,
+  );
+  final menuStyle = MenuStyle(
+    backgroundColor: WidgetStatePropertyAll(
+      TitoColors.card.withValues(alpha: 0.96),
+    ),
+    surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+    shape: WidgetStatePropertyAll(menuShape),
+    elevation: const WidgetStatePropertyAll(2),
+  );
 
   return ThemeData(
     useMaterial3: true,
@@ -108,7 +129,8 @@ ThemeData _buildSolidPlasticTheme() {
       shape: mediumShape,
     ),
     bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: TitoColors.card.withValues(alpha: 0.97),
+      backgroundColor: TitoColors.card.withValues(alpha: 0.86),
+      surfaceTintColor: Colors.transparent,
       modalBarrierColor: const Color(0x73221F26),
       showDragHandle: true,
       dragHandleColor: TitoColors.mutedInk,
@@ -116,11 +138,80 @@ ThemeData _buildSolidPlasticTheme() {
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(TitoRadii.xl),
         ),
-        side: BorderSide(
-          color: Colors.white.withValues(alpha: 0.72),
-          width: TitoBorders.glass,
+        side: glassSide,
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: TitoColors.card.withValues(alpha: 0.94),
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.xl),
+        side: glassSide,
+      ),
+      titleTextStyle: textTheme.titleMedium,
+      contentTextStyle: textTheme.bodyMedium,
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: Colors.white.withValues(alpha: 0.78),
+      selectedColor: TitoColors.mint.withValues(alpha: 0.9),
+      disabledColor: Colors.white.withValues(alpha: 0.4),
+      surfaceTintColor: Colors.transparent,
+      side: BorderSide(
+        color: Colors.white.withValues(alpha: 0.85),
+        width: TitoBorders.glass,
+      ),
+      shape: smallShape,
+      labelStyle: textTheme.labelMedium,
+      secondaryLabelStyle: textTheme.labelMedium,
+      checkmarkColor: TitoColors.ink,
+      showCheckmark: true,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      elevation: 0,
+      pressElevation: 0,
+    ),
+    dividerTheme: DividerThemeData(
+      color: Colors.white.withValues(alpha: 0.45),
+      thickness: 1,
+      space: 24,
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: TitoColors.card.withValues(alpha: 0.96),
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shape: menuShape,
+      textStyle: textTheme.bodyMedium,
+    ),
+    menuTheme: MenuThemeData(style: menuStyle),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: menuStyle,
+      textStyle: textTheme.bodyMedium,
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? TitoColors.softYellow.withValues(alpha: 0.9)
+              : Colors.white.withValues(alpha: 0.75),
+        ),
+        foregroundColor: const WidgetStatePropertyAll(TitoColors.ink),
+        side: const WidgetStatePropertyAll(
+          BorderSide(color: TitoColors.ink, width: TitoBorders.element),
+        ),
+        shape: WidgetStatePropertyAll(smallShape),
+        elevation: const WidgetStatePropertyAll(0),
+        textStyle: WidgetStatePropertyAll(
+          textTheme.labelLarge?.copyWith(fontSize: 13),
         ),
       ),
+    ),
+    listTileTheme: ListTileThemeData(
+      dense: true,
+      iconColor: TitoColors.ink,
+      textColor: TitoColors.ink,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+      shape: smallShape,
     ),
     snackBarTheme: SnackBarThemeData(
       contentTextStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.card),
@@ -251,6 +342,15 @@ ThemeData _buildFlatUiTheme() {
   final largeShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(TitoRadii.lg),
   );
+  final smallShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.sm),
+  );
+  final menuStyle = MenuStyle(
+    backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainer),
+    surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+    shape: WidgetStatePropertyAll(mediumShape),
+    elevation: const WidgetStatePropertyAll(2),
+  );
 
   return ThemeData(
     useMaterial3: true,
@@ -314,8 +414,30 @@ ThemeData _buildFlatUiTheme() {
         textStyle: WidgetStatePropertyAll(
           textTheme.labelLarge?.copyWith(fontSize: 13),
         ),
-        shape: WidgetStatePropertyAll(mediumShape),
+        shape: WidgetStatePropertyAll(smallShape),
       ),
+    ),
+    chipTheme: ChipThemeData(
+      selectedColor: colorScheme.secondaryContainer,
+      checkmarkColor: colorScheme.onSecondaryContainer,
+      side: BorderSide(color: colorScheme.outlineVariant),
+      shape: smallShape,
+      labelStyle: textTheme.labelMedium,
+      secondaryLabelStyle: textTheme.labelMedium,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: colorScheme.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      elevation: 2,
+      shape: mediumShape,
+      textStyle: textTheme.bodyMedium,
+    ),
+    menuTheme: MenuThemeData(style: menuStyle),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: menuStyle,
+      textStyle: textTheme.bodyMedium,
     ),
     snackBarTheme: SnackBarThemeData(
       contentTextStyle: textTheme.bodyMedium?.copyWith(
@@ -453,9 +575,23 @@ ThemeData _buildClassicTheme() {
     secondary: TitoColors.coral,
     surface: TitoColors.card,
   );
+  const cardSide = BorderSide(color: TitoColors.ink, width: TitoBorders.card);
+  const elementSide = BorderSide(
+    color: TitoColors.ink,
+    width: TitoBorders.element,
+  );
   final mediumShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(TitoRadii.md),
-    side: const BorderSide(color: TitoColors.ink, width: 2),
+    side: cardSide,
+  );
+  final smallShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.sm),
+  );
+  final menuStyle = MenuStyle(
+    backgroundColor: const WidgetStatePropertyAll(TitoColors.card),
+    surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+    shape: WidgetStatePropertyAll(mediumShape),
+    elevation: const WidgetStatePropertyAll(0),
   );
 
   return ThemeData(
@@ -479,12 +615,99 @@ ThemeData _buildClassicTheme() {
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: TitoColors.card,
+      surfaceTintColor: Colors.transparent,
       modalBarrierColor: Color(0x73221F26),
       showDragHandle: true,
       dragHandleColor: TitoColors.mutedInk,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
-        side: BorderSide(color: TitoColors.ink, width: 2),
+        side: cardSide,
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: TitoColors.card,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.lg),
+        side: cardSide,
+      ),
+      titleTextStyle: textTheme.titleMedium,
+      contentTextStyle: textTheme.bodyMedium,
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: TitoColors.card,
+      selectedColor: TitoColors.mint,
+      disabledColor: TitoColors.cardWarm.withValues(alpha: 0.6),
+      surfaceTintColor: Colors.transparent,
+      side: elementSide,
+      shape: smallShape,
+      labelStyle: textTheme.labelMedium,
+      secondaryLabelStyle: textTheme.labelMedium,
+      checkmarkColor: TitoColors.ink,
+      showCheckmark: true,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+      elevation: 0,
+      pressElevation: 0,
+    ),
+    dividerTheme: DividerThemeData(
+      color: TitoColors.ink.withValues(alpha: 0.18),
+      thickness: 1,
+      space: 24,
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: TitoColors.card,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: mediumShape,
+      textStyle: textTheme.bodyMedium,
+    ),
+    menuTheme: MenuThemeData(style: menuStyle),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: menuStyle,
+      textStyle: textTheme.bodyMedium,
+    ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? TitoColors.softYellow
+              : TitoColors.card,
+        ),
+        foregroundColor: const WidgetStatePropertyAll(TitoColors.ink),
+        side: const WidgetStatePropertyAll(elementSide),
+        shape: WidgetStatePropertyAll(smallShape),
+        elevation: const WidgetStatePropertyAll(0),
+        textStyle: WidgetStatePropertyAll(
+          textTheme.labelLarge?.copyWith(fontSize: 13),
+        ),
+      ),
+    ),
+    listTileTheme: ListTileThemeData(
+      dense: true,
+      iconColor: TitoColors.ink,
+      textColor: TitoColors.ink,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+      shape: smallShape,
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? TitoColors.deepBlue
+            : Colors.transparent,
+      ),
+      checkColor: const WidgetStatePropertyAll(TitoColors.card),
+      side: elementSide,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TitoRadii.sm / 2),
+      ),
+    ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? TitoColors.deepBlue
+            : TitoColors.ink,
       ),
     ),
     appBarTheme: AppBarTheme(
@@ -517,7 +740,7 @@ ThemeData _buildClassicTheme() {
       style: OutlinedButton.styleFrom(
         foregroundColor: TitoColors.deepBlue,
         textStyle: textTheme.labelLarge,
-        side: const BorderSide(color: TitoColors.ink, width: 2),
+        side: cardSide,
         shape: mediumShape,
       ),
     ),
@@ -542,15 +765,18 @@ ThemeData _buildClassicTheme() {
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+        borderSide: cardSide,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.ink, width: 2),
+        borderSide: cardSide,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(color: TitoColors.coral, width: 2),
+        borderSide: const BorderSide(
+          color: TitoColors.coral,
+          width: TitoBorders.card,
+        ),
       ),
     ),
   );

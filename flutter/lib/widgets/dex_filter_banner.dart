@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../features/dex/dex_filter.dart';
+import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import 'sticker_card.dart';
+import 'tito_pokeball_loading.dart';
 
 /// Reference drill-down filter banner for [DexPage].
 class DexFilterBanner extends StatelessWidget {
@@ -19,6 +21,21 @@ class DexFilterBanner extends StatelessWidget {
   final bool loading;
 
   String get _label {
+    final search = <String>[
+      if (filter.query.trim().isNotEmpty) '“${filter.query.trim()}”',
+      ...filter.typeSlugs.map(typeNameZh),
+      if (filter.formDisplay != DexFormDisplay.base)
+        filter.formDisplay == DexFormDisplay.all
+            ? AppZh.dexFormDisplayAll
+            : AppZh.dexFormDisplayAlternate,
+    ];
+    if (search.isNotEmpty) {
+      return [
+        ...search,
+        if (filter.speciesAxesLabelZh != null) filter.speciesAxesLabelZh!,
+        if (filter.labelZh != null) filter.labelZh!,
+      ].join(' · ');
+    }
     // Species axes are stackable, so they describe themselves and take
     // precedence over the drill-down label a reference sheet may have set.
     final axes = filter.speciesAxesLabelZh;
@@ -52,11 +69,7 @@ class DexFilterBanner extends StatelessWidget {
           if (loading)
             const Padding(
               padding: EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+              child: TitoPokeballLoading(size: 16),
             ),
           Expanded(
             child: Text(

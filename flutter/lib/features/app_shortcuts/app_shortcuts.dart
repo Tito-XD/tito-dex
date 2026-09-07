@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../l10n/app_zh.dart';
+
 class AppShortcutOption {
   const AppShortcutOption({
     required this.id,
@@ -151,19 +153,41 @@ class AppShortcutOption {
 
   Map<String, String> toPlatformMap() => {
     'id': id,
-    'label': labelZh,
+    'label': label,
     'route': route,
+  };
+
+  String get label => switch (id) {
+    'dex' => AppZh.navDex,
+    'search' => AppZh.navSearch,
+    'moves' => AppZh.dexReferenceMoves,
+    'abilities' => AppZh.dexReferenceAbilities,
+    'locations' => AppZh.locationDexTitle,
+    'items' => AppZh.searchRefItems,
+    'natures' => AppZh.searchRefNatures,
+    'egg-groups' => AppZh.searchRefEggGroups,
+    'weather' => AppZh.searchRefWeather,
+    'terrains' => AppZh.searchRefTerrains,
+    'status' => AppZh.searchRefStatus,
+    'quiz' => AppZh.quizTitle,
+    'type-matchup' => AppZh.searchBattleTypeMatchup,
+    'stat-calc' => AppZh.searchBattleStatCalc,
+    'blind-spot' => AppZh.companionToolBlindSpot,
+    'quick-damage' => AppZh.searchBattleQuickDamage,
+    _ => labelZh,
   };
 }
 
 enum AppShortcutSection {
-  primary('默认入口'),
-  reference('图鉴与资料'),
-  tool('对战工具');
+  primary,
+  reference,
+  tool;
 
-  const AppShortcutSection(this.labelZh);
-
-  final String labelZh;
+  String get label => switch (this) {
+    AppShortcutSection.primary => AppZh.settingsAppShortcutsSectionPrimary,
+    AppShortcutSection.reference => AppZh.settingsAppShortcutsSectionReference,
+    AppShortcutSection.tool => AppZh.settingsAppShortcutsSectionTool,
+  };
 }
 
 class AppShortcutsPlatform {
@@ -285,6 +309,8 @@ class AppShortcutPreferences extends ChangeNotifier {
     );
     await _platform.update(_selected);
   }
+
+  Future<void> resyncPlatform() => _platform.update(_selected);
 
   List<AppShortcutOption> _normalize(Iterable<AppShortcutOption> shortcuts) {
     final selectedIds = shortcuts.map((shortcut) => shortcut.id).toSet();

@@ -13,7 +13,9 @@ import '../features/companion/battle_handoff.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/game/journey_capability.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -23,7 +25,7 @@ import '../widgets/party_team_list.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
-import '../widgets/sticker_pressable.dart';
+import '../widgets/tito_loading_panel.dart';
 import '../widgets/tito_sprite_sticker.dart';
 import '../widgets/team_summary_card.dart';
 import 'dex/dex_reference_list.dart';
@@ -134,15 +136,15 @@ class _TeamPageState extends State<TeamPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(AppZh.partySaveSyncConfirm),
+        title: Text(AppZh.partySaveSyncConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(AppZh.cancel),
+            child: Text(AppZh.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(AppZh.confirm),
+            child: Text(AppZh.confirm),
           ),
         ],
       ),
@@ -245,7 +247,7 @@ class _TeamPageState extends State<TeamPage> {
       }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(AppZh.teamAddInvalidId)));
+      ).showSnackBar(SnackBar(content: Text(AppZh.teamAddInvalidId)));
     }
   }
 
@@ -258,33 +260,38 @@ class _TeamPageState extends State<TeamPage> {
         if (_showSaveDiffBanner)
           Padding(
             padding: const EdgeInsets.only(bottom: 14),
-            child: Material(
-              color: TitoColors.softYellow,
-              borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-              child: InkWell(
-                onTap: _confirmSyncFromSave,
-                borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.sync_rounded, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          AppZh.partySaveDiffBanner,
-                          style: SecondaryTypography.onCard.body14.copyWith(
-                            fontWeight: FontWeight.w800,
+            child: StickerCard(
+              variant: StickerVariant.softYellow,
+              padding: EdgeInsets.zero,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _confirmSyncFromSave,
+                  borderRadius: BorderRadius.circular(
+                    DeviceLayout.rLg(context),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sync_rounded, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            AppZh.partySaveDiffBanner,
+                            style: SecondaryTypography.onCard.body14.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: _dismissDiffBanner,
-                        tooltip: AppZh.partySaveDiffDismiss,
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: _dismissDiffBanner,
+                          tooltip: AppZh.partySaveDiffDismiss,
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.close_rounded, size: 18),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -296,7 +303,7 @@ class _TeamPageState extends State<TeamPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabelZh}',
+                '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabel}',
                 style: SecondaryTypography.onGradient.h15,
               ),
               const SizedBox(height: 4),
@@ -466,6 +473,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
     final picked = await showModalBottomSheet<Set<int>>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setSheetState) {
           final normalized = query.trim().toLowerCase();
@@ -480,10 +488,16 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                     )
                     .toList(growable: false);
           return SafeArea(
+            top: false,
             child: SizedBox(
               height: MediaQuery.sizeOf(context).height * 0.76,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  8,
+                  16,
+                  12 + MediaQuery.viewInsetsOf(context).bottom,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -491,20 +505,22 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                       children: [
                         Expanded(
                           child: Text(
-                            '选择招式 · ${working.length}/4',
+                            AppZh.teamPickMovesCount(working.length),
                             style: SecondaryTypography.onCard.h15,
                           ),
                         ),
                         FilledButton(
                           onPressed: () => Navigator.pop(sheetContext, working),
-                          child: const Text(AppZh.confirm),
+                          child: Text(AppZh.confirm),
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       autofocus: true,
-                      decoration: retroInsetDecoration(labelText: '搜索招式名称或编号'),
+                      decoration: retroInsetDecoration(
+                        labelText: AppZh.teamSearchMovesHint,
+                      ),
                       onChanged: (value) => setSheetState(() => query = value),
                     ),
                     const SizedBox(height: 8),
@@ -517,9 +533,9 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                           return CheckboxListTile(
                             dense: true,
                             value: selected,
-                            title: Text(move.nameZh),
+                            title: Text(move.displayName),
                             subtitle: Text(
-                              '#${move.id} · ${typeNameZh(move.type)} · ${_moveCategoryLabelZh(move.category)}',
+                              '#${move.id} · ${typeNameZh(move.type)} · ${AppZh.moveCategory(move.category)}',
                             ),
                             onChanged: !selected && working.length >= 4
                                 ? null
@@ -550,7 +566,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
   @override
   Widget build(BuildContext context) {
     final abilityOptions = defensiveAbilityOptionsFrom(_abilities);
-    final radius = BorderRadius.circular(TitoRadii.sm);
+    final scheme = Theme.of(context).colorScheme;
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -563,15 +579,19 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                   builder: (context, snapshot) => TitoSpriteSticker(
                     source: snapshot.data?.displaySpritePath,
                     size: 40,
-                    radius: 12,
+                    radius: TitoRadii.md,
                   ),
                 )
               else
-                const TitoSpriteSticker(source: null, size: 40, radius: 12),
+                const TitoSpriteSticker(
+                  source: null,
+                  size: 40,
+                  radius: TitoRadii.md,
+                ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '${AppZh.teamEditTitle} · 槽位 ${widget.index + 1}',
+                  AppZh.teamSlotTitle(widget.index + 1),
                   style: SecondaryTypography.onCard.h15.copyWith(
                     color: TitoColors.deepBlue,
                   ),
@@ -631,7 +651,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
           if (_availableMoves.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
-              '当前招式（最多 4 个）',
+              AppZh.teamCurrentMoves,
               style: SecondaryTypography.onCard.small12.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -645,13 +665,17 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                 for (final move in _availableMoves)
                   if (_selectedMoveIds.contains(move.id))
                     InputChip(
-                      label: Text(move.nameZh),
+                      label: Text(move.displayName),
                       onDeleted: () =>
                           setState(() => _selectedMoveIds.remove(move.id)),
                     ),
                 ActionChip(
                   avatar: const Icon(Icons.add_rounded, size: 18),
-                  label: Text(_selectedMoveIds.isEmpty ? '选择招式' : '调整招式'),
+                  label: Text(
+                    _selectedMoveIds.isEmpty
+                        ? AppZh.teamPickMovesTitle
+                        : AppZh.teamAdjustMoves,
+                  ),
                   onPressed: _pickMoves,
                 ),
               ],
@@ -662,46 +686,57 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
             children: [
               if (widget.canSwapPrev) ...[
                 Expanded(
-                  child: _EditorActionButton(
-                    label: AppZh.teamEditSwapPrev,
-                    background: TitoColors.cardWarm,
-                    foreground: TitoColors.deepBlue,
-                    radius: radius,
-                    onTap: () => widget.onSwap(widget.index, -1),
+                  child: OutlinedButton(
+                    onPressed: () => widget.onSwap(widget.index, -1),
+                    child: Text(
+                      AppZh.teamEditSwapPrev,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
               ],
               if (widget.canSwapNext) ...[
                 Expanded(
-                  child: _EditorActionButton(
-                    label: AppZh.teamEditSwapNext,
-                    background: TitoColors.cardWarm,
-                    foreground: TitoColors.deepBlue,
-                    radius: radius,
-                    onTap: () => widget.onSwap(widget.index, 1),
+                  child: OutlinedButton(
+                    onPressed: () => widget.onSwap(widget.index, 1),
+                    child: Text(
+                      AppZh.teamEditSwapNext,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
               ],
               Expanded(
-                child: _EditorActionButton(
-                  label: AppZh.teamEditDelete,
-                  background: const Color(0xFFFDE0D6),
-                  foreground: const Color(0xFF7A2A12),
-                  radius: radius,
-                  onTap: () => widget.onDelete(widget.index),
+                child: FilledButton.tonal(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: scheme.errorContainer,
+                    foregroundColor: scheme.onErrorContainer,
+                  ),
+                  onPressed: () => widget.onDelete(widget.index),
+                  child: Text(
+                    AppZh.teamEditDelete,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          _EditorActionButton(
-            label: AppZh.confirm,
-            background: TitoColors.coral,
-            foreground: const Color(0xFF4A1B0C),
-            radius: radius,
-            onTap: () => widget.onSave(
+          FilledButton(
+            // Coral is the editor's existing confirm accent on the sticker
+            // themes; Flat UI keeps the Material primary fill from the theme.
+            style: appVisualStyle.usesFlatUi
+                ? null
+                : FilledButton.styleFrom(
+                    backgroundColor: TitoColors.coral,
+                    foregroundColor: TitoColors.ink,
+                  ),
+            onPressed: () => widget.onSave(
               widget.index,
               level: int.tryParse(_levelController.text.trim()),
               nickname: _nicknameController.text.trim(),
@@ -709,6 +744,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
               abilitySlug: _selectedAbility,
               moveIds: _selectedMoveIds.toList(growable: false),
             ),
+            child: Text(AppZh.confirm),
           ),
         ],
       ),
@@ -812,10 +848,10 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('队伍与进化', style: SecondaryTypography.onCard.h15),
+          Text(AppZh.teamAssistTitle, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 4),
           Text(
-            '存档可读取的特性与招式会自动带入；手动队伍可在上方点成员补充。',
+            AppZh.teamAssistHint,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.mutedInk,
             ),
@@ -826,9 +862,12 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
             builder: (context, snapshot) {
               final entries = snapshot.data;
               if (entries == null) {
-                return const LinearProgressIndicator();
+                return const TitoLoadingPanel(
+                  compact: true,
+                  onLightSurface: true,
+                );
               }
-              if (entries.isEmpty) return const Text('添加队伍成员后可查看辅助信息');
+              if (entries.isEmpty) return Text(AppZh.teamAssistEmpty);
               return Column(
                 children: [
                   for (final entry in entries)
@@ -917,7 +956,7 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                                     );
                                   },
                             icon: const Icon(Icons.calculate_rounded, size: 18),
-                            label: const Text('带入伤害速算'),
+                            label: Text(AppZh.teamToQuickDamage),
                           ),
                         ),
                       ],
@@ -956,104 +995,50 @@ class _TeamAssistEntry {
 
   String moveLabel(int index) {
     final move = moves[index];
-    if (index >= member.movePp.length) return move.nameZh;
+    if (index >= member.movePp.length) return move.displayName;
     final ppUp = index < member.movePpUps.length ? member.movePpUps[index] : 0;
-    return '${move.nameZh} · PP ${member.movePp[index]}'
-        '${ppUp > 0 ? ' · 增强 $ppUp' : ''}';
+    return '${move.displayName} · PP ${member.movePp[index]}'
+        '${ppUp > 0 ? ' · ${AppZh.teamMovePpBoost(ppUp)}' : ''}';
   }
 
   List<String> get saveFacts {
     final stats = member.battleStats;
     return [
-      if (member.nature != null) '${member.nature}性格',
+      if (member.nature != null) AppZh.teamNatureFact(member.nature!),
       if (member.gender != null) member.gender!,
-      if (member.isShiny) '闪光',
-      if (member.isEgg) '蛋',
-      if (member.formIndex != 0) '形态索引 ${member.formIndex}',
+      if (member.isShiny) AppZh.shinyLabel,
+      if (member.isEgg) AppZh.eggLabel,
+      if (member.formIndex != 0) AppZh.teamFormIndex(member.formIndex),
       if (member.status != null) member.status!,
       if (member.currentHp != null && member.maxHp != null)
         'HP ${member.currentHp}/${member.maxHp}',
-      if (member.experience != null) '经验 ${member.experience}',
-      if (member.friendship != null) '亲密度 ${member.friendship}',
+      if (member.experience != null) AppZh.teamExperience(member.experience!),
+      if (member.friendship != null) AppZh.teamFriendship(member.friendship!),
       if (member.heldItemId != null)
-        '携带 ${heldItemName ?? '道具 #${member.heldItemId}'}',
+        AppZh.teamHeldItem(
+          heldItemName ?? AppZh.teamItemNumber(member.heldItemId!),
+        ),
       if (stats.isNotEmpty)
-        '能力 ${stats.entries.map((entry) => '${entry.key}${entry.value}').join(' / ')}',
-      if (member.ivs.length == 6) 'IV（HP/攻/防/速/特攻/特防）${member.ivs.join('/')}',
-      if (member.evs.length == 6) 'EV（HP/攻/防/速/特攻/特防）${member.evs.join('/')}',
+        AppZh.teamStatsLine(
+          stats.entries.map((entry) => '${entry.key}${entry.value}').join(' / '),
+        ),
+      if (member.ivs.length == 6) AppZh.teamIvLine(member.ivs.join('/')),
+      if (member.evs.length == 6) AppZh.teamEvLine(member.evs.join('/')),
     ];
   }
 
   String get subtitle {
     final parts = [
-      if (ability != null) '特性：${ability!.nameZh}',
-      if (member.nature != null) '性格：${member.nature}',
+      if (ability != null) AppZh.teamAbilityLine(ability!.displayName),
+      if (member.nature != null) AppZh.teamNatureLine(member.nature!),
       if (member.heldItemId != null)
-        '携带：${heldItemName ?? '#${member.heldItemId}'}',
-      if (moves.isNotEmpty) '招式 ${moves.length}/4',
+        AppZh.teamHeldLine(heldItemName ?? '#${member.heldItemId}'),
+      if (moves.isNotEmpty) AppZh.teamMovesCount(moves.length),
       if (evolutions.isNotEmpty)
-        '可进化：${evolutions.map((entry) => entry.nameZh).join(' / ')}',
-    ];
-    return parts.isEmpty ? '点击成员可补充招式与特性' : parts.join(' · ');
-  }
-}
-
-String _moveCategoryLabelZh(String category) => switch (category) {
-  'physical' => '物理',
-  'special' => '特殊',
-  'status' => '变化',
-  _ => category,
-};
-
-/// Sticker action button for the inline editor (small solid drop shadow,
-/// sinks on press like every other sticker).
-class _EditorActionButton extends StatelessWidget {
-  const _EditorActionButton({
-    required this.label,
-    required this.background,
-    required this.foreground,
-    required this.radius,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color background;
-  final Color foreground;
-  final BorderRadius radius;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return StickerPressable(
-      borderRadius: radius,
-      child: Material(
-        color: background,
-        borderRadius: radius,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.element,
-              ),
-            ),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                color: foreground,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+        AppZh.teamCanEvolve(
+          evolutions.map((entry) => entry.displayName).join(' / '),
         ),
-      ),
-    );
+    ];
+    return parts.isEmpty ? AppZh.teamAssistTapToFill : parts.join(' · ');
   }
 }

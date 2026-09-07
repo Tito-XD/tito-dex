@@ -78,20 +78,77 @@ Color usage:
   with no blur (never Material's soft elevation). Paired with press-down
   physics it reads as a physical handheld key.
 
-Suggested tokens:
+Tokens (`flutter/lib/theme/tito_colors.dart`, values are what ships):
 
-```css
-:root {
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-  --outline-thick: 3px;
-  --outline-thin: 2px;
-  --shadow-sticker: 0 5px 0 rgba(24, 40, 59, 0.22);
-  --shadow-soft: 0 12px 32px rgba(24, 40, 59, 0.14);
-}
-```
+| Token | Value | Use |
+| --- | ---: | --- |
+| `TitoRadii.sm` | 8 | chips, pills, tabs, badges, segmented buttons, list tiles |
+| `TitoRadii.md` | 12 | buttons, text fields, menus, snack bars |
+| `TitoRadii.lg` | 16 | cards; sheets and dialogs in Trainer's Journal |
+| `TitoRadii.xl` | 28 | sheets and dialogs in Solid Plastic / Flat UI |
+| `TitoBorders.card` | 2.0 | ink outline on cards, buttons, fields, sheets, dialogs |
+| `TitoBorders.element` | 1.5 | ink outline on chips, badges, small controls, knobs |
+| `TitoBorders.glass` | 1.1 | Solid Plastic light hairline (`LiquidGlassSurface`) |
+
+Radii are fixed on every device: `DeviceLayout.rSm/rMd/rLg` are plain
+pass-throughs and must not halve on the handheld. Never write a literal outline
+width in a widget — pick the token that matches the surface size.
+
+Shadow recipes are per theme and never mixed:
+
+| Theme | Recipe | Cards / buttons | Chips / sprites | Pressed |
+| --- | --- | --- | --- | --- |
+| Trainer's Journal | `TrainerJournalShadows` — hard, no blur | `0 5px 0` ink@.22 | `0 3px 0` ink@.16 | `0 1px 0` |
+| Solid Plastic | `SolidPlasticShadows` — moulded, blurred | `0 8px 16px` + `0 2px 3px` | `0 5px 11px` | `0 2px 7px` |
+| Flat UI | `TitoShadows` — soft Material elevation (**Flat UI only**) | `0 2px 8px` | `0 1px 4px` | `0 1px 3px` |
+
+Stock Material surfaces (`AlertDialog`, bottom sheets, `Divider`, chips,
+menus, segmented buttons, list tiles, checkbox/radio) are styled purely by the
+`ThemeData` built in `tito_theme.dart` for each style. Do not re-style them at
+call sites: a plain `AlertDialog`, `showModalBottomSheet` (drag handle on) and
+`Divider()` already look right in every theme.
+
+## Selection colours
+
+| Control | Selected colour | Notes |
+| --- | --- | --- |
+| Single choice drawn as segments / tabs / custom method chips | `softYellow` | one active option at a time (`SegmentedButton`, search hub bar, detail move-method chips, stats toggle) |
+| Any Material chip (`FilterChip`, `ChoiceChip`, `InputChip`) and toggles | `mint` | `ChipThemeData` is shared by every chip class, so single-choice chip groups (weather, terrain, status…) also select in mint — do not fight it with local `selectedColor` |
+| Detail bottom tabs | type colour tint | intentional exception: the tab bar is the species' colour identity |
+| Flat UI (all of the above) | `colorScheme.secondaryContainer` | Material semantics, no cream/yellow |
+
+Coral is reserved for destructive actions, warnings and the primary CTA — never
+as a selection highlight.
+
+## Text tokens
+
+| Where the text sits | Token |
+| --- | --- |
+| Page level, directly on the shell / gradient | `SecondaryTypography.onPage(context)` (theme-aware) |
+| Deep card (deepBlue, slate, gradient fills) | `SecondaryTypography.onGradient` (cream) |
+| Cream / sky / mint card | `SecondaryTypography.onCard` (ink) |
+
+`onGradient` is a fixed cream and does not adapt to Flat UI; use `onPage` for
+anything that is not inside a deep card.
+
+## Loading indicators
+
+| Situation | Widget |
+| --- | --- |
+| Determinate progress (downloads, installs, sync) | `TitoProgressBar` |
+| Whole section / page waiting | `TitoLoadingPanel` or `TitoPokeballLoading` |
+| Image / sprite placeholder | `TitoSkeletonBox` |
+
+No bare `CircularProgressIndicator` in feature code.
+
+## Theme-blind components are bugs
+
+Every shared widget must branch on `appVisualStyle` (`usesTrainerJournal`,
+`usesSolidPlastic`, `usesFlatUi`) — `widgets/sticker_card.dart` is the
+reference implementation. A component that hard-codes cream cards, ink borders
+or hard shadows will look wrong in Solid Plastic and Flat UI; a component that
+reads only `Theme.of(context).colorScheme` loses the sticker language in
+Trainer's Journal. Fix the component, do not special-case the caller.
 
 ### Retro sticker feel (Flutter implementation)
 
@@ -100,6 +157,7 @@ package through `retroStyle`:
 
 - `TrainerJournalShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
   (0/3px) on chips/sprites/bubbles, `.stickerPressed` (0/1px) while held.
+  Solid Plastic swaps in `SolidPlasticShadows`; Flat UI uses `TitoShadows`.
 - `StickerPressable` wraps interactive stickers: touch-down sinks the
   sticker 3px in ~80ms and squashes the shadow; release springs back.
   `ownShadow: false` gives sink-only physics when the inner `StickerCard`

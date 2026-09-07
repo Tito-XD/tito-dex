@@ -12,6 +12,7 @@ import '../../features/dex/type_chart.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
+import '../../theme/app_visual_style.dart';
 import '../../theme/error_text.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
@@ -122,6 +123,14 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
         _loading = false;
       });
     }
+  }
+
+  void _retryLoadRelations() {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    _loadRelations();
   }
 
   Future<void> _consumePartyHandoff() async {
@@ -369,16 +378,11 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SecondaryPageAppBar(
+                    SecondaryPageAppBar(
                       title: AppZh.companionToolQuickDamage,
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      edition.labelZh,
-                      style: SecondaryTypography.onGradient.body14.copyWith(
-                        color: TitoColors.card.withValues(alpha: 0.92),
-                      ),
-                    ),
+                    SecondaryPageSubtitle(text: edition.label),
                   ],
                 ),
               ),
@@ -397,18 +401,30 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                   padding: pagePadding.copyWith(top: 12, bottom: 96),
                   children: [
                     if (_loading)
-                      const TitoLoadingPanel(
+                      TitoLoadingPanel(
                         message: AppZh.companionLoading,
                         compact: true,
                       )
                     else if (_error != null)
                       StickerCard(
-                        child: Text(
-                          _error!,
-                          style: SecondaryTypography.onCard.small12.copyWith(
-                            color: TitoColors.mutedInk,
-                            height: 1.45,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _error!,
+                              style: SecondaryTypography.onCard.small12
+                                  .copyWith(
+                                    color: TitoColors.mutedInk,
+                                    height: 1.45,
+                                  ),
+                            ),
+                            const SizedBox(height: 12),
+                            FilledButton.icon(
+                              onPressed: _retryLoadRelations,
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: Text(AppZh.dexRetry),
+                            ),
+                          ],
                         ),
                       )
                     else ...[
@@ -426,7 +442,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                           const SizedBox(height: 12),
                           if (widget.journey.party.isNotEmpty) ...[
                             Text(
-                              '从当前队伍带入',
+                              AppZh.importFromParty,
                               style: SecondaryTypography.onCard.small12
                                   .copyWith(fontWeight: FontWeight.w800),
                             ),
@@ -676,11 +692,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
                         const SizedBox(height: 12),
                         Text(
                           AppZh.companionDamageAssumptions,
-                          style: SecondaryTypography.onGradient.small12
-                              .copyWith(
-                                color: TitoColors.card.withValues(alpha: 0.92),
-                                height: 1.45,
-                              ),
+                          style: SecondaryTypography.onPage(
+                            context,
+                          ).small12.copyWith(height: 1.45),
                         ),
                       ],
                     ],
@@ -823,12 +837,20 @@ class _DamageResultCard extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
+              // HP bar rail: a translucent white wash over the deep card so
+              // the mint/coral split reads on every theme; ink outline only
+              // where the theme draws ink.
               return Container(
                 height: 20,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: TitoColors.ink, width: 2),
+                  border: appVisualStyle.usesFlatUi
+                      ? null
+                      : Border.all(
+                          color: TitoColors.ink,
+                          width: TitoBorders.element,
+                        ),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(

@@ -15,6 +15,7 @@ import '../features/journey/ask_titodex_settings.dart';
 import '../pages/dex/dex_json_reference_page.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
@@ -203,7 +204,7 @@ class _SearchPageState extends State<SearchPage> {
       type: MaterialType.transparency,
       child: SecondaryPageScaffold(
         title: AppZh.navSearch,
-        subtitle: edition.labelZh,
+        subtitle: edition.label,
         children: [
           _SearchHubSegmentBar(
             selected: _hubSegment,
@@ -266,44 +267,17 @@ class _SearchPageState extends State<SearchPage> {
               onSubmitted: _rememberRecentQuery,
               textInputAction: TextInputAction.search,
               spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
-              style: SecondaryTypography.onCard.small12.copyWith(
+              style: SecondaryTypography.onCard.body14.copyWith(
                 fontWeight: FontWeight.w800,
               ),
+              // Fill, outline, and focus colour come from the theme's
+              // inputDecorationTheme so every field reads the same.
               decoration: InputDecoration(
                 hintText: AppZh.searchPlaceholder,
-                hintStyle: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: TitoColors.deepBlue,
-                ),
-                filled: true,
-                fillColor: TitoColors.card,
-                contentPadding: const EdgeInsets.symmetric(
+                prefixIcon: Icon(Icons.search_rounded),
+                contentPadding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(
-                    color: TitoColors.softYellow,
-                    width: TitoBorders.card,
-                  ),
                 ),
               ),
             ),
@@ -374,7 +348,7 @@ class _SearchPageState extends State<SearchPage> {
       return _SearchIdlePlaceholder(onSuggestionTap: _applyQuery);
     }
     if (_searching) {
-      return const TitoLoadingPanel(
+      return TitoLoadingPanel(
         message: AppZh.searchLoading,
         compact: true,
         showSkeleton: false,
@@ -397,6 +371,15 @@ class _SearchPageState extends State<SearchPage> {
               style: SecondaryTypography.onCard.small12.copyWith(
                 color: TitoColors.mutedInk,
                 height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                onPressed: () => _runSearch(_controller.text),
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: Text(AppZh.dexRetry),
               ),
             ),
           ],
@@ -467,7 +450,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 ActionChip(
                   onPressed: () => context.push('/dex/locations'),
-                  label: const Text(AppZh.locationDexTitle),
+                  label: Text(AppZh.locationDexTitle),
                 ),
                 ActionChip(
                   onPressed: () => openDexJsonReference(
@@ -587,7 +570,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  AppZh.companionToolsSubtitle(edition.labelZh),
+                  AppZh.companionToolsSubtitle(edition.label),
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.mutedInk,
                   ),
@@ -612,7 +595,7 @@ class _SearchHubSegmentBar extends StatelessWidget {
   final int selected;
   final ValueChanged<int> onSelected;
 
-  static const _labels = [
+  static List<String> get _labels => [
     AppZh.searchHubSearch,
     AppZh.searchHubReference,
     AppZh.searchHubBattle,
@@ -621,50 +604,82 @@ class _SearchHubSegmentBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duration = TitoMotion.duration(context, TitoMotion.fast);
+    final scheme = Theme.of(context).colorScheme;
+    // Single-choice segment: soft-yellow selected (Flat: secondaryContainer).
+    final (
+      Color idle,
+      Color active,
+      BoxBorder? border,
+      Color foreground,
+    ) = appVisualStyle.usesTrainerJournal
+        ? (
+            TitoColors.card,
+            TitoColors.softYellow,
+            Border.all(color: TitoColors.ink, width: TitoBorders.element),
+            TitoColors.ink,
+          )
+        : appVisualStyle.usesSolidPlastic
+        ? (
+            Colors.white.withValues(alpha: 0.75),
+            TitoColors.softYellow.withValues(alpha: 0.9),
+            Border.all(
+              color: Colors.white.withValues(alpha: 0.85),
+              width: TitoBorders.glass,
+            ),
+            TitoColors.ink,
+          )
+        : (
+            scheme.surfaceContainerHighest,
+            scheme.secondaryContainer,
+            null,
+            scheme.onSurface,
+          );
+    final radius = BorderRadius.circular(TitoRadii.sm);
     return Row(
       children: List.generate(_labels.length, (index) {
         final isSelected = index == selected;
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(left: index == 0 ? 0 : 4),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(end: isSelected ? 1 : 0),
-              duration: duration,
-              curve: Curves.easeOutCubic,
-              builder: (context, selection, child) {
-                return Transform.translate(
-                  key: ValueKey<String>('search-segment-motion-$index'),
-                  offset: Offset(0, -selection),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => onSelected(index),
-                      borderRadius: BorderRadius.circular(TitoRadii.sm),
-                      child: Ink(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Color.lerp(
-                            TitoColors.card,
-                            TitoColors.softYellow,
-                            selection,
+            child: HandheldFocusDecorator(
+              onActivate: () => onSelected(index),
+              borderRadius: radius,
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: isSelected ? 1 : 0),
+                duration: duration,
+                curve: Curves.easeOutCubic,
+                builder: (context, selection, child) {
+                  return Transform.translate(
+                    key: ValueKey<String>('search-segment-motion-$index'),
+                    offset: Offset(0, -selection),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => onSelected(index),
+                        borderRadius: radius,
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Color.lerp(idle, active, selection),
+                            borderRadius: radius,
+                            border: border,
                           ),
-                          borderRadius: BorderRadius.circular(TitoRadii.sm),
-                          border: Border.all(color: TitoColors.ink, width: 2),
+                          child: child,
                         ),
-                        child: child,
                       ),
                     ),
-                  ),
-                );
-              },
-              child: Semantics(
-                selected: isSelected,
-                button: true,
-                child: Text(
-                  _labels[index],
-                  textAlign: TextAlign.center,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    fontWeight: FontWeight.w800,
+                  );
+                },
+                child: Semantics(
+                  selected: isSelected,
+                  button: true,
+                  child: Text(
+                    _labels[index],
+                    textAlign: TextAlign.center,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: foreground,
+                    ),
                   ),
                 ),
               ),
@@ -731,18 +746,8 @@ class _SearchQueryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ActionChip(
-      onPressed: onTap,
-      backgroundColor: TitoColors.card,
-      side: const BorderSide(color: TitoColors.ink, width: 2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-      label: Text(
-        label,
-        style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
+    // Colours, outline, and radius come from the theme's chipTheme.
+    return ActionChip(onPressed: onTap, label: Text(label));
   }
 }
 
@@ -796,6 +801,8 @@ class _SearchResultRow extends StatelessWidget {
                         children: [
                           Text(
                             '#${entry.id.toString().padLeft(3, '0')} ${entry.nameZh}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: SecondaryTypography.onCard.body14.copyWith(
                               fontWeight: FontWeight.w800,
                             ),

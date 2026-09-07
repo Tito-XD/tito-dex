@@ -1,3 +1,4 @@
+import '../../l10n/app_locale.dart';
 import 'dex_game_scope.dart';
 
 const _methodLabels = <String, String>{
@@ -72,9 +73,25 @@ const _methodLabels = <String, String>{
   'purple-flowers': '紫花丛',
 };
 
-String encounterMethodLabelZh(String slug) => _methodLabels[slug] ?? '特殊遭遇方式';
+String _humanizeEncounterSlug(String slug) => slug
+    .split('-')
+    .where((part) => part.isNotEmpty)
+    .map((part) => part[0].toUpperCase() + part.substring(1))
+    .join(' ');
+
+String encounterMethodLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _methodLabels.containsKey(slug)
+        ? _humanizeEncounterSlug(slug)
+        : 'Special encounter';
+  }
+  return _methodLabels[slug] ?? '特殊遭遇方式';
+}
 
 String encounterConditionLabelZh(String slug) {
+  if (AppLocale.instance.isEnglish) {
+    return _encounterConditionLabelEn(slug);
+  }
   const exact = <String, String>{
     'time-day': '白天',
     'time-morning': '早晨',
@@ -181,4 +198,76 @@ String encounterConditionLabelZh(String slug) {
   if (slug.startsWith('story-progress-')) return '达到指定剧情进度';
   if (slug.startsWith('other-')) return '满足特殊剧情条件';
   return '特殊出现条件';
+}
+
+String _encounterConditionLabelEn(String slug) {
+  const exact = <String, String>{
+    'time-day': 'Day',
+    'time-morning': 'Morning',
+    'time-night': 'Night',
+    'weather-normal': 'Normal weather',
+    'weather-overcast': 'Overcast',
+    'weather-raining': 'Rain',
+    'weather-thunderstorm': 'Thunderstorm',
+    'weather-intense-sun': 'Harsh sunlight',
+    'weather-sandstorm': 'Sandstorm',
+    'weather-fog': 'Fog',
+    'weather-snowing': 'Snow',
+    'weather-snowstorm': 'Blizzard',
+    'season-spring': 'Spring',
+    'season-summer': 'Summer',
+    'season-autumn': 'Autumn',
+    'season-winter': 'Winter',
+    'radar-on': 'Poké Radar on',
+    'radar-off': 'Poké Radar off',
+    'swarm-yes': 'During a swarm',
+    'swarm-no': 'Not during a swarm',
+    'roaming': 'Roaming',
+    'bug-catching-contest-yes': 'Bug-Catching Contest',
+    'bug-catching-contest-no': 'Not Bug-Catching Contest',
+    'max-den-rarity-common': 'Common den',
+    'max-den-rarity-rare': 'Rare den',
+    'max-den-rarity-special': 'Special den',
+    'johto-safari-blocks-inactive': 'Safari decorations inactive',
+  };
+  final known = exact[slug];
+  if (known != null) return known;
+  final timeRange = RegExp(r'^time-(.+)$').firstMatch(slug);
+  if (timeRange != null) {
+    return 'Time: ${timeRange.group(1)!.replaceAll('-', ':')}';
+  }
+  final weekday = RegExp(r'^weekday-(.+)$').firstMatch(slug);
+  if (weekday != null) {
+    return _humanizeEncounterSlug(weekday.group(1)!);
+  }
+  final denRating = RegExp(r'^max-den-rating-(\d)-star$').firstMatch(slug);
+  if (denRating != null) return '${denRating.group(1)}★ den';
+  final safari = RegExp(
+    r'^johto-safari-blocks-(forest|peak|plains|water)-min-(\d+)$',
+  ).firstMatch(slug);
+  if (safari != null) {
+    return 'Safari Zone: ${_humanizeEncounterSlug(safari.group(1)!)} decorations ≥${safari.group(2)}';
+  }
+  final slot2 = RegExp(r'^slot2-(.+)$').firstMatch(slug);
+  if (slot2 != null) {
+    return 'GBA slot: ${flavorVersionLabelZh(slot2.group(1)!)}';
+  }
+  final friendSafari = RegExp(r'^friend-safari-slot-(\d)$').firstMatch(slug);
+  if (friendSafari != null) return 'Friend Safari slot ${friendSafari.group(1)}';
+  final greatMarsh = RegExp(r'^great-marsh-daily-slot-(.+)$').firstMatch(slug);
+  if (greatMarsh != null) {
+    return 'Great Marsh daily: ${greatMarsh.group(1)!.replaceAll('-', ' ')}';
+  }
+  final coins = RegExp(r'^coins-(\d+)$').firstMatch(slug);
+  if (coins != null) return '${coins.group(1)} coins required';
+  final diglett = RegExp(r'^alolan-diglett-found-(\d+)$').firstMatch(slug);
+  if (diglett != null) return 'Found ${diglett.group(1)} Alolan Diglett';
+  if (slug.startsWith('berry-tree-type-')) return 'Berry tree of a set color';
+  if (slug.startsWith('item-')) return 'Holding a required item';
+  if (slug.startsWith('trade-')) return 'After a set NPC trade';
+  if (slug.startsWith('starter-')) return 'Chosen starter';
+  if (slug.startsWith('save-data-from-')) return 'Linked save data';
+  if (slug.startsWith('story-progress-')) return 'Story progress required';
+  if (slug.startsWith('other-')) return 'Special story condition';
+  return _humanizeEncounterSlug(slug);
 }

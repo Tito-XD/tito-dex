@@ -21,14 +21,14 @@ class JourneyAssistantPanel extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData &&
             snapshot.connectionState != ConnectionState.done) {
-          return const TitoLoadingPanel(
+          return TitoLoadingPanel(
             message: AppZh.journeyAssistantLoading,
             compact: true,
           );
         }
         final data = snapshot.data;
         if (data == null) {
-          return const StickerCard(
+          return StickerCard(
             child: Text(AppZh.journeyAssistantLoadFailed),
           );
         }
@@ -91,7 +91,7 @@ class _NearbyCard extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => context.push('/dex/locations'),
               icon: const Icon(Icons.map_outlined, size: 18),
-              label: const Text(AppZh.journeyAssistantLocationDex),
+              label: Text(AppZh.journeyAssistantLocationDex),
             ),
           ),
         ],
@@ -111,7 +111,7 @@ class _PartyCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(
+          _SectionTitle(
             icon: Icons.groups_2_outlined,
             title: AppZh.journeyAssistantPartyTitle,
           ),
@@ -165,7 +165,7 @@ class _VersionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(
+          _SectionTitle(
             icon: Icons.route_outlined,
             title: AppZh.journeyAssistantVersionTitle,
           ),

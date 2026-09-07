@@ -1,3 +1,6 @@
+import '../../l10n/app_locale.dart';
+import '../../l10n/app_zh.dart';
+
 import '../dex/battle_effectiveness.dart';
 import '../dex/type_chart.dart';
 
@@ -12,6 +15,18 @@ extension BattleStatLabel on BattleStat {
     BattleStat.specialDefense => '特防',
     BattleStat.speed => '速度',
   };
+
+  String get label => AppLocale.pick(
+    zh: labelZh,
+    en: switch (this) {
+      BattleStat.hp => 'HP',
+      BattleStat.attack => 'Attack',
+      BattleStat.defense => 'Defense',
+      BattleStat.specialAttack => 'Sp. Atk',
+      BattleStat.specialDefense => 'Sp. Def',
+      BattleStat.speed => 'Speed',
+    },
+  );
 
   String get apiKey => switch (this) {
     BattleStat.hp => 'hp',
@@ -30,6 +45,14 @@ extension MoveCategoryLabel on MoveCategory {
     MoveCategory.physical => '物理',
     MoveCategory.special => '特殊',
   };
+
+  String get label => AppLocale.pick(
+    zh: labelZh,
+    en: switch (this) {
+      MoveCategory.physical => 'Physical',
+      MoveCategory.special => 'Special',
+    },
+  );
 }
 
 class NatureModifier {
@@ -44,6 +67,13 @@ class NatureModifier {
   final String labelZh;
   final BattleStat? boost;
   final BattleStat? drop;
+
+  String get label {
+    if (!AppLocale.instance.isEnglish) {
+      return labelZh;
+    }
+    return '${key[0].toUpperCase()}${key.substring(1)}';
+  }
 }
 
 const battleNatures = <NatureModifier>[
@@ -407,32 +437,32 @@ DamageEstimate estimateDamage({
 
 String _offenseVerdict(int minDamage, int maxDamage, int hp) {
   if (maxDamage <= 0) {
-    return '无伤害';
+    return AppZh.damageNone;
   }
   if (minDamage >= hp) {
-    return '稳秒杀';
+    return AppZh.damageGuaranteedKo;
   }
   if (maxDamage >= hp) {
-    return '可能秒杀';
+    return AppZh.damagePossibleKo;
   }
   if (maxDamage * 2 >= hp) {
-    return '可能两招击杀';
+    return AppZh.damagePossible2hko;
   }
-  return '伤害偏低';
+  return AppZh.damageLow;
 }
 
 String _tankVerdict(int minDamage, int maxDamage, int hp) {
   if (maxDamage <= 0) {
-    return '完全免疫或无伤';
+    return AppZh.tankImmune;
   }
   if (minDamage >= hp) {
-    return '扛不住（必倒）';
+    return AppZh.tankGuaranteedKo;
   }
   if (maxDamage >= hp) {
-    return '有风险（可能被秒）';
+    return AppZh.tankPossibleKo;
   }
   if (maxDamage * 2 >= hp) {
-    return '较危险（两招可能倒）';
+    return AppZh.tankPossible2hko;
   }
-  return '大概率能扛住';
+  return AppZh.tankLikelySurvives;
 }

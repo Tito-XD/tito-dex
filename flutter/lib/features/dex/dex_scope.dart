@@ -29,7 +29,7 @@ enum DexGameVersion {
       };
 
   String get versionGroup => edition.dataVersionGroupKey;
-  String get labelZh => edition.labelZh;
+  String get labelZh => edition.label;
 
   static DexGameVersion? fromStorageKey(String? key) {
     if (key == null) {
@@ -94,7 +94,7 @@ class DexScope {
   /// Legacy alias mapped to the closest HGSS regional scope enum.
   DexRegionalScope get region => regionalScopeFromPokedex(regionalScope);
 
-  String get label => '${gameEdition.labelZh} · ${regionalScope.labelZh}';
+  String get label => '${gameEdition.label} · ${regionalScope.label}';
 
   (int, int) get idRange => idRangeForScope(
         regionalScope,

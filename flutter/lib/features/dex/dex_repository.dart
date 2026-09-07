@@ -366,38 +366,58 @@ class DexRepository {
         .toList(growable: false);
   }
 
-  /// Resolve a filter to the species that satisfy **every** active axis.
-  ///
-  /// Reference drill-downs (move / ability / egg group) each need their own
-  /// reverse index, so at most one of those is applied; the stackable species
-  /// axes (body style, colour, generation, tag) then narrow that result — or
-  /// the whole dex when no drill-down is set.
-  Future<List<PokemonSummary>> filterSummaries(DexFilter filter) async {
-    if (!filter.isActive) {
-      return getAllSummaries();
+  /// Reference constraints intersect; text, types and appearance then apply
+  /// to the same result. Optional forms are read in bounded batches and cached.
+  Future<List<PokemonSummary>> filterSummaries(
+    DexFilter filter, {
+    bool Function()? isCancelled,
+  }) async {
+    var base = await getAllSummaries();
+    final constraints = await Future.wait<Set<int>>([
+      if (filter.learnsMoveId != null)
+        findPokemonWithMove(filter.learnsMoveId!).then((ids) => ids.toSet()),
+      if (filter.abilityId != null)
+        findByAbility(
+          filter.abilityId!,
+        ).then((items) => items.map((p) => p.id).toSet()),
+      if (filter.eggGroupSlug != null)
+        findByEggGroup(
+          filter.eggGroupSlug!,
+        ).then((items) => items.map((p) => p.id).toSet()),
+    ]);
+    base = base
+        .where((p) => constraints.every((ids) => ids.contains(p.id)))
+        .toList();
+    if (filter.formDisplay == DexFormDisplay.base) {
+      return base.where(filter.matchesSpeciesAxes).toList(growable: false);
     }
-
-    List<PokemonSummary>? base;
-    if (filter.learnsMoveId != null) {
-      final ids = await findPokemonWithMove(filter.learnsMoveId!);
-      base = await getSummariesForIds(ids);
-    } else if (filter.abilityId != null) {
-      base = await findByAbility(filter.abilityId!);
-    } else if (filter.eggGroupSlug != null) {
-      base = await findByEggGroup(filter.eggGroupSlug!);
-    }
-
-    if (base == null) {
-      if (!filter.hasSpeciesAxis) {
-        return const [];
+    final expanded = <PokemonSummary>[];
+    for (var start = 0; start < base.length; start += 4) {
+      if (isCancelled?.call() ?? false) return const [];
+      final batch = base.skip(start).take(4);
+      final groups = await Future.wait(
+        batch.map((species) async {
+          final result = <PokemonSummary>[
+            if (filter.formDisplay == DexFormDisplay.all) species,
+          ];
+          // The compact directory identifies species with alternate forms.
+          // Base-only species never trigger a new detail/network read here.
+          if (species.formSearchTerms.isNotEmpty) {
+            final detail = await getDetail(species.id);
+            result.addAll(
+              detail.forms
+                  .where((form) => !form.isDefault)
+                  .map((form) => form.summaryFor(species)),
+            );
+          }
+          return result;
+        }),
+      );
+      for (final group in groups) {
+        expanded.addAll(group);
       }
-      base = await getAllSummaries();
     }
-
-    if (!filter.hasSpeciesAxis) {
-      return base;
-    }
-    return base.where(filter.matchesSpeciesAxes).toList(growable: false);
+    return expanded.where(filter.matchesSpeciesAxes).toList(growable: false);
   }
 
   Future<List<int>> findPokemonWithMove(int moveId) async {

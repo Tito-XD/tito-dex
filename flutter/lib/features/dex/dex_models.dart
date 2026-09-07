@@ -22,6 +22,7 @@ class PokemonSummary {
     this.spriteUrlsByVersion = const {},
     this.animatedSpriteUrl,
     this.spriteResourceId,
+    this.formKey,
     this.formSearchTerms = const [],
     this.genusZh,
     this.generation,
@@ -51,6 +52,7 @@ class PokemonSummary {
   /// The national dex [id] remains the species id so navigation, evolution
   /// highlighting, and progress continue to work when a form is selected.
   final int? spriteResourceId;
+  final String? formKey;
 
   /// Alternate-form names/slugs folded into species-level dex search.
   final List<String> formSearchTerms;
@@ -102,6 +104,7 @@ class PokemonSummary {
       'spriteUrlsByVersion': spriteUrlsByVersion,
     if (animatedSpriteUrl != null) 'animatedSpriteUrl': animatedSpriteUrl,
     if (spriteResourceId != null) 'spriteResourceId': spriteResourceId,
+    if (formKey != null) 'formKey': formKey,
     if (formSearchTerms.isNotEmpty) 'formSearchTerms': formSearchTerms,
     if (genusZh != null) 'genusZh': genusZh,
     if (generation != null) 'generation': generation,
@@ -135,6 +138,7 @@ class PokemonSummary {
       spriteUrlsByVersion: spriteUrlsByVersion,
       animatedSpriteUrl: json['animatedSpriteUrl'] as String?,
       spriteResourceId: (json['spriteResourceId'] as num?)?.toInt(),
+      formKey: json['formKey'] as String?,
       formSearchTerms: (json['formSearchTerms'] as List<dynamic>? ?? const [])
           .cast<String>(),
       genusZh: json['genusZh'] as String?,
@@ -156,6 +160,7 @@ class PokemonSummary {
     Map<String, String>? spriteUrlsByVersion,
     String? animatedSpriteUrl,
     int? spriteResourceId,
+    String? formKey,
     List<String>? formSearchTerms,
     String? genusZh,
     int? generation,
@@ -178,6 +183,7 @@ class PokemonSummary {
       spriteUrlsByVersion: spriteUrlsByVersion ?? this.spriteUrlsByVersion,
       animatedSpriteUrl: animatedSpriteUrl ?? this.animatedSpriteUrl,
       spriteResourceId: spriteResourceId ?? this.spriteResourceId,
+      formKey: formKey ?? this.formKey,
       formSearchTerms: formSearchTerms ?? this.formSearchTerms,
       genusZh: genusZh ?? this.genusZh,
       generation: generation ?? this.generation,
@@ -619,6 +625,32 @@ class PokemonMoveSet {
   final List<PokemonMove> egg;
   final List<PokemonMove> tutor;
 
+  /// A version-neutral directory: one move per method, without a learning
+  /// level that would only be valid for one of the contributing games.
+  factory PokemonMoveSet.combined(Iterable<PokemonMoveSet> sets) {
+    final sources = sets.toList();
+    List<PokemonMove> merge(List<PokemonMove> Function(PokemonMoveSet) pick) {
+      final moves = <int, PokemonMove>{};
+      for (final set in sources) {
+        for (final entry in pick(set)) {
+          moves.putIfAbsent(
+            entry.move.id,
+            () => PokemonMove(move: entry.move, method: entry.method),
+          );
+        }
+      }
+      return moves.values.toList()
+        ..sort((a, b) => a.move.id.compareTo(b.move.id));
+    }
+
+    return PokemonMoveSet(
+      levelUp: merge((set) => set.levelUp),
+      machine: merge((set) => set.machine),
+      egg: merge((set) => set.egg),
+      tutor: merge((set) => set.tutor),
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'levelUp': _refs(levelUp),
     'machine': _refs(machine),
@@ -836,7 +868,14 @@ class PokemonFormDetail {
           animatedSpriteUrl ??
           (mayInheritAssets ? species.animatedSpriteUrl : null),
       spriteResourceId: pokemonId,
-      formSearchTerms: species.formSearchTerms,
+      formKey: isDefault ? species.formKey : key,
+      formSearchTerms: const [],
+      genusZh: species.genusZh,
+      generation: species.generation,
+      shapeSlug: species.shapeSlug,
+      colorSlug: species.colorSlug,
+      tags: species.tags,
+      heightDm: heightDm,
     );
   }
 

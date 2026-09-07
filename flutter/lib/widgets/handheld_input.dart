@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../navigation/back_navigation.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 
 /// D-pad / gamepad focus traversal and A·B actions for RG handhelds.
@@ -102,11 +103,12 @@ class HandheldPressed extends InheritedWidget {
 }
 
 /// Visible focus ring for D-pad navigation on cream tiles.
-class HandheldFocusDecorator extends StatefulWidget {  const HandheldFocusDecorator({
+class HandheldFocusDecorator extends StatefulWidget {
+  const HandheldFocusDecorator({
     super.key,
     required this.child,
     required this.onActivate,
-    this.borderRadius = const BorderRadius.all(Radius.circular(TitoRadii.md)),
+    this.borderRadius = const BorderRadius.all(Radius.circular(TitoRadii.sm)),
   });
 
   final Widget child;
@@ -141,6 +143,11 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
 
   @override
   Widget build(BuildContext context) {
+    // Trainer's Journal and Solid Plastic share the soft-yellow ring; Flat UI
+    // uses the scheme primary so the ring matches Material focus colour.
+    final ringColor = appVisualStyle.usesFlatUi
+        ? Theme.of(context).colorScheme.primary
+        : TitoColors.softYellow;
     return Focus(
       onKeyEvent: _trackActivateKey,
       // Skip in traversal (this is a passive listener, not a target) or it
@@ -162,15 +169,12 @@ class _HandheldFocusDecoratorState extends State<HandheldFocusDecorator> {
             decoration: BoxDecoration(
               borderRadius: widget.borderRadius,
               border: _focused
-                  ? Border.all(
-                      color: TitoColors.softYellow,
-                      width: TitoBorders.card,
-                    )
+                  ? Border.all(color: ringColor, width: TitoBorders.card)
                   : null,
               boxShadow: _focused
-                  ? const [
+                  ? [
                       BoxShadow(
-                        color: Color(0x66FFE08A),
+                        color: ringColor.withValues(alpha: 0.4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),

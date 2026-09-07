@@ -12,9 +12,11 @@ import '../features/dex/type_chart.dart';
 import '../widgets/companion_tool_fields.dart';
 import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
+import '../l10n/localized_names.dart';
 import '../features/dex/dex_search_terms.dart';
 import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_encounter_labels.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
@@ -23,9 +25,26 @@ import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
 import 'sticker_card.dart';
+import 'tito_animated_size_switcher.dart';
 import 'tito_loading_panel.dart';
 import 'tito_progress_bar.dart';
 import 'type_badge.dart';
+
+/// Stroke for custom-drawn tiles and pills inside cards. Trainer's Journal
+/// keeps the ink element stroke, Solid Plastic uses its milky hairline, and
+/// Flat UI drops the stroke in favour of the Material surface colour.
+BorderSide _elementStroke(BuildContext context) {
+  if (appVisualStyle.usesFlatUi) {
+    return BorderSide.none;
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return BorderSide(
+      color: Colors.white.withValues(alpha: 0.8),
+      width: TitoBorders.glass,
+    );
+  }
+  return const BorderSide(color: TitoColors.ink, width: TitoBorders.element);
+}
 
 List<String> pokemonFormStatusLabels(
   PokemonFormDetail form, {
@@ -50,275 +69,6 @@ List<String> pokemonFormStatusLabels(
     labels.add(AppZh.dexFormStatusNotObtainableHere);
   }
   return labels;
-}
-
-class PokemonFormSelector extends StatelessWidget {
-  const PokemonFormSelector({
-    super.key,
-    required this.forms,
-    required this.selectedKey,
-    required this.onSelected,
-  });
-
-  final List<PokemonFormDetail> forms;
-  final String selectedKey;
-  final ValueChanged<PokemonFormDetail> onSelected;
-
-  static const int _maxInlineChips = 4;
-
-  List<PokemonFormDetail> get _sortedForms {
-    final copy = List<PokemonFormDetail>.from(forms);
-    copy.sort((a, b) {
-      if (a.isDefault != b.isDefault) {
-        return a.isDefault ? -1 : 1;
-      }
-      if (a.isMega != b.isMega) {
-        return a.isMega ? -1 : 1;
-      }
-      if (a.isBattleOnly != b.isBattleOnly) {
-        return a.isBattleOnly ? -1 : 1;
-      }
-      if (a.isCosmetic != b.isCosmetic) {
-        return a.isCosmetic ? 1 : -1;
-      }
-      return a.nameZh.compareTo(b.nameZh);
-    });
-    return copy;
-  }
-
-  List<PokemonFormDetail> get _inlineForms {
-    if (forms.length <= _maxInlineChips) {
-      return forms;
-    }
-    final sorted = _sortedForms;
-    return sorted.take(_maxInlineChips - 1).toList();
-  }
-
-  bool get _hasMore => forms.length > _maxInlineChips;
-
-  void _showMore(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: TitoColors.deepBlue,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.md)),
-      ),
-      builder: (context) => _FormPickerSheet(
-        forms: forms,
-        selectedKey: selectedKey,
-        onSelected: (form) {
-          Navigator.of(context).pop();
-          onSelected(form);
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final form in _inlineForms)
-          ChoiceChip(
-            selected: form.key == selectedKey,
-            onSelected: (_) => onSelected(form),
-            label: Text(
-              pokemonFormStatusLabels(form).isEmpty
-                  ? form.nameZh
-                  : '${form.nameZh} · ${pokemonFormStatusLabels(form).first}',
-            ),
-            tooltip: [
-              form.kind.labelZh,
-              ...pokemonFormStatusLabels(form),
-            ].join(' · '),
-            showCheckmark: false,
-            selectedColor: TitoColors.softYellow,
-            backgroundColor: TitoColors.card,
-            side: const BorderSide(
-              color: TitoColors.ink,
-              width: TitoBorders.element,
-            ),
-            labelStyle: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.ink,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        if (_hasMore)
-          ActionChip(
-            onPressed: () => _showMore(context),
-            label: Text('更多 (${forms.length - _inlineForms.length})'),
-            tooltip: '展开全部形态',
-            backgroundColor: TitoColors.skyBlue.withValues(alpha: 0.15),
-            side: const BorderSide(
-              color: TitoColors.ink,
-              width: TitoBorders.element,
-            ),
-            labelStyle: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.ink,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _FormPickerSheet extends StatelessWidget {
-  const _FormPickerSheet({
-    required this.forms,
-    required this.selectedKey,
-    required this.onSelected,
-  });
-
-  final List<PokemonFormDetail> forms;
-  final String selectedKey;
-  final ValueChanged<PokemonFormDetail> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    return SizedBox(
-      height: size.height * 0.55,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '选择形态',
-                    style: SecondaryTypography.onGradient.h15.copyWith(
-                      color: TitoColors.card,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded, color: TitoColors.card),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.92,
-                ),
-                itemCount: forms.length,
-                itemBuilder: (context, index) {
-                  final form = forms[index];
-                  final selected = form.key == selectedKey;
-                  return _FormPickerTile(
-                    form: form,
-                    selected: selected,
-                    onTap: () => onSelected(form),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FormPickerTile extends StatelessWidget {
-  const _FormPickerTile({
-    required this.form,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final PokemonFormDetail form;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: selected
-          ? TitoColors.softYellow.withValues(alpha: 0.18)
-          : TitoColors.card.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(TitoRadii.sm),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(
-              color: selected
-                  ? TitoColors.softYellow
-                  : TitoColors.card.withValues(alpha: 0.35),
-              width: 2,
-            ),
-          ),
-          padding: const EdgeInsets.all(6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final imageSize =
-                        math.min(constraints.maxWidth, constraints.maxHeight) -
-                        8;
-                    return DexSpriteImage(
-                      source: form.summaryFor(_dummySpecies).displaySpritePath,
-                      width: imageSize,
-                      height: imageSize,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                form.nameZh,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.card,
-                  fontWeight: selected ? FontWeight.w900 : FontWeight.w700,
-                ),
-              ),
-              if (pokemonFormStatusLabels(form).isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(
-                  pokemonFormStatusLabels(form).take(2).join(' · '),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.softYellow,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  static final PokemonSummary _dummySpecies = PokemonSummary(
-    id: 1,
-    nameEn: '',
-    nameZh: '',
-    types: const [],
-  );
 }
 
 /// Lightweight first-frame destination for the Dex card shared element.
@@ -398,10 +148,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                       colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
                     ),
                     borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(
-                      color: TitoColors.ink,
-                      width: TitoBorders.element,
-                    ),
+                    border: Border.fromBorderSide(_elementStroke(context)),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
@@ -422,7 +169,7 @@ class PokemonDetailTransitionHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        summary.nameZh,
+                        summary.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.h15.copyWith(
@@ -549,10 +296,7 @@ class PokemonDetailHeader extends StatelessWidget {
                       colors: [Color.lerp(accent, Colors.white, 0.35)!, accent],
                     ),
                     borderRadius: BorderRadius.circular(TitoRadii.sm),
-                    border: Border.all(
-                      color: TitoColors.ink,
-                      width: TitoBorders.element,
-                    ),
+                    border: Border.fromBorderSide(_elementStroke(context)),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Center(
@@ -572,7 +316,7 @@ class PokemonDetailHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        summary.nameZh,
+                        summary.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: SecondaryTypography.onGradient.h15.copyWith(
@@ -697,7 +441,7 @@ class PokemonDetailHeader extends StatelessWidget {
               children: [
                 Text(dexLabel, style: context.tito.onDeepSubtitle),
                 Text(
-                  summary.nameZh,
+                  summary.displayName,
                   style: context.tito.onDeepHeading.copyWith(
                     fontWeight: FontWeight.w900,
                   ),
@@ -803,18 +547,20 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
     'violet',
   };
 
-  late final PageController _controller;
+  /// Shortest body the card reserves so one-line entries don't collapse the
+  /// pager against the title; longer entries grow the card instead of
+  /// clipping or scrolling inside a fixed box.
+  static const _minBodyHeight = 72.0;
+
   int _index = 0;
   bool _iconsPrecached = false;
 
   @override
   void initState() {
     super.initState();
-    final page = widget.entries.isEmpty
+    _index = widget.entries.isEmpty
         ? 0
         : widget.initialPage.clamp(0, widget.entries.length - 1);
-    _index = page;
-    _controller = PageController(initialPage: page);
   }
 
   @override
@@ -825,9 +571,21 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
       final page = widget.initialPage.clamp(0, widget.entries.length - 1);
       if (_index != page) {
         _index = page;
-        _controller.jumpToPage(page);
       }
     }
+  }
+
+  void _goTo(int index) {
+    final clamped = index.clamp(0, widget.entries.length - 1);
+    if (clamped != _index) {
+      setState(() => _index = clamped);
+    }
+  }
+
+  void _onHorizontalSwipe(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    if (velocity.abs() < 120) return;
+    _goTo(velocity < 0 ? _index + 1 : _index - 1);
   }
 
   @override
@@ -843,12 +601,6 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
         );
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -868,7 +620,7 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: widget.onPickEdition,
-                  child: const Text(AppZh.dexFlavorPickEdition),
+                  child: Text(AppZh.dexFlavorPickEdition),
                 ),
               ],
             ],
@@ -893,31 +645,42 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
         zhReference.isNotEmpty &&
         widget.entries.any((entry) => !_looksChinese(entry.text));
 
+    final index = _index.clamp(0, widget.entries.length - 1);
+    final entry = widget.entries[index];
+    final isChinese = _looksChinese(entry.text);
+    final reference = !isChinese && zhReference.isNotEmpty
+        ? zhReference.first
+        : null;
+    final note = entry.version == 'zh-reference'
+        ? AppZh.dexFlavorZhFallbackNote
+        : (!isChinese && reference == null ? AppZh.dexFlavorEnglishNote : null);
+
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(AppZh.dexFlavorTitle, style: SecondaryTypography.onCard.h15),
           const SizedBox(height: 8),
-          SizedBox(
-            height: needsZhReference ? 184 : 132,
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: widget.entries.length,
-              onPageChanged: (value) => setState(() => _index = value),
-              itemBuilder: (context, index) {
-                final entry = widget.entries[index];
-                final isChinese = _looksChinese(entry.text);
-                final reference = !isChinese && zhReference.isNotEmpty
-                    ? zhReference.first
-                    : null;
-                final note = entry.version == 'zh-reference'
-                    ? AppZh.dexFlavorZhFallbackNote
-                    : (!isChinese && reference == null
-                          ? AppZh.dexFlavorEnglishNote
-                          : null);
-                return Column(
+          // The body sizes to its text: short entries stop at the minimum,
+          // long ones grow the card, and the pager row always sits right
+          // below. Swiping horizontally still turns the page.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onHorizontalDragEnd: widget.entries.length > 1
+                ? _onHorizontalSwipe
+                : null,
+            child: TitoAnimatedSizeSwitcher(
+              switchKey: ValueKey<int>(index),
+              alignment: Alignment.topLeft,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: needsZhReference
+                      ? _minBodyHeight * 1.5
+                      : _minBodyHeight,
+                ),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       children: [
@@ -959,38 +722,26 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                       ),
                     ],
                     const SizedBox(height: 6),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              entry.text,
-                              style: SecondaryTypography.onCard.body14,
-                            ),
-                            if (reference != null) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                AppZh.dexFlavorZhReference(
-                                  reference.displayLabel,
-                                ),
-                                style: SecondaryTypography.onCard.small12
-                                    .copyWith(color: TitoColors.mutedInk),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                reference.text,
-                                style: SecondaryTypography.onCard.body14
-                                    .copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ],
-                          ],
+                    Text(entry.text, style: SecondaryTypography.onCard.body14),
+                    if (reference != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        AppZh.dexFlavorZhReference(reference.displayLabel),
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 2),
+                      Text(
+                        reference.text,
+                        style: SecondaryTypography.onCard.body14.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ],
-                );
-              },
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -1001,17 +752,12 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                onPressed: _index > 0
-                    ? () => _controller.previousPage(
-                        duration: const Duration(milliseconds: 220),
-                        curve: Curves.easeOut,
-                      )
-                    : null,
+                onPressed: index > 0 ? () => _goTo(index - 1) : null,
                 icon: const Icon(Icons.chevron_left_rounded),
                 color: TitoColors.coral,
               ),
               Text(
-                '${_index + 1}/${widget.entries.length}',
+                '${index + 1}/${widget.entries.length}',
                 style: SecondaryTypography.onCard.meta14.copyWith(
                   fontWeight: FontWeight.w800,
                   color: TitoColors.coral,
@@ -1021,11 +767,8 @@ class _FlavorTextCarouselState extends State<FlavorTextCarousel> {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                onPressed: _index < widget.entries.length - 1
-                    ? () => _controller.nextPage(
-                        duration: const Duration(milliseconds: 220),
-                        curve: Curves.easeOut,
-                      )
+                onPressed: index < widget.entries.length - 1
+                    ? () => _goTo(index + 1)
                     : null,
                 icon: const Icon(Icons.chevron_right_rounded),
                 color: TitoColors.coral,
@@ -1091,7 +834,7 @@ class BaseStatsCard extends StatelessWidget {
               ),
             );
           }),
-          const Divider(height: 20),
+          const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1387,6 +1130,16 @@ class _StatsViewChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Single-choice toggle: soft-yellow selection (Flat: secondaryContainer),
+    // element stroke that follows the theme, small radius.
+    final scheme = Theme.of(context).colorScheme;
+    final flat = appVisualStyle.usesFlatUi;
+    final background = flat
+        ? (selected ? scheme.secondaryContainer : scheme.surfaceContainerLow)
+        : (selected ? TitoColors.softYellow : TitoColors.card);
+    final foreground = flat
+        ? (selected ? scheme.onSecondaryContainer : scheme.onSurface)
+        : TitoColors.ink;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1395,15 +1148,16 @@ class _StatsViewChip extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: selected ? TitoColors.softYellow : TitoColors.card,
+            color: background,
             borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.all(color: TitoColors.ink, width: 2),
+            border: Border.fromBorderSide(_elementStroke(context)),
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
             style: SecondaryTypography.onCard.small12.copyWith(
               fontWeight: FontWeight.w800,
+              color: foreground,
             ),
           ),
         ),
@@ -1500,8 +1254,10 @@ class TypeEffectivenessGrid extends StatelessWidget {
                         height: math.min(tileSide, tileWidth),
                         decoration: BoxDecoration(
                           color: typeTileColor(type),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: TitoColors.ink, width: 2),
+                          borderRadius: BorderRadius.circular(TitoRadii.sm),
+                          border: Border.fromBorderSide(
+                            _elementStroke(context),
+                          ),
                         ),
                         alignment: Alignment.center,
                         child: TypeIconImage(
@@ -1606,8 +1362,10 @@ class AbilitiesCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: TitoColors.skyBlue.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: TitoColors.ink, width: 1),
+                            borderRadius: BorderRadius.circular(TitoRadii.sm),
+                            border: Border.fromBorderSide(
+                              _elementStroke(context),
+                            ),
                           ),
                           child: Text(
                             AppZh.dexAbilityHidden,
@@ -1650,13 +1408,14 @@ class ObtainLocationsCard extends StatelessWidget {
   final String? gameLabel;
 
   List<String> _encounterTags(ObtainLocationEntry entry) => [
-    if (entry.formAmbiguous) '形态未区分',
-    if (entry.teraType != null) '太晶：${typeNameZh(entry.teraType!)}',
-    if (entry.isAlpha) '头目',
-    if (entry.isTitan) '霸主',
-    if (entry.isTotem) '图腾',
-    if (entry.isRaid) '团体战',
-    if (entry.isFixedEncounter) '固定出现',
+    if (entry.formAmbiguous) AppZh.encounterFormAmbiguous,
+    if (entry.teraType != null)
+      AppZh.encounterTera(typeNameZh(entry.teraType!)),
+    if (entry.isAlpha) AppZh.encounterAlpha,
+    if (entry.isTitan) AppZh.encounterTitan,
+    if (entry.isTotem) AppZh.encounterTotem,
+    if (entry.isRaid) AppZh.encounterRaid,
+    if (entry.isFixedEncounter) AppZh.encounterFixed,
   ];
 
   @override
@@ -1702,7 +1461,7 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
         .toSet()
         .toList();
     final rateLabel = entry.rateKind == 'weight'
-        ? '权重 ${entry.rateValue ?? entry.maxChance}'
+        ? AppZh.encounterWeight(entry.rateValue ?? entry.maxChance)
         : (entry.maxChance > 0 ? '${entry.maxChance}%' : null);
 
     return Padding(
@@ -1774,7 +1533,9 @@ class _ObtainLocationRowState extends State<_ObtainLocationRow> {
                     color: TitoColors.deepBlue,
                   ),
                   Text(
-                    _expanded ? '收起出现条件' : '出现条件 ${conditions.length} 项',
+                    _expanded
+                        ? AppZh.encounterConditionsHide
+                        : AppZh.encounterConditionsShow(conditions.length),
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.deepBlue,
                       fontWeight: FontWeight.w800,
@@ -1888,7 +1649,7 @@ class _MoveTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: typeTileColor(entry.move.type).withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.all(color: TitoColors.ink, width: 2),
+        border: Border.fromBorderSide(_elementStroke(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1941,7 +1702,7 @@ class IntroMetaCard extends StatelessWidget {
             label: AppZh.dexHeight,
             value: '${heightM.toStringAsFixed(1)} m',
           ),
-          const Divider(height: 20),
+          const Divider(),
           _MetaRow(
             label: AppZh.dexWeight,
             value: '${weightKg.toStringAsFixed(1)} kg',
@@ -1949,53 +1710,53 @@ class IntroMetaCard extends StatelessWidget {
           if (detail.summary.shapeSlug != null ||
               detail.summary.colorSlug != null ||
               detail.summary.tags.isNotEmpty) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaWidgetRow(
               label: AppZh.dexSpeciesAxes,
               child: SpeciesAxisChips(summary: detail.summary),
             ),
           ],
           if (female != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexGenderRatio,
               value: AppZh.dexGenderFemale(female),
             ),
           ],
           if (detail.eggGroups.isNotEmpty) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexEggGroups,
               value: detail.eggGroups.join(' / '),
             ),
           ],
           if (detail.hatchCounter != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexHatchSteps,
               value: '${detail.hatchCounter} (${detail.hatchSteps})',
             ),
           ],
           if (detail.baseHappiness != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexBaseHappiness,
               value: '${detail.baseHappiness}',
             ),
           ],
           if (detail.captureRate != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexCaptureRate,
               value: '${detail.captureRate}',
             ),
           ],
           if (detail.evYieldLabel != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(label: AppZh.dexEvYield, value: detail.evYieldLabel!),
           ],
           if (detail.growthRateSlug != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexGrowthRate,
               value:
@@ -2005,14 +1766,14 @@ class IntroMetaCard extends StatelessWidget {
             ),
           ],
           if (detail.baseExperience != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexBaseExperience,
               value: '${detail.baseExperience}',
             ),
           ],
           if (detail.habitatSlug != null) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexHabitat,
               // Habitat is a Gen I–III-only field, so say why it is missing
@@ -2024,7 +1785,7 @@ class IntroMetaCard extends StatelessWidget {
             ),
           ],
           if (detail.hasGenderDifferences) ...[
-            const Divider(height: 20),
+            const Divider(),
             _MetaRow(
               label: AppZh.dexGenderDifferences,
               value: AppZh.dexGenderDifferencesYes,
@@ -2073,7 +1834,7 @@ class SpeciesAxisChips extends StatelessWidget {
               summary.colorSlug!,
           DexFilter(colorSlugs: {summary.colorSlug!}),
         ),
-      if (size != null) (size.labelZh, DexFilter(sizeSlug: size.slug)),
+      if (size != null) (size.label, DexFilter(sizeSlug: size.slug)),
       for (final tag in summary.tags)
         (dexTagLabelZh(tag) ?? tag, DexFilter(tag: tag)),
     ];
@@ -2087,18 +1848,9 @@ class SpeciesAxisChips extends StatelessWidget {
       runSpacing: 8,
       children: [
         for (final (label, filter) in entries)
+          // Theme chipTheme owns colour, stroke and radius.
           ActionChip(
-            backgroundColor: TitoColors.card,
-            side: const BorderSide(color: TitoColors.ink, width: 2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(999),
-            ),
-            label: Text(
-              label,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+            label: Text(label),
             onPressed: () {
               dexFilterController.setFilter(filter);
               context.push('/dex');
@@ -2158,13 +1910,14 @@ class _MetaWidgetRow extends StatelessWidget {
 }
 
 class InteractiveTypeEffectivenessCard extends StatefulWidget {
-  const InteractiveTypeEffectivenessCard({
+  InteractiveTypeEffectivenessCard({
     super.key,
     required this.types,
     required this.abilities,
     required this.generation,
-    this.abilityPickerLabel = AppZh.companionDefenderAbilityPick,
-  });
+    String? abilityPickerLabel,
+  }) : abilityPickerLabel =
+           abilityPickerLabel ?? AppZh.companionDefenderAbilityPick;
 
   final List<String> types;
   final List<PokemonAbility> abilities;
@@ -2232,7 +1985,7 @@ class _InteractiveTypeEffectivenessCardState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const TitoLoadingPanel(
+      return TitoLoadingPanel(
         message: AppZh.companionLoading,
         compact: true,
       );
@@ -2295,7 +2048,9 @@ class _InteractiveTypeEffectivenessCardState
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '世代修正：${normalized.map(typeNameZh).join('/')}',
+                  AppZh.generationCorrection(
+                    normalized.map(typeNameZh).join('/'),
+                  ),
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.mutedInk,
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/sleep/sleep_calculator.dart';
+import '../l10n/localized_names.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -138,17 +139,13 @@ class _SleepToolsPageState extends State<SleepToolsPage> {
                 runSpacing: 6,
                 children: [
                   for (final ingredient in sleepIngredients)
+                    // Theme chipTheme supplies fill / outline / radius.
                     ActionChip(
                       avatar: const Icon(Icons.add_rounded, size: 16),
                       label: Text(
-                        '${ingredient.nameZh} · ${ingredient.baseEnergy}',
+                        '${localizedName(nameEn: ingredient.nameEn, nameZh: ingredient.nameZh)} · ${ingredient.baseEnergy}',
                       ),
                       onPressed: () => _changeQuantity(ingredient, 1),
-                      backgroundColor: TitoColors.card,
-                      side: const BorderSide(color: TitoColors.ink, width: 2),
-                      labelStyle: SecondaryTypography.onCard.small12.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
                     ),
                 ],
               ),
@@ -296,7 +293,7 @@ class _IngredientQuantityRow extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              '${ingredient.nameZh} · ${ingredient.baseEnergy}',
+              '${localizedName(nameEn: ingredient.nameEn, nameZh: ingredient.nameZh)} · ${ingredient.baseEnergy}',
               style: SecondaryTypography.onCard.body14.copyWith(
                 fontWeight: FontWeight.w800,
               ),
@@ -338,33 +335,28 @@ class _ResultBand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: TitoColors.mint,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TitoColors.ink, width: 2),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              mainText,
-              style: SecondaryTypography.onCard.h15.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+    // Mint sticker card: border, radius, and shadow follow the active theme.
+    return StickerCard(
+      variant: StickerVariant.mint,
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            mainText,
+            style: SecondaryTypography.onCard.h15.copyWith(
+              fontWeight: FontWeight.w900,
             ),
-            const SizedBox(height: 4),
-            Text(
-              detailText,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
-                fontWeight: FontWeight.w700,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            detailText,
+            style: SecondaryTypography.onCard.small12.copyWith(
+              color: TitoColors.mutedInk,
+              fontWeight: FontWeight.w700,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

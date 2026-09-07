@@ -101,7 +101,7 @@ Future<DexCacheProgress?> trackWhileDownloading({
                               }
                             }
                           },
-                    child: const Text(AppZh.settingsDexBackgroundDownload),
+                    child: Text(AppZh.settingsDexBackgroundDownload),
                   ),
                 if (showCancel)
                   TextButton(
@@ -111,7 +111,7 @@ Future<DexCacheProgress?> trackWhileDownloading({
                       onCancel();
                       Navigator.pop(dialogContext);
                     },
-                    child: const Text(AppZh.cancel),
+                    child: Text(AppZh.cancel),
                   ),
               ],
             );

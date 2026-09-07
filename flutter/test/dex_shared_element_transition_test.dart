@@ -28,6 +28,33 @@ const _immediateDetail = PokemonDetail(
   immunities: [],
   stabSuperEffective: [],
   evolutionChain: null,
+  moveSet: PokemonMoveSet(
+    levelUp: [
+      PokemonMove(
+        move: CachedMove(
+          id: 33,
+          nameEn: 'tackle',
+          nameZh: '撞击',
+          type: 'normal',
+          category: 'physical',
+        ),
+        method: 'level-up',
+        level: 1,
+      ),
+    ],
+    machine: [
+      PokemonMove(
+        move: CachedMove(
+          id: 182,
+          nameEn: 'protect',
+          nameZh: '守住',
+          type: 'normal',
+          category: 'status',
+        ),
+        method: 'machine',
+      ),
+    ],
+  ),
 );
 
 Future<void> _pumpUntilRouteInserted(

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_zh.dart';
 import '../../l10n/game_zh.dart';
+import '../../theme/app_visual_style.dart';
+import '../../theme/secondary_typography.dart';
+import '../../theme/tito_colors.dart';
+import '../../theme/tito_typography.dart';
 import 'game_edition.dart';
 
 /// Playable / upcoming game slots — badge cycles in this order (legacy).
@@ -35,7 +40,7 @@ String badgeForEdition(GameEdition edition) {
 
 /// Short label for home header pill (before full name in grid picker).
 String homeGameBadgeLabel(GameEdition edition) {
-  final label = edition.labelZh;
+  final label = edition.label;
   final paren = label.indexOf(' (');
   if (paren > 0) {
     return label.substring(0, paren);
@@ -75,9 +80,11 @@ Future<GameEdition?> showGameEditionGridPicker(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       final current = selected ?? defaultGameEdition;
       final columns = MediaQuery.sizeOf(context).width >= 520 ? 4 : 3;
+      final scheme = Theme.of(context).colorScheme;
       return SafeArea(
         child: DraggableScrollableSheet(
           expand: false,
@@ -91,10 +98,22 @@ Future<GameEdition?> showGameEditionGridPicker(
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Text(
-                    '选择游戏版本',
+                    AppZh.pickGameEdition,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pop(context, GameEdition.general),
+                    icon: const GameEditionIcon(
+                      edition: GameEdition.general,
+                      size: 24,
+                    ),
+                    label: Text(AppZh.clearGameEdition),
                   ),
                 ),
                 Expanded(
@@ -111,13 +130,11 @@ Future<GameEdition?> showGameEditionGridPicker(
                     itemBuilder: (context, index) {
                       final edition = GameEdition.all[index];
                       final isSelected = edition.slug == current.slug;
-                      final displayEdition =
-                          isSelected ? current : edition;
+                      final displayEdition = isSelected ? current : edition;
+                      final tile = _gridTileStyle(scheme, selected: isSelected);
                       return Material(
-                        color: isSelected
-                            ? const Color(0xFFFFF3B0)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        color: tile.fill,
+                        borderRadius: BorderRadius.circular(TitoRadii.md),
                         child: InkWell(
                           onTap: () async {
                             final result = await _resolveEditionWithFlavor(
@@ -129,15 +146,13 @@ Future<GameEdition?> showGameEditionGridPicker(
                               Navigator.pop(context, result);
                             }
                           },
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(TitoRadii.md),
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(TitoRadii.md),
                               border: Border.all(
-                                color: isSelected
-                                    ? const Color(0xFF18283B)
-                                    : const Color(0x3318283B),
-                                width: isSelected ? 2.5 : 1.5,
+                                color: tile.outline,
+                                width: tile.outlineWidth,
                               ),
                             ),
                             padding: const EdgeInsets.symmetric(
@@ -150,17 +165,18 @@ Future<GameEdition?> showGameEditionGridPicker(
                                 _GameEditionGridIcon(edition: displayEdition),
                                 const SizedBox(height: 6),
                                 Text(
-                                  edition.labelZh,
+                                  edition.label,
                                   textAlign: TextAlign.center,
                                   maxLines: 4,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w800
-                                        : FontWeight.w700,
-                                    height: 1.15,
-                                  ),
+                                  style: SecondaryTypography.onCard.small12
+                                      .copyWith(
+                                        color: tile.foreground,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w800
+                                            : FontWeight.w700,
+                                        height: 1.15,
+                                      ),
                                 ),
                               ],
                             ),
@@ -179,79 +195,32 @@ Future<GameEdition?> showGameEditionGridPicker(
   );
 }
 
-/// List bottom sheet (used in detail pages). Same merged-or-flavor behavior as
-/// the grid picker.
-Future<GameEdition?> showGameEditionPicker(
-  BuildContext context, {
-  GameEdition? selected,
-}) {
-  return showModalBottomSheet<GameEdition>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) {
-      final current = selected ?? defaultGameEdition;
-      return SafeArea(
-        child: DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.55,
-          minChildSize: 0.35,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Text(
-                    '选择游戏版本',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: GameEdition.all.length,
-                    itemBuilder: (context, index) {
-                      final edition = GameEdition.all[index];
-                      final isSelected = edition.slug == current.slug;
-                      final displayEdition =
-                          isSelected ? current : edition;
-                      return ListTile(
-                        leading: GameEditionIcon(
-                          edition: displayEdition,
-                          size: 32,
-                        ),
-                        title: Text(edition.labelZh),
-                        subtitle: edition.hasPokeApiData
-                            ? null
-                            : const Text('暂无 PokeAPI 数据'),
-                        trailing: isSelected
-                            ? const Icon(Icons.check_rounded)
-                            : null,
-                        selected: isSelected,
-                        onTap: () async {
-                          final result = await _resolveEditionWithFlavor(
-                            context,
-                            edition: edition,
-                            current: current,
-                          );
-                          if (context.mounted && result != null) {
-                            Navigator.pop(context, result);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    },
+/// Per-theme surface for one grid tile in [showGameEditionGridPicker].
+({Color fill, Color outline, double outlineWidth, Color? foreground})
+_gridTileStyle(ColorScheme scheme, {required bool selected}) {
+  if (appVisualStyle.usesFlatUi) {
+    return (
+      fill: selected ? scheme.secondaryContainer : scheme.surfaceContainerHigh,
+      outline: selected ? scheme.primary : scheme.outlineVariant,
+      outlineWidth: selected ? TitoBorders.card : TitoBorders.element,
+      foreground: selected ? scheme.onSecondaryContainer : scheme.onSurface,
+    );
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return (
+      fill: selected
+          ? TitoColors.softYellow.withValues(alpha: 0.85)
+          : Colors.white.withValues(alpha: 0.8),
+      outline: Colors.white.withValues(alpha: 0.85),
+      outlineWidth: TitoBorders.glass,
+      foreground: null,
+    );
+  }
+  return (
+    fill: selected ? TitoColors.softYellow : TitoColors.card,
+    outline: selected ? TitoColors.ink : TitoColors.ink.withValues(alpha: 0.2),
+    outlineWidth: selected ? TitoBorders.card : TitoBorders.element,
+    foreground: null,
   );
 }
 
@@ -278,6 +247,7 @@ Future<GameEdition?> _showFlavorPicker(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       final flavors = edition.flavorVersions;
       return SafeArea(
@@ -293,10 +263,22 @@ Future<GameEdition?> _showFlavorPicker(
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Text(
-                    edition.labelZh,
+                    edition.label,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: OutlinedButton.icon(
+                    onPressed: () =>
+                        Navigator.pop(context, GameEdition.general),
+                    icon: const GameEditionIcon(
+                      edition: GameEdition.general,
+                      size: 24,
+                    ),
+                    label: Text(AppZh.clearGameEdition),
                   ),
                 ),
                 Expanded(
@@ -311,15 +293,13 @@ Future<GameEdition?> _showFlavorPicker(
                             current.selectedFlavor == null;
                         return ListTile(
                           leading: GameEditionIcon(edition: edition, size: 32),
-                          title: const Text('合并版本'),
+                          title: Text(AppZh.mergedGameEdition),
                           trailing: isSelected
                               ? const Icon(Icons.check_rounded)
                               : null,
                           selected: isSelected,
-                          onTap: () => Navigator.pop(
-                            context,
-                            edition.withFlavor(null),
-                          ),
+                          onTap: () =>
+                              Navigator.pop(context, edition.withFlavor(null)),
                         );
                       }
                       final flavor = flavors[index - 1];
@@ -336,10 +316,8 @@ Future<GameEdition?> _showFlavorPicker(
                             ? const Icon(Icons.check_rounded)
                             : null,
                         selected: isSelected,
-                        onTap: () => Navigator.pop(
-                          context,
-                          edition.withFlavor(flavor),
-                        ),
+                        onTap: () =>
+                            Navigator.pop(context, edition.withFlavor(flavor)),
                       );
                     },
                   ),
@@ -356,7 +334,7 @@ Future<GameEdition?> _showFlavorPicker(
 /// Short code for the letter-badge fallback — the ASCII tag inside the
 /// label's parentheses ('心金/魂银 (HGSS)' → 'HGSS').
 String gameEditionShortCode(GameEdition edition) {
-  final label = edition.labelZh;
+  final label = edition.label;
   final open = label.lastIndexOf('(');
   final close = label.lastIndexOf(')');
   if (open >= 0 && close > open + 1) {
@@ -386,10 +364,8 @@ class GameEditionIcon extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _LetterBadge(
-            edition: edition,
-            size: size,
-          ),
+          errorBuilder: (_, __, ___) =>
+              _LetterBadge(edition: edition, size: size),
         ),
       );
     }
@@ -415,7 +391,10 @@ class _LetterBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: accent,
         borderRadius: BorderRadius.circular(size * 0.22),
-        border: Border.all(color: const Color(0x3318283B), width: 1),
+        border: Border.all(
+          color: TitoColors.ink.withValues(alpha: 0.2),
+          width: TitoBorders.glass,
+        ),
       ),
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -423,11 +402,12 @@ class _LetterBadge extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: size * 0.08),
           child: Text(
             code,
-            style: TextStyle(
+            // Proportional to the badge size (24–40px), so no fixed token.
+            style: TitoTypography.style(
               fontSize: size * 0.34,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.3,
-              color: dark ? Colors.white : const Color(0xFF221F26),
+              color: dark ? TitoColors.card : TitoColors.ink,
             ),
           ),
         ),

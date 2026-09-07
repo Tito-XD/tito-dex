@@ -9,12 +9,14 @@ import '../../features/dex/dex_repository.dart';
 import '../../features/dex/silhouette_quiz.dart';
 import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
+import '../../theme/app_visual_style.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
+import '../../widgets/handheld_input.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/sticker_pressable.dart';
@@ -165,7 +167,7 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
       type: MaterialType.transparency,
       child: SecondaryPageScaffold(
         title: AppZh.quizTitle,
-        subtitle: gameEditionRepository.edition.labelZh,
+        subtitle: gameEditionRepository.edition.label,
         children: [_body(context)],
       ),
     );
@@ -175,12 +177,26 @@ class _SilhouetteQuizPageState extends State<SilhouetteQuizPage> {
     final error = _error;
     if (error != null) {
       return StickerCard(
-        child: Text(error, style: SecondaryTypography.onCard.body14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(error, style: SecondaryTypography.onCard.body14),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () {
+                setState(() => _error = null);
+                _loadPool();
+              },
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: Text(AppZh.dexRetry),
+            ),
+          ],
+        ),
       );
     }
     final question = _question;
     if (_pool == null || question == null) {
-      return const TitoLoadingPanel(
+      return TitoLoadingPanel(
         message: AppZh.dexLoadingDetail,
         compact: true,
         showSkeleton: false,
@@ -291,41 +307,26 @@ class _QuizBody extends StatelessWidget {
         ),
         if (answered) ...[
           const SizedBox(height: 14),
+          // Button colours / outlines / radii come from the theme's button
+          // themes; only the handheld-friendly height is kept local.
           if (answerIsCorrect) ...[
             OutlinedButton.icon(
               onPressed: onAdopt,
               icon: const Icon(Icons.pets_rounded, size: 18),
-              label: const Text(AppZh.quizAdoptCompanion),
+              label: Text(AppZh.quizAdoptCompanion),
               style: OutlinedButton.styleFrom(
-                foregroundColor: TitoColors.ink,
-                backgroundColor: TitoColors.card,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  side: const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.element,
-                  ),
-                ),
               ),
             ),
             const SizedBox(height: 8),
           ],
-          FilledButton(
+          FilledButton.icon(
             onPressed: onNext,
+            icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+            label: Text(AppZh.quizNext),
             style: FilledButton.styleFrom(
-              backgroundColor: TitoColors.softYellow,
-              foregroundColor: TitoColors.ink,
               padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(TitoRadii.md),
-                side: const BorderSide(
-                  color: TitoColors.ink,
-                  width: TitoBorders.card,
-                ),
-              ),
             ),
-            child: const Text(AppZh.quizNext),
           ),
         ],
       ],
@@ -361,35 +362,58 @@ class _ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final flat = appVisualStyle.usesFlatUi;
+    final plastic = appVisualStyle.usesSolidPlastic;
+    // Idle / muted follow the theme surface; correct / wrong keep the shared
+    // mint / coral verdict colours on every theme.
+    final idle = flat
+        ? scheme.surfaceContainerHighest
+        : plastic
+        ? Colors.white.withValues(alpha: 0.82)
+        : TitoColors.card;
     final background = switch (state) {
       _ChoiceState.correct => TitoColors.mint,
       _ChoiceState.wrong => TitoColors.coral,
-      _ChoiceState.muted => TitoColors.card.withValues(alpha: 0.55),
-      _ChoiceState.idle => TitoColors.card,
+      _ChoiceState.muted => idle.withValues(alpha: idle.a * 0.55),
+      _ChoiceState.idle => idle,
     };
+    final BoxBorder? border = flat
+        ? null
+        : plastic
+        ? Border.all(
+            color: Colors.white.withValues(alpha: 0.85),
+            width: TitoBorders.glass,
+          )
+        : Border.all(color: TitoColors.ink, width: TitoBorders.card);
+    final radius = BorderRadius.circular(TitoRadii.md);
 
-    return StickerPressable(
-      borderRadius: BorderRadius.circular(TitoRadii.md),
-      interactive: onTap != null,
-      child: Material(
-        color: background,
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: SecondaryTypography.onCard.body14.copyWith(
-                fontWeight: FontWeight.w800,
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: radius,
+      child: StickerPressable(
+        borderRadius: radius,
+        interactive: onTap != null,
+        child: Material(
+          color: background,
+          borderRadius: radius,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(borderRadius: radius, border: border),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: flat && state == _ChoiceState.idle
+                      ? scheme.onSurface
+                      : null,
+                ),
               ),
             ),
           ),
@@ -443,19 +467,7 @@ class _ScoreChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: TitoColors.card,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 2),
-      ),
-      child: Text(
-        label,
-        style: SecondaryTypography.onCard.small12.copyWith(
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
+    // Read-only score badge: Material Chip so the theme's chipTheme styles it.
+    return Chip(label: Text(label));
   }
 }

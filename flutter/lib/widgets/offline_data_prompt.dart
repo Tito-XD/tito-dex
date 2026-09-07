@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/app_zh.dart';
-import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
 
 const _offlinePromptKey = 'titodex_offline_prompt_shown';
 
@@ -22,24 +20,14 @@ Future<void> showOfflineDataPrompt(BuildContext context) async {
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      backgroundColor: TitoColors.card,
-      title: Text(
-        AppZh.offlinePromptTitle,
-        style: TitoTypography.style(
-          fontWeight: FontWeight.w700,
-          color: TitoColors.ink,
-        ),
-      ),
-      content: Text(
-        AppZh.offlinePromptBody,
-        style: TitoTypography.style(color: TitoColors.mutedInk),
-      ),
+      title: Text(AppZh.offlinePromptTitle),
+      content: Text(AppZh.offlinePromptBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(),
           child: Text(AppZh.offlinePromptLater),
         ),
-        TextButton(
+        FilledButton(
           onPressed: () {
             Navigator.of(dialogContext).pop();
             context.push('/settings');
@@ -62,24 +50,14 @@ Future<void> showUpdateAvailableDialog(BuildContext context) async {
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      backgroundColor: TitoColors.card,
-      title: Text(
-        AppZh.updateAvailableTitle,
-        style: TitoTypography.style(
-          fontWeight: FontWeight.w700,
-          color: TitoColors.ink,
-        ),
-      ),
-      content: Text(
-        AppZh.updateAvailableBody,
-        style: TitoTypography.style(color: TitoColors.mutedInk),
-      ),
+      title: Text(AppZh.updateAvailableTitle),
+      content: Text(AppZh.updateAvailableBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(),
           child: Text(AppZh.updateAvailableLater),
         ),
-        TextButton(
+        FilledButton(
           onPressed: () {
             Navigator.of(dialogContext).pop();
             context.push('/settings');

@@ -82,6 +82,14 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
     }
   }
 
+  void _retryLoadRelations() {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    _loadRelations();
+  }
+
   Future<void> _searchDefender(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
@@ -211,20 +219,32 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
           type: MaterialType.transparency,
           child: SecondaryPageScaffold(
             title: AppZh.companionToolBlindSpot,
-            subtitle: edition.labelZh,
+            subtitle: edition.label,
             children: [
               if (_loading)
-                const TitoLoadingPanel(
+                TitoLoadingPanel(
                   message: AppZh.companionLoading,
                   compact: true,
                 )
               else if (_error != null)
                 StickerCard(
-                  child: Text(
-                    _error!,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _error!,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: _retryLoadRelations,
+                        icon: const Icon(Icons.refresh_rounded, size: 18),
+                        label: Text(AppZh.dexRetry),
+                      ),
+                    ],
                   ),
                 )
               else if (relations != null) ...[
@@ -384,7 +404,9 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
                               if (generation < 6) ...[
                                 const SizedBox(height: 8),
                                 Text(
-                                  '世代修正属性：${normalized.map(typeNameZh).join('/')}',
+                                  AppZh.generationCorrectionTypes(
+                                    normalized.map(typeNameZh).join('/'),
+                                  ),
                                   style: SecondaryTypography.onCard.small12
                                       .copyWith(color: TitoColors.mutedInk),
                                 ),

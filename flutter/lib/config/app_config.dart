@@ -15,16 +15,19 @@ class AppConfig {
   static const _assetPath = 'assets/config/app_config.json';
 
   int configVersion = 0;
-  String sleepToolsTierAHint = AppZh.sleepToolsTierAHint;
+  String? _sleepToolsTierAHintOverride;
   List<({String labelZh, String url})> sleepToolsLinks = _defaultSleepLinks;
 
-  Future<void>? _loading;
+  String get sleepToolsTierAHint =>
+      _sleepToolsTierAHintOverride ?? AppZh.sleepToolsTierAHint;
 
-  static const List<({String labelZh, String url})> _defaultSleepLinks = [
+  static List<({String labelZh, String url})> get _defaultSleepLinks => [
     (labelZh: AppZh.sleepToolsMain, url: 'https://nerolislab.com'),
     (labelZh: AppZh.sleepToolsGuides, url: 'https://nerolislab.com/guides/'),
     (labelZh: AppZh.sleepToolsDocs, url: 'https://docs.nerolislab.com'),
   ];
+
+  Future<void>? _loading;
 
   Future<void> ensureLoaded() {
     return _loading ??= _load();
@@ -33,7 +36,7 @@ class AppConfig {
   Future<void> reload() async {
     _loading = null;
     configVersion = 0;
-    sleepToolsTierAHint = AppZh.sleepToolsTierAHint;
+    _sleepToolsTierAHintOverride = null;
     sleepToolsLinks = _defaultSleepLinks;
     await ensureLoaded();
   }
@@ -54,7 +57,7 @@ class AppConfig {
 
     final hint = sleepTools['tierAHint'] as String?;
     if (hint != null && hint.isNotEmpty) {
-      sleepToolsTierAHint = hint;
+      _sleepToolsTierAHintOverride = hint;
     }
 
     final linksRaw = sleepTools['links'] as List<dynamic>?;
@@ -102,7 +105,7 @@ class AppConfig {
   /// Test-only reset.
   void resetForTest() {
     configVersion = 0;
-    sleepToolsTierAHint = AppZh.sleepToolsTierAHint;
+    _sleepToolsTierAHintOverride = null;
     sleepToolsLinks = _defaultSleepLinks;
     _loading = null;
   }

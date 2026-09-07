@@ -29,12 +29,14 @@ class DexReferenceCategoryFilter<T> {
     required this.options,
     required this.label,
     required this.filter,
+    this.displayLabel,
   });
 
-  /// Ordered category labels (null = "全部").
+  /// Ordered category keys (null = all). Display uses [displayLabel] when set.
   final List<String?> options;
   final String Function(T entry) label;
   final bool Function(T entry, String? category) filter;
+  final String Function(String? category)? displayLabel;
 }
 
 class DexReferenceListPage<T> extends StatefulWidget {
@@ -344,13 +346,10 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
           StickerCard(
             child: TextField(
               controller: _queryController,
+              // Outline / fill / focus come from the theme's field look.
               decoration: InputDecoration(
                 hintText: AppZh.dexReferenceSearchHint,
-                prefixIcon: const Icon(Icons.search_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(TitoRadii.md),
-                  borderSide: const BorderSide(color: TitoColors.ink, width: 2),
-                ),
+                prefixIcon: Icon(Icons.search_rounded),
               ),
             ),
           ),
@@ -361,9 +360,10 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
               counts: _categoryCounts,
               selected: _selectedCategory,
               onSelected: _selectCategory,
+              displayLabel: widget.categoryFilter!.displayLabel,
             ),
           if (_loading)
-            const TitoLoadingPanel(
+            TitoLoadingPanel(
               message: AppZh.referenceLoading,
               compact: true,
             )
@@ -383,7 +383,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   const SizedBox(height: 12),
                   FilledButton(
                     onPressed: _load,
-                    child: const Text(AppZh.dexRetry),
+                    child: Text(AppZh.dexRetry),
                   ),
                 ],
               ),
@@ -506,7 +506,10 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   key: const Key('dex-reference-load-more'),
                   onPressed: _materializeNextBatch,
                   child: Text(
-                    '继续显示 · ${visible.length}/${allVisible.length}',
+                    AppZh.dexReferenceLoadMore(
+                      visible.length,
+                      allVisible.length,
+                    ),
                     style: SecondaryTypography.onCard.small12.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -527,8 +530,8 @@ void showMoveDetailSheet(
 }) {
   showModalBottomSheet<void>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       return SafeArea(
         child: Padding(
@@ -557,28 +560,11 @@ void showMoveDetailSheet(
                 const SizedBox(height: 12),
                 TitoTypeBadge(typeEn: move.type, size: TypeBadgeSize.medium),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      moveCategoryIcon(move.category),
-                      size: 18,
-                      color: TitoColors.ink,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        formatMoveStatLine(
-                          category: move.category,
-                          power: move.power,
-                          accuracy: move.accuracy,
-                          pp: move.pp,
-                        ),
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                MoveStatRow(
+                  category: move.category,
+                  power: move.power,
+                  accuracy: move.accuracy,
+                  pp: move.pp,
                 ),
                 if (move.descriptionZh?.isNotEmpty == true) ...[
                   const SizedBox(height: 12),
@@ -622,68 +608,71 @@ void showAbilityDetailSheet(
 }) {
   showModalBottomSheet<void>(
     context: context,
-    showDragHandle: true,
+    isScrollControlled: true,
+    useSafeArea: true,
     builder: (context) {
       final pokemonCount = ability.pokemonIds.length;
       return SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (scopeNotice != null) ...[
-                ReferenceScopeNotice(message: scopeNotice),
-                const SizedBox(height: 12),
-              ],
-              Text(
-                ability.nameZh,
-                style: SecondaryTypography.onCard.h15.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              Text(
-                ability.nameEn,
-                style: SecondaryTypography.onCard.small12.copyWith(
-                  color: TitoColors.mutedInk,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                ability.descriptionZh.isEmpty
-                    ? AppZh.dexReferenceNoDescription
-                    : ability.descriptionZh,
-                style: SecondaryTypography.onCard.body14,
-              ),
-              if (pokemonCount > 0) ...[
-                const SizedBox(height: 8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (scopeNotice != null) ...[
+                  ReferenceScopeNotice(message: scopeNotice),
+                  const SizedBox(height: 12),
+                ],
                 Text(
-                  AppZh.dexReferencePokemonCount(pokemonCount),
-                  style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
-                    fontWeight: FontWeight.w700,
+                  ability.nameZh,
+                  style: SecondaryTypography.onCard.h15.copyWith(
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-              ],
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: pokemonCount == 0
-                    ? null
-                    : () {
-                        Navigator.pop(context);
-                        dexFilterController.setFilter(
-                          DexFilter(
-                            abilityId: ability.id,
-                            labelZh: AppZh.dexFilterAbilityLabel(
-                              ability.nameZh,
+                Text(
+                  ability.nameEn,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.mutedInk,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  ability.descriptionZh.isEmpty
+                      ? AppZh.dexReferenceNoDescription
+                      : ability.descriptionZh,
+                  style: SecondaryTypography.onCard.body14,
+                ),
+                if (pokemonCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    AppZh.dexReferencePokemonCount(pokemonCount),
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: pokemonCount == 0
+                      ? null
+                      : () {
+                          Navigator.pop(context);
+                          dexFilterController.setFilter(
+                            DexFilter(
+                              abilityId: ability.id,
+                              labelZh: AppZh.dexFilterAbilityLabel(
+                                ability.nameZh,
+                              ),
                             ),
-                          ),
-                        );
-                        context.push('/dex');
-                      },
-                child: Text(AppZh.dexReferenceViewAbilityPokemon),
-              ),
-            ],
+                          );
+                          context.push('/dex');
+                        },
+                  child: Text(AppZh.dexReferenceViewAbilityPokemon),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -739,7 +728,6 @@ class _GridItemCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: SecondaryTypography.onCard.body14.copyWith(
                     fontWeight: FontWeight.w700,
-                    fontSize: 13,
                   ),
                 ),
               ),
@@ -754,7 +742,6 @@ class _GridItemCard extends StatelessWidget {
                   style: SecondaryTypography.onCard.small12.copyWith(
                     color: TitoColors.coral,
                     fontWeight: FontWeight.w800,
-                    fontSize: 10,
                   ),
                 ),
               ],
@@ -772,12 +759,14 @@ class _CategoryFilterChips extends StatelessWidget {
     required this.counts,
     required this.selected,
     required this.onSelected,
+    this.displayLabel,
   });
 
   final List<String?> options;
   final Map<String?, int> counts;
   final String? selected;
   final ValueChanged<String?> onSelected;
+  final String Function(String? category)? displayLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -793,21 +782,13 @@ class _CategoryFilterChips extends StatelessWidget {
           final cat = options[index];
           final sel = selected == cat;
           final count = counts[cat] ?? 0;
+          // Colours, outline, and radius come from the theme's chipTheme.
           return FilterChip(
             selected: sel,
             label: Text(
-              '${cat ?? "全部"} ($count)',
-              style: const TextStyle(fontSize: 11),
+              '${displayLabel?.call(cat) ?? cat ?? AppZh.dexMoveFilterAll} ($count)',
             ),
             onSelected: (_) => onSelected(sel ? null : cat),
-            backgroundColor: TitoColors.card,
-            selectedColor: TitoColors.mint,
-            checkmarkColor: TitoColors.deepBlue,
-            side: BorderSide(
-              color: sel
-                  ? TitoColors.mint
-                  : TitoColors.ink.withValues(alpha: 0.2),
-            ),
           );
         },
       ),

@@ -1,6 +1,8 @@
 /// Chinese names for games, locations, species, and related game text.
 library;
 
+import 'app_locale.dart';
+
 const gameTitlesZh = <String, String>{
   'SoulSilver': '宝可梦 魂银',
   'HeartGold': '宝可梦 心金',
@@ -103,7 +105,12 @@ const companionNamesZh = <String, String>{
   'Riolu': '利欧路',
 };
 
-String localizeGame(String game) => gameTitlesZh[game] ?? game;
+String localizeGame(String game) {
+  if (AppLocale.instance.isEnglish) {
+    return game;
+  }
+  return gameTitlesZh[game] ?? game;
+}
 
 /// PokeAPI version slug → short Chinese flavor label for the edition picker.
 const flavorVersionLabelsZh = <String, String>{
@@ -149,18 +156,31 @@ const flavorVersionLabelsZh = <String, String>{
   'champions': 'Champions',
 };
 
-String localizeFlavorVersion(String flavor) =>
-    flavorVersionLabelsZh[flavor] ?? flavor;
+String localizeFlavorVersion(String flavor) {
+  if (AppLocale.instance.isEnglish) {
+    return flavor;
+  }
+  return flavorVersionLabelsZh[flavor] ?? flavor;
+}
 
-String localizeSpecies(String species) => speciesNamesZh[species] ?? species;
+String localizeSpecies(String species) {
+  if (AppLocale.instance.isEnglish) {
+    return species;
+  }
+  return speciesNamesZh[species] ?? species;
+}
 
-String localizeCompanion(String companion) =>
-    companionNamesZh[companion] ?? companion;
+String localizeCompanion(String companion) {
+  if (AppLocale.instance.isEnglish) {
+    return companion;
+  }
+  return companionNamesZh[companion] ?? companion;
+}
 
 String localizeLocation(String label) {
   if (label.startsWith('Map #')) {
     final id = label.replaceFirst('Map #', '');
-    return '地图 #$id';
+    return AppLocale.pick(zh: '地图 #$id', en: 'Map #$id');
   }
 
   final parts = label.split(' · ');
@@ -169,11 +189,16 @@ String localizeLocation(String label) {
     return place;
   }
 
-  final hint = interiorHintsZh[parts[1]] ?? parts[1];
+  final hint = AppLocale.instance.isEnglish
+      ? parts[1]
+      : (interiorHintsZh[parts[1]] ?? parts[1]);
   return '$place · $hint';
 }
 
 String _localizePlace(String name) {
+  if (AppLocale.instance.isEnglish) {
+    return name;
+  }
   if (locationNamesZh.containsKey(name)) {
     return locationNamesZh[name]!;
   }
@@ -187,6 +212,9 @@ String _localizePlace(String name) {
 }
 
 String localizeTimelineEntry(String text) {
+  if (AppLocale.instance.isEnglish) {
+    return text;
+  }
   const map = <String, String>{
     'Loaded from local SoulSilver save': '已从本地魂银存档同步',
     'Reached Goldenrod City': '抵达满金市',

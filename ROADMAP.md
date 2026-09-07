@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.6](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.6) · Lite `0.9.6+191` · Offline `0.9.6-offline+192`.
+> **Latest release:** [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · Lite `0.9.15+196` · Offline `0.9.15-offline+197`.
 >
-> **Current `main`:** v0.9.6 with responsive Team/Search predictive back, a restrained Home-to-Dex return, full-card Journey feedback, stable text focus, embedded Offline v20 data, BGE-M3 AI Search, Tavily/DeepSeek allowlisted search, and Workers AI Qwen. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.15 with unified Dex filtering and reference context, theme-specific shared controls, system-following Chinese/English UI and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,20 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v20; v0.9.6 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.15 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.9.15
+
+- Combine Dex search, regional scope, generation, journey-only browsing and species/reference filters in one sheet; preserve drafts and form identity while intersecting constraints.
+- Share one visible form and merged reference-game selection across detail tabs; support General and explicit DLC descriptions, deduplicate general moves and hide unsupported categories.
+- Make shared controls, sheets, dialogs, loading placeholders, typography, outlines and shadows consistent within each of the three themes; retain type-colour detail tabs and reduced-motion behavior.
+- Let long flavor descriptions size to content and remove redundant move-section gaps and version accordions.
+- Add Chinese/English UI following system / Android per-app language, localized entity labels and shortcuts, with source-language fallback for missing reference translations.
+- Retain v0.9.7 anniversary artwork and its explicit form matching, opt-in network loading and Web links. Versions between v0.9.7 and v0.9.15 were not public releases.
 
 ## Completed in v0.9.6
 
@@ -146,6 +155,8 @@
 - Ensure every Flutter route owns a `Scaffold`, including web preview routes.
 
 ## Remaining validation / maintenance
+
+- Expand English runtime coverage across all three themes and phone/handheld layouts; reference prose and assistant answers are not claimed to be fully translated.
 
 1. Add reviewed real-save fixtures as the maintainer completes more versions. Do not promote an experimental adapter to fixture-verified before that.
 2. Run the release checklist on a physical RG device and Android 15 phone: Offline first unpack, background notification, cancellation, task removal and service timeout.

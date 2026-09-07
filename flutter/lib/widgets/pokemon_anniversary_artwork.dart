@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../features/dex/pokemon_anniversary_art.dart';
+import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
+import 'tito_skeleton.dart';
 
 /// Loaded only after selecting the anniversary display in the artwork viewer.
 class PokemonAnniversaryArtwork extends StatefulWidget {
@@ -50,7 +52,9 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
     if (mounted) {
       ScaffoldMessenger.maybeOf(
         context,
-      )?.showSnackBar(const SnackBar(content: Text('暂时无法打开官方页面，请稍后重试。')));
+      )?.showSnackBar(
+        SnackBar(content: Text(AppZh.anniversarySourceOpenFailed)),
+      );
     }
   }
 
@@ -82,8 +86,8 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
               menuMaxHeight: 280,
               dropdownColor: TitoColors.ink,
               style: const TextStyle(color: TitoColors.card, fontSize: 14),
-              decoration: const InputDecoration(
-                labelText: '选择周年 Logo',
+              decoration: InputDecoration(
+                labelText: AppZh.anniversaryPickLogo,
                 labelStyle: TextStyle(color: TitoColors.card),
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(
@@ -105,7 +109,10 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
             ),
           ),
         Text(
-          '${_selectedFile == null && !selection.matchesForm ? '未自动匹配当前形态；' : ''}当前展示：${art.label}',
+          AppZh.anniversaryCurrentLabel(
+            art.label,
+            formMismatch: _selectedFile == null && !selection.matchesForm,
+          ),
           textAlign: TextAlign.center,
           style: const TextStyle(color: TitoColors.card, fontSize: 12),
         ),
@@ -131,11 +138,21 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
                 webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
                 key: ValueKey('anniversary-${art.file}-$_attempt'),
                 fit: BoxFit.contain,
-                semanticLabel:
-                    '全国图鉴 ${widget.nationalId} · ${art.label} · 30周年 Logo',
+                semanticLabel: AppZh.anniversaryImageSemantics(
+                  widget.nationalId,
+                  art.label,
+                ),
                 loadingBuilder: (context, child, progress) {
                   if (progress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
+                  // Image placeholder: the same skeleton block the sprite
+                  // slots use, sized like the artwork it stands in for.
+                  return const Center(
+                    child: TitoSkeletonBox(
+                      height: 180,
+                      width: 180,
+                      radius: TitoRadii.lg,
+                    ),
+                  );
                 },
                 errorBuilder: (context, error, stackTrace) =>
                     SingleChildScrollView(
@@ -148,8 +165,8 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
                             size: 40,
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            '周年图片暂时无法加载',
+                          Text(
+                            AppZh.anniversaryImageLoadFailed,
                             style: TextStyle(color: TitoColors.card),
                           ),
                           TextButton.icon(
@@ -162,7 +179,7 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
                               if (mounted) setState(() => _attempt++);
                             },
                             icon: const Icon(Icons.refresh_rounded),
-                            label: const Text('重试'),
+                            label: Text(AppZh.retry),
                           ),
                         ],
                       ),
@@ -172,21 +189,24 @@ class _PokemonAnniversaryArtworkState extends State<PokemonAnniversaryArtwork> {
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'Logo 选择仅用于展示，不改变当前形态、闪光或图鉴数据。',
+        Text(
+          AppZh.anniversaryDisplayOnlyNote,
           textAlign: TextAlign.center,
           style: TextStyle(color: TitoColors.card, fontSize: 12),
         ),
         const SizedBox(height: 4),
         Text(
-          '需联网加载 · 图片版权归原权利人所有',
+          AppZh.anniversaryCopyrightNote,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: TitoColors.card.withValues(alpha: 0.7),
             fontSize: 11,
           ),
         ),
-        TextButton(onPressed: _openSource, child: const Text('官方来源与使用条款')),
+        TextButton(
+          onPressed: _openSource,
+          child: Text(AppZh.anniversarySourceLink),
+        ),
       ],
     );
   }

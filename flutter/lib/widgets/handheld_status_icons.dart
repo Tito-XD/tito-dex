@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../services/device_status_service.dart';
 import '../theme/device_layout.dart';
+import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_typography.dart';
 
 /// Real Wi-Fi and battery indicators for RG / native handheld.
 class HandheldStatusIcons extends StatelessWidget {
@@ -49,7 +49,9 @@ class _WifiIcon extends StatelessWidget {
     return Icon(
       onWifi ? Icons.wifi_rounded : Icons.wifi_off_rounded,
       size: DeviceLayout.statusIconSize(context, compact: compact),
-      color: onWifi ? TitoColors.deepBlue : TitoColors.deepBlue.withValues(alpha: 0.45),
+      color: onWifi
+          ? TitoColors.deepBlue
+          : TitoColors.deepBlue.withValues(alpha: 0.45),
     );
   }
 }
@@ -95,7 +97,10 @@ class _BatteryIndicator extends StatelessWidget {
                 width: bodyWidth,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    border: Border.all(color: borderColor, width: 1.5),
+                    border: Border.all(
+                      color: borderColor,
+                      width: TitoBorders.element,
+                    ),
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: Align(
@@ -139,9 +144,7 @@ class _BatteryIndicator extends StatelessWidget {
           SizedBox(width: compact ? 2 : 3),
           Text(
             '$value%',
-            style: TitoTypography.style(
-              fontSize: compact ? 11 : 10,
-              fontWeight: FontWeight.w800,
+            style: SecondaryTypography.onCard.team12.copyWith(
               color: TitoColors.deepBlue,
             ),
           ),

@@ -204,7 +204,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
           type: MaterialType.transparency,
           child: SecondaryPageScaffold(
             title: AppZh.companionToolStatCalc,
-            subtitle: edition.labelZh,
+            subtitle: edition.label,
             children: [
               CompanionSectionCard(
                 title: AppZh.companionStatInputsTitle,
@@ -307,7 +307,7 @@ class _StatCalcPageState extends State<StatCalcPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${_stat.labelZh}：$result',
+                      '${_stat.label}：$result',
                       style: SecondaryTypography.onCard.h15.copyWith(
                         fontWeight: FontWeight.w900,
                       ),

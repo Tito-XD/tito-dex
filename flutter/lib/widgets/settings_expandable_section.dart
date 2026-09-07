@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'handheld_input.dart';
@@ -32,6 +33,13 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final chevronColor = appVisualStyle.usesFlatUi
+        ? scheme.onSurface
+        : TitoColors.ink;
+    final subtitleColor = appVisualStyle.usesFlatUi
+        ? scheme.onSurfaceVariant
+        : TitoColors.mutedInk;
     return StickerCard(
       variant: widget.variant,
       child: Column(
@@ -61,7 +69,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: SecondaryTypography.onCard.small12
-                                  .copyWith(color: TitoColors.mutedInk),
+                                  .copyWith(color: subtitleColor),
                             ),
                           ],
                         ],
@@ -71,7 +79,7 @@ class _SettingsExpandableSectionState extends State<SettingsExpandableSection> {
                       _expanded
                           ? Icons.expand_less_rounded
                           : Icons.expand_more_rounded,
-                      color: TitoColors.ink,
+                      color: chevronColor,
                     ),
                   ],
                 ),

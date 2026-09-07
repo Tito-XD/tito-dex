@@ -4,10 +4,27 @@ import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
+import 'tito_skeleton.dart';
+
+/// Stroke for the small status boxes and pills drawn inside these cards:
+/// ink element stroke in Trainer's Journal, plastic hairline, none in Flat.
+BorderSide _elementStroke() {
+  if (appVisualStyle.usesFlatUi) {
+    return BorderSide.none;
+  }
+  if (appVisualStyle.usesSolidPlastic) {
+    return BorderSide(
+      color: Colors.white.withValues(alpha: 0.8),
+      width: TitoBorders.glass,
+    );
+  }
+  return const BorderSide(color: TitoColors.ink, width: TitoBorders.element);
+}
 
 class HeldItemReference {
   const HeldItemReference({
@@ -132,7 +149,7 @@ class PokemonHeldItemsCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               for (var index = 0; index < entries.length; index++) ...[
-                if (index > 0) const Divider(height: 18),
+                if (index > 0) const Divider(),
                 _HeldItemRow(entry: entries[index]),
               ],
             ],
@@ -143,24 +160,34 @@ class PokemonHeldItemsCard extends StatelessWidget {
   }
 }
 
+/// Skeleton of the loaded card (title + one item row) so the card keeps its
+/// shape while items.json resolves instead of showing a spinner.
 class _HeldItemsLoading extends StatelessWidget {
   const _HeldItemsLoading();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2.5),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          AppZh.dexWildHeldItems,
-          style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+        Text(AppZh.dexWildHeldItems, style: SecondaryTypography.onCard.h15),
+        const SizedBox(height: 10),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const TitoSkeletonBox(height: 40, width: 40, radius: TitoRadii.sm),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  TitoSkeletonBox(height: 14, width: 96),
+                  SizedBox(height: 8),
+                  TitoSkeletonBox(height: 18, width: 140, radius: TitoRadii.sm),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -305,23 +332,37 @@ class _PlanningPrompt extends StatelessWidget {
   }
 }
 
+/// Skeleton of the plan card (title, status box, two stage rows) while the
+/// chain details load.
 class _PlanningLoading extends StatelessWidget {
   const _PlanningLoading();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2.5),
+        Text(
+          AppZh.dexChainPlanningTitle,
+          style: SecondaryTypography.onCard.h15,
         ),
-        const SizedBox(width: 10),
+        const SizedBox(height: 4),
         Text(
           AppZh.dexChainPlanningLoading,
-          style: SecondaryTypography.onCard.body14,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            color: TitoColors.mutedInk,
+          ),
         ),
+        const SizedBox(height: 10),
+        const TitoSkeletonBox(
+          height: 36,
+          width: double.infinity,
+          radius: TitoRadii.sm,
+        ),
+        const SizedBox(height: 10),
+        const TitoSkeletonBox(height: 14, width: 160),
+        const SizedBox(height: 8),
+        const TitoSkeletonBox(height: 14, width: 120),
       ],
     );
   }
@@ -376,7 +417,7 @@ class _VersionPlanBody extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: Border.all(color: TitoColors.ink, width: 2),
+              border: Border.fromBorderSide(_elementStroke()),
             ),
             child: Row(
               children: [
@@ -558,8 +599,8 @@ class _InfoPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: TitoColors.ink, width: 1.5),
+        borderRadius: BorderRadius.circular(TitoRadii.sm),
+        border: Border.fromBorderSide(_elementStroke()),
       ),
       child: Text(
         label,

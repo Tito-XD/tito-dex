@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Compatibility elevation tokens for the Flat UI experiment.
+/// Soft Material elevation — **Flat UI only**.
 ///
-/// Existing widgets still reference the historical sticker token names, but
-/// the branch maps them to soft Material elevation so feature code does not
-/// need a visual-only rewrite.
+/// Trainer's Journal must use [TrainerJournalShadows] and Solid Plastic must
+/// use [SolidPlasticShadows]; shared widgets pick the recipe by branching on
+/// `appVisualStyle`. The historical sticker token names are kept so feature
+/// code can switch recipes without a rename.
 abstract final class TitoShadows {
   static const List<BoxShadow> sticker = [
     BoxShadow(
@@ -139,9 +140,15 @@ abstract final class TitoRadii {
   static const xl = 28.0;
 }
 
-/// Compatibility outline widths mapped to Material's restrained separators.
+/// Outline widths for Trainer's Journal ink strokes. Never write literal
+/// widths in widgets — pick the token that matches the surface size.
 abstract final class TitoBorders {
-  static const card = 1.0;
-  static const element = 1.0;
+  /// Cards, buttons, text fields, sheets, dialogs.
+  static const card = 2.0;
+
+  /// Chips, badges, small controls, knobs, checkbox/radio rings.
+  static const element = 1.5;
+
+  /// Solid Plastic hairline used by `LiquidGlassSurface` and glass outlines.
   static const glass = 1.1;
 }

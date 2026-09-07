@@ -1,9 +1,10 @@
 /// HGSS / Johto dex scope constants for PokeAPI version groups.
 library;
 
+import '../../l10n/app_locale.dart';
+import '../../l10n/zh_catalog.dart';
 import '../parser/hgss_map_lookup.dart';
 import 'dex_models.dart';
-import '../../l10n/zh_catalog.dart';
 
 const hgssVersionGroup = 'heartgold-soulsilver';
 
@@ -219,8 +220,21 @@ String statLabelZh(String? statKey) {
     'speed' || 'spe' => 'speed',
     _ => normalized,
   };
+  if (AppLocale.instance.isEnglish) {
+    return _statLabelEn(canonical, statKey);
+  }
   return statLabelsZh[canonical] ?? statKey;
 }
+
+String _statLabelEn(String canonical, String original) => switch (canonical) {
+  'hp' => 'HP',
+  'attack' => 'Attack',
+  'defense' => 'Defense',
+  'special-attack' => 'Sp. Atk',
+  'special-defense' => 'Sp. Def',
+  'speed' => 'Speed',
+  _ => original,
+};
 
 const moveMethodLabelsZh = <String, String>{
   'level-up': '等级提升',
@@ -229,10 +243,77 @@ const moveMethodLabelsZh = <String, String>{
   'tutor': '教学招式',
 };
 
-String flavorVersionLabelZh(String version) =>
-    flavorVersionLabelsZh[version] ?? version;
+const flavorVersionLabelsEn = <String, String>{
+  'red': 'Red',
+  'blue': 'Blue',
+  'red-japan': 'Red (JP)',
+  'green-japan': 'Green (JP)',
+  'blue-japan': 'Blue (JP)',
+  'yellow': 'Yellow',
+  'gold': 'Gold',
+  'silver': 'Silver',
+  'crystal': 'Crystal',
+  'ruby': 'Ruby',
+  'sapphire': 'Sapphire',
+  'emerald': 'Emerald',
+  'firered': 'FireRed',
+  'leafgreen': 'LeafGreen',
+  'diamond': 'Diamond',
+  'pearl': 'Pearl',
+  'platinum': 'Platinum',
+  'heartgold': 'HeartGold',
+  'soulsilver': 'SoulSilver',
+  'black': 'Black',
+  'white': 'White',
+  'black-2': 'Black 2',
+  'white-2': 'White 2',
+  'x': 'X',
+  'y': 'Y',
+  'omega-ruby': 'Omega Ruby',
+  'alpha-sapphire': 'Alpha Sapphire',
+  'sun': 'Sun',
+  'moon': 'Moon',
+  'ultra-sun': 'Ultra Sun',
+  'ultra-moon': 'Ultra Moon',
+  'lets-go-pikachu': "Let's Go Pikachu",
+  'lets-go-eevee': "Let's Go Eevee",
+  'sword': 'Sword',
+  'shield': 'Shield',
+  'the-isle-of-armor-sword': 'Sword · Isle of Armor',
+  'the-isle-of-armor-shield': 'Shield · Isle of Armor',
+  'the-crown-tundra-sword': 'Sword · Crown Tundra',
+  'the-crown-tundra-shield': 'Shield · Crown Tundra',
+  'brilliant-diamond': 'Brilliant Diamond',
+  'shining-pearl': 'Shining Pearl',
+  'legends-arceus': 'Legends: Arceus',
+  'scarlet': 'Scarlet',
+  'violet': 'Violet',
+  'the-teal-mask-scarlet': 'Scarlet · Teal Mask',
+  'the-teal-mask-violet': 'Violet · Teal Mask',
+  'the-indigo-disk-scarlet': 'Scarlet · Indigo Disk',
+  'the-indigo-disk-violet': 'Violet · Indigo Disk',
+  'legends-za': 'Legends Z-A',
+  'mega-dimension': 'Mega Dimension',
+  'champions': 'Champions',
+  'zh-reference': 'HeartGold/SoulSilver (ZH reference)',
+};
 
-String moveMethodLabelZh(String method) => moveMethodLabelsZh[method] ?? method;
+String flavorVersionLabelZh(String version) => AppLocale.instance.isEnglish
+    ? (flavorVersionLabelsEn[version] ?? version)
+    : (flavorVersionLabelsZh[version] ?? version);
+
+String moveMethodLabelZh(String method) {
+  if (AppLocale.instance.isEnglish) {
+    return switch (method) {
+      'level-up' => 'Level up',
+      'machine' => 'TM/HM',
+      'egg' => 'Egg',
+      'tutor' => 'Tutor',
+      _ => method,
+    };
+  }
+  return moveMethodLabelsZh[method] ?? method;
+}
 
 /// Regional pokedex scopes backed by CDN `pokedexNumbers` keys.
 enum DexRegionalPokedex {
@@ -252,6 +333,22 @@ enum DexRegionalPokedex {
 
   final String primaryPokedexKey;
   final String labelZh;
+
+  String get label => AppLocale.instance.isEnglish
+      ? switch (this) {
+          DexRegionalPokedex.national => 'National',
+          DexRegionalPokedex.kanto => 'Kanto',
+          DexRegionalPokedex.johto => 'Johto',
+          DexRegionalPokedex.hoenn => 'Hoenn',
+          DexRegionalPokedex.sinnoh => 'Sinnoh',
+          DexRegionalPokedex.unova => 'Unova',
+          DexRegionalPokedex.kalos => 'Kalos',
+          DexRegionalPokedex.alola => 'Alola',
+          DexRegionalPokedex.galar => 'Galar',
+          DexRegionalPokedex.paldea => 'Paldea',
+          DexRegionalPokedex.hisui => 'Hisui',
+        }
+      : labelZh;
 
   /// All CDN / PokeAPI pokedex name keys that belong to this regional dex.
   List<String> get pokedexKeys => switch (this) {
@@ -289,7 +386,7 @@ enum DexRegionalPokedex {
   }
 }
 
-String regionalPokedexLabelZh(DexRegionalPokedex scope) => scope.labelZh;
+String regionalPokedexLabelZh(DexRegionalPokedex scope) => scope.label;
 
 enum DexRegionalScope { national, johto, kanto }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
@@ -139,12 +140,16 @@ class _TrainerCardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final greetingStyle = TitoTypography.style(
+    // The trainer card is the dashboard hero: it keeps the home card styles
+    // (family, ink, weight) but at the density metrics above, which are
+    // already device-scaled through `DeviceLayout.dim` — no home token is
+    // this large.
+    final greetingStyle = context.titoHome.cardSectionTitle.copyWith(
       fontSize: metrics.greetingFontSize,
       fontWeight: FontWeight.w800,
       height: 1.05,
     );
-    final nameStyle = TitoTypography.style(
+    final nameStyle = context.titoHome.cardTitle.copyWith(
       fontSize: metrics.nameFontSize,
       fontWeight: FontWeight.w900,
       height: 1.05,
@@ -225,6 +230,7 @@ class _TrainerAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (placeholder) {
       return _avatarContainer(
+        context,
         child: Icon(
           Icons.person_rounded,
           size: size * 0.45,
@@ -260,10 +266,25 @@ class _TrainerAvatar extends StatelessWidget {
             ),
           );
 
-    return _avatarContainer(child: child, hasImage: hasImage);
+    return _avatarContainer(context, child: child, hasImage: hasImage);
   }
 
-  Widget _avatarContainer({required Widget child, required bool hasImage}) {
+  Widget _avatarContainer(
+    BuildContext context, {
+    required Widget child,
+    required bool hasImage,
+  }) {
+    final BoxBorder? border;
+    if (appVisualStyle.usesFlatUi) {
+      border = null;
+    } else if (appVisualStyle.usesSolidPlastic) {
+      border = Border.all(
+        color: Colors.white.withValues(alpha: 0.78),
+        width: TitoBorders.glass,
+      );
+    } else {
+      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
+    }
     return Container(
       width: size,
       height: size,
@@ -276,7 +297,7 @@ class _TrainerAvatar extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: border,
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

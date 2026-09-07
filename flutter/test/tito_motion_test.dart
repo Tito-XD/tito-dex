@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/features/dex/dex_browse_scope.dart';
-import 'package:titodex/features/dex/dex_filter.dart';
 import 'package:titodex/features/dex/dex_game_scope.dart';
 import 'package:titodex/features/dex/dex_regional_picker.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
@@ -11,8 +10,6 @@ import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/search_page.dart';
 import 'package:titodex/theme/motion_preferences.dart';
-import 'package:titodex/theme/tito_colors.dart';
-import 'package:titodex/widgets/dex_species_filter_sheet.dart';
 import 'package:titodex/widgets/tito_animated_size_switcher.dart';
 import 'package:titodex/widgets/tito_list_reveal.dart';
 
@@ -269,41 +266,6 @@ void main() {
     expect(enteringBody.transform.getTranslation().x, greaterThan(0));
     expect(find.text(AppZh.searchPrompt), findsOneWidget);
     expect(find.text(AppZh.searchHubDataTitle), findsOneWidget);
-  });
-
-  testWidgets('species filter chips animate color and transform selection', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _motionHost(
-        Builder(
-          builder: (context) => ElevatedButton(
-            onPressed: () =>
-                showDexSpeciesFilterSheet(context, selected: DexFilter.empty),
-            child: const Text('open-filter'),
-          ),
-        ),
-      ),
-    );
-    await tester.tap(find.text('open-filter'));
-    await tester.pumpAndSettle();
-
-    final chip = find.byKey(const ValueKey<String>('dex-shape-motion-ball'));
-    await tester.tap(chip);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 70));
-
-    final transform = tester.widget<Transform>(chip);
-    final dy = transform.transform.getTranslation().y;
-    expect(dy, lessThan(0));
-    expect(dy, greaterThan(-1.5));
-
-    final ink = tester.widget<Ink>(
-      find.descendant(of: chip, matching: find.byType(Ink)).first,
-    );
-    final color = (ink.decoration! as BoxDecoration).color;
-    expect(color, isNot(TitoColors.card));
-    expect(color, isNot(TitoColors.softYellow));
   });
 
   testWidgets('regional picker body moves forward and back by level', (

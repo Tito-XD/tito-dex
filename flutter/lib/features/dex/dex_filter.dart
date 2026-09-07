@@ -1,11 +1,17 @@
 import 'package:flutter/foundation.dart';
 
+import '../../l10n/app_zh.dart';
 import 'dex_models.dart';
 import 'dex_search_terms.dart';
 
 /// Active drill-down filter for the dex list (egg group, ability, move, …).
+enum DexFormDisplay { base, all, alternate }
+
 class DexFilter {
   const DexFilter({
+    this.query = '',
+    this.typeSlugs = const {},
+    this.formDisplay = DexFormDisplay.base,
     this.eggGroupSlug,
     this.abilityId,
     this.learnsMoveId,
@@ -17,12 +23,16 @@ class DexFilter {
     this.labelZh,
   });
 
+  final String query;
+  final Set<String> typeSlugs;
+  final DexFormDisplay formDisplay;
   final String? eggGroupSlug;
   final int? abilityId;
   final int? learnsMoveId;
+
   /// Species axes that combine with each other: body style × colour × size ×
-  /// generation × tag. These are the ones a player stacks to narrow 1025 down
-  /// to a handful, so unlike the reference drill-downs they are not exclusive.
+  /// generation × tag. These intersect with the reference constraints to
+  /// narrow the directory down to matching species.
   final String? shapeSlug;
 
   /// Colours are a **set**: the in-game palette has no orange, so anyone
@@ -39,6 +49,9 @@ class DexFilter {
   final String? labelZh;
 
   bool get isActive =>
+      query.trim().isNotEmpty ||
+      typeSlugs.isNotEmpty ||
+      formDisplay != DexFormDisplay.base ||
       eggGroupSlug != null ||
       abilityId != null ||
       learnsMoveId != null ||
@@ -55,6 +68,9 @@ class DexFilter {
   static const empty = DexFilter();
 
   DexFilter copyWith({
+    String? query,
+    Set<String>? typeSlugs,
+    DexFormDisplay? formDisplay,
     String? eggGroupSlug,
     int? abilityId,
     int? learnsMoveId,
@@ -64,18 +80,20 @@ class DexFilter {
     int? generation,
     String? tag,
     String? labelZh,
-  }) =>
-      DexFilter(
-        eggGroupSlug: eggGroupSlug ?? this.eggGroupSlug,
-        abilityId: abilityId ?? this.abilityId,
-        learnsMoveId: learnsMoveId ?? this.learnsMoveId,
-        shapeSlug: shapeSlug ?? this.shapeSlug,
-        colorSlugs: colorSlugs ?? this.colorSlugs,
-        sizeSlug: sizeSlug ?? this.sizeSlug,
-        generation: generation ?? this.generation,
-        tag: tag ?? this.tag,
-        labelZh: labelZh ?? this.labelZh,
-      );
+  }) => DexFilter(
+    query: query ?? this.query,
+    typeSlugs: typeSlugs ?? this.typeSlugs,
+    formDisplay: formDisplay ?? this.formDisplay,
+    eggGroupSlug: eggGroupSlug ?? this.eggGroupSlug,
+    abilityId: abilityId ?? this.abilityId,
+    learnsMoveId: learnsMoveId ?? this.learnsMoveId,
+    shapeSlug: shapeSlug ?? this.shapeSlug,
+    colorSlugs: colorSlugs ?? this.colorSlugs,
+    sizeSlug: sizeSlug ?? this.sizeSlug,
+    generation: generation ?? this.generation,
+    tag: tag ?? this.tag,
+    labelZh: labelZh ?? this.labelZh,
+  );
 
   /// Drop a single species axis — `copyWith` cannot clear a field to null.
   DexFilter without({
@@ -84,18 +102,20 @@ class DexFilter {
     bool size = false,
     bool generation = false,
     bool tag = false,
-  }) =>
-      DexFilter(
-        eggGroupSlug: eggGroupSlug,
-        abilityId: abilityId,
-        learnsMoveId: learnsMoveId,
-        shapeSlug: shape ? null : shapeSlug,
-        colorSlugs: color ? const {} : colorSlugs,
-        sizeSlug: size ? null : sizeSlug,
-        generation: generation ? null : this.generation,
-        tag: tag ? null : this.tag,
-        labelZh: labelZh,
-      );
+  }) => DexFilter(
+    query: query,
+    typeSlugs: typeSlugs,
+    formDisplay: formDisplay,
+    eggGroupSlug: eggGroupSlug,
+    abilityId: abilityId,
+    learnsMoveId: learnsMoveId,
+    shapeSlug: shape ? null : shapeSlug,
+    colorSlugs: color ? const {} : colorSlugs,
+    sizeSlug: size ? null : sizeSlug,
+    generation: generation ? null : this.generation,
+    tag: tag ? null : this.tag,
+    labelZh: labelZh,
+  );
 
   /// Replace the stackable species axes wholesale.
   ///
@@ -107,18 +127,20 @@ class DexFilter {
     String? sizeSlug,
     int? generation,
     String? tag,
-  }) =>
-      DexFilter(
-        eggGroupSlug: eggGroupSlug,
-        abilityId: abilityId,
-        learnsMoveId: learnsMoveId,
-        shapeSlug: shapeSlug,
-        colorSlugs: colorSlugs,
-        sizeSlug: sizeSlug,
-        generation: generation,
-        tag: tag,
-        labelZh: labelZh,
-      );
+  }) => DexFilter(
+    query: query,
+    typeSlugs: typeSlugs,
+    formDisplay: formDisplay,
+    eggGroupSlug: eggGroupSlug,
+    abilityId: abilityId,
+    learnsMoveId: learnsMoveId,
+    shapeSlug: shapeSlug,
+    colorSlugs: colorSlugs,
+    sizeSlug: sizeSlug,
+    generation: generation,
+    tag: tag,
+    labelZh: labelZh,
+  );
 
   /// Human-readable summary of the active species axes, e.g. 「四足 · 棕/红 · 小」.
   /// Returns null when no species axis is set.
@@ -131,7 +153,7 @@ class DexFilter {
       parts.add(dexTagLabelZh(tag!) ?? tag!);
     }
     if (generation != null) {
-      parts.add('第$generation世代');
+      parts.add(AppZh.generationFilterLabel(generation!));
     }
     if (shapeSlug != null) {
       parts.add(dexShapeLabelZh(shapeSlug!) ?? shapeSlug!);
@@ -142,13 +164,18 @@ class DexFilter {
       parts.add(ordered.map((s) => dexColorLabelZh(s) ?? s).join('/'));
     }
     if (sizeSlug != null) {
-      parts.add(DexSizeBucket.fromSlug(sizeSlug!)?.labelZh ?? sizeSlug!);
+      parts.add(DexSizeBucket.fromSlug(sizeSlug!)?.label ?? sizeSlug!);
     }
     return parts.join(' · ');
   }
 
   /// Does this species pass every stackable axis?
   bool matchesSpeciesAxes(PokemonSummary summary) {
+    if (query.trim().isNotEmpty &&
+        !dexQueryMatches(parseDexSearchQuery(query), summary)) {
+      return false;
+    }
+    if (!typeSlugs.every((type) => summary.types.contains(type))) return false;
     // Accepts the pre-Gen VI body style as well, so reclassified species
     // stay findable under the shape a HGSS player remembers.
     if (shapeSlug != null && !dexSummaryHasShape(summary, shapeSlug!)) {

@@ -10,7 +10,6 @@ import '../features/dex/dex_filter.dart';
 import '../features/dex/dex_browse_scope.dart';
 import '../features/dex/dex_browse_session.dart';
 import '../features/dex/dex_game_scope.dart';
-import '../features/dex/dex_regional_picker.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/dex_progress.dart';
 import '../features/dex/dex_repository.dart';
@@ -24,10 +23,9 @@ import '../navigation/tito_route_work.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_motion.dart';
 import '../theme/tito_colors.dart';
 import '../widgets/dex_filter_banner.dart';
-import '../widgets/dex_species_filter_sheet.dart';
+import '../widgets/dex_search_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -35,7 +33,6 @@ import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
 import '../widgets/tito_skeleton.dart';
-import '../widgets/tito_animated_size_switcher.dart';
 
 class DexPage extends StatefulWidget {
   const DexPage({
@@ -82,6 +79,7 @@ class _DexPageState extends State<DexPage> {
   List<PokemonSummary> _referenceFilteredSummaries = const [];
   bool _loadingReferenceFilter = false;
   int _filterVisibleCount = 0;
+  int _filterRequest = 0;
   final Map<DexRegionalPokedex, List<PokemonSummary>> _regionCache = {};
   final Map<int, List<PokemonSummary>> _generationCache = {};
   bool _loadingRegion = false;
@@ -273,25 +271,31 @@ class _DexPageState extends State<DexPage> {
   }
 
   Future<void> _openSpeciesFilter() async {
-    final picked = await showDexSpeciesFilterSheet(
+    final picked = await showDexSearchFilterSheet(
       context,
-      selected: dexFilterController.currentFilter,
+      filter: dexFilterController.currentFilter,
+      scope: _browseScope,
+      encounter: _encounterFilter,
+      journeyOnly: _mode == _DexMode.journey,
     );
-    if (picked == null || !mounted) {
-      return;
-    }
-    // The picker owns the species axes; an empty result clears them without
-    // disturbing an active reference drill-down.
-    if (picked.isActive) {
-      dexFilterController.setFilter(picked);
-    } else {
-      dexFilterController.clearFilter();
-    }
+    if (picked == null || !mounted) return;
+    _pendingRestoreOffset = null;
+    _scrollMemory.rememberRestoreTarget(0);
+    if (picked.scope != _browseScope) _setBrowseScope(picked.scope);
+    setState(() {
+      _encounterFilter = picked.encounter;
+    });
+    dexFilterController.setFilter(picked.filter);
+    await _setMode(picked.journeyOnly ? _DexMode.journey : _DexMode.national);
+    if (!mounted) return;
+    if (_scrollController.hasClients) _scrollController.jumpTo(0);
+    _saveBrowseSession();
   }
 
   Future<void> _loadReferenceFilter() async {
+    final request = ++_filterRequest;
     if (!dexFilterController.hasActiveFilter) {
-      if (!mounted) {
+      if (!mounted || request != _filterRequest) {
         return;
       }
       setState(() {
@@ -306,19 +310,19 @@ class _DexPageState extends State<DexPage> {
     try {
       final entries = await dexRepository.filterSummaries(
         dexFilterController.currentFilter,
+        isCancelled: () => !mounted || request != _filterRequest,
       );
-      if (!mounted) {
+      if (!mounted || request != _filterRequest) {
         return;
       }
       setState(() {
         _referenceFilteredSummaries = entries;
         _filterVisibleCount = _chunkSize.clamp(0, entries.length);
         _loadingReferenceFilter = false;
-        _mode = _DexMode.national;
         _error = null;
       });
     } catch (error) {
-      if (!mounted) {
+      if (!mounted || request != _filterRequest) {
         return;
       }
       setState(() {
@@ -432,20 +436,20 @@ class _DexPageState extends State<DexPage> {
         }
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text(AppZh.dexManualMarkSeen)));
+        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkSeen)));
       case DexEncounterStatus.seen:
         if (!caughtIds.contains(id)) {
           caughtIds = [...caughtIds, id];
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppZh.dexManualMarkCaught)),
+          SnackBar(content: Text(AppZh.dexManualMarkCaught)),
         );
       case DexEncounterStatus.caught:
         seenIds = seenIds.where((value) => value != id).toList();
         caughtIds = caughtIds.where((value) => value != id).toList();
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text(AppZh.dexManualMarkClear)));
+        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkClear)));
     }
 
     final updated = widget.journey.copyWith(
@@ -598,23 +602,6 @@ class _DexPageState extends State<DexPage> {
     }
   }
 
-  Future<void> _onNationalTabTap() async {
-    if (_mode != _DexMode.national) {
-      await _setMode(_DexMode.national);
-      return;
-    }
-    if (!mounted) {
-      return;
-    }
-    final picked = await showDexBrowseScopePicker(
-      context,
-      selected: _browseScope,
-    );
-    if (picked != null && picked != _browseScope) {
-      _setBrowseScope(picked);
-    }
-  }
-
   void _setBrowseScope(DexBrowseScope scope) {
     final region = scope.region ?? DexRegionalPokedex.national;
     setState(() {
@@ -716,7 +703,7 @@ class _DexPageState extends State<DexPage> {
 
     final Iterable<PokemonSummary> entries;
     if (_mode == _DexMode.journey) {
-      entries = _journeySummaries;
+      entries = _journeySummaries.where(_browseScope.matches);
     } else if (_browseScope.generation != null) {
       entries = _generationCache[_browseScope.generation] ?? const [];
     } else if (_region != DexRegionalPokedex.national &&
@@ -737,6 +724,10 @@ class _DexPageState extends State<DexPage> {
   List<PokemonSummary> get _scopedReferenceEntries =>
       _referenceFilteredSummaries
           .where(_browseScope.matches)
+          .where(
+            (entry) =>
+                _mode != _DexMode.journey || _journeyIds.contains(entry.id),
+          )
           .toList(growable: false);
 
   Iterable<PokemonSummary> get _primaryScopeEntries {
@@ -822,7 +813,12 @@ class _DexPageState extends State<DexPage> {
     final stats = _scopeStats;
     final generation = _browseScope.generation;
     if (generation != null) {
-      return 'G$generation · 已见 ${stats.seen} / 已捕 ${stats.caught} / 共 ${stats.total}';
+      return AppZh.dexGenerationProgress(
+        generation,
+        stats.seen,
+        stats.caught,
+        stats.total,
+      );
     }
     if (_region == DexRegionalPokedex.national) return null;
     final (start, end) = DexScope.idRangeForScope(
@@ -864,10 +860,7 @@ class _DexPageState extends State<DexPage> {
                 padding.right,
                 0,
               ),
-              child: _DexTopBar(
-                onSearch: () => context.push('/search'),
-                onReference: () => _showReferenceMenu(context),
-              ),
+              child: _DexTopBar(onSearch: _openSpeciesFilter),
             ),
             Expanded(
               child: NotificationListener<ScrollNotification>(
@@ -895,7 +888,8 @@ class _DexPageState extends State<DexPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SecondaryPageSubtitle(
-                              text: gameEditionRepository.edition.labelZh,
+                              text:
+                                  gameEditionRepository.edition.selectedLabel,
                             ),
                             const SizedBox(height: 12),
                             TitoListReveal(
@@ -937,67 +931,29 @@ class _DexPageState extends State<DexPage> {
                                     ),
                                     SizedBox(height: squareGap(context)),
                                   ],
-                                  _DexScopeBar(
-                                    mode: _mode,
-                                    browseScope: _browseScope,
-                                    scopeStats: _scopeStats,
-                                    journeyCount: _journeyIds.length,
-                                    availabilityLoading:
-                                        _loadingEvolutionOrTrade,
-                                    onModeSelected: _setMode,
-                                    onNationalRegionPicker: _onNationalTabTap,
-                                  ),
-                                  // Keyed encounter-filter swap without a custom transition.
-                                  TitoAnimatedSizeSwitcher(
-                                    switchKey: ValueKey<bool>(
-                                      _mode == _DexMode.national,
-                                    ),
-                                    child: _mode == _DexMode.national
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              SizedBox(
-                                                height: squareGap(context),
-                                              ),
-                                              _DexEncounterFilterBar(
-                                                filter: _encounterFilter,
-                                                availabilityLoading:
-                                                    _loadingEvolutionOrTrade,
-                                                onSelected: (filter) {
-                                                  if (filter ==
-                                                          DexEncounterFilter
-                                                              .evolutionOrTrade &&
-                                                      _loadingEvolutionOrTrade) {
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                          AppZh
-                                                              .dexEvolutionOrTradeLoading,
-                                                        ),
-                                                      ),
-                                                    );
-                                                    return;
-                                                  }
-                                                  setState(
-                                                    () => _encounterFilter =
-                                                        filter,
-                                                  );
-                                                },
-                                              ),
-                                              SizedBox(
-                                                height: squareGap(context),
-                                              ),
-                                              _DexSpeciesFilterButton(
-                                                filter: dexFilterController
-                                                    .currentFilter,
-                                                onTap: _openSpeciesFilter,
-                                              ),
-                                            ],
-                                          )
-                                        : const SizedBox.shrink(),
+                                  Text(
+                                    [
+                                      if (_mode == _DexMode.journey)
+                                        AppZh.dexTabJourney,
+                                      _browseScope.titleZh,
+                                      if (_encounterFilter !=
+                                          DexEncounterFilter.all)
+                                        switch (_encounterFilter) {
+                                          DexEncounterFilter.caught =>
+                                            AppZh.dexFilterCaught,
+                                          DexEncounterFilter.seen =>
+                                            AppZh.dexEncounterSeen,
+                                          DexEncounterFilter.unseen =>
+                                            AppZh.dexEncounterUnseen,
+                                          DexEncounterFilter.evolutionOrTrade =>
+                                            AppZh.dexEncounterEvolutionOrTrade,
+                                          DexEncounterFilter.all =>
+                                            AppZh.dexFilterAll,
+                                        },
+                                    ].join(' · '),
+                                    style: SecondaryTypography.onPage(
+                                      context,
+                                    ).small12,
                                   ),
                                   SizedBox(height: squareGap(context)),
                                   if (_error != null)
@@ -1036,15 +992,24 @@ class _DexPageState extends State<DexPage> {
                                                 _setMode(_DexMode.journey);
                                               }
                                             },
-                                            child: const Text(AppZh.dexRetry),
+                                            child: Text(AppZh.dexRetry),
                                           ),
                                         ],
                                       ),
                                     )
                                   else if (visible.isEmpty && loading)
-                                    TitoDexGridSkeleton(
-                                      crossAxisCount: columns,
-                                      childAspectRatio: aspectRatio,
+                                    LayoutBuilder(
+                                      builder: (context, constraints) =>
+                                          TitoDexGridSkeleton(
+                                            crossAxisCount: columns,
+                                            childAspectRatio: aspectRatio,
+                                            itemCount: _skeletonTileCount(
+                                              context,
+                                              width: constraints.maxWidth,
+                                              columns: columns,
+                                              aspectRatio: aspectRatio,
+                                            ),
+                                          ),
                                     )
                                   else if (visible.isEmpty)
                                     StickerCard(
@@ -1090,7 +1055,7 @@ class _DexPageState extends State<DexPage> {
                             );
                             return TitoListReveal(
                               key: ValueKey<String>(
-                                'dex-grid-entry-${entry.id}',
+                                'dex-grid-entry-${entry.id}-${entry.formKey ?? ''}',
                               ),
                               replayKey: _revealReplayKey,
                               delay: _cardRevealDelay(index, columns),
@@ -1104,7 +1069,13 @@ class _DexPageState extends State<DexPage> {
                                     entry.id,
                                   );
                                   context.push(
-                                    '/dex/${entry.id}',
+                                    Uri(
+                                      path: '/dex/${entry.id}',
+                                      queryParameters: {
+                                        if (entry.formKey != null)
+                                          'form': entry.formKey!,
+                                      },
+                                    ).toString(),
                                     extra: PokemonDetailTransition(
                                       summary: entry,
                                       detailFuture: detailFuture,
@@ -1162,28 +1133,7 @@ class _DexPageState extends State<DexPage> {
             child: AnimatedOpacity(
               opacity: _showScrollToTop ? 1 : 0,
               duration: const Duration(milliseconds: 180),
-              child: Semantics(
-                button: true,
-                label: '回到图鉴顶部',
-                child: Material(
-                  color: TitoColors.softYellow,
-                  shape: const CircleBorder(
-                    side: BorderSide(color: TitoColors.ink, width: 2),
-                  ),
-                  child: InkWell(
-                    onTap: _scrollToTop,
-                    customBorder: const CircleBorder(),
-                    child: const SizedBox(
-                      width: 44,
-                      height: 44,
-                      child: Icon(
-                        Icons.vertical_align_top_rounded,
-                        color: TitoColors.deepBlue,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              child: _ScrollToTopButton(onTap: _scrollToTop),
             ),
           ),
         ),
@@ -1194,70 +1144,100 @@ class _DexPageState extends State<DexPage> {
   double squareGap(BuildContext context) =>
       DeviceLayout.useSquareDashboard(context) ? 6 : 8;
 
-  void _showReferenceMenu(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.sports_martial_arts_rounded),
-                title: Text(AppZh.dexReferenceMoves),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('/dex/moves');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.auto_awesome_rounded),
-                title: Text(AppZh.dexReferenceAbilities),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('/dex/abilities');
-                },
-              ),
-            ],
+  /// Enough skeleton tiles to fill the viewport (at least two rows, capped so
+  /// an unusually tall window does not build hundreds of placeholders), so a
+  /// slow first load never shows a short stub of six cards above an empty
+  /// page. The list scrolls, so overshooting by a row is harmless.
+  int _skeletonTileCount(
+    BuildContext context, {
+    required double width,
+    required int columns,
+    required double aspectRatio,
+  }) {
+    if (!width.isFinite || width <= 0 || columns <= 0 || aspectRatio <= 0) {
+      return columns * 2;
+    }
+    const spacing = 6.0;
+    final tileWidth = (width - spacing * (columns - 1)) / columns;
+    final rowExtent = tileWidth / aspectRatio + spacing;
+    final viewport = MediaQuery.sizeOf(context).height;
+    final rows = (viewport / rowExtent).ceil().clamp(2, 12);
+    return rows * columns;
+  }
+}
+
+/// Scroll-to-top action. Trainer's Journal / Solid Plastic keep the
+/// soft-yellow sticker disc with a themed stroke; Flat UI uses the stock
+/// small Material FAB so it matches the rest of the Material surface.
+class _ScrollToTopButton extends StatelessWidget {
+  const _ScrollToTopButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  static String get _label => AppZh.dexScrollToTop;
+
+  @override
+  Widget build(BuildContext context) {
+    if (appVisualStyle.usesFlatUi) {
+      return FloatingActionButton.small(
+        heroTag: null,
+        tooltip: _label,
+        onPressed: onTap,
+        child: const Icon(Icons.vertical_align_top_rounded),
+      );
+    }
+    final side = appVisualStyle.usesSolidPlastic
+        ? BorderSide(
+            color: Colors.white.withValues(alpha: 0.8),
+            width: TitoBorders.glass,
+          )
+        : const BorderSide(color: TitoColors.ink, width: TitoBorders.card);
+    return Semantics(
+      button: true,
+      label: _label,
+      child: Material(
+        color: TitoColors.softYellow,
+        shape: CircleBorder(side: side),
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: const SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(
+              Icons.vertical_align_top_rounded,
+              color: TitoColors.deepBlue,
+            ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
 
 class _DexTopBar extends StatelessWidget {
-  const _DexTopBar({required this.onSearch, required this.onReference});
+  const _DexTopBar({required this.onSearch});
 
   final VoidCallback onSearch;
-  final VoidCallback onReference;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: SecondaryPageAppBar(title: AppZh.navDex, showSettings: false),
         ),
         _DexTopBarAction(
           icon: Icons.search_rounded,
-          label: AppZh.navSearch,
+          label: AppZh.dexFilterAction,
           onTap: onSearch,
-        ),
-        const SizedBox(width: 6),
-        _DexTopBarAction(
-          icon: Icons.menu_book_rounded,
-          label: AppZh.dexReferenceTitle,
-          onTap: onReference,
         ),
       ],
     );
   }
 }
 
-/// Shared pill for the dex top bar — one height, padding, and icon size so
-/// 搜索 and 常用资料 read as siblings.
+/// Compact search-and-filter entry for the dex top bar.
 class _DexTopBarAction extends StatelessWidget {
   const _DexTopBarAction({
     required this.icon,
@@ -1278,6 +1258,12 @@ class _DexTopBarAction extends StatelessWidget {
     final shellColor = appVisualStyle.usesFlatUi
         ? scheme.primary
         : TitoColors.card;
+    // Outline pill on the page header: card-weight stroke in the cream
+    // themes, plastic hairline in Solid Plastic (colour stays the shell tint
+    // so the label and icon read as one control).
+    final strokeWidth = appVisualStyle.usesSolidPlastic
+        ? TitoBorders.glass
+        : TitoBorders.card;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,
@@ -1295,7 +1281,7 @@ class _DexTopBarAction extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: radius,
-                border: Border.all(color: shellColor, width: 2),
+                border: Border.all(color: shellColor, width: strokeWidth),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1311,358 +1297,6 @@ class _DexTopBarAction extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DexScopeBar extends StatelessWidget {
-  const _DexScopeBar({
-    required this.mode,
-    required this.browseScope,
-    required this.scopeStats,
-    required this.journeyCount,
-    required this.availabilityLoading,
-    required this.onModeSelected,
-    required this.onNationalRegionPicker,
-  });
-
-  final _DexMode mode;
-  final DexBrowseScope browseScope;
-  final DexScopeStats scopeStats;
-  final int journeyCount;
-  final bool availabilityLoading;
-  final ValueChanged<_DexMode> onModeSelected;
-  final VoidCallback onNationalRegionPicker;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _DexModeTab(
-            selected: mode == _DexMode.national,
-            title: browseScope.titleZh,
-            subtitle: AppZh.dexScopeProgress(
-              scopeStats.caught,
-              scopeStats.seen,
-              scopeStats.total,
-              evolutionOrTrade: availabilityLoading
-                  ? null
-                  : scopeStats.evolutionOrTradeOnly,
-            ),
-            count: scopeStats.total,
-            showRegionPicker: true,
-            regionPickerActive: mode == _DexMode.national,
-            onTap: () => onModeSelected(_DexMode.national),
-            onRegionPickerTap: onNationalRegionPicker,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Expanded(
-          child: _DexModeTab(
-            selected: mode == _DexMode.journey,
-            title: AppZh.dexTabJourney,
-            subtitle: AppZh.teamSubtitle(journeyCount),
-            count: journeyCount,
-            onTap: () => onModeSelected(_DexMode.journey),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DexEncounterFilterBar extends StatelessWidget {
-  const _DexEncounterFilterBar({
-    required this.filter,
-    required this.availabilityLoading,
-    required this.onSelected,
-  });
-
-  final DexEncounterFilter filter;
-  final bool availabilityLoading;
-  final ValueChanged<DexEncounterFilter> onSelected;
-
-  static const _order = [
-    DexEncounterFilter.all,
-    DexEncounterFilter.seen,
-    DexEncounterFilter.caught,
-    DexEncounterFilter.unseen,
-    DexEncounterFilter.evolutionOrTrade,
-  ];
-
-  static const _labels = {
-    DexEncounterFilter.all: AppZh.dexFilterAll,
-    DexEncounterFilter.seen: AppZh.dexFilterSeen,
-    DexEncounterFilter.caught: AppZh.dexFilterCaught,
-    DexEncounterFilter.unseen: AppZh.dexFilterUnseen,
-    DexEncounterFilter.evolutionOrTrade: AppZh.dexFilterEvolutionOrTrade,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final entry in _order) ...[
-          if (entry != _order.first) const SizedBox(width: 5),
-          Expanded(
-            child: _DexFilterChip(
-              label:
-                  availabilityLoading &&
-                      entry == DexEncounterFilter.evolutionOrTrade
-                  ? AppZh.dexFilterCalculating
-                  : _labels[entry]!,
-              selected: filter == entry,
-              onTap: () => onSelected(entry),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _DexModeTab extends StatelessWidget {
-  const _DexModeTab({
-    required this.selected,
-    required this.title,
-    required this.subtitle,
-    required this.count,
-    required this.onTap,
-    this.showRegionPicker = false,
-    this.regionPickerActive = false,
-    this.onRegionPickerTap,
-  });
-
-  final bool selected;
-  final String title;
-  final String subtitle;
-  final int count;
-  final VoidCallback onTap;
-  final bool showRegionPicker;
-  final bool regionPickerActive;
-  final VoidCallback? onRegionPickerTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = DeviceLayout.rMd(context);
-    final square = DeviceLayout.useSquareDashboard(context);
-    final openPicker = showRegionPicker && regionPickerActive && selected;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: selected ? 1 : 0),
-      duration: TitoMotion.duration(context, TitoMotion.fast),
-      curve: Curves.easeOutCubic,
-      builder: (context, selection, _) {
-        return Transform.translate(
-          key: ValueKey<String>('dex-mode-tab-motion-$title'),
-          offset: Offset(0, -1.5 * selection),
-          child: Transform.scale(
-            scale: 1 + 0.015 * selection,
-            child: HandheldFocusDecorator(
-              onActivate: openPicker ? (onRegionPickerTap ?? onTap) : onTap,
-              borderRadius: BorderRadius.circular(radius),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: openPicker ? onRegionPickerTap : onTap,
-                  canRequestFocus: false,
-                  borderRadius: BorderRadius.circular(radius),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      color: Color.lerp(
-                        TitoColors.card,
-                        TitoColors.softYellow,
-                        selection,
-                      ),
-                      borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: square ? 5 : 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: SecondaryTypography.onCard.body14
-                                    .copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            if (openPicker)
-                              const Padding(
-                                padding: EdgeInsets.only(right: 2),
-                                child: Icon(
-                                  Icons.arrow_drop_down_rounded,
-                                  size: 18,
-                                  color: TitoColors.ink,
-                                ),
-                              ),
-                            Text(
-                              '$count',
-                              style: SecondaryTypography.onCard.meta14.copyWith(
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: SecondaryTypography.onCard.meta14.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: TitoColors.mutedInk,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _DexFilterChip extends StatelessWidget {
-  const _DexFilterChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: selected ? 1 : 0),
-      duration: TitoMotion.duration(context, TitoMotion.fast),
-      curve: Curves.easeOutCubic,
-      builder: (context, selection, _) {
-        return Transform.translate(
-          key: ValueKey<String>('dex-filter-chip-motion-$label'),
-          offset: Offset(0, -1.5 * selection),
-          child: Transform.scale(
-            scale: 1 + 0.02 * selection,
-            child: HandheldFocusDecorator(
-              onActivate: onTap,
-              borderRadius: BorderRadius.circular(999),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  canRequestFocus: false,
-                  borderRadius: BorderRadius.circular(999),
-                  child: Ink(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Color.lerp(
-                        TitoColors.card,
-                        TitoColors.softYellow,
-                        selection,
-                      ),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: TitoColors.ink, width: 2),
-                    ),
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.small12.copyWith(
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Entry point for the stackable body style / colour / size filter.
-class _DexSpeciesFilterButton extends StatelessWidget {
-  const _DexSpeciesFilterButton({required this.filter, required this.onTap});
-
-  final DexFilter filter;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = DeviceLayout.rMd(context);
-    final square = DeviceLayout.useSquareDashboard(context);
-    final label = filter.speciesAxesLabelZh;
-    final active = label != null;
-
-    return HandheldFocusDecorator(
-      onActivate: onTap,
-      borderRadius: BorderRadius.circular(radius),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          canRequestFocus: false,
-          borderRadius: BorderRadius.circular(radius),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: active ? TitoColors.softYellow : TitoColors.card,
-              borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: TitoColors.ink, width: 2),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: square ? 6 : 9,
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.tune_rounded, size: 18, color: TitoColors.ink),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label ?? AppZh.dexSpeciesFilterOpen,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Icon(
-                  active
-                      ? Icons.check_circle_rounded
-                      : Icons.chevron_right_rounded,
-                  size: 18,
-                  color: TitoColors.ink,
-                ),
-              ],
             ),
           ),
         ),
