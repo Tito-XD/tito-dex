@@ -12,21 +12,17 @@ import '../features/dex/dex_search_terms.dart';
 import '../features/dex/type_chart.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/journey/ask_titodex_settings.dart';
-import '../pages/dex/dex_json_reference_page.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../theme/device_layout.dart';
-import '../widgets/companion_tools_panel.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/secondary_page_scaffold.dart';
-import '../widgets/sleep_tools_section.dart';
 import '../widgets/sticker_card.dart';
 import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_list_reveal.dart';
@@ -61,7 +57,6 @@ class _SearchPageState extends State<SearchPage> {
   List<PokemonSummary> _results = const [];
   DexProgress _progress = const DexProgress(caughtIds: {}, seenIds: {});
   List<String> _recentQueries = const [];
-  int _hubSegment = 0;
   bool _initialQueryApplied = false;
 
   @override
@@ -205,25 +200,7 @@ class _SearchPageState extends State<SearchPage> {
       child: SecondaryPageScaffold(
         title: AppZh.navSearch,
         subtitle: edition.label,
-        children: [
-          _SearchHubSegmentBar(
-            selected: _hubSegment,
-            onSelected: (index) => setState(() => _hubSegment = index),
-          ),
-          const SizedBox(height: 12),
-          // Numeric keys let the shared fade-through follow segment direction.
-          TitoAnimatedSizeSwitcher(
-            switchKey: ValueKey<int>(_hubSegment),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: switch (_hubSegment) {
-                0 => _searchSegment(context),
-                1 => _referenceSegment(context),
-                _ => _battleSegment(context),
-              },
-            ),
-          ),
-        ],
+        children: _searchSegment(context),
       ),
     );
   }
@@ -283,6 +260,26 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ],
         ),
+      ),
+      const SizedBox(height: 12),
+      Row(
+        children: [
+          Expanded(
+            child: _HubExitTile(
+              title: AppZh.searchHubReference,
+              subtitle: AppZh.searchHubReferenceHint,
+              onTap: () => context.push('/search/reference'),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _HubExitTile(
+              title: AppZh.searchHubBattle,
+              subtitle: AppZh.searchHubBattleHint,
+              onTap: () => context.push('/search/companion'),
+            ),
+          ),
+        ],
       ),
       if (_recentQueries.isNotEmpty) ...[
         const SizedBox(height: 12),
@@ -399,6 +396,8 @@ class _SearchPageState extends State<SearchPage> {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      clipBehavior: Clip.none,
+      padding: const EdgeInsets.only(bottom: 8),
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemCount: _results.length,
       itemBuilder: (context, index) {
@@ -419,104 +418,6 @@ class _SearchPageState extends State<SearchPage> {
         );
       },
     );
-  }
-
-  List<Widget> _referenceSegment(BuildContext context) {
-    return [
-      if (_showAssistant(SearchAssistantDisplayMode.compact)) ...[
-        _assistantCard(prominent: false),
-        const SizedBox(height: 12),
-      ],
-      StickerCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppZh.searchHubDataTitle,
-              style: SecondaryTypography.onCard.h15,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                ActionChip(
-                  onPressed: () => context.push('/dex/moves'),
-                  label: Text(AppZh.dexReferenceMoves),
-                ),
-                ActionChip(
-                  onPressed: () => context.push('/dex/abilities'),
-                  label: Text(AppZh.dexReferenceAbilities),
-                ),
-                ActionChip(
-                  onPressed: () => context.push('/dex/locations'),
-                  label: Text(AppZh.locationDexTitle),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefNatures,
-                    cdnPath: '/v5/natures.json',
-                  ),
-                  label: Text(AppZh.searchRefNatures),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefEggGroups,
-                    cdnPath: '/v5/egg_groups.json',
-                  ),
-                  label: Text(AppZh.searchRefEggGroups),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefItems,
-                    cdnPath: '/v5/items.json',
-                  ),
-                  label: Text(AppZh.searchRefItems),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefWeather,
-                    cdnPath: '/v5/weather.json',
-                  ),
-                  label: Text(AppZh.searchRefWeather),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefTerrains,
-                    cdnPath: '/v5/terrains.json',
-                  ),
-                  label: Text(AppZh.searchRefTerrains),
-                ),
-                ActionChip(
-                  onPressed: () => openDexJsonReference(
-                    context,
-                    title: AppZh.searchRefStatus,
-                    cdnPath: '/v5/status_conditions.json',
-                  ),
-                  label: Text(AppZh.searchRefStatus),
-                ),
-                ActionChip(
-                  onPressed: () => context.push('/dex'),
-                  label: Text(AppZh.searchHubRegionalDex),
-                ),
-                ActionChip(
-                  onPressed: () => context.push('/dex/quiz'),
-                  avatar: const Icon(Icons.help_center_rounded, size: 16),
-                  label: Text(AppZh.quizTitle),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 12),
-      const SleepToolsSection(),
-    ];
   }
 
   bool _showAssistant(SearchAssistantDisplayMode mode) {
@@ -553,140 +454,54 @@ class _SearchPageState extends State<SearchPage> {
       ],
     ),
   );
+}
 
-  List<Widget> _battleSegment(BuildContext context) {
-    return [
-      ListenableBuilder(
-        listenable: gameEditionRepository,
-        builder: (context, _) {
-          final edition = gameEditionRepository.edition;
-          return StickerCard(
+class _HubExitTile extends StatelessWidget {
+  const _HubExitTile({
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(TitoRadii.md);
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: radius,
+      child: StickerPressable(
+        borderRadius: radius,
+        ownShadow: false,
+        child: StickerCard(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(title, style: SecondaryTypography.onCard.h15),
+                const SizedBox(height: 2),
                 Text(
-                  AppZh.searchHubBattleTitle,
-                  style: SecondaryTypography.onCard.h15,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  AppZh.companionToolsSubtitle(edition.label),
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.mutedInk,
+                    color: appVisualStyle.usesFlatUi
+                        ? scheme.onSurfaceVariant
+                        : TitoColors.mutedInk,
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
-      const SizedBox(height: 12),
-      CompanionToolsPanel(journey: widget.journey),
-    ];
-  }
-}
-
-class _SearchHubSegmentBar extends StatelessWidget {
-  const _SearchHubSegmentBar({
-    required this.selected,
-    required this.onSelected,
-  });
-
-  final int selected;
-  final ValueChanged<int> onSelected;
-
-  static List<String> get _labels => [
-    AppZh.searchHubSearch,
-    AppZh.searchHubReference,
-    AppZh.searchHubBattle,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final duration = TitoMotion.duration(context, TitoMotion.fast);
-    final scheme = Theme.of(context).colorScheme;
-    // Single-choice segment: soft-yellow selected (Flat: secondaryContainer).
-    final (
-      Color idle,
-      Color active,
-      BoxBorder? border,
-      Color foreground,
-    ) = appVisualStyle.usesTrainerJournal
-        ? (
-            TitoColors.card,
-            TitoColors.softYellow,
-            Border.all(color: TitoColors.ink, width: TitoBorders.element),
-            TitoColors.ink,
-          )
-        : appVisualStyle.usesSolidPlastic
-        ? (
-            Colors.white.withValues(alpha: 0.75),
-            TitoColors.softYellow.withValues(alpha: 0.9),
-            Border.all(
-              color: Colors.white.withValues(alpha: 0.85),
-              width: TitoBorders.glass,
-            ),
-            TitoColors.ink,
-          )
-        : (
-            scheme.surfaceContainerHighest,
-            scheme.secondaryContainer,
-            null,
-            scheme.onSurface,
-          );
-    final radius = BorderRadius.circular(TitoRadii.sm);
-    return Row(
-      children: List.generate(_labels.length, (index) {
-        final isSelected = index == selected;
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(left: index == 0 ? 0 : 4),
-            child: HandheldFocusDecorator(
-              onActivate: () => onSelected(index),
-              borderRadius: radius,
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(end: isSelected ? 1 : 0),
-                duration: duration,
-                curve: Curves.easeOutCubic,
-                builder: (context, selection, child) {
-                  return Transform.translate(
-                    key: ValueKey<String>('search-segment-motion-$index'),
-                    offset: Offset(0, -selection),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => onSelected(index),
-                        borderRadius: radius,
-                        child: Ink(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Color.lerp(idle, active, selection),
-                            borderRadius: radius,
-                            border: border,
-                          ),
-                          child: child,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                child: Semantics(
-                  selected: isSelected,
-                  button: true,
-                  child: Text(
-                    _labels[index],
-                    textAlign: TextAlign.center,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: foreground,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 }

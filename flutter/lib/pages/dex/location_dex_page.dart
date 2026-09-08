@@ -14,8 +14,10 @@ import '../../models/journey.dart';
 import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
+import '../../widgets/sticker_pressable.dart';
 import '../../widgets/tito_loading_panel.dart';
 
 class LocationDexPage extends StatefulWidget {
@@ -67,6 +69,73 @@ class _LocationDexPageState extends State<LocationDexPage> {
     return SecondaryPageScaffold(
       title: AppZh.locationDexTitle,
       subtitle: gameEditionRepository.edition.label,
+      slivers: [
+        FutureBuilder<_LocationPageData>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData &&
+                snapshot.connectionState != ConnectionState.done) {
+              return SliverToBoxAdapter(
+                child: TitoLoadingPanel(
+                  message: AppZh.referenceLoading,
+                  compact: true,
+                ),
+              );
+            }
+            if (snapshot.hasError || snapshot.data == null) {
+              return SliverToBoxAdapter(
+                child: StickerCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(AppZh.locationDexLoadFailed),
+                      const SizedBox(height: 8),
+                      FilledButton(
+                        onPressed: () => setState(() => _future = _load()),
+                        child: Text(AppZh.dexRetry),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            final data = snapshot.data!;
+            final query = _queryController.text.trim().toLowerCase();
+            final areas = data.areas
+                .where((area) {
+                  if (query.isEmpty ||
+                      area.labelZh.toLowerCase().contains(query)) {
+                    return true;
+                  }
+                  return area.entries.any((entry) {
+                    final summary = data.summaries[entry.speciesId];
+                    return summary?.nameZh.contains(query) == true ||
+                        summary?.nameEn.toLowerCase().contains(query) == true;
+                  });
+                })
+                .toList(growable: false);
+            if (areas.isEmpty) {
+              return SliverToBoxAdapter(
+                child: StickerCard(child: Text(AppZh.locationDexEmpty)),
+              );
+            }
+            return SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 220,
+                mainAxisExtent: 66,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: areas.length,
+              itemBuilder: (context, index) => _LocationAreaChip(
+                area: areas[index],
+                summaries: data.summaries,
+                caughtIds: progress.caughtIds,
+              ),
+            );
+          },
+        ),
+      ],
       children: [
         StickerCard(
           variant: StickerVariant.softYellow,
@@ -89,71 +158,6 @@ class _LocationDexPageState extends State<LocationDexPage> {
           ),
         ),
         const SizedBox(height: 12),
-        FutureBuilder<_LocationPageData>(
-          future: _future,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData &&
-                snapshot.connectionState != ConnectionState.done) {
-              return TitoLoadingPanel(
-                message: AppZh.referenceLoading,
-                compact: true,
-              );
-            }
-            if (snapshot.hasError || snapshot.data == null) {
-              return StickerCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(AppZh.locationDexLoadFailed),
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      onPressed: () => setState(() => _future = _load()),
-                      child: Text(AppZh.dexRetry),
-                    ),
-                  ],
-                ),
-              );
-            }
-            final data = snapshot.data!;
-            final query = _queryController.text.trim().toLowerCase();
-            final areas = data.areas
-                .where((area) {
-                  if (query.isEmpty ||
-                      area.labelZh.toLowerCase().contains(query)) {
-                    return true;
-                  }
-                  return area.entries.any((entry) {
-                    final summary = data.summaries[entry.speciesId];
-                    return summary?.nameZh.contains(query) == true ||
-                        summary?.nameEn.toLowerCase().contains(query) == true;
-                  });
-                })
-                .toList(growable: false);
-            if (areas.isEmpty) {
-              return StickerCard(child: Text(AppZh.locationDexEmpty));
-            }
-            return Column(
-              children: [
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 220,
-                    mainAxisExtent: 66,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: areas.length,
-                  itemBuilder: (context, index) => _LocationAreaChip(
-                    area: areas[index],
-                    summaries: data.summaries,
-                    caughtIds: progress.caughtIds,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
       ],
     );
   }
@@ -307,33 +311,25 @@ class _LocationAreaChip extends StatelessWidget {
                               style: SecondaryTypography.onCard.body14,
                             ),
                           )
-                        : ListView.builder(
+                        : ListView.separated(
                             controller: controller,
-                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
                             itemCount: entries.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final entry = entries[index];
                               final caught = caughtIds.contains(
                                 entry.speciesId,
                               );
-                              return ListTile(
-                                dense: true,
-                                leading: Icon(
-                                  caught
-                                      ? Icons.check_circle_rounded
-                                      : Icons.radio_button_unchecked_rounded,
-                                  color: caught
-                                      ? TitoColors.deepBlue
-                                      : TitoColors.mutedInk,
-                                ),
-                                title: Text(
-                                  summaries[entry.speciesId]?.displayName ??
-                                      '#${entry.speciesId}',
-                                ),
-                                subtitle: Text(_entryDetails(entry)),
-                                trailing: const Icon(
-                                  Icons.chevron_right_rounded,
-                                ),
+                              final summary = summaries[entry.speciesId];
+                              return _EncounterSheetRow(
+                                name:
+                                    summary?.displayName ??
+                                    '#${entry.speciesId}',
+                                spritePath: summary?.displaySpritePath,
+                                details: _entryDetails(entry),
+                                caught: caught,
                                 onTap: () {
                                   Navigator.pop(context);
                                   final route = Uri(
@@ -393,6 +389,77 @@ class _LocationAreaChip extends StatelessWidget {
       tags,
       conditions,
     ].where((value) => value.isNotEmpty).join(' · ');
+  }
+}
+
+class _EncounterSheetRow extends StatelessWidget {
+  const _EncounterSheetRow({
+    required this.name,
+    required this.spritePath,
+    required this.details,
+    required this.caught,
+    required this.onTap,
+  });
+
+  final String name;
+  final String? spritePath;
+  final String details;
+  final bool caught;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(TitoRadii.md);
+    return StickerPressable(
+      borderRadius: radius,
+      ownShadow: false,
+      child: StickerCard(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Row(
+            children: [
+              DexSpriteImage(source: spritePath, height: 40, width: 40),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: SecondaryTypography.onCard.body14.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (details.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        details,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: SecondaryTypography.onCard.small12.copyWith(
+                          color: TitoColors.mutedInk,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(
+                caught
+                    ? Icons.check_circle_rounded
+                    : Icons.chevron_right_rounded,
+                size: 20,
+                color: caught ? TitoColors.deepBlue : TitoColors.mutedInk,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -52,10 +52,25 @@ void main() {
         home: const Scaffold(body: StickerCard(child: Text('x'))),
       ),
     );
-    expect(cardMaterial().elevation, 1);
+    expect(cardMaterial().elevation, 0);
     expect(
       (cardMaterial().shape! as RoundedRectangleBorder).side,
       BorderSide.none,
+    );
+    expect(
+      tester
+          .widget<DecoratedBox>(
+            find.descendant(
+              of: find.byType(StickerCard),
+              matching: find.byType(DecoratedBox),
+            ),
+          )
+          .decoration,
+      isA<BoxDecoration>().having(
+        (decoration) => decoration.boxShadow,
+        'boxShadow',
+        TitoShadows.sticker,
+      ),
     );
 
     await retroStyle.setEnabled(false);

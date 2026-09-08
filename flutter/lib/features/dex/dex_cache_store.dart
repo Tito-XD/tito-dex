@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'dex_catalog.dart';
 import 'dex_models.dart';
+import 'dex_json_decode.dart';
 import 'type_chart.dart';
 
 class DexCachePaths {
@@ -56,12 +57,16 @@ class DexCachePaths {
 }
 
 class DexCacheStore {
-  DexCacheStore({DexCachePaths? paths})
-    : _pathsFuture = paths != null
-          ? Future.value(paths)
-          : DexCachePaths.resolve();
+  DexCacheStore({DexCachePaths? paths}) : _providedPaths = paths;
 
-  final Future<DexCachePaths> _pathsFuture;
+  // Constructing a repository must not start platform I/O (pure lookups and
+  // unopened tools may never use the offline store).
+  final DexCachePaths? _providedPaths;
+  late final Future<DexCachePaths> _pathsFuture = _providedPaths != null
+      ? Future.value(_providedPaths)
+      : DexCachePaths.resolve();
+  (DateTime, int)? _movesStamp;
+  Future<Map<int, CachedMove>>? _movesRead;
 
   Future<DexCacheManifest> readManifest() async {
     final paths = await _pathsFuture;
@@ -98,7 +103,8 @@ class DexCacheStore {
     if (!await file.exists()) {
       return const [];
     }
-    final list = jsonDecode(await file.readAsString()) as List<dynamic>;
+    final list =
+        await decodeDexJson(await file.readAsString()) as List<dynamic>;
     return list
         .map((item) => PokemonSummary.fromJson(item as Map<String, dynamic>))
         .toList();
@@ -214,15 +220,38 @@ class DexCacheStore {
     await paths.movesFile.writeAsString(
       const JsonEncoder.withIndent('  ').convert(payload),
     );
+    _movesRead = null;
+    _movesStamp = null;
   }
 
   Future<Map<int, CachedMove>> readMoves() async {
     final paths = await _pathsFuture;
     final file = paths.movesFile;
-    if (!await file.exists()) {
+    final stat = await file.stat();
+    if (stat.type != FileSystemEntityType.file) {
+      _movesRead = null;
+      _movesStamp = null;
       return {};
     }
-    final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    final stamp = (stat.modified, stat.size);
+    if (_movesStamp == stamp && _movesRead != null) return _movesRead!;
+    _movesStamp = stamp;
+    final pending = _decodeMovesFile(file);
+    _movesRead = pending;
+    try {
+      return await pending;
+    } catch (_) {
+      if (identical(_movesRead, pending)) {
+        _movesRead = null;
+        _movesStamp = null;
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<int, CachedMove>> _decodeMovesFile(File file) async {
+    final json =
+        await decodeDexJson(await file.readAsString()) as Map<String, dynamic>;
     final moves = <int, CachedMove>{};
     for (final entry in json.entries) {
       final id = int.tryParse(entry.key);
@@ -236,12 +265,7 @@ class DexCacheStore {
 
   /// Read CDN reference indices bundled offline (natures, weather, items, …).
   Future<List<Map<String, dynamic>>> readJsonArray(String filename) async {
-    final paths = await _pathsFuture;
-    final file = paths.jsonFile(filename);
-    if (!await file.exists()) {
-      return const [];
-    }
-    final decoded = jsonDecode(await file.readAsString());
+    final decoded = await readReferenceJson(filename);
     if (decoded is! List) {
       return const [];
     }
@@ -253,16 +277,22 @@ class DexCacheStore {
 
   /// Read object-shaped CDN indices (items.json, moves.json, …).
   Future<Map<String, dynamic>> readJsonObject(String filename) async {
-    final paths = await _pathsFuture;
-    final file = paths.jsonFile(filename);
-    if (!await file.exists()) {
-      return const {};
-    }
-    final decoded = jsonDecode(await file.readAsString());
+    final decoded = await readReferenceJson(filename);
     if (decoded is! Map) {
       return const {};
     }
     return Map<String, dynamic>.from(decoded);
+  }
+
+  /// Read once before inspecting the shape; items are object-shaped even when
+  /// the caller needs a list, so array-first probing would decode them twice.
+  Future<dynamic> readReferenceJson(String filename) async {
+    final paths = await _pathsFuture;
+    final file = paths.jsonFile(filename);
+    if (!await file.exists()) {
+      return null;
+    }
+    return decodeDexJson(await file.readAsString());
   }
 
   Future<Map<int, CachedAbility>> readAbilities() async {
@@ -298,7 +328,8 @@ class DexCacheStore {
       return null;
     }
     final moves = await readMoves();
-    final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+    final json =
+        await decodeDexJson(await file.readAsString()) as Map<String, dynamic>;
     return PokemonDetail.fromJson(json, moveLookup: moves);
   }
 
@@ -482,6 +513,8 @@ class DexCacheStore {
   }
 
   Future<void> clearAll() async {
+    _movesRead = null;
+    _movesStamp = null;
     final paths = await _pathsFuture;
     if (await paths.root.exists()) {
       await paths.root.delete(recursive: true);

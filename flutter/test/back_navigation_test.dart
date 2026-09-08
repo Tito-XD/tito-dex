@@ -22,6 +22,8 @@ void main() {
       TitoBackNavigation.parentPath('/search/companion/type-matchup'),
       '/search',
     );
+    expect(TitoBackNavigation.parentPath('/search/companion'), '/search');
+    expect(TitoBackNavigation.parentPath('/search/reference'), '/search');
     expect(TitoBackNavigation.parentPath('/search/reference/json'), '/search');
     expect(TitoBackNavigation.parentPath('/search/sleep-tools'), '/search');
     expect(TitoBackNavigation.parentPath('/journey/ask'), '/journey');

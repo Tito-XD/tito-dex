@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import '../l10n/app_zh.dart';
 import '../theme/tito_colors.dart';
 
-/// A pale white silhouette spins in place with a soft shimmer, letting the
+/// A pale white silhouette spins in place with constant colour, letting the
 /// surrounding type tint show through.
 ///
 /// On cream / white surfaces the white silhouette vanishes; pass
-/// [onLight] (or an explicit [inkColor]) to draw a dark ink silhouette.
+/// [onLight] to add a faint outline without changing the white fill.
 class TitoPokeballLoading extends StatefulWidget {
   const TitoPokeballLoading({
     super.key,
@@ -20,10 +20,10 @@ class TitoPokeballLoading extends StatefulWidget {
 
   final double size;
 
-  /// Silhouette colour. Defaults to white (or ink when [onLight] is set).
+  /// Silhouette colour. Defaults to pale white.
   final Color? inkColor;
 
-  /// Render the dark variant for cream / white cards.
+  /// Add a faint outline for cream / white cards.
   final bool onLight;
 
   @override
@@ -57,8 +57,7 @@ class _TitoPokeballLoadingState extends State<TitoPokeballLoading>
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        widget.inkColor ?? (widget.onLight ? TitoColors.ink : Colors.white);
+    final color = widget.inkColor ?? Colors.white.withValues(alpha: .8);
     return Semantics(
       label: AppZh.loadingSemantics,
       child: SizedBox(
@@ -66,16 +65,16 @@ class _TitoPokeballLoadingState extends State<TitoPokeballLoading>
         height: widget.size,
         child: AnimatedBuilder(
           animation: _controller,
+          child: RepaintBoundary(
+            child: CustomPaint(
+              size: Size.square(widget.size),
+              painter: _PokeballPainter(color, widget.onLight),
+            ),
+          ),
           builder: (context, child) {
             final t = _controller.value;
             return Center(
-              child: Transform.rotate(
-                angle: t * 2 * math.pi,
-                child: CustomPaint(
-                  size: Size.square(widget.size),
-                  painter: _PokeballShimmerPainter(t, color),
-                ),
-              ),
+              child: Transform.rotate(angle: t * 2 * math.pi, child: child),
             );
           },
         ),
@@ -84,14 +83,14 @@ class _TitoPokeballLoadingState extends State<TitoPokeballLoading>
   }
 }
 
-class _PokeballShimmerPainter extends CustomPainter {
-  const _PokeballShimmerPainter(this.phase, this.color);
-  final double phase;
+class _PokeballPainter extends CustomPainter {
+  const _PokeballPainter(this.color, this.onLight);
   final Color color;
+  final bool onLight;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
+    final rect = (Offset.zero & size).deflate(.5);
     final center = rect.center;
     final radius = size.width / 2;
     final body = Path()..addOval(rect);
@@ -108,22 +107,19 @@ class _PokeballShimmerPainter extends CustomPainter {
       ..addOval(Rect.fromCircle(center: center, radius: radius * .43));
     final silhouette = Path.combine(PathOperation.difference, halves, ring)
       ..addOval(Rect.fromCircle(center: center, radius: radius * .27));
-    final highlight = math.sin(phase * 2 * math.pi);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment(highlight - 1, -.4),
-        end: Alignment(highlight + 1, .4),
-        colors: [
-          color.withValues(alpha: 0.4),
-          color.withValues(alpha: 0.8),
-          color.withValues(alpha: 0.4),
-        ],
-        stops: const [0, .5, 1],
-      ).createShader(rect);
-    canvas.drawPath(silhouette, paint);
+    canvas.drawPath(silhouette, Paint()..color = color);
+    if (onLight) {
+      canvas.drawPath(
+        silhouette,
+        Paint()
+          ..color = TitoColors.ink.withValues(alpha: .25)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = .8,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(_PokeballShimmerPainter oldDelegate) =>
-      oldDelegate.phase != phase || oldDelegate.color != color;
+  bool shouldRepaint(_PokeballPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.onLight != onLight;
 }

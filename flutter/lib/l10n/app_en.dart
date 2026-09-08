@@ -83,7 +83,8 @@ const kAppEn = <String, String>{
   'askTitoDexRouteLocal': 'Reviewed data · local answer',
   'askTitoDexRouteAuditedOnline': 'Reviewed data · Qwen online match',
   'askTitoDexRouteAiSearch': 'R2 AI Search · Qwen match',
-  'askTitoDexRouteCuratedDeterministic': 'Curated sources · deterministic extract',
+  'askTitoDexRouteCuratedDeterministic':
+      'Curated sources · deterministic extract',
   'askTitoDexRouteCuratedQwen': 'Curated sources · Qwen write-up',
   'askTitoDexTraceNoModel': 'Qwen was not called this time',
   'askTitoDexTraceModel': 'Qwen took part',
@@ -102,13 +103,16 @@ const kAppEn = <String, String>{
   'askTitoDexEvidenceVerified': 'Verified · {count} sources cited',
   'askTitoDexEvidenceLowConfidence': 'Low confidence · {count} sources cited',
   'askTitoDexEvidenceLocalVerified': 'Local data verified',
-  'askTitoDexEvidenceUnverified': 'Low confidence · no expandable citations yet',
+  'askTitoDexEvidenceUnverified':
+      'Low confidence · no expandable citations yet',
   'askTitoDexSourceSheetTitle': 'Answer citations',
   'askTitoDexSourceSheetHint':
       'These pages were used to write or verify this answer. Tap to open the original link.',
-  'askTitoDexSourceLinkUnavailable': 'This citation link cannot be opened right now.',
+  'askTitoDexSourceLinkUnavailable':
+      'This citation link cannot be opened right now.',
   'askTitoDexSourceLinkInvalid': 'Link unavailable',
-  'askTitoDexNeedsClarification': 'Please add the game version or a specific location.',
+  'askTitoDexNeedsClarification':
+      'Please add the game version or a specific location.',
   'askTitoDexTimeout':
       'Online write-up timed out. Your journey and save were not touched — you can try again.',
   'askTitoDexNetworkFailed':
@@ -135,7 +139,8 @@ const kAppEn = <String, String>{
       'This build has no extension catalog configured. Offline features still work.',
   'extensionInstallStarted':
       'Handed to Android — confirm the install on the system page',
-  'extensionInstallFailed': 'The extension install could not start. Please try again later.',
+  'extensionInstallFailed':
+      'The extension install could not start. Please try again later.',
   'extensionInstalled': 'Installed',
   'extensionEnabled': 'Enable Ask TitoDex assistant',
   'extensionUninstall': 'Uninstall extension',
@@ -151,7 +156,8 @@ const kAppEn = <String, String>{
   'emulatorContinueHint': 'Continue from emulator',
   'partySaveDiffBanner': 'Different from the latest save · tap to sync',
   'partySaveDiffDismiss': 'Don’t remind me about this difference',
-  'partySaveSyncConfirm': 'Overwrite your current party edits with the save party?',
+  'partySaveSyncConfirm':
+      'Overwrite your current party edits with the save party?',
   'settingsChangeAvatar': 'Change avatar',
   'settingsJourneyReadOnly': 'Journey info (from save)',
   'settingsTrainerId': 'Trainer ID',
@@ -170,7 +176,8 @@ const kAppEn = <String, String>{
   'sleepToolsTierAHint':
       'Built-in offline calculator, plus a Neroli’s Lab reference link',
   'sleepToolsOpen': 'Open sleep & cooking calculator',
-  'sleepToolsOpenHint': 'Sleep score · ingredient base energy · recipe level bonus',
+  'sleepToolsOpenHint':
+      'Sleep score · ingredient base energy · recipe level bonus',
   'sleepToolsSubtitle':
       'Offline mini-tools · does not read your Pokémon Sleep account or records',
   'sleepScoreTitle': 'Sleep score',
@@ -191,8 +198,7 @@ const kAppEn = <String, String>{
   'sleepRecipeEnergy': 'Normal dish energy · {value}',
   'sleepRecipeBreakdown':
       'Ingredients {base} × level {level} × inherent bonus {bonus}%',
-  'sleepRecipeCrit':
-      'Big success: weekday 2× {weekday} · Sunday 3× {sunday}',
+  'sleepRecipeCrit': 'Big success: weekday 2× {weekday} · Sunday 3× {sunday}',
   'sleepSourceTitle': 'Formulas & scope',
   'sleepSourceBody':
       'Sleep score, 19 ingredient base energies, recipe multipliers for levels 1–70, and the cooking formula are ported from Neroli’s Lab pinned commit cb533f2, used under Apache-2.0 with full credit on the App licenses page. Chinese ingredient names follow 52Poké Wiki. For full team building, ingredient production, and long-term simulation, please use Neroli’s Lab.',
@@ -319,16 +325,20 @@ const kAppEn = <String, String>{
   'dexObtainExactVersion': 'Exact version',
   'dexObtainCombinedVersions': 'Versions combined',
   'dexWildHeldItems': 'Wild held items',
-  'dexWildHeldItemsHint': 'Rates are shown separately for the selected version.',
+  'dexWildHeldItemsHint':
+      'Rates are shown separately for the selected version.',
   'dexChainPlanningTitle': 'Complete this line in this version',
   'dexChainPlanningPickVersion':
       'Pick an exact version to see whether this evolution line can be finished in one game.',
   'dexChainPlanningLoading': 'Sorting how this evolution line is obtained…',
   'dexChainPlanningUnavailable':
       'Version data for this evolution line cannot be read right now.',
-  'dexChainSelfContained': '{version} can finish this evolution line on its own',
-  'dexChainTradeRequired': 'A link trade is needed to finish this evolution line',
-  'dexChainUnavailable': '{version} cannot finish this evolution line on its own',
+  'dexChainSelfContained':
+      '{version} can finish this evolution line on its own',
+  'dexChainTradeRequired':
+      'A link trade is needed to finish this evolution line',
+  'dexChainUnavailable':
+      '{version} cannot finish this evolution line on its own',
   'dexChainMethodCatch': 'Catch directly',
   'dexChainMethodEvolve': 'Obtain by evolution',
   'dexChainMethodTrade': 'Needs a link trade',
@@ -371,7 +381,8 @@ const kAppEn = <String, String>{
   'dexNoEvolution': 'No evolution chain on record.',
   'dexMovesHgssScope': 'Move scope below: HeartGold / SoulSilver',
   'dexMovesScope': 'Move scope below: {gameLabel}',
-  'dexDataFallbackNote': 'This game has no data here; showing {gameLabel} instead',
+  'dexDataFallbackNote':
+      'This game has no data here; showing {gameLabel} instead',
   'dexFormDataInherited':
       'This form has no separate data; the default form is used below.',
   'dexFormDataPartial':
@@ -386,7 +397,8 @@ const kAppEn = <String, String>{
   'dexReferenceDataMissing':
       'This entry is not in the current data pack. Update the pack and try again.',
   'dexReferenceUnavailableInGame': 'Unavailable in this version',
-  'dexReferenceScopeUnknown': 'This version’s reference scope is not confirmed yet',
+  'dexReferenceScopeUnknown':
+      'This version’s reference scope is not confirmed yet',
   'dexReferenceNoDescription': 'No ability description yet.',
   'dexReferenceFindPokemon': 'Find Pokémon with this',
   'dexReferenceMoveMeta':
@@ -439,7 +451,8 @@ const kAppEn = <String, String>{
       'Partial cache {pokemonCount} / 1025 — tap Resume download to finish',
   'settingsDexVerify': 'Verify offline data',
   'settingsDexVerifyRunning': 'Verifying…',
-  'settingsDexVerifyNoData': 'No offline pack is installed, so there is nothing to verify.',
+  'settingsDexVerifyNoData':
+      'No offline pack is installed, so there is nothing to verify.',
   'settingsDexVerifyOk':
       'Verified: offline data is complete for {pokemonCount} Pokémon.',
   'settingsDexVerifyProblems':
@@ -472,8 +485,7 @@ const kAppEn = <String, String>{
   'dexDownloadNotificationDoneBody':
       'The full Pokédex and library are ready to use offline',
   'dexDownloadNotificationPartialTitle': 'Offline pack is partly ready',
-  'dexDownloadNotificationPartialBody':
-      'Return to TitoDex to finish the rest',
+  'dexDownloadNotificationPartialBody': 'Return to TitoDex to finish the rest',
   'dexDownloadNotificationFailedTitle': 'Offline pack failed',
   'dexDownloadNotificationFailedBody': 'Return to TitoDex to download again',
   'settingsDexOfflineDownloadPokeApi': 'Download from PokeAPI (fallback)',
@@ -509,15 +521,17 @@ const kAppEn = <String, String>{
   'dexFlavorZhReference': 'Chinese reference · from {source}:',
   'searchTrending': 'Popular searches',
   'searchNoResults': 'No matching Pokémon.',
-  'searchHubSearch': 'Search',
   'searchHubReference': 'Quick reference',
   'searchHubBattle': 'Battle notes',
-  'searchHubGuideTitle': 'Guides',
   'searchHubDataTitle': 'Reference lists',
-  'searchHubBattleTitle': 'Battle tools',
-  'searchHubBreedTitle': 'Breeding tools',
-  'searchHubOnlineTitle': 'Online resources',
   'searchHubRegionalDex': 'Regional dexes',
+  'searchHubReferenceHint': 'Moves, items, abilities, and Sleep',
+  'searchHubBattleHint': 'Matchup, stats, and damage estimates',
+  'battleCalcTitle': 'Battle calc',
+  'battleCalcModeMatchup': 'Matchup',
+  'battleCalcModeStats': 'Stats',
+  'battleCalcModeDamage': 'Damage',
+  'battleCalcModeBlind': 'Blind',
   'searchRefNatures': 'Natures',
   'searchRefEggGroups': 'Egg groups',
   'searchRefItems': 'Items',
@@ -559,7 +573,8 @@ const kAppEn = <String, String>{
   'settingsGroupAdvancedHint':
       'Built-in save import, journey JSON import/export, and reset',
   'settingsCategoryProfile': 'Game & trainer',
-  'settingsCategoryProfileHint': 'Game version, avatar, display name, and journey status',
+  'settingsCategoryProfileHint':
+      'Game version, avatar, display name, and journey status',
   'settingsCategoryAssistant': 'Assistant & extensions',
   'settingsCategoryAssistantHint':
       'Journey assistant, online Q&A, and Search placement',
@@ -608,17 +623,8 @@ const kAppEn = <String, String>{
   'quizBestStreak': 'Best streak {streak}',
   'quizAdoptCompanion': 'Set as companion',
   'quizAdopted': '{name} is traveling with you now!',
-  'companionToolsTitle': 'Battle helper',
-  'companionToolsSubtitle': 'Following the current game: {gameTitle}',
-  'companionToolsFacility': 'Reference scene: {facility}',
-  'companionToolDex': 'Open Pokédex',
-  'companionToolDexHint': 'Base stats, types, moves, and matchups',
   'companionToolTypeMatchup': 'Type matchup lookup',
-  'companionToolTypeMatchupHint': 'Pick the defender’s types to see weaknesses and resists',
   'companionToolStatCalc': 'Stat calculator',
-  'companionToolStatCalcHint': 'Level, IVs, EVs, and nature → actual stats',
-  'companionToolQuickDamageHint':
-      'Can you KO / can you live? ({facility} reference)',
   'companionToolQuickDamage': 'Quick damage',
   'companionPokemonSearchHint': 'Search Pokémon…',
   'companionLinkedTypes': 'Type',
@@ -630,7 +636,8 @@ const kAppEn = <String, String>{
   'companionDefenderAbilityPick': 'Defender ability (affects type resists)',
   'companionAttackerAbilityPick':
       'Attacker ability (breaks immunities / skins / Huge Power, etc.)',
-  'companionManualAbilityPick': 'Pick an ability by hand (when no Pokémon is searched)',
+  'companionManualAbilityPick':
+      'Pick an ability by hand (when no Pokémon is searched)',
   'companionWeatherPick': 'Weather',
   'companionTerrainPick': 'Terrain',
   'companionTerastalToggle': 'Terastallize',
@@ -642,7 +649,6 @@ const kAppEn = <String, String>{
   'companionStatusPick': 'Status (attacker)',
   'companionContactMove': 'Contact move (Fluffy, etc.)',
   'companionToolBlindSpot': 'Offense / coverage holes',
-  'companionToolBlindSpotHint': 'Who your STABs cannot hit, and who hits you',
   'companionOffensiveBlindSpots': 'Offensive holes',
   'companionDefensiveBlindSpots': 'Defensive holes',
   'companionGenerationTypeNote':
@@ -661,7 +667,8 @@ const kAppEn = <String, String>{
       'Estimates one hit of a fixed-power move; fixed damage, multi-hit, variable power, and move-specific effects are not modeled. '
       'Unlisted abilities, items, and field details are omitted. Results are for the journey, not a full simulator.',
   'companionStatInputsTitle': 'Inputs',
-  'companionStatFacilityNote': 'Default level follows common {facility} sets (Lv.50)',
+  'companionStatFacilityNote':
+      'Default level follows common {facility} sets (Lv.50)',
   'companionStatBase': 'Base stat',
   'companionStatLevel': 'Level',
   'companionStatIv': 'IV',
@@ -685,8 +692,7 @@ const kAppEn = <String, String>{
   'companionDamagePercent': 'About {min}% ~ {max}% of HP',
   'companionDamageOffense': 'Offense',
   'companionDamageDefense': 'Defense',
-  'companionDamageModifiers':
-      'Type ×{type} · STAB ×{stab} · roll 85%–100%',
+  'companionDamageModifiers': 'Type ×{type} · STAB ×{stab} · roll 85%–100%',
   'recentTimeline': 'Recent activity',
   'nextPrefix': 'Next:',
   'journeyTimelineEmpty': 'No journey notes yet',
@@ -822,8 +828,10 @@ const kAppEn = <String, String>{
   'journeyPackErrorTimeout': 'Connection timed out. Please try again later.',
   'journeyPackErrorInvalid':
       'Pack verification failed. The previous pack was not replaced.',
-  'journeyPackErrorBundleIncompatible': 'Update the Pokédex data version first.',
-  'journeyPackErrorDisabled': 'Enable the Ask TitoDex assistant in Settings first.',
+  'journeyPackErrorBundleIncompatible':
+      'Update the Pokédex data version first.',
+  'journeyPackErrorDisabled':
+      'Enable the Ask TitoDex assistant in Settings first.',
   'journeyPackErrorGeneric': 'That did not finish. Please try again later.',
   'mediaResourceTitle': 'Media library',
   'mediaResourceCachedTitle': 'Cached media',
@@ -1020,8 +1028,7 @@ const kAppEn = <String, String>{
   'itemPriceSell': 'Sell {amount}',
   'referenceAvailabilityPending':
       '{game} · Availability and shop prices still pending',
-  'referenceAvailableNotShop':
-      '{game} · Available, not a regular shop price',
+  'referenceAvailableNotShop': '{game} · Available, not a regular shop price',
   'teamPickMovesTitle': 'Choose moves',
   'teamPickMovesCount': 'Choose moves · {count}/4',
   'teamSearchMovesHint': 'Search a move name or number',
@@ -1033,6 +1040,9 @@ const kAppEn = <String, String>{
       'Abilities and moves from the save are filled in automatically. Tap a manual teammate above to add the rest.',
   'teamAssistEmpty': 'Add party members to see helper details',
   'teamAssistTapToFill': 'Tap a member to add moves and an ability',
+  'teamInspectorHint':
+      'Tap a slot to see evolution and moves, then Edit to fill in the rest',
+  'teamEditAction': 'Edit',
   'teamToQuickDamage': 'Send to quick damage',
   'teamMovePpBoost': 'PP Ups {count}',
   'teamNatureFact': '{nature} nature',
@@ -1080,8 +1090,7 @@ const kAppEn = <String, String>{
   'askTitoDexHistoryCount': 'Q&A {count}/{limit}',
   'askTitoDexHistoryCountSemantics':
       'Q&A history {count}/{limit}, tap to manage',
-  'askTitoDexEditionSemantics':
-      'Current game version {edition}, tap to change',
+  'askTitoDexEditionSemantics': 'Current game version {edition}, tap to change',
   'askTitoDexSaveBadgeCount': 'Save badges: {count} (count only)',
   'askTitoDexConnectionDialogTitle':
       'Connection · {enabled}/{total}\nQ&A history · {history}/{limit}',
@@ -1141,18 +1150,27 @@ const kAppEn = <String, String>{
       'Ask about routes and catch locations, or what matters most at the start.',
   'askTitoDexLocalMsg1': '{name} is rummaging through the berry pouch…',
   'askTitoDexLocalMsg2': '{name} is following footprints to a reliable answer…',
-  'askTitoDexLocalMsg3': '{name} is checking the version so you do not take the wrong map…',
+  'askTitoDexLocalMsg3':
+      '{name} is checking the version so you do not take the wrong map…',
   'askTitoDexLocalMsg4': '{name} is lining the data cards up neatly…',
   'askTitoDexLocalMsg5': '{name} used Foresight on the notes…',
   'askTitoDexWorkerMsg1': '{name} is waiting for the Rotom line to call back…',
-  'askTitoDexWorkerMsg2': '{name} is waiting for the index or model to take this question…',
+  'askTitoDexWorkerMsg2':
+      '{name} is waiting for the index or model to take this question…',
   'askTitoDexWorkerMsg3': '{name} is asking the library and online sources…',
-  'askTitoDexWorkerMsg4': '{name} is checking that the answer fits this version…',
-  'askTitoDexResolvingMsg1': '{name} is matching your wording to in-game objects…',
-  'askTitoDexResolvingMsg2': '{name} is checking the version so generations stay separate…',
-  'askTitoDexVerifyingMsg1': '{name} is letting structured data and encyclopedias vouch for each other…',
-  'askTitoDexVerifyingMsg2': '{name} is checking that locations, numbers, and versions agree…',
-  'askTitoDexRevealingMsg1': '{name} is turning verified clues into a readable answer…',
-  'askTitoDexRevealingMsg2': '{name} is packing the citations before handing the answer over…',
+  'askTitoDexWorkerMsg4':
+      '{name} is checking that the answer fits this version…',
+  'askTitoDexResolvingMsg1':
+      '{name} is matching your wording to in-game objects…',
+  'askTitoDexResolvingMsg2':
+      '{name} is checking the version so generations stay separate…',
+  'askTitoDexVerifyingMsg1':
+      '{name} is letting structured data and encyclopedias vouch for each other…',
+  'askTitoDexVerifyingMsg2':
+      '{name} is checking that locations, numbers, and versions agree…',
+  'askTitoDexRevealingMsg1':
+      '{name} is turning verified clues into a readable answer…',
+  'askTitoDexRevealingMsg2':
+      '{name} is packing the citations before handing the answer over…',
   'askTitoDexViewCitations': '{label}, view citations',
 };

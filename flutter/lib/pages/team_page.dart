@@ -116,6 +116,12 @@ class _TeamPageState extends State<TeamPage> {
     if (oldWidget.journey != widget.journey) {
       _party = List<PartyMember>.from(widget.journey.party);
       _partyDetailsFuture = _loadPartyDetails(_party);
+      if (_selectedIndex != null && _selectedIndex! >= _party.length) {
+        _selectedIndex = _party.isEmpty ? null : _party.length - 1;
+      }
+      if (_editingIndex != null && _editingIndex! >= _party.length) {
+        _editingIndex = null;
+      }
     }
   }
 
@@ -160,12 +166,21 @@ class _TeamPageState extends State<TeamPage> {
     );
   }
 
-  /// v0.6.7: the member editor expands inline at the tapped slot (team
-  /// template) instead of a modal bottom sheet — context stays visible.
+  /// First tap selects a slot; Edit in the inspector opens the inline editor.
+  int? _selectedIndex;
   int? _editingIndex;
 
-  void _toggleEditor(int index) {
-    setState(() => _editingIndex = _editingIndex == index ? null : index);
+  void _selectMember(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _editingIndex = null;
+    });
+  }
+
+  void _openEditor() {
+    final index = _selectedIndex;
+    if (index == null || index >= _party.length) return;
+    setState(() => _editingIndex = index);
   }
 
   void _handleEditorSave(
@@ -195,6 +210,9 @@ class _TeamPageState extends State<TeamPage> {
   void _handleEditorDelete(int index) {
     final updated = List<PartyMember>.from(_party)..removeAt(index);
     _editingIndex = null;
+    _selectedIndex = updated.isEmpty
+        ? null
+        : index.clamp(0, updated.length - 1);
     _saveParty(updated);
   }
 
@@ -209,6 +227,7 @@ class _TeamPageState extends State<TeamPage> {
     updated[index] = temp;
     // Keep the editor open on the moved member so repeat swaps are easy.
     _editingIndex = target;
+    _selectedIndex = target;
     _saveParty(updated);
   }
 
@@ -240,7 +259,10 @@ class _TeamPageState extends State<TeamPage> {
       if (!mounted) {
         return;
       }
-      _saveParty([..._party, member]);
+      final next = [..._party, member];
+      _selectedIndex = next.length - 1;
+      _editingIndex = null;
+      _saveParty(next);
     } catch (_) {
       if (!mounted) {
         return;
@@ -319,27 +341,33 @@ class _TeamPageState extends State<TeamPage> {
         const SizedBox(height: 14),
         TeamSummaryCard(party: _party, detailsFuture: _partyDetailsFuture),
         const SizedBox(height: 14),
-        PartyTeamList(
+        PartyTeamBoard(
           party: _party,
           detailsFuture: _partyDetailsFuture,
-          showEmptySlots: true,
-          onMemberTap: _toggleEditor,
+          selectedIndex: _selectedIndex,
+          onSelect: _selectMember,
           onEmptySlotTap: _party.length < 6 ? _addMember : null,
-          expandedIndex: _editingIndex,
-          editorBuilder: (context, index) => _InlineTeamEditor(
-            key: ValueKey('team-editor-$index'),
-            member: _party[index],
-            index: index,
-            canSwapPrev: index > 0,
-            canSwapNext: index < _party.length - 1,
+        ),
+        const SizedBox(height: 14),
+        if (_editingIndex != null)
+          _InlineTeamEditor(
+            key: ValueKey('team-editor-$_editingIndex'),
+            member: _party[_editingIndex!],
+            index: _editingIndex!,
+            canSwapPrev: _editingIndex! > 0,
+            canSwapNext: _editingIndex! < _party.length - 1,
             onSave: _handleEditorSave,
             onDelete: _handleEditorDelete,
             onSwap: _handleEditorSwap,
             onClose: () => setState(() => _editingIndex = null),
+          )
+        else
+          _TeamAssistCard(
+            party: _party,
+            detailsFuture: _partyDetailsFuture,
+            selectedIndex: _selectedIndex,
+            onEdit: _openEditor,
           ),
-        ),
-        const SizedBox(height: 14),
-        _TeamAssistCard(party: _party, detailsFuture: _partyDetailsFuture),
         const SizedBox(height: 14),
         StickerCard(
           variant: StickerVariant.cream,
@@ -753,10 +781,17 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
 }
 
 class _TeamAssistCard extends StatefulWidget {
-  const _TeamAssistCard({required this.party, required this.detailsFuture});
+  const _TeamAssistCard({
+    required this.party,
+    required this.detailsFuture,
+    required this.selectedIndex,
+    this.onEdit,
+  });
 
   final List<PartyMember> party;
   final Future<Map<int, PokemonDetail>> detailsFuture;
+  final int? selectedIndex;
+  final VoidCallback? onEdit;
 
   @override
   State<_TeamAssistCard> createState() => _TeamAssistCardState();
@@ -815,6 +850,7 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
       result.add(
         _TeamAssistEntry(
           member: member,
+          spritePath: detail?.summary.displaySpritePath,
           moves: [
             for (final moveId in member.moveIds)
               if (moves[moveId] != null) moves[moveId]!,
@@ -848,10 +884,25 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(AppZh.teamAssistTitle, style: SecondaryTypography.onCard.h15),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  AppZh.teamAssistTitle,
+                  style: SecondaryTypography.onCard.h15,
+                ),
+              ),
+              if (widget.selectedIndex != null &&
+                  widget.selectedIndex! < widget.party.length)
+                FilledButton.tonal(
+                  onPressed: widget.onEdit,
+                  child: Text(AppZh.teamEditAction),
+                ),
+            ],
+          ),
           const SizedBox(height: 4),
           Text(
-            AppZh.teamAssistHint,
+            AppZh.teamInspectorHint,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: TitoColors.mutedInk,
             ),
@@ -868,99 +919,122 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                 );
               }
               if (entries.isEmpty) return Text(AppZh.teamAssistEmpty);
+              final index = widget.selectedIndex;
+              if (index == null || index < 0 || index >= entries.length) {
+                return const SizedBox.shrink();
+              }
+              final entry = entries[index];
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final entry in entries)
-                    ExpansionTile(
-                      tilePadding: EdgeInsets.zero,
-                      childrenPadding: const EdgeInsets.only(bottom: 10),
-                      title: Text(
-                        entry.member.nickname ?? entry.member.species,
-                        style: SecondaryTypography.onCard.body14.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      subtitle: Text(
-                        entry.subtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                  Text(
+                    entry.member.nickname ?? entry.member.species,
+                    style: SecondaryTypography.onCard.body14.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    entry.subtitle,
+                    style: SecondaryTypography.onCard.small12.copyWith(
+                      color: TitoColors.mutedInk,
+                    ),
+                  ),
+                  if (entry.saveFacts.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
                       children: [
-                        if (entry.saveFacts.isNotEmpty) ...[
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              for (final fact in entry.saveFacts)
-                                Chip(label: Text(fact)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                        if (entry.moves.isNotEmpty)
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              for (
-                                var index = 0;
-                                index < entry.moves.length;
-                                index++
-                              )
-                                ActionChip(
-                                  label: Text(entry.moveLabel(index)),
-                                  onPressed: () => showMoveDetailSheet(
-                                    context,
-                                    entry.moves[index],
-                                  ),
-                                ),
-                            ],
-                          ),
-                        if (entry.evolutions.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              for (final evolution in entry.evolutions)
-                                ActionChip(
-                                  avatar: const Icon(
-                                    Icons.auto_awesome_rounded,
-                                    size: 16,
-                                  ),
-                                  label: Text(
-                                    evolution.triggerZh == null
-                                        ? evolution.nameZh
-                                        : '${evolution.nameZh} · ${evolution.triggerZh}',
-                                  ),
-                                  onPressed: () =>
-                                      context.push('/dex/${evolution.id}'),
-                                ),
-                            ],
-                          ),
-                        ],
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: FilledButton.icon(
-                            onPressed: entry.member.speciesId == null
-                                ? null
-                                : () {
-                                    battlePartyHandoff.set(
-                                      entry.member,
-                                      selectedMoveId:
-                                          entry.preferredDamageMove?.id,
-                                    );
-                                    context.push(
-                                      '/search/companion/quick-damage',
-                                    );
-                                  },
-                            icon: const Icon(Icons.calculate_rounded, size: 18),
-                            label: Text(AppZh.teamToQuickDamage),
-                          ),
-                        ),
+                        for (final fact in entry.saveFacts)
+                          Chip(label: Text(fact)),
                       ],
                     ),
+                  ],
+                  if (entry.evolutions.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    for (final evolution in entry.evolutions)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: InkWell(
+                          onTap: () => context.push('/dex/${evolution.id}'),
+                          borderRadius: BorderRadius.circular(TitoRadii.md),
+                          child: Row(
+                            children: [
+                              TitoSpriteSticker(
+                                source: entry.spritePath,
+                                size: 36,
+                                radius: TitoRadii.sm,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: Text(
+                                    evolution.triggerZh ?? '→',
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: SecondaryTypography.onCard.small12
+                                        .copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                              ),
+                              TitoSpriteSticker(
+                                source: evolution.displaySpritePath,
+                                size: 36,
+                                radius: TitoRadii.sm,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  evolution.displayName,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: SecondaryTypography.onCard.body14
+                                      .copyWith(fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                  if (entry.moves.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (var index = 0; index < entry.moves.length; index++)
+                          ActionChip(
+                            label: Text(entry.moveLabel(index)),
+                            onPressed: () => showMoveDetailSheet(
+                              context,
+                              entry.moves[index],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: entry.member.speciesId == null
+                          ? null
+                          : () {
+                              battlePartyHandoff.set(
+                                entry.member,
+                                selectedMoveId: entry.preferredDamageMove?.id,
+                              );
+                              context.push('/search/companion/quick-damage');
+                            },
+                      icon: const Icon(Icons.calculate_rounded, size: 18),
+                      label: Text(AppZh.teamToQuickDamage),
+                    ),
+                  ),
                 ],
               );
             },
@@ -974,6 +1048,7 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
 class _TeamAssistEntry {
   const _TeamAssistEntry({
     required this.member,
+    required this.spritePath,
     required this.moves,
     required this.ability,
     required this.heldItemName,
@@ -981,6 +1056,7 @@ class _TeamAssistEntry {
   });
 
   final PartyMember member;
+  final String? spritePath;
   final List<CachedMove> moves;
   final CachedAbility? ability;
   final String? heldItemName;
@@ -1020,7 +1096,9 @@ class _TeamAssistEntry {
         ),
       if (stats.isNotEmpty)
         AppZh.teamStatsLine(
-          stats.entries.map((entry) => '${entry.key}${entry.value}').join(' / '),
+          stats.entries
+              .map((entry) => '${entry.key}${entry.value}')
+              .join(' / '),
         ),
       if (member.ivs.length == 6) AppZh.teamIvLine(member.ivs.join('/')),
       if (member.evs.length == 6) AppZh.teamEvLine(member.evs.join('/')),

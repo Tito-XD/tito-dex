@@ -73,63 +73,70 @@ class _PortraitHomeLayout extends StatelessWidget {
     final partyHeight = compact ? 164.0 : 174.0;
     final companionPad = compact ? 72.0 : 84.0;
 
-    final trainerSlot = _TrainerCardSlot(
-      journey: journey,
-      bootstrapping: bootstrapping,
-      dense: true,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final trainerSlot = _TrainerCardSlot(
+          journey: journey,
+          bootstrapping: bootstrapping,
+          dense: true,
+        );
 
-    final belowTrainer = IgnorePointer(
-      ignoring: bootstrapping,
-      child: Opacity(
-        opacity: bootstrapping ? 0.0 : 1.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (saveLinked) ...[
-              SizedBox(height: gap),
-              SizedBox(
-                height: journeyHeight,
-                child: JourneyCard(
-                  journey: journey,
-                  onOpenDetail: onJourneyOpen,
-                  compact: compact,
+        final belowTrainer = IgnorePointer(
+          ignoring: bootstrapping,
+          child: Opacity(
+            opacity: bootstrapping ? 0.0 : 1.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (saveLinked) ...[
+                  SizedBox(height: gap),
+                  SizedBox(
+                    height: journeyHeight,
+                    child: JourneyCard(
+                      journey: journey,
+                      onOpenDetail: onJourneyOpen,
+                      compact: compact,
+                    ),
+                  ),
+                ],
+                SizedBox(height: gap),
+                SizedBox(
+                  height: partyHeight,
+                  child: PartyStrip(party: journey.party, compact: compact),
                 ),
-              ),
-            ],
-            SizedBox(height: gap),
-            SizedBox(
-              height: partyHeight,
-              child: PartyStrip(party: journey.party, compact: compact),
+                SizedBox(height: gap),
+                quickActions,
+                SizedBox(height: companionPad),
+              ],
             ),
-            SizedBox(height: gap),
-            quickActions,
-            SizedBox(height: companionPad),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
 
-    // Content hangs from the header with the standard section gap and any
-    // spare height falls to the bottom (behind the companion) instead of
-    // opening a gap between the header and the trainer card.
-    final column = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [SizedBox(height: gap), trainerSlot, belowTrainer],
-    );
+        // Phone portrait has leftover height below the header. Keep the
+        // module stack (trainer / journey / party / quick actions) vertically
+        // centered in that space; when the stack is taller than the viewport
+        // the scroll view still starts from the top.
+        final column = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [trainerSlot, belowTrainer],
+        );
 
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SingleChildScrollView(
-        physics: bootstrapping
-            ? const NeverScrollableScrollPhysics()
-            : const ClampingScrollPhysics(),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 520),
-          child: column,
-        ),
-      ),
+        return Center(
+          child: SingleChildScrollView(
+            physics: bootstrapping
+                ? const NeverScrollableScrollPhysics()
+                : const ClampingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 520,
+                minHeight: constraints.maxHeight,
+              ),
+              child: Align(alignment: Alignment.center, child: column),
+            ),
+          ),
+        );
+      },
     );
   }
 }

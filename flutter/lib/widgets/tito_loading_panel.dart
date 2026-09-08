@@ -7,8 +7,9 @@ import 'tito_pokeball_loading.dart';
 import 'sticker_card.dart';
 import 'tito_progress_bar.dart';
 import 'tito_skeleton.dart';
+import 'tito_delayed_loading.dart';
 
-/// In-card loading panel — skeleton hints + spinner or progress bar.
+/// In-card loading panel — delayed pale ball or immediate measured progress.
 ///
 /// Prefer this over a bare [CircularProgressIndicator] so pages do not look
 /// frozen while async work runs.
@@ -18,7 +19,7 @@ class TitoLoadingPanel extends StatelessWidget {
     this.message,
     this.progress,
     this.compact = false,
-    this.showSkeleton = true,
+    this.showSkeleton = false,
     this.onLightSurface = true,
   });
 
@@ -27,15 +28,15 @@ class TitoLoadingPanel extends StatelessWidget {
   final bool compact;
   final bool showSkeleton;
 
-  /// Draw the ink Poké Ball. Defaults to `true` because the panel always
+  /// Outline the pale Poké Ball. Defaults to `true` because the panel always
   /// sits on its own cream [StickerCard]; pass `false` only when the card
-  /// variant is deep / type-tinted. Flat UI always uses the dark variant.
+  /// variant is deep / type-tinted. Flat UI always keeps the faint outline.
   final bool onLightSurface;
 
   @override
   Widget build(BuildContext context) {
-    final darkBall = onLightSurface || appVisualStyle.usesFlatUi;
-    return StickerCard(
+    final outlinedBall = onLightSurface || appVisualStyle.usesFlatUi;
+    final panel = StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -59,10 +60,18 @@ class TitoLoadingPanel extends StatelessWidget {
           if (progress != null)
             TitoProgressBar(value: progress!.clamp(0.0, 1.0), height: 6)
           else
-            Center(child: TitoPokeballLoading(onLight: darkBall)),
+            Center(child: TitoPokeballLoading(onLight: outlinedBall)),
         ],
       ),
     );
+    // Determinate downloads report progress immediately. Short local reads
+    // keep a quiet slot and do not construct a spinner until actually needed.
+    return progress != null
+        ? panel
+        : TitoDelayedLoading(
+            placeholder: const SizedBox(height: 64),
+            child: panel,
+          );
   }
 }
 

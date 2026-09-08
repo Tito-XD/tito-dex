@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) |
-| **`main` / lite source** | `0.9.15+196` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.15-offline+197` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.16) |
+| **`main` / lite source** | `0.9.16+198` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.16-offline+199` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,13 +44,14 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.15)
+## Current feature status (latest release line: v0.9.16)
 
-> v0.9.15 uses Lite versionCode 196 and Offline versionCode 197. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.9.16 uses Lite versionCode 198 and Offline versionCode 199. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Current UI and language
+- **v0.9.16 layout:** Search keeps query entry separate from the reference catalog; four battle tools share one page and mount on first use. Team uses a six-slot board with separate detail/editor areas. Portrait Home placement and location tiles are refined; secondary scrolling stays below fixed headers.
 - **v0.9.15:** each of Trainer's Journal, Solid Plastic and Flat UI now owns its shared controls, outlines, shadows, selection states, sheets and dialogs. Fixed radius tokens also apply on handhelds; see `DESIGN_SYSTEM.md` for intentional differences between themes and the type-colour detail-tab exception.
-- Ordinary images use a shared pulsing skeleton; type-tinted detail artwork can use the pale Poké Ball spinning in place. Section loaders and determinate download progress remain separate, with reduced-motion support. Long Pokédex descriptions grow to fit instead of scrolling inside a fixed-height card.
+- **v0.9.16 first-open optimization:** ordinary images use static placeholders; slow detail/media slots and section reads use a delayed pale Poké Ball rotating in place without shimmer. Large Dex JSON and catalog/location model decoding run off the native UI thread; move-index reads are shared and battle tools / location cards mount on demand. Determinate progress remains immediate. See [FIRST_OPEN_LOADING.md](./FIRST_OPEN_LOADING.md) for coverage and device-validation limits. Long Pokédex descriptions grow to fit instead of scrolling inside a fixed-height card.
 - Simplified Chinese and English UI follow the OS / Android per-app language, without an in-app switch. Names use available English data; missing translations and reference prose retain their source-language fallback. This does not claim an entirely English reference bundle or English assistant answers.
 
 ### Journey & save
@@ -100,8 +101,8 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 - v0.8.9 bundles an APK-local item matrix derived from the attributed v19 catalog, official PokeAPI CSV data, and cached 52poke source pages: 1465 items have version-group availability, 18 retain exact paired-version exclusivity, and 1114 have game-scoped prices. Unknown/new-game coverage stays visible as unknown instead of being hidden or assigned a guessed price. A second 833-move matrix filters removed/reintroduced moves by version group; generation gates cover abilities and the smaller mechanics references.
 
 ### Search hub
-- **常用资料:** moves, abilities, natures, egg groups, items, weather, terrain, status.
-- **对战资料:** type matchup, stat calc, quick damage (partial).
+- Query-first Search: field, recents, results. Two exits, both real child routes whose top-bar / system / RG-B back returns to Search: **常用资料** (`/search/reference`) is an icon-card catalog; **对战资料** (`/search/companion`) is one calculator shell (matchup / stats / damage / blind-spot).
+- **常用资料 cards:** moves, abilities, locations, natures, egg groups, items, weather, terrain, status, regional dex, silhouette quiz, plus Sleep tools on the same page.
 - Moves filter by all 18 types; abilities, natures, egg groups, weather, and status expose compact category filters that intersect with text search. Items keep their existing categories; terrain stays ungrouped because it has only four entries.
 - Reference → **structured detail** + drill-down to dex filter (move / ability / egg group).
 - `/search?q=` deep link supported.
@@ -120,12 +121,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 | Runtime data | Behavior | Reachable UI |
 | --- | --- | --- |
-| Parsed save metadata / rich HGSS party records / dex flags | journey merge, progress, edition auto-selection, battle handoff | Home, Team expansion, Journey, Settings, Dex status, quick damage |
+| Parsed save metadata / rich HGSS party records / dex flags | journey merge, progress, edition auto-selection, battle handoff | Home, Team inspector, Journey, Settings, Dex status, battle calc |
 | Summaries + `dex_catalog.json` | browse, search, stacked species axes | Dex and Search |
 | Per-species details + forms | type/stat/ability/obtain/move/evolution planning | Four detail tabs + form selector |
 | `version_availability_index.json` | evolution/breeding/trade missing classification | Dex progress filter + Journey assistant |
 | `location_index.json` | selected-version area tree and save-location match | Compact Location Dex grid/sheet + Journey card/page |
-| Moves + `move_version_matrix.json`; items + `item_version_matrix.json`; abilities, natures, egg groups, weather, terrain, status | selected-game filtering, scoped prices, reference search/detail and supported species drill-down | Search reference hub, Team assistance, quick damage + configurable app shortcuts |
+| Moves + `move_version_matrix.json`; items + `item_version_matrix.json`; abilities, natures, egg groups, weather, terrain, status | selected-game filtering, scoped prices, reference search/detail and supported species drill-down | Search reference catalog, Team inspector, battle calc + configurable app shortcuts |
 | `media_catalog_52poke.json` | form-aware art/animation/cry candidates | companion, picker, media resource page |
 | `app_config.json` + pinned Sleep formula/value constants | remotely updateable external links plus deterministic offline calculations | Search → Pokémon Sleep section → dedicated secondary page |
 
@@ -197,13 +198,14 @@ flutter/lib/
     game/                     # GameEdition, regional dex
   config/app_config.dart      # Offline-first app configuration
   l10n/                       # app_zh.dart, game_zh.dart, zh_catalog.dart
-  pages/                      # home, dex, search, settings, companion tools
+  pages/                      # home, dex, search, settings, battle calc
   widgets/                    # DeviceShell, dex_reference_detail, …
 ```
 
 **Routing:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, Dex sub-routes
-(`moves`, `abilities`, `locations`, `quiz`), `/search`, companion tools,
-`/search/sleep-tools`, `/search/reference/json`, `/journey/ask`, `/settings`, and Settings
+(`moves`, `abilities`, `locations`, `quiz`), `/search`, `/search/reference`,
+`/search/companion` (and legacy companion sub-paths), `/search/sleep-tools`,
+`/search/reference/json`, `/journey/ask`, `/settings`, and Settings
 media/companion-position sub-routes.
 
 **Dex offline dir** (`dex_offline/` in app documents): mirrors CDN bundle — see [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md).
@@ -346,6 +348,17 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 - Locale: OS / Android per-app language via `lib/l10n/app_locale.dart` (no in-app switch)
 - Game terms / locations: `lib/l10n/game_zh.dart`
 - Zh catalog runtime: `lib/l10n/zh_catalog.dart` (offline l10n first)
+
+### English follow-ups (not claimed done)
+
+Chrome follows the OS / Android per-app language. These surfaces may still
+read as Chinese in an English UI and are a later pass — do not treat them as
+regressions of the 0.9.15 language work:
+
+- Stored companion name is `nameZh` only (Ask TitoDex loading / home sticker)
+- Journey Assistant Worker answers stay Simplified Chinese
+- Dex flavor text, location catalog, and many move/ability prose strings fall back to source language
+- Search aliases and parser / `progression_hints` matching stay Chinese on purpose (playthrough matching)
 
 ---
 

@@ -273,6 +273,9 @@ class _TitoListRevealState extends State<TitoListReveal>
       child: widget.child,
       builder: (context, child) {
         final progress = _progress.value.clamp(0.0, 1.0);
+        // Keep the element hierarchy stable when settling or replaying so
+        // descendants retain their state and focus. At rest these resolve to
+        // full opacity and identity transforms; card shadows stay unclipped.
         final fadeProgress = Curves.easeOut.transform(progress);
         final travelProgress = Curves.easeOutCubic.transform(progress);
         return Opacity(

@@ -33,7 +33,7 @@ const _referenceMove = CachedMove(
 
 void main() {
   testWidgets(
-    'shimmer ball rotates without changing position or using colored artwork',
+    'pale ball rotates without changing position or using colored artwork',
     (tester) async {
       await tester.pumpWidget(
         const MaterialApp(

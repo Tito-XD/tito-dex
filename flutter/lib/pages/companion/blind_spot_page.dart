@@ -19,9 +19,14 @@ import '../../widgets/sticker_card.dart';
 import '../../widgets/tito_loading_panel.dart';
 
 class BlindSpotPage extends StatefulWidget {
-  const BlindSpotPage({super.key, required this.journey});
+  const BlindSpotPage({
+    super.key,
+    required this.journey,
+    this.embedded = false,
+  });
 
   final CurrentJourney journey;
+  final bool embedded;
 
   @override
   State<BlindSpotPage> createState() => _BlindSpotPageState();
@@ -51,7 +56,9 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
   @override
   void initState() {
     super.initState();
-    _loadRelations();
+    _relations = battleToolsService.cachedTypeRelations;
+    _loading = _relations == null;
+    if (_loading) _loadRelations();
   }
 
   @override
@@ -87,7 +94,9 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
       _loading = true;
       _error = null;
     });
-    _loadRelations();
+    _relations = battleToolsService.cachedTypeRelations;
+    _loading = _relations == null;
+    if (_loading) _loadRelations();
   }
 
   Future<void> _searchDefender(String query) async {
@@ -215,212 +224,207 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
         final relations = _relations;
         final generation = scope.generation;
 
-        return Material(
-          type: MaterialType.transparency,
-          child: SecondaryPageScaffold(
-            title: AppZh.companionToolBlindSpot,
-            subtitle: edition.label,
-            children: [
-              if (_loading)
-                TitoLoadingPanel(
-                  message: AppZh.companionLoading,
-                  compact: true,
-                )
-              else if (_error != null)
-                StickerCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _error!,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                          height: 1.45,
-                        ),
+        return CompanionToolScaffold(
+          embedded: widget.embedded,
+          title: AppZh.companionToolBlindSpot,
+          subtitle: edition.label,
+          children: [
+            if (_loading)
+              TitoLoadingPanel(message: AppZh.companionLoading, compact: true)
+            else if (_error != null)
+              StickerCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _error!,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        height: 1.45,
                       ),
-                      const SizedBox(height: 12),
-                      FilledButton.icon(
-                        onPressed: _retryLoadRelations,
-                        icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: Text(AppZh.dexRetry),
-                      ),
-                    ],
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: _retryLoadRelations,
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: Text(AppZh.dexRetry),
+                    ),
+                  ],
+                ),
+              )
+            else if (relations != null) ...[
+              CompanionSectionCard(
+                title: AppZh.companionTypeDefenderTitle,
+                subtitle: AppZh.companionGenerationTypeNote,
+                children: [
+                  PokemonSearchField(
+                    controller: _defenderQueryController,
+                    hintText: AppZh.companionDefenderSearchHint,
+                    suggestions: _defenderSuggestions,
+                    onQueryChanged: _searchDefender,
+                    onPokemonSelected: _applyDefender,
+                    prefixIcon: Icons.shield_rounded,
                   ),
-                )
-              else if (relations != null) ...[
-                CompanionSectionCard(
-                  title: AppZh.companionTypeDefenderTitle,
-                  subtitle: AppZh.companionGenerationTypeNote,
-                  children: [
-                    PokemonSearchField(
-                      controller: _defenderQueryController,
-                      hintText: AppZh.companionDefenderSearchHint,
-                      suggestions: _defenderSuggestions,
-                      onQueryChanged: _searchDefender,
-                      onPokemonSelected: _applyDefender,
-                      prefixIcon: Icons.shield_rounded,
-                    ),
+                  const SizedBox(height: 12),
+                  LinkedOrManualTypePicker(
+                    linkedPokemonId: _linkedDefenderId,
+                    label: AppZh.companionTypeManualPick,
+                    selected: _defenderTypes,
+                    onManualChanged: (types) {
+                      if (types.isNotEmpty) {
+                        setState(() {
+                          _defenderTypes = types;
+                          _defenderTeraType = defaultTeraTypeFor(
+                            types,
+                            generation,
+                          );
+                        });
+                        _clearLinkedDefender();
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  CompanionAbilitySection(
+                    pokemonLabel: AppZh.companionDefenderAbilityPick,
+                    manualLabel: AppZh.companionManualAbilityPick,
+                    manualOptions: kManualDefensiveAbilityOptions,
+                    pokemonOptions: _defenderAbilityOptions,
+                    linkedPokemonId: _linkedDefenderId,
+                    selectedSlug: _defenderAbilitySlug,
+                    onChanged: (slug) =>
+                        setState(() => _defenderAbilitySlug = slug),
+                  ),
+                  if (generation >= 9) ...[
                     const SizedBox(height: 12),
-                    LinkedOrManualTypePicker(
-                      linkedPokemonId: _linkedDefenderId,
-                      label: AppZh.companionTypeManualPick,
-                      selected: _defenderTypes,
-                      onManualChanged: (types) {
-                        if (types.isNotEmpty) {
-                          setState(() {
-                            _defenderTypes = types;
-                            _defenderTeraType = defaultTeraTypeFor(
-                              types,
-                              generation,
-                            );
-                          });
-                          _clearLinkedDefender();
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    CompanionAbilitySection(
-                      pokemonLabel: AppZh.companionDefenderAbilityPick,
-                      manualLabel: AppZh.companionManualAbilityPick,
-                      manualOptions: kManualDefensiveAbilityOptions,
-                      pokemonOptions: _defenderAbilityOptions,
-                      linkedPokemonId: _linkedDefenderId,
-                      selectedSlug: _defenderAbilitySlug,
-                      onChanged: (slug) =>
-                          setState(() => _defenderAbilitySlug = slug),
-                    ),
-                    if (generation >= 9) ...[
-                      const SizedBox(height: 12),
-                      TerastalPicker(
-                        label: AppZh.companionDefenderTerastal,
-                        enabled: true,
-                        terastallized: _defenderTerastallized,
-                        teraType: _defenderTeraType,
-                        fallbackTypes: _defenderTypes,
-                        generation: generation,
-                        onTerastallizedChanged: (value) =>
-                            setState(() => _defenderTerastallized = value),
-                        onTeraTypeChanged: (type) =>
-                            setState(() => _defenderTeraType = type),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 12),
-                CompanionSectionCard(
-                  title: AppZh.companionTypeAttackerTitle,
-                  children: [
-                    PokemonSearchField(
-                      controller: _attackerQueryController,
-                      hintText: AppZh.companionAttackerSearchHint,
-                      suggestions: _attackerSuggestions,
-                      onQueryChanged: _searchAttacker,
-                      onPokemonSelected: _applyAttacker,
-                      prefixIcon: Icons.sports_martial_arts_rounded,
-                    ),
-                    const SizedBox(height: 12),
-                    LinkedOrManualTypePicker(
-                      linkedPokemonId: _linkedAttackerId,
-                      label: AppZh.companionTypeAttackerPick,
-                      selected: _attackerTypes,
-                      maxSelected: 2,
-                      onManualChanged: (types) {
-                        setState(() => _attackerTypes = types);
-                        _clearLinkedAttacker();
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    CompanionAbilitySection(
-                      pokemonLabel: AppZh.companionAttackerAbilityPick,
-                      manualLabel: AppZh.companionAttackerAbilityPick,
-                      manualOptions: kManualAttackerAbilityOptions,
-                      pokemonOptions: _attackerAbilityOptions,
-                      linkedPokemonId: _linkedAttackerId,
-                      selectedSlug: _attackerAbilitySlug,
-                      onChanged: (slug) =>
-                          setState(() => _attackerAbilitySlug = slug),
-                    ),
-                    if (generation >= 9) ...[
-                      const SizedBox(height: 12),
-                      TerastalPicker(
-                        label: AppZh.companionAttackerTerastal,
-                        enabled: true,
-                        terastallized: _attackerTerastallized,
-                        teraType: _attackerTeraType,
-                        fallbackTypes: _attackerTypes,
-                        generation: generation,
-                        onTerastallizedChanged: (value) =>
-                            setState(() => _attackerTerastallized = value),
-                        onTeraTypeChanged: (type) =>
-                            setState(() => _attackerTeraType = type),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Builder(
-                  builder: (context) {
-                    final input = _input(relations, generation);
-                    final offensive = computeOffensiveBlindSpots(
-                      _attackerTypes,
-                      relations,
+                    TerastalPicker(
+                      label: AppZh.companionDefenderTerastal,
+                      enabled: true,
+                      terastallized: _defenderTerastallized,
+                      teraType: _defenderTeraType,
+                      fallbackTypes: _defenderTypes,
                       generation: generation,
-                      attackerAbilitySlug: _attackerAbilitySlug,
-                      attackerTerastallized: _attackerTerastallized,
-                      attackerTeraType: _attackerTeraType,
-                    );
-                    final defensive = computeDefensiveBlindSpots(input);
-                    final normalized = normalizeTypesForGeneration(
-                      _defenderTypes,
-                      generation,
-                    );
+                      onTerastallizedChanged: (value) =>
+                          setState(() => _defenderTerastallized = value),
+                      onTeraTypeChanged: (type) =>
+                          setState(() => _defenderTeraType = type),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 12),
+              CompanionSectionCard(
+                title: AppZh.companionTypeAttackerTitle,
+                children: [
+                  PokemonSearchField(
+                    controller: _attackerQueryController,
+                    hintText: AppZh.companionAttackerSearchHint,
+                    suggestions: _attackerSuggestions,
+                    onQueryChanged: _searchAttacker,
+                    onPokemonSelected: _applyAttacker,
+                    prefixIcon: Icons.sports_martial_arts_rounded,
+                  ),
+                  const SizedBox(height: 12),
+                  LinkedOrManualTypePicker(
+                    linkedPokemonId: _linkedAttackerId,
+                    label: AppZh.companionTypeAttackerPick,
+                    selected: _attackerTypes,
+                    maxSelected: 2,
+                    onManualChanged: (types) {
+                      setState(() => _attackerTypes = types);
+                      _clearLinkedAttacker();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  CompanionAbilitySection(
+                    pokemonLabel: AppZh.companionAttackerAbilityPick,
+                    manualLabel: AppZh.companionAttackerAbilityPick,
+                    manualOptions: kManualAttackerAbilityOptions,
+                    pokemonOptions: _attackerAbilityOptions,
+                    linkedPokemonId: _linkedAttackerId,
+                    selectedSlug: _attackerAbilitySlug,
+                    onChanged: (slug) =>
+                        setState(() => _attackerAbilitySlug = slug),
+                  ),
+                  if (generation >= 9) ...[
+                    const SizedBox(height: 12),
+                    TerastalPicker(
+                      label: AppZh.companionAttackerTerastal,
+                      enabled: true,
+                      terastallized: _attackerTerastallized,
+                      teraType: _attackerTeraType,
+                      fallbackTypes: _attackerTypes,
+                      generation: generation,
+                      onTerastallizedChanged: (value) =>
+                          setState(() => _attackerTerastallized = value),
+                      onTeraTypeChanged: (type) =>
+                          setState(() => _attackerTeraType = type),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 12),
+              Builder(
+                builder: (context) {
+                  final input = _input(relations, generation);
+                  final offensive = computeOffensiveBlindSpots(
+                    _attackerTypes,
+                    relations,
+                    generation: generation,
+                    attackerAbilitySlug: _attackerAbilitySlug,
+                    attackerTerastallized: _attackerTerastallized,
+                    attackerTeraType: _attackerTeraType,
+                  );
+                  final defensive = computeDefensiveBlindSpots(input);
+                  final normalized = normalizeTypesForGeneration(
+                    _defenderTypes,
+                    generation,
+                  );
 
-                    return Column(
-                      children: [
-                        StickerCard(
-                          variant: StickerVariant.mint,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppZh.companionOffensiveBlindSpots,
-                                style: SecondaryTypography.onCard.h15,
-                              ),
+                  return Column(
+                    children: [
+                      StickerCard(
+                        variant: StickerVariant.mint,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppZh.companionOffensiveBlindSpots,
+                              style: SecondaryTypography.onCard.h15,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              profileLine('', offensive),
+                              style: SecondaryTypography.onCard.body14,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              AppZh.companionDefensiveBlindSpots,
+                              style: SecondaryTypography.onCard.h15,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              profileLine('', defensive),
+                              style: SecondaryTypography.onCard.body14,
+                            ),
+                            if (generation < 6) ...[
                               const SizedBox(height: 8),
                               Text(
-                                profileLine('', offensive),
-                                style: SecondaryTypography.onCard.body14,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                AppZh.companionDefensiveBlindSpots,
-                                style: SecondaryTypography.onCard.h15,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                profileLine('', defensive),
-                                style: SecondaryTypography.onCard.body14,
-                              ),
-                              if (generation < 6) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  AppZh.generationCorrectionTypes(
-                                    normalized.map(typeNameZh).join('/'),
-                                  ),
-                                  style: SecondaryTypography.onCard.small12
-                                      .copyWith(color: TitoColors.mutedInk),
+                                AppZh.generationCorrectionTypes(
+                                  normalized.map(typeNameZh).join('/'),
                                 ),
-                              ],
+                                style: SecondaryTypography.onCard.small12
+                                    .copyWith(color: TitoColors.mutedInk),
+                              ),
                             ],
-                          ),
+                          ],
                         ),
-                      ],
-                    );
-                  },
-                ),
-              ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ],
-          ),
+          ],
         );
       },
     );

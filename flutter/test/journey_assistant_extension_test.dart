@@ -11,6 +11,7 @@ import 'package:titodex/features/journey/progression_hints.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/journey_page.dart';
 import 'package:titodex/pages/search_page.dart';
+import 'package:titodex/pages/search_reference_page.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
 void main() {
@@ -343,6 +344,17 @@ void main() {
                 onAskTitoDex: () {},
               ),
             ),
+            routes: [
+              GoRoute(
+                path: 'reference',
+                builder: (_, _) => TitoPageContainer(
+                  child: SearchReferencePage(
+                    assistantDisplayMode: mode,
+                    onAskTitoDex: () {},
+                  ),
+                ),
+              ),
+            ],
           ),
           GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
         ],

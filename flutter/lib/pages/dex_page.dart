@@ -441,9 +441,9 @@ class _DexPageState extends State<DexPage> {
         if (!caughtIds.contains(id)) {
           caughtIds = [...caughtIds, id];
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppZh.dexManualMarkCaught)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(AppZh.dexManualMarkCaught)));
       case DexEncounterStatus.caught:
         seenIds = seenIds.where((value) => value != id).toList();
         caughtIds = caughtIds.where((value) => value != id).toList();
@@ -888,8 +888,7 @@ class _DexPageState extends State<DexPage> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             SecondaryPageSubtitle(
-                              text:
-                                  gameEditionRepository.edition.selectedLabel,
+                              text: gameEditionRepository.edition.selectedLabel,
                             ),
                             const SizedBox(height: 12),
                             TitoListReveal(
@@ -1001,6 +1000,7 @@ class _DexPageState extends State<DexPage> {
                                     LayoutBuilder(
                                       builder: (context, constraints) =>
                                           TitoDexGridSkeleton(
+                                            showLoading: true,
                                             crossAxisCount: columns,
                                             childAspectRatio: aspectRatio,
                                             itemCount: _skeletonTileCount(

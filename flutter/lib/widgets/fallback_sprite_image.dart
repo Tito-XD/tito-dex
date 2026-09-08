@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../theme/tito_colors.dart';
 import 'tito_skeleton.dart';
+import 'tito_pokeball_loading.dart';
+import 'tito_delayed_loading.dart';
 
 /// Renders the first loadable source from [sources] (network / asset / file),
 /// advancing to the next candidate on load error. Used for animated sprites
@@ -27,7 +29,7 @@ class FallbackSpriteImage extends StatefulWidget {
   /// Upscale filtering — pass [FilterQuality.none] for crisp pixel art.
   final FilterQuality filterQuality;
 
-  /// Show a pulsing skeleton box while a network source downloads.
+  /// Show a pale rotating ball only when a network source takes time to load.
   final bool showLoadingProgress;
 
   @override
@@ -121,14 +123,20 @@ class _FallbackSpriteImageState extends State<FallbackSpriteImage> {
     );
   }
 
-  /// Image slots show a pulsing skeleton, not a spinner (D10). Byte progress
-  /// is intentionally not drawn: sprites are tiny and the ring only flickered.
+  /// Brief reads use a quiet placeholder; slow downloads get one steady ball.
   Widget _loadingBox() {
-    return TitoSkeletonBox(
-      width: widget.width,
-      height: widget.height,
-      radius: TitoRadii.sm,
-      shimmer: true,
+    return TitoDelayedLoading(
+      placeholder: _placeholder(),
+      child: SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: Center(
+          child: TitoPokeballLoading(
+            size: ((widget.height ?? 56) * .4).clamp(12.0, 28.0),
+            onLight: true,
+          ),
+        ),
+      ),
     );
   }
 }

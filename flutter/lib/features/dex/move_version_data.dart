@@ -1,6 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/services.dart';
+
+import 'dex_json_decode.dart';
 
 class MoveVersionDataRepository {
   Future<Map<int, Set<String>>>? _future;
@@ -12,7 +12,7 @@ class MoveVersionDataRepository {
     final source = await rootBundle.loadString(
       'assets/data/move_version_matrix.json',
     );
-    final payload = jsonDecode(source) as Map<String, dynamic>;
+    final payload = await decodeDexJson(source) as Map<String, dynamic>;
     final moves = payload['moves'] as Map<String, dynamic>? ?? const {};
     final result = <int, Set<String>>{};
     for (final entry in moves.entries) {

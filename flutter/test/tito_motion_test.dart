@@ -9,6 +9,7 @@ import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/search_page.dart';
+import 'package:titodex/pages/search_reference_page.dart';
 import 'package:titodex/theme/motion_preferences.dart';
 import 'package:titodex/widgets/tito_animated_size_switcher.dart';
 import 'package:titodex/widgets/tito_list_reveal.dart';
@@ -48,6 +49,10 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.getSize(find.byType(TitoAnimatedSizeSwitcher)).height, 40);
+      expect(
+        tester.widget<AnimatedSize>(find.byType(AnimatedSize)).clipBehavior,
+        Clip.none,
+      );
 
       selected.value = 1;
       await tester.pump();
@@ -227,7 +232,65 @@ void main() {
     expect(_opacityAbove(tester, 'generation-1'), inExclusiveRange(0, 1));
   });
 
-  testWidgets('Search segment and body expose a real intermediate frame', (
+  testWidgets(
+    'list reveal preserves input state when completing and replaying',
+    (tester) async {
+      final replay = ValueNotifier<int>(0);
+      addTearDown(replay.dispose);
+      await tester.pumpWidget(
+        _motionHost(
+          ValueListenableBuilder<int>(
+            valueListenable: replay,
+            builder: (context, value, _) => TitoListReveal(
+              key: const ValueKey('editable-reveal'),
+              replayKey: value,
+              child: const TextField(),
+            ),
+          ),
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'keep this draft');
+      final state = tester.state<EditableTextState>(find.byType(EditableText));
+      expect(state.widget.focusNode.hasFocus, isTrue);
+
+      await tester.pump(const Duration(seconds: 1));
+      expect(tester.state(find.byType(EditableText)), same(state));
+      expect(state.widget.controller.text, 'keep this draft');
+      expect(state.widget.focusNode.hasFocus, isTrue);
+
+      replay.value++;
+      await tester.pump();
+      expect(tester.state(find.byType(EditableText)), same(state));
+      await tester.pump(const Duration(seconds: 1));
+      expect(tester.state(find.byType(EditableText)), same(state));
+      expect(state.widget.controller.text, 'keep this draft');
+      expect(state.widget.focusNode.hasFocus, isTrue);
+    },
+  );
+
+  testWidgets(
+    'list reveal preserves input when motion is disabled mid-flight',
+    (tester) async {
+      await tester.pumpWidget(
+        _motionHost(
+          const TitoListReveal(
+            key: ValueKey('cancelled-editable-reveal'),
+            delay: Duration(milliseconds: 100),
+            child: TextField(),
+          ),
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'keep on settle');
+      final state = tester.state<EditableTextState>(find.byType(EditableText));
+      await motionPreferences.setListAnimationsEnabled(false);
+      await tester.pump();
+      expect(tester.state(find.byType(EditableText)), same(state));
+      expect(state.widget.controller.text, 'keep on settle');
+      expect(state.widget.focusNode.hasFocus, isTrue);
+    },
+  );
+
+  testWidgets('reference catalog is a real route that pops back to search', (
     tester,
   ) async {
     final router = GoRouter(
@@ -241,6 +304,13 @@ void main() {
               assistantDisplayMode: SearchAssistantDisplayMode.hidden,
             ),
           ),
+          routes: [
+            GoRoute(
+              path: 'reference',
+              builder: (context, state) =>
+                  const Scaffold(body: SearchReferencePage()),
+            ),
+          ],
         ),
         GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
       ],
@@ -250,22 +320,66 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
     await tester.tap(find.text(AppZh.searchHubReference));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pumpAndSettle();
 
-    final selectedSegment = tester.widget<Transform>(
-      find.byKey(const ValueKey<String>('search-segment-motion-1')),
-    );
-    final selectedDy = selectedSegment.transform.getTranslation().y;
-    expect(selectedDy, lessThan(0));
-    expect(selectedDy, greaterThan(-1));
+    expect(find.byType(SearchReferencePage), findsOneWidget);
+    expect(find.text(AppZh.dexReferenceMoves), findsOneWidget);
+    expect(router.canPop(), isTrue);
 
-    final enteringBody = tester.widget<Transform>(
-      find.byKey(const ValueKey<Key?>(ValueKey<int>(1))),
-    );
-    expect(enteringBody.transform.getTranslation().x, greaterThan(0));
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(SearchReferencePage), findsNothing);
     expect(find.text(AppZh.searchPrompt), findsOneWidget);
-    expect(find.text(AppZh.searchHubDataTitle), findsOneWidget);
+  });
+
+  testWidgets('reference catalog shows icon cards instead of chips', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: '/search',
+      routes: [
+        GoRoute(
+          path: '/search',
+          builder: (context, state) => Scaffold(
+            body: SearchPage(
+              journey: CurrentJourney.mock(),
+              assistantDisplayMode: SearchAssistantDisplayMode.hidden,
+            ),
+          ),
+          routes: [
+            GoRoute(
+              path: 'reference',
+              builder: (context, state) =>
+                  const Scaffold(body: SearchReferencePage()),
+            ),
+          ],
+        ),
+        GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppZh.searchHubReference));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byType(SearchReferencePage),
+        matching: find.text(AppZh.dexReferenceMoves),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.flash_on_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.place_rounded), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(SearchReferencePage),
+        matching: find.byType(ActionChip),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('regional picker body moves forward and back by level', (
@@ -331,5 +445,8 @@ double _opacityAbove(WidgetTester tester, String text) {
     of: find.text(text),
     matching: find.byType(Opacity),
   );
+  if (finder.evaluate().isEmpty) {
+    return 1;
+  }
   return tester.widget<Opacity>(finder.first).opacity;
 }

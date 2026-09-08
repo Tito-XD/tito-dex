@@ -15,8 +15,8 @@ abstract final class TitoBackNavigation {
         path == '/dex/quiz') {
       return '/dex';
     }
-    if (path.startsWith('/search/companion/') ||
-        path == '/search/reference/json' ||
+    if (path.startsWith('/search/companion') ||
+        path.startsWith('/search/reference') ||
         path == '/search/sleep-tools') {
       return '/search';
     }

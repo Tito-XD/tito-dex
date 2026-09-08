@@ -263,18 +263,18 @@ class DexOfflineService {
     if (kIsWeb) {
       return const [];
     }
-    final array = await _store.readJsonArray(filename);
-    if (array.isNotEmpty) {
-      return _localizeItemSprites(filename, array);
-    }
-    final object = await _store.readJsonObject(filename);
-    if (object.isEmpty) {
-      return const [];
-    }
-    return _localizeItemSprites(
-      filename,
-      DexCdnDataSource.objectEntriesToList(object),
-    );
+    final decoded = await _store.readReferenceJson(filename);
+    final entries = decoded is List
+        ? decoded
+              .whereType<Map>()
+              .map((entry) => Map<String, dynamic>.from(entry))
+              .toList(growable: false)
+        : decoded is Map
+        ? DexCdnDataSource.objectEntriesToList(
+            Map<String, dynamic>.from(decoded),
+          )
+        : const <Map<String, dynamic>>[];
+    return _localizeItemSprites(filename, entries);
   }
 
   Future<Map<String, dynamic>> readReferenceObject(String filename) async {
