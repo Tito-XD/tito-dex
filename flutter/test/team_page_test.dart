@@ -110,6 +110,14 @@ void main() {
 
     await tester.tap(find.text('火球鼠').first);
     await tester.pump(const Duration(milliseconds: 300));
+    expect(
+      find.widgetWithText(TextField, AppZh.teamEditNickname),
+      findsNothing,
+    );
+    final edit = find.text(AppZh.teamEditAction);
+    await tester.ensureVisible(edit);
+    await tester.tap(edit);
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.enterText(
       find.widgetWithText(TextField, AppZh.teamEditNickname),
       '小火',
@@ -119,7 +127,10 @@ void main() {
       '12',
     );
     final confirm = find.text(AppZh.confirm).last;
+    // Commit TextField/caret layout before calculating the scroll target.
+    await tester.pump();
     await tester.ensureVisible(confirm);
+    await tester.pump();
     await tester.tap(confirm);
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -131,6 +142,8 @@ void main() {
     await tester.ensureVisible(renamedMember);
     await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(renamedMember);
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text(AppZh.teamEditAction));
     await tester.pump(const Duration(milliseconds: 300));
     final delete = find.text(AppZh.teamEditDelete);
     await tester.ensureVisible(delete);

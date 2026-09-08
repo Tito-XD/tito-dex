@@ -4,21 +4,27 @@ import '../dex/type_chart.dart';
 
 /// Loads type relations for companion battle tools (offline cache → PokeAPI).
 class BattleToolsService {
-  BattleToolsService({
-    PokeApiClient? client,
-    DexCacheStore? store,
-  })  : _client = client ?? PokeApiClient(),
-        _store = store ?? DexCacheStore();
+  BattleToolsService({PokeApiClient? client, DexCacheStore? store})
+    : _client = client ?? PokeApiClient(),
+      _store = store ?? DexCacheStore();
 
   final PokeApiClient _client;
   final DexCacheStore _store;
   Map<String, TypeDamageRelations>? _cached;
+  Future<Map<String, TypeDamageRelations>>? _pending;
+
+  Map<String, TypeDamageRelations>? get cachedTypeRelations => _cached;
 
   Future<Map<String, TypeDamageRelations>> loadTypeRelations() async {
     if (_cached != null) {
       return _cached!;
     }
+    return _pending ??= _loadTypeRelations().whenComplete(
+      () => _pending = null,
+    );
+  }
 
+  Future<Map<String, TypeDamageRelations>> _loadTypeRelations() async {
     final offline = await _store.readTypeRelations();
     if (offline.isNotEmpty) {
       _cached = offline;

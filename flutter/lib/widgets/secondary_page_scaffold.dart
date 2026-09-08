@@ -19,6 +19,7 @@ class SecondaryPageScaffold extends StatelessWidget {
     this.subtitle,
     this.showSettings = true,
     this.padding,
+    this.slivers,
   });
 
   final String title;
@@ -26,6 +27,9 @@ class SecondaryPageScaffold extends StatelessWidget {
   final List<Widget> children;
   final bool showSettings;
   final EdgeInsets? padding;
+
+  /// Long catalogs append lazy slivers instead of nesting shrink-wrapped grids.
+  final List<Widget>? slivers;
 
   @override
   Widget build(BuildContext context) {
@@ -43,21 +47,53 @@ class SecondaryPageScaffold extends StatelessWidget {
           child: SecondaryPageAppBar(title: title, showSettings: showSettings),
         ),
         Expanded(
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              pagePadding.left,
-              subtitle == null ? 12 : 6,
-              pagePadding.right,
-              96,
-            ),
-            children: [
-              if (subtitle != null) ...[
-                SecondaryPageSubtitle(text: subtitle!),
-                const SizedBox(height: 12),
-              ],
-              ...children,
-            ],
-          ),
+          child: slivers != null
+              ? CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        pagePadding.left,
+                        subtitle == null ? 12 : 6,
+                        pagePadding.right,
+                        0,
+                      ),
+                      sliver: SliverList.list(
+                        children: [
+                          if (subtitle != null) ...[
+                            SecondaryPageSubtitle(text: subtitle!),
+                            const SizedBox(height: 12),
+                          ],
+                          ...children,
+                        ],
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        pagePadding.left,
+                        0,
+                        pagePadding.right,
+                        96,
+                      ),
+                      sliver: SliverMainAxisGroup(slivers: slivers!),
+                    ),
+                  ],
+                )
+              : ListView(
+                  clipBehavior: Clip.hardEdge,
+                  padding: EdgeInsets.fromLTRB(
+                    pagePadding.left,
+                    subtitle == null ? 12 : 6,
+                    pagePadding.right,
+                    96,
+                  ),
+                  children: [
+                    if (subtitle != null) ...[
+                      SecondaryPageSubtitle(text: subtitle!),
+                      const SizedBox(height: 12),
+                    ],
+                    ...children,
+                  ],
+                ),
         ),
       ],
     );
@@ -240,6 +276,51 @@ class _SecondaryHeaderIconButton extends StatelessWidget {
           foregroundColor: scheme.onSecondaryContainer,
         ),
         icon: Icon(icon, size: iconSize),
+      ),
+    );
+  }
+}
+
+/// Shared frame for battle calculators: full secondary scaffold, or a
+/// ListView body when hosted inside [BattleCalcPage].
+class CompanionToolScaffold extends StatelessWidget {
+  const CompanionToolScaffold({
+    super.key,
+    required this.embedded,
+    required this.title,
+    required this.children,
+    this.subtitle,
+  });
+
+  final bool embedded;
+  final String title;
+  final String? subtitle;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!embedded) {
+      return Material(
+        type: MaterialType.transparency,
+        child: SecondaryPageScaffold(
+          title: title,
+          subtitle: subtitle,
+          children: children,
+        ),
+      );
+    }
+    final pagePadding = DeviceLayout.pagePadding(context);
+    return Material(
+      type: MaterialType.transparency,
+      child: ListView(
+        clipBehavior: Clip.none,
+        padding: EdgeInsets.fromLTRB(
+          pagePadding.left,
+          12,
+          pagePadding.right,
+          96,
+        ),
+        children: children,
       ),
     );
   }

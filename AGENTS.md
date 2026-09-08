@@ -6,7 +6,7 @@
 
 - **Active code:** `flutter/` (Flutter + Dart; Simplified Chinese default, English follows system / Android per-app language)
 - **Removed:** the pre-Flutter React mock (`src/`) was deleted in the 0.6.5 cleanup; root `tsconfig*.json` / `vite.config.ts` are dead relics — ignore; releases stay on GitHub as historical artifacts
-- **Latest release:** v0.9.15 · Lite `0.9.15+196`; Offline `0.9.15-offline+197`
+- **Latest release:** v0.9.16 · Lite `0.9.16+198`; Offline `0.9.16-offline+199`
 - **Offline data:** CDN bundle v20 live; Offline APK embeds the complete verified v20 reference/gameplay archive (`/v5/`; `/v4/` rollback)
 - **Tests:** `cd flutter && flutter test`
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../theme/tito_colors.dart';
 import 'tito_pokeball_loading.dart';
 import 'tito_skeleton.dart';
+import 'tito_delayed_loading.dart';
 
 class DexSpriteImage extends StatelessWidget {
   const DexSpriteImage({
@@ -24,7 +25,7 @@ class DexSpriteImage extends StatelessWidget {
   final double? width;
   final BoxFit fit;
 
-  /// Spin the pale Poké Ball while the frame decodes instead of pulsing a
+  /// Spin the pale Poké Ball during a slow decode instead of a static
   /// skeleton box. The ball is drawn for type-tinted deep headers; leave this
   /// off on cream / white cards where the skeleton placeholder belongs.
   final bool showPokeball;
@@ -65,21 +66,19 @@ class DexSpriteImage extends StatelessWidget {
 
   Widget _placeholder({bool loading = false}) {
     if (loading && showPokeball) {
-      return SizedBox(
-        height: height,
-        width: width,
-        child: Center(
-          child: TitoPokeballLoading(
-            size: ((height ?? 56) * .4).clamp(12.0, 28.0),
+      return TitoDelayedLoading(
+        placeholder: SizedBox(height: height, width: width),
+        child: SizedBox(
+          height: height,
+          width: width,
+          child: Center(
+            child: TitoPokeballLoading(
+              size: ((height ?? 56) * .4).clamp(12.0, 28.0),
+            ),
           ),
         ),
       );
     }
-    return TitoSkeletonBox(
-      height: height,
-      width: width,
-      radius: TitoRadii.sm,
-      shimmer: loading,
-    );
+    return TitoSkeletonBox(height: height, width: width, radius: TitoRadii.sm);
   }
 }

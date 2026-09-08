@@ -87,7 +87,11 @@ class _TitoAnimatedSizeSwitcherState extends State<TitoAnimatedSizeSwitcher> {
       duration: TitoMotion.emphasized,
       curve: Curves.easeOutCubic,
       alignment: widget.alignment,
-      clipBehavior: Clip.hardEdge,
+      // Flat UI cards paint elevation / box shadows outside their layout
+      // box. Hard-edge clipping here slices that lip off on the first
+      // expand (search results, recent-query chips) and it stays gone
+      // until a later rebuild.
+      clipBehavior: Clip.none,
       child: AnimatedSwitcher(
         duration: widget.duration,
         reverseDuration: outgoingDuration,
@@ -99,7 +103,7 @@ class _TitoAnimatedSizeSwitcherState extends State<TitoAnimatedSizeSwitcher> {
           }
           return Stack(
             alignment: widget.alignment,
-            clipBehavior: Clip.hardEdge,
+            clipBehavior: Clip.none,
             children: [
               for (final previous in previousChildren)
                 ExcludeSemantics(child: IgnorePointer(child: previous)),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import 'sticker_card.dart';
+import 'tito_delayed_loading.dart';
+import 'tito_pokeball_loading.dart';
 
 /// Placeholder block for loading layouts (detail header, cards, sprites…).
 ///
@@ -118,7 +120,11 @@ class TitoDetailHeaderSkeleton extends StatelessWidget {
         children: [
           Expanded(child: TitoSkeletonBox(height: 18, width: double.infinity)),
           SizedBox(width: 8),
-          TitoSkeletonBox(height: 52, width: 52),
+          SizedBox(
+            height: 52,
+            width: 52,
+            child: Center(child: TitoPokeballLoading()),
+          ),
         ],
       ),
     );
@@ -156,7 +162,9 @@ class TitoDexMiniCardSkeleton extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(child: Center(child: TitoSkeletonBox(height: 40, width: 40))),
+          Expanded(
+            child: Center(child: TitoSkeletonBox(height: 40, width: 40)),
+          ),
           SizedBox(height: 4),
           TitoSkeletonBox(height: 9, width: 32),
           SizedBox(height: 4),
@@ -175,15 +183,17 @@ class TitoDexGridSkeleton extends StatelessWidget {
     this.crossAxisCount = 2,
     this.itemCount = 6,
     this.childAspectRatio = 0.78,
+    this.showLoading = false,
   });
 
   final int crossAxisCount;
   final int itemCount;
   final double childAspectRatio;
+  final bool showLoading;
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    final grid = GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -195,6 +205,17 @@ class TitoDexGridSkeleton extends StatelessWidget {
       ),
       itemCount: itemCount,
       itemBuilder: (context, index) => const TitoDexMiniCardSkeleton(),
+    );
+    if (!showLoading) return grid;
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        grid,
+        const Padding(
+          padding: EdgeInsets.only(top: 32),
+          child: TitoDelayedLoading(child: TitoPokeballLoading(onLight: true)),
+        ),
+      ],
     );
   }
 }

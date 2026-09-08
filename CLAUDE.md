@@ -49,7 +49,7 @@ flutter/lib/
   pages/  widgets/      # DeviceShell, dex_reference_detail, home/dex/search/settings
 ```
 
-- **Routes:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/dex/{moves,abilities,locations,quiz}`, `/search`, `/search/companion/*`, `/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings media/companion-position sub-routes. `/search?q=` deep link supported.
+- **Routes:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/dex/{moves,abilities,locations,quiz}`, `/search`, `/search/reference`, `/search/companion/*`, `/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings media/companion-position sub-routes. `/search?q=` deep link supported.
 - **Reference-data load order:** a complete preferred install reads app-documents `dex_offline/` first; Lite normally reads CDN first and falls back through local cache/APK assets. See `docs/AI_CONTEXT.md` for the exact policy.
 - **Game context is first-class:** edition / generation / regional `DexScope` drive which data and calculations apply.
 

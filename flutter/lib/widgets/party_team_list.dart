@@ -1,356 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../features/parser/gen4_exp.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/sprite_generation_catalog.dart';
-import '../features/dex/type_chart.dart';
 import '../l10n/app_zh.dart';
 import '../l10n/game_zh.dart';
 import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'handheld_input.dart';
 import 'sticker_card.dart';
 import 'sticker_pressable.dart';
-import 'tito_progress_bar.dart';
 import 'tito_sprite_sticker.dart';
-
-/// Design-spec team row: sticker sprite, name, HP + EXP bars.
-class PartyTeamList extends StatelessWidget {
-  const PartyTeamList({
-    super.key,
-    required this.party,
-    this.detailsFuture,
-    this.showEmptySlots = false,
-    this.onMemberTap,
-    this.onEmptySlotTap,
-    this.expandedIndex,
-    this.editorBuilder,
-  });
-
-  final List<PartyMember> party;
-  final Future<Map<int, PokemonDetail>>? detailsFuture;
-  final bool showEmptySlots;
-  final ValueChanged<int>? onMemberTap;
-  final VoidCallback? onEmptySlotTap;
-
-  /// v0.6.7 inline editor: when [expandedIndex] points at a member and
-  /// [editorBuilder] is set, that slot renders the editor card in place
-  /// of the row (team template) instead of opening a bottom sheet.
-  final int? expandedIndex;
-  final Widget Function(BuildContext context, int index)? editorBuilder;
-
-  @override
-  Widget build(BuildContext context) {
-    final slots = showEmptySlots ? 6 : party.length;
-    return FutureBuilder<Map<int, PokemonDetail>>(
-      future: detailsFuture,
-      builder: (context, snapshot) {
-        final details = snapshot.data ?? const <int, PokemonDetail>{};
-        return Column(
-          children: [
-            for (var index = 0; index < slots; index++) ...[
-              if (index > 0) const SizedBox(height: 10),
-              if (index == expandedIndex && editorBuilder != null)
-                editorBuilder!(context, index)
-              else if (index < party.length)
-                _PartyTeamRow(
-                  member: party[index],
-                  summary: details[party[index].speciesId]?.summary,
-                  slot: index + 1,
-                  onTap: onMemberTap == null ? null : () => onMemberTap!(index),
-                )
-              else
-                _EmptyTeamRow(onTap: onEmptySlotTap),
-            ],
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _PartyTeamRow extends StatelessWidget {
-  const _PartyTeamRow({
-    required this.member,
-    required this.summary,
-    required this.slot,
-    this.onTap,
-  });
-
-  final PartyMember member;
-  final PokemonSummary? summary;
-  final int slot;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = member.nickname ?? localizeSpecies(member.species);
-    final speciesId = member.speciesId;
-    // v0.6.7 team template: rounded-square sprite plate, name + sub + type
-    // pills, coral level on the right. HP/EXP bars only render when real
-    // save data exists — manually added members (NS journeys) keep the
-    // clean template look without empty bars.
-    final hasVitals = member.currentHp != null && member.maxHp != null;
-    final hasExp = member.experience != null && member.level != null;
-    final subParts = <String>[
-      if (member.level != null) '${AppZh.level}${member.level}',
-      if (member.nickname != null) localizeSpecies(member.species),
-    ];
-
-    return StickerPressable(
-      borderRadius: BorderRadius.circular(TitoRadii.md),
-      ownShadow: false,
-      interactive: onTap != null,
-      child: StickerCard(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(TitoRadii.md),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (speciesId != null)
-                TitoSpriteSticker(
-                  source:
-                      summary?.displaySpritePath ??
-                      defaultSpriteUrlFor(speciesId),
-                  size: 46,
-                  radius: TitoRadii.md,
-                )
-              else
-                const TitoSpriteSticker(
-                  source: null,
-                  size: 46,
-                  radius: TitoRadii.md,
-                ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: SecondaryTypography.onCard.h15.copyWith(
-                        color: TitoColors.deepBlue,
-                      ),
-                    ),
-                    if (subParts.isNotEmpty) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        subParts.join(' · '),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: SecondaryTypography.onCard.small12.copyWith(
-                          color: TitoColors.mutedInk,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                    if (member.types.isNotEmpty) ...[
-                      const SizedBox(height: 5),
-                      Wrap(
-                        spacing: 5,
-                        runSpacing: 4,
-                        children: [
-                          for (final type in member.types)
-                            _TypePill(typeKey: type),
-                        ],
-                      ),
-                    ],
-                    if (hasVitals) ...[
-                      const SizedBox(height: 8),
-                      _StatBar(
-                        label: 'HP',
-                        value: (member.currentHp! / member.maxHp!).clamp(
-                          0.0,
-                          1.0,
-                        ),
-                        detail: '${member.currentHp}/${member.maxHp}',
-                        fillColor: TitoColors.hpGreen,
-                      ),
-                    ],
-                    if (hasExp) ...[
-                      const SizedBox(height: 6),
-                      _StatBar(
-                        label: 'EXP',
-                        value: gen4MediumFastExpProgress(
-                          member.experience!,
-                          member.level!,
-                        ),
-                        detail: null,
-                        fillColor: TitoColors.expGold,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              if (member.level != null) ...[
-                const SizedBox(width: 8),
-                Text(
-                  '${AppZh.level}${member.level}',
-                  style: SecondaryTypography.onCard.h15.copyWith(
-                    color: TitoColors.coral,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Tiny type-colored pill from the team template (火/飞行…).
-class _TypePill extends StatelessWidget {
-  const _TypePill({required this.typeKey});
-
-  final String typeKey;
-
-  @override
-  Widget build(BuildContext context) {
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
-    }
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
-      decoration: BoxDecoration(
-        color: typeTileColor(typeKey),
-        borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: border,
-      ),
-      child: Text(
-        typeNameZh(typeKey),
-        // 10px keeps two type pills inside the narrow team row; the row's
-        // other text stays on the 12/14 secondary scale.
-        style: SecondaryTypography.onCard.small12.copyWith(
-          fontSize: 10,
-          fontWeight: FontWeight.w800,
-          color: TitoColors.ink.withValues(alpha: 0.75),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatBar extends StatelessWidget {
-  const _StatBar({
-    required this.label,
-    required this.value,
-    required this.fillColor,
-    this.detail,
-  });
-
-  final String label;
-  final double value;
-  final Color fillColor;
-  final String? detail;
-
-  @override
-  Widget build(BuildContext context) {
-    final team12 = SecondaryTypography.onCard.team12;
-
-    return Row(
-      children: [
-        SizedBox(width: 28, child: Text(label, style: team12)),
-        Expanded(
-          child: TitoProgressBar(
-            value: value,
-            height: 8,
-            fillColor: fillColor,
-            trackColor: TitoColors.skyBlue.withValues(alpha: 0.45),
-          ),
-        ),
-        if (detail != null) ...[
-          const SizedBox(width: 6),
-          Text(detail!, style: team12),
-        ],
-      ],
-    );
-  }
-}
-
-class _EmptyTeamRow extends StatelessWidget {
-  const _EmptyTeamRow({this.onTap});
-
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    // Team template: dashed warm card, centered label, no drop shadow.
-    final radius = BorderRadius.circular(TitoRadii.md);
-    final Color fill;
-    final Color dash;
-    final double stroke;
-    if (appVisualStyle.usesFlatUi) {
-      final scheme = Theme.of(context).colorScheme;
-      fill = scheme.surfaceContainerLow;
-      dash = scheme.outlineVariant;
-      stroke = TitoBorders.element;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      fill = Colors.white.withValues(alpha: 0.3);
-      dash = Colors.white.withValues(alpha: 0.6);
-      stroke = TitoBorders.glass;
-    } else {
-      fill = TitoColors.cardWarm;
-      dash = TitoColors.ink.withValues(alpha: 0.45);
-      stroke = TitoBorders.card;
-    }
-    return StickerPressable(
-      borderRadius: radius,
-      ownShadow: false,
-      interactive: onTap != null,
-      child: CustomPaint(
-        painter: _DashedRRectPainter(
-          color: dash,
-          radius: TitoRadii.md,
-          strokeWidth: stroke,
-        ),
-        child: Material(
-          color: fill,
-          borderRadius: radius,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: radius,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_rounded,
-                    size: 18,
-                    color: TitoColors.mutedInk.withValues(alpha: 0.8),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    AppZh.teamEmptySlot,
-                    style: SecondaryTypography.onCard.body14.copyWith(
-                      color: TitoColors.mutedInk,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 /// Dashed rounded-rect outline for the empty team slot (no native dashed
 /// borders in Flutter).
@@ -393,4 +54,236 @@ class _DashedRRectPainter extends CustomPainter {
       color != oldDelegate.color ||
       radius != oldDelegate.radius ||
       strokeWidth != oldDelegate.strokeWidth;
+}
+
+/// 3×2 party index. Tap a filled slot to select it; empty slots add a member.
+class PartyTeamBoard extends StatelessWidget {
+  const PartyTeamBoard({
+    super.key,
+    required this.party,
+    this.detailsFuture,
+    this.selectedIndex,
+    this.onSelect,
+    this.onEmptySlotTap,
+  });
+
+  final List<PartyMember> party;
+  final Future<Map<int, PokemonDetail>>? detailsFuture;
+  final int? selectedIndex;
+  final ValueChanged<int>? onSelect;
+  final VoidCallback? onEmptySlotTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<int, PokemonDetail>>(
+      future: detailsFuture,
+      builder: (context, snapshot) {
+        final details = snapshot.data ?? const <int, PokemonDetail>{};
+        return Column(
+          children: [
+            for (var row = 0; row < 2; row++) ...[
+              if (row > 0) const SizedBox(height: 8),
+              Row(
+                children: [
+                  for (var col = 0; col < 3; col++) ...[
+                    if (col > 0) const SizedBox(width: 8),
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 0.92,
+                        child: _PartyGridSlot(
+                          index: row * 3 + col,
+                          party: party,
+                          details: details,
+                          selected: selectedIndex == row * 3 + col,
+                          onSelect: onSelect,
+                          onEmptySlotTap: onEmptySlotTap,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+bool _canEvolveFrom(EvolutionNode? node, int id) {
+  if (node == null) return false;
+  if (node.id == id) return node.children.isNotEmpty;
+  return node.children.any((child) => _canEvolveFrom(child, id));
+}
+
+class _PartyGridSlot extends StatelessWidget {
+  const _PartyGridSlot({
+    required this.index,
+    required this.party,
+    required this.details,
+    required this.selected,
+    this.onSelect,
+    this.onEmptySlotTap,
+  });
+
+  final int index;
+  final List<PartyMember> party;
+  final Map<int, PokemonDetail> details;
+  final bool selected;
+  final ValueChanged<int>? onSelect;
+  final VoidCallback? onEmptySlotTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (index >= party.length) {
+      return _EmptyGridSlot(onTap: party.length < 6 ? onEmptySlotTap : null);
+    }
+    final member = party[index];
+    final speciesId = member.speciesId;
+    final summary = speciesId == null ? null : details[speciesId]?.summary;
+    final canEvolve =
+        speciesId != null &&
+        _canEvolveFrom(details[speciesId]?.evolutionChain, speciesId);
+    final label = member.nickname ?? localizeSpecies(member.species);
+    final scheme = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(TitoRadii.md);
+    final selectedColor = appVisualStyle.usesFlatUi
+        ? scheme.primary
+        : TitoColors.coral;
+    return HandheldFocusDecorator(
+      onActivate: onSelect == null ? null : () => onSelect!(index),
+      borderRadius: radius,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(TitoRadii.md + 2),
+          border: Border.all(
+            color: selected ? selectedColor : Colors.transparent,
+            width: TitoBorders.card,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: StickerPressable(
+            borderRadius: radius,
+            ownShadow: false,
+            child: StickerCard(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+              child: InkWell(
+                onTap: onSelect == null ? null : () => onSelect!(index),
+                borderRadius: radius,
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TitoSpriteSticker(
+                          source:
+                              summary?.displaySpritePath ??
+                              (speciesId == null
+                                  ? null
+                                  : defaultSpriteUrlFor(speciesId)),
+                          size: 40,
+                          radius: TitoRadii.md,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: SecondaryTypography.onCard.small12.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: TitoColors.deepBlue,
+                          ),
+                        ),
+                        if (member.level != null)
+                          Text(
+                            '${AppZh.level}${member.level}',
+                            maxLines: 1,
+                            style: SecondaryTypography.onCard.small12.copyWith(
+                              color: TitoColors.coral,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (canEvolve)
+                      const Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Icon(
+                          Icons.auto_awesome_rounded,
+                          size: 14,
+                          color: TitoColors.coral,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyGridSlot extends StatelessWidget {
+  const _EmptyGridSlot({this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(TitoRadii.md);
+    final Color fill;
+    final Color dash;
+    final double stroke;
+    if (appVisualStyle.usesFlatUi) {
+      final scheme = Theme.of(context).colorScheme;
+      fill = scheme.surfaceContainerLow;
+      dash = scheme.outlineVariant;
+      stroke = TitoBorders.element;
+    } else if (appVisualStyle.usesSolidPlastic) {
+      fill = Colors.white.withValues(alpha: 0.3);
+      dash = Colors.white.withValues(alpha: 0.6);
+      stroke = TitoBorders.glass;
+    } else {
+      fill = TitoColors.cardWarm;
+      dash = TitoColors.ink.withValues(alpha: 0.45);
+      stroke = TitoBorders.card;
+    }
+    return HandheldFocusDecorator(
+      onActivate: onTap,
+      borderRadius: radius,
+      child: StickerPressable(
+        borderRadius: radius,
+        ownShadow: false,
+        interactive: onTap != null,
+        child: CustomPaint(
+          painter: _DashedRRectPainter(
+            color: dash,
+            radius: TitoRadii.md,
+            strokeWidth: stroke,
+          ),
+          child: Material(
+            color: fill,
+            borderRadius: radius,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: radius,
+              child: Center(
+                child: Icon(
+                  Icons.add_rounded,
+                  size: 22,
+                  color: TitoColors.mutedInk.withValues(alpha: 0.8),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

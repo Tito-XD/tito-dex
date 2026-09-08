@@ -82,23 +82,37 @@ class StickerCard extends StatelessWidget {
 
     // Keep the existing preference contract: enabled selects a lightly raised
     // Flat UI card; disabled selects its outlined variant.
+    //
+    // Paint the lip with [TitoShadows.sticker] *outside* the clipped Material.
+    // `Material(elevation + clipAntiAlias)` eats its own shadow — and on the
+    // first inflate (search results) Impeller often skips that elevation
+    // until a later frame, which is the "cut-off sticker" flash.
     return ListenableBuilder(
       listenable: retroStyle,
-      builder: (context, inner) => Material(
-        type: MaterialType.card,
-        color: colors.$1,
-        elevation: retroStyle.enabled ? 1 : 0,
-        shadowColor: scheme.shadow,
-        surfaceTintColor: scheme.surfaceTint,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radius),
-          side: retroStyle.enabled
-              ? BorderSide.none
-              : BorderSide(color: scheme.outlineVariant),
-        ),
-        child: inner,
-      ),
+      builder: (context, inner) {
+        final raised = retroStyle.enabled;
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            boxShadow: raised ? TitoShadows.sticker : null,
+          ),
+          child: Material(
+            type: MaterialType.card,
+            color: colors.$1,
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: raised ? scheme.surfaceTint : Colors.transparent,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radius),
+              side: raised
+                  ? BorderSide.none
+                  : BorderSide(color: scheme.outlineVariant),
+            ),
+            child: inner,
+          ),
+        );
+      },
       child: Padding(padding: padding, child: child),
     );
   }

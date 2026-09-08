@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/services.dart';
 
 import '../../l10n/app_locale.dart';
 import '../game/game_edition.dart';
+import 'dex_json_decode.dart';
 
 enum ItemGameAvailability { available, unavailable, unknown }
 
@@ -33,7 +32,7 @@ class ItemGameDataRepository {
     final source = await rootBundle.loadString(
       'assets/data/item_version_matrix.json',
     );
-    final payload = jsonDecode(source) as Map<String, dynamic>;
+    final payload = await decodeDexJson(source) as Map<String, dynamic>;
     final items = payload['items'] as Map<String, dynamic>? ?? const {};
     _knownVersionGroups = {
       for (final value in items.values)

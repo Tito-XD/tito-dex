@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/widgets/home_dashboard_body.dart';
 import 'package:titodex/widgets/journey_card.dart';
+import 'package:titodex/widgets/trainer_card.dart';
 
 void main() {
   const journey = CurrentJourney(
@@ -35,7 +36,10 @@ void main() {
             journey: journey,
             saveLinked: saveLinked,
             onJourneyOpen: () {},
-            quickActions: const SizedBox(height: 60),
+            quickActions: const SizedBox(
+              key: Key('home-quick-actions'),
+              height: 60,
+            ),
           ),
         ),
       ),
@@ -71,5 +75,27 @@ void main() {
     expect(find.byType(IntrinsicHeight), findsNothing);
     expect(find.byType(JourneyCard), findsOneWidget);
     expect(find.byType(GridView), findsOneWidget);
+  });
+
+  testWidgets('portrait home centers the module stack vertically', (
+    tester,
+  ) async {
+    await pumpDashboard(
+      tester,
+      size: const Size(400, 900),
+      saveLinked: true,
+    );
+
+    final body = tester.getRect(find.byType(HomeDashboardBody));
+    final trainer = tester.getRect(find.byType(TrainerCard));
+    final quickActions = tester.getRect(find.byKey(const Key('home-quick-actions')));
+
+    // Spare height is split around the stack, not dumped under the header.
+    // Companion clearance lives inside the column, so the visible midpoint
+    // sits a little above the geometric center.
+    final spaceAbove = trainer.top - body.top;
+    final visibleMid = (trainer.top + quickActions.bottom) / 2;
+    expect(spaceAbove, greaterThan(60));
+    expect((visibleMid - body.center.dy).abs(), lessThan(80));
   });
 }

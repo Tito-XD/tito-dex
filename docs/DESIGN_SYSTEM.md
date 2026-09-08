@@ -112,7 +112,7 @@ call sites: a plain `AlertDialog`, `showModalBottomSheet` (drag handle on) and
 
 | Control | Selected colour | Notes |
 | --- | --- | --- |
-| Single choice drawn as segments / tabs / custom method chips | `softYellow` | one active option at a time (`SegmentedButton`, search hub bar, detail move-method chips, stats toggle) |
+| Single choice drawn as segments / tabs / custom method chips | `softYellow` | one active option at a time (`SegmentedButton`, battle-calc mode chips, detail move-method chips, stats toggle) |
 | Any Material chip (`FilterChip`, `ChoiceChip`, `InputChip`) and toggles | `mint` | `ChipThemeData` is shared by every chip class, so single-choice chip groups (weather, terrain, status…) also select in mint — do not fight it with local `selectedColor` |
 | Detail bottom tabs | type colour tint | intentional exception: the tab bar is the species' colour identity |
 | Flat UI (all of the above) | `colorScheme.secondaryContainer` | Material semantics, no cream/yellow |
@@ -225,6 +225,10 @@ The home screen should prioritize:
 Square screens may show these as a dashboard with multiple panels visible at once. Phone portrait can stack them.
 
 ## Component Direction
+
+### Loading feedback
+
+First-open reads should reuse cached data and avoid eager hidden-page or full-list construction. Ordinary image cells retain static placeholders. Slow image slots and section loads use one pale white Poké Ball rotating in place, with constant opacity and no shimmer; a faint outline keeps it visible on light surfaces. Shared loaders wait 160 ms before appearing and disappear as soon as content is ready. Respect reduced motion and stop tickers in hidden battle tools. Measured download progress and the Assistant's semantic response animation keep their own behavior. See [FIRST_OPEN_LOADING.md](./FIRST_OPEN_LOADING.md).
 
 ### Trainer Card
 

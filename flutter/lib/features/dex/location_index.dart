@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../game/game_edition.dart';
 import 'dex_cdn_data_source.dart';
 import 'dex_offline_service.dart';
@@ -204,17 +206,18 @@ class LocationIndexRepository {
     if (await _offline.isReady() || await _offline.shouldPreferOffline()) {
       final local = await _offline.readReferenceObject('location_index.json');
       if (local.isNotEmpty) {
-        return LocationIndex.fromJson(local);
+        return compute(LocationIndex.fromJson, local);
       }
     }
     try {
-      return LocationIndex.fromJson(
+      return await compute(
+        LocationIndex.fromJson,
         await _cdn.fetchReferenceObject('location_index.json'),
       );
     } catch (_) {
       final local = await _offline.readReferenceObject('location_index.json');
       if (local.isNotEmpty) {
-        return LocationIndex.fromJson(local);
+        return compute(LocationIndex.fromJson, local);
       }
       rethrow;
     }

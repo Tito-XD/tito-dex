@@ -1,8 +1,8 @@
 # TitoDex Roadmap
 
-> **Latest release:** [v0.9.15](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.15) · Lite `0.9.15+196` · Offline `0.9.15-offline+197`.
+> **Latest release:** [v0.9.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.16) · Lite `0.9.16+198` · Offline `0.9.16-offline+199`.
 >
-> **Current `main`:** v0.9.15 with unified Dex filtering and reference context, theme-specific shared controls, system-following Chinese/English UI and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
+> **Current `main`:** v0.9.16 with unified Dex filtering and reference context, theme-specific shared controls, system-following Chinese/English UI and verified Offline v20 data. Canonical status: [`docs/AI_CONTEXT.md`](docs/AI_CONTEXT.md).
 
 ## Current capability status
 
@@ -14,11 +14,18 @@
 | Pokédex 1–1025, 803 form records and exact-version obtain planning | Shipped |
 | Location dex + save assistant | Shipped in v0.8.8; version → area → encounter tree plus Journey capture/evolution/version reminders |
 | “Ask TitoDex” blocker Q&A | Built into the host; save-first local fuzzy matching, BGE-M3 reviewed retrieval, bounded public sources and Workers AI Qwen with visible connectivity and per-answer execution traces |
-| Offline data | Live bundle v20; v0.9.15 Offline embeds the verified v20 archive |
+| Offline data | Live bundle v20; v0.9.16 Offline embeds the verified v20 archive |
 | Items | 2130/2130 descriptions/icons; 1465 version-scoped items, 18 exact paired-version exclusives and 1114 scoped prices |
 | Battle tools | Lightweight matchup/stat/damage estimates; assumptions are explicit, simulator parity remains out of scope |
 | Pokémon Sleep | Sleep score and basic cooking-strength estimates ported from a pinned Neroli’s Lab commit; full team/production simulation remains external |
 | Controller/accessibility | D-pad A/B routing and semantics coverage; real-device matrix remains ongoing |
+
+## Completed in v0.9.16
+
+- Separate reference browsing from query-first Search; consolidate four battle tools with lazy first mounting and retained input.
+- Use a six-slot Team board with separate details/editor, refine portrait Home placement and location tiles.
+- Decode large Dex data off the native UI thread, share move-index reads, and lazily build location grids.
+- Use delayed pale rotating balls for slow reads, static small-image placeholders, stable reveal state and bounded header painting.
 
 ## Completed in v0.9.15
 
@@ -156,7 +163,7 @@
 
 ## Remaining validation / maintenance
 
-- Expand English runtime coverage across all three themes and phone/handheld layouts; reference prose and assistant answers are not claimed to be fully translated.
+- Expand English runtime coverage across all three themes and phone/handheld layouts. Known leftovers for a later pass: companion stored `nameZh`, Journey Assistant Worker answers (remain zh), Dex flavor / location / move-ability prose fallbacks. Search aliases and parser matching stay Chinese on purpose. Reference prose and assistant answers are not claimed to be fully translated.
 
 1. Add reviewed real-save fixtures as the maintainer completes more versions. Do not promote an experimental adapter to fixture-verified before that.
 2. Run the release checklist on a physical RG device and Android 15 phone: Offline first unpack, background notification, cancellation, task removal and service timeout.

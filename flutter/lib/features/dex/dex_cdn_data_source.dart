@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'dex_cdn_config.dart';
 import 'dex_models.dart';
+import 'dex_json_decode.dart';
 
 /// Live dex data from the pre-built Cloudflare R2 CDN (compile-time base URL).
 ///
@@ -53,7 +54,7 @@ class DexCdnDataSource {
       try {
         final body = await _getBody(_config.summariesUrl(prefix: prefix));
         _activeApiPrefix = prefix;
-        final list = jsonDecode(body) as List<dynamic>;
+        final list = await decodeDexJson(body) as List<dynamic>;
         return list
             .map((item) {
               final json = item as Map<String, dynamic>;
@@ -89,7 +90,7 @@ class DexCdnDataSource {
         final body = await _getBody(
           _config.referenceUrl(filename, prefix: prefix),
         );
-        final decoded = jsonDecode(body);
+        final decoded = await decodeDexJson(body);
         if (decoded is List) {
           return decoded
               .whereType<Map>()
@@ -115,7 +116,7 @@ class DexCdnDataSource {
         final body = await _getBody(
           _config.referenceUrl(filename, prefix: prefix),
         );
-        final decoded = jsonDecode(body);
+        final decoded = await decodeDexJson(body);
         if (decoded is Map) {
           return Map<String, dynamic>.from(decoded);
         }
@@ -163,7 +164,7 @@ class DexCdnDataSource {
   Future<Map<int, CachedMove>> _loadMoves() async {
     final prefix = await _resolveApiPrefix();
     final body = await _getBody(_config.movesUrl(prefix: prefix));
-    final json = jsonDecode(body) as Map<String, dynamic>;
+    final json = await decodeDexJson(body) as Map<String, dynamic>;
     final moves = <int, CachedMove>{};
     for (final entry in json.entries) {
       final id = int.tryParse(entry.key);
@@ -194,7 +195,7 @@ class DexCdnDataSource {
     for (final prefix in prefixes) {
       try {
         final body = await _getBody(_config.abilitiesUrl(prefix: prefix));
-        final json = jsonDecode(body) as Map<String, dynamic>;
+        final json = await decodeDexJson(body) as Map<String, dynamic>;
         final abilities = <int, CachedAbility>{};
         for (final entry in json.entries) {
           final id = int.tryParse(entry.key);
@@ -248,7 +249,7 @@ class DexCdnDataSource {
   }
 
   Future<Map<String, dynamic>> _getJson(String url) async {
-    return jsonDecode(await _getBody(url)) as Map<String, dynamic>;
+    return await decodeDexJson(await _getBody(url)) as Map<String, dynamic>;
   }
 
   Future<String> _getBody(String url) async {

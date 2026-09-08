@@ -70,8 +70,9 @@ class DexCatalog {
   /// JSON decoding is deliberately isolated: decoding a full 1025-species
   /// catalog must never take a frame away from the handheld UI.
   static Future<DexCatalog> decode(String source) async {
-    final decoded = await Isolate.run(() => _decodeCatalogPayload(source));
-    return DexCatalog.fromJson(decoded);
+    return Isolate.run(
+      () => DexCatalog.fromJson(_decodeCatalogPayload(source)),
+    );
   }
 
   /// Compatibility bridge for bundles published before [filename] existed.

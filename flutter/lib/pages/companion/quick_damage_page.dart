@@ -23,9 +23,14 @@ import '../../widgets/sticker_card.dart';
 import '../../widgets/tito_loading_panel.dart';
 
 class QuickDamagePage extends StatefulWidget {
-  const QuickDamagePage({super.key, required this.journey});
+  const QuickDamagePage({
+    super.key,
+    required this.journey,
+    this.embedded = false,
+  });
 
   final CurrentJourney journey;
+  final bool embedded;
 
   @override
   State<QuickDamagePage> createState() => _QuickDamagePageState();
@@ -74,26 +79,35 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
     super.initState();
     final scope = battleScopeForEdition(gameEditionRepository.edition);
     _levelController.text = scope.defaultLevel.toString();
-    // Values carried over from the stat calculator (one-shot).
-    if (!battleStatHandoff.isEmpty) {
-      final handoff = battleStatHandoff;
-      if (handoff.attack != null) {
-        _attackController.text = '${handoff.attack}';
-      }
-      if (handoff.defense != null) {
-        _defenseController.text = '${handoff.defense}';
-      }
-      if (handoff.hp != null) {
-        _hpController.text = '${handoff.hp}';
-      }
-      battleStatHandoff.clear();
-    }
-    _loadRelations();
+    _consumeStatHandoff();
+    _relations = battleToolsService.cachedTypeRelations;
+    _loading = _relations == null;
+    if (_loading) _loadRelations();
+    battleStatHandoff.addListener(_consumeStatHandoff);
     WidgetsBinding.instance.addPostFrameCallback((_) => _consumePartyHandoff());
+  }
+
+  void _consumeStatHandoff() {
+    if (battleStatHandoff.isEmpty) return;
+    final handoff = battleStatHandoff;
+    if (handoff.attack != null) {
+      _attackController.text = '${handoff.attack}';
+    }
+    if (handoff.defense != null) {
+      _defenseController.text = '${handoff.defense}';
+    }
+    if (handoff.hp != null) {
+      _hpController.text = '${handoff.hp}';
+    }
+    battleStatHandoff.clear(notify: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
+    battleStatHandoff.removeListener(_consumeStatHandoff);
     _attackerQueryController.dispose();
     _defenderQueryController.dispose();
     _levelController.dispose();
@@ -130,7 +144,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       _loading = true;
       _error = null;
     });
-    _loadRelations();
+    _relations = battleToolsService.cachedTypeRelations;
+    _loading = _relations == null;
+    if (_loading) _loadRelations();
   }
 
   Future<void> _consumePartyHandoff() async {
@@ -373,19 +389,20 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: pagePadding.copyWith(bottom: 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SecondaryPageAppBar(
-                      title: AppZh.companionToolQuickDamage,
-                    ),
-                    const SizedBox(height: 6),
-                    SecondaryPageSubtitle(text: edition.label),
-                  ],
+              if (!widget.embedded)
+                Padding(
+                  padding: pagePadding.copyWith(bottom: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SecondaryPageAppBar(
+                        title: AppZh.companionToolQuickDamage,
+                      ),
+                      const SizedBox(height: 6),
+                      SecondaryPageSubtitle(text: edition.label),
+                    ],
+                  ),
                 ),
-              ),
               if (estimate != null)
                 Padding(
                   padding: EdgeInsets.fromLTRB(

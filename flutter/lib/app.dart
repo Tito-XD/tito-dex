@@ -44,13 +44,11 @@ import 'pages/journey_page.dart';
 import 'pages/journey_pack_manager_page.dart';
 import 'pages/ask_titodex_page.dart';
 import 'pages/media_resource_page.dart';
-import 'pages/companion/blind_spot_page.dart';
-import 'pages/companion/quick_damage_page.dart';
-import 'pages/companion/stat_calc_page.dart';
-import 'pages/companion/type_matchup_page.dart';
+import 'pages/companion/battle_calc_page.dart';
 import 'pages/dex/dex_json_reference_page.dart';
 import 'pages/dex/silhouette_quiz_page.dart';
 import 'pages/search_page.dart';
+import 'pages/search_reference_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/sleep_tools_page.dart';
 import 'pages/team_page.dart';
@@ -334,11 +332,26 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   ),
                 ),
                 GoRoute(
+                  path: 'companion',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: BattleCalcPage(
+                        journey: _journey,
+                        initialMode: BattleCalcMode.matchup,
+                      ),
+                    ),
+                  ),
+                ),
+                GoRoute(
                   path: 'companion/type-matchup',
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
-                      child: TypeMatchupPage(journey: _journey),
+                      child: BattleCalcPage(
+                        journey: _journey,
+                        initialMode: BattleCalcMode.matchup,
+                      ),
                     ),
                   ),
                 ),
@@ -347,7 +360,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
-                      child: StatCalcPage(journey: _journey),
+                      child: BattleCalcPage(
+                        journey: _journey,
+                        initialMode: BattleCalcMode.stats,
+                      ),
                     ),
                   ),
                 ),
@@ -356,7 +372,10 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
-                      child: BlindSpotPage(journey: _journey),
+                      child: BattleCalcPage(
+                        journey: _journey,
+                        initialMode: BattleCalcMode.blind,
+                      ),
                     ),
                   ),
                 ),
@@ -365,7 +384,21 @@ class _TitoDexAppState extends State<TitoDexApp> {
                   pageBuilder: (context, state) => titoMaterialPage(
                     key: state.pageKey,
                     child: TitoPageContainer(
-                      child: QuickDamagePage(journey: _journey),
+                      child: BattleCalcPage(
+                        journey: _journey,
+                        initialMode: BattleCalcMode.damage,
+                      ),
+                    ),
+                  ),
+                ),
+                GoRoute(
+                  path: 'reference',
+                  pageBuilder: (context, state) => titoMaterialPage(
+                    key: state.pageKey,
+                    child: TitoPageContainer(
+                      child: SearchReferencePage(
+                        onAskTitoDex: () => context.push('/search/ask'),
+                      ),
                     ),
                   ),
                 ),
