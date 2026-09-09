@@ -27,6 +27,8 @@ import 'package:titodex/pages/journey_page.dart';
 import 'package:titodex/widgets/assistant_surface.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
+import 'ask_motion_test_images.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -523,6 +525,7 @@ void main() {
             path: '/journey/ask',
             builder: (_, _) => TitoPageContainer(
               child: AskTitoDexPage(
+                motionImagePreparer: prepareTestAskMotionImages,
                 journey: _journey,
                 edition: GameEdition.hgss.withFlavor('soulsilver'),
                 service: service,
@@ -667,7 +670,8 @@ void main() {
       expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('检索 2 路'), findsOneWidget);
-      expect(find.text('已核验 · 参考 3 个来源'), findsOneWidget);
+      expect(find.text('参考 3 个来源 · 未逐项核验'), findsOneWidget);
+      expect(find.text('已核验 · 参考 3 个来源'), findsNothing);
       expect(find.text('参考 3 个来源'), findsNothing);
       expect(find.text('升级习得'), findsOneWidget);
       expect(find.text('## 升级习得'), findsNothing);
@@ -698,6 +702,10 @@ void main() {
         findsOneWidget,
       );
 
+      await tester.ensureVisible(
+        find.byKey(const Key('ask-titodex-source-summary')),
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('ask-titodex-source-summary')));
       await tester.pumpAndSettle();
 
@@ -734,6 +742,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: service,
@@ -782,7 +791,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('回答会直接完整显示。'), findsOneWidget);
-    expect(find.text('已核验 · 参考 1 个来源'), findsOneWidget);
+    expect(find.text('参考 1 个来源 · 未逐项核验'), findsOneWidget);
   });
 
   testWidgets('newest question and completed answer stay in view', (
@@ -814,6 +823,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: service,
@@ -839,8 +849,8 @@ void main() {
         )
         .position;
 
-    expect(answerPosition().maxScrollExtent, greaterThan(0));
-    answerPosition().jumpTo(answerPosition().maxScrollExtent);
+    expect(answerPosition().minScrollExtent, lessThan(0));
+    answerPosition().jumpTo(answerPosition().minScrollExtent);
     await tester.pump();
 
     await tester.enterText(
@@ -851,19 +861,19 @@ void main() {
     await tester.pump();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 240));
-    expect(answerPosition().extentBefore, lessThanOrEqualTo(1));
+    expect(answerPosition().pixels, closeTo(0, .5));
 
     service.complete(
       const AskTitoDexResult(
         status: AskTitoDexStatus.answered,
-        answer: '这是最新的回答，完成后也应该自动停留在最下面。',
+        answer: '这是最新的回答，完成后也应该停留在这一轮开头。',
         onlineComposed: true,
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('这是最新的回答，完成后也应该自动停留在最下面。'), findsOneWidget);
-    expect(answerPosition().extentBefore, lessThanOrEqualTo(1));
+    expect(find.text('这是最新的回答，完成后也应该停留在这一轮开头。'), findsOneWidget);
+    expect(answerPosition().pixels, closeTo(0, .5));
   });
 
   testWidgets('compact connection summary expands grouped provider details', (
@@ -877,6 +887,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: _CompleterService(webSearchEnabled: true),
@@ -931,6 +942,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: gameEditionFromSlug('sv')!.withFlavor('violet'),
               service: _FakeService(const []),
@@ -969,6 +981,7 @@ void main() {
               changeEdition = (edition) => setState(() => selected = edition);
               return TitoPageContainer(
                 child: AskTitoDexPage(
+                  motionImagePreparer: prepareTestAskMotionImages,
                   journey: _journey,
                   edition: selected,
                   service: service,
@@ -1024,6 +1037,7 @@ void main() {
             valueListenable: edition,
             builder: (_, value, _) => TitoPageContainer(
               child: AskTitoDexPage(
+                motionImagePreparer: prepareTestAskMotionImages,
                 journey: _journey,
                 edition: value,
                 service: service,
@@ -1077,6 +1091,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: _FakeService(const []),
@@ -1112,7 +1127,6 @@ void main() {
                   journey: _journey,
                   askTitoDexEnabled: enabled,
                   onAskTitoDex: () {},
-                  onManageJourneyPacks: () {},
                   assistantFuture: Future.value(_snapshot),
                 ),
               ),
@@ -1135,18 +1149,7 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       expect(find.byKey(const Key('ask-titodex-entry')), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.byKey(
-          const Key('journey-pack-manager-entry'),
-          skipOffstage: false,
-        ),
-        120,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(
-        find.byKey(const Key('journey-pack-manager-entry')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('journey-pack-manager-entry')), findsNothing);
     },
   );
 
@@ -1179,6 +1182,7 @@ void main() {
             path: '/journey/ask',
             builder: (_, _) => TitoPageContainer(
               child: AskTitoDexPage(
+                motionImagePreparer: prepareTestAskMotionImages,
                 journey: _journey,
                 edition: GameEdition.hgss.withFlavor('soulsilver'),
                 service: service,
@@ -1300,6 +1304,7 @@ class _FixedEntityResolver implements AskTitoDexEntityResolver {
   Future<List<AskTitoDexEntityLink>> resolve({
     required String question,
     required String answer,
+    List<String>? stableIds,
   }) async => const [
     AskTitoDexEntityLink(
       kind: AskTitoDexEntityKind.pokemon,

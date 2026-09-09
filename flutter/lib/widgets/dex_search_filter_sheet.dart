@@ -77,6 +77,7 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
   );
   late bool _journeyOnly = widget.journeyOnly;
   late DexEncounterFilter _encounter = widget.encounter;
+  late Set<int>? _speciesIds = widget.filter.speciesIds;
   late Set<String> _types = {...widget.filter.typeSlugs};
   late Set<String> _colors = {...widget.filter.colorSlugs};
   late String? _shape = widget.filter.shapeSlug;
@@ -171,6 +172,7 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
     _scope = const DexBrowseScope.region(DexRegionalPokedex.national);
     _encounter = DexEncounterFilter.all;
     _types = {};
+    _speciesIds = null;
     _colors = {};
     _shape = null;
     _size = null;
@@ -188,6 +190,8 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
   void _apply() {
     if (!_abilityValid || !_moveValid) return;
     final labels = <String>[
+      if (_speciesIds != null && widget.filter.speciesLabelZh != null)
+        widget.filter.speciesLabelZh!,
       if (_ability != null)
         AppZh.dexSearchAbilityLabel(
           _abilities.where((a) => a.id == _ability).firstOrNull?.nameZh ??
@@ -204,6 +208,10 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
       DexSearchFilterSelection(
         DexFilter(
           query: _query.text.trim(),
+          speciesIds: _speciesIds,
+          speciesLabelZh: _speciesIds == null
+              ? null
+              : widget.filter.speciesLabelZh,
           typeSlugs: _types,
           formDisplay: _forms,
           shapeSlug: _shape,
@@ -377,15 +385,20 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _select(AppZh.dexSearchGenerationField, _generation ?? 0, {
-                          0: AppZh.dexSearchAllGenerations,
-                          for (
-                            var generation = 1;
-                            generation <= 9;
-                            generation++
-                          )
-                            generation: generationLabelZh(generation),
-                        }, (v) => _generation = v == 0 ? null : v),
+                        child: _select(
+                          AppZh.dexSearchGenerationField,
+                          _generation ?? 0,
+                          {
+                            0: AppZh.dexSearchAllGenerations,
+                            for (
+                              var generation = 1;
+                              generation <= 9;
+                              generation++
+                            )
+                              generation: generationLabelZh(generation),
+                          },
+                          (v) => _generation = v == 0 ? null : v,
+                        ),
                       ),
                     ],
                   ),
@@ -393,28 +406,42 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
                   Row(
                     children: [
                       Expanded(
-                        child: _select(AppZh.dexSearchTagField, _tag ?? '', {
-                          '': AppZh.dexSearchAllPokemon,
-                          'legendary': AppZh.dexSearchTagLegendary,
-                          'mythical': AppZh.dexSearchTagMythical,
-                          'pseudo-legendary': AppZh.dexSearchTagPseudoLegendary,
-                          'baby': AppZh.dexSearchTagBaby,
-                        }, (v) => _tag = v.isEmpty ? null : v),
+                        child: _select(
+                          AppZh.dexSearchTagField,
+                          _tag ?? '',
+                          {
+                            '': AppZh.dexSearchAllPokemon,
+                            'legendary': AppZh.dexSearchTagLegendary,
+                            'mythical': AppZh.dexSearchTagMythical,
+                            'pseudo-legendary':
+                                AppZh.dexSearchTagPseudoLegendary,
+                            'baby': AppZh.dexSearchTagBaby,
+                          },
+                          (v) => _tag = v.isEmpty ? null : v,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: _select(AppZh.dexSearchFormField, _forms, {
                           DexFormDisplay.base: AppZh.dexDetailBaseForm,
                           DexFormDisplay.all: AppZh.dexFormDisplayAll,
-                          DexFormDisplay.alternate: AppZh.dexFormDisplayAlternate,
+                          DexFormDisplay.alternate:
+                              AppZh.dexFormDisplayAlternate,
                         }, (v) => _forms = v),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
-                  _chips(AppZh.dexSearchTypesField, _typesAll, _types, typeNameZh, (v) {
-                    if (!_types.remove(v)) _types.add(v);
-                  }, avatar: _typeAvatar),
+                  _chips(
+                    AppZh.dexSearchTypesField,
+                    _typesAll,
+                    _types,
+                    typeNameZh,
+                    (v) {
+                      if (!_types.remove(v)) _types.add(v);
+                    },
+                    avatar: _typeAvatar,
+                  ),
                   const Divider(),
                   ExpansionTile(
                     tilePadding: EdgeInsets.zero,
@@ -498,10 +525,12 @@ class _DexSearchFilterSheetState extends State<DexSearchFilterSheet> {
                         ),
                         const SizedBox(height: 12),
                       ],
-                      _select(AppZh.dexSearchEggGroupField, _egg ?? '', {
-                        '': AppZh.dexSearchAllEggGroups,
-                        ..._eggs,
-                      }, (v) => _egg = v.isEmpty ? null : v),
+                      _select(
+                        AppZh.dexSearchEggGroupField,
+                        _egg ?? '',
+                        {'': AppZh.dexSearchAllEggGroups, ..._eggs},
+                        (v) => _egg = v.isEmpty ? null : v,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         AppZh.dexSearchReferenceNote,

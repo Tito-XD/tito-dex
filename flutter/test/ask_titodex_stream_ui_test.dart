@@ -15,6 +15,8 @@ import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
+import 'ask_motion_test_images.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -52,6 +54,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: service,
@@ -313,7 +316,7 @@ void main() {
   });
 
   testWidgets(
-    'semantic growth does not pull the user back after they scroll up',
+    'long answers keep their beginning visible and preserve a reading position',
     (tester) async {
       final service = _SemanticStreamService();
       await _pumpAskPage(tester, service);
@@ -325,6 +328,11 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pump();
+
+      final answerSurface = find.byKey(
+        const Key('ask-titodex-active-answer-surface'),
+      );
+      final initialTop = tester.getTopLeft(answerSurface).dy;
 
       final firstText = List.generate(
         24,
@@ -355,7 +363,9 @@ void main() {
           .first;
       final position = tester.state<ScrollableState>(scrollable).position;
       expect(position.maxScrollExtent, greaterThan(72));
-      position.jumpTo(position.maxScrollExtent);
+      expect(position.pixels, closeTo(0, .5));
+      expect(tester.getTopLeft(answerSurface).dy, closeTo(initialTop, .5));
+      position.jumpTo(position.maxScrollExtent * .45);
       await tester.pump();
       ScrollUpdateNotification(
         metrics: position,
@@ -366,11 +376,12 @@ void main() {
           globalPosition: Offset.zero,
           delta: Offset(0, 180),
         ),
-        scrollDelta: 180,
+        scrollDelta: -180,
       ).dispatch(
         tester.element(find.byKey(const Key('ask-titodex-answer-scroll'))),
       );
       expect(position.extentBefore, greaterThan(72));
+      final readingOffset = position.pixels;
 
       final grownText =
           '$firstText\n\n${List.generate(8, (index) => '新增的第${index + 1}条核验说明。').join('\n\n')}';
@@ -390,11 +401,97 @@ void main() {
       await _pumpUntil(tester, () => secondRevealFinished);
       await secondReveal;
 
-      expect(position.extentBefore, greaterThan(72));
+      expect(position.pixels, closeTo(readingOffset, .5));
       service.complete(
-        AskTitoDexResult(status: AskTitoDexStatus.answered, answer: grownText),
+        AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: grownText,
+          answerBlocks: [
+            AskTitoDexAnswerBlock(
+              id: 'route',
+              kind: AskTitoDexAnswerBlockKind.paragraph,
+              text: grownText,
+            ),
+          ],
+        ),
       );
       await tester.pumpAndSettle();
+      expect(position.pixels, closeTo(readingOffset, .5));
+    },
+  );
+
+  testWidgets(
+    'following the end requires user intent and stops when reading upward',
+    (tester) async {
+      final service = _SemanticStreamService();
+      await _pumpAskPage(tester, service);
+      await tester.enterText(
+        find.byKey(const Key('ask-titodex-question')),
+        '长回答',
+      );
+      await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+      await tester.pump();
+      Future<void> emit(String text) async {
+        var done = false;
+        final future = service
+            .emitBlock(
+              AskTitoDexAnswerBlock(
+                id: 'reading',
+                kind: AskTitoDexAnswerBlockKind.paragraph,
+                text: text,
+                isComplete: false,
+              ),
+            )
+            .then((_) => done = true);
+        await _pumpUntil(tester, () => done);
+        await future;
+        await tester.pump();
+      }
+
+      void userScroll(ScrollPosition position, double delta) {
+        final context = tester.element(
+          find.byKey(const Key('ask-titodex-answer-scroll')),
+        );
+        ScrollUpdateNotification(
+          metrics: position,
+          context: context,
+          scrollDelta: delta,
+          dragDetails: DragUpdateDetails(globalPosition: Offset.zero),
+        ).dispatch(context);
+      }
+
+      var answer = List.generate(35, (i) => '第 $i 段：已经呈现的资料说明。').join('\n\n');
+      await emit(answer);
+      final position = _conversationPosition(tester);
+      expect(position.pixels, closeTo(0, .5));
+      position.jumpTo(position.maxScrollExtent);
+      await tester.pump();
+      userScroll(position, 100);
+      answer += '\n\n${List.filled(8, '新增资料向下展开。').join('\n\n')}';
+      await emit(answer);
+      expect(position.extentAfter, lessThanOrEqualTo(.5));
+      position.jumpTo(position.maxScrollExtent - 150);
+      await tester.pump();
+      userScroll(position, -150);
+      final readingOffset = position.pixels;
+      answer += '\n\n${List.filled(8, '继续追加，但不移动正在阅读的段落。').join('\n\n')}';
+      await emit(answer);
+      expect(position.pixels, closeTo(readingOffset, .5));
+      service.complete(
+        AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: answer,
+          answerBlocks: [
+            AskTitoDexAnswerBlock(
+              id: 'reading',
+              kind: AskTitoDexAnswerBlockKind.paragraph,
+              text: answer,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(position.pixels, closeTo(readingOffset, .5));
     },
   );
 
@@ -498,6 +595,9 @@ void main() {
       final historicalChip = find.byKey(
         const ValueKey('ask-clarification-riolu'),
       );
+      final position = _conversationPosition(tester);
+      position.jumpTo(position.minScrollExtent);
+      await tester.pumpAndSettle();
       expect(historicalChip, findsOneWidget);
       await tester.ensureVisible(historicalChip);
       await tester.tap(historicalChip);
@@ -648,6 +748,7 @@ void main() {
             path: '/journey/ask',
             builder: (_, _) => TitoPageContainer(
               child: AskTitoDexPage(
+                motionImagePreparer: prepareTestAskMotionImages,
                 journey: _journey,
                 edition: GameEdition.hgss.withFlavor('soulsilver'),
                 service: service,
@@ -685,8 +786,12 @@ void main() {
           )
           .first;
       final position = tester.state<ScrollableState>(scrollable).position;
-      expect(position.maxScrollExtent, greaterThan(0));
-      expect(position.extentBefore, lessThanOrEqualTo(1));
+      expect(position.minScrollExtent, lessThan(0));
+      expect(position.pixels, closeTo(0, .5));
+      final viewport = tester.getRect(
+        find.byKey(const Key('ask-titodex-answer-viewport')),
+      );
+      expect(viewport.contains(tester.getCenter(find.text('历史问题 50'))), isTrue);
     },
   );
 
@@ -706,6 +811,7 @@ void main() {
           path: '/journey/ask',
           builder: (_, _) => TitoPageContainer(
             child: AskTitoDexPage(
+              motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
               service: service,
@@ -754,6 +860,9 @@ void main() {
     await tester.tap(find.byKey(const Key('ask-titodex-submit')));
     await tester.pump();
 
+    final position = _conversationPosition(tester);
+    position.jumpTo(position.minScrollExtent);
+    await tester.pump();
     expect(find.text(firstAnswer, findRichText: true), findsOne);
     expect(find.text('$firstAnswer▍', findRichText: true), findsNothing);
     expect(find.byKey(const Key('ask-titodex-generating-answer')), findsOne);
@@ -766,6 +875,8 @@ void main() {
           .first,
     );
     expect(staticEvidence.sizeFactor.value, 1);
+    position.jumpTo(0);
+    await tester.pump();
 
     service.complete(
       const AskTitoDexResult(
@@ -796,6 +907,7 @@ void main() {
               valueListenable: edition,
               builder: (_, value, _) => TitoPageContainer(
                 child: AskTitoDexPage(
+                  motionImagePreparer: prepareTestAskMotionImages,
                   journey: _journey,
                   edition: value,
                   service: service,
@@ -835,6 +947,17 @@ void main() {
     },
   );
 }
+
+ScrollPosition _conversationPosition(WidgetTester tester) => tester
+    .state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byKey(const Key('ask-titodex-answer-scroll')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    )
+    .position;
 
 String _visibleCursorText(WidgetTester tester) {
   final values = <String>[
@@ -887,6 +1010,7 @@ Future<void> _pumpAskPage(
         path: '/journey/ask',
         builder: (_, _) => TitoPageContainer(
           child: AskTitoDexPage(
+            motionImagePreparer: prepareTestAskMotionImages,
             journey: _journey,
             edition: GameEdition.hgss.withFlavor('soulsilver'),
             service: service,
@@ -963,6 +1087,7 @@ class _FixedEntityResolver implements AskTitoDexEntityResolver {
   Future<List<AskTitoDexEntityLink>> resolve({
     required String question,
     required String answer,
+    List<String>? stableIds,
   }) async => links;
 }
 

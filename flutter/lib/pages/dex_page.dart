@@ -335,9 +335,14 @@ class _DexPageState extends State<DexPage> {
 
   Future<void> _bootstrap() async {
     try {
-      final browseScope = await dexSettingsRepository.loadBrowseScope();
+      final explicitSpecies =
+          dexFilterController.currentFilter.speciesIds != null;
+      final browseScope = explicitSpecies
+          ? const DexBrowseScope.region(DexRegionalPokedex.national)
+          : await dexSettingsRepository.loadBrowseScope();
       final session = DexBrowseSessionStore.current;
       final restore =
+          !explicitSpecies &&
           session != null &&
           session.matches(browseScope, dexFilterController.currentFilter);
       _journeyIds = _resolveJourneyIds();

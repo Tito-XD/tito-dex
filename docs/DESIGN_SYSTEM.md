@@ -296,3 +296,19 @@ rights boundaries are maintained in `CREDITS.md` and the in-app credits page.
 ## Supplied Reference Translation
 
 The reference image should be interpreted as a product direction, not a requirement to copy every pixel. Preserve the feeling: warm blue device, cream sticker cards, thick navy outlines, companion presence, dashboard density, and playful Trainer Card energy.
+
+
+### Compact fact grids and answer progress (0.9.17)
+
+Journey and Team facts share `TitoFactGrid` / `TitoFactTile`: 8px row/column
+spacing, `TitoRadii.sm`, 10px cell padding, 12px label and 14px value separated
+by 6px. Cells grow to their content. The requested column count is an upper
+bound; the minimum 84px cell width scales with system text size. Use
+`TitoBorders.element` for Journal/Flat outlines and `TitoBorders.glass` for the
+Plastic light edge. Flat text uses the semantic on-surface colours.
+
+Native answer progress uses an 18px prop in a 26px leading lane, with the
+12px progress label aligned to the answer's leading edge. Loading rotates
+only semantically related props, while completion holds the original subject.
+Idle prompts keep their separate inline word transitions. Primary buttons
+wrap long labels within available width without shrinking accessibility text.

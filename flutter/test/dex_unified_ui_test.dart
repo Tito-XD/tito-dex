@@ -33,6 +33,57 @@ const _referenceMove = CachedMove(
 
 void main() {
   testWidgets(
+    'Journey cohort survives narrowing and clears with all conditions',
+    (tester) async {
+      DexSearchFilterSelection? result;
+      const label = '其他待补全 · 2 种';
+      const initial = DexFilter(
+        speciesIds: {6, 7},
+        speciesLabelZh: label,
+        labelZh: label,
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () async {
+                  result = await showDexSearchFilterSheet(
+                    context,
+                    filter: result?.filter ?? initial,
+                    scope: const DexBrowseScope.region(
+                      DexRegionalPokedex.national,
+                    ),
+                    encounter: DexEncounterFilter.all,
+                  );
+                },
+                child: const Text('打开'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('打开'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, '火');
+      await tester.tap(find.text('查看结果'));
+      await tester.pumpAndSettle();
+      expect(result!.filter.speciesIds, {6, 7});
+      expect(result!.filter.query, '火');
+      expect(result!.filter.labelZh, label);
+      await tester.tap(find.text('打开'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('清空条件'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('查看结果'));
+      await tester.pumpAndSettle();
+      expect(result!.filter.speciesIds, isNull);
+      expect(result!.filter.speciesLabelZh, isNull);
+      expect(result!.filter.isActive, isFalse);
+    },
+  );
+
+  testWidgets(
     'pale ball rotates without changing position or using colored artwork',
     (tester) async {
       await tester.pumpWidget(
@@ -108,7 +159,7 @@ void main() {
   );
 
   testWidgets(
-    'detail merges App edition and offers only combined reference versions',
+    'detail preserves exact App edition and shares local reference selection',
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       await gameEditionRepository.save(
@@ -194,7 +245,7 @@ void main() {
             .widget<DexDetailControls>(find.byType(DexDetailControls))
             .edition
             .selectedFlavor,
-        isNull,
+        'soulsilver',
       );
       expect(
         tester
@@ -221,21 +272,18 @@ void main() {
       );
       expect(gameEditionRepository.edition.selectedFlavor, 'soulsilver');
       expect(find.byTooltip('清除版本'), findsNothing);
-      final versionPicker = tester.widget<DropdownButtonFormField<String>>(
-        find.byKey(const ValueKey('detail-version-sv:')),
-      );
-      final versionDropdown = tester.widget<DropdownButton<String>>(
-        find.descendant(
-          of: find.byKey(const ValueKey('detail-version-sv:')),
-          matching: find.byType(DropdownButton<String>),
-        ),
-      );
-      expect(versionDropdown.items!.length, GameEdition.all.length + 1);
       expect(
-        versionDropdown.items!.map((item) => item.value),
-        isNot(contains('sv:scarlet')),
+        find.descendant(
+          of: find.byType(DexDetailControls),
+          matching: find.text('朱'),
+        ),
+        findsOneWidget,
       );
-      versionPicker.onChanged!('general:');
+      await tester.tap(find.byKey(const ValueKey('detail-version-picker')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey('detail-game-choice-general')),
+      );
       await tester.pumpAndSettle();
       expect(
         tester

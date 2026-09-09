@@ -10,6 +10,8 @@ enum DexFormDisplay { base, all, alternate }
 class DexFilter {
   const DexFilter({
     this.query = '',
+    this.speciesIds,
+    this.speciesLabelZh,
     this.typeSlugs = const {},
     this.formDisplay = DexFormDisplay.base,
     this.eggGroupSlug,
@@ -24,6 +26,13 @@ class DexFilter {
   });
 
   final String query;
+
+  /// An explicit drill-down cohort, such as the remaining Journey species.
+  /// Null means unrestricted; an empty set intentionally matches nothing.
+  final Set<int>? speciesIds;
+
+  /// Keep the cohort label separate when other reference filters are edited.
+  final String? speciesLabelZh;
   final Set<String> typeSlugs;
   final DexFormDisplay formDisplay;
   final String? eggGroupSlug;
@@ -55,6 +64,7 @@ class DexFilter {
       eggGroupSlug != null ||
       abilityId != null ||
       learnsMoveId != null ||
+      speciesIds != null ||
       hasSpeciesAxis;
 
   /// True when at least one stackable species axis is set.
@@ -69,6 +79,8 @@ class DexFilter {
 
   DexFilter copyWith({
     String? query,
+    Set<int>? speciesIds,
+    String? speciesLabelZh,
     Set<String>? typeSlugs,
     DexFormDisplay? formDisplay,
     String? eggGroupSlug,
@@ -82,6 +94,8 @@ class DexFilter {
     String? labelZh,
   }) => DexFilter(
     query: query ?? this.query,
+    speciesIds: speciesIds ?? this.speciesIds,
+    speciesLabelZh: speciesLabelZh ?? this.speciesLabelZh,
     typeSlugs: typeSlugs ?? this.typeSlugs,
     formDisplay: formDisplay ?? this.formDisplay,
     eggGroupSlug: eggGroupSlug ?? this.eggGroupSlug,
@@ -104,6 +118,8 @@ class DexFilter {
     bool tag = false,
   }) => DexFilter(
     query: query,
+    speciesIds: speciesIds,
+    speciesLabelZh: speciesLabelZh,
     typeSlugs: typeSlugs,
     formDisplay: formDisplay,
     eggGroupSlug: eggGroupSlug,
@@ -129,6 +145,8 @@ class DexFilter {
     String? tag,
   }) => DexFilter(
     query: query,
+    speciesIds: speciesIds,
+    speciesLabelZh: speciesLabelZh,
     typeSlugs: typeSlugs,
     formDisplay: formDisplay,
     eggGroupSlug: eggGroupSlug,
@@ -171,6 +189,7 @@ class DexFilter {
 
   /// Does this species pass every stackable axis?
   bool matchesSpeciesAxes(PokemonSummary summary) {
+    if (speciesIds != null && !speciesIds!.contains(summary.id)) return false;
     if (query.trim().isNotEmpty &&
         !dexQueryMatches(parseDexSearchQuery(query), summary)) {
       return false;

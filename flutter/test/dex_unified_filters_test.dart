@@ -193,6 +193,46 @@ void main() {
     );
     expect(repo.reads, 0);
   });
+  test(
+    'Journey species lists intersect filters and preserve form identity',
+    () async {
+      final repo = _Repository();
+      const cohort = DexFilter(speciesIds: {6, 7});
+      expect((await repo.filterSummaries(cohort)).map((p) => p.id), [6, 7]);
+      expect(
+        (await repo.filterSummaries(
+          cohort.copyWith(typeSlugs: {'water'}),
+        )).map((p) => p.id),
+        [7],
+      );
+      expect(
+        await repo.filterSummaries(const DexFilter(speciesIds: {})),
+        isEmpty,
+      );
+      final form = (await repo.filterSummaries(
+        cohort.copyWith(
+          formDisplay: DexFormDisplay.alternate,
+          typeSlugs: {'dragon'},
+        ),
+      )).single;
+      expect(form.id, 6);
+      expect(form.formKey, 'charizard-mega-x');
+      expect(cohort.without(color: true).speciesIds, {6, 7});
+      expect(cohort.withSpeciesAxes(generation: 1).speciesIds, {6, 7});
+      expect(
+        dexFilterFingerprint(cohort),
+        dexFilterFingerprint(const DexFilter(speciesIds: {7, 6})),
+      );
+      expect(
+        dexFilterFingerprint(cohort),
+        isNot(dexFilterFingerprint(const DexFilter(speciesIds: {6}))),
+      );
+      expect(
+        dexFilterFingerprint(const DexFilter(speciesIds: {})),
+        isNot(dexFilterFingerprint(DexFilter.empty)),
+      );
+    },
+  );
   test('all unified constraints participate in browse restoration', () {
     const f = DexFilter(
       query: '火',

@@ -848,8 +848,26 @@ describe('journey assistant Worker contract', () => {
     );
     const evolution = await post(violetBody('利欧路怎么进化？'), 'dex-intent-key-1234');
     const value = await evolution.json() as Record<string, unknown>;
-    expect(value).toMatchObject({ status: 'no_match', answerMode: 'no_match' });
+    expect(value).toMatchObject({ status: 'answered', evidence: { basis: 'structured', scope: 'general', complete: false } });
+    expect(value.answer).toContain('利欧路 → 路卡利欧');
     expect(JSON.stringify(value)).not.toContain('亲密度至少 160');
+  });
+
+  it('answers the reported Cyndaquil question through the Worker without any model rewrite', async () => {
+    await seedDexBundle({}, {}, 20);
+    await env.DEX_CONTENT.put('v5/details/155.json', JSON.stringify({
+      summary: { id: 155 }, evolutionChain: { id: 155, children: [
+        { id: 156, children: [{ id: 157, children: [] }] },
+      ] },
+    }));
+    const request = JSON.parse(violetBody('火球鼠的进化链是什么'));
+    request.context.game = 'soulsilver';
+    request.context.generation = 4;
+    const result = await (await post(JSON.stringify(request), 'evolution-regression-1234')).json() as AssistantResponse;
+    expect(result.answer).toContain('火球鼠 → 火岩鼠 → 火暴兽');
+    expect(result).toMatchObject({ status: 'answered', modelUsed: false,
+      evidence: { basis: 'structured', entityIds: ['pokemon:155', 'pokemon:156', 'pokemon:157'] } });
+    expect(JSON.stringify(result)).not.toContain('暴鲤龙');
   });
 
   it('uses exact-version held-item rates and keeps their provenance warning', async () => {
@@ -1244,12 +1262,13 @@ describe('journey assistant Worker contract', () => {
     const value = await response.json() as AssistantResponse;
     expect(value).toMatchObject({
       status: 'answered',
-      answerMode: 'curated_sources_qwen',
+      answerMode: 'curated_sources_deterministic',
       modelUsed: true,
-      sourceKinds: ['pokeapi'],
+      sourceKinds: [],
+      evidence: { basis: 'structured', scope: 'general' },
     });
-    expect(value.answer).toContain('本地资料与 PokéAPI 核对');
-    expect(value.verifiedFacts).toContain('TitoDex Dex bundle v20 · 本地结构化底稿');
+    expect(value.answer).not.toContain('本地资料与 PokéAPI 核对');
+    expect(value.verifiedFacts).toContain('TitoDex Dex bundle v20');
     expect(value.unknowns).not.toContain(
       '限定来源联网核验未完成，当前显示 TitoDex 本地结构化底稿。',
     );

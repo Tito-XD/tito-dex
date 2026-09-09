@@ -64,10 +64,13 @@ class DexBrowseScrollMemory {
 }
 
 String dexFilterFingerprint(DexFilter filter) {
+  final ids = filter.speciesIds?.toList();
+  ids?.sort();
   final colors = filter.colorSlugs.toList()..sort();
   final types = filter.typeSlugs.toList()..sort();
   return [
     filter.query.trim(),
+    ids?.join(','),
     types.join(','),
     filter.formDisplay.name,
     filter.eggGroupSlug,

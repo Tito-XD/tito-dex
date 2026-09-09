@@ -77,7 +77,7 @@ class JourneyAssistantSnapshot {
     if (partyEvolutions.isNotEmpty) {
       return '队伍 ${partyEvolutions.length} 条进化提醒';
     }
-    return '打开存档助手';
+    return '查看旅途';
   }
 }
 
@@ -150,13 +150,6 @@ class JourneyAssistantRepository {
       progress: progress,
       edition: edition,
     );
-    final details = <int, PokemonDetail>{};
-    await Future.wait([
-      for (final id in journey.party.map((member) => member.speciesId).nonNulls)
-        _dex
-            .getDetail(id)
-            .then<void>((detail) => details[id] = detail, onError: (_) {}),
-    ]);
     return buildJourneyAssistantSnapshot(
       journey: journey,
       edition: edition,
@@ -164,7 +157,6 @@ class JourneyAssistantRepository {
       summaries: summaries,
       progress: progress,
       evolutionOrTradeMissingIds: evolutionMissingIds,
-      partyDetails: details,
     );
   }
 
@@ -228,7 +220,12 @@ JourneyAssistantSnapshot buildJourneyAssistantSnapshot({
           .where((id) => !progress.caughtIds.contains(id))
           .toList()
         ..sort();
-  final evolutionIds = evolutionOrTradeMissingIds.toList()..sort();
+  final evolutionIds =
+      evolutionOrTradeMissingIds
+          .difference(encounterGapIds.toSet())
+          .where((id) => !progress.caughtIds.contains(id))
+          .toList()
+        ..sort();
 
   final partyEvolutions = <JourneyAssistantEvolution>[];
   for (final member in journey.party) {
@@ -280,13 +277,9 @@ JourneyAssistantSnapshot buildJourneyAssistantSnapshot({
     pairedVersionLabel: pairedVersion == null
         ? null
         : flavorVersionLabelZh(pairedVersion),
-    versionEncounterGaps: [
-      for (final id in encounterGapIds.take(previewLimit)) pokemon(id),
-    ],
+    versionEncounterGaps: [for (final id in encounterGapIds) pokemon(id)],
     versionEncounterGapCount: encounterGapIds.length,
-    evolutionOrTradeMissing: [
-      for (final id in evolutionIds.take(previewLimit)) pokemon(id),
-    ],
+    evolutionOrTradeMissing: [for (final id in evolutionIds) pokemon(id)],
     evolutionOrTradeMissingCount: evolutionIds.length,
     partyEvolutions: partyEvolutions,
   );

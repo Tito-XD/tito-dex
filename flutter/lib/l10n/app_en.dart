@@ -97,14 +97,18 @@ const kAppEn = <String, String>{
   'askTitoDexOnlineSearchedNoMatch':
       'The online assistant looked, but nothing was reliable enough.',
   'askTitoDexUnknownWarning':
-      'Some status could not be parsed from this save. Double-check any unknown notes in the answer.',
-  'askTitoDexSources': 'Verified sources',
+      'Some details or game applicability remain unconfirmed. Check the scope notes in the answer.',
+  'askTitoDexSources': 'Reference sources',
   'askTitoDexSourceSummary': '{count} sources cited',
   'askTitoDexEvidenceVerified': 'Verified · {count} sources cited',
   'askTitoDexEvidenceLowConfidence': 'Low confidence · {count} sources cited',
   'askTitoDexEvidenceLocalVerified': 'Local data verified',
+  'askTitoDexStructuredGame': 'Local data · selected game',
+  'askTitoDexStructuredGeneral': 'Local data · general scope',
+  'askTitoDexStructuredPartial': 'Local data · some details unconfirmed',
+  'askTitoDexSourcesAvailable': '{count} sources · not checked claim by claim',
   'askTitoDexEvidenceUnverified':
-      'Low confidence · no expandable citations yet',
+      'Not checked claim by claim · no citations yet',
   'askTitoDexSourceSheetTitle': 'Answer citations',
   'askTitoDexSourceSheetHint':
       'These pages were used to write or verify this answer. Tap to open the original link.',
@@ -172,6 +176,13 @@ const kAppEn = <String, String>{
   'settingsLeagueChampion': 'First championship',
   'settingsDexProgress': 'Pokédex progress',
   'teamSummaryTitle': 'Team overview',
+  'teamCollapseDetails': 'Collapse details',
+  'teamCommonWeaknesses': 'Common weaknesses',
+  'teamSharedWeaknesses': 'Shared weaknesses (2+)',
+  'teamAverageLevel': 'Average level',
+  'teamBaseStatTotal': 'BST total',
+  'teamTypeCoverage': 'Type coverage',
+  'journeyRemainingDex': 'Other missing Pokémon in Dex · {count}',
   'sleepToolsTitle': 'Pokémon Sleep tools',
   'sleepToolsTierAHint':
       'Built-in offline calculator, plus a Neroli’s Lab reference link',
@@ -867,6 +878,8 @@ const kAppEn = <String, String>{
   'dexDetailFormField': 'Form',
   'dexDetailVersionField': 'Data version',
   'dexDetailBaseForm': 'Base form',
+  'dexDetailExpansionScopeHint':
+      'Choose the expansion you own. Its scope includes the base game and earlier expansions for the same version.',
   'close': 'Close',
   'dexSearchSheetTitle': 'Search & filters',
   'dexSearchSheetHint': 'Name, number, or types: Fire Flying',

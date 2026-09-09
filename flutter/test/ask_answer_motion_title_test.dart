@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/features/dex/type_chart.dart';
 import 'package:titodex/features/journey/ask_motion_theme.dart';
+import 'package:titodex/features/journey/ask_motion_images.dart';
 import 'package:titodex/widgets/ask_answer_motion_title.dart';
 
 const _titleKey = ValueKey('tested-title');
@@ -11,20 +12,17 @@ const _style = TextStyle(fontFamily: 'Ahem', fontSize: 12, height: 1);
 const _ball = AskMotionTheme(
   topic: 'capture',
   kind: AskMotionKind.ball,
-  assets: ['assets/ask_motion/poke-ball.png'],
+  assets: ['item-sprites/poke-ball.png'],
 );
 const _book = AskMotionTheme(
   topic: 'moves',
   kind: AskMotionKind.book,
-  assets: ['assets/ask_motion/sonias-book.png'],
+  assets: ['item-sprites/sonias-book.png'],
 );
 const _berries = AskMotionTheme(
   topic: 'berries',
   kind: AskMotionKind.berries,
-  assets: [
-    'assets/ask_motion/oran-berry.png',
-    'assets/ask_motion/pecha-berry.png',
-  ],
+  assets: ['item-sprites/oran-berry.png', 'item-sprites/pecha-berry.png'],
 );
 const _types = AskMotionTheme(
   topic: 'types',
@@ -41,6 +39,7 @@ Widget _host({
   bool ticker = true,
   double width = 300,
   double scale = 1,
+  bool leading = false,
 }) => MaterialApp(
   home: MediaQuery(
     data: MediaQueryData(
@@ -60,6 +59,13 @@ Widget _host({
               outcome: outcome,
               stage: stage,
               style: _style,
+              leading: leading,
+              prepareImages: (_, resources) async => {
+                for (final resource in resources)
+                  resource: resource.startsWith('assets/')
+                      ? AssetImage(resource)
+                      : AskMotionImages.fallback(resource),
+              },
             ),
           ),
         ),
@@ -71,9 +77,85 @@ Widget _host({
 Future<void> _start(WidgetTester tester, Widget widget) async {
   await tester.pumpWidget(widget);
   await tester.pump();
+  // Start the animation clock after the asynchronous image preparation frame.
+  await tester.pump();
 }
 
 void main() {
+  testWidgets(
+    'leading props cycle without restarting on stages and finish on the subject',
+    (tester) async {
+      await _start(tester, _host(theme: _berries, leading: true));
+      ImageProvider current() => tester
+          .widget<Image>(
+            find
+                .descendant(
+                  of: find.byKey(const ValueKey('ask-motion-leading-image')),
+                  matching: find.byType(Image),
+                )
+                .first,
+          )
+          .image;
+      expect(current(), const AssetImage('assets/ask_motion/oran-berry.png'));
+      final position = find.byKey(
+        const ValueKey('ask-motion-leading-position'),
+      );
+      expect(
+        tester.getTopLeft(position).dx,
+        tester.getTopLeft(find.byKey(_titleKey)).dx,
+      );
+      await tester.pump(const Duration(milliseconds: 700));
+      await _start(
+        tester,
+        _host(theme: _berries, leading: true, stage: 'verify'),
+      );
+      expect(tester.widget<Transform>(position).transform.storage[13], 0);
+      await tester.pump(const Duration(milliseconds: 2000));
+      await tester.pump();
+      expect(current(), const AssetImage('assets/ask_motion/pecha-berry.png'));
+      await _start(
+        tester,
+        _host(
+          theme: _berries,
+          leading: true,
+          outcome: AskMotionOutcome.caught,
+          text: 'Done',
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(current(), const AssetImage('assets/ask_motion/oran-berry.png'));
+      expect(tester.widget<Transform>(position).transform.storage[13], 0);
+      expect(tester.hasRunningAnimations, isFalse);
+      await tester.pump(const Duration(seconds: 8));
+      expect(current(), const AssetImage('assets/ask_motion/oran-berry.png'));
+    },
+  );
+
+  testWidgets(
+    'leading ball holds its final outcome and reduced motion stays still',
+    (tester) async {
+      await _start(tester, _host(theme: _ball, leading: true));
+      await _start(
+        tester,
+        _host(theme: _ball, leading: true, outcome: AskMotionOutcome.escaped),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('ask-motion-escaped')), findsOneWidget);
+      expect(tester.hasRunningAnimations, isFalse);
+      await tester.pumpWidget(const SizedBox());
+      await _start(
+        tester,
+        _host(theme: _berries, leading: true, reduced: true),
+      );
+      expect(tester.hasRunningAnimations, isFalse);
+      expect(
+        find.byKey(const ValueKey('ask-motion-leading-image')),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+
   testWidgets('rolling follows actual text span at 48 px/s without sliding', (
     tester,
   ) async {

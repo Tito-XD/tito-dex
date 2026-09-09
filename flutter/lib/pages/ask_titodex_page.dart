@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
@@ -13,6 +14,7 @@ import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/journey/ask_titodex_answer_blocks.dart';
 import '../features/journey/ask_motion_theme.dart';
+import '../features/journey/ask_motion_images.dart';
 import '../features/journey/ask_titodex_entity_links.dart';
 import '../features/journey/ask_titodex_history.dart';
 import '../features/journey/ask_titodex_service.dart';
@@ -176,6 +178,7 @@ class AskTitoDexPage extends StatefulWidget {
     required this.journey,
     required this.edition,
     this.service,
+    this.motionImagePreparer,
     this.historyStore,
     this.entityResolver,
     this.sourceOpener,
@@ -184,6 +187,7 @@ class AskTitoDexPage extends StatefulWidget {
   final CurrentJourney journey;
   final GameEdition edition;
   final AskTitoDexService? service;
+  final AskMotionImagePreparer? motionImagePreparer;
   final AskTitoDexHistoryStore? historyStore;
   final AskTitoDexEntityResolver? entityResolver;
   final AskTitoDexSourceOpener? sourceOpener;
@@ -219,7 +223,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   Timer? _progressTimer;
   var _initializationStarted = false;
   DateTime _progressChangedAt = DateTime.fromMillisecondsSinceEpoch(0);
-  var _followingLatest = true;
+  var _followingLatest = false;
+  var _userScrolling = false;
+  var _scrollUpdateScheduled = false;
+  var _startLatestPending = false;
 
   @override
   void initState() {
@@ -411,12 +418,11 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       _semanticRevealQueue = Future<void>.value();
       _activeResult = null;
       _activeEntryId = null;
-      _followingLatest = true;
+      _followingLatest = false;
     });
     _progressChangedAt = DateTime.now();
-    // The pending answer skeleton is inserted in the same frame. Jumping after
-    // that layout guarantees the new question and its full placeholder stay
-    // visible instead of animating toward the pre-skeleton scroll extent.
+    // The latest turn grows down from a stable origin. Start there once;
+    // incoming blocks must not move the reader to the end of a long answer.
     _scrollToLatest(animate: false, force: true);
     final result = await _service.ask(
       question,
@@ -703,46 +709,60 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       '${edition.slug}\u0000${edition.selectedFlavor ?? ''}';
 
   bool _handleAnswerScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return false;
+    if (notification is UserScrollNotification) {
+      _userScrolling = notification.direction != ScrollDirection.idle;
+      if (notification.direction == ScrollDirection.forward) {
+        _followingLatest = false;
+      }
+    }
     if (notification is ScrollUpdateNotification &&
-        notification.dragDetails != null) {
-      _followingLatest = notification.metrics.extentBefore <= 72;
+        (notification.dragDetails != null || _userScrolling)) {
+      if ((notification.scrollDelta ?? 0) < 0) {
+        _followingLatest = false;
+      } else if ((notification.scrollDelta ?? 0) > 0) {
+        _followingLatest = notification.metrics.extentAfter <= 48;
+      }
     } else if (notification is OverscrollNotification &&
-        notification.dragDetails != null) {
-      _followingLatest = notification.metrics.extentBefore <= 72;
+        (notification.dragDetails != null || _userScrolling)) {
+      _followingLatest =
+          notification.overscroll > 0 && notification.metrics.extentAfter <= 48;
     }
     return false;
   }
 
   void _scrollToLatest({bool animate = true, bool force = false}) {
     if (!force && !_followingLatest) return;
+    _startLatestPending = _startLatestPending || force;
+    if (_scrollUpdateScheduled) return;
+    _scrollUpdateScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollUpdateScheduled = false;
+      final startLatest = _startLatestPending;
+      _startLatestPending = false;
       if (!mounted ||
           !_answerScrollController.hasClients ||
-          (!force && !_followingLatest)) {
+          (!startLatest && !_followingLatest)) {
         return;
       }
-      final duration = !animate || MediaQuery.disableAnimationsOf(context)
+      final duration =
+          !animate || startLatest || MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
           : const Duration(milliseconds: 220);
-      final target = _answerScrollController.position.minScrollExtent;
+      final position = _answerScrollController.position;
+      final target = startLatest
+          ? 0.0.clamp(position.minScrollExtent, position.maxScrollExtent)
+          : position.maxScrollExtent;
       if (duration == Duration.zero) {
         _answerScrollController.jumpTo(target);
         return;
       }
       unawaited(
-        _answerScrollController
-            .animateTo(target, duration: duration, curve: Curves.easeOut)
-            .then((_) {
-              if (!mounted ||
-                  !_answerScrollController.hasClients ||
-                  (!force && !_followingLatest)) {
-                return;
-              }
-              final position = _answerScrollController.position;
-              if ((position.minScrollExtent - position.pixels).abs() > 0.5) {
-                position.jumpTo(position.minScrollExtent);
-              }
-            }),
+        _answerScrollController.animateTo(
+          target,
+          duration: duration,
+          curve: Curves.easeOut,
+        ),
       );
     });
   }
@@ -797,6 +817,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
         _LiveAnswerCard(
           key: ValueKey('ask-live-turn-$_requestSeed'),
           question: question,
+          prepareImages: widget.motionImagePreparer,
           progress: _progress,
           streamedBlocks: _streamedBlocks,
           clarification: _streamedClarification,
@@ -825,10 +846,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final showEmptyConversation =
         _history.isEmpty && _submittedQuestion == null && !_loading;
     final hasLiveTurn = _submittedQuestion != null;
-    final conversationItemCount =
-        historyTurns.length +
-        (showEmptyConversation ? 1 : 0) +
-        (hasLiveTurn ? 1 : 0);
+    final olderTurns = hasLiveTurn || historyTurns.isEmpty
+        ? historyTurns
+        : historyTurns.sublist(0, historyTurns.length - 1);
+    const latestTurnOrigin = ValueKey('ask-titodex-latest-turn-origin');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -895,31 +916,47 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                       onNotification: _handleAnswerScrollNotification,
                       child: Scrollbar(
                         controller: _answerScrollController,
-                        child: ListView.builder(
+                        child: CustomScrollView(
                           key: const Key('ask-titodex-answer-scroll'),
                           controller: _answerScrollController,
-                          reverse: true,
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-                          itemCount: conversationItemCount,
-                          itemBuilder: (context, index) {
-                            if (showEmptyConversation) {
-                              return const _ConversationEmptyState();
-                            }
-                            if (hasLiveTurn && index == 0) {
-                              return _buildLiveTurn(_submittedQuestion!);
-                            }
-                            final historyOffset = index - (hasLiveTurn ? 1 : 0);
-                            final historyIndex =
-                                historyTurns.length - 1 - historyOffset;
-                            if (historyIndex < 0 ||
-                                historyIndex >= historyTurns.length) {
-                              return const SizedBox.shrink();
-                            }
-                            return _buildHistoryTurn(
-                              historyTurns[historyIndex],
-                              contextValue?.game,
-                            );
-                          },
+                          center: latestTurnOrigin,
+                          slivers: [
+                            // Older turns remain lazy above the origin; the
+                            // live turn's growing bottom cannot push its top up.
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                              sliver: SliverList.builder(
+                                itemCount: olderTurns.length,
+                                itemBuilder: (context, index) =>
+                                    _buildHistoryTurn(
+                                      olderTurns[olderTurns.length - 1 - index],
+                                      contextValue?.game,
+                                    ),
+                              ),
+                            ),
+                            SliverPadding(
+                              key: latestTurnOrigin,
+                              padding: const EdgeInsets.fromLTRB(
+                                10,
+                                10,
+                                10,
+                                12,
+                              ),
+                              sliver: SliverToBoxAdapter(
+                                child: showEmptyConversation
+                                    ? _ConversationEmptyState(
+                                        prepareImages:
+                                            widget.motionImagePreparer,
+                                      )
+                                    : hasLiveTurn
+                                    ? _buildLiveTurn(_submittedQuestion!)
+                                    : _buildHistoryTurn(
+                                        historyTurns.last,
+                                        contextValue?.game,
+                                      ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1606,7 +1643,8 @@ class _ContextChip extends StatelessWidget {
 }
 
 class _ConversationEmptyState extends StatefulWidget {
-  const _ConversationEmptyState();
+  const _ConversationEmptyState({this.prepareImages});
+  final AskMotionImagePreparer? prepareImages;
 
   @override
   State<_ConversationEmptyState> createState() =>
@@ -1727,6 +1765,7 @@ class _ConversationEmptyStateState extends State<_ConversationEmptyState>
                   key: const Key('ask-titodex-idle-topic'),
                   text: labels[_index],
                   theme: _themes[_index],
+                  prepareImages: widget.prepareImages,
                   height: 22,
                   style: style.copyWith(fontWeight: FontWeight.w900),
                 ),
@@ -1895,6 +1934,7 @@ class _LiveAnswerCard extends StatefulWidget {
   const _LiveAnswerCard({
     super.key,
     required this.question,
+    this.prepareImages,
     required this.progress,
     required this.streamedBlocks,
     required this.clarification,
@@ -1907,6 +1947,7 @@ class _LiveAnswerCard extends StatefulWidget {
   });
 
   final String question;
+  final AskMotionImagePreparer? prepareImages;
   final AskTitoDexProgress progress;
   final List<AskTitoDexAnswerBlock> streamedBlocks;
   final AskTitoDexClarification? clarification;
@@ -1970,9 +2011,11 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
   };
 
   Widget _motionTitle(String stage) => AskAnswerMotionTitle(
+    leading: true,
     key: const Key('ask-titodex-answer-motion-title'),
     text: _titleText(stage),
     theme: _motionTheme,
+    prepareImages: widget.prepareImages,
     stage: widget.progress == AskTitoDexProgress.verifyingAnswer
         ? 'verify'
         : widget.progress == AskTitoDexProgress.revealingAnswer
@@ -3132,7 +3175,7 @@ class _AnswerCardContent extends StatelessWidget {
           animate: animateEvidence,
           onComplete: onContentSettled,
           child: _AnswerEvidenceSummary(
-            confidence: result.confidence,
+            evidence: result.evidence,
             sources: sources,
             sourceKinds: sourceKinds,
             sourceOpener: sourceOpener,
@@ -3143,6 +3186,9 @@ class _AnswerCardContent extends StatelessWidget {
           _EntityLinkCards(
             question: question,
             answer: answerBody,
+            stableIds: result.evidence?.basis == 'structured'
+                ? result.evidence!.entityIds
+                : null,
             resolver: entityResolver,
             animate: animateEntityLinks,
           ),
@@ -3186,13 +3232,13 @@ class _AnswerMetaLabel extends StatelessWidget {
 
 class _AnswerEvidenceSummary extends StatelessWidget {
   const _AnswerEvidenceSummary({
-    required this.confidence,
     required this.sources,
     required this.sourceKinds,
     required this.sourceOpener,
+    this.evidence,
   });
 
-  final String confidence;
+  final AskTitoDexEvidence? evidence;
   final List<ProgressionSource> sources;
   final List<String> sourceKinds;
   final AskTitoDexSourceOpener sourceOpener;
@@ -3200,13 +3246,18 @@ class _AnswerEvidenceSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasSources = sources.isNotEmpty;
-    final verified = confidence != 'low';
-    final label = hasSources
-        ? verified
-              ? AppZh.askTitoDexEvidenceVerified(sources.length)
-              : AppZh.askTitoDexEvidenceLowConfidence(sources.length)
-        : verified
-        ? AppZh.askTitoDexEvidenceLocalVerified
+    final verified =
+        evidence?.basis == 'structured' &&
+        evidence?.scope == 'game' &&
+        evidence?.complete == true;
+    final label = evidence?.basis == 'structured'
+        ? evidence!.complete
+              ? evidence!.scope == 'game'
+                    ? AppZh.askTitoDexStructuredGame
+                    : AppZh.askTitoDexStructuredGeneral
+              : AppZh.askTitoDexStructuredPartial
+        : hasSources
+        ? AppZh.askTitoDexSourcesAvailable(sources.length)
         : AppZh.askTitoDexEvidenceUnverified;
     return Semantics(
       button: hasSources,
@@ -3501,12 +3552,14 @@ class _EntityLinkCards extends StatefulWidget {
     required this.answer,
     required this.resolver,
     this.animate = false,
+    this.stableIds,
   });
 
   final String question;
   final String answer;
   final AskTitoDexEntityResolver resolver;
   final bool animate;
+  final List<String>? stableIds;
 
   @override
   State<_EntityLinkCards> createState() => _EntityLinkCardsState();
@@ -3521,6 +3574,7 @@ class _EntityLinkCardsState extends State<_EntityLinkCards> {
     _links = widget.resolver.resolve(
       question: widget.question,
       answer: widget.answer,
+      stableIds: widget.stableIds,
     );
   }
 
@@ -3529,10 +3583,12 @@ class _EntityLinkCardsState extends State<_EntityLinkCards> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.question != widget.question ||
         oldWidget.answer != widget.answer ||
-        oldWidget.resolver != widget.resolver) {
+        oldWidget.resolver != widget.resolver ||
+        oldWidget.stableIds != widget.stableIds) {
       _links = widget.resolver.resolve(
         question: widget.question,
         answer: widget.answer,
+        stableIds: widget.stableIds,
       );
     }
   }

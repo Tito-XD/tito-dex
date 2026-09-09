@@ -3,6 +3,7 @@ import {
   type MoveAdviceGuardFailure,
   type MoveAnswerStructuredSource,
 } from './move_answer_quality_guard';
+import { entityNameMismatch, evolutionClaimMismatch } from './structured_entities';
 
 export type GuardedGame = 'scarlet' | 'violet';
 
@@ -10,6 +11,7 @@ export type GeneratedAnswerGuardFailure =
   | MoveAdviceGuardFailure
   | 'excessive_move_candidates'
   | 'internal_source_reference'
+  | 'entity_identity_conflict'
   | 'selected_game_conflict';
 
 export type GeneratedAnswerGuardInput = {
@@ -57,6 +59,7 @@ export function generatedAnswerGuardFailure(
   input: GeneratedAnswerGuardInput,
 ): GeneratedAnswerGuardFailure | null {
   const answer = input.answer.trim();
+  if (entityNameMismatch(answer) || evolutionClaimMismatch(answer, input.structuredSources ?? [])) return 'entity_identity_conflict';
   if (internalSourceReferencePatterns.some((pattern) => pattern.test(answer))) {
     return 'internal_source_reference';
   }

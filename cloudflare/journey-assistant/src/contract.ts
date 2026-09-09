@@ -119,6 +119,15 @@ export type AssistantResponse = {
   clarificationCandidates?: ClarificationCandidate[];
   errorCode?: string;
   onlineComposed?: boolean;
+  /** Computed by code, never accepted from a model's confidence/support flag. */
+  evidence?: {
+    basis: 'structured' | 'sources' | 'unverified';
+    scope: 'game' | 'general';
+    complete: boolean;
+    bundleVersion?: number;
+    entityIds: string[];
+    total?: number;
+  };
   /** Privacy-safe execution trace for the client UI. No prompts or queries. */
   answerMode?:
     | 'local_audited'

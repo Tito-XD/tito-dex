@@ -8,7 +8,9 @@ import '../features/game/game_edition_repository.dart';
 import '../l10n/app_zh.dart';
 import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
-import '../theme/tito_colors.dart';
+import '../features/dex/type_chart.dart';
+import 'tito_fact_grid.dart';
+import 'type_badge.dart';
 import 'sticker_card.dart';
 import 'tito_skeleton.dart';
 
@@ -17,10 +19,12 @@ class TeamSummaryCard extends StatefulWidget {
     super.key,
     required this.party,
     required this.detailsFuture,
+    this.typeRelationsFuture,
   });
 
   final List<PartyMember> party;
   final Future<Map<int, PokemonDetail>> detailsFuture;
+  final Future<Map<String, TypeDamageRelations>>? typeRelationsFuture;
 
   @override
   State<TeamSummaryCard> createState() => _TeamSummaryCardState();
@@ -34,6 +38,7 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
   @override
   void initState() {
     super.initState();
+    gameEditionRepository.addListener(_load);
     _load();
   }
 
@@ -41,7 +46,8 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
   void didUpdateWidget(TeamSummaryCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!_partyListsEqual(oldWidget.party, widget.party) ||
-        oldWidget.detailsFuture != widget.detailsFuture) {
+        oldWidget.detailsFuture != widget.detailsFuture ||
+        oldWidget.typeRelationsFuture != widget.typeRelationsFuture) {
       _load();
     }
   }
@@ -56,7 +62,11 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
     setState(() => _loading = true);
     try {
       final details = await widget.detailsFuture;
-      final data = await _computeSummary(widget.party, details);
+      final data = await _computeSummary(
+        widget.party,
+        details,
+        widget.typeRelationsFuture,
+      );
       if (!mounted || generation != _loadGeneration) {
         return;
       }
@@ -75,84 +85,139 @@ class _TeamSummaryCardState extends State<TeamSummaryCard> {
   @override
   void dispose() {
     _loadGeneration += 1;
+    gameEditionRepository.removeListener(_load);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final body14 = SecondaryTypography.onCard.body14;
-
-    return ListenableBuilder(
-      listenable: gameEditionRepository,
-      builder: (context, _) {
-        return StickerCard(
-          variant: StickerVariant.cream,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 112),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppZh.teamSummaryTitle,
+    final data = _data;
+    return StickerCard(
+      key: const Key('team-summary-header'),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabel}',
                   style: SecondaryTypography.onCard.h15,
                 ),
-                const SizedBox(height: 8),
-                if (widget.party.isEmpty)
+              ),
+              const SizedBox(width: 6),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.groups_rounded, size: 16),
+                  const SizedBox(width: 5),
                   Text(
-                    AppZh.teamEmptySlot,
-                    style: body14.copyWith(color: TitoColors.mutedInk),
-                  )
-                else if (_loading && _data == null)
-                  // Three skeleton lines sized like the level / BST / coverage
-                  // rows below so the card keeps its shape while computing.
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TitoSkeletonBox(height: 14, width: 132),
-                      SizedBox(height: 6),
-                      TitoSkeletonBox(height: 14, width: 168),
-                      SizedBox(height: 6),
-                      TitoSkeletonBox(height: 14, width: 148),
-                    ],
-                  )
-                else if (_data != null) ...[
-                  Text(
-                    AppZh.teamSummaryAvgLevel(_data!.avgLevel),
-                    style: body14,
+                    AppZh.teamSubtitle(widget.party.length),
+                    style: SecondaryTypography.onCard.small12,
                   ),
-                  const SizedBox(height: 4),
-                  Text(AppZh.teamSummaryBstSum(_data!.bstSum), style: body14),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppZh.teamSummaryTypeCoverage(_data!.typeCoverage),
-                    style: body14,
-                  ),
-                  if (_data!.weaknessLine.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      _data!.weaknessLine,
-                      style: body14.copyWith(color: TitoColors.mutedInk),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  if (_data!.sharedWeaknessLine.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      _data!.sharedWeaknessLine,
-                      style: body14.copyWith(color: TitoColors.mutedInk),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
                 ],
+              ),
+            ],
+          ),
+          if (widget.party.isEmpty)
+            Text(AppZh.teamEmptySlot, style: SecondaryTypography.onCard.small12)
+          else if (_loading && data == null) ...[
+            const SizedBox(height: 8),
+            const TitoFactGrid(
+              columns: 3,
+              children: [
+                TitoSkeletonBox(height: 60, width: double.infinity),
+                TitoSkeletonBox(height: 60, width: double.infinity),
+                TitoSkeletonBox(height: 60, width: double.infinity),
               ],
             ),
-          ),
-        );
-      },
+          ] else if (data != null) ...[
+            const SizedBox(height: 10),
+            TitoFactGrid(
+              key: const Key('team-summary-stats'),
+              columns: 3,
+              children: [
+                TitoFactTile(
+                  icon: Icons.trending_up_rounded,
+                  title: AppZh.teamAverageLevel,
+                  child: Text(data.avgLevel.toStringAsFixed(1)),
+                ),
+                TitoFactTile(
+                  icon: Icons.bar_chart_rounded,
+                  title: AppZh.teamBaseStatTotal,
+                  child: Text('${data.bstSum}'),
+                ),
+                TitoFactTile(
+                  icon: Icons.category_rounded,
+                  title: AppZh.teamTypeCoverage,
+                  child: Text('${data.typeCoverage}/18'),
+                ),
+              ],
+            ),
+            if (data.weaknesses.isNotEmpty ||
+                data.sharedWeaknesses.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              TitoFactGrid(
+                children: [
+                  TitoFactTile(
+                    title: AppZh.teamCommonWeaknesses,
+                    child: _WeaknessTypes(types: data.weaknesses),
+                  ),
+                  TitoFactTile(
+                    title: AppZh.teamSharedWeaknesses,
+                    child: _WeaknessTypes(types: data.sharedWeaknesses),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ],
+      ),
     );
   }
+}
+
+class _WeaknessTypes extends StatelessWidget {
+  const _WeaknessTypes({required this.types});
+  final List<String> types;
+
+  @override
+  Widget build(BuildContext context) => types.isEmpty
+      ? const Text('—')
+      : Wrap(
+          spacing: 10,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            for (final type in types)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 20,
+                    height: 20,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: typeTileColor(
+                        typeEnForZh(type) ?? type.toLowerCase(),
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: TypeIconImage(
+                      typeEn: typeEnForZh(type) ?? type.toLowerCase(),
+                      size: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    typeNameZh(typeEnForZh(type) ?? type.toLowerCase()),
+                    style: SecondaryTypography.onCard.small12,
+                  ),
+                ],
+              ),
+          ],
+        );
 }
 
 class _TeamSummaryData {
@@ -160,39 +225,40 @@ class _TeamSummaryData {
     required this.avgLevel,
     required this.bstSum,
     required this.typeCoverage,
-    required this.weaknessLine,
-    required this.sharedWeaknessLine,
+    required this.weaknesses,
+    required this.sharedWeaknesses,
   });
 
   final double avgLevel;
   final int bstSum;
   final int typeCoverage;
-  final String weaknessLine;
-  final String sharedWeaknessLine;
+  final List<String> weaknesses;
+  final List<String> sharedWeaknesses;
 }
 
 Future<_TeamSummaryData> _computeSummary(
   List<PartyMember> party,
   Map<int, PokemonDetail> details,
+  Future<Map<String, TypeDamageRelations>>? typeRelationsFuture,
 ) async {
   final levels = <int>[];
   var bstSum = 0;
   final types = <String>{};
   final weaknessCounts = <String, int>{};
   final memberTypes = <List<String>>[];
-  final relations = await battleToolsService.loadTypeRelations();
+  final relations = typeRelationsFuture != null
+      ? await typeRelationsFuture
+      : details.isEmpty
+      ? const <String, TypeDamageRelations>{}
+      : await battleToolsService.loadTypeRelations();
   final generation = battleScopeForEdition(
     gameEditionRepository.edition,
   ).generation;
 
   for (final member in party) {
     final id = member.speciesId;
-    if (id == null) {
-      continue;
-    }
-    if (member.level != null) {
-      levels.add(member.level!);
-    }
+    if (member.level != null) levels.add(member.level!);
+    if (id == null) continue;
 
     final detail = details[id];
     if (detail == null) continue;
@@ -216,29 +282,24 @@ Future<_TeamSummaryData> _computeSummary(
       ? 0.0
       : levels.reduce((a, b) => a + b) / levels.length;
 
-  String weaknessLine = '';
-  if (weaknessCounts.isNotEmpty) {
-    final sorted = weaknessCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final top = sorted.take(3).map((entry) => entry.key).join('、');
-    weaknessLine = AppZh.teamSummaryWeaknesses(top);
-  }
+  final sorted = weaknessCounts.entries.toList()
+    ..sort((a, b) {
+      final count = b.value.compareTo(a.value);
+      return count == 0 ? a.key.compareTo(b.key) : count;
+    });
+  final weaknesses = sorted.take(3).map((entry) => entry.key).toList();
 
   final shared = computeTeamSharedWeaknesses(
     memberTypes,
     relations,
     generation: generation,
   );
-  final sharedWeaknessLine = shared.isEmpty
-      ? ''
-      : AppZh.teamSummarySharedWeaknesses(shared.join('、'));
-
   return _TeamSummaryData(
     avgLevel: avgLevel,
     bstSum: bstSum,
     typeCoverage: types.length,
-    weaknessLine: weaknessLine,
-    sharedWeaknessLine: sharedWeaknessLine,
+    weaknesses: weaknesses,
+    sharedWeaknesses: shared,
   );
 }
 

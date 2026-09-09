@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:titodex/features/game/game_edition.dart';
 import 'package:titodex/features/journey/ask_titodex_answer_blocks.dart';
+import 'package:titodex/features/journey/ask_motion_images.dart';
 import 'package:titodex/features/journey/ask_titodex_service.dart';
 import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/features/journey/progression_hints.dart';
@@ -26,7 +27,7 @@ void main() {
   });
 
   testWidgets(
-    'one answer title keeps its theme through stream updates and catches after the body is visible',
+    'one answer title keeps its theme through stream updates and settles on the subject',
     (tester) async {
       final service = _MotionService();
       await _mount(tester, service);
@@ -37,7 +38,7 @@ void main() {
       expect(theme.topic, 'moves');
       expect(tester.getSize(title).height, 18);
 
-      // Let the phase transition end before new semantic text arrives.
+      // The leading prop stays present while semantic text arrives.
       await tester.pump(const Duration(seconds: 2));
       expect(_paintInside(title), findsNothing);
       const initial = AskTitoDexAnswerBlock(
@@ -72,13 +73,22 @@ void main() {
       expect(tester.state(title), same(titleState));
       expect(_title(tester).theme, same(theme));
       expect(_title(tester).outcome, AskMotionOutcome.caught);
-      expect(find.byKey(const ValueKey('ask-motion-caught')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('ask-motion-leading-image')),
+        findsOneWidget,
+      );
       expect(find.text(answer, findRichText: true), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 600));
-      expect(find.byKey(const ValueKey('ask-motion-caught')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('ask-motion-leading-image')),
+        findsOneWidget,
+      );
       expect(find.text(answer, findRichText: true), findsOneWidget);
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('ask-motion-caught')), findsNothing);
+      expect(
+        find.byKey(const ValueKey('ask-motion-leading-image')),
+        findsOneWidget,
+      );
       expect(tester.getSize(title).height, 18);
     },
   );
@@ -243,6 +253,16 @@ Future<void> _mount(WidgetTester tester, _MotionService service) async {
             journey: _journey,
             edition: GameEdition.hgss.withFlavor('soulsilver'),
             service: service,
+            motionImagePreparer: (_, resources) async => {
+              for (final resource in {
+                ...resources,
+                AskMotionImages.book,
+                AskMotionImages.ball,
+              })
+                resource: resource.startsWith('assets/')
+                    ? AssetImage(resource)
+                    : AskMotionImages.fallback(resource),
+            },
           ),
         ),
       ),

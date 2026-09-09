@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:titodex/features/journey/ask_motion_catalog.dart';
 import 'package:titodex/features/journey/ask_motion_theme.dart';
+import 'package:titodex/features/journey/ask_motion_images.dart';
 
 void main() {
-  const root = 'assets/ask_motion/';
+  const root = 'item-sprites/';
   const book = '${root}sonias-book.png';
 
-  test('all question categories have appropriate offline artwork', () {
+  test('all question categories use Dex resources or existing App icons', () {
     const examples = <String, (String, AskMotionKind)>{
       '火球鼠在哪里可以捕捉？': ('capture', AskMotionKind.ball),
       '火球鼠什么时候学会喷射火焰？': ('moves', AskMotionKind.book),
@@ -31,7 +32,11 @@ void main() {
       expect(theme.kind, entry.value.$2, reason: entry.key);
       expect(theme.assets, isNotEmpty, reason: entry.key);
       for (final asset in theme.assets) {
-        expect(File(asset).existsSync(), isTrue, reason: asset);
+        expect(
+          asset.startsWith('item-sprites/') || File(asset).existsSync(),
+          isTrue,
+          reason: asset,
+        );
       }
     }
     expect(askMotionIdleThemes.map((t) => t.topic).toSet(), hasLength(13));
@@ -49,7 +54,7 @@ void main() {
     expect(repeated.assets, ['${root}sitrus-berry.png']);
   });
 
-  test('every catalog berry has its exact bundled artwork', () {
+  test('every catalog berry keeps its exact Dex resource', () {
     final berries = askMotionCatalogItems.where((row) => row[2] == 'berry');
     expect(berries.length, greaterThanOrEqualTo(73));
     for (final row in berries) {
@@ -95,7 +100,9 @@ void main() {
       expect(classifyAskMotionTheme('剩饭有什么用？').assets, [
         '${root}leftovers.png',
       ]);
-      expect(classifyAskMotionTheme('神奇糖果有什么用？').assets, [book]);
+      expect(classifyAskMotionTheme('神奇糖果有什么用？').assets, [
+        '${root}rare-candy.png',
+      ]);
     },
   );
 
@@ -136,15 +143,40 @@ void main() {
     ]);
   });
 
-  test('every catalog asset is packaged locally, with no dynamic URLs', () {
-    final paths = <String>{
-      ...askMotionCatalogItems.map((row) => row[3]),
-      ...askMotionCatalogTypes.map((row) => 'assets/type_icons/${row[1]}.png'),
-      ...askMotionIdleThemes.expand((theme) => theme.assets),
-    };
-    for (final path in paths) {
-      expect(path.startsWith('assets/'), isTrue, reason: path);
-      expect(File(path).existsSync(), isTrue, reason: path);
-    }
-  });
+  test(
+    'catalog keeps safe relative resources and only starter props are packaged',
+    () {
+      final paths = <String>{
+        ...askMotionCatalogItems.map((row) => row[3]),
+        ...askMotionCatalogTypes.map(
+          (row) => 'assets/type_icons/${row[1]}.png',
+        ),
+        ...askMotionIdleThemes.expand((theme) => theme.assets),
+      };
+      for (final path in paths) {
+        if (path.startsWith('assets/')) {
+          expect(File(path).existsSync(), isTrue, reason: path);
+        } else {
+          expect(
+            RegExp(r'^item-sprites/[a-z0-9-]+\.png$').hasMatch(path),
+            isTrue,
+            reason: path,
+          );
+        }
+      }
+      final packaged = Directory('assets/ask_motion')
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.png'))
+          .toList();
+      expect(packaged, hasLength(AskMotionImages.fallbackSlugs.length));
+      expect(
+        packaged.fold<int>(0, (sum, f) => sum + f.lengthSync()),
+        lessThan(120000),
+      );
+      for (final slug in AskMotionImages.fallbackSlugs) {
+        expect(File('assets/ask_motion/$slug.png').existsSync(), isTrue);
+      }
+    },
+  );
 }
