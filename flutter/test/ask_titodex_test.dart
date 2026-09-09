@@ -22,6 +22,7 @@ import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/models/parsed_save.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
+import 'package:titodex/widgets/ask_answer_motion_title.dart';
 import 'package:titodex/pages/journey_page.dart';
 import 'package:titodex/widgets/assistant_surface.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
@@ -609,11 +610,12 @@ void main() {
         find.byKey(const Key('ask-titodex-generating-answer')),
         findsOneWidget,
       );
-      expect(find.text('正在翻本地资料'), findsOneWidget);
+      final title = find.byKey(const Key('ask-titodex-answer-motion-title'));
+      expect(tester.widget<AskAnswerMotionTitle>(title).text, '正在翻阅本地记录');
 
       await tester.pump(const Duration(milliseconds: 160));
       expect(find.text('正在连接 Journey Assistant'), findsOneWidget);
-      expect(find.text('正在交叉核对资料与联网来源'), findsOneWidget);
+      expect(tester.widget<AskAnswerMotionTitle>(title).text, '正在查看进化条件');
 
       service.complete(
         const AskTitoDexResult(
