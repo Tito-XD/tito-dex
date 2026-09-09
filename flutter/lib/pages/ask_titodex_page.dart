@@ -12,6 +12,7 @@ import '../features/game/game_edition.dart';
 import '../features/game/game_edition_repository.dart';
 import '../features/dex/dex_game_scope.dart';
 import '../features/journey/ask_titodex_answer_blocks.dart';
+import '../features/journey/ask_motion_theme.dart';
 import '../features/journey/ask_titodex_entity_links.dart';
 import '../features/journey/ask_titodex_history.dart';
 import '../features/journey/ask_titodex_service.dart';
@@ -29,6 +30,7 @@ import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
 import '../widgets/assistant_surface.dart';
 import '../widgets/ask_titodex_loading.dart';
+import '../widgets/ask_answer_motion_title.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/tito_skeleton.dart';
@@ -1403,7 +1405,9 @@ class _CapabilityDetail extends StatelessWidget {
             child: Text(label, style: SecondaryTypography.onCard.body14),
           ),
           Text(
-            enabled ? AppZh.askTitoDexCapAvailable : AppZh.askTitoDexCapDisconnected,
+            enabled
+                ? AppZh.askTitoDexCapAvailable
+                : AppZh.askTitoDexCapDisconnected,
             style: SecondaryTypography.onCard.small12.copyWith(
               color: enabled ? TitoColors.deepBlue : TitoColors.mutedInk,
               fontWeight: FontWeight.w800,
@@ -1455,7 +1459,7 @@ class _HistoryManagerSheet extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
-              child:                 Text(
+              child: Text(
                 AppZh.askTitoDexHistorySheetHint(askTitoDexContextEntryLimit),
                 style: SecondaryTypography.onCard.small12.copyWith(
                   color: TitoColors.mutedInk,
@@ -1601,26 +1605,145 @@ class _ContextChip extends StatelessWidget {
   }
 }
 
-class _ConversationEmptyState extends StatelessWidget {
+class _ConversationEmptyState extends StatefulWidget {
   const _ConversationEmptyState();
 
   @override
+  State<_ConversationEmptyState> createState() =>
+      _ConversationEmptyStateState();
+}
+
+class _ConversationEmptyStateState extends State<_ConversationEmptyState>
+    with WidgetsBindingObserver {
+  final _themes = askMotionIdleThemes;
+  Timer? _wordTimer;
+  Timer? _introTimer;
+  int _index = 0;
+  int _introLength = 0;
+  bool _introFinished = false;
+  bool _introStarted = false;
+  bool _visible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  bool get _canAnimate =>
+      _visible &&
+      !MediaQuery.disableAnimationsOf(context) &&
+      TickerMode.valuesOf(context).enabled &&
+      (ModalRoute.isCurrentOf(context) ?? true);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncTimers();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _visible = state == AppLifecycleState.resumed;
+    _syncTimers();
+    if (mounted) setState(() {});
+  }
+
+  void _syncTimers() {
+    if (!_canAnimate) {
+      _wordTimer?.cancel();
+      _wordTimer = null;
+      _introTimer?.cancel();
+      _introFinished = true;
+      return;
+    }
+    _wordTimer ??= Timer.periodic(const Duration(seconds: 6), (_) {
+      if (mounted && _canAnimate) {
+        setState(() => _index = (_index + 1) % _themes.length);
+      }
+    });
+    if (!_introStarted && !_introFinished) {
+      _introStarted = true;
+      final length = AppZh.askTitoDexIdlePrompt.characters.length;
+      final step = (length / 28).ceil().clamp(1, length);
+      _introTimer = Timer.periodic(_semanticRevealFrame, (timer) {
+        if (!mounted || !_canAnimate) {
+          timer.cancel();
+          return;
+        }
+        setState(() => _introLength = (_introLength + step).clamp(0, length));
+        if (_introLength == length) {
+          timer.cancel();
+          _introTimer = Timer(_semanticCursorHold, () {
+            if (mounted) setState(() => _introFinished = true);
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _wordTimer?.cancel();
+    _introTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final style = SecondaryTypography.onCard.small12.copyWith(
+      color: TitoColors.deepBlue.withValues(alpha: 0.72),
+    );
+    final labels = AppZh.askTitoDexIdleTopics;
+    final scaler = MediaQuery.textScalerOf(context);
+    // Reserve just the changing phrase so the surrounding sentence stays put.
+    var wordWidth = 64.0;
+    for (final label in labels) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: label,
+          style: style.copyWith(fontWeight: FontWeight.w900),
+        ),
+        textDirection: Directionality.of(context),
+        textScaler: scaler,
+      )..layout();
+      if (painter.width + 12 > wordWidth) wordWidth = painter.width + 12;
+      painter.dispose();
+    }
+    final prompt = AppZh.askTitoDexIdlePrompt;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
       child: Column(
         children: [
-          Icon(
-            Icons.chat_bubble_outline_rounded,
-            size: 24,
-            color: TitoColors.skyBlue.withValues(alpha: 0.82),
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(AppZh.askTitoDexIdlePrefix, style: style),
+              SizedBox(
+                width: wordWidth,
+                child: AskAnswerMotionTitle(
+                  key: const Key('ask-titodex-idle-topic'),
+                  text: labels[_index],
+                  theme: _themes[_index],
+                  height: 22,
+                  style: style.copyWith(fontWeight: FontWeight.w900),
+                ),
+              ),
+              Text(AppZh.askTitoDexIdleSuffix, style: style),
+            ],
           ),
           const SizedBox(height: 6),
-          Text(
-            AppZh.askTitoDexAnswerPlaceholder,
-            textAlign: TextAlign.center,
-            style: SecondaryTypography.onCard.small12.copyWith(
-              color: TitoColors.deepBlue.withValues(alpha: 0.72),
+          Semantics(
+            label: prompt,
+            child: ExcludeSemantics(
+              child: _introFinished
+                  ? Text(prompt, style: style, textAlign: TextAlign.center)
+                  : _BlinkingInlineText(
+                      text: prompt.characters.take(_introLength).join(),
+                      style: style,
+                    ),
             ),
           ),
         ],
@@ -1801,10 +1924,12 @@ class _LiveAnswerCard extends StatefulWidget {
 class _LiveAnswerCardState extends State<_LiveAnswerCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _settle;
+  late AskMotionTheme _motionTheme;
 
   @override
   void initState() {
     super.initState();
+    _motionTheme = classifyAskMotionTheme(widget.question);
     _settle = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 340),
@@ -1815,6 +1940,9 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
   @override
   void didUpdateWidget(covariant _LiveAnswerCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.question != widget.question) {
+      _motionTheme = classifyAskMotionTheme(widget.question);
+    }
     if (oldWidget.result == null && widget.result != null) {
       if (MediaQuery.disableAnimationsOf(context)) {
         _settle.value = 1;
@@ -1833,38 +1961,48 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
     super.dispose();
   }
 
-  Widget _stageTransition(Widget child, Animation<double> animation) {
-    final eased = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutCubic,
-    );
-    return FadeTransition(
-      opacity: eased,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 0.14),
-          end: Offset.zero,
-        ).animate(eased),
-        child: child,
-      ),
-    );
-  }
+  String _titleText(String stage) => switch (widget.result?.status) {
+    AskTitoDexStatus.answered => AppZh.askTitoDexProgressDone,
+    AskTitoDexStatus.noMatch => AppZh.askMotionNoMatch,
+    AskTitoDexStatus.needsClarification => AppZh.askMotionClarify,
+    AskTitoDexStatus.failed => AppZh.askMotionFailed,
+    null => stage,
+  };
+
+  Widget _motionTitle(String stage) => AskAnswerMotionTitle(
+    key: const Key('ask-titodex-answer-motion-title'),
+    text: _titleText(stage),
+    theme: _motionTheme,
+    stage: widget.progress == AskTitoDexProgress.verifyingAnswer
+        ? 'verify'
+        : widget.progress == AskTitoDexProgress.revealingAnswer
+        ? 'organize'
+        : 'lookup',
+    outcome: switch (widget.result?.status) {
+      AskTitoDexStatus.answered => AskMotionOutcome.caught,
+      AskTitoDexStatus.noMatch => AskMotionOutcome.escaped,
+      AskTitoDexStatus.needsClarification ||
+      AskTitoDexStatus.failed => AskMotionOutcome.neutral,
+      null => null,
+    },
+    style: SecondaryTypography.onCard.small12.copyWith(
+      color: TitoColors.deepBlue,
+      fontWeight: FontWeight.w900,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final stage = switch (widget.progress) {
-      AskTitoDexProgress.checkingLocal => AppZh.askTitoDexProgressCheckingLocal,
-      AskTitoDexProgress.contactingWorker =>
-        AppZh.askTitoDexProgressContactingWorker,
-      AskTitoDexProgress.retrievingSources =>
-        AppZh.askTitoDexProgressRetrievingSources,
-      AskTitoDexProgress.resolvingQuestion =>
-        AppZh.askTitoDexProgressResolvingQuestion,
-      AskTitoDexProgress.verifyingAnswer =>
-        AppZh.askTitoDexProgressVerifyingAnswer,
-      AskTitoDexProgress.revealingAnswer =>
-        AppZh.askTitoDexProgressRevealingAnswer,
+      AskTitoDexProgress.checkingLocal => AppZh.askMotionLocal,
+      AskTitoDexProgress.contactingWorker ||
+      AskTitoDexProgress.retrievingSources => AppZh.askMotionLookup(
+        _motionTheme.topic,
+      ),
+      AskTitoDexProgress.resolvingQuestion => AppZh.askMotionResolve,
+      AskTitoDexProgress.verifyingAnswer => AppZh.askMotionVerify,
+      AskTitoDexProgress.revealingAnswer => AppZh.askMotionOrganize,
     };
     final hasSemanticAnswer = widget.streamedBlocks.isNotEmpty;
     final streamedSemanticBody = widget.streamedBlocks
@@ -1894,7 +2032,7 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
           ? liveAnswerBody.isNotEmpty
                 ? AppZh.askTitoDexLiveStageBody(stage, liveAnswerBody)
                 : stage
-          : AppZh.askTitoDexProgressDone,
+          : _titleText(stage),
       child: AnimatedBuilder(
         animation: _settle,
         builder: (context, child) {
@@ -1925,29 +2063,7 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
                       const SizedBox.shrink(
                         key: Key('ask-titodex-generating-answer'),
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: reduceMotion
-                                  ? Duration.zero
-                                  : const Duration(milliseconds: 260),
-                              transitionBuilder: _stageTransition,
-                              child: Text(
-                                stage,
-                                key: ValueKey(
-                                  'ask-progress-${widget.progress.name}',
-                                ),
-                                style: SecondaryTypography.onCard.small12
-                                    .copyWith(
-                                      color: TitoColors.deepBlue,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      _motionTitle(stage),
                       const SizedBox(height: 11),
                       AnimatedSwitcher(
                         duration: reduceMotion
@@ -2004,41 +2120,13 @@ class _LiveAnswerCardState extends State<_LiveAnswerCard>
                     key: const Key('ask-titodex-live-answer-content'),
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox.shrink(
+                      const SizedBox(
                         key: Key('ask-titodex-answer-card'),
+                        child: SizedBox.shrink(
+                          key: Key('ask-titodex-completion-check'),
+                        ),
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: reduceMotion
-                                  ? Duration.zero
-                                  : const Duration(milliseconds: 260),
-                              transitionBuilder: _stageTransition,
-                              child: Row(
-                                key: const Key('ask-titodex-completion-check'),
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.check_circle_rounded,
-                                    size: 17,
-                                    color: TitoColors.mint,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    AppZh.askTitoDexAnswerVerified,
-                                    style: SecondaryTypography.onCard.small12
-                                        .copyWith(
-                                          color: TitoColors.deepBlue,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      _motionTitle(stage),
                       const SizedBox(height: 11),
                       if (hasSemanticAnswer)
                         _AnswerBlocksView(
@@ -3602,7 +3690,8 @@ String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
   AskTitoDexAnswerMode.curatedSourcesDeterministic =>
     AppZh.askTitoDexRouteCuratedDeterministic,
   AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
-  AskTitoDexAnswerMode.deepseekNativeSearch => AppZh.askTitoDexRouteDeepseekNative,
+  AskTitoDexAnswerMode.deepseekNativeSearch =>
+    AppZh.askTitoDexRouteDeepseekNative,
   AskTitoDexAnswerMode.multiSourceQwen => AppZh.askTitoDexRouteMultiSource,
   AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
 };

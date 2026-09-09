@@ -1898,6 +1898,47 @@ abstract final class AppZh {
       t('askTitoDexHistoryClearAction', '清除全部');
   static String get askTitoDexAnswerPlaceholder =>
       t('askTitoDexAnswerPlaceholder', '回答会显示在这里');
+  static String get askTitoDexIdlePrefix => t('askTitoDexIdlePrefix', '陪你');
+  static String get askTitoDexIdleSuffix => t('askTitoDexIdleSuffix', '，继续旅程。');
+  static String get askTitoDexIdlePrompt =>
+      t('askTitoDexIdlePrompt', '从旅途中的一个小问题开始。');
+  static List<String> get askTitoDexIdleTopics => [
+    t('askIdlePokemon', '查宝可梦'),
+    t('askIdleMoves', '查招式'),
+    t('askIdleTypes', '查属性'),
+    t('askIdleBerries', '查树果'),
+    t('askIdleEvolution', '查进化'),
+    t('askIdleLevel', '查升级'),
+    t('askIdleItems', '查道具'),
+    t('askIdleRoute', '查路线'),
+    t('askIdleAbilities', '查特性'),
+    t('askIdleBreeding', '查培育'),
+    t('askIdleStats', '查能力值'),
+    t('askIdleWeather', '查天气'),
+    t('askIdleGeneral', '查资料'),
+  ];
+  static String get askMotionLocal => t('askMotionLocal', '正在翻阅本地记录');
+  static String get askMotionResolve => t('askMotionResolve', '正在确认问题与版本');
+  static String get askMotionVerify => t('askMotionVerify', '正在核对版本与来源');
+  static String get askMotionOrganize => t('askMotionOrganize', '正在整理回答');
+  static String get askMotionNoMatch => t('askMotionNoMatch', '暂未找到匹配答案');
+  static String get askMotionClarify => t('askMotionClarify', '需要确认问题');
+  static String get askMotionFailed => t('askMotionFailed', '暂时无法完成');
+  static String askMotionLookup(String topic) => switch (topic) {
+    'capture' => t('askMotionCapture', '正在查找宝可梦资料'),
+    'moves' => t('askMotionMoves', '正在查阅招式记录'),
+    'types' => t('askMotionTypes', '正在查看属性关系'),
+    'berry' || 'berries' => t('askMotionBerries', '正在对照树果效果'),
+    'evolution' => t('askMotionEvolution', '正在查看进化条件'),
+    'level' => t('askMotionLevel', '正在查找升级方式'),
+    'items' => t('askMotionItems', '正在查找道具资料'),
+    'route' => t('askMotionRoute', '正在展开路线资料'),
+    'abilities' => t('askMotionAbilities', '正在查看特性记录'),
+    'breeding' => t('askMotionBreeding', '正在查阅培育资料'),
+    'stats' => t('askMotionStats', '正在查阅能力数据'),
+    'weather' => t('askMotionWeather', '正在查看天气效果'),
+    _ => t('askMotionGeneral', '正在查找相关资料'),
+  };
   static String get askTitoDexProgressCheckingLocal =>
       t('askTitoDexProgressCheckingLocal', '正在翻本地资料');
   static String get askTitoDexProgressContactingWorker =>

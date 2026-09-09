@@ -1,0 +1,134 @@
+"""Build the small, offline Ask TitoDex motion catalog from checked-in data.
+
+No network, descriptions, or service configuration are included. Regenerate
+with Pillow available; keep native pixel sprites at their original resolution.
+"""
+
+import hashlib
+import io
+import json
+from pathlib import Path
+
+from PIL import Image
+
+
+ROOT = Path(__file__).resolve().parents[1]
+OUTPUT = ROOT / "flutter/assets/ask_motion"
+CATALOG = ROOT / "flutter/lib/features/journey/ask_motion_catalog.dart"
+BOOK = "assets/ask_motion/sonias-book.png"
+DEFAULT_SPRITES = (
+    "poke-ball", "great-ball", "town-map", "sonias-book", "thunder-stone",
+    "fire-stone", "water-stone", "oran-berry", "pecha-berry", "leppa-berry",
+    "exp-candy-m", "lucky-egg", "egg", "destiny-knot", "ability-capsule",
+    "protein", "calcium", "soothe-bell", "potion", "heat-rock", "damp-rock",
+    "smooth-rock", "icy-rock",
+)
+
+
+def read_catalog(name):
+    return json.loads((ROOT / "data/l10n/zh" / f"{name}.json").read_text("utf-8"))
+
+
+def dart_string(value):
+    return json.dumps(value, ensure_ascii=False).replace("$", r"\$")
+
+
+def main():
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    types = read_catalog("types")
+    type_by_zh = {value["nameZh"]: slug for slug, value in types.items()}
+    items = {value["slug"]: dict(value) for value in read_catalog("items").values()}
+    for name in (
+        "items_core_extra", "items_all_extra", "items_52poke_extra",
+        "items_v19_pokeapi_enrichment", "items_v19_enrichment",
+        "item_name_overrides_v19",
+    ):
+        extra = read_catalog(name)
+        for key, value in extra.get("itemsBySlug", extra.get("itemsByZhName", {})).items():
+            slug = value.get("slug", key)
+            items.setdefault(slug, {"slug": slug}).update({
+                k: v for k, v in value.items()
+                if k in ("nameZh", "nameEn", "category", "categoryEn", "categoryZh")
+            })
+
+    sprites = set(DEFAULT_SPRITES)
+    item_rows = []
+    for slug, value in items.items():
+        if not value.get("nameZh"):
+            continue
+        source = ROOT / "data/assets/item-sprites" / f"{slug}.png"
+        asset = BOOK
+        if source.is_file():
+            sprites.add(slug)
+            asset = f"assets/ask_motion/{slug}.png"
+        item_rows.append([
+            value["nameZh"], value.get("nameEn", "").replace("-", " "),
+            "berry" if slug.endswith("-berry") else "item", asset,
+        ])
+    item_rows.append(["剩饭", "", "item", "assets/ask_motion/leftovers.png"])
+    sprites.add("leftovers")
+
+    # Template items deliberately share artwork. Store identical rendered PNGs
+    # once, while keeping every default prop's stable path for the widget.
+    rendered = {}
+    source_assets = {}
+    images = {}
+    ordered_sprites = list(DEFAULT_SPRITES) + sorted(sprites - set(DEFAULT_SPRITES))
+    for slug in ordered_sprites:
+        source = ROOT / "data/assets/item-sprites" / f"{slug}.png"
+        with Image.open(source) as opened:
+            image = opened.convert("RGBA")
+            # Rolling distance uses the original ball's exact 80% alpha width.
+            # Resampling its edge changes that bound by a pixel at this scale.
+            if max(image.size) > 54 and slug not in ("poke-ball", "great-ball"):
+                image.thumbnail((54, 54), Image.Resampling.LANCZOS)
+            stream = io.BytesIO()
+            image.save(stream, format="PNG", optimize=True)
+            png = stream.getvalue()
+        fingerprint = hashlib.sha256(png).hexdigest()
+        previous = rendered.get(fingerprint)
+        filename = f"{slug}.png" if previous is None or slug in DEFAULT_SPRITES else previous
+        rendered.setdefault(fingerprint, filename)
+        images[filename] = png
+        source_assets[f"assets/ask_motion/{slug}.png"] = f"assets/ask_motion/{filename}"
+    for row in item_rows:
+        row[3] = source_assets.get(row[3], row[3])
+    for filename, png in images.items():
+        (OUTPUT / filename).write_bytes(png)
+    # Only generated flat PNGs in this verified output directory are removed.
+    for stale in OUTPUT.glob("*.png"):
+        if stale.name not in images and stale.resolve().parent == OUTPUT.resolve():
+            stale.unlink()
+
+    catalog = {
+        "Types": [[value["nameZh"], slug] for slug, value in types.items()],
+        "Items": item_rows,
+        "Moves": [[value["nameZh"], value.get("nameEn", ""), type_by_zh[value["typeZh"]]]
+                  for key, value in read_catalog("moves").items()
+                  if int(key) < 10000 and value.get("typeZh") in type_by_zh],
+        "Abilities": [[value["nameZh"], value.get("nameEn", "")]
+                      for key, value in read_catalog("abilities").items() if int(key) < 10000],
+        "Species": [[value["nameZh"], value.get("nameEn", "")]
+                    for value in read_catalog("species").values()],
+    }
+    lines = [
+        "// Generated by tools/build_ask_motion_assets.py; do not edit by hand.",
+        "// Names, type identities and local sprite paths only; no runtime network.",
+        "// dart format off", "",
+    ]
+    for name, rows in catalog.items():
+        lines.append(f"const askMotionCatalog{name} = <List<String>>[")
+        lines.extend("  [" + ", ".join(dart_string(v) for v in row) + "]," for row in rows)
+        lines.extend(["];", ""])
+    CATALOG.write_text("\n".join(lines), "utf-8")
+    print(json.dumps({
+        "catalog": {name: len(rows) for name, rows in catalog.items()},
+        "sourceSprites": len(sprites),
+        "bundledSprites": len(images),
+        "spriteBytes": sum(len(png) for png in images.values()),
+        "catalogBytes": CATALOG.stat().st_size,
+    }))
+
+
+if __name__ == "__main__":
+    main()
