@@ -155,9 +155,9 @@ const encounterIntent = /(?:哪里|哪儿|在哪|何处|怎么抓|如何抓|怎�
 const heldItemIntent = /(?:携带|持有|带着|身上|掉落|偷到|偷取|野生.*道具|道具.*野生)/u;
 const moveLearningIntent = /(?:学会|能学|可以学|能用|能使用|可以用|会不会|几级|招式|技能|学习器|蛋招式)/u;
 const speciesProfileIntent = /(?:属性|弱点|抗性|免疫|种族值|能力值|特性|隐藏特性|基础资料|详细资料|是什么宝可梦)/u;
-const itemInfoIntent = /(?:作用|用途|效果|干嘛|是什么|价格|多少钱|分类|怎么用|道具)/u;
-const moveInfoIntent = /(?:威力|命中|pp|属性|类型|分类|效果|招式|技能)/iu;
-const abilityInfoIntent = /(?:作用|效果|是什么|特性)/u;
+const itemInfoIntent = /(?:作用|用途|效果|干嘛|干什么|什么用|啥用|有用吗|介绍|资料|是什么|价格|多少钱|分类|怎么用|道具)/u;
+const moveInfoIntent = /(?:威力|命中|pp|属性|类型|分类|作用|用途|效果|干嘛|干什么|什么用|啥用|有用吗|介绍|资料|招式|技能)/iu;
+const abilityInfoIntent = /(?:作用|用途|效果|干嘛|干什么|什么用|啥用|有用吗|介绍|资料|是什么|特性)/u;
 const bundlePrefix = /^v[1-9]\d{0,3}$/;
 
 const gameVersionGroups: Record<AssistantRequest['context']['game'], string> = {
