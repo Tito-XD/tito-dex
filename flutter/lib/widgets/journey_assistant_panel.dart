@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/journey/journey_assistant.dart';
+import '../features/dex/dex_filter.dart';
+import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_loading_panel.dart';
+import 'tito_fact_grid.dart';
 
 class JourneyAssistantPanel extends StatelessWidget {
   const JourneyAssistantPanel({super.key, required this.future});
@@ -28,18 +31,47 @@ class JourneyAssistantPanel extends StatelessWidget {
         }
         final data = snapshot.data;
         if (data == null) {
-          return StickerCard(
-            child: Text(AppZh.journeyAssistantLoadFailed),
-          );
+          return StickerCard(child: Text(AppZh.journeyAssistantLoadFailed));
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _NearbyCard(data: data),
-            const SizedBox(height: 12),
-            _PartyCard(data: data),
-            const SizedBox(height: 12),
-            _VersionCard(data: data),
+            if (data.pairedVersionLabel != null) ...[
+              const SizedBox(height: 12),
+              _VersionCard(data: data),
+            ],
+            if (data.evolutionOrTradeMissing.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  key: const Key('journey-remaining-dex'),
+                  icon: const Icon(Icons.catching_pokemon_rounded, size: 18),
+                  label: Text(
+                    AppZh.journeyRemainingDex(
+                      data.evolutionOrTradeMissingCount,
+                    ),
+                  ),
+                  onPressed: () {
+                    dexFilterController.setFilter(
+                      DexFilter(
+                        speciesIds: data.evolutionOrTradeMissing
+                            .map((pokemon) => pokemon.id)
+                            .toSet(),
+                        speciesLabelZh: AppZh.journeyRemainingDex(
+                          data.evolutionOrTradeMissingCount,
+                        ),
+                        labelZh: AppZh.journeyRemainingDex(
+                          data.evolutionOrTradeMissingCount,
+                        ),
+                      ),
+                    );
+                    context.push('/dex');
+                  },
+                ),
+              ),
+            ],
           ],
         );
       },
@@ -100,57 +132,6 @@ class _NearbyCard extends StatelessWidget {
   }
 }
 
-class _PartyCard extends StatelessWidget {
-  const _PartyCard({required this.data});
-
-  final JourneyAssistantSnapshot data;
-
-  @override
-  Widget build(BuildContext context) {
-    return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            icon: Icons.groups_2_outlined,
-            title: AppZh.journeyAssistantPartyTitle,
-          ),
-          const SizedBox(height: 8),
-          if (data.partyEvolutions.isEmpty)
-            Text(
-              AppZh.journeyAssistantPartyComplete,
-              style: SecondaryTypography.onCard.body14,
-            )
-          else
-            for (final advice in data.partyEvolutions)
-              Material(
-                color: Colors.transparent,
-                child: ListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.trending_up_rounded),
-                  title: Text(
-                    AppZh.journeyAssistantEvolutionRoute(
-                      advice.fromNameZh,
-                      advice.toNameZh,
-                      advice.triggerZh,
-                    ),
-                    style: SecondaryTypography.onCard.body14,
-                  ),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => _openPokemon(
-                    context,
-                    advice.toId,
-                    exactVersion: data.exactVersion,
-                  ),
-                ),
-              ),
-        ],
-      ),
-    );
-  }
-}
-
 class _VersionCard extends StatelessWidget {
   const _VersionCard({required this.data});
 
@@ -186,21 +167,42 @@ class _VersionCard extends StatelessWidget {
                 style: SecondaryTypography.onCard.body14,
               ),
             if (data.versionEncounterGaps.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              for (final pokemon in data.versionEncounterGaps)
-                _PokemonRow(pokemon: pokemon, exactVersion: data.exactVersion),
-            ],
-            if (paired != null) const Divider(height: 20),
-            Text(
-              AppZh.journeyAssistantEvolutionGap(
-                data.evolutionOrTradeMissingCount,
+              const SizedBox(height: 8),
+              LayoutBuilder(
+                builder: (context, constraints) => TitoFactGrid(
+                  columns: constraints.maxWidth < 320 ? 2 : 3,
+                  children: [
+                    for (final pokemon in data.versionEncounterGaps)
+                      TitoFactTile(
+                        title: pokemon.nameZh,
+                        onTap: () => _openPokemon(
+                          context,
+                          pokemon.id,
+                          formKey: pokemon.formKey,
+                          exactVersion: pairedEncounterVersion(
+                            data.exactVersion!,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            DexSpriteImage(
+                              source: pokemon.spritePath,
+                              width: 28,
+                              height: 28,
+                            ),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '#${pokemon.id.toString().padLeft(3, '0')}',
+                                style: SecondaryTypography.onCard.small12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              style: SecondaryTypography.onCard.body14,
-            ),
-            if (data.evolutionOrTradeMissing.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              for (final pokemon in data.evolutionOrTradeMissing)
-                _PokemonRow(pokemon: pokemon, exactVersion: data.exactVersion),
             ],
           ],
         ],

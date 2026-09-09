@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 
 import '../features/dex/type_chart.dart';
 import '../features/journey/ask_motion_theme.dart';
+import '../features/journey/ask_motion_images.dart';
 import '../theme/tito_colors.dart';
 
 /// An answer was found, no supported answer was found, or a neutral interruption.
 enum AskMotionOutcome { caught, escaped, neutral }
 
-/// The small, centered title above an Ask TitoDex answer.
+/// Compact inline word transitions and leading Ask TitoDex progress props.
 ///
-/// Props belong to a change of words, so there is no repeating loading animation.
-/// A completed answer mounted from history is still; only a live outcome changes
-/// the title into the brief catch / escape finish.
+/// Idle words animate only when they change. Leading answer props cycle while
+/// work is pending and hold the subject or final ball outcome when complete.
 class AskAnswerMotionTitle extends StatefulWidget {
   const AskAnswerMotionTitle({
     super.key,
@@ -24,6 +24,8 @@ class AskAnswerMotionTitle extends StatefulWidget {
     this.outcome,
     this.style,
     this.height = 18,
+    this.prepareImages,
+    this.leading = false,
   });
 
   final String text;
@@ -32,6 +34,11 @@ class AskAnswerMotionTitle extends StatefulWidget {
   final AskMotionOutcome? outcome;
   final TextStyle? style;
   final double height;
+  final AskMotionImagePreparer? prepareImages;
+
+  /// Answer progress owns a persistent leading prop; idle words use the
+  /// compact in-sentence transition instead.
+  final bool leading;
 
   @override
   State<AskAnswerMotionTitle> createState() => _AskAnswerMotionTitleState();
@@ -50,6 +57,69 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
   _TitleLayout? _layout;
   int _revision = 0;
   int _scheduledRevision = -1;
+  int _imageRequest = 0;
+  List<String>? _requestedImages;
+  Map<String, ImageProvider> _images = const {};
+  bool _imagesReady = false;
+  int _cycle = 0;
+
+  List<String> get _resources {
+    final selected = widget.theme.assets;
+    if (!widget.leading) return selected;
+    final extras = switch (widget.theme.topic) {
+      'berry' || 'berries' => const [
+        'item-sprites/oran-berry.png',
+        'item-sprites/pecha-berry.png',
+      ],
+      'items' => const [
+        'item-sprites/potion.png',
+        'item-sprites/soothe-bell.png',
+      ],
+      'evolution' => const [
+        'item-sprites/fire-stone.png',
+        'item-sprites/water-stone.png',
+      ],
+      'breeding' => const [
+        'item-sprites/egg.png',
+        'item-sprites/destiny-knot.png',
+      ],
+      'level' => const [
+        'item-sprites/exp-candy-m.png',
+        'item-sprites/lucky-egg.png',
+      ],
+      'stats' => const ['item-sprites/protein.png', 'item-sprites/calcium.png'],
+      _ => const <String>[],
+    };
+    return {...selected, ...extras}.take(6).toList();
+  }
+
+  void _prepareImages() {
+    final resources = _resources;
+    if ((!_active && !widget.leading) ||
+        listEquals(_requestedImages, resources)) {
+      return;
+    }
+    _requestedImages = List.of(resources);
+    _imagesReady = false;
+    final request = ++_imageRequest;
+    final prepare = widget.prepareImages ?? askMotionImages.prepare;
+    prepare(context, resources).then(
+      (images) {
+        if (!mounted || request != _imageRequest) return;
+        setState(() {
+          _images = images;
+          _imagesReady = true;
+        });
+      },
+      onError: (Object _, StackTrace _) {
+        if (!mounted || request != _imageRequest) return;
+        setState(() {
+          _images = const {};
+          _imagesReady = true;
+        });
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -60,7 +130,12 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
     _motion = AnimationController(vsync: this)
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed && mounted && _active) {
-          setState(() => _active = false);
+          if (widget.leading && widget.outcome == null) {
+            setState(() => _cycle++);
+            _motion.forward(from: 0);
+          } else {
+            setState(() => _active = false);
+          }
         }
       });
     _active = widget.outcome == null && widget.text.isNotEmpty;
@@ -74,6 +149,17 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
         TickerMode.valuesOf(context).enabled &&
         (ModalRoute.isCurrentOf(context) ?? true);
     if (_reduced || !_visible || !_foreground) _finish();
+    if (widget.leading &&
+        !_active &&
+        !_reduced &&
+        _visible &&
+        _foreground &&
+        widget.outcome == null &&
+        widget.text.isNotEmpty) {
+      _active = true;
+      _revision++;
+    }
+    _prepareImages();
   }
 
   @override
@@ -87,10 +173,19 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
         oldWidget.theme.kind != widget.theme.kind ||
         !listEquals(oldWidget.theme.assets, widget.theme.assets);
     if (!changed) return;
+    if (widget.leading &&
+        oldWidget.outcome == widget.outcome &&
+        oldWidget.theme.topic == widget.theme.topic &&
+        oldWidget.theme.kind == widget.theme.kind &&
+        listEquals(oldWidget.theme.assets, widget.theme.assets)) {
+      // Retrieval stages and streamed blocks do not restart the prop cycle.
+      return;
+    }
     _motion.stop();
     _motion.value = 0;
     _revision++;
     _previous = oldWidget.text;
+    _cycle = 0;
     _active =
         !_reduced &&
         _visible &&
@@ -98,6 +193,7 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
         widget.text.isNotEmpty &&
         widget.outcome != AskMotionOutcome.neutral &&
         (widget.outcome == null || oldWidget.outcome != widget.outcome);
+    _prepareImages();
   }
 
   void _finish() {
@@ -111,6 +207,17 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
     _foreground = state == AppLifecycleState.resumed;
     if (state != AppLifecycleState.resumed && mounted && _active) {
       setState(_finish);
+    } else if (state == AppLifecycleState.resumed &&
+        mounted &&
+        widget.leading &&
+        _visible &&
+        !_reduced &&
+        widget.outcome == null) {
+      setState(() {
+        _active = true;
+        _revision++;
+      });
+      _prepareImages();
     }
   }
 
@@ -202,80 +309,157 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
     );
     final scaler = MediaQuery.textScalerOf(context);
     final direction = Directionality.of(context);
-    return Semantics(
-      label: widget.text,
-      child: ExcludeSemantics(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final layout = _measureLayout(
-              constraints.maxWidth,
-              style,
-              scaler,
-              direction,
-            );
-            final width = layout.width;
-            final size = Size(layout.width, layout.height);
-            if (_lastLayoutSize != null && _lastLayoutSize != size && _active) {
-              // Resizing should not change the speed halfway through a roll.
-              _finish();
-            }
-            _lastLayoutSize = size;
-            if (!_active) {
+    if (widget.leading) return _buildLeading(style);
+    return _PreparedMotionImages(
+      images: _images,
+      child: Semantics(
+        label: widget.text,
+        child: ExcludeSemantics(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final layout = _measureLayout(
+                constraints.maxWidth,
+                style,
+                scaler,
+                direction,
+              );
+              final width = layout.width;
+              final size = Size(layout.width, layout.height);
+              if (_lastLayoutSize != null &&
+                  _lastLayoutSize != size &&
+                  _active) {
+                // Resizing should not change the speed halfway through a roll.
+                _finish();
+              }
+              _lastLayoutSize = size;
+              if (!_active || !_imagesReady) {
+                return SizedBox(
+                  width: width,
+                  height: layout.height,
+                  child: Center(
+                    child: SizedBox(
+                      width: layout.fresh.width,
+                      child: Text(
+                        widget.text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: style,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              final duration = _duration(
+                layout,
+                widget.theme.kind,
+                widget.outcome,
+                widget.theme.assets.length,
+              );
+              _startAfterLayout(
+                Duration(microseconds: (duration * 1000).round()),
+              );
               return SizedBox(
                 width: width,
                 height: layout.height,
-                child: Center(
-                  child: SizedBox(
-                    width: layout.fresh.width,
-                    child: Text(
-                      widget.text,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: style,
-                    ),
-                  ),
-                ),
-              );
-            }
-            final duration = _duration(
-              layout,
-              widget.theme.kind,
-              widget.outcome,
-              widget.theme.assets.length,
-            );
-            _startAfterLayout(
-              Duration(microseconds: (duration * 1000).round()),
-            );
-            return SizedBox(
-              width: width,
-              height: layout.height,
-              child: AnimatedBuilder(
-                animation: _motion,
-                builder: (context, child) {
-                  final ms = _motion.value * duration;
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _TitlePainter(
-                            layout: layout,
-                            kind: widget.theme.kind,
-                            outcome: widget.outcome,
-                            ms: ms,
-                            duration: duration,
+                child: AnimatedBuilder(
+                  animation: _motion,
+                  builder: (context, child) {
+                    final ms = _motion.value * duration;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: _TitlePainter(
+                              layout: layout,
+                              kind: widget.theme.kind,
+                              outcome: widget.outcome,
+                              ms: ms,
+                              duration: duration,
+                            ),
                           ),
                         ),
-                      ),
-                      ..._props(layout, ms, duration),
-                    ],
-                  );
-                },
-              ),
-            );
-          },
+                        ..._props(layout, ms, duration),
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLeading(TextStyle style) {
+    final assets = _resources.isEmpty
+        ? const [AskMotionImages.book]
+        : _resources;
+    final complete = widget.outcome != null;
+    if (_active && _imagesReady) {
+      _startAfterLayout(Duration(milliseconds: complete ? 760 : 2600));
+    }
+    return _PreparedMotionImages(
+      images: _images,
+      child: AnimatedBuilder(
+        animation: _motion,
+        builder: (context, _) {
+          final moving = _active && _imagesReady;
+          final ms = moving ? _motion.value * (complete ? 760 : 2600) : 760.0;
+          final falling =
+              !complete || widget.outcome == AskMotionOutcome.caught;
+          final y = !moving || !falling
+              ? 0.0
+              : ms < 300
+              ? -12 * (1 - math.pow(ms / 300, 2)).toDouble()
+              : ms < 540
+              ? -2.5 * math.sin((ms - 300) / 240 * math.pi)
+              : 0.0;
+          final opacity = moving && !complete
+              ? 1 - _segment(ms, 2390, 2600)
+              : 1.0;
+          final asset = complete
+              ? assets.first
+              : assets[_cycle % assets.length];
+          final ballOutcome =
+              widget.outcome == AskMotionOutcome.escaped ||
+              (widget.outcome == AskMotionOutcome.caught &&
+                  widget.theme.kind == AskMotionKind.ball);
+          final prop = ballOutcome
+              ? _OutcomeBall(outcome: widget.outcome!, ms: moving ? ms : 760)
+              : _PropImage(
+                  key: const ValueKey('ask-motion-leading-image'),
+                  asset: asset,
+                );
+          return Semantics(
+            label: widget.text,
+            child: ExcludeSemantics(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 26,
+                    height: widget.height,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Opacity(
+                        opacity: _imagesReady ? opacity : 0,
+                        child: Transform.translate(
+                          key: const ValueKey('ask-motion-leading-position'),
+                          offset: Offset(0, y),
+                          child: prop,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(child: Text(widget.text, style: style)),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -284,7 +468,7 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
     final center = layout.width / 2;
     final top = (layout.height - 18) / 2;
     final assets = widget.theme.assets.isEmpty
-        ? const ['assets/ask_motion/sonias-book.png']
+        ? const ['item-sprites/sonias-book.png']
         : widget.theme.assets;
     if (widget.outcome == AskMotionOutcome.caught ||
         widget.outcome == AskMotionOutcome.escaped) {
@@ -324,9 +508,7 @@ class _AskAnswerMotionTitleState extends State<AskAnswerMotionTitle>
                 child: Transform.rotate(
                   key: const ValueKey('ask-motion-ball-rotation'),
                   angle: travel / 7.2,
-                  child: const _PropImage(
-                    asset: 'assets/ask_motion/poke-ball.png',
-                  ),
+                  child: const _PropImage(asset: 'item-sprites/poke-ball.png'),
                 ),
               ),
             ),
@@ -727,8 +909,10 @@ class _PropImage extends StatelessWidget {
       decoration: type == null
           ? null
           : BoxDecoration(color: typeTileColor(type), shape: BoxShape.circle),
-      child: Image.asset(
-        asset,
+      child: Image(
+        image:
+            _PreparedMotionImages.of(context)[asset] ??
+            AskMotionImages.fallback(asset),
         fit: BoxFit.contain,
         filterQuality: type == null ? FilterQuality.none : FilterQuality.low,
         excludeFromSemantics: true,
@@ -738,6 +922,21 @@ class _PropImage extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PreparedMotionImages extends InheritedWidget {
+  const _PreparedMotionImages({required this.images, required super.child});
+  final Map<String, ImageProvider> images;
+
+  static Map<String, ImageProvider> of(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<_PreparedMotionImages>()
+          ?.images ??
+      const {};
+
+  @override
+  bool updateShouldNotify(_PreparedMotionImages oldWidget) =>
+      images != oldWidget.images;
 }
 
 class _BookPainter extends CustomPainter {
@@ -854,7 +1053,7 @@ class _OutcomeBall extends StatelessWidget {
     final open = caught ? 0.0 : _segment(ms, 450, 650);
     Widget half(bool upper) => ClipRect(
       clipper: _BallHalfClipper(upper),
-      child: const _PropImage(asset: 'assets/ask_motion/poke-ball.png'),
+      child: const _PropImage(asset: 'item-sprites/poke-ball.png'),
     );
     return SizedBox(
       key: ValueKey('ask-motion-${outcome.name}'),

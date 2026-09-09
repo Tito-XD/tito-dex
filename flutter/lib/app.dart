@@ -175,8 +175,6 @@ class _TitoDexAppState extends State<TitoDexApp> {
                       onLaunchEmulator: () => _onContinue(context),
                       askTitoDexEnabled: askTitoDexSettings.extensionEnabled,
                       onAskTitoDex: () => context.push('/journey/ask'),
-                      onManageJourneyPacks: () =>
-                          context.push('/journey/packs'),
                     ),
                   ),
                 ),

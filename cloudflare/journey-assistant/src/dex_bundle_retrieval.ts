@@ -11,12 +11,14 @@ import {
   type ClarificationCandidate,
 } from './contract';
 import type { CuratedSource } from './curated_web';
+import { answerStructuredResources } from './structured_resources';
+import { entityName, mentionedEntities } from './structured_entities';
 
 const MAX_MANIFEST_BYTES = 64 * 1024;
 const MAX_DETAIL_BYTES = 4 * 1024 * 1024;
 const MAX_ITEMS_BYTES = 2 * 1024 * 1024;
 const MAX_MOVES_BYTES = 256 * 1024;
-const MAX_CATALOG_BYTES = 4 * 1024 * 1024;
+const MAX_CATALOG_BYTES = 8 * 1024 * 1024;
 const MAX_REFERENCE_SHARD_BYTES = 64 * 1024;
 const MAX_GAMEPLAY_SHARD_BYTES = 1024 * 1024;
 const MAX_AREAS = 6;
@@ -150,9 +152,8 @@ const regionalDexKeys: Partial<Record<AssistantRequest['context']['game'], reado
 };
 
 const encounterIntent = /(?:哪里|哪儿|在哪|何处|怎么抓|如何抓|怎么捉|如何捉|可以抓|能抓|捕捉|捕获|抓到|捉到|遇到|出没|分布|栖息)/u;
-const evolutionIntent = /(?:进化|退化|进化链)/u;
 const heldItemIntent = /(?:携带|持有|带着|身上|掉落|偷到|偷取|野生.*道具|道具.*野生)/u;
-const moveLearningIntent = /(?:学会|能学|可以学|几级|招式|技能|学习器|蛋招式)/u;
+const moveLearningIntent = /(?:学会|能学|可以学|能用|能使用|可以用|会不会|几级|招式|技能|学习器|蛋招式)/u;
 const speciesProfileIntent = /(?:属性|弱点|抗性|免疫|种族值|能力值|特性|隐藏特性|基础资料|详细资料|是什么宝可梦)/u;
 const itemInfoIntent = /(?:作用|用途|效果|干嘛|是什么|价格|多少钱|分类|怎么用|道具)/u;
 const moveInfoIntent = /(?:威力|命中|pp|属性|类型|分类|效果|招式|技能)/iu;
@@ -279,12 +280,32 @@ export async function answerFromDexBundle(
   const item = findTarget(request.question, itemTargets);
   const move = findTarget(request.question, moveTargets);
   const ability = findTarget(request.question, abilityTargets);
-  if (!species && !item && !move && !ability) return null;
-
   const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
   if (!validBundleManifest(manifest)) return null;
 
   const bundleVersion = manifest.bundleVersion as number;
+  const structured = await answerStructuredResources({
+    request, version: bundleVersion, versionGroup: gameVersionGroups[request.context.game],
+    gameLabel: gameLabels[request.context.game],
+    read: async (path, limit) => {
+      // Resource names originate exclusively in the fixed query adapters.
+      if (!/^[a-z_]+(?:\/[a-z_]+)*\/\d+\.json$|^[a-z_]+\.json$/u.test(path)) return null;
+      try {
+        const value = await bucket.get(`${manifest.cdnPrefix}/${path}`);
+        if (!value) return null;
+        if (value.size > limit) { await value.body.cancel(); return null; }
+        return JSON.parse(new TextDecoder().decode(await readBounded(value.body, limit)));
+      }
+      catch { return null; }
+    },
+  });
+  if (structured) {
+    const result = bundleAnswerResult(request, structured, bundleVersion);
+    // This response explicitly states its data scope, including missing fields.
+    // A language model cannot upgrade that scope or replace the query result.
+    return result ? { ...result, requiresOnlineVerification: false } : null;
+  }
+  if (!species && !item && !move && !ability) return null;
   const referenceConfig = bundleVersion >= 20
     ? validReferenceDataConfig(manifest.referenceData, manifest.referenceDataSourceCommit)
     : null;
@@ -748,7 +769,12 @@ function answerMoveLearning(
       )),
     )) methods.push(label);
   }
-  if (methods.length === 0) return null;
+  if (methods.length === 0) return bundleResponse(
+    request,
+    `《宝可梦 ${gameLabels[request.context.game]}》的已收录招式表中，没有${species.nameZh}学习${move.nameZh}的记录；这项查询只覆盖当前版本的学习表，不包含未收录的活动或特殊来源。`,
+    bundleVersion, `move-learning-${request.context.game}-${species.id}-${move.id}`,
+    [`species:${species.id}`, `move:${move.id}`, `game:${request.context.game}`],
+  );
   return bundleResponse(
     request,
     `《宝可梦 ${gameLabels[request.context.game]}》的 TitoDex v${bundleVersion} 招式表记录：${species.nameZh}可通过${methods.join('；')}学会${move.nameZh}。`,
@@ -916,7 +942,16 @@ function bundleAnswerResult(
     }).slice(0, 6_000),
   };
   return {
-    response,
+    response: {
+      ...response,
+      evidence: response.evidence ?? {
+        basis: 'structured',
+        scope: response.confidence === 'high' ? 'game' : 'general',
+        complete: true,
+        bundleVersion,
+        entityIds: mentionedEntities(response.answer).map((entity) => `${entity.kind}:${entity.id}`),
+      },
+    },
     localSource: source,
     // V20 reference/gameplay projections declare online-verify provenance.
     // They remain the deterministic offline fallback, but an online-capable
@@ -1050,6 +1085,17 @@ function compactSpeciesEvidence(
           truncated: true,
         };
   }
+  if (isPlainObject(detail.evolutionChain)) {
+    const edges = collectEvolutionEdges(detail.evolutionChain);
+    evidence.evolutionChain = {
+      scope: 'general', exactGameApplicability: 'unknown', truncated: edges.length > 32,
+      edges: edges.slice(0, 32).flatMap((edge) => {
+        const from = entityName('pokemon', edge.fromId), to = entityName('pokemon', edge.toId);
+        return from && to ? [{ fromStableId: `pokemon:${edge.fromId}`, fromNameZh: from,
+          toStableId: `pokemon:${edge.toId}`, toNameZh: to }] : [];
+      }),
+    };
+  }
   if (gameplayShard && gameplayShard.evolutions.length > 0) {
     evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
       const safeTriggers = Array.isArray(row.triggers)
@@ -1160,6 +1206,7 @@ function compactMoveEvidence(
 function collectEvolutionEdges(root: Record<string, unknown>): EvolutionEdge[] {
   const edges: EvolutionEdge[] = [];
   const visit = (node: Record<string, unknown>): void => {
+    if (edges.length >= 40) return;
     if (!Number.isInteger(node.id) || typeof node.nameZh !== 'string' ||
         !Array.isArray(node.children)) return;
     for (const childValue of node.children) {

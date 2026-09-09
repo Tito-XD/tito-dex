@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:titodex/features/dex/dex_filter.dart';
 import 'package:titodex/features/dex/dex_models.dart';
 import 'package:titodex/features/dex/dex_progress.dart';
 import 'package:titodex/features/dex/location_index.dart';
@@ -8,6 +10,7 @@ import 'package:titodex/features/journey/journey_assistant.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/widgets/journey_assistant_panel.dart';
 import 'package:titodex/widgets/journey_card.dart';
+import 'package:titodex/widgets/tito_fact_grid.dart';
 
 void main() {
   const summaries = {
@@ -123,11 +126,100 @@ void main() {
     expect(find.text('附近 1 种待捕'), findsOneWidget);
     expect(find.bySemanticsLabel('查看旅程详情'), findsOneWidget);
     expect(find.text('附近未捕获'), findsOneWidget);
-    expect(find.text('队伍与进化'), findsOneWidget);
+    expect(find.text('队伍与进化'), findsNothing);
     expect(find.text('版本补全'), findsOneWidget);
-    expect(find.textContaining('火岩鼠 → 火暴兽'), findsOneWidget);
+    expect(find.textContaining('火岩鼠 → 火暴兽'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  test(
+    'completion keeps the full list and separates caught and paired species',
+    () {
+      final snapshot = buildJourneyAssistantSnapshot(
+        journey: journey,
+        edition: GameEdition.hgss.withFlavor('soulsilver'),
+        index: _index,
+        summaries: {
+          ...summaries,
+          for (var id = 30; id < 40; id++)
+            id: PokemonSummary(
+              id: id,
+              nameEn: 'species-$id',
+              nameZh: '宝可梦$id',
+              types: const [],
+            ),
+        },
+        progress: const DexProgress(caughtIds: {19}, seenIds: {}),
+        evolutionOrTradeMissingIds: {
+          19,
+          21,
+          22,
+          for (var id = 30; id < 40; id++) id,
+        },
+      );
+      expect(snapshot.versionEncounterGaps.map((p) => p.id), [21]);
+      expect(snapshot.evolutionOrTradeMissing.map((p) => p.id), [
+        22,
+        for (var id = 30; id < 40; id++) id,
+      ]);
+      expect(snapshot.evolutionOrTradeMissingCount, 11);
+    },
+  );
+
+  testWidgets(
+    'completion grid uses the paired game and hands other species to Dex',
+    (tester) async {
+      final snapshot = buildJourneyAssistantSnapshot(
+        journey: journey,
+        edition: GameEdition.hgss.withFlavor('soulsilver'),
+        index: _index,
+        summaries: summaries,
+        progress: const DexProgress(caughtIds: {19}, seenIds: {}),
+        evolutionOrTradeMissingIds: {20, 21, 22},
+      );
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => Scaffold(
+              body: SingleChildScrollView(
+                child: JourneyAssistantPanel(future: Future.value(snapshot)),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/dex',
+            builder: (context, state) =>
+                const Scaffold(body: Text('filtered-dex')),
+          ),
+          GoRoute(
+            path: '/dex/:id',
+            builder: (context, state) =>
+                Scaffold(body: Text(state.uri.toString())),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      addTearDown(dexFilterController.clearFilter);
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+      final paired = find.widgetWithText(TitoFactTile, '烈雀');
+      await tester.ensureVisible(paired);
+      await tester.pumpAndSettle();
+      await tester.tap(paired);
+      await tester.pumpAndSettle();
+      expect(find.text('/dex/21?version=heartgold'), findsOneWidget);
+      router.pop();
+      await tester.pumpAndSettle();
+      final other = find.byKey(const Key('journey-remaining-dex'));
+      await tester.ensureVisible(other);
+      await tester.pumpAndSettle();
+      await tester.tap(other);
+      await tester.pumpAndSettle();
+      expect(find.text('filtered-dex'), findsOneWidget);
+      expect(dexFilterController.currentFilter.speciesIds, {20, 22});
+    },
+  );
 }
 
 const _index = LocationIndex(

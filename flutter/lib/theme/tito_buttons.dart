@@ -49,12 +49,15 @@ class TitoPrimaryButton extends StatelessWidget {
               mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  label,
-                  style: TitoTypography.style(
-                    color: TitoColors.card,
-                    fontWeight: FontWeight.w800,
-                    fontSize: dense ? 12 : (compact ? 14 : 16),
+                Flexible(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: TitoTypography.style(
+                      color: TitoColors.card,
+                      fontWeight: FontWeight.w800,
+                      fontSize: dense ? 12 : (compact ? 14 : 16),
+                    ),
                   ),
                 ),
                 if (showArrow) ...[
@@ -118,7 +121,7 @@ class TitoPrimaryButton extends StatelessWidget {
         mainAxisSize: expanded ? MainAxisSize.max : MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label),
+          Flexible(child: Text(label, textAlign: TextAlign.center)),
           if (showArrow) ...[
             SizedBox(width: dense ? 4 : 8),
             Icon(Icons.arrow_forward_rounded, size: iconSize),

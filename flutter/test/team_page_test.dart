@@ -67,7 +67,7 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
 
     expect(find.text('火球鼠'), findsOneWidget);
-    expect(find.text(AppZh.teamSummaryTitle), findsOneWidget);
+    expect(find.byKey(const Key('team-summary-header')), findsOneWidget);
   });
 
   testWidgets('team editor saves a user override and removes a member', (
@@ -147,8 +147,54 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     final delete = find.text(AppZh.teamEditDelete);
     await tester.ensureVisible(delete);
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(delete);
     await tester.pump(const Duration(milliseconds: 300));
     expect(journey.party, isEmpty);
   });
+
+  testWidgets(
+    'member details can collapse and reopen without editing the team',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var saves = 0;
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => Scaffold(
+              body: TeamPage(
+                journey: CurrentJourney.mock().copyWith(
+                  party: const [PartyMember(species: 'Cyndaquil', level: 5)],
+                ),
+                onSaveJourney: (_) => saves++,
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pump(const Duration(milliseconds: 300));
+      final collapse = find.byKey(const Key('team-inspector-collapse'));
+      expect(collapse, findsNothing);
+      await tester.tap(find.text('火球鼠'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.ensureVisible(collapse);
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(collapse);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(collapse, findsNothing);
+      expect(find.text(AppZh.teamEditAction), findsNothing);
+      await tester.ensureVisible(find.text('火球鼠'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('火球鼠'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(collapse, findsOneWidget);
+      expect(saves, 0);
+    },
+  );
 }

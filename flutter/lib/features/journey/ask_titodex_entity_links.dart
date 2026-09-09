@@ -54,6 +54,7 @@ abstract class AskTitoDexEntityResolver {
   Future<List<AskTitoDexEntityLink>> resolve({
     required String question,
     required String answer,
+    List<String>? stableIds,
   });
 }
 
@@ -69,8 +70,22 @@ class DexAskTitoDexEntityResolver implements AskTitoDexEntityResolver {
   Future<List<AskTitoDexEntityLink>> resolve({
     required String question,
     required String answer,
+    List<String>? stableIds,
   }) async {
     final candidates = await (_candidates ??= _loadCandidates());
+    if (stableIds != null) {
+      final byId = {
+        for (final candidate in candidates)
+          '${candidate.kind.name}:${candidate.id}': candidate,
+      };
+      return stableIds
+          .toSet()
+          .map((id) => byId[id])
+          .whereType<_EntityCandidate>()
+          .take(6)
+          .map((candidate) => candidate.toLink())
+          .toList(growable: false);
+    }
     final questionLower = question.toLowerCase();
     final answerLower = answer.toLowerCase();
     final matches =

@@ -182,7 +182,8 @@ class _ReferenceCatalogGrid extends StatelessWidget {
             crossAxisCount: columns,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
-            childAspectRatio: 0.92,
+            mainAxisExtent:
+                80 * MediaQuery.textScalerOf(context).scale(12) / 12,
           ),
           itemBuilder: (context, index) {
             final entry = entries[index];
@@ -223,15 +224,15 @@ class _ReferenceGridCard extends StatelessWidget {
         borderRadius: radius,
         ownShadow: false,
         child: StickerCard(
-          padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+          padding: const EdgeInsets.all(8),
           child: InkWell(
             onTap: onTap,
             borderRadius: radius,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 26, color: iconColor),
-                const SizedBox(height: 6),
+                Icon(icon, size: 22, color: iconColor),
+                const SizedBox(height: 4),
                 Text(
                   label,
                   textAlign: TextAlign.center,

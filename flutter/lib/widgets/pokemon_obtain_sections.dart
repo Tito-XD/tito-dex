@@ -249,6 +249,7 @@ class VersionChainPlanningCard extends StatelessWidget {
     required this.versionGroup,
     required this.exactVersion,
     required this.detailsFuture,
+    this.onPickVersion,
   });
 
   final EvolutionNode chain;
@@ -256,14 +257,15 @@ class VersionChainPlanningCard extends StatelessWidget {
   final String versionGroup;
   final String? exactVersion;
   final Future<Map<int, PokemonDetail>> detailsFuture;
+  final VoidCallback? onPickVersion;
 
   @override
   Widget build(BuildContext context) {
     final version = exactVersion;
     if (version == null) {
-      return const StickerCard(
+      return StickerCard(
         variant: StickerVariant.softYellow,
-        child: _PlanningPrompt(),
+        child: _PlanningPrompt(onPickVersion: onPickVersion),
       );
     }
     return FutureBuilder<Map<int, PokemonDetail>>(
@@ -310,7 +312,9 @@ class VersionChainPlanningCard extends StatelessWidget {
 }
 
 class _PlanningPrompt extends StatelessWidget {
-  const _PlanningPrompt();
+  const _PlanningPrompt({this.onPickVersion});
+
+  final VoidCallback? onPickVersion;
 
   @override
   Widget build(BuildContext context) {
@@ -320,11 +324,24 @@ class _PlanningPrompt extends StatelessWidget {
         const Icon(Icons.tune_rounded, size: 22),
         const SizedBox(width: 9),
         Expanded(
-          child: Text(
-            AppZh.dexChainPlanningPickVersion,
-            style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppZh.dexChainPlanningPickVersion,
+                style: SecondaryTypography.onCard.body14.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (onPickVersion != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onPickVersion,
+                  icon: const Icon(Icons.videogame_asset_rounded, size: 18),
+                  label: Text(AppZh.dexObtainExactVersion),
+                ),
+              ],
+            ],
           ),
         ),
       ],

@@ -4,10 +4,10 @@ import '../features/dex/dex_models.dart';
 import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
-import '../l10n/localized_names.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'dex_detail_picker_sheet.dart';
 
 /// One visible context shared by every bottom tab of a Pokémon detail page.
 class DexDetailControls extends StatelessWidget {
@@ -44,7 +44,6 @@ class DexDetailControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editions = [GameEdition.general, ...GameEdition.all];
     final scheme = Theme.of(context).colorScheme;
     final flat = appVisualStyle.usesFlatUi;
     final plastic = appVisualStyle.usesSolidPlastic;
@@ -59,11 +58,6 @@ class DexDetailControls extends StatelessWidget {
     final disabledTextColor = flat
         ? scheme.onSurfaceVariant
         : TitoColors.mutedInk;
-    final menuColor = flat
-        ? scheme.surfaceContainerHigh
-        : plastic
-        ? Colors.white.withValues(alpha: 0.96)
-        : TitoColors.card;
     final Color fill;
     final Color disabledFill;
     final BoxBorder? outline;
@@ -115,117 +109,86 @@ class DexDetailControls extends StatelessWidget {
           disabledBorder: noBorder(),
         );
     final formLocked = forms.length < 2;
-    final formField = DropdownButtonFormField<String>(
-      key: ValueKey('detail-form-$selectedFormKey'),
-      initialValue: forms.any((form) => form.key == selectedFormKey)
-          ? selectedFormKey
-          : forms.firstOrNull?.key,
-      isExpanded: true,
-      menuMaxHeight: 320,
-      style: style,
-      dropdownColor: menuColor,
-      decoration: decoration(AppZh.dexDetailFormField, disabled: formLocked),
-      // A single form has nothing to pick: hide the chevron and mute the text
-      // so the control reads as a label rather than a broken dropdown.
-      icon: formLocked ? const SizedBox.shrink() : null,
-      selectedItemBuilder: forms.isEmpty
-          ? null
-          : (context) => [
-              for (final form in forms)
-                Text(
-                  selectedFormLabel(form, speciesNameZh),
-                  overflow: TextOverflow.ellipsis,
-                  style: formLocked
-                      ? style.copyWith(color: disabledTextColor)
-                      : null,
-                ),
-            ],
-      items: forms.isEmpty
-          ? [
-              DropdownMenuItem(
-                value: 'base',
-                child: Text(AppZh.dexDetailBaseForm),
+    final selectedForm =
+        forms.where((form) => form.key == selectedFormKey).firstOrNull ??
+        forms.firstOrNull;
+    Widget field({
+      required Key key,
+      required String label,
+      required Widget value,
+      required VoidCallback? onTap,
+    }) => Semantics(
+      button: onTap != null,
+      enabled: onTap != null,
+      child: Material(
+        key: key,
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: InputDecorator(
+            isFocused: false,
+            decoration: decoration(label, disabled: onTap == null),
+            child: DefaultTextStyle(
+              style: style,
+              child: Row(
+                children: [
+                  Expanded(child: value),
+                  if (onTap != null)
+                    Icon(
+                      Icons.expand_more_rounded,
+                      size: 22,
+                      color: labelColor,
+                    ),
+                ],
               ),
-            ]
-          : [
-              for (final form in forms)
-                DropdownMenuItem(
-                  value: form.key,
-                  child: Text(
-                    form.displayName,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-            ],
-      hint: Text(
-        AppZh.dexDetailBaseForm,
-        style: formLocked ? style.copyWith(color: disabledTextColor) : null,
-      ),
-      onChanged: formLocked
-          ? null
-          : (key) => onFormChanged(forms.firstWhere((form) => form.key == key)),
-    );
-    final versionField = Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            key: ValueKey(
-              'detail-version-${editionKey(edition.withFlavor(null))}',
-            ),
-            initialValue: editionKey(edition.withFlavor(null)),
-            isExpanded: true,
-            menuMaxHeight: 340,
-            itemHeight: null,
-            style: style,
-            dropdownColor: menuColor,
-            decoration: decoration(AppZh.dexDetailVersionField),
-            selectedItemBuilder: (context) => [
-              for (final game in editions)
-                Row(
-                  children: [
-                    GameEditionIcon(edition: game, size: 16),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        game.referenceGameNameZh,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-            items: [
-              for (final game in editions)
-                DropdownMenuItem(
-                  value: editionKey(game),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(game.referenceGameNameZh),
-                        if (game.referenceExpansionZh != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            game.referenceExpansionZh!,
-                            style: style.copyWith(
-                              fontSize: 11,
-                              color: labelColor,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-            onChanged: (key) => onEditionChanged(
-              editions.firstWhere((game) => editionKey(game) == key),
             ),
           ),
         ),
-      ],
+      ),
+    );
+    final formField = field(
+      key: const ValueKey('detail-form-picker'),
+      label: AppZh.dexDetailFormField,
+      value: Text(
+        selectedForm == null
+            ? AppZh.dexDetailBaseForm
+            : selectedFormLabel(selectedForm, speciesNameZh),
+        overflow: TextOverflow.ellipsis,
+        style: formLocked ? style.copyWith(color: disabledTextColor) : null,
+      ),
+      onTap: formLocked
+          ? null
+          : () async {
+              final result = await showDexFormPicker(
+                context,
+                forms: forms,
+                selectedFormKey: selectedForm?.key,
+              );
+              if (context.mounted && result != null) onFormChanged(result);
+            },
+    );
+    final versionField = field(
+      key: const ValueKey('detail-version-picker'),
+      label: AppZh.dexDetailVersionField,
+      value: Row(
+        children: [
+          GameEditionIcon(edition: edition, size: 16),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              edition.selectedFlavor == null
+                  ? edition.referenceGameName
+                  : edition.selectedLabel,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      onTap: () async {
+        final result = await showDexEditionPicker(context, selected: edition);
+        if (context.mounted && result != null) onEditionChanged(result);
+      },
     );
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8),

@@ -12,6 +12,7 @@ import '../widgets/journey_timeline.dart';
 import '../widgets/journey_assistant_panel.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/tito_fact_grid.dart';
 
 class JourneyPage extends StatelessWidget {
   const JourneyPage({
@@ -21,7 +22,6 @@ class JourneyPage extends StatelessWidget {
     this.assistantFuture,
     this.askTitoDexEnabled = false,
     this.onAskTitoDex,
-    this.onManageJourneyPacks,
   });
 
   final CurrentJourney journey;
@@ -29,7 +29,6 @@ class JourneyPage extends StatelessWidget {
   final Future<JourneyAssistantSnapshot>? assistantFuture;
   final bool askTitoDexEnabled;
   final VoidCallback? onAskTitoDex;
-  final VoidCallback? onManageJourneyPacks;
 
   @override
   Widget build(BuildContext context) {
@@ -97,16 +96,7 @@ class JourneyPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        Text(
-          AppZh.journeyAssistantTitle,
-          style: SecondaryTypography.onCard.h15,
-        ),
-        const SizedBox(height: 8),
-        JourneyAssistantPanel(
-          future: assistantFuture ?? journeyAssistantRepository.load(journey),
-        ),
         if (askTitoDexEnabled && onAskTitoDex != null) ...[
-          const SizedBox(height: 12),
           StickerCard(
             variant: StickerVariant.softYellow,
             child: Column(
@@ -125,25 +115,14 @@ class JourneyPage extends StatelessWidget {
                   onPressed: onAskTitoDex,
                   expanded: true,
                 ),
-                if (onManageJourneyPacks != null) ...[
-                  const SizedBox(height: 8),
-                  // Full width and the same 48px height as the primary CTA
-                  // above so the two stacked actions read as one group.
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      key: const Key('journey-pack-manager-entry'),
-                      onPressed: onManageJourneyPacks,
-                      icon: const Icon(Icons.download_for_offline_outlined),
-                      label: Text(AppZh.manageJourneyPacks),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
+          const SizedBox(height: 12),
         ],
+        JourneyAssistantPanel(
+          future: assistantFuture ?? journeyAssistantRepository.load(journey),
+        ),
         const SizedBox(height: 14),
         JourneyTimeline(
           entries: journey.timeline,
@@ -156,82 +135,90 @@ class JourneyPage extends StatelessWidget {
             children: [
               Text(AppZh.trainerCard, style: SecondaryTypography.onCard.h15),
               const SizedBox(height: 10),
-              _StatRow(
-                label: AppZh.settingsDisplayName,
-                value: journey.trainerName,
-              ),
-              if (journey.saveTrainerId != null)
-                _StatRow(
-                  label: AppZh.settingsTrainerId,
-                  value: journey.saveTrainerId!.toString().padLeft(5, '0'),
-                ),
-              if (journey.saveTrainerSecretId != null)
-                _StatRow(
-                  label: AppZh.settingsTrainerSecretId,
-                  value: journey.saveTrainerSecretId!.toString().padLeft(
-                    5,
-                    '0',
+              TitoFactGrid(
+                key: const Key('journey-trainer-facts'),
+                children: [
+                  _TrainerFact(
+                    label: AppZh.settingsDisplayName,
+                    value: journey.trainerName,
                   ),
-                ),
-              if (journey.saveTrainerGender != null)
-                _StatRow(
-                  label: AppZh.settingsTrainerGender,
-                  value: journey.saveTrainerGender!,
-                ),
-              if (journey.saveLanguage != null)
-                _StatRow(
-                  label: AppZh.settingsSaveLanguage,
-                  value: journey.saveLanguage!,
-                ),
-              if (journey.saveMoney != null)
-                _StatRow(
-                  label: AppZh.settingsSaveMoney,
-                  value: '₽ ${journey.saveMoney}',
-                ),
-              if (journey.saveMotherMoney != null)
-                _StatRow(
-                  label: AppZh.settingsMotherMoney,
-                  value: '₽ ${journey.saveMotherMoney}',
-                ),
-              if (journey.saveStarterSpeciesId != null)
-                _StatRow(
-                  label: AppZh.settingsStarter,
-                  value: localizeSpecies(
-                    speciesNameFor(journey.saveStarterSpeciesId!),
+                  if (journey.saveTrainerId != null)
+                    _TrainerFact(
+                      label: AppZh.settingsTrainerId,
+                      value: journey.saveTrainerId!.toString().padLeft(5, '0'),
+                    ),
+                  if (journey.saveTrainerSecretId != null)
+                    _TrainerFact(
+                      label: AppZh.settingsTrainerSecretId,
+                      value: journey.saveTrainerSecretId!.toString().padLeft(
+                        5,
+                        '0',
+                      ),
+                    ),
+                  if (journey.saveTrainerGender != null)
+                    _TrainerFact(
+                      label: AppZh.settingsTrainerGender,
+                      value: journey.saveTrainerGender!,
+                    ),
+                  if (journey.saveLanguage != null)
+                    _TrainerFact(
+                      label: AppZh.settingsSaveLanguage,
+                      value: journey.saveLanguage!,
+                    ),
+                  if (journey.saveMoney != null)
+                    _TrainerFact(
+                      label: AppZh.settingsSaveMoney,
+                      value: '₽ ${journey.saveMoney}',
+                    ),
+                  if (journey.saveMotherMoney != null)
+                    _TrainerFact(
+                      label: AppZh.settingsMotherMoney,
+                      value: '₽ ${journey.saveMotherMoney}',
+                    ),
+                  if (journey.saveStarterSpeciesId != null)
+                    _TrainerFact(
+                      label: AppZh.settingsStarter,
+                      value: localizeSpecies(
+                        speciesNameFor(journey.saveStarterSpeciesId!),
+                      ),
+                    ),
+                  if (journey.saveDexSeenIds.isNotEmpty ||
+                      journey.saveDexCaughtIds.isNotEmpty)
+                    _TrainerFact(
+                      label: AppZh.settingsDexProgress,
+                      value: AppZh.settingsDexSeenCaught(
+                        journey.saveDexSeenIds.length,
+                        journey.saveDexCaughtIds.length,
+                      ),
+                    ),
+                  if (journey.saveMapCoordinates.length == 3)
+                    _TrainerFact(
+                      label: AppZh.settingsMapCoordinates,
+                      value: journey.saveMapCoordinates.join(' / '),
+                    ),
+                  if (journey.saveAdventureStartedAt != null)
+                    _TrainerFact(
+                      label: AppZh.settingsJourneyStarted,
+                      value: _formatSaveDate(journey.saveAdventureStartedAt!),
+                    ),
+                  if (journey.saveLeagueChampionAt != null)
+                    _TrainerFact(
+                      label: AppZh.settingsLeagueChampion,
+                      value: _formatSaveDate(journey.saveLeagueChampionAt!),
+                    ),
+                  _TrainerFact(
+                    label: AppZh.settingsPlayTime,
+                    value: journey.playTime,
                   ),
-                ),
-              if (journey.saveDexSeenIds.isNotEmpty ||
-                  journey.saveDexCaughtIds.isNotEmpty)
-                _StatRow(
-                  label: AppZh.settingsDexProgress,
-                  value: AppZh.settingsDexSeenCaught(
-                    journey.saveDexSeenIds.length,
-                    journey.saveDexCaughtIds.length,
+                  _TrainerFact(
+                    label: AppZh.settingsBadges,
+                    value: journey.badgeProgressLabel,
                   ),
-                ),
-              if (journey.saveMapCoordinates.length == 3)
-                _StatRow(
-                  label: AppZh.settingsMapCoordinates,
-                  value: journey.saveMapCoordinates.join(' / '),
-                ),
-              if (journey.saveAdventureStartedAt != null)
-                _StatRow(
-                  label: AppZh.settingsJourneyStarted,
-                  value: _formatSaveDate(journey.saveAdventureStartedAt!),
-                ),
-              if (journey.saveLeagueChampionAt != null)
-                _StatRow(
-                  label: AppZh.settingsLeagueChampion,
-                  value: _formatSaveDate(journey.saveLeagueChampionAt!),
-                ),
-              _StatRow(label: AppZh.settingsPlayTime, value: journey.playTime),
-              _StatRow(
-                label: AppZh.settingsBadges,
-                value: journey.badgeProgressLabel,
-              ),
-              _StatRow(
-                label: AppZh.settingsCurrentGame,
-                value: localizeGame(journey.game),
+                  _TrainerFact(
+                    label: AppZh.settingsCurrentGame,
+                    value: localizeGame(journey.game),
+                  ),
+                ],
               ),
             ],
           ),
@@ -244,36 +231,14 @@ class JourneyPage extends StatelessWidget {
 String _formatSaveDate(DateTime value) =>
     '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';
 
-class _StatRow extends StatelessWidget {
-  const _StatRow({required this.label, required this.value});
-
+class _TrainerFact extends StatelessWidget {
+  const _TrainerFact({required this.label, required this.value});
   final String label;
   final String value;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: SecondaryTypography.onCard.team12.copyWith(
-              color: TitoColors.mutedInk,
-            ),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: SecondaryTypography.onCard.meta14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      TitoFactTile(title: label, child: Text(value));
 }
 
 class _SummaryMeta extends StatelessWidget {

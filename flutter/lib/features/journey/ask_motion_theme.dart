@@ -18,7 +18,7 @@ class AskMotionTheme {
   final List<String> assets;
 }
 
-const _spriteRoot = 'assets/ask_motion/';
+const _spriteRoot = 'item-sprites/';
 const _book = '${_spriteRoot}sonias-book.png';
 const _typeRoot = 'assets/type_icons/';
 
@@ -74,7 +74,7 @@ AskMotionTheme _theme(
   assets: List.unmodifiable(assets.where((s) => s.isNotEmpty).toSet().take(6)),
 );
 
-/// Uses the bundled entity names and exact local artwork for both APK variants.
+/// Uses bundled entity names and canonical Dex artwork for both APK variants.
 /// Missing artwork falls back to a reference book, never an unrelated item.
 AskMotionTheme classifyAskMotionTheme(String question) {
   final text = _normalize(question);

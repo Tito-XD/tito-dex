@@ -23,6 +23,7 @@ import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
 import '../widgets/dex_detail_controls.dart';
+import '../widgets/dex_detail_picker_sheet.dart';
 import '../widgets/pokemon_detail_sections.dart';
 import '../widgets/pokemon_obtain_sections.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -56,8 +57,8 @@ class PokemonDetailPage extends StatefulWidget {
   /// without decoding the same bundle entry twice.
   final Future<PokemonDetail>? initialDetailFuture;
 
-  /// Deep-link targets from `/dex/:id?form=&version=`; validated against the
-  /// loaded detail before applying, so a stale link degrades to the default.
+  /// Deep-link targets from `/dex/:id?form=&version=`; form identity is checked
+  /// against the detail and versions against the known reference scopes.
   final String? initialFormKey;
   final String? initialObtainVersion;
 
@@ -121,15 +122,13 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
   void _onGlobalEditionChanged() {
     if (!mounted || _hasEditionOverride) return;
-    setState(
-      () => _gameEdition = gameEditionRepository.edition.withFlavor(null),
-    );
+    setState(() => _gameEdition = gameEditionRepository.edition);
   }
 
   void _selectEdition(GameEdition edition) {
     setState(() {
       _hasEditionOverride = true;
-      _gameEdition = edition.withFlavor(null);
+      _gameEdition = edition;
     });
   }
 
@@ -141,7 +140,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   Future<void> _loadDefaultMoveVersion() async {
     final edition = await dexSettingsRepository.loadDefaultGameEdition();
     if (!mounted || _hasEditionOverride) return;
-    setState(() => _gameEdition = edition.withFlavor(null));
+    setState(() => _gameEdition = edition);
   }
 
   Future<void> _loadDetail() async {
@@ -173,13 +172,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         _detail = detail;
         _abilities = abilities;
         _selectedFormKey = selectedFormKey;
-        if (linkedVersion != null &&
-            detail.obtainLocationsByVersion.containsKey(linkedVersion)) {
+        if (linkedVersion != null) {
           final linkedEdition = GameEdition.all
-              .where((game) => game.flavorVersions.contains(linkedVersion))
+              .where(
+                (game) => dexDetailExactVersions(game).contains(linkedVersion),
+              )
               .firstOrNull;
           if (linkedEdition != null) {
-            _gameEdition = linkedEdition.withFlavor(null);
+            _gameEdition = linkedEdition.withFlavor(linkedVersion);
             _hasEditionOverride = true;
           }
         }
@@ -499,10 +499,11 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
   List<FlavorTextEntry> _flavorEntriesForEdition(PokemonDetail detail) {
     if (_gameEdition.isGeneral) return detail.flavorEntries;
     final exact = _gameEdition.selectedFlavor;
+    final versions = exact == null ? null : accessibleEncounterVersions(exact);
     return detail.flavorEntries
         .where(
-          (entry) => exact != null
-              ? entry.version == exact
+          (entry) => versions != null
+              ? versions.contains(entry.version)
               : entry.versionGroup == _gameEdition.dataVersionGroupKey ||
                     _gameEdition.flavorVersions.contains(entry.version),
         )
@@ -617,7 +618,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         (exactVersions.length == 1 ? exactVersions.single : null);
     final List<ObtainLocationEntry>? locations;
     if (selectedVersion != null) {
-      locations = detail.obtainLocationsByVersion[selectedVersion];
+      locations = [
+        for (final version in accessibleEncounterVersions(selectedVersion))
+          ...?detail.obtainLocationsByVersion[version],
+      ];
     } else {
       final matchIndex = obtainGroups.indexWhere(
         (group) => group.$1 == editionKey,
@@ -667,6 +671,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           currentDetail: detail,
           versionGroup: editionKey,
           exactVersion: selectedVersion,
+          onPickVersion: () async {
+            final selected = await showDexEditionPicker(
+              context,
+              selected: _gameEdition,
+              exactOnly: true,
+            );
+            if (mounted && selected != null) _selectEdition(selected);
+          },
           detailsFuture: _chainDetailsFuture,
         ),
         const SizedBox(height: 12),
@@ -1070,10 +1082,7 @@ class _ErrorBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              FilledButton(
-                onPressed: onRetry,
-                child: Text(AppZh.dexRetry),
-              ),
+              FilledButton(onPressed: onRetry, child: Text(AppZh.dexRetry)),
             ],
           ),
         ),

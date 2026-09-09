@@ -243,7 +243,16 @@ class GameEdition {
     if (isGeneral) return 'assets/icons/titodex-app.png';
     final flavor = selectedFlavor;
     if (flavor != null) {
-      return 'assets/game_icons/$flavor.png';
+      // DLC reference scopes keep the matching base game's icon; the APK
+      // has no separate HOME icon for each expansion and paired-game side.
+      final iconFlavor = switch (flavor) {
+        'the-isle-of-armor-sword' || 'the-crown-tundra-sword' => 'sword',
+        'the-isle-of-armor-shield' || 'the-crown-tundra-shield' => 'shield',
+        'the-teal-mask-scarlet' || 'the-indigo-disk-scarlet' => 'scarlet',
+        'the-teal-mask-violet' || 'the-indigo-disk-violet' => 'violet',
+        _ => flavor,
+      };
+      return 'assets/game_icons/$iconFlavor.png';
     }
     return switch (slug) {
       // Older merged editions have no slug file of their own — show the

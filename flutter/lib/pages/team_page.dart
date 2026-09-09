@@ -319,26 +319,6 @@ class _TeamPageState extends State<TeamPage> {
               ),
             ),
           ),
-        StickerCard(
-          variant: StickerVariant.deep,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${AppZh.navTeam} · ${gameEditionRepository.edition.selectedLabel}',
-                style: SecondaryTypography.onGradient.h15,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                AppZh.teamSubtitle(_party.length),
-                style: SecondaryTypography.onGradient.meta14.copyWith(
-                  color: TitoColors.skyBlue,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
         TeamSummaryCard(party: _party, detailsFuture: _partyDetailsFuture),
         const SizedBox(height: 14),
         PartyTeamBoard(
@@ -361,23 +341,14 @@ class _TeamPageState extends State<TeamPage> {
             onSwap: _handleEditorSwap,
             onClose: () => setState(() => _editingIndex = null),
           )
-        else
+        else if (_selectedIndex != null)
           _TeamAssistCard(
             party: _party,
             detailsFuture: _partyDetailsFuture,
             selectedIndex: _selectedIndex,
             onEdit: _openEditor,
+            onCollapse: () => setState(() => _selectedIndex = null),
           ),
-        const SizedBox(height: 14),
-        StickerCard(
-          variant: StickerVariant.cream,
-          child: Text(
-            AppZh.teamNote,
-            style: SecondaryTypography.onCard.body14.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -786,12 +757,14 @@ class _TeamAssistCard extends StatefulWidget {
     required this.detailsFuture,
     required this.selectedIndex,
     this.onEdit,
+    required this.onCollapse,
   });
 
   final List<PartyMember> party;
   final Future<Map<int, PokemonDetail>> detailsFuture;
   final int? selectedIndex;
   final VoidCallback? onEdit;
+  final VoidCallback onCollapse;
 
   @override
   State<_TeamAssistCard> createState() => _TeamAssistCardState();
@@ -898,6 +871,12 @@ class _TeamAssistCardState extends State<_TeamAssistCard> {
                   onPressed: widget.onEdit,
                   child: Text(AppZh.teamEditAction),
                 ),
+              IconButton(
+                key: const Key('team-inspector-collapse'),
+                tooltip: AppZh.teamCollapseDetails,
+                onPressed: widget.onCollapse,
+                icon: const Icon(Icons.expand_less_rounded),
+              ),
             ],
           ),
           const SizedBox(height: 4),

@@ -211,8 +211,8 @@ abstract final class AppZh {
   static String get askTitoDexOnlineSearchedNoMatch =>
       t('askTitoDexOnlineSearchedNoMatch', '在线助手已查找，但没有足够可靠的答案。');
   static String get askTitoDexUnknownWarning =>
-      t('askTitoDexUnknownWarning', '部分状态无法从当前存档解析，请按答案中的未知提示自行确认。');
-  static String get askTitoDexSources => t('askTitoDexSources', '核验来源');
+      t('askTitoDexUnknownWarning', '部分信息或版本适用性仍需确认，请留意答案中的范围说明。');
+  static String get askTitoDexSources => t('askTitoDexSources', '参考来源');
   static String askTitoDexSourceSummary(int count) =>
       t('askTitoDexSourceSummary', '参考 $count 个来源', {'count': count});
   static String askTitoDexEvidenceVerified(int count) =>
@@ -224,8 +224,19 @@ abstract final class AppZh {
   );
   static String get askTitoDexEvidenceLocalVerified =>
       t('askTitoDexEvidenceLocalVerified', '本地资料已核验');
+  static String get askTitoDexStructuredGame =>
+      t('askTitoDexStructuredGame', '本地资料 · 当前版本');
+  static String get askTitoDexStructuredGeneral =>
+      t('askTitoDexStructuredGeneral', '本地资料 · 通用范围');
+  static String get askTitoDexStructuredPartial =>
+      t('askTitoDexStructuredPartial', '本地资料 · 部分信息待确认');
+  static String askTitoDexSourcesAvailable(int count) => t(
+    'askTitoDexSourcesAvailable',
+    '参考 $count 个来源 · 未逐项核验',
+    {'count': count},
+  );
   static String get askTitoDexEvidenceUnverified =>
-      t('askTitoDexEvidenceUnverified', '低置信度 · 尚无可展开引用');
+      t('askTitoDexEvidenceUnverified', '尚未逐项核验 · 暂无引用');
   static String get askTitoDexSourceSheetTitle =>
       t('askTitoDexSourceSheetTitle', '回答引用');
   static String get askTitoDexSourceSheetHint =>
@@ -318,6 +329,15 @@ abstract final class AppZh {
       t('settingsLeagueChampion', '首次通关');
   static String get settingsDexProgress => t('settingsDexProgress', '图鉴进度');
   static String get teamSummaryTitle => t('teamSummaryTitle', '队伍概览');
+  static String get teamCollapseDetails => t('teamCollapseDetails', '收回详情');
+  static String get teamCommonWeaknesses => t('teamCommonWeaknesses', '常见弱点');
+  static String get teamSharedWeaknesses =>
+      t('teamSharedWeaknesses', '共同弱点（≥2 只）');
+  static String get teamAverageLevel => t('teamAverageLevel', '平均等级');
+  static String get teamBaseStatTotal => t('teamBaseStatTotal', '种族值合计');
+  static String get teamTypeCoverage => t('teamTypeCoverage', '属性覆盖');
+  static String journeyRemainingDex(int count) =>
+      t('journeyRemainingDex', '图鉴查看其他待补全 · $count 种', {'count': count});
   static String get sleepToolsTitle => t('sleepToolsTitle', 'Pokémon Sleep 工具');
   static String get sleepToolsTierAHint =>
       t('sleepToolsTierAHint', '内置离线试算，并保留 Neroli’s Lab 资料入口');
@@ -1500,6 +1520,8 @@ abstract final class AppZh {
   static String get dexDetailFormField => t('dexDetailFormField', '形态');
   static String get dexDetailVersionField => t('dexDetailVersionField', '资料版本');
   static String get dexDetailBaseForm => t('dexDetailBaseForm', '基础形态');
+  static String get dexDetailExpansionScopeHint =>
+      t('dexDetailExpansionScopeHint', '按已拥有的扩展内容选择；扩展范围包含同版本的本篇及此前扩展内容。');
 
   static String get close => t('close', '关闭');
   static String get dexSearchSheetTitle => t('dexSearchSheetTitle', '搜索与筛选');

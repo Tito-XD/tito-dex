@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.16](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.16) |
-| **`main` / lite source** | `0.9.16+198` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.16-offline+199` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.17) |
+| **`main` / lite source** | `0.9.17+202` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.17-offline+203` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,7 +44,17 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.16)
+## Current feature status (latest release line: v0.9.17)
+
+### v0.9.17: structured answers and compact native layouts (2026-09-09)
+
+The v0.9.17 source adds deterministic queries across existing Dex/reference resources, reverse move/ability filters, final fact ownership, and explicit evidence scope/identity in the App. The App and Worker release must be verified together; deployment and signed artifact identities belong to the release record. See [ASK_STRUCTURED_DATA.md](./ASK_STRUCTURED_DATA.md) for the resource map, version limitations and artifact-backed regression commands.
+
+Local Ask scrolling now anchors the latest turn at its beginning: older history grows upward lazily, while streamed answer blocks grow downward without moving the reader. Following the end requires an explicit user scroll toward the bottom and stops on upward scrolling. The native answer heading now uses a fixed 26px leading lane for an 18px prop: a 300ms drop and 240ms small bounce, then rest within a 2600ms cycle. Stages retain the cycle; completion returns to the question subject and holds its final frame. Catch/no-match ball outcomes, reduced motion, hidden routes and background lifecycle are explicit. Idle phrases retain compact in-sentence transitions. Browser mockups remain local design artifacts.
+
+v0.9.17 Journey/Team density changes: Journey places the enabled Ask entry directly below current location, removes the duplicate party/evolution section and assistant heading, and uses aligned, content-height grids for trainer facts and paired-game direct-encounter gaps. Paired cells open the counterpart's exact game; other completion gaps pass the complete, uncaught, non-overlapping species set to a national Dex filter. That set survives further filtering and clears with all conditions. Team merges edition, party count, level/BST/type coverage and icon-labelled weaknesses into one header with separate labels and values in grid cells, with an explicit collapse control on selected-member details. The 11 reference cards now use a compact 80 logical-pixel height at default text size. On 2026-09-09 the configured Journey pack catalog returned HTTP 404 (`not_found`), so Journey no longer advertises a download entry; built-in reviewed hints, structured Dex data and existing pack compatibility remain. This does not claim the optional pack publishing pipeline or authored hint content is absent.
+
+v0.9.17 Ask motion asset reuse: animation props resolve canonical `item-sprites/<slug>.png` resources from the installed Dex bundle first, then the small built-in starter set or the same individual CDN image used by the reference pages. Only the chosen props plus shared finish props are decoded before starting motion; text and answer retrieval continue while they load. Late preparation cannot replace a newer question's props; timeouts and missing artwork use a neutral local book. The checked-in v19 item media audit supplies the v20-compatible sprite identities: all 2130 referenced paths were checked against the published Offline v20 archive. APK motion PNGs drop from 1030 files / 3,067,440 bytes to 24 starter files / 106,214 bytes, with generation-time guards against reintroducing the full catalog as packaged images. The existing ball artwork matches the bundle pixel-for-pixel, retaining the calibrated rolling geometry.
 
 > v0.9.16 uses Lite versionCode 198 and Offline versionCode 199. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
@@ -72,7 +82,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ### Dex (national 1–1025)
 - **v0.9.15:** one search/filter sheet combines query, journey-only scope, regional dex, debut generation, types, appearance and reference constraints. Region and generation intersect, as do ability/move/egg-group constraints. Form expansion preserves identity and cancels obsolete reads.
-- Detail form and merged reference-game controls sit below the header and initially inherit the App game without an extra hint. A General option uses the actual App icon; collapsed choices show concise form/game names and menus spell out DLC. Obtain and move sections follow this shared selection, hide unsupported categories and avoid duplicate version accordions. General moves deduplicate across versions without assigning a misleading learning level.
+- Detail form and reference-game controls sit below the header. The local detail-selection fix preserves the App exact version and exact-version deep links; form changes keep that scope. Both controls now open theme-aware compact choice sheets, with merged/exact game choices and explicit DLC ranges. The obtain planner can open the same exact-version sheet directly. DLC encounter, held-item and planning scopes include the same-side base game and prior expansions. A General option uses the actual App icon. Obtain and move sections follow this shared selection, hide unsupported categories and avoid duplicate version accordions. General moves deduplicate across versions without assigning a misleading learning level. This selection fix is included in the v0.9.17 source.
 - **v0.9.7:** the artwork viewer offers opt-in 30th anniversary logos with all 1324 official catalog entries (1025 base files plus 299 additional files). Exact verified form slugs and official names drive automatic selection; ambiguous or unsupported forms remain explicitly unmatched and manually selectable. Images load only after opting in, with zoom/retry/source links; switching back preserves the original form and shiny state. The App repository and TitoDex 网页版 link to each other.
 - Grid + form-name search; 4-tab detail (简介 / 基本信息 / 获取 / 招式) with a form switcher.
 - **23 game editions**, **11 regional dexes**, and persisted G1–G9 debut-generation browse scopes. Primary browse scope intersects with body/color/size/reference filters.
@@ -261,7 +271,7 @@ cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-lite-
 | ABI | arm64-v8a only |
 | Filename | `releases/TitoDex-<ver>-{lite,offline}-rg-arm64.apk` |
 | SDK | compile/target 36, min 24 |
-| Size | ~20–23 MB; verify script must PASS |
+| Size | Artifact-dependent; verify contents, ABI and signer, not a historical size estimate |
 | Signing | `flutter/android/key.properties` + upload keystore |
 
 Full checklist: [RELEASE_BUILD.md](./RELEASE_BUILD.md).

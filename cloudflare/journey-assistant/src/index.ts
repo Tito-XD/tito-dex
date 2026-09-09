@@ -32,6 +32,7 @@ import {
 } from './dex_bundle_retrieval';
 import { attachSemanticAnswer, semanticBlockDeltas } from './semantic_stream';
 import { generatedAnswerGuardFailure } from './answer_quality_guards';
+import { enforceFinalFacts } from './final_answer_facts';
 import {
   answerKnownPokemonFranchiseFact,
   answerSelectedGameMechanic,
@@ -172,6 +173,7 @@ export default {
       const trace: RequestTrace = { modelUsed: false, aiSearchUsed: false };
       let curatedDecision: unknown;
       let bundleFallback: AssistantResponse | null = null;
+      let structuredResponse: AssistantResponse | null = null;
       // Resolve reviewed hints and exact Dex-bundle facts before retrieval.
       // V19 remains deterministic; V20 facts marked online-verify become the
       // bounded local baseline for the allowlisted corroboration pass below.
@@ -211,6 +213,7 @@ export default {
       if (response.status !== 'answered' && !clarificationLocked && env.DEX_CONTENT) {
         try {
           const bundleResult = await answerFromDexBundle(parsed, env.DEX_CONTENT);
+          structuredResponse = bundleResult?.response ?? null;
           if (bundleResult?.requiresOnlineVerification) {
             bundleFallback = bundleResult.response;
             dexBundleSources = [bundleResult.localSource];
@@ -397,6 +400,7 @@ export default {
           ])),
         };
       }
+      response = enforceFinalFacts(response, structuredResponse, dexBundleSources);
       response = contextualizeFinalNoMatch(response, parsed.question);
       response = normalizeResponseAnswer(response);
       if (response.status === 'answered') observer?.stage('verifying');

@@ -15,5 +15,9 @@ export function buildLogRecord(
     answerMode: response.answerMode ?? null,
     modelUsed: response.modelUsed ?? false,
     aiSearchUsed: response.aiSearchUsed ?? false,
+    evidenceBasis: response.evidence?.basis ?? null,
+    evidenceScope: response.evidence?.scope ?? null,
+    structuredEntityIds: response.evidence?.entityIds ?? [],
+    structuredResultComplete: response.evidence?.complete ?? false,
   };
 }

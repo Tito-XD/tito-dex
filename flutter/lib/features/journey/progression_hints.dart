@@ -276,6 +276,57 @@ class AskTitoDexContext {
   }
 }
 
+class AskTitoDexEvidence {
+  const AskTitoDexEvidence({
+    required this.basis,
+    required this.scope,
+    required this.complete,
+    this.entityIds = const [],
+  });
+  final String basis;
+  final String scope;
+  final bool complete;
+  final List<String> entityIds;
+
+  static AskTitoDexEvidence? parse(Object? value) {
+    if (value is! Map ||
+        !const [
+          'structured',
+          'sources',
+          'unverified',
+        ].contains(value['basis']) ||
+        !const ['game', 'general'].contains(value['scope']) ||
+        value['complete'] is! bool) {
+      return null;
+    }
+    final ids = value['entityIds'];
+    if (ids is! List ||
+        ids.length > 40 ||
+        ids.any(
+          (id) =>
+              id is! String ||
+              !RegExp(
+                r'^(pokemon|move|ability|item):[1-9]\d{0,4}$',
+              ).hasMatch(id),
+        )) {
+      return null;
+    }
+    return AskTitoDexEvidence(
+      basis: value['basis'] as String,
+      scope: value['scope'] as String,
+      complete: value['complete'] as bool,
+      entityIds: List<String>.unmodifiable(ids.cast<String>()),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'basis': basis,
+    'scope': scope,
+    'complete': complete,
+    'entityIds': entityIds,
+  };
+}
+
 class AskTitoDexResult {
   const AskTitoDexResult({
     required this.status,
@@ -296,6 +347,7 @@ class AskTitoDexResult {
     this.answerBlocks = const [],
     this.clarificationCandidates = const [],
     this.onlineAttempted = false,
+    this.evidence,
   });
 
   final AskTitoDexStatus status;
@@ -316,6 +368,7 @@ class AskTitoDexResult {
   final List<AskTitoDexAnswerBlock> answerBlocks;
   final List<AskTitoDexClarificationCandidate> clarificationCandidates;
   final bool onlineAttempted;
+  final AskTitoDexEvidence? evidence;
 
   AskTitoDexResult withRuntimeTrace({
     bool? onlineAttempted,
@@ -339,6 +392,7 @@ class AskTitoDexResult {
     answerBlocks: answerBlocks,
     clarificationCandidates: clarificationCandidates,
     onlineAttempted: onlineAttempted ?? this.onlineAttempted,
+    evidence: evidence,
   );
 
   factory AskTitoDexResult.fromJson(Map<String, dynamic> json) {
@@ -383,6 +437,7 @@ class AskTitoDexResult {
         json['clarificationCandidates'],
       ),
       onlineAttempted: json['onlineAttempted'] as bool? ?? true,
+      evidence: AskTitoDexEvidence.parse(json['evidence']),
     );
   }
 
@@ -414,6 +469,7 @@ class AskTitoDexResult {
           .map((candidate) => candidate.toJson())
           .toList(),
     'onlineAttempted': onlineAttempted,
+    if (evidence != null) 'evidence': evidence!.toJson(),
   };
 
   static List<AskTitoDexAnswerBlock> _answerBlocks(Object? value) {
