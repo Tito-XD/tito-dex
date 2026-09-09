@@ -1120,6 +1120,32 @@ describe('journey assistant Worker contract', () => {
     const moveValue = await move.json() as AssistantResponse;
     expect(moveValue.answer).toContain('PP：20');
     expect(moveValue.answer).toContain('大幅提高自己的攻击');
+    for (const [name, expected] of [
+      ['光之石', '进化道具'], ['恶臭', '使对手畏缩'], ['剑舞', '大幅提高自己的攻击'],
+    ]) {
+      for (const wording of ['有什么用？', '有啥用？', '是干什么的？']) {
+        const response = await post(violetBody(`${name}${wording}`), 'v20-colloquial-reference-key');
+        const value = await response.json() as AssistantResponse;
+        expect(value.answer).toContain(expected);
+        expect(value.status).toBe('answered');
+      }
+    }
+  });
+
+  it('answers the colloquial Oran Berry question from its existing structured shard', async () => {
+    await seedDexBundle({}, {}, 20);
+    await seedV20ReferenceManifest();
+    await env.DEX_CONTENT.put('v5/reference/items/132.json', JSON.stringify(
+      referenceShard('item', 132, 'oran-berry', '橙橙果', {
+        categoryZh: '树果', effectZh: '回复10HP。',
+      }),
+    ));
+    const result = await post(violetBody('橙橙果有什么用？'), 'v20-oran-question-key');
+    const value = await result.json() as AssistantResponse;
+    expect(value.status).toBe('answered');
+    expect(value.answer).toContain('回复10HP');
+    expect(value.evidence?.basis).toBe('structured');
+    expect(value.evidence?.entityIds).toContain('item:132');
   });
 
   it('uses the bounded v20 item slug index for held items and reports the audited license', async () => {
