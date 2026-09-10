@@ -22,9 +22,11 @@ class MainActivity : FlutterActivity() {
     private var pendingShortcutRoute: String? = null
     private var appShortcutChannel: MethodChannel? = null
     private lateinit var journeyAssistantExtensionHost: JourneyAssistantExtensionHost
+    private lateinit var appUpdateHost: AppUpdateHost
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        appUpdateHost = AppUpdateHost(this).also { it.configure(flutterEngine) }
         journeyAssistantExtensionHost = JourneyAssistantExtensionHost(this).also {
             it.configure(flutterEngine)
             it.handleIntent(intent)
@@ -47,6 +49,19 @@ class MainActivity : FlutterActivity() {
                         result.success(null)
                     }
                     "getDynamicShortcutIds" -> result.success(dynamicShortcutIds())
+                    "trainerShortcutSupported" -> result.success(
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                            getSystemService(ShortcutManager::class.java).isRequestPinShortcutSupported,
+                    )
+                    "pinTrainerShortcut", "updateTrainerShortcut" -> {
+                        try {
+                            result.success(trainerShortcut(
+                                call.argument<String>("label"), call.method == "pinTrainerShortcut",
+                            ))
+                        } catch (_: Exception) {
+                            result.error("shortcut_failed", "Launcher could not update the shortcut", null)
+                        }
+                    }
                     else -> result.notImplemented()
                 }
             }
@@ -146,6 +161,34 @@ class MainActivity : FlutterActivity() {
         if (this::journeyAssistantExtensionHost.isInitialized) {
             journeyAssistantExtensionHost.notifyStatusChanged("activity_resumed")
         }
+    }
+
+    override fun onDestroy() {
+        if (this::appUpdateHost.isInitialized) appUpdateHost.close()
+        super.onDestroy()
+    }
+
+    private fun trainerShortcut(label: String?, pin: Boolean): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return "unsupported"
+        val manager = getSystemService(ShortcutManager::class.java)
+        if (!manager.isRequestPinShortcutSupported) return "unsupported"
+        val name = label?.trim()?.takeIf { it.isNotEmpty() } ?: return "invalid"
+        val shortcut = ShortcutInfo.Builder(this, "trainer-home")
+            .setShortLabel(name.take(40))
+            .setLongLabel(name.take(80))
+            .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
+            .setIntent(Intent(applicationContext, MainActivity::class.java).apply {
+                action = APP_SHORTCUT_ACTION
+                putExtra(APP_SHORTCUT_ROUTE, "/")
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }).build()
+        if (manager.pinnedShortcuts.any { it.id == "trainer-home" }) {
+            return if (manager.updateShortcuts(listOf(shortcut))) "updated" else "failed"
+        }
+        if (!pin) return "not_pinned"
+        // True means the launcher accepted the request, not that the user
+        // confirmed it. Flutter deliberately says "confirm on your launcher".
+        return if (manager.requestPinShortcut(shortcut, null)) "requested" else "unsupported"
     }
 
     private fun shortcutRouteFrom(intent: Intent?): String? {

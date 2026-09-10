@@ -19,6 +19,81 @@ abstract final class AppZh {
     return text;
   }
 
+  static String get appUpdateTitle => t("appUpdateTitle", "应用更新");
+  static String get appUpdateReading => t("appUpdateReading", "正在读取当前版本…");
+  static String get appUpdateUnsupported =>
+      t("appUpdateUnsupported", "此安装包不支持应用内更新，请使用对应平台的安装包。");
+  static String get appUpdateAutomatic => t("appUpdateAutomatic", "自动检查新版本");
+  static String get appUpdateAutomaticHint =>
+      t("appUpdateAutomaticHint", "每天检查一次 GitHub 正式版；由你确认下载和安装。");
+  static String get appUpdateAvailable => t("appUpdateAvailable", "有新版本");
+  static String get appUpdateNotes => t("appUpdateNotes", "更新内容");
+  static String get appUpdateDownloading => t("appUpdateDownloading", "正在下载");
+  static String get appUpdateVerifying => t("appUpdateVerifying", "正在校验安装包…");
+  static String get appUpdateKeepOpen => t("appUpdateKeepOpen", "下载时请保持应用打开。");
+  static String get appUpdatePermission =>
+      t("appUpdatePermission", "请允许 TitoDex 安装应用，返回后点“继续安装”。");
+  static String get appUpdateInstall => t("appUpdateInstall", "继续安装");
+  static String get appUpdateDownload => t("appUpdateDownload", "下载并安装");
+  static String get appUpdateLatest => t("appUpdateLatest", "暂无可用的正式版更新。");
+  static String get appUpdateCheck => t("appUpdateCheck", "检查新版本");
+  static String get appUpdateChecking => t("appUpdateChecking", "正在检查…");
+  static String get appUpdateCheckFailed =>
+      t("appUpdateCheckFailed", "暂时无法检查版本，请稍后重试或打开发布页面。");
+  static String get appUpdateDownloadFailed =>
+      t("appUpdateDownloadFailed", "下载未完成或文件校验失败，请重试。");
+  static String get appUpdateInstallFailed =>
+      t("appUpdateInstallFailed", "系统未能安装此更新，请确认安装权限或重新下载。");
+  static String get appUpdateReleasePage =>
+      t("appUpdateReleasePage", "GitHub 发布页面");
+  static String get appUpdateBrowserFailed =>
+      t("appUpdateBrowserFailed", "无法打开浏览器。");
+  static String get appUpdateView => t("appUpdateView", "查看更新");
+  static String get onboardingProfileTitle =>
+      t("onboardingProfileTitle", "先认识一下你");
+  static String get onboardingProfileHint =>
+      t("onboardingProfileHint", "取个训练家名字，选一张喜欢的头像，让这本图鉴属于你。");
+  static String get onboardingNameHint =>
+      t("onboardingNameHint", "可以稍后修改；不会改写游戏存档。");
+  static String get onboardingFeaturesTitle =>
+      t("onboardingFeaturesTitle", "你的旅程小助手");
+  static String get onboardingJourney =>
+      t("onboardingJourney", "先选正在玩的版本；导入存档后查看地点、徽章和旅程进度。");
+  static String get onboardingTeam =>
+      t("onboardingTeam", "查看或手动整理同行宝可梦，了解队伍的属性覆盖和弱点。");
+  static String get onboardingDex =>
+      t("onboardingDex", "查宝可梦、进化和获取方式，也能按招式、特性等条件筛选。");
+  static String get onboardingSearch =>
+      t("onboardingSearch", "招式、道具、树果等资料，以及属性克制和对战计算工具。");
+  static String get onboardingAskTitle => t("onboardingAskTitle", "问 TitoDex");
+  static String get onboardingAsk =>
+      t("onboardingAsk", "按当前游戏提问。需在设置中了解联网说明后启用。");
+  static String get onboardingReadyTitle => t("onboardingReadyTitle", "准备好出发了");
+  static String get onboardingDataHint => t(
+    "onboardingDataHint",
+    "Lite 版可在设置下载离线资料；Offline 版会自动准备内置资料。资料就绪后，断网也能查图鉴。",
+  );
+  static String get onboardingSettingsHint =>
+      t("onboardingSettingsHint", "头像、名字、外观和宝可梦伴侣都能在设置里调整。这份介绍也可以随时再看。");
+  static String get onboardingLater => t("onboardingLater", "稍后设置");
+  static String get onboardingBack => t("onboardingBack", "上一步");
+  static String get onboardingNext => t("onboardingNext", "下一步");
+  static String get onboardingStart => t("onboardingStart", "开始旅程");
+  static String get onboardingData => t("onboardingData", "前往离线资料");
+  static String get onboardingReplay => t("onboardingReplay", "新手引导");
+  static String get onboardingSaveFailed =>
+      t("onboardingSaveFailed", "资料保存失败，请重试。");
+  static String get trainerShortcutHint =>
+      t("trainerShortcutHint", "用训练家名字创建桌面入口，之后改名会同步更新。应用列表仍显示 TitoDex。");
+  static String get trainerShortcutCreate =>
+      t("trainerShortcutCreate", "添加桌面图标");
+  static String get trainerShortcutRequested =>
+      t("trainerShortcutRequested", "请在桌面弹窗中确认添加。");
+  static String get trainerShortcutUpdated =>
+      t("trainerShortcutUpdated", "桌面入口名称已更新。");
+  static String get trainerShortcutUnsupported =>
+      t("trainerShortcutUnsupported", "当前桌面暂时无法添加或更新此图标。");
+
   static String get appTitle => t('appTitle', 'TitoDex');
   static String get bootstrapLoading => t('bootstrapLoading', '正在准备你的旅程…');
   static String get companionLoading => t('companionLoading', '正在加载对战数据…');

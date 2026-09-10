@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -59,6 +60,7 @@ abstract final class TrainerAvatarService {
       final dir = await getApplicationDocumentsDirectory();
       final out = File('${dir.path}/trainer_avatar.jpg');
       await out.writeAsBytes(await cropped.readAsBytes(), flush: true);
+      await FileImage(out).evict();
       return out.path;
     } catch (error, stackTrace) {
       debugPrint('TrainerAvatarService: $error');

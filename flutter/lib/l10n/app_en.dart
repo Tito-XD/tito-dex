@@ -2,6 +2,70 @@
 library;
 
 const kAppEn = <String, String>{
+  "appUpdateTitle": "App updates",
+  "appUpdateReading": "Reading the installed version\u2026",
+  "appUpdateUnsupported":
+      "In-app updates are unavailable for this installation.",
+  "appUpdateAutomatic": "Check for updates automatically",
+  "appUpdateAutomaticHint":
+      "Check GitHub stable releases daily. You choose when to download and install.",
+  "appUpdateAvailable": "Update available",
+  "appUpdateNotes": "Release notes",
+  "appUpdateDownloading": "Downloading",
+  "appUpdateVerifying": "Verifying the APK\u2026",
+  "appUpdateKeepOpen": "Keep the app open while downloading.",
+  "appUpdatePermission":
+      "Allow TitoDex to install apps, then return and tap Continue installation.",
+  "appUpdateInstall": "Continue installation",
+  "appUpdateDownload": "Download and install",
+  "appUpdateLatest": "No newer stable release is available.",
+  "appUpdateCheck": "Check for updates",
+  "appUpdateChecking": "Checking\u2026",
+  "appUpdateCheckFailed":
+      "Unable to check right now. Retry later or open the releases page.",
+  "appUpdateDownloadFailed":
+      "The download failed or its checksum did not match. Please retry.",
+  "appUpdateInstallFailed":
+      "Unable to start installation. Check install permission or download again.",
+  "appUpdateReleasePage": "GitHub releases",
+  "appUpdateBrowserFailed": "Unable to open a browser.",
+  "appUpdateView": "View update",
+  "onboardingProfileTitle": "Make it yours",
+  "onboardingProfileHint":
+      "Choose your trainer name and a favorite avatar to make this Pok\u00e9dex yours.",
+  "onboardingNameHint":
+      "You can change this later. Your game save stays unchanged.",
+  "onboardingFeaturesTitle": "Your journey companion",
+  "onboardingJourney":
+      "Choose your game, then import a save to see your location, badges and progress.",
+  "onboardingTeam":
+      "View or organize your party, its type coverage and weaknesses.",
+  "onboardingDex":
+      "Look up Pok\u00e9mon, evolutions and encounters, or filter by moves and abilities.",
+  "onboardingSearch":
+      "Find moves, items and berries, plus type matchups and battle calculators.",
+  "onboardingAskTitle": "Ask TitoDex",
+  "onboardingAsk":
+      "Ask about your current game. Enable it in Settings after reviewing the online-use notice.",
+  "onboardingReadyTitle": "Ready to set off",
+  "onboardingDataHint":
+      "Lite can download offline data in Settings. Offline prepares its bundled data automatically. Once ready, the Pok\u00e9dex works without a connection.",
+  "onboardingSettingsHint":
+      "Change your avatar, name, theme and Pok\u00e9mon companion in Settings. You can also revisit this guide there.",
+  "onboardingLater": "Set up later",
+  "onboardingBack": "Back",
+  "onboardingNext": "Next",
+  "onboardingStart": "Start my journey",
+  "onboardingData": "Offline data",
+  "onboardingReplay": "Getting started",
+  "onboardingSaveFailed": "Unable to save your profile. Please retry.",
+  "trainerShortcutHint":
+      "Create a home-screen shortcut named after your trainer. It follows future name changes. The app list still shows TitoDex.",
+  "trainerShortcutCreate": "Add to home screen",
+  "trainerShortcutRequested": "Confirm the shortcut in the launcher dialog.",
+  "trainerShortcutUpdated": "Home-screen shortcut updated.",
+  "trainerShortcutUnsupported":
+      "This launcher could not add or update the shortcut.",
   'appTitle': 'TitoDex',
   'bootstrapLoading': 'Preparing your journey…',
   'companionLoading': 'Loading battle data…',
