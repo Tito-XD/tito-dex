@@ -7,6 +7,7 @@ import '../l10n/app_zh.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_skeleton.dart';
@@ -23,7 +24,10 @@ BorderSide _elementStroke() {
       width: TitoBorders.glass,
     );
   }
-  return const BorderSide(color: TitoColors.ink, width: TitoBorders.element);
+  return const BorderSide(
+    color: TrainerJournal.smallEdge,
+    width: TitoBorders.journalElement,
+  );
 }
 
 class HeldItemReference {

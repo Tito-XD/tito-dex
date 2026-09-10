@@ -10,6 +10,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
@@ -32,8 +33,8 @@ BorderSide _pillStroke({Color? accent}) {
     );
   }
   return BorderSide(
-    color: accent ?? TitoColors.ink,
-    width: TitoBorders.element,
+    color: accent ?? TrainerJournal.smallEdge,
+    width: TitoBorders.journalElement,
   );
 }
 
@@ -506,9 +507,7 @@ String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
     }
     if (trigger.tradeSpecies != null) {
       final species = _speciesLabelZh(trigger.tradeSpecies!);
-      parts.add(
-        AppLocale.pick(zh: '与$species交换', en: 'Trade with $species'),
-      );
+      parts.add(AppLocale.pick(zh: '与$species交换', en: 'Trade with $species'));
     }
   } else if (trigger.item != null) {
     parts.add(_itemLabelZh(trigger.item!));
@@ -537,9 +536,7 @@ String evolutionTriggerLabelZh(EvolutionTrigger trigger) {
   }
   if (trigger.knownMoveType != null) {
     final type = _typeLabelZh(trigger.knownMoveType!);
-    parts.add(
-      AppLocale.pick(zh: '学会$type招式', en: 'Knows a $type move'),
-    );
+    parts.add(AppLocale.pick(zh: '学会$type招式', en: 'Knows a $type move'));
   }
   if (trigger.location != null) {
     final location = _evolutionLocationLabelZh(trigger.location!);
@@ -596,26 +593,30 @@ String _moveLabelZh(String slug) {
     return _humanizeSlug(slug);
   }
   return const {
-      'ancient-power': '原始之力',
-      'barb-barrage': '毒千针',
-      'double-hit': '二连击',
-      'dragon-cheer': '龙声鼓舞',
-      'dragon-pulse': '龙之波动',
-      'hyper-drill': '强力钻',
-      'mimic': '模仿',
-      'rollout': '滚动',
-      'stomp': '踩踏',
-      'taunt': '挑衅',
-      'twin-beam': '双光束',
-    }[slug] ??
-    _humanizeSlug(slug);
+        'ancient-power': '原始之力',
+        'barb-barrage': '毒千针',
+        'double-hit': '二连击',
+        'dragon-cheer': '龙声鼓舞',
+        'dragon-pulse': '龙之波动',
+        'hyper-drill': '强力钻',
+        'mimic': '模仿',
+        'rollout': '滚动',
+        'stomp': '踩踏',
+        'taunt': '挑衅',
+        'twin-beam': '双光束',
+      }[slug] ??
+      _humanizeSlug(slug);
 }
 
 String _speciesLabelZh(String slug) {
   if (AppLocale.instance.isEnglish) {
     return _humanizeSlug(slug);
   }
-  return const {'karrablast': '盖盖虫', 'shelmet': '小嘴蜗', 'remoraid': '铁炮鱼'}[slug] ??
+  return const {
+        'karrablast': '盖盖虫',
+        'shelmet': '小嘴蜗',
+        'remoraid': '铁炮鱼',
+      }[slug] ??
       _humanizeSlug(slug);
 }
 
@@ -631,24 +632,24 @@ String _evolutionLocationLabelZh(String slug) {
     return _humanizeSlug(slug);
   }
   return const {
-      'blush-mountain': '火特力山',
-      'chargestone-cave': '电气石洞穴',
-      'eterna-forest': '百代森林',
-      'frost-cavern': '冰结洞窟',
-      'kalos-route-13': '卡洛斯13号道路',
-      'kalos-route-20': '卡洛斯20号道路',
-      'lush-jungle': '树荫丛林',
-      'mount-lanakila': '拉纳基拉山',
-      'mt-coronet': '天冠山',
-      'new-mauville': '新紫堇',
-      'petalburg-woods': '橙华森林',
-      'pinwheel-forest': '矢车森林',
-      'shoal-cave': '浅滩洞穴',
-      'sinnoh-route-217': '神奥217号道路',
-      'twist-mountain': '螺旋山',
-      'vast-poni-canyon': '波尼大峡谷',
-    }[slug] ??
-    _humanizeSlug(slug);
+        'blush-mountain': '火特力山',
+        'chargestone-cave': '电气石洞穴',
+        'eterna-forest': '百代森林',
+        'frost-cavern': '冰结洞窟',
+        'kalos-route-13': '卡洛斯13号道路',
+        'kalos-route-20': '卡洛斯20号道路',
+        'lush-jungle': '树荫丛林',
+        'mount-lanakila': '拉纳基拉山',
+        'mt-coronet': '天冠山',
+        'new-mauville': '新紫堇',
+        'petalburg-woods': '橙华森林',
+        'pinwheel-forest': '矢车森林',
+        'shoal-cave': '浅滩洞穴',
+        'sinnoh-route-217': '神奥217号道路',
+        'twist-mountain': '螺旋山',
+        'vast-poni-canyon': '波尼大峡谷',
+      }[slug] ??
+      _humanizeSlug(slug);
 }
 
 String _humanizeSlug(String slug) => slug

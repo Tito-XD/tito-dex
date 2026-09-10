@@ -11,6 +11,7 @@ import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/sticker_card.dart';
@@ -110,7 +111,9 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
                   color: canvasFill,
                   border: Border.all(
                     color: canvasOutline,
-                    width: TitoBorders.element,
+                    width: appVisualStyle.usesTrainerJournal
+                        ? TitoBorders.journalHairline
+                        : TitoBorders.element,
                   ),
                   borderRadius: BorderRadius.circular(
                     DeviceLayout.rMd(context),
@@ -218,10 +221,10 @@ class _PositionHandle extends StatelessWidget {
       outlineWidth = TitoBorders.glass;
       shadow = SolidPlasticShadows.stickerSmall;
     } else {
-      fill = TitoColors.card;
-      outline = TitoColors.ink;
-      outlineWidth = TitoBorders.element;
-      shadow = TrainerJournalShadows.stickerSmall;
+      fill = TrainerJournal.paper;
+      outline = TrainerJournal.edge;
+      outlineWidth = TitoBorders.journalElement;
+      shadow = const <BoxShadow>[];
     }
     return Container(
       width: diameter,

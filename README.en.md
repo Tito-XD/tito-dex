@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18+204` | In-app updates, first-run guidance and trainer shortcuts; on-demand v20 data |
-| Offline APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18-offline+205` | The same updated UI with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19+206` | Lighter Trainer’s Journal and on-demand companion animations; on-demand v20 data |
+| Offline APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19-offline+207` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Structured-data-first answers, 50 local Q&A pairs, and category-aware prop motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -47,6 +47,8 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 - **Offline-first data** — downloadable Dex bundle with Chinese labels, maps, configuration, icons, and list sprites; the Offline APK starts from a verified local seed.
 - **Handheld layouts** — phones, tablets, square screens, and controller focus navigation.
 
+Companion animation choices now include Paraíso game collections and explicitly mapped ShinyHunters samples. The app bundles a small URL index and downloads only the confirmed choice; the first catalog covers 546 species, with exact form and color matching. Trainer’s Journal uses lighter outlines, paper edges, photo/tape details and ruled records while retaining existing font sizes and bundled fonts.
+
 ## Product principles
 
 1. **Resume quickly** — show what is needed to continue a playthrough.
@@ -70,11 +72,11 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.18-lite-rg-arm64.apk`** or **`TitoDex-0.9.18-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.18 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.19-lite-rg-arm64.apk`** or **`TitoDex-0.9.19-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.19 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
-v0.9.18 adds Settings-based updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.13 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-lite-rg-arm64.apk), [Offline · 95.25 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
+Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-lite-rg-arm64.apk), [Offline](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
 
 ## Development
 

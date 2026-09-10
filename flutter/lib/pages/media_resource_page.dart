@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/companion/companion_media.dart';
+import '../features/companion/companion_animation_catalog.dart';
 import '../features/dex/online_media_catalog.dart';
 import '../l10n/app_zh.dart';
 import '../theme/secondary_typography.dart';
@@ -21,6 +22,7 @@ class MediaResourcePage extends StatefulWidget {
 class _MediaResourcePageState extends State<MediaResourcePage> {
   List<CachedMediaFile> _cached = const [];
   List<OnlineMediaEntry> _catalog = const [];
+  Map<String, CompanionAnimationAsset> _animations = const {};
   var _query = '';
   var _busy = false;
   var _loading = true;
@@ -37,15 +39,27 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       setState(() => _loading = true);
     }
     try {
-      final (cached, entries) = await (
+      final (cached, entries, animations) = await (
         companionMediaCache.listCached(),
-        reloadCatalog ? onlineMediaCatalog.reload() : onlineMediaCatalog.load(),
+        (reloadCatalog
+                ? onlineMediaCatalog.reload()
+                : onlineMediaCatalog.load())
+            .catchError((Object error) {
+              _loadError = AppZh.mediaResourceLoadFailed;
+              return <int, OnlineMediaEntry>{};
+            }),
+        CompanionAnimationCatalog.load().catchError(
+          (Object _) => CompanionAnimationCatalog(const []),
+        ),
       ).wait;
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _loadError = null;
+        if (entries.isNotEmpty) _loadError = null;
         _cached = cached;
+        _animations = {
+          for (final asset in animations.assets) asset.cacheFileName: asset,
+        };
         _catalog = entries.values.toList()
           ..sort((a, b) => a.id.compareTo(b.id));
       });
@@ -63,6 +77,12 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
       return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
     return '${(bytes / 1024).toStringAsFixed(0)} KB';
+  }
+
+  String _cachedLabel(CachedMediaFile file) {
+    final asset = _animations[file.name];
+    if (asset == null) return file.name;
+    return '${asset.displayName} · ${asset.label}${asset.shiny ? ' · ${AppZh.companionPickerShiny}' : ''}';
   }
 
   Future<void> _downloadCry(OnlineMediaEntry entry) async {
@@ -148,7 +168,7 @@ class _MediaResourcePageState extends State<MediaResourcePage> {
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   title: Text(
-                    file.name,
+                    _cachedLabel(file),
                     style: SecondaryTypography.onCard.body14,
                   ),
                   trailing: Row(

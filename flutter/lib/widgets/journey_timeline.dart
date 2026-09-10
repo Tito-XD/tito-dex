@@ -6,6 +6,7 @@ import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
 
 class JourneyTimeline extends StatelessWidget {
@@ -17,31 +18,33 @@ class JourneyTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StickerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppZh.recentTimeline, style: SecondaryTypography.onCard.h15),
-          const SizedBox(height: 8),
-          if (entries.isEmpty)
-            Text(
-              AppZh.journeyTimelineEmpty,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                color: TitoColors.mutedInk,
+      child: JournalRuledPaper(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppZh.recentTimeline, style: SecondaryTypography.onCard.h15),
+            const SizedBox(height: 8),
+            if (entries.isEmpty)
+              Text(
+                AppZh.journeyTimelineEmpty,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  color: TitoColors.mutedInk,
+                ),
+              )
+            else
+              for (var i = 0; i < entries.length; i++)
+                _TimelineEntryTile(
+                  entry: entries[i],
+                  isLast: i == entries.length - 1,
+                ),
+            if (nextReminder != null) ...[
+              const SizedBox(height: 10),
+              _ReminderBox(
+                text: '${AppZh.nextPrefix}${localizeReminder(nextReminder)}',
               ),
-            )
-          else
-            for (var i = 0; i < entries.length; i++)
-              _TimelineEntryTile(
-                entry: entries[i],
-                isLast: i == entries.length - 1,
-              ),
-          if (nextReminder != null) ...[
-            const SizedBox(height: 10),
-            _ReminderBox(
-              text: '${AppZh.nextPrefix}${localizeReminder(nextReminder)}',
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -72,8 +75,8 @@ class _ReminderBox extends StatelessWidget {
       );
     } else {
       background = TitoColors.softYellow;
-      foreground = TitoColors.ink;
-      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
+      foreground = TrainerJournal.ink;
+      border = null;
     }
     return Container(
       width: double.infinity,
@@ -120,8 +123,8 @@ class _TimelineEntryTile extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: appVisualStyle.usesTrainerJournal
                         ? Border.all(
-                            color: TitoColors.ink,
-                            width: TitoBorders.element,
+                            color: TrainerJournal.smallEdge,
+                            width: TitoBorders.journalHairline,
                           )
                         : null,
                   ),
@@ -146,15 +149,17 @@ class _TimelineEntryTile extends StatelessWidget {
                       child: Text(
                         entry.at!,
                         style: SecondaryTypography.onCard.small12.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: TitoColors.mutedInk,
+                          fontWeight: TrainerJournal.weight(FontWeight.w800),
+                          color: appVisualStyle.usesTrainerJournal
+                              ? TrainerJournal.muted
+                              : TitoColors.mutedInk,
                         ),
                       ),
                     ),
                   Text(
                     localizeTimelineEntry(entry.text),
                     style: SecondaryTypography.onCard.body14.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: TrainerJournal.weight(FontWeight.w700),
                     ),
                   ),
                 ],

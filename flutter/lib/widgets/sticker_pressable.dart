@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'handheld_input.dart';
 
 /// Trainer's Journal uses the original hard physical sticker press, Solid
@@ -63,16 +64,18 @@ class _StickerPressableState extends State<StickerPressable> {
         final keyHeld = widget.interactive && HandheldPressed.of(context);
         final sunk =
             depthEnabled && widget.interactive && (_pressed || keyHeld);
-        final restingShadow = appVisualStyle.usesTrainerJournal
-            ? TrainerJournalShadows.sticker
+        final journal = appVisualStyle.usesTrainerJournal;
+        final sink = journal ? TrainerJournal.pressSink : 3.0;
+        final restingShadow = journal
+            ? TrainerJournalShadows.control
             : SolidPlasticShadows.sticker;
-        final pressedShadow = appVisualStyle.usesTrainerJournal
+        final pressedShadow = journal
             ? TrainerJournalShadows.stickerPressed
             : SolidPlasticShadows.stickerPressed;
         Widget result = AnimatedContainer(
           duration: const Duration(milliseconds: 80),
           curve: Curves.easeOut,
-          transform: Matrix4.translationValues(0, sunk ? 3 : 0, 0),
+          transform: Matrix4.translationValues(0, sunk ? sink : 0, 0),
           decoration: BoxDecoration(
             borderRadius: widget.borderRadius,
             boxShadow: !depthEnabled || !widget.ownShadow

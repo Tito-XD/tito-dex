@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) |
-| **`main` / lite source** | `0.9.18+204` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.18-offline+205` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) |
+| **`main` / lite source** | `0.9.19+206` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.19-offline+207` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,7 +44,11 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.18)
+## Current feature status (latest release line: v0.9.19)
+
+### v0.9.19: Trainer’s Journal and companion animation choices (2026-09-10)
+
+Trainer’s Journal uses thin gray-blue outlines, short paper edges, photo/tape details and ruled journey records. Existing font sizes, layout rules and bundled Nunito cuts remain; Plastic/Flat retain their own styles. Companion bundles 1,550 exact source/form/color mappings across 546 species, with game/source choices, explicit downloads, full-frame validation and independent caches. Missing mappings are not replaced with another form or color. Lite uses versionCode 206 and Offline 207; v20 stays unchanged. See [COMPANION_ANIMATION_CATALOG.md](COMPANION_ANIMATION_CATALOG.md) and [release records](RELEASES.md).
 
 ### v0.9.18: App updater and first-run setup (2026-09-10)
 
@@ -63,6 +67,7 @@ v0.9.17 Ask motion asset reuse: animation props resolve canonical `item-sprites/
 > v0.9.18 uses Lite versionCode 204 and Offline versionCode 205; published sizes are 29.13 MB / 95.25 MB. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Current UI and language
+- **v0.9.19:** Companion now includes a small built-in animation URL catalog (1,550 exact identity/source/colour mappings), grouped by game/source and downloaded only after confirmation. New choices use independent validated caches and preserve the current companion on failure; see [COMPANION_ANIMATION_CATALOG.md](COMPANION_ANIMATION_CATALOG.md) for coverage, validation boundaries and tests. This does not update the v20 Dex bundle or claim full-form coverage.
 - **v0.9.16 layout:** Search keeps query entry separate from the reference catalog; four battle tools share one page and mount on first use. Team uses a six-slot board with separate detail/editor areas. Portrait Home placement and location tiles are refined; secondary scrolling stays below fixed headers.
 - **v0.9.15:** each of Trainer's Journal, Solid Plastic and Flat UI now owns its shared controls, outlines, shadows, selection states, sheets and dialogs. Fixed radius tokens also apply on handhelds; see `DESIGN_SYSTEM.md` for intentional differences between themes and the type-colour detail-tab exception.
 - **v0.9.16 first-open optimization:** ordinary images use static placeholders; slow detail/media slots and section reads use a delayed pale Poké Ball rotating in place without shimmer. Large Dex JSON and catalog/location model decoding run off the native UI thread; move-index reads are shared and battle tools / location cards mount on demand. Determinate progress remains immediate. See [FIRST_OPEN_LOADING.md](./FIRST_OPEN_LOADING.md) for coverage and device-validation limits. Long Pokédex descriptions grow to fit instead of scrolling inside a fixed-height card.

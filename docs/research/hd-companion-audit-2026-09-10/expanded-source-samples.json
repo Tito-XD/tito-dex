@@ -1,0 +1,537 @@
+{
+  "generatedAt": "2026-09-10T14:05:18.441977+00:00",
+  "note": "Canvas dimensions; not object bounding box or proof of native resolution. PNG alpha was not measured; hasPaletteTransparency refers only to Pillow transparency metadata. No app/device validation.",
+  "furretComparison": [
+    {
+      "name": "sh-regular-furret",
+      "url": "https://www.shinyhunters.com/images/regular/162.gif",
+      "status": 200,
+      "bytes": 2148354,
+      "dimensions": [
+        560,
+        510
+      ],
+      "frames": 60,
+      "loopMs": 1800,
+      "transparent": true
+    },
+    {
+      "name": "sh-shiny-furret",
+      "url": "https://www.shinyhunters.com/images/shiny/162.gif",
+      "status": 200,
+      "bytes": 921765,
+      "dimensions": [
+        314,
+        289
+      ],
+      "frames": 60,
+      "loopMs": 1800,
+      "transparent": true
+    },
+    {
+      "name": "pk-furret-default",
+      "url": "https://www.pkparaiso.com/imagenes/xy/sprites/animados/furret.gif",
+      "status": 200,
+      "bytes": 170567,
+      "dimensions": [
+        85,
+        73
+      ],
+      "frames": 59,
+      "loopMs": 1770,
+      "transparent": true
+    }
+  ],
+  "shinyHuntersSamples": [
+    {
+      "speciesId": 649,
+      "sourceName": "Genesect",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/649",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/649.gif",
+          "format": "GIF",
+          "bytes": 71967,
+          "dimensions": [
+            70,
+            92
+          ],
+          "frames": 49,
+          "loop": 0,
+          "durationMs": 1960,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/649.gif",
+          "format": "GIF",
+          "bytes": 727040,
+          "dimensions": [
+            204,
+            274
+          ],
+          "frames": 50,
+          "loop": 0,
+          "durationMs": 1500,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 252,
+      "sourceName": "Treecko",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/252",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/252.gif",
+          "format": "GIF",
+          "bytes": 956496,
+          "dimensions": [
+            360,
+            450
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/252.gif",
+          "format": "GIF",
+          "bytes": 406295,
+          "dimensions": [
+            182,
+            248
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 1,
+      "sourceName": "Bulbasaur",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/1",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/1.gif",
+          "format": "GIF",
+          "bytes": 943811,
+          "dimensions": [
+            320,
+            350
+          ],
+          "frames": 42,
+          "loop": 0,
+          "durationMs": 1260,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/1.gif",
+          "format": "GIF",
+          "bytes": 411410,
+          "dimensions": [
+            182,
+            194
+          ],
+          "frames": 42,
+          "loop": 0,
+          "durationMs": 1260,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 201,
+      "sourceName": "Unown B",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/867",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/867.gif",
+          "format": "GIF",
+          "bytes": 75096,
+          "dimensions": [
+            63,
+            63
+          ],
+          "frames": 79,
+          "loop": 0,
+          "durationMs": 2370,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/867.gif",
+          "format": "GIF",
+          "bytes": 689621,
+          "dimensions": [
+            259,
+            277
+          ],
+          "frames": 80,
+          "loop": 0,
+          "durationMs": 2400,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 493,
+      "sourceName": "Arceus",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/493",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/493.gif",
+          "format": "GIF",
+          "bytes": 3965251,
+          "dimensions": [
+            450,
+            610
+          ],
+          "frames": 90,
+          "loop": 0,
+          "durationMs": 2700,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/493.gif",
+          "format": "GIF",
+          "bytes": 1877805,
+          "dimensions": [
+            291,
+            346
+          ],
+          "frames": 90,
+          "loop": 0,
+          "durationMs": 2700,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 666,
+      "sourceName": "Vivillon Icy Snow Pattern",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/843",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/843.gif",
+          "format": "GIF",
+          "bytes": 290989,
+          "dimensions": [
+            104,
+            104
+          ],
+          "frames": 79,
+          "loop": 0,
+          "durationMs": 2370,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/843.gif",
+          "format": "GIF",
+          "bytes": 1256594,
+          "dimensions": [
+            313,
+            312
+          ],
+          "frames": 80,
+          "loop": 0,
+          "durationMs": 2400,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 658,
+      "sourceName": "Greninja",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/658",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/658.gif",
+          "format": "GIF",
+          "bytes": 57392,
+          "dimensions": [
+            131,
+            76
+          ],
+          "frames": 39,
+          "loop": 0,
+          "durationMs": 1560,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/658.gif",
+          "format": "GIF",
+          "bytes": 854393,
+          "dimensions": [
+            526,
+            313
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 810,
+      "sourceName": "Grookey",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/903",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/903.gif",
+          "format": "GIF",
+          "bytes": 1458491,
+          "dimensions": [
+            301,
+            379
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/903.gif",
+          "format": "GIF",
+          "bytes": 468579,
+          "dimensions": [
+            151,
+            190
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 869,
+      "sourceName": "Alcremie (Strawberry Sweet)",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/969",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/969.gif",
+          "format": "GIF",
+          "bytes": 3195101,
+          "dimensions": [
+            320,
+            438
+          ],
+          "frames": 60,
+          "loop": 0,
+          "durationMs": 1800,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/969.gif",
+          "format": "GIF",
+          "bytes": 5100418,
+          "dimensions": [
+            503,
+            669
+          ],
+          "frames": 60,
+          "loop": 0,
+          "durationMs": 1800,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 58,
+      "sourceName": "Hisuian Growlithe",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/1024",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/1024.gif",
+          "format": "PNG",
+          "bytes": 33626,
+          "dimensions": [
+            250,
+            250
+          ],
+          "frames": 1,
+          "loop": null,
+          "durationMs": 0,
+          "hasPaletteTransparency": false,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/1024.gif",
+          "format": "GIF",
+          "bytes": 3608660,
+          "dimensions": [
+            594,
+            667
+          ],
+          "frames": 40,
+          "loop": 0,
+          "durationMs": 1200,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 906,
+      "sourceName": "Spirigato",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/1044",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/1044.gif",
+          "format": "GIF",
+          "bytes": 803446,
+          "dimensions": [
+            158,
+            228
+          ],
+          "frames": 60,
+          "loop": 0,
+          "durationMs": 1800,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/1044.gif",
+          "format": "GIF",
+          "bytes": 839009,
+          "dimensions": [
+            158,
+            228
+          ],
+          "frames": 60,
+          "loop": 0,
+          "durationMs": 1800,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 773,
+      "sourceName": "Silvally",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/784",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/784.gif",
+          "format": "GIF",
+          "bytes": 66563,
+          "dimensions": [
+            57,
+            117
+          ],
+          "frames": 47,
+          "loop": 0,
+          "durationMs": 1410,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/784.gif",
+          "format": "GIF",
+          "bytes": 624784,
+          "dimensions": [
+            165,
+            346
+          ],
+          "frames": 48,
+          "loop": 0,
+          "durationMs": 1440,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 1013,
+      "sourceName": "Sinistcha",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/1160",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/1160.gif",
+          "format": "PNG",
+          "bytes": 36798,
+          "dimensions": [
+            250,
+            250
+          ],
+          "frames": 1,
+          "loop": null,
+          "durationMs": 0,
+          "hasPaletteTransparency": false,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/1160.gif",
+          "format": "GIF",
+          "bytes": 6709344,
+          "dimensions": [
+            599,
+            822
+          ],
+          "frames": 90,
+          "loop": 0,
+          "durationMs": 2700,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    },
+    {
+      "speciesId": 1007,
+      "sourceName": "Koraidon",
+      "guideUrl": "https://www.shinyhunters.com/en/guides/pokemon/1138",
+      "assets": [
+        {
+          "url": "https://www.shinyhunters.com/images/regular/1138.gif",
+          "format": "GIF",
+          "bytes": 7123222,
+          "dimensions": [
+            470,
+            573
+          ],
+          "frames": 110,
+          "loop": 0,
+          "durationMs": 3300,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        },
+        {
+          "url": "https://www.shinyhunters.com/images/shiny/1138.gif",
+          "format": "GIF",
+          "bytes": 7468051,
+          "dimensions": [
+            470,
+            573
+          ],
+          "frames": 110,
+          "loop": 0,
+          "durationMs": 3300,
+          "hasPaletteTransparency": true,
+          "validation": "Entire file read in memory and all frames decoded with Pillow; no media persisted."
+        }
+      ]
+    }
+  ]
+}

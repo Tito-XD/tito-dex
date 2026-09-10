@@ -7,6 +7,7 @@ import '../l10n/app_zh.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_detail_picker_sheet.dart';
 
 /// One visible context shared by every bottom tab of a Pokémon detail page.
@@ -75,7 +76,7 @@ class DexDetailControls extends StatelessWidget {
     } else {
       fill = TitoColors.card;
       disabledFill = TitoColors.cardWarm.withValues(alpha: 0.6);
-      outline = Border.all(color: TitoColors.ink, width: TitoBorders.card);
+      outline = TrainerJournal.allCard();
     }
     // Keep inset labels on the filled surface while matching adjacent controls.
     Widget outlined(Widget child) => outline == null

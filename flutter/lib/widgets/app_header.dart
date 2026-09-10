@@ -8,6 +8,7 @@ import '../l10n/app_zh.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../theme/tito_typography.dart';
 import 'handheld_input.dart';
 import 'handheld_status_icons.dart';
@@ -150,10 +151,7 @@ class _GameBadgeButton extends StatelessWidget {
           shape: CircleBorder(
             side: appVisualStyle.usesFlatUi
                 ? BorderSide.none
-                : const BorderSide(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
-                  ),
+                : TrainerJournal.cardSide,
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -231,8 +229,8 @@ class _HeaderIconButton extends StatelessWidget {
           side: appVisualStyle.usesFlatUi
               ? BorderSide.none
               : const BorderSide(
-                  color: TitoColors.ink,
-                  width: TitoBorders.card,
+                  color: TrainerJournal.edge,
+                  width: TitoBorders.journalCard,
                 ),
           shape: const CircleBorder(),
         ),

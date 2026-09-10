@@ -85,6 +85,12 @@ jobs:
       - name: Run tests
         run: flutter test --no-pub
 
+      - name: Verify companion animation catalog
+        run: |
+          cd ..
+          python3 tools/generate_companion_animation_catalog.py --check
+          python3 -m unittest tools.test_audit_hd_companion_sources -v
+
   build:
     name: Build signed ${{ matrix.variant }} APK
     needs: validate

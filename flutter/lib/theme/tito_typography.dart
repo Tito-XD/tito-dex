@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'app_visual_style.dart';
 import 'device_layout.dart';
 import 'tito_colors.dart';
+import 'trainer_journal.dart';
 
 /// TitoDex typography — always uses bundled Nunito, never bare system font.
 abstract final class TitoTypography {
@@ -30,6 +32,14 @@ abstract final class TitoTypography {
     double? height,
     double? letterSpacing,
   }) {
+    final journal = appVisualStyle.usesTrainerJournal;
+    final resolvedColor = !journal
+        ? color
+        : color == TitoColors.ink
+        ? TrainerJournal.ink
+        : color == TitoColors.mutedInk
+        ? TrainerJournal.muted
+        : color;
     return TextStyle(
       fontFamily: fontFamily,
       fontFamilyFallback: const [
@@ -38,8 +48,8 @@ abstract final class TitoTypography {
         'sans-serif',
       ],
       fontSize: fontSize,
-      fontWeight: fontWeight,
-      color: color,
+      fontWeight: TrainerJournal.weight(fontWeight),
+      color: resolvedColor,
       height: height,
       letterSpacing: letterSpacing,
       decoration: TextDecoration.none,

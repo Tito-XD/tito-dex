@@ -11,6 +11,7 @@ import '../l10n/game_zh.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/sticker_card.dart';
 import 'dex_sprite_image.dart';
 import 'type_badge.dart';
@@ -146,8 +147,7 @@ String? itemVersionPriceLabel(
   String amount(Object value) =>
       currency == '₽' ? '₽$value' : '$value $currency';
   final parts = [
-    if (buy != null)
-      AppZh.itemPriceBuy(compact: compact, amount: amount(buy)),
+    if (buy != null) AppZh.itemPriceBuy(compact: compact, amount: amount(buy)),
     if (sell != null)
       AppZh.itemPriceSell(compact: compact, amount: amount(sell)),
   ];
@@ -848,7 +848,7 @@ class _CategoryBadge extends StatelessWidget {
 /// Solid Plastic, and none in Flat UI.
 BoxBorder? _referenceBadgeBorder() {
   if (appVisualStyle.usesTrainerJournal) {
-    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+    return TrainerJournal.allElement();
   }
   if (appVisualStyle.usesSolidPlastic) {
     return Border.all(
@@ -959,7 +959,8 @@ const referenceFallbackDescriptionsEn = <String, String>{
       'Misty Terrain: Dragon moves are weakened, and status conditions cannot be inflicted.',
   'burn': 'Burn: Attack is halved, and HP is lost each turn.',
   'freeze': 'Freeze: Cannot act until it thaws.',
-  'paralysis': 'Paralysis: Speed is halved, and the Pokémon may be fully paralyzed.',
+  'paralysis':
+      'Paralysis: Speed is halved, and the Pokémon may be fully paralyzed.',
   'poison': 'Poison: HP is lost each turn.',
   'bad-poison': 'Badly poisoned: HP loss increases each turn.',
   'sleep': 'Sleep: Cannot act for several turns.',

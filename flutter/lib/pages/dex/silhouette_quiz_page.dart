@@ -14,6 +14,7 @@ import '../../theme/device_layout.dart';
 import '../../theme/error_text.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/trainer_journal.dart';
 import '../../widgets/companion_picker_sheet.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/handheld_input.dart';
@@ -385,7 +386,10 @@ class _ChoiceButton extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.85),
             width: TitoBorders.glass,
           )
-        : Border.all(color: TitoColors.ink, width: TitoBorders.card);
+        : Border.all(
+            color: TrainerJournal.edge,
+            width: TitoBorders.journalCard,
+          );
     final radius = BorderRadius.circular(TitoRadii.md);
 
     return HandheldFocusDecorator(

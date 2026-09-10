@@ -17,6 +17,7 @@ import '../../theme/error_text.dart';
 import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/trainer_journal.dart';
 import '../../widgets/companion_tool_fields.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -865,8 +866,12 @@ class _DamageResultCard extends StatelessWidget {
                   border: appVisualStyle.usesFlatUi
                       ? null
                       : Border.all(
-                          color: TitoColors.ink,
-                          width: TitoBorders.element,
+                          color: appVisualStyle.usesTrainerJournal
+                              ? TrainerJournal.smallEdge
+                              : TitoColors.ink,
+                          width: appVisualStyle.usesTrainerJournal
+                              ? TitoBorders.journalHairline
+                              : TitoBorders.element,
                         ),
                 ),
                 clipBehavior: Clip.antiAlias,

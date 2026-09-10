@@ -1,9 +1,65 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../dex/sprite_generation_catalog.dart';
+import 'companion_animation_catalog.dart';
+
+class CompanionDownloadCancellation {
+  bool _cancelled = false;
+  VoidCallback? _abort;
+  bool get isCancelled => _cancelled;
+  void cancel() {
+    _cancelled = true;
+    _abort?.call();
+  }
+}
+
+/// Check real GIF content and decode every frame at a bounded preview size.
+/// A .gif URL may actually return a single-frame PNG or an error page.
+Future<bool> validateCompanionAnimation(
+  Uint8List bytes,
+  CompanionAnimationAsset asset, {
+  bool Function()? isCancelled,
+}) async {
+  if (bytes.length != asset.sizeBytes ||
+      bytes.length < 14 ||
+      String.fromCharCodes(bytes.take(6)) != 'GIF89a' &&
+          String.fromCharCodes(bytes.take(6)) != 'GIF87a' ||
+      bytes.last != 0x3b) {
+    return false;
+  }
+  final header = ByteData.sublistView(bytes);
+  if (header.getUint16(6, Endian.little) != asset.width ||
+      header.getUint16(8, Endian.little) != asset.height) {
+    return false;
+  }
+  ui.Codec? codec;
+  try {
+    codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: 256,
+      allowUpscaling: false,
+    );
+    if (codec.frameCount <= 1 ||
+        asset.frameCount != null && asset.frameCount != codec.frameCount) {
+      return false;
+    }
+    for (var i = 0; i < codec.frameCount; i++) {
+      if (isCancelled?.call() ?? false) return false;
+      final frame = await codec.getNextFrame();
+      frame.image.dispose();
+    }
+    return true;
+  } catch (_) {
+    return false;
+  } finally {
+    codec?.dispose();
+  }
+}
 
 /// Core-series starter trios Gen I–IX plus Pikachu / Eevee. Their animated
 /// GIF and cry ship inside the APK (~1.4 MB total) so the default companions
@@ -64,7 +120,15 @@ String companionFormArtCacheFileName(
 }
 
 /// Disk cache for non-bundled companion media under app documents.
-class CompanionMediaCache {
+class CompanionMediaCache extends ChangeNotifier {
+  CompanionMediaCache({
+    Future<Directory> Function()? cacheDirectory,
+    http.Client Function()? clientFactory,
+  }) : _directoryProvider = cacheDirectory,
+       _clientFactory = clientFactory ?? http.Client.new;
+
+  final Future<Directory> Function()? _directoryProvider;
+  final http.Client Function() _clientFactory;
   Directory? _dir;
 
   Future<Directory> _cacheDir() async {
@@ -72,8 +136,12 @@ class CompanionMediaCache {
     if (cached != null) {
       return cached;
     }
-    final docs = await getApplicationDocumentsDirectory();
-    final dir = Directory('${docs.path}/companion_media');
+    final custom = _directoryProvider;
+    final dir = custom != null
+        ? await custom()
+        : Directory(
+            '${(await getApplicationDocumentsDirectory()).path}/companion_media',
+          );
     await dir.create(recursive: true);
     _dir = dir;
     return dir;
@@ -114,6 +182,100 @@ class CompanionMediaCache {
   }
 
   Future<String?> cachedGifPath(int mediaId) => _existingPath(mediaId, 'gif');
+
+  Future<String?> cachedAnimationPath(CompanionAnimationAsset asset) async {
+    final path = await _existingNamedPath(asset.cacheFileName);
+    if (path == null) return null;
+    try {
+      return await File(path).length() == asset.sizeBytes ? path : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Explicit candidates never fall through to another source or legacy cache.
+  Future<String?> ensureAnimation(
+    CompanionAnimationAsset asset, {
+    CompanionDownloadCancellation? cancellation,
+    void Function(int received, int total)? onProgress,
+  }) async {
+    if (cancellation?.isCancelled ?? false) return null;
+    final cached = await cachedAnimationPath(asset);
+    if (cached != null) return cached;
+    final client = _clientFactory();
+    cancellation?._abort = client.close;
+    File? temporary;
+    IOSink? sink;
+    try {
+      if (asset.sizeBytes > 128 * 1024 * 1024 ||
+          (cancellation?.isCancelled ?? false)) {
+        return null;
+      }
+      final response = await client
+          .send(
+            http.Request('GET', Uri.parse(asset.url))
+              ..headers['Accept-Encoding'] = 'identity',
+          )
+          .timeout(const Duration(seconds: 30));
+      if (response.statusCode != 200 ||
+          response.contentLength != null &&
+              response.contentLength != asset.sizeBytes) {
+        return null;
+      }
+      final destination = await _namedFile(asset.cacheFileName);
+      temporary = File(
+        '${destination.path}.${DateTime.now().microsecondsSinceEpoch}.part',
+      );
+      sink = temporary.openWrite();
+      var received = 0;
+      await for (final chunk in response.stream.timeout(
+        const Duration(seconds: 30),
+      )) {
+        if (cancellation?.isCancelled ?? false) return null;
+        received += chunk.length;
+        if (received > asset.sizeBytes) return null;
+        sink.add(chunk);
+        onProgress?.call(received, asset.sizeBytes);
+      }
+      await sink.flush();
+      await sink.close();
+      sink = null;
+      if (received != asset.sizeBytes || (cancellation?.isCancelled ?? false)) {
+        return null;
+      }
+      final valid = await validateCompanionAnimation(
+        await temporary.readAsBytes(),
+        asset,
+        isCancelled: () => cancellation?.isCancelled ?? false,
+      );
+      if (!valid || (cancellation?.isCancelled ?? false)) return null;
+      // Another completed download may have populated the same exact asset.
+      final existing = await cachedAnimationPath(asset);
+      if (existing != null) return existing;
+      if (await destination.exists()) await destination.delete();
+      await temporary.rename(destination.path);
+      temporary = null;
+      notifyListeners();
+      return destination.path;
+    } catch (_) {
+      return null;
+    } finally {
+      cancellation?._abort = null;
+      client.close();
+      try {
+        await sink?.close();
+      } catch (_) {
+        // The original network or disk failure is already represented by null.
+      }
+      try {
+        if (temporary != null && await temporary.exists()) {
+          await temporary.delete();
+        }
+      } catch (_) {
+        // Partial files are never listed or considered reusable cache entries.
+      }
+    }
+  }
 
   Future<String?> cachedCryPath(int speciesId) =>
       _existingPath(speciesId, 'ogg');
@@ -224,7 +386,7 @@ class CompanionMediaCache {
         }
         try {
           final stat = await entity.stat();
-          if (stat.size > 0) {
+          if (stat.size > 0 && !entity.path.endsWith('.part')) {
             result.add(
               CachedMediaFile(
                 name: entity.uri.pathSegments.last,
@@ -245,11 +407,15 @@ class CompanionMediaCache {
   }
 
   Future<void> deleteCached(String fileName) async {
+    if (fileName.contains('/') || fileName.contains('\\') || fileName == '..') {
+      return;
+    }
     try {
       final dir = await _cacheDir();
       final file = File('${dir.path}/$fileName');
       if (await file.exists()) {
         await file.delete();
+        notifyListeners();
       }
     } catch (_) {
       // Deletion is best-effort.

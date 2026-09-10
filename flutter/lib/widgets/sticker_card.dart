@@ -4,6 +4,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'liquid_glass.dart';
 
 enum StickerVariant { cream, deep, sky, mint, softYellow }
@@ -26,22 +27,26 @@ class StickerCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     if (appVisualStyle.usesTrainerJournal) {
       final colors = switch (variant) {
-        StickerVariant.cream => (TitoColors.card, TitoColors.ink),
+        StickerVariant.cream => (TrainerJournal.paperWarm, TrainerJournal.ink),
         StickerVariant.deep => (TitoColors.deepBlue, TitoColors.card),
-        StickerVariant.sky => (TitoColors.skyBlue, TitoColors.ink),
-        StickerVariant.mint => (TitoColors.mint, TitoColors.ink),
-        StickerVariant.softYellow => (TitoColors.softYellow, TitoColors.ink),
+        StickerVariant.sky => (TitoColors.skyBlue, TrainerJournal.ink),
+        StickerVariant.mint => (TitoColors.mint, TrainerJournal.ink),
+        StickerVariant.softYellow => (
+          TitoColors.softYellow,
+          TrainerJournal.ink,
+        ),
       };
+      final shadow = variant == StickerVariant.deep
+          ? TrainerJournalShadows.deep
+          : TrainerJournalShadows.sticker;
       return ListenableBuilder(
         listenable: retroStyle,
         builder: (context, inner) => DecoratedBox(
           decoration: BoxDecoration(
             color: colors.$1,
             borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: TitoColors.ink, width: TitoBorders.card),
-            boxShadow: retroStyle.enabled
-                ? TrainerJournalShadows.sticker
-                : null,
+            border: TrainerJournal.allCard(),
+            boxShadow: retroStyle.enabled ? shadow : null,
           ),
           child: inner,
         ),

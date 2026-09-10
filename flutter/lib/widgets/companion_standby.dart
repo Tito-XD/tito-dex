@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../features/companion/companion_art.dart';
+import '../features/companion/companion_animation_catalog.dart';
 import '../features/companion/companion_media.dart';
 import '../features/companion/companion_metrics.dart';
 import '../features/companion/companion_repository.dart';
@@ -22,6 +23,7 @@ import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'companion_picker_sheet.dart';
 import 'fallback_sprite_image.dart';
 
@@ -37,6 +39,7 @@ class CompanionStandby extends StatefulWidget {
     this.formKey,
     this.isShiny = false,
     this.animationSourceUrl,
+    this.animationAssetId,
     this.crySourceUrl,
     this.compact = false,
     this.sizeScale = 1.0,
@@ -54,6 +57,7 @@ class CompanionStandby extends StatefulWidget {
   /// Persisted media choices from the companion picker. Null keeps automatic
   /// best-source selection and all existing fallbacks.
   final String? animationSourceUrl;
+  final String? animationAssetId;
   final String? crySourceUrl;
 
   final bool compact;
@@ -97,12 +101,14 @@ class _CompanionStandbyState extends State<CompanionStandby>
   var _nextHeartId = 0;
   var _pats = 0;
   var _spriteResourceId = 0;
+  var _spriteRequest = 0;
 
   bool get _friend => _pats >= _friendshipPats;
 
   @override
   void initState() {
     super.initState();
+    companionMediaCache.addListener(_onMediaCacheChanged);
     _initForSpecies();
     _bounce = AnimationController(
       vsync: this,
@@ -122,6 +128,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
         oldWidget.formKey != widget.formKey ||
         oldWidget.isShiny != widget.isShiny ||
         oldWidget.animationSourceUrl != widget.animationSourceUrl ||
+        oldWidget.animationAssetId != widget.animationAssetId ||
         oldWidget.crySourceUrl != widget.crySourceUrl) {
       _pats = 0;
       _hearts.clear();
@@ -153,8 +160,20 @@ class _CompanionStandbyState extends State<CompanionStandby>
   /// → network candidates. Every miss falls through to the normal look, so
   /// a shiny choice can never blank the companion.
   Future<void> _resolveSpriteSources() async {
+    final request = ++_spriteRequest;
     final id = widget.speciesId;
     final shiny = widget.isShiny;
+    final assetId = widget.animationAssetId;
+    if (assetId != null) {
+      await _resolveCatalogAnimation(
+        assetId,
+        id,
+        widget.formKey,
+        shiny,
+        request,
+      );
+      return;
+    }
 
     // Resolve the sprite resource id for the chosen form.
     var mediaId = id;
@@ -232,7 +251,7 @@ class _CompanionStandbyState extends State<CompanionStandby>
       // Prime the disk cache so the sparkle survives going offline later.
       unawaited(companionMediaCache.ensureShinyGif(mediaId));
     }
-    if (!mounted || id != widget.speciesId) {
+    if (!mounted || id != widget.speciesId || request != _spriteRequest) {
       return;
     }
     setState(() {
@@ -257,8 +276,67 @@ class _CompanionStandbyState extends State<CompanionStandby>
     });
   }
 
+  void _onMediaCacheChanged() {
+    if (mounted && widget.animationAssetId != null) _resolveSpriteSources();
+  }
+
+  /// Explicit catalog choices play only the validated local file. Missing or
+  /// deleted media uses an exact still image; reopening Home never downloads it.
+  Future<void> _resolveCatalogAnimation(
+    String assetId,
+    int speciesId,
+    String? formKey,
+    bool shiny,
+    int request,
+  ) async {
+    final sources = <String>[];
+    try {
+      final catalog = await CompanionAnimationCatalog.load();
+      final asset = catalog.entry(assetId);
+      if (asset != null && asset.matches(speciesId, formKey, shiny)) {
+        final cached = await companionMediaCache.cachedAnimationPath(asset);
+        if (cached != null) {
+          sources.add(cached);
+        } else {
+          final detail = await dexRepository.getDetail(speciesId);
+          final form = detail.forms.cast<PokemonFormDetail?>().firstWhere(
+            (form) => form?.key == asset.formKey,
+            orElse: () => null,
+          );
+          if (shiny) {
+            final media = await onlineMediaCatalog.entryFor(speciesId);
+            sources.addAll(
+              media?.artCandidatesFor(asset.formKey, shiny: true) ?? const [],
+            );
+            final mediaId = form?.pokemonId ?? speciesId;
+            if (asset.isDefault || mediaId != speciesId) {
+              final source = shinySpriteVariantUrl(
+                defaultSpriteUrlFor(mediaId),
+              );
+              if (source != null) sources.add(source);
+            }
+          } else if (form != null || asset.isDefault) {
+            final summary = form?.summaryFor(detail.summary) ?? detail.summary;
+            if (summary.displayArtworkPath case final source?) {
+              sources.add(source);
+            }
+            if (summary.displaySpritePath case final source?) {
+              sources.add(source);
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // An unavailable catalog/detail must not trigger a different animation.
+    }
+    if (mounted && request == _spriteRequest) {
+      setState(() => _spriteSources = sources);
+    }
+  }
+
   @override
   void dispose() {
+    companionMediaCache.removeListener(_onMediaCacheChanged);
     _quoteTimer?.cancel();
     _cryPlayer.dispose();
     _bounce.dispose();
@@ -431,17 +509,21 @@ class _CompanionStandbyState extends State<CompanionStandby>
       child: FallbackSpriteImage(
         sources:
             _spriteSources ??
-            [
-              if (bundledCompanionGifAsset(_spriteResourceId) != null)
-                bundledCompanionGifAsset(_spriteResourceId)!,
-              ...animatedSpriteCandidatesFor(_spriteResourceId),
-            ],
+            (widget.animationAssetId != null
+                ? const <String>[]
+                : [
+                    if (bundledCompanionGifAsset(_spriteResourceId) != null)
+                      bundledCompanionGifAsset(_spriteResourceId)!,
+                    ...animatedSpriteCandidatesFor(_spriteResourceId),
+                  ]),
         width: spriteSize,
         height: spriteSize,
         showLoadingProgress: true,
         // Beyond ~1.3× the Showdown source starts to blur when smoothed —
         // nearest-neighbor keeps the pixel-art edges crisp instead.
-        filterQuality: widget.sizeScale > 1.3
+        filterQuality: widget.animationAssetId != null
+            ? FilterQuality.medium
+            : widget.sizeScale > 1.3
             ? FilterQuality.none
             : FilterQuality.low,
       ),
@@ -519,8 +601,12 @@ class _CompanionStandbyState extends State<CompanionStandby>
                       color: TitoColors.softYellow,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: TitoColors.ink,
-                        width: TitoBorders.element,
+                        color: appVisualStyle.usesTrainerJournal
+                            ? TrainerJournal.smallEdge
+                            : TitoColors.ink,
+                        width: appVisualStyle.usesTrainerJournal
+                            ? TitoBorders.journalElement
+                            : TitoBorders.element,
                       ),
                     ),
                     child: const Icon(
@@ -578,8 +664,12 @@ class _QuoteBubble extends StatelessWidget {
               color: TitoColors.card,
               borderRadius: BorderRadius.circular(TitoRadii.md),
               border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.element,
+                color: appVisualStyle.usesTrainerJournal
+                    ? TrainerJournal.edge
+                    : TitoColors.ink,
+                width: appVisualStyle.usesTrainerJournal
+                    ? TitoBorders.journalElement
+                    : TitoBorders.element,
               ),
               boxShadow: !retroStyle.enabled
                   ? null
@@ -695,6 +785,7 @@ class CompanionStandbyOverlay extends StatelessWidget {
                 formKey: choice?.formKey,
                 isShiny: choice?.isShiny ?? false,
                 animationSourceUrl: choice?.animationSourceUrl,
+                animationAssetId: choice?.animationAssetId,
                 crySourceUrl: choice?.crySourceUrl,
                 compact: compact,
                 sizeScale: companionRepository.sizeScale,

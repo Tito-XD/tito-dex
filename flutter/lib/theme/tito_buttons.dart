@@ -9,6 +9,7 @@ import '../widgets/sticker_pressable.dart';
 import 'app_visual_style.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
+import 'trainer_journal.dart';
 
 /// Flat UI filled action with the compact sizing required by RG screens.
 class TitoPrimaryButton extends StatelessWidget {
@@ -88,8 +89,8 @@ class TitoPrimaryButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: radius,
                   border: Border.all(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
+                    color: TrainerJournal.edge,
+                    width: TitoBorders.journalCard,
                   ),
                 ),
                 child: content,
@@ -230,8 +231,8 @@ class TitoQuickTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: radius,
                   border: Border.all(
-                    color: TitoColors.ink,
-                    width: TitoBorders.card,
+                    color: TrainerJournal.edge,
+                    width: TitoBorders.journalCard,
                   ),
                 ),
                 child: content,
@@ -367,10 +368,10 @@ class TitoPolaroidQuickTile extends StatelessWidget {
                   border: Border.all(
                     color: appVisualStyle.usesSolidPlastic
                         ? Colors.white.withValues(alpha: 0.70)
-                        : TitoColors.ink,
+                        : TrainerJournal.edge,
                     width: appVisualStyle.usesSolidPlastic
                         ? TitoBorders.glass
-                        : TitoBorders.card,
+                        : TitoBorders.journalCard,
                   ),
                 ),
                 child: Padding(
@@ -388,10 +389,12 @@ class TitoPolaroidQuickTile extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: frameColor,
                             borderRadius: BorderRadius.circular(TitoRadii.sm),
-                            border: Border.all(
-                              color: TitoColors.ink,
-                              width: TitoBorders.element,
-                            ),
+                            border: appVisualStyle.usesTrainerJournal
+                                ? null
+                                : Border.all(
+                                    color: TitoColors.ink,
+                                    width: TitoBorders.element,
+                                  ),
                           ),
                           alignment: Alignment.center,
                           child: Icon(icon, color: iconColor, size: iconSize),

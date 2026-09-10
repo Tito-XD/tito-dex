@@ -22,6 +22,7 @@ TitoDex 会在构建阶段整理公开 API、社区资料与技术文档，并�
 
 - [PokéAPI/sprites](https://github.com/PokeAPI/sprites)：游戏精灵、HOME／官方绘图、道具图标、叫声链接及部分动画的上游索引。仓库同时注明部分第五世代风格与 Showdown 动画由 Smogon／Pokémon Showdown 社区贡献；TitoDex 保留这些上游 Credits。
 - [Pokémon Showdown](https://pokemonshowdown.com/) 与 Smogon 社区创作者：由 PokéAPI/sprites 提供的部分社区动画与扩展精灵。
+- [Pokémon Paraíso](https://www.pkparaiso.com/espada_escudo/sprites_pokemon.php) 与 [ShinyHunters](https://www.shinyhunters.com/en/guides)：同行动画候选的来源；APK 只新增来源 URL 与精确身份映射，确认选择后下载原文件并本地缓存。素材整理者署名及底层 Pokémon 媒体权利保持原状；收录范围见 [候选说明](docs/COMPANION_ANIMATION_CATALOG.md)。
 - [PokéSprite](https://github.com/msikma/pokesprite) `c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e`：18 个属性图标的 Gen 8 图标集，项目代码／整理以 MIT 发布；随包许可证见 [`pokesprite-MIT.txt`](flutter/assets/licenses/pokesprite-MIT.txt)。MIT 不改变底层 Pokémon 素材的权利状态。
 - [SteamGridDB](https://www.steamgriddb.com/) 社区来源：部分第一至第五世代游戏入口图标。原下载管线没有保留投稿者身份，因此不猜测作者；现已在 [`SOURCES.json`](flutter/assets/game_icons/SOURCES.json) 逐文件保留 CDN key、来源 URL 与这一限制。各素材权利仍归相应权利人，SteamGridDB 并不代表对 TitoDex 的认可。
 - Pokémon HOME、各代游戏图标、角色绘图、游戏精灵与音频等官方素材：仅用于学习向资料检索与个人游玩辅助，其著作权与商标权归相应权利人所有。
@@ -55,6 +56,7 @@ TitoDex compiles public APIs, community references, and technical documentation 
 - **Project Pokémon** — HGSS save structure, Gen IV Pokémon structure, and HGSS map-index technical references.
 - **Ask TitoDex live-source allowlist** — Chinese questions try 52Poké Wiki first. If no directly supported answer is available, retrieval may fall back to Pokémon.com, Bulbapedia, StrategyWiki, Serebii, PokéAPI, Wikidata, Pokémon Database, Smogon, Marriland, GameFAQs, Game8, IGN, Nintendo Life, and Eurogamer. Tavily and DeepSeek are bounded retrieval/generation services rather than content licensors. Live snippets are used only for the current answer, verification, and per-answer citations; they are not automatically persisted to R2, AI Search, the APK, local bundles, or training data.
 - **PokéAPI/sprites and Pokémon Showdown / Smogon contributors** — upstream sprite, animation, cry, artwork, and item-icon sources. Rights and upstream contributor credits remain with their respective owners.
+- **Pokémon Paraíso and ShinyHunters** — additional companion animation candidates. The APK adds source URLs and exact identity mappings; original files download to a local cache only after confirmation. Source contributor credits and underlying Pokémon-media rights remain unchanged.
 - **PokéSprite** — the vendored Gen 8 type-icon set, pinned at `c5aaa610ff2acdf7fd8e2dccd181bca8be9fcb3e`; MIT project license, with underlying Pokémon-media rights unchanged.
 - **SteamGridDB community sources and official Pokémon media** — selected game-icon sources. Exact retained source keys and URLs are in `flutter/assets/game_icons/SOURCES.json`; the original pipeline did not retain SteamGridDB uploader identities.
 - **Nunito** — bundled UI font, Copyright 2014 The Nunito Project Authors, SIL OFL 1.1.

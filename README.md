@@ -12,8 +12,8 @@
 
 | 渠道 | 版本 | 说明 |
 | --- | --- | --- |
-| Lite APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18+204` | 应用内更新、新手引导与训练家桌面入口，v20 按需下载 |
-| Offline APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18-offline+205` | 同步新增功能并内置完整 v20 图鉴与玩法资料 |
+| Lite APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19+206` | 轻薄训练家手账与按需下载的同行动画，v20 按需下载 |
+| Offline APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19-offline+207` | 同步新增功能并内置完整 v20 图鉴与玩法资料 |
 | Journey Assistant | 主 App 内建 | 结构化资料优先、50 组本地问答与分类道具动效 |
 
 > 名为 `TitoDex-1.0.x-*` 的旧附件属于已冻结的 Flutter 之前原型，仅保留作历史记录，并不比当前 0.9.x 版本更新。
@@ -31,6 +31,8 @@
 - **系统语言**：界面支持简体中文和英文，跟随系统或 Android 单独设置的 App 语言，无 App 内语言开关；名称优先使用现有英文资料，缺少翻译的正文仍保留原文。
 
 - **30 周年 Logo**：点开宝可梦立绘后，可切换周年展示并选择该物种的官方形态 Logo。目录保留 1324 项（1025 张基础图与 299 个额外文件），优先匹配已核验形态，未知形态明确提示并支持手动选择；图片按需联网加载，不改变原形态、闪光状态或图鉴数据。
+- **同行动画候选**：按游戏素材集与来源选择 Paraíso、ShinyHunters 动画，确认后下载并验证；普通／异色与形态精确匹配，失败保留原同行宝可梦。首批覆盖 546 个物种，未覆盖形态保留既有来源。
+- **训练家手账更新**：减轻描边、纸边阴影与文字粗细，加入相片、胶带和旅程横线；沿用现有字号、布局及字体资源。
 - **三套内置主题**：训练家手帐、固态塑料与扁平贴纸可在设置中切换并持久保存；正式版首次启动仍使用训练家手帐。页面展开、返回和内容揭示会随主题调整，并尊重系统减少动态效果设置。
 - **旅程首页**：显示当前游戏、地点、队伍、徽章、游玩时间与常用入口。
 - **旅程详情**：当前地点下方直接进入问 TitoDex；训练家资料与同代另一版本的直遇缺口使用紧凑网格，其余未捕获集合可转到图鉴筛选。队伍与进化集中在队伍页。
@@ -70,12 +72,12 @@
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.18-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.18-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.18 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
+前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.19-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.19-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.19 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
-- **[Lite · 29.13 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-lite-rg-arm64.apk)**：推荐，需要时可在设置中下载离线数据。
-- **[Offline · 95.25 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-offline-rg-arm64.apk)**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。
+- **[Lite](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-lite-rg-arm64.apk)**：推荐，需要时可在设置中下载离线数据。
+- **[Offline](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-offline-rg-arm64.apk)**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。
 
-v0.9.18 新增设置内检查更新：启动时每 24 小时最多自动检查一次，按当前 Lite／Offline 匹配 GitHub 正式版；用户确认下载，校验后交给系统安装。0.9.17 及更早版本需先手动安装本版，APK 下载期间保持 App 运行。也可使用[网站下载入口](https://titodex.pages.dev/app#download)。
+自 v0.9.18 起支持设置内检查更新：启动时每 24 小时最多自动检查一次，按当前 Lite／Offline 匹配 GitHub 正式版；用户确认下载，校验后交给系统安装。0.9.17 及更早版本需先手动安装本版，APK 下载期间保持 App 运行。也可使用[网站下载入口](https://titodex.pages.dev/app#download)。
 
 如果 Android 提示与本地 Debug 包签名冲突，请先卸载 Debug 包再安装正式版。
 

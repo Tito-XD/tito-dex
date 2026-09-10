@@ -14,6 +14,7 @@ import '../../models/journey.dart';
 import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/trainer_journal.dart';
 import '../../widgets/dex_sprite_image.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
@@ -188,7 +189,7 @@ class _LocationAreaChip extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.8),
             width: TitoBorders.glass,
           )
-        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
+        : TrainerJournal.allElement();
     return Material(
       color: appVisualStyle.usesFlatUi
           ? scheme.surfaceContainerLow

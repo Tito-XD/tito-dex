@@ -14,6 +14,7 @@ import '../features/dex/type_chart.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
@@ -317,7 +318,7 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
 /// Outline for the collapsible picker header (field-like control).
 BoxBorder? _companionControlBorder() {
   if (appVisualStyle.usesTrainerJournal) {
-    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+    return TrainerJournal.allElement();
   }
   if (appVisualStyle.usesSolidPlastic) {
     return Border.all(
@@ -333,13 +334,15 @@ BoxBorder? _companionControlBorder() {
 /// borderless (Flat).
 BoxBorder? _typeTileBorder(bool active) {
   if (active) {
-    return Border.all(color: TitoColors.ink, width: TitoBorders.element);
+    return appVisualStyle.usesTrainerJournal
+        ? Border.all(
+            color: TrainerJournal.selectedEdge,
+            width: TitoBorders.journalElement,
+          )
+        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
   }
   if (appVisualStyle.usesTrainerJournal) {
-    return Border.all(
-      color: TitoColors.ink.withValues(alpha: 0.35),
-      width: TitoBorders.element,
-    );
+    return null;
   }
   if (appVisualStyle.usesSolidPlastic) {
     return Border.all(
@@ -523,7 +526,10 @@ List<DefensiveAbilityOption> defensiveAbilityOptionsFrom(
       .map(
         (ability) => DefensiveAbilityOption(
           slug: abilitySlugFromNameEn(ability.nameEn),
-          labelZh: localizedName(nameEn: ability.nameEn, nameZh: ability.nameZh),
+          labelZh: localizedName(
+            nameEn: ability.nameEn,
+            nameZh: ability.nameZh,
+          ),
           isHidden: ability.isHidden,
         ),
       )

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
 import 'tito_delayed_loading.dart';
 import 'tito_pokeball_loading.dart';
@@ -43,11 +44,8 @@ class TitoSkeletonBox extends StatelessWidget {
         width: TitoBorders.glass,
       );
     } else {
-      fill = TitoColors.card.withValues(alpha: 0.45);
-      border = Border.all(
-        color: TitoColors.ink.withValues(alpha: 0.10),
-        width: TitoBorders.element,
-      );
+      fill = TrainerJournal.cell;
+      border = null;
     }
     final box = Container(
       width: width,

@@ -24,6 +24,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/dex_filter_banner.dart';
 import '../widgets/dex_search_filter_sheet.dart';
 import '../widgets/handheld_input.dart';
@@ -1196,7 +1197,7 @@ class _ScrollToTopButton extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.8),
             width: TitoBorders.glass,
           )
-        : const BorderSide(color: TitoColors.ink, width: TitoBorders.card);
+        : TrainerJournal.cardSide;
     return Semantics(
       button: true,
       label: _label,
@@ -1268,6 +1269,8 @@ class _DexTopBarAction extends StatelessWidget {
     // so the label and icon read as one control).
     final strokeWidth = appVisualStyle.usesSolidPlastic
         ? TitoBorders.glass
+        : appVisualStyle.usesTrainerJournal
+        ? TitoBorders.journalCard
         : TitoBorders.card;
     return HandheldFocusDecorator(
       onActivate: onTap,

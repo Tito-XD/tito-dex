@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_visual_style.dart';
 import 'tito_colors.dart';
 import 'tito_typography.dart';
+import 'trainer_journal.dart';
 
 ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.classic]) =>
     switch (style) {
@@ -526,8 +527,8 @@ ThemeData _buildClassicTheme() {
 
   TextStyle baseStyle({
     double fontSize = 14,
-    FontWeight fontWeight = FontWeight.w600,
-    Color color = TitoColors.ink,
+    FontWeight fontWeight = FontWeight.w400,
+    Color color = TrainerJournal.ink,
     double? height,
     double? letterSpacing,
   }) => TextStyle(
@@ -541,7 +542,7 @@ ThemeData _buildClassicTheme() {
 
   TextStyle headingStyle({
     required double fontSize,
-    FontWeight fontWeight = FontWeight.w800,
+    FontWeight fontWeight = FontWeight.w700,
   }) => baseStyle(
     fontSize: fontSize,
     fontWeight: fontWeight,
@@ -557,29 +558,26 @@ ThemeData _buildClassicTheme() {
     headlineSmall: headingStyle(fontSize: 20),
     titleLarge: headingStyle(fontSize: 20),
     titleMedium: headingStyle(fontSize: 18),
-    titleSmall: headingStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    titleSmall: headingStyle(fontSize: 16, fontWeight: FontWeight.w600),
     bodyLarge: baseStyle(fontSize: 16),
     bodyMedium: baseStyle(fontSize: 14),
-    bodySmall: baseStyle(fontSize: 12, color: TitoColors.mutedInk),
-    labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w800),
-    labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w700),
+    bodySmall: baseStyle(fontSize: 12, color: TrainerJournal.muted),
+    labelLarge: baseStyle(fontSize: 14, fontWeight: FontWeight.w700),
+    labelMedium: baseStyle(fontSize: 12, fontWeight: FontWeight.w600),
     labelSmall: baseStyle(
       fontSize: 11,
-      fontWeight: FontWeight.w700,
-      color: TitoColors.mutedInk,
+      fontWeight: FontWeight.w600,
+      color: TrainerJournal.muted,
     ),
   );
   final scheme = ColorScheme.fromSeed(
     seedColor: TitoColors.deepBlue,
     primary: TitoColors.deepBlue,
     secondary: TitoColors.coral,
-    surface: TitoColors.card,
+    surface: TrainerJournal.paper,
   );
-  const cardSide = BorderSide(color: TitoColors.ink, width: TitoBorders.card);
-  const elementSide = BorderSide(
-    color: TitoColors.ink,
-    width: TitoBorders.element,
-  );
+  const cardSide = TrainerJournal.cardSide;
+  const elementSide = TrainerJournal.elementSide;
   final mediumShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(TitoRadii.md),
     side: cardSide,
@@ -588,7 +586,7 @@ ThemeData _buildClassicTheme() {
     borderRadius: BorderRadius.circular(TitoRadii.sm),
   );
   final menuStyle = MenuStyle(
-    backgroundColor: const WidgetStatePropertyAll(TitoColors.card),
+    backgroundColor: const WidgetStatePropertyAll(TrainerJournal.paper),
     surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
     shape: WidgetStatePropertyAll(mediumShape),
     elevation: const WidgetStatePropertyAll(0),
@@ -614,18 +612,18 @@ ThemeData _buildClassicTheme() {
       },
     ),
     bottomSheetTheme: const BottomSheetThemeData(
-      backgroundColor: TitoColors.card,
+      backgroundColor: TrainerJournal.paper,
       surfaceTintColor: Colors.transparent,
       modalBarrierColor: Color(0x73221F26),
       showDragHandle: true,
-      dragHandleColor: TitoColors.mutedInk,
+      dragHandleColor: TrainerJournal.muted,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(TitoRadii.lg)),
         side: cardSide,
       ),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: TitoColors.card,
+      backgroundColor: TrainerJournal.paper,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -636,7 +634,7 @@ ThemeData _buildClassicTheme() {
       contentTextStyle: textTheme.bodyMedium,
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: TitoColors.card,
+      backgroundColor: TrainerJournal.paper,
       selectedColor: TitoColors.mint,
       disabledColor: TitoColors.cardWarm.withValues(alpha: 0.6),
       surfaceTintColor: Colors.transparent,
@@ -644,7 +642,7 @@ ThemeData _buildClassicTheme() {
       shape: smallShape,
       labelStyle: textTheme.labelMedium,
       secondaryLabelStyle: textTheme.labelMedium,
-      checkmarkColor: TitoColors.ink,
+      checkmarkColor: TrainerJournal.ink,
       showCheckmark: true,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       labelPadding: const EdgeInsets.symmetric(horizontal: 4),
@@ -652,12 +650,12 @@ ThemeData _buildClassicTheme() {
       pressElevation: 0,
     ),
     dividerTheme: DividerThemeData(
-      color: TitoColors.ink.withValues(alpha: 0.18),
+      color: TrainerJournal.ink.withValues(alpha: 0.12),
       thickness: 1,
       space: 24,
     ),
     popupMenuTheme: PopupMenuThemeData(
-      color: TitoColors.card,
+      color: TrainerJournal.paper,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       shape: mediumShape,
@@ -673,9 +671,9 @@ ThemeData _buildClassicTheme() {
         backgroundColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
               ? TitoColors.softYellow
-              : TitoColors.card,
+              : TrainerJournal.paper,
         ),
-        foregroundColor: const WidgetStatePropertyAll(TitoColors.ink),
+        foregroundColor: const WidgetStatePropertyAll(TrainerJournal.ink),
         side: const WidgetStatePropertyAll(elementSide),
         shape: WidgetStatePropertyAll(smallShape),
         elevation: const WidgetStatePropertyAll(0),
@@ -686,8 +684,8 @@ ThemeData _buildClassicTheme() {
     ),
     listTileTheme: ListTileThemeData(
       dense: true,
-      iconColor: TitoColors.ink,
-      textColor: TitoColors.ink,
+      iconColor: TrainerJournal.ink,
+      textColor: TrainerJournal.ink,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       shape: smallShape,
     ),
@@ -707,7 +705,7 @@ ThemeData _buildClassicTheme() {
       fillColor: WidgetStateProperty.resolveWith(
         (states) => states.contains(WidgetState.selected)
             ? TitoColors.deepBlue
-            : TitoColors.ink,
+            : TrainerJournal.ink,
       ),
     ),
     appBarTheme: AppBarTheme(
@@ -716,7 +714,7 @@ ThemeData _buildClassicTheme() {
       titleTextStyle: textTheme.titleLarge?.copyWith(color: TitoColors.card),
     ),
     cardTheme: CardThemeData(
-      color: TitoColors.card,
+      color: TrainerJournal.paper,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       margin: EdgeInsets.zero,
@@ -752,16 +750,16 @@ ThemeData _buildClassicTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: TitoColors.card,
+      fillColor: TrainerJournal.paper,
       labelStyle: textTheme.bodySmall?.copyWith(
-        color: TitoColors.mutedInk,
-        fontWeight: FontWeight.w700,
+        color: TrainerJournal.muted,
+        fontWeight: FontWeight.w600,
       ),
-      hintStyle: textTheme.bodyMedium?.copyWith(color: TitoColors.mutedInk),
+      hintStyle: textTheme.bodyMedium?.copyWith(color: TrainerJournal.muted),
       helperStyle: textTheme.bodySmall,
       errorStyle: textTheme.bodySmall?.copyWith(
         color: TitoColors.coral,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -773,10 +771,7 @@ ThemeData _buildClassicTheme() {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: const BorderSide(
-          color: TitoColors.coral,
-          width: TitoBorders.card,
-        ),
+        borderSide: const BorderSide(color: TitoColors.coral, width: 1.6),
       ),
     ),
   );

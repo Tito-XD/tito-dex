@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 
 /// Sticker-framed Pokémon sprite: white pad + ink outline (design system).
@@ -44,12 +45,12 @@ class TitoSpriteSticker extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.78),
         width: TitoBorders.glass,
       );
-      shadow = () => retroStyle.enabled ? SolidPlasticShadows.stickerSmall : null;
+      shadow = () =>
+          retroStyle.enabled ? SolidPlasticShadows.stickerSmall : null;
     } else {
       fill = Colors.white;
-      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
-      shadow = () =>
-          retroStyle.enabled ? TrainerJournalShadows.stickerSmall : null;
+      border = TrainerJournal.allElement();
+      shadow = () => null;
     }
 
     return ListenableBuilder(

@@ -4,6 +4,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'liquid_glass.dart';
 
 /// Retro form language shared across Settings, team editing, and the battle
@@ -11,8 +12,8 @@ import 'liquid_glass.dart';
 /// engraved input fills, and pill toggles with a state dot.
 ///
 /// Every component branches on the three visual styles the same way
-/// `sticker_card.dart` does: Trainer's Journal keeps the ink-outlined sticker
-/// look with hard offset shadows, Solid Plastic swaps to milky glass, and
+/// `sticker_card.dart` does: Trainer's Journal uses a thin gray-blue outline
+/// and a paper-edge shadow, Solid Plastic swaps to milky glass, and
 /// Flat UI hands the control to Material so it inherits the theme.
 
 Color _glassOutline([double alpha = 0.78]) =>
@@ -64,8 +65,10 @@ class StickerSwitch extends StatelessWidget {
                           : TitoColors.cardWarm),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: plastic ? _glassOutline() : TitoColors.ink,
-                  width: plastic ? TitoBorders.glass : TitoBorders.element,
+                  color: plastic ? _glassOutline() : TrainerJournal.smallEdge,
+                  width: plastic
+                      ? TitoBorders.glass
+                      : TitoBorders.journalElement,
                 ),
                 boxShadow: !retroStyle.enabled
                     ? null
@@ -88,8 +91,10 @@ class StickerSwitch extends StatelessWidget {
                       : (plastic ? Colors.white : TitoColors.card),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: plastic ? _glassOutline() : TitoColors.ink,
-                    width: plastic ? TitoBorders.glass : TitoBorders.element,
+                    color: plastic ? _glassOutline() : TrainerJournal.smallEdge,
+                    width: plastic
+                        ? TitoBorders.glass
+                        : TitoBorders.journalElement,
                   ),
                 ),
               ),
@@ -160,8 +165,8 @@ class StickerGroupLabel extends StatelessWidget {
               color: TitoColors.softYellow,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: TitoColors.ink,
-                width: TitoBorders.element,
+                color: TrainerJournal.smallEdge,
+                width: TitoBorders.journalElement,
               ),
               boxShadow: retroStyle.enabled
                   ? TrainerJournalShadows.stickerSmall
@@ -235,7 +240,10 @@ class StickerIconPlate extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(size * 0.32),
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: Border.all(
+          color: TrainerJournal.smallEdge,
+          width: TitoBorders.journalElement,
+        ),
       ),
       alignment: Alignment.center,
       child: glyph,
@@ -254,7 +262,7 @@ class StickerRowDivider extends StatelessWidget {
     }
     final dashColor = appVisualStyle.usesSolidPlastic
         ? Colors.white.withValues(alpha: 0.6)
-        : TitoColors.ink.withValues(alpha: 0.35);
+        : TrainerJournal.ink.withValues(alpha: 0.22);
     return LayoutBuilder(
       builder: (context, constraints) {
         const dashWidth = 6.0;
@@ -302,15 +310,14 @@ InputDecoration retroInsetDecoration({
     return decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
   }
   final plastic = appVisualStyle.usesSolidPlastic;
-  OutlineInputBorder border(Color color, [double? width]) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(TitoRadii.md),
-        borderSide: BorderSide(
-          color: color,
-          width: width ?? (plastic ? TitoBorders.glass : TitoBorders.card),
-        ),
-      );
-  final outline = plastic ? _glassOutline() : TitoColors.ink;
+  OutlineInputBorder border(Color color, [double? width]) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(TitoRadii.md),
+    borderSide: BorderSide(
+      color: color,
+      width: width ?? (plastic ? TitoBorders.glass : TitoBorders.journalCard),
+    ),
+  );
+  final outline = plastic ? _glassOutline() : TrainerJournal.edge;
   return InputDecoration(
     labelText: labelText,
     hintText: hintText,
@@ -323,7 +330,7 @@ InputDecoration retroInsetDecoration({
         : TitoColors.cardWarm,
     border: border(outline),
     enabledBorder: border(outline),
-    focusedBorder: border(TitoColors.coral, TitoBorders.card),
+    focusedBorder: border(TitoColors.coral, plastic ? TitoBorders.card : 1.6),
   );
 }
 
@@ -360,8 +367,8 @@ class StickerPillToggle extends StatelessWidget {
             : (plastic ? Colors.white : TitoColors.card),
         shape: BoxShape.circle,
         border: Border.all(
-          color: plastic ? _glassOutline() : TitoColors.ink,
-          width: plastic ? TitoBorders.glass : TitoBorders.element,
+          color: plastic ? _glassOutline() : TrainerJournal.smallEdge,
+          width: plastic ? TitoBorders.glass : TitoBorders.journalElement,
         ),
       ),
     );
@@ -384,8 +391,8 @@ class StickerPillToggle extends StatelessWidget {
                       : TitoColors.cardWarm),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: plastic ? _glassOutline() : TitoColors.ink,
-              width: plastic ? TitoBorders.glass : TitoBorders.element,
+              color: plastic ? _glassOutline() : TrainerJournal.smallEdge,
+              width: plastic ? TitoBorders.glass : TitoBorders.journalElement,
             ),
             boxShadow: !retroStyle.enabled
                 ? null

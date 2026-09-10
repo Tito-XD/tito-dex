@@ -8,6 +8,7 @@ import '../models/journey.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_buttons.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/journey_timeline.dart';
 import '../widgets/journey_assistant_panel.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -213,6 +214,7 @@ class JourneyPage extends StatelessWidget {
                   _TrainerFact(
                     label: AppZh.settingsBadges,
                     value: journey.badgeProgressLabel,
+                    stamp: true,
                   ),
                   _TrainerFact(
                     label: AppZh.settingsCurrentGame,
@@ -232,13 +234,20 @@ String _formatSaveDate(DateTime value) =>
     '${value.year}/${value.month.toString().padLeft(2, '0')}/${value.day.toString().padLeft(2, '0')}';
 
 class _TrainerFact extends StatelessWidget {
-  const _TrainerFact({required this.label, required this.value});
+  const _TrainerFact({
+    required this.label,
+    required this.value,
+    this.stamp = false,
+  });
   final String label;
   final String value;
+  final bool stamp;
 
   @override
-  Widget build(BuildContext context) =>
-      TitoFactTile(title: label, child: Text(value));
+  Widget build(BuildContext context) => TitoFactTile(
+    title: label,
+    child: stamp ? JournalStampLabel(child: Text(value)) : Text(value),
+  );
 }
 
 class _SummaryMeta extends StatelessWidget {

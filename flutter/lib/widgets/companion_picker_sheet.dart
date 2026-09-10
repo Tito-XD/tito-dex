@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../features/companion/companion_animation_catalog.dart';
 import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/dex_models.dart';
@@ -16,6 +17,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_pressable.dart';
@@ -56,13 +58,31 @@ Future<CompanionChoice?> adoptCompanion(
   bool isShiny = false,
   String? animationSourceUrl,
   String? animationLabel,
+  CompanionAnimationAsset? animationAsset,
   String? crySourceUrl,
   String? cryLabel,
   bool useGenericAnimation = true,
   List<String> formArtCandidates = const [],
   bool formArtIsShiny = false,
+  CompanionMediaCache? mediaCache,
 }) async {
-  if (!bundledCompanionIds.contains(summary.id)) {
+  final cache = mediaCache ?? companionMediaCache;
+  if (animationAsset != null) {
+    if (!animationAsset.matches(summary.id, formKey, isShiny)) return null;
+    final cached = await cache.cachedAnimationPath(animationAsset);
+    if (!context.mounted) return null;
+    if (cached == null) {
+      final ready = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _CompanionAnimationDownloadDialog(
+          asset: animationAsset,
+          cache: cache,
+        ),
+      );
+      if (ready != true || !context.mounted) return null;
+    }
+  } else if (!bundledCompanionIds.contains(summary.id)) {
     final ready = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -86,8 +106,9 @@ Future<CompanionChoice?> adoptCompanion(
     nameZh: summary.nameZh,
     formKey: formKey,
     isShiny: isShiny,
-    animationSourceUrl: animationSourceUrl,
-    animationLabel: animationLabel,
+    animationSourceUrl: animationAsset?.url ?? animationSourceUrl,
+    animationAssetId: animationAsset?.id,
+    animationLabel: animationAsset?.label ?? animationLabel,
     crySourceUrl: crySourceUrl,
     cryLabel: cryLabel,
   );
@@ -99,12 +120,20 @@ Future<CompanionChoice?> adoptCompanion(
 /// standby companion. Returns the saved choice, or null when cancelled.
 Future<CompanionChoice?> showCompanionFormPickerSheet(
   BuildContext context,
-  PokemonSummary summary,
-) {
+  PokemonSummary summary, {
+  Future<(PokemonDetail, OnlineMediaEntry?)>? data,
+  CompanionAnimationCatalog? animationCatalog,
+  CompanionMediaCache? mediaCache,
+}) {
   return showTitoModalBottomSheet<CompanionChoice>(
     context: context,
     isScrollControlled: true,
-    builder: (context) => _CompanionFormPickerSheet(summary: summary),
+    builder: (context) => _CompanionFormPickerSheet(
+      summary: summary,
+      data: data,
+      animationCatalog: animationCatalog,
+      mediaCache: mediaCache,
+    ),
   );
 }
 
@@ -244,6 +273,102 @@ class _CompanionPickerSheetState extends State<_CompanionPickerSheet> {
 }
 
 enum _MediaLoadState { loading, done, failed }
+
+/// Starts only after the user confirms the candidate, including for starters.
+class _CompanionAnimationDownloadDialog extends StatefulWidget {
+  const _CompanionAnimationDownloadDialog({
+    required this.asset,
+    required this.cache,
+  });
+  final CompanionAnimationAsset asset;
+  final CompanionMediaCache cache;
+  @override
+  State<_CompanionAnimationDownloadDialog> createState() =>
+      _CompanionAnimationDownloadDialogState();
+}
+
+class _CompanionAnimationDownloadDialogState
+    extends State<_CompanionAnimationDownloadDialog> {
+  CompanionDownloadCancellation? _cancellation;
+  var _received = 0;
+  var _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _download();
+  }
+
+  Future<void> _download() async {
+    final cancellation = CompanionDownloadCancellation();
+    _cancellation = cancellation;
+    setState(() {
+      _received = 0;
+      _failed = false;
+    });
+    final path = await widget.cache.ensureAnimation(
+      widget.asset,
+      cancellation: cancellation,
+      onProgress: (received, _) {
+        if (mounted && !cancellation.isCancelled) {
+          setState(() => _received = received);
+        }
+      },
+    );
+    if (!mounted || cancellation.isCancelled) return;
+    if (path != null) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(() => _failed = true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _cancellation?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(AppZh.companionAnimationDownload),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.asset.label),
+        const SizedBox(height: 8),
+        Text('${widget.asset.dimensionsLabel} · ${widget.asset.sizeLabel}'),
+        const SizedBox(height: 12),
+        if (_failed)
+          Text(AppZh.companionAnimationFailed)
+        else ...[
+          LinearProgressIndicator(value: _received / widget.asset.sizeBytes),
+          const SizedBox(height: 8),
+          Text(
+            _received == widget.asset.sizeBytes
+                ? AppZh.companionAnimationVerify
+                : '${(_received * 100 / widget.asset.sizeBytes).round()}%',
+          ),
+        ],
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () {
+          _cancellation?.cancel();
+          Navigator.of(context).pop(false);
+        },
+        child: Text(AppZh.cancel),
+      ),
+      if (_failed)
+        TextButton(
+          onPressed: _download,
+          child: Text(AppZh.companionAnimationRetry),
+        ),
+    ],
+  );
+}
 
 /// Cancellable preload dialog — downloads the animated GIF and cry to the
 /// disk cache before the choice is committed, so the home standby and the
@@ -504,9 +629,17 @@ class _CompanionPickTile extends StatelessWidget {
 
 /// Second-step form + shiny picker for the standby companion.
 class _CompanionFormPickerSheet extends StatefulWidget {
-  const _CompanionFormPickerSheet({required this.summary});
+  const _CompanionFormPickerSheet({
+    required this.summary,
+    this.data,
+    this.animationCatalog,
+    this.mediaCache,
+  });
 
   final PokemonSummary summary;
+  final Future<(PokemonDetail, OnlineMediaEntry?)>? data;
+  final CompanionAnimationCatalog? animationCatalog;
+  final CompanionMediaCache? mediaCache;
 
   @override
   State<_CompanionFormPickerSheet> createState() =>
@@ -519,6 +652,11 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
   String? _selectedFormKey;
   String? _selectedAnimationUrl;
   String? _selectedAnimationLabel;
+  String? _selectedAnimationAssetId;
+  CompanionAnimationCatalog? _animationCatalog;
+  Map<String, CachedMediaFile> _cachedFiles = const {};
+  bool _catalogFailed = false;
+  bool _confirming = false;
   String? _selectedCryUrl;
   String? _selectedCryLabel;
   var _isShiny = false;
@@ -526,13 +664,61 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
   @override
   void initState() {
     super.initState();
+    final current = companionRepository.choice;
+    if (current?.pokemonId == widget.summary.id) {
+      _selectedFormKey = current?.formKey;
+      _isShiny = current?.isShiny ?? false;
+      _selectedAnimationAssetId = current?.animationAssetId;
+      _selectedAnimationUrl = _selectedAnimationAssetId == null
+          ? current?.animationSourceUrl
+          : null;
+      _selectedAnimationLabel = current?.animationLabel;
+      _selectedCryUrl = current?.crySourceUrl;
+      _selectedCryLabel = current?.cryLabel;
+    }
     _dataFuture = _loadData();
   }
 
+  CompanionAnimationAsset? get _selectedAsset =>
+      _animationCatalog?.entry(_selectedAnimationAssetId);
+
+  String? _cachedAssetPath(CompanionAnimationAsset asset) {
+    final file = _cachedFiles[asset.cacheFileName];
+    return file?.sizeBytes == asset.sizeBytes ? file?.path : null;
+  }
+
+  Future<void> _loadAnimationCatalog() async {
+    try {
+      _animationCatalog =
+          widget.animationCatalog ?? await CompanionAnimationCatalog.load();
+      final files = await (widget.mediaCache ?? companionMediaCache)
+          .listCached();
+      _cachedFiles = {for (final file in files) file.name: file};
+      if (_selectedAnimationAssetId != null &&
+          !(_selectedAsset?.matches(
+                widget.summary.id,
+                _selectedFormKey,
+                _isShiny,
+              ) ??
+              false)) {
+        _selectedAnimationAssetId = null;
+        _selectedAnimationLabel = null;
+      }
+    } catch (_) {
+      _catalogFailed = true;
+    }
+  }
+
   Future<(PokemonDetail, OnlineMediaEntry?)> _loadData() async {
+    final supplied = widget.data;
+    if (supplied != null) {
+      final values = await (supplied, _loadAnimationCatalog()).wait;
+      return values.$1;
+    }
     final values = await Future.wait<Object?>([
       dexRepository.getDetail(widget.summary.id),
       onlineMediaCatalog.entryFor(widget.summary.id),
+      _loadAnimationCatalog(),
     ]);
     return (values[0] as PokemonDetail, values[1] as OnlineMediaEntry?);
   }
@@ -548,24 +734,26 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
     required PokemonFormDetail? form,
   }) {
     final mediaId = summary.spriteResourceId ?? summary.id;
-    if (form != null &&
-        !companionFormUsesIdAnimation(
+    final generic =
+        form == null ||
+        companionFormUsesIdAnimation(
           speciesId: summary.id,
           mediaId: mediaId,
           isDefault: form.isDefault,
-        )) {
-      return const [];
-    }
-    final options = spriteEditionOptionsForPokemon(
-      mediaId,
-      cdnUrlsByVersion: summary.spriteUrlsByVersion,
-      fallbackSpriteUrl: summary.displaySpritePath,
-    );
+        );
+    final options = generic
+        ? spriteEditionOptionsForPokemon(
+            mediaId,
+            cdnUrlsByVersion: summary.spriteUrlsByVersion,
+            fallbackSpriteUrl: summary.displaySpritePath,
+          )
+        : const <SpriteEditionOption>[];
     final seen = <String>{};
     return [
       for (final option in options)
         if (option.animatedUrl case final url?)
-          if (seen.add(url))
+          if ((!_isShiny || shinySpriteVariantUrl(url) != null) &&
+              seen.add(url))
             _LabeledMediaSource(
               url: url,
               label: option.generation == spriteGenerationUniversal
@@ -573,6 +761,19 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                   : '${generationRomanLabel(option.generation)} · '
                         '${option.editionLabelZh}',
             ),
+      for (final asset
+          in _animationCatalog?.forForm(
+                summary.id,
+                formKey: form?.key,
+                shiny: _isShiny,
+              ) ??
+              const <CompanionAnimationAsset>[])
+        if (seen.add(asset.url))
+          _LabeledMediaSource(
+            url: asset.url,
+            label: asset.label,
+            animation: asset,
+          ),
     ];
   }
 
@@ -622,30 +823,46 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
         media?.artCandidatesFor(formKey, shiny: _isShiny) ?? const [];
     final normalArt = media?.artCandidatesFor(formKey) ?? const [];
     final formArtCandidates = shinyArt.isNotEmpty ? shinyArt : normalArt;
-    if (!mounted) {
+    if (!mounted || _confirming) {
       return;
     }
-    final choice = await adoptCompanion(
-      context,
-      summary,
-      formKey: formKey,
-      isShiny: _isShiny,
-      animationSourceUrl: _selectedAnimationUrl,
-      animationLabel: _selectedAnimationLabel,
-      crySourceUrl: _selectedCryUrl,
-      cryLabel: _selectedCryLabel,
-      useGenericAnimation:
-          form == null ||
-          companionFormUsesIdAnimation(
-            speciesId: widget.summary.id,
-            mediaId: form.pokemonId,
-            isDefault: form.isDefault,
-          ),
-      formArtCandidates: formArtCandidates,
-      formArtIsShiny: shinyArt.isNotEmpty,
-    );
-    if (choice != null && mounted) {
-      Navigator.of(context).pop(choice);
+    final selectedValue = _selectedAnimationAssetId ?? _selectedAnimationUrl;
+    final selection = _animationChoices(summary, form: form)
+        .cast<_LabeledMediaSource?>()
+        .firstWhere(
+          (choice) => choice?.value == selectedValue,
+          orElse: () => null,
+        );
+    setState(() => _confirming = true);
+    try {
+      final choice = await adoptCompanion(
+        context,
+        summary,
+        formKey: formKey,
+        isShiny: _isShiny,
+        animationSourceUrl: selection?.animation == null
+            ? selection?.url
+            : null,
+        animationLabel: selection == null
+            ? null
+            : _selectedAnimationLabel ?? selection.label,
+        animationAsset: selection?.animation,
+        mediaCache: widget.mediaCache,
+        crySourceUrl: _selectedCryUrl,
+        cryLabel: _selectedCryLabel,
+        useGenericAnimation:
+            form == null ||
+            companionFormUsesIdAnimation(
+              speciesId: widget.summary.id,
+              mediaId: form.pokemonId,
+              isDefault: form.isDefault,
+            ),
+        formArtCandidates: formArtCandidates,
+        formArtIsShiny: shinyArt.isNotEmpty,
+      );
+      if (choice != null && mounted) Navigator.of(context).pop(choice);
+    } finally {
+      if (mounted) setState(() => _confirming = false);
     }
   }
 
@@ -689,29 +906,32 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                 const [];
             final normalFormArt =
                 media?.artCandidatesFor(_selectedFormKey) ?? const [];
-            final formArtCandidates = shinyFormArt.isNotEmpty
-                ? shinyFormArt
-                : normalFormArt;
-            final selectedAnimationShiny = _selectedAnimationUrl == null
-                ? null
-                : shinySpriteVariantUrl(_selectedAnimationUrl!);
+            final asset = _selectedAsset;
+            final cachedAsset = asset == null ? null : _cachedAssetPath(asset);
+            // Selecting/browsing a source does not fetch its remote animation.
+            // Preview an already downloaded file or exact static artwork.
             final previewSources = <String>[
-              if (_isShiny && selectedAnimationShiny != null)
-                selectedAnimationShiny,
-              if (_isShiny && useGenericAnimation)
-                ...animatedShinySpriteCandidatesFor(previewMediaId),
-              if (!_isShiny &&
-                  useGenericAnimation &&
-                  _selectedAnimationUrl != null)
-                _selectedAnimationUrl!,
-              if (useGenericAnimation)
-                ...companionGifDownloadCandidates(previewMediaId),
-              ...formArtCandidates,
-              if (previewSummary.displayArtworkPath case final source?) source,
-              if (previewSummary.displaySpritePath case final source?) source,
-              if (useGenericAnimation) cdnStaticSpriteUrlFor(previewMediaId),
-              if (useGenericAnimation) defaultSpriteUrlFor(previewMediaId),
+              if (cachedAsset != null) cachedAsset,
+              if (_isShiny) ...[
+                ...shinyFormArt,
+                if (useGenericAnimation)
+                  if (shinySpriteVariantUrl(defaultSpriteUrlFor(previewMediaId))
+                      case final source?)
+                    source,
+              ] else ...[
+                ...normalFormArt,
+                if (previewSummary.displayArtworkPath case final source?)
+                  source,
+                if (previewSummary.displaySpritePath case final source?) source,
+                if (useGenericAnimation) defaultSpriteUrlFor(previewMediaId),
+              ],
             ];
+            final selectedValue =
+                _selectedAnimationAssetId ?? _selectedAnimationUrl ?? '';
+            final dropdownValue =
+                animationChoices.any((choice) => choice.value == selectedValue)
+                ? selectedValue
+                : '';
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -729,7 +949,12 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                       onSelected:
                           hasForms ||
                               snapshot.connectionState == ConnectionState.done
-                          ? (value) => setState(() => _isShiny = value)
+                          ? (value) => setState(() {
+                              _isShiny = value;
+                              _selectedAnimationAssetId = null;
+                              _selectedAnimationUrl = null;
+                              _selectedAnimationLabel = null;
+                            })
                           : null,
                       avatar: const Icon(Icons.auto_awesome_rounded, size: 16),
                       label: Text(AppZh.companionPickerShiny),
@@ -790,6 +1015,7 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                           onTap: () => setState(() {
                             _selectedFormKey = form.key;
                             _selectedAnimationUrl = null;
+                            _selectedAnimationAssetId = null;
                             _selectedAnimationLabel = null;
                             _selectedCryUrl = null;
                             _selectedCryLabel = null;
@@ -828,9 +1054,9 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                           DropdownButtonFormField<String>(
                             key: ValueKey(
                               'animation-${previewSummary.spriteResourceId}'
-                              '-${_selectedAnimationUrl ?? 'auto'}',
+                              '-$_isShiny-$dropdownValue',
                             ),
-                            initialValue: _selectedAnimationUrl ?? '',
+                            initialValue: dropdownValue,
                             isExpanded: true,
                             decoration: InputDecoration(
                               labelText: AppZh.companionPickerGifSource,
@@ -843,25 +1069,40 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                               ),
                               for (final choice in animationChoices)
                                 DropdownMenuItem(
-                                  value: choice.url,
+                                  value: choice.value,
                                   child: Text(
-                                    choice.label,
+                                    '${choice.label}${choice.animation != null && _cachedAssetPath(choice.animation!) != null ? ' · ${AppZh.companionAnimationCached}' : ''}',
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                             ],
                             onChanged: (value) => setState(() {
-                              _selectedAnimationUrl =
-                                  value == null || value.isEmpty ? null : value;
-                              _selectedAnimationLabel = animationChoices
+                              final choice = animationChoices
                                   .cast<_LabeledMediaSource?>()
                                   .firstWhere(
-                                    (choice) => choice?.url == value,
+                                    (choice) => choice?.value == value,
                                     orElse: () => null,
-                                  )
-                                  ?.label;
+                                  );
+                              _selectedAnimationAssetId = choice?.animation?.id;
+                              _selectedAnimationUrl = choice?.animation == null
+                                  ? choice?.url
+                                  : null;
+                              _selectedAnimationLabel = choice?.label;
                             }),
                           ),
+                          if (asset != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                '${asset.dimensionsLabel} · ${asset.sizeLabel}\n${cachedAsset != null ? AppZh.companionAnimationCached : AppZh.companionAnimationOnDemand}',
+                                style: SecondaryTypography.onCard.small12,
+                              ),
+                            ),
+                          if (_catalogFailed)
+                            Text(
+                              AppZh.companionAnimationUnavailable,
+                              style: SecondaryTypography.onCard.small12,
+                            ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
@@ -924,10 +1165,18 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
                   borderRadius: BorderRadius.circular(TitoRadii.md),
                   ownShadow: false,
                   child: FilledButton(
-                    onPressed: snapshot.connectionState == ConnectionState.done
+                    onPressed:
+                        snapshot.connectionState == ConnectionState.done &&
+                            !_confirming
                         ? () => _confirm(selectedForm, media)
                         : null,
-                    child: Text(AppZh.confirm),
+                    child: Text(
+                      asset == null
+                          ? AppZh.confirm
+                          : cachedAsset == null
+                          ? AppZh.companionAnimationDownload
+                          : AppZh.companionAnimationUse,
+                    ),
                   ),
                 ),
               ],
@@ -940,10 +1189,16 @@ class _CompanionFormPickerSheetState extends State<_CompanionFormPickerSheet> {
 }
 
 class _LabeledMediaSource {
-  const _LabeledMediaSource({required this.url, required this.label});
+  const _LabeledMediaSource({
+    required this.url,
+    required this.label,
+    this.animation,
+  });
 
   final String url;
   final String label;
+  final CompanionAnimationAsset? animation;
+  String get value => animation?.id ?? url;
 }
 
 /// Per-theme fill/outline for the picker's grid tiles and preview slot. They
@@ -973,9 +1228,11 @@ class _LabeledMediaSource {
   return (
     fill: selected
         ? TitoColors.softYellow.withValues(alpha: 0.22)
-        : TitoColors.cream,
-    outline: selected ? TitoColors.softYellow : TitoColors.ink,
-    outlineWidth: TitoBorders.element,
+        : TrainerJournal.paper,
+    outline: selected ? TrainerJournal.selectedEdge : TrainerJournal.smallEdge,
+    outlineWidth: selected
+        ? TitoBorders.journalCard
+        : TitoBorders.journalElement,
   );
 }
 

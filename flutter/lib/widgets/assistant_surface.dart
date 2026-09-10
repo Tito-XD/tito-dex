@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'liquid_glass.dart';
 
 /// Surface used by the assistant conversation (status pill, composer, answer
@@ -79,8 +80,10 @@ class AssistantSurface extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius,
             side: BorderSide(
-              color: borderColor ?? TitoColors.deepBlue.withValues(alpha: 0.24),
-              width: borderWidth,
+              color: borderColor ?? TrainerJournal.edge,
+              width: borderWidth == TitoBorders.element
+                  ? TitoBorders.journalCard
+                  : borderWidth,
             ),
           ),
           child: Padding(padding: padding, child: child),

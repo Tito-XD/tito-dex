@@ -8,6 +8,7 @@ import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
 import 'sticker_pressable.dart';
@@ -148,9 +149,77 @@ class _PartyGridSlot extends StatelessWidget {
     final label = member.nickname ?? localizeSpecies(member.species);
     final scheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(TitoRadii.md);
+    final journal = appVisualStyle.usesTrainerJournal;
     final selectedColor = appVisualStyle.usesFlatUi
         ? scheme.primary
         : TitoColors.coral;
+    final body = InkWell(
+      onTap: onSelect == null ? null : () => onSelect!(index),
+      borderRadius: radius,
+      child: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TitoSpriteSticker(
+                source:
+                    summary?.displaySpritePath ??
+                    (speciesId == null ? null : defaultSpriteUrlFor(speciesId)),
+                size: 40,
+                radius: TitoRadii.md,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: SecondaryTypography.onCard.small12.copyWith(
+                  fontWeight: TrainerJournal.weight(FontWeight.w800),
+                  color: journal ? TrainerJournal.ink : TitoColors.deepBlue,
+                ),
+              ),
+              if (member.level != null)
+                Text(
+                  '${AppZh.level}${member.level}',
+                  maxLines: 1,
+                  style: SecondaryTypography.onCard.small12.copyWith(
+                    color: TitoColors.coral,
+                    fontWeight: TrainerJournal.weight(FontWeight.w800),
+                  ),
+                ),
+            ],
+          ),
+          if (canEvolve)
+            const Positioned(
+              top: 0,
+              right: 0,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                size: 14,
+                color: TitoColors.coral,
+              ),
+            ),
+        ],
+      ),
+    );
+    if (journal) {
+      return HandheldFocusDecorator(
+        onActivate: onSelect == null ? null : () => onSelect!(index),
+        borderRadius: radius,
+        child: Material(
+          color: selected ? TrainerJournal.selectedFill : TrainerJournal.cell,
+          shape: RoundedRectangleBorder(
+            borderRadius: radius,
+            side: selected ? TrainerJournal.selectedSide : BorderSide.none,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
+            child: body,
+          ),
+        ),
+      );
+    }
     return HandheldFocusDecorator(
       onActivate: onSelect == null ? null : () => onSelect!(index),
       borderRadius: radius,
@@ -169,58 +238,7 @@ class _PartyGridSlot extends StatelessWidget {
             ownShadow: false,
             child: StickerCard(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 6),
-              child: InkWell(
-                onTap: onSelect == null ? null : () => onSelect!(index),
-                borderRadius: radius,
-                child: Stack(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TitoSpriteSticker(
-                          source:
-                              summary?.displaySpritePath ??
-                              (speciesId == null
-                                  ? null
-                                  : defaultSpriteUrlFor(speciesId)),
-                          size: 40,
-                          radius: TitoRadii.md,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: SecondaryTypography.onCard.small12.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: TitoColors.deepBlue,
-                          ),
-                        ),
-                        if (member.level != null)
-                          Text(
-                            '${AppZh.level}${member.level}',
-                            maxLines: 1,
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              color: TitoColors.coral,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (canEvolve)
-                      const Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Icon(
-                          Icons.auto_awesome_rounded,
-                          size: 14,
-                          color: TitoColors.coral,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+              child: body,
             ),
           ),
         ),
@@ -250,9 +268,9 @@ class _EmptyGridSlot extends StatelessWidget {
       dash = Colors.white.withValues(alpha: 0.6);
       stroke = TitoBorders.glass;
     } else {
-      fill = TitoColors.cardWarm;
-      dash = TitoColors.ink.withValues(alpha: 0.45);
-      stroke = TitoBorders.card;
+      fill = TrainerJournal.cell;
+      dash = TrainerJournal.smallEdge;
+      stroke = TitoBorders.journalHairline;
     }
     return HandheldFocusDecorator(
       onActivate: onTap,

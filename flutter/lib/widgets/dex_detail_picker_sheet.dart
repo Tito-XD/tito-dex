@@ -10,6 +10,7 @@ import '../navigation/tito_page_transition.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 
 /// Reference scopes include the explicitly named DLC encounter ranges as well
@@ -253,12 +254,12 @@ class _ChoiceTile extends StatelessWidget {
         ? (selected
               ? TitoColors.softYellow.withValues(alpha: .85)
               : Colors.white.withValues(alpha: .8))
-        : (selected ? TitoColors.softYellow : TitoColors.card);
+        : (selected ? TitoColors.softYellow : TrainerJournal.paper);
     final outline = flat
         ? (selected ? scheme.primary : scheme.outlineVariant)
         : plastic
         ? Colors.white.withValues(alpha: .85)
-        : (selected ? TitoColors.ink : TitoColors.ink.withValues(alpha: .2));
+        : (selected ? TrainerJournal.edge : TrainerJournal.smallEdge);
     final radius = BorderRadius.circular(TitoRadii.md);
     return Semantics(
       selected: selected,
@@ -271,9 +272,11 @@ class _ChoiceTile extends StatelessWidget {
             color: outline,
             width: plastic
                 ? TitoBorders.glass
-                : selected
-                ? TitoBorders.card
-                : TitoBorders.element,
+                : appVisualStyle.usesTrainerJournal
+                ? (selected
+                      ? TitoBorders.journalCard
+                      : TitoBorders.journalElement)
+                : (selected ? TitoBorders.card : TitoBorders.element),
           ),
         ),
         clipBehavior: Clip.antiAlias,

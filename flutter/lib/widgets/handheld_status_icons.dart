@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/device_status_service.dart';
+import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
@@ -99,7 +100,9 @@ class _BatteryIndicator extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: borderColor,
-                      width: TitoBorders.element,
+                      width: appVisualStyle.usesTrainerJournal
+                          ? TitoBorders.journalHairline
+                          : TitoBorders.element,
                     ),
                     borderRadius: BorderRadius.circular(2),
                   ),

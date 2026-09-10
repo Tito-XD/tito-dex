@@ -26,6 +26,7 @@ void main() {
         isShiny: true,
         animationSourceUrl: 'https://media/xy.gif',
         animationLabel: '第六世代 · X/Y',
+        animationAssetId: 'sample-source:700:shiny',
         crySourceUrl: 'https://media/0700_cry.opus',
         cryLabel: '标准叫声',
       ),
@@ -41,6 +42,7 @@ void main() {
     expect(restored.choice?.isShiny, isTrue);
     expect(restored.choice?.animationSourceUrl, 'https://media/xy.gif');
     expect(restored.choice?.animationLabel, '第六世代 · X/Y');
+    expect(restored.choice?.animationAssetId, 'sample-source:700:shiny');
     expect(restored.choice?.crySourceUrl, 'https://media/0700_cry.opus');
     expect(restored.choice?.cryLabel, '标准叫声');
   });
@@ -69,6 +71,7 @@ void main() {
     SharedPreferences.setMockInitialValues({
       'companion.pokemonId': 25,
       'companion.nameZh': '皮卡丘',
+      'companion.animationAssetId': 'old-asset',
     });
     final repository = CompanionRepository();
     await repository.load();
@@ -80,7 +83,29 @@ void main() {
     final reloaded = CompanionRepository();
     await reloaded.load();
     expect(reloaded.choice, isNull);
+    expect(
+      (await SharedPreferences.getInstance()).getString(
+        'companion.animationAssetId',
+      ),
+      isNull,
+    );
   });
+
+  test(
+    'choosing automatic after a catalog asset clears its persistent ID',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'companion.animationAssetId': 'old-asset',
+      });
+      final repository = CompanionRepository();
+      await repository.save(
+        const CompanionChoice(pokemonId: 162, nameZh: '大尾立'),
+      );
+      final restored = CompanionRepository();
+      await restored.load();
+      expect(restored.choice?.animationAssetId, isNull);
+    },
+  );
 
   test('pat counts persist per species and survive a new instance', () async {
     SharedPreferences.setMockInitialValues({});

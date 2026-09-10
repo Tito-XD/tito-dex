@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 /// Trainer's Journal must use [TrainerJournalShadows] and Solid Plastic must
 /// use [SolidPlasticShadows]; shared widgets pick the recipe by branching on
 /// `appVisualStyle`. The historical sticker token names are kept so feature
-/// code can switch recipes without a rename.
+/// code can switch recipes without a rename. Journal-only colour, stroke and
+/// type helpers live in `trainer_journal.dart`.
 abstract final class TitoShadows {
   static const List<BoxShadow> sticker = [
     BoxShadow(
@@ -37,20 +38,29 @@ abstract final class TitoShadows {
   ];
 }
 
-/// The hard, unblurred depth that gives Trainer's Journal its physical
-/// sticker-button press. Keep this separate from Flat UI elevation so changing
-/// themes immediately restores the original motion and shadow recipe.
+/// Thin paper-edge depth for Trainer's Journal. Keep this separate from Flat
+/// UI elevation and Solid Plastic blur so theme switches restore the recipe.
+///
+/// Cream cards use a short paper lip plus a faint outline. Deep cards use a
+/// single muted offset. Small chips, sprites and ordinary labels stay flat.
 abstract final class TrainerJournalShadows {
   static const List<BoxShadow> sticker = [
-    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 5)),
+    BoxShadow(color: Color(0xFFE4DFD3), offset: Offset(0, 2)),
+    BoxShadow(color: Color(0x2B566A77), offset: Offset(0, 3)),
   ];
 
   static const List<BoxShadow> stickerPressed = [
-    BoxShadow(color: Color(0x3818283B), offset: Offset(0, 1)),
+    BoxShadow(color: Color(0x24566A77), offset: Offset(0, 1)),
   ];
 
-  static const List<BoxShadow> stickerSmall = [
-    BoxShadow(color: Color(0x2818283B), offset: Offset(0, 3)),
+  static const List<BoxShadow> stickerSmall = [];
+
+  static const List<BoxShadow> deep = [
+    BoxShadow(color: Color(0x3321394C), offset: Offset(0, 2)),
+  ];
+
+  static const List<BoxShadow> control = [
+    BoxShadow(color: Color(0x2B4D6775), offset: Offset(0, 2)),
   ];
 }
 
@@ -140,15 +150,26 @@ abstract final class TitoRadii {
   static const xl = 28.0;
 }
 
-/// Outline widths for Trainer's Journal ink strokes. Never write literal
-/// widths in widgets — pick the token that matches the surface size.
+/// Outline widths. Never write literal widths in widgets — pick the token
+/// that matches the surface size. [card] and [element] stay at the historical
+/// 2.0 / 1.5 values used by Flat UI fallbacks; Trainer's Journal reads the
+/// `journal*` tokens instead so the other themes do not get thinner strokes.
 abstract final class TitoBorders {
-  /// Cards, buttons, text fields, sheets, dialogs.
+  /// Cards, buttons, text fields, sheets, dialogs (Flat UI / historical).
   static const card = 2.0;
 
-  /// Chips, badges, small controls, knobs, checkbox/radio rings.
+  /// Chips, badges, small controls, knobs, checkbox/radio rings (historical).
   static const element = 1.5;
 
   /// Solid Plastic hairline used by `LiquidGlassSurface` and glass outlines.
   static const glass = 1.1;
+
+  /// Trainer's Journal main cards, buttons, fields, sheets, dialogs.
+  static const journalCard = 1.25;
+
+  /// Trainer's Journal chips, badges, small controls, knobs.
+  static const journalElement = 0.85;
+
+  /// Trainer's Journal hairlines and empty-slot dashes.
+  static const journalHairline = 0.75;
 }

@@ -371,7 +371,7 @@ const kAppEn = <String, String>{
       'TitoDex is an unofficial, non-commercial tool for learning and personal playthrough help. It is not affiliated with, licensed, sponsored, or endorsed by Nintendo Co., Ltd., Creatures Inc., GAME FREAK inc., The Pokémon Company, or their affiliates. Pokémon, characters, game names, images, audio, and trademarks belong to their respective rights holders. This tool does not provide ROMs, keys, paid content, or save editing.\n\n'
       'Data and text: PokéAPI (species, forms, moves, abilities, items, versions, and base locations; data/code repository BSD-3-Clause); 52Poké Wiki (some Chinese descriptions, held items, locations, and body styles; original wiki content CC BY-NC-SA 3.0); Bulbapedia (item grouping and a few location language links; CC BY-NC-SA 2.5); PKHeX (modern encounter overlays exported from a pinned commit; GPL-3.0-or-later — the App does not embed or execute it); Project Pokémon (technical reference for HGSS save/PKM structure and map IDs).\n\n'
       'Ask TitoDex curated online sources: Chinese search prefers 52Poké Wiki; only when that is not reliable enough does it fall back to the official Pokémon site, Bulbapedia, StrategyWiki, Serebii, PokéAPI, Wikidata, Pokémon Database, Smogon, Marriland, GameFAQs, Game8, IGN, Nintendo Life, and Eurogamer. Online summaries are used only for that answer and citation check; they are not written automatically into R2, AI Search, the APK, or the local dex pack. Each site’s own terms still apply. Tavily and DeepSeek are search/generation services, not encyclopedia rights holders.\n\n'
-      'Media: PokéAPI/sprites, Pokémon Showdown / Smogon community creators, PokéSprite type icons (MIT), SteamGridDB community source pages, and official images/audio from Pokémon HOME and the games; the Nunito font ships under SIL OFL 1.1. Open wiki licenses do not automatically cover official game media; each asset is handled by recorded source and original rights status.\n\n'
+      'Media: PokéAPI/sprites, Pokémon Showdown / Smogon community creators, Pokémon Paraíso and ShinyHunters companion animation candidates, PokéSprite type icons (MIT), SteamGridDB community source pages, and official images/audio from Pokémon HOME and the games; the Nunito font ships under SIL OFL 1.1. Open wiki licenses do not automatically cover official game media; each asset is handled by recorded source and original rights status.\n\n'
       'External tools: sleep score, 19 ingredient values, recipe-level multipliers, and cooking energy formulas on the Pokémon Sleep secondary page are ported from Neroli’s Lab pinned commit cb533f2, used under Apache-2.0 with the license and NOTICE bundled in the App. Full team building and long-term simulation stay as an external link.\n\n'
       'Source entry points: pokemon.com · wiki.52poke.com · bulbapedia.bulbagarden.net · strategywiki.org · serebii.net · pokeapi.co · wikidata.org · pokemondb.net · smogon.com · marriland.com · gamefaqs.gamespot.com · game8.co · ign.com · nintendolife.com · eurogamer.net · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com. Pinned commits, per-file sources, and build-batch notes live in CREDITS.md and THIRD_PARTY_NOTICES.md at the project root, plus attribution files shipped with the data pack.',
   'dexMoves': 'Level-up moves',
@@ -642,6 +642,18 @@ const kAppEn = <String, String>{
   'companionSettingsSize': 'Companion size',
   'companionMediaTitle': 'Getting {name} ready…',
   'companionMediaGif': 'Load animation',
+  'companionAnimationUniversal': 'Universal',
+  'companionAnimationCached': 'Downloaded',
+  'companionAnimationDownload': 'Download and use',
+  'companionAnimationUse': 'Use this animation',
+  'companionAnimationOnDemand':
+      'Downloads after confirmation. Available offline once downloaded.',
+  'companionAnimationFailed':
+      'Animation download or validation failed. Your current companion is unchanged.',
+  'companionAnimationVerify': 'Checking animation…',
+  'companionAnimationRetry': 'Retry download',
+  'companionAnimationUnavailable':
+      'Some animation choices are unavailable. Reopen the picker to retry.',
   'companionMediaCry': 'Load cry',
   'companionMediaFailedHint':
       'Some media failed to load. A still image will be used, or you can retry later.',

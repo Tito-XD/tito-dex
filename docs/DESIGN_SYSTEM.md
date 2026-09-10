@@ -60,9 +60,11 @@ Suggested tokens, aligned with the supplied UI reference:
 
 Color usage:
 
-- Cream: app background and card warmth.
+- Cream: app background and card warmth. Trainer's Journal paper is a
+  slightly lighter cream (`#FFF9ED`) than the shared card token.
 - Blue gray: device shell, panels, secondary surfaces.
-- Deep navy: text, outlines, top-level contrast.
+- Deep navy: text and top-level contrast. Trainer's Journal outlines use a
+  softer gray-blue (`#7C8999`) instead of near-black ink.
 - Soft yellow: friendly highlights, badge glow.
 - Coral: sparing call-to-action accent.
 - Mint: success / gentle progress.
@@ -70,15 +72,16 @@ Color usage:
 ## Shape and Surface
 
 - rounded cards
-- chunky borders
 - sticker-like offsets
 - badge pills
 - panel seams like a small handheld device
-- **solid offset sticker shadows are the signature** — a hard `0 5px 0` drop
-  with no blur (never Material's soft elevation). Paired with press-down
-  physics it reads as a physical handheld key.
+- **Trainer's Journal** uses a thin gray-blue outline and a short paper-edge
+  shadow. **Solid Plastic** keeps moulded blurred depth. **Flat UI** keeps
+  soft Material elevation. Journal press-down is a 1px sink; Plastic keeps
+  the 3px physical key press.
 
-Tokens (`flutter/lib/theme/tito_colors.dart`, values are what ships):
+Tokens (`flutter/lib/theme/tito_colors.dart` and
+`flutter/lib/theme/trainer_journal.dart`, values are what ships):
 
 | Token | Value | Use |
 | --- | ---: | --- |
@@ -86,19 +89,24 @@ Tokens (`flutter/lib/theme/tito_colors.dart`, values are what ships):
 | `TitoRadii.md` | 12 | buttons, text fields, menus, snack bars |
 | `TitoRadii.lg` | 16 | cards; sheets and dialogs in Trainer's Journal |
 | `TitoRadii.xl` | 28 | sheets and dialogs in Solid Plastic / Flat UI |
-| `TitoBorders.card` | 2.0 | ink outline on cards, buttons, fields, sheets, dialogs |
-| `TitoBorders.element` | 1.5 | ink outline on chips, badges, small controls, knobs |
+| `TitoBorders.card` | 2.0 | Flat UI / historical card outline |
+| `TitoBorders.element` | 1.5 | Flat UI / historical small-control outline |
+| `TitoBorders.journalCard` | 1.25 | Trainer's Journal cards, buttons, fields, sheets, dialogs |
+| `TitoBorders.journalElement` | 0.85 | Trainer's Journal chips, badges, small controls |
+| `TitoBorders.journalHairline` | 0.75 | Trainer's Journal empty-slot dashes |
 | `TitoBorders.glass` | 1.1 | Solid Plastic light hairline (`LiquidGlassSurface`) |
 
 Radii are fixed on every device: `DeviceLayout.rSm/rMd/rLg` are plain
 pass-throughs and must not halve on the handheld. Never write a literal outline
-width in a widget — pick the token that matches the surface size.
+width in a widget — pick the token that matches the surface size. Font sizes
+stay on the existing `TitoTypography` / `DeviceLayout` rules in every theme;
+Trainer's Journal only remaps weight and the shared ink/muted colours.
 
 Shadow recipes are per theme and never mixed:
 
 | Theme | Recipe | Cards / buttons | Chips / sprites | Pressed |
 | --- | --- | --- | --- | --- |
-| Trainer's Journal | `TrainerJournalShadows` — hard, no blur | `0 5px 0` ink@.22 | `0 3px 0` ink@.16 | `0 1px 0` |
+| Trainer's Journal | `TrainerJournalShadows` — hard, no blur | paper lip `0 2px` + faint `0 3px`; controls `0 2px` | none | `0 1px 0` |
 | Solid Plastic | `SolidPlasticShadows` — moulded, blurred | `0 8px 16px` + `0 2px 3px` | `0 5px 11px` | `0 2px 7px` |
 | Flat UI | `TitoShadows` — soft Material elevation (**Flat UI only**) | `0 2px 8px` | `0 1px 4px` | `0 1px 3px` |
 
@@ -155,13 +163,13 @@ Trainer's Journal. Fix the component, do not special-case the caller.
 Settings → 界面风格 → **Retro 贴纸手感** (default on) drives the whole
 package through `retroStyle`:
 
-- `TrainerJournalShadows.sticker` (0/5px) on cards and buttons, `.stickerSmall`
-  (0/3px) on chips/sprites/bubbles, `.stickerPressed` (0/1px) while held.
-  Solid Plastic swaps in `SolidPlasticShadows`; Flat UI uses `TitoShadows`.
-- `StickerPressable` wraps interactive stickers: touch-down sinks the
-  sticker 3px in ~80ms and squashes the shadow; release springs back.
-  `ownShadow: false` gives sink-only physics when the inner `StickerCard`
-  already paints the drop, so shadows never double.
+- `TrainerJournalShadows.sticker` (paper lip) on cream cards, `.control`
+  (0/2px) on buttons and quick tiles, `.stickerSmall` empty on chips/sprites,
+  `.stickerPressed` (0/1px) while held. Solid Plastic swaps in
+  `SolidPlasticShadows`; Flat UI uses `TitoShadows`.
+- `StickerPressable` wraps interactive stickers: Journal sinks 1px in ~80ms;
+  Solid Plastic keeps the 3px physical key. `ownShadow: false` gives
+  sink-only physics when the inner `StickerCard` already paints the drop.
 - Headings tighten to `letter-spacing: -0.02em` (applies in both modes).
 - Toggle off = pure flat stickers; every shadow and press effect gates on
   `retroStyle.enabled` and switches live.
@@ -180,6 +188,9 @@ secondary routes. These sizes do not multiply by `handheldUiScale`:
 | Small | 12 | `small12` / `team12` | Hints, HP/EXP and compact labels |
 
 Dex, Team, Journey, Search, Settings and battle/Sleep tools use this hierarchy.
+Trainer's Journal remaps Nunito weights one step lighter (body Regular 400,
+labels SemiBold 600, titles Bold 700) because the bundled files have no
+Medium cut. Sizes stay the same in every theme.
 The Home dashboard intentionally stays larger for glanceability: its title is
 layout-driven near 33 px, quick tiles own explicit sizes, and trainer details
 may use `homeDetailMultiplier`. `TitoFontScale` is retired; layout dimensions
@@ -295,7 +306,7 @@ rights boundaries are maintained in `CREDITS.md` and the in-app credits page.
 
 ## Supplied Reference Translation
 
-The reference image should be interpreted as a product direction, not a requirement to copy every pixel. Preserve the feeling: warm blue device, cream sticker cards, thick navy outlines, companion presence, dashboard density, and playful Trainer Card energy.
+The reference image should be interpreted as a product direction, not a requirement to copy every pixel. Preserve the feeling: warm blue device, cream sticker cards, companion presence, dashboard density, and playful Trainer Card energy. Trainer's Journal now uses thinner gray-blue outlines and a paper lip instead of chunky near-black ink.
 
 
 ### Compact fact grids and answer progress (0.9.17)
@@ -303,9 +314,10 @@ The reference image should be interpreted as a product direction, not a requirem
 Journey and Team facts share `TitoFactGrid` / `TitoFactTile`: 8px row/column
 spacing, `TitoRadii.sm`, 10px cell padding, 12px label and 14px value separated
 by 6px. Cells grow to their content. The requested column count is an upper
-bound; the minimum 84px cell width scales with system text size. Use
-`TitoBorders.element` for Journal/Flat outlines and `TitoBorders.glass` for the
-Plastic light edge. Flat text uses the semantic on-surface colours.
+bound; the minimum 84px cell width scales with system text size. Trainer's
+Journal fact tiles use a pale fill with no outline. Flat keeps
+`TitoBorders.element` and Plastic uses `TitoBorders.glass` for the light edge.
+Flat text uses the semantic on-surface colours.
 
 Native answer progress uses an 18px prop in a 26px leading lane, with the
 12px progress label aligned to the answer's leading edge. Loading rotates

@@ -30,6 +30,7 @@ import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_motion.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/assistant_surface.dart';
 import '../widgets/ask_titodex_loading.dart';
 import '../widgets/ask_answer_motion_title.dart';
@@ -84,7 +85,7 @@ Color? get _paperColor => _usesPaperLook ? _assistantPaper : null;
 
 /// Ink outline tint for paper surfaces, again Trainer's Journal only.
 Color? _paperOutline(double alpha) =>
-    _usesPaperLook ? TitoColors.deepBlue.withValues(alpha: alpha) : null;
+    _usesPaperLook ? TrainerJournal.edge.withValues(alpha: alpha) : null;
 
 /// Fill and outline for the small "paper" tiles (history rows, source
 /// references) that sit on a themed sheet or card surface.
@@ -110,8 +111,8 @@ Color? _paperOutline(double alpha) =>
   }
   return (
     fill: paper,
-    outline: TitoColors.ink.withValues(alpha: outlineAlpha),
-    outlineWidth: TitoBorders.element,
+    outline: TrainerJournal.edge.withValues(alpha: outlineAlpha),
+    outlineWidth: TitoBorders.journalElement,
   );
 }
 
@@ -1310,7 +1311,9 @@ class _StatusDot extends StatelessWidget {
       shape: BoxShape.circle,
       border: Border.all(
         color: TitoColors.deepBlue,
-        width: TitoBorders.element,
+        width: appVisualStyle.usesTrainerJournal
+            ? TitoBorders.journalHairline
+            : TitoBorders.element,
       ),
     ),
     child: checking
@@ -1821,8 +1824,12 @@ class _QuestionBubble extends StatelessWidget {
               bottomRight: Radius.circular(4),
             ),
             border: Border.all(
-              color: TitoColors.ink.withValues(alpha: 0.3),
-              width: TitoBorders.element,
+              color: appVisualStyle.usesTrainerJournal
+                  ? TrainerJournal.smallEdge
+                  : TitoColors.ink.withValues(alpha: 0.3),
+              width: appVisualStyle.usesTrainerJournal
+                  ? TitoBorders.journalElement
+                  : TitoBorders.element,
             ),
             boxShadow: !retroStyle.enabled
                 ? null
@@ -2960,8 +2967,12 @@ class _StatusPill extends StatelessWidget {
             : TitoColors.cardWarm,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: TitoColors.ink.withValues(alpha: 0.62),
-          width: TitoBorders.element,
+          color: appVisualStyle.usesTrainerJournal
+              ? TrainerJournal.smallEdge
+              : TitoColors.ink.withValues(alpha: 0.62),
+          width: appVisualStyle.usesTrainerJournal
+              ? TitoBorders.journalHairline
+              : TitoBorders.element,
         ),
       ),
       child: Row(
@@ -3280,7 +3291,14 @@ class _AnswerEvidenceSummary extends StatelessWidget {
             decoration: BoxDecoration(
               color: TitoColors.skyBlue.withValues(alpha: 0.28),
               borderRadius: BorderRadius.circular(TitoRadii.md),
-              border: Border.all(color: TitoColors.ink.withValues(alpha: 0.45)),
+              border: Border.all(
+                color: appVisualStyle.usesTrainerJournal
+                    ? TrainerJournal.smallEdge
+                    : TitoColors.ink.withValues(alpha: 0.45),
+                width: appVisualStyle.usesTrainerJournal
+                    ? TitoBorders.journalElement
+                    : 1,
+              ),
             ),
             child: Row(
               children: [

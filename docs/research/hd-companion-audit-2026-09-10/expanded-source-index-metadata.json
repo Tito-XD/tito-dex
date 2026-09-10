@@ -1,0 +1,242 @@
+{
+  "shinyHuntersGuideRecords": 1135,
+  "nationalSpeciesRepresented": 984,
+  "speciesNotInGuideIndex": [
+    {
+      "speciesId": 494,
+      "nameZh": "比克提尼"
+    },
+    {
+      "speciesId": 567,
+      "nameZh": "始祖大鸟"
+    },
+    {
+      "speciesId": 720,
+      "nameZh": "胡帕"
+    },
+    {
+      "speciesId": 789,
+      "nameZh": "科斯莫古"
+    },
+    {
+      "speciesId": 790,
+      "nameZh": "科斯莫姆"
+    },
+    {
+      "speciesId": 801,
+      "nameZh": "玛机雅娜"
+    },
+    {
+      "speciesId": 802,
+      "nameZh": "玛夏多"
+    },
+    {
+      "speciesId": 804,
+      "nameZh": "四颚针龙"
+    },
+    {
+      "speciesId": 809,
+      "nameZh": "美录梅塔"
+    },
+    {
+      "speciesId": 811,
+      "nameZh": "啪咚猴"
+    },
+    {
+      "speciesId": 812,
+      "nameZh": "轰擂金刚猩"
+    },
+    {
+      "speciesId": 815,
+      "nameZh": "闪焰王牌"
+    },
+    {
+      "speciesId": 817,
+      "nameZh": "变涩蜥"
+    },
+    {
+      "speciesId": 818,
+      "nameZh": "千面避役"
+    },
+    {
+      "speciesId": 891,
+      "nameZh": "熊徒弟"
+    },
+    {
+      "speciesId": 892,
+      "nameZh": "武道熊师"
+    },
+    {
+      "speciesId": 893,
+      "nameZh": "萨戮德"
+    },
+    {
+      "speciesId": 896,
+      "nameZh": "雪暴马"
+    },
+    {
+      "speciesId": 897,
+      "nameZh": "灵幽马"
+    },
+    {
+      "speciesId": 898,
+      "nameZh": "蕾冠王"
+    },
+    {
+      "speciesId": 907,
+      "nameZh": "蒂蕾喵"
+    },
+    {
+      "speciesId": 908,
+      "nameZh": "魔幻假面喵"
+    },
+    {
+      "speciesId": 910,
+      "nameZh": "炙烫鳄"
+    },
+    {
+      "speciesId": 911,
+      "nameZh": "骨纹巨声鳄"
+    },
+    {
+      "speciesId": 913,
+      "nameZh": "涌跃鸭"
+    },
+    {
+      "speciesId": 1000,
+      "nameZh": "赛富豪"
+    },
+    {
+      "speciesId": 1009,
+      "nameZh": "波荡水"
+    },
+    {
+      "speciesId": 1010,
+      "nameZh": "铁斑叶"
+    },
+    {
+      "speciesId": 1011,
+      "nameZh": "裹蜜虫"
+    },
+    {
+      "speciesId": 1014,
+      "nameZh": "够赞狗"
+    },
+    {
+      "speciesId": 1015,
+      "nameZh": "愿增猿"
+    },
+    {
+      "speciesId": 1016,
+      "nameZh": "吉雉鸡"
+    },
+    {
+      "speciesId": 1017,
+      "nameZh": "厄诡椪"
+    },
+    {
+      "speciesId": 1018,
+      "nameZh": "铝钢桥龙"
+    },
+    {
+      "speciesId": 1019,
+      "nameZh": "蜜集大蛇"
+    },
+    {
+      "speciesId": 1020,
+      "nameZh": "破空焰"
+    },
+    {
+      "speciesId": 1021,
+      "nameZh": "猛雷鼓"
+    },
+    {
+      "speciesId": 1022,
+      "nameZh": "鐵磐岩"
+    },
+    {
+      "speciesId": 1023,
+      "nameZh": "鐵頭殼"
+    },
+    {
+      "speciesId": 1024,
+      "nameZh": "太乐巴戈斯"
+    },
+    {
+      "speciesId": 1025,
+      "nameZh": "桃歹郎"
+    }
+  ],
+  "wikidexHomeProjectUniqueWebmUrls": 1439,
+  "generatedAt": "2026-09-10T14:05:18.441977+00:00",
+  "validation": "Directory metadata only. ZIP contents and WebM payloads not downloaded or decoded.",
+  "mediafireFolder": "https://www.mediafire.com/folder/9t19091d3l857/Pok%C3%A9mon_Sprites",
+  "mediafireMoreChunks": "no",
+  "mediafireFiles": [
+    {
+      "filename": "FurretTurret_REGULAR_HD_SPRITE_GEN1.zip",
+      "bytes": 339962389,
+      "url": "https://www.mediafire.com/file/h96hsc69fphfnyu/FurretTurret_REGULAR_HD_SPRITE_GEN1.zip/file"
+    },
+    {
+      "filename": "FurretTurret_REGULAR_HD_SPRITE_GEN2.zip",
+      "bytes": 252282164,
+      "url": "https://www.mediafire.com/file/68x5m310j3hd11a/FurretTurret_REGULAR_HD_SPRITE_GEN2.zip/file"
+    },
+    {
+      "filename": "FurretTurret_REGULAR_HD_SPRITE_GEN3.zip",
+      "bytes": 365177354,
+      "url": "https://www.mediafire.com/file/vzdr28o0aj0v726/FurretTurret_REGULAR_HD_SPRITE_GEN3.zip/file"
+    },
+    {
+      "filename": "FurretTurret_REGULAR_HD_SPRITE_GEN4.zip",
+      "bytes": 359529379,
+      "url": "https://www.mediafire.com/file/zumoryc00jj39ol/FurretTurret_REGULAR_HD_SPRITE_GEN4.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITES.zip",
+      "bytes": 4574872873,
+      "url": "https://www.mediafire.com/file/47d1447if3di0k3/FurretTurret_SHINY_HD_SPRITES.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN1.zip",
+      "bytes": 663468954,
+      "url": "https://www.mediafire.com/file/b5b4t71usx50t4f/FurretTurret_SHINY_HD_SPRITE_GEN1.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN2.zip",
+      "bytes": 519943628,
+      "url": "https://www.mediafire.com/file/1tm3sxsi338adrm/FurretTurret_SHINY_HD_SPRITE_GEN2.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN3.zip",
+      "bytes": 772950203,
+      "url": "https://www.mediafire.com/file/0n1bu3b8byu11j2/FurretTurret_SHINY_HD_SPRITE_GEN3.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN4.zip",
+      "bytes": 776642737,
+      "url": "https://www.mediafire.com/file/ah61ren1zybpq4n/FurretTurret_SHINY_HD_SPRITE_GEN4.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN5.zip",
+      "bytes": 717431006,
+      "url": "https://www.mediafire.com/file/z01n2z1r011nfd2/FurretTurret_SHINY_HD_SPRITE_GEN5.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN6.zip",
+      "bytes": 560037059,
+      "url": "https://www.mediafire.com/file/u6q9xqcq5m6ai7o/FurretTurret_SHINY_HD_SPRITE_GEN6.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_GEN7.zip",
+      "bytes": 564413723,
+      "url": "https://www.mediafire.com/file/maa7qhhbrt40y4h/FurretTurret_SHINY_HD_SPRITE_GEN7.zip/file"
+    },
+    {
+      "filename": "FurretTurret_SHINY_HD_SPRITE_ULTRA.zip",
+      "bytes": 36442596,
+      "url": "https://www.mediafire.com/file/f839505xdn9vml6/FurretTurret_SHINY_HD_SPRITE_ULTRA.zip/file"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ class CompanionChoice {
     this.formKey,
     this.isShiny = false,
     this.animationSourceUrl,
+    this.animationAssetId,
     this.animationLabel,
     this.crySourceUrl,
     this.cryLabel,
@@ -21,6 +22,7 @@ class CompanionChoice {
   final String? formKey;
   final bool isShiny;
   final String? animationSourceUrl;
+  final String? animationAssetId;
   final String? animationLabel;
   final String? crySourceUrl;
   final String? cryLabel;
@@ -29,6 +31,7 @@ class CompanionChoice {
     String? formKey,
     bool? isShiny,
     String? animationSourceUrl,
+    String? animationAssetId,
     String? animationLabel,
     String? crySourceUrl,
     String? cryLabel,
@@ -38,6 +41,7 @@ class CompanionChoice {
     formKey: formKey ?? this.formKey,
     isShiny: isShiny ?? this.isShiny,
     animationSourceUrl: animationSourceUrl ?? this.animationSourceUrl,
+    animationAssetId: animationAssetId ?? this.animationAssetId,
     animationLabel: animationLabel ?? this.animationLabel,
     crySourceUrl: crySourceUrl ?? this.crySourceUrl,
     cryLabel: cryLabel ?? this.cryLabel,
@@ -53,6 +57,7 @@ class CompanionRepository extends ChangeNotifier {
   static const _formKey = 'companion.formKey';
   static const _shinyKey = 'companion.isShiny';
   static const _animationSourceKey = 'companion.animationSourceUrl';
+  static const _animationAssetKey = 'companion.animationAssetId';
   static const _animationLabelKey = 'companion.animationLabel';
   static const _crySourceKey = 'companion.crySourceUrl';
   static const _cryLabelKey = 'companion.cryLabel';
@@ -103,6 +108,7 @@ class CompanionRepository extends ChangeNotifier {
     final formKey = prefs.getString(_formKey);
     final isShiny = prefs.getBool(_shinyKey) ?? false;
     final animationSourceUrl = prefs.getString(_animationSourceKey);
+    final animationAssetId = prefs.getString(_animationAssetKey);
     final animationLabel = prefs.getString(_animationLabelKey);
     final crySourceUrl = prefs.getString(_crySourceKey);
     final cryLabel = prefs.getString(_cryLabelKey);
@@ -122,6 +128,7 @@ class CompanionRepository extends ChangeNotifier {
         formKey: formKey,
         isShiny: isShiny,
         animationSourceUrl: animationSourceUrl,
+        animationAssetId: animationAssetId,
         animationLabel: animationLabel,
         crySourceUrl: crySourceUrl,
         cryLabel: cryLabel,
@@ -183,6 +190,11 @@ class CompanionRepository extends ChangeNotifier {
       choice.animationSourceUrl,
     );
     await _setOptionalString(prefs, _animationLabelKey, choice.animationLabel);
+    await _setOptionalString(
+      prefs,
+      _animationAssetKey,
+      choice.animationAssetId,
+    );
     await _setOptionalString(prefs, _crySourceKey, choice.crySourceUrl);
     await _setOptionalString(prefs, _cryLabelKey, choice.cryLabel);
   }
@@ -225,6 +237,7 @@ class CompanionRepository extends ChangeNotifier {
     await prefs.remove(_formKey);
     await prefs.remove(_shinyKey);
     await prefs.remove(_animationSourceKey);
+    await prefs.remove(_animationAssetKey);
     await prefs.remove(_animationLabelKey);
     await prefs.remove(_crySourceKey);
     await prefs.remove(_cryLabelKey);

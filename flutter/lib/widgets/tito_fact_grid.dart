@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 
 /// Aligned cells that grow with their contents instead of clipping long values.
 class TitoFactGrid extends StatelessWidget {
@@ -72,24 +73,37 @@ class TitoFactTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final flat = appVisualStyle.usesFlatUi;
     final plastic = appVisualStyle.usesSolidPlastic;
-    final foreground = flat ? scheme.onSurface : TitoColors.ink;
-    final secondary = flat ? scheme.onSurfaceVariant : TitoColors.mutedInk;
+    final journal = appVisualStyle.usesTrainerJournal;
+    final foreground = flat
+        ? scheme.onSurface
+        : journal
+        ? TrainerJournal.ink
+        : TitoColors.ink;
+    final secondary = flat
+        ? scheme.onSurfaceVariant
+        : journal
+        ? TrainerJournal.muted
+        : TitoColors.mutedInk;
     final radius = BorderRadius.circular(TitoRadii.sm);
     return Material(
       color: flat
           ? scheme.surfaceContainerLow
+          : journal
+          ? TrainerJournal.cell
           : Colors.white.withValues(alpha: .46),
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: radius,
-        side: BorderSide(
-          color: flat
-              ? scheme.outlineVariant
-              : plastic
-              ? Colors.white.withValues(alpha: .85)
-              : TitoColors.ink.withValues(alpha: .2),
-          width: plastic ? TitoBorders.glass : TitoBorders.element,
-        ),
+        side: journal
+            ? BorderSide.none
+            : BorderSide(
+                color: flat
+                    ? scheme.outlineVariant
+                    : plastic
+                    ? Colors.white.withValues(alpha: .85)
+                    : TitoColors.ink.withValues(alpha: .2),
+                width: plastic ? TitoBorders.glass : TitoBorders.element,
+              ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -121,7 +135,7 @@ class TitoFactTile extends StatelessWidget {
               const SizedBox(height: 6),
               DefaultTextStyle(
                 style: SecondaryTypography.onCard.body14.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: TrainerJournal.weight(FontWeight.w800),
                   color: foreground,
                 ),
                 child: child,

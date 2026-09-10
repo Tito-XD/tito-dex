@@ -7,6 +7,7 @@ import '../navigation/tito_page_transition.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/trainer_journal.dart';
 import 'tito_skeleton.dart';
 
 Future<EmulatorAppChoice?> showEmulatorPickerSheet(
@@ -272,10 +273,10 @@ class _AppChoiceTile extends StatelessWidget {
             ),
           )
         : (
-            TitoColors.card,
-            BorderSide(
-              color: TitoColors.ink.withValues(alpha: 0.35),
-              width: TitoBorders.element,
+            TrainerJournal.paper,
+            const BorderSide(
+              color: TrainerJournal.smallEdge,
+              width: TitoBorders.journalElement,
             ),
           );
     return Material(

@@ -15,14 +15,15 @@ import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
 
 /// Inset party cell / empty cell surface, branched per visual style the same
-/// way `sticker_card.dart` does: Trainer's Journal keeps the translucent
-/// cream + ink outline, Solid Plastic swaps to milky glass, Flat UI uses the
-/// Material container tone with no outline.
+/// way `sticker_card.dart` does: Trainer's Journal uses a quiet pale fill,
+/// Solid Plastic swaps to milky glass, Flat UI uses the Material container
+/// tone with no outline.
 BoxDecoration _partyCellDecoration(BuildContext context, {bool empty = false}) {
   final radius = BorderRadius.circular(TitoRadii.sm);
   if (appVisualStyle.usesFlatUi) {
@@ -45,12 +46,10 @@ BoxDecoration _partyCellDecoration(BuildContext context, {bool empty = false}) {
     );
   }
   return BoxDecoration(
-    color: TitoColors.card.withValues(alpha: empty ? 0.28 : 0.52),
-    borderRadius: radius,
-    border: Border.all(
-      color: empty ? TitoColors.ink.withValues(alpha: 0.45) : TitoColors.ink,
-      width: TitoBorders.element,
-    ),
+    color: empty
+        ? TrainerJournal.cell.withValues(alpha: 0.35)
+        : TrainerJournal.cell,
+    borderRadius: BorderRadius.circular(6),
   );
 }
 
@@ -324,7 +323,11 @@ class _PartyGridCell extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final nameStyle = context.titoHome.captionStrong;
-          final nameH = (nameStyle.fontSize ?? 11) * 1.4;
+          final nameH = appVisualStyle.usesTrainerJournal
+              ? MediaQuery.textScalerOf(
+                  context,
+                ).scale((nameStyle.fontSize ?? 11) * (nameStyle.height ?? 1.4))
+              : (nameStyle.fontSize ?? 11) * 1.4;
           final spriteSize = math.max(
             16.0,
             math.min(
@@ -443,9 +446,9 @@ class _PartyLevelBadge extends StatelessWidget {
         width: TitoBorders.glass,
       );
     } else {
-      background = TitoColors.softYellow;
-      foreground = TitoColors.ink;
-      border = Border.all(color: TitoColors.ink, width: TitoBorders.element);
+      background = TrainerJournal.levelFill;
+      foreground = TrainerJournal.ink;
+      border = null;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
@@ -585,10 +588,9 @@ class _PartyMemberAvatar extends StatelessWidget {
       );
     }
     return BoxDecoration(
-      color: TitoColors.cream,
+      color: TrainerJournal.paper,
       shape: BoxShape.circle,
-      border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
-      boxShadow: depth ? TrainerJournalShadows.stickerSmall : null,
+      border: TrainerJournal.allElement(),
     );
   }
 

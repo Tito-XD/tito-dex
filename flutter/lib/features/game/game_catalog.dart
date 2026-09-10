@@ -5,6 +5,7 @@ import '../../l10n/game_zh.dart';
 import '../../theme/app_visual_style.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
+import '../../theme/trainer_journal.dart';
 import '../../theme/tito_typography.dart';
 import 'game_edition.dart';
 
@@ -217,9 +218,11 @@ _gridTileStyle(ColorScheme scheme, {required bool selected}) {
     );
   }
   return (
-    fill: selected ? TitoColors.softYellow : TitoColors.card,
-    outline: selected ? TitoColors.ink : TitoColors.ink.withValues(alpha: 0.2),
-    outlineWidth: selected ? TitoBorders.card : TitoBorders.element,
+    fill: selected ? TitoColors.softYellow : TrainerJournal.paper,
+    outline: selected ? TrainerJournal.edge : TrainerJournal.smallEdge,
+    outlineWidth: selected
+        ? TitoBorders.journalCard
+        : TitoBorders.journalElement,
     foreground: null,
   );
 }

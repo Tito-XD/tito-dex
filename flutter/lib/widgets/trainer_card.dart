@@ -8,6 +8,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
 
 enum TrainerCardDensity { standard, dense, micro }
@@ -55,17 +56,25 @@ class TrainerCard extends StatelessWidget {
         ? const EdgeInsets.all(16)
         : DeviceLayout.cardPadding(context);
 
-    return StickerCard(
+    final body = _TrainerCardBody(
+      journey: journey,
+      metrics: metrics,
+      avatarPlaceholder: avatarPlaceholder,
+      onAvatarTap: onAvatarTap,
+    );
+    final card = StickerCard(
       padding: padding,
-      child: SizedBox(
-        height: metrics.cardHeight,
-        child: _TrainerCardBody(
-          journey: journey,
-          metrics: metrics,
-          avatarPlaceholder: avatarPlaceholder,
-          onAvatarTap: onAvatarTap,
-        ),
-      ),
+      child: appVisualStyle.usesTrainerJournal
+          ? body
+          : SizedBox(height: metrics.cardHeight, child: body),
+    );
+    if (!appVisualStyle.usesTrainerJournal) return card;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        card,
+        const Positioned(top: -7, right: 28, child: JournalTape()),
+      ],
     );
   }
 }
@@ -146,12 +155,12 @@ class _TrainerCardBody extends StatelessWidget {
     // this large.
     final greetingStyle = context.titoHome.cardSectionTitle.copyWith(
       fontSize: metrics.greetingFontSize,
-      fontWeight: FontWeight.w800,
+      fontWeight: TrainerJournal.weight(FontWeight.w800),
       height: 1.05,
     );
     final nameStyle = context.titoHome.cardTitle.copyWith(
       fontSize: metrics.nameFontSize,
-      fontWeight: FontWeight.w900,
+      fontWeight: TrainerJournal.weight(FontWeight.w900),
       height: 1.05,
     );
 
@@ -177,6 +186,9 @@ class _TrainerCardBody extends StatelessWidget {
       style: nameStyle,
     );
     final textColumn = Column(
+      mainAxisSize: appVisualStyle.usesTrainerJournal
+          ? MainAxisSize.min
+          : MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -186,22 +198,28 @@ class _TrainerCardBody extends StatelessWidget {
       ],
     );
 
-    final content = SizedBox(
-      height: metrics.avatarSize,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          avatar,
-          SizedBox(width: metrics.gutter),
-          Expanded(child: textColumn),
-        ],
-      ),
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        avatar,
+        SizedBox(width: metrics.gutter),
+        Expanded(child: textColumn),
+      ],
     );
 
-    final body = SizedBox(
-      height: metrics.cardHeight,
-      child: Center(child: content),
-    );
+    // Keep the normal card height and existing font sizes. Large accessibility
+    // text may grow the Journal card; long names ellipsize within the row.
+    final Widget body = appVisualStyle.usesTrainerJournal
+        ? ConstrainedBox(
+            constraints: BoxConstraints(minHeight: metrics.cardHeight),
+            child: Center(heightFactor: 1, child: row),
+          )
+        : SizedBox(
+            height: metrics.cardHeight,
+            child: Center(
+              child: SizedBox(height: metrics.avatarSize, child: row),
+            ),
+          );
 
     if (onAvatarTap != null) {
       return GestureDetector(
@@ -248,14 +266,21 @@ class TrainerAvatar extends StatelessWidget {
         File(avatarPath).existsSync();
 
     final child = hasImage
-        ? ClipOval(
-            child: Image.file(
-              File(avatarPath),
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-            ),
-          )
+        ? (appVisualStyle.usesTrainerJournal
+              ? Image.file(
+                  File(avatarPath),
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                )
+              : ClipOval(
+                  child: Image.file(
+                    File(avatarPath),
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                  ),
+                ))
         : Text(
             journey.trainerName.isNotEmpty
                 ? journey.trainerName[0].toUpperCase()
@@ -275,6 +300,9 @@ class TrainerAvatar extends StatelessWidget {
     required Widget child,
     required bool hasImage,
   }) {
+    if (appVisualStyle.usesTrainerJournal) {
+      return JournalPhotoFrame(size: size, child: child);
+    }
     final BoxBorder? border;
     if (appVisualStyle.usesFlatUi) {
       border = null;

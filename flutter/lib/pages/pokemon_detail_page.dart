@@ -18,6 +18,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
@@ -1019,7 +1020,7 @@ class _SelectionChipPalette {
       selected: TitoColors.softYellow,
       restingText: TitoColors.ink,
       selectedText: TitoColors.ink,
-      border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+      border: TrainerJournal.allElement(),
     );
   }
 }
@@ -1128,7 +1129,7 @@ class _DetailBottomTabs extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.8),
             width: TitoBorders.glass,
           )
-        : Border.all(color: TitoColors.ink, width: TitoBorders.element);
+        : TrainerJournal.allElement();
     return Container(
       key: const ValueKey('detail-bottom-tabs'),
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),

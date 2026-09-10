@@ -6,6 +6,6 @@
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="TitoDex Flat UI"
+        android:label="${appLabel}"
         tools:replace="android:label" />
 </manifest>

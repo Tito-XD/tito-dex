@@ -192,7 +192,7 @@ void main() {
       );
       expect(
         (pressable.decoration! as BoxDecoration).boxShadow,
-        TrainerJournalShadows.sticker,
+        TrainerJournalShadows.control,
       );
 
       final gesture = await tester.startGesture(
@@ -205,7 +205,7 @@ void main() {
           matching: find.byType(AnimatedContainer),
         ),
       );
-      expect(sunk.transform!.storage[13], 3);
+      expect(sunk.transform!.storage[13], 1);
       expect(
         (sunk.decoration! as BoxDecoration).boxShadow,
         TrainerJournalShadows.stickerPressed,

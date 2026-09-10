@@ -21,6 +21,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
@@ -43,7 +44,10 @@ BorderSide _elementStroke(BuildContext context) {
       width: TitoBorders.glass,
     );
   }
-  return const BorderSide(color: TitoColors.ink, width: TitoBorders.element);
+  return const BorderSide(
+    color: TrainerJournal.smallEdge,
+    width: TitoBorders.journalElement,
+  );
 }
 
 List<String> pokemonFormStatusLabels(
@@ -1985,10 +1989,7 @@ class _InteractiveTypeEffectivenessCardState
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return TitoLoadingPanel(
-        message: AppZh.companionLoading,
-        compact: true,
-      );
+      return TitoLoadingPanel(message: AppZh.companionLoading, compact: true);
     }
     final relations = _relations;
     if (relations == null) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 
 /// Tag for the single home action that expands into its first-level page.
 abstract final class TitoHomeActionHero {
@@ -843,14 +844,14 @@ class _DexFlightVisual {
           end: Alignment.bottomCenter,
           colors: [Color(0xFF5D728A), TitoColors.slateBlue],
         ),
-        outlineColor: TitoColors.ink,
-        borderWidth: TitoBorders.card,
+        outlineColor: TrainerJournal.edge,
+        borderWidth: TitoBorders.journalCard,
         startRadius: TitoRadii.md,
         shadowColor: TitoColors.deepBlue,
-        shadowOpacity: 0.24,
+        shadowOpacity: 0.16,
         shadowBlur: 0,
         shadowSpread: 0,
-        shadowOffset: Offset(0, 5),
+        shadowOffset: Offset(0, 2),
       ),
       AppVisualStyle.solidPlastic => _DexFlightVisual(
         surfaceGradient: const LinearGradient(

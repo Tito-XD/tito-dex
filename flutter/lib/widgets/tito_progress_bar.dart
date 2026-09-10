@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
+import '../theme/trainer_journal.dart';
 
 /// Thin, sticker-style progress bar used across TitoDex surfaces.
 ///
@@ -43,12 +44,9 @@ class TitoProgressBar extends StatelessWidget {
         width: TitoBorders.glass,
       );
     } else {
-      track = trackColor ?? TitoColors.ink.withValues(alpha: 0.12);
+      track = trackColor ?? TrainerJournal.ink.withValues(alpha: 0.10);
       fill = fillColor ?? TitoColors.deepBlue;
-      border = Border.all(
-        color: TitoColors.ink.withValues(alpha: 0.35),
-        width: TitoBorders.element,
-      );
+      border = null;
     }
 
     return Column(

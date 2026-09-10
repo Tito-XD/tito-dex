@@ -36,6 +36,7 @@ import '../widgets/retro_forms.dart';
 import '../theme/retro_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/trainer_journal.dart';
 import '../widgets/companion_picker_sheet.dart';
 import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
@@ -1902,8 +1903,12 @@ class _CompanionSection extends StatelessWidget {
                           color: TitoColors.card,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: TitoColors.ink,
-                            width: TitoBorders.element,
+                            color: appVisualStyle.usesTrainerJournal
+                                ? TrainerJournal.smallEdge
+                                : TitoColors.ink,
+                            width: appVisualStyle.usesTrainerJournal
+                                ? TitoBorders.journalElement
+                                : TitoBorders.element,
                           ),
                         ),
                         clipBehavior: Clip.antiAlias,
@@ -2052,7 +2057,14 @@ class _SettingsAvatarPreview extends StatelessWidget {
                 colors: [TitoColors.softYellow, TitoColors.coral],
               ),
         shape: BoxShape.circle,
-        border: Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: Border.all(
+          color: appVisualStyle.usesTrainerJournal
+              ? TrainerJournal.smallEdge
+              : TitoColors.ink,
+          width: appVisualStyle.usesTrainerJournal
+              ? TitoBorders.journalElement
+              : TitoBorders.element,
+        ),
       ),
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,

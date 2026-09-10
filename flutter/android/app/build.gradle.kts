@@ -55,6 +55,8 @@ android {
 
     buildTypes {
         debug {
+            manifestPlaceholders["appLabel"] =
+                System.getenv("TITODEX_APP_LABEL") ?: "TitoDex Flat UI"
             // The Flat UI experiment must coexist with the signed TitoDex
             // release on one device. Namespace stays unchanged so native
             // activity/service classes and MethodChannels need no fork.
