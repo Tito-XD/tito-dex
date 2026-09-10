@@ -1,6 +1,6 @@
 # App updates, first-run introduction and trainer shortcuts
 
-Release line: v0.9.18, Lite build 204 / Offline build 205. Published artifacts and verification evidence belong to the GitHub Release record.
+Release line: v0.9.18, Lite build 204 / Offline build 205. Published artifact sizes, digests, source SHA and CI evidence are recorded in [RELEASES.md](RELEASES.md).
 
 ## App updates
 

@@ -4,7 +4,7 @@ Proxy R2 bucket `titodex-dex` at **`https://dex.tito.cafe`** with CORS + cache h
 
 **Worker name:** `tito-dex` · **Live bundle:** v20 on `/v5/` · **Health:** `/cdn-health`
 
-## Auto-deploy (recommended)
+## Existing Git auto-deploy configuration
 
 Connect this repo in **Cloudflare Workers Builds**:
 
@@ -14,13 +14,15 @@ Connect this repo in **Cloudflare Workers Builds**:
 | Root directory | `cloudflare/dex-cdn` |
 | Deploy command | `npx wrangler deploy` |
 
-Step-by-step: **[DEPLOY.md](./DEPLOY.md)**
+The main-history cleanup did not migrate this legacy deployment branch. Do not merge its old history into main or bypass attribution hooks. Until an explicit branch migration, deploy verified current main via the CLI below. See **[DEPLOY.md](./DEPLOY.md)**.
 
 ## Manual deploy
 
 ```bash
 cd cloudflare/dex-cdn
 npm ci
+npx wrangler deploy --dry-run
+# After deployment authorization and target/configuration checks:
 npx wrangler deploy
 ```
 

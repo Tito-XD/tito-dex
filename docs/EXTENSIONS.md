@@ -1,6 +1,6 @@
 # TitoDex 旧 Android 附加包兼容
 
-> 状态：Journey Assistant 1.0.0 曾作为可选 APK 扩展发布；当前 v0.9.2 181/182 已把助手、持久会话、状态入口、语义分块回答与等待动画集成进主 App，并以 Worker 提供的按游戏数据包替代新增 companion APK。本页只记录旧包读取兼容与维护协议。
+> 状态：v0.9.18 的助手、审核种子与问答界面均内建于主 App；Journey Assistant 1.0.0 仅保留旧包读取兼容。v0.9.17 起 Journey 不展示资料包下载入口，既有数据包加载协议仍保留。本页记录兼容与维护协议。
 
 旧附加包是一个无桌面入口的独立 Android APK。当前主 App 不要求它存在：有效的旧包仍可作为兼容数据源；包不存在、Provider 不可见或任何校验失败时，立即使用主 APK 内建审核资料。
 
@@ -27,7 +27,7 @@ canonical schema：
 3. 已安装旧 1.0.0 包时，主 App 可继续按严格协议读取；用户可在 Android 系统设置自行卸载，不影响内建功能。
 4. 未来资料扩充使用 App 私有数据包，不再发布可执行 APK。
 
-当前 UI 不再触发 APK 安装。遗留 host/catalog 代码暂时保留一版兼容，后续确认迁移完成后可连同 `REQUEST_INSTALL_PACKAGES` 一并移除。
+助手 UI 不再触发附加 APK 安装。v0.9.18 的主 App 更新仍通过系统安装器安装已校验 APK，因此 `REQUEST_INSTALL_PACKAGES` 不能随旧附加包兼容代码一起移除。两条路径的身份与签名校验独立；见 [应用更新](APP_UPDATE_AND_ONBOARDING.md)。
 
 ## 旧包构建与 R2 staging（仅兼容维护）
 

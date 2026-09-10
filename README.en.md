@@ -14,7 +14,7 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 | --- | --- | --- |
 | Lite APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18+204` | In-app updates, first-run guidance and trainer shortcuts; on-demand v20 data |
 | Offline APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18-offline+205` | The same updated UI with the complete verified v20 bundle embedded |
-| Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
+| Journey Assistant | Built in | Structured-data-first answers, 50 local Q&A pairs, and category-aware prop motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
 
@@ -25,7 +25,7 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 ## Highlights
 
 - **Unified Dex filtering** — search, regional dex, debut generation, journey-only browsing, types, appearance, abilities, moves and egg groups share one sheet and can intersect; optional form display preserves form identity.
-- **Shared detail context** — form and merged reference-game selectors sit below the header and initially use the App game. General reference is available, menus identify DLC, and obtain/move sections follow the same selection without unsupported-category placeholders.
+- **Shared detail context** — themed sheets below the header select form, merged reference context, exact game and DLC scope. Obtain methods, evolution conditions and moves share that selection.
 - **Consistent themes** — each theme owns its corners, outlines, shadows, sheets and selection states. Small images use static placeholders; slow image and reference reads use a pale ball rotating in place. Long descriptions grow with their content.
 - **Clearer layouts and lighter loading** — separate query and reference browsing, switch among four battle tools, and inspect a six-slot Team board. Shared data reads, background decoding and lazy lists reduce first-open work.
 - **System language** — Chinese and English UI follow the OS or Android per-app language without an in-app switch. Available English entity names are used; untranslated reference prose retains its original language.
@@ -33,16 +33,16 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 - **30th anniversary logos** — open a Pokémon image to switch to anniversary artwork and choose its official logo variants. The catalog preserves 1324 entries: 1025 base graphics and 299 additional files. Verified forms match automatically; unknown forms remain explicitly unmatched and can be chosen manually. Images load online only on demand and never alter the original form, shiny selection, or Dex data.
 - **Three built-in themes** — Trainer's Journal, Solid Plastic, and Flat UI persist across launches; production installs still default to Trainer's Journal. Navigation and content reveals adapt to each theme and respect reduced-motion settings.
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
-- **Save assistant** — nearby uncaught Pokémon, current-location capture reminders, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion advice.
-- **Ask TitoDex** — the entire assistant is off by default. Its first Settings activation discloses network access, AI retrieval, and bounded context; Journey and Search reserve no entry space before consent. Once enabled, optional journey data can be installed, updated, or removed per game, while interrupted or invalid downloads leave the previous usable pack intact. The selected version, compatible save context, and reviewed local facts still run first, and save location alone can no longer hijack an unrelated question. Unresolved questions can use BGE-M3 AI Search, the Dex bundle, fixed public sources, Tavily, and DeepSeek native search; when both live routes succeed, Qwen performs an additional conflict/corroboration check. The modern conversation page stores the latest 50 Q&A pairs locally and sends at most six same-game pairs for follow-ups. Three compact controls separately open connection details, local history management, and the 23-edition picker. Verified answers progressively reveal after the evidence pass with headings, emphasis, lists, and scrollable tables; citation URLs stay inside one expandable evidence row, while stable Pokémon, item, move, and ability links open their existing TitoDex details. Raw saves and trainer/party data are never uploaded.
+- **Journey details** — Ask sits directly below current location. Trainer facts and same-generation counterpart encounter gaps use compact grids; other uncaught species open as a Dex filter. Party evolution lives in Team.
+- **Ask TitoDex** — off by default, with explicit network and context consent. Supported evolution, move/ability reverse lookup, intersected filters, items and other existing resources use deterministic queries whose results cannot be overwritten by the model; remaining questions use bounded source retrieval. The latest 50 Q&A pairs stay on-device, with at most six same-game pairs used for follow-ups. Raw saves and trainer/party data are never uploaded. Leading answer props follow the question category and stop on its subject; long answers retain their starting reading position. Expand evidence on demand and open entities by stable IDs.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
 - **Reference hub** — moves, abilities, natures, egg groups, items, weather, terrain, and status; item availability/prices, moves, and mechanics follow the selected game and generation.
-- **Party assistance** — inspect moves, abilities, and next evolutions, then hand a party member and damaging move directly to the quick damage tool.
+- **Party assistance** — one grid combines edition, count, average level, base stats, type coverage and weaknesses. Expand or collapse member details for moves, abilities and evolution, with direct damage-tool handoff.
 - **Battle utilities** — type matchup, stat and damage estimates, blind-spot analysis, abilities, items, weather, terrain, status, and Terastal modifiers with explicit assumptions.
 - **Pokémon Sleep utilities** — offline sleep-score and basic cooking-strength estimates with overnight duration, 19 ingredients, recipe levels 1–70, and recipe bonus; formulas are pinned to Neroli’s Lab with its Apache-2.0 license bundled in the app.
-- **Android shortcuts** — long-press the app icon for Dex and Search by default; Settings can customize up to three secondary destinations.
+- **Introduction and trainer shortcuts** — first-run guidance sets name/avatar and introduces features; existing users skip it and Settings can replay it. A pinned Home shortcut uses the trainer name and follows renames; the application label stays TitoDex. Up to three configurable long-press destinations remain separate.
 - **Native Android handoff** — select an installed emulator or game app and resume from TitoDex.
 - **Offline-first data** — downloadable Dex bundle with Chinese labels, maps, configuration, icons, and list sprites; the Offline APK starts from a verified local seed.
 - **Handheld layouts** — phones, tablets, square screens, and controller focus navigation.
@@ -74,6 +74,8 @@ Download **`TitoDex-0.9.18-lite-rg-arm64.apk`** or **`TitoDex-0.9.18-offline-rg-
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
+v0.9.18 adds Settings-based updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.13 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-lite-rg-arm64.apk), [Offline · 95.25 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.18/TitoDex-0.9.18-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
+
 ## Development
 
 ```bash
@@ -88,6 +90,8 @@ Build and release instructions: [docs/RELEASE_BUILD.md](docs/RELEASE_BUILD.md)
 
 Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repository permissions](docs/PERMISSIONS.md)
 
+Contribution and required commit checks: [CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
 ## Documentation
 
 | Document | Contents |
@@ -95,7 +99,10 @@ Maintainer references: [Dex bundle and CDN](docs/CLOUDFLARE_DEX_CDN.md) · [Repo
 | [AI context](docs/AI_CONTEXT.md) | Current source and release state, architecture, and guardrails |
 | [Roadmap](ROADMAP.md) | Release history and next work |
 | [Architecture](docs/ARCHITECTURE.md) | Technology choice, data flow, and platform boundaries |
-| [Journey blocker assistant](docs/JOURNEY_ASSISTANT.md) | Save-first fuzzy matching, privacy contract, AI Search/DeepSeek, and deployment gates |
+| [Journey Q&A](docs/JOURNEY_ASSISTANT.md) | Reviewed hints, privacy and bounded retrieval |
+| [Structured answers](docs/ASK_STRUCTURED_DATA.md) | Existing resource queries and fact ownership |
+| [Updates and introduction](docs/APP_UPDATE_AND_ONBOARDING.md) | App updates, trainer identity and shortcuts |
+| [Contribution workflow](docs/CONTRIBUTING.md) | Attribution checks and history migration |
 | [Legacy Android extension compatibility](docs/EXTENSIONS.md) | 1.0.0 compatibility protocol and migration to bundled host data |
 | [Flutter app](flutter/README.md) | App development notes |
 | [Design system](docs/DESIGN_SYSTEM.md) | Visual, typography, layout, and interaction rules |

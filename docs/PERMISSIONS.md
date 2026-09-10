@@ -2,8 +2,9 @@
 
 > Android signing was rotated for v0.8.13 after legacy signing material was
 > found in public Git history. v0.8.13 and later use the private V2 key stored
-> only in maintainer secure storage and GitHub Actions secrets. Existing users
-> must export their journey, uninstall the older app, then install v0.8.13.
+> only in maintainer secure storage and GitHub Actions secrets. Users upgrading from v0.8.12 or earlier
+> must export their journey before uninstalling. v0.8.13+ releases can upgrade
+> directly to v0.9.18 with the same signing identity.
 
 TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 object put --remote`).
 
@@ -17,6 +18,10 @@ TitoDex CI workflows upload to Cloudflare R2 via **Wrangler 4** (`wrangler r2 ob
 | `ANDROID_SIGNER_SHA256` | Recommended SHA-256 certificate digest used by the release publisher to pin both APKs to the historical Android signer |
 | `TITODEX_JOURNEY_ASSISTANT_URL` | Journey Assistant Worker 的完整 HTTPS `/v1/ask` 入口；仅用于 release build 的 dart-define |
 | `TITODEX_EXTENSION_CATALOG_URL` | 同一 Worker 的完整 HTTPS extension catalog 入口；仅用于 release build 的 dart-define |
+
+## Main branch checks
+
+The active `Human commit attribution` ruleset requires GitHub Actions' `Commit authorship` check on `main`, with no bypass actors. Push a `code/` branch, wait for the check on the exact commit, then fast-forward main. Preserve human authors and do not merge pre-cleanup history back. See [CONTRIBUTING.md](CONTRIBUTING.md). Release publishing uses its separately scoped Actions/Contents permissions and retains original signed-release tag evidence.
 
 ## Cloudflare API token — required permissions
 

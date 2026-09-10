@@ -70,7 +70,7 @@ titodex-dex/
     ├── type_icons/*.png
     ├── bundle-v14.tar.zst      # 历史紧凑 archive
     ├── bundle-v19.tar.zst      # v20 的只读完整基座；保留作回滚
-    └── bundle-v20.tar.zst      # 当前生产 archive；v0.9.0 Offline 直接嵌入
+    └── bundle-v20.tar.zst      # 当前生产 archive；v0.9.18 Offline 直接嵌入
 ```
 
 `bundle.tar.zst` 解压后的根直接对应 App 文档目录 `dex_offline/`，不包含 `v5/`

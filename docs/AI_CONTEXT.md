@@ -19,7 +19,7 @@
 **TitoDex** is a warm, offline-first Pokémon journey companion for Android handhelds and phones. It combines save-aware progress, manual team and journey management, structured Pokédex data, and lightweight battle utilities in a distinctive device-like UI.
 
 - **Resume quickly:** home shows current game, location, party, badges, play time, and actions.
-- **Local first:** single-file save import, richer HGSS parsing, offline dex bundle, no runtime 52poke/PokeAPI scraping in the app.
+- **Local first:** single-file save import, richer HGSS parsing, offline dex bundle, no runtime 52poke/PokeAPI scraping for Chinese catalogs.
 - **Game context first:** edition, generation, and regional scope affect data and calculations.
 - **Focused reference:** provide practical depth without reproducing a full community wiki or simulator.
 
@@ -60,7 +60,7 @@ v0.9.17 Journey/Team density changes: Journey places the enabled Ask entry direc
 
 v0.9.17 Ask motion asset reuse: animation props resolve canonical `item-sprites/<slug>.png` resources from the installed Dex bundle first, then the small built-in starter set or the same individual CDN image used by the reference pages. Only the chosen props plus shared finish props are decoded before starting motion; text and answer retrieval continue while they load. Late preparation cannot replace a newer question's props; timeouts and missing artwork use a neutral local book. The checked-in v19 item media audit supplies the v20-compatible sprite identities: all 2130 referenced paths were checked against the published Offline v20 archive. APK motion PNGs drop from 1030 files / 3,067,440 bytes to 24 starter files / 106,214 bytes, with generation-time guards against reintroducing the full catalog as packaged images. The existing ball artwork matches the bundle pixel-for-pixel, retaining the calibrated rolling geometry.
 
-> v0.9.16 uses Lite versionCode 198 and Offline versionCode 199. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
+> v0.9.18 uses Lite versionCode 204 and Offline versionCode 205; published sizes are 29.13 MB / 95.25 MB. The intervening 0.9.8 local debug package was not a public release. Lite downloads the current live bundle when requested; Offline embeds the verified v20 archive. Anniversary images remain online-only in both variants. It upgrades directly from v0.8.13 onward, including the public Liquid Glass preview. Android signing was rotated in v0.8.13; upgrades from v0.8.12 or earlier still require export, uninstall, and reinstall.
 
 ### Current UI and language
 - **v0.9.16 layout:** Search keeps query entry separate from the reference catalog; four battle tools share one page and mount on first use. Team uses a six-slot board with separate detail/editor areas. Portrait Home placement and location tiles are refined; secondary scrolling stays below fixed headers.
@@ -69,18 +69,20 @@ v0.9.17 Ask motion asset reuse: animation props resolve canonical `item-sprites/
 - Simplified Chinese and English UI follow the OS / Android per-app language, without an in-app switch. Names use available English data; missing translations and reference prose retain their source-language fallback. This does not claim an entirely English reference bundle or English assistant answers.
 
 ### Journey & save
-- **Current v0.9.6:** makes Team and Search side routes follow real Android predictive-back progress, spring back on cancel, and finish from the release point on commit. Home-to-Dex keeps the standard predictive preview and collapses its shared artwork only after a committed return; detail routes retain the stable Material predictive-back behavior from v0.9.5. Journey card ink now covers the full card. Separate root/shell route-focus observers clear only covered editable focus, preventing Search and other inputs from unexpectedly reopening the keyboard after a detail pop while preserving intentional editor autofocus.
+
+Dated navigation entries below record how the current behavior evolved; later fixes supersede earlier transition experiments. Current v0.9.17/0.9.18 layout and answer behavior is described above.
+- **v0.9.6 navigation baseline:** makes Team and Search side routes follow real Android predictive-back progress, spring back on cancel, and finish from the release point on commit. Home-to-Dex keeps the standard predictive preview and collapses its shared artwork only after a committed return; detail routes retain the stable Material predictive-back behavior from v0.9.5. Journey card ink now covers the full card. Separate root/shell route-focus observers clear only covered editable focus, preventing Search and other inputs from unexpectedly reopening the keyboard after a detail pop while preserving intentional editor autofocus.
 - **v0.9.5 rebuild:** keeps the matte Solid Plastic surface and sprite-only forward Hero, but removes the Dex-only predictive-back observer and full-page edge slide. Every Pokémon detail entry now stays inside Flutter's standard Material predictive-back wrapper; Sprite Heroes do not participate in interactive edge gestures, so Dex, Search and Ask TitoDex share one return behavior and cancel/commit cannot strand the page or artwork halfway.
 - **v0.9.4:** keeps the live Dex grid inside the route Hero subtree so the real card Sprite expands into an exactly aligned detail canvas on device, then hands off to the loaded header without a blank skeleton or geometry jump. Dex detail predictive back visibly shrinks, rounds and follows the swipe edge; Team/Search side routes carry their opaque background with the slide instead of flashing it before entry. Ask TitoDex pins changing companion copy to one leading edge and removes duplicate heading sparkles.
 - **v0.9.3:** keeps one Pokémon Sprite alive throughout the Dex card-to-detail Hero flight, prefetches detail data before navigation, and preserves the previous artwork until a new form image has decoded. Secondary reference pages paint opaque shells before bounded local reads; Team rows render on the first frame with immediate Sprite fallbacks. Ask TitoDex uses one continuous-corner status family and a finer semantic reveal cadence.
 - **v0.9.1:** keeps the three persistent themes and modern Ask TitoDex semantics from v0.9.0, while correcting visible motion edges: the Home Dex icon no longer stretches into the page, card-to-detail transitions move the creature sprite itself, selected form or edition artwork replaces the stable viewer sprite, secondary lists use a shorter bounded settle, rotating assistant copy crossfades without overlap, and the save-aware status surface stays pill-shaped while badge context arrives.
-- **Current v0.9.0:** ships three persistent built-in themes with Trainer's Journal as the first-install default, theme-aware navigation motion, restrained Solid Plastic optics, and a modern Ask TitoDex surface. The latest App and Worker use verified semantic blocks rather than legacy answer deltas: progress is shown while sources are retrieved and checked, then summary, prose, bullets, tables, warnings, or clarification choices reveal in place. Request IDs, exact-game context and semantic reset prevent stale or cross-version answers from reappearing.
-- **v0.8.20 baseline retained in v0.9.0:** Journey Assistant and three HGSS blocker chains are built into the host APK, but the entire feature defaults off. First activation happens only in Settings after a disclosure covering network access, AI/search and bounded recent conversation context; upgraded installs do not inherit the earlier default-on entry state. While disabled, Journey and Search build no assistant entry or spacer. After consent, local deterministic facts still run first, and Journey can manage one signed, catalog-pinned optional data pack for the selected game; failed or cancelled replacement keeps the prior pack. The App keeps the newest 50 Q&A pairs locally, sends at most six same-game pairs for follow-ups, and presents online status, local history and selected game as three independent compact controls. History management can explicitly compact local storage to the newest 10 entries or clear it after confirmation; the game control opens the existing 23-edition picker and rebuilds isolated Assistant context. Answers use a refined light conversation surface without stray corner marks, an unboxed companion with four-point sparkles, smoother shimmer motion, and bottom-following scroll; verified answers progressively reveal only after the Worker evidence pass completes; verification plus citations collapse into one expandable row. Recognized Pokémon, items, moves and abilities resolve against installed runtime data and stable IDs before their Poké Ball/backpack/sparkle/bolt ActionChips open existing details; ambiguous labels do not create a guessed target. The encyclopedia/guide allowlist remains one connection capability while Worker/Qwen/AI Search/Dex bundle/Tavily/DeepSeek stay individually observable. The complete possible-source list lives in Settings Credits. A save location alone no longer selects an unrelated blocker, and selected-game changes physically clear incompatible save context. On a local miss—or a V20 Dex fact whose provenance requires online verification—the Worker can combine exact-version Dex-bundle facts, BGE-M3 reviewed retrieval, fixed PokeAPI/StrategyWiki/Wikidata evidence, Tavily and DeepSeek V4 Flash allowlisted search, with Workers AI Qwen as the public composer/verifier. A V20 deterministic answer remains the offline fallback; it is replaced only when the allowlisted pass returns real online evidence. Chinese Tavily retrieval first attempts 52Poké alone; only a missing or unsupported primary answer falls back to the remaining allowlisted encyclopedias and guide sites, and final output stays Simplified Chinese. When both live routes succeed, a separate Qwen pass labels them as dual-source only if the DeepSeek result materially corroborates the primary evidence chain without a version/fact conflict. The explicit broad-answer trial can return sourced low-confidence material when a second evidence pass is incomplete for selected-game gameplay, but general franchise questions require verified citation support; Pokémon-only scope, fixed domains, bounded payloads, and deterministic failure fallback remain enforced. The strict request excludes raw saves, hashes, trainer/party/financial/coordinate data. See [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) and [EXTENSIONS.md](./EXTENSIONS.md).
+- **v0.9.0 theme/answer baseline:** ships three persistent built-in themes with Trainer's Journal as the first-install default, theme-aware navigation motion, restrained Solid Plastic optics, and a modern Ask TitoDex surface. The latest App and Worker use verified semantic blocks rather than legacy answer deltas: progress is shown while sources are retrieved and checked, then summary, prose, bullets, tables, warnings, or clarification choices reveal in place. Request IDs, exact-game context and semantic reset prevent stale or cross-version answers from reappearing.
+- **Current assistant behavior:** the host includes three reviewed HGSS hint chains; the feature defaults off until Settings consent. Supported existing-resource queries use deterministic results, with bounded online retrieval for remaining questions and final fact protection. History keeps 50 local pairs and sends at most six same-game pairs; raw saves and trainer/party data remain private. The answer heading and props stay leading-aligned and long answers retain their beginning. Journey no longer exposes the optional pack downloader; legacy data loading remains compatible. See [JOURNEY_ASSISTANT.md](JOURNEY_ASSISTANT.md) and [ASK_STRUCTURED_DATA.md](ASK_STRUCTURED_DATA.md).
 - Experimental pre-Switch Gen 1–7 `.sav` metadata recognition; one explicitly selected save file with persisted read permission; optional startup reload. HGSS is fixture-verified and additionally imports party species/level/HP/EXP/ability/four moves, map, both regional badge banks, and Pokédex progress.
 - Home / Team / Journey / Settings; native Android installed-app picker and launcher; journey JSON import/export.
 - Manual dex marks when save not linked.
 - v0.8.8: Android long-press app shortcuts default to Dex + Search and are configurable in Settings (up to three destinations from dex sub-pages, reference catalogs and battle tools); HGSS counts both badge banks, and DeSmuME `.dsv` wrappers are recognized.
-- v0.8.8: save import preserves the numeric trainer ID for Journey/Settings; the Journey card shows a lightweight current-location capture reminder, while the Journey page expands nearby uncaught species, party evolution routes, paired-version direct-encounter gaps, and evolution/breeding/trade completion gaps. Unknown locations and merged editions show explicit prompts instead of guessed advice.
+- v0.8.8: save import preserves the numeric trainer ID for Journey/Settings; the Journey card shows a lightweight current-location capture reminder, while current Journey uses location and paired-version completion grids plus a remaining-species Dex filter; party evolution moved to Team in v0.9.17. Unknown locations and merged editions show explicit prompts instead of guessed advice.
 - v0.8.9: unknown Android document timestamps no longer become 1970, and the latest Journey event records TitoDex import time. HGSS displays 城都 x/8 + 关都 y/8; parsed ability/moves/EXP flow into Team and can hand a damaging move to quick damage. Manually customized trainer identity remains protected by the existing override rules.
 - v0.8.10: HGSS rich sync adds party nicknames, held items, move PP/PP Ups, friendship, nature, shiny/gender/status, IV/EV and battle stats, plus Secret ID, money, trainer gender/language, starter, player coordinates and save milestones. Current/max HP offsets are corrected against the Gen IV party structure. The Team expansion and Journey/Settings read-only summaries expose the imported fields; PC boxes remain deferred until big-block selection is independently fixture-verified.
 
@@ -122,7 +124,7 @@ v0.9.17 Ask motion asset reuse: animation props resolve canonical `item-sprites/
 - `/search?q=` deep link supported.
 - **Multi-word species search** (`dex_search_terms.dart`). Each whitespace-separated word resolves to one constraint through an alias table (神 / 传说 / legendary all reach the legendary tag); words of different kinds AND. Single-valued kinds (body style, colour, generation, size) OR with each other, because a species holds exactly one of each and ANDing two could only return nothing — that is what lets 「棕 红」 stand in for the orange the in-game palette lacks. Types and tags are genuinely multi-valued and still AND, so 「火 飞行」 means the dual type.
 - An alias never suppresses a text match: 「鱼」 resolves to the fish body style **and** still finds 鲤鱼王. Genus is searchable because it rides on the summary.
-- **Stackable dex axes** (`DexFilter`): body style × colour (multi-select set) × relative size × generation × tag, intersected with at most one reference drill-down. Size buckets are cut from the real 1025-species height distribution (~19/29/24/16/13 %).
+- **Stackable dex axes** (`DexFilter`): body style × colour (multi-select set) × relative size × generation × tag, intersected with type, ability, move and egg-group constraints plus any explicit Journey species set. Size buckets are cut from the real 1025-species height distribution (~19/29/24/16/13 %).
 - Body style labels are the canonical 52poke names. The eight species reclassified in Gen VI (绿毛虫 / 独角虫 / 刺尾虫 / 结草儿 / 结草贵妇 / 无壳海兔 / 海兔兽 / 克雷色利亚 — all present in HGSS) match under **both** the current and the pre-Gen VI body style.
 
 ### Pokémon Sleep tools
@@ -165,7 +167,7 @@ and treats PokeAPI/sprites/official media as rights-varying instead of applying
 an unsupported blanket Creative Commons claim. The preserved v19 object set still carries historical
 attribution text; live v20 adds corrected metadata without overwriting v19 objects.
 
-### Latest release-line highlights
+### Earlier release-line history (superseded where noted above)
 - v0.9.6: makes Team/Search predictive back follow, cancel and commit from actual Android gesture progress; delays the Home-to-Dex shared-art collapse until commit; expands Journey ink across the full card; and prevents covered text fields from reclaiming focus after route return.
 - v0.9.5 rebuild: keeps matte Solid Plastic and sprite-only forward entry, removes the competing Dex-specific edge-slide controller, and routes all Pokémon details through the standard Material predictive-back transition without interactive Hero flights.
 - v0.9.4: keeps Dex grid Heroes discoverable on device, expands the exact card Sprite into a geometry-aligned detail header, restores expressive predictive back, removes the side-page background flash, and keeps rotating Ask TitoDex copy pinned without duplicate sparkles.
@@ -204,6 +206,11 @@ GitHub Releases, and Git history; this agent context keeps only the active relea
 flutter/lib/
   app.dart                    # GoRouter, bootstrap, offline/update prompts
   features/
+    app_update/               # GitHub APK update checks/downloads
+    onboarding/               # first-run eligibility
+    app_shortcuts/            # dynamic and pinned trainer Home shortcuts
+    extensions/               # Ask TitoDex and legacy data compatibility
+    trainer/                  # trainer identity
     dex/                      # PokeAPI, offline cache, CDN installer, l10n update
     journey/                  # JourneyRepository
     parser/                   # PokemonSaveParser, HgssParser, hgss_map_list
@@ -265,14 +272,14 @@ restores only the saved v19 root manifest and never deletes objects or touches `
 cd flutter
 flutter pub get
 flutter test --no-pub           # regression gate
-flutter build apk --release --target-platform android-arm64  # ~21 MB Lite; Offline size follows the verified v20 archive
+flutter build apk --release --target-platform android-arm64  # v0.9.18: 29.13 MB Lite / 95.25 MB Offline
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 cp build/app/outputs/flutter-apk/app-release.apk ../releases/TitoDex-<ver>-lite-rg-arm64.apk
 ```
 
 | Rule | Detail |
 | --- | --- |
-| ABI | arm64-v8a only |
+| ABI | arm64-v8a Flutter runtime; small plugin helpers may include other ABIs |
 | Filename | `releases/TitoDex-<ver>-{lite,offline}-rg-arm64.apk` |
 | SDK | compile/target 36, min 24 |
 | Size | Artifact-dependent; verify contents, ABI and signer, not a historical size estimate |
@@ -305,7 +312,7 @@ Same codebase, no diverging fork — `ios/` generated via
 - **Last iOS build verification (2026-07-23, v0.7.0)**: `pod install`,
   `flutter analyze`, 215 Flutter tests, and
   `flutter build ios --no-codesign --release` under Xcode 27 (27.6 MB
-  Runner.app). v0.8.19 passes the shared Dart suite, but its iOS no-codesign
+  Runner.app). v0.9.18 passes the shared Dart suite, but its iOS no-codesign
   build has not been repeated; generated Pods/build files are not committed.
 - Signing, IPA, TestFlight, and App Store distribution are intentionally not
   part of the Android release and require an Apple Developer account.
@@ -338,14 +345,15 @@ Optional tooling venv: `~/.venv-titodex-tools` (`tools/dex_bundle_requirements.t
 ## Contributor guardrails
 
 ### Do
-- Edit **`flutter/lib/`** and **`flutter/test/`** only for product work.
+- Product code lives in **`flutter/`**, including Android native code when needed. Match tests to the affected layer.
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`).
 - Write commits and pull requests in **English**. GitHub Release titles and
   bodies are **Simplified Chinese by default**, following `docs/RELEASES.md`;
   keep the standalone English README current instead of duplicating every
   release note bilingually.
 - Prefer small, focused diffs; match existing patterns.
-- Run `flutter test` before pushing.
+- Run checks appropriate to the change; App releases require analysis and the full Flutter suite. Documentation-only changes require consistency/link checks.
+- Follow [CONTRIBUTING.md](CONTRIBUTING.md): configure hooks, preserve human attribution, push a `code/` branch and pass `Commit authorship` before updating main. Do not merge pre-cleanup history back; historical release tags and artifact source SHAs remain unchanged.
 
 ### Do not
 - Runtime-fetch 52poke/PokeAPI for zh catalog in the app.
@@ -385,6 +393,11 @@ regressions of the 0.9.15 language work:
 | [ROADMAP.md](../ROADMAP.md) | Release history & what's next |
 | [RELEASES.md](./RELEASES.md) | 中文优先的 GitHub Release 文案规范与近期历史 |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technology choice, structure and platform boundaries |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Human attribution, required checks and history migration |
+| [APP_UPDATE_AND_ONBOARDING.md](./APP_UPDATE_AND_ONBOARDING.md) | App updater, onboarding and trainer shortcuts |
+| [ASK_STRUCTURED_DATA.md](./ASK_STRUCTURED_DATA.md) | Resource queries and final fact ownership |
+| [JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md) | Assistant flow and privacy |
+| [FIRST_OPEN_LOADING.md](./FIRST_OPEN_LOADING.md) | Loading behavior and original performance audit |
 | [RELEASE_BUILD.md](./RELEASE_BUILD.md) | APK checklist |
 | [CLOUDFLARE_DEX_CDN.md](./CLOUDFLARE_DEX_CDN.md) | R2 / Worker / bundle layout |
 | [DEX_BUNDLE_V20.md](./DEX_BUNDLE_V20.md) | v19-read-only v20 build, protected publication, provenance and stable entity-index contract |

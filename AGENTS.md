@@ -24,4 +24,4 @@ Everything else (feature status, file map, CDN build, contributor rules) lives i
 - Claude attribution is disabled in `.claude/settings.json`. Repository hooks and the `Commit authorship` check enforce this rule.
 - For a new checkout, enable hooks with `git config core.hooksPath .githooks`. If Python is not on PATH, set `git config titodex.python /absolute/path/to/python`.
 - Push a `code/` branch first, wait for `Commit authorship` to pass, then update `main`. Main requires this check; do not bypass it.
-- Main history was cleaned on 2026-09-10. Rebase/cherry-pick unfinished work onto current `origin/main`; never merge the old history back. Existing release tags are intentionally unchanged.
+- Main history was cleaned on 2026-09-10. Rebase/cherry-pick unfinished work onto current `origin/main`; never merge the old history back. Existing release tags are intentionally unchanged. Detailed safe-transfer and publishing steps: [CONTRIBUTING.md](docs/CONTRIBUTING.md).

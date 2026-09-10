@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**TitoDex** — an offline-first Pokémon journey companion for Android RG handhelds (arm64-v8a, SDK 36). Save-aware progress, manual team/journey management, offline Pokédex (1025 species), and lightweight battle utilities. UI is **Simplified Chinese**; local-first with no runtime PokeAPI/52poke scraping in the app.
+**TitoDex** — an offline-first Pokémon journey companion for Android RG handhelds (arm64-v8a, SDK 36). Save-aware progress, manual team/journey management, offline Pokédex (1025 species), and lightweight battle utilities. UI supports **Simplified Chinese and English**, following the system. Chinese catalogs are built ahead of time; Dex data may use the documented PokeAPI fallback.
 
 The only active app code is **`flutter/`** (Flutter + Dart). The old React mock (`src/`) was deleted in the 0.6.5 cleanup.
 
@@ -19,12 +19,12 @@ All app work happens in `flutter/`:
 ```bash
 cd flutter
 flutter pub get
-flutter test                              # regression gate — run before pushing
+flutter test                              # regression gate for App changes/releases
 flutter test test/<file>_test.dart        # single test file
 flutter test --name "<substring>"         # single test by name
 flutter analyze                           # must be clean for release work
 flutter run -d chrome                     # web smoke target when no Android SDK
-flutter build apk --release --target-platform android-arm64   # ~21 MB, arm64 only
+flutter build apk --release --target-platform android-arm64   # v0.9.18 Lite 29.13 MB; arm64 Flutter runtime
 ../tools/verify_release_apk.sh build/app/outputs/flutter-apk/app-release.apk
 ```
 
@@ -38,6 +38,10 @@ Bump `flutter/pubspec.yaml` **before** building. Full APK checklist: `docs/RELEA
 flutter/lib/
   app.dart              # GoRouter, bootstrap, offline/update prompts
   features/
+    app_update/         # verified GitHub APK updates
+    onboarding/         # first-run setup
+    app_shortcuts/      # long-press and trainer Home shortcuts
+    extensions/  # reviewed and structured Q&A
     dex/                # PokeAPI, offline cache, CDN installer, l10n update
     journey/            # JourneyRepository
     parser/             # PokemonSaveParser, HgssParser, hgss_map_list
@@ -49,7 +53,7 @@ flutter/lib/
   pages/  widgets/      # DeviceShell, dex_reference_detail, home/dex/search/settings
 ```
 
-- **Routes:** `/`, `/team`, `/journey`, `/dex`, `/dex/:id`, `/dex/{moves,abilities,locations,quiz}`, `/search`, `/search/reference`, `/search/companion/*`, `/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings media/companion-position sub-routes. `/search?q=` deep link supported.
+- **Routes:** `/`, `/team`, `/journey`, `/journey/ask`, `/dex`, `/dex/:id`, `/dex/{moves,abilities,locations,quiz}`, `/search`, `/search/reference`, `/search/companion/*`, `/search/sleep-tools`, `/search/reference/json`, `/settings`, and Settings media/companion-position sub-routes. `/search?q=` deep link supported.
 - **Reference-data load order:** a complete preferred install reads app-documents `dex_offline/` first; Lite normally reads CDN first and falls back through local cache/APK assets. See `docs/AI_CONTEXT.md` for the exact policy.
 - **Game context is first-class:** edition / generation / regional `DexScope` drive which data and calculations apply.
 
@@ -57,13 +61,13 @@ flutter/lib/
 
 Bundle version and CDN prefix are **decoupled** — every release since v7 has patched in place over `/v5/`, so a new prefix is not needed for new fields (see `docs/CLOUDFLARE_DEX_CDN.md`).
 
-R2-proxy Worker lives in `cloudflare/dex-cdn/` (deploy branch `deploy/dex-cdn`); config in `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env). Bundles are immutable per prefix (`/v5/` current, `/v4/` rollback). Release order: upload+verify every immutable object, update root `bundle-manifest.json` **last**, never overwrite `/v4/`. Worker uses the dedicated `MANIFEST_KV` namespace — never bind the unrelated `FODI_CACHE`. Details: `docs/CLOUDFLARE_DEX_CDN.md`, secrets in `docs/PERMISSIONS.md`.
+R2-proxy Worker lives in `cloudflare/dex-cdn/` (legacy deploy branch `deploy/dex-cdn`; migration/CLI workflow in `cloudflare/dex-cdn/DEPLOY.md`); config in `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env). Objects are immutable within the active prefix (`/v5/` current, `/v4/` rollback). Release order: upload+verify every immutable object, update root `bundle-manifest.json` **last**, never overwrite `/v4/`. Worker uses the dedicated `MANIFEST_KV` namespace — never bind the unrelated `FODI_CACHE`. Details: `docs/CLOUDFLARE_DEX_CDN.md`, secrets in `docs/PERMISSIONS.md`.
 
 ## Guardrails
 
 - Follow the commit attribution policy in `AGENTS.md`: use the maintainer's Git identity; do not add AI authors, co-authors, generated-by or session trailers. Preserve real human attribution. Push a `code/` branch and pass `Commit authorship` before updating `main`.
 
-- Edit **`flutter/lib/`** and **`flutter/test/`** only for product work; prefer small focused diffs matching existing patterns.
+- Product work lives in **`flutter/`**, including Android native code when needed; prefer small focused diffs matching existing patterns.
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`). Commits and PRs use English; GitHub Release titles/bodies and the root README use Simplified Chinese by default per `docs/RELEASES.md`.
 - **Never** paste production CDN URLs into README / release notes / user-facing copy.
 - No runtime 52poke/PokeAPI fetches for the zh catalog in the app; hand-drawn nav icons ship as APK assets only, never on CDN.

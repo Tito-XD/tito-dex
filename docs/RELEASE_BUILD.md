@@ -2,10 +2,10 @@
 
 **Audience:** maintainers packaging `TitoDex-<ver>-lite-rg-arm64.apk` and `TitoDex-<ver>-offline-rg-arm64.apk`.
 
-A valid **arm64-v8a Lite** APK is about **20–23 MB** on disk. The v0.9.0
-Offline APK embeds the complete verified v20 archive and is therefore
-materially larger than the historical compact-v14 package; validate it against
-the selected manifest rather than an old fixed-size expectation. If a Lite
+Published **v0.9.18** is **29,125,977 bytes (29.13 MB) Lite** and
+**95,253,577 bytes (95.25 MB) Offline** (decimal MB). Offline embeds the verified
+66,129,008-byte v20 archive. Validate ZIP contents, native runtime, metadata,
+signer and archive digest rather than reusing an old fixed-size expectation. If a Lite
 build is only **~7 MB**, the file is truncated or corrupt (missing
 `libflutter.so` tail / broken ZIP central directory) — **do not ship it**.
 
@@ -17,8 +17,8 @@ build is only **~7 MB**, the file is truncated or corrupt (missing
 
 | File | ~Size | Purpose |
 | --- | --- | --- |
-| `libflutter.so` | ~11 MB | Flutter engine |
-| `libapp.so` | ~7–8 MB | Compiled Dart AOT (`flutter build apk --release`) |
+| `libflutter.so` | ~11.6 MB | Flutter engine |
+| `libapp.so` | ~11.9 MB in v0.9.18 | Compiled Dart AOT (`flutter build apk --release`) |
 | `libzstandard_android.so` | ~0.5 MB | Offline bundle zstd decompress (`zstandard` package) |
 | `libdatastore_shared_counter.so` | tiny | AndroidX DataStore |
 
@@ -35,6 +35,7 @@ These ship **inside** the APK via `pubspec.yaml`:
 | --- | --- |
 | `assets/fixtures/PKMSS.sav` | Settings → 导入内置存档 |
 | `assets/companion_media/*` | Starter companion GIFs + cries (29 species) |
+| `assets/ask_motion/*.png` | 24 starter props, 106,214 bytes; other prop artwork reuses the Dex bundle |
 | `assets/game_icons/*.png` | Bundled game icons with per-file provenance in `assets/game_icons/SOURCES.json` |
 | `assets/fonts/Nunito-*.ttf` | UI typography (Regular / SemiBold / Bold / ExtraBold) |
 | `AssetManifest.bin`, `FontManifest.json`, `NOTICES.Z` | Flutter asset index |
@@ -49,9 +50,9 @@ Endpoints are baked in at build time (`flutter/lib/features/dex/dex_cdn_config.d
 
 ## Prerequisites
 
-1. **Flutter SDK** (stable, matches CI)
+1. **Flutter SDK 3.44.6** (pinned in the current CI workflows)
 2. **Android SDK** — `compileSdk 36`, NDK `28.2.13676358`
-3. **Release signing** — `flutter/android/key.properties` + keystore (see `flutter/android/app/build.gradle.kts`). CI/cloud VM must have the same keystore as historical RG builds, or users must uninstall before sideloading a differently signed APK.
+3. **Release signing** — `flutter/android/key.properties` + keystore (see `flutter/android/app/build.gradle.kts`). CI/cloud VM must use the v0.8.13+ release key. Only upgrades from v0.8.12 or earlier require export/uninstall because of the historical signing rotation; never rotate the key during routine packaging.
 
 ```properties
 # flutter/android/key.properties (not committed)
@@ -73,7 +74,7 @@ flutter test
 # Standard RG arm64 release — NO --split-per-abi
 flutter build apk --release --target-platform android-arm64
 
-# Sanity: output should be ~20–23 MB
+# Compare with the current release baseline; v0.9.18 Lite is 29.13 MB
 ls -lh build/app/outputs/flutter-apk/app-release.apk
 
 # Verify before copy (required)
@@ -89,6 +90,10 @@ cp build/app/outputs/flutter-apk/app-release.apk \
 
 Update `flutter/pubspec.yaml` `version:` (`x.y.z+build`) **before** building.
 
+### Source and main gate
+
+Follow [CONTRIBUTING.md](CONTRIBUTING.md): push a `code/` branch, pass `Commit authorship` on the exact commit, then fast-forward main. Build from that verified main SHA. The September 10 history cleanup intentionally retained release tags; old artifact records still use their original source SHA. Do not retag or rebuild v0.9.18 for documentation changes.
+
 ### Fast cloud build (Lite + Offline)
 
 Run the **Android Release APKs** workflow manually with:
@@ -99,14 +104,13 @@ Run the **Android Release APKs** workflow manually with:
 - `bundle_manifest_url` — the currently published root manifest; the current workflow requires `bundleVersion==20`, 1025 species, `/v5/`, completeness, and a matching archive SHA-256 before embedding it
 - `offline_seed_apk_url` — optional previously published Offline APK; when set, CI reuses its embedded manifest/archive and performs the same completeness and SHA-256 checks instead of following the root manifest
 
-The v0.9.16 release pair uses Lite versionCode `198` and Offline versionCode
-`199`. Any later build must use a Lite versionCode greater than `199` and an even
-larger Offline versionCode; keep the same product version only for an explicitly
-authorized same-tag replacement. v0.9.0
-was the explicit large-package cutover; for v0.9.16, leave `offline_seed_apk_url` empty so CI
-downloads and verifies the current published v20 archive through
-`bundle_manifest_url`. This gives fresh Offline installs the complete v20
-reference/gameplay data instead of the older compact v14 seed.
+The v0.9.18 pair uses Lite versionCode `204` and Offline `205`. A later pair
+needs Lite greater than `205` and an even larger Offline code. Reusing a product
+version requires explicit same-tag replacement authorization. Leave
+`offline_seed_apk_url` empty to fetch the current v20 manifest/archive, or reuse
+a published Offline seed only after the same v20 completeness/digest checks.
+v0.9.18 reused the verified v20 archive from v0.9.17 unchanged; never substitute
+the historical compact v14 seed.
 
 The workflow analyzes and tests once, then builds the signed Lite and Offline
 APKs in parallel. Each artifact is named
@@ -122,7 +126,11 @@ successful build run id, that run's exact source SHA, both build numbers, a full
 refuses runs from another commit or workflow, rechecks package id, versionName and versionCode,
 requires Lite and Offline to have the same signer, then creates an annotated tag and a draft
 GitHub Release. Configure `ANDROID_SIGNER_SHA256` to pin that signer to the historical release
-certificate rather than checking only cross-variant equality.
+certificate rather than checking only cross-variant equality. The current publisher also requires legacy compatibility inputs `extension_version=1.0.0` and `extension_build_number=1`; the public App download pair remains Lite and Offline.
+
+After inspecting the draft notes and downloading/verifying both uploaded APKs, publish the draft as stable or prerelease as authorized. In-app updates consume only stable releases with matching `TitoDex-<version>-{lite,offline}-rg-arm64.apk` asset names, uploaded state and GitHub SHA-256 digests. Keep increasing versionCodes and the existing package/signer identity.
+
+Notify the separately maintained TitoDex Web task after publication. Its `src/lib/app-release.ts` must synchronize both `latestAppReleaseFallback` and `appDownloadsFallback`, including exact names, URLs and bytes. The homepage links to `/app#download`; verify both direct APK links after deployment, allowing for Service Worker cache.
 
 ### Offline variant
 
@@ -142,9 +150,9 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 ## Post-build checklist
 
 - [ ] `unzip -t releases/TitoDex-*-rg-arm64.apk` → **No errors**
-- [ ] Lite file size **≥ 15 MB** (expect **19–26 MB**); Offline is materially larger because it embeds v20, so verify the archive size and SHA-256 against the selected manifest instead of assuming the historical ~80 MB v14 size
-- [ ] `lib/arm64-v8a/libflutter.so` present (~11 MB)
-- [ ] `lib/arm64-v8a/libapp.so` present (~7–8 MB)
+- [ ] Lite file size within the verifier bounds (**15–35 MB**; v0.9.18 is **29.13 MB**); Offline is materially larger because it embeds v20, so verify the archive size and SHA-256 against the selected manifest instead of assuming the historical ~80 MB v14 size
+- [ ] `lib/arm64-v8a/libflutter.so` present (~11.6 MB)
+- [ ] `lib/arm64-v8a/libapp.so` present (~11.9 MB in v0.9.18)
 - [ ] `lib/arm64-v8a/libzstandard_android.so` present
 - [ ] Fresh-install Offline APK shows the one-time local unpack percentage, reaches 100%, then does not show it again on the next launch
 - [ ] Lite Settings download can be minimized; Android requests notification permission, shows the same weighted percentage in a foreground-service notification, and completes while the app is backgrounded
@@ -155,6 +163,9 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 - [ ] GitHub Release asset uploaded **after** local verify (same bytes as `releases/` copy)
 - [ ] Publisher run is bound to the successful build run's exact `head_sha`; package metadata and signer checks pass
 - [ ] Release title, opening summary, headings and filenames follow `docs/RELEASES.md`; public copy is Chinese-first
+- [ ] App APK updater: matching variant, digest failure/cancel, unknown-source permission return, system confirmation and upgrade across signed versions; keep this device gate distinct from the Dex background-download checks
+- [ ] First-run migration/replay and trainer shortcut pin/rename checked on target launchers; document any untested device behavior
+- [ ] Web release metadata and both direct download links synchronized
 - [ ] Do **not** paste CDN URLs in release notes (see `CLOUDFLARE_DEX_CDN.md`)
 
 ---
@@ -165,7 +176,7 @@ Restore the Lite `version:` and remove the `assets/dex/` entry before committing
 | --- | --- | --- |
 | APK ~7 MB, `unzip -t` fails | Copied APK before `flutter build` finished, or partial git commit | Rebuild; run `verify_release_apk.sh` |
 | APK ~40 MB+ | Debug build or universal/multi-ABI APK | Use `flutter build apk --release` only; check `abiFilters` = `arm64-v8a` |
-| Install fails on RG | Signature mismatch vs installed build | Uninstall old TitoDex first |
+| Install fails on RG | Check signer, package id, Android version and versionCode | Preserve data; use the same release signer and a greater code. Export before uninstalling only an incompatible legacy/debug install |
 | App opens but dex empty | User has not downloaded offline pack | Settings → 下载完整离线资料包 (not an APK packaging issue) |
 
 ---

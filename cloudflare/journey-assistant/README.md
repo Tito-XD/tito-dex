@@ -10,7 +10,8 @@ The request path is deliberately fail-safe:
 1. Exact game + local aliases + verified save location are scored first.
 2. On a miss, the Worker may read the current versioned TitoDex Dex bundle
    through the read-only `DEX_CONTENT` R2 binding. Exact species encounter,
-   held-item, versioned learnset, profile, item, and ability questions are
+   held-item, versioned learnset, evolution, profile, item, ability, catalog
+   and reverse move/ability intersection questions are
    validated and answered without a model. Open-ended questions receive only a
    bounded entity evidence object. Cultivation, strategy, route, and
    recommendation questions try a bounded Chinese 52Poké result pool first;
@@ -43,6 +44,13 @@ The request path is deliberately fail-safe:
    provider supplies it. In explicit trial mode a linked, allowlisted result
    without citation text can be returned at low confidence with a warning.
    Any provider, quota, shape, or scope failure preserves deterministic fallback.
+
+Before semantic blocks leave the Worker, `enforceFinalFacts` restores executed
+structured query results and keeps their evidence/entity IDs aligned. An
+online verification pass does not grant the model ownership of those facts.
+See [structured query coverage and limitations](../../docs/ASK_STRUCTURED_DATA.md).
+The App no longer advertises the optional Journey pack downloader; compatible
+pack loading and reviewed hint delivery remain implemented.
 
 ## Key-free curated source fallback
 
@@ -77,7 +85,9 @@ original deterministic `no_match` response. Live answers never write to R2.
 ## Optional Tavily allowlist search
 
 Tavily is a retrieval adapter, not an answer provider. It is never called while
-a local audited hint or exact Dex-bundle fact already answers the question.
+a local audited hint or a Dex query returns a direct answer. Legacy bundle
+results explicitly marked `online-verify` can still trigger corroboration,
+but final fact enforcement restores the executed structured result.
 Chinese questions first run a 52Poké-only request alongside fixed-source
 collection. If the primary evidence cannot produce a supported answer, broad
 advice runs two bounded fallback language pools and narrow questions run one

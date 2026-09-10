@@ -312,3 +312,12 @@ Native answer progress uses an 18px prop in a 26px leading lane, with the
 only semantically related props, while completion holds the original subject.
 Idle prompts keep their separate inline word transitions. Primary buttons
 wrap long labels within available width without shrinking accessibility text.
+
+### Setup and update surfaces (0.9.18)
+
+First-run guidance reuses the App theme, existing avatar cropper and responsive
+scrollable content; it is replayable from Settings without enabling Ask consent.
+The companion Settings icon uses the same outlined Poké Ball family as other
+icons. App-update progress and actions live in Settings → About. Custom form
+and exact-game/DLC choice sheets retain themed spacing, selection and large-text
+behavior; Android installer and launcher confirmation remain system surfaces.

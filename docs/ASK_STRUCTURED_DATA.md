@@ -1,6 +1,6 @@
 # 问 TitoDex：结构化资料查询与答案约束
 
-2026-09-09，0.9.17 发布源代码；线上部署与签名制品验证以本版发布记录为准。
+随 v0.9.17 发布，v0.9.18 延续；当前签名制品及源码证据见 [发布记录](RELEASES.md)。
 
 针对“火岩鼠进化成暴鲤龙（Typhlosion）”这一实机错误，修复的对象是问答链路。已发布的 v20 包中，155 → 156 → 157 的关系及中文名称均正确，不需要为这一错误重发数据包。
 
@@ -35,6 +35,6 @@
 
 在 `cloudflare/journey-assistant` 运行 `npm test` 和 `npm run test:structured`，并执行 TypeScript 检查。普通 Worker 测试池的文件系统是虚拟的，APK 资料检查使用独立 Node 配置。
 
-准备真实包检查：在仓库根目录运行 `python tools/prepare_structured_query_audit.py releases/TitoDex-0.9.17-preview.1-offline-rg-arm64.apk`，然后在 Worker 目录运行 `npm run test:structured`。可传 `--sha256` 校验指定制品。脚本只从现有 APK 提取固定 JSON 路径到忽略目录，不下载、不发布。
+准备真实包检查：在仓库根目录运行 `python tools/prepare_structured_query_audit.py releases/TitoDex-0.9.18-offline-rg-arm64.apk`，然后在 Worker 目录运行 `npm run test:structured`。可传 `--sha256` 校验指定制品。脚本只从现有 APK 提取固定 JSON 路径到忽略目录，不下载、不发布。
 
-回归覆盖：原始火球鼠问题的 HTTP 路由、完整进化链、错误译名、模型复核错误通过、综合建议中的错误进化关系、版本缺失、分页、招式与特性交集、资源意图冲突、真实包结构、实体 ID 持久化、来源标签及原有回答动画/流式显示。新制品和实机验证属于后续发布步骤。
+回归覆盖：原始火球鼠问题的 HTTP 路由、完整进化链、错误译名、模型复核错误通过、综合建议中的错误进化关系、版本缺失、分页、招式与特性交集、资源意图冲突、真实包结构、实体 ID 持久化、来源标签及原有回答动画/流式显示。v0.9.18 签名制品已发布并校验；实体设备覆盖范围仍单独记录，不由自动检查推定。

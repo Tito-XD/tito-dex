@@ -16,14 +16,23 @@
 
 Lite 使用 `0.9.18+204`，Offline 使用 `0.9.18-offline+205`，沿用发布签名和完整 v20 离线资料。
 
-- 设置新增应用更新：每天最多检查一次 GitHub 正式版，按当前 Lite / Offline 匹配安装包；手动确认下载后校验文件并打开系统安装界面。
+- 设置新增应用更新：启动时每 24 小时最多自动检查一次 GitHub 正式版，按当前 Lite / Offline 匹配安装包；手动确认下载后校验文件并打开系统安装界面。
 - 首次启动用三步引导介绍名字、头像、基本功能和离线资料；已有旅程的用户跳过，设置中可重看。
 - 可添加以训练家名字命名的桌面快捷方式，后续改名同步更新；应用列表保留 TitoDex。
 - 设置中的宝可梦伴侣采用统一线条精灵球；手动名字保留自定义标记，换头像后立即刷新图片。
 
 0.9.17 及更早版本需手动安装本版，之后才可使用应用内更新。安装和添加桌面图标均保留系统确认；下载时需保持 App 运行。
 
-构建、签名、实际包体与验证结果以本版 GitHub Release 的制品记录为准。实体设备覆盖安装和不同桌面的图标行为不由单元测试替代。
+正式发布时间：2026-09-10 05:50 UTC；[GitHub Release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18)。
+
+| 制品 | versionCode | 字节数（十进制 MB） | SHA-256 |
+| --- | --- | --- | --- |
+| Lite | 204 | 29,125,977（29.13 MB） | `17cf361514282022a63dbe98a6848b3cff599b5f58d8204ea8ada77b4bc17ae2` |
+| Offline | 205 | 95,253,577（95.25 MB） | `ba0522b7cec09feaa28e7d59f2c9808af0181dfb5399238581633818265f1fec` |
+
+发布源码为 [`124c82aca6f4e6034989b394a5cb4f916ba45b82`](https://github.com/Tito-XD/tito-dex/commit/124c82aca6f4e6034989b394a5cb4f916ba45b82)；[签名构建 34441530316](https://github.com/Tito-XD/tito-dex/actions/runs/34441530316)、[发布复验 34442243695](https://github.com/Tito-XD/tito-dex/actions/runs/34442243695) 与 [Flutter CI 34441529375](https://github.com/Tito-XD/tito-dex/actions/runs/34441529375) 均通过。记录包含 652 项 Flutter 测试、静态分析、Web 编译、Android 模拟器资料/媒体/快捷入口冒烟、原生 Kotlin 编译及实际 APK 元数据、ZIP 和签名校验。Offline 内置 v20 archive 为 66,129,008 字节，SHA-256 为 `e7c8e059ed9ee0a8d5e77a9a8ac0a13516f66c848597276f989d5800051530d5`，与 v0.9.17 一致。
+
+后续 main 的署名历史清理没有重写该发布标签或 APK；历史制品继续引用上述原始源码和构建证据。实体设备覆盖安装、安装权限返回及不同桌面的图标行为尚未复测，不由单元测试或模拟器记录替代。
 
 ## 0.9.17 正式版
 

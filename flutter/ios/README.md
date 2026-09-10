@@ -2,7 +2,7 @@
 
 **Audience:** maintainers working on the shared Flutter source.
 
-Last reviewed: 2026-08-12.
+Last reviewed: 2026-09-10; Android release line v0.9.18.
 
 ## Current status
 
@@ -19,9 +19,9 @@ iOS support is merged into **`main`** for v0.7.0. The original platform branch s
 `pod install`, `flutter analyze`, 215 Flutter tests, and
 `flutter build ios --no-codesign --release` succeeded under Xcode 27 beta
 (27.6 MB Runner.app). Pods and generated files were cleaned afterward.
-Current v0.8.19 Dart tests are covered by the shared Flutter suite, but the
+Current v0.9.18 Dart tests are covered by the shared Flutter suite, but the
 iOS no-codesign build has not been rerun for this release line; do not present
-v0.8.19 as device/TestFlight verified until that gate is repeated.
+v0.9.18 as device/TestFlight verified until that gate is repeated.
 
 ## iOS shell & layout adaptation (merged for v0.7.0)
 
@@ -47,6 +47,8 @@ battle handoff, …) is pure widget/layout code — no platform channels, no new
 plugins — and needed no per-platform changes. `battery_plus` /
 `connectivity_plus` (header Wi-Fi/battery icons) support iOS and the service
 already falls back on errors.
+
+GitHub APK installation and trainer-named pinned launcher shortcuts are Android-only. Shared onboarding source does not imply an iOS device or signed-build verification.
 
 ## Things to check at first device run
 

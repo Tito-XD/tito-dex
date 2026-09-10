@@ -1,7 +1,8 @@
 # Journey Assistant companion APK
 
-This Android application module builds the optional TitoDex Journey Assistant
-content pack. It has no activity or launcher entry. It exports one immutable
+This Android application module maintains the legacy Journey Assistant 1.0.0
+content pack. v0.9.18 includes the assistant in the host and does not offer a
+second-APK install flow. See [legacy compatibility](../../../docs/EXTENSIONS.md). It has no activity or launcher entry. It exports one immutable
 `ContentProvider`, protected by a signature-level permission, so only a TitoDex
 host signed with the same certificate can read it.
 

@@ -12,14 +12,19 @@
 
 只把 **Worker / CDN 相关改动** 合进 `deploy/dex-cdn`，避免 Flutter App 每次 push 都触发 Worker 重部署。
 
-日常流程：
+2026-09-10 的署名清理只更新了 main，旧 `deploy/dex-cdn` 分支没有重写。不要再按旧流程合并整个 main/旧部署历史；本地 pre-push 会扫描整条待推分支。贡献步骤见 [CONTRIBUTING.md](../../docs/CONTRIBUTING.md)。
+
+当前可从经过验证的新 main 源码执行独立 Worker CLI 部署：
 
 ```bash
-# 在 feature 分支改完 cloudflare/dex-cdn/ 或 tools/build_dex_bundle.py 后：
-git checkout deploy/dex-cdn
-git merge main   # 或 cherry-pick 具体 commit
-git push origin deploy/dex-cdn   # → Cloudflare 自动 deploy
+cd cloudflare/dex-cdn
+npm ci
+npx wrangler deploy --dry-run
+# 在部署已获授权、目标与配置核对完成后：
+npx wrangler deploy
 ```
+
+表中 Git 自动部署配置保留作既有配置记录。恢复分支推送部署前，应单独迁移部署分支并确认 Cloudflare Git 配置；不要为通过 hook 擅自强推旧分支，也不要把 Worker 部署与数据包发布混为一件事。
 
 ---
 
@@ -64,7 +69,7 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
    类型/目标补记录，不要把 `dex` 直接指向 R2 公开 bucket
 4. 用根 manifest 与 `/cdn-health` 验证 HTTPS、CORS 和 Worker 路由
 
-`wrangler.toml` 已含 `dex.tito.cafe/*` 路由；push `deploy/dex-cdn` 后会同步。
+`wrangler.toml` 已含 `dex.tito.cafe/*` 路由；经核对后执行 Worker 部署会同步。
 
 ### 5. Cache Rules（Dashboard）
 
@@ -149,7 +154,7 @@ Telegram 收到消息即配置成功。探活失败或 cron 报错时 Worker 会
 ## 图鉴包构建与上传
 
 与 Worker 部署 **分开**进行。当前生产是 bundle v20（仍使用 `/v5/`），
-v0.9.0 Offline APK 直接嵌入经过完整校验的 v20 archive。
+v0.9.18 Offline APK 直接嵌入经过完整校验的 v20 archive。
 
 `.github/workflows/upload-dex-bundle.yml` 是历史 **v19 专用** workflow；
 `.github/workflows/release-dex-bundle-v20.yml` 已从只读 v19 基线发布当前 v20。

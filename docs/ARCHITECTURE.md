@@ -1,6 +1,6 @@
 # TitoDex Architecture
 
-> Current release: v0.9.15 · Lite `0.9.15+196` · Offline `0.9.15-offline+197` · unified Dex context/filtering, theme-specific shared controls and system-following Chinese/English UI · live bundle v20 embedded by Offline.
+> Current release: v0.9.18 · Lite `0.9.18+204` · Offline `0.9.18-offline+205` · App updates, onboarding, trainer shortcuts and structured-data-first answers · live bundle v20 embedded by Offline.
 >
 > Canonical operational context: [AI_CONTEXT.md](./AI_CONTEXT.md).
 
@@ -27,17 +27,21 @@ is the portability path, and parser coverage remains fixture-gated.
 | Save import | One persisted document URI; HGSS rich parser; experimental Gen I–VII metadata adapters |
 | Dex data | Installed bundle first when preferred, then versioned CDN, then PokeAPI fallback |
 | Offline install | SHA-256 verified zstd/tar bundle into app documents |
-| Android native | Save document channel, emulator launcher, foreground download service, dynamic app shortcuts |
-| Optional blocker Q&A | Built-in reviewed seed; save-first local fuzzy match; opt-in Workers AI only for unresolved intent; legacy same-signer pack remains read-compatible |
+| Android native | Save document channel, emulator launcher, Dex foreground download service, verified APK installer, long-press and pinned trainer shortcuts |
+| App update | GitHub stable release → matching variant → user download → SHA-256/package/signer/version validation → system installer |
+| First run | Persisted introduction eligibility; existing installs bypass; name/avatar, features and offline setup |
+| Optional Q&A | Reviewed local hints; deterministic structured resource queries; bounded online fallback with final fact protection; legacy pack read compatibility |
 
 ## Main data flow
 
 ```text
 App bootstrap
+  → decide and persist first-run eligibility before creating journey state
   → load journey / edition / UI preferences / app shortcuts
   → optionally re-read the selected save document
-  → render Home immediately
-  → prepare offline seed/catalog and update prompts in the background
+  → show first-run introduction when eligible; otherwise Home
+  → prepare offline seed/catalog (one-time blocking progress when Offline needs extraction)
+  → check App updates at startup when enabled and at least 24 hours since the last attempt
 ```
 
 ```text
@@ -49,9 +53,9 @@ Dex request
 ```
 
 The location dex and Journey assistant share `location_index.json`. The home
-card uses only the cached summary catalog + location index; the Journey page
-loads at most the six party detail records for evolution reminders. Both
-resolve the selected exact flavor (or merge paired flavors) without inverting
+card uses only the cached summary catalog + location index. Journey shows
+location and counterpart completion grids; Team owns party/evolution details.
+The location views resolve the selected exact flavor (or merge paired flavors) without inverting
 1025 details on-device.
 
 APK-local `item_version_matrix.json` and `move_version_matrix.json` add
@@ -67,17 +71,11 @@ pack may override it only after catalog digest, APK identity/signer, provider
 contract, protocol/host compatibility, and payload digest validation. See
 [EXTENSIONS.md](./EXTENSIONS.md).
 
-The App sends only fields allowed by `data/journey/assistant_api.schema.json`,
-including explicit save-field reliability. Deterministic fuzzy matching always
-runs first. On a miss/tie, optional BGE-M3 hybrid AI Search may return candidate
-IDs, but returned text is discarded and every ID is checked against the same
-local audited facts. On a reviewed-corpus miss, a strict scope gate may fetch
-bounded PokeAPI, StrategyWiki and Wikidata data. Exact move fields are resolved
-for the selected version before use; Qwen composition must pass direct-support
-classification, numeric/version guards and a second verification call. Invalid
-JSON, timeouts, unsupported versions and unknown conditions return a
-local/follow-up state rather than invented guidance. See
-[JOURNEY_ASSISTANT.md](./JOURNEY_ASSISTANT.md).
+The App sends only fields allowed by `data/journey/assistant_api.schema.json`, including explicit save-field reliability and at most six same-game conversation pairs. Local reviewed matching runs first. Supported queries then resolve existing Dex/reference data, including move/ability reverse lookup and intersections, by stable IDs and bounded reads. Unknown version coverage remains explicit.
+
+Remaining questions can use reviewed AI Search candidate IDs and bounded fixed-source/Tavily/DeepSeek retrieval. Retrieved prose is transient and never becomes a new bundle fact. Qwen composition and verification are followed by `enforceFinalFacts`, which restores executed structured results before semantic blocks are produced. Open-ended answers are not automatically labelled verified. UI evidence and entity links use the same IDs; leading props animate through stages and stop on the subject, while the answer grows below its starting reading position. See [ASK_STRUCTURED_DATA.md](ASK_STRUCTURED_DATA.md) and [JOURNEY_ASSISTANT.md](JOURNEY_ASSISTANT.md).
+
+Journey no longer exposes the optional pack download entry. Legacy protocol/data loading remains compatible. App APK updating is separate; see [APP_UPDATE_AND_ONBOARDING.md](APP_UPDATE_AND_ONBOARDING.md).
 
 ## Active layout
 
@@ -85,7 +83,8 @@ local/follow-up state rather than invented guidance. See
 flutter/lib/
   app.dart
   features/
-    app_shortcuts/ companion/ dex/ game/ journey/ launcher/ parser/ save/
+    app_shortcuts/ app_update/ onboarding/ companion/ dex/ game/
+    journey/ extensions/ launcher/ parser/ save/
   pages/
   widgets/
   l10n/
@@ -104,9 +103,9 @@ The React/Capacitor source tree no longer exists.
 
 ## Native and platform boundaries
 
-- Android: full save, launcher, notification and app-shortcut support.
+- Android: full save, launcher, Dex download notifications, verified APK installation and app-shortcut support. APK downloads require the App to remain running; they do not use the Dex foreground download service.
 - Web: save/launcher native operations are disabled; all routes still own a `Scaffold` for preview stability.
-- iOS: imported save files are copied into app documents; emulator launch is unavailable.
+- iOS: imported save files are copied into app documents; emulator launch, APK updates and pinned Android shortcuts are unavailable. The last no-codesign build is v0.7.0; v0.9.18 has no new iOS device/build claim.
 
 ## Verification
 

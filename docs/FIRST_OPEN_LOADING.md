@@ -1,5 +1,7 @@
 # 首次打开与加载检查（2026-09-08，v0.9.16）
 
+此页保留 v0.9.16 首开优化的原始检查记录；v0.9.18 继续沿用该加载策略。新版首次引导与 App 更新见 [APP_UPDATE_AND_ONBOARDING.md](APP_UPDATE_AND_ONBOARDING.md)，当前发布验证见 [RELEASES.md](RELEASES.md)。
+
 本轮是源代码检查与 Flutter 回归验证，不是 Android 真机帧率报告。首次打开的卡顿可能来自读取、解析、组件布局或图片解码；加加载图标本身不能解决 UI 线程占用。
 
 | 页面 / 部分 | 首次需要的工作 | 处理方式 |
