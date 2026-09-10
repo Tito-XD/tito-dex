@@ -26,7 +26,8 @@ android/local.properties
 .vscode/*
 !.vscode/extensions.json
 .idea
-.claude/
+.claude/*
+!.claude/settings.json
 .DS_Store
 *.suo
 *.ntvs*

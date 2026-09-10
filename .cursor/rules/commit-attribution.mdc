@@ -1,0 +1,9 @@
+---
+description: Keep Git attribution under the responsible human maintainer
+alwaysApply: true
+---
+
+Follow AGENTS.md. Use the maintainer's configured Git identity. Do not override
+author or committer with an AI tool identity. Do not add AI Co-authored-by,
+Made-with, generated-by or session trailers. Preserve genuine human credits.
+Repository hooks reject these identities; main also requires Commit authorship.

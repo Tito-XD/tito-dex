@@ -17,3 +17,11 @@
 - Dex CDN secrets: [PERMISSIONS.md](docs/PERMISSIONS.md) — never publish CDN URLs in public copy
 
 Everything else (feature status, file map, CDN build, contributor rules) lives in **AI_CONTEXT.md**.
+
+## Commit attribution
+
+- Use the maintainer's configured Git identity for agent-assisted work. Never set an AI tool as author/committer or add AI `Co-authored-by`, `Made-with`, generated-by or session trailers. Preserve real human contributors.
+- Claude attribution is disabled in `.claude/settings.json`. Repository hooks and the `Commit authorship` check enforce this rule.
+- For a new checkout, enable hooks with `git config core.hooksPath .githooks`. If Python is not on PATH, set `git config titodex.python /absolute/path/to/python`.
+- Push a `code/` branch first, wait for `Commit authorship` to pass, then update `main`. Main requires this check; do not bypass it.
+- Main history was cleaned on 2026-09-10. Rebase/cherry-pick unfinished work onto current `origin/main`; never merge the old history back. Existing release tags are intentionally unchanged.

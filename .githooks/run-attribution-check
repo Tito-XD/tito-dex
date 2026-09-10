@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+root=$(git rev-parse --show-toplevel)
+runtime=$(git config --get titodex.python || true)
+if [ -n "$runtime" ]; then
+  exec "$runtime" "$root/tools/check_commit_attribution.py" "$@"
+fi
+for runtime in python3 python; do
+  if command -v "$runtime" >/dev/null 2>&1 && "$runtime" -c 'import sys; assert sys.version_info >= (3, 9)' >/dev/null 2>&1; then
+    exec "$runtime" "$root/tools/check_commit_attribution.py" "$@"
+  fi
+done
+echo 'Python 3 is required. Set git config titodex.python /absolute/path/to/python.' >&2
+exit 1

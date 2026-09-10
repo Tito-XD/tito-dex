@@ -61,6 +61,8 @@ R2-proxy Worker lives in `cloudflare/dex-cdn/` (deploy branch `deploy/dex-cdn`);
 
 ## Guardrails
 
+- Follow the commit attribution policy in `AGENTS.md`: use the maintainer's Git identity; do not add AI authors, co-authors, generated-by or session trailers. Preserve real human attribution. Push a `code/` branch and pass `Commit authorship` before updating `main`.
+
 - Edit **`flutter/lib/`** and **`flutter/test/`** only for product work; prefer small focused diffs matching existing patterns.
 - Default UI copy in **Chinese** (`app_zh.dart`, `game_zh.dart`). Commits and PRs use English; GitHub Release titles/bodies and the root README use Simplified Chinese by default per `docs/RELEASES.md`.
 - **Never** paste production CDN URLs into README / release notes / user-facing copy.
