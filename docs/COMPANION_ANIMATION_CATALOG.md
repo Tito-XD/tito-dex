@@ -65,6 +65,10 @@ flutter test --no-pub test/companion_animation_live_test.dart
 
 该测试读取大尾立普通／异色与 Paraíso 火球鼠三个真实文件，经过 App 下载器和逐帧验证，再禁止网络检查缓存读取，最后删除测试临时媒体。它是 Flutter 测试运行器验证，不能代替 Android 真机的持续播放、内存和功耗验收。
 
+## 正式制品记录
+
+v0.9.19 Lite / Offline 已发布，签名与 v0.9.18 一致；清单在正式 APK 中为 551,815 字节，压缩占 66,659 字节。两个包的字体、原有 29 个 Companion GIF 均与 v0.9.18 一致，Offline 复用同一完整 v20 归档。正式源码为 `286474e`，完整制品与 CI 证据见 [RELEASES.md](RELEASES.md)。Android 模拟器冒烟通过，实体设备持续播放与功耗尚未验证。
+
 ## 本次验证记录
 
 - `flutter analyze --no-pub`：无问题。

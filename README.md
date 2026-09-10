@@ -74,8 +74,8 @@
 
 前往 [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases) 下载 **`TitoDex-0.9.19-lite-rg-arm64.apk`** 或 **`TitoDex-0.9.19-offline-rg-arm64.apk`**。两个版本都面向 arm64-v8a Android 设备。v0.9.19 可直接从 v0.8.13 及之后的正式版或公开预览版升级；从 v0.8.12 或更早版本升级时，仍需先导出旅程、卸载旧版。
 
-- **[Lite](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-lite-rg-arm64.apk)**：推荐，需要时可在设置中下载离线数据。
-- **[Offline](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-offline-rg-arm64.apk)**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。
+- **[Lite · 29.32 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-lite-rg-arm64.apk)**：推荐，需要时可在设置中下载离线数据。
+- **[Offline · 95.45 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-offline-rg-arm64.apk)**：内置完整 v20 资料，首次启动会准备随包数据，安装包较大但无需先联网补齐最新招式与图鉴信息。
 
 自 v0.9.18 起支持设置内检查更新：启动时每 24 小时最多自动检查一次，按当前 Lite／Offline 匹配 GitHub 正式版；用户确认下载，校验后交给系统安装。0.9.17 及更早版本需先手动安装本版，APK 下载期间保持 App 运行。也可使用[网站下载入口](https://titodex.pages.dev/app#download)。
 

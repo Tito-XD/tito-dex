@@ -18,7 +18,7 @@ flutter run -d chrome # web preview (limited)
 
 ## Release APK (RG handheld)
 
-Arm64 Flutter runtime, SDK 36. Published v0.9.18 is 29.13 MB Lite / 95.25 MB Offline; small plugin helpers may include other ABIs. Verify contents and signatures rather than relying on a fixed size.
+Arm64 Flutter runtime, SDK 36. Published v0.9.19 is 29.32 MB Lite / 95.45 MB Offline; small plugin helpers may include other ABIs. Verify contents and signatures rather than relying on a fixed size.
 
 ```bash
 flutter build apk --release --target-platform android-arm64

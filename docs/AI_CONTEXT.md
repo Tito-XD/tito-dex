@@ -48,7 +48,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ### v0.9.19: Trainer’s Journal and companion animation choices (2026-09-10)
 
-Trainer’s Journal uses thin gray-blue outlines, short paper edges, photo/tape details and ruled journey records. Existing font sizes, layout rules and bundled Nunito cuts remain; Plastic/Flat retain their own styles. Companion bundles 1,550 exact source/form/color mappings across 546 species, with game/source choices, explicit downloads, full-frame validation and independent caches. Missing mappings are not replaced with another form or color. Lite uses versionCode 206 and Offline 207; v20 stays unchanged. See [COMPANION_ANIMATION_CATALOG.md](COMPANION_ANIMATION_CATALOG.md) and [release records](RELEASES.md).
+Trainer’s Journal uses thin gray-blue outlines, short paper edges, photo/tape details and ruled journey records. Existing font sizes, layout rules and bundled Nunito cuts remain; Plastic/Flat retain their own styles. Companion bundles 1,550 exact source/form/color mappings across 546 species, with game/source choices, explicit downloads, full-frame validation and independent caches. Missing mappings are not replaced with another form or color. Lite uses versionCode 206 (29.32 MB) and Offline 207 (95.45 MB); v20 stays unchanged. Signed artifacts bind to source `286474e`; local 684 tests, cloud Web build and Android emulator smoke passed. Physical-device playback and upgrade acceptance remain separate. See [COMPANION_ANIMATION_CATALOG.md](COMPANION_ANIMATION_CATALOG.md) and [release records](RELEASES.md).
 
 ### v0.9.18: App updater and first-run setup (2026-09-10)
 

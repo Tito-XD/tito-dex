@@ -23,6 +23,15 @@ Lite 使用 `0.9.19+206`，Offline 使用 `0.9.19-offline+207`，合并训练家
 
 [GitHub Release](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) 记录本版实际签名包、源码提交、大小、摘要与构建验证；[候选说明](COMPANION_ANIMATION_CATALOG.md) 记录覆盖范围和测试边界。真机持续播放、内存与功耗验收仍独立于自动化测试。
 
+正式发布时间：2026-09-10T15:38:44Z；[发布源码 `286474e`](https://github.com/Tito-XD/tito-dex/commit/286474e5f21809f8475425d836265ba45017726b) · [签名构建 34493567443](https://github.com/Tito-XD/tito-dex/actions/runs/34493567443) · [Flutter CI 34493566837](https://github.com/Tito-XD/tito-dex/actions/runs/34493566837)。
+
+| 制品 | versionCode | 字节数（十进制 MB） | SHA-256 |
+| --- | --- | --- | --- |
+| Lite | 206 | 29,323,945（29.32 MB） | `f9225bf69a8c6405092b68afe8f9b942ea23f5cf83ca4160bee8d13d6ccbd77b` |
+| Offline | 207 | 95,451,533（95.45 MB） | `fc7f116149a3b71bb7131f2fcbeda10a1e454a664d1c92e06c93c995000110aa` |
+
+本地静态分析无问题，684 项 Flutter 测试通过、2 项条件跳过；云端重新通过源码检查、测试、清单生成核对、Web 编译和 Android 模拟器冒烟。下载后的正式附件已复核 ZIP、包名、版本、版本码与 arm64 主程序，发布签名与 v0.9.18 一致。字体文件和 29 个内置 Companion GIF 与 v0.9.18 逐字节一致；新增候选清单为 551,815 字节，APK 内压缩占 66,659 字节。Offline 的 v20 归档仍为 66,129,008 字节，SHA-256 为 `e7c8e059ed9ee0a8d5e77a9a8ac0a13516f66c848597276f989d5800051530d5`。App 更新解析器已接受 GitHub 正式版中的两种真实附件与摘要。实体 Android 设备的持续播放、内存、功耗与覆盖安装尚未复测。
+
 ## 0.9.18 正式版
 
 Lite 使用 `0.9.18+204`，Offline 使用 `0.9.18-offline+205`，沿用发布签名和完整 v20 离线资料。
