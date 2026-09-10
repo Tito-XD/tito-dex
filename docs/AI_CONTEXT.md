@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.17) |
-| **`main` / lite source** | `0.9.17+202` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.17-offline+203` — APK-bundled verified v20 archive |
+| **Latest release** | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) |
+| **`main` / lite source** | `0.9.18+204` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.18-offline+205` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,7 +44,11 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.17)
+## Current feature status (latest release line: v0.9.18)
+
+### v0.9.18: App updater and first-run setup (2026-09-10)
+
+v0.9.18 adds a GitHub stable-release checker with variant-aware verified APK download and Android system installation, a three-step first-run profile/feature guide with upgrade migration, and a user-confirmed trainer-named pinned Home shortcut. Settings companion icons use the standard outlined Poké Ball. Explicit trainer names remain protected from later save imports. Users of v0.9.17 and earlier need to install v0.9.18 manually once to gain in-app updates. See [APP_UPDATE_AND_ONBOARDING.md](./APP_UPDATE_AND_ONBOARDING.md) for behavior, source locations through the test map, and device acceptance boundaries.
 
 ### v0.9.17: structured answers and compact native layouts (2026-09-09)
 

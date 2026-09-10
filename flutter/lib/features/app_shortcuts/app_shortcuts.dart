@@ -239,6 +239,38 @@ class AppShortcutsPlatform {
     }
   }
 
+  Future<bool> trainerShortcutSupported() async {
+    if (!_supported) return false;
+    try {
+      return await _channel.invokeMethod<bool>('trainerShortcutSupported') ??
+          false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
+  Future<String> pinTrainerShortcut(String trainerName) =>
+      _trainerShortcut('pinTrainerShortcut', trainerName);
+
+  Future<String> updateTrainerShortcut(String trainerName) =>
+      _trainerShortcut('updateTrainerShortcut', trainerName);
+
+  Future<String> _trainerShortcut(String method, String trainerName) async {
+    if (!_supported) return 'unsupported';
+    try {
+      return await _channel.invokeMethod<String>(method, {
+            'label': AppZh.displayTitleForTrainer(trainerName),
+          }) ??
+          'failed';
+    } on PlatformException {
+      return 'failed';
+    } on MissingPluginException {
+      return 'unsupported';
+    }
+  }
+
   @visibleForTesting
   Future<List<String>> dynamicShortcutIds() async {
     if (!_supported) {

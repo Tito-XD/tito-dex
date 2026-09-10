@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.17) · App `0.9.17+202` | Structured answers, exact-game selection and compact grids; on-demand v20 data |
-| Offline APK | [v0.9.17](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.17) · App `0.9.17-offline+203` | The same updated UI with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18+204` | In-app updates, first-run guidance and trainer shortcuts; on-demand v20 data |
+| Offline APK | [v0.9.18](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.18) · App `0.9.18-offline+205` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Per-game optional data packs, 50 local Q&A pairs, and companion motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -70,7 +70,7 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.17-lite-rg-arm64.apk`** or **`TitoDex-0.9.17-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.17 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.18-lite-rg-arm64.apk`** or **`TitoDex-0.9.18-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.18 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/companion/companion_art.dart';
 import '../features/app_shortcuts/app_shortcuts.dart';
+import '../features/app_update/app_update_service.dart';
 import '../features/companion/companion_media.dart';
 import '../features/companion/companion_repository.dart';
 import '../features/dex/sprite_generation_catalog.dart';
@@ -40,6 +41,8 @@ import '../widgets/fallback_sprite_image.dart';
 import '../widgets/secondary_page_scaffold.dart';
 import '../widgets/settings_expandable_section.dart';
 import '../widgets/sticker_card.dart';
+import '../widgets/app_update_card.dart';
+import '../widgets/trainer_shortcut_button.dart';
 import '../widgets/tito_progress_dialog.dart';
 import '../widgets/tito_progress_bar.dart';
 
@@ -97,6 +100,7 @@ class SettingsPage extends StatefulWidget {
     required this.onPickEmulator,
     required this.onClearEmulator,
     this.onChangeGameEdition,
+    this.onShowIntroduction,
     this.section = SettingsSection.overview,
   });
 
@@ -118,6 +122,7 @@ class SettingsPage extends StatefulWidget {
 
   /// Opens the game edition picker (same flow as the home header badge).
   final Future<void> Function(BuildContext context)? onChangeGameEdition;
+  final VoidCallback? onShowIntroduction;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -328,9 +333,9 @@ class _SettingsPageState extends State<SettingsPage> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineFailed)));
     } finally {
       if (mounted) {
         setState(() => _dexDownloading = false);
@@ -458,9 +463,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showDexDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.snackDownloadCancelled)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDownloadCancelled)));
       return;
     }
     if (lastProgress?.phase == 'done') {
@@ -476,9 +481,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _showDexOfflineDownloadResult(DexCacheProgress? lastProgress) {
     if (lastProgress?.phase == 'cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.snackDownloadCancelled)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDownloadCancelled)));
       return;
     }
     final cachedCount = _dexCacheStatus?.manifest.pokemonCount ?? 0;
@@ -491,9 +496,9 @@ class _SettingsPageState extends State<SettingsPage> {
         SnackBar(content: Text(AppZh.snackDexOfflinePartial(cachedCount))),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppZh.snackDexOfflineFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppZh.snackDexOfflineFailed)));
     }
   }
 
@@ -598,7 +603,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
 
-    final customized = trimmed != (widget.journey.saveTrainerName ?? trimmed);
+    final customized = trimmed != widget.journey.saveTrainerName;
     widget.onSaveJourney(
       widget.journey.copyWith(
         trainerName: trimmed,
@@ -681,7 +686,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             _SettingsNavigationEntry(
               section: SettingsSection.companion,
-              icon: Icons.cruelty_free_outlined,
+              icon: Icons.catching_pokemon_outlined,
               hint: AppZh.settingsCategoryCompanionHint,
             ),
             _SettingsNavigationEntry(
@@ -851,6 +856,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   FilledButton(
                     onPressed: _trainerDirty ? _saveTrainerName : null,
                     child: Text(AppZh.settingsSaveTrainerName),
+                  ),
+                  TrainerShortcutButton(
+                    trainerName: widget.journey.trainerName,
                   ),
                   if (saveLinked) ...[
                     const SizedBox(height: 16),
@@ -1261,6 +1269,18 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 16),
         ],
         if (widget.section == SettingsSection.about) ...[
+          if (appUpdateService.supported) ...[
+            const AppUpdateCard(),
+            const SizedBox(height: 16),
+          ],
+          if (widget.onShowIntroduction != null) ...[
+            OutlinedButton.icon(
+              onPressed: widget.onShowIntroduction,
+              icon: const Icon(Icons.explore_outlined),
+              label: Text(AppZh.onboardingReplay),
+            ),
+            const SizedBox(height: 16),
+          ],
           StickerCard(
             variant: StickerVariant.cream,
             child: Row(
@@ -1832,7 +1852,7 @@ class _CompanionSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _SettingsToggleRow(
-                  icon: Icons.cruelty_free_rounded,
+                  icon: Icons.catching_pokemon_outlined,
                   plateColor: TitoColors.softYellow,
                   label: AppZh.companionSettingsToggle,
                   hint: AppZh.companionSettingsHint,

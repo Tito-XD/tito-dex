@@ -159,7 +159,7 @@ class _TrainerCardBody extends StatelessWidget {
         ? journey.trainerName
         : 'Tito';
 
-    final avatar = _TrainerAvatar(
+    final avatar = TrainerAvatar(
       journey: journey,
       size: metrics.avatarSize,
       placeholder: avatarPlaceholder,
@@ -215,8 +215,9 @@ class _TrainerCardBody extends StatelessWidget {
   }
 }
 
-class _TrainerAvatar extends StatelessWidget {
-  const _TrainerAvatar({
+class TrainerAvatar extends StatelessWidget {
+  const TrainerAvatar({
+    super.key,
     required this.journey,
     required this.size,
     this.placeholder = false,

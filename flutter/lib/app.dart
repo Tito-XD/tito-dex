@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import 'config/app_config.dart';
 import 'features/app_shortcuts/app_shortcuts.dart';
+import 'features/app_update/app_update_service.dart';
+import 'features/onboarding/onboarding_preferences.dart';
 import 'features/companion/companion_repository.dart';
 import 'features/extensions/journey_assistant_extension.dart';
 import 'theme/app_visual_style.dart';
@@ -58,6 +61,7 @@ import 'widgets/continue_emulator_sheet.dart';
 import 'widgets/device_shell.dart';
 import 'widgets/handheld_input.dart';
 import 'widgets/offline_data_prompt.dart';
+import 'widgets/onboarding_dialog.dart';
 import 'widgets/pokemon_card.dart';
 import 'widgets/system_ui_coordinator.dart';
 import 'widgets/tito_page_container.dart';
@@ -85,6 +89,8 @@ class _TitoDexAppState extends State<TitoDexApp> {
   SaveFileConfig _saveConfig = const SaveFileConfig();
   EmulatorAppChoice? _emulatorChoice;
   bool _bootstrapComplete = false;
+  bool _introductionNeeded = false;
+  bool _introductionOpen = false;
   String? _pendingShortcutRoute;
 
   @override
@@ -503,10 +509,16 @@ class _TitoDexAppState extends State<TitoDexApp> {
         onPickEmulator: () => _pickEmulatorFromSettings(context),
         onClearEmulator: () => _clearEmulator(context),
         onChangeGameEdition: _onGameBadgeTap,
+        onShowIntroduction: () async {
+          if (await _showIntroduction() && mounted) {
+            _router.push('/settings/data');
+          }
+        },
       );
 
   void _openShortcutRoute(String route) {
-    if (!AppShortcutOption.all.any((option) => option.route == route)) {
+    if (route != '/' &&
+        !AppShortcutOption.all.any((option) => option.route == route)) {
       return;
     }
     if (!_bootstrapComplete) {
@@ -517,6 +529,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
   }
 
   Future<void> _bootstrap() async {
+    _introductionNeeded = await OnboardingPreferences().shouldShow();
     await gameEditionRepository.load();
     await askTitoDexSettings.load();
     await journeyAssistantExtension.refresh();
@@ -568,6 +581,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     _emulatorChoiceRefresh.value = emulatorChoice;
     _settingsRefresh.value += 1;
     _BootstrapGate.instance.markReady();
+    unawaited(_appShortcutsPlatform.updateTrainerShortcut(journey.trainerName));
     final initialShortcut =
         _pendingShortcutRoute ??
         await _appShortcutsPlatform.consumeInitialRoute();
@@ -576,8 +590,53 @@ class _TitoDexAppState extends State<TitoDexApp> {
       _openShortcutRoute(initialShortcut);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _prepareDexAfterHomeIsReady();
+      _finishStartup();
     });
+  }
+
+  Future<bool> _showIntroduction() async {
+    final context = _rootNavigatorKey.currentContext;
+    if (_introductionOpen || context == null || !context.mounted) return false;
+    _introductionOpen = true;
+    try {
+      return await showTrainerOnboarding(
+        context,
+        journey: _journey,
+        onSave: _persist,
+      );
+    } finally {
+      _introductionOpen = false;
+    }
+  }
+
+  Future<void> _finishStartup() async {
+    final openData = _introductionNeeded && await _showIntroduction();
+    if (!mounted) return;
+    // Release metadata is small; check independently of large Dex preparation.
+    final updateCheck = appUpdateService.check(automaticCheck: true);
+    await _prepareDexAfterHomeIsReady();
+    if (!mounted) return;
+    if (openData) _router.push('/settings/data');
+    await updateCheck;
+    final context = _rootNavigatorKey.currentContext;
+    if (!mounted ||
+        context == null ||
+        !context.mounted ||
+        appUpdateService.release == null) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${AppZh.appUpdateAvailable} · ${appUpdateService.release!.version}',
+        ),
+        duration: const Duration(seconds: 12),
+        action: SnackBarAction(
+          label: AppZh.appUpdateView,
+          onPressed: () => _router.push('/settings/about'),
+        ),
+      ),
+    );
   }
 
   Future<CurrentJourney> _migrateLegacyBundledTrainerName(
@@ -679,6 +738,7 @@ class _TitoDexAppState extends State<TitoDexApp> {
     setState(() => _journey = journey);
     _settingsRefresh.value += 1;
     await _repository.save(journey);
+    await _appShortcutsPlatform.updateTrainerShortcut(journey.trainerName);
   }
 
   Future<void> _pickSaveFile(BuildContext feedbackContext) async {
