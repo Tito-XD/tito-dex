@@ -4,9 +4,9 @@
 
 | Field | Value |
 | --- | --- |
-| **Latest release** | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) |
-| **`main` / lite source** | `0.9.20+208` (`flutter/pubspec.yaml`; release preparation) |
-| **Offline package** | Planned `0.9.20-offline+209` — APK-bundled verified v20 archive; published pair remains v0.9.19 until artifact verification |
+| **Latest release** | [v0.9.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.20) |
+| **`main` / lite source** | `0.9.20+208` (`flutter/pubspec.yaml`) |
+| **Offline package** | `0.9.20-offline+209` — APK-bundled verified v20 archive |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -44,9 +44,9 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ---
 
-## Current feature status (latest release line: v0.9.19)
+## Current feature status (latest release line: v0.9.20)
 
-### v0.9.20 release preparation: Ask experience and structure (2026-09-14)
+### v0.9.20: Continuous questions and experience improvements (2026-09-14)
 
 The Ask page keeps request/version ownership, history persistence and scroll
 anchoring. `AskTitoDexRevealController` owns semantic queues, reveal pacing,
@@ -68,8 +68,10 @@ changes, cursor restart and download completion/cancellation across settings
 routes. The controller retains the original 20ms/112-step/96ms/150ms timing.
 Ask history/source tiles share their identical shape/border definition; answer
 cards reuse `AssistantSurface` defaults. Three-theme differences remain explicit.
-No release version, data bundle or production traffic changes accompany this
-work; see [P2 boundaries and independent follow-up work](P2_REFACTOR_HANDOFF.md).
+These changes ship in v0.9.20 while the Dex bundle remains v20. The Journey
+Worker version `018d1740-4433-4b87-8488-d892adeb82a7` serves 100% of production
+traffic; health and both new/legacy request checks passed. See
+[P2 boundaries and independent follow-up work](P2_REFACTOR_HANDOFF.md).
 
 Follow-up source work adds an explicit `general` / generation `0` request mode:
 no save facts or Journey pack references accompany an unspecified game. Local
@@ -98,8 +100,9 @@ fall through to online research. Structured answers preserve encounter condition
 multi-part questions when their facts do not cover the whole request. Evolution
 shortcuts must match the requested edge. Source-scoped relaxed verification also
 applies to franchise questions, with unverified-support labeling and the existing
-empty-source, topic and generated-fact guards retained. Preview uploads do not
-change production traffic.
+empty-source, topic and generated-fact guards retained. Earlier content checks
+used isolated previews; production deployment does not imply every answer passed
+content review.
 Card-rule verification keeps exact supporting excerpts for each retained claim;
 contradictions cannot fall back to relaxed acceptance. Official rule sources
 participate before accepting a short search result. Natural-language conjunctions
@@ -120,6 +123,29 @@ Preview checks still found unsupported refusals for English character/manga
 questions and incomplete machine acquisition answers. Exact-quote verification
 can still misjudge meaning; nested model JSON and dangling example introductions
 are rejected at the output boundary. Keep live content review separate from tests.
+
+Published at 2026-09-14T10:21:05Z: [v0.9.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.20), source
+[`f560d68`](https://github.com/Tito-XD/tito-dex/commit/f560d68ac5a3690a9ba4908f4f1095ea229f0437).
+Signed artifacts use versionCodes 208/209; downloaded APKs passed ZIP, signature,
+package/version checks and retain the bundled fonts. Offline retains the same
+66,129,008-byte v20 archive. [Release verification 34830148118](https://github.com/Tito-XD/tito-dex/actions/runs/34830148118) passed.
+Development validation recorded 732 Flutter tests passed / 2 skipped, no analyzer
+issues, and 36 unchanged before/after theme screenshots. Local next-step answers
+were demonstrated on a connected emulator. A separate local test package built
+from the same f560d68 App source passed all three Android integration tests
+(artwork front/back toggle, media resource page and dynamic shortcuts), preserving
+existing app data. Both App updater variants accepted the public release assets
+and matched their audited byte counts and SHA-256 digests. The first cloud Android
+run [34829241382](https://github.com/Tito-XD/tito-dex/actions/runs/34829241382)
+timed out at 35 minutes; logs showed insufficient /dev/kvm permission and software
+emulation. This does not establish the sole cause or an App deadlock. The separate
+CI-only KVM permission fix `8e90062` passed [Flutter CI 34832894885](https://github.com/Tito-XD/tito-dex/actions/runs/34832894885),
+including Android emulator tests, analysis, unit tests and Web compilation.
+Its App/backend source is unchanged from the release tag; the initial timed-out
+cloud run is not counted as passed.
+Final signed-APK launch/upgrade remains unverified: installation over the old
+0.8.5 debug signature was blocked without deleting its data. Full artifact hashes
+and acceptance details are in [the release record](RELEASES.md).
 
 ### v0.9.19: Trainer’s Journal and companion animation choices (2026-09-10)
 

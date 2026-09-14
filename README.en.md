@@ -12,8 +12,8 @@ It is designed to make returning to a playthrough feel immediate: see where the 
 
 | Channel | Version | Notes |
 | --- | --- | --- |
-| Lite APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19+206` | Lighter Trainer’s Journal and on-demand companion animations; on-demand v20 data |
-| Offline APK | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) · App `0.9.19-offline+207` | The same updated UI with the complete verified v20 bundle embedded |
+| Lite APK | [v0.9.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.20) · App `0.9.20+208` | General questions, follow-ups and stability improvements; on-demand v20 data |
+| Offline APK | [v0.9.20](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.20) · App `0.9.20-offline+209` | The same updated UI with the complete verified v20 bundle embedded |
 | Journey Assistant | Built in | Structured-data-first answers, 50 local Q&A pairs, and category-aware prop motion |
 
 > Deprecated artifacts named `TitoDex-1.0.x-*` belong to the frozen pre-Flutter mock prototype. They remain available only for historical reference and are not newer than the current Flutter release.
@@ -34,7 +34,7 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 - **Three built-in themes** — Trainer's Journal, Solid Plastic, and Flat UI persist across launches; production installs still default to Trainer's Journal. Navigation and content reveals adapt to each theme and respect reduced-motion settings.
 - **Playthrough dashboard** — current game, location, party, badges, play time, and quick actions.
 - **Journey details** — Ask sits directly below current location. Trainer facts and same-generation counterpart encounter gaps use compact grids; other uncaught species open as a Dex filter. Party evolution lives in Team.
-- **Ask TitoDex** — off by default, with explicit network and context consent. Supported evolution, move/ability reverse lookup, intersected filters, items and other existing resources use deterministic queries whose results cannot be overwritten by the model; remaining questions use bounded source retrieval. The latest 50 Q&A pairs stay on-device, with at most six same-game pairs used for follow-ups. Raw saves and trainer/party data are never uploaded. Leading answer props follow the question category and stop on its subject; long answers retain their starting reading position. Expand evidence on demand and open entities by stable IDs.
+- **Ask TitoDex** — off by default, with explicit network and context consent. Supported evolution, move/ability reverse lookup, intersected filters, items and other existing resources use deterministic queries whose complete structured results are protected from model rewrites; remaining questions use bounded source retrieval. General questions can be asked without choosing a game; exact version labels match the Dex. The latest 50 Q&A pairs stay on-device, with at most six same-scope pairs used for follow-ups. Failed or empty turns break old context, and reviewed local progression supports explicit next-step and prerequisite follow-ups. Raw saves and trainer/party data are never uploaded. Leading answer props follow the question category and stop on its subject; long answers retain their starting reading position. Expand evidence on demand and open entities by stable IDs.
 - **Save-aware journeys** — one selected `.sav` file with persisted access; experimental Gen 1–7 metadata recognition, while HGSS syncs party nicknames, held items, moves/PP, abilities, EXP, friendship, natures, shiny state, IVs/EVs, battle stats, map/coordinates, money, trainer metadata, both badge banks, and Pokédex progress.
 - **Pokédex 1–1025** — searchable forms, regional or G1–G9 scopes, body-style / colour / size filters, form-aware evolution chains, exact game and DLC obtain methods, moves, abilities, and selective form media.
 - **Location Dex** — a compact selected-version area grid with caught completion and a missing-first encounter sheet.
@@ -48,6 +48,8 @@ Dex data: live and Offline bundles **v20** · 1025 species · 803 form records �
 - **Handheld layouts** — phones, tablets, square screens, and controller focus navigation.
 
 Companion animation choices now include Paraíso game collections and explicitly mapped ShinyHunters samples. The app bundles a small URL index and downloads only the confirmed choice; the first catalog covers 546 species, with exact form and color matching. Trainer’s Journal uses lighter outlines, paper edges, photo/tape details and ruled records while retaining existing font sizes and bundled fonts.
+
+Online answer quality remains limited: some manga and English character questions are still declined, and PTCG rules and exceptions may be interpreted incorrectly. Citations and an answered status do not establish that every claim has been verified.
 
 ## Product principles
 
@@ -72,11 +74,11 @@ Details: [Architecture](docs/ARCHITECTURE.md)
 
 ## Install
 
-Download **`TitoDex-0.9.19-lite-rg-arm64.apk`** or **`TitoDex-0.9.19-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.19 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
+Download **`TitoDex-0.9.20-lite-rg-arm64.apk`** or **`TitoDex-0.9.20-offline-rg-arm64.apk`** from [GitHub Releases](https://github.com/Tito-XD/tito-dex/releases). Both target arm64-v8a Android devices. v0.9.20 upgrades directly from v0.8.13 and later production or public preview builds; Android signing was rotated in v0.8.13, so v0.8.12 or earlier still requires export, uninstall, and reinstall.
 
 The Lite APK downloads v20 data from Settings when requested. The larger Offline APK embeds the complete v20 bundle and prepares it on first launch.
 
-Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.32 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-lite-rg-arm64.apk), [Offline · 95.45 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.19/TitoDex-0.9.19-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
+Since v0.9.18, Settings supports updates: startup checks stable GitHub releases at most once per 24 hours, matches the installed Lite/Offline variant, and downloads only on user request before verification and Android installation. Earlier versions need one manual upgrade. Keep the App running during APK downloads. Direct downloads: [Lite · 29.32 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.20/TitoDex-0.9.20-lite-rg-arm64.apk), [Offline · 95.45 MB](https://github.com/Tito-XD/tito-dex/releases/download/v0.9.20/TitoDex-0.9.20-offline-rg-arm64.apk), or the [website download page](https://titodex.pages.dev/app#download).
 
 ## Development
 
