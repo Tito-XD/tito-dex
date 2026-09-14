@@ -13,6 +13,7 @@ import 'package:titodex/features/journey/progression_hints.dart';
 import 'package:titodex/l10n/app_zh.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
+import 'package:titodex/widgets/ask/ask_answer_text.dart';
 import 'package:titodex/widgets/ask_answer_motion_title.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
@@ -173,6 +174,146 @@ void main() {
     },
   );
 
+  testWidgets('idle intro pauses midway in background and resumes its text', (
+    tester,
+  ) async {
+    await _mount(tester, _MotionService(), settle: false);
+    await tester.pump(const Duration(milliseconds: 80));
+    final partial = _visibleIdlePrompt(tester);
+    expect(partial, isNotEmpty);
+    expect(AppZh.askTitoDexIdlePrompt, startsWith(partial));
+    expect(partial, isNot(AppZh.askTitoDexIdlePrompt));
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump(const Duration(seconds: 2));
+    expect(_visibleIdlePrompt(tester), partial);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump(const Duration(milliseconds: 40));
+    expect(_visibleIdlePrompt(tester).length, greaterThan(partial.length));
+    await _until(
+      tester,
+      () => find.text(AppZh.askTitoDexIdlePrompt).evaluate().isNotEmpty,
+    );
+    await tester.pumpWidget(const SizedBox());
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('covering the route preserves the unfinished idle intro', (
+    tester,
+  ) async {
+    final router = await _mount(tester, _MotionService(), settle: false);
+    await tester.pump(const Duration(milliseconds: 80));
+    final partial = _visibleIdlePrompt(tester);
+    expect(partial, isNotEmpty);
+    expect(partial, isNot(AppZh.askTitoDexIdlePrompt));
+
+    unawaited(router.push('/settings'));
+    await tester.pump();
+    final paused = _visibleIdlePrompt(tester, skipOffstage: false);
+    await tester.pump(const Duration(seconds: 2));
+    expect(_visibleIdlePrompt(tester, skipOffstage: false), paused);
+
+    router.pop();
+    await tester.pump();
+    await _until(
+      tester,
+      () => find.text(AppZh.askTitoDexIdlePrompt).evaluate().isNotEmpty,
+    );
+    await tester.pumpWidget(const SizedBox());
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reduce motion settles an unfinished intro and can be disabled', (
+    tester,
+  ) async {
+    final dispatcher = tester.binding.platformDispatcher;
+    addTearDown(dispatcher.clearAccessibilityFeaturesTestValue);
+    await _mount(tester, _MotionService(), settle: false);
+    await tester.pump(const Duration(milliseconds: 80));
+    final partial = _visibleIdlePrompt(tester);
+    expect(partial, isNotEmpty);
+    expect(partial, isNot(AppZh.askTitoDexIdlePrompt));
+
+    dispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+      disableAnimations: true,
+    );
+    await tester.pump();
+    expect(find.text(AppZh.askTitoDexIdlePrompt), findsOneWidget);
+    await tester.pump(const Duration(seconds: 7));
+    expect(find.text(AppZh.askTitoDexIdlePrompt), findsOneWidget);
+    final idle = find.byKey(const Key('ask-titodex-idle-topic'));
+    expect(
+      tester.widget<AskAnswerMotionTitle>(idle).text,
+      AppZh.askTitoDexIdleTopics.first,
+    );
+
+    dispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(
+      disableAnimations: false,
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 40));
+    expect(_visibleIdlePrompt(tester).length, greaterThan(partial.length));
+    await _until(
+      tester,
+      () => find.text(AppZh.askTitoDexIdlePrompt).evaluate().isNotEmpty,
+    );
+    await tester.pump(const Duration(seconds: 6));
+    expect(
+      tester.widget<AskAnswerMotionTitle>(idle).text,
+      AppZh.askTitoDexIdleTopics[1],
+    );
+    await tester.pumpWidget(const SizedBox());
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('inline cursor resumes after reducing motion is switched off', (
+    tester,
+  ) async {
+    final reduceMotion = ValueNotifier(false);
+    addTearDown(reduceMotion.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ValueListenableBuilder<bool>(
+          valueListenable: reduceMotion,
+          builder: (context, disabled, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(disableAnimations: disabled),
+            child: child!,
+          ),
+          child: const AskBlinkingInlineText(
+            text: '预览',
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+      ),
+    );
+    final renderedText = find.byWidgetPredicate(
+      (widget) => widget is Text && (widget.data?.startsWith('预览') ?? false),
+    );
+    Future<Set<String>> sampleCursor() async {
+      final frames = <String>{};
+      for (var frame = 0; frame < 20; frame++) {
+        await tester.pump(const Duration(milliseconds: 100));
+        frames.add(tester.widget<Text>(renderedText).data!);
+      }
+      return frames;
+    }
+
+    expect(await sampleCursor(), {'预览▍', '预览\u2009'});
+    reduceMotion.value = true;
+    await tester.pump();
+    expect(await sampleCursor(), {'预览▍'});
+    reduceMotion.value = false;
+    await tester.pump();
+    expect(await sampleCursor(), {'预览▍', '预览\u2009'});
+    await tester.pumpWidget(const SizedBox());
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('reduced motion keeps idle and real answer outcomes immediate', (
     tester,
   ) async {
@@ -204,6 +345,26 @@ void main() {
     expect(_paintInside(find.byKey(_titleKey)), findsNothing);
     expect(find.byKey(const ValueKey('ask-motion-caught')), findsNothing);
   });
+}
+
+String _visibleIdlePrompt(WidgetTester tester, {bool skipOffstage = true}) {
+  final prompt = find.byWidgetPredicate(
+    (widget) =>
+        widget is Semantics &&
+        widget.properties.label == AppZh.askTitoDexIdlePrompt,
+    skipOffstage: skipOffstage,
+  );
+  final text = find.descendant(
+    of: prompt,
+    matching: find.byType(RichText, skipOffstage: skipOffstage),
+    skipOffstage: skipOffstage,
+  );
+  return tester
+      .widget<RichText>(text)
+      .text
+      .toPlainText()
+      .replaceAll('▍', '')
+      .replaceAll('\u2009', '');
 }
 
 const _titleKey = Key('ask-titodex-answer-motion-title');
@@ -239,7 +400,11 @@ Future<void> _submit(WidgetTester tester, String question) async {
   await tester.pump();
 }
 
-Future<void> _mount(WidgetTester tester, _MotionService service) async {
+Future<GoRouter> _mount(
+  WidgetTester tester,
+  _MotionService service, {
+  bool settle = true,
+}) async {
   tester.view.physicalSize = const Size(420, 900);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -271,7 +436,8 @@ Future<void> _mount(WidgetTester tester, _MotionService service) async {
   );
   addTearDown(router.dispose);
   await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-  await tester.pumpAndSettle();
+  if (settle) await tester.pumpAndSettle();
+  return router;
 }
 
 class _MotionService extends AskTitoDexService {

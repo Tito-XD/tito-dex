@@ -46,6 +46,27 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.9.19)
 
+### Unreleased source: Ask component extraction (2026-09-14)
+
+The Ask page keeps request/version ownership, history persistence, semantic reveal
+pacing and scroll anchoring. Its presentation components now live in
+`flutter/lib/widgets/ask/`: connection/history panels, question input and idle
+prompt, answer text/blocks/cards, sources/entities and shared paper styles.
+`AskTitoDexPage`, `AskTitoDexSourceOpener` and
+`buildAskTitoDexClarificationQuestion` retain their original page import path.
+Wire-hint validation and rendering share the existing answer text parsers;
+canonical-text precedence, all widget keys and theme-specific visuals remain.
+
+The preceding P1/P3 fixes remain: resumable idle typing, restored cursor animation
+after reduced motion is disabled, shared 50-pair history trimming, diagnostic
+logs, zh/en translation-key checks and download-only settings polling. Settings
+also resynchronizes shared download/cache state when returning from a covered
+route. New regressions cover idle lifecycle/route interruption, reduced-motion
+changes, cursor restart and download completion/cancellation across settings
+routes. No release version, data bundle or Worker deployment changes accompany
+this source refactor. The reveal-controller and wider theme work remains deferred;
+see [remaining P2 work](P2_REFACTOR_HANDOFF.md).
+
 ### v0.9.19: Trainer’s Journal and companion animation choices (2026-09-10)
 
 Trainer’s Journal uses thin gray-blue outlines, short paper edges, photo/tape details and ruled journey records. Existing font sizes, layout rules and bundled Nunito cuts remain; Plastic/Flat retain their own styles. Companion bundles 1,550 exact source/form/color mappings across 546 species, with game/source choices, explicit downloads, full-frame validation and independent caches. Missing mappings are not replaced with another form or color. Lite uses versionCode 206 (29.32 MB) and Offline 207 (95.45 MB); v20 stays unchanged. Signed artifacts bind to source `286474e`; local 684 tests, cloud Web build and Android emulator smoke passed. Physical-device playback and upgrade acceptance remain separate. See [COMPANION_ANIMATION_CATALOG.md](COMPANION_ANIMATION_CATALOG.md) and [release records](RELEASES.md).

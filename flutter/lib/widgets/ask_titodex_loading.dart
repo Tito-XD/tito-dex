@@ -19,7 +19,7 @@ import 'assistant_surface.dart';
 import 'fallback_sprite_image.dart';
 
 /// Trainer's Journal paper tone shared with the Ask TitoDex answer cards.
-const _assistantPaper = Color(0xFFFFFBF2);
+const _assistantPaper = AssistantSurface.paper;
 
 /// Keeps the selected home companion beside the conversation at all times.
 /// The orbit, bob, rotating copy and shimmer start only while a request runs.
@@ -132,7 +132,8 @@ class _AskTitoDexLoadingCardState extends State<AskTitoDexLoadingCard>
 
   String _titleForProgress(AskTitoDexProgress progress) => switch (progress) {
     AskTitoDexProgress.checkingLocal => AppZh.askTitoDexStageCheckingLocal,
-    AskTitoDexProgress.contactingWorker => AppZh.askTitoDexStageContactingWorker,
+    AskTitoDexProgress.contactingWorker =>
+      AppZh.askTitoDexStageContactingWorker,
     AskTitoDexProgress.retrievingSources =>
       AppZh.askTitoDexStageRetrievingSources,
     AskTitoDexProgress.resolvingQuestion =>

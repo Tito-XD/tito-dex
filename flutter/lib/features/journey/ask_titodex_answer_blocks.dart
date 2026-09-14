@@ -93,12 +93,12 @@ class AskTitoDexAnswerBlock {
         ) ??
         const <String>[];
     final rawRows = _boundedRows(json['rows']) ?? const <List<String>>[];
-    final canonicalBody = _canonicalBlockBody(text, title as String?);
+    final canonicalBody = askTitoDexBlockBody(text, title as String?);
     final canonicalItems = kind == AskTitoDexAnswerBlockKind.bullets
-        ? _bulletItemsFromText(canonicalBody)
+        ? askTitoDexBulletItemsFromText(canonicalBody)
         : const <String>[];
     final canonicalRows = kind == AskTitoDexAnswerBlockKind.table
-        ? _tableRowsFromText(canonicalBody)
+        ? askTitoDexTableRowsFromText(canonicalBody)
         : const <List<String>>[];
     // `text` is the canonical answer. Projections are only rendering hints;
     // discard a partial or contradictory hint so the completed UI parses the
@@ -299,7 +299,9 @@ List<List<String>>? _boundedRows(Object? value) {
   return List.unmodifiable(rows);
 }
 
-String _canonicalBlockBody(String text, String? title) {
+/// Removes a repeated leading title using the same rule for protocol validation
+/// and UI rendering. The canonical answer text itself remains unchanged.
+String askTitoDexBlockBody(String text, String? title) {
   final body = text.trim();
   if (title == null || body.isEmpty) return body;
   final lines = body.split('\n');
@@ -310,7 +312,8 @@ String _canonicalBlockBody(String text, String? title) {
   return body;
 }
 
-List<String> _bulletItemsFromText(String text) => text
+/// Rendering projection used when a block has no validated list-item hints.
+List<String> askTitoDexBulletItemsFromText(String text) => text
     .split('\n')
     .map(
       (line) =>
@@ -319,7 +322,8 @@ List<String> _bulletItemsFromText(String text) => text
     .where((line) => line.isNotEmpty)
     .toList(growable: false);
 
-List<List<String>> _tableRowsFromText(String text) {
+/// Rendering projection shared by wire-hint validation and the table widget.
+List<List<String>> askTitoDexTableRowsFromText(String text) {
   final lines = text.split('\n').where((line) => line.contains('|')).toList();
   final rows = <List<String>>[];
   for (var index = 0; index < lines.length; index += 1) {
