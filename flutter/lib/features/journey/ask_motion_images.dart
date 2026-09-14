@@ -109,7 +109,9 @@ class AskMotionImages {
               context,
               onError: (_, _) {},
             ).timeout(const Duration(seconds: 1));
-          } catch (_) {}
+          } catch (error) {
+            debugPrint('Ask motion image prefetch skipped: $error');
+          }
         }
         return MapEntry(resource, provider);
       }),

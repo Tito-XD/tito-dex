@@ -57,6 +57,21 @@ class AskTitoDexHistoryEntry {
   }
 }
 
+/// Returns [entries] with [entry] appended, clamped to [askTitoDexHistoryLimit].
+///
+/// The store's append and the page's in-memory fallback share this so both
+/// trim identically.
+List<AskTitoDexHistoryEntry> askTitoDexHistoryAppend(
+  List<AskTitoDexHistoryEntry> entries,
+  AskTitoDexHistoryEntry entry,
+) {
+  final combined = [...entries, entry];
+  if (combined.length <= askTitoDexHistoryLimit) {
+    return combined;
+  }
+  return combined.sublist(combined.length - askTitoDexHistoryLimit);
+}
+
 abstract class AskTitoDexHistoryStore {
   Future<List<AskTitoDexHistoryEntry>> load();
 
@@ -115,10 +130,7 @@ class SharedPreferencesAskTitoDexHistoryStore
   Future<List<AskTitoDexHistoryEntry>> append(
     AskTitoDexHistoryEntry entry,
   ) async {
-    final entries = [...await load(), entry];
-    final trimmed = entries.length > askTitoDexHistoryLimit
-        ? entries.sublist(entries.length - askTitoDexHistoryLimit)
-        : entries;
+    final trimmed = askTitoDexHistoryAppend(await load(), entry);
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
       _historyStorageKey,

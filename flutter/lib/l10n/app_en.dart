@@ -82,7 +82,6 @@ const kAppEn = <String, String>{
   'navSettings': 'Settings',
   'trainerCard': 'Trainer card',
   'companion': 'Companion',
-  'timeGreeting': 'Good morning',
   'trainerGreeting': '{greeting}, Trainer {trainerName}',
   'trainerNameLine': 'Trainer {trainerName}',
   'journeyCardTitle': 'Journey',
@@ -302,8 +301,6 @@ const kAppEn = <String, String>{
   'dexFilterCaught': 'Caught',
   'dexFilterSeen': 'Seen',
   'dexFilterUnseen': 'Unseen',
-  'dexScopeProgress':
-      'Caught {caught} · Seen {seen} · Trade/evolve {evolutionOrTrade} / {total}',
   'dexTabNational': 'National Dex',
   'dexRegionalDexTitle': '{regionLabel} Dex',
   'dexPickRegionalPokedex': 'Choose a regional dex',
@@ -476,8 +473,6 @@ const kAppEn = <String, String>{
       'This version’s reference scope is not confirmed yet',
   'dexReferenceNoDescription': 'No ability description yet.',
   'dexReferenceFindPokemon': 'Find Pokémon with this',
-  'dexReferenceMoveMeta':
-      '{category} · Power {power} · Accuracy {accuracy} · PP {pp}',
   'dexReferenceNatureStats': 'Stat changes',
   'dexReferenceNatureFlavors': 'Flavor likes',
   'dexReferenceNatureNeutral': 'No stat change (neutral nature)',
@@ -512,8 +507,6 @@ const kAppEn = <String, String>{
   'dexSpeciesFilterApply': 'See results',
   'dexFilterByMove': 'Move · {name}',
   'dexFilterByAbility': 'Ability · {name}',
-  'dexFilterMoveLabel': 'Move · {name}',
-  'dexFilterAbilityLabel': 'Ability · {name}',
   'dexGameVersionHgss': 'HeartGold · SoulSilver',
   'dexGameVersionSv': 'Scarlet · Violet',
   'dexGameVersionSwsh': 'Sword · Shield',
@@ -542,7 +535,6 @@ const kAppEn = <String, String>{
   'settingsDexOfflineResume': 'Resume offline pack download',
   'settingsDexOfflineClear': 'Clear offline cache',
   'settingsDexOfflinePrefer': 'Prefer offline cache',
-  'settingsDexOfflineProgress': '{verb}{phase} {current} / {total}',
   'offlineSeedProgressTitle': 'Preparing the offline pack',
   'settingsDexCdnDownload': 'Download the full offline pack',
   'settingsDexCdnDownloadHint':

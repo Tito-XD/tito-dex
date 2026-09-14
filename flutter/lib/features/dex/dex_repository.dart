@@ -191,7 +191,9 @@ class DexRepository {
         _summaryCache[id] = cached.summary;
         return cached;
       }
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to read offline detail for $id: $error');
+    }
 
     try {
       final detail = await _client.fetchDetailWithMoves(id);

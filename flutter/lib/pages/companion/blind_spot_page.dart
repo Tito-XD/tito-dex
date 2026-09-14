@@ -180,7 +180,9 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
         _defenderAbilityOptions = options;
         _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
       });
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to load defender ability options: $error');
+    }
   }
 
   Future<void> _loadAttackerAbilities(int pokemonId) async {
@@ -194,7 +196,9 @@ class _BlindSpotPageState extends State<BlindSpotPage> {
         _attackerAbilityOptions = options;
         _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
       });
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to load attacker ability options: $error');
+    }
   }
 
   BattleEffectivenessInput _input(

@@ -126,7 +126,9 @@ class _StatCalcPageState extends State<StatCalcPage> {
         _abilityOptions = options;
         _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
       });
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to load stat calc ability options: $error');
+    }
   }
 
   Future<void> _refreshBaseFromLinked() async {

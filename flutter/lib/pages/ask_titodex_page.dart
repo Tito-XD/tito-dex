@@ -452,11 +452,11 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     List<AskTitoDexHistoryEntry> saved;
     try {
       saved = await _historyStore.append(entry);
-    } on Object {
-      saved = [..._history, entry];
-      if (saved.length > askTitoDexHistoryLimit) {
-        saved = saved.sublist(saved.length - askTitoDexHistoryLimit);
-      }
+    } on Object catch (error) {
+      // Persistence is best-effort: keep the turn for this session and
+      // surface the failure instead of dropping it silently.
+      debugPrint('AskTitoDex history append failed: $error');
+      saved = askTitoDexHistoryAppend(_history, entry);
     }
     if (!_isActiveRequest(requestId, editionToken)) return;
     setState(() {
@@ -1662,7 +1662,7 @@ class _ConversationEmptyStateState extends State<_ConversationEmptyState>
   int _index = 0;
   int _introLength = 0;
   bool _introFinished = false;
-  bool _introStarted = false;
+  bool _settledByReduceMotion = false;
   bool _visible = true;
 
   @override
@@ -1695,32 +1695,50 @@ class _ConversationEmptyStateState extends State<_ConversationEmptyState>
       _wordTimer?.cancel();
       _wordTimer = null;
       _introTimer?.cancel();
-      _introFinished = true;
+      _introTimer = null;
+      // Reduce-motion is a persistent preference, so settle the prompt
+      // instead of pausing it. Transient covers (route push, backgrounding)
+      // only pause the typing so the intro resumes once the surface can
+      // animate again instead of never playing at all.
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _settledByReduceMotion = true;
+      }
       return;
     }
+    _settledByReduceMotion = false;
     _wordTimer ??= Timer.periodic(const Duration(seconds: 6), (_) {
       if (mounted && _canAnimate) {
         setState(() => _index = (_index + 1) % _themes.length);
       }
     });
-    if (!_introStarted && !_introFinished) {
-      _introStarted = true;
-      final length = AppZh.askTitoDexIdlePrompt.characters.length;
-      final step = (length / 28).ceil().clamp(1, length);
-      _introTimer = Timer.periodic(_semanticRevealFrame, (timer) {
-        if (!mounted || !_canAnimate) {
-          timer.cancel();
-          return;
-        }
-        setState(() => _introLength = (_introLength + step).clamp(0, length));
-        if (_introLength == length) {
-          timer.cancel();
-          _introTimer = Timer(_semanticCursorHold, () {
-            if (mounted) setState(() => _introFinished = true);
-          });
-        }
+    if (_introFinished || _introTimer != null) return;
+    final length = AppZh.askTitoDexIdlePrompt.characters.length;
+    if (_introLength >= length) {
+      // Typing already completed; resume the interrupted cursor hold.
+      _introTimer = Timer(_semanticCursorHold, () {
+        if (mounted) setState(() => _introFinished = true);
       });
+      return;
     }
+    final step = (length / 28).ceil().clamp(1, length);
+    _introTimer = Timer.periodic(_semanticRevealFrame, (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (!_canAnimate) {
+        timer.cancel();
+        _introTimer = null;
+        return;
+      }
+      setState(() => _introLength = (_introLength + step).clamp(0, length));
+      if (_introLength == length) {
+        timer.cancel();
+        _introTimer = Timer(_semanticCursorHold, () {
+          if (mounted) setState(() => _introFinished = true);
+        });
+      }
+    });
   }
 
   @override
@@ -1780,7 +1798,7 @@ class _ConversationEmptyStateState extends State<_ConversationEmptyState>
           Semantics(
             label: prompt,
             child: ExcludeSemantics(
-              child: _introFinished
+              child: _introFinished || _settledByReduceMotion
                   ? Text(prompt, style: style, textAlign: TextAlign.center)
                   : _BlinkingInlineText(
                       text: prompt.characters.take(_introLength).join(),
@@ -1900,7 +1918,7 @@ class _QuestionComposer extends StatelessWidget {
               enabled: enabled,
               minLines: 1,
               maxLines: 3,
-              maxLength: 240,
+              maxLength: _askTitoDexQuestionLimit,
               textInputAction: TextInputAction.send,
               decoration:
                   retroInsetDecoration(
@@ -2679,6 +2697,8 @@ class _BlinkingInlineTextState extends State<_BlinkingInlineText>
     if (MediaQuery.disableAnimationsOf(context)) {
       _cursor.stop();
       _cursor.value = 1;
+    } else if (!_cursor.isAnimating) {
+      _cursor.repeat(reverse: true);
     }
   }
 

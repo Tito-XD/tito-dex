@@ -16,11 +16,17 @@ dist-ssr
 __pycache__/
 *.py[cod]
 
-# Capacitor
-android/.gradle
-android/app/build
-android/build
-android/local.properties
+# Release APKs are published to GitHub Releases; only the historical
+# 0.6.2.1 artifact stays tracked. Local verified-* audit folders, design
+# mockups and scratch tooling notes stay untracked.
+releases/*.apk
+releases/verified-*/
+docs/mockups/
+tools/_app_zh_ids.txt
+
+# Local agent / editor workspaces
+.qoder/
+.codex-remote-attachments/
 
 # Editor directories and files
 .vscode/*

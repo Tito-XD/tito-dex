@@ -149,10 +149,15 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     _refreshDexCacheStatus();
     _loadDexSettings();
-    _dexStatusTimer = Timer.periodic(const Duration(milliseconds: 750), (_) {
-      if (_dexDownloading || dexOfflineService.isDownloading) {
-        _syncDexDownloadStatus();
-      }
+    _syncDexDownloadStatus();
+  }
+
+  void _ensureDexStatusPolling() {
+    // The service exposes no change stream, so a bounded timer drives the
+    // progress UI. It is created only while a download runs and cancelled in
+    // _syncDexDownloadStatus once the download ends.
+    _dexStatusTimer ??= Timer.periodic(const Duration(milliseconds: 750), (_) {
+      _syncDexDownloadStatus();
     });
   }
 
@@ -163,12 +168,15 @@ class _SettingsPageState extends State<SettingsPage> {
     final isDownloading = dexOfflineService.isDownloading;
     final progress = dexOfflineService.progress;
     if (!isDownloading) {
+      _dexStatusTimer?.cancel();
+      _dexStatusTimer = null;
       if (_dexDownloading) {
         setState(() => _dexDownloading = false);
         unawaited(_refreshDexCacheStatus());
       }
       return;
     }
+    _ensureDexStatusPolling();
     setState(() {
       _dexDownloading = true;
       _dexCacheStatus = DexCacheStatus(
@@ -271,6 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     setState(() => _dexDownloading = true);
+    _ensureDexStatusPolling();
 
     try {
       final lastProgress = await trackWhileDownloading(
@@ -311,6 +320,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     setState(() => _dexDownloading = true);
+    _ensureDexStatusPolling();
 
     try {
       final lastProgress = await trackWhileDownloading(

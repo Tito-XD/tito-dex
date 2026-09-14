@@ -17,16 +17,6 @@ abstract final class TitoShadows {
     ),
   ];
 
-  /// Material controls flatten slightly while pressed.
-  static const List<BoxShadow> stickerPressed = [
-    BoxShadow(
-      color: Color(0x1F1A1C20),
-      blurRadius: 3,
-      spreadRadius: -1,
-      offset: Offset(0, 1),
-    ),
-  ];
-
   /// Small Material elevation for chips, sprites, and bubbles.
   static const List<BoxShadow> stickerSmall = [
     BoxShadow(

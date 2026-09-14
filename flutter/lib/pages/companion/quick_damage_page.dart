@@ -322,7 +322,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
         _attackerAbilityOptions = options;
         _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
       });
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to load attacker ability options: $error');
+    }
   }
 
   Future<void> _loadDefenderAbilities(int pokemonId) async {
@@ -336,7 +338,9 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
         _defenderAbilityOptions = options;
         _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
       });
-    } catch (_) {}
+    } catch (error) {
+      debugPrint('Failed to load defender ability options: $error');
+    }
   }
 
   int _readInt(TextEditingController controller, int fallback) =>
