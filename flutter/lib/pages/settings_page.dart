@@ -103,6 +103,7 @@ class SettingsPage extends StatefulWidget {
     this.onChangeGameEdition,
     this.onShowIntroduction,
     this.section = SettingsSection.overview,
+    this.offlineService,
   });
 
   final CurrentJourney journey;
@@ -121,6 +122,9 @@ class SettingsPage extends StatefulWidget {
   final VoidCallback onClearEmulator;
   final SettingsSection section;
 
+  /// Optional service override for embedded settings and widget tests.
+  final DexOfflineService? offlineService;
+
   /// Opens the game edition picker (same flow as the home header badge).
   final Future<void> Function(BuildContext context)? onChangeGameEdition;
   final VoidCallback? onShowIntroduction;
@@ -138,6 +142,10 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _dexDownloadBackgrounded = false;
   bool _dexVerifying = false;
   Timer? _dexStatusTimer;
+  bool? _wasRouteCurrent;
+
+  DexOfflineService get _dexOfflineService =>
+      widget.offlineService ?? dexOfflineService;
   final _dexDownloadNotification = DexDownloadNotification();
   GameEdition _defaultGameEdition = defaultGameEdition;
 
@@ -150,6 +158,20 @@ class _SettingsPageState extends State<SettingsPage> {
     _refreshDexCacheStatus();
     _loadDexSettings();
     _syncDexDownloadStatus();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isCurrent = ModalRoute.isCurrentOf(context) ?? true;
+    if (isCurrent && _wasRouteCurrent == false) {
+      // Nested settings routes share one download service. A covered page
+      // may have stopped polling before another page started or finished a
+      // download, so refresh when it becomes visible again.
+      _syncDexDownloadStatus();
+      unawaited(_refreshDexCacheStatus());
+    }
+    _wasRouteCurrent = isCurrent;
   }
 
   void _ensureDexStatusPolling() {
@@ -165,8 +187,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    final isDownloading = dexOfflineService.isDownloading;
-    final progress = dexOfflineService.progress;
+    final isDownloading = _dexOfflineService.isDownloading;
+    final progress = _dexOfflineService.progress;
     if (!isDownloading) {
       _dexStatusTimer?.cancel();
       _dexStatusTimer = null;
@@ -264,7 +286,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _refreshDexCacheStatus() async {
-    final status = await dexOfflineService.getStatus();
+    final status = await _dexOfflineService.getStatus();
     if (!mounted) {
       return;
     }
@@ -272,6 +294,9 @@ class _SettingsPageState extends State<SettingsPage> {
       _dexCacheStatus = status;
       _dexDownloading = status.isDownloading;
     });
+    if (status.isDownloading) {
+      _ensureDexStatusPolling();
+    }
   }
 
   Future<void> _downloadDexCdnBundle() async {
@@ -285,10 +310,10 @@ class _SettingsPageState extends State<SettingsPage> {
       final lastProgress = await trackWhileDownloading(
         context: context,
         title: AppZh.settingsDexCdnDownload,
-        onCancel: dexOfflineService.requestCancelDownload,
+        onCancel: _dexOfflineService.requestCancelDownload,
         onMinimize: Platform.isAndroid ? _minimizeDexDownload : null,
         download: (onProgress) => _consumeDexDownload(
-          dexOfflineService.downloadFromCdnBundle(),
+          _dexOfflineService.downloadFromCdnBundle(),
           onProgress,
         ),
       );
@@ -326,10 +351,10 @@ class _SettingsPageState extends State<SettingsPage> {
       final lastProgress = await trackWhileDownloading(
         context: context,
         title: AppZh.settingsDexOfflineDownloadPokeApi,
-        onCancel: dexOfflineService.requestCancelDownload,
+        onCancel: _dexOfflineService.requestCancelDownload,
         onMinimize: Platform.isAndroid ? _minimizeDexDownload : null,
         download: (onProgress) =>
-            _consumeDexDownload(dexOfflineService.downloadAll(), onProgress),
+            _consumeDexDownload(_dexOfflineService.downloadAll(), onProgress),
       );
       await _finishDexBackgroundNotification(lastProgress);
       dexRepository.clearMemoryCache();
@@ -396,7 +421,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _minimizeDexDownload(DexCacheProgress? progress) async {
     _dexDownloadBackgrounded = true;
-    final current = dexOfflineService.progress ?? progress;
+    final current = _dexOfflineService.progress ?? progress;
     final notificationsGranted = await _dexDownloadNotification.start(
       progress: _dexProgressPercent(current),
       title: AppZh.dexDownloadNotificationTitle,
@@ -515,7 +540,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _verifyDexOffline() async {
     setState(() => _dexVerifying = true);
-    final result = await dexOfflineService.verifyOfflineData();
+    final result = await _dexOfflineService.verifyOfflineData();
     if (!mounted) {
       return;
     }
@@ -539,7 +564,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _clearDexOffline() async {
-    await dexOfflineService.clearAll();
+    await _dexOfflineService.clearAll();
     dexRepository.clearMemoryCache();
     await _refreshDexCacheStatus();
     if (!mounted) {
@@ -551,7 +576,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _setDexPreferOffline(bool enabled) async {
-    await dexOfflineService.setPreferOffline(enabled);
+    await _dexOfflineService.setPreferOffline(enabled);
     await _refreshDexCacheStatus();
   }
 
@@ -658,7 +683,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 12),
                   if (_dexDownloading)
                     OutlinedButton(
-                      onPressed: dexOfflineService.requestCancelDownload,
+                      onPressed: _dexOfflineService.requestCancelDownload,
                       child: Text(AppZh.settingsDexCancelDownload),
                     )
                   else
@@ -1106,7 +1131,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 12),
                   if (_dexDownloading)
                     OutlinedButton(
-                      onPressed: dexOfflineService.requestCancelDownload,
+                      onPressed: _dexOfflineService.requestCancelDownload,
                       child: Text(AppZh.settingsDexCancelDownload),
                     )
                   else
