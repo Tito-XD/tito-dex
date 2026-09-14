@@ -13,6 +13,9 @@ import {
 import type { CuratedSource } from './curated_web';
 import { answerStructuredResources } from './structured_resources';
 import { entityName, mentionedEntities } from './structured_entities';
+import { isGeneralPokemonFranchiseRequest } from './pokemon_question_scope';
+import { needsExpandedAnswer } from './answer_coverage';
+import { conversationRetrievalRequest } from './conversation_context';
 
 const MAX_MANIFEST_BYTES = 64 * 1024;
 const MAX_DETAIL_BYTES = 4 * 1024 * 1024;
@@ -67,6 +70,7 @@ export type DexBundleAnswerResult = {
   response: AssistantResponse;
   localSource: CuratedSource;
   requiresOnlineVerification: boolean;
+  coversQuestion: boolean;
 };
 
 const speciesTargets = buildTargets(speciesLabels as Record<string, SpeciesLabel>);
@@ -151,9 +155,9 @@ const regionalDexKeys: Partial<Record<AssistantRequest['context']['game'], reado
   violet: ['paldea', 'kitakami', 'blueberry'],
 };
 
-const encounterIntent = /(?:哪里|哪儿|在哪|何处|怎么抓|如何抓|怎么捉|如何捉|可以抓|能抓|捕捉|捕获|抓到|捉到|遇到|出没|分布|栖息)/u;
+const encounterIntent = /(?:哪里|哪儿|在哪|何处|怎么抓|如何抓|怎么捉|如何捉|可以抓|能抓|捕捉|捕获|抓到|捉到|遇到|出没|分布|栖息|\b(?:catch|caught|capture|encounter|habitat|spawn(?:s|ing)?)\b|\bwhere\b.{0,60}\b(?:find|found|appear|appears)\b)/iu;
 const heldItemIntent = /(?:携带|持有|带着|身上|掉落|偷到|偷取|野生.*道具|道具.*野生)/u;
-const moveLearningIntent = /(?:学会|能学|可以学|能用|能使用|可以用|会不会|几级|招式|技能|学习器|蛋招式)/u;
+const moveLearningIntent = /(?:学会|能学|可以学|能用|能使用|可以用|会不会|几级|招式|技能|学习器|蛋招式|\b(?:learn(?:s|ed|ing)?|learnset|moves?|tm\d*|hm\d*|egg moves?)\b|\b(?:what|which) level\b|\b(?:can|could)\b.{0,60}\buse\b)/iu;
 const speciesProfileIntent = /(?:属性|弱点|抗性|免疫|种族值|能力值|特性|隐藏特性|基础资料|详细资料|是什么宝可梦)/u;
 const itemInfoIntent = /(?:作用|用途|效果|干嘛|干什么|什么用|啥用|有用吗|介绍|资料|是什么|价格|多少钱|分类|怎么用|道具)/u;
 const moveInfoIntent = /(?:威力|命中|pp|属性|类型|分类|作用|用途|效果|干嘛|干什么|什么用|啥用|有用吗|介绍|资料|招式|技能)/iu;
@@ -161,6 +165,7 @@ const abilityInfoIntent = /(?:作用|用途|效果|干嘛|干什么|什么用|�
 const bundlePrefix = /^v[1-9]\d{0,3}$/;
 
 const gameVersionGroups: Record<AssistantRequest['context']['game'], string> = {
+  general: '',
   diamond: 'diamond-pearl',
   pearl: 'diamond-pearl',
   platinum: 'platinum',
@@ -188,6 +193,7 @@ const gameVersionGroups: Record<AssistantRequest['context']['game'], string> = {
 };
 
 const gameLabels: Record<AssistantRequest['context']['game'], string> = {
+  general: '通用',
   diamond: '钻石',
   pearl: '珍珠',
   platinum: '白金',
@@ -275,17 +281,28 @@ export async function answerFromDexBundle(
   request: AssistantRequest,
   bucket: R2Bucket | undefined,
 ): Promise<DexBundleAnswerResult | null> {
-  if (!bucket) return null;
-  const species = findTarget(request.question, speciesTargets);
-  const item = findTarget(request.question, itemTargets);
-  const move = findTarget(request.question, moveTargets);
-  const ability = findTarget(request.question, abilityTargets);
+  if (!bucket || isGeneralPokemonFranchiseRequest(request)) return null;
+  const retrievalRequest = conversationRetrievalRequest(request);
+  // A relationship or profile is evidence for an explanation, not the
+  // explanation itself. Keep these questions on the existing research path.
+  if (/(?:为什么|为何|原因|原理|\bwhy\b)/iu.test(request.question)) return null;
+  // A missing game still permits general reference facts, but never a guessed
+  // encounter, learnset, wild held item or edition-specific description.
+  if (request.context.game === 'general' && (
+    encounterIntent.test(request.question) || moveLearningIntent.test(request.question) ||
+    heldItemIntent.test(request.question) ||
+    /(?:招式表|能学哪些|能学什么|会哪些招式|图鉴描述)/u.test(request.question)
+  )) return null;
+  const species = findTarget(retrievalRequest.question, speciesTargets);
+  const item = findTarget(retrievalRequest.question, itemTargets);
+  const move = findTarget(retrievalRequest.question, moveTargets);
+  const ability = findTarget(retrievalRequest.question, abilityTargets);
   const manifest = await readJsonObject(bucket, 'bundle-manifest.json', MAX_MANIFEST_BYTES);
   if (!validBundleManifest(manifest)) return null;
 
   const bundleVersion = manifest.bundleVersion as number;
   const structured = await answerStructuredResources({
-    request, version: bundleVersion, versionGroup: gameVersionGroups[request.context.game],
+    request: retrievalRequest, version: bundleVersion, versionGroup: gameVersionGroups[request.context.game],
     gameLabel: gameLabels[request.context.game],
     read: async (path, limit) => {
       // Resource names originate exclusively in the fixed query adapters.
@@ -303,7 +320,7 @@ export async function answerFromDexBundle(
     const result = bundleAnswerResult(request, structured, bundleVersion);
     // This response explicitly states its data scope, including missing fields.
     // A language model cannot upgrade that scope or replace the query result.
-    return result ? { ...result, requiresOnlineVerification: false } : null;
+    return result ? { ...result, requiresOnlineVerification: !result.coversQuestion } : null;
   }
   if (!species && !item && !move && !ability) return null;
   const referenceConfig = bundleVersion >= 20
@@ -318,17 +335,17 @@ export async function answerFromDexBundle(
     if (!detail || !isPlainObject(detail.summary) || detail.summary.id !== species.id) {
       return null;
     }
-    const gameplayShard = bundleVersion >= 20
+    const gameplayShard = bundleVersion >= 20 && request.context.game !== 'general'
       ? await readGameplaySpeciesShard(bucket, manifest.cdnPrefix as string, species.id)
       : null;
-    if (encounterIntent.test(request.question)) {
+    if (encounterIntent.test(retrievalRequest.question) && !(move && moveLearningIntent.test(retrievalRequest.question))) {
       return bundleAnswerResult(
         request,
         answerEncounter(request, detail, species, bundleVersion, gameplayShard),
         bundleVersion,
       );
     }
-    if (move && moveLearningIntent.test(request.question)) {
+    if (move && moveLearningIntent.test(retrievalRequest.question)) {
       return bundleAnswerResult(
         request,
         answerMoveLearning(request, detail, species, move, bundleVersion, gameplayShard),
@@ -414,7 +431,7 @@ export async function resolveDexBundleClarificationCandidates(
   request: AssistantRequest,
   bucket: R2Bucket | undefined,
 ): Promise<ClarificationCandidate[]> {
-  if (!bucket) return [];
+  if (!bucket || isGeneralPokemonFranchiseRequest(request)) return [];
   const question = request.question.trim();
   const groupMatches = fuzzySpeciesGroups.filter(({ pattern }) => pattern.test(question));
   const allowedGroupIds = groupMatches.length === 0
@@ -468,7 +485,8 @@ export async function resolveDexBundleClarificationCandidates(
     const generation = Number.isInteger(value.generation)
       ? value.generation as number
       : null;
-    if (generation !== null && generation > request.context.generation) return [];
+    if (request.context.generation > 0 && generation !== null &&
+        generation > request.context.generation) return [];
     if (allowedGroupIds && !allowedGroupIds.has(id)) return [];
     if (types.length > 0 && !types.every((type) => candidateTypes.includes(type))) return [];
     if (colors.length > 0 &&
@@ -532,7 +550,8 @@ export async function buildDexBundleSources(
   request: AssistantRequest,
   bucket: R2Bucket | undefined,
 ): Promise<CuratedSource[]> {
-  if (!bucket) return [];
+  if (!bucket || isGeneralPokemonFranchiseRequest(request)) return [];
+  request = conversationRetrievalRequest(request);
   const species = findTarget(request.question, speciesTargets);
   const item = findTarget(request.question, itemTargets);
   const move = findTarget(request.question, moveTargets);
@@ -551,13 +570,13 @@ export async function buildDexBundleSources(
     : null;
   const facts: Record<string, unknown> = {
     sourceBundleVersion: bundleVersion,
-    exactGame: request.context.game,
+    exactGame: request.context.game === 'general' ? false : request.context.game,
   };
 
   if (species) {
     const [detail, gameplayShard] = await Promise.all([
       readJsonObject(bucket, `${prefix}/details/${species.id}.json`, MAX_DETAIL_BYTES),
-      bundleVersion >= 20
+      bundleVersion >= 20 && request.context.game !== 'general'
         ? readGameplaySpeciesShard(bucket, prefix, species.id)
         : Promise.resolve(null),
     ]);
@@ -648,9 +667,21 @@ function answerEncounter(
   });
   if (entries.length === 0) return null;
 
-  const grouped = groupEncounters(entries).slice(0, MAX_AREAS);
+  const weekdayOnly = /(?:星期几|周几|哪天|哪一天|\b(?:what|which) day(?: of the week)?\b|\bweekday\b)/iu.test(request.question) &&
+    !needsExpandedAnswer(request.question);
+  const relevantEntries = weekdayOnly
+    ? entries.filter((entry) => entry.conditions.some((condition) => /^weekday-(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/u.test(condition)))
+    : entries;
+  if (weekdayOnly && relevantEntries.length === 0) return bundleResponse(
+    request,
+    `《宝可梦 ${gameLabels[request.context.game]}》已收录的${target.nameZh}地点资料没有明确的星期记录，暂时不能据此判断应该周几前往，也不能认定每天都能遇到。`,
+    bundleVersion, `encounter-${request.context.game}-${target.id}`,
+    [`species:${target.id}`, `game:${request.context.game}`], 'low',
+    ['当前地点记录未提供星期条件，需要进一步核对。'],
+  );
+  const grouped = groupEncounters(relevantEntries, weekdayOnly).slice(0, MAX_AREAS);
   if (grouped.length === 0) return null;
-  const remainingAreas = Math.max(0, new Set(entries.map((entry) => entry.areaSlug)).size - grouped.length);
+  const remainingAreas = Math.max(0, new Set(relevantEntries.map((entry) => entry.areaSlug)).size - grouped.length);
   const lines = grouped.map((group) =>
     `- ${group.label}：${group.details.join('；')}`,
   );
@@ -658,7 +689,9 @@ function answerEncounter(
     ? `\n此外还有 ${remainingAreas} 个地点记录；可以补充“前期／固定点／团体战”等条件继续缩小。`
     : '';
   const answer = [
-    `《宝可梦 ${gameLabels[request.context.game]}》的 TitoDex v${bundleVersion} 图鉴包记录到${target.nameZh}可在以下地点获得：`,
+    weekdayOnly
+      ? `《宝可梦 ${gameLabels[request.context.game]}》中，${target.nameZh}有明确星期限制的地点记录如下：`
+      : `《宝可梦 ${gameLabels[request.context.game]}》已收录的资料记录到${target.nameZh}可在以下地点获得：`,
     lines.join('\n'),
     extra.trim(),
   ].filter(Boolean).join('\n\n').slice(0, MAX_ANSWER_LENGTH);
@@ -669,6 +702,9 @@ function answerEncounter(
     bundleVersion,
     `encounter-${request.context.game}-${target.id}`,
     [`species:${target.id}`, `game:${request.context.game}`],
+    !weekdayOnly && relevantEntries.some((entry) => hasMergedEncounterConditions(entry.conditions)) ? 'medium' : 'high',
+    !weekdayOnly && relevantEntries.some((entry) => hasMergedEncounterConditions(entry.conditions))
+      ? ['部分地点把不同遭遇合并记录，具体等级与遭遇条件对应关系未收录；需继续核对。'] : [],
   );
 }
 
@@ -777,10 +813,14 @@ function answerMoveLearning(
   );
   return bundleResponse(
     request,
-    `《宝可梦 ${gameLabels[request.context.game]}》的 TitoDex v${bundleVersion} 招式表记录：${species.nameZh}可通过${methods.join('；')}学会${move.nameZh}。`,
+    `《宝可梦 ${gameLabels[request.context.game]}》的招式表记录：${species.nameZh}可通过${methods.join('；')}学会${move.nameZh}。`,
     bundleVersion,
     `move-learning-${request.context.game}-${species.id}-${move.id}`,
     [`species:${species.id}`, `move:${move.id}`, `game:${request.context.game}`],
+    'high',
+    methods.includes('招式学习器')
+      ? ['当前学习表只确认学习方式，未收录该版本招式学习器的编号与获取地点；这些细节需要继续核对。']
+      : [],
   );
 }
 
@@ -931,11 +971,18 @@ function bundleAnswerResult(
   bundleVersion: number,
 ): DexBundleAnswerResult | null {
   if (!response || !response.answer) return null;
+  const missingMachineDetails = response.matchedHintIds?.some((id) => id.includes('move-learning-')) &&
+    response.answer.includes('招式学习器') &&
+    /(?:怎么|怎样|如何|方法|几号|编号|哪里|哪儿|获取|获得|\bhow\b|\bwhere\b|\bwhich\b)/iu.test(request.question);
+  const missingEncounterAssociations = response.unknowns?.some((note) => note.includes('遭遇条件对应关系')) ?? false;
+  const missingEncounterWeekday = response.unknowns?.some((note) => note.includes('未提供星期条件')) ?? false;
+  const coversQuestion = !needsExpandedAnswer(request.question) && !missingMachineDetails &&
+    !missingEncounterAssociations && !missingEncounterWeekday;
   const source: CuratedSource = {
     id: `dex-bundle-v${bundleVersion}`,
     title: `TitoDex Dex bundle v${bundleVersion} · 本地结构化底稿`,
     text: JSON.stringify({
-      exactGame: request.context.game,
+      exactGame: request.context.game === 'general' ? false : request.context.game,
       answer: response.answer,
       verifiedFacts: response.verifiedFacts ?? [],
       unknowns: response.unknowns ?? [],
@@ -946,17 +993,18 @@ function bundleAnswerResult(
       ...response,
       evidence: response.evidence ?? {
         basis: 'structured',
-        scope: response.confidence === 'high' ? 'game' : 'general',
-        complete: true,
+        scope: request.context.game !== 'general' && response.confidence === 'high' ? 'game' : 'general',
+        complete: coversQuestion,
         bundleVersion,
         entityIds: mentionedEntities(response.answer).map((entity) => `${entity.kind}:${entity.id}`),
       },
     },
     localSource: source,
+    coversQuestion,
     // V20 reference/gameplay projections declare online-verify provenance.
     // They remain the deterministic offline fallback, but an online-capable
     // request must continue through the allowlisted corroboration pipeline.
-    requiresOnlineVerification: bundleVersion >= 20,
+    requiresOnlineVerification: bundleVersion >= 20 || !coversQuestion,
   };
 }
 
@@ -1007,7 +1055,7 @@ function compactSpeciesEvidence(
   const evidence: Record<string, unknown> = {
     id: species.id,
     nameZh: species.nameZh,
-    versionedFor: game,
+    ...(game === 'general' ? { scope: 'general' } : { versionedFor: game }),
   };
   if (Array.isArray(summary.types)) {
     evidence.types = summary.types.filter((value): value is string =>
@@ -1044,7 +1092,7 @@ function compactSpeciesEvidence(
         Array.isArray(detail.obtainLocationsByVersion[game])
       ? detail.obtainLocationsByVersion[game]
       : null;
-  if (Array.isArray(rawEncounters)) {
+  if (game !== 'general' && Array.isArray(rawEncounters)) {
     evidence.encounters = rawEncounters
       .flatMap((value) => {
         const encounter = Array.isArray(shardEncounters)
@@ -1053,6 +1101,8 @@ function compactSpeciesEvidence(
         return encounter ? [{
           area: normalizeFullWidth(encounter.areaLabelZh),
           methods: encounter.methods.slice(0, 4),
+          conditions: encounter.conditions,
+          conditionsZh: encounter.conditions.map(encounterConditionLabel),
           ...(encounter.minLevel === undefined ? {} : { minLevel: encounter.minLevel }),
           ...(encounter.maxLevel === undefined ? {} : { maxLevel: encounter.maxLevel }),
         }] : [];
@@ -1069,7 +1119,7 @@ function compactSpeciesEvidence(
     : isPlainObject(detail.moveSets) && isPlainObject(detail.moveSets[versionGroup])
       ? detail.moveSets[versionGroup]
       : null;
-  if (isPlainObject(rawMoveSet)) {
+  if (game !== 'general' && isPlainObject(rawMoveSet)) {
     const set = rawMoveSet;
     const compactRows = usingShardMoveSet ? compactGameplayMoveRows : compactMoveRows;
     evidence.moveSet = moveAdvice
@@ -1096,7 +1146,7 @@ function compactSpeciesEvidence(
       }),
     };
   }
-  if (gameplayShard && gameplayShard.evolutions.length > 0) {
+  if (game !== 'general' && gameplayShard && gameplayShard.evolutions.length > 0) {
     evidence.adjacentEvolution = gameplayShard.evolutions.slice(0, 6).map((row) => {
       const safeTriggers = Array.isArray(row.triggers)
         ? row.triggers.filter(isPlainObject).slice(0, 6)
@@ -1110,7 +1160,7 @@ function compactSpeciesEvidence(
           : 'unknown',
       };
     });
-  } else if (isPlainObject(detail.evolutionChain)) {
+  } else if (game !== 'general' && isPlainObject(detail.evolutionChain)) {
     evidence.adjacentEvolution = collectEvolutionEdges(detail.evolutionChain)
       .filter((edge) => edge.fromId === species.id || edge.toId === species.id)
       .slice(0, 6)
@@ -1120,7 +1170,9 @@ function compactSpeciesEvidence(
         conditions: describeEvolutionTriggers(edge.triggers),
       }));
   }
-  evidence.scopeNote = gameplayShard
+  evidence.scopeNote = game === 'general'
+    ? 'General reference fields only; no selected-game encounters, learnsets or evolution conditions.'
+    : gameplayShard
     ? 'encounters and moveSet come from the bounded audited v20 species shard; evolution triggers are global and exact-game applicability remains explicit'
     : 'encounters and moveSet are selected-game facts; stats/types/abilities/evolution are general bundle fields and may differ in older games';
   return evidence;
@@ -1345,7 +1397,7 @@ function parseGameplayEncounter(value: unknown): EncounterEntry | null {
   });
 }
 
-function groupEncounters(entries: EncounterEntry[]): { label: string; details: string[] }[] {
+function groupEncounters(entries: EncounterEntry[], conditionsOnly = false): { label: string; details: string[] }[] {
   const sorted = [...entries].sort((left, right) =>
     encounterPriority(left) - encounterPriority(right) ||
     (left.minLevel ?? 999) - (right.minLevel ?? 999) ||
@@ -1358,7 +1410,11 @@ function groupEncounters(entries: EncounterEntry[]): { label: string; details: s
       details: [],
       seen: new Set<string>(),
     };
-    const detail = describeEncounter(entry);
+    const detail = conditionsOnly
+      ? Array.from(new Set((hasMergedEncounterConditions(entry.conditions)
+        ? entry.conditions.filter((condition) => condition.startsWith('weekday-'))
+        : entry.conditions).map(encounterConditionLabel))).join('，')
+      : describeEncounter(entry);
     if (!group.seen.has(detail)) {
       group.seen.add(detail);
       if (group.details.length < 3) group.details.push(detail);
@@ -1382,9 +1438,79 @@ function describeEncounter(entry: EncounterEntry): string {
     entry.isFixedEncounter && !entry.methods.includes('fixed') && !entry.methods.includes('static')
       ? '固定点'
       : '',
-    entry.conditions.length > 0 ? '有出现条件' : '',
+    ...(hasMergedEncounterConditions(entry.conditions)
+      ? ['包含不同条件的合并记录，不能把下列条件当作同时要求',
+        `记录涉及：${Array.from(new Set(entry.conditions.map(encounterConditionLabel))).join('／')}`]
+      : entry.conditions.map(encounterConditionLabel)),
   ].filter(Boolean);
   return [methods, level, ...tags].filter(Boolean).join('，');
+}
+
+function hasMergedEncounterConditions(conditions: string[]): boolean {
+  const groups = new Set<string>();
+  for (const condition of new Set(conditions)) {
+    const group = /^(time|weather|season|weekday|swarm|radar|radio|slot2|backlot)-/u.exec(condition)?.[1]
+      ?? (/^johto-safari-blocks-(?:forest|peak|plains|water)-min-/u.exec(condition)?.[0]);
+    if (group && groups.has(group)) return true;
+    if (group) groups.add(group);
+  }
+  return conditions.includes('johto-safari-blocks-inactive') &&
+    conditions.some((condition) => /^johto-safari-blocks-.*-min-/u.test(condition));
+}
+
+function encounterConditionLabel(slug: string): string {
+  // Same condition vocabulary as Flutter's dex_encounter_labels.dart.
+  const labels: Record<string, string> = {
+    'time-day': '白天', 'time-morning': '早晨', 'time-night': '夜晚',
+    'weather-normal': '普通天气', 'weather-overcast': '阴天',
+    'weather-raining': '下雨', 'weather-thunderstorm': '雷雨',
+    'weather-intense-sun': '烈日', 'weather-sandstorm': '沙暴',
+    'weather-fog': '雾天', 'weather-snowing': '下雪', 'weather-snowstorm': '暴雪',
+    'season-spring': '春季', 'season-summer': '夏季', 'season-autumn': '秋季', 'season-winter': '冬季',
+    'swarm-yes': '大量出现时', 'swarm-no': '非大量出现',
+    'radar-on': '使用宝可追踪', 'radar-off': '不使用宝可追踪',
+    roaming: '地图游走',
+    'bug-catching-contest-yes': '捕虫大赛期间', 'bug-catching-contest-no': '非捕虫大赛',
+    'backlot-mentioned': '豪宅主人提及时', 'backlot-not-mentioned': '豪宅主人未提及',
+    'radio-hoenn': '播放丰缘之声', 'radio-sinnoh': '播放神奥之声', 'radio-off': '未播放宝可梦音乐',
+    'headbutt-tree-common': '普通撞树点', 'headbutt-tree-rare': '稀有撞树点', 'headbutt-tree-secret': '隐藏撞树点',
+    'honey-tree-group-a': '甜甜蜜树 A 组', 'honey-tree-group-b': '甜甜蜜树 B 组', 'honey-tree-group-c': '甜甜蜜树 C 组',
+    'slot2-none': '无需插入 GBA 卡带', 'defeated-ghetsis': '击败魁奇思后',
+    'first-party-pokemon-high-friendship': '队首宝可梦高亲密度',
+    'special-encounter-couldnt-capture-before': '此前未能捕获时',
+    'trash-can-type-daily': '每日垃圾桶', 'trash-can-type-thursday': '周四垃圾桶',
+    'tv-option-blue': '电视选择蓝色', 'tv-option-red': '电视选择红色',
+    'max-den-rarity-common': '普通巢穴', 'max-den-rarity-rare': '稀有巢穴', 'max-den-rarity-special': '特殊巢穴',
+    'johto-safari-blocks-inactive': '狩猎地带摆设未生效',
+  };
+  if (labels[slug]) return labels[slug];
+  const weekdays: Record<string, string> = {
+    monday: '周一', tuesday: '周二', wednesday: '周三', thursday: '周四',
+    friday: '周五', saturday: '周六', sunday: '周日',
+  };
+  if (slug.startsWith('weekday-') && weekdays[slug.slice(8)]) return weekdays[slug.slice(8)];
+  const safari = /^johto-safari-blocks-(forest|peak|plains|water)-min-(\d+)$/u.exec(slug);
+  if (safari) {
+    const decorations: Record<string, string> = { forest: '森林', peak: '山峰', plains: '草原', water: '水边' };
+    return `狩猎地带：${decorations[safari[1]]}摆设≥${safari[2]}`;
+  }
+  const rating = /^max-den-rating-(\d)-star$/u.exec(slug);
+  if (rating) return `${rating[1]}★巢穴`;
+  const friend = /^friend-safari-slot-(\d)$/u.exec(slug);
+  if (friend) return `朋友狩猎第${friend[1]}栏`;
+  const coins = /^coins-(\d+)$/u.exec(slug);
+  if (coins) return `需要${coins[1]}枚代币`;
+  const diglett = /^alolan-diglett-found-(\d+)$/u.exec(slug);
+  if (diglett) return `找到${diglett[1]}只阿罗拉地鼠`;
+  const prefixes: Record<string, string> = {
+    'slot2-': '插入指定 GBA 卡带', 'great-marsh-daily-slot-': '大湿地每日轮换',
+    'berry-tree-type-': '指定颜色树果树', 'item-': '持有指定关键道具',
+    'trade-': '完成指定 NPC 交换', 'starter-': '选择指定初始宝可梦',
+    'save-data-from-': '拥有对应游戏存档联动', 'story-progress-': '达到指定剧情进度',
+    'other-': '满足特殊剧情条件',
+  };
+  for (const [prefix, label] of Object.entries(prefixes)) if (slug.startsWith(prefix)) return label;
+  return '特殊出现条件';
 }
 
 function encounterPriority(entry: EncounterEntry): number {

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../features/dex/dex_game_scope.dart';
 import '../../features/journey/ask_motion_images.dart';
 import '../../features/journey/ask_motion_theme.dart';
 import '../../l10n/app_zh.dart';
@@ -16,6 +15,7 @@ import '../ask_answer_motion_title.dart';
 import '../assistant_surface.dart';
 import '../retro_forms.dart';
 import 'ask_answer_text.dart';
+import 'ask_game_label.dart';
 
 class AskConversationEmptyState extends StatefulWidget {
   const AskConversationEmptyState({
@@ -244,7 +244,7 @@ class AskQuestionBubble extends StatelessWidget {
               children: [
                 if (showGame && game != null) ...[
                   Text(
-                    flavorVersionLabelZh(game!),
+                    askGameLabel(game!),
                     style: SecondaryTypography.onCard.small12.copyWith(
                       color: TitoColors.deepBlue,
                       fontWeight: FontWeight.w800,

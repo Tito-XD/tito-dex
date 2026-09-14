@@ -93,6 +93,81 @@ void main() {
     );
   });
 
+  group('follow-up context boundaries', () {
+    AskTitoDexHistoryEntry entry(
+      String question,
+      AskTitoDexResult result, {
+      String game = 'general',
+    }) => AskTitoDexHistoryEntry(
+      game: game,
+      question: question,
+      result: result,
+      createdAt: DateTime.utc(2026, 9, 14),
+    );
+
+    const answered = AskTitoDexResult(
+      status: AskTitoDexStatus.answered,
+      answer: '已验证的回答。',
+    );
+    const clarification = AskTitoDexResult(
+      status: AskTitoDexStatus.needsClarification,
+      followUp: '你指的是哪个版本？',
+    );
+    final unusableResults = {
+      'no match': const AskTitoDexResult(
+        status: AskTitoDexStatus.noMatch,
+        followUp: '暂未找到资料。',
+      ),
+      'failure': const AskTitoDexResult(
+        status: AskTitoDexStatus.failed,
+        followUp: '请求失败，请重试。',
+      ),
+      'missing answer': const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+      ),
+      'blank clarification': const AskTitoDexResult(
+        status: AskTitoDexStatus.needsClarification,
+        followUp: '   ',
+      ),
+    };
+    for (final failure in unusableResults.entries) {
+      test(
+        '${failure.key} prevents a follow-up from reviving an older topic',
+        () {
+          final history = [
+            entry('皮卡丘怎么进化？', answered),
+            entry('拉普拉斯在哪里捕捉？', failure.value),
+          ];
+
+          expect(askTitoDexRequestHistory(history, game: 'general'), isEmpty);
+
+          history.add(entry('伊布怎么进化？', clarification));
+          history.add(entry('太阳伊布。', answered));
+          final messages = askTitoDexRequestHistory(history, game: 'general');
+          expect(messages, [
+            {'role': 'user', 'content': '伊布怎么进化？'},
+            {'role': 'assistant', 'content': '你指的是哪个版本？'},
+            {'role': 'user', 'content': '太阳伊布。'},
+            {'role': 'assistant', 'content': '已验证的回答。'},
+          ]);
+        },
+      );
+    }
+
+    test('a failure in another scope does not erase this scope context', () {
+      final history = [
+        entry('皮卡丘怎么进化？', answered),
+        entry('拉普拉斯在哪里捕捉？', unusableResults['no match']!, game: 'soulsilver'),
+      ];
+
+      expect(askTitoDexRequestHistory(history, game: 'general'), [
+        {'role': 'user', 'content': '皮卡丘怎么进化？'},
+        {'role': 'assistant', 'content': '已验证的回答。'},
+      ]);
+      expect(askTitoDexRequestHistory(history, game: 'soulsilver'), isEmpty);
+    });
+  });
+
   test(
     'manual history compression keeps only the newest requested entries',
     () async {

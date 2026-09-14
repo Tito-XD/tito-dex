@@ -25,6 +25,15 @@ final _askTitoDexAnswerEnvelope = RegExp(
   r'TitoDex 图鉴包整理)[：:][ \t]*\n',
 );
 
+// Shared character/species names are not enough to identify a story blocker.
+// Let reference and franchise questions continue to the online research path.
+final _nonProgressionQuestion = RegExp(
+  r'动画|动漫|剧场版|电影|台词|开场白|口头禅|口号|配音|声优|卡牌|卡片|集换式|'
+  r'种族值|属性|弱点|抗性|特性|配招|招式|进化|努力值|个体值|'
+  r'\b(?:ptcg|tcg|anime|animation|movie|episode|voice|cards?|stats?|types?|typing|abilities|ability|moves?|moveset|evolutions?|motto)\b',
+  caseSensitive: false,
+);
+
 /// Returns the user-facing answer body without the legacy inline citation
 /// footer. Sources already travel in [AskTitoDexResult.sources] and render in
 /// the dedicated expandable evidence sheet.
@@ -202,6 +211,22 @@ class AskTitoDexContext {
   );
 
   Map<String, dynamic> toRequestJson() {
+    if (game == null || game!.isEmpty || game == 'general') {
+      return {
+        'game': 'general',
+        'generation': 0,
+        'badgeIds': <String>[],
+        'milestoneIds': <String>[],
+        'locale': locale,
+        'parserRevision': 0,
+        'contextReliability': {
+          'game': 'user_selected',
+          'location': 'unknown',
+          'badges': 'unknown',
+          'milestones': 'unsupported',
+        },
+      };
+    }
     final sendsLocation = includeLocation && locationId != null;
     final effectiveBadgeReliability = includeBadges
         ? badgesReliability
@@ -720,19 +745,45 @@ class ProgressionHintRepository {
 
   Future<AskTitoDexResult> answer(
     String question,
-    AskTitoDexContext context,
-  ) async {
+    AskTitoDexContext context, {
+    List<Map<String, String>> history = const [],
+  }) async {
+    if (_nonProgressionQuestion.hasMatch(question)) {
+      return const AskTitoDexResult(
+        status: AskTitoDexStatus.noMatch,
+        followUp: '本地资料暂时无法回答这个问题。联网后可以继续查找宝可梦、动画或卡牌资料。',
+      );
+    }
     final game = context.game;
     if (game == null || game.isEmpty) {
       return const AskTitoDexResult(
-        status: AskTitoDexStatus.needsClarification,
-        followUp: '请先确认你正在玩心金还是魂银。',
+        status: AskTitoDexStatus.noMatch,
+        followUp: '本地资料暂时无法回答这个问题。联网后可以继续查找宝可梦、动画或卡牌资料。',
       );
     }
+    final available = (await load())
+        .where((hint) => hint.games.contains(game))
+        .toList();
+    // Only explicit requests to repeat the same steps/prerequisites can inherit
+    // a local blocker. Never use an assistant's prose as a new source of facts.
+    var retrievalQuestion = question;
+    if (_isLocalContinuation(question)) {
+      for (final turn in history.reversed) {
+        if (turn['role'] != 'user') continue;
+        final previous = turn['content'] ?? '';
+        if (_isLocalContinuation(previous)) continue;
+        if (!_nonProgressionQuestion.hasMatch(previous)) {
+          retrievalQuestion = previous;
+        }
+        break; // A changed topic is a boundary, not a reason to search older turns.
+      }
+    }
     final candidates =
-        (await load())
-            .where((hint) => hint.games.contains(game))
-            .map((hint) => (hint: hint, score: _score(hint, question, context)))
+        available
+            .map(
+              (hint) =>
+                  (hint: hint, score: _score(hint, retrievalQuestion, context)),
+            )
             .where((candidate) => candidate.score > 0)
             .toList()
           ..sort((left, right) => right.score.compareTo(left.score));
@@ -750,6 +801,11 @@ class ProgressionHintRepository {
     }
     return _deterministicAnswer(candidates.first.hint, context);
   }
+
+  bool _isLocalContinuation(String question) => RegExp(
+    r'^(?:(?:那|那么|所以|然后)[，,\s]*)?(?:接下来(?:呢|怎么办|怎么做|做什么)|然后呢|具体(?:怎么做|步骤呢)|需要什么(?:条件|道具)|有什么前提|再说一遍|重复一下步骤|what next|what should i do next|what are the prerequisites|repeat (?:the )?steps)[？?。.!！\s]*$',
+    caseSensitive: false,
+  ).hasMatch(question.trim());
 
   int _score(ProgressionHint hint, String question, AskTitoDexContext context) {
     final normalized = _normalize(question);

@@ -34,6 +34,47 @@ function json(value: unknown, status = 200): Response {
 }
 
 describe('curated key-free web research', () => {
+  it('follows a selected move machine link when a species name is also present', async () => {
+    const paths: string[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      paths.push(url.pathname);
+      if (url.hostname === 'pokeapi.co' && url.pathname === '/api/v2/move/89/') return json({
+        id: 89, name: 'earthquake', machines: [{
+          version_group: { url: 'https://pokeapi.co/api/v2/version-group/9/' },
+          machine: { url: 'https://pokeapi.co/api/v2/machine/999/' },
+        }],
+      });
+      if (url.hostname === 'pokeapi.co' && url.pathname === '/api/v2/machine/999/') return json({
+        move: { url: 'https://pokeapi.co/api/v2/move/89/' },
+        version_group: { url: 'https://pokeapi.co/api/v2/version-group/9/', name: 'platinum' },
+        item: { name: 'tm26' },
+      });
+      return json({}, 503);
+    });
+    await researchCuratedWeb({ ...request, question: '《白金》中烈咬陆鲨怎样学会地震？',
+      context: { ...request.context, game: 'platinum' } }, async (_phase, messages) => {
+      if (_phase === 'curated-web-compose') expect(messages[1].content).toContain('TM26');
+      throw new Error('stop_after_evidence');
+    }, fetcher);
+    expect(paths).toContain('/api/v2/move/89/');
+    expect(paths).toContain('/api/v2/machine/999/');
+    expect(paths.some((path) => path.startsWith('/api/v2/pokemon-species/'))).toBe(false);
+  });
+  it.each([
+    ['《白金》中烈咬陆鲨怎样学会地震？', '89'],
+    ['皮卡丘怎么学习十万伏特？', '85'],
+  ])('retrieves the move rather than only species data for a learning question: %s', (question, moveId) => {
+    expect(deterministicCuratedScopeDecision({ ...request, question })).toMatchObject({
+      pokeApiKind: 'move', pokeApiSlug: moveId,
+    });
+  });
+  it.each(['Jessie and James', 'Ash and Misty'])('keeps English anime identity subjects in both query languages: %s', (subject) => {
+    const decision = deterministicCuratedScopeDecision({ ...request,
+      question: `Who are ${subject} in the Pokemon anime?` });
+    expect(decision?.queryEn).toBe(`Pokémon anime ${subject}`);
+    expect(decision?.queryZh).toContain(subject);
+  });
   it('preserves Markdown list boundaries while filtering broad claims', () => {
     const answer = '- 波导弹：用于稳定输出。\n- 剑舞：用于强化后推进。';
     expect(sanitizeUnsupportedBroadClaims(answer, '路卡利欧配招推荐', []))
@@ -444,6 +485,42 @@ describe('curated key-free web research', () => {
     expect(result?.answer).not.toContain('等级门槛');
   });
 
+  it.each([
+    '皮卡丘怎么进化成雷丘？',
+    '皮卡丘为什么会进化成雷丘？',
+    '皮丘为什么会进化成皮卡丘？',
+  ])('does not shortcut a different evolution edge or a why question: %s', async (question) => {
+    const runModel = vi.fn<CuratedWebModelRunner>(async () => ({
+      supported: false, answer: '', usedSourceIds: [],
+    }));
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === 'pokeapi.co' && url.pathname === '/api/v2/pokemon-species/25/') {
+        return json({
+          id: 25, name: 'pikachu',
+          names: [{ name: '皮卡丘', language: { name: 'zh-hans' } }],
+          evolution_chain: { url: 'https://pokeapi.co/api/v2/evolution-chain/10/' },
+        });
+      }
+      if (url.hostname === 'pokeapi.co' && url.pathname === '/api/v2/evolution-chain/10/') {
+        return json({ chain: {
+          species: { name: 'pichu' }, evolves_to: [{
+            species: { name: 'pikachu' },
+            evolution_details: [{ trigger: { name: 'level-up' }, min_happiness: 220 }],
+            evolves_to: [{ species: { name: 'raichu' },
+              evolution_details: [{ trigger: { name: 'use-item' }, item: { name: 'thunder-stone' } }],
+              evolves_to: [],
+            }],
+          }],
+        } });
+      }
+      return json({}, 503);
+    });
+    const result = await researchCuratedWeb({ ...request, question }, runModel, fetcher);
+    expect(result).toBeNull();
+    expect(runModel).toHaveBeenCalled();
+  });
+
   it('resolves move values for the selected game before answering', async () => {
     let modelCalls = 0;
     const runModel: CuratedWebModelRunner = async () => {
@@ -680,8 +757,8 @@ describe('curated key-free web research', () => {
       context: violetContext,
     })).toMatchObject({
       allowed: true,
-      queryZh: '宝可梦 紫 悖谬宝可梦 未来种 第零区',
-      queryEn: 'Paradox Pokémon Bulbapedia definition future Pokémon Area Zero Violet',
+      queryZh: '宝可梦 紫 紫里的悖谬宝可梦是什么？ 第零区',
+      queryEn: 'Paradox Pokémon definition examples Area Zero Pokémon Violet',
       pokeApiKind: '',
     });
     expect(deterministicCuratedScopeDecision({
@@ -690,7 +767,7 @@ describe('curated key-free web research', () => {
     })).toMatchObject({
       allowed: true,
       queryZh: '宝可梦 动画 好讨厌的感觉是谁的台词？',
-      queryEn: 'Pokémon anime character quote Chinese dub',
+      queryEn: 'Pokémon anime 好讨厌的感觉是谁的台词？',
       pokeApiKind: '',
     });
   });
@@ -714,10 +791,12 @@ describe('curated key-free web research', () => {
     };
     const phases: string[] = [];
     const queries: string[] = [];
-    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+    const runModel: CuratedWebModelRunner = async (phase, messages, _schema, maxTokens) => {
       phases.push(phase);
       if (phase === 'curated-web-compose') {
-        expect(messages[0].content).toContain('宝可梦作品范围内');
+        expect(maxTokens).toBeGreaterThanOrEqual(1000);
+        expect(maxTokens).toBeLessThanOrEqual(1200);
+        expect(messages[0].content).toContain('宝可梦动画人物与剧情');
         expect(messages[1].content).toContain('"scope":"pokemon_franchise"');
         expect(messages[1].content).not.toContain('"game":"violet"');
         return {
@@ -727,10 +806,10 @@ describe('curated key-free web research', () => {
         };
       }
       if (phase === 'curated-web-verify') {
-        expect(messages[0].content).toContain('作品通用问题');
+        expect(messages[0].content).toContain('宝可梦动画人物与剧情');
         return {
-          supported: true,
-          answer: '这是宝可梦动画中火箭队三人组武藏、小次郎和喵喵被打飞时的经典退场台词，不是某一个人的专属台词。',
+          claims: [{ index: 0, verdict: 'supported', sourceId: 'tavily-52poke-1',
+            quote: '武藏、小次郎和喵喵组成的火箭队三人组在被打飞时会说“好讨厌的感觉啊”。' }],
         };
       }
       throw new Error(`unexpected_phase_${phase}`);
@@ -759,8 +838,8 @@ describe('curated key-free web research', () => {
       { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true },
     );
 
-    expect(queries).toHaveLength(1);
-    expect(queries.every((query) => query.startsWith('宝可梦 '))).toBe(true);
+    expect(queries).toHaveLength(3);
+    expect(queries.every((query) => /宝可梦|Pokémon/u.test(query))).toBe(true);
     expect(queries.every((query) => !query.includes('Pokémon Violet'))).toBe(true);
     expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
     expect(result).toMatchObject({
@@ -769,6 +848,128 @@ describe('curated key-free web research', () => {
       sourceKinds: ['tavily'],
     });
     expect(result?.answer).toContain('武藏、小次郎和喵喵');
+  });
+
+  it.each(['那需要星期几去？', 'What day of the week can I catch it?'])(
+    'keeps the encounter subject and weekday focus in retrieval: %s', async (question) => {
+      const queries: string[] = [];
+      const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+        const url = new URL(input instanceof Request ? input.url : input.toString());
+        if (url.hostname === 'api.tavily.com') {
+          queries.push(JSON.parse(init?.body as string).query);
+          return json({ results: [] });
+        }
+        return json({}, 503);
+      });
+      const runModel = vi.fn<CuratedWebModelRunner>(async () => { throw new Error('scope must be deterministic'); });
+      await researchCuratedWeb({ ...request, question, history: [
+        { role: 'user', content: 'Where can I catch Lapras in SoulSilver?' },
+        { role: 'assistant', content: '互连洞底层。' },
+      ] }, runModel, fetcher, () => new Date(), undefined, { tavilyApiKey: 'x'.repeat(32) });
+      expect(queries.some((query) => query.includes('Lapras location encounter day of week conditions'))).toBe(true);
+      expect(queries.some((query) => query.includes(question))).toBe(true);
+      expect(runModel).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    'PTCG里基础能量卡和特殊能量卡有什么区别？',
+    'Can I attach it twice per turn?',
+    'How many of those cards can I include in my deck?',
+  ].flatMap((question) => [true, false].map((verified) => ({ question, verified }))))(
+    'accepts official card-rule evidence for the current focus: $question, verified=$verified', async ({ question, verified }) => {
+    const phases: string[] = [];
+    const queries: string[] = [];
+    const answer = '基本能量卡不受同名四张上限。特殊能量卡按卡面文字供能，通常受同名四张上限。';
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      expect(messages[1].content).toContain(JSON.stringify(question));
+      expect(messages[1].content).not.toContain('"game":"general"');
+      return phase === 'curated-web-verify'
+        ? { claims: [
+            { index: 0, verdict: 'supported', sourceId: 'tavily-en-1', quote: 'Basic Energy cards are not limited to four copies.' },
+            { index: 1, verdict: verified ? 'supported' : 'unsupported', sourceId: verified ? 'tavily-en-1' : '',
+              quote: verified ? 'Special Energy cards provide Energy as written on each card and are limited to four copies of the same name.' : '' },
+          ] }
+        : { supported: true, answer, usedSourceIds: ['tavily-en-1'] };
+    };
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      const body = JSON.parse(init?.body as string);
+      queries.push(body.query);
+      if (body.include_domains.length === 1) return json({ results: [{
+        title: '能量卡（TCG）', url: 'https://wiki.52poke.com/wiki/Energy_card',
+        content: '基本能量卡和特殊能量卡是实体卡牌游戏的两类能量卡。特殊能量卡有同名卡数量限制。', score: 0.9,
+      }] });
+      return json({ results: [{
+        title: 'Pokémon Card Game Advanced Rulebook',
+        url: 'https://asia.pokemon-card.com/sg/wp-content/uploads/sites/6/2025/10/EN_advanced_manual-2025.pdf',
+        content: 'Basic Energy cards are not limited to four copies. Special Energy cards provide Energy as written on each card and are limited to four copies of the same name. Once during your turn you may attach one Energy card from your hand to one Pokemon. Card effects can change this rule.',
+        score: 0.95,
+      }] });
+    });
+    const result = await researchCuratedWeb({ ...request, question,
+      context: { ...request.context, game: 'general', generation: 0 },
+      history: question.startsWith('PTCG') ? [] : [
+        { role: 'user', content: 'PTCG里基础能量卡和特殊能量卡有什么区别？' },
+        { role: 'assistant', content: answer },
+      ],
+    }, runModel, fetcher, () => new Date(), undefined, { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true });
+    expect(result?.status).toBe('answered');
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(queries.some((query) => query.includes('official rulebook'))).toBe(true);
+    expect(result?.confidence).toBe(verified ? 'medium' : 'low');
+    if (!verified) {
+      expect(result?.unknowns?.join('')).toContain('资料不足的断言已省略');
+      expect(result?.answer).not.toContain('特殊能量');
+    }
+  });
+
+  it.each([
+    { question: '《紫》中悖谬宝可梦是什么？可以举几个例子吗？', subject: '悖谬宝可梦' },
+    { question: 'Who are Jessie and James in the Pokemon anime?', subject: 'Jessie and James' },
+  ])('keeps the subject and requested aspects across retrieval: $subject', async ({ question, subject }) => {
+    const wikiQueries: string[] = [];
+    const webQueries: string[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname === 'www.wikidata.org') wikiQueries.push(url.searchParams.get('search') ?? '');
+      if (url.hostname === 'api.tavily.com') {
+        webQueries.push(JSON.parse(init?.body as string).query);
+        return json({ results: [] });
+      }
+      return json({}, 503);
+    });
+    await researchCuratedWeb({ ...request, question, context: { ...request.context, game: 'violet', generation: 9 } },
+      async () => { throw new Error('No model should run without evidence'); }, fetcher, () => new Date(), undefined,
+      { tavilyApiKey: 'x'.repeat(32) });
+    expect(wikiQueries[0]).toContain(subject);
+    expect(wikiQueries[0]).not.toBe('宝可梦');
+    expect(webQueries).toHaveLength(3);
+    if (subject === '悖谬宝可梦') {
+      expect(webQueries.some((query) => query.includes('举几个例子'))).toBe(true);
+      expect(webQueries.some((query) => query.includes('definition examples'))).toBe(true);
+    }
+  });
+
+  it.each([
+    null,
+    { title: 'Fake rules', url: 'https://unreviewed.example/rules' },
+    { title: 'Pikachu (Pokémon)', url: 'https://bulbapedia.bulbagarden.net/wiki/Pikachu_(Pok%C3%A9mon)' },
+  ])('does not relax missing or mismatched card evidence: %j', async (source) => {
+    const runModel = vi.fn<CuratedWebModelRunner>(async () => ({ supported: true, answer: '不应回答', usedSourceIds: ['tavily-en-1'] }));
+    const fetcher = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input.toString());
+      if (url.hostname !== 'api.tavily.com') return json({}, 503);
+      return json({ results: source ? [{ ...source, content: 'Pikachu has Electric typing in the main series games.', score: 0.9 }] : [] });
+    });
+    const result = await researchCuratedWeb({ ...request,
+      question: 'PTCG里基础能量卡和特殊能量卡有什么区别？',
+      context: { ...request.context, game: 'general', generation: 0 },
+    }, runModel, fetcher, () => new Date(), undefined, { tavilyApiKey: 'x'.repeat(32), relaxedEvidence: true });
+    expect(result).toBeNull();
+    expect(runModel).not.toHaveBeenCalled();
   });
 
   it('does not let a catalog entity bypass the non-game and injection guard', async () => {
@@ -787,6 +988,17 @@ describe('curated key-free web research', () => {
     );
     expect(result).toBeNull();
     expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('still rejects explicit uppercase search operators while allowing natural conjunctions', async () => {
+    const fetcher = vi.fn<typeof fetch>();
+    const runModel = vi.fn<CuratedWebModelRunner>();
+    const result = await researchCuratedWeb({ ...request,
+      question: 'Who are Jessie AND James in the Pokemon anime?',
+    }, runModel, fetcher);
+    expect(result).toBeNull();
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(runModel).not.toHaveBeenCalled();
   });
 
   it('rejects model-selected URLs and search operators', async () => {

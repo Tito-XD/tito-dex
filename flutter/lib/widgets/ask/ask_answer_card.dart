@@ -183,7 +183,6 @@ class _LiveAnswerCardState extends State<AskLiveAnswerCard>
         },
         child: AssistantSurface(
           key: const Key('ask-titodex-active-answer-surface'),
-          color: askPaperColor,
           padding: const EdgeInsets.fromLTRB(14, 13, 14, 14),
           radius: TitoRadii.lg,
           borderColor: askPaperOutline(0.24),
@@ -453,7 +452,6 @@ class AskAnswerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AssistantSurface(
       key: const Key('ask-titodex-answer-card'),
-      color: askPaperColor,
       radius: TitoRadii.lg,
       child: _AnswerCardContent(
         question: question,

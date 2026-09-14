@@ -151,7 +151,7 @@ describe('DeepSeek native search gateway request', () => {
 
     const [, init] = mock.call.mock.calls[0] as [URL, RequestInit];
     const body = JSON.parse(init.body as string) as Record<string, unknown>;
-    expect(body.system).toContain('宝可梦作品通用范围');
+    expect(body.system).toContain('当前回答不绑定具体主系列游戏版本');
     expect(JSON.stringify(body.messages)).toContain('检索范围：宝可梦作品');
     expect(JSON.stringify(body.messages)).not.toContain('宝可梦 紫');
     expect(JSON.stringify(body.messages)).not.toContain('当前游戏');
@@ -506,11 +506,11 @@ describe('DeepSeek native Anthropic response parsing', () => {
     const content = withLongEvidence.content as Array<Record<string, unknown>>;
     const final = content[3];
     const citations = final.citations as Array<Record<string, unknown>>;
-    citations[0] = { ...citations[0], cited_text: '证'.repeat(500) };
+    citations[0] = { ...citations[0], cited_text: '证'.repeat(1500) };
     const parsed = parseDeepSeekNativeResponse(withLongEvidence);
     expect(parsed.status).toBe('answered');
     if (parsed.status === 'answered') {
-      expect(parsed.sources[0].snippet).toHaveLength(240);
+      expect(parsed.sources[0].snippet).toHaveLength(1200);
     }
 
     final.text = '这个版本中伤害倍率是 1.5 倍。';

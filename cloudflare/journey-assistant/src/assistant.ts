@@ -7,6 +7,8 @@ import {
 } from './contract';
 import type { ClarificationCandidate } from './contract';
 import { progressionHints, type ProgressionHint } from './progression_hints';
+import { isGeneralPokemonFranchiseRequest, isPokemonReferenceQuestion } from './pokemon_question_scope';
+import { needsExpandedAnswer } from './answer_coverage';
 
 export type AiRunner = (
   hint: ProgressionHint,
@@ -25,8 +27,18 @@ export async function answerQuestion(
   resolveWithAi?: AiHintResolver,
   availableHints: ProgressionHint[] = progressionHints,
 ): Promise<AssistantResponse> {
+  if (request.context.game === 'general' ||
+      isGeneralPokemonFranchiseRequest(request) || isPokemonReferenceQuestion(request.question)) {
+    return {
+      status: 'no_match',
+      answer: null,
+      confidence: 'low',
+      followUp: '暂未找到足够资料。可以补充宝可梦名称、卡牌编号、作品名或你想了解的方面。',
+    };
+  }
   const gameHints = availableHints
-    .filter((hint) => hint.games.includes(request.context.game));
+    .filter((hint) => hint.games.includes(request.context.game))
+    .filter((hint) => hint.subject.type !== 'reference_topic' || !needsExpandedAnswer(request.question));
   const candidates = gameHints
     .map((hint) => ({ hint, score: scoreHint(hint, request) }))
     .filter((candidate) => candidate.score > 0)
@@ -60,7 +72,9 @@ export async function answerQuestion(
       status: 'no_match',
       answer: null,
       confidence: 'low',
-      followUp: '目前只收录少量主线阻塞点。请补充游戏版本、地点、挡路角色或所需道具。',
+      followUp: blockerIntent.test(request.question)
+        ? '目前只收录少量主线阻塞点。请补充游戏版本、地点、挡路角色或所需道具。'
+        : '暂未找到足够资料。可以补充宝可梦名称或你想了解的具体方面。',
     };
   }
   if (!hint) {
@@ -130,7 +144,7 @@ function scoreHint(hint: ProgressionHint, request: AssistantRequest): number {
     // Reference summaries are not catch-all answers for their game/location.
     // They require an explicit topic alias, and detail/action questions must
     // continue to structured data or online retrieval instead.
-    if (!subjectMatched || referenceDetailIntent.test(request.question)) return 0;
+    if (!subjectMatched || referenceDetailIntent.test(request.question) || needsExpandedAnswer(request.question)) return 0;
     score += 5;
   } else if (subjectMatched) {
     score += 5;

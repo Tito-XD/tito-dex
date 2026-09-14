@@ -11,6 +11,8 @@ export type GeneratedAnswerGuardFailure =
   | MoveAdviceGuardFailure
   | 'excessive_move_candidates'
   | 'internal_source_reference'
+  | 'model_output_envelope'
+  | 'incomplete_answer'
   | 'entity_identity_conflict'
   | 'selected_game_conflict';
 
@@ -59,6 +61,14 @@ export function generatedAnswerGuardFailure(
   input: GeneratedAnswerGuardInput,
 ): GeneratedAnswerGuardFailure | null {
   const answer = input.answer.trim();
+  // The outer model schema cannot prevent a second serialized object inside
+  // answer. Do not present its fragments as prose after claim filtering.
+  if (/^(?:```(?:json|javascript)?\s*)?[{\[]\s*(?:\{\s*)?["'](?:supported|answer|points|claims|usedSourceIds|verdict)["']\s*:/iu.test(answer)) {
+    return 'model_output_envelope';
+  }
+  if (/(?:例如|比如|举例|例子(?:如下)?|for example|examples? include)\s*[：:]\s*$/iu.test(answer)) {
+    return 'incomplete_answer';
+  }
   if (entityNameMismatch(answer) || evolutionClaimMismatch(answer, input.structuredSources ?? [])) return 'entity_identity_conflict';
   if (internalSourceReferencePatterns.some((pattern) => pattern.test(answer))) {
     return 'internal_source_reference';

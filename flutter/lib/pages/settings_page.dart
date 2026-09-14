@@ -783,7 +783,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
         if (widget.section == SettingsSection.assistant) ...[
           _SettingsGroup(
-            title: AppZh.extensionOnlineTitle,
+            title: AppZh.askTitoDexTitle,
             child: StickerCard(
               variant: StickerVariant.softYellow,
               child: ListenableBuilder(
@@ -791,11 +791,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 builder: (context, _) => Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      '${AppZh.extensionJourneyTitle} · ${AppZh.extensionBuiltIn}',
-                      style: SecondaryTypography.onCard.h15,
-                    ),
-                    const SizedBox(height: 8),
                     _SettingsToggleRow(
                       key: const Key('journey-assistant-master-toggle'),
                       icon: Icons.auto_awesome_outlined,

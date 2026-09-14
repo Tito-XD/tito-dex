@@ -59,6 +59,8 @@ export async function answerStructuredResources(c: Context): Promise<AssistantRe
   const moves = mentionedEntities(q, 'move');
   const abilities = mentionedEntities(q, 'ability');
   const items = mentionedEntities(q, 'item');
+  if (c.request.context.game === 'general' &&
+      /(?:能学|会哪些招式|学会|捕捉|捕获地点|哪里抓|在哪抓|招式表|图鉴描述)/u.test(q)) return null;
   const filter = /(?:哪些|哪几|都有谁|有什么(?:宝可梦|精灵|招式|特性|道具|树果)|找出|筛选|列出|谁能|谁会)/u.test(q);
   if (filter && /(?:或者|或是|或|排除|除了|不能|不会|不是|不具有|没有)/u.test(q)) return unavailable(c, '当前查询按同时满足条件执行；请将“或”与排除条件拆开查询，避免给出不符合要求的名单。');
   const referenceList = filter && /(?:招式|技能|道具|树果|特性)/u.test(q) && !/(?:宝可梦|精灵|谁|学会|能学|携带)/u.test(q) && !pokemon.length;
@@ -85,7 +87,7 @@ export async function answerStructuredResources(c: Context): Promise<AssistantRe
   }
   if ((pokemon.length || moves.length || abilities.length || items.length) &&
       !/(?:性格|天气|场地|异常状态)/u.test(q)) return null;
-  return queryMechanics(c);
+  return c.request.context.game === 'general' ? null : queryMechanics(c);
 }
 
 async function queryPokemon(c: Context): Promise<AssistantResponse> {

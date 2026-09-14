@@ -192,6 +192,9 @@ class JourneyPackRepository extends ChangeNotifier {
   ) async {
     if (exactGame == null || !featureEnabled) return const [];
     if (_installed.isEmpty) await loadInstalled();
+    // The downloadable catalog is optional. Fresh installs have no pack
+    // references to verify and must not wait on an unused catalog request.
+    if (_installed.isEmpty) return const [];
     if (_catalog == null && await refreshCatalog() != 'ok') return const [];
     final catalogDescriptor = descriptorForGame(exactGame);
     if (catalogDescriptor == null || !catalogDescriptor.isCompatible) {

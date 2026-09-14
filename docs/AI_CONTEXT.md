@@ -5,8 +5,8 @@
 | Field | Value |
 | --- | --- |
 | **Latest release** | [v0.9.19](https://github.com/Tito-XD/tito-dex/releases/tag/v0.9.19) |
-| **`main` / lite source** | `0.9.19+206` (`flutter/pubspec.yaml`) |
-| **Offline package** | `0.9.19-offline+207` — APK-bundled verified v20 archive |
+| **`main` / lite source** | `0.9.20+208` (`flutter/pubspec.yaml`; release preparation) |
+| **Offline package** | Planned `0.9.20-offline+209` — APK-bundled verified v20 archive; published pair remains v0.9.19 until artifact verification |
 | **Journey Assistant** | Built into the host APK with three offline HGSS chains; reviewed online blockers also cover DPPt, BW/BW2, XY, ORAS, SM/USUM, SWSH, BDSP, PLA and SV; legacy 1.0.0 content APK remains read-compatible |
 | **Offline dex bundle** | **v20** live on CDN and embedded in the Offline APK — 1025 species, 803 form records, complete item text/icons, audited form media, verified reference/gameplay projections, CDN prefix `/v5/`; `/v4/` rollback |
 | **UI language** | Simplified Chinese default; English follows the OS / Android per-app language. No in-app switch (`flutter/lib/l10n/`) |
@@ -46,10 +46,12 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.9.19)
 
-### Unreleased source: Ask component extraction (2026-09-14)
+### v0.9.20 release preparation: Ask experience and structure (2026-09-14)
 
-The Ask page keeps request/version ownership, history persistence, semantic reveal
-pacing and scroll anchoring. Its presentation components now live in
+The Ask page keeps request/version ownership, history persistence and scroll
+anchoring. `AskTitoDexRevealController` owns semantic queues, reveal pacing,
+progress stages and final replacement, using the page's request/edition gate.
+Its presentation components now live in
 `flutter/lib/widgets/ask/`: connection/history panels, question input and idle
 prompt, answer text/blocks/cards, sources/entities and shared paper styles.
 `AskTitoDexPage`, `AskTitoDexSourceOpener` and
@@ -63,9 +65,61 @@ logs, zh/en translation-key checks and download-only settings polling. Settings
 also resynchronizes shared download/cache state when returning from a covered
 route. New regressions cover idle lifecycle/route interruption, reduced-motion
 changes, cursor restart and download completion/cancellation across settings
-routes. No release version, data bundle or Worker deployment changes accompany
-this source refactor. The reveal-controller and wider theme work remains deferred;
-see [remaining P2 work](P2_REFACTOR_HANDOFF.md).
+routes. The controller retains the original 20ms/112-step/96ms/150ms timing.
+Ask history/source tiles share their identical shape/border definition; answer
+cards reuse `AssistantSurface` defaults. Three-theme differences remain explicit.
+No release version, data bundle or production traffic changes accompany this
+work; see [P2 boundaries and independent follow-up work](P2_REFACTOR_HANDOFF.md).
+
+Follow-up source work adds an explicit `general` / generation `0` request mode:
+no save facts or Journey pack references accompany an unspecified game. Local
+story keywords no longer intercept animation, PTCG or species-reference questions.
+The Worker recognizes Chinese/English franchise topics and elliptical follow-ups,
+keeps game and card evidence separate, and excludes revision/history pages from
+research evidence. A general question does not require selecting a game first;
+version-dependent facts still need an appropriate game context. History remains
+bounded and isolated by game/general scope, with localized general labels.
+
+Ask now retries deferred initialization when a covered route becomes current,
+including after theme changes; the version control uses the same exact name as
+the Dex. The inactive Journey pack download button is removed. Fresh installs
+do not fetch a pack catalog while preparing a question; existing installed packs
+remain readable. Assistant activation and online-consent controls remain, under
+the Ask title. These changes require coordinated App/Worker acceptance; unit
+tests and live answer-quality checks are separate from release/deployment status.
+
+The follow-up retrieval path now resolves an unambiguous subject from prior user
+turns while keeping the current question as the answer focus. Failed/empty App
+turns break request context so a later pronoun cannot revive an older subject.
+Offline progression hints also resolve explicit requests for the same next
+steps/prerequisites from the latest supported user topic. They do not infer new
+facts from previous assistant answers; topic changes and unsupported details
+fall through to online research. Structured answers preserve encounter conditions and defer
+multi-part questions when their facts do not cover the whole request. Evolution
+shortcuts must match the requested edge. Source-scoped relaxed verification also
+applies to franchise questions, with unverified-support labeling and the existing
+empty-source, topic and generated-fact guards retained. Preview uploads do not
+change production traffic.
+Card-rule verification keeps exact supporting excerpts for each retained claim;
+contradictions cannot fall back to relaxed acceptance. Official rule sources
+participate before accepting a short search result. Natural-language conjunctions
+and example requests remain in research queries, and generic research misses use
+reference-oriented clarification instead of a storyline-blocker prompt.
+Merged encounter records explicitly disclose missing condition/level associations
+and remain incomplete research inputs. Optional PokéAPI machine references are
+bounded, version-group checked and establish a TM/HM/TR number only; acquisition
+locations still require separate evidence. SV species-footnote cleanup accepts
+common simplified/traditional character variants while preserving explicit card names.
+Research distinguishes main-series mechanics, anime, manga, physical PTCG and
+TCG Pocket. Explicit manga questions retain matching manga evidence and identify
+the work/character version in the answer; manga episodes do not establish a
+general game mechanic. General, franchise and card claims share one evidence
+verification pass, including relevant rule exceptions, before relaxed acceptance.
+These are implemented safeguards, not a claim that live answer quality has passed.
+Preview checks still found unsupported refusals for English character/manga
+questions and incomplete machine acquisition answers. Exact-quote verification
+can still misjudge meaning; nested model JSON and dangling example introductions
+are rejected at the output boundary. Keep live content review separate from tests.
 
 ### v0.9.19: Trainer’s Journal and companion animation choices (2026-09-10)
 

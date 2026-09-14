@@ -4,7 +4,7 @@ import {
   type AssistantResponse,
 } from './contract';
 import speciesLabels from '../../../flutter/assets/l10n/zh/species_labels.json';
-import { isMegaEvolutionQuestion } from './pokemon_question_scope';
+import { isGeneralPokemonFranchiseRequest, isMegaEvolutionQuestion } from './pokemon_question_scope';
 
 type LabelRecord = Record<string, { en?: string; zh?: string }>;
 
@@ -20,6 +20,7 @@ const megaEvolutionGames = new Set<AssistantRequest['context']['game']>([
 ]);
 
 const gameLabels: Record<AssistantRequest['context']['game'], string> = {
+  general: '宝可梦通用',
   diamond: '宝可梦 钻石',
   pearl: '宝可梦 珍珠',
   platinum: '宝可梦 白金',
@@ -57,7 +58,8 @@ const speciesNames = Object.values(speciesLabels as LabelRecord)
 export function answerSelectedGameMechanic(
   request: AssistantRequest,
 ): AssistantResponse | null {
-  if (!isMegaEvolutionQuestion(request.question) ||
+  if (request.context.game === 'general' || isGeneralPokemonFranchiseRequest(request) ||
+      !isMegaEvolutionQuestion(request.question) ||
       megaEvolutionGames.has(request.context.game)) {
     return null;
   }

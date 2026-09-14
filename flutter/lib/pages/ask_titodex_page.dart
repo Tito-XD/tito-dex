@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../features/companion/companion_repository.dart';
@@ -13,6 +12,7 @@ import '../features/journey/ask_titodex_answer_blocks.dart';
 import '../features/journey/ask_motion_images.dart';
 import '../features/journey/ask_titodex_entity_links.dart';
 import '../features/journey/ask_titodex_history.dart';
+import '../features/journey/ask_titodex_reveal_controller.dart';
 import '../features/journey/ask_titodex_service.dart';
 import '../features/journey/ask_titodex_settings.dart';
 import '../features/journey/progression_hints.dart';
@@ -31,10 +31,6 @@ import '../widgets/secondary_page_scaffold.dart';
 
 export '../widgets/ask/ask_answer_sources.dart' show AskTitoDexSourceOpener;
 
-const _semanticRevealFrame = Duration(milliseconds: 20);
-const _semanticRevealStepLimit = 112;
-const _semanticCursorHold = Duration(milliseconds: 96);
-const _progressStageMinimum = Duration(milliseconds: 150);
 const _askTitoDexQuestionLimit = 240;
 
 String buildAskTitoDexClarificationQuestion({
@@ -125,20 +121,15 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   List<AskTitoDexHistoryEntry> _history = const [];
   AskTitoDexWorkerStatus _workerStatus =
       const AskTitoDexWorkerStatus.checking();
-  AskTitoDexProgress _progress = AskTitoDexProgress.checkingLocal;
+  late final AskTitoDexRevealController _reveal;
   var _requestSeed = 0;
   var _contextRequestId = 0;
   int? _activeEntryId;
   String? _submittedQuestion;
   bool _loading = false;
-  List<AskTitoDexAnswerBlock> _streamedBlocks = const [];
-  AskTitoDexClarification? _streamedClarification;
   AskTitoDexResult? _activeResult;
-  var _semanticRevealSteps = 0;
-  Future<void> _semanticRevealQueue = Future<void>.value();
-  Timer? _progressTimer;
   var _initializationStarted = false;
-  DateTime _progressChangedAt = DateTime.fromMillisecondsSinceEpoch(0);
+  var _initializationPending = false;
   var _followingLatest = false;
   var _userScrolling = false;
   var _scrollUpdateScheduled = false;
@@ -153,10 +144,25 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     _historyStore = widget.historyStore ?? askTitoDexHistoryStore;
     _entityResolver = widget.entityResolver ?? askTitoDexEntityResolver;
     _edition = widget.edition;
+    _reveal = AskTitoDexRevealController(
+      isActiveRequest: _isActiveRequest,
+      reduceMotion: () => MediaQuery.disableAnimationsOf(context),
+      onChanged: _handleRevealChanged,
+      onBlocksChanged: _handleRevealBlocksChanged,
+    );
     _historyReadyCompleter = Completer<void>();
     _historyReady = _historyReadyCompleter.future;
     askTitoDexSettings.addListener(_handleSettingsChanged);
-    unawaited(_startInitialTasksAfterRoute());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Theme changes can recreate a page while another route covers it.
+    // Defer until it becomes current, and retry if its first entry was covered.
+    if (ModalRoute.isCurrentOf(context) ?? true) {
+      unawaited(_startInitialTasksAfterRoute());
+    }
   }
 
   void _handleSettingsChanged() {
@@ -164,14 +170,16 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
   }
 
   Future<void> _startInitialTasksAfterRoute() async {
-    final canStart = await waitForIncomingRouteSettled(context);
-    if (!canStart || !mounted) {
-      if (!_historyReadyCompleter.isCompleted) {
-        _historyReadyCompleter.complete();
+    if (_initializationStarted || _initializationPending) return;
+    _initializationPending = true;
+    try {
+      final canStart = await waitForIncomingRouteSettled(context);
+      if (canStart && mounted) {
+        _startInitialTasks();
       }
-      return;
+    } finally {
+      _initializationPending = false;
     }
-    _startInitialTasks();
   }
 
   void _startInitialTasks() {
@@ -201,13 +209,12 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (oldWidget.edition.slug != widget.edition.slug ||
         oldWidget.edition.selectedFlavor != widget.edition.selectedFlavor) {
       _requestSeed += 1;
-      _progressTimer?.cancel();
+      _reveal.clear();
       _edition = widget.edition;
+
       _context = null;
       _loading = false;
       _submittedQuestion = null;
-      _streamedBlocks = const [];
-      _streamedClarification = null;
       _activeEntryId = null;
       _activeResult = null;
       if (_initializationStarted) {
@@ -253,12 +260,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (!mounted || _loading) return;
     setState(() {
       _requestSeed += 1;
-      _progressTimer?.cancel();
+      _reveal.clear();
       _edition = picked;
       _context = null;
       _submittedQuestion = null;
-      _streamedBlocks = const [];
-      _streamedClarification = null;
       _activeEntryId = null;
       _activeResult = null;
     });
@@ -322,21 +327,18 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     final requestId = _requestSeed + 1;
     final editionToken = _editionToken(_edition);
     FocusScope.of(context).unfocus();
-    _progressTimer?.cancel();
+
     setState(() {
       _loading = true;
       _submittedQuestion = question;
-      _progress = AskTitoDexProgress.checkingLocal;
+
       _requestSeed = requestId;
-      _streamedBlocks = const [];
-      _streamedClarification = null;
-      _semanticRevealSteps = 0;
-      _semanticRevealQueue = Future<void>.value();
+      _reveal.begin();
       _activeResult = null;
       _activeEntryId = null;
       _followingLatest = false;
     });
-    _progressChangedAt = DateTime.now();
+
     // The latest turn grows down from a stable origin. Start there once;
     // incoming blocks must not move the reader to the end of a long answer.
     _scrollToLatest(animate: false, force: true);
@@ -345,21 +347,20 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
       contextValue,
       history: askTitoDexRequestHistory(
         _history,
-        game: contextValue.game ?? '',
+        game: contextValue.game ?? 'general',
       ),
       onProgress: (progress) {
-        _queueProgress(progress, requestId, editionToken);
+        _reveal.queueProgress(progress, requestId, editionToken);
       },
-      onStreamEvent: (event) =>
-          _enqueueSemanticEvent(event, requestId, editionToken),
+      onStreamEvent: (event) => _reveal.enqueue(event, requestId, editionToken),
     );
     if (!_isActiveRequest(requestId, editionToken)) return;
-    await _semanticRevealQueue;
+    await _reveal.pending;
     if (!_isActiveRequest(requestId, editionToken)) return;
-    await _revealVerifiedResult(result, requestId, editionToken);
+    await _reveal.revealVerifiedResult(result, requestId, editionToken);
     if (!_isActiveRequest(requestId, editionToken)) return;
     final entry = AskTitoDexHistoryEntry(
-      game: contextValue.game ?? 'unknown',
+      game: contextValue.game ?? 'general',
       question: question,
       result: result,
       createdAt: DateTime.now(),
@@ -389,216 +390,12 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     }
   }
 
-  Future<void> _enqueueSemanticEvent(
-    AskTitoDexOnlineStreamEvent event,
-    int requestId,
-    String editionToken,
-  ) {
-    final next = _semanticRevealQueue.then(
-      (_) => _applySemanticEvent(event, requestId, editionToken),
-    );
-    _semanticRevealQueue = next;
-    return next;
+  void _handleRevealChanged() {
+    if (mounted) setState(() {});
   }
 
-  Future<void> _applySemanticEvent(
-    AskTitoDexOnlineStreamEvent event,
-    int requestId,
-    String editionToken,
-  ) async {
-    if (!_isActiveRequest(requestId, editionToken)) return;
-    if (event.semanticReset) {
-      setState(() {
-        _streamedBlocks = const [];
-        _streamedClarification = null;
-        _semanticRevealSteps = 0;
-      });
-      _scrollToLatest(animate: false);
-      return;
-    }
-    if (event.answerBlock case final block?) {
-      await _revealBlock(block, requestId, editionToken);
-    }
-    if (event.clarification case final clarification?) {
-      if (_isActiveRequest(requestId, editionToken)) {
-        setState(() => _streamedClarification = clarification);
-      }
-    }
-  }
-
-  void _queueProgress(
-    AskTitoDexProgress progress,
-    int requestId,
-    String editionToken,
-  ) {
-    if (!_isActiveRequest(requestId, editionToken) || progress == _progress) {
-      return;
-    }
-    _progressTimer?.cancel();
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _showProgressNow(progress, requestId, editionToken);
-      return;
-    }
-    final elapsed = DateTime.now().difference(_progressChangedAt);
-    final delay = _progressStageMinimum - elapsed;
-    if (delay <= Duration.zero) {
-      _showProgressNow(progress, requestId, editionToken);
-      return;
-    }
-    _progressTimer = Timer(
-      delay,
-      () => _showProgressNow(progress, requestId, editionToken),
-    );
-  }
-
-  void _showProgressNow(
-    AskTitoDexProgress progress,
-    int requestId,
-    String editionToken,
-  ) {
-    if (!_isActiveRequest(requestId, editionToken)) return;
-    _progressTimer?.cancel();
-    _progressTimer = null;
-    if (_progress != progress) {
-      setState(() => _progress = progress);
-      _progressChangedAt = DateTime.now();
-    }
-  }
-
-  Future<void> _revealVerifiedResult(
-    AskTitoDexResult result,
-    int requestId,
-    String editionToken,
-  ) async {
-    if (result.status != AskTitoDexStatus.answered) return;
-    final answer = askTitoDexAnswerBody(result.answer ?? '');
-    final targetBlocks = result.answerBlocks.isNotEmpty
-        ? result.answerBlocks
-        : synthesizeAskTitoDexAnswerBlocks(answer);
-    if (targetBlocks.isEmpty) return;
-    final mustResetStream =
-        _streamedBlocks.isNotEmpty &&
-        ((result.errorCode?.contains('_fallback') ?? false) ||
-            !_streamedBlocksAreCompatibleWith(targetBlocks));
-    if (mustResetStream) {
-      setState(() {
-        _streamedBlocks = const [];
-        _streamedClarification = null;
-        _semanticRevealSteps = 0;
-      });
-      _scrollToLatest(animate: false);
-    }
-    _showProgressNow(
-      AskTitoDexProgress.revealingAnswer,
-      requestId,
-      editionToken,
-    );
-    for (final block in targetBlocks) {
-      await _revealBlock(block, requestId, editionToken);
-      if (!_isActiveRequest(requestId, editionToken)) return;
-    }
-    if (_isActiveRequest(requestId, editionToken)) {
-      setState(() => _streamedBlocks = List.unmodifiable(targetBlocks));
-    }
-  }
-
-  bool _streamedBlocksAreCompatibleWith(
-    List<AskTitoDexAnswerBlock> authoritative,
-  ) {
-    if (_streamedBlocks.length > authoritative.length) return false;
-    for (var index = 0; index < _streamedBlocks.length; index += 1) {
-      final streamed = _streamedBlocks[index];
-      final finalBlock = authoritative[index];
-      if (streamed.id != finalBlock.id ||
-          streamed.kind != finalBlock.kind ||
-          streamed.title != finalBlock.title ||
-          !finalBlock.text.startsWith(streamed.text)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  Future<void> _revealBlock(
-    AskTitoDexAnswerBlock target,
-    int requestId,
-    String editionToken,
-  ) async {
-    if (!_isActiveRequest(requestId, editionToken)) return;
-    final index = _streamedBlocks.indexWhere((block) => block.id == target.id);
-    final current = index < 0 ? null : _streamedBlocks[index];
-    final currentText = current?.text ?? '';
-    final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    if (current != null &&
-        (current.kind != target.kind ||
-            current.title != target.title ||
-            !target.text.startsWith(currentText))) {
-      _replaceStreamBlock(target);
-      return;
-    }
-    if (index < 0) {
-      _replaceStreamBlock(
-        target.copyWith(
-          text: '',
-          isComplete: target.text.isEmpty && target.isComplete,
-        ),
-      );
-    }
-    final suffix = target.text.substring(currentText.length);
-    if (suffix.isNotEmpty &&
-        !reduceMotion &&
-        _semanticRevealSteps < _semanticRevealStepLimit) {
-      final runes = suffix.runes.toList(growable: false);
-      final remainingBudget = _semanticRevealStepLimit - _semanticRevealSteps;
-      var steps = runes.length < 28 ? runes.length : 28;
-      if (steps > remainingBudget) steps = remainingBudget;
-      final runesPerStep = (runes.length / steps).ceil();
-      final visible = StringBuffer(currentText);
-      var offset = 0;
-      while (offset < runes.length &&
-          _isActiveRequest(requestId, editionToken)) {
-        final end = offset + runesPerStep < runes.length
-            ? offset + runesPerStep
-            : runes.length;
-        visible.writeAll(runes.sublist(offset, end).map(String.fromCharCode));
-        _semanticRevealSteps += 1;
-        _replaceStreamBlock(
-          target.copyWith(text: visible.toString(), isComplete: false),
-        );
-        offset = end;
-        await Future<void>.delayed(_semanticRevealFrame);
-      }
-    } else if (suffix.isNotEmpty) {
-      _replaceStreamBlock(target.copyWith(isComplete: false));
-    }
-    if (!_isActiveRequest(requestId, editionToken)) return;
-    final visible = _streamedBlocks.firstWhere(
-      (block) => block.id == target.id,
-      orElse: () => target,
-    );
-    if (visible.text != target.text) {
-      _replaceStreamBlock(target.copyWith(isComplete: false));
-    }
-    if (target.isComplete) {
-      if (!reduceMotion && !visible.isComplete) {
-        await Future<void>.delayed(_semanticCursorHold);
-      }
-      if (_isActiveRequest(requestId, editionToken)) {
-        _replaceStreamBlock(target);
-      }
-    }
-  }
-
-  void _replaceStreamBlock(AskTitoDexAnswerBlock block) {
-    if (!mounted) return;
-    final blocks = [..._streamedBlocks];
-    final index = blocks.indexWhere((value) => value.id == block.id);
-    if (index < 0) {
-      blocks.add(block);
-    } else {
-      blocks[index] = block;
-    }
-    setState(() => _streamedBlocks = List.unmodifiable(blocks));
+  void _handleRevealBlocksChanged() {
+    _handleRevealChanged();
     _scrollToLatest(animate: false);
   }
 
@@ -689,7 +486,8 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
     if (!_historyReadyCompleter.isCompleted) {
       _historyReadyCompleter.complete();
     }
-    _progressTimer?.cancel();
+
+    _reveal.dispose();
     _questionController.dispose();
     _answerScrollController.dispose();
     super.dispose();
@@ -704,7 +502,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
         AskQuestionBubble(
           question: entry.question,
           game: entry.game,
-          showGame: entry.game != currentGame,
+          showGame: entry.game != (currentGame ?? 'general'),
         ),
         const SizedBox(height: 8),
         AskAnswerCard(
@@ -734,9 +532,9 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
           key: ValueKey('ask-live-turn-$_requestSeed'),
           question: question,
           prepareImages: widget.motionImagePreparer,
-          progress: _progress,
-          streamedBlocks: _streamedBlocks,
-          clarification: _streamedClarification,
+          progress: _reveal.progress,
+          streamedBlocks: _reveal.blocks,
+          clarification: _reveal.clarification,
           result: _activeResult,
           entityResolver: _entityResolver,
           sourceOpener: widget.sourceOpener ?? _openExternalSource,
@@ -797,9 +595,6 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                   onRefresh: _checkConnection,
                   onShowHistory: _showHistoryManager,
                   onChangeEdition: _loading ? null : _pickEdition,
-                  onManagePacks: askTitoDexSettings.extensionEnabled
-                      ? () => context.push('/journey/packs')
-                      : null,
                   onRemoveLocation: _loading || contextValue == null
                       ? null
                       : () => setState(
@@ -819,7 +614,7 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                 AskTitoDexLoadingCard(
                   journey: widget.journey,
                   loading: _loading,
-                  progress: _progress,
+                  progress: _reveal.progress,
                   requestSeed: _requestSeed,
                 ),
                 SizedBox(height: spacing),
@@ -861,8 +656,10 @@ class _AskTitoDexPageState extends State<AskTitoDexPage> {
                               sliver: SliverToBoxAdapter(
                                 child: showEmptyConversation
                                     ? AskConversationEmptyState(
-                                        revealFrame: _semanticRevealFrame,
-                                        cursorHold: _semanticCursorHold,
+                                        revealFrame: AskTitoDexRevealController
+                                            .revealFrame,
+                                        cursorHold: AskTitoDexRevealController
+                                            .cursorHold,
                                         prepareImages:
                                             widget.motionImagePreparer,
                                       )

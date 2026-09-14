@@ -33,6 +33,7 @@ export type ClarificationCandidate = {
 };
 
 const supportedGameGenerations = {
+  general: 0,
   diamond: 4,
   pearl: 4,
   platinum: 4,
@@ -220,6 +221,12 @@ export function parseAssistantRequest(value: unknown): AssistantRequest | null {
   }
   if (reliability.badges === 'unknown' && (context.badgeIds.length !== 0 || context.badgeCount !== undefined)) return null;
   if (reliability.milestones === 'unsupported' && context.milestoneIds.length !== 0) return null;
+  // General questions cannot inherit gameplay facts from a save.
+  if (game === 'general' && (
+    reliability.game !== 'user_selected' ||
+    reliability.location !== 'unknown' || reliability.badges !== 'unknown' ||
+    reliability.milestones !== 'unsupported' || journeyPacks.length !== 0
+  )) return null;
   return {
     question,
     history,
@@ -298,7 +305,7 @@ function parseHistory(value: unknown): AssistantHistoryMessage[] | null {
 
 export function effectiveContextReliability(context: AssistantContext): ContextReliability {
   return context.contextReliability ?? {
-    game: 'save_verified',
+    game: context.game === 'general' ? 'user_selected' : 'save_verified',
     location: context.locationId === undefined ? 'unknown' : 'save_verified',
     badges: context.game === 'heartgold' || context.game === 'soulsilver'
       ? 'save_verified'

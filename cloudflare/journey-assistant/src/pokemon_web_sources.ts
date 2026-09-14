@@ -8,6 +8,9 @@
  */
 export const POKEMON_WEB_ALLOWED_DOMAINS = [
   'www.pokemon.com',
+  // Official rulebook PDFs; keep exact hosts rather than trusting subdomains.
+  'assets.pokemon.com',
+  'asia.pokemon-card.com',
   'bulbapedia.bulbagarden.net',
   'www.serebii.net',
   'strategywiki.org',

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 
 import 'ask_titodex_answer_blocks.dart';
@@ -41,7 +42,9 @@ String _encodeAskRequest(
     'question': question,
     'context': context.toRequestJson(),
     if (boundedHistory.isNotEmpty) 'history': boundedHistory,
-    if (context.journeyPacks.isNotEmpty)
+    if (context.game?.isNotEmpty == true &&
+        context.game != 'general' &&
+        context.journeyPacks.isNotEmpty)
       'journeyPacks': context.journeyPackRequestJson,
   });
 
@@ -486,7 +489,7 @@ class AskTitoDexService {
     AskTitoDexStreamEventCallback? onStreamEvent,
   }) async {
     onProgress?.call(AskTitoDexProgress.checkingLocal);
-    final local = await _hints.answer(question, context);
+    final local = await _hints.answer(question, context, history: history);
     final client = _online;
     if (local.status == AskTitoDexStatus.answered ||
         client == null ||
@@ -610,7 +613,10 @@ class AskTitoDexService {
         onlineAttempted: true,
         errorCode: 'online_${error.code}_fallback',
       );
-    } on Object {
+    } on Object catch (error, stack) {
+      // Do not log questions, contexts, endpoints, or the anonymous device key.
+      debugPrint('AskTitoDex online request failed: ${error.runtimeType}');
+      debugPrint('$stack');
       return local.withRuntimeTrace(
         onlineAttempted: true,
         errorCode: 'online_failed_fallback',

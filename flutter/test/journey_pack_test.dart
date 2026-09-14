@@ -240,6 +240,24 @@ void main() {
   });
 
   group('Journey pack repository and Ask context', () {
+    test('fresh install does not request an unused pack catalog', () async {
+      var requests = 0;
+      final repository = JourneyPackRepository(
+        enabledProvider: () => true,
+        store: _MemoryPackStore(),
+        client: JourneyPackClient(
+          workerAskUrl: 'https://journey.example.test/v1/ask',
+          client: MockClient((request) async {
+            requests += 1;
+            return http.Response('{}', 404, request: request);
+          }),
+        ),
+      );
+      expect(await repository.referencesForGame('soulsilver'), isEmpty);
+      expect(requests, 0);
+      repository.dispose();
+    });
+
     test('disabled master switch never requests the catalog', () async {
       var requests = 0;
       final repository = JourneyPackRepository(

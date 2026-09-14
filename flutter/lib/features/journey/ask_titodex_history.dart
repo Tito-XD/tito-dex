@@ -171,13 +171,21 @@ List<Map<String, String>> askTitoDexRequestHistory(
   List<AskTitoDexHistoryEntry> entries, {
   required String game,
 }) {
-  final eligible = entries
-      .where((entry) {
-        if (entry.game != game || entry.assistantContent == null) return false;
-        return entry.result.status == AskTitoDexStatus.answered ||
-            entry.result.status == AskTitoDexStatus.needsClarification;
-      })
-      .toList(growable: false);
+  final eligible = <AskTitoDexHistoryEntry>[];
+  for (final entry in entries) {
+    if (entry.game != game) continue;
+    final usable =
+        entry.assistantContent != null &&
+        (entry.result.status == AskTitoDexStatus.answered ||
+            entry.result.status == AskTitoDexStatus.needsClarification);
+    if (!usable) {
+      // A failed turn can introduce a new subject. Skipping it would make a
+      // later pronoun refer to an older topic that the user has already left.
+      eligible.clear();
+      continue;
+    }
+    eligible.add(entry);
+  }
   final recent = eligible.length > askTitoDexContextEntryLimit
       ? eligible.sublist(eligible.length - askTitoDexContextEntryLimit)
       : eligible;

@@ -545,7 +545,7 @@ void main() {
 
       expect(find.text('在线 4/6'), findsOneWidget);
       expect(find.text('问答 0/50'), findsOneWidget);
-      expect(find.text('魂银 · HGSS'), findsOneWidget);
+      expect(find.text('魂银'), findsOneWidget);
       expect(find.text('Journey Worker'), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-companion-card')),
@@ -687,7 +687,7 @@ void main() {
       expect(find.byIcon(Icons.fact_check_outlined), findsNothing);
       expect(find.text('在线 4/6'), findsOneWidget);
       expect(find.text('问答 1/50'), findsOneWidget);
-      expect(find.text('魂银 · HGSS'), findsOneWidget);
+      expect(find.text('魂银'), findsOneWidget);
       expect(find.byKey(const Key('ask-titodex-loading-card')), findsNothing);
       expect(
         find.byKey(const Key('ask-titodex-generating-answer')),
@@ -903,7 +903,7 @@ void main() {
 
     expect(find.text('在线 5/6'), findsOneWidget);
     expect(find.text('问答 0/50'), findsOneWidget);
-    expect(find.text('魂银 · HGSS'), findsOneWidget);
+    expect(find.text('魂银'), findsOneWidget);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
     expect(find.text('联网 · Tavily'), findsOneWidget);
@@ -956,7 +956,7 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('紫 · SV'), findsOneWidget);
+    expect(find.text('紫'), findsOneWidget);
     expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
     expect(find.text(AppZh.askTitoDexBadgeContext(3)), findsNothing);
     expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
@@ -1007,7 +1007,7 @@ void main() {
     service.completeContext(0);
     await tester.pumpAndSettle();
 
-    expect(find.text('紫 · SV'), findsOneWidget);
+    expect(find.text('紫'), findsOneWidget);
     expect(find.byKey(const Key('ask-titodex-save-context')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-location-context')), findsNothing);
     expect(find.byKey(const Key('ask-titodex-badge-context')), findsNothing);
@@ -1064,7 +1064,7 @@ void main() {
     edition.value = gameEditionFromSlug('sv')!.withFlavor('violet');
     await tester.pumpAndSettle();
 
-    expect(find.text('紫 · SV'), findsOneWidget);
+    expect(find.text('紫'), findsOneWidget);
     expect(find.text('切换版本后还能看到这条吗？'), findsOneWidget);
     expect(find.text('这是切换版本前已经完成的回答。'), findsOneWidget);
   });

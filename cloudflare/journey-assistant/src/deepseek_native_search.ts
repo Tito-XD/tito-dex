@@ -4,7 +4,10 @@ import {
   type AssistantRequest,
 } from './contract';
 import { POKEMON_WEB_ALLOWED_DOMAINS } from './pokemon_web_sources';
-import { isGeneralPokemonFranchiseQuestion } from './pokemon_question_scope';
+import { isGeneralPokemonFranchiseQuestion, isGeneralPokemonFranchiseRequest, isVersionIndependentPokemonRequest } from './pokemon_question_scope';
+import { sourceMatchesPokemonQuestion } from './pokemon_source_scope';
+import { evidenceScopeInstruction } from './question_evidence_scope';
+import { mentionedEntities } from './structured_entities';
 import {
   isExplicitFollowUpQuestion,
   recentConversationForQuestion,
@@ -15,7 +18,7 @@ const DEEPSEEK_NATIVE_TOTAL_TIMEOUT_MS = 26_000;
 const MAX_DEEPSEEK_RESPONSE_BYTES = 128 * 1024;
 const MAX_SOURCE_TITLE_CHARS = 160;
 const MAX_SOURCE_URL_CHARS = 2_048;
-const MAX_SOURCE_SNIPPET_CHARS = 240;
+const MAX_SOURCE_SNIPPET_CHARS = 1200;
 const MAX_SOURCES = 6;
 const MAX_DEEPSEEK_CONTINUATIONS = 4;
 
@@ -30,6 +33,7 @@ export const DEEPSEEK_NATIVE_MODEL = 'deepseek-v4-flash';
 export const DEEPSEEK_NATIVE_ALLOWED_DOMAINS = POKEMON_WEB_ALLOWED_DOMAINS;
 
 const gameNames: Record<AssistantRequest['context']['game'], string> = {
+  general: '宝可梦通用',
   diamond: '宝可梦 钻石 / Pokémon Diamond',
   pearl: '宝可梦 珍珠 / Pokémon Pearl',
   platinum: '宝可梦 白金 / Pokémon Platinum',
@@ -157,7 +161,7 @@ export async function runDeepSeekNativeSearch(
       (result.nativeSearchUsed !== true &&
         inspected?.hasServerToolUse !== true)
     ) {
-      return result;
+      return enforceSourceScope(request, result);
     }
     const continuationBody = buildContinuationBody(
       request,
@@ -189,7 +193,17 @@ export async function runDeepSeekNativeSearch(
   ) {
     console.log(JSON.stringify(summarizeIncompletePayload(accumulatedPayload)));
   }
-  return finalResult;
+  return enforceSourceScope(request, finalResult);
+}
+
+function enforceSourceScope(
+  request: AssistantRequest,
+  result: DeepSeekNativeSearchResult,
+): DeepSeekNativeSearchResult {
+  return result.status === 'answered' &&
+    result.sources.some((source) => !sourceMatchesPokemonQuestion(request, source))
+    ? unavailable('unsafe_answer', true)
+    : result;
 }
 
 async function requestDeepSeekPayload(
@@ -286,8 +300,11 @@ export function isPokemonScopedQuestion(request: AssistantRequest): boolean {
     Object.hasOwn(gameNames, request.context.game) &&
     !rejectedScope.test(question) &&
     !clientUrlOrDomainOverride.test(question) &&
-    (pokemonScope.test(question) ||
-      (isExplicitFollowUpQuestion(question) && pokemonScope.test(recentContext)) ||
+    (pokemonScope.test(question) || mentionedEntities(question, 'pokemon').length > 0 ||
+      (isExplicitFollowUpQuestion(question) && (
+        pokemonScope.test(recentContext) ||
+        mentionedEntities(recentContext, 'pokemon').length > 0 ||
+        isGeneralPokemonFranchiseQuestion(recentContext))) ||
       isGeneralPokemonFranchiseQuestion(question));
 }
 
@@ -316,7 +333,7 @@ function validateConfig(config: DeepSeekNativeSearchConfig): {
 }
 
 function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
-  const generalFranchise = isGeneralPokemonFranchiseQuestion(request.question);
+  const generalFranchise = isVersionIndependentPokemonRequest(request);
   const reliability = effectiveContextReliability(request.context);
   const safeQuestion = request.question
     .replace(/[\u0000-\u001f\u007f]/gu, ' ')
@@ -344,8 +361,9 @@ function buildRequestBody(request: AssistantRequest): Record<string, unknown> {
     temperature: 0.2,
     thinking: { type: 'disabled' },
     system: [
+      evidenceScopeInstruction(request),
       generalFranchise
-        ? '你是 TitoDex 的宝可梦助手。当前问题属于宝可梦作品通用范围（例如动画、角色、配音或台词），不得强行关联用户所选游戏或存档。'
+        ? '你是 TitoDex 的宝可梦助手。当前回答不绑定具体主系列游戏版本。属性、种族值、进化关系等通用知识可直接回答；若实际问题涉及卡牌、动画或角色，则按相应作品范围回答，不得强行关联用户所选游戏或存档。能按通用资料回答的直接回答；只有获得地点、流程或数值确实依赖具体游戏版本时，才简短询问版本。卡牌应区分实体 PTCG 与 TCG Pocket；不确定赛制、地区或卡牌编号时询问相应信息，不要求选择主系列游戏。'
         : '你是 TitoDex 的宝可梦游戏助手。只回答用户当前所选版本内的宝可梦玩法问题。',
       '回答前必须调用一次 web_search，并且只能依据工具返回的限定来源。不得回答现实世界、政治、医疗、金融、编程或其他非宝可梦主题。',
       `搜索查询和引用都只能使用这些固定域名：${DEEPSEEK_NATIVE_ALLOWED_DOMAINS.join(', ')}；若搜索结果不在名单内，必须忽略并改查名单内来源。`,

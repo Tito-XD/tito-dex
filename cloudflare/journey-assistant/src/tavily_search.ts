@@ -59,12 +59,20 @@ export async function searchTavily(
     : broadOverview || queryMode === 'english'
       ? decision.queryEn
       : `${decision.queryEn} ${decision.queryZh}`;
-  const query = `${exactGameName} ${queryTerms}`
+  const researchTerms = `${decision.queryEn} ${decision.queryZh}`;
+  const physicalCardRules =
+    /(?:\bptcg\b|\btcg\b|trading card game|卡牌|集换式)/iu.test(researchTerms) &&
+    /(?:rules?|rulebook|energy|deck|attach|能量|回合|牌组|卡组|规则)/iu.test(researchTerms) &&
+    !/(?:\bpocket\b|口袋版|袖珍版)/iu.test(researchTerms);
+  const officialRuleTerms = physicalCardRules && domainMode !== '52poke'
+    ? ' official rulebook'
+    : '';
+  const query = `${exactGameName} ${queryTerms}${officialRuleTerms}`
     .replace(/\s+/gu, ' ')
     .trim()
     .slice(0, MAX_QUERY_CHARS);
   if (query.length < 2) return [];
-  const advancedResearch =
+  const advancedResearch = physicalCardRules ||
     /(?:training guide|moveset|viability|配招|培养|攻略|队伍|搭配|打法|推荐|值不值得)/iu
       .test(`${decision.queryEn} ${decision.queryZh}`);
   const allowedDomains = domainMode === '52poke'

@@ -317,6 +317,120 @@ describe('journey assistant Worker contract', () => {
     expect(aiRun).toHaveBeenCalledTimes(2);
   });
 
+  it.each([
+    ['reviewed card source without claim evidence', 'https://assets.pokemon.com/assets/cms2/pdf/trading-card-game/rulebook/2025/rulebook_en.pdf', false],
+    ['wrong gameplay source', 'https://www.serebii.net/pokedex-sv/pikachu/', false],
+    ['no source', '', false],
+  ] as const)('bounds relaxed franchise answers with %s', async (_label, url, accepted) => {
+    const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => ({
+      response: options?.gateway?.metadata?.phase === 'deepseek-native-topic-check'
+        ? { onTopic: true } : { supported: false, webAllowed: false, hintId: '' },
+    }));
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      type: 'message', stop_reason: 'end_turn', content: [
+        { type: 'server_tool_use', id: 'search-cards', name: 'web_search', input: { query: 'Pokemon TCG energy rules' } },
+        { type: 'web_search_tool_result', tool_use_id: 'search-cards', content: url ? [{
+          type: 'web_search_result', title: url.includes('pokedex') ? 'Pikachu game locations' : 'Pokemon TCG rulebook', url,
+        }] : [] },
+        { type: 'text', text: 'PTCG 中基本能量提供对应属性的能量，特殊能量的效果以卡面说明为准。' },
+      ],
+    }), { headers: { 'content-type': 'application/json' } })));
+    const response = await worker.fetch(new Request('https://assistant.test/v1/ask', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-titodex-device-key': 'card-relaxed-test-12345' },
+      body: violetBody('PTCG 中基本能量与特殊能量有什么区别？'),
+    }), deepSeekEnv({ aiRun, experimental: true }));
+    const result = await response.json() as AssistantResponse;
+    if (accepted) {
+      expect(result.status).toBe('answered');
+      expect(result.confidence).toBe('low');
+      expect(result.unknowns?.join('')).toContain('逐句');
+      expect(result.sources).toHaveLength(1);
+    } else {
+      expect(result.status).not.toBe('answered');
+      expect(result.answer).toBeNull();
+    }
+  });
+
+  it.each([
+    ['Who are Jessie and James in the Pokemon anime?', 'Jessie and James - Bulbapedia', 'https://bulbapedia.bulbagarden.net/wiki/Team_Rocket_trio'],
+    ['皮卡丘为什么进化成雷丘？', 'Pikachu (Pokémon)', 'https://bulbapedia.bulbagarden.net/wiki/Pikachu_(Pok%C3%A9mon)'],
+  ])('never revives a contradicted scoped native answer: %s', async (question, title, url) => {
+    const phases: unknown[] = [];
+    const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => {
+      const phase = options?.gateway?.metadata?.phase;
+      phases.push(phase);
+      if (phase === 'curated-web-verify') return { response: { claims: [
+        { index: 0, verdict: 'contradicted', sourceId: 'deepseek-citation-1', quote: 'This source contradicts the proposed claim.' },
+      ] } };
+      return { response: { supported: false, webAllowed: false, onTopic: true, hintId: '' } };
+    });
+    const citation = { type: 'web_search_result_location', title, url, cited_text: 'This source contradicts the proposed claim.' };
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      type: 'message', stop_reason: 'end_turn', content: [
+        { type: 'server_tool_use', id: 'scope-search', name: 'web_search', input: { query: question } },
+        { type: 'web_search_tool_result', tool_use_id: 'scope-search', content: [{ ...citation, type: 'web_search_result' }] },
+        { type: 'text', text: '这条宝可梦断言与作品资料冲突。', citations: [citation] },
+      ],
+    }), { headers: { 'content-type': 'application/json' } })));
+    const body = JSON.parse(violetBody(question));
+    body.context.game = 'general'; body.context.generation = 0;
+    const response = await worker.fetch(new Request('https://assistant.test/v1/ask', {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-titodex-device-key': 'scope-grounding-test-12345' },
+      body: JSON.stringify(body),
+    }), deepSeekEnv({ aiRun, experimental: true }));
+    expect((await response.json() as AssistantResponse).status).not.toBe('answered');
+    expect(phases).toContain('curated-web-verify');
+    expect(phases).not.toContain('deepseek-native-topic-check');
+  });
+
+  it.each(['contradicted', 'unsupported', 'invented-quote', 'partial', 'supported'] as const)(
+    'grounds native card claims even in relaxed mode: %s', async (mode) => {
+      const answer = mode === 'supported'
+        ? '基本能量没有同名张数限制。特殊能量同名卡最多四张。'
+        : '基本能量没有同名张数限制。特殊能量没有任何张数限制。';
+      const quote = 'Basic Energy cards are not restricted by the four-copy rule.';
+      const aiRun = vi.fn(async (_model: string, _input: Record<string, unknown>, options?: AiOptions) => {
+        const phase = options?.gateway?.metadata?.phase;
+        if (phase === 'curated-web-verify') return { response: { claims: [
+          { index: 0, verdict: mode === 'unsupported' ? 'unsupported' : 'supported',
+            sourceId: 'deepseek-citation-1', quote: mode === 'invented-quote' ? 'A fabricated quote that is absent from the source.' : quote },
+          { index: 1, verdict: mode === 'contradicted' ? 'contradicted' : mode === 'supported' ? 'supported' : 'unsupported',
+            sourceId: 'deepseek-citation-2', quote: 'Special Energy cards are subject to the four-copy rule.' },
+        ] } };
+        if (phase === 'deepseek-native-topic-check') return { response: { onTopic: true } };
+        return { response: { supported: false, webAllowed: false, hintId: '' } };
+      });
+      const citations = [
+        { type: 'web_search_result_location', title: 'Pokemon TCG rulebook', url: 'https://assets.pokemon.com/rulebook.pdf', cited_text: quote },
+        { type: 'web_search_result_location', title: 'Pokemon TCG special energy rules', url: 'https://asia.pokemon-card.com/sg/rules.pdf', cited_text: 'Special Energy cards are subject to the four-copy rule.' },
+      ];
+      vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+        type: 'message', stop_reason: 'end_turn', content: [
+          { type: 'server_tool_use', id: 'card-search', name: 'web_search', input: { query: 'Pokemon TCG energy limits' } },
+          { type: 'web_search_tool_result', tool_use_id: 'card-search', content: citations.map((citation) => ({ ...citation, type: 'web_search_result' })) },
+          { type: 'text', text: answer, citations },
+        ],
+      }), { headers: { 'content-type': 'application/json' } })));
+      const response = await worker.fetch(new Request('https://assistant.test/v1/ask', {
+        method: 'POST', headers: { 'content-type': 'application/json', 'x-titodex-device-key': 'grounded-card-test-12345' },
+        body: violetBody('PTCG 基本能量和特殊能量的张数限制是什么？'),
+      }), deepSeekEnv({ aiRun, experimental: true }));
+      const result = await response.json() as AssistantResponse;
+      if (mode === 'partial') {
+        expect(result.answer).toBe('基本能量没有同名张数限制。');
+        expect(result.confidence).toBe('low');
+        expect(result.unknowns?.join('')).toContain('仅保留');
+        expect(result.sources?.map((source) => source.url)).toEqual(['https://assets.pokemon.com/rulebook.pdf']);
+      } else if (mode === 'supported') {
+        expect(result.status).toBe('answered');
+        expect(result.confidence).toBe('medium');
+      } else {
+        expect(result.status).not.toBe('answered');
+        expect(result.answer).toBeNull();
+      }
+    },
+  );
+
   it('accepts cited DeepSeek trial output at low confidence when snippets are absent', async () => {
     const aiRun = vi.fn(async (
       _model: string,
@@ -471,6 +585,12 @@ describe('journey assistant Worker contract', () => {
         accepted: true,
       },
       {
+        question: '宝可梦紫里未来主题的宝可梦包括哪些例子？',
+        answer: '例如铁包袱V和铁臂膀V。',
+        expectedAnswer: '例如铁包袱和铁臂膀。',
+        accepted: true,
+      },
+      {
         question: '紫里利欧路适合学哪些招式？',
         answer: '- 波导弹：特殊格斗系，威力 120，用于稳定输出。\n- 真空波：物理格斗系，威力 40，用于先手收割。',
         accepted: false,
@@ -500,7 +620,7 @@ describe('journey assistant Worker contract', () => {
         expect(value).toMatchObject({
           status: 'answered',
           answerMode: 'deepseek_native_search',
-          answer: testCase.answer,
+          answer: 'expectedAnswer' in testCase ? testCase.expectedAnswer : testCase.answer,
         });
       } else {
         expect(value).toMatchObject({ status: 'no_match', answer: null });
@@ -783,7 +903,8 @@ describe('journey assistant Worker contract', () => {
       matchedHintIds: ['dex-bundle-encounter-violet-447'],
       confidence: 'high',
     });
-    expect(value.answer).toContain('TitoDex v19');
+    expect(value.answer).not.toMatch(/TitoDex v\d/);
+    expect(value.evidence).toMatchObject({ bundleVersion: 19 });
     expect(value.answer).toContain('南第2区');
     expect(value.answer).toContain('Lv.16–20');
     expect(value.answer).toContain('帕底亚太晶结晶');

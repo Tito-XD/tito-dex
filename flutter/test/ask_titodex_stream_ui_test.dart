@@ -13,6 +13,7 @@ import 'package:titodex/features/journey/ask_titodex_settings.dart';
 import 'package:titodex/features/journey/progression_hints.dart';
 import 'package:titodex/models/journey.dart';
 import 'package:titodex/pages/ask_titodex_page.dart';
+import 'package:titodex/widgets/ask/ask_conversation.dart';
 import 'package:titodex/widgets/tito_page_container.dart';
 
 import 'ask_motion_test_images.dart';
@@ -795,6 +796,143 @@ void main() {
     },
   );
 
+  testWidgets('a page first mounted under a cover initializes once on return', (
+    tester,
+  ) async {
+    final service = _SemanticStreamService();
+    final historyStore = _CountingHistoryStore([
+      AskTitoDexHistoryEntry(
+        game: 'soulsilver',
+        question: '保存的问题',
+        result: const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '保存的回答',
+        ),
+        createdAt: DateTime.utc(2026, 9, 14),
+      ),
+    ]);
+    final router = _coveredAskRouter(service, historyStore);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+    expect(find.byType(AskTitoDexPage, skipOffstage: false), findsOneWidget);
+    expect(service.contextBuilds, 0);
+    expect(service.connectionChecks, 0);
+    expect(historyStore.loadCalls, 0);
+
+    router.pop();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+    await tester.pump();
+    expect(service.contextBuilds, 1);
+    expect(service.connectionChecks, 1);
+    expect(historyStore.loadCalls, 1);
+    expect(find.text('保存的问题'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '返回后可以继续提问',
+    );
+    final submit = tester.widget<FilledButton>(
+      find.byKey(const Key('ask-titodex-submit')),
+    );
+    expect(submit.onPressed, isNotNull);
+
+    router.push('/journey/ask/cover');
+    await tester.pumpAndSettle();
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(service.contextBuilds, 1);
+    expect(service.connectionChecks, 1);
+    expect(historyStore.loadCalls, 1);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('disposing a covered page never starts deferred work', (
+    tester,
+  ) async {
+    final service = _SemanticStreamService();
+    final historyStore = _CountingHistoryStore();
+    final router = _coveredAskRouter(service, historyStore);
+    addTearDown(router.dispose);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+    expect(service.contextBuilds, 0);
+    expect(service.connectionChecks, 0);
+    expect(historyStore.loadCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('general follow-ups reuse only the general conversation', (
+    tester,
+  ) async {
+    final service = _SemanticStreamService();
+    final historyStore = _CountingHistoryStore([
+      AskTitoDexHistoryEntry(
+        game: 'soulsilver',
+        question: '游戏版本的问题',
+        result: const AskTitoDexResult(
+          status: AskTitoDexStatus.answered,
+          answer: '魂银专属回答',
+        ),
+        createdAt: DateTime.utc(2026, 9, 14),
+      ),
+    ]);
+    await _pumpAskPage(
+      tester,
+      service,
+      edition: GameEdition.general,
+      historyStore: historyStore,
+    );
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '动画中的皮卡丘叫什么？',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+    expect(service.requestHistories.single, isEmpty);
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '小智的皮卡丘。',
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(historyStore._entries.last.game, 'general');
+
+    await tester.enterText(
+      find.byKey(const Key('ask-titodex-question')),
+      '它最擅长什么？',
+    );
+    await tester.tap(find.byKey(const Key('ask-titodex-submit')));
+    await tester.pump();
+    expect(service.requestHistories.last, [
+      {'role': 'user', 'content': '动画中的皮卡丘叫什么？'},
+      {'role': 'assistant', 'content': '小智的皮卡丘。'},
+    ]);
+    final position = _conversationPosition(tester);
+    position.jumpTo(position.minScrollExtent);
+    await tester.pump();
+    final previousQuestion = tester.widget<AskQuestionBubble>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is AskQuestionBubble && widget.question == '动画中的皮卡丘叫什么？',
+      ),
+    );
+    expect(previousQuestion.showGame, isFalse);
+    position.jumpTo(0);
+    service.complete(
+      const AskTitoDexResult(
+        status: AskTitoDexStatus.answered,
+        answer: '电属性招式。',
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('reduced motion still starts deferred initialization', (
     tester,
   ) async {
@@ -894,6 +1032,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       final service = _SemanticStreamService();
+      final historyStore = _CountingHistoryStore();
       final edition = ValueNotifier<GameEdition>(
         GameEdition.hgss.withFlavor('soulsilver'),
       );
@@ -911,6 +1050,7 @@ void main() {
                   journey: _journey,
                   edition: value,
                   service: service,
+                  historyStore: historyStore,
                 ),
               ),
             ),
@@ -929,6 +1069,23 @@ void main() {
       await tester.tap(find.byKey(const Key('ask-titodex-submit')));
       await tester.pump();
 
+      final oldReveal = service.emitBlock(
+        const AskTitoDexAnswerBlock(
+          id: 'old-edition-partial',
+          kind: AskTitoDexAnswerBlockKind.summary,
+          text: '旧版本尚在逐字显示的内容。',
+          isComplete: false,
+        ),
+      );
+      final oldQueued = service.emitBlock(
+        const AskTitoDexAnswerBlock(
+          id: 'old-edition-queued',
+          kind: AskTitoDexAnswerBlockKind.paragraph,
+          text: '旧版本仍在排队的内容。',
+        ),
+      );
+      await tester.pump();
+      expect(_visibleCursorText(tester), startsWith('旧'));
       edition.value = gameEditionFromSlug('sv')!.withFlavor('violet');
       await tester.pump();
       service.complete(
@@ -938,8 +1095,19 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await oldReveal;
+      await oldQueued;
 
       expect(find.text('这是旧版本请求的回答。'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('ask-answer-block-old-edition-partial')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('ask-answer-block-old-edition-queued')),
+        findsNothing,
+      );
+      expect(await historyStore.load(), isEmpty);
       expect(
         find.byKey(const Key('ask-titodex-active-answer-surface')),
         findsNothing,
@@ -999,6 +1167,7 @@ Future<void> _pumpAskPage(
   _SemanticStreamService service, {
   AskTitoDexHistoryStore? historyStore,
   AskTitoDexEntityResolver? entityResolver,
+  GameEdition? edition,
 }) async {
   tester.view.physicalSize = const Size(420, 900);
   tester.view.devicePixelRatio = 1;
@@ -1012,7 +1181,7 @@ Future<void> _pumpAskPage(
           child: AskTitoDexPage(
             motionImagePreparer: prepareTestAskMotionImages,
             journey: _journey,
-            edition: GameEdition.hgss.withFlavor('soulsilver'),
+            edition: edition ?? GameEdition.hgss.withFlavor('soulsilver'),
             service: service,
             historyStore: historyStore,
             entityResolver: entityResolver,
@@ -1027,9 +1196,38 @@ Future<void> _pumpAskPage(
   await tester.pumpAndSettle();
 }
 
+GoRouter _coveredAskRouter(
+  AskTitoDexService service,
+  AskTitoDexHistoryStore historyStore,
+) => GoRouter(
+  initialLocation: '/journey/ask/cover',
+  routes: [
+    GoRoute(
+      path: '/journey/ask',
+      builder: (_, _) => TitoPageContainer(
+        child: AskTitoDexPage(
+          journey: _journey,
+          edition: GameEdition.hgss.withFlavor('soulsilver'),
+          service: service,
+          historyStore: historyStore,
+          motionImagePreparer: prepareTestAskMotionImages,
+        ),
+      ),
+      routes: [
+        GoRoute(
+          path: 'cover',
+          builder: (_, _) => const Scaffold(body: Text('覆盖页面')),
+        ),
+      ],
+    ),
+    GoRoute(path: '/settings', builder: (_, _) => const SizedBox()),
+  ],
+);
+
 class _SemanticStreamService extends AskTitoDexService {
   final List<Completer<AskTitoDexResult>> _answers = [];
   final List<String> questions = [];
+  final List<List<Map<String, String>>> requestHistories = [];
   AskTitoDexStreamEventCallback? _onStreamEvent;
   int connectionChecks = 0;
   int contextBuilds = 0;
@@ -1057,6 +1255,7 @@ class _SemanticStreamService extends AskTitoDexService {
     AskTitoDexStreamEventCallback? onStreamEvent,
   }) {
     questions.add(question);
+    requestHistories.add(List.of(history));
     _onStreamEvent = onStreamEvent;
     onProgress?.call(AskTitoDexProgress.retrievingSources);
     final answer = Completer<AskTitoDexResult>();

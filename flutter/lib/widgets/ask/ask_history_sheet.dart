@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../features/dex/dex_game_scope.dart';
 import '../../features/journey/ask_titodex_history.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import 'ask_paper_style.dart';
+import 'ask_game_label.dart';
 
 enum AskHistoryManagerAction { compact, clear }
 
@@ -79,14 +79,7 @@ class AskHistoryManagerSheet extends StatelessWidget {
                           outlineAlpha: 0.2,
                         );
                         return DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: tile.fill,
-                            borderRadius: BorderRadius.circular(TitoRadii.md),
-                            border: Border.all(
-                              color: tile.outline,
-                              width: tile.outlineWidth,
-                            ),
-                          ),
+                          decoration: tile.decoration,
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(11, 8, 11, 8),
                             child: Column(
@@ -101,7 +94,7 @@ class AskHistoryManagerSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
-                                  '${_assistantGameLabel(entry.game)} · ${_formatHistoryTime(entry.createdAt)}',
+                                  '${askGameLabel(entry.game)} · ${_formatHistoryTime(entry.createdAt)}',
                                   style: SecondaryTypography.onCard.small12
                                       .copyWith(color: TitoColors.mutedInk),
                                 ),
@@ -161,5 +154,3 @@ String _formatHistoryTime(DateTime value) {
   final minute = local.minute.toString().padLeft(2, '0');
   return '$month-$day $hour:$minute';
 }
-
-String _assistantGameLabel(String value) => flavorVersionLabelZh(value);

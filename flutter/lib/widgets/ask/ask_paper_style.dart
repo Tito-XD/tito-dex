@@ -44,39 +44,61 @@ BoxDecoration askAnswerViewportDecoration(BuildContext context) {
   );
 }
 
-/// Paper fill for answer cards — null lets [AssistantSurface] pick its
-/// theme default outside Trainer's Journal.
-Color? get askPaperColor => usesAskPaperLook ? askAssistantPaper : null;
-
 /// Ink outline tint for paper surfaces, again Trainer's Journal only.
 Color? askPaperOutline(double alpha) =>
     usesAskPaperLook ? TrainerJournal.edge.withValues(alpha: alpha) : null;
 
+/// Shared outline geometry for history rows and source references. Callers
+/// retain their own container so source links keep Material ink feedback.
+class AskPaperTileStyle {
+  const AskPaperTileStyle({required this.fill, required this.border});
+
+  final Color fill;
+  final BorderSide border;
+
+  BorderRadius get borderRadius => BorderRadius.circular(TitoRadii.md);
+
+  BoxDecoration get decoration => BoxDecoration(
+    color: fill,
+    borderRadius: borderRadius,
+    border: Border.fromBorderSide(border),
+  );
+
+  RoundedRectangleBorder get shape =>
+      RoundedRectangleBorder(borderRadius: borderRadius, side: border);
+}
+
 /// Fill and outline for the small "paper" tiles (history rows, source
 /// references) that sit on a themed sheet or card surface.
-({Color fill, Color outline, double outlineWidth}) askPaperTileStyle(
+AskPaperTileStyle askPaperTileStyle(
   BuildContext context, {
   required Color paper,
   required double outlineAlpha,
 }) {
   final scheme = Theme.of(context).colorScheme;
   if (appVisualStyle.usesFlatUi) {
-    return (
+    return AskPaperTileStyle(
       fill: scheme.surfaceContainerHigh,
-      outline: scheme.outlineVariant,
-      outlineWidth: TitoBorders.element,
+      border: BorderSide(
+        color: scheme.outlineVariant,
+        width: TitoBorders.element,
+      ),
     );
   }
   if (appVisualStyle.usesSolidPlastic) {
-    return (
+    return AskPaperTileStyle(
       fill: Colors.white.withValues(alpha: 0.8),
-      outline: Colors.white.withValues(alpha: 0.85),
-      outlineWidth: TitoBorders.glass,
+      border: BorderSide(
+        color: Colors.white.withValues(alpha: 0.85),
+        width: TitoBorders.glass,
+      ),
     );
   }
-  return (
+  return AskPaperTileStyle(
     fill: paper,
-    outline: TrainerJournal.edge.withValues(alpha: outlineAlpha),
-    outlineWidth: TitoBorders.journalElement,
+    border: BorderSide(
+      color: TrainerJournal.edge.withValues(alpha: outlineAlpha),
+      width: TitoBorders.journalElement,
+    ),
   );
 }

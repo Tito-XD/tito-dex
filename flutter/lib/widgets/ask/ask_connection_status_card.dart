@@ -47,7 +47,7 @@ class AskConnectionStatusCard extends StatelessWidget {
         ? capabilities.where((capability) => capability.$2).length
         : 0;
     final capabilityCount = capabilities.length;
-    final editionLabel = assistantEditionDisplayLabel(edition);
+    final editionLabel = edition.selectedLabel;
     final value = contextValue;
     final showLocation = value != null && value.hasVerifiedLocationContext;
     final showVerifiedBadges =

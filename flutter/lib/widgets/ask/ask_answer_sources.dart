@@ -267,14 +267,11 @@ class _SourceReferenceTile extends StatelessWidget {
     );
     return Material(
       color: tile.fill,
-      borderRadius: BorderRadius.circular(TitoRadii.md),
+      borderRadius: tile.borderRadius,
       child: ListTile(
         key: ValueKey('ask-titodex-source-$index'),
         enabled: uri != null,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(TitoRadii.md),
-          side: BorderSide(color: tile.outline, width: tile.outlineWidth),
-        ),
+        shape: tile.shape,
         leading: SizedBox(
           width: 30,
           child: Text(

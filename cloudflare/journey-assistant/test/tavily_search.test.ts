@@ -28,6 +28,45 @@ function json(value: unknown, status = 200, headers?: HeadersInit): Response {
 }
 
 describe('bounded Tavily allowlist search', () => {
+  it('searches physical card rules with official rulebook terms and bounded evidence', async () => {
+    const content = 'Basic Energy has no four-card limit; Special Energy follows its card text. '.repeat(28);
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      expect(body.query).toContain('official rulebook');
+      expect(body).toMatchObject({ search_depth: 'advanced', chunks_per_source: 3 });
+      expect(body.include_domains).toContain('assets.pokemon.com');
+      expect(body.include_domains).toContain('asia.pokemon-card.com');
+      return json({ results: [{
+        title: 'Pokémon Card Game Advanced Player’s Rulebook',
+        url: 'https://asia.pokemon-card.com/sg/wp-content/uploads/2025/10/advanced-manual.pdf',
+        content,
+        score: 0.99,
+      }] });
+    });
+    const result = await searchTavily({
+      allowed: true, queryZh: 'PTCG 基础能量 特殊能量 规则',
+      queryEn: 'Pokemon trading card game basic Energy special Energy',
+      pokeApiKind: '', pokeApiSlug: '',
+    }, 'Pokémon', apiKey, fetcher);
+    expect(result).toHaveLength(1);
+    expect(result[0].text).toBe(content.trim());
+  });
+
+  it('does not apply physical card rulebook terms to TCG Pocket or the isolated 52Poké pass', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      expect(body.query).not.toContain('official rulebook');
+      return json({ results: [] });
+    });
+    const cardDecision: ScopeDecision = {
+      allowed: true, queryZh: 'PTCG 能量卡规则', queryEn: 'Pokemon TCG Energy rules',
+      pokeApiKind: '', pokeApiSlug: '',
+    };
+    await searchTavily52Poke(cardDecision, 'Pokémon', apiKey, fetcher);
+    await searchTavily({ ...cardDecision, queryEn: 'Pokemon TCG Pocket Energy rules' }, 'Pokémon', apiKey, fetcher);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
   it('tries 52Poké as an isolated Chinese source before the remaining allowlist', async () => {
     const bodies: Record<string, unknown>[] = [];
     const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
