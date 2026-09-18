@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:titodex/theme/tito_colors.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -224,21 +225,25 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester
-            .widget<Material>(
-              find.byKey(const ValueKey('detail-tab-surface-0')),
+            .widget<DecoratedBox>(
+              find.byKey(const ValueKey('detail-tab-indicator')),
             )
-            .color,
-        typeTileColor('fire'),
+            .decoration,
+        isA<BoxDecoration>().having(
+          (d) => d.color,
+          'primary type fill',
+          typeTileColor('fire'),
+        ),
       );
       expect(
         (tester
-                    .widget<Container>(
-                      find.byKey(const ValueKey('detail-bottom-tabs')),
+                    .widget<DecoratedBox>(
+                      find.byKey(const ValueKey('detail-tab-rail')),
                     )
-                    .decoration!
+                    .decoration
                 as BoxDecoration)
             .color,
-        Colors.transparent,
+        TitoColors.card,
       );
       expect(
         tester

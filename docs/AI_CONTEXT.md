@@ -46,6 +46,23 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.9.20)
 
+### v0.9.21 release preparation: battle workspace and shared surfaces
+
+The four battle tools share attacker/defender inputs and allow quick Party imports.
+Team analysis covers weaknesses, resistances, coverage gaps, six-stat comparisons,
+and each member's configured moves against the current defender. Session edits do
+not overwrite the saved Party. Move selection uses the selected Pokemon's exact-game
+learnset. Results lead the page, with compact team grids, whole-page scrolling and
+animated summaries and segmented navigation. Dex detail uses the shared cream rail,
+type-coloured sliding indicator and a fade behind the floating footer.
+
+Shared surfaces use TitoSurfaceTokens and the exported design-tokens.json. Capture
+marks, status contrast, Plastic badge borders and touch/semantic targets are fixed.
+Damage estimates use generation-aware rules and explicitly block unsupported cases;
+see BATTLE_CALCULATION_SCOPE.md for remaining approximations. Planned signed APKs
+are Lite 0.9.21+210 and Offline 0.9.21-offline+211; the v20 data bundle is unchanged.
+Publication and final signed-artifact verification are recorded separately below.
+
 ### v0.9.20: Continuous questions and experience improvements (2026-09-14)
 
 The Ask page keeps request/version ownership, history persistence and scroll

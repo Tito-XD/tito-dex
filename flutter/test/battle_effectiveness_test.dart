@@ -38,18 +38,11 @@ void main() {
     'ghost': const TypeDamageRelations(
       doubleDamageTo: {'psychic', 'ghost'},
       halfDamageTo: {'dark'},
-      noDamageTo: {'normal', 'fighting'},
+      noDamageTo: {'normal'},
     ),
     'steel': const TypeDamageRelations(
       doubleDamageTo: {'ice', 'rock', 'fairy'},
-      halfDamageTo: {
-        'fire',
-        'water',
-        'electric',
-        'steel',
-        'ghost',
-        'dark',
-      },
+      halfDamageTo: {'fire', 'water', 'electric', 'steel'},
       noDamageTo: {},
     ),
   };
@@ -86,23 +79,32 @@ void main() {
   });
 
   test('gen 4 strips fairy from defender types', () {
-    final normalized = normalizeTypesForGeneration(
-      const ['water', 'fairy'],
-      4,
-    );
+    final normalized = normalizeTypesForGeneration(const ['water', 'fairy'], 4);
     expect(normalized, ['water']);
   });
 
-  test('gen 5 steel does not resist ghost', () {
-    final gen5 = typeRelationsForGeneration(relations, 5);
-    final input = BattleEffectivenessInput(
-      defenderTypes: const ['steel'],
-      relationsByType: gen5,
-      generation: 5,
-    );
-    final multipliers = computeBattleTypeMultipliers(input);
-    expect(formatTypeMultiplier(multipliers['ghost'] ?? 1), '1');
-  });
+  test(
+    'Steel resists Ghost before Gen 6 and loses that resistance in Gen 6',
+    () {
+      final gen5 = typeRelationsForGeneration(relations, 5);
+      final input = BattleEffectivenessInput(
+        defenderTypes: const ['steel'],
+        relationsByType: gen5,
+        generation: 5,
+      );
+      final multipliers = computeBattleTypeMultipliers(input);
+      expect(formatTypeMultiplier(multipliers['ghost'] ?? 1), '1/2');
+      final modern = computeBattleTypeMultipliers(
+        BattleEffectivenessInput(
+          defenderTypes: ['steel'],
+          relationsByType: relations,
+          generation: 6,
+        ),
+      );
+      expect(modern['ghost'], 1);
+      expect(gen5['steel']!.halfDamageTo, relations['steel']!.halfDamageTo);
+    },
+  );
 
   test('huge power doubles physical attack in damage estimate', () {
     final without = estimateDamage(
@@ -162,7 +164,7 @@ void main() {
     expect(formatTypeMultiplier(multipliers['grass'] ?? 1), '1/2');
   });
 
-  test('attacker terastallized grants double stab on tera type', () {
+  test('new Tera type grants 1.5 STAB, not original-type 2 STAB', () {
     final stab = terastalStabMultiplier(
       moveType: 'water',
       attackerTypes: const ['grass'],
@@ -170,7 +172,7 @@ void main() {
       attackerTerastallized: true,
       attackerTeraType: 'water',
     );
-    expect(stab, 2.0);
+    expect(stab, 1.5);
   });
 
   test('burn halves physical attack in damage estimate', () {
@@ -295,6 +297,9 @@ void main() {
       defenderAbilitySlug: 'levitate',
       generation: 9,
     );
-    expect(formatTypeMultiplier(computeBattleTypeMultipliers(input)['ground'] ?? 1), '0');
+    expect(
+      formatTypeMultiplier(computeBattleTypeMultipliers(input)['ground'] ?? 1),
+      '0',
+    );
   });
 }

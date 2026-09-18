@@ -344,15 +344,23 @@ void main() {
         .getTranslation()
         .y;
 
-    expect(translationY('detail-tab-motion-1'), 0);
+    final indicator = find.byKey(const ValueKey('detail-tab-indicator'));
+    final tabStart = tester.getCenter(indicator).dx;
     await tester.tap(find.text(AppZh.dexTabBasic));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
-    final tabMiddle = translationY('detail-tab-motion-1');
-    expect(tabMiddle, greaterThan(-1.5));
-    expect(tabMiddle, lessThan(0));
+    final tabMiddle = tester.getCenter(indicator).dx;
+    expect(tabMiddle, greaterThan(tabStart));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(translationY('detail-tab-motion-1'), -1.5);
+    final tabEnd = tester.getCenter(indicator).dx;
+    expect(tabMiddle, lessThan(tabEnd));
+    expect(
+      tabEnd,
+      closeTo(
+        tester.getCenter(find.byKey(const ValueKey('detail-tab-surface-1'))).dx,
+        2,
+      ),
+    );
 
     await tester.tap(find.text(AppZh.dexTabMoves));
     await tester.pump(const Duration(milliseconds: 450));

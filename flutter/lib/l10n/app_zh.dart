@@ -19,6 +19,61 @@ abstract final class AppZh {
     return text;
   }
 
+  static String get battleViewDamage => t('battleViewDamage', '查看伤害');
+  static String get battleExpandResult => t('battleExpandResult', '展开完整结果');
+  static String battleTeamSummary(int count) =>
+      t('battleTeamSummary', '整队 · {count} 名队员', {'count': count});
+  static String get battleTeamStats => t('battleTeamStats', '全队能力值');
+  static String get battleTeamDamage => t('battleTeamDamage', '全队配招伤害');
+  static String get battleTeamStatsHint =>
+      t('battleTeamStatsHint', '按当前计算队伍的等级、性格、IV、EV、特性和状态计算；可横向滑动比较六项。');
+  static String get battleTeamDamageHint =>
+      t('battleTeamDamageHint', '全队已配招式 → 当前防守方。按当前世代估算一次命中；缺少特殊触发条件的组合会标明原因。');
+  static String get battleTeamNoMoves =>
+      t('battleTeamNoMoves', '尚无当前游戏可用招式，点下方成员选择');
+  static String get battleTeamMoveMissing =>
+      t('battleTeamMoveMissing', '招式数据缺失');
+  static String get battleTeamMoveUnsupported =>
+      t('battleTeamMoveUnsupported', '变化／特殊威力或当前世代不可用，暂不估算');
+  static String get battleTeamMemberFailed =>
+      t('battleTeamMemberFailed', '队员数据缺失，暂不计算');
+  static String get battleTeamItemsExcluded =>
+      t('battleTeamItemsExcluded', '有携带道具未识别，请在队员配置中确认。');
+  static String get battleTeamAnalysis => t('battleTeamAnalysis', '整队分析');
+  static String get battleDuelAnalysis => t('battleDuelAnalysis', '攻守双方');
+  static String get battleTeamScope =>
+      t('battleTeamScope', '按已保存队伍与当前世代分析。数字为队员数；打击盲点按本系攻击估算，不含配招与太晶化。');
+  static String get battleTeamIncomplete =>
+      t('battleTeamIncomplete', '部分队员属性缺失，以下仅汇总已读取的队员。');
+  static String get battleTeamUnknownAbility =>
+      t('battleTeamUnknownAbility', '未设置或未读取的特性按无特性计算。');
+  static String get battleTeamWeaknesses =>
+      t('battleTeamWeaknesses', '共同弱点 · 至少 2 名');
+  static String get battleTeamResistances =>
+      t('battleTeamResistances', '抗性 · 受击低于 1×');
+  static String get battleTeamImmunities =>
+      t('battleTeamImmunities', '免疫 · 0×');
+  static String get battleChooseParty => t('battleChooseParty', '从队伍选择');
+  static String get battlePartyEmpty => t('battlePartyEmpty', '暂无队员');
+  static String get battleSelectionFailed =>
+      t('battleSelectionFailed', '队员数据读取失败，已保留原配置，请重选。');
+  static String get battlePartyDefaults =>
+      t('battlePartyDefaults', '缺失项使用默认值：等级 50、IV 31、EV 0、中性性格；特性请核对。');
+  static String get battleUnsupportedItem =>
+      t('battleUnsupportedItem', '携带道具未计入，请在更多选项中核对。');
+  static String get battleRestoreStats =>
+      t('battleRestoreStats', '已手填能力值 · 恢复计算');
+  static String get battleMoreOptions => t('battleMoreOptions', '更多选项');
+  static String get battleMatchupSummary =>
+      t('battleMatchupSummary', '防守方受击倍率');
+  static String get battleAttacker => t('battleAttacker', '进攻方');
+  static String get battleTypes => t('battleTypes', '属性');
+  static String get battleAbility => t('battleAbility', '特性');
+  static String get battleTerastal => t('battleTerastal', '太晶化');
+  static String get battleMoveInputs => t('battleMoveInputs', '招式参数');
+  static String get battleFieldOptions =>
+      t('battleFieldOptions', '天气 / 场地 / 更多修正');
+
   static String get appUpdateTitle => t("appUpdateTitle", "应用更新");
   static String get appUpdateReading => t("appUpdateReading", "正在读取当前版本…");
   static String get appUpdateUnsupported =>
@@ -1265,8 +1320,9 @@ abstract final class AppZh {
     '计算假设：默认单打；勾选「双打·多目标招式」后按命中多个目标 ×0.75 计算；'
         '伤害含 85%–100% 随机浮动；'
         '击中要害按世代倍率（第六世代起 ×1.5，此前 ×2）并无视光墙/反射壁；'
-        '按一次命中的固定威力招式估算，不处理固定伤害、连续攻击、动态威力或招式专属效果；'
-        '未收录的特性、道具与场地细节不计入，结果仅供旅途参考。',
+        '自动识别招式属性、接触与部分特殊效果，使用当前世代威力；'
+        '连续攻击、反击、残血触发等条件尚未支持时不输出伤害。'
+        '未模拟能力等级、替身、守住与回合历史；部分修正的取整仍为近似，结果供快速参考。',
   );
   static String get companionStatInputsTitle =>
       t('companionStatInputsTitle', '输入');

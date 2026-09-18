@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Floating navigation is a shared surface across all visual families.
+abstract final class TitoNavigationShadows {
+  static const List<BoxShadow> floating = [
+    BoxShadow(color: Color(0x1A21394C), blurRadius: 10, offset: Offset(0, 3)),
+    BoxShadow(color: Color(0x1021394C), blurRadius: 3, offset: Offset(0, 1)),
+  ];
+}
+
 /// Soft Material elevation — **Flat UI only**.
 ///
 /// Trainer's Journal must use [TrainerJournalShadows] and Solid Plastic must

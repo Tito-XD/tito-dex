@@ -19,7 +19,6 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_surface_tokens.dart';
-import '../theme/trainer_journal.dart';
 import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
 import '../widgets/handheld_input.dart';
@@ -34,6 +33,7 @@ import '../widgets/sticker_pressable.dart';
 import '../widgets/tito_skeleton.dart';
 import '../widgets/tito_skeleton_gate.dart';
 import '../widgets/tito_animated_size_switcher.dart';
+import '../widgets/tito_segmented_control.dart';
 
 enum _MoveMethodFilter { level, machine, egg, tutor }
 
@@ -205,7 +205,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     final displayDetail = detail == null ? null : _displayDetail(detail);
     final errorCopy = _errorCopy;
     final padding = DeviceLayout.pagePadding(context);
-    final bodyPadding = EdgeInsets.fromLTRB(padding.left, 8, padding.right, 12);
+    final bodyPadding = EdgeInsets.fromLTRB(
+      padding.left,
+      8,
+      padding.right,
+      _DetailBottomTabs.listBottomClearance(context),
+    );
     final transitionHeader = widget.transitionSummary == null
         ? null
         : PokemonDetailTransitionHeader(summary: widget.transitionSummary!);
@@ -221,145 +226,157 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             ? Brightness.dark
             : Brightness.light,
       ),
-      child: Column(
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              padding.left,
-              padding.top,
-              padding.right,
-              0,
-            ),
-            child: SecondaryPageAppBar(
-              title: AppZh.navDex,
-              showSettings: false,
-            ),
-          ),
-          Expanded(
-            child: keepSharedElementTarget
-                ? ListView(
-                    key: const ValueKey('pokemon-detail-shared-element-stage'),
-                    padding: bodyPadding,
-                    children: [transitionHeader],
-                  )
-                : TitoSkeletonGate(
-                    loading: _loading,
-                    // Shared-element entries skip the skeleton cards: the
-                    // geometry-aligned transition header stays put and the
-                    // real content fills in with its arrival animation, so
-                    // nothing flashes when the detail data lands. Deep links
-                    // (no transition summary) keep the full skeleton.
-                    skeleton: ListView(
-                      padding: bodyPadding,
-                      children: [
-                        if (transitionHeader != null)
-                          transitionHeader
-                        else ...[
-                          const TitoDetailHeaderSkeleton(),
-                          const SizedBox(height: 12),
-                          const TitoCardSkeleton(height: 140),
-                          const SizedBox(height: 12),
-                          const TitoCardSkeleton(height: 88),
-                        ],
-                      ],
-                    ),
-                    placeholder: transitionHeader == null
-                        ? const SizedBox.shrink()
-                        : ListView(
-                            padding: bodyPadding,
-                            children: [transitionHeader],
-                          ),
-                    child: errorCopy != null
-                        ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
-                        : displayDetail == null
-                        ? const SizedBox.shrink()
-                        : ListView(
-                            padding: bodyPadding,
-                            children: [
-                              // The fill lines (dex label, genus subtitle)
-                              // fade in once when the loaded header first
-                              // appears; the progress is owned here so the
-                              // Hero shuttle's copy stays fully opaque.
-                              TweenAnimationBuilder<double>(
-                                tween: Tween<double>(
-                                  begin: TitoMotion.disabled(context) ? 1 : 0,
-                                  end: 1,
-                                ),
-                                duration: TitoMotion.duration(
-                                  context,
-                                  TitoMotion.standard,
-                                ),
-                                curve: Curves.easeOutCubic,
-                                builder: (context, fill, _) =>
-                                    PokemonDetailHeader(
-                                      detail: displayDetail,
-                                      compact: true,
-                                      showSettingsAction: false,
-                                      fillProgress: fill,
-                                    ),
-                              ),
-                              _DetailArrival(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    DexDetailControls(
-                                      speciesNameZh:
-                                          _detail?.summary.displayName ?? '',
-                                      forms: displayDetail.forms,
-                                      selectedFormKey: _selectedFormKey,
-                                      edition: _gameEdition,
-                                      onEditionChanged: _selectEdition,
-                                      onFormChanged: (form) {
-                                        setState(() {
-                                          _selectedFormKey = form.key;
-                                          _prepareObtainSupport(
-                                            _detail!.forForm(form),
-                                          );
-                                          _abilities =
-                                              form.abilities.isEmpty &&
-                                                  (form.isDefault ||
-                                                      form.isCosmetic)
-                                              ? _detail!.abilities
-                                              : form.abilities;
-                                        });
-                                      },
-                                    ),
-                                    // Keyed tab-body swap without a custom transition.
-                                    TitoAnimatedSizeSwitcher(
-                                      switchKey: ValueKey<int>(
-                                        _currentTabIndex,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: _tabSections(
-                                          displayDetail,
-                                          _currentTabIndex,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height:
-                                          _DetailBottomTabs.listBottomClearance,
-                                    ),
-                                  ],
-                                ),
-                              ),
+          Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  padding.left,
+                  padding.top,
+                  padding.right,
+                  0,
+                ),
+                child: SecondaryPageAppBar(
+                  title: AppZh.navDex,
+                  showSettings: false,
+                ),
+              ),
+              Expanded(
+                child: keepSharedElementTarget
+                    ? ListView(
+                        key: const ValueKey(
+                          'pokemon-detail-shared-element-stage',
+                        ),
+                        padding: bodyPadding,
+                        children: [transitionHeader],
+                      )
+                    : TitoSkeletonGate(
+                        loading: _loading,
+                        // Shared-element entries skip the skeleton cards: the
+                        // geometry-aligned transition header stays put and the
+                        // real content fills in with its arrival animation, so
+                        // nothing flashes when the detail data lands. Deep links
+                        // (no transition summary) keep the full skeleton.
+                        skeleton: ListView(
+                          padding: bodyPadding,
+                          children: [
+                            if (transitionHeader != null)
+                              transitionHeader
+                            else ...[
+                              const TitoDetailHeaderSkeleton(),
+                              const SizedBox(height: 12),
+                              const TitoCardSkeleton(height: 140),
+                              const SizedBox(height: 12),
+                              const TitoCardSkeleton(height: 88),
                             ],
-                          ),
-                  ),
+                          ],
+                        ),
+                        placeholder: transitionHeader == null
+                            ? const SizedBox.shrink()
+                            : ListView(
+                                padding: bodyPadding,
+                                children: [transitionHeader],
+                              ),
+                        child: errorCopy != null
+                            ? _ErrorBody(copy: errorCopy, onRetry: _loadDetail)
+                            : displayDetail == null
+                            ? const SizedBox.shrink()
+                            : ListView(
+                                padding: bodyPadding,
+                                children: [
+                                  // The fill lines (dex label, genus subtitle)
+                                  // fade in once when the loaded header first
+                                  // appears; the progress is owned here so the
+                                  // Hero shuttle's copy stays fully opaque.
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                      begin: TitoMotion.disabled(context)
+                                          ? 1
+                                          : 0,
+                                      end: 1,
+                                    ),
+                                    duration: TitoMotion.duration(
+                                      context,
+                                      TitoMotion.standard,
+                                    ),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, fill, _) =>
+                                        PokemonDetailHeader(
+                                          detail: displayDetail,
+                                          compact: true,
+                                          showSettingsAction: false,
+                                          fillProgress: fill,
+                                        ),
+                                  ),
+                                  _DetailArrival(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        DexDetailControls(
+                                          speciesNameZh:
+                                              _detail?.summary.displayName ??
+                                              '',
+                                          forms: displayDetail.forms,
+                                          selectedFormKey: _selectedFormKey,
+                                          edition: _gameEdition,
+                                          onEditionChanged: _selectEdition,
+                                          onFormChanged: (form) {
+                                            setState(() {
+                                              _selectedFormKey = form.key;
+                                              _prepareObtainSupport(
+                                                _detail!.forForm(form),
+                                              );
+                                              _abilities =
+                                                  form.abilities.isEmpty &&
+                                                      (form.isDefault ||
+                                                          form.isCosmetic)
+                                                  ? _detail!.abilities
+                                                  : form.abilities;
+                                            });
+                                          },
+                                        ),
+                                        // Keep the detail sections in step with the sliding type tab.
+                                        TitoAnimatedSizeSwitcher(
+                                          switchKey: ValueKey<int>(
+                                            _currentTabIndex,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: _tabSections(
+                                              displayDetail,
+                                              _currentTabIndex,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+              ),
+            ],
           ),
-          _DetailBottomTabs(
-            selectedColor: typeTileColor(
-              displayDetail?.summary.types.firstOrNull ?? 'normal',
+          // Content stays sharp above the rail and fades behind the footer.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _DetailBottomTabs(
+              selectedColor: typeTileColor(
+                displayDetail?.summary.types.firstOrNull ?? 'normal',
+              ),
+              currentIndex: _currentTabIndex,
+              onSelected: (index) {
+                if (_currentTabIndex != index) {
+                  setState(() => _currentTabIndex = index);
+                }
+              },
             ),
-            currentIndex: _currentTabIndex,
-            onSelected: (index) {
-              if (_currentTabIndex != index) {
-                setState(() => _currentTabIndex = index);
-              }
-            },
           ),
         ],
       ),
@@ -1098,6 +1115,16 @@ class _DetailBottomTabs extends StatelessWidget {
   final ValueChanged<int> onSelected;
   final Color selectedColor;
 
+  static double listBottomClearance(BuildContext context) {
+    final style = SecondaryTypography.onCard.small12;
+    final labelHeight =
+        MediaQuery.textScalerOf(context).scale(style.fontSize ?? 12) *
+        (style.height ?? 1.4);
+    return (labelHeight + 20).clamp(44.0, double.infinity) +
+        26 +
+        MediaQuery.paddingOf(context).bottom;
+  }
+
   static List<String> get _labels => [
     AppZh.dexTabIntro,
     AppZh.dexTabBasic,
@@ -1105,99 +1132,55 @@ class _DetailBottomTabs extends StatelessWidget {
     AppZh.dexTabMoves,
   ];
 
-  /// Bottom inset the detail list keeps free so its last card clears this bar
-  /// (bar padding + tab height + a breathing gap). Single source for the page.
-  static const double listBottomClearance = 72;
-
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    // Type tint on the selected tab is intentional; only the stroke follows
-    // the theme (ink in Trainer's Journal, plastic hairline, none in Flat).
-    final selectedText = selectedColor.computeLuminance() > .45
-        ? TitoColors.ink
-        : TitoColors.card;
-    final Border? tabBorder = appVisualStyle.usesFlatUi
-        ? null
-        : appVisualStyle.usesSolidPlastic
-        ? Border.all(
-            color: Colors.white.withValues(alpha: 0.8),
-            width: TitoBorders.glass,
-          )
-        : TrainerJournal.allElement();
-    return Container(
-      key: const ValueKey('detail-bottom-tabs'),
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border(
-          top: BorderSide(color: scheme.outline.withValues(alpha: .3)),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: List.generate(_labels.length, (index) {
-            final selected = index == currentIndex;
-            final radius = BorderRadius.circular(TitoRadii.sm);
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: index == _labels.length - 1 ? 0 : 8,
-                ),
-                child: _DetailSelectionMotion(
-                  motionKey: ValueKey('detail-tab-motion-$index'),
-                  selected: selected,
-                  builder: (context, selection) => HandheldFocusDecorator(
-                    onActivate: () => onSelected(index),
-                    child: StickerPressable(
-                      borderRadius: radius,
-                      child: Material(
-                        key: ValueKey('detail-tab-surface-$index'),
-                        color: Color.lerp(
-                          scheme.surface,
-                          selectedColor,
-                          selection,
-                        ),
-                        borderRadius: radius,
-                        child: InkWell(
-                          borderRadius: radius,
-                          onTap: () => onSelected(index),
-                          child: Container(
-                            constraints: const BoxConstraints(
-                              minHeight: 44,
-                              minWidth: 44,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              borderRadius: radius,
-                              border: tabBorder,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 9),
-                            child: Text(
-                              _labels[index],
-                              textAlign: TextAlign.center,
-                              style: SecondaryTypography.onCard.small12
-                                  .copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: Color.lerp(
-                                      scheme.onSurfaceVariant,
-                                      selectedText,
-                                      selection,
-                                    ),
-                                  ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+    final padding = DeviceLayout.pagePadding(context);
+    final luminance = selectedColor.computeLuminance();
+    final inkContrast =
+        (luminance + .05) / (TitoColors.ink.computeLuminance() + .05);
+    final creamContrast =
+        (TitoColors.card.computeLuminance() + .05) / (luminance + .05);
+    final backdrop = Theme.of(context).scaffoldBackgroundColor;
+    return Stack(
+      children: [
+        Positioned.fill(
+          // The rail starts after 6px of footer padding and its 4px inset.
+          top: 10,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [backdrop.withValues(alpha: 0), backdrop],
                 ),
               ),
-            );
-          }),
+            ),
+          ),
         ),
-      ),
+        Padding(
+          key: const ValueKey('detail-bottom-tabs'),
+          padding: EdgeInsets.fromLTRB(padding.left, 6, padding.right, 8),
+          child: SafeArea(
+            top: false,
+            child: TitoSegmentedControl<int>(
+              value: currentIndex,
+              options: {for (var i = 0; i < _labels.length; i++) i: _labels[i]},
+              onChanged: onSelected,
+              railColor: TitoColors.card,
+              floating: true,
+              railForeground: TitoColors.ink,
+              selectedColor: selectedColor,
+              selectedForeground: inkContrast >= creamContrast
+                  ? TitoColors.ink
+                  : TitoColors.card,
+              indicatorKey: const ValueKey('detail-tab-indicator'),
+              railKey: const ValueKey('detail-tab-rail'),
+              optionKeyBuilder: (i) => ValueKey('detail-tab-surface-$i'),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

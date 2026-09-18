@@ -7,6 +7,8 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import 'battle_result_scroll.dart';
+import 'battle_content_fade.dart';
 import 'handheld_input.dart';
 import 'liquid_glass.dart';
 
@@ -290,22 +292,71 @@ class CompanionToolScaffold extends StatelessWidget {
     required this.title,
     required this.children,
     this.subtitle,
+    this.result,
+    this.resultSummary,
+    this.scopeSelector,
+    this.transitionKey,
   });
 
   final bool embedded;
   final String title;
   final String? subtitle;
   final List<Widget> children;
+  final Widget? result;
+  final Widget? resultSummary;
+  final Widget? scopeSelector;
+  final Object? transitionKey;
 
   @override
   Widget build(BuildContext context) {
+    if (result != null) {
+      final padding = DeviceLayout.pagePadding(context);
+      return Material(
+        type: MaterialType.transparency,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!embedded)
+              Padding(
+                padding: padding.copyWith(bottom: 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SecondaryPageAppBar(title: title),
+                    if (subtitle != null)
+                      SecondaryPageSubtitle(text: subtitle!),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: BattleContentFade(
+                changeKey: transitionKey,
+                child: BattleResultScroll(
+                  storageId: title,
+                  result: result!,
+                  summary: resultSummary ?? Text(title),
+                  leading: scopeSelector,
+                  children: children,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     if (!embedded) {
       return Material(
         type: MaterialType.transparency,
         child: SecondaryPageScaffold(
           title: title,
           subtitle: subtitle,
-          children: children,
+          children: [
+            if (scopeSelector != null) ...[
+              scopeSelector!,
+              const SizedBox(height: 10),
+            ],
+            ...children,
+          ],
         ),
       );
     }
@@ -320,7 +371,13 @@ class CompanionToolScaffold extends StatelessWidget {
           pagePadding.right,
           96,
         ),
-        children: children,
+        children: [
+          if (scopeSelector != null) ...[
+            scopeSelector!,
+            const SizedBox(height: 10),
+          ],
+          ...children,
+        ],
       ),
     );
   }

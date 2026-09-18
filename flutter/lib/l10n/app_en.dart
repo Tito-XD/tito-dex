@@ -2,6 +2,49 @@
 library;
 
 const kAppEn = <String, String>{
+  'battleViewDamage': 'View damage',
+  'battleExpandResult': 'Expand full result',
+  'battleTeamSummary': 'Party · {count} members',
+  'battleTeamStats': 'Party stats',
+  'battleTeamDamage': 'Party moveset damage',
+  'battleTeamStatsHint':
+      'Saved level, nature, IVs, EVs, ability and status. Swipe horizontally to compare all six stats.',
+  'battleTeamDamageHint':
+      'Assigned moves against the current defender. Estimates one hit in this generation; missing special conditions are explained.',
+  'battleTeamNoMoves': 'No valid moves for this game. Tap the member below to choose.',
+  'battleTeamMoveMissing': 'Move data unavailable',
+  'battleTeamMoveUnsupported':
+      'Status, special power or unavailable in this generation; not estimated',
+  'battleTeamMemberFailed': 'Member data unavailable; not calculated',
+  'battleTeamItemsExcluded': 'Some held items are unidentified. Confirm them in the member settings.',
+  'battleTeamAnalysis': 'Party analysis',
+  'battleDuelAnalysis': 'Attacker / defender',
+  'battleTeamScope':
+      'Saved party, current generation. Counts are members. Offensive gaps use STAB types, without movesets or Tera.',
+  'battleTeamIncomplete':
+      'Some members have no type data. Only loaded members are included.',
+  'battleTeamUnknownAbility':
+      'Unknown or unset abilities are treated as no ability.',
+  'battleTeamWeaknesses': 'Shared weaknesses · 2+ members',
+  'battleTeamResistances': 'Resistances · below 1×',
+  'battleTeamImmunities': 'Immunities · 0×',
+  'battleChooseParty': 'Choose from party',
+  'battlePartyEmpty': 'No party members',
+  'battleSelectionFailed':
+      'Could not load member. Previous inputs kept; please select again.',
+  'battlePartyDefaults':
+      'Missing values default to level 50, IV 31, EV 0 and neutral nature. Check the ability.',
+  'battleUnsupportedItem': 'Held item not included. Check more options.',
+  'battleRestoreStats': 'Manual stats · Recalculate',
+  'battleMoreOptions': 'More options',
+  'battleMatchupSummary': 'Damage taken by type',
+  'battleAttacker': 'Attacker',
+  'battleTypes': 'Types',
+  'battleAbility': 'Ability',
+  'battleTerastal': 'Terastallization',
+  'battleMoveInputs': 'Move parameters',
+  'battleFieldOptions': 'Weather / terrain / modifiers',
+
   "appUpdateTitle": "App updates",
   "appUpdateReading": "Reading the installed version\u2026",
   "appUpdateUnsupported":
@@ -743,8 +786,9 @@ const kAppEn = <String, String>{
       'Assumptions: singles by default; with “Doubles · multi-target move” checked, hits that strike multiple targets use ×0.75. '
       'Damage includes an 85%–100% random roll. '
       'Critical hits use the generation multiplier (×1.5 from Gen 6, ×2 before) and ignore Light Screen / Reflect. '
-      'Estimates one hit of a fixed-power move; fixed damage, multi-hit, variable power, and move-specific effects are not modeled. '
-      'Unlisted abilities, items, and field details are omitted. Results are for the journey, not a full simulator.',
+      'Uses historical power, contact flags and supported special move effects. '
+      'Unsupported multi-hit, retaliation and HP-dependent conditions produce no damage estimate. '
+      'Stat stages, Substitute, Protect and turn history are not modeled. Some modifier rounding remains approximate; use as a quick reference.',
   'companionStatInputsTitle': 'Inputs',
   'companionStatFacilityNote':
       'Default level follows common {facility} sets (Lv.50)',

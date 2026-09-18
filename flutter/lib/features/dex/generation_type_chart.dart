@@ -7,10 +7,7 @@ import 'type_chart.dart';
 const kTypesIntroducedGen6 = {'fairy'};
 
 /// Normalize species types for games before Gen VI (strip Fairy, fallback Normal).
-List<String> normalizeTypesForGeneration(
-  List<String> types,
-  int generation,
-) {
+List<String> normalizeTypesForGeneration(List<String> types, int generation) {
   if (generation >= 6) {
     return List<String>.from(types);
   }
@@ -43,12 +40,14 @@ Map<String, TypeDamageRelations> typeRelationsForGeneration(
     patched[entry.key] = entry.value;
   }
 
-  final steel = patched['steel'];
-  if (steel != null) {
-    patched['steel'] = TypeDamageRelations(
-      doubleDamageTo: steel.doubleDamageTo,
-      halfDamageTo: steel.halfDamageTo.difference({'ghost', 'dark'}),
-      noDamageTo: steel.noDamageTo,
+  // Relations are keyed by ATTACK type. Before Gen VI Steel resists both.
+  for (final attackType in ['ghost', 'dark']) {
+    final attack = patched[attackType];
+    if (attack == null) continue;
+    patched[attackType] = TypeDamageRelations(
+      doubleDamageTo: attack.doubleDamageTo,
+      halfDamageTo: {...attack.halfDamageTo, 'steel'},
+      noDamageTo: attack.noDamageTo,
     );
   }
 

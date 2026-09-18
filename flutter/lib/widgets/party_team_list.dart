@@ -67,6 +67,7 @@ class PartyTeamBoard extends StatelessWidget {
     this.selectedIndex,
     this.onSelect,
     this.onEmptySlotTap,
+    this.adaptiveHeight = false,
   });
 
   final List<PartyMember> party;
@@ -74,6 +75,7 @@ class PartyTeamBoard extends StatelessWidget {
   final int? selectedIndex;
   final ValueChanged<int>? onSelect;
   final VoidCallback? onEmptySlotTap;
+  final bool adaptiveHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -90,15 +92,19 @@ class PartyTeamBoard extends StatelessWidget {
                   for (var col = 0; col < 3; col++) ...[
                     if (col > 0) const SizedBox(width: 8),
                     Expanded(
-                      child: AspectRatio(
-                        aspectRatio: 0.92,
-                        child: _PartyGridSlot(
-                          index: row * 3 + col,
-                          party: party,
-                          details: details,
-                          selected: selectedIndex == row * 3 + col,
-                          onSelect: onSelect,
-                          onEmptySlotTap: onEmptySlotTap,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) => SizedBox(
+                          height: adaptiveHeight
+                              ? 64 + MediaQuery.textScalerOf(context).scale(36)
+                              : constraints.maxWidth / .92,
+                          child: _PartyGridSlot(
+                            index: row * 3 + col,
+                            party: party,
+                            details: details,
+                            selected: selectedIndex == row * 3 + col,
+                            onSelect: onSelect,
+                            onEmptySlotTap: onEmptySlotTap,
+                          ),
                         ),
                       ),
                     ),
@@ -158,6 +164,7 @@ class _PartyGridSlot extends StatelessWidget {
       onTap: onSelect == null ? null : () => onSelect!(index),
       borderRadius: radius,
       child: Stack(
+        fit: StackFit.expand,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -185,7 +192,7 @@ class _PartyGridSlot extends StatelessWidget {
                   '${AppZh.level}${member.level}',
                   maxLines: 1,
                   style: SecondaryTypography.onCard.small12.copyWith(
-                    color: TitoColors.coral,
+                    color: TitoColors.deepBlue,
                     fontWeight: TrainerJournal.weight(FontWeight.w800),
                   ),
                 ),

@@ -120,13 +120,65 @@ call sites: a plain `AlertDialog`, `showModalBottomSheet` (drag handle on) and
 
 | Control | Selected colour | Notes |
 | --- | --- | --- |
-| Single choice drawn as segments / tabs / custom method chips | `softYellow` | one active option at a time (`SegmentedButton`, battle-calc mode chips, detail move-method chips, stats toggle) |
+| Single choice drawn as segments / tabs / custom method chips | `softYellow` | one active option at a time (`SegmentedButton`, detail move-method chips, stats toggle) |
 | Any Material chip (`FilterChip`, `ChoiceChip`, `InputChip`) and toggles | `mint` | `ChipThemeData` is shared by every chip class, so single-choice chip groups (weather, terrain, status…) also select in mint — do not fight it with local `selectedColor` |
-| Detail bottom tabs | type colour tint | intentional exception: the tab bar is the species' colour identity |
+| Detail bottom tabs | primary type colour sliding indicator | one continuous cream rail; intentional palette exception across themes |
 | Flat UI (all of the above) | `colorScheme.secondaryContainer` | Material semantics, no cream/yellow |
+| Battle calculator mode bar | `TitoSurfaceRole.card` on a `deep` rail | four connected segments, shared outline and separators; each theme supplies its own surface recipe |
 
 Coral is reserved for destructive actions, warnings and the primary CTA — never
 as a selection highlight.
+
+### 对战工具布局
+
+克制、能力值、伤害、盲点共用一体式分段导航和同一组攻守双方配置，滚动状态各自保留。
+四页按「范围切换 → 完整结果 → 参数」整页连续滚动，结果和参数共用一个纵向列表。
+完整结果离开视野后，顶部出现可点击的一行摘要；240ms 缓出展开并渐显，回看时
+180ms 收起淡出，页面以 380ms 缓入缓出回到完整结果。摘要浮层不改变输入区位置，
+边界留有回滞以避免慢速滚动时闪烁；系统减少动画时直接切换。长表和大字不再
+限高或套第二个纵向滚动区。输入聚焦留出摘要所需空间。
+工具导航和「攻守双方／整队」共用轻薄的分段控件，外框圆角 12、滑块圆角 8，左右与下方卡片齐平，触摸高度至少 44；
+选中背景以 280ms 滑动，工具与范围切换伴随 220ms 淡入，并遵循减少动态效果设置。
+卡片和输入框沿用原圆角层级，色彩与描边仍由三套主题各自提供。
+图鉴详情底栏复用 `TitoSegmentedControl`，整条奶油白底配当前形态主属性色滑块，
+底栏浮于连续滚动内容上，以轻阴影和 8px 底部留白保留悬浮感。背景遮罩从导航条上沿开始，由透明向底部页面底色渐变；底栏上方内容保持清晰，经过底栏后方时逐渐隐去。列表末尾为底栏预留空间，确保最后一张卡片可完整阅读。
+内容沿用淡入和高度过渡；两处共享滑动、文字颜色过渡、居中和减少动态效果规则。
+
+克制表按实际倍率分组，包含中性、抗性和免疫；特性产生的 1.5×、0.75× 等
+数值也单独显示，不归并为整数倍率。盲点页的打击盲点、联防盲点均显示在顶部。
+克制、伤害、盲点的配置固定为左进攻方、右防守方；能力值页可切换编辑哪一方，
+数值字段按两列排布。特性、道具、状态采用紧凑选择框，伤害页的额外修正默认折叠。
+
+`BattleSession` 随工具页创建和释放，不写回队伍；双方分别保存六项种族值、IV、EV、
+等级、性格、特性、太晶状态及计算用道具和状态。切页自动代入，物理／特殊招式分别
+读取对应能力。伤害页使用加成前数值，避免重复应用特性、道具和状态；手填能力值
+会标记为覆盖值，修改对应培养参数或点击恢复后重新计算。
+
+四页均可从队伍快速选择，攻守双方独立。存档 IV／EV 按 HP、攻击、防御、速度、
+特攻、特防顺序映射；缺失参数明确提示默认值。未建立跨世代 ID 映射的存档道具
+不会自动猜测，提示用户在更多选项中选择。队伍原数据保持不变。
+
+克制／盲点可切换「整队分析」：共同弱点为至少两名成员受击超过 1×，抗性与免疫
+分别统计人数；打击盲点沿用本系属性对单属性目标的估算，不等于实际配招覆盖，
+不计太晶化。分析默认代入已保存队伍，之后使用本次工具会话的临时队伍，展示已读取人数及未知特性提示。
+
+四页共享「攻守双方／整队分析」范围。能力值的整队模式按已保存培养参数横向比较
+六项能力值；伤害整队模式逐个队员读取已配招式，针对当前共享防守方计算，分别
+使用物攻／物防和特攻／特防。默认显示每名队员最高伤害的招式，展开可查看全部。
+变化招式、未支持的特殊条件、晚于当前世代的招式和缺失数据均明确标注，不编造
+结果。单体与队伍的招式选择仅提供所选宝可梦在当前游戏的可学招式，不跨版本回退；
+选中后读取当前世代的属性、分类、威力及接触标记；单只与整队共用计算入口。
+存档中不属于当前可学集合的招式不参与估算。未识别道具须先确认；已支持的特殊取值、
+固定伤害、属性与特性联动及近似边界见 [计算范围](BATTLE_CALCULATION_SCOPE.md)。
+队伍区采用紧凑的三列两行 `BattleTeamEditor`：直接展示等级、性格、特性、IV／EV 摘要与招式；
+点选可替换成员、修改六项种族值／IV／EV、性格、特性、道具、状态和最多四个招式，空位可添加，成员可移除。
+四页共享临时修改，不写回 Party。选择弹层仍复用 `PartyTeamBoard`，窄屏与大字适配行高；
+菜单明确采用浅色卡片背景，深色结果卡上的操作文字采用浅色前景。
+
+`flutter test test/battle_session_test.dart test/battle_party_damage_test.dart test/battle_tools_layout_test.dart` 验证三套主题、
+窄屏、掌机、英文大字、键盘、跨页同步、队员导入、异步选择及整队统计。可选传入
+`--dart-define=UI_AUDIT_CJK_FONT=<本地中文字体路径>`，在 `flutter/build/battle-audit/`
+生成四页的测试数据截图；这些截图不等同于 APK 或真机验收。
 
 ## Text tokens
 

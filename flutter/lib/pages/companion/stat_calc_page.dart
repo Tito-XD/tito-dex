@@ -1,9 +1,12 @@
+import '../../widgets/battle_team_editor.dart';
+import '../../widgets/battle_party_results.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
 import '../../features/companion/battle_game_scope.dart';
-import '../../features/companion/battle_handoff.dart';
+import '../../features/companion/battle_session.dart';
+import '../../widgets/battle_party_picker.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/dex/battle_effectiveness.dart';
 import '../../features/dex/dex_models.dart';
@@ -12,8 +15,8 @@ import '../../features/game/game_edition_repository.dart';
 import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/secondary_typography.dart';
-import '../../theme/tito_colors.dart';
 import '../../widgets/companion_tool_fields.dart';
+import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 
@@ -22,11 +25,13 @@ class StatCalcPage extends StatefulWidget {
     super.key,
     required this.journey,
     this.embedded = false,
+    this.session,
     this.onHandoffToDamage,
   });
 
   final CurrentJourney journey;
   final bool embedded;
+  final BattleSession? session;
   final VoidCallback? onHandoffToDamage;
 
   @override
@@ -34,148 +39,62 @@ class StatCalcPage extends StatefulWidget {
 }
 
 class _StatCalcPageState extends State<StatCalcPage> {
-  final _queryController = TextEditingController();
-  final _baseController = TextEditingController(text: '100');
-  final _levelController = TextEditingController(text: '50');
-  final _ivController = TextEditingController(text: '31');
-  final _evController = TextEditingController(text: '0');
+  late final BattleSession _session =
+      widget.session ??
+      BattleSession(
+        level: battleScopeForEdition(
+          gameEditionRepository.edition,
+        ).defaultLevel,
+      );
+  void _edit(VoidCallback change) {
+    setState(change);
+    _session.changed();
+  }
 
+  bool _editingDefender = false;
+  BattleCombatant get _combatant =>
+      _editingDefender ? _session.defender : _session.attacker;
   BattleStat _stat = BattleStat.attack;
-  NatureModifier _nature = battleNatures.firstWhere((n) => n.key == 'serious');
-  String? _attackerAbilitySlug;
-  int? _linkedPokemonId;
-  List<DefensiveAbilityOption> _abilityOptions = const [];
-  BattleHeldItem _heldItem = BattleHeldItem.none;
-  BattleStatusCondition _status = BattleStatusCondition.none;
   List<PokemonSummary> _suggestions = const [];
 
   @override
-  void initState() {
-    super.initState();
-    final scope = battleScopeForEdition(gameEditionRepository.edition);
-    _levelController.text = scope.defaultLevel.toString();
-  }
-
-  @override
   void dispose() {
-    _queryController.dispose();
-    _baseController.dispose();
-    _levelController.dispose();
-    _ivController.dispose();
-    _evController.dispose();
+    if (widget.session == null) _session.dispose();
     super.dispose();
   }
 
   Future<void> _searchPokemon(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      setState(() => _suggestions = const []);
+      _edit(() => _suggestions = const []);
       return;
     }
+    final combatant = _combatant;
     final results = await dexRepository.search(trimmed);
-    if (!mounted || _queryController.text.trim() != trimmed) {
+    if (!mounted ||
+        combatant != _combatant ||
+        _combatant.query.text.trim() != trimmed) {
       return;
     }
-    setState(() => _suggestions = results.take(6).toList());
+    _edit(() => _suggestions = results.take(6).toList());
   }
 
   Future<void> _applyPokemon(PokemonSummary summary) async {
-    final detail = await dexRepository.getDetail(summary.id);
-    final stats = detail.baseStats;
-    if (stats == null) {
-      return;
-    }
-    final base = switch (_stat) {
-      BattleStat.hp => stats.hp,
-      BattleStat.attack => stats.attack,
-      BattleStat.defense => stats.defense,
-      BattleStat.specialAttack => stats.specialAttack,
-      BattleStat.specialDefense => stats.specialDefense,
-      BattleStat.speed => stats.speed,
-    };
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _baseController.text = base.toString();
-      _suggestions = const [];
-      _queryController.text = summary.nameZh;
-      _linkedPokemonId = summary.id;
-      _abilityOptions = const [];
-      _attackerAbilitySlug = null;
-    });
-    _loadAbilities(summary.id);
+    final combatant = _combatant;
+    _edit(() => _suggestions = const []);
+    await combatant.selectPokemon(summary);
   }
 
-  void _clearLinkedPokemon() {
-    setState(() {
-      _linkedPokemonId = null;
-      _abilityOptions = const [];
-      _attackerAbilitySlug = null;
-    });
-  }
-
-  Future<void> _loadAbilities(int pokemonId) async {
-    try {
-      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
-      if (!mounted || _linkedPokemonId != pokemonId) {
-        return;
-      }
-      final options = statAbilityOptionsFromPokemon(abilities);
-      setState(() {
-        _abilityOptions = options;
-        _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
-      });
-    } catch (error) {
-      debugPrint('Failed to load stat calc ability options: $error');
-    }
-  }
-
-  Future<void> _refreshBaseFromLinked() async {
-    final id = _linkedPokemonId;
-    if (id == null) {
-      return;
-    }
-    final detail = await dexRepository.getDetail(id);
-    final stats = detail.baseStats;
-    if (stats == null || !mounted) {
-      return;
-    }
-    final base = switch (_stat) {
-      BattleStat.hp => stats.hp,
-      BattleStat.attack => stats.attack,
-      BattleStat.defense => stats.defense,
-      BattleStat.specialAttack => stats.specialAttack,
-      BattleStat.specialDefense => stats.specialDefense,
-      BattleStat.speed => stats.speed,
-    };
-    setState(() => _baseController.text = base.toString());
-  }
-
-  /// Which quick-damage slot this stat maps into.
-  String get _applyToDamageLabel => switch (_stat) {
-    BattleStat.attack ||
-    BattleStat.specialAttack => AppZh.companionStatApplyAttack,
-    BattleStat.defense ||
-    BattleStat.specialDefense => AppZh.companionStatApplyDefense,
-    _ => AppZh.companionStatApplyHp,
-  };
+  String get _applyToDamageLabel => AppZh.battleViewDamage;
 
   void _applyToDamage(int result) {
-    battleStatHandoff.clear(notify: false);
-    switch (_stat) {
-      case BattleStat.attack:
-      case BattleStat.specialAttack:
-        battleStatHandoff.attack = result;
-      case BattleStat.defense:
-      case BattleStat.specialDefense:
-        battleStatHandoff.defense = result;
-      case BattleStat.hp:
-        battleStatHandoff.hp = result;
-      case BattleStat.speed:
-        return;
+    if (_stat == BattleStat.specialAttack ||
+        _stat == BattleStat.specialDefense) {
+      _session.category = MoveCategory.special;
+    } else if (_stat == BattleStat.attack || _stat == BattleStat.defense) {
+      _session.category = MoveCategory.physical;
     }
-    battleStatHandoff.commit();
+    _session.changed();
     final onHandoff = widget.onHandoffToDamage;
     if (onHandoff != null) {
       onHandoff();
@@ -184,167 +103,228 @@ class _StatCalcPageState extends State<StatCalcPage> {
     }
   }
 
-  int _readBase() => int.tryParse(_baseController.text.trim()) ?? 0;
-
-  int _readLevel() {
-    final scope = battleScopeForEdition(gameEditionRepository.edition);
-    return int.tryParse(_levelController.text.trim()) ?? scope.defaultLevel;
-  }
-
-  int _readIv() => int.tryParse(_ivController.text.trim()) ?? 31;
-
-  int _readEv() => int.tryParse(_evController.text.trim()) ?? 0;
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: gameEditionRepository,
+      listenable: Listenable.merge([gameEditionRepository, _session]),
       builder: (context, _) {
         final edition = gameEditionRepository.edition;
         final scope = battleScopeForEdition(edition);
-        final result = computeBattleStat(
-          stat: _stat,
-          base: _readBase(),
-          level: _readLevel(),
-          iv: _readIv(),
-          ev: _readEv(),
-          nature: _nature,
-          attackerAbilitySlug: _attackerAbilitySlug,
-          isPhysicalStat: _stat == BattleStat.attack,
-          heldItem: _heldItem,
-          status: _status,
+        final result = _combatant.effectiveStat(
+          _stat,
+          generation: scope.generation,
         );
 
         return CompanionToolScaffold(
+          transitionKey: _session.teamMode,
           embedded: widget.embedded,
           title: AppZh.companionToolStatCalc,
           subtitle: edition.label,
-          children: [
-            CompanionSectionCard(
-              title: AppZh.companionStatInputsTitle,
-              subtitle: AppZh.companionStatFacilityNote(scope.facilityLabel),
-              children: [
-                PokemonSearchField(
-                  controller: _queryController,
-                  hintText: AppZh.companionPokemonSearchHint,
-                  suggestions: _suggestions,
-                  onQueryChanged: _searchPokemon,
-                  onPokemonSelected: _applyPokemon,
-                ),
-                const SizedBox(height: 12),
-                StatPicker(
-                  selected: _stat,
-                  onChanged: (value) {
-                    setState(() => _stat = value);
-                    _refreshBaseFromLinked();
-                  },
-                ),
-                const SizedBox(height: 12),
-                NaturePicker(
-                  selected: _nature,
-                  onChanged: (value) => setState(() => _nature = value),
-                ),
-                const SizedBox(height: 12),
-                CompanionNumberField(
-                  label: AppZh.companionStatBase,
-                  controller: _baseController,
-                  max: 255,
-                  onChanged: (_) {
-                    setState(() {});
-                    _clearLinkedPokemon();
-                  },
-                ),
-                const SizedBox(height: 12),
-                CompanionNumberField(
-                  label: AppZh.companionStatLevel,
-                  controller: _levelController,
-                  max: 100,
-                  onChanged: (_) => setState(() {}),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: CompanionNumberField(
-                        label: AppZh.companionStatIv,
-                        controller: _ivController,
-                        max: 31,
-                        onChanged: (_) => setState(() {}),
+          resultSummary: Text(
+            _session.teamMode
+                ? '${AppZh.battleTeamStats} · ${_session.teamCount(widget.journey.party)}'
+                : '${_stat.label} · $result',
+          ),
+          result: _session.teamMode
+              ? BattlePartyResults(
+                  session: _session,
+                  party: widget.journey.party,
+                  generation: scope.generation,
+                )
+              : StickerCard(
+                  variant: StickerVariant.deep,
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        AppZh.companionStatResultTitle,
+                        style: SecondaryTypography.onGradient.small12,
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: CompanionNumberField(
-                        label: AppZh.companionStatEv,
-                        controller: _evController,
-                        max: 252,
-                        onChanged: (_) => setState(() {}),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$result',
+                                  key: const ValueKey('battle-stat-value'),
+                                  style: SecondaryTypography.onGradient.h15
+                                      .copyWith(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                                Text(
+                                  _stat.label,
+                                  style: SecondaryTypography.onGradient.body14,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (_stat != BattleStat.speed)
+                            Flexible(
+                              child: FilledButton.tonal(
+                                onPressed: () => _applyToDamage(result),
+                                child: Text(
+                                  _applyToDamageLabel,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                if (_abilityOptions.isNotEmpty || _linkedPokemonId == null) ...[
-                  const SizedBox(height: 12),
-                  CompanionAbilitySection(
-                    pokemonLabel: AppZh.companionAttackerAbilityPick,
-                    manualLabel: AppZh.companionAttackerAbilityPick,
-                    manualOptions: kManualAttackerAbilityOptions,
-                    pokemonOptions: _abilityOptions,
-                    linkedPokemonId: _linkedPokemonId,
-                    selectedSlug: _attackerAbilitySlug,
-                    onChanged: (slug) =>
-                        setState(() => _attackerAbilitySlug = slug),
+                      const SizedBox(height: 6),
+                      Text(
+                        AppZh.companionStatResultHint,
+                        style: SecondaryTypography.onGradient.small12,
+                      ),
+                    ],
                   ),
-                ],
-                const SizedBox(height: 12),
-                HeldItemPicker(
-                  selected: _heldItem,
-                  onChanged: (value) => setState(() => _heldItem = value),
                 ),
-                const SizedBox(height: 12),
-                StatusConditionPicker(
-                  selected: _status,
-                  onChanged: (value) => setState(() => _status = value),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            StickerCard(
-              variant: StickerVariant.mint,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+          scopeSelector: BattleSegmentedControl<bool>(
+            key: const ValueKey('battle-scope'),
+            value: _session.teamMode,
+            options: {
+              false: AppZh.battleDuelAnalysis,
+              true: AppZh.battleTeamAnalysis,
+            },
+            onChanged: (value) => _edit(() => _session.teamMode = value),
+          ),
+          children: [
+            if (_session.teamMode)
+              BattleTeamEditor(session: _session, party: widget.journey.party)
+            else
+              CompanionSectionCard(
+                padding: const EdgeInsets.all(10),
+                title: AppZh.companionStatInputsTitle,
                 children: [
-                  Text(
-                    AppZh.companionStatResultTitle,
-                    style: SecondaryTypography.onCard.h15,
+                  CompanionSelectField<bool>(
+                    value: _editingDefender,
+                    options: {
+                      false: AppZh.battleAttacker,
+                      true: AppZh.companionTypeDefenderTitle,
+                    },
+                    onChanged: (value) => _edit(() {
+                      _editingDefender = value;
+                      _suggestions = const [];
+                    }),
+                  ),
+                  BattlePartyPicker(
+                    journey: widget.journey,
+                    combatant: _combatant,
+                  ),
+                  PokemonSearchField(
+                    compact: true,
+                    controller: _combatant.query,
+                    hintText: AppZh.companionPokemonSearchHint,
+                    suggestions: _suggestions,
+                    onQueryChanged: _searchPokemon,
+                    onPokemonSelected: _applyPokemon,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '${_stat.label}：$result',
-                    style: SecondaryTypography.onCard.h15.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
+                  BattleDraftNotice(combatant: _combatant),
+                  StatPicker(
+                    selected: _stat,
+                    onChanged: (value) {
+                      _edit(() => _stat = value);
+                    },
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    AppZh.companionStatResultHint,
-                    style: SecondaryTypography.onCard.small12.copyWith(
-                      color: TitoColors.mutedInk,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CompanionNumberField(
+                          label: AppZh.companionStatBase,
+                          controller: _combatant.base[_stat]!,
+                          max: 255,
+                          onChanged: (_) {
+                            _edit(() {});
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: CompanionNumberField(
+                          label: AppZh.companionStatLevel,
+                          controller: _combatant.level,
+                          max: 100,
+                          onChanged: (_) => _edit(() {}),
+                        ),
+                      ),
+                    ],
                   ),
-                  // Speed has no slot in the damage formula — no carry-over.
-                  if (_stat != BattleStat.speed) ...[
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: () => _applyToDamage(result),
-                      icon: const Icon(Icons.calculate_rounded, size: 18),
-                      label: Text(_applyToDamageLabel),
-                    ),
-                  ],
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CompanionNumberField(
+                          label: AppZh.companionStatIv,
+                          controller: _combatant.iv[_stat]!,
+                          max: 31,
+                          onChanged: (_) => _edit(() {}),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: CompanionNumberField(
+                          label: AppZh.companionStatEv,
+                          controller: _combatant.ev[_stat]!,
+                          max: 252,
+                          onChanged: (_) => _edit(() {}),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  NaturePicker(
+                    selected: _combatant.nature,
+                    onChanged: (value) =>
+                        _edit(() => _combatant.nature = value),
+                  ),
+                  const SizedBox(height: 8),
+                  BattleMoreOptions(
+                    children: [
+                      CompanionAbilitySection(
+                        compact: true,
+                        pokemonLabel: AppZh.battleAbility,
+                        manualLabel: AppZh.battleAbility,
+                        manualOptions: {
+                          ...kManualDefensiveAbilityOptions,
+                          ...kManualAttackerAbilityOptions,
+                        },
+                        pokemonOptions: defensiveAbilityOptionsFrom(
+                          _combatant.abilities,
+                        ),
+                        linkedPokemonId: _combatant.pokemonId,
+                        selectedSlug: _combatant.abilitySlug,
+                        onChanged: (slug) =>
+                            _edit(() => _combatant.abilitySlug = slug),
+                      ),
+                      const SizedBox(height: 8),
+                      HeldItemPicker(
+                        compact: true,
+                        selected: _combatant.heldItem,
+                        onChanged: (value) =>
+                            _edit(() => _combatant.heldItem = value),
+                      ),
+                      const SizedBox(height: 8),
+                      StatusConditionPicker(
+                        compact: true,
+                        selected: _combatant.status,
+                        onChanged: (value) =>
+                            _edit(() => _combatant.status = value),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppZh.companionStatFacilityNote(scope.facilityLabel),
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ),
           ],
         );
       },

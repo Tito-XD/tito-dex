@@ -333,8 +333,21 @@ DamageEstimate estimateDamage({
   bool defenderScreened = false,
   bool isSpreadMove = false,
   double otherMultiplier = 1,
+  bool ignoreBurn = false,
+  bool usesPhysicalDefense = false,
+  bool teraPowerFloorEligible = false,
 }) {
   final isPhysical = category == MoveCategory.physical;
+  final groundingAbility = defenderAbilitySlug;
+  defenderAbilitySlug = effectiveDefenderAbility(
+    attackerAbilitySlug,
+    defenderAbilitySlug,
+  );
+  final effectiveType = effectiveMoveType(moveType, attackerAbilitySlug);
+  final effectiveTypes =
+      defenderTerastallized && generation >= 9 && defenderTeraType != null
+      ? [defenderTeraType]
+      : defenderTypes;
 
   var effectiveAttack = applyAttackerAbilityToAttackStat(
     attack,
@@ -346,18 +359,55 @@ DamageEstimate estimateDamage({
     isPhysical,
     attackerHeldItem,
   );
-  effectiveAttack = applyStatusToAttackStat(
-    effectiveAttack,
-    isPhysical,
-    attackerStatus,
-  );
-
-  final base = computeBaseDamage(
-    level: level,
-    power: power,
-    attack: effectiveAttack,
-    defense: defense,
-  );
+  if (attackerAbilitySlug == 'guts' &&
+      isPhysical &&
+      attackerStatus != BattleStatusCondition.none) {
+    effectiveAttack = (effectiveAttack * 1.5).floor();
+  }
+  if (attackerAbilitySlug == 'water-bubble' && effectiveType == 'water') {
+    effectiveAttack *= 2;
+  }
+  final halfAttack =
+      (defenderAbilitySlug == 'thick-fat' &&
+          const {'fire', 'ice'}.contains(effectiveType)) ||
+      (const {'heatproof', 'water-bubble'}.contains(defenderAbilitySlug) &&
+          effectiveType == 'fire') ||
+      (defenderAbilitySlug == 'purifying-salt' && effectiveType == 'ghost');
+  if (halfAttack) {
+    effectiveAttack = (effectiveAttack / 2).floor().clamp(1, 99999);
+  }
+  var effectiveDefense = defense;
+  if ((isPhysical || usesPhysicalDefense) &&
+      defenderAbilitySlug == 'fur-coat') {
+    effectiveDefense *= 2;
+  }
+  if (!(isPhysical || usesPhysicalDefense) &&
+      generation >= 4 &&
+      weatherSlug == 'sandstorm' &&
+      effectiveTypes.contains('rock')) {
+    effectiveDefense = (effectiveDefense * 1.5).floor();
+  }
+  if ((isPhysical || usesPhysicalDefense) &&
+      generation >= 9 &&
+      weatherSlug == 'snow' &&
+      effectiveTypes.contains('ice')) {
+    effectiveDefense = (effectiveDefense * 1.5).floor();
+  }
+  var effectivePower = power;
+  if (moveType == 'normal' &&
+      kAbilityMoveTypeConversion.containsKey(attackerAbilitySlug)) {
+    effectivePower = (effectivePower * (generation == 6 ? 1.3 : 1.2)).round();
+  }
+  if (attackerAbilitySlug == 'technician' && power <= 60) {
+    effectivePower = (effectivePower * 1.5).floor();
+  }
+  if (generation >= 9 &&
+      attackerTerastallized &&
+      teraPowerFloorEligible &&
+      attackerTeraType == effectiveType &&
+      effectivePower < 60) {
+    effectivePower = 60;
+  }
 
   final stab = terastalStabMultiplier(
     moveType: moveType,
@@ -371,10 +421,11 @@ DamageEstimate estimateDamage({
   final input = BattleEffectivenessInput(
     defenderTypes: defenderTypes,
     relationsByType: relationsByType,
-    defenderAbilitySlug: defenderAbilitySlug,
+    defenderAbilitySlug: groundingAbility,
     attackerAbilitySlug: attackerAbilitySlug,
     generation: generation,
     weatherSlug: weatherSlug,
+    attackerTypes: attackerTypes,
     terrainSlug: terrainSlug,
     defenderTerastallized: defenderTerastallized,
     defenderTeraType: defenderTeraType,
@@ -384,28 +435,77 @@ DamageEstimate estimateDamage({
   final effectiveMove = effectiveMoveType(moveType, attackerAbilitySlug);
   final type = typeMultiplierForBattleMove(moveType, input);
   final fieldMod = fieldMoveTypeModifier(effectiveMove, input);
+  final weatherMod =
+      kFieldMoveTypeModifiers[weatherSlug]?[effectiveMove] ?? 1.0;
+  final terrainMod = weatherMod == 0 ? 1.0 : fieldMod / weatherMod;
+  // Terrain, type-boosting items and Dry Skin change power, not final damage.
+  final powerItem =
+      attackerHeldItem == BattleHeldItem.typeBoost &&
+          typeBoostItemType == effectiveType
+      ? 1.2
+      : 1.0;
+  final drySkin = defenderAbilitySlug == 'dry-skin' && effectiveType == 'fire'
+      ? 1.25
+      : 1.0;
+  effectivePower =
+      (effectivePower * terrainMod * powerItem * drySkin * otherMultiplier)
+          .floor();
+  final base = computeBaseDamage(
+    level: level,
+    power: effectivePower,
+    attack: effectiveAttack,
+    defense: effectiveDefense,
+  );
+  final rawType = typeMultiplierForMove(
+    moveType,
+    defenderTypes,
+    relationsByType,
+    attackerAbilitySlug: attackerAbilitySlug,
+    generation: generation,
+    defenderTerastallized: defenderTerastallized,
+    defenderTeraType: defenderTeraType,
+  );
   final abilityMod = abilityDamageMultiplier(
-    typeMultiplier: type,
+    typeMultiplier: rawType,
     defenderAbilitySlug: defenderAbilitySlug,
     attackerAbilitySlug: attackerAbilitySlug,
   );
   final defenderMod = defenderAbilityDamageMultiplier(
     isPhysical: isPhysical,
-    defenderAbilitySlug: defenderAbilitySlug,
+    defenderAbilitySlug: defenderAbilitySlug == 'fur-coat'
+        ? null
+        : defenderAbilitySlug,
     isContactMove: isContactMove,
   );
   final itemMod = heldItemDamageMultiplier(
     heldItem: attackerHeldItem,
-    typeMultiplier: type,
-    moveType: moveType,
+    typeMultiplier: rawType,
+    moveType: effectiveType,
     typeBoostItemType: typeBoostItemType,
   );
+  final damageType = type == 0 ? 0.0 : rawType;
+  final fluffyFire = defenderAbilitySlug == 'fluffy' && effectiveType == 'fire'
+      ? 2.0
+      : 1.0;
   // Critical hits: ×2 before Gen 6, ×1.5 since — and they bypass screens.
+  isCriticalHit =
+      isCriticalHit &&
+      !const {'battle-armor', 'shell-armor'}.contains(defenderAbilitySlug);
   final critMod = isCriticalHit ? (generation >= 6 ? 1.5 : 2.0) : 1.0;
-  final screenMod = defenderScreened && !isCriticalHit ? 0.5 : 1.0;
+  final screenMod =
+      defenderScreened && !isCriticalHit && attackerAbilitySlug != 'infiltrator'
+      ? 0.5
+      : 1.0;
   // Doubles: a move hitting multiple targets takes the ×0.75 spread
   // modifier (Gen 3+). Crits do not bypass it.
-  final spreadMod = isSpreadMove ? 0.75 : 1.0;
+  final spreadMod = isSpreadMove ? (generation == 3 ? .5 : .75) : 1.0;
+  final burnMod =
+      isPhysical &&
+          attackerStatus == BattleStatusCondition.burn &&
+          !const {'guts', 'water-bubble'}.contains(attackerAbilitySlug) &&
+          !ignoreBurn
+      ? .5
+      : 1.0;
   final extra =
       fieldMod *
       abilityMod *
@@ -414,10 +514,34 @@ DamageEstimate estimateDamage({
       critMod *
       screenMod *
       spreadMod *
-      otherMultiplier;
-  final modifier = stab * type * extra;
-  final minDamage = (base * modifier * 0.85).floor();
-  final maxDamage = (base * modifier).floor();
+      otherMultiplier *
+      burnMod *
+      (isCriticalHit && attackerAbilitySlug == 'sniper' ? 1.5 : 1.0);
+  // Apply random roll before STAB/type; round between stages rather than
+  // flooring one giant product. This remains an estimate for unmodelled states.
+  int roll(int random) {
+    if (type == 0 || base <= 0) return 0;
+    var damage = (base * spreadMod).floor();
+    damage = (damage * weatherMod).floor();
+    damage = (damage * critMod).floor();
+    damage = damage * random ~/ 100;
+    damage = (damage * stab).floor();
+    damage = (damage * damageType).floor();
+    damage = (damage * burnMod).floor();
+    damage =
+        (damage *
+                abilityMod *
+                defenderMod *
+                (itemMod / powerItem) *
+                screenMod *
+                fluffyFire *
+                (isCriticalHit && attackerAbilitySlug == 'sniper' ? 1.5 : 1.0))
+            .floor();
+    return damage < 1 ? 1 : damage;
+  }
+
+  final minDamage = roll(85);
+  final maxDamage = roll(100);
   final safeHp = defenderHp <= 0 ? 1 : defenderHp;
   final minPercent = minDamage / safeHp * 100;
   final maxPercent = maxDamage / safeHp * 100;
@@ -465,4 +589,24 @@ String _tankVerdict(int minDamage, int maxDamage, int hp) {
     return AppZh.tankPossible2hko;
   }
   return AppZh.tankLikelySurvives;
+}
+
+DamageEstimate fixedDamageEstimate(
+  int damage,
+  int defenderHp,
+  double effectiveness,
+) {
+  final value = effectiveness == 0 ? 0 : damage;
+  final hp = defenderHp > 0 ? defenderHp : 1;
+  return DamageEstimate(
+    minDamage: value,
+    maxDamage: value,
+    minPercent: value / hp * 100,
+    maxPercent: value / hp * 100,
+    verdictZh: _offenseVerdict(value, value, hp),
+    tankVerdictZh: _tankVerdict(value, value, hp),
+    typeMultiplier: effectiveness,
+    stabMultiplier: 1,
+    extraMultiplier: 1,
+  );
 }

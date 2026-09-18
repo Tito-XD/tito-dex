@@ -20,6 +20,88 @@ import '../widgets/handheld_input.dart';
 import '../widgets/retro_forms.dart';
 import '../widgets/sticker_card.dart';
 
+/// Compact selector for side-by-side combatant forms; long labels truncate
+/// only in the field, while the menu can wrap to keep every option readable.
+class CompanionSelectField<T> extends StatelessWidget {
+  const CompanionSelectField({
+    super.key,
+    this.label,
+    required this.value,
+    required this.options,
+    required this.onChanged,
+  });
+  final String? label;
+  final T value;
+  final Map<T, String> options;
+  final ValueChanged<T> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      if (label != null) ...[
+        Text(
+          label!,
+          style: SecondaryTypography.onCard.small12.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+      ],
+      InputDecorator(
+        decoration: retroInsetDecoration(context: context).copyWith(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<T>(
+            value: value,
+            isExpanded: true,
+            itemHeight: null,
+            dropdownColor: TitoSurfaceTokens.of(context).cardFill,
+            style: SecondaryTypography.onCard.body14,
+            selectedItemBuilder: (context) => [
+              for (final text in options.values)
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+            ],
+            items: [
+              for (final entry in options.entries)
+                DropdownMenuItem(
+                  value: entry.key,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(entry.value),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+            onChanged: (next) {
+              if (next != null) {
+                onChanged(next);
+              }
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
 class CompanionNumberField extends StatelessWidget {
   const CompanionNumberField({
     super.key,
@@ -29,6 +111,7 @@ class CompanionNumberField extends StatelessWidget {
     this.min = 0,
     this.hint,
     this.onChanged,
+    this.inline = false,
   });
 
   final String label;
@@ -37,36 +120,47 @@ class CompanionNumberField extends StatelessWidget {
   final int min;
   final String? hint;
   final ValueChanged<String>? onChanged;
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
+    final caption = Text(
+      label,
+      style: SecondaryTypography.onCard.small12.copyWith(
+        fontWeight: FontWeight.w800,
+      ),
+    );
+    final field = TextField(
+      controller: controller,
+      scrollPadding: const EdgeInsets.all(64),
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      style: SecondaryTypography.onCard.body14.copyWith(
+        fontWeight: FontWeight.w800,
+      ),
+      decoration: retroInsetDecoration(context: context, hintText: hint)
+          .copyWith(
+            isDense: true,
+            constraints: const BoxConstraints(minHeight: 44),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: inline ? 8 : 12,
+              vertical: 10,
+            ),
+          ),
+      onChanged: onChanged,
+    );
+    if (inline) {
+      return Row(
+        children: [
+          Expanded(child: caption),
+          const SizedBox(width: 6),
+          Expanded(child: field),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-          decoration: retroInsetDecoration(context: context, hintText: hint)
-              .copyWith(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-              ),
-          onChanged: onChanged,
-        ),
-      ],
+      children: [caption, const SizedBox(height: 4), field],
     );
   }
 
@@ -202,7 +296,7 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         HandheldFocusDecorator(
           onActivate: () => setState(() => _expanded = !_expanded),
           borderRadius: BorderRadius.circular(TitoRadii.md),
@@ -212,9 +306,10 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
               onTap: () => setState(() => _expanded = !_expanded),
               borderRadius: BorderRadius.circular(TitoRadii.md),
               child: Ink(
+                height: 44,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 8,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: appVisualStyle.usesFlatUi
@@ -278,8 +373,8 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 6,
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 64,
               mainAxisSpacing: 6,
               crossAxisSpacing: 6,
               childAspectRatio: 1,
@@ -351,15 +446,18 @@ class CompanionSectionCard extends StatelessWidget {
     required this.title,
     required this.children,
     this.subtitle,
+    this.padding,
   });
 
   final String title;
   final String? subtitle;
+  final EdgeInsets? padding;
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
     return StickerCard(
+      padding: padding ?? const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -374,7 +472,7 @@ class CompanionSectionCard extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 12),
+          SizedBox(height: padding == null ? 12 : 8),
           ...children,
         ],
       ),
@@ -393,35 +491,12 @@ class NaturePicker extends StatelessWidget {
   final ValueChanged<NatureModifier> onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppZh.natureLabel,
-          style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 6),
-        DropdownMenu<NatureModifier>(
-          initialSelection: selected,
-          dropdownMenuEntries: [
-            for (final nature in battleNatures)
-              DropdownMenuEntry(value: nature, label: nature.label),
-          ],
-          onSelected: (value) {
-            if (value != null) {
-              onChanged(value);
-            }
-          },
-          textStyle: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => CompanionSelectField<NatureModifier>(
+    label: AppZh.natureLabel,
+    value: selected,
+    options: {for (final value in battleNatures) value: value.label},
+    onChanged: onChanged,
+  );
 }
 
 class StatPicker extends StatelessWidget {
@@ -435,35 +510,12 @@ class StatPicker extends StatelessWidget {
   final ValueChanged<BattleStat> onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppZh.statLabel,
-          style: SecondaryTypography.onCard.small12.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 6),
-        DropdownMenu<BattleStat>(
-          initialSelection: selected,
-          dropdownMenuEntries: [
-            for (final stat in BattleStat.values)
-              DropdownMenuEntry(value: stat, label: stat.label),
-          ],
-          onSelected: (value) {
-            if (value != null) {
-              onChanged(value);
-            }
-          },
-          textStyle: SecondaryTypography.onCard.body14.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => CompanionSelectField<BattleStat>(
+    label: AppZh.statLabel,
+    value: selected,
+    options: {for (final value in BattleStat.values) value: value.label},
+    onChanged: onChanged,
+  );
 }
 
 class MoveCategoryPicker extends StatelessWidget {
@@ -563,6 +615,7 @@ class PokemonSearchField extends StatelessWidget {
     required this.onQueryChanged,
     required this.onPokemonSelected,
     this.prefixIcon = Icons.search_rounded,
+    this.compact = false,
   });
 
   final TextEditingController controller;
@@ -571,6 +624,7 @@ class PokemonSearchField extends StatelessWidget {
   final ValueChanged<String> onQueryChanged;
   final ValueChanged<PokemonSummary> onPokemonSelected;
   final IconData prefixIcon;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -580,10 +634,20 @@ class PokemonSearchField extends StatelessWidget {
         TextField(
           controller: controller,
           onChanged: onQueryChanged,
+          scrollPadding: const EdgeInsets.all(64),
+          style: compact ? SecondaryTypography.onCard.body14 : null,
           // Fill / outline / focus come from the theme's field look.
           decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: Icon(prefixIcon),
+            isDense: compact ? true : null,
+            constraints: compact ? const BoxConstraints(minHeight: 44) : null,
+            hintText: compact ? AppZh.companionPokemonSearchHint : hintText,
+            prefixIcon: Icon(prefixIcon, size: compact ? 18 : null),
+            prefixIconConstraints: compact
+                ? const BoxConstraints(minWidth: 28)
+                : null,
+            contentPadding: compact
+                ? const EdgeInsets.symmetric(horizontal: 6, vertical: 10)
+                : null,
           ),
         ),
         if (suggestions.isNotEmpty) ...[
@@ -665,6 +729,7 @@ class CompanionAbilitySection extends StatelessWidget {
     required this.linkedPokemonId,
     required this.selectedSlug,
     required this.onChanged,
+    this.compact = false,
   });
 
   final String pokemonLabel;
@@ -674,9 +739,29 @@ class CompanionAbilitySection extends StatelessWidget {
   final int? linkedPokemonId;
   final String? selectedSlug;
   final ValueChanged<String?> onChanged;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      if (pokemonOptions.isEmpty && linkedPokemonId != null) {
+        return const SizedBox.shrink();
+      }
+      final options = pokemonOptions.isNotEmpty
+          ? {
+              for (final option in pokemonOptions)
+                option.slug: option.isHidden
+                    ? AppZh.companionHiddenAbilityOption(option.labelZh)
+                    : option.labelZh,
+            }
+          : manualOptions;
+      return CompanionSelectField<String>(
+        label: pokemonOptions.isNotEmpty ? pokemonLabel : manualLabel,
+        value: options.containsKey(selectedSlug) ? selectedSlug! : '',
+        options: {'': AppZh.dexNone, ...options},
+        onChanged: (value) => onChanged(value.isEmpty ? null : value),
+      );
+    }
     if (pokemonOptions.isNotEmpty) {
       return AbilityChipPicker(
         label: pokemonLabel,
@@ -986,12 +1071,14 @@ class HeldItemPicker extends StatelessWidget {
     required this.onChanged,
     this.typeBoostItemType,
     this.onTypeBoostChanged,
+    this.compact = false,
   });
 
   final BattleHeldItem selected;
   final ValueChanged<BattleHeldItem> onChanged;
   final String? typeBoostItemType;
   final ValueChanged<String?>? onTypeBoostChanged;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -1005,18 +1092,27 @@ class HeldItemPicker extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: BattleHeldItem.values.map((item) {
-            return FilterChip(
-              selected: selected == item,
-              showCheckmark: false,
-              label: Text(item.label),
-              onSelected: (_) => onChanged(item),
-            );
-          }).toList(),
-        ),
+        if (compact)
+          CompanionSelectField<BattleHeldItem>(
+            value: selected,
+            options: {
+              for (final item in BattleHeldItem.values) item: item.label,
+            },
+            onChanged: onChanged,
+          )
+        else
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: BattleHeldItem.values.map((item) {
+              return FilterChip(
+                selected: selected == item,
+                showCheckmark: false,
+                label: Text(item.label),
+                onSelected: (_) => onChanged(item),
+              );
+            }).toList(),
+          ),
         if (selected == BattleHeldItem.typeBoost &&
             onTypeBoostChanged != null) ...[
           const SizedBox(height: 8),
@@ -1041,10 +1137,12 @@ class StatusConditionPicker extends StatelessWidget {
     super.key,
     required this.selected,
     required this.onChanged,
+    this.compact = false,
   });
 
   final BattleStatusCondition selected;
   final ValueChanged<BattleStatusCondition> onChanged;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -1058,18 +1156,28 @@ class StatusConditionPicker extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: BattleStatusCondition.values.map((status) {
-            return FilterChip(
-              selected: selected == status,
-              showCheckmark: false,
-              label: Text(status.label),
-              onSelected: (_) => onChanged(status),
-            );
-          }).toList(),
-        ),
+        if (compact)
+          CompanionSelectField<BattleStatusCondition>(
+            value: selected,
+            options: {
+              for (final status in BattleStatusCondition.values)
+                status: status.label,
+            },
+            onChanged: onChanged,
+          )
+        else
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: BattleStatusCondition.values.map((status) {
+              return FilterChip(
+                selected: selected == status,
+                showCheckmark: false,
+                label: Text(status.label),
+                onSelected: (_) => onChanged(status),
+              );
+            }).toList(),
+          ),
       ],
     );
   }

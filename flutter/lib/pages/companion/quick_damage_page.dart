@@ -1,11 +1,19 @@
+import '../../features/companion/battle_party_damage.dart';
+import '../../features/companion/battle_move_rules.dart';
+import '../../features/companion/battle_learnset.dart';
+import '../../widgets/battle_move_picker.dart';
+import '../../l10n/app_locale.dart';
+import '../../widgets/battle_team_editor.dart';
+import '../../widgets/battle_party_results.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/companion/battle_game_scope.dart';
+import '../../features/companion/battle_session.dart';
+import '../../widgets/battle_party_picker.dart';
 import '../../features/companion/battle_handoff.dart';
 import '../../features/companion/battle_math.dart';
 import '../../features/companion/battle_tools_service.dart';
 import '../../features/dex/battle_effectiveness.dart';
-import '../../features/dex/ability_type_modifiers.dart';
 import '../../features/dex/dex_models.dart';
 import '../../features/dex/dex_repository.dart';
 import '../../features/dex/type_chart.dart';
@@ -14,11 +22,11 @@ import '../../l10n/app_zh.dart';
 import '../../models/journey.dart';
 import '../../theme/app_visual_style.dart';
 import '../../theme/error_text.dart';
-import '../../theme/device_layout.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/trainer_journal.dart';
 import '../../widgets/companion_tool_fields.dart';
+import '../../widgets/battle_tool_panels.dart';
 import '../../widgets/secondary_page_scaffold.dart';
 import '../../widgets/sticker_card.dart';
 import '../../widgets/tito_loading_panel.dart';
@@ -28,47 +36,62 @@ class QuickDamagePage extends StatefulWidget {
     super.key,
     required this.journey,
     this.embedded = false,
+    this.session,
   });
 
   final CurrentJourney journey;
   final bool embedded;
+  final BattleSession? session;
 
   @override
   State<QuickDamagePage> createState() => _QuickDamagePageState();
 }
 
 class _QuickDamagePageState extends State<QuickDamagePage> {
-  final _attackerQueryController = TextEditingController();
-  final _defenderQueryController = TextEditingController();
-  final _levelController = TextEditingController(text: '50');
-  final _powerController = TextEditingController(text: '80');
-  final _attackController = TextEditingController(text: '100');
-  final _defenseController = TextEditingController(text: '100');
-  final _hpController = TextEditingController(text: '150');
+  late final BattleSession _session =
+      widget.session ??
+      BattleSession(
+        level: battleScopeForEdition(
+          gameEditionRepository.edition,
+        ).defaultLevel,
+      );
+  void _edit(VoidCallback change) {
+    setState(change);
+    _session.changed();
+  }
 
-  MoveCategory _category = MoveCategory.physical;
-  String _moveType = 'normal';
-  List<String> _attackerTypes = const ['normal'];
-  List<String> _defenderTypes = const ['normal'];
-  String? _defenderAbilitySlug;
-  String? _attackerAbilitySlug;
-  int? _linkedDefenderId;
-  int? _linkedAttackerId;
-  bool _defenderTerastallized = false;
-  String? _defenderTeraType;
-  bool _attackerTerastallized = false;
-  String? _attackerTeraType;
-  BattleHeldItem _heldItem = BattleHeldItem.none;
-  String? _typeBoostItemType;
-  BattleStatusCondition _attackerStatus = BattleStatusCondition.none;
-  bool _isContactMove = false;
+  CachedMove? _selectedMove;
+  int? _movePokemonId;
+  String? _moveVersion;
   bool _isCriticalHit = false;
   bool _defenderScreened = false;
   bool _isSpreadMove = false;
-  List<DefensiveAbilityOption> _defenderAbilityOptions = const [];
-  List<DefensiveAbilityOption> _attackerAbilityOptions = const [];
   FieldCondition _weather = FieldCondition.none;
   TerrainCondition _terrain = TerrainCondition.none;
+  BattleMoveProfile? get _profile => battleMoveProfile(
+    _selectedMove,
+    battleScopeForEdition(gameEditionRepository.edition).generation,
+    attacker: _session.attacker,
+    weather: _weather.slug,
+  );
+  MoveCategory get _damageCategory => _profile == null
+      ? _session.category
+      : _profile!.physical
+      ? MoveCategory.physical
+      : MoveCategory.special;
+  BattleStat get _attackStat => battleOffensiveStat(
+    _selectedMove,
+    _damageCategory == MoveCategory.physical,
+  );
+  BattleStat get _defenseStat => battleDefensiveStat(
+    _selectedMove,
+    _damageCategory == MoveCategory.physical,
+  );
+  TextEditingController get _attackController =>
+      (_selectedMove?.id == 492 ? _session.defender : _session.attacker)
+          .raw[_attackStat]!;
+  TextEditingController get _defenseController =>
+      _session.defender.raw[_defenseStat]!;
   Map<String, TypeDamageRelations>? _relations;
   String? _error;
   bool _loading = true;
@@ -78,44 +101,15 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   @override
   void initState() {
     super.initState();
-    final scope = battleScopeForEdition(gameEditionRepository.edition);
-    _levelController.text = scope.defaultLevel.toString();
-    _consumeStatHandoff();
     _relations = battleToolsService.cachedTypeRelations;
     _loading = _relations == null;
     if (_loading) _loadRelations();
-    battleStatHandoff.addListener(_consumeStatHandoff);
     WidgetsBinding.instance.addPostFrameCallback((_) => _consumePartyHandoff());
-  }
-
-  void _consumeStatHandoff() {
-    if (battleStatHandoff.isEmpty) return;
-    final handoff = battleStatHandoff;
-    if (handoff.attack != null) {
-      _attackController.text = '${handoff.attack}';
-    }
-    if (handoff.defense != null) {
-      _defenseController.text = '${handoff.defense}';
-    }
-    if (handoff.hp != null) {
-      _hpController.text = '${handoff.hp}';
-    }
-    battleStatHandoff.clear(notify: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() {});
-    });
   }
 
   @override
   void dispose() {
-    battleStatHandoff.removeListener(_consumeStatHandoff);
-    _attackerQueryController.dispose();
-    _defenderQueryController.dispose();
-    _levelController.dispose();
-    _powerController.dispose();
-    _attackController.dispose();
-    _defenseController.dispose();
-    _hpController.dispose();
+    if (widget.session == null) _session.dispose();
     super.dispose();
   }
 
@@ -125,7 +119,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       if (!mounted) {
         return;
       }
-      setState(() {
+      _edit(() {
         _relations = relations;
         _loading = false;
       });
@@ -133,7 +127,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
       if (!mounted) {
         return;
       }
-      setState(() {
+      _edit(() {
         _error = formatUserFacingError(error);
         _loading = false;
       });
@@ -141,7 +135,7 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   }
 
   void _retryLoadRelations() {
-    setState(() {
+    _edit(() {
       _loading = true;
       _error = null;
     });
@@ -164,643 +158,522 @@ class _QuickDamagePageState extends State<QuickDamagePage> {
   }) async {
     final speciesId = member.speciesId;
     if (speciesId == null) return;
-    CachedMove? selectedMove;
-    final moveId =
-        preferredMoveId ??
-        (member.moveIds.isEmpty ? null : member.moveIds.first);
-    if (moveId != null) {
-      for (final move in await dexRepository.getAllMoves()) {
-        if (move.id == moveId) {
-          selectedMove = move;
-          break;
-        }
-      }
-    }
-    if (selectedMove?.category == 'status') selectedMove = null;
-    if (selectedMove != null && mounted) {
-      setState(() {
-        _category = switch (selectedMove!.category) {
-          'special' => MoveCategory.special,
-          _ => MoveCategory.physical,
-        };
-        _moveType = selectedMove.type;
-        if (selectedMove.power != null) {
-          _powerController.text = '${selectedMove.power}';
-        }
-      });
-    }
     final summary = await dexRepository.getSummary(speciesId);
-    await _applyAttacker(summary);
     if (!mounted) return;
-    if (member.level != null) _levelController.text = '${member.level}';
-    final abilityId = member.abilityId;
-    var preferredAbility = member.abilitySlug;
-    if (preferredAbility == null && abilityId != null) {
-      for (final ability in await dexRepository.getAllAbilities()) {
-        if (ability.id == abilityId) {
-          preferredAbility = abilitySlugFromNameEn(ability.nameEn);
-          break;
-        }
-      }
-    }
-    if (preferredAbility != null &&
-        _attackerAbilityOptions.any(
-          (option) => option.slug == preferredAbility,
-        )) {
-      setState(() => _attackerAbilitySlug = preferredAbility);
-    }
+    await _session.attacker.selectPokemon(summary, member: member);
+    if (!mounted) return;
+    final legal = battleLearnset(
+      _session.attacker.detail,
+      gameEditionRepository.edition.dataVersionGroupKey,
+    );
+    final moveId = preferredMoveId ?? member.moveIds.firstOrNull;
+    final move = legal.where((m) => m.id == moveId).firstOrNull;
+    if (move != null) _chooseMove(move);
   }
+
+  void _chooseMove(CachedMove? move) => _edit(() {
+    _selectedMove = move;
+    _movePokemonId = _session.attacker.pokemonId;
+    _moveVersion = gameEditionRepository.edition.dataVersionGroupKey;
+    _session.category = move?.category == 'special'
+        ? MoveCategory.special
+        : MoveCategory.physical;
+  });
 
   Future<void> _searchAttacker(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      setState(() => _attackerSuggestions = const []);
+      _edit(() => _attackerSuggestions = const []);
       return;
     }
     final results = await dexRepository.search(trimmed);
-    if (!mounted || _attackerQueryController.text.trim() != trimmed) {
+    if (!mounted || _session.attacker.query.text.trim() != trimmed) {
       return;
     }
-    setState(() => _attackerSuggestions = results.take(6).toList());
+    _edit(() => _attackerSuggestions = results.take(6).toList());
   }
 
   Future<void> _searchDefender(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      setState(() => _defenderSuggestions = const []);
+      _edit(() => _defenderSuggestions = const []);
       return;
     }
     final results = await dexRepository.search(trimmed);
-    if (!mounted || _defenderQueryController.text.trim() != trimmed) {
+    if (!mounted || _session.defender.query.text.trim() != trimmed) {
       return;
     }
-    setState(() => _defenderSuggestions = results.take(6).toList());
+    _edit(() => _defenderSuggestions = results.take(6).toList());
   }
 
   Future<void> _applyAttacker(PokemonSummary summary) async {
-    final detail = await dexRepository.getDetail(summary.id);
-    final stats = detail.baseStats;
-    if (stats == null) {
-      return;
-    }
-    final attackStat = _category == MoveCategory.physical
-        ? stats.attack
-        : stats.specialAttack;
-    if (!mounted) {
-      return;
-    }
-    final generation = battleScopeForEdition(
-      gameEditionRepository.edition,
-    ).generation;
-    setState(() {
-      _attackerTypes = List<String>.from(summary.types);
-      _attackController.text = attackStat.toString();
-      _attackerSuggestions = const [];
-      _attackerQueryController.text = summary.nameZh;
-      _linkedAttackerId = summary.id;
-      _attackerAbilityOptions = const [];
-      _attackerAbilitySlug = null;
-      _attackerTerastallized = false;
-      _attackerTeraType = defaultTeraTypeFor(summary.types, generation);
-    });
-    await _loadAttackerAbilities(summary.id);
+    _edit(() => _attackerSuggestions = const []);
+    await _session.attacker.selectPokemon(summary);
   }
 
   Future<void> _applyDefender(PokemonSummary summary) async {
-    final detail = await dexRepository.getDetail(summary.id);
-    final stats = detail.baseStats;
-    if (stats == null) {
-      return;
-    }
-    final defenseStat = _category == MoveCategory.physical
-        ? stats.defense
-        : stats.specialDefense;
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _defenderTypes = List<String>.from(summary.types);
-      _defenseController.text = defenseStat.toString();
-      _hpController.text = stats.hp.toString();
-      _defenderSuggestions = const [];
-      _defenderQueryController.text = summary.nameZh;
-      _linkedDefenderId = summary.id;
-      _defenderAbilityOptions = const [];
-      _defenderAbilitySlug = null;
-      _defenderTeraType = defaultTeraTypeFor(
-        summary.types,
-        battleScopeForEdition(gameEditionRepository.edition).generation,
-      );
-    });
-    _loadDefenderAbilities(summary.id);
+    _edit(() => _defenderSuggestions = const []);
+    await _session.defender.selectPokemon(summary);
   }
 
-  void _clearLinkedDefender() {
-    setState(() {
-      _linkedDefenderId = null;
-      _defenderAbilityOptions = const [];
-      _defenderAbilitySlug = null;
-    });
-  }
-
-  void _clearLinkedAttacker() {
-    setState(() {
-      _linkedAttackerId = null;
-      _attackerAbilityOptions = const [];
-      _attackerAbilitySlug = null;
-    });
-  }
-
-  Future<void> _loadAttackerAbilities(int pokemonId) async {
-    try {
-      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
-      if (!mounted || _linkedAttackerId != pokemonId) {
-        return;
-      }
-      final options = attackerAbilityOptionsFromPokemon(abilities);
-      setState(() {
-        _attackerAbilityOptions = options;
-        _attackerAbilitySlug = defaultAbilitySlugForOptions(options);
-      });
-    } catch (error) {
-      debugPrint('Failed to load attacker ability options: $error');
-    }
-  }
-
-  Future<void> _loadDefenderAbilities(int pokemonId) async {
-    try {
-      final abilities = await dexRepository.abilitiesForPokemon(pokemonId);
-      if (!mounted || _linkedDefenderId != pokemonId) {
-        return;
-      }
-      final options = defensiveAbilityOptionsFrom(abilities);
-      setState(() {
-        _defenderAbilityOptions = options;
-        _defenderAbilitySlug = defaultAbilitySlugForOptions(options);
-      });
-    } catch (error) {
-      debugPrint('Failed to load defender ability options: $error');
-    }
-  }
-
-  int _readInt(TextEditingController controller, int fallback) =>
-      int.tryParse(controller.text.trim()) ?? fallback;
+  void _clearLinkedAttacker() => _edit(_session.attacker.clearIdentity);
+  void _clearLinkedDefender() => _edit(_session.defender.clearIdentity);
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: gameEditionRepository,
+      listenable: Listenable.merge([gameEditionRepository, _session]),
       builder: (context, _) {
         final edition = gameEditionRepository.edition;
         final scope = battleScopeForEdition(edition);
         final relations = _relations;
-        DamageEstimate? estimate;
-        if (relations != null) {
-          estimate = estimateDamage(
-            level: _readInt(_levelController, scope.defaultLevel),
-            power: _readInt(_powerController, 80),
-            attack: _readInt(_attackController, 100),
-            defense: _readInt(_defenseController, 100),
-            defenderHp: _readInt(_hpController, 150),
-            moveType: _moveType,
-            attackerTypes: _attackerTypes,
-            defenderTypes: _defenderTypes,
-            relationsByType: relations,
-            defenderAbilitySlug: _defenderAbilitySlug,
-            attackerAbilitySlug: _attackerAbilitySlug,
-            generation: scope.generation,
-            weatherSlug: _weather.slug.isEmpty ? null : _weather.slug,
-            terrainSlug: _terrain.slug.isEmpty ? null : _terrain.slug,
-            category: _category,
-            defenderTerastallized: _defenderTerastallized,
-            defenderTeraType: _defenderTeraType,
-            attackerTerastallized: _attackerTerastallized,
-            attackerTeraType: _attackerTeraType,
-            attackerHeldItem: _heldItem,
-            typeBoostItemType: _typeBoostItemType,
-            attackerStatus: _attackerStatus,
-            isContactMove: _isContactMove,
-            isCriticalHit: _isCriticalHit,
-            defenderScreened: _defenderScreened,
-            isSpreadMove: _isSpreadMove,
-          );
-        }
+        final selectedMove =
+            _movePokemonId == _session.attacker.pokemonId &&
+                _moveVersion == edition.dataVersionGroupKey
+            ? battleLearnset(
+                _session.attacker.detail,
+                edition.dataVersionGroupKey,
+              ).where((m) => m.id == _selectedMove?.id).firstOrNull
+            : null;
+        final estimate = relations == null
+            ? null
+            : estimatePartyMove(
+                attacker: _session.attacker,
+                defender: _session.defender,
+                move: selectedMove,
+                relations: relations,
+                generation: scope.generation,
+                weatherSlug: _weather.slug,
+                terrainSlug: _terrain.slug,
+                critical: _isCriticalHit,
+                screened: _defenderScreened,
+                spread: _isSpreadMove,
+              );
+        final profile = battleMoveProfile(
+          selectedMove,
+          scope.generation,
+          attacker: _session.attacker,
+          weather: _weather.slug,
+        );
 
-        // v0.6.7: the estimate pins under the app bar (compact card) while
-        // the long form scrolls below — result-first layout.
-        final pagePadding = DeviceLayout.pagePadding(context);
-        return Material(
-          type: MaterialType.transparency,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (!widget.embedded)
-                Padding(
-                  padding: pagePadding.copyWith(bottom: 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SecondaryPageAppBar(
-                        title: AppZh.companionToolQuickDamage,
-                      ),
-                      const SizedBox(height: 6),
-                      SecondaryPageSubtitle(text: edition.label),
-                    ],
+        // The full estimate leads one continuous page; a small live summary
+        // takes over only after it scrolls out of view.
+        return CompanionToolScaffold(
+          transitionKey: _session.teamMode,
+          embedded: widget.embedded,
+          title: AppZh.companionToolQuickDamage,
+          subtitle: edition.label,
+          resultSummary: _session.teamMode && relations != null
+              ? BattlePartyResults(
+                  session: _session,
+                  party: widget.journey.party,
+                  compact: true,
+                  relations: relations,
+                  generation: scope.generation,
+                  weatherSlug: _weather.slug,
+                  terrainSlug: _terrain.slug,
+                  critical: _isCriticalHit,
+                  screened: _defenderScreened,
+                  spread: _isSpreadMove,
+                )
+              : Text(
+                  estimate == null
+                      ? AppZh.companionDamageResultTitle
+                      : '${estimate.minDamage}–${estimate.maxDamage} HP · ${estimate.minPercent.toStringAsFixed(1)}–${estimate.maxPercent.toStringAsFixed(1)}%',
+                ),
+          result: _session.teamMode && relations != null
+              ? BattlePartyResults(
+                  session: _session,
+                  party: widget.journey.party,
+                  relations: relations,
+                  generation: scope.generation,
+                  weatherSlug: _weather.slug,
+                  terrainSlug: _terrain.slug,
+                  critical: _isCriticalHit,
+                  screened: _defenderScreened,
+                  spread: _isSpreadMove,
+                )
+              : estimate != null
+              ? _DamageResultCard(estimate: estimate, compact: true)
+              : StickerCard(
+                  child: Text(
+                    selectedMove == null
+                        ? AppLocale.pick(
+                            zh: '选择进攻方和它在当前游戏可学的招式，即可计算伤害。',
+                            en: 'Choose an attacker and a move it can learn in this game.',
+                          )
+                        : battleMoveIssue(
+                                _session.attacker,
+                                _session.defender,
+                                selectedMove,
+                                scope.generation,
+                              ) ??
+                              AppZh.battleTeamMoveUnsupported,
+                    style: SecondaryTypography.onCard.body14,
                   ),
                 ),
-              if (estimate != null)
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    pagePadding.left,
-                    12,
-                    pagePadding.right,
-                    0,
-                  ),
-                  child: _DamageResultCard(estimate: estimate, compact: true),
-                ),
-              Expanded(
-                child: ListView(
-                  padding: pagePadding.copyWith(top: 12, bottom: 96),
+          scopeSelector: BattleSegmentedControl<bool>(
+            key: const ValueKey('battle-scope'),
+            value: _session.teamMode,
+            options: {
+              false: AppZh.battleDuelAnalysis,
+              true: AppZh.battleTeamAnalysis,
+            },
+            onChanged: (value) => _edit(() => _session.teamMode = value),
+          ),
+          children: [
+            if (_loading)
+              TitoLoadingPanel(message: AppZh.companionLoading, compact: true)
+            else if (_error != null)
+              StickerCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_loading)
-                      TitoLoadingPanel(
-                        message: AppZh.companionLoading,
-                        compact: true,
-                      )
-                    else if (_error != null)
-                      StickerCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _error!,
-                              style: SecondaryTypography.onCard.small12
-                                  .copyWith(
-                                    color: TitoColors.mutedInk,
-                                    height: 1.45,
-                                  ),
-                            ),
-                            const SizedBox(height: 12),
-                            FilledButton.icon(
-                              onPressed: _retryLoadRelations,
-                              icon: const Icon(Icons.refresh_rounded, size: 18),
-                              label: Text(AppZh.dexRetry),
-                            ),
-                          ],
-                        ),
-                      )
-                    else ...[
-                      CompanionSectionCard(
-                        title: AppZh.companionDamageInputsTitle,
-                        subtitle: scope.damageNote,
-                        children: [
-                          Text(
-                            AppZh.companionDamageFacility(scope.facilityLabel),
-                            style: SecondaryTypography.onCard.small12.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: TitoColors.deepBlue,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          if (widget.journey.party.isNotEmpty) ...[
-                            Text(
-                              AppZh.importFromParty,
-                              style: SecondaryTypography.onCard.small12
-                                  .copyWith(fontWeight: FontWeight.w800),
-                            ),
-                            const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
-                              children: [
-                                for (final member in widget.journey.party)
-                                  ActionChip(
-                                    label: Text(
-                                      member.nickname ?? member.species,
-                                    ),
-                                    onPressed: () => _applyPartyMember(member),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                          ],
-                          PokemonSearchField(
-                            controller: _attackerQueryController,
-                            hintText: AppZh.companionAttackerSearchHint,
-                            suggestions: _attackerSuggestions,
-                            onQueryChanged: _searchAttacker,
-                            onPokemonSelected: _applyAttacker,
-                            prefixIcon: Icons.sports_martial_arts_rounded,
-                          ),
-                          const SizedBox(height: 12),
-                          PokemonSearchField(
-                            controller: _defenderQueryController,
-                            hintText: AppZh.companionDefenderSearchHint,
-                            suggestions: _defenderSuggestions,
-                            onQueryChanged: _searchDefender,
-                            onPokemonSelected: _applyDefender,
-                            prefixIcon: Icons.shield_rounded,
-                          ),
-                          const SizedBox(height: 12),
-                          MoveCategoryPicker(
-                            selected: _category,
-                            onChanged: (value) =>
-                                setState(() => _category = value),
-                          ),
-                          const SizedBox(height: 12),
-                          CollapsibleTypePicker(
-                            label: AppZh.companionMoveType,
-                            selected: [_moveType],
-                            maxSelected: 1,
-                            onChanged: (types) {
-                              if (types.isNotEmpty) {
-                                setState(() => _moveType = types.first);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          LinkedOrManualTypePicker(
-                            linkedPokemonId: _linkedAttackerId,
-                            label: AppZh.companionTypeAttackerPick,
-                            selected: _attackerTypes,
-                            onManualChanged: (types) {
-                              setState(() => _attackerTypes = types);
-                              _clearLinkedAttacker();
-                            },
-                          ),
-                          const SizedBox(height: 12),
-                          LinkedOrManualTypePicker(
-                            linkedPokemonId: _linkedDefenderId,
-                            label: AppZh.companionTypeManualPick,
-                            selected: _defenderTypes,
-                            onManualChanged: (types) {
-                              if (types.isNotEmpty) {
-                                setState(() {
-                                  _defenderTypes = types;
-                                  _defenderTeraType = defaultTeraTypeFor(
-                                    types,
-                                    scope.generation,
-                                  );
-                                });
-                                _clearLinkedDefender();
-                              }
-                            },
-                          ),
-                          if (scope.generation >= 9) ...[
-                            const SizedBox(height: 12),
-                            TerastalPicker(
-                              label: AppZh.companionDefenderTerastal,
-                              enabled: true,
-                              terastallized: _defenderTerastallized,
-                              teraType: _defenderTeraType,
-                              fallbackTypes: _defenderTypes,
-                              generation: scope.generation,
-                              onTerastallizedChanged: (value) => setState(
-                                () => _defenderTerastallized = value,
-                              ),
-                              onTeraTypeChanged: (type) =>
-                                  setState(() => _defenderTeraType = type),
-                            ),
-                            const SizedBox(height: 12),
-                            TerastalPicker(
-                              label: AppZh.companionAttackerTerastal,
-                              enabled: true,
-                              terastallized: _attackerTerastallized,
-                              teraType: _attackerTeraType,
-                              fallbackTypes: _attackerTypes,
-                              generation: scope.generation,
-                              onTerastallizedChanged: (value) => setState(
-                                () => _attackerTerastallized = value,
-                              ),
-                              onTeraTypeChanged: (type) =>
-                                  setState(() => _attackerTeraType = type),
-                            ),
-                          ],
-                          if (_defenderAbilityOptions.isNotEmpty ||
-                              _linkedDefenderId == null) ...[
-                            const SizedBox(height: 12),
-                            CompanionAbilitySection(
-                              pokemonLabel: AppZh.companionDefenderAbilityPick,
-                              manualLabel: AppZh.companionManualAbilityPick,
-                              manualOptions: kManualDefensiveAbilityOptions,
-                              pokemonOptions: _defenderAbilityOptions,
-                              linkedPokemonId: _linkedDefenderId,
-                              selectedSlug: _defenderAbilitySlug,
-                              onChanged: (slug) =>
-                                  setState(() => _defenderAbilitySlug = slug),
-                            ),
-                          ],
-                          if (_attackerAbilityOptions.isNotEmpty ||
-                              _linkedAttackerId == null) ...[
-                            const SizedBox(height: 12),
-                            CompanionAbilitySection(
-                              pokemonLabel: AppZh.companionAttackerAbilityPick,
-                              manualLabel: AppZh.companionAttackerAbilityPick,
-                              manualOptions: kManualAttackerAbilityOptions,
-                              pokemonOptions: _attackerAbilityOptions,
-                              linkedPokemonId: _linkedAttackerId,
-                              selectedSlug: _attackerAbilitySlug,
-                              onChanged: (slug) =>
-                                  setState(() => _attackerAbilitySlug = slug),
-                            ),
-                          ],
-                          const SizedBox(height: 12),
-                          FieldConditionPicker(
-                            label: AppZh.companionWeatherPick,
-                            selected: _weather,
-                            onChanged: (value) =>
-                                setState(() => _weather = value),
-                          ),
-                          const SizedBox(height: 12),
-                          TerrainConditionPicker(
-                            label: AppZh.companionTerrainPick,
-                            selected: _terrain,
-                            onChanged: (value) =>
-                                setState(() => _terrain = value),
-                          ),
-                          const SizedBox(height: 12),
-                          HeldItemPicker(
-                            selected: _heldItem,
-                            onChanged: (value) =>
-                                setState(() => _heldItem = value),
-                            typeBoostItemType: _typeBoostItemType,
-                            onTypeBoostChanged: (type) =>
-                                setState(() => _typeBoostItemType = type),
-                          ),
-                          const SizedBox(height: 12),
-                          StatusConditionPicker(
-                            selected: _attackerStatus,
-                            onChanged: (value) =>
-                                setState(() => _attackerStatus = value),
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              ContactMoveToggle(
-                                value: _isContactMove,
-                                onChanged: (value) =>
-                                    setState(() => _isContactMove = value),
-                              ),
-                              BattleToggleChip(
-                                label: AppZh.companionCriticalHit,
-                                value: _isCriticalHit,
-                                onChanged: (value) =>
-                                    setState(() => _isCriticalHit = value),
-                              ),
-                              BattleToggleChip(
-                                label: AppZh.companionDefenderScreen,
-                                value: _defenderScreened,
-                                onChanged: (value) =>
-                                    setState(() => _defenderScreened = value),
-                              ),
-                              BattleToggleChip(
-                                label: AppZh.companionSpreadMove,
-                                value: _isSpreadMove,
-                                onChanged: (value) =>
-                                    setState(() => _isSpreadMove = value),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          CompanionNumberField(
-                            label: AppZh.companionStatLevel,
-                            controller: _levelController,
-                            max: 100,
-                            onChanged: (_) => setState(() {}),
-                          ),
-                          const SizedBox(height: 12),
-                          _PowerSliderRow(
-                            controller: _powerController,
-                            onChanged: () => setState(() {}),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CompanionNumberField(
-                                  label: _category == MoveCategory.physical
-                                      ? AppZh.companionAttackStat
-                                      : AppZh.companionSpAttackStat,
-                                  controller: _attackController,
-                                  max: 999,
-                                  onChanged: (_) => setState(() {}),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: CompanionNumberField(
-                                  label: _category == MoveCategory.physical
-                                      ? AppZh.companionDefenseStat
-                                      : AppZh.companionSpDefenseStat,
-                                  controller: _defenseController,
-                                  max: 999,
-                                  onChanged: (_) => setState(() {}),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          CompanionNumberField(
-                            label: AppZh.companionDefenderHp,
-                            controller: _hpController,
-                            max: 999,
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ],
+                    Text(
+                      _error!,
+                      style: SecondaryTypography.onCard.small12.copyWith(
+                        color: TitoColors.mutedInk,
+                        height: 1.45,
                       ),
-                      if (estimate != null) ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          AppZh.companionDamageAssumptions,
-                          style: SecondaryTypography.onPage(
-                            context,
-                          ).small12.copyWith(height: 1.45),
+                    ),
+                    const SizedBox(height: 8),
+                    FilledButton.icon(
+                      onPressed: _retryLoadRelations,
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: Text(AppZh.dexRetry),
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              BattleCombatants(
+                showAttacker: !_session.teamMode,
+                attacker: CompanionSectionCard(
+                  padding: const EdgeInsets.all(10),
+                  title: AppZh.battleAttacker,
+                  children: [
+                    BattlePartyPicker(
+                      journey: widget.journey,
+                      combatant: _session.attacker,
+                    ),
+                    PokemonSearchField(
+                      compact: true,
+                      controller: _session.attacker.query,
+                      hintText: AppZh.companionAttackerSearchHint,
+                      suggestions: _attackerSuggestions,
+                      onQueryChanged: _searchAttacker,
+                      onPokemonSelected: _applyAttacker,
+                      prefixIcon: Icons.sports_martial_arts_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    BattleDraftNotice(combatant: _session.attacker),
+                    LinkedOrManualTypePicker(
+                      linkedPokemonId: _session.attacker.pokemonId,
+                      label: AppZh.battleTypes,
+                      selected: _session.attacker.types,
+                      onManualChanged: (types) {
+                        _edit(() => _session.attacker.types = types);
+                        _clearLinkedAttacker();
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    CompanionNumberField(
+                      inline: true,
+                      label: AppZh.companionStatLevel,
+                      controller: _session.attacker.level,
+                      max: 100,
+                      onChanged: (_) => _edit(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    CompanionNumberField(
+                      inline: true,
+                      label: _attackStat.label,
+                      controller: _attackController,
+                      max: 999,
+                      onChanged: (_) => _edit(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    CompanionAbilitySection(
+                      compact: true,
+                      pokemonLabel: AppZh.battleAbility,
+                      manualLabel: AppZh.battleAbility,
+                      manualOptions: {
+                        ...kManualDefensiveAbilityOptions,
+                        ...kManualAttackerAbilityOptions,
+                      },
+                      pokemonOptions: defensiveAbilityOptionsFrom(
+                        _session.attacker.abilities,
+                      ),
+                      linkedPokemonId: _session.attacker.pokemonId,
+                      selectedSlug: _session.attacker.abilitySlug,
+                      onChanged: (slug) =>
+                          _edit(() => _session.attacker.abilitySlug = slug),
+                    ),
+                    const SizedBox(height: 8),
+                    BattleMoreOptions(
+                      storageId: 'attacker',
+                      children: [
+                        HeldItemPicker(
+                          compact: true,
+                          selected: _session.attacker.heldItem,
+                          onChanged: (value) => _edit(() {
+                            _session.attacker.heldItem = value;
+                            _session.attacker.unsupportedItem = false;
+                          }),
+                          typeBoostItemType:
+                              _session.attacker.typeBoostItemType,
+                          onTypeBoostChanged: (type) => _edit(
+                            () => _session.attacker.typeBoostItemType = type,
+                          ),
                         ),
+                        const SizedBox(height: 8),
+                        StatusConditionPicker(
+                          compact: true,
+                          selected: _session.attacker.status,
+                          onChanged: (value) =>
+                              _edit(() => _session.attacker.status = value),
+                        ),
+                        const SizedBox(height: 8),
+                        if (scope.generation >= 9)
+                          TerastalPicker(
+                            label: AppZh.battleTerastal,
+                            enabled: true,
+                            terastallized: _session.attacker.terastallized,
+                            teraType: _session.attacker.teraType,
+                            fallbackTypes: _session.attacker.types,
+                            generation: scope.generation,
+                            onTerastallizedChanged: (value) => _edit(
+                              () => _session.attacker.terastallized = value,
+                            ),
+                            onTeraTypeChanged: (type) =>
+                                _edit(() => _session.attacker.teraType = type),
+                          ),
                       ],
+                    ),
+                  ],
+                ),
+                defender: CompanionSectionCard(
+                  padding: const EdgeInsets.all(10),
+                  title: AppZh.companionTypeDefenderTitle,
+                  children: [
+                    BattlePartyPicker(
+                      journey: widget.journey,
+                      combatant: _session.defender,
+                    ),
+                    PokemonSearchField(
+                      compact: true,
+                      controller: _session.defender.query,
+                      hintText: AppZh.companionDefenderSearchHint,
+                      suggestions: _defenderSuggestions,
+                      onQueryChanged: _searchDefender,
+                      onPokemonSelected: _applyDefender,
+                      prefixIcon: Icons.shield_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    BattleDraftNotice(combatant: _session.defender),
+                    LinkedOrManualTypePicker(
+                      linkedPokemonId: _session.defender.pokemonId,
+                      label: AppZh.battleTypes,
+                      selected: _session.defender.types,
+                      onManualChanged: (types) {
+                        if (types.isNotEmpty) {
+                          _edit(() {
+                            _session.defender.types = types;
+                            _session.defender.teraType = defaultTeraTypeFor(
+                              types,
+                              scope.generation,
+                            );
+                          });
+                          _clearLinkedDefender();
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    CompanionNumberField(
+                      inline: true,
+                      label: AppZh.companionDefenderHp,
+                      controller: _session.defender.raw[BattleStat.hp]!,
+                      max: 999,
+                      onChanged: (_) => _edit(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    CompanionNumberField(
+                      inline: true,
+                      label:
+                          _session.teamMode ||
+                              _defenseStat == BattleStat.defense
+                          ? AppZh.companionDefenseStat
+                          : AppZh.companionSpDefenseStat,
+                      controller: _session.teamMode
+                          ? _session.defender.raw[BattleStat.defense]!
+                          : _defenseController,
+                      max: 999,
+                      onChanged: (_) => _edit(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_session.teamMode) ...[
+                      CompanionNumberField(
+                        inline: true,
+                        label: AppZh.companionSpDefenseStat,
+                        controller:
+                            _session.defender.raw[BattleStat.specialDefense]!,
+                        max: 999,
+                        onChanged: (_) => _edit(() {}),
+                      ),
+                      const SizedBox(height: 8),
                     ],
+                    CompanionAbilitySection(
+                      compact: true,
+                      pokemonLabel: AppZh.battleAbility,
+                      manualLabel: AppZh.battleAbility,
+                      manualOptions: {
+                        ...kManualDefensiveAbilityOptions,
+                        ...kManualAttackerAbilityOptions,
+                      },
+                      pokemonOptions: defensiveAbilityOptionsFrom(
+                        _session.defender.abilities,
+                      ),
+                      linkedPokemonId: _session.defender.pokemonId,
+                      selectedSlug: _session.defender.abilitySlug,
+                      onChanged: (slug) =>
+                          _edit(() => _session.defender.abilitySlug = slug),
+                    ),
+                    const SizedBox(height: 8),
+                    BattleMoreOptions(
+                      storageId: 'defender',
+                      children: [
+                        HeldItemPicker(
+                          compact: true,
+                          selected: _session.defender.heldItem,
+                          onChanged: (value) => _edit(() {
+                            _session.defender.heldItem = value;
+                            _session.defender.unsupportedItem = false;
+                          }),
+                          typeBoostItemType:
+                              _session.defender.typeBoostItemType,
+                          onTypeBoostChanged: (type) => _edit(
+                            () => _session.defender.typeBoostItemType = type,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        BattleToggleChip(
+                          label: AppZh.companionDefenderScreen,
+                          value: _defenderScreened,
+                          onChanged: (value) =>
+                              _edit(() => _defenderScreened = value),
+                        ),
+                        const SizedBox(height: 8),
+                        if (scope.generation >= 9)
+                          TerastalPicker(
+                            label: AppZh.battleTerastal,
+                            enabled: true,
+                            terastallized: _session.defender.terastallized,
+                            teraType: _session.defender.teraType,
+                            fallbackTypes: _session.defender.types,
+                            generation: scope.generation,
+                            onTerastallizedChanged: (value) => _edit(
+                              () => _session.defender.terastallized = value,
+                            ),
+                            onTeraTypeChanged: (type) =>
+                                _edit(() => _session.defender.teraType = type),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (_session.teamMode)
+                BattleTeamEditor(session: _session, party: widget.journey.party)
+              else
+                CompanionSectionCard(
+                  padding: const EdgeInsets.all(10),
+                  title: AppZh.battleMoveInputs,
+                  children: [
+                    BattleMovePicker(
+                      detail: _session.attacker.detail,
+                      versionGroup: edition.dataVersionGroupKey,
+                      value: selectedMove,
+                      onChanged: _chooseMove,
+                    ),
+                    if (selectedMove != null)
+                      Text(
+                        '${typeNameZh(profile?.type ?? selectedMove.type)} · ${profile?.physical == false
+                            ? AppZh.companionSpAttackStat
+                            : profile?.physical == true
+                            ? AppZh.companionAttackStat
+                            : AppLocale.pick(zh: '变化', en: 'Status')} · ${AppZh.companionMovePower} ${profile?.power ?? '—'}',
+                        style: SecondaryTypography.onCard.small12,
+                      ),
+                  ],
+                ),
+              const SizedBox(height: 8),
+              StickerCard(
+                child: BattleMoreOptions(
+                  title: AppZh.battleFieldOptions,
+                  storageId: 'field',
+                  children: [
+                    FieldConditionPicker(
+                      label: AppZh.companionWeatherPick,
+                      selected: _weather,
+                      onChanged: (value) => _edit(() => _weather = value),
+                    ),
+                    const SizedBox(height: 8),
+                    TerrainConditionPicker(
+                      label: AppZh.companionTerrainPick,
+                      selected: _terrain,
+                      onChanged: (value) => _edit(() => _terrain = value),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        BattleToggleChip(
+                          label: AppZh.companionCriticalHit,
+                          value: _isCriticalHit,
+                          onChanged: (value) =>
+                              _edit(() => _isCriticalHit = value),
+                        ),
+                        if (!_session.teamMode)
+                          BattleToggleChip(
+                            label: AppZh.companionSpreadMove,
+                            value: _isSpreadMove,
+                            onChanged: (value) =>
+                                _edit(() => _isSpreadMove = value),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      scope.damageNote,
+                      style: SecondaryTypography.onCard.small12,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      AppZh.companionDamageFacility(scope.facilityLabel),
+                      style: SecondaryTypography.onCard.small12,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      AppZh.companionDamageAssumptions,
+                      style: SecondaryTypography.onCard.small12,
+                    ),
                   ],
                 ),
               ),
             ],
-          ),
+          ],
         );
       },
     );
   }
 }
 
-/// Move-power slider row (battle template): label + live value over a
-/// coral-filled rail. The text controller stays the source of truth so the
-/// estimate pipeline is unchanged.
-class _PowerSliderRow extends StatelessWidget {
-  const _PowerSliderRow({required this.controller, required this.onChanged});
-
-  final TextEditingController controller;
-  final VoidCallback onChanged;
-
-  static const _min = 10.0;
-  static const _max = 250.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final current = (int.tryParse(controller.text.trim()) ?? 80)
-        .clamp(_min.toInt(), _max.toInt())
-        .toDouble();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              AppZh.companionMovePower,
-              style: SecondaryTypography.onCard.small12.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            Text(
-              current.round().toString(),
-              style: SecondaryTypography.onCard.meta14.copyWith(
-                color: TitoColors.deepBlue,
-              ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: TitoColors.coral,
-            inactiveTrackColor: TitoColors.cardWarm,
-            thumbColor: TitoColors.card,
-            overlayColor: TitoColors.coral.withValues(alpha: 0.15),
-            trackHeight: 8,
-            thumbShape: const RoundSliderThumbShape(
-              enabledThumbRadius: 11,
-              elevation: 0,
-              pressedElevation: 0,
-            ),
-          ),
-          child: Slider(
-            value: current,
-            min: _min,
-            max: _max,
-            divisions: (_max - _min).toInt(),
-            onChanged: (value) {
-              controller.text = value.round().toString();
-              onChanged();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 /// Result card (battle template): the single accent focus of the page —
 /// deep-blue card, oversized soft-yellow percentage, and an HP bar split
-/// into mint-safe / coral-damage segments. [compact] (pinned under the app
-/// bar) drops the verdict and assumptions so the summary stays glanceable.
+/// into mint-safe / coral-damage segments. [compact] drops the extra verdict
+/// and assumptions so the result stays glanceable before the input form.
 class _DamageResultCard extends StatelessWidget {
   const _DamageResultCard({required this.estimate, this.compact = false});
 
