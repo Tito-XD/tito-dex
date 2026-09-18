@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../features/dex/type_chart.dart';
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import '../theme/trainer_journal.dart';
 
 enum TypeBadgeSize { small, medium }
 
@@ -64,13 +63,9 @@ class TitoTypeBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: typeTileColor(typeEn),
         borderRadius: BorderRadius.circular(999),
-        // Flat UI keeps the type colour but drops the ink outline; the other
-        // themes use the small-element stroke for both badge sizes.
-        border: appVisualStyle.usesFlatUi
-            ? null
-            : appVisualStyle.usesTrainerJournal
-            ? TrainerJournal.allElement()
-            : Border.all(color: TitoColors.ink, width: TitoBorders.element),
+        border: Border.fromBorderSide(
+          TitoSurfaceTokens.of(context).elementOutline,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

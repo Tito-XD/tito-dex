@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/retro_style.dart';
-import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'handheld_input.dart';
 
 /// Trainer's Journal uses the original hard physical sticker press, Solid
@@ -55,7 +53,8 @@ class _StickerPressableState extends State<StickerPressable> {
 
   @override
   Widget build(BuildContext context) {
-    if (appVisualStyle.usesFlatUi) return widget.child;
+    final tokens = TitoSurfaceTokens.of(context);
+    if (tokens.pressSink == 0) return widget.child;
 
     return ListenableBuilder(
       listenable: retroStyle,
@@ -64,14 +63,9 @@ class _StickerPressableState extends State<StickerPressable> {
         final keyHeld = widget.interactive && HandheldPressed.of(context);
         final sunk =
             depthEnabled && widget.interactive && (_pressed || keyHeld);
-        final journal = appVisualStyle.usesTrainerJournal;
-        final sink = journal ? TrainerJournal.pressSink : 3.0;
-        final restingShadow = journal
-            ? TrainerJournalShadows.control
-            : SolidPlasticShadows.sticker;
-        final pressedShadow = journal
-            ? TrainerJournalShadows.stickerPressed
-            : SolidPlasticShadows.stickerPressed;
+        final sink = tokens.pressSink;
+        final restingShadow = tokens.controlShadow;
+        final pressedShadow = tokens.pressedShadow;
         Widget result = AnimatedContainer(
           duration: const Duration(milliseconds: 80),
           curve: Curves.easeOut,

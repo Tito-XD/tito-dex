@@ -46,9 +46,9 @@ class JourneyCard extends StatelessWidget {
       label: AppZh.journeyOpenDetail,
       child: HandheldFocusDecorator(
         onActivate: onOpenDetail,
-        borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+        borderRadius: BorderRadius.circular(TitoRadii.lg),
         child: StickerPressable(
-          borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+          borderRadius: BorderRadius.circular(TitoRadii.lg),
           ownShadow: false,
           child: StickerCard(
             variant: StickerVariant.deep,
@@ -57,7 +57,7 @@ class JourneyCard extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: onOpenDetail,
-                borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+                borderRadius: BorderRadius.circular(TitoRadii.lg),
                 child: Padding(
                   padding: padding,
                   child: Column(
@@ -85,7 +85,9 @@ class JourneyCard extends StatelessWidget {
                                 Text(
                                   location,
                                   style: dense
-                                      ? denseStyle(context.titoHome.onDeepHeading)
+                                      ? denseStyle(
+                                          context.titoHome.onDeepHeading,
+                                        )
                                       : context.titoHome.onDeepHeading,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -134,7 +136,9 @@ class JourneyCard extends StatelessWidget {
                             _AssistantMeta(
                               future:
                                   assistantFuture ??
-                                  journeyAssistantRepository.loadPreview(journey),
+                                  journeyAssistantRepository.loadPreview(
+                                    journey,
+                                  ),
                             ),
                           ],
                         ),

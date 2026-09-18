@@ -37,7 +37,10 @@ class TitoPageContainer extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFF5D728A), TitoColors.slateBlue],
+                  colors: [
+                    TitoColors.shellGradientTop,
+                    TitoColors.shellGradientBottom,
+                  ],
                 ),
               ),
               child: SafeArea(child: child),

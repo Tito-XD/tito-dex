@@ -184,7 +184,7 @@ class _BackTitleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = DeviceLayout.rMd(context);
+    final radius = TitoRadii.md;
     final scheme = Theme.of(context).colorScheme;
     // Solid Plastic intentionally shares this plain back-title row: the glossy
     // title pill was removed so secondary headers stay matte like the rest of

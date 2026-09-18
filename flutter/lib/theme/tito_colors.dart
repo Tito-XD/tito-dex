@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Soft Material elevation — **Flat UI only**.
 ///
 /// Trainer's Journal must use [TrainerJournalShadows] and Solid Plastic must
-/// use [SolidPlasticShadows]; shared widgets pick the recipe by branching on
-/// `appVisualStyle`. The historical sticker token names are kept so feature
+/// use [SolidPlasticShadows]; shared widgets read the recipe from
+/// `TitoSurfaceTokens`. The historical sticker token names are kept so feature
 /// code can switch recipes without a rename. Journal-only colour, stroke and
 /// type helpers live in `trainer_journal.dart`.
 abstract final class TitoShadows {
@@ -109,6 +109,8 @@ abstract final class TitoColors {
   static const flatOutline = Color(0xFF74777F);
 
   static const deepBlue = Color(0xFF2F4361);
+  static const shellGradientTop = Color(0xFF5D728A);
+  static const shellGradientBottom = slateBlue;
   static const slateBlue = Color(0xFF7B91A6);
   static const skyBlue = Color(0xFFAFC7DA);
   static const cream = Color(0xFFF3E4B3);

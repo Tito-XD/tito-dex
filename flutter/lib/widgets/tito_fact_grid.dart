@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/trainer_journal.dart';
@@ -71,9 +71,10 @@ class TitoFactTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
-    final plastic = appVisualStyle.usesSolidPlastic;
-    final journal = appVisualStyle.usesTrainerJournal;
+    final tokens = TitoSurfaceTokens.of(context);
+    final surface = tokens.surface(TitoSurfaceRole.fact);
+    final flat = tokens.usesMaterial;
+    final journal = tokens.finish == TitoSurfaceFinish.paper;
     final foreground = flat
         ? scheme.onSurface
         : journal
@@ -86,24 +87,11 @@ class TitoFactTile extends StatelessWidget {
         : TitoColors.mutedInk;
     final radius = BorderRadius.circular(TitoRadii.sm);
     return Material(
-      color: flat
-          ? scheme.surfaceContainerLow
-          : journal
-          ? TrainerJournal.cell
-          : Colors.white.withValues(alpha: .46),
+      color: surface.fill,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: radius,
-        side: journal
-            ? BorderSide.none
-            : BorderSide(
-                color: flat
-                    ? scheme.outlineVariant
-                    : plastic
-                    ? Colors.white.withValues(alpha: .85)
-                    : TitoColors.ink.withValues(alpha: .2),
-                width: plastic ? TitoBorders.glass : TitoBorders.element,
-              ),
+        side: surface.outline,
       ),
       child: InkWell(
         onTap: onTap,

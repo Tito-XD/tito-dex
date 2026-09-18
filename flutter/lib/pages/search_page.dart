@@ -18,7 +18,6 @@ import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/error_text.dart';
-import '../theme/device_layout.dart';
 import '../widgets/dex_sprite_image.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/pokemon_card.dart';
@@ -587,9 +586,9 @@ class _SearchResultRow extends StatelessWidget {
 
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+      borderRadius: BorderRadius.circular(TitoRadii.lg),
       child: StickerPressable(
-        borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
+        borderRadius: BorderRadius.circular(TitoRadii.lg),
         ownShadow: false,
         child: GestureDetector(
           onTap: onTap,

@@ -121,7 +121,10 @@ class _ThemeBackdrop extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF5D728A), TitoColors.slateBlue],
+            colors: [
+              TitoColors.shellGradientTop,
+              TitoColors.shellGradientBottom,
+            ],
           ),
         ),
         child: child,
@@ -130,7 +133,7 @@ class _ThemeBackdrop extends StatelessWidget {
   }
 }
 
-/// Legacy alias — kept for references.
+/// Web preview frame; native layouts use their own shells.
 class _PreviewShell extends StatelessWidget {
   const _PreviewShell({required this.child});
 

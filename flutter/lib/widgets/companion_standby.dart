@@ -21,6 +21,7 @@ import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
 import '../theme/trainer_journal.dart';
@@ -673,11 +674,7 @@ class _QuoteBubble extends StatelessWidget {
               ),
               boxShadow: !retroStyle.enabled
                   ? null
-                  : appVisualStyle.usesTrainerJournal
-                  ? TrainerJournalShadows.stickerSmall
-                  : appVisualStyle.usesSolidPlastic
-                  ? SolidPlasticShadows.stickerSmall
-                  : TitoShadows.stickerSmall,
+                  : TitoSurfaceTokens.of(context).elementShadow,
             ),
             child: Text(
               quote ?? '',

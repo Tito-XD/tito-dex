@@ -10,7 +10,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import '../theme/trainer_journal.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'dex_sprite_image.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
@@ -20,21 +20,15 @@ import 'type_badge.dart';
 /// Stroke for the pills drawn in this file. Trainer's Journal keeps the ink
 /// element stroke (or an accent colour when the pill carries a warning),
 /// Solid Plastic uses its milky hairline, Flat UI drops the stroke.
-BorderSide _pillStroke({Color? accent}) {
-  if (appVisualStyle.usesFlatUi) {
-    return accent == null
-        ? BorderSide.none
-        : BorderSide(color: accent, width: TitoBorders.element);
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return BorderSide(
-      color: accent ?? Colors.white.withValues(alpha: 0.8),
-      width: accent == null ? TitoBorders.glass : TitoBorders.element,
-    );
-  }
+BorderSide _pillStroke(BuildContext context, {Color? accent}) {
+  final tokens = TitoSurfaceTokens.of(context);
+  final side = tokens.elementOutline;
+  if (accent == null) return side;
   return BorderSide(
-    color: accent ?? TrainerJournal.smallEdge,
-    width: TitoBorders.journalElement,
+    color: accent,
+    width: tokens.usesMaterial || tokens.usesOptics
+        ? TitoBorders.element
+        : side.width,
   );
 }
 
@@ -132,7 +126,7 @@ class PokemonMiniCard extends StatelessWidget {
     final activate = onTap ?? () => context.push('/dex/${summary.id}');
     final padding = compact ? 6.0 : 10.0;
     final checkSize = compact ? 14.0 : 18.0;
-    final radius = DeviceLayout.rLg(context);
+    final radius = TitoRadii.lg;
     return HandheldFocusDecorator(
       onActivate: activate,
       borderRadius: BorderRadius.circular(radius),
@@ -140,85 +134,103 @@ class PokemonMiniCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         // StickerCard below paints the retro shadow — sink physics only.
         ownShadow: false,
-        child: GestureDetector(
-          key: ValueKey<String>('pokemon-card-tap-${summary.id}'),
+        child: Semantics(
+          button: true,
+          label: '#${summary.id} ${summary.displayName}',
+          value: switch (status) {
+            DexEncounterStatus.caught => AppLocale.pick(
+              zh: '已捕获',
+              en: 'Caught',
+            ),
+            DexEncounterStatus.seen => AppLocale.pick(zh: '已见过', en: 'Seen'),
+            DexEncounterStatus.unknown => AppLocale.pick(
+              zh: '未发现',
+              en: 'Unknown',
+            ),
+          },
           onTap: activate,
           onLongPress: onLongPress,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              StickerCard(
-                variant: variant,
-                padding: EdgeInsets.fromLTRB(
-                  padding,
-                  padding,
-                  padding,
-                  padding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // The sprite alone is the shared element. The card shell
-                    // (number, name, types) stays anchored in the grid while
-                    // the creature flies to the detail header; offstaging
-                    // the whole card punched a hole in the list and lost the
-                    // exact sprite rect the flight must start from.
-                    // Grid cards use the plain skeleton placeholder (no
-                    // pokéball spinner) so a loading grid reads as one calm
-                    // surface instead of a field of spinning dots.
-                    Expanded(
-                      child: PokemonCardTransitionHero(
-                        summary: summary,
-                        child: DexSpriteImage(
-                          source: summary.displaySpritePath,
-                          height: null,
-                          fit: BoxFit.contain,
+          excludeSemantics: true,
+          child: GestureDetector(
+            key: ValueKey<String>('pokemon-card-tap-${summary.id}'),
+            onTap: activate,
+            onLongPress: onLongPress,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                StickerCard(
+                  variant: variant,
+                  padding: EdgeInsets.fromLTRB(
+                    padding,
+                    padding,
+                    padding,
+                    padding,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // The sprite alone is the shared element. The card shell
+                      // (number, name, types) stays anchored in the grid while
+                      // the creature flies to the detail header; offstaging
+                      // the whole card punched a hole in the list and lost the
+                      // exact sprite rect the flight must start from.
+                      // Grid cards use the plain skeleton placeholder (no
+                      // pokéball spinner) so a loading grid reads as one calm
+                      // surface instead of a field of spinning dots.
+                      Expanded(
+                        child: PokemonCardTransitionHero(
+                          summary: summary,
+                          child: DexSpriteImage(
+                            source: summary.displaySpritePath,
+                            height: null,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: compact ? 2 : 4),
-                    Text(
-                      '#${summary.id.toString().padLeft(3, '0')}',
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      style: TitoTypography.style(
-                        fontSize: compact ? 10 : 12,
-                        fontWeight: FontWeight.w700,
-                        color: TitoColors.mutedInk,
-                        height: 1.1,
+                      SizedBox(height: compact ? 2 : 4),
+                      Text(
+                        '#${summary.id.toString().padLeft(3, '0')}',
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: TitoTypography.style(
+                          fontSize: compact ? 10 : 12,
+                          fontWeight: FontWeight.w700,
+                          color: TitoColors.mutedInk,
+                          height: 1.1,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      summary.displayName,
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TitoTypography.style(
-                        fontSize: compact ? 12 : 14,
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
+                      const SizedBox(height: 1),
+                      Text(
+                        summary.displayName,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TitoTypography.style(
+                          fontSize: compact ? 12 : 14,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: compact ? 3 : 4),
-                    TitoTypeBadgeRow(
-                      typesEn: summary.types,
-                      size: TypeBadgeSize.small,
-                    ),
-                  ],
-                ),
-              ),
-              if (status == DexEncounterStatus.caught)
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Icon(
-                    Icons.check_circle_rounded,
-                    color: TitoColors.mint,
-                    size: checkSize,
+                      SizedBox(height: compact ? 3 : 4),
+                      TitoTypeBadgeRow(
+                        typesEn: summary.types,
+                        size: TypeBadgeSize.small,
+                      ),
+                    ],
                   ),
                 ),
-            ],
+                if (status == DexEncounterStatus.caught)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      color: TitoColors.deepBlue,
+                      size: checkSize,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -264,7 +276,7 @@ class TypeChipRow extends StatelessWidget {
               TypeChipTone.neutral => TitoColors.skyBlue,
             },
             borderRadius: BorderRadius.circular(TitoRadii.sm),
-            border: Border.fromBorderSide(_pillStroke()),
+            border: Border.fromBorderSide(_pillStroke(context)),
           ),
           child: Text(types[index], style: context.tito.chip),
         );
@@ -287,28 +299,35 @@ class _EvolutionCard extends StatelessWidget {
 
     return HandheldFocusDecorator(
       onActivate: () => context.push('/dex/${node.id}'),
-      borderRadius: BorderRadius.circular(DeviceLayout.rLg(context)),
-      child: GestureDetector(
+      borderRadius: BorderRadius.circular(TitoRadii.lg),
+      child: Semantics(
+        button: true,
+        label: '#${node.id} ${node.displayName}',
+        selected: highlighted,
         onTap: () => context.push('/dex/${node.id}'),
-        child: StickerCard(
-          variant: highlighted ? StickerVariant.mint : StickerVariant.cream,
-          padding: EdgeInsets.all(compact ? 8 : 12),
-          child: SizedBox(
-            width: compact ? 84 : 96,
-            child: Column(
-              children: [
-                DexSpriteImage(
-                  source: node.displaySpritePath,
-                  height: compact ? 56 : 64,
-                ),
-                Text(
-                  node.displayName,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.tito.cardBodyEmphasis,
-                ),
-              ],
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: () => context.push('/dex/${node.id}'),
+          child: StickerCard(
+            variant: highlighted ? StickerVariant.mint : StickerVariant.cream,
+            padding: EdgeInsets.all(compact ? 8 : 12),
+            child: SizedBox(
+              width: compact ? 84 : 96,
+              child: Column(
+                children: [
+                  DexSpriteImage(
+                    source: node.displaySpritePath,
+                    height: compact ? 56 : 64,
+                  ),
+                  Text(
+                    node.displayName,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.tito.cardBodyEmphasis,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -452,7 +471,7 @@ class _EvolutionTriggerLabel extends StatelessWidget {
               : TitoColors.card,
           borderRadius: BorderRadius.circular(TitoRadii.sm),
           border: Border.fromBorderSide(
-            _pillStroke(accent: tradeLocked ? TitoColors.coral : null),
+            _pillStroke(context, accent: tradeLocked ? TitoColors.coral : null),
           ),
         ),
         child: Row(

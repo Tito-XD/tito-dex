@@ -96,8 +96,8 @@ Tokens (`flutter/lib/theme/tito_colors.dart` and
 | `TitoBorders.journalHairline` | 0.75 | Trainer's Journal empty-slot dashes |
 | `TitoBorders.glass` | 1.1 | Solid Plastic light hairline (`LiquidGlassSurface`) |
 
-Radii are fixed on every device: `DeviceLayout.rSm/rMd/rLg` are plain
-pass-throughs and must not halve on the handheld. Never write a literal outline
+Radii are fixed on every device: read `TitoRadii.sm/md/lg` directly. The
+old `DeviceLayout` identity helpers and font multiplier have been removed. Never write a literal outline
 width in a widget — pick the token that matches the surface size. Font sizes
 stay on the existing `TitoTypography` / `DeviceLayout` rules in every theme;
 Trainer's Journal only remaps weight and the shared ink/muted colours.
@@ -151,12 +151,48 @@ No bare `CircularProgressIndicator` in feature code.
 
 ## Theme-blind components are bugs
 
-Every shared widget must branch on `appVisualStyle` (`usesTrainerJournal`,
-`usesSolidPlastic`, `usesFlatUi`) — `widgets/sticker_card.dart` is the
-reference implementation. A component that hard-codes cream cards, ink borders
-or hard shadows will look wrong in Solid Plastic and Flat UI; a component that
-reads only `Theme.of(context).colorScheme` loses the sticker language in
-Trainer's Journal. Fix the component, do not special-case the caller.
+共享表面通过 `Theme.of(context).extension<TitoSurfaceTokens>()` 获取令牌，
+不要在组件中重复全局三主题的 fill / outline / shadow 判断。
+`buildTitoTheme` 为三套主题分别注册扩展；`StickerCard`、`StickerPressable`、
+表单、队伍槽、属性/状态徽章、详情控件、骨架与进度条读取同一来源。
+塑料光学层、Material 控件与手帐专属装饰仍保留各自的渲染方式；
+主题特有的布局、字体、插画和业务状态颜色不属于通用表面令牌。
+
+### 共享表面令牌与导出
+
+- 源码：`flutter/lib/theme/tito_surface_tokens.dart`；基础色、阴影与尺寸引用现有主题常量。
+- 对照表：[`design-tokens.json`](design-tokens.json)，由真实 `buildTitoTheme` 实例生成，禁止手改数值。
+- 核心字段：`cardFill`、`cardOutline`（颜色、宽度）、`cardShadow`、`elementOutline`、`pressSink`。
+- `surfaces` 包含卡片变体、输入框、队伍槽、徽章、选中态等语义角色。
+- 颜色格式为 CSS `#RRGGBBAA`（不是 Flutter 的 AARRGGBB）；尺寸使用逻辑像素 / CSS px。
+- 塑料表面的 `fill` 是光学渲染底色，`opacity` 是其透明度参数；JSON 不替代光学渲染器。
+- `retroStyle` 仍控制阴影与按压；JSON 表示开启深度时的配方，Flat 关闭深度时读 `flatCardOutline`。
+- 外壳两端颜色统一为 `TitoColors.shellGradientTop/Bottom`，页面和设备外壳共用。
+
+在 `flutter/` 下执行：
+
+```sh
+flutter test --no-pub test/design_tokens_test.dart --dart-define=EXPORT_DESIGN_TOKENS=true
+flutter test --no-pub test/design_tokens_test.dart
+```
+
+第二条命令及完整测试会校验 JSON 与运行时令牌一致，并验证局部 Theme 覆盖、
+`copyWith` 和跨主题插值。Web 端可消费该生成表或与其核对，本次没有修改 Web 仓库。
+
+UI 回归与可选截图：
+
+```sh
+flutter test --no-pub test/ui_surface_audit_test.dart
+flutter test --no-pub test/ui_surface_audit_test.dart --dart-define=UI_AUDIT_CJK_FONT=C:/Windows/Fonts/msyh.ttc
+```
+
+截图输出至 `flutter/build/ui-audit/`，使用离线测试条目、精灵占位图及仅在测试
+宿主注册的中文字体回退，覆盖三套主题的图鉴、详情四个 Tab、设置总览和外观页。
+这些是 Flutter 测试引擎渲染，不是 Android 真机截图。实际设备仍需检查捕获对勾、
+状态文字、塑料徽章以及页面滚动和点按。
+
+`_PreviewShell` 经检索仍由 Web 入口调用，因此保留实际实现并移除错误的 legacy
+alias 注释；它不是死代码。
 
 ### Retro sticker feel (Flutter implementation)
 

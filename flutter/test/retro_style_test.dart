@@ -48,7 +48,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: buildTitoTheme(),
+        theme: buildTitoTheme(AppVisualStyle.flatUi),
         home: const Scaffold(body: StickerCard(child: Text('x'))),
       ),
     );

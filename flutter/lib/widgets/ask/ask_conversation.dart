@@ -6,8 +6,8 @@ import '../../features/journey/ask_motion_images.dart';
 import '../../features/journey/ask_motion_theme.dart';
 import '../../l10n/app_zh.dart';
 import '../../theme/app_visual_style.dart';
-import '../../theme/device_layout.dart';
 import '../../theme/retro_style.dart';
+import '../../theme/tito_surface_tokens.dart';
 import '../../theme/secondary_typography.dart';
 import '../../theme/tito_colors.dart';
 import '../../theme/trainer_journal.dart';
@@ -231,11 +231,7 @@ class AskQuestionBubble extends StatelessWidget {
             ),
             boxShadow: !retroStyle.enabled
                 ? null
-                : appVisualStyle.usesTrainerJournal
-                ? TrainerJournalShadows.stickerSmall
-                : appVisualStyle.usesSolidPlastic
-                ? SolidPlasticShadows.stickerSmall
-                : TitoShadows.stickerSmall,
+                : TitoSurfaceTokens.of(context).elementShadow,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
@@ -290,7 +286,7 @@ class AskQuestionComposer extends StatelessWidget {
     return AssistantSurface(
       key: const Key('ask-titodex-composer'),
       padding: const EdgeInsets.fromLTRB(8, 7, 7, 7),
-      radius: DeviceLayout.rLg(context),
+      radius: TitoRadii.lg,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -305,6 +301,7 @@ class AskQuestionComposer extends StatelessWidget {
               textInputAction: TextInputAction.send,
               decoration:
                   retroInsetDecoration(
+                    context: context,
                     hintText: AppZh.askTitoDexQuestionHint,
                   ).copyWith(
                     isDense: true,

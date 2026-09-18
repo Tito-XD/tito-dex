@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'sticker_card.dart';
 import 'tito_delayed_loading.dart';
 import 'tito_pokeball_loading.dart';
@@ -32,21 +31,11 @@ class TitoSkeletonBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fill;
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      fill = Theme.of(context).colorScheme.surfaceContainerHighest;
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      fill = Colors.white.withValues(alpha: 0.35);
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      fill = TrainerJournal.cell;
-      border = null;
-    }
+    final surface = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.party);
+    final fill = surface.fill;
+    final border = surface.border;
     final box = Container(
       width: width,
       height: height,

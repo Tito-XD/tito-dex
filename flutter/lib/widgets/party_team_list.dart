@@ -8,6 +8,7 @@ import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/trainer_journal.dart';
 import 'handheld_input.dart';
 import 'sticker_card.dart';
@@ -255,23 +256,12 @@ class _EmptyGridSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(TitoRadii.md);
-    final Color fill;
-    final Color dash;
-    final double stroke;
-    if (appVisualStyle.usesFlatUi) {
-      final scheme = Theme.of(context).colorScheme;
-      fill = scheme.surfaceContainerLow;
-      dash = scheme.outlineVariant;
-      stroke = TitoBorders.element;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      fill = Colors.white.withValues(alpha: 0.3);
-      dash = Colors.white.withValues(alpha: 0.6);
-      stroke = TitoBorders.glass;
-    } else {
-      fill = TrainerJournal.cell;
-      dash = TrainerJournal.smallEdge;
-      stroke = TitoBorders.journalHairline;
-    }
+    final surface = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.emptyTeam);
+    final fill = surface.fill;
+    final dash = surface.outline.color;
+    final stroke = surface.outline.width;
     return HandheldFocusDecorator(
       onActivate: onTap,
       borderRadius: radius,

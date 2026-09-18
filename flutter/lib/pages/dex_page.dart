@@ -1251,7 +1251,7 @@ class _DexTopBarAction extends StatelessWidget {
     required this.onTap,
   });
 
-  static const _height = 34.0;
+  static const _height = 44.0;
 
   final IconData icon;
   final String label;
@@ -1259,7 +1259,7 @@ class _DexTopBarAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(DeviceLayout.rMd(context));
+    final radius = BorderRadius.circular(TitoRadii.md);
     final scheme = Theme.of(context).colorScheme;
     final shellColor = appVisualStyle.usesFlatUi
         ? scheme.primary

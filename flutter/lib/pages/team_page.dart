@@ -289,9 +289,7 @@ class _TeamPageState extends State<TeamPage> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: _confirmSyncFromSave,
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rLg(context),
-                  ),
+                  borderRadius: BorderRadius.circular(TitoRadii.lg),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
                     child: Row(
@@ -518,6 +516,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                     TextField(
                       autofocus: true,
                       decoration: retroInsetDecoration(
+                        context: context,
                         labelText: AppZh.teamSearchMovesHint,
                       ),
                       onChanged: (value) => setSheetState(() => query = value),
@@ -612,6 +611,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                 child: TextField(
                   controller: _nicknameController,
                   decoration: retroInsetDecoration(
+                    context: context,
                     labelText: AppZh.teamEditNickname,
                   ),
                 ),
@@ -623,6 +623,7 @@ class _InlineTeamEditorState extends State<_InlineTeamEditor> {
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   decoration: retroInsetDecoration(
+                    context: context,
                     labelText: AppZh.teamEditLevel,
                   ),
                 ),

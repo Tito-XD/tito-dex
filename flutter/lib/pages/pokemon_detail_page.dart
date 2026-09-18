@@ -18,6 +18,7 @@ import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/trainer_journal.dart';
 import '../theme/tito_motion.dart';
 import '../theme/error_text.dart';
@@ -435,13 +436,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
     if (form == null) {
       return null;
     }
-    // This note sits directly on the page background (not inside a card), so
-    // it reads with the theme-aware page ink; only the status labels keep an
-    // accent so "blank" and "not in this game" stay distinguishable.
+    // Status labels need a dark backing on both blue shell gradients; cream
+    // text alone cannot meet AA at the light end of the gradient.
     final pageStyle = SecondaryTypography.onPage(context).small12;
     final statusColor = appVisualStyle.usesFlatUi
         ? Theme.of(context).colorScheme.tertiary
-        : TitoColors.softYellow;
+        : TitoColors.card;
     final statusLabels = pokemonFormStatusLabels(
       form,
       versionGroup: _gameEdition.dataVersionGroupKey,
@@ -467,11 +467,20 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       runSpacing: 4,
       children: [
         for (final label in statusLabels)
-          Text(
-            '· $label',
-            style: pageStyle.copyWith(
-              color: statusColor,
-              fontWeight: FontWeight.w800,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            decoration: BoxDecoration(
+              color: appVisualStyle.usesFlatUi
+                  ? null
+                  : TitoColors.deepBlue.withValues(alpha: .88),
+              borderRadius: BorderRadius.circular(TitoRadii.sm),
+            ),
+            child: Text(
+              '· $label',
+              style: pageStyle.copyWith(
+                color: statusColor,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         if (qualityCopy != null)
@@ -940,6 +949,11 @@ class _MoveMethodFilterBar extends StatelessWidget {
                         onTap: () => onSelected(entry),
                         borderRadius: radius,
                         child: Container(
+                          constraints: const BoxConstraints(
+                            minHeight: 44,
+                            minWidth: 44,
+                          ),
+                          alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           decoration: BoxDecoration(
                             borderRadius: radius,
@@ -993,34 +1007,15 @@ class _SelectionChipPalette {
   final Border? border;
 
   factory _SelectionChipPalette.of(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    if (appVisualStyle.usesFlatUi) {
-      return _SelectionChipPalette(
-        resting: scheme.surfaceContainerLow,
-        selected: scheme.secondaryContainer,
-        restingText: scheme.onSurface,
-        selectedText: scheme.onSecondaryContainer,
-        border: null,
-      );
-    }
-    if (appVisualStyle.usesSolidPlastic) {
-      return _SelectionChipPalette(
-        resting: TitoColors.card.withValues(alpha: 0.86),
-        selected: TitoColors.softYellow.withValues(alpha: 0.92),
-        restingText: TitoColors.ink,
-        selectedText: TitoColors.ink,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.8),
-          width: TitoBorders.glass,
-        ),
-      );
-    }
+    final tokens = TitoSurfaceTokens.of(context);
+    final resting = tokens.surface(TitoSurfaceRole.selection);
+    final selected = tokens.surface(TitoSurfaceRole.selectionActive);
     return _SelectionChipPalette(
-      resting: TitoColors.card,
-      selected: TitoColors.softYellow,
-      restingText: TitoColors.ink,
-      selectedText: TitoColors.ink,
-      border: TrainerJournal.allElement(),
+      resting: resting.fill,
+      selected: selected.fill,
+      restingText: resting.foreground,
+      selectedText: selected.foreground,
+      border: resting.border as Border?,
     );
   }
 }
@@ -1169,6 +1164,11 @@ class _DetailBottomTabs extends StatelessWidget {
                           borderRadius: radius,
                           onTap: () => onSelected(index),
                           child: Container(
+                            constraints: const BoxConstraints(
+                              minHeight: 44,
+                              minWidth: 44,
+                            ),
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
                               borderRadius: radius,
                               border: tabBorder,

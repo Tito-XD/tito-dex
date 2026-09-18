@@ -4,31 +4,17 @@ import '../features/dex/dex_game_scope.dart';
 import '../features/dex/dex_models.dart';
 import '../features/dex/version_availability.dart';
 import '../l10n/app_zh.dart';
-import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'dex_sprite_image.dart';
 import 'sticker_card.dart';
 import 'tito_skeleton.dart';
 
 /// Stroke for the small status boxes and pills drawn inside these cards:
 /// ink element stroke in Trainer's Journal, plastic hairline, none in Flat.
-BorderSide _elementStroke() {
-  if (appVisualStyle.usesFlatUi) {
-    return BorderSide.none;
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return BorderSide(
-      color: Colors.white.withValues(alpha: 0.8),
-      width: TitoBorders.glass,
-    );
-  }
-  return const BorderSide(
-    color: TrainerJournal.smallEdge,
-    width: TitoBorders.journalElement,
-  );
-}
+BorderSide _elementStroke(BuildContext context) =>
+    TitoSurfaceTokens.of(context).elementOutline;
 
 class HeldItemReference {
   const HeldItemReference({
@@ -438,7 +424,7 @@ class _VersionPlanBody extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(TitoRadii.sm),
-              border: Border.fromBorderSide(_elementStroke()),
+              border: Border.fromBorderSide(_elementStroke(context)),
             ),
             child: Row(
               children: [
@@ -621,7 +607,7 @@ class _InfoPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: Border.fromBorderSide(_elementStroke()),
+        border: Border.fromBorderSide(_elementStroke(context)),
       ),
       child: Text(
         label,

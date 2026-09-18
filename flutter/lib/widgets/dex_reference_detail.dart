@@ -11,7 +11,7 @@ import '../l10n/game_zh.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../widgets/sticker_card.dart';
 import 'dex_sprite_image.dart';
 import 'type_badge.dart';
@@ -757,7 +757,7 @@ class _TypeModifierChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: typeTileColor(type),
         borderRadius: BorderRadius.circular(999),
-        border: _referenceBadgeBorder(),
+        border: _referenceBadgeBorder(context),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -831,7 +831,7 @@ class _CategoryBadge extends StatelessWidget {
             ? TitoColors.softYellow.withValues(alpha: 0.9)
             : TitoColors.softYellow,
         borderRadius: BorderRadius.circular(TitoRadii.sm),
-        border: _referenceBadgeBorder(),
+        border: _referenceBadgeBorder(context),
       ),
       child: Text(
         label,
@@ -846,18 +846,8 @@ class _CategoryBadge extends StatelessWidget {
 
 /// Badge outline per theme: ink in Trainer's Journal, a milky hairline in
 /// Solid Plastic, and none in Flat UI.
-BoxBorder? _referenceBadgeBorder() {
-  if (appVisualStyle.usesTrainerJournal) {
-    return TrainerJournal.allElement();
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return Border.all(
-      color: Colors.white.withValues(alpha: 0.8),
-      width: TitoBorders.glass,
-    );
-  }
-  return null;
-}
+BoxBorder? _referenceBadgeBorder(BuildContext context) =>
+    TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.element).border;
 
 IconData moveCategoryIcon(String category) => switch (category) {
   'physical' => Icons.sports_martial_arts_rounded,

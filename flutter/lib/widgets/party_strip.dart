@@ -13,9 +13,9 @@ import '../models/journey.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/device_layout.dart';
 import '../theme/retro_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import '../theme/trainer_journal.dart';
 import 'dex_sprite_image.dart';
 import 'fallback_sprite_image.dart';
 import 'sticker_card.dart';
@@ -25,32 +25,9 @@ import 'sticker_card.dart';
 /// Solid Plastic swaps to milky glass, Flat UI uses the Material container
 /// tone with no outline.
 BoxDecoration _partyCellDecoration(BuildContext context, {bool empty = false}) {
-  final radius = BorderRadius.circular(TitoRadii.sm);
-  if (appVisualStyle.usesFlatUi) {
-    final scheme = Theme.of(context).colorScheme;
-    return BoxDecoration(
-      color: empty
-          ? scheme.surfaceContainerHigh
-          : scheme.surfaceContainerHighest,
-      borderRadius: radius,
-    );
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return BoxDecoration(
-      color: Colors.white.withValues(alpha: empty ? 0.18 : 0.35),
-      borderRadius: radius,
-      border: Border.all(
-        color: Colors.white.withValues(alpha: empty ? 0.5 : 0.78),
-        width: TitoBorders.glass,
-      ),
-    );
-  }
-  return BoxDecoration(
-    color: empty
-        ? TrainerJournal.cell.withValues(alpha: 0.35)
-        : TrainerJournal.cell,
-    borderRadius: BorderRadius.circular(6),
-  );
+  return TitoSurfaceTokens.of(context)
+      .surface(empty ? TitoSurfaceRole.emptyParty : TitoSurfaceRole.party)
+      .decoration();
 }
 
 class PartyStrip extends StatelessWidget {
@@ -430,26 +407,12 @@ class _PartyLevelBadge extends StatelessWidget {
     // Badge text scales with the sprite it rides on; no home token is this
     // small, so the size stays derived from the sprite.
     final fontSize = (spriteSize * 0.24).clamp(7.5, 10.0);
-    final Color background;
-    final Color foreground;
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      final scheme = Theme.of(context).colorScheme;
-      background = scheme.tertiaryContainer;
-      foreground = scheme.onTertiaryContainer;
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      background = TitoColors.softYellow.withValues(alpha: 0.92);
-      foreground = TitoColors.ink;
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      background = TrainerJournal.levelFill;
-      foreground = TrainerJournal.ink;
-      border = null;
-    }
+    final surface = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.level);
+    final background = surface.fill;
+    final foreground = surface.foreground;
+    final border = surface.border;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 3.5, vertical: 0.5),
       decoration: BoxDecoration(
@@ -567,31 +530,11 @@ class _PartyMemberAvatar extends StatelessWidget {
 
   /// Circular sticker frame with the per-theme small-element shadow.
   BoxDecoration _framedAvatarDecoration(BuildContext context) {
-    final depth = retroStyle.enabled;
-    if (appVisualStyle.usesFlatUi) {
-      final scheme = Theme.of(context).colorScheme;
-      return BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        shape: BoxShape.circle,
-        boxShadow: depth ? TitoShadows.stickerSmall : null,
-      );
-    }
-    if (appVisualStyle.usesSolidPlastic) {
-      return BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.7),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.78),
-          width: TitoBorders.glass,
-        ),
-        boxShadow: depth ? SolidPlasticShadows.stickerSmall : null,
-      );
-    }
-    return BoxDecoration(
-      color: TrainerJournal.paper,
-      shape: BoxShape.circle,
-      border: TrainerJournal.allElement(),
-    );
+    final tokens = TitoSurfaceTokens.of(context);
+    return tokens
+        .surface(TitoSurfaceRole.avatar)
+        .decoration(shape: BoxShape.circle)
+        .copyWith(boxShadow: retroStyle.enabled ? tokens.elementShadow : null);
   }
 
   Widget _letterFallback(String label, double size) {

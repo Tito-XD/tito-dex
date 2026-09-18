@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 
 import 'app_visual_style.dart';
 import 'tito_colors.dart';
+import 'tito_surface_tokens.dart';
 import 'tito_typography.dart';
 import 'trainer_journal.dart';
 
-ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.classic]) =>
-    switch (style) {
-      AppVisualStyle.classic => _buildClassicTheme(),
-      AppVisualStyle.solidPlastic => _buildSolidPlasticTheme(),
-      AppVisualStyle.flatUi => _buildFlatUiTheme(),
-    };
+ThemeData buildTitoTheme([AppVisualStyle style = AppVisualStyle.classic]) {
+  final theme = switch (style) {
+    AppVisualStyle.classic => _buildClassicTheme(),
+    AppVisualStyle.solidPlastic => _buildSolidPlasticTheme(),
+    AppVisualStyle.flatUi => _buildFlatUiTheme(),
+  };
+  return theme.copyWith(
+    extensions: [
+      ...theme.extensions.values,
+      TitoSurfaceTokens.forStyle(style, theme.colorScheme),
+    ],
+  );
+}
 
 /// Translucent, light-reactive treatment from the Liquid Glass experiment,
 /// now exposed as the built-in Solid Plastic theme.

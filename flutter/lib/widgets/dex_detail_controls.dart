@@ -4,10 +4,9 @@ import '../features/dex/dex_models.dart';
 import '../features/game/game_catalog.dart';
 import '../features/game/game_edition.dart';
 import '../l10n/app_zh.dart';
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
 import 'dex_detail_picker_sheet.dart';
 
 /// One visible context shared by every bottom tab of a Pokémon detail page.
@@ -46,8 +45,8 @@ class DexDetailControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final flat = appVisualStyle.usesFlatUi;
-    final plastic = appVisualStyle.usesSolidPlastic;
+    final tokens = TitoSurfaceTokens.of(context);
+    final flat = tokens.usesMaterial;
     final radius = BorderRadius.circular(TitoRadii.md);
     final style = flat
         ? SecondaryTypography.onCard.body14.copyWith(
@@ -59,25 +58,10 @@ class DexDetailControls extends StatelessWidget {
     final disabledTextColor = flat
         ? scheme.onSurfaceVariant
         : TitoColors.mutedInk;
-    final Color fill;
-    final Color disabledFill;
-    final BoxBorder? outline;
-    if (flat) {
-      fill = scheme.surfaceContainerHighest;
-      disabledFill = scheme.surfaceContainerHighest.withValues(alpha: 0.6);
-      outline = null;
-    } else if (plastic) {
-      fill = Colors.white.withValues(alpha: 0.7);
-      disabledFill = Colors.white.withValues(alpha: 0.45);
-      outline = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      fill = TitoColors.card;
-      disabledFill = TitoColors.cardWarm.withValues(alpha: 0.6);
-      outline = TrainerJournal.allCard();
-    }
+    final fieldSurface = tokens.surface(TitoSurfaceRole.field);
+    final fill = fieldSurface.fill;
+    final disabledFill = tokens.surface(TitoSurfaceRole.disabledField).fill;
+    final outline = fieldSurface.border;
     // Keep inset labels on the filled surface while matching adjacent controls.
     Widget outlined(Widget child) => outline == null
         ? child

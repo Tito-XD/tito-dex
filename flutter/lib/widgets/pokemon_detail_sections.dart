@@ -21,7 +21,7 @@ import '../theme/device_layout.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_typography.dart';
 import '../theme/tito_colors.dart';
-import '../theme/trainer_journal.dart';
+import '../theme/tito_surface_tokens.dart';
 import 'dex_sprite_image.dart';
 import 'pokemon_artwork_viewer.dart';
 import 'pokemon_card.dart';
@@ -34,21 +34,8 @@ import 'type_badge.dart';
 /// Stroke for custom-drawn tiles and pills inside cards. Trainer's Journal
 /// keeps the ink element stroke, Solid Plastic uses its milky hairline, and
 /// Flat UI drops the stroke in favour of the Material surface colour.
-BorderSide _elementStroke(BuildContext context) {
-  if (appVisualStyle.usesFlatUi) {
-    return BorderSide.none;
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return BorderSide(
-      color: Colors.white.withValues(alpha: 0.8),
-      width: TitoBorders.glass,
-    );
-  }
-  return const BorderSide(
-    color: TrainerJournal.smallEdge,
-    width: TitoBorders.journalElement,
-  );
-}
+BorderSide _elementStroke(BuildContext context) =>
+    TitoSurfaceTokens.of(context).elementOutline;
 
 List<String> pokemonFormStatusLabels(
   PokemonFormDetail form, {

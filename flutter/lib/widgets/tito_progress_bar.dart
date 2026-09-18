@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_visual_style.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/tito_colors.dart';
 import '../theme/tito_typography.dart';
-import '../theme/trainer_journal.dart';
 
 /// Thin, sticker-style progress bar used across TitoDex surfaces.
 ///
@@ -28,26 +27,12 @@ class TitoProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clamped = value.clamp(0.0, 1.0);
-    final scheme = Theme.of(context).colorScheme;
-    final Color track;
-    final Color fill;
-    final BoxBorder? border;
-    if (appVisualStyle.usesFlatUi) {
-      track = trackColor ?? scheme.surfaceContainerHighest;
-      fill = fillColor ?? scheme.primary;
-      border = null;
-    } else if (appVisualStyle.usesSolidPlastic) {
-      track = trackColor ?? Colors.white.withValues(alpha: 0.35);
-      fill = fillColor ?? TitoColors.deepBlue;
-      border = Border.all(
-        color: Colors.white.withValues(alpha: 0.78),
-        width: TitoBorders.glass,
-      );
-    } else {
-      track = trackColor ?? TrainerJournal.ink.withValues(alpha: 0.10);
-      fill = fillColor ?? TitoColors.deepBlue;
-      border = null;
-    }
+    final surface = TitoSurfaceTokens.of(
+      context,
+    ).surface(TitoSurfaceRole.progress);
+    final track = trackColor ?? surface.fill;
+    final fill = fillColor ?? surface.foreground;
+    final border = surface.border;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

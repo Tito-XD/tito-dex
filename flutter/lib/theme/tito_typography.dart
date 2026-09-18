@@ -74,7 +74,7 @@ abstract final class TitoTypography {
         DeviceLayout.isNativeTarget || DeviceLayout.useSquareDashboard(context)
         ? handheld
         : phone;
-    return base * DeviceLayout.fontMultiplier(context);
+    return base;
   }
 
   /// Large titles on the blue gradient shell (Dex, Search, etc.).

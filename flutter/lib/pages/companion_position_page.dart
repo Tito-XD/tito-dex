@@ -115,9 +115,7 @@ class _CompanionPositionPageState extends State<CompanionPositionPage> {
                         ? TitoBorders.journalHairline
                         : TitoBorders.element,
                   ),
-                  borderRadius: BorderRadius.circular(
-                    DeviceLayout.rMd(context),
-                  ),
+                  borderRadius: BorderRadius.circular(TitoRadii.md),
                 ),
                 child: GestureDetector(
                   key: const ValueKey('companion-position-canvas'),

@@ -14,6 +14,7 @@ import '../features/dex/type_chart.dart';
 import '../theme/app_visual_style.dart';
 import '../theme/secondary_typography.dart';
 import '../theme/tito_colors.dart';
+import '../theme/tito_surface_tokens.dart';
 import '../theme/trainer_journal.dart';
 import '../widgets/handheld_input.dart';
 import '../widgets/retro_forms.dart';
@@ -56,12 +57,13 @@ class CompanionNumberField extends StatelessWidget {
           style: SecondaryTypography.onCard.body14.copyWith(
             fontWeight: FontWeight.w800,
           ),
-          decoration: retroInsetDecoration(hintText: hint).copyWith(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-          ),
+          decoration: retroInsetDecoration(context: context, hintText: hint)
+              .copyWith(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
           onChanged: onChanged,
         ),
       ],
@@ -221,7 +223,7 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
                       ? Colors.white.withValues(alpha: 0.8)
                       : TitoColors.card,
                   borderRadius: BorderRadius.circular(TitoRadii.md),
-                  border: _companionControlBorder(),
+                  border: _companionControlBorder(context),
                 ),
                 child: Row(
                   children: [
@@ -316,18 +318,8 @@ class _CollapsibleTypePickerState extends State<CollapsibleTypePicker> {
 }
 
 /// Outline for the collapsible picker header (field-like control).
-BoxBorder? _companionControlBorder() {
-  if (appVisualStyle.usesTrainerJournal) {
-    return TrainerJournal.allElement();
-  }
-  if (appVisualStyle.usesSolidPlastic) {
-    return Border.all(
-      color: Colors.white.withValues(alpha: 0.85),
-      width: TitoBorders.glass,
-    );
-  }
-  return null;
-}
+BoxBorder? _companionControlBorder(BuildContext context) =>
+    TitoSurfaceTokens.of(context).surface(TitoSurfaceRole.element).border;
 
 /// Type grid tile outline: the selected tile always gets a full ink ring;
 /// idle tiles fade the ring (TJ), use a milky hairline (Plastic), or go

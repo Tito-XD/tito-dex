@@ -363,10 +363,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
               displayLabel: widget.categoryFilter!.displayLabel,
             ),
           if (_loading)
-            TitoLoadingPanel(
-              message: AppZh.referenceLoading,
-              compact: true,
-            )
+            TitoLoadingPanel(message: AppZh.referenceLoading, compact: true)
           else if (_error != null)
             StickerCard(
               child: Column(
@@ -381,10 +378,7 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   const SizedBox(height: 8),
                   Text(_error!, style: SecondaryTypography.onCard.small12),
                   const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: _load,
-                    child: Text(AppZh.dexRetry),
-                  ),
+                  FilledButton(onPressed: _load, child: Text(AppZh.dexRetry)),
                 ],
               ),
             )
@@ -416,21 +410,15 @@ class _DexReferenceListPageState<T> extends State<DexReferenceListPage<T>> {
                   delay: TitoListReveal.staggerDelay(index),
                   child: HandheldFocusDecorator(
                     onActivate: () => _openDetail(context, entry),
-                    borderRadius: BorderRadius.circular(
-                      DeviceLayout.rMd(context),
-                    ),
+                    borderRadius: BorderRadius.circular(TitoRadii.md),
                     child: StickerPressable(
-                      borderRadius: BorderRadius.circular(
-                        DeviceLayout.rMd(context),
-                      ),
+                      borderRadius: BorderRadius.circular(TitoRadii.md),
                       ownShadow: false,
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () => _openDetail(context, entry),
-                          borderRadius: BorderRadius.circular(
-                            DeviceLayout.rMd(context),
-                          ),
+                          borderRadius: BorderRadius.circular(TitoRadii.md),
                           child: StickerCard(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -710,7 +698,7 @@ class _GridItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return HandheldFocusDecorator(
       onActivate: onTap,
-      borderRadius: BorderRadius.circular(DeviceLayout.rMd(context)),
+      borderRadius: BorderRadius.circular(TitoRadii.md),
       child: GestureDetector(
         onTap: onTap,
         child: StickerCard(

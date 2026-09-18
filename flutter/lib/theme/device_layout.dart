@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'tito_colors.dart';
-
 /// Layout helpers for real Android/iOS/Linux devices vs web preview frame.
 abstract final class DeviceLayout {
   static bool get isNativeTarget =>
@@ -217,11 +215,6 @@ abstract final class DeviceLayout {
     return 1.0;
   }
 
-  /// Typography now has explicit Home and secondary-page tokens. Layout
-  /// scaling remains handheld-aware, but body text no longer changes through
-  /// an inherited per-route multiplier.
-  static double fontMultiplier(BuildContext context) => 1.0;
-
   /// Scale layout values that were sized for v0.2.18's 2× handheld chrome.
   static double dim(BuildContext context, double at2xHandheld) {
     if (isNativeTarget || useSquareDashboard(context) || isCompact(context)) {
@@ -229,14 +222,6 @@ abstract final class DeviceLayout {
     }
     return at2xHandheld;
   }
-
-  /// Corner radii are fixed design tokens ([TitoRadii]) on every device. The
-  /// helpers stay for call-site compatibility but no longer halve on handheld.
-  static double radius(BuildContext context, double base) => base;
-
-  static double rSm(BuildContext context) => radius(context, TitoRadii.sm);
-  static double rMd(BuildContext context) => radius(context, TitoRadii.md);
-  static double rLg(BuildContext context) => radius(context, TitoRadii.lg);
 
   static double headerIconSize(BuildContext context) {
     return headerTitleSize(context);
