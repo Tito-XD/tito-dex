@@ -879,7 +879,6 @@ class _SettingsPageState extends State<SettingsPage> {
                               saveName != _trainerController.text
                           ? AppZh.settingsSaveDecodeHint(saveName)
                           : AppZh.settingsSaveTrainerHint,
-                      border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => setState(() => _trainerDirty = true),
                   ),

@@ -131,9 +131,9 @@ class BattleMatchupSummary extends StatelessWidget {
                       style: SecondaryTypography.onCard.body14.copyWith(
                         fontWeight: FontWeight.w800,
                         color: value > 1
-                            ? const Color(0xFFAE3438)
+                            ? TitoColors.danger
                             : value > 0 && value < 1
-                            ? const Color(0xFF286B49)
+                            ? TitoColors.success
                             : TitoColors.deepBlue,
                       ),
                     ),

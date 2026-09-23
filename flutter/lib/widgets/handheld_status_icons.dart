@@ -72,7 +72,7 @@ class _BatteryIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = (level ?? 0).clamp(0, 100);
     final fillColor = switch (value) {
-      < 20 => const Color(0xFFE85D5D),
+      < 20 => TitoColors.danger,
       < 40 => TitoColors.coral,
       _ => charging ? TitoColors.mint : TitoColors.softYellow,
     };

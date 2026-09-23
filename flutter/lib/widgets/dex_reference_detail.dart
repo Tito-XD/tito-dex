@@ -801,7 +801,7 @@ class _TypeModifierChip extends StatelessWidget {
 
   Color _modifierColor(double multiplier) {
     if (multiplier >= 2) {
-      return const Color(0xFF2E9E5B);
+      return TitoColors.success;
     }
     if (multiplier <= 0) {
       return TitoColors.mutedInk;

@@ -19,7 +19,7 @@ class AssistantSurface extends StatelessWidget {
     required this.child,
     this.color,
     this.padding = const EdgeInsets.all(14),
-    this.radius = 20,
+    this.radius = TitoRadii.lg,
     this.borderColor,
     this.borderWidth = TitoBorders.element,
     this.shadow = true,

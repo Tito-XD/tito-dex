@@ -1286,13 +1286,13 @@ class TypeEffectivenessGrid extends StatelessWidget {
 
   Color _multiplierColor(double multiplier) {
     if (multiplier >= 2) {
-      return const Color(0xFFD94848);
+      return TitoColors.danger;
     }
     if (multiplier <= 0) {
       return TitoColors.mutedInk;
     }
     if (multiplier <= 0.5) {
-      return const Color(0xFF4B7FD1);
+      return TitoColors.effectivenessResist;
     }
     return TitoColors.ink;
   }

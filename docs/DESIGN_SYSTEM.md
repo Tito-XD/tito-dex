@@ -216,6 +216,7 @@ No bare `CircularProgressIndicator` in feature code.
 - 对照表：[`design-tokens.json`](design-tokens.json)，由真实 `buildTitoTheme` 实例生成，禁止手改数值。
 - 核心字段：`cardFill`、`cardOutline`（颜色、宽度）、`cardShadow`、`elementOutline`、`pressSink`。
 - `surfaces` 包含卡片变体、输入框、队伍槽、徽章、选中态等语义角色。
+- 顶层 `semantic`（success/danger 及暗色变体、effectivenessResist、selectionInk）、`typePalette`（18 属性粉彩，数据源 `type_chart.dart` 的 `typeTileColors`）与 `typeIcons`（图标集引用）随同一导出提供，供 Web 端对齐消费。
 - 颜色格式为 CSS `#RRGGBBAA`（不是 Flutter 的 AARRGGBB）；尺寸使用逻辑像素 / CSS px。
 - 塑料表面的 `fill` 是光学渲染底色，`opacity` 是其透明度参数；JSON 不替代光学渲染器。
 - `retroStyle` 仍控制阴影与按压；JSON 表示开启深度时的配方，Flat 关闭深度时读 `flatCardOutline`。

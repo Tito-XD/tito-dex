@@ -16,6 +16,44 @@
     "lg": 16.0,
     "xl": 28.0
   },
+  "semantic": {
+    "success": {
+      "light": "#2F9E62FF",
+      "dark": "#4CBD8AFF"
+    },
+    "danger": {
+      "light": "#D64545FF",
+      "dark": "#FF8080FF"
+    },
+    "effectivenessResist": "#4B7FD1FF",
+    "selectionInk": "#08402FFF"
+  },
+  "typePalette": {
+    "fallback": "#B8D8F0FF",
+    "normal": "#D8D3C3FF",
+    "fire": "#F5A26FFF",
+    "water": "#7CB7FFFF",
+    "electric": "#F7D977FF",
+    "grass": "#8ED081FF",
+    "ice": "#9BE7E6FF",
+    "fighting": "#E07B62FF",
+    "poison": "#C68FD9FF",
+    "ground": "#E6C07AFF",
+    "flying": "#B8C8F0FF",
+    "psychic": "#FF8CB3FF",
+    "bug": "#B5D06AFF",
+    "rock": "#C9B48AFF",
+    "ghost": "#9F8AC8FF",
+    "dragon": "#7B8CFFFF",
+    "dark": "#9B8B7DFF",
+    "steel": "#B0C0CFFF",
+    "fairy": "#FFA9D6FF"
+  },
+  "typeIcons": {
+    "set": "gen8",
+    "slugScheme": "type_icons/<slug>.png",
+    "source": "v5"
+  },
   "themes": {
     "trainerJournal": {
       "finish": "paper",

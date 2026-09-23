@@ -708,10 +708,7 @@ class _DamageResultCard extends StatelessWidget {
             children: [
               Text(
                 bigPercent,
-                style: SecondaryTypography.onGradient.h15.copyWith(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 34 * -0.03,
+                style: SecondaryTypography.onGradient.h34.copyWith(
                   color: TitoColors.softYellow,
                 ),
               ),

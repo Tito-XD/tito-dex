@@ -132,6 +132,20 @@ abstract final class TitoColors {
   static const hpGreen = Color(0xFF6BC4A6);
   static const expGold = Color(0xFFF7D977);
 
+  // Semantic status palette shared with docs/design-tokens.json and the web
+  // token table (--color-success / --color-danger). Dark variants exist for
+  // web parity; the app currently only consumes the light values.
+  static const success = Color(0xFF2F9E62);
+  static const successDark = Color(0xFF4CBD8A);
+  static const danger = Color(0xFFD64545);
+  static const dangerDark = Color(0xFFFF8080);
+
+  /// Tint for resisted type-effectiveness hits (app-only semantic).
+  static const effectivenessResist = Color(0xFF4B7FD1);
+
+  /// Selected-state ink on pastel fills (chip/toggle labels).
+  static const selectionInk = Color(0xFF08402F);
+
   // Solid Plastic keeps a cool hardware shell underneath the optical layers.
   // The accents are deliberately milky instead of neon so translucent edges
   // read as moulded plastic rather than a fully transparent glass sheet.

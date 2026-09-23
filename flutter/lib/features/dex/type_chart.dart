@@ -72,27 +72,35 @@ IconData typeIconData(String type) => switch (type) {
       _ => Icons.help_outline,
     };
 
-Color typeTileColor(String type) => switch (type) {
-      'normal' => const Color(0xFFD8D3C3),
-      'fire' => const Color(0xFFF5A26F),
-      'water' => const Color(0xFF7CB7FF),
-      'electric' => const Color(0xFFF7D977),
-      'grass' => const Color(0xFF8ED081),
-      'ice' => const Color(0xFF9BE7E6),
-      'fighting' => const Color(0xFFE07B62),
-      'poison' => const Color(0xFFC68FD9),
-      'ground' => const Color(0xFFE6C07A),
-      'flying' => const Color(0xFFB8C8F0),
-      'psychic' => const Color(0xFFFF8CB3),
-      'bug' => const Color(0xFFB5D06A),
-      'rock' => const Color(0xFFC9B48A),
-      'ghost' => const Color(0xFF9F8AC8),
-      'dragon' => const Color(0xFF7B8CFF),
-      'dark' => const Color(0xFF9B8B7D),
-      'steel' => const Color(0xFFB0C0CF),
-      'fairy' => const Color(0xFFFFA9D6),
-      _ => const Color(0xFFB8D8F0),
-    };
+/// Pastel tile palette for the 18 types, keyed by lowercase slug.
+///
+/// Canonical source of the exported design-tokens.json `typePalette` block;
+/// values must stay byte-identical with the web `typeTileColors` copy.
+const Map<String, Color> typeTileColors = {
+  'normal': Color(0xFFD8D3C3),
+  'fire': Color(0xFFF5A26F),
+  'water': Color(0xFF7CB7FF),
+  'electric': Color(0xFFF7D977),
+  'grass': Color(0xFF8ED081),
+  'ice': Color(0xFF9BE7E6),
+  'fighting': Color(0xFFE07B62),
+  'poison': Color(0xFFC68FD9),
+  'ground': Color(0xFFE6C07A),
+  'flying': Color(0xFFB8C8F0),
+  'psychic': Color(0xFFFF8CB3),
+  'bug': Color(0xFFB5D06A),
+  'rock': Color(0xFFC9B48A),
+  'ghost': Color(0xFF9F8AC8),
+  'dragon': Color(0xFF7B8CFF),
+  'dark': Color(0xFF9B8B7D),
+  'steel': Color(0xFFB0C0CF),
+  'fairy': Color(0xFFFFA9D6),
+};
+
+/// Tile color for unknown type slugs.
+const Color typeTileColorFallback = Color(0xFFB8D8F0);
+
+Color typeTileColor(String type) => typeTileColors[type] ?? typeTileColorFallback;
 
 /// Defensive profile: how incoming attack types interact with [defenderTypes].
 class DefensiveProfile {

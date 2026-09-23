@@ -16,6 +16,7 @@ import 'tito_typography.dart';
 /// |------|-----|-------|-----|
 /// | Page title | 22.5 | `onGradient.title` | App bar «← 图鉴» |
 /// | Section | 15 | `h15` | Card headings, tab context |
+/// | Hero metric | 34 | `h34` | Damage percent, big stat numbers |
 /// | Body / meta | 14 | `body14` / `meta14` | Descriptions, values, tab labels |
 /// | Small / team | 12 | `small12` / `team12` | Hints, HP row, bottom tabs |
 ///
@@ -75,6 +76,14 @@ final class SecondaryPageTypography {
     fontWeight: FontWeight.w800,
     color: color,
     letterSpacing: 15 * -0.02,
+  );
+
+  /// Hero metric (damage percent) — 34px extra-bold with tight tracking.
+  TextStyle get h34 => TitoTypography.style(
+    fontSize: 34,
+    fontWeight: FontWeight.w800,
+    color: color,
+    letterSpacing: 34 * -0.03,
   );
 
   TextStyle get body14 => TitoTypography.style(

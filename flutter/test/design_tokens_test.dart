@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:titodex/features/dex/type_chart.dart';
 import 'package:titodex/theme/app_visual_style.dart';
 import 'package:titodex/theme/tito_colors.dart';
 import 'package:titodex/theme/tito_surface_tokens.dart';
@@ -28,6 +29,28 @@ void main() {
         'md': TitoRadii.md,
         'lg': TitoRadii.lg,
         'xl': TitoRadii.xl,
+      },
+      'semantic': {
+        'success': {
+          'light': colorToken(TitoColors.success),
+          'dark': colorToken(TitoColors.successDark),
+        },
+        'danger': {
+          'light': colorToken(TitoColors.danger),
+          'dark': colorToken(TitoColors.dangerDark),
+        },
+        'effectivenessResist': colorToken(TitoColors.effectivenessResist),
+        'selectionInk': colorToken(TitoColors.selectionInk),
+      },
+      'typePalette': {
+        'fallback': colorToken(typeTileColorFallback),
+        for (final entry in typeTileColors.entries)
+          entry.key: colorToken(entry.value),
+      },
+      'typeIcons': {
+        'set': 'gen8',
+        'slugScheme': 'type_icons/<slug>.png',
+        'source': 'v5',
       },
       'themes': {
         for (final style in AppVisualStyle.values)

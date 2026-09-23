@@ -367,7 +367,7 @@ class StickerPillToggle extends StatelessWidget {
                   style: SecondaryTypography.onCard.small12.copyWith(
                     fontWeight: FontWeight.w800,
                     color: value
-                        ? const Color(0xFF08402F)
+                        ? TitoColors.selectionInk
                         : TitoColors.mutedInk,
                   ),
                 ),
