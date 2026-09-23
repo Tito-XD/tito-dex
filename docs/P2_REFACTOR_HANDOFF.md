@@ -82,5 +82,43 @@ flutter test --no-pub
 抽出的样式要对照 Journal/Plastic/Flat、深度开关、手机/掌机尺寸；
 保留描边、透明度、阴影层级、裁剪和点击反馈。
 
+## Web DEX 数据对齐（独立轨道，与第二轮无耦合）
+
+> 目标：网页图鉴成为 App 图鉴的**同源只读镜像**——网页可以是子集，但它展示
+> 的每个结果与筛选语义必须出自同一份事实。App 本地离线用、无分享功能，对齐
+> 是单向的：Web 向 App 的数据事实收敛。
+
+原则：bundle 是唯一事实源，App 与 Web 都只是客户端；写侧永远产出 bundle
+（构建/审计/发布工具在本仓库），读侧永远消费 bundle，"哪边维护数据"由此
+消解。只对齐 dex 面：数据版本、搜索/筛选语义、形态与进化处理、媒体可用性
+规则、分版本招式语义。存档/旅程（隐私边界）、问 TitoDex、对战工具、Sleep
+保持 App-only；拼贴/测验/PWA 保持 Web-only。
+
+现状与漂移根源：App 消费 CDN `/v5/` v20 bundle（4748 对象、SHA-256 校验、
+`/v4/` 回滚、版本门禁）；Web（titodex.pages.dev，独立仓库）用构建时自有快照
+加 `/data/dex-search-references.json`，无版本号、无校验——两边会静默漂移。
+
+方案 B（先做，约一天）：Web 构建脚本从同一 `bundle-manifest.json` 拉同版本
+对象生成站点数据，钉住 `bundleVersion`，替换手工快照路径；`/pokedex` 页脚
+显示"数据 v20 · 同步于 <date>"；Web CI 每日比对站点数据版本与线上 manifest，
+落后即报警（先 issue）；可选接本仓库发布 workflow 的 `repository_dispatch`
+自动重建。
+
+方案 A（升级项）：同域代理运行时读——Pages Function / Worker 路由（`/cdn/*`
+→ R2 绑定），Web JS 只 fetch 自己域名，私有 CDN base 不进公开 JS
+（PERMISSIONS 约束）。首访记版本、按需取对象、Cache API 缓存、PWA 兜底；
+`/v5/` 是松散对象，Web 端无需 zstd。
+
+语义下沉：多词搜索别名表（`dex_search_terms.dart`）、大小分桶切点、形态标签
+规则提升为 bundle 数据文件（如 `search_aliases.json`、`size_buckets.json`），
+App/Web 都读数据而非各自内嵌。
+
+安全红线（Web 侧）：私有 CDN base URL 不进 Web 仓库的公开产物（源码/构建
+JS/文案），只存在于 CI secrets 或同域代理绑定；Web 是只读消费者，不发布、
+不改写 bundle，不触碰 `/v4/`。
+
+漂移证明：版本对齐加 bundle 的 SHA-256 校验链即证明"两边同一份字节"；金样本
+交叉查询（扩展 `tools/audit_dex_golden_samples.py`）为可选加强，不是起步要求。
+
 第二轮结论已合并到 `AI_CONTEXT.md`；本文保留验收边界及独立后续事项，
 不作为当前版本和实际发布状态的替代记录。
