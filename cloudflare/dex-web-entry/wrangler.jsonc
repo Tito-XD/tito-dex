@@ -1,0 +1,8 @@
+{
+  "name": "titodex-web-entry",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-27",
+  "workers_dev": false,
+  "services": [{ "binding": "CDN", "service": "tito-dex" }],
+  "routes": [{ "pattern": "dex.tito.cafe/*", "zone_name": "tito.cafe" }]
+}

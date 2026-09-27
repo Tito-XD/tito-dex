@@ -1,0 +1,6 @@
+{
+  "name": "titodex-web-entry",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test" }
+}
