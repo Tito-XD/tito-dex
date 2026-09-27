@@ -6,6 +6,10 @@ name = "tito-dex"
 main = "src/worker.js"
 compatibility_date = "2026-07-23"
 
+# Public host routing is owned by ../dex-web-entry; this Worker is called
+# through its CDN service binding. Do not reclaim the host-wide route.
+routes = []
+
 # Set in Dashboard → Settings → Variables, or uncomment after first deploy:
 # account_id = "YOUR_ACCOUNT_ID"
 
@@ -17,11 +21,6 @@ bucket_name = "titodex-dex"
 [[kv_namespaces]]
 binding = "MANIFEST_KV"
 id = "38305ab2b6b249079241407b5e1e0366"
-
-# Custom domain — zone tito.cafe must be on this Cloudflare account.
-[[routes]]
-pattern = "dex.tito.cafe/*"
-zone_name = "tito.cafe"
 
 [triggers]
 crons = ["0 4 * * SUN", "0 */6 * * *"]
