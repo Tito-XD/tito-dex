@@ -61,15 +61,16 @@ Dashboard → **R2** → 启用并创建 bucket：`titodex-dex`
 
 ### 4. 自定义域名 `dex.tito.cafe`
 
-专用图鉴 CDN 子域名。**推荐**，App 与离线包 URL 均使用该域名。
+该域名同时提供网页入口与 App CDN。整站路由 `dex.tito.cafe/*` 由
+[`titodex-web-entry`](../dex-web-entry/README.md) 管理：网页路径请求原 Pages，
+CDN 路径通过 service binding 调用 `tito-dex`。
 
-1. Worker → **Settings** → **Domains & Routes** → Add custom domain → `dex.tito.cafe`
-2. 确认 `tito.cafe` zone 在本 CF 账号（DNS 通常自动创建）
-3. 等 Custom domain 状态变成 Active；若向导没有自动创建 DNS，按向导给出的
-   类型/目标补记录，不要把 `dex` 直接指向 R2 公开 bucket
-4. 用根 manifest 与 `/cdn-health` 验证 HTTPS、CORS 和 Worker 路由
+`dex-cdn/wrangler.toml` 使用 `routes = []`，部署 CDN Worker 时不得重新绑定
+整站路由或添加该域名的 Custom domain。现有 DNS 保持不变。
 
-`wrangler.toml` 已含 `dex.tito.cafe/*` 路由；经核对后执行 Worker 部署会同步。
+部署后验证首页、App 介绍、1025 拼贴、网页图鉴，以及根 manifest、
+`/cdn-health` 和版本化资源。旧 `deploy/dex-cdn` 分支仍含历史整站路由；
+恢复其自动部署前，必须按上文迁移分支并同步移除该路由。
 
 ### 5. Cache Rules（Dashboard）
 

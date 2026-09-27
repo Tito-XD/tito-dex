@@ -18,7 +18,7 @@ npx wrangler@4.107.1 deploy --dry-run --config cloudflare/dex-web-entry/wrangler
 npx wrangler@4.107.1 deploy --config cloudflare/dex-web-entry/wrangler.jsonc
 ```
 
-入口配置负责 host-wide route；`../dex-cdn/wrangler.toml` 不再声明该路由。CDN 自动部署分支也必须采用这一配置，避免旧配置重新抢占网页入口。
+入口配置负责 host-wide route；`../dex-cdn/wrangler.toml` 不再声明该路由。旧 `deploy/dex-cdn` 分支的自动部署流程已在 [CDN 部署说明](../dex-cdn/DEPLOY.md) 中标记为待迁移；恢复时也必须采用这一配置，避免旧配置重新抢占网页入口。当前从经过验证的 main 源码独立部署 Worker。
 
 2026-09-27 首次切换前，先部署无正式 route 的临时配置，验证网页与 CDN 基线，再将原路由的 script 从 `tito-dex` 改为 `titodex-web-entry`。正式验证后关闭临时 workers.dev 入口。
 
