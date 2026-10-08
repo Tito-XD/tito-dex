@@ -4,6 +4,12 @@
 
 “问 TitoDex”是可选的存档优先卡关助手。主 APK 内建上下文能力和三个 HGSS 审核链路，但整个功能默认关闭；用户必须先在设置中确认联网、AI 检索和最近对话上下文说明，Journey／Search 才会出现入口。关闭时不预留入口位置，也不发起健康检查或问答请求。开启后仍然本地优先，并可再单独关闭在线回答。在线审核库增加了 DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯和朱紫的少量关键卡点，但仍不是完整流程攻略，也不会把“能识别版本”误写成“已经解析所有剧情进度”。
 
+> 当前 main 已准备 GLM 5.3 Flash 公共分类、组成与核验路径。Worker 通过
+> AI Gateway 自定义 Provider raw slug `zai`（控制台及请求标识 `custom-zai`）调用 Z.ai 标准 API，
+> 并显式选择 BYOK 别名 `journey-assistant`。当前生产因 Z.ai 上游 WAF 对 AI Gateway 转发返回 405，
+> 保持 `AI_EXTERNAL_PROVIDER_ENABLED=false`，因此 Workers AI Qwen 暂时继续服务。
+> DeepSeek Anthropic 原生联网检索链保持独立并行。
+
 ## 匹配顺序
 
 ```text
@@ -17,12 +23,12 @@
           → 开放式培养／攻略／路线问题：bundle 事实 + 固定来源 + Tavily 中文 52Poké 优先、其余来源回退
           → AI Search（BGE-M3 hybrid/RRF）只召回候选 hintId
           → 只接受本地审核白名单中的 hintId
-          → 默认 Workers AI 只做候选分类/段落排序
+          → 默认主模型只做候选分类/段落排序
           → 审核库仍未命中：严格范围门禁后限定查询 PokéAPI / StrategyWiki / Wikidata
           → 结构化进化/招式可先按当前版本确定性提取
           → Tavily／固定来源与 DeepSeek V4 Flash 原生限定搜索并行，避免串行超时
-          → Qwen 优先根据 bundle 与白名单片段生成并做第二遍事实支持核对
-          → Tavily／固定来源与 DeepSeek 都成功时，再由 Qwen 判断核心事实是否独立印证且无版本冲突
+          → GLM 5.3 Flash 优先根据 bundle 与白名单片段生成并做第二遍事实支持核对
+          → Tavily／固定来源与 DeepSeek 都成功时，再由 GLM 5.3 Flash 判断核心事实是否独立印证且无版本冲突
           → 宽范围试用模式下，若第二遍核对失败但已有固定域名来源，降为低置信度而非直接丢弃
           → 两路都失败才澄清或 no_match
 ```
@@ -42,9 +48,9 @@ source revision、许可和审核记录。52Poké/Bulbapedia 的原文、图片�
 
 即时限定来源回答与审核数据供应链分开：Worker 可在审核库未命中后查询
 PokéAPI REST v2 的结构化实体、StrategyWiki 的最新 revision 与 Wikidata 的
-CC0 实体搜索，随后由 Workers AI Qwen 只根据这些有界资料生成明确标为“未经
+CC0 实体搜索，随后由 AI Gateway GLM 5.3 Flash 只根据这些有界资料生成明确标为“未经
 TitoDex 人工审核”的回答。精确招式数值会根据所选游戏的 version-group 与
-`past_values` 在来源层先行解析；Qwen 组成必须先确认资料直接支持问题，并经过
+`past_values` 在来源层先行解析；GLM 5.3 Flash 组成必须先确认资料直接支持问题，并经过
 第二次事实支持核对。开放式培养／攻略／路线／推荐问题可显式开启 Tavily，先用
 中文问题单独查询 52Poké，并把返回域名再次限制为 `wiki.52poke.com`；只有资料为空
 或组成／核验不能支持答案时，才对其余允许站点执行中英文回退查询。正常模式仍要求两个独立证据组；
@@ -52,7 +58,7 @@ v0.8.16 的明确试用开关允许已有一个固定域名证据组时返回低
 丢弃，并在界面展示试用警告。窄问题则仅在固定来源仍无法支持时调用。Tavily 只对
 Pokémon.com、Bulbapedia、Serebii、StrategyWiki、PokéAPI、Pokémon Database、52Poké wiki、
 Smogon、Marriland、GameFAQs、Game8、IGN、Nintendo Life 与 Eurogamer
-做有界 `basic` 搜索。Tavily 不生成答案、不返回页面全文，其短片段仍必须通过同一遍 Qwen
+做有界 `basic` 搜索。Tavily 不生成答案、不返回页面全文，其短片段仍必须通过同一遍 GLM 5.3 Flash
 组成与第二遍事实支持核对。Worker 不接收客户端或模型给出的 URL/域名，也不会
 把即时回答自动写入 R2。PokéAPI 实体优先由 App 已有的中文宝可梦／招式／道具／
 特性／地点紧凑目录确定性映射；StrategyWiki 若拒绝 Cloudflare 出站请求则跳过，
@@ -104,11 +110,11 @@ release gate，并要求审核事实与 hint ID 完全一致。
 ## Cloudflare 选型
 
 - **AI Search + BGE-M3：需要，但保持可选。** BGE-M3 运行在 Cloudflare 托管侧，不塞进 Worker bundle，也不在设备下载模型。它支持中文/多语言 embedding；hybrid + RRF 同时利用别名关键词和语义近似。
-- **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题会先确定性组装；V20 中标为 `online-verify` 的命中继续作为本地底稿进入限定来源交叉核验，只有取得真实网页证据才替换底稿，联网为空、超时或模型失败则返回本地底稿并明确标注。开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 Qwen，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
-- **Workers AI Qwen：公共默认。** 唯一命中的本地审核 hint 不调用模型；V20 `online-verify` 事实、未命中／并列和开放式问题才可能消耗 Workers AI 免费额度。额度或模型失败后返回本地确定性底稿、澄清或 `no_match`。
+- **Dex R2 结构化事实：回答底座与校验层。** Worker 只读现有版本化 Dex bundle 的根 manifest、数值物种详情和固定目录对象，利用宝可梦、进化、属性、能力值、特性、精确版本遭遇、携带物、招式表，以及道具／招式目录。版本遭遇、携带物、版本招式表等明确问题会先确定性组装；V20 中标为 `online-verify` 的命中继续作为本地底稿进入限定来源交叉核验，只有取得真实网页证据才替换底稿，联网为空、超时或模型失败则返回本地底稿并明确标注。开放式培养、攻略、路线或推荐问题则把当前实体的最多 6,000 字符结构化证据与固定来源、Tavily 联网结果一起交给 GLM 5.3 Flash，用 bundle 核对实体、版本和数值，再做第二遍事实支持验证。bundle 命中不等于禁止联网。通用进化条件与招式数值不会覆盖原有的逐版本 PokéAPI 核对路径。对象、路径、大小、实体 ID 与精确游戏 key 全部校验；App 不直连 R2，也不会把朱／紫等成对版本的数据混用。
+- **AI Gateway GLM 5.3 Flash：目标公共默认，当前受上游 WAF 阻塞。** Cloudflare 控制台在 raw slug `zai` 前固定显示 `custom-`，因此 Provider 请求标识就是 `custom-zai`，不能再次叠加前缀。base URL 固定为 `https://api.z.ai/api/paas/v4`，请求路径为 `chat/completions`，模型为 `glm-5.3-flash`，BYOK 别名为 `journey-assistant`。密钥只保存在 AI Gateway Provider Keys／Secrets Store，不进入 Worker、仓库或 App。2026-09-01 的最小 `Hello` smoke 仍被 Z.ai 的阿里云 WAF 以 HTTP 405 阻断；在 Provider 侧放行前保持功能门关闭。唯一命中的本地审核 hint 不调用模型；外部 Provider 失败时先回退 Workers AI Qwen，再回到本地确定性底稿、澄清或 `no_match`。
 - **免 Key 限定来源：审核库未命中时可选。** `CURATED_WEB_ENABLED=true` 时仅查询 PokéAPI、StrategyWiki、Wikidata；不需要新 Cloudflare 资源或第三方 key。现有每设备 20 次/分钟限流继续生效，不另设每天 5 次上限。范围分类、来源请求或生成任何一步失败都保留原本的本地 `no_match`。
 - **Tavily 限定搜索：可选的联网证据层。** 中文问题先发起一组仅允许 52Poké 的查询，并再次校验返回 host；若没有得到可支持答案的证据，开放式培养／攻略／路线／推荐问题才会对其余允许站点发起中英文两组回退查询，窄问题则发起一组混合语言回退。`TAVILY_API_KEY` 必须存为 Worker Secret，且 `TAVILY_WEB_ENABLED=true` 才启用；当前生产配置已在 Secret 就绪后开启。每组 basic search 最多 6 条、短超时、响应字节上限、无重试；额度/网络失败继续其他路径，最终始终输出简体中文。
-- **DeepSeek V4 Flash 原生搜索：宽范围试用，与 Tavily 并行。** Worker 固定调用 `custom-deepseek-anthropic` 的 `anthropic/v1/messages` 与 `deepseek-v4-flash`，并显式选择 BYOK 别名 `TitoDex`，缺失时不会回退到 `default`。密钥只保存在 BYOK/Secrets Store，Gateway 身份与 Run token 只保存在加密 Worker Secrets。已确认原生搜索会实际执行，但当前响应常不含 `cited_text`；因此 Worker 会重新校验每个来源域名，有片段时交给 Qwen 复核，没有片段时在 `EXPERIMENTAL_BROAD_ANSWERS=true` 下明确标为低置信度试用答案。若 Tavily／固定来源的主回答也成功，会额外调用一次 Qwen，只判断 DeepSeek 是否对核心事实形成独立印证且没有地点、数值或版本冲突；只有通过才显示 `Qwen × DeepSeek 交叉核对`，正文仍保留主证据链。任何失败仍可由 Tavily + Qwen 或本地确定性结果接管。
+- **DeepSeek V4 Flash 原生搜索：宽范围试用，与 Tavily 并行。** Worker 固定调用 `custom-deepseek-anthropic` 的 `anthropic/v1/messages` 与 `deepseek-v4-flash`，并显式选择 BYOK 别名 `TitoDex`，缺失时不会回退到 `default`。密钥只保存在 BYOK/Secrets Store，Gateway 身份与 Run token 只保存在加密 Worker Secrets。已确认原生搜索会实际执行，但当前响应常不含 `cited_text`；因此 Worker 会重新校验每个来源域名，有片段时交给 GLM 5.3 Flash 复核，没有片段时在 `EXPERIMENTAL_BROAD_ANSWERS=true` 下明确标为低置信度试用答案。若 Tavily／固定来源的主回答也成功，会额外调用一次 GLM 5.3 Flash，只判断 DeepSeek 是否对核心事实形成独立印证且没有地点、数值或版本冲突；只有通过才显示 `GLM 5.3 Flash × DeepSeek 交叉核对`，正文仍保留主证据链。任何失败仍可由 Tavily + GLM 5.3 Flash 或本地确定性结果接管。
 - **不使用 Agents SDK / Durable Objects / Queues / Workflows。** 当前是短请求、无会话状态、事实白名单的检索分类，普通 Worker 已足够。
 
 AI Search 只信五个自定义 metadata 字段：`hint_id` text、`audited` boolean、`game` text、`generation` number、`location_id` text。Cloudflare 要求字段名全小写。它返回的 chunk 文本被完全忽略。实例创建时固定 embedding 模型；更换模型要新建实例，不能在原索引上静默改向量维度。
@@ -120,7 +126,7 @@ AI Search 只信五个自定义 metadata 字段：`hint_id` text、`audited` boo
 1. `JOURNEY_CONTENT` → R2 bucket `titodex-journey-content`，只由 Worker 读取；App 不直连 R2。
 2. `DEX_CONTENT` → 现有版本化 Dex R2 bucket，只由 Worker 对根 manifest、数值物种详情及固定 `items.json`／`moves.json`／`dex_catalog.json` 路径做有界读取；不会修改或公开 CDN manifest／对象。
 3. `JOURNEY_SEARCH_NAMESPACE` → AI Search namespace `tito-dex`；Worker 仅在 `AI_SEARCH_ENABLED=true` 时调用 `.get("titodex-journey-search")` 获取实例。`ai_search` 单实例 binding 只能访问 `default` namespace，因此这里必须使用 `ai_search_namespaces`。实例 embedding 选择 `@cf/baai/bge-m3`，启用 hybrid，并配置上述五个 metadata 字段。
-4. `AI` → Workers AI；Gateway ID 固定为 `titodex-journey-assistant`，Worker 通过 `env.AI.gateway(...)` 使用，App 不直连 Gateway。
+4. `AI` → Workers AI binding，仅用于 Qwen 回退；GLM 使用与 DeepSeek 相同的 Provider-native Gateway HTTPS 路径，由 Worker Secrets 中的 `CF_ACCOUNT_ID`／`CF_AIG_TOKEN` 认证，并通过 `cf-aig-byok-alias: journey-assistant` 选择 Z.ai 密钥。Gateway ID 固定为 `titodex-journey-assistant`，App 不直连 Gateway。
 
 `CURATED_WEB_ENABLED` 是纯 Worker 开关，不是 binding。当前 App 的响应契约已能
 显示通用 `answered`、来源名称与本次实际执行路径。限定来源查询逻辑本身只更新
@@ -129,16 +135,16 @@ Worker 即可生效；若要看到连接状态卡、伙伴等待动画及细分�
 在 Cloudflare Dashboard 新建资源或保存 Secret。Tavily 不需要 Cloudflare 新资源，但需要将
 `TAVILY_API_KEY` 保存为现有 Worker 的加密 Secret，然后再单独开启 `TAVILY_WEB_ENABLED`。
 
-进入“问 TitoDex”时，App 会读取 Worker 的 `/health`，显示 Worker、Workers AI
-Qwen、AI Search 与限定来源的配置状态。通用 `webSearch` 和
+进入“问 TitoDex”时，App 会读取 Worker 的 `/health`，显示 Worker、AI Gateway
+GLM 5.3 Flash、AI Search 与限定来源的配置状态。通用 `webSearch` 和
 `webSearchProviders` 会分别显示已配置的 `tavily` 与 `deepseek-native`。旧客户端的
-`braveSearch: false` 仅保留兼容。后续源码的状态弹窗逐项列出 Worker、Qwen、AI Search、
+`braveSearch: false` 仅保留兼容。后续源码的状态弹窗逐项列出 Worker、GLM 5.3 Flash、AI Search、
 Dex bundle、合并后的“多个百科来源”和两条联网路径，并显示本机问答数量；完整可能来源及权利说明统一放在 Settings Credits。这个
 状态只代表部署配置和 Worker 当前可达，不伪称模型额度或第三方来源一定成功；每条
 回答另外显示本次实际走过的 `answerMode`、`modelUsed`、`aiSearchUsed` 与
-`sourceKinds`。因此唯一命中的本地审核 hint 会显示“本次未调用 Qwen”；V20
+`sourceKinds`。因此唯一命中的本地审核 hint 会显示“本次未调用 GLM 5.3 Flash”；V20
 `online-verify` 底稿会在取得真实在线证据后显示相应来源，太阳伊布等本地审核库
-未覆盖的问题若成功使用即时来源，会显示“限定来源 · Qwen 整理”及真实来源；在线
+未覆盖的问题若成功使用即时来源，会显示“限定来源 · GLM 5.3 Flash 整理”及真实来源；在线
 超时／失败则明确显示已回退本地，不再静默伪装成普通 no-match。
 
 确认后的 R2 对象布局：
@@ -152,7 +158,7 @@ extensions/journey-assistant/objects/<immutable-digest-name>.apk  # 仅旧兼容
 AI Search 数据源只包含 `journey-search/`，不能索引 `extensions/`。当前主 App 只需 `/v1/ask`；旧 catalog 与固定 `objects/*.apk` 路径暂留兼容，但内建助手不会调用它们。
 
 现有 Dex bundle 不复制到 `journey-search/`：精确实体、版本遭遇、携带物和招式表
-直接从 `DEX_CONTENT` 读取并确定性组装，优先于联网搜索，也不会消耗 Qwen；开放式
+直接从 `DEX_CONTENT` 读取并确定性组装，优先于联网搜索，也不会消耗 GLM 5.3 Flash；开放式
 问题抽取当前实体所需的小型证据对象作为联网回答的校验底座，并与固定来源、Tavily
 证据共同组成和复核。后续若为口语别名增加派生 AI Search
 文档，索引只负责返回候选宝可梦／道具／招式与版本；Worker 仍必须
@@ -160,7 +166,7 @@ AI Search 数据源只包含 `journey-search/`，不能索引 `extensions/`。�
 已有 bundle，又不会产生两套容易漂移的图鉴数据。
 
 许可边界仍然生效：中文 flavor prose 不进入模型或 embedding；携带物中来自
-52Poké 的批次只用于带来源说明的确定性回答，不送给 Qwen／AI Search。攻略回答可
+52Poké 的批次只用于带来源说明的确定性回答，不送给 GLM 5.3 Flash／AI Search。攻略回答可
 把 PokeAPI／版本 overlay 的结构化字段作为背景，但“某道具能推进剧情”只有在审核
 Journey requirement 明确关联时才能成立，不能从“野生宝可梦会携带它”自行推断。
 
@@ -170,7 +176,7 @@ Journey requirement 明确关联时才能成立，不能从“野生宝可梦会
 python3 tools/build_journey_search_documents.py /tmp/titodex-journey-search
 ```
 
-正式上传前检查 `search-upload-plan.json`：每个搜索对象只能带 `hint_id`、`audited`、`game`、`generation`、`location_id` 这五项 custom metadata。R2 metadata 是字符串；AI Search 字段 schema 会把 `audited`/`generation` 转为 boolean/number。确认索引完成后，才在部署配置中把 `AI_SEARCH_ENABLED` 设为 `true`。Tavily 与 DeepSeek 已在各自 Secret/BYOK 和 live smoke 就绪后启用；公共整理仍优先使用 Workers AI Qwen，所有搜索失败都回退到确定性回答。
+正式上传前检查 `search-upload-plan.json`：每个搜索对象只能带 `hint_id`、`audited`、`game`、`generation`、`location_id` 这五项 custom metadata。R2 metadata 是字符串；AI Search 字段 schema 会把 `audited`/`generation` 转为 boolean/number。确认索引完成后，才在部署配置中把 `AI_SEARCH_ENABLED` 设为 `true`。Tavily 与 DeepSeek 已在各自 Secret/BYOK 和 live smoke 就绪后启用；公共整理仍优先使用 AI Gateway GLM 5.3 Flash，Provider 失败时回退 Workers AI Qwen，所有搜索失败都回退到确定性回答。
 
 ## 验证与部署闸门
 
@@ -188,4 +194,4 @@ cd ../../cloudflare/journey-assistant && npm ci && npm run check && npm test && 
 
 Tavily 与 DeepSeek 原生搜索适配器及回退测试都已准备；当前检入配置同时启用两者，并开启明确标注的宽范围试用策略。真实 Secret 只存在于 Cloudflare 加密配置中。
 
-当前 Worker 启用 AI Search、免密钥固定来源、Tavily 与 DeepSeek，公共整理默认使用 Workers AI。Dex bundle 只读接入不修改当前 v20 图鉴 CDN manifest 或对象。生产 URL、Account ID 与密钥不写入源码或文档。官方参考：[AI Search BGE-M3 支持](https://developers.cloudflare.com/ai-search/configuration/models/supported-models/) · [metadata filtering](https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/) · [R2 data source](https://developers.cloudflare.com/ai-search/configuration/data-source/r2/) · [Tavily Search API](https://docs.tavily.com/documentation/api-reference/endpoint/search) · [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/) · [Worker binding 限制](https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/) · [custom providers](https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/) · [Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) · [DeepSeek Anthropic API](https://api-docs.deepseek.com/guides/anthropic_api)。
+当前 Worker 启用 AI Search、免密钥固定来源、Tavily 与 DeepSeek，公共整理默认使用 AI Gateway GLM 5.3 Flash，并保留 Workers AI Qwen 回退。Dex bundle 只读接入不修改当前 v20 图鉴 CDN manifest 或对象。生产 URL、Account ID 与密钥不写入源码或文档。官方参考：[AI Search BGE-M3 支持](https://developers.cloudflare.com/ai-search/configuration/models/supported-models/) · [metadata filtering](https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/) · [R2 data source](https://developers.cloudflare.com/ai-search/configuration/data-source/r2/) · [Tavily Search API](https://docs.tavily.com/documentation/api-reference/endpoint/search) · [AI Gateway BYOK](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/) · [Worker binding 限制](https://developers.cloudflare.com/ai-gateway/usage/worker-binding-methods/) · [custom providers](https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/) · [Gateway authentication](https://developers.cloudflare.com/ai-gateway/configuration/authentication/) · [BigModel 标准 HTTP API](https://docs.bigmodel.cn/cn/guide/develop/http/introduction) · [DeepSeek Anthropic API](https://api-docs.deepseek.com/guides/anthropic_api)。

@@ -16,7 +16,8 @@
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",
     "AI_PROVIDER": "workers-ai",
     "AI_PROVIDER_MODEL": "deepseek-v4-flash",
-    "AI_PROVIDER_ENDPOINT": "chat/completions"
+    "AI_PROVIDER_ENDPOINT": "chat/completions",
+    "AI_PROVIDER_KEY_ALIAS": "journey-assistant"
   },
   "r2_buckets": [
     {
@@ -28,6 +29,8 @@
       "bucket_name": "titodex-dex-test"
     }
   ],
+  "durable_objects": { "bindings": [{ "name": "QUESTION_BUDGET", "class_name": "QuestionBudget" }] },
+  "migrations": [{ "tag": "question-budget-v1", "new_sqlite_classes": ["QuestionBudget"] }],
   "ratelimits": [
     {
       "name": "QUESTION_RATE_LIMITER",

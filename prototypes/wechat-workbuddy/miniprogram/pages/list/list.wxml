@@ -1,0 +1,101 @@
+<view class="page">
+
+  <!-- 顶部：搜索 + 筛选入口（原生页面滚动，sticky 顶栏） -->
+  <view class="topbar">
+    <view class="search-row">
+      <view class="search-box">
+        <input
+          class="search-input"
+          value="{{searchText}}"
+          placeholder="搜索 中文名 / 英文名 / 编号（25、025、#025）"
+          placeholder-class="search-placeholder"
+          confirm-type="search"
+          bindinput="onSearchInput"
+        />
+        <view wx:if="{{searchText}}" class="search-clear" bindtap="onClearSearch">×</view>
+      </view>
+      <view class="filter-btn {{activeGen || activeType ? 'filter-btn-active' : ''}}" bindtap="onToggleFilter">
+        筛选
+      </view>
+    </view>
+
+    <view wx:if="{{showFilter}}" class="filter-panel">
+      <view class="filter-title">世代</view>
+      <view class="chip-row">
+        <view class="filter-chip {{activeGen === 0 ? 'chip-on' : ''}}" data-gen="0" bindtap="onPickGen">全部</view>
+        <view
+          wx:for="{{generations}}"
+          wx:key="gen"
+          class="filter-chip {{activeGen === item.gen ? 'chip-on' : ''}}"
+          data-gen="{{item.gen}}"
+          bindtap="onPickGen"
+        >{{item.gen}}</view>
+      </view>
+      <view class="filter-title">属性</view>
+      <view class="chip-row">
+        <view
+          wx:for="{{typeChips}}"
+          wx:key="slug"
+          class="filter-chip {{activeType === item.slug ? 'chip-on' : ''}}"
+          data-type="{{item.slug}}"
+          bindtap="onPickType"
+        >{{item.zh}}</view>
+      </view>
+      <view class="filter-actions">
+        <view class="reset-btn" bindtap="onResetFilter">重置筛选</view>
+      </view>
+    </view>
+
+    <view class="count-row">
+      <text>共 {{total}} 只</text>
+      <text class="count-loaded" wx:if="{{total > 0}}">已显示 {{loadedCount}}</text>
+    </view>
+  </view>
+
+  <!-- 双列卡片 -->
+  <view class="grid" wx:if="{{shown.length > 0}}">
+    <view
+      class="card poke-card"
+      wx:for="{{shown}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTapCard"
+    >
+      <view class="poke-no">#{{item.no}}</view>
+      <view class="poke-img-wrap">
+        <image
+          wx:if="{{!item.imgFailed}}"
+          class="poke-img"
+          src="{{item.imageUrl}}"
+          mode="aspectFit"
+          lazy-load="{{true}}"
+          data-index="{{index}}"
+          binderror="onImageError"
+        />
+        <view wx:else class="img-fallback poke-fallback">
+          <text>图片加载失败</text>
+        </view>
+      </view>
+      <view class="poke-name">{{item.nameZh}}</view>
+      <view class="poke-name-en">{{item.nameEn}}</view>
+      <view class="poke-types">
+        <view wx:for="{{item.types}}" wx:for-item="t" wx:key="slug" class="type-chip" style="background:{{t.color}}">{{t.zh}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 无结果 -->
+  <view class="empty" wx:if="{{noResult}}">
+    <view class="empty-title">没有找到匹配的宝可梦</view>
+    <view class="empty-tip">试试更换关键词，或重置搜索与筛选条件</view>
+    <view class="reset-btn empty-reset" bindtap="onResetFilter">重置搜索与筛选</view>
+  </view>
+
+  <!-- 底部状态 -->
+  <view class="footer" wx:if="{{total > 0}}">
+    <button wx:if="{{hasMore}}" class="load-more" bindtap="loadMore" disabled="{{loading}}">{{loading ? '加载中…' : '加载更多'}}</button>
+    <text wx:else class="muted">已加载全部 {{total}} 只</text>
+  </view>
+
+  <view class="about-entry" bindtap="onGoAbout">关于 TitoDex 原型</view>
+</view>

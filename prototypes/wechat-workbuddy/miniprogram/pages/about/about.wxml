@@ -1,0 +1,34 @@
+<view class="page">
+  <view class="card about-card">
+    <view class="about-logo">TitoDex</view>
+    <view class="about-sub">宝可梦全国图鉴 · 微信小程序原型</view>
+
+    <view class="about-section">
+      <view class="about-title">版本</view>
+      <view class="about-text">{{version}}（原型，仅供预览）</view>
+      <view class="about-text">数据抓取日期：{{fetchedAt}}</view>
+    </view>
+
+    <view class="about-section">
+      <view class="about-title">数据覆盖</view>
+      <view class="about-text">· 全国图鉴 1025 条（编号 0001-1025），含中文名、英文名、属性、世代、身高与官方立绘。</view>
+      <view class="about-text">· 其中 17 个代表条目包含种族值、特性（含隐藏特性）、各版本图鉴描述与结构化进化链。</view>
+      <view class="about-text">· 其余条目仅展示已知基础信息，详细数据将在在线版接入，不以推测数据填充。</view>
+    </view>
+
+    <view class="about-section">
+      <view class="about-title">原型说明</view>
+      <view class="about-text">· 本原型不含登录、支付、存档同步、离线包与云服务，未创建试用小程序，未绑定账号，未发布。</view>
+      <view class="about-text">· 图片为远程加载的官方立绘固定版本地址，原型不承诺国内网络加载稳定性；正式版需通过云开发图片分发并进行真机测试。</view>
+      <view class="about-text">· 微信真机尚未验证。</view>
+    </view>
+
+    <view class="about-section">
+      <view class="about-title">来源与许可</view>
+      <view class="about-text">数据：TitoDex v20，来自 PokeAPI 与 52poke 的对应中文图鉴文本。</view>
+      <view class="about-text">PokeAPI：https://pokeapi.co/</view>
+      <view class="about-text">52poke：https://wiki.52poke.com/ ，其原创文本按 CC BY-NC-SA 3.0 授权。</view>
+      <view class="about-text">宝可梦名称与官方立绘的权利归相应权利人所有，官方媒体不适用统一 CC 授权声明。本项目为非商业原型。</view>
+    </view>
+  </view>
+</view>

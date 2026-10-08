@@ -1270,7 +1270,10 @@ Future<void> _showConnectionDetails(
 
 List<(String, bool)> _connectionCapabilities(AskTitoDexWorkerStatus status) => [
   ('Journey Worker', status.availability == AskTitoDexAvailability.online),
-  ('Qwen · 回答整理/核对', status.qwenConfigured),
+  (
+    status.qwenConfigured ? 'Qwen · 回答整理/核对（回退）' : 'GLM 5.3 Flash · 回答整理/核对',
+    status.publicModelConfigured,
+  ),
   ('AI Search · R2 索引', status.aiSearchEnabled),
   ('TitoDex Bundle · 结构化校验', status.dexBundleEnabled),
   ('百科资料 · 多个限定来源', status.curatedSourcesEnabled),
@@ -3531,9 +3534,11 @@ String _answerModeLabel(AskTitoDexAnswerMode mode) => switch (mode) {
   AskTitoDexAnswerMode.aiSearchAudited => AppZh.askTitoDexRouteAiSearch,
   AskTitoDexAnswerMode.curatedSourcesDeterministic =>
     AppZh.askTitoDexRouteCuratedDeterministic,
-  AskTitoDexAnswerMode.curatedSourcesQwen => AppZh.askTitoDexRouteCuratedQwen,
+  AskTitoDexAnswerMode.curatedSourcesGlm => AppZh.askTitoDexRouteCuratedGlm,
+  AskTitoDexAnswerMode.curatedSourcesQwen => '限定来源 · Qwen 整理（旧回答）',
   AskTitoDexAnswerMode.deepseekNativeSearch => 'DeepSeek 原生联网回答',
-  AskTitoDexAnswerMode.multiSourceQwen => 'Qwen × DeepSeek 交叉核对',
+  AskTitoDexAnswerMode.multiSourceGlm => 'GLM 5.3 Flash × DeepSeek 交叉核对',
+  AskTitoDexAnswerMode.multiSourceQwen => 'Qwen × DeepSeek 交叉核对（旧回答）',
   AskTitoDexAnswerMode.noMatch => AppZh.askTitoDexOnlineSearchedNoMatch,
 };
 

@@ -125,8 +125,12 @@ export type AssistantResponse = {
     | 'audited_online'
     | 'ai_search_audited'
     | 'curated_sources_deterministic'
+    | 'curated_sources_glm'
+    /** Compatibility with answers persisted before GLM 5.3 Flash. */
     | 'curated_sources_qwen'
     | 'deepseek_native_search'
+    | 'multi_source_glm'
+    /** Compatibility with answers persisted before GLM 5.3 Flash. */
     | 'multi_source_qwen'
     | 'no_match';
   modelUsed?: boolean;

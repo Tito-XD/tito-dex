@@ -1,0 +1,42 @@
+.page {
+  padding: 24rpx;
+}
+
+.about-card {
+  padding: 40rpx 32rpx;
+}
+
+.about-logo {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #2f4361;
+  text-align: center;
+  letter-spacing: 4rpx;
+}
+
+.about-sub {
+  text-align: center;
+  font-size: 26rpx;
+  color: #7b91a6;
+  margin: 8rpx 0 20rpx;
+}
+
+.about-section {
+  margin-top: 28rpx;
+  border-top: 2rpx solid #f3e4b3;
+  padding-top: 20rpx;
+}
+
+.about-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2f4361;
+  margin-bottom: 10rpx;
+}
+
+.about-text {
+  font-size: 24rpx;
+  color: #2f4361;
+  margin-bottom: 8rpx;
+  word-break: break-all;
+}

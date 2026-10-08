@@ -44,8 +44,12 @@ enum AskTitoDexAnswerMode {
   auditedOnline('audited_online'),
   aiSearchAudited('ai_search_audited'),
   curatedSourcesDeterministic('curated_sources_deterministic'),
+  curatedSourcesGlm('curated_sources_glm'),
+  // Compatibility with answers saved before GLM 5.3 Flash.
   curatedSourcesQwen('curated_sources_qwen'),
   deepseekNativeSearch('deepseek_native_search'),
+  multiSourceGlm('multi_source_glm'),
+  // Compatibility with answers saved before GLM 5.3 Flash.
   multiSourceQwen('multi_source_qwen'),
   noMatch('no_match');
 
@@ -63,7 +67,7 @@ enum AskTitoDexAnswerMode {
     }
     if (!onlineComposed) return AskTitoDexAnswerMode.localAudited;
     return matchedHintIds.isEmpty
-        ? AskTitoDexAnswerMode.curatedSourcesQwen
+        ? AskTitoDexAnswerMode.curatedSourcesGlm
         : AskTitoDexAnswerMode.auditedOnline;
   }
 }

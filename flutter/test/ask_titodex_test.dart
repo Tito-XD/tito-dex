@@ -228,7 +228,7 @@ void main() {
                 'answer': '白天、高亲密度升级。',
                 'confidence': 'medium',
                 'followUp': null,
-                'answerMode': 'curated_sources_qwen',
+                'answerMode': 'curated_sources_glm',
                 'modelUsed': true,
                 'answerBlocks': [
                   {'id': 'summary', 'kind': 'summary', 'text': '白天、高亲密度升级。'},
@@ -333,7 +333,7 @@ void main() {
           'schemaVersion': 2,
           'capabilities': {
             'worker': true,
-            'publicModel': 'workers-ai-qwen',
+            'publicModel': 'ai-gateway-glm-5.3-flash',
             'aiSearch': true,
             'curatedSources': true,
             'sourceProviders': [
@@ -363,7 +363,7 @@ void main() {
     final status = await online.checkStatus();
 
     expect(status.availability, AskTitoDexAvailability.online);
-    expect(status.qwenConfigured, isTrue);
+    expect(status.glmConfigured, isTrue);
     expect(status.aiSearchEnabled, isTrue);
     expect(status.curatedSourcesEnabled, isTrue);
     expect(status.braveSearchEnabled, isFalse);
@@ -395,12 +395,23 @@ void main() {
       'confidence': 'medium',
       'followUp': null,
       'onlineComposed': true,
-      'answerMode': 'multi_source_qwen',
+      'answerMode': 'multi_source_glm',
       'modelUsed': true,
       'sourceKinds': ['tavily', 'deepseek-native'],
     });
-    expect(dual.answerMode, AskTitoDexAnswerMode.multiSourceQwen);
+    expect(dual.answerMode, AskTitoDexAnswerMode.multiSourceGlm);
     expect(dual.sourceKinds, ['tavily', 'deepseek-native']);
+
+    final legacy = AskTitoDexResult.fromJson({
+      'status': 'answered',
+      'answer': '旧版 Qwen 回答',
+      'confidence': 'medium',
+      'followUp': null,
+      'onlineComposed': true,
+      'answerMode': 'curated_sources_qwen',
+      'modelUsed': true,
+    });
+    expect(legacy.answerMode, AskTitoDexAnswerMode.curatedSourcesQwen);
   });
 
   group('HGSS deterministic progression hints', () {
@@ -582,7 +593,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Journey Worker'), findsOneWidget);
-      expect(find.textContaining('Qwen ·'), findsOneWidget);
+      expect(find.textContaining('GLM 5.3 Flash ·'), findsOneWidget);
       expect(find.textContaining('AI Search ·'), findsOneWidget);
       expect(find.text('百科资料 · 多个限定来源'), findsOneWidget);
       expect(find.text('联网搜索'), findsOneWidget);
@@ -630,7 +641,7 @@ void main() {
 来源：
 [1] PokeAPI · 路卡利欧：https://pokeapi.co/api/v2/pokemon-species/448/''',
           onlineComposed: true,
-          answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
+          answerMode: AskTitoDexAnswerMode.curatedSourcesGlm,
           modelUsed: true,
           confidence: 'medium',
           sourceKinds: ['pokeapi', 'tavily', 'pokeapi'],
@@ -662,7 +673,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
+      expect(find.text(AppZh.askTitoDexRouteCuratedGlm), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
       expect(find.text('检索 2 路'), findsOneWidget);
       expect(find.text('已核验 · 参考 3 个来源'), findsOneWidget);
@@ -1263,7 +1274,7 @@ class _CompleterService extends AskTitoDexService {
   Future<AskTitoDexWorkerStatus> checkConnection() async =>
       AskTitoDexWorkerStatus(
         availability: AskTitoDexAvailability.online,
-        qwenConfigured: true,
+        publicModel: 'ai-gateway-glm-5.3-flash',
         aiSearchEnabled: true,
         curatedSourcesEnabled: true,
         sourceProviders: const ['pokeapi', 'strategywiki', 'wikidata'],

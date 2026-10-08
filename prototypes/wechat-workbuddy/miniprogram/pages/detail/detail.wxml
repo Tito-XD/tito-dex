@@ -1,0 +1,129 @@
+<view class="page" wx:if="{{!loading && !notFound}}">
+
+  <!-- 头部：立绘 + 名称 -->
+  <view class="hero">
+    <view class="hero-img-wrap">
+      <image wx:if="{{!imgFailed}}" class="hero-img" src="{{imageUrl}}" mode="aspectFit" binderror="onImageError" />
+      <view wx:else class="img-fallback hero-fallback"><text>图片加载失败</text></view>
+    </view>
+    <view class="hero-no">#{{no}}</view>
+    <view class="hero-name">{{nameZh}}</view>
+    <view class="hero-name-en">{{nameEn}}</view>
+    <view class="hero-genus" wx:if="{{genusZh}}">{{genusZh}}</view>
+    <view class="hero-types">
+      <view wx:for="{{types}}" wx:key="slug" class="type-chip" style="background:{{item.color}}">{{item.zh}}</view>
+    </view>
+    <view class="hero-gen">{{generationLabel}}</view>
+  </view>
+
+  <!-- 基础信息（全部条目） -->
+  <view class="section card">
+    <view class="section-title">基础信息</view>
+    <view class="info-row"><text class="info-label">身高</text><text class="info-value">{{heightM ? heightM + ' m' : '暂无数据'}}</text></view>
+    <view class="info-row" wx:if="{{hasDetail}}"><text class="info-label">体重</text><text class="info-value">{{extra.weightKg ? extra.weightKg + ' kg' : '暂无数据'}}</text></view>
+    <view class="info-row" wx:if="{{!hasDetail}}"><text class="info-label">体重</text><text class="info-value muted">—（详细数据接入后提供）</text></view>
+  </view>
+
+  <!-- 无扩展详情提示 -->
+  <view class="notice card" wx:if="{{!hasDetail}}">
+    <view class="notice-title">详细资料待接入</view>
+    <view class="notice-text">这条宝可梦暂未包含种族值、特性、图鉴描述与进化链数据。原型仅展示全国图鉴已知信息，更多详情将在在线版中接入，不会以推测数据填充。</view>
+  </view>
+
+  <block wx:if="{{hasDetail}}">
+
+    <!-- 种族值 -->
+    <view class="section card">
+      <view class="section-title">种族值</view>
+      <view class="stat-row" wx:for="{{stats}}" wx:key="key">
+        <text class="stat-label">{{item.zh}}</text>
+        <view class="stat-bar-track">
+          <view class="stat-bar" style="width:{{item.width}}%;background:{{item.color}}"></view>
+        </view>
+        <text class="stat-value">{{item.value}}</text>
+      </view>
+      <view class="stat-row stat-total">
+        <text class="stat-label">总和</text>
+        <view class="stat-bar-track"></view>
+        <text class="stat-value">{{statTotal}}</text>
+      </view>
+    </view>
+
+    <!-- 特性 -->
+    <view class="section card">
+      <view class="section-title">特性</view>
+      <view class="ability" wx:for="{{abilities}}" wx:key="nameEn">
+        <view class="ability-head">
+          <text class="ability-name">{{item.nameZh}}</text>
+          <text class="ability-en">{{item.nameEn}}</text>
+          <text class="ability-tag" wx:if="{{item.isHidden}}">隐藏特性</text>
+        </view>
+        <view class="ability-desc">{{item.descriptionZh}}</view>
+      </view>
+    </view>
+
+    <!-- 版本描述 -->
+    <view class="section card" wx:if="{{flavor.length > 0}}">
+      <view class="section-title">图鉴描述</view>
+      <block wx:if="{{flavorExpanded}}">
+        <view class="flavor-item" wx:for="{{flavor}}" wx:key="index">
+          <text class="flavor-label">{{item.labelZh}}</text>
+          <text class="flavor-text">{{item.text}}</text>
+        </view>
+        <view class="flavor-toggle" bindtap="onToggleFlavor">收起</view>
+      </block>
+      <block wx:else>
+        <view class="flavor-item">
+          <text class="flavor-label">{{flavor[0].labelZh}}</text>
+          <text class="flavor-text">{{flavor[0].text}}</text>
+        </view>
+        <view class="flavor-toggle" bindtap="onToggleFlavor">展开全部 {{flavor.length}} 条版本描述</view>
+      </block>
+    </view>
+
+    <!-- 进化链 -->
+    <view class="section card" wx:if="{{evoChain.length > 1}}">
+      <view class="section-title">进化链</view>
+      <block wx:for="{{evoChain}}" wx:key="id">
+        <view class="evo-edge" wx:if="{{item.depth > 0}}">
+          <view class="evo-arrow">{{item.parentName}} → {{item.nameZh}}</view>
+          <view class="evo-condition">{{item.conditionZh}}</view>
+        </view>
+        <view class="evo-node" style="margin-left:{{item.depth * 40}}rpx">
+          <image
+            wx:if="{{!item.imgFailed}}"
+            class="evo-img"
+            src="{{item.imageUrl}}"
+            mode="aspectFit"
+            data-index="{{index}}"
+            binderror="onEvoImageError"
+          />
+          <view wx:else class="img-fallback evo-fallback"><text>无图</text></view>
+          <view class="evo-info">
+            <view class="evo-name">{{item.nameZh}} <text class="evo-no">#{{item.no}}</text></view>
+            <view class="evo-en">{{item.nameEn}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 其他信息 -->
+    <view class="section card">
+      <view class="section-title">其他信息</view>
+      <view class="info-row" wx:if="{{extra.genderText}}"><text class="info-label">性别比例</text><text class="info-value">{{extra.genderText}}</text></view>
+      <view class="info-row" wx:if="{{extra.captureRate}}"><text class="info-label">捕获率</text><text class="info-value">{{extra.captureRate}}</text></view>
+      <view class="info-row" wx:if="{{extra.baseHappiness}}"><text class="info-label">初始亲密度</text><text class="info-value">{{extra.baseHappiness}}</text></view>
+      <view class="info-row" wx:if="{{extra.eggGroups}}"><text class="info-label">蛋群</text><text class="info-value">{{extra.eggGroups}}</text></view>
+      <view class="info-row" wx:if="{{extra.hatchCycles}}"><text class="info-label">孵化周期</text><text class="info-value">{{extra.hatchCycles}}</text></view>
+      <view class="info-row" wx:if="{{extra.growthRate}}"><text class="info-label">成长速度</text><text class="info-value">{{extra.growthRate}}</text></view>
+    </view>
+
+  </block>
+
+  <view class="about-entry" bindtap="onGoAbout">关于 TitoDex 原型</view>
+</view>
+
+<!-- 未找到 -->
+<view class="empty" wx:if="{{notFound}}">
+  <view class="empty-title">未找到该编号的宝可梦</view>
+</view>

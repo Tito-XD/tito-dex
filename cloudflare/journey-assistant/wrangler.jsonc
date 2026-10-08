@@ -34,6 +34,8 @@
       "bucket_name": "titodex-dex"
     }
   ],
+  "durable_objects": { "bindings": [{ "name": "QUESTION_BUDGET", "class_name": "QuestionBudget" }] },
+  "migrations": [{ "tag": "question-budget-v1", "new_sqlite_classes": ["QuestionBudget"] }],
   "ratelimits": [
     {
       "name": "QUESTION_RATE_LIMITER",
@@ -45,6 +47,7 @@
     }
   ],
   "vars": {
+    // Workers AI remains the bounded fallback if the external GLM route fails.
     "AI_MODEL": "@cf/qwen/qwen3-30b-a3b-fp8",
     "AI_GATEWAY_ID": "titodex-journey-assistant",
     "AI_SEARCH_ENABLED": "true",
@@ -60,10 +63,16 @@
     "DEEPSEEK_NATIVE_SEARCH_ENABLED": "true",
     "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
     "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",
+    // Standard BigModel API resource bundle through AI Gateway Custom Provider.
+    // The provider base URL is https://api.z.ai/api/paas/v4 and its
+    // bearer key is stored only in AI Gateway BYOK under the alias below.
+    // Enable only after the Provider-native custom-zai smoke returns a
+    // successful structured response instead of an upstream 4xx/5xx.
     "AI_EXTERNAL_PROVIDER_ENABLED": "false",
-    "AI_PROVIDER": "workers-ai",
-    "AI_PROVIDER_MODEL": "deepseek-v4-flash",
-    "AI_PROVIDER_ENDPOINT": "chat/completions"
+    "AI_PROVIDER": "custom-zai",
+    "AI_PROVIDER_MODEL": "glm-5.3-flash",
+    "AI_PROVIDER_ENDPOINT": "chat/completions",
+    "AI_PROVIDER_KEY_ALIAS": "journey-assistant"
   },
   "observability": {
     "enabled": true,

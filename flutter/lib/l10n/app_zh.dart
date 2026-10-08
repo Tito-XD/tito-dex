@@ -98,7 +98,7 @@ abstract final class AppZh {
   static const askTitoDexWorkerDisabled = '在线 AI 已关闭';
   static const askTitoDexWorkerUnavailable = '当前仅可使用本地资料';
   static const askTitoDexWorkerRefresh = '重新检查连接';
-  static const askTitoDexQwenConfigured = 'Qwen 已配置';
+  static const askTitoDexGlmConfigured = 'GLM 5.3 Flash 已配置';
   static const askTitoDexAiSearchEnabled = 'AI Search 已开启';
   static const askTitoDexCuratedSourcesEnabled = '限定来源已开启';
   static const askTitoDexBraveNotConnected = '未接入 Brave Search';
@@ -107,12 +107,12 @@ abstract final class AppZh {
   static const askTitoDexStatusOnlineHint =
       '百科与攻略来源已合并显示；完整允许名单和许可说明见设置里的“数据来源与许可”。连接状态只表示已配置，本次实际命中来源仍会显示在答案上。';
   static const askTitoDexRouteLocal = '审核资料 · 本地回答';
-  static const askTitoDexRouteAuditedOnline = '审核资料 · Qwen 在线匹配';
-  static const askTitoDexRouteAiSearch = 'R2 AI Search · Qwen 匹配';
+  static const askTitoDexRouteAuditedOnline = '审核资料 · GLM 在线匹配';
+  static const askTitoDexRouteAiSearch = 'R2 AI Search · GLM 匹配';
   static const askTitoDexRouteCuratedDeterministic = '限定来源 · 确定性提取';
-  static const askTitoDexRouteCuratedQwen = '限定来源 · Qwen 整理';
-  static const askTitoDexTraceNoModel = '本次未调用 Qwen';
-  static const askTitoDexTraceModel = 'Qwen 已参与';
+  static const askTitoDexRouteCuratedGlm = '限定来源 · GLM 5.3 Flash 整理';
+  static const askTitoDexTraceNoModel = '本次未调用 GLM';
+  static const askTitoDexTraceModel = 'GLM 5.3 Flash 已参与';
   static const askTitoDexTraceAiSearch = 'AI Search 已命中';
   static String askTitoDexTraceSearchRoutes(int count) => '检索 $count 路';
   static const askTitoDexOnlineFallback = '在线链路失败，本次已回退到本地资料。';
@@ -135,7 +135,7 @@ abstract final class AppZh {
   static const askTitoDexNetworkFailed = '在线服务暂时不可用。旅程仍可离线使用，请稍后重试。';
   static const askTitoDexNoticeTitle = '开启问 TitoDex？';
   static const askTitoDexNoticeBody =
-      '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、Workers AI（Qwen）、限定来源联网检索与 DeepSeek 来整理答案。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及同一游戏最近最多 6 组问答用于理解追问。最近 50 组问答只保存在本机，超出会自动删除最早一组。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。';
+      '这个助手默认关闭。确认开启后，TitoDex 仍会优先使用 App 内的本地资料；本地不足时才会连接 Journey Worker，并可能使用 AI Search、经 Cloudflare AI Gateway 中转的 GLM 5.3 Flash、限定来源联网检索与 DeepSeek 来整理答案。请求只包含你确认后的游戏版本、可靠的地点/徽章/里程碑 ID、语言、解析器版本、本次问题，以及同一游戏最近最多 6 组问答用于理解追问。最近 50 组问答只保存在本机，超出会自动删除最早一组。不会上传原始存档、训练家姓名、ID、金钱、队伍或个体数据。你之后可单独关闭在线回答，或关闭整个助手并隐藏所有入口。';
   static const askTitoDexNoticeAccept = '确认开启';
   static const settingsAskTitoDex = '允许在线 AI 与检索';
   static const settingsAskTitoDexHint =
@@ -311,7 +311,7 @@ abstract final class AppZh {
   static const settingsAttributionBody =
       'TitoDex 是非官方、非商业、仅面向学习与个人游玩辅助的工具，与 Nintendo Co., Ltd.、Creatures Inc.、GAME FREAK inc.、The Pokémon Company 及其关联公司不存在隶属、授权、赞助或认可关系。Pokémon、宝可梦、角色、游戏名称、图像、音频与商标归各自权利人所有；本工具不提供 ROM、密钥、付费内容或存档修改。\n\n'
       '资料与文字：PokéAPI（物种、形态、招式、特性、道具、版本与基础地点；数据／代码仓库 BSD-3-Clause）、52Poké Wiki／神奇宝贝百科（部分中文说明、携带道具、地点与体形；百科原创内容 CC BY-NC-SA 3.0）、Bulbapedia（道具分组与少量地点语言链接；CC BY-NC-SA 2.5）、PKHeX（固定提交导出的现代遭遇覆盖；GPL-3.0-or-later，App 不嵌入或执行）、Project Pokémon（HGSS 存档／PKM 结构与地图编号技术参考）。\n\n'
-      '问 TitoDex 的限定联网来源：中文检索优先 52Poké Wiki；没有足够可靠的结果时，才回退到 Pokémon 官方网站、Bulbapedia、StrategyWiki、Serebii、PokéAPI、Wikidata、Pokémon Database、Smogon、Marriland、GameFAQs、Game8、IGN、Nintendo Life 与 Eurogamer。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。Tavily 与 DeepSeek 是检索／生成服务，不是百科内容权利人。\n\n'
+      '问 TitoDex 的限定联网来源：中文检索优先 52Poké Wiki；没有足够可靠的结果时，才回退到 Pokémon 官方网站、Bulbapedia、StrategyWiki、Serebii、PokéAPI、Wikidata、Pokémon Database、Smogon、Marriland、GameFAQs、Game8、IGN、Nintendo Life 与 Eurogamer。联网摘要只用于当次回答与引用核验，不会自动写入 R2、AI Search、APK 或本地图鉴包；各站内容仍适用其自身条款与权利说明。经 Cloudflare AI Gateway 中转的 GLM 5.3 Flash、Workers AI Qwen 回退、Tavily 与 DeepSeek 是检索／生成服务，不是百科内容权利人。\n\n'
       '媒体：PokéAPI/sprites、Pokémon Showdown／Smogon 社区创作者、PokéSprite 类型图标（MIT）、SteamGridDB 社区来源页、Pokémon HOME 与各代游戏的官方图像／音频；Nunito 字体依 SIL OFL 1.1 随包分发。百科开放许可不自动覆盖其中的官方游戏媒体，各素材仍按记录级来源与原权利状态处理。\n\n'
       '外部工具：Pokémon Sleep 二级页的睡眠分数、19 种食材数值、食谱等级倍率与料理能量公式移植自 Neroli’s Lab 固定提交 cb533f2，依 Apache-2.0 使用并随 App 提供许可证与 NOTICE；完整配队和长期模拟仍保留为外部入口。\n\n'
       '来源入口：pokemon.com · wiki.52poke.com · bulbapedia.bulbagarden.net · strategywiki.org · serebii.net · pokeapi.co · wikidata.org · pokemondb.net · smogon.com · marriland.com · gamefaqs.gamespot.com · game8.co · ign.com · nintendolife.com · eurogamer.net · github.com/PokeAPI/sprites · github.com/msikma/pokesprite · github.com/kwsch/PKHeX · projectpokemon.org · pokemonshowdown.com · steamgriddb.com · nerolislab.com。固定提交、逐文件来源和构建批次说明见项目根目录 CREDITS.md、THIRD_PARTY_NOTICES.md 及数据包随附 attribution 文件。';

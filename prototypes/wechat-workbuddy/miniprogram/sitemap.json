@@ -1,0 +1,9 @@
+{
+  "desc": "TitoDex 图鉴原型",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

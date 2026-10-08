@@ -1,4 +1,4 @@
-import { env, SELF } from 'cloudflare:test';
+import { env, SELF, runInDurableObject } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
 import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
@@ -27,6 +27,7 @@ async function post(payload: string, deviceKey = 'test-device-key-12345'): Promi
     headers: {
       'content-type': 'application/json',
       'x-titodex-device-key': deviceKey,
+      'cf-connecting-ip': deviceKey,
     },
     body: payload,
   });
@@ -81,6 +82,7 @@ describe('journey assistant Worker contract', () => {
   });
 
   beforeEach(async () => {
+    await runInDurableObject(env.QUESTION_BUDGET.getByName('journey-questions-v1'), async (_instance, state) => { await state.storage.deleteAll(); });
     const [journeyObjects, dexObjects] = await Promise.all([
       env.JOURNEY_CONTENT.list(),
       env.DEX_CONTENT.list(),
@@ -209,13 +211,37 @@ describe('journey assistant Worker contract', () => {
     );
     expect(await response.json()).toMatchObject({
       capabilities: {
+        publicModel: 'workers-ai-qwen',
         webSearch: true,
         webSearchProviders: ['deepseek-native'],
       },
     });
   });
 
-  it('accepts a real DeepSeek server-search result only after Qwen support verification', async () => {
+  it('reports GLM as the primary model only with a complete external-provider config', async () => {
+    const fakeEnv = deepSeekEnv({ aiRun: vi.fn() });
+    Object.assign(fakeEnv, {
+      AI_EXTERNAL_PROVIDER_ENABLED: 'true',
+      AI_PROVIDER: 'custom-zai',
+      AI_PROVIDER_MODEL: 'glm-5.3-flash',
+      AI_PROVIDER_ENDPOINT: 'chat/completions',
+      AI_PROVIDER_KEY_ALIAS: 'journey-assistant',
+    });
+
+    const response = await worker.fetch(
+      new Request('https://assistant.test/health'),
+      fakeEnv,
+    );
+    expect(await response.json()).toMatchObject({
+      capabilities: {
+        publicModel: 'ai-gateway-glm-5.3-flash',
+        publicModelFallback: 'workers-ai-qwen',
+        externalProvider: true,
+      },
+    });
+  });
+
+  it('accepts a real DeepSeek server-search result only after GLM support verification', async () => {
     const aiRun = vi.fn(async (
       _model: string,
       _input: Record<string, unknown>,
@@ -573,7 +599,7 @@ describe('journey assistant Worker contract', () => {
         'deepseek-native-topic-check')).toBe(true);
   });
 
-  it('marks Qwen and DeepSeek as dual-source only after an explicit cross-check', async () => {
+  it('marks GLM and DeepSeek as dual-source only after an explicit cross-check', async () => {
     const aiRun = vi.fn(async (
       _model: string,
       _input: Record<string, unknown>,
@@ -591,7 +617,7 @@ describe('journey assistant Worker contract', () => {
       confidence: 'medium',
       followUp: null,
       onlineComposed: true,
-      answerMode: 'curated_sources_qwen',
+      answerMode: 'curated_sources_glm',
       sourceKinds: ['tavily'],
       sources: [{
         title: 'Riolu guide',
@@ -625,7 +651,7 @@ describe('journey assistant Worker contract', () => {
     );
 
     expect(result).toMatchObject({
-      answerMode: 'multi_source_qwen',
+      answerMode: 'multi_source_glm',
       sourceKinds: ['tavily', 'deepseek-native'],
       sources: [{ title: 'Riolu guide' }, { title: 'Riolu - Bulbapedia' }],
     });
@@ -1030,7 +1056,7 @@ describe('journey assistant Worker contract', () => {
     expect(JSON.stringify(species)).not.toContain('must-not-leak');
   });
 
-  it('answers item and species profile facts from bundle catalogs without Qwen', async () => {
+  it('answers item and species profile facts from bundle catalogs without GLM', async () => {
     await seedDexBundle({}, {
       summary: { id: 447, nameZh: '利欧路', types: ['fighting'] },
       weaknesses: ['妖精', '超能力', '飞行'],
@@ -1641,7 +1667,7 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
   });
 
-  it('enforces the configured per-key cost guard', async () => {
+  it('enforces the configured edge-source cost guard', async () => {
     const deviceKey = 'rate-limit-key-unique-12345';
     const responses = await Promise.all(
       Array.from({ length: 21 }, () => post(body(), deviceKey)),
@@ -2031,6 +2057,7 @@ function deepSeekEnv({
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_BUDGET: env.QUESTION_BUDGET,
     QUESTION_RATE_LIMITER: {
       limit: async () => ({ success: true }),
     },
@@ -2053,6 +2080,7 @@ function deepSeekEnv({
     AI_PROVIDER: 'workers-ai',
     AI_PROVIDER_MODEL: 'deepseek-v4-flash',
     AI_PROVIDER_ENDPOINT: 'chat/completions',
+    AI_PROVIDER_KEY_ALIAS: 'journey-assistant',
     TAVILY_API_KEY: '',
   } as unknown as Env;
 }
@@ -2089,6 +2117,7 @@ function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_BUDGET: env.QUESTION_BUDGET,
     QUESTION_RATE_LIMITER: {
       limit: async () => ({ success: true }),
     },
@@ -2107,6 +2136,7 @@ function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
     AI_PROVIDER: 'workers-ai',
     AI_PROVIDER_MODEL: 'deepseek-v4-flash',
     AI_PROVIDER_ENDPOINT: 'chat/completions',
+    AI_PROVIDER_KEY_ALIAS: 'journey-assistant',
     TAVILY_API_KEY: '',
   } as unknown as Env;
 }

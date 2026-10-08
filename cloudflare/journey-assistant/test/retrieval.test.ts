@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { AssistantRequest } from '../src/contract';
-import { parseProviderJsonResponse } from '../src/index';
+import { parseProviderJsonResponse, runGatewayProvider } from '../src/index';
 import { progressionHints } from '../src/progression_hints';
 import {
   getJourneySearch,
@@ -154,6 +154,53 @@ describe('audited AI Search retrieval', () => {
 });
 
 describe('OpenAI-compatible provider response limits', () => {
+  it('selects the configured GLM BYOK alias on the custom-provider request', async () => {
+    const fetcher = vi.fn(async (
+      _input: RequestInfo | URL,
+      _init?: RequestInit,
+    ) => Response.json({
+      choices: [{ message: { content: '{"ok":true}' } }],
+    }));
+    const fakeEnv = {
+      CF_ACCOUNT_ID: 'a'.repeat(32),
+      CF_AIG_TOKEN: 'test-gateway-run-token-123456',
+      AI_GATEWAY_ID: 'titodex-journey-assistant',
+      AI_PROVIDER: 'custom-zai',
+      AI_PROVIDER_ENDPOINT: 'chat/completions',
+      AI_PROVIDER_MODEL: 'glm-5.3-flash',
+      AI_PROVIDER_KEY_ALIAS: 'journey-assistant',
+    } as unknown as Env;
+
+    await expect(runGatewayProvider(
+      fakeEnv,
+      'curated-web-compose',
+      [{ role: 'system', content: '只输出 JSON。' }],
+      240,
+      0,
+      fetcher,
+    )).resolves.toEqual({ ok: true });
+
+    expect(fetcher).toHaveBeenCalledOnce();
+    const [input, init] = fetcher.mock.calls[0]!;
+    expect(String(input)).toBe(
+      `https://gateway.ai.cloudflare.com/v1/${'a'.repeat(32)}/titodex-journey-assistant/custom-zai/chat/completions`,
+    );
+    const headers = new Headers(init?.headers);
+    expect(headers.get('accept')).toBe('application/json');
+    expect(headers.get('accept-language')).toBe('en-US,en');
+    expect(headers.get('cf-aig-authorization')).toBe(
+      'Bearer test-gateway-run-token-123456',
+    );
+    expect(headers.get('cf-aig-byok-alias')).toBe('journey-assistant');
+    expect(headers.get('cf-aig-request-timeout')).toBe('30000');
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      model: 'glm-5.3-flash',
+      response_format: { type: 'json_object' },
+      thinking: { type: 'enabled' },
+      reasoning_effort: 'low',
+    });
+  });
+
   it('parses only strict JSON content from a bounded successful response', async () => {
     const response = Response.json({
       choices: [{ message: { content: '{"hintId":"hgss-route36-sudowoodo"}' } }],

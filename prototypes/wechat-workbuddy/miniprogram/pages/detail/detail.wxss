@@ -1,0 +1,328 @@
+.page {
+  padding: 24rpx 24rpx 60rpx;
+  box-sizing: border-box;
+}
+
+/* ---- 头部 ---- */
+.hero {
+  background: linear-gradient(180deg, #afc7da 0%, #fff7e6 100%);
+  border: 2rpx solid #afc7da;
+  border-radius: 20rpx;
+  padding: 30rpx 24rpx 36rpx;
+  text-align: center;
+}
+
+.hero-img-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-img {
+  width: 340rpx;
+  height: 340rpx;
+}
+
+.hero-fallback {
+  width: 340rpx;
+  height: 340rpx;
+}
+
+.hero-no {
+  font-size: 26rpx;
+  color: #7b91a6;
+  font-weight: 600;
+}
+
+.hero-name {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #2f4361;
+  margin-top: 4rpx;
+}
+
+.hero-name-en {
+  font-size: 26rpx;
+  color: #7b91a6;
+}
+
+.hero-genus {
+  font-size: 26rpx;
+  color: #2f4361;
+  margin-top: 8rpx;
+}
+
+.hero-types {
+  display: flex;
+  justify-content: center;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.hero-types .type-chip {
+  font-size: 24rpx;
+  padding: 4rpx 20rpx;
+}
+
+.hero-gen {
+  font-size: 24rpx;
+  color: #7b91a6;
+  margin-top: 12rpx;
+}
+
+/* ---- 区块 ---- */
+.section {
+  margin-top: 24rpx;
+  padding: 24rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2f4361;
+  margin-bottom: 16rpx;
+  border-left: 8rpx solid #f7d977;
+  padding-left: 16rpx;
+}
+
+/* ---- 基础信息 ---- */
+.info-row {
+  display: flex;
+  padding: 10rpx 0;
+  border-bottom: 2rpx solid #f3e4b3;
+  font-size: 26rpx;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  width: 180rpx;
+  color: #7b91a6;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #2f4361;
+}
+
+/* ---- 无详情提示 ---- */
+.notice {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #f3e4b3;
+  border-color: #f7d977;
+}
+
+.notice-title {
+  font-weight: 700;
+  font-size: 28rpx;
+  margin-bottom: 8rpx;
+}
+
+.notice-text {
+  font-size: 24rpx;
+  color: #2f4361;
+}
+
+/* ---- 种族值 ---- */
+.stat-row {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 0;
+}
+
+.stat-label {
+  width: 90rpx;
+  font-size: 24rpx;
+  color: #2f4361;
+  flex-shrink: 0;
+}
+
+.stat-bar-track {
+  flex: 1;
+  height: 20rpx;
+  background: #f3e4b3;
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin: 0 16rpx;
+}
+
+.stat-bar {
+  height: 100%;
+  border-radius: 10rpx;
+}
+
+.stat-value {
+  width: 80rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #2f4361;
+  font-weight: 600;
+}
+
+.stat-total {
+  border-top: 2rpx solid #f3e4b3;
+  margin-top: 8rpx;
+  padding-top: 14rpx;
+}
+
+.stat-total .stat-value {
+  color: #2f4361;
+  font-weight: 700;
+}
+
+/* ---- 特性 ---- */
+.ability {
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f3e4b3;
+}
+
+.ability:last-child {
+  border-bottom: none;
+}
+
+.ability-head {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.ability-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2f4361;
+}
+
+.ability-en {
+  font-size: 22rpx;
+  color: #7b91a6;
+}
+
+.ability-tag {
+  font-size: 20rpx;
+  color: #2f4361;
+  background: #f7d977;
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
+}
+
+.ability-desc {
+  font-size: 24rpx;
+  color: #7b91a6;
+  margin-top: 6rpx;
+}
+
+/* ---- 版本描述 ---- */
+.flavor-item {
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f3e4b3;
+}
+
+.flavor-item:last-of-type {
+  border-bottom: none;
+}
+
+.flavor-label {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #fff7e6;
+  background: #7b91a6;
+  border-radius: 8rpx;
+  padding: 2rpx 14rpx;
+  margin-bottom: 8rpx;
+}
+
+.flavor-text {
+  display: block;
+  font-size: 26rpx;
+  color: #2f4361;
+}
+
+.flavor-toggle {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #7b91a6;
+  text-decoration: underline;
+}
+
+/* ---- 进化链 ---- */
+.evo-edge {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 8rpx 0;
+  margin-left: 40rpx;
+}
+
+.evo-arrow {
+  color: #7b91a6;
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.evo-condition {
+  font-size: 24rpx;
+  color: #2f4361;
+  background: #f3e4b3;
+  border-radius: 10rpx;
+  padding: 6rpx 16rpx;
+}
+
+.evo-node {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 8rpx 0;
+}
+
+.evo-img {
+  width: 110rpx;
+  height: 110rpx;
+  background: #fff7e6;
+  border: 2rpx solid #afc7da;
+  border-radius: 12rpx;
+}
+
+.evo-fallback {
+  width: 110rpx;
+  height: 110rpx;
+}
+
+.evo-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2f4361;
+}
+
+.evo-no {
+  font-size: 22rpx;
+  color: #7b91a6;
+  font-weight: 400;
+}
+
+.evo-en {
+  font-size: 22rpx;
+  color: #7b91a6;
+}
+
+/* ---- 其他 ---- */
+.empty {
+  padding: 200rpx 60rpx;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2f4361;
+}
+
+.about-entry {
+  text-align: center;
+  padding: 30rpx 0 20rpx;
+  font-size: 24rpx;
+  color: #7b91a6;
+  text-decoration: underline;
+}

@@ -79,7 +79,7 @@ enum AskTitoDexAvailability { checking, online, disabled, unavailable }
 class AskTitoDexWorkerStatus {
   const AskTitoDexWorkerStatus({
     required this.availability,
-    this.qwenConfigured = false,
+    this.publicModel = 'unavailable',
     this.aiSearchEnabled = false,
     this.dexBundleEnabled = false,
     this.curatedSourcesEnabled = false,
@@ -105,7 +105,12 @@ class AskTitoDexWorkerStatus {
       );
 
   final AskTitoDexAvailability availability;
-  final bool qwenConfigured;
+  final String publicModel;
+  bool get glmConfigured =>
+      publicModel == 'ai-gateway-glm-5.3-flash' ||
+      publicModel == 'workers-ai-glm-5.3-flash';
+  bool get qwenConfigured => publicModel == 'workers-ai-qwen';
+  bool get publicModelConfigured => glmConfigured || qwenConfigured;
   final bool aiSearchEnabled;
   final bool dexBundleEnabled;
   final bool curatedSourcesEnabled;
@@ -263,7 +268,13 @@ class HttpAskTitoDexOnlineClient
     final legacyBraveSearch = capabilities['braveSearch'] == true;
     return AskTitoDexWorkerStatus(
       availability: AskTitoDexAvailability.online,
-      qwenConfigured: capabilities['publicModel'] == 'workers-ai-qwen',
+      publicModel: switch (capabilities['publicModel']) {
+        'ai-gateway-glm-5.3-flash' => 'ai-gateway-glm-5.3-flash',
+        // Compatibility with the short-lived hosted-Workers-AI rollout.
+        'workers-ai-glm-5.3-flash' => 'workers-ai-glm-5.3-flash',
+        'workers-ai-qwen' => 'workers-ai-qwen',
+        _ => 'unavailable',
+      },
       aiSearchEnabled: capabilities['aiSearch'] == true,
       dexBundleEnabled: capabilities['dexBundle'] == true,
       curatedSourcesEnabled: capabilities['curatedSources'] == true,

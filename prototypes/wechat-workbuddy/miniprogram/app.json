@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/list/list",
+    "pages/detail/detail",
+    "pages/about/about"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#2f4361",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "TitoDex 图鉴",
+    "backgroundColor": "#fff7e6",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

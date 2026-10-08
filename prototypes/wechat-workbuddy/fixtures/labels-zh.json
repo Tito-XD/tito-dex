@@ -1,0 +1,33 @@
+{
+  "locations": {
+    "eterna-forest": "百代森林",
+    "frost-cavern": "冰结洞窟",
+    "kalos-route-20": "卡洛斯20号道路",
+    "lush-jungle": "树荫丛林",
+    "mount-lanakila": "拉纳基拉山",
+    "petalburg-woods": "橙华森林",
+    "pinwheel-forest": "矢车森林",
+    "shoal-cave": "浅滩洞穴",
+    "sinnoh-route-217": "神奥217号道路",
+    "twist-mountain": "螺旋山"
+  },
+  "items": {
+    "fire-stone": "火之石",
+    "thunder-stone": "雷之石",
+    "water-stone": "水之石",
+    "leaf-stone": "叶之石",
+    "ice-stone": "冰之石"
+  },
+  "growthRates": {
+    "slow": "慢",
+    "medium": "中等",
+    "fast": "快",
+    "medium-slow": "偏慢",
+    "slow-then-very-fast": "先慢后快",
+    "fast-then-very-slow": "先快后慢"
+  },
+  "notes": {
+    "minHappiness": "亲密度",
+    "minAffection": "友好度"
+  }
+}

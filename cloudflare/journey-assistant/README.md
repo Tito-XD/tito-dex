@@ -16,7 +16,7 @@ The request path is deliberately fail-safe:
    recommendation questions try a bounded Chinese 52Poké result pool first;
    if it cannot support the answer, they retrieve fixed sources plus bounded
    English and Chinese fallback pools over the remaining domains, then use bundle fields to
-   cross-check entities, versions, and numbers before Qwen composition and a
+   cross-check entities, versions, and numbers before GLM 5.3 Flash composition and a
    second verification pass. Strict mode requires two independent evidence
    groups whenever available; the explicit v0.8.16 trial may return one
    allowlisted evidence group at low confidence. Evolution conditions and
@@ -24,22 +24,23 @@ The request path is deliberately fail-safe:
 3. Only a remaining local miss or tie may use the optional AI Search binding.
 4. AI Search returns candidate `hintId` values; its chunk text is never used as
    an answer.
-5. Workers AI is the public default and may classify an allowed candidate and
+5. AI Gateway GLM 5.3 Flash is the public default and may classify an allowed candidate and
    reorder deterministic answer sections. It cannot add, remove, or rewrite
-   facts. A unique local match makes zero model calls.
+   facts. Workers AI Qwen is the bounded provider-failure fallback. A unique
+   local match makes zero model calls.
 6. If the audited corpus still has no match and `CURATED_WEB_ENABLED=true`, a
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
-   and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
+   and Wikidata. GLM 5.3 Flash composes a labelled, cited, unreviewed answer solely from
    the bounded results.
 7. For Chinese questions, Tavily first runs one `basic` search whose request
    and accepted-result boundary is only `wiki.52poke.com`. If that evidence is
-   empty or fails Qwen support verification, broad advice opens independent
+   empty or fails GLM 5.3 Flash support verification, broad advice opens independent
    English/Chinese searches over the remaining server-owned allowlist; narrow
-   questions open one mixed fallback search. Snippets still pass through Qwen
+   questions open one mixed fallback search. Snippets still pass through GLM 5.3 Flash
    composition and verification, and final answers remain Simplified Chinese.
 8. DeepSeek V4 Flash native search runs concurrently with that curated route.
    TitoDex requires linked search-result blocks, revalidates every URL against
-   the same allowlist, and uses citation text for a Qwen support pass when the
+   the same allowlist, and uses citation text for a GLM 5.3 Flash support pass when the
    provider supplies it. In explicit trial mode a linked, allowlisted result
    without citation text can be returned at low confidence with a warning.
    Any provider, quota, shape, or scope failure preserves deterministic fallback.
@@ -95,7 +96,7 @@ already attempted.
 - The fixed allowlist includes Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
   PokéAPI, Pokémon Database, 52Poké wiki, Smogon, Marriland, GameFAQs, Game8,
   IGN, Nintendo Life, and Eurogamer. Returned URLs are revalidated against the
-  same exact hostnames before snippets can reach Qwen.
+  same exact hostnames before snippets can reach GLM 5.3 Flash.
 - Tavily snippets are transient and are never stored, indexed, or packaged.
   52Poké remains excluded from direct page fetching; without separate
   permission its content also remains excluded from R2/AI Search and APK data.
@@ -113,7 +114,7 @@ until the intended deployment has the secret.
 ## Client-visible status and execution trace
 
 `GET /health` returns only sanitized capability flags: Worker reachability,
-Workers AI Qwen configuration, Dex-bundle/AI Search/curated-source switches, the three
+AI Gateway GLM 5.3 Flash configuration, Dex-bundle/AI Search/curated-source switches, the three
 fixed source provider names, generic `webSearch` plus
 `webSearchProviders` containing `tavily` only when its flag and secret are
 present, and `deepseek-native` only after its server flag is enabled following
@@ -130,7 +131,7 @@ only the sources actually used.
 Every `/v1/ask` response also carries a privacy-safe trace:
 
 - `answerMode`: local audited, online audited, AI Search audited, curated
-  sources + Qwen, DeepSeek native search, Qwen × DeepSeek corroborated, or no
+  sources + GLM 5.3 Flash, DeepSeek native search, GLM 5.3 Flash × DeepSeek corroborated, or no
   match;
 - `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
   what the deployment has configured;
@@ -220,13 +221,36 @@ References:
 - <https://developers.cloudflare.com/ai-search/configuration/retrieval/filtering/>
 - <https://developers.cloudflare.com/ai-search/configuration/models/supported-models/>
 
+## Public GLM 5.3 Flash setup
+
+1. Create the Z.ai AI Gateway custom provider with base URL
+   `https://api.z.ai/api/paas/v4`. Use Cloudflare's resulting provider route
+   raw slug `zai`; the dashboard adds its fixed `custom-` prefix, so the
+   Provider request identifier is `custom-zai`. Use the `chat/completions` path.
+2. Add the standard BigModel API resource-bundle key to the existing
+   `titodex-journey-assistant` Gateway's Provider Keys screen. Store it under
+   alias `journey-assistant`; never put the key in Wrangler vars, source, docs, an
+   APK, a committed environment file, or logs.
+3. Keep `AI_EXTERNAL_PROVIDER_ENABLED=false` until the private smoke succeeds;
+   then enable it with model `glm-5.3-flash` and
+   `AI_PROVIDER_KEY_ALIAS=journey-assistant`. The Worker explicitly selects that
+   alias on the Provider-native Gateway endpoint using the existing
+   `CF_ACCOUNT_ID` and `CF_AIG_TOKEN` Worker secrets, disables cache, prompt
+   logs and retries, and strictly parses bounded JSON responses.
+4. Run a private structured-output smoke before deployment. As of 2026-09-01,
+   Z.ai's upstream Alibaba WAF returns HTTP 405 to even a minimal `Hello`
+   request forwarded by AI Gateway, so production remains disabled pending
+   provider-side allowlisting. Provider, key,
+   quota, timeout, or response-shape failure falls through to Workers AI Qwen;
+   if that also fails, TitoDex retains its deterministic local fallback.
+
 ## Optional DeepSeek / custom provider setup
 
 DeepSeek is not AI Search's generation model and is never an unlimited public
-fallback. Qwen remains the public classifier/composer/verifier. After the
+fallback. GLM 5.3 Flash remains the public classifier/composer/verifier. After the
 local/audited/Dex-bundle route misses, the optional native-search request runs
-concurrently with fixed-source/Tavily + Qwen research so one slow provider does
-not consume the App's whole timeout; the verified Qwen route wins when both
+concurrently with fixed-source/Tavily + GLM 5.3 Flash research so one slow provider does
+not consume the App's whole timeout; the verified GLM 5.3 Flash route wins when both
 succeed.
 
 Native V4 Flash setup:
@@ -260,22 +284,23 @@ search use, the same server-owned Pokémon domain allowlist, up to four bounded
 pause-turn continuations, an 18-second per-request timeout and a 26-second
 whole-chain deadline, no cache or prompt logging, and a 128 KiB response cap. TitoDex rejects model
 text containing its own URL/domain, exposes only revalidated source URLs, and
-asks Workers AI to support-check the draft against bounded citation snippets.
+asks the primary GLM route to support-check the draft against bounded citation
+snippets. The same Workers AI Qwen fallback remains available on provider failure.
 Failure falls back without changing the deterministic result.
 
 The provider has executed the requested search in a live smoke, but its current
-response shape does not always include bounded `cited_text` for the Qwen
+response shape does not always include bounded `cited_text` for the GLM 5.3 Flash
 support verifier. TitoDex therefore revalidates every returned source URL
-against its server-owned allowlist. When citation text exists, Qwen verifies
+against its server-owned allowlist. When citation text exists, GLM 5.3 Flash verifies
 the draft; when it does not, the explicit
 `EXPERIMENTAL_BROAD_ANSWERS=true` trial may return the sourced result at low
 confidence with an in-App warning. Disabling that flag restores the strict
 evidence gate without changing deterministic fallback.
 
-The older provider-native JSON generation path remains separately gated by
-`AI_EXTERNAL_PROVIDER_ENABLED=true` and `AI_PROVIDER=deepseek`; its example
-model is now `deepseek-v4-flash`. It does not provide native web search and is
-not required for the native-search route above.
+The OpenAI-compatible JSON generation path is the current GLM main route. It is
+separately gated by `AI_EXTERNAL_PROVIDER_ENABLED=true`, validates the custom
+provider, endpoint, model and BYOK alias, and does not provide native web search.
+DeepSeek's native-search route above remains independent.
 
 For a self-hosted OpenAI-compatible model, first create an authenticated custom
 provider in AI Gateway. Then set `AI_PROVIDER` to `custom-<slug>` and use either
@@ -307,11 +332,12 @@ R2, Search, Gateway, or model resources fail closed; Journey answers continue
 to use the installed deterministic pack. The structured reader permits only the
 validated root manifest, numeric species details, and fixed `items.json`,
 `moves.json`, or `dex_catalog.json` objects under that manifest prefix. Flavor
-prose and held-item rows are not supplied to embeddings or Qwen. Held-item
+prose and held-item rows are not supplied to embeddings or GLM 5.3 Flash. Held-item
 answers are deterministic and retain the bundle's PokeAPI / 52Poké attribution.
 
 References:
 
+- <https://developers.cloudflare.com/workers-ai/models/glm-5.3-flash/>
 - <https://developers.cloudflare.com/ai-gateway/usage/providers/deepseek/>
 - <https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/>
 - <https://developers.cloudflare.com/ai-gateway/configuration/custom-providers/>
@@ -322,3 +348,20 @@ also documented in [`../../docs/JOURNEY_ASSISTANT.md`](../../docs/JOURNEY_ASSIST
 
 Tavily request fields and response bounds follow its official Search endpoint:
 <https://docs.tavily.com/documentation/api-reference/endpoint/search>.
+
+
+### 问答滥用控制
+
+`/v1/ask` 按 Cloudflare 覆写的 `CF-Connecting-IP` 限流（20 次/60 秒）；
+设备键和 `X-Forwarded-For` 不参与额度身份。缺失边缘地址共享保守桶。
+该信任边界要求请求经过 Cloudflare 公网边缘；不要通过不可信 Worker
+子请求转发任意 `CF-Connecting-IP`，也不要开放绕过边缘的入口。
+
+`QUESTION_BUDGET` 使用单个 SQLite Durable Object 持久化、原子预留整个问答
+流程的额度：全服务 60 次/分钟、1000 次/UTC 日，失败不退款。额度在任何
+问答 R2、检索、搜索及模型调用前扣减，绑定缺失或控制失败返回 503，额度
+耗尽返回 429。发布时必须包含 `question-budget-v1` 的 Durable Object 迁移。
+这些是保守的初始请求阈值；每次请求仍受现有调用数量、Token 与超时限制。
+这不是精确费用计量或独立提供商熔断；部署前应按实际容量调整阈值，并结合
+提供商费用上限。Cloudflare 原生 IP 限流是边缘近似控制，全服务预算由
+Durable Object 跨边缘协调。

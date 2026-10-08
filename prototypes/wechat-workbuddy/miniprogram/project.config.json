@@ -1,0 +1,20 @@
+{
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "titodex-prototype",
+  "miniprogramRoot": "./",
+  "setting": {
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": false,
+    "enhance": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "libVersion": "3.4.3",
+  "condition": {}
+}
