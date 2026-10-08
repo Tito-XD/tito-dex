@@ -584,6 +584,88 @@ describe('curated key-free web research', () => {
     expect(await researchCuratedWeb(request, runModel, fetcher)).toBeNull();
   });
 
+  it.each([
+    { exaStatus: 200, provider: 'exa' },
+    { exaStatus: 402, provider: 'tavily' },
+  ])('preserves verified citations through Exa or its quota fallback ($provider)', async ({ exaStatus, provider }) => {
+    const queryRequest: AssistantRequest = {
+      ...request,
+      question: '紫里在哪里可以抓利欧路？',
+      context: { ...request.context, game: 'violet', generation: 9 },
+    };
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase, messages) => {
+      phases.push(phase);
+      if (phase === 'curated-web-compose') expect(messages[0].content).toContain('当前指定');
+      if (phase === 'curated-web-compose') return {
+        supported: true,
+        answer: '在《宝可梦 紫》中，利欧路可在南第4区找到。',
+        usedSourceIds: [`${provider}-1`],
+      };
+      if (phase === 'curated-web-verify') return {
+        supported: true,
+        answer: '在《宝可梦 紫》中，利欧路可在南第4区找到。',
+      };
+      throw new Error(`unexpected_phase_${phase}`);
+    };
+    const calls: string[] = [];
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      const host = new URL(input.toString()).hostname;
+      if (!['api.exa.ai', 'api.tavily.com'].includes(host)) return json({}, 503);
+      calls.push(host);
+      if (host === 'api.exa.ai' && exaStatus !== 200) return json({}, exaStatus);
+      const body = JSON.parse(init?.body as string) as Record<string, unknown>;
+      const domains = (body.includeDomains ?? body.include_domains) as string[];
+      if (domains.includes('wiki.52poke.com')) return json({ results: [] });
+      expect(body.query).toContain('Pokémon Violet');
+      const text = 'In Pokémon Violet, Riolu can be found in South Province Area Four.';
+      return json({ results: [{
+        title: 'Riolu - Bulbapedia',
+        url: 'https://bulbapedia.bulbagarden.net/wiki/Riolu',
+        ...(host === 'api.exa.ai' ? { highlights: [text] } : { content: text, score: 0.9 }),
+      }] });
+    });
+    const result = await researchCuratedWeb(
+      queryRequest, runModel, fetcher, () => new Date('2026-10-08T00:00:00Z'),
+      undefined, { exaApiKey: 'e'.repeat(32), tavilyApiKey: 't'.repeat(32) },
+    );
+    expect(calls[0]).toBe('api.exa.ai');
+    expect(calls.filter((host) => host === 'api.exa.ai')).toHaveLength(exaStatus === 200 ? 2 : 1);
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-verify']);
+    expect(result).toMatchObject({
+      status: 'answered', sourceKinds: [provider],
+      sources: [{ title: 'Riolu - Bulbapedia', accessedAt: '2026-10-08' }],
+    });
+  });
+
+  it('continues other domains after unsupported Exa evidence and rejects unsupported answers', async () => {
+    const phases: string[] = [];
+    const runModel: CuratedWebModelRunner = async (phase) => {
+      phases.push(phase);
+      return { supported: false, answer: '', usedSourceIds: [] };
+    };
+    const domainsUsed: string[][] = [];
+    const fetcher = vi.fn<typeof fetch>(async (input, init) => {
+      if (new URL(input.toString()).hostname !== 'api.exa.ai') return json({}, 503);
+      const body = JSON.parse(init?.body as string) as { includeDomains: string[] };
+      domainsUsed.push(body.includeDomains);
+      return json({ results: [{
+        title: 'Unrelated evidence',
+        url: body.includeDomains.includes('wiki.52poke.com')
+          ? 'https://wiki.52poke.com/wiki/Riolu' : 'https://www.serebii.net/pokedex-sv/riolu/',
+        highlights: ['Riolu is a Fighting-type Pokémon, with no supported encounter location here.'],
+      }] });
+    });
+    expect(await researchCuratedWeb({
+      ...request, question: '紫里在哪里可以抓利欧路？',
+      context: { ...request.context, game: 'violet', generation: 9 },
+    }, runModel, fetcher, undefined, undefined, { exaApiKey: 'e'.repeat(32) })).toBeNull();
+    expect(domainsUsed).toHaveLength(2);
+    expect(domainsUsed[0]).toEqual(['wiki.52poke.com']);
+    expect(domainsUsed[1]).not.toContain('wiki.52poke.com');
+    expect(phases).toEqual(['curated-web-compose', 'curated-web-compose']);
+  });
+
   it('uses Tavily only after fixed sources fail, then composes and verifies citations', async () => {
     const violetRequest: AssistantRequest = {
       ...request,
@@ -1078,6 +1160,7 @@ describe('generated answer quality guards', () => {
 
   it('rejects internal source IDs and fields instead of rewriting them', () => {
     for (const answer of [
+      '依据 exa-52poke-1，这个地点可以捕捉。',
       '依据 tavily-52poke-1，这个地点可以捕捉。',
       '结构化事实来自 dex-bundle-v20。',
       '来源是 TitoDex Dex bundle v20。',

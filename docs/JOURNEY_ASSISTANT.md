@@ -1,5 +1,7 @@
 # 问 TitoDex / 旅程卡关助手
 
+> Exa 接入候选：Exa 优先、Tavily 备用，保留现有版本与来源核验。账号、Worker Secret 与真实检索已验证；候选源码 `EXA_WEB_ENABLED=true`。候选版本仍为 0% 普通流量，原生产版本为 100%，等待上线授权。详细配置与回退策略见 [Worker README](../cloudflare/journey-assistant/README.md#optional-exa-primary--tavily-fallback-search)。
+
 > 状态：v0.9.18（Lite 204 / Offline 205），延续 v0.9.17 的结构化资料查询、最终事实约束、左侧道具动效与答案开头锚定。默认关闭，首次启用明确说明联网与最近对话上下文。保留 50 组本地记录，同游戏最近 6 组用于追问；引用按需展开、实体按稳定 ID 跳转。Journey 的下载入口已移除，内建 HGSS 种子与旧包读取兼容保留。资源覆盖及限制见 [ASK_STRUCTURED_DATA.md](ASK_STRUCTURED_DATA.md)。
 
 “问 TitoDex”是可选的存档优先卡关助手。主 APK 内建上下文能力和三个 HGSS 审核链路，但整个功能默认关闭；用户必须先在设置中确认联网、AI 检索和最近对话上下文说明，Journey／Search 才会出现入口。关闭时不预留入口位置，也不发起健康检查或问答请求。开启后仍然本地优先，并可再单独关闭在线回答。在线审核库增加了 DPPt、BW/BW2、XY、ORAS、SM/USUM、SWSH、BDSP、传说阿尔宙斯和朱紫的少量关键卡点，但仍不是完整流程攻略，也不会把“能识别版本”误写成“已经解析所有剧情进度”。

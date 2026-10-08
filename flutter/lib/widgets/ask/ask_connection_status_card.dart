@@ -526,6 +526,7 @@ class _ContextChip extends StatelessWidget {
 }
 
 String _webSearchProviderLabel(String value) => switch (value) {
+  'exa' => 'Exa',
   'tavily' => 'Tavily',
   'deepseek-native' => AppZh.askTitoDexSourceDeepseekNativeShort,
   'brave' => 'Brave',

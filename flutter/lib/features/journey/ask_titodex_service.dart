@@ -257,6 +257,7 @@ class HttpAskTitoDexOnlineClient
             .whereType<String>()
             .where(
               (provider) => const {
+                'exa',
                 'tavily',
                 'deepseek-native',
                 'brave',

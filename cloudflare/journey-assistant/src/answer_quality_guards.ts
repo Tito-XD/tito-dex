@@ -28,7 +28,7 @@ const adviceIntentPattern =
   /(?:培养|适合|推荐|配招|值不值得|怎么练|练什么|练吗|好不好用|好用吗|强不强|厉不厉害|打法|队伍|搭配)/u;
 
 const internalSourceReferencePatterns = [
-  /\b(?:tavily|dex-bundle|strategywiki|wikidata)-[a-z0-9][a-z0-9-]*\b/iu,
+  /\b(?:exa|tavily|dex-bundle|strategywiki|wikidata)-[a-z0-9][a-z0-9-]*\b/iu,
   /\bpokeapi-(?:pokemon-species|pokemon|move|item|ability|location|location-area)-[a-z0-9-]+\b/iu,
   /\bTitoDex\s+Dex\s+bundle(?:\s+v\d+)?\b/iu,
   /\b(?:usedSourceIds|sourceKinds|versionScope|exactGame|moveSet|verifiedFacts|matchedHintIds|answerMode)\b/u,

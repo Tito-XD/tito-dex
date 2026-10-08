@@ -82,51 +82,98 @@ Every live-source answer is visibly labelled `未经 TitoDex 人工审核`. A so
 failure, invalid model result, quota exhaustion, or scope rejection returns the
 original deterministic `no_match` response. Live answers never write to R2.
 
-## Optional Tavily allowlist search
+## Optional Exa primary / Tavily fallback search
 
-Tavily is a retrieval adapter, not an answer provider. It is never called while
-a local audited hint or a Dex query returns a direct answer. Legacy bundle
-results explicitly marked `online-verify` can still trigger corroboration,
-but final fact enforcement restores the executed structured result.
-Chinese questions first run a 52Poké-only request alongside fixed-source
-collection. If the primary evidence cannot produce a supported answer, broad
-advice runs two bounded fallback language pools and narrow questions run one
-mixed fallback request. The fallback domain set excludes 52Poké because it was
-already attempted.
+Both services retrieve evidence; the existing composer and verifier decide
+whether it supports an answer. Neither is called when a local audited hint or
+exact Dex-bundle fact already answers the question.
 
-- Install `TAVILY_API_KEY` as a Worker secret; never place it in
-  `wrangler.jsonc`, source, an APK, documentation examples, or logs.
-- After the secret exists, set `TAVILY_WEB_ENABLED=true` in the private
-  deployment configuration. Both conditions are required.
-- Each request uses `search_depth=basic`, no Tavily-generated answer, no raw
-  page content, six results maximum, a short timeout, a bounded response, and
-  no retry. A broad Chinese miss makes one 52Poké request followed by at most
-  two concurrent fallback-language requests.
-- The fixed allowlist includes Pokémon.com, Bulbapedia, Serebii, StrategyWiki,
-  PokéAPI, Pokémon Database, 52Poké wiki, Smogon, Marriland, GameFAQs, Game8,
-  IGN, Nintendo Life, and Eurogamer. Returned URLs are revalidated against the
-  same exact hostnames before snippets can reach Qwen.
-- Tavily snippets are transient and are never stored, indexed, or packaged.
-  52Poké remains excluded from direct page fetching; without separate
-  permission its content also remains excluded from R2/AI Search and APK data.
+- `WEB_SEARCH_PRIMARY=exa` selects Exa first. `tavily` explicitly reverses the
+  order. A missing/disabled provider is skipped. Exa is enabled in the validated candidate after its Worker secret and live
+  retrieval passed. Production traffic is still on the previous version until
+  rollout is approved.
+- Store `EXA_API_KEY` and `TAVILY_API_KEY` only as Worker secrets. Each also
+  needs its corresponding `EXA_WEB_ENABLED` / `TAVILY_WEB_ENABLED` flag and
+  `CURATED_WEB_ENABLED=true`. Health requires a valid key shape plus these
+  flags; it does not probe the account balance.
+- In each language/domain pool, the primary is tried first. Empty or rejected
+  results, timeout, malformed data, account errors, rate limiting and quota
+  exhaustion fall through to the other provider. Non-empty retrieved evidence
+  still needs the existing support checks. If the 52Poké evidence cannot
+  support an answer, research proceeds to the remaining domains; it does not
+  rerun the same 52Poké pool in the backup solely because composition failed.
+- Exa uses `/search`, `type=auto`, six results and bounded `highlights` only.
+  It ignores generated summaries, answer output and page text. Tavily retains
+  basic retrieval, or advanced retrieval for strategy questions, with no
+  generated answer or raw page text. Each call has a five-second maximum,
+  a 64 KiB response limit and no retry. Search across both stages shares a
+  ten-second wall-clock deadline, including any rejected preferred-source pass.
+- Chinese retrieval first isolates `wiki.52poke.com`. A missing or unsupported
+  answer opens the remaining allowlisted domains: one mixed query for narrow
+  questions, concurrent English/Chinese pools for broad advice. Returned URLs
+  must use HTTPS and exactly match the server-owned domain list.
+- Exa HTTP 402 and Tavily HTTP 432/433 indicate credit/budget exhaustion;
+  HTTP 429 is rate limiting. These and other provider failures skip further
+  calls to that provider during the same user question. Already-started language
+  requests can still finish. The next question tries the configured primary
+  again, allowing a replenished quota to recover without a shared counter.
+- Logs contain provider/stage/status/count only, never keys, queries, snippets
+  or upstream error bodies. Retrieved evidence is not stored, indexed or
+  packaged. A URL returned by both engines counts once; independent evidence
+  groups are based on websites, not search-engine names.
 
-The secret can be installed interactively from the Worker directory:
+Local development can use a git-ignored `.dev.vars` file in this directory with
+`EXA_API_KEY=<your key>`; keep the value out of chat, command arguments and logs.
+For production, install the key interactively, then enable Exa only after a
+successful live check:
 
 ```bash
-npx wrangler secret put TAVILY_API_KEY
+npx wrangler secret put EXA_API_KEY
 ```
 
-This command prompts for the value without writing it to the repository. Do
-not run it during ordinary source verification, and do not enable the flag
-until the intended deployment has the secret.
+The failover reacts to API status; it does not distinguish free credits from
+paid balance. Free-only usage must be enforced by the account's spending cap
+and disabled automatic recharge. The user created the account and installed the secret. Validation uses a
+zero-traffic candidate; ordinary production requests remain on the previous
+version. No payment settings were changed.
+
+Official API references: [Exa Search](https://exa.ai/docs/reference/search),
+[Exa error codes](https://exa.ai/docs/admin/error-codes),
+[Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search).
+
+## Validation on 2026-10-08
+
+The candidate is based on current `origin/main` (`4d204de`), preserving the
+production Worker source (`49a04e6`) and its security/grounding checks. The older
+local checkout was not used for deployment.
+
+- Worker: 372 tests passed, 10 existing artifact tests skipped; the separate
+  structured-data checks passed 27 tests (10 existing skips).
+- Flutter: 27 assistant tests passed, targeted analysis clean, zh/en Exa labels
+  preserved alongside the current split Ask components.
+- Real Exa adapter calls using the encrypted Worker secret: 52Poké returned six
+  accepted snippets in 2.534 seconds; fallback returned three accepted snippets
+  from Game8/Pokémon Database in 2.541 seconds, both HTTP 200.
+- Live validation uses `redirect=manual` and rejects 3xx responses. This avoids
+  the immediate runtime failure observed with `redirect=error` while preventing
+  credential forwarding. Private probe code/credentials were removed locally;
+  probe versions are outside the active deployment.
+- End-to-end Lucario cultivation query returned a medium-confidence answer
+  with `sourceKinds=[exa]` and two citations in 12.9 seconds. A broader starter
+  recommendation returned `no_match` in 8.3 seconds when support was insufficient.
+- Clean candidate `17f7ddc9-5ea5-4fe3-9957-6d9257ef5d3c` is at 0% traffic.
+  Production `0ab85fe8-9d78-4c0b-a925-24377f5c6f1c` remains at 100%.
+
+Successful retrieval does not establish that every generated answer is correct;
+version, source and claim checks remain required.
 
 ## Client-visible status and execution trace
 
 `GET /health` returns only sanitized capability flags: Worker reachability,
 Workers AI Qwen configuration, Dex-bundle/AI Search/curated-source switches, the three
 fixed source provider names, generic `webSearch` plus
-`webSearchProviders` containing `tavily` only when its flag and secret are
-present, and `deepseek-native` only after its server flag is enabled following
+`webSearchProviders` containing `exa` and/or `tavily` in configured order
+only when their flags and secrets are present, and `deepseek-native` only after its server flag is enabled following
 a successful custom-provider smoke test. Explicit `braveSearch: false` remains
 for older clients. Health never returns
 an Account ID, binding identifier, production origin, model credential, or
@@ -144,7 +191,7 @@ Every `/v1/ask` response also carries a privacy-safe trace:
   match;
 - `modelUsed` and `aiSearchUsed`: what this request actually used, not merely
   what the deployment has configured;
-- `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `tavily`, or
+- `sourceKinds`: `pokeapi`, `strategywiki`, `wikidata`, `exa`, `tavily`, or
   `deepseek-native` only when that route actually supports the returned answer.
 
 Clients may opt into progressive rendering with

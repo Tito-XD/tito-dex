@@ -379,6 +379,7 @@ String? _sourceAccessDate(String raw) {
 }
 
 String _sourceKindLabel(String value) => switch (value) {
+  'exa' => 'Exa',
   'pokeapi' => 'PokeAPI',
   'strategywiki' => 'StrategyWiki',
   'wikidata' => 'Wikidata',

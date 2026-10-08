@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # Python bytecode
 __pycache__/

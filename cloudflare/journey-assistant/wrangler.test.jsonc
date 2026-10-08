@@ -10,6 +10,8 @@
     "AI_SEARCH_ENABLED": "false",
     "CURATED_WEB_ENABLED": "false",
     "TAVILY_WEB_ENABLED": "false",
+    "EXA_WEB_ENABLED": "false",
+    "WEB_SEARCH_PRIMARY": "exa",
     "DEEPSEEK_NATIVE_SEARCH_ENABLED": "false",
     "DEEPSEEK_NATIVE_PROVIDER": "custom-deepseek-anthropic",
     "DEEPSEEK_NATIVE_KEY_ALIAS": "TitoDex",

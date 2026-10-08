@@ -46,6 +46,8 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.9.21)
 
+**Exa integration candidate:** search defaults to Exa first, Tavily as backup, with the existing source and version checks preserved. `EXA_API_KEY` and bounded live retrieval have been verified (six 52Poké / three fallback snippets, about 2.5s). `EXA_WEB_ENABLED=true` in the candidate source. Candidate `17f7ddc9-5ea5-4fe3-9957-6d9257ef5d3c` serves 0% regular traffic; previous production remains at 100%, pending rollout approval.
+
 ### v0.9.21: battle workspace and shared surfaces
 
 The four battle tools share attacker/defender inputs and allow quick Party imports.

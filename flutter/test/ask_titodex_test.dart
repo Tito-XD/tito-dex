@@ -348,6 +348,7 @@ void main() {
             'braveSearch': false,
             'webSearch': true,
             'webSearchProviders': [
+              'exa',
               'tavily',
               'deepseek-native',
               'unexpected-provider',
@@ -371,7 +372,7 @@ void main() {
     expect(status.curatedSourcesEnabled, isTrue);
     expect(status.braveSearchEnabled, isFalse);
     expect(status.webSearchEnabled, isTrue);
-    expect(status.webSearchProviders, ['tavily', 'deepseek-native']);
+    expect(status.webSearchProviders, ['exa', 'tavily', 'deepseek-native']);
     expect(status.sourceProviders, ['pokeapi', 'strategywiki', 'wikidata']);
   });
 
@@ -638,7 +639,7 @@ void main() {
           answerMode: AskTitoDexAnswerMode.curatedSourcesQwen,
           modelUsed: true,
           confidence: 'medium',
-          sourceKinds: ['pokeapi', 'tavily', 'pokeapi'],
+          sourceKinds: ['pokeapi', 'exa', 'tavily', 'pokeapi'],
           sources: [
             ProgressionSource(
               title: 'PokeAPI · 路卡利欧',
@@ -669,7 +670,7 @@ void main() {
 
       expect(find.text(AppZh.askTitoDexRouteCuratedQwen), findsOneWidget);
       expect(find.text(AppZh.askTitoDexTraceModel), findsOneWidget);
-      expect(find.text('检索 2 路'), findsOneWidget);
+      expect(find.text('检索 3 路'), findsOneWidget);
       expect(find.text('参考 3 个来源 · 未逐项核验'), findsOneWidget);
       expect(find.text('已核验 · 参考 3 个来源'), findsNothing);
       expect(find.text('参考 3 个来源'), findsNothing);
@@ -712,6 +713,7 @@ void main() {
       expect(find.byKey(const Key('ask-titodex-source-sheet')), findsOneWidget);
       expect(find.text('回答引用 · 3'), findsOneWidget);
       expect(find.text('PokeAPI'), findsOneWidget);
+      expect(find.text('Exa'), findsOneWidget);
       expect(find.text('Tavily'), findsOneWidget);
       expect(find.text('PokeAPI · 路卡利欧'), findsOneWidget);
       expect(find.text('神奇宝贝百科 · 路卡利欧'), findsOneWidget);
@@ -890,7 +892,10 @@ void main() {
               motionImagePreparer: prepareTestAskMotionImages,
               journey: _journey,
               edition: GameEdition.hgss.withFlavor('soulsilver'),
-              service: _CompleterService(webSearchEnabled: true),
+              service: _CompleterService(
+                webSearchEnabled: true,
+                webSearchProviders: const ['exa', 'tavily'],
+              ),
             ),
           ),
         ),
@@ -901,13 +906,14 @@ void main() {
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
     await tester.pumpAndSettle();
 
-    expect(find.text('在线 5/6'), findsOneWidget);
+    expect(find.text('在线 6/7'), findsOneWidget);
     expect(find.text('问答 0/50'), findsOneWidget);
     expect(find.text('魂银'), findsOneWidget);
     await tester.tap(find.byKey(const Key('ask-titodex-connection-summary')));
     await tester.pumpAndSettle();
+    expect(find.text('联网 · Exa'), findsOneWidget);
     expect(find.text('联网 · Tavily'), findsOneWidget);
-    expect(find.text('可用'), findsNWidgets(5));
+    expect(find.text('可用'), findsNWidgets(6));
     await tester.tap(find.text('知道了'));
     await tester.pumpAndSettle();
 
@@ -1260,9 +1266,13 @@ class _FakeService extends AskTitoDexService {
 }
 
 class _CompleterService extends AskTitoDexService {
-  _CompleterService({this.webSearchEnabled = false});
+  _CompleterService({
+    this.webSearchEnabled = false,
+    this.webSearchProviders = const ['tavily'],
+  });
 
   final bool webSearchEnabled;
+  final List<String> webSearchProviders;
   final Completer<AskTitoDexResult> _answer = Completer<AskTitoDexResult>();
 
   @override
@@ -1274,7 +1284,7 @@ class _CompleterService extends AskTitoDexService {
         curatedSourcesEnabled: true,
         sourceProviders: const ['pokeapi', 'strategywiki', 'wikidata'],
         webSearchEnabled: webSearchEnabled,
-        webSearchProviders: webSearchEnabled ? const ['tavily'] : const [],
+        webSearchProviders: webSearchEnabled ? webSearchProviders : const [],
       );
 
   @override
