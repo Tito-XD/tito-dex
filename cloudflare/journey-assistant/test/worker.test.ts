@@ -1,4 +1,4 @@
-import { env, SELF } from 'cloudflare:test';
+import { env, SELF, runInDurableObject } from 'cloudflare:test';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AssistantRequest, AssistantResponse } from '../src/contract';
 import { buildDexBundleSources } from '../src/dex_bundle_retrieval';
@@ -27,6 +27,7 @@ async function post(payload: string, deviceKey = 'test-device-key-12345'): Promi
     headers: {
       'content-type': 'application/json',
       'x-titodex-device-key': deviceKey,
+      'cf-connecting-ip': deviceKey,
     },
     body: payload,
   });
@@ -81,6 +82,7 @@ describe('journey assistant Worker contract', () => {
   });
 
   beforeEach(async () => {
+    await runInDurableObject(env.QUESTION_BUDGET.getByName('journey-questions-v1'), async (_instance, state) => { await state.storage.deleteAll(); });
     const [journeyObjects, dexObjects] = await Promise.all([
       env.JOURNEY_CONTENT.list(),
       env.DEX_CONTENT.list(),
@@ -1807,7 +1809,7 @@ describe('journey assistant Worker contract', () => {
     expect(await response.json()).toMatchObject({ status: 'no_match', answer: null });
   });
 
-  it('enforces the configured per-key cost guard', async () => {
+  it('enforces the configured edge-source cost guard', async () => {
     const deviceKey = 'rate-limit-key-unique-12345';
     const responses = await Promise.all(
       Array.from({ length: 21 }, () => post(body(), deviceKey)),
@@ -2197,6 +2199,7 @@ function deepSeekEnv({
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_BUDGET: env.QUESTION_BUDGET,
     QUESTION_RATE_LIMITER: {
       limit: async () => ({ success: true }),
     },
@@ -2255,6 +2258,7 @@ function curatedDexEnv(aiRun: ReturnType<typeof vi.fn>): Env {
   return {
     JOURNEY_CONTENT: env.JOURNEY_CONTENT,
     DEX_CONTENT: env.DEX_CONTENT,
+    QUESTION_BUDGET: env.QUESTION_BUDGET,
     QUESTION_RATE_LIMITER: {
       limit: async () => ({ success: true }),
     },

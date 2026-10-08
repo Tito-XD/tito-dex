@@ -332,3 +332,20 @@ also documented in [`../../docs/JOURNEY_ASSISTANT.md`](../../docs/JOURNEY_ASSIST
 
 Tavily request fields and response bounds follow its official Search endpoint:
 <https://docs.tavily.com/documentation/api-reference/endpoint/search>.
+
+
+### 问答滥用控制
+
+`/v1/ask` 按 Cloudflare 覆写的 `CF-Connecting-IP` 限流（20 次/60 秒）；
+设备键和 `X-Forwarded-For` 不参与额度身份。缺失边缘地址共享保守桶。
+该信任边界要求请求经过 Cloudflare 公网边缘；不要通过不可信 Worker
+子请求转发任意 `CF-Connecting-IP`，也不要开放绕过边缘的入口。
+
+`QUESTION_BUDGET` 使用单个 SQLite Durable Object 持久化、原子预留整个问答
+流程的额度：全服务 60 次/分钟、1000 次/UTC 日，失败不退款。额度在任何
+问答 R2、检索、搜索及模型调用前扣减，绑定缺失或控制失败返回 503，额度
+耗尽返回 429。发布时必须包含 `question-budget-v1` 的 Durable Object 迁移。
+这些是保守的初始请求阈值；每次请求仍受现有调用数量、Token 与超时限制。
+这不是精确费用计量或独立提供商熔断；部署前应按实际容量调整阈值，并结合
+提供商费用上限。Cloudflare 原生 IP 限流是边缘近似控制，全服务预算由
+Durable Object 跨边缘协调。

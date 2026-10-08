@@ -112,21 +112,41 @@ a published Offline seed only after the same v20 completeness/digest checks.
 v0.9.18 reused the verified v20 archive from v0.9.17 unchanged; never substitute
 the historical compact v14 seed.
 
-The workflow analyzes and tests once, then builds the signed Lite and Offline
-APKs in parallel. Each artifact is named
-`TitoDex-<ver>-<variant>-rg-arm64.apk` and passes the release verifier before
-upload. The Offline verifier also checks its embedded manifest and archive
-SHA-256 against the selected manifest. Product versions and both Android
-versionCodes must always increase monotonically.
+The workflow accepts only the exact protected `main` tip with a successful push
+run of `commit-attribution.yml`, analyzes/tests it once, then builds unsigned
+Lite, Offline and legacy extension APKs. Checkout credentials are not persisted.
+A separate fresh `android-release` job downloads only this run's exact artifacts;
+it never checks out source, restores build caches, or runs Flutter/Gradle/repository
+scripts. SDK 36.0.0 tools align (including 16 KB native page alignment), sign and
+verify each APK against the mandatory `ANDROID_SIGNER_SHA256` certificate pin.
+The publisher independently runs the existing content and package checks.
+
+Before enabling this workflow, an administrator must configure `android-release`:
+
+- Require independent reviewers, prevent self-review, and disable administrator bypass.
+- Allow only the exact `main` **branch**, with no tag rules or additional patterns.
+- Move `ANDROID_KEYSTORE_BASE64`, `ANDROID_STORE_PASSWORD`, `ANDROID_KEY_PASSWORD`
+  and `ANDROID_KEY_ALIAS` into this environment. Remove all repository/organization
+  copies accessible to this repository; otherwise a collaborator can write another
+  workflow to read them. Keep the existing key and certificate identity.
+- Set `ANDROID_SIGNER_SHA256` in the environment and protect `main` with the required
+  Commit authorship check and reviewed changes to workflows/build code.
+
+Both source gates fail before entering the environment when its required protections
+are missing. GitHub must enforce environment policies as well: a workflow-only ref
+check can be removed by an actor who can edit a branch workflow. The automated tests
+cannot establish that secrets were migrated or that reviewers are independent.
+Run `python3 -m unittest tools.test_android_release_security -v` (PyYAML + Node.js)
+for the provenance rejection cases and signing isolation regression checks.
 
 Publishing is a separate manual **Publish Verified Android Release** workflow. Supply the
 successful build run id, that run's exact source SHA, both build numbers, a full Chinese
 `release_title`, a one-sentence Chinese `release_summary`, and a Chinese Markdown
 `release_highlights` bullet list based on the exact tag contents. The publisher
-refuses runs from another commit or workflow, rechecks package id, versionName and versionCode,
+requires a full source SHA reachable from protected main and verifies the build run's workflow ID/path, repository, main branch, event, success and exact SHA; it rechecks package id, versionName and versionCode,
 requires Lite and Offline to have the same signer, then creates an annotated tag and a draft
-GitHub Release. Configure `ANDROID_SIGNER_SHA256` to pin that signer to the historical release
-certificate rather than checking only cross-variant equality. The current publisher also requires legacy compatibility inputs `extension_version=1.0.0` and `extension_build_number=1`; the public App download pair remains Lite and Offline.
+GitHub Release. `ANDROID_SIGNER_SHA256` is required to pin that signer to the historical release
+certificate as well as checking cross-variant equality. The current publisher also requires legacy compatibility inputs `extension_version=1.0.0` and `extension_build_number=1`; the public App download pair remains Lite and Offline.
 
 After inspecting the draft notes and downloading/verifying both uploaded APKs, publish the draft as stable or prerelease as authorized. In-app updates consume only stable releases with matching `TitoDex-<version>-{lite,offline}-rg-arm64.apk` asset names, uploaded state and GitHub SHA-256 digests. Keep increasing versionCodes and the existing package/signer identity.
 

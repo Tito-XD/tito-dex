@@ -1,3 +1,4 @@
+export { QuestionBudget } from './question_budget';
 import { answerQuestion } from './assistant';
 import {
   effectiveContextReliability,
@@ -146,13 +147,14 @@ export default {
     const contentLength = Number(request.headers.get('content-length') ?? '0');
     if (contentLength > MAX_REQUEST_BYTES) return jsonError('payload_too_large', 413);
 
-    const deviceKey = request.headers.get('x-titodex-device-key')?.trim();
-    if (env.QUESTION_RATE_LIMITER) {
-      const rateKey = deviceKey && /^[A-Za-z0-9_-]{12,80}$/.test(deviceKey)
-        ? deviceKey
-        : 'anonymous-missing-key';
-      const outcome = await env.QUESTION_RATE_LIMITER.limit({ key: rateKey });
-      if (!outcome.success) return jsonError('rate_limited', 429);
+    // Only Cloudflare's edge identity is trusted; device keys are caller controlled.
+    if (!env.QUESTION_RATE_LIMITER || !env.QUESTION_BUDGET) return jsonError('admission_unavailable', 503);
+    try {
+      const source = request.headers.get('cf-connecting-ip')?.trim();
+      const result = await env.QUESTION_RATE_LIMITER.limit({ key: source ? `edge:${source}` : 'edge:unknown' });
+      if (!result.success) return jsonError('rate_limited', 429);
+    } catch {
+      return jsonError('admission_unavailable', 503);
     }
 
     let value: unknown;
@@ -170,6 +172,13 @@ export default {
     }
     const parsed = parseAssistantRequest(value);
     if (!parsed) return jsonError('invalid_request', 400);
+    try {
+      // Reserve for the entire bounded pipeline before R2/search/model work.
+      if (!await env.QUESTION_BUDGET.getByName('journey-questions-v1').admit()) return jsonError('rate_limited', 429);
+    } catch {
+      return jsonError('admission_unavailable', 503);
+    }
+
     const buildResponse = async (
       observer?: ResponseBuildObserver,
     ): Promise<AssistantResponse> => {

@@ -49,14 +49,74 @@ permissions:
   contents: write
 
 jobs:
+  approve-source:
+    name: Verify protected main source
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      source_sha: ${{ steps.source.outputs.source_sha }}
+    steps:
+      - name: Verify source approval before building or signing
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        id: source
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const repo = context.repo;
+            if (context.eventName !== 'workflow_dispatch' || context.ref !== 'refs/heads/main') {
+              throw new Error('Release workflows must be dispatched on main');
+            }
+            const branch = (await github.rest.repos.getBranch({...repo, branch: 'main'})).data;
+            if (!branch.protected || ! /^[0-9a-f]{40}$/.test(process.env.SOURCE_SHA)) {
+              throw new Error('Source must be a full SHA and main must be protected');
+            }
+            const comparison = (await github.rest.repos.compareCommits({
+              ...repo, base: process.env.SOURCE_SHA, head: branch.commit.sha
+            })).data;
+            if (!['ahead', 'identical'].includes(comparison.status)) {
+              throw new Error('Source is not reachable from protected main');
+            }
+            const runs = (await github.rest.actions.listWorkflowRuns({
+              ...repo, workflow_id: 'commit-attribution.yml', head_sha: process.env.SOURCE_SHA,
+              status: 'success', per_page: 100
+            })).data.workflow_runs;
+            if (!runs.some(run => run.head_sha === process.env.SOURCE_SHA && run.event === 'push' &&
+                run.head_repository.full_name === `${repo.owner}/${repo.repo}`)) {
+              throw new Error('Exact source has no successful push Commit attribution run');
+            }
+            // Fail closed: merely naming an environment would auto-create an unprotected one.
+            const environment = (await github.rest.repos.getEnvironment({
+              ...repo, environment_name: 'android-release'
+            })).data;
+            const reviewers = environment.protection_rules.find(rule => rule.type === 'required_reviewers');
+            if (!reviewers || !reviewers.prevent_self_review || !reviewers.reviewers?.length ||
+                environment.can_admins_bypass !== false ||
+                !environment.deployment_branch_policy?.custom_branch_policies) {
+              throw new Error('android-release must require independent review, forbid bypass, and restrict branches');
+            }
+            const policies = await github.paginate(github.rest.repos.listDeploymentBranchPolicies, {
+              ...repo, environment_name: 'android-release', per_page: 100
+            });
+            if (policies.length !== 1 || policies[0].name !== 'main' || policies[0].type !== 'branch') {
+              throw new Error('android-release must allow only the main branch (no tags)');
+            }
+            core.setOutput('source_sha', process.env.SOURCE_SHA);
+
   verify-and-draft:
+    needs: approve-source
+    if: github.ref == 'refs/heads/main'
+    environment: android-release
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Check out exact release source
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.source_sha }}
+          ref: ${{ needs.approve-source.outputs.source_sha }}
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Java for apksigner
@@ -72,8 +132,13 @@ jobs:
           SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
           set -euo pipefail
+          [[ "$BUILD_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           run_json="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID")"
-          test "$(printf '%s' "$run_json" | jq -r .name)" = "Android Release APKs"
+          expected_workflow_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/android-release-build.yml" --jq .id)"
+          test "$(printf '%s' "$run_json" | jq -r .workflow_id)" = "$expected_workflow_id"
+          test "$(printf '%s' "$run_json" | jq -r .path)" = ".github/workflows/android-release-build.yml"
+          test "$(printf '%s' "$run_json" | jq -r .head_branch)" = "main"
+          test "$(printf '%s' "$run_json" | jq -r .head_repository.full_name)" = "$GITHUB_REPOSITORY"
           test "$(printf '%s' "$run_json" | jq -r .event)" = "workflow_dispatch"
           test "$(printf '%s' "$run_json" | jq -r .conclusion)" = "success"
           test "$(printf '%s' "$run_json" | jq -r .head_sha)" = "$SOURCE_SHA"
@@ -135,9 +200,8 @@ jobs:
           test -n "$lite_signer"
           test "$lite_signer" = "$offline_signer"
           test "$lite_signer" = "$extension_signer"
-          if [[ -n "$EXPECTED_SIGNER_SHA256" ]]; then
-            test "${lite_signer,,}" = "${EXPECTED_SIGNER_SHA256,,}"
-          fi
+          [[ "$EXPECTED_SIGNER_SHA256" =~ ^[0-9A-Fa-f]{64}$ ]]
+          test "${lite_signer,,}" = "${EXPECTED_SIGNER_SHA256,,}"
           (
             cd dist/release
             sha256sum \
@@ -160,6 +224,8 @@ jobs:
         run: |
           set -euo pipefail
           tag="v$VERSION"
+          git remote set-url origin "https://github.com/$GITHUB_REPOSITORY.git"
+          gh auth setup-git
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           remote_tags="$(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")"

@@ -28,6 +28,8 @@
       "bucket_name": "titodex-dex-test"
     }
   ],
+  "durable_objects": { "bindings": [{ "name": "QUESTION_BUDGET", "class_name": "QuestionBudget" }] },
+  "migrations": [{ "tag": "question-budget-v1", "new_sqlite_classes": ["QuestionBudget"] }],
   "ratelimits": [
     {
       "name": "QUESTION_RATE_LIMITER",

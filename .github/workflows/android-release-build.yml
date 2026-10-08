@@ -40,7 +40,56 @@ permissions:
   contents: read
 
 jobs:
+  approve-source:
+    name: Verify protected main source
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      source_sha: ${{ steps.source.outputs.source_sha }}
+    steps:
+      - name: Verify source approval before building or signing
+        id: source
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const repo = context.repo;
+            if (context.eventName !== 'workflow_dispatch' || context.ref !== 'refs/heads/main') {
+              throw new Error('Release workflows must be dispatched on main');
+            }
+            const branch = (await github.rest.repos.getBranch({...repo, branch: 'main'})).data;
+            if (!branch.protected || branch.commit.sha !== context.sha) {
+              throw new Error('Release source must be the exact protected main tip');
+            }
+            const runs = (await github.rest.actions.listWorkflowRuns({
+              ...repo, workflow_id: 'commit-attribution.yml', head_sha: context.sha,
+              status: 'success', per_page: 100
+            })).data.workflow_runs;
+            if (!runs.some(run => run.head_sha === context.sha && run.event === 'push' &&
+                run.head_repository.full_name === `${repo.owner}/${repo.repo}`)) {
+              throw new Error('Exact source has no successful push Commit attribution run');
+            }
+            // Fail closed: merely naming an environment would auto-create an unprotected one.
+            const environment = (await github.rest.repos.getEnvironment({
+              ...repo, environment_name: 'android-release'
+            })).data;
+            const reviewers = environment.protection_rules.find(rule => rule.type === 'required_reviewers');
+            if (!reviewers || !reviewers.prevent_self_review || !reviewers.reviewers?.length ||
+                environment.can_admins_bypass !== false ||
+                !environment.deployment_branch_policy?.custom_branch_policies) {
+              throw new Error('android-release must require independent review, forbid bypass, and restrict branches');
+            }
+            const policies = await github.paginate(github.rest.repos.listDeploymentBranchPolicies, {
+              ...repo, environment_name: 'android-release', per_page: 100
+            });
+            if (policies.length !== 1 || policies[0].name !== 'main' || policies[0].type !== 'branch') {
+              throw new Error('android-release must allow only the main branch (no tags)');
+            }
+            core.setOutput('source_sha', context.sha);
+
   validate:
+    needs: approve-source
     name: Analyze and test release source
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -49,8 +98,11 @@ jobs:
         working-directory: flutter
 
     steps:
-      - name: Check out selected release ref
+      - name: Check out approved release commit
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.approve-source.outputs.source_sha }}
+          persist-credentials: false
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -92,8 +144,8 @@ jobs:
           python3 -m unittest tools.test_audit_hd_companion_sources -v
 
   build:
-    name: Build signed ${{ matrix.variant }} APK
-    needs: validate
+    name: Build unsigned ${{ matrix.variant }} APK
+    needs: [approve-source, validate]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -105,8 +157,16 @@ jobs:
         working-directory: flutter
 
     steps:
-      - name: Check out selected release ref
+      - name: Check out approved release commit
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.approve-source.outputs.source_sha }}
+          persist-credentials: false
+
+      - name: Require secret-free checkout
+        run: |
+          test ! -e android/key.properties
+          test ! -e android/titodex-upload.keystore
 
       - name: Set up Java
         uses: actions/setup-java@v5
@@ -122,26 +182,6 @@ jobs:
           flutter-version: "3.44.6"
           cache: true
           pub-cache: true
-
-      - name: Restore Android release signing
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: |
-          set -euo pipefail
-          test -n "$ANDROID_KEYSTORE_BASE64"
-          test -n "$ANDROID_STORE_PASSWORD"
-          test -n "$ANDROID_KEY_PASSWORD"
-          test -n "$ANDROID_KEY_ALIAS"
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/titodex-upload.keystore
-          {
-            printf 'storePassword=%s\n' "$ANDROID_STORE_PASSWORD"
-            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
-            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
-            printf 'storeFile=../titodex-upload.keystore\n'
-          } > android/key.properties
 
       - name: Download and verify published offline dex seed
         if: matrix.variant == 'offline'
@@ -189,7 +229,7 @@ jobs:
           # Flutter 3.44.x can generate a production registrant for root dev
           # plugins that Gradle correctly omits from the release classpath.
           # Keep integration_test for validation, but exclude it from the
-          # ephemeral signed-build dependency graph.
+          # ephemeral release-build dependency graph.
           test "$(grep -c '^  integration_test:$' pubspec.yaml)" -eq 1
           sed -i '/^  integration_test:$/,+1d' pubspec.yaml
           flutter pub get
@@ -212,7 +252,7 @@ jobs:
           fi
           echo "ARTIFACT_NAME=TitoDex-$VERSION-$VARIANT-rg-arm64.apk" >> "$GITHUB_ENV"
 
-      - name: Build signed arm64 APK
+      - name: Build unsigned arm64 APK
         env:
           TITODEX_JOURNEY_ASSISTANT_URL: ${{ secrets.TITODEX_JOURNEY_ASSISTANT_URL }}
           TITODEX_EXTENSION_CATALOG_URL: ${{ secrets.TITODEX_EXTENSION_CATALOG_URL }}
@@ -241,32 +281,26 @@ jobs:
             --dart-define="TITODEX_JOURNEY_ASSISTANT_URL=$TITODEX_JOURNEY_ASSISTANT_URL" \
             --dart-define="TITODEX_EXTENSION_CATALOG_URL=$TITODEX_EXTENSION_CATALOG_URL"
 
-      - name: Name and verify APK
+      - name: Stage unsigned APK
         env:
           VARIANT: ${{ matrix.variant }}
         run: |
           set -euo pipefail
           mkdir -p ../dist
           cp build/app/outputs/flutter-apk/app-release.apk "../dist/$ARTIFACT_NAME"
-          if [[ "$VARIANT" == "offline" ]]; then
-            ../tools/verify_release_apk.sh --offline --expected-bundle-version 20 \
-              "../dist/$ARTIFACT_NAME"
-          else
-            ../tools/verify_release_apk.sh "../dist/$ARTIFACT_NAME"
-          fi
           sha256sum "../dist/$ARTIFACT_NAME"
 
-      - name: Upload verified APK
+      - name: Upload unsigned APK
         uses: actions/upload-artifact@v4
         with:
-          name: TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
+          name: unsigned-TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
           path: dist/TitoDex-${{ inputs.version }}-${{ matrix.variant }}-rg-arm64.apk
           if-no-files-found: error
           retention-days: 14
 
   build-extension:
-    name: Build signed Journey Assistant extension APK
-    needs: validate
+    name: Build unsigned Journey Assistant extension APK
+    needs: [approve-source, validate]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
@@ -274,8 +308,16 @@ jobs:
         working-directory: flutter
 
     steps:
-      - name: Check out selected release ref
+      - name: Check out approved release commit
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.approve-source.outputs.source_sha }}
+          persist-credentials: false
+
+      - name: Require secret-free checkout
+        run: |
+          test ! -e android/key.properties
+          test ! -e android/titodex-upload.keystore
 
       - name: Set up Java
         uses: actions/setup-java@v5
@@ -300,27 +342,7 @@ jobs:
       - name: Prepare Flutter Android project
         run: flutter pub get
 
-      - name: Restore Android release signing
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: |
-          set -euo pipefail
-          test -n "$ANDROID_KEYSTORE_BASE64"
-          test -n "$ANDROID_STORE_PASSWORD"
-          test -n "$ANDROID_KEY_PASSWORD"
-          test -n "$ANDROID_KEY_ALIAS"
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/titodex-upload.keystore
-          {
-            printf 'storePassword=%s\n' "$ANDROID_STORE_PASSWORD"
-            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
-            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
-            printf 'storeFile=../titodex-upload.keystore\n'
-          } > android/key.properties
-
-      - name: Build and verify extension APK
+      - name: Build unsigned extension APK
         env:
           EXTENSION_VERSION: ${{ inputs.extension_version }}
           EXTENSION_BUILD_NUMBER: ${{ inputs.extension_build_number }}
@@ -336,17 +358,90 @@ jobs:
             :journey-assistant-pack:assembleJourneyAssistantPack
           apk="../build/journey-assistant-pack/outputs/apk/release/journey-assistant-pack-release.apk"
           test -s "$apk"
-          apksigner="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
-          test -x "$apksigner"
-          "$apksigner" verify --verbose --print-certs "$apk"
           mkdir -p ../../dist
           cp "$apk" "../../dist/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
           sha256sum "../../dist/TitoDex-Journey-Assistant-$EXTENSION_VERSION-rg.apk"
 
-      - name: Upload verified extension APK
+      - name: Upload unsigned extension APK
         uses: actions/upload-artifact@v4
         with:
-          name: TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
+          name: unsigned-TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
           path: dist/TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  sign:
+    name: Sign approved build APK
+    needs: [approve-source, validate, build, build-extension]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: android-release
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact:
+          - TitoDex-${{ inputs.version }}-lite-rg-arm64.apk
+          - TitoDex-${{ inputs.version }}-offline-rg-arm64.apk
+          - TitoDex-Journey-Assistant-${{ inputs.extension_version }}-rg.apk
+    steps:
+      # No checkout, build cache, Gradle, Flutter, or repository scripts here.
+      - name: Download exact unsigned artifact from this run
+        uses: actions/download-artifact@v4
+        with:
+          name: unsigned-${{ matrix.artifact }}
+          path: unsigned
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Align, sign, and verify APK using SDK tools only
+        env:
+          ARTIFACT_NAME: ${{ matrix.artifact }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          EXPECTED_SIGNER_SHA256: ${{ secrets.ANDROID_SIGNER_SHA256 }}
+        run: |
+          set -euo pipefail
+          umask 077
+          key="$RUNNER_TEMP/release.keystore"
+          trap 'rm -f "$key"' EXIT
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_STORE_PASSWORD"
+          test -n "$ANDROID_KEY_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          [[ "$EXPECTED_SIGNER_SHA256" =~ ^[0-9A-Fa-f]{64}$ ]]
+          test -f "unsigned/$ARTIFACT_NAME"
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          test -x "$tools/zipalign"
+          test -x "$tools/apksigner"
+          mkdir -p aligned dist
+          "$tools/zipalign" -P 16 -f 4 "unsigned/$ARTIFACT_NAME" "aligned/$ARTIFACT_NAME"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$key"
+          unset ANDROID_KEYSTORE_BASE64
+          "$tools/apksigner" sign --ks "$key" --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass env:ANDROID_STORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "dist/$ARTIFACT_NAME" "aligned/$ARTIFACT_NAME"
+          rm -f "$key"
+          unset ANDROID_STORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS
+          certs="$("$tools/apksigner" verify --verbose --print-certs "dist/$ARTIFACT_NAME")"
+          signer="$(printf '%s\n' "$certs" | sed -n 's/^.*certificate SHA-256 digest: //p' | head -n 1)"
+          test "${signer,,}" = "${EXPECTED_SIGNER_SHA256,,}"
+          "$tools/zipalign" -c -P 16 4 "dist/$ARTIFACT_NAME"
+          sha256sum "dist/$ARTIFACT_NAME"
+
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}
           if-no-files-found: error
           retention-days: 14
