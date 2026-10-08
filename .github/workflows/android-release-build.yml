@@ -75,10 +75,10 @@ jobs:
               ...repo, environment_name: 'android-release'
             })).data;
             const reviewers = environment.protection_rules.find(rule => rule.type === 'required_reviewers');
-            if (!reviewers || !reviewers.prevent_self_review || !reviewers.reviewers?.length ||
+            if (!reviewers || !reviewers.reviewers?.length ||
                 environment.can_admins_bypass !== false ||
                 !environment.deployment_branch_policy?.custom_branch_policies) {
-              throw new Error('android-release must require independent review, forbid bypass, and restrict branches');
+              throw new Error('android-release must require review, forbid bypass, and restrict branches');
             }
             const policies = await github.paginate(github.rest.repos.listDeploymentBranchPolicies, {
               ...repo, environment_name: 'android-release', per_page: 100

@@ -123,7 +123,8 @@ The publisher independently runs the existing content and package checks.
 
 Before enabling this workflow, an administrator must configure `android-release`:
 
-- Require independent reviewers, prevent self-review, and disable administrator bypass.
+- Require `Tito-XD` as reviewer and disable administrator bypass. Self-review is
+  allowed by maintainer policy so the owner can dispatch and approve a release.
 - Allow only the exact `main` **branch**, with no tag rules or additional patterns.
 - Move `ANDROID_KEYSTORE_BASE64`, `ANDROID_STORE_PASSWORD`, `ANDROID_KEY_PASSWORD`
   and `ANDROID_KEY_ALIAS` into this environment. Remove all repository/organization
@@ -133,9 +134,9 @@ Before enabling this workflow, an administrator must configure `android-release`
   Commit authorship check and reviewed changes to workflows/build code.
 
 Both source gates fail before entering the environment when its required protections
-are missing. GitHub must enforce environment policies as well: a workflow-only ref
+are missing. Self-review is allowed, but approval is still required. GitHub must enforce environment policies as well: a workflow-only ref
 check can be removed by an actor who can edit a branch workflow. The automated tests
-cannot establish that secrets were migrated or that reviewers are independent.
+cannot establish that secrets were migrated or that a particular approval was reviewed by a human.
 Run `python3 -m unittest tools.test_android_release_security -v` (PyYAML + Node.js)
 for the provenance rejection cases and signing isolation regression checks.
 

@@ -81,13 +81,17 @@ class ReleaseSecurityTests(unittest.TestCase):
     def test_missing_or_unsafe_environment_fails_closed(self):
         for workflow in [BUILD, PUBLISH]:
             for scenario in [dict(environment=False), dict(reviewers=False),
-                             dict(self_review=True), dict(bypass=True),
+                             dict(bypass=True),
                              dict(policies=[]), dict(policies=[{'name':'*', 'type':'branch'}]),
                              dict(policies=[{'name':'main', 'type':'tag'}]),
                              dict(policies=[{'name':'main', 'type':'branch'},
                                             {'name':'attack', 'type':'branch'}])]:
                 with self.subTest(scenario=scenario):
                     self.assertFalse(exercise_gate(workflow, **scenario)['ok'])
+
+    def test_owner_authorized_self_review_is_supported(self):
+        for workflow in [BUILD, PUBLISH]:
+            self.assertTrue(exercise_gate(workflow, self_review=True)['ok'])
 
     def test_build_rejects_stale_main_tip(self):
         self.assertFalse(exercise_gate(BUILD, tip='b'*40)['ok'])
