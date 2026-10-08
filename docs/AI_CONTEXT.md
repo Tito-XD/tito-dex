@@ -46,7 +46,7 @@ Visual identity: blue-gray + cream + deep navy, sticker cards, `DeviceShell`, bu
 
 ## Current feature status (latest release line: v0.9.21)
 
-**Exa integration candidate:** search defaults to Exa, with Tavily disabled and available only as an explicitly enabled backup, with the existing source and version checks preserved. `EXA_API_KEY` and bounded live retrieval have been verified (six 52Poké / three fallback snippets, about 2.5s). `EXA_WEB_ENABLED=true` in the candidate source. Candidate `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 0% regular traffic; previous production remains at 100%, pending rollout approval.
+**Exa search live (2026-10-08):** Worker version `337a442a-3a13-49c0-bdbb-80c54f7666fe` serves 100% of production traffic, from verified source `7b30345`. Exa is enabled and primary; Tavily is disabled by default and requires explicit opt-in. Existing source/version checks and DeepSeek remain. Production health confirms Exa without Tavily; a live cultivation answer returned an Exa citation in 11.6s. Existing App clients remain compatible; Exa labels ship with the next normal App release.
 
 ### v0.9.21: battle workspace and shared surfaces
 

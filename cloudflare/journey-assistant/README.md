@@ -95,8 +95,7 @@ exact Dex-bundle fact already answers the question.
 
 - `WEB_SEARCH_PRIMARY=exa` selects Exa first. `tavily` explicitly reverses the
   order. A missing/disabled provider is skipped. Exa is enabled in the validated candidate after its Worker secret and live
-  retrieval passed. Production traffic is still on the previous version until
-  rollout is approved.
+  retrieval passed. Production uses the validated Exa version after the approved rollout.
 - Store `EXA_API_KEY` and `TAVILY_API_KEY` only as Worker secrets. Each also
   needs its corresponding `EXA_WEB_ENABLED` / `TAVILY_WEB_ENABLED` flag and
   `CURATED_WEB_ENABLED=true`. Health requires a valid key shape plus these
@@ -139,8 +138,7 @@ npx wrangler secret put EXA_API_KEY
 The failover reacts to API status; it does not distinguish free credits from
 paid balance. Free-only usage must be enforced by the account's spending cap
 and disabled automatic recharge. The user created the account and installed the secret. Validation uses a
-zero-traffic candidate; ordinary production requests remain on the previous
-version. No payment settings were changed.
+candidate before the approved production rollout recorded below. No payment settings were changed.
 
 Official API references: [Exa Search](https://exa.ai/docs/reference/search),
 [Exa error codes](https://exa.ai/docs/admin/error-codes),
@@ -168,9 +166,12 @@ local checkout was not used for deployment.
   recommendation returned `no_match` in 8.3 seconds when support was insufficient.
 - Initial candidate `17f7ddc9-5ea5-4fe3-9957-6d9257ef5d3c` verified Exa/Tavily
   failover. The current candidate disables Tavily by default at the user's request;
-  candidate `337a442a-3a13-49c0-bdbb-80c54f7666fe` is at 0% traffic and
-  health reports only Exa and DeepSeek as enabled search routes.
-  Production `0ab85fe8-9d78-4c0b-a925-24377f5c6f1c` remains at 100%.
+  version `337a442a-3a13-49c0-bdbb-80c54f7666fe` now serves 100% of production
+  traffic from source `7b30345`. Health reports Exa and DeepSeek; Tavily is absent.
+  The former production `0ab85fe8-9d78-4c0b-a925-24377f5c6f1c` remains the
+  rollback version. A normal production request returned HTTP 200, an Exa
+  citation and a low-confidence answer in 11.6 seconds. The private probe path
+  returns 404.
 
 Successful retrieval does not establish that every generated answer is correct;
 version, source and claim checks remain required.
