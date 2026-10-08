@@ -1,4 +1,4 @@
-name: One-time Android secret migration
+name: One-time Android signing verification
 
 on:
   workflow_dispatch:
@@ -7,17 +7,14 @@ permissions:
   contents: read
 
 jobs:
-  seal:
+  verify:
     if: github.ref == 'refs/heads/main' && github.actor == 'Tito-XD'
     runs-on: ubuntu-latest
+    environment: android-release
     timeout-minutes: 5
     steps:
-      # No source checkout or build code. Only the distro crypto library.
-      - name: Install distro libsodium
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends libsodium23
-      - name: Seal existing signing values to the protected environment public key
+      # No checkout or build code. Verify the migrated key with JDK tools only.
+      - name: Verify migrated private key and certificate identity
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
@@ -27,43 +24,22 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          python3 - <<'PY'
-          import base64, ctypes, ctypes.util, json, os
-          from pathlib import Path
-          sodium = ctypes.CDLL(ctypes.util.find_library('sodium'))
-          assert sodium.sodium_init() >= 0
-          sodium.crypto_box_keypair.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
-          sodium.crypto_box_seal.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulonglong, ctypes.c_void_p]
-          sodium.crypto_box_seal_open.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulonglong, ctypes.c_void_p, ctypes.c_void_p]
-          def seal(value, key):
-              output = ctypes.create_string_buffer(len(value) + 48)
-              assert sodium.crypto_box_seal(output, value, len(value), key) == 0
-              return output.raw
-          # Verify the library contract with non-secret bytes before migrating.
-          pk, sk = ctypes.create_string_buffer(32), ctypes.create_string_buffer(32)
-          assert sodium.crypto_box_keypair(pk, sk) == 0
-          sample = b'crypto-self-test'
-          encrypted = seal(sample, pk)
-          plain = ctypes.create_string_buffer(len(sample))
-          assert sodium.crypto_box_seal_open(plain, encrypted, len(encrypted), pk, sk) == 0
-          assert plain.raw == sample
-          key = base64.b64decode('3BL1pQ0mDYC7gb1eX5326oDyjPLQrUVoyDKlvsubE3c=', validate=True)
-          names = ['ANDROID_KEYSTORE_BASE64', 'ANDROID_STORE_PASSWORD', 'ANDROID_KEY_PASSWORD',
-                   'ANDROID_KEY_ALIAS', 'ANDROID_SIGNER_SHA256']
-          result = {}
-          for name in names:
-              value = os.environ.pop(name, '')
-              if not value:
-                  raise RuntimeError('Missing migration input: ' + name)
-              result[name] = {'key_id': '3380204578043523366',
-                              'encrypted_value': base64.b64encode(seal(value.encode(), key)).decode()}
-          Path('sealed').mkdir()
-          Path('sealed/environment-secrets.json').write_text(json.dumps(result))
-          print('Crypto self-test passed; five values sealed without plaintext output.')
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: environment-secrets-sealed
-          path: sealed/environment-secrets.json
-          retention-days: 1
-          if-no-files-found: error
+          key="$RUNNER_TEMP/migration-check.keystore"
+          cert="$RUNNER_TEMP/migration-check.der"
+          csr="$RUNNER_TEMP/migration-check.csr"
+          trap 'rm -f "$key" "$cert" "$csr"' EXIT
+          [[ "$ANDROID_SIGNER_SHA256" =~ ^[0-9A-Fa-f]{64}$ ]]
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_STORE_PASSWORD"
+          test -n "$ANDROID_KEY_PASSWORD"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$key"
+          unset ANDROID_KEYSTORE_BASE64
+          keytool -exportcert -keystore "$key" -alias "$ANDROID_KEY_ALIAS" \
+            -storepass:env ANDROID_STORE_PASSWORD -file "$cert"
+          actual="$(sha256sum "$cert" | cut -d ' ' -f 1)"
+          test "$actual" = "${ANDROID_SIGNER_SHA256,,}"
+          keytool -certreq -keystore "$key" -alias "$ANDROID_KEY_ALIAS" \
+            -storepass:env ANDROID_STORE_PASSWORD -keypass:env ANDROID_KEY_PASSWORD -file "$csr"
+          test -s "$csr"
+          printf 'Migrated private key and certificate pin verified.\n'
