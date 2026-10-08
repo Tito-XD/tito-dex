@@ -32,7 +32,7 @@ The request path is deliberately fail-safe:
    strict Pokémon-game scope classifier may query only PokéAPI, StrategyWiki,
    and Wikidata. Qwen composes a labelled, cited, unreviewed answer solely from
    the bounded results.
-7. For Chinese questions, Tavily first runs one `basic` search whose request
+7. For Chinese questions, enabled retrieval providers first search within a boundary whose request
    and accepted-result boundary is only `wiki.52poke.com`. If that evidence is
    empty or fails Qwen support verification, broad advice opens independent
    English/Chinese searches over the remaining server-owned allowlist; narrow
@@ -75,7 +75,7 @@ no daily five-request cap.
   with timeouts, and treated as untrusted prompt-injection input.
 - 52Poké remains in the manual fact-check/source-lock workflow for future
   reviewed R2 facts. The Worker never directly fetches its page prose and never
-  adds it to AI Search; only a transient Tavily citation snippet may reach the
+  adds it to AI Search; only a transient enabled-provider citation snippet may reach the
   verifier when that optional route is enabled.
 
 Every live-source answer is visibly labelled `未经 TitoDex 人工审核`. A source
@@ -83,6 +83,11 @@ failure, invalid model result, quota exhaustion, or scope rejection returns the
 original deterministic `no_match` response. Live answers never write to R2.
 
 ## Optional Exa primary / Tavily fallback search
+
+Exa is the default retrieval provider. Tavily is disabled by default; it only
+participates as a backup after an explicit `TAVILY_WEB_ENABLED=true` setting.
+With Tavily disabled, Exa failure continues through the existing fixed-source,
+DeepSeek and deterministic fallback paths.
 
 Both services retrieve evidence; the existing composer and verifier decide
 whether it supports an answer. Neither is called when a local audited hint or
@@ -161,7 +166,10 @@ local checkout was not used for deployment.
 - End-to-end Lucario cultivation query returned a medium-confidence answer
   with `sourceKinds=[exa]` and two citations in 12.9 seconds. A broader starter
   recommendation returned `no_match` in 8.3 seconds when support was insufficient.
-- Clean candidate `17f7ddc9-5ea5-4fe3-9957-6d9257ef5d3c` is at 0% traffic.
+- Initial candidate `17f7ddc9-5ea5-4fe3-9957-6d9257ef5d3c` verified Exa/Tavily
+  failover. The current candidate disables Tavily by default at the user's request;
+  candidate `337a442a-3a13-49c0-bdbb-80c54f7666fe` is at 0% traffic and
+  health reports only Exa and DeepSeek as enabled search routes.
   Production `0ab85fe8-9d78-4c0b-a925-24377f5c6f1c` remains at 100%.
 
 Successful retrieval does not establish that every generated answer is correct;

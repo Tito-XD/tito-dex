@@ -51,9 +51,8 @@
     "AI_GATEWAY_ID": "titodex-journey-assistant",
     "AI_SEARCH_ENABLED": "true",
     "CURATED_WEB_ENABLED": "true",
-    // The production secret is installed in Worker Secrets Store. Failures
-    // remain optional and fall through to the deterministic answer.
-    "TAVILY_WEB_ENABLED": "true",
+    // Tavily is opt-in only. A stored secret does not enable retrieval.
+    "TAVILY_WEB_ENABLED": "false",
     // Exa secret and live retrieval verified. Exa is primary; Tavily is backup.
     // This candidate remains at zero production traffic pending rollout.
     "EXA_WEB_ENABLED": "true",
