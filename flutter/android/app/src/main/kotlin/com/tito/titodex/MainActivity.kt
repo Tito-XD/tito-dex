@@ -27,7 +27,6 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         journeyAssistantExtensionHost = JourneyAssistantExtensionHost(this).also {
             it.configure(flutterEngine)
-            it.handleIntent(intent)
         }
         pendingShortcutRoute = shortcutRouteFrom(intent)
         appShortcutChannel = MethodChannel(
@@ -135,7 +134,6 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (journeyAssistantExtensionHost.handleIntent(intent)) return
         val route = shortcutRouteFrom(intent) ?: return
         pendingShortcutRoute = null
         appShortcutChannel?.invokeMethod("shortcutOpened", route)

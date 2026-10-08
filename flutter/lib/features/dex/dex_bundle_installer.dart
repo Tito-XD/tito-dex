@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:zstandard/zstandard.dart';
 
 import 'dex_cache_store.dart';
+import 'dex_archive_install.dart';
 import 'dex_cdn_config.dart';
 import 'dex_models.dart';
 import '../../config/app_config.dart';
@@ -129,68 +129,44 @@ class DexBundleInstaller {
       label: 'zstd',
     );
 
-    await _store.clearAll();
-    final paths = await _resolvePaths();
+    yield _progress(phase: '${progressPrefix}_extract', current: 0, total: 1);
+    var pokemonTotal = bundleManifest.pokemonCount ?? titodexMaxNationalDexId;
+    final root = Directory(await _store.rootPath());
+    await installDexTar(
+      tarBytes,
+      root,
+      prepare: (staging) async {
+        final stagedStore = DexCacheStore(paths: DexCachePaths(staging));
+        // Old CDN bundles predate dex_catalog.json.  Build it here, while the
+        // Settings download panel is already active, so first Dex/filter use is
+        // still a memory-only operation.
+        if (!await stagedStore.hasCatalog()) {
+          await stagedStore.rebuildCatalogFromLegacyBundle();
+        }
 
-    final archive = TarDecoder().decodeBytes(tarBytes);
-    final files = archive.where((entry) => entry.isFile).toList();
-    final fileCount = files.length;
-
-    for (var i = 0; i < files.length; i++) {
-      final entry = files[i];
-      final outFile = File('${paths.root.path}/${entry.name}');
-      await outFile.parent.create(recursive: true);
-      await outFile.writeAsBytes(entry.content as List<int>);
-      final shouldReport = i == 0 || i + 1 == fileCount || (i + 1) % 50 == 0;
-      if (shouldReport) {
-        yield _progress(
-          phase: '${progressPrefix}_extract',
-          current: i + 1,
-          total: fileCount,
-          label: entry.name,
+        final cacheManifest = await stagedStore.readManifest();
+        final sizeBytes = await stagedStore.directorySizeBytes();
+        final summaries = await stagedStore.readSummaries();
+        final moves = await stagedStore.readMoves();
+        pokemonTotal = summaries.isNotEmpty
+            ? summaries.length
+            : (bundleManifest.pokemonCount ?? titodexMaxNationalDexId);
+        await stagedStore.writeManifest(
+          DexCacheManifest(
+            version: bundleManifest.bundleVersion,
+            complete: true,
+            preferOffline: true,
+            downloadedAt: DateTime.now().toIso8601String(),
+            pokemonCount: pokemonTotal,
+            moveCount: moves.length,
+            sizeBytes: sizeBytes,
+            l10nVersion:
+                bundleManifest.l10nVersion ?? cacheManifest.l10nVersion,
+            configVersion:
+                bundleManifest.configVersion ?? cacheManifest.configVersion,
+          ),
         );
-      }
-    }
-
-    // Old CDN bundles predate dex_catalog.json.  Build it here, while the
-    // Settings download panel is already active, so first Dex/filter use is
-    // still a memory-only operation.
-    if (!await _store.hasCatalog()) {
-      yield _progress(
-        phase: '${progressPrefix}_index',
-        current: 0,
-        total: 1,
-        label: null,
-      );
-      await _store.rebuildCatalogFromLegacyBundle();
-      yield _progress(
-        phase: '${progressPrefix}_index',
-        current: 1,
-        total: 1,
-        label: null,
-      );
-    }
-
-    final cacheManifest = await _store.readManifest();
-    final sizeBytes = await _store.directorySizeBytes();
-    final summaries = await _store.readSummaries();
-    final moves = await _store.readMoves();
-    final pokemonTotal = summaries.isNotEmpty
-        ? summaries.length
-        : (bundleManifest.pokemonCount ?? titodexMaxNationalDexId);
-    await _store.writeManifest(
-      DexCacheManifest(
-        version: bundleManifest.bundleVersion,
-        complete: true,
-        preferOffline: true,
-        downloadedAt: DateTime.now().toIso8601String(),
-        pokemonCount: pokemonTotal,
-        moveCount: moves.length,
-        sizeBytes: sizeBytes,
-        l10nVersion: bundleManifest.l10nVersion ?? cacheManifest.l10nVersion,
-        configVersion:
-            bundleManifest.configVersion ?? cacheManifest.configVersion,
-      ),
+      },
     );
 
     await ZhCatalog.instance.reload();
@@ -212,12 +188,6 @@ class DexBundleInstaller {
       debugPrint('$stackTrace');
       return null;
     }
-  }
-
-  Future<DexCachePaths> _resolvePaths() async {
-    final paths = await DexCachePaths.resolve();
-    await paths.ensureLayout();
-    return paths;
   }
 
   DexCacheProgress _progress({

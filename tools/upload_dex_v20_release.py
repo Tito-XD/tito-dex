@@ -622,36 +622,19 @@ def upload_root_manifest(
     }
 
 
+ROLLBACK_DISABLED = (
+    "v19 rollback is disabled: no reviewed canonical manifest identity and "
+    "trusted producer provenance are pinned; caller-supplied artifacts cannot be published"
+)
+
+
 def restore_v19(*, release: Path, backend: Backend) -> dict[str, Any]:
-    rollback = release / "rollback" / "bundle-manifest-v19.json"
-    payload = read_json(rollback)
-    require(payload.get("bundleVersion") == BASE_VERSION, "rollback manifest is not v19")
-    require(payload.get("cdnPrefix") == CDN_PREFIX, "rollback manifest prefix is not v5")
-    _safe_put(backend, "bundle-manifest.json", rollback, "application/json")
-    with tempfile.TemporaryDirectory() as raw:
-        readback = Path(raw) / "bundle-manifest.json"
-        _safe_get(backend, "bundle-manifest.json", readback)
-        require(sha256_file(readback) == sha256_file(rollback), "rollback manifest readback mismatch")
-    return {
-        "bundleVersion": BASE_VERSION,
-        "rootManifestSha256": sha256_file(rollback),
-        "v4Touched": False,
-    }
+    raise ValueError(ROLLBACK_DISABLED)
 
 
 def dry_run(release: Path, phase: str, sample_size: int) -> dict[str, Any]:
     if phase == "rollback":
-        rollback = read_json(release / "rollback" / "bundle-manifest-v19.json")
-        require(rollback.get("bundleVersion") == BASE_VERSION, "rollback manifest is not v19")
-        require(rollback.get("cdnPrefix") == CDN_PREFIX, "rollback manifest prefix is not v5")
-        return {
-            "dryRun": True,
-            "phase": phase,
-            "objects": 0,
-            "readbackSample": 0,
-            "manifestLast": True,
-            "v4Touched": False,
-        }
+        raise ValueError(ROLLBACK_DISABLED)
     plan, objects = _plan_objects(release)
     if phase == "manifest":
         manifest = read_json(release / "manifest" / "bundle-manifest.json")
@@ -679,6 +662,8 @@ def main() -> int:
     parser.add_argument("--wrangler-dir", type=Path, default=DEFAULT_WRANGLER_DIR)
     args = parser.parse_args()
 
+    # Reject before backend construction can read production credentials.
+    require(args.phase != "rollback", ROLLBACK_DISABLED)
     require(args.release.is_dir(), "prepared v20 release directory is missing")
     if not args.execute:
         result = dry_run(args.release, args.phase, args.readback_sample)

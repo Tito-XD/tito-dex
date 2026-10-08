@@ -92,9 +92,7 @@ Only needed when 52poke actually updates `location_areas.json`. R2 upload does n
 | --- | --- | --- |
 | `sync-l10n-catalog.yml` | Worker cron（周日）、`repository_dispatch`、手动 | `v5/l10n/zh/*`, maps, config |
 | `build-pokeapi-assets.yml` | `repository_dispatch`、手动 | PokeAPI sprites / artwork / animated → R2 |
-| `upload-dex-bundle.yml` | 手动、历史复现 | 已完成的 v19 专用流程：以线上 v18 为只读基线；生产已为 v19，**不得再次用于发布** |
 | `release-dex-bundle-v20.yml` | 手动、默认 dry-run | 精确绑定 v19 基线，三重验证 v20；objects 与根 manifest 分开批准 |
-| `rollback-dex-bundle-v20.yml` | 手动、默认关闭 | 从指定 release run 的 artifact 只恢复已批准 v19 根 manifest |
 
 已完成使命的一次性发布 workflow 已从工作树移除，避免被误当成当前发布入口；
 对应提交、构建脚本与演进过程仍可从 Git 历史和 `tools/` 追溯。v20 只允许使用上表的

@@ -64,33 +64,6 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
         }
     }
 
-    fun handleIntent(intent: Intent?): Boolean {
-        if (intent?.action != INSTALL_STATUS_ACTION) return false
-        val status = intent.getIntExtra(
-            PackageInstaller.EXTRA_STATUS,
-            PackageInstaller.STATUS_FAILURE,
-        )
-        if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
-            val confirmation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(Intent.EXTRA_INTENT, Intent::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableExtra(Intent.EXTRA_INTENT) as? Intent
-            }
-            confirmation?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (confirmation != null) activity.startActivity(confirmation)
-            return true
-        }
-        channel?.invokeMethod(
-            "statusChanged",
-            mapOf(
-                "status" to status,
-                "message" to intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE),
-            ),
-        )
-        return true
-    }
-
     fun notifyStatusChanged(reason: String) {
         channel?.invokeMethod(
             "statusChanged",
@@ -322,30 +295,37 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
             setSize(canonicalApk.length())
         }
         val sessionId = installer.createSession(params)
-        installer.openSession(sessionId).use { session ->
-            canonicalApk.inputStream().use { input ->
-                session.openWrite("base.apk", 0, canonicalApk.length()).use { output ->
-                    input.copyTo(output)
-                    session.fsync(output)
+        try {
+            installer.openSession(sessionId).use { session ->
+                canonicalApk.inputStream().use { input ->
+                    session.openWrite("base.apk", 0, canonicalApk.length()).use { output ->
+                        input.copyTo(output)
+                        session.fsync(output)
+                    }
                 }
-            }
-            val statusIntent = Intent(activity, MainActivity::class.java).apply {
-                action = INSTALL_STATUS_ACTION
-                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
-            val flags = PendingIntent.FLAG_UPDATE_CURRENT or
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    PendingIntent.FLAG_MUTABLE
-                } else {
-                    0
+                val token = ExtensionInstallStatusActivity.register(activity, sessionId)
+                val statusIntent = Intent(activity, ExtensionInstallStatusActivity::class.java).apply {
+                    action = ExtensionInstallStatusActivity.ACTION
+                    data = Uri.parse("titodex-install://callback/$sessionId/$token")
                 }
-            val sender = PendingIntent.getActivity(
-                activity,
-                INSTALL_REQUEST_CODE,
-                statusIntent,
-                flags,
-            ).intentSender
-            session.commit(sender)
+                val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        PendingIntent.FLAG_MUTABLE
+                    } else {
+                        0
+                    }
+                val sender = PendingIntent.getActivity(
+                    activity,
+                    sessionId,
+                    statusIntent,
+                    flags,
+                ).intentSender
+                session.commit(sender)
+            }
+        } catch (error: Exception) {
+            ExtensionInstallStatusActivity.clear(activity, sessionId)
+            installer.abandonSession(sessionId)
+            throw error
         }
         return "started"
     }
@@ -456,9 +436,6 @@ class JourneyAssistantExtensionHost(private val activity: Activity) {
             "com.tito.titodex.extension.journeyassistant.provider"
         const val EXTENSION_READ_PERMISSION =
             "com.tito.titodex.permission.READ_EXTENSION_PACK"
-        const val INSTALL_STATUS_ACTION =
-            "com.tito.titodex.JOURNEY_ASSISTANT_INSTALL_STATUS"
-        const val INSTALL_REQUEST_CODE = 47023
         const val MAX_MANIFEST_BYTES = 256L * 1024L
         const val MAX_PACK_FILE_BYTES = 8L * 1024L * 1024L
     }

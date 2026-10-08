@@ -41,6 +41,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ExtensionInstallStatusActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/UCropTheme"

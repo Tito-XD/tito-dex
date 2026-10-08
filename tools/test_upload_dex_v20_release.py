@@ -406,25 +406,31 @@ class UploadDexV20ReleaseTests(unittest.TestCase):
                     release=release, receipt=receipt, backend=MemoryBackend()
                 )
 
-    def test_rollback_only_restores_root_and_never_touches_v4(self) -> None:
+    def test_rollback_rejects_caller_authored_manifests_without_writes(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             release = make_release(Path(raw))
-            backend = MemoryBackend()
-            result = upload.restore_v19(release=release, backend=backend)
-            self.assertEqual(result["bundleVersion"], 19)
-            self.assertFalse(result["v4Touched"])
-            self.assertEqual(set(backend.objects), {"bundle-manifest.json"})
-
-    def test_rollback_dry_run_accepts_the_separate_rollback_artifact(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            release = Path(raw) / "release"
-            write_json(
-                release / "rollback/bundle-manifest-v19.json",
+            for manifest in (
                 {"bundleVersion": 19, "cdnPrefix": "v5"},
-            )
-            result = upload.dry_run(release, "rollback", 32)
-            self.assertTrue(result["dryRun"])
-            self.assertEqual(result["objects"], 0)
+                {"bundleVersion": 19, "cdnPrefix": "v5", "archiveUrl": "https://attacker.invalid/archive", "archiveSha256": "a" * 64, "complete": True},
+            ):
+                write_json(release / "rollback/bundle-manifest-v19.json", manifest)
+                backend = MemoryBackend()
+                with self.assertRaisesRegex(ValueError, "v19 rollback is disabled"):
+                    upload.restore_v19(release=release, backend=backend)
+                self.assertEqual(backend.put_keys, [])
+                with self.assertRaisesRegex(ValueError, "v19 rollback is disabled"):
+                    upload.dry_run(release, "rollback", 32)
+
+    def test_rollback_cli_rejects_before_loading_credentials(self) -> None:
+        for flags in ([], ["--execute", "--restore-v19"]):
+            with patch("sys.argv", ["upload", "/nonexistent", "--phase", "rollback", *flags]), patch.object(upload, "build_backend") as backend:
+                with self.assertRaisesRegex(ValueError, "v19 rollback is disabled"):
+                    upload.main()
+                backend.assert_not_called()
+
+    def test_rollback_workflow_has_no_dispatch_entrypoint(self) -> None:
+        workflow = Path(__file__).resolve().parents[1] / ".github/workflows/rollback-dex-bundle-v20.yml"
+        self.assertFalse(workflow.exists())
 
 
 if __name__ == "__main__":

@@ -173,10 +173,13 @@ python3 tools/verify_dex_upload_tree.py dist/dex-v14-prerelease/upload
 
 ## 两阶段发布与回滚
 
-`.github/workflows/upload-dex-bundle.yml` 是已经完成使命的 v19 专用 workflow：它要求
-线上 bundleVersion 仍为 v18，从已验证的 v18 archive 恢复只读基座，只 stage 变化
-对象，最后切换根 manifest。生产现已为 v20，因此不得再次使用该 workflow 发布；
-未来 v21 需复制版本专用安全结构并把输入、路径、测试和精确生产前置版本一起升级。
+历史 v19 专用 workflow `.github/workflows/upload-dex-bundle.yml` 已移除，防止
+调用者修改预期生产版本后，用旧构建器覆盖线上 v20。历史复现应从 Git 历史
+取得构建步骤并在本地生成候选包，不应恢复带生产凭据的发布入口。
+旧 `rollback-dex-bundle-v20.yml` 也已移除，上传工具在读取生产凭据前拒绝
+回滚命令；恢复此能力需先固定可信生产者及已审核清单身份。
+当前发布只使用 `release-dex-bundle-v20.yml` 的版本专用受保护流程；
+未来 v21 需升级输入、路径、测试和精确基线摘要。
 更早的一次性 workflow 已从工作树移除，可从 Git 历史追溯；本地底层工具
 `tools/publish_dex_bundle_incremental.py` 仍须遵守相同前置检查。
 v19 当时使用的底层两阶段命令（历史复现）：

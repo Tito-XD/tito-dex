@@ -17,14 +17,15 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
       - name: Install Python deps
-        run: pip install beautifulsoup4 -r tools/dex_bundle_requirements.txt
+        run: >-
+          pip install --require-hashes --only-binary=:all: -r tools/dex_bundle_requirements.lock
 
       - name: Fetch 52poke location labels (incremental)
         env:
@@ -68,7 +69,7 @@ jobs:
           --remote-manifest dist/l10n-source/bundle-manifest.json
           --expected-bundle-version 20
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: "22"
 

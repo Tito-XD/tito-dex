@@ -215,14 +215,18 @@ media/companion-position sub-routes.
 
 Bundle v19 was built with `tools/patch_dex_bundle_v19_items.py`,
 `tools/audit_item_media_v19.py`, `tools/verify_dex_v19_items.py`, and the
-version-specific `.github/workflows/upload-dex-bundle.yml`. That workflow
-requires live v18 as its base and must not be used to republish now that live
-production is v20. The v20 path
+version-specific `.github/workflows/upload-dex-bundle.yml`. The historical
+v19 workflow has been removed to prevent caller-selected base versions from
+reopening a production downgrade path. Reproduce historical builds locally
+using Git history; do not restore its credentialed publisher. The v20 path
 `.github/workflows/release-dex-bundle-v20.yml` published the current bundle: it
 bound the approved live v19 manifest/archive/staging to a frozen candidate,
 fully read back every versioned `/v5/` object, then switched and publicly
-verified the root manifest in a separate protected phase. Its rollback workflow
-restores only the saved v19 root manifest and never deletes objects or touches `/v4/`.
+verified the root manifest in a separate protected phase. The legacy v19 rollback
+workflow has been removed and the uploader rejects
+rollback before loading production credentials. Re-enabling rollback requires a
+reviewed canonical manifest identity and trusted producer provenance; a caller
+selected run and digest are insufficient. Existing objects and `/v4/` remain intact.
 
 - Config: `flutter/lib/features/dex/dex_cdn_config.dart` (compile-time `TITODEX_DEX_*` env).
 - **Do not** paste production CDN URLs in public README / release notes.

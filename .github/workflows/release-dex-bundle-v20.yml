@@ -26,6 +26,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+      - name: Download only hash-locked Python wheels
+        run: >-
+          python -m pip download --require-hashes --only-binary=:all: -r tools/dex_bundle_requirements.lock -d dist/release-runtime/wheels
+      - name: Prepare repository-locked Wrangler without install scripts
+        working-directory: cloudflare/dex-cdn
+        run: |
+          npm ci --ignore-scripts
+          tar -czf ../../dist/release-runtime/wrangler-runtime.tar.gz node_modules
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dex-release-runtime
+          path: dist/release-runtime
+          if-no-files-found: error
+          retention-days: 14
+
   build-and-verify:
     runs-on: ubuntu-latest
     timeout-minutes: 150
@@ -50,17 +76,18 @@ jobs:
           fi
 
       - name: Check out selected release ref
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: tools/dex_bundle_requirements.txt
+          cache-dependency-path: tools/dex_bundle_requirements.lock
 
       - name: Install data-build dependencies
-        run: pip install -r tools/dex_bundle_requirements.txt
+        run: >-
+          pip install --require-hashes --only-binary=:all: -r tools/dex_bundle_requirements.lock
 
       - name: Run v20 release-gate unit tests
         run: |
@@ -105,14 +132,18 @@ jobs:
           --expected-archive-sha256 "$V20_EXPECTED_ARCHIVE_SHA256"
           --expected-root-manifest-sha256 "$V20_EXPECTED_ROOT_MANIFEST_SHA256"
 
-      - name: Prove every remote phase remains dry-run by default
+      - name: Prove publication is dry-run and legacy rollback is disabled
         run: |
           python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase objects
           python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase manifest
-          python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase rollback
+          if python3 tools/upload_dex_v20_release.py dist/dex-v20-release --phase rollback > rollback-rejection.log 2>&1; then
+            echo "Legacy rollback unexpectedly succeeded" >&2
+            exit 1
+          fi
+          grep -q "v19 rollback is disabled" rollback-rejection.log
 
       - name: Store verified v20 release candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: titodex-dex-v20-release-candidate
           path: dist/dex-v20-release
@@ -120,7 +151,7 @@ jobs:
           retention-days: 14
 
       - name: Store the exact v19 rollback manifest separately
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: titodex-root-manifest-v19-rollback
           path: dist/dex-v20-release/rollback/bundle-manifest-v19.json
@@ -129,35 +160,39 @@ jobs:
 
   upload-v5-objects:
     if: inputs.upload_objects
-    needs: build-and-verify
+    needs: [build-and-verify, prepare-runtime]
     runs-on: ubuntu-latest
     timeout-minutes: 180
     environment: dex-production
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: titodex-dex-v20-release-candidate
           path: dist/dex-v20-release
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: tools/dex_bundle_requirements.txt
+          cache-dependency-path: tools/dex_bundle_requirements.lock
 
-      - run: pip install -r tools/dex_bundle_requirements.txt
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: dex-release-runtime
+          path: dist/release-runtime
+      - name: Install verified Python wheels without network access
+        run: >-
+          python -m pip install --no-index --find-links dist/release-runtime/wheels --require-hashes --only-binary=:all: -r tools/dex_bundle_requirements.lock
+      - name: Restore prepared Wrangler without running npm
+        run: tar -xzf dist/release-runtime/wrangler-runtime.tar.gz -C cloudflare/dex-cdn
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: cloudflare/dex-cdn/package-lock.json
-
-      - name: Install the repository-locked Wrangler runtime
-        working-directory: cloudflare/dex-cdn
-        run: npm ci
 
       - name: Resume v5 objects within Cloudflare API limits
         env:
@@ -172,7 +207,7 @@ jobs:
           --readback-sample 64
           --receipt dist/dex-v20-upload-receipt.json
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: titodex-dex-v20-object-receipt
           path: dist/dex-v20-upload-receipt.json
@@ -182,6 +217,7 @@ jobs:
   publish-root-manifest:
     if: inputs.publish_manifest && inputs.upload_objects
     needs:
+      - prepare-runtime
       - build-and-verify
       - upload-v5-objects
     runs-on: ubuntu-latest
@@ -190,25 +226,33 @@ jobs:
     env:
       TITODEX_DEX_CDN_BASE: ${{ secrets.TITODEX_DEX_CDN_BASE }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: titodex-dex-v20-release-candidate
           path: dist/dex-v20-release
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: titodex-dex-v20-object-receipt
           path: dist
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: tools/dex_bundle_requirements.txt
+          cache-dependency-path: tools/dex_bundle_requirements.lock
 
-      - run: pip install -r tools/dex_bundle_requirements.txt
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: dex-release-runtime
+          path: dist/release-runtime
+      - name: Install verified Python wheels without network access
+        run: >-
+          python -m pip install --no-index --find-links dist/release-runtime/wheels --require-hashes --only-binary=:all: -r tools/dex_bundle_requirements.lock
+      - name: Restore prepared Wrangler without running npm
+        run: tar -xzf dist/release-runtime/wrangler-runtime.tar.gz -C cloudflare/dex-cdn
 
       - name: Reconfirm exact v19 production root immediately before cutover
         env:

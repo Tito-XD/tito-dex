@@ -1,7 +1,8 @@
-requests>=2.32.0
-Pillow>=11.0.0
-zstandard>=0.23.0
-opencc-python-reimplemented>=0.1.7
-boto3>=1.40.0
-beautifulsoup4>=4.13.0
-lxml>=5.3.0
+# Local cross-platform inputs. CI uses the complete Linux/Python 3.12 hash lock.
+requests==2.34.2
+Pillow==12.3.0
+zstandard==0.25.0
+opencc-python-reimplemented==0.1.7
+boto3==1.43.109
+beautifulsoup4==4.15.0
+lxml==6.1.3
