@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   verify:
@@ -13,6 +14,43 @@ jobs:
     environment: android-release
     timeout-minutes: 5
     steps:
+      - name: Verify actual source and environment API gate
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const repo = context.repo;
+            if (context.eventName !== 'workflow_dispatch' || context.ref !== 'refs/heads/main') {
+              throw new Error('Release workflows must be dispatched on main');
+            }
+            const branch = (await github.rest.repos.getBranch({...repo, branch: 'main'})).data;
+            if (!branch.protected || branch.commit.sha !== context.sha) {
+              throw new Error('Release source must be the exact protected main tip');
+            }
+            const runs = (await github.rest.actions.listWorkflowRuns({
+              ...repo, workflow_id: 'commit-attribution.yml', head_sha: context.sha,
+              status: 'success', per_page: 100
+            })).data.workflow_runs;
+            if (!runs.some(run => run.head_sha === context.sha && run.event === 'push' &&
+                run.head_repository.full_name === `${repo.owner}/${repo.repo}`)) {
+              throw new Error('Exact source has no successful push Commit attribution run');
+            }
+            // Fail closed: merely naming an environment would auto-create an unprotected one.
+            const environment = (await github.rest.repos.getEnvironment({
+              ...repo, environment_name: 'android-release'
+            })).data;
+            const reviewers = environment.protection_rules.find(rule => rule.type === 'required_reviewers');
+            if (!reviewers || !reviewers.reviewers?.length ||
+                environment.can_admins_bypass !== false ||
+                !environment.deployment_branch_policy?.custom_branch_policies) {
+              throw new Error('android-release must require review, forbid bypass, and restrict branches');
+            }
+            const policies = await github.paginate(github.rest.repos.listDeploymentBranchPolicies, {
+              ...repo, environment_name: 'android-release', per_page: 100
+            });
+            if (policies.length !== 1 || policies[0].name !== 'main' || policies[0].type !== 'branch') {
+              throw new Error('android-release must allow only the main branch (no tags)');
+            }
+            core.setOutput('source_sha', context.sha);
       # No checkout or build code. Verify the migrated key with JDK tools only.
       - name: Verify migrated private key and certificate identity
         env:
